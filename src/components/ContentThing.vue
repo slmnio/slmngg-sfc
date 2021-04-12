@@ -3,7 +3,7 @@
         <span
             class="icon-internal bg-center icon-internal-left"
             :style="logo"
-            v-if="showLogo && logo && !logoRight"></span>
+            v-if="showLogo && logo && !logoRight && theme"></span>
 
         <span class="name">{{ text || thing.name }}</span>
 
@@ -12,7 +12,7 @@
         <span
             class="icon-internal bg-center icon-internal-right"
             :style="logo"
-            v-if="showLogo && logo && logoRight"></span></router-link>
+            v-if="showLogo && logo && logoRight && theme"></span></router-link>
 </template>
 
 <script>
@@ -27,6 +27,7 @@ export default {
     computed: {
         logo () { return { backgroundImage: image(this.theme, "default_logo") }; },
         bgStyle () {
+            if (!this.theme) return {};
             return {
                 backgroundColor: this.theme.color_logo_background || this.theme.color_theme,
                 borderColor: this.theme.color_logo_accent || this.theme.color_accent,
@@ -45,7 +46,15 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+
+        /* default colouring */
+        background-color: rgba(255,255,255,0.1);
+        border-color: rgba(255,255,255,0.2);
+        color: rgba(255,255,255,0.5);
+
+        transition: background-color .2s, border-color .2s, color .2s;
     }
+
     .icon-internal {
         height: 1.5em;
         width: 1.5em;

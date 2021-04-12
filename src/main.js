@@ -3,10 +3,11 @@ import App from "./App.vue";
 import router from "./router";
 import store from "@/thing-store";
 import Vuex from "vuex";
-
 import VueSocketIO from "vue-socket.io";
-Vue.use(Vuex);
+import VueMeta from "vue-meta";
 
+Vue.use(Vuex);
+Vue.use(VueMeta);
 Vue.use(new VueSocketIO({
     debug: true,
     connection: "http://localhost:8901"

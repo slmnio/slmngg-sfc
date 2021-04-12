@@ -14,7 +14,8 @@
                 </div>
 
 
-                <div class="thing-lower" v-if="thing.event">from
+                <div class="thing-lower" v-if="thing.event">
+                    <span>{{ thing.type_description || 'from'}} </span>
                     <router-link :to="`/event/${thing.event.id}`">{{ thing.event.name }}</router-link>
                 </div>
 
@@ -33,7 +34,7 @@ export default {
         ThemeLogo
     },
     created () {
-        console.log(this.thing, this.type);
+        // console.log(this.thing, this.type);
     }
 };
 </script>

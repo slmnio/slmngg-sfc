@@ -13,7 +13,10 @@ export default {
     methods: {
     },
     computed: {
-        logo () { return { backgroundImage: image(this.theme, "default_logo") }; },
+        logo () {
+            if (!this.theme) return {};
+            return { backgroundImage: image(this.theme, "default_logo") };
+        },
         bgStyle () {
             if (!this.theme) return { };
             return {

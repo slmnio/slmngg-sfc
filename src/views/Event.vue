@@ -29,10 +29,10 @@ export default {
     methods: {
         async fetchData () {
             const event = await fetchThing(this.$route.params.eventId);
-            event.theme = await fetchThing(event.theme[0]);
+            if (event.theme) event.theme = await fetchThing(event.theme[0]);
             event.teams = await fetchThings(event.teams);
             event.teams.forEach(async team => {
-                team.theme = await fetchThing(team.theme[0]);
+                if (team.theme) team.theme = await fetchThing(team.theme[0]);
             });
             this.event = event;
             // this.event = event;

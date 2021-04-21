@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import Team from "@/views/Team";
 import Event from "@/views/Event";
+import Player from "@/views/Player";
 Vue.use(VueRouter);
 
 const routes = [
@@ -12,14 +13,22 @@ const routes = [
         component: Home
     },
     {
-        path: "/team/:teamId",
+        path: "/team/:id",
         name: "Team",
-        component: Team
+        component: Team,
+        props: route => ({ id: route.params.id })
     },
     {
-        path: "/event/:eventId",
+        path: "/event/:id",
         name: "Event",
-        component: Event
+        component: Event,
+        props: route => ({ id: route.params.id })
+    },
+    {
+        path: "/player/:id",
+        name: "Player",
+        component: Player,
+        props: route => ({ id: route.params.id })
     },
     {
         path: "/about",

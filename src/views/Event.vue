@@ -19,6 +19,7 @@ import ContentRow from "@/components/ContentRow";
 
 export default {
     name: "Event",
+    props: ["id"],
     components: {
         ThingTop, ContentThing, ContentRow
     },
@@ -28,7 +29,7 @@ export default {
     }),
     methods: {
         async fetchData () {
-            const event = await fetchThing(this.$route.params.eventId);
+            const event = await fetchThing(this.id);
             if (event.theme) event.theme = await fetchThing(event.theme[0]);
             event.teams = await fetchThings(event.teams);
             event.teams.forEach(async team => {

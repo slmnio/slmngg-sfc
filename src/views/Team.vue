@@ -34,6 +34,7 @@ import { cleanID } from "@/utils/content-utils";
 
 export default {
     name: "Team",
+    props: ["id"],
     components: {
         ThingTop, ContentRow, ContentThing
     },
@@ -62,7 +63,7 @@ export default {
         },
         team() {
             // use the
-            let data = this.storeCache(this.$route.params.teamId);
+            let data = this.storeCache(this.id);
             // console.log(">team computed", data);
             if (!data) return null;
 
@@ -118,13 +119,13 @@ export default {
         },
         async fetchData () {
             // get first load data
-            const team = await resolveThing(this.$route.params.teamId);
+            const team = await resolveThing(this.id);
             team.theme = await resolveThing(team.theme);
             team.captain = await resolveThing(team.captain);
             team.event = await resolveThing(team.event);
             team.players = await resolveThings(team.players);
             team.sister_teams = await resolveThings(team.sister_teams);
-            // this.team = this.storeCache(this.$route.params.teamId);
+            // this.team = this.storeCache(this.id);
             // console.log(">team", team);
             // team.theme = await resolveThing(team.theme);
             // team.event = await resolveThing(team.event);
@@ -136,6 +137,7 @@ export default {
     },
     async created () {
         console.log("first load");
+        console.log(this, this.$props);
         // get first load data
         await this.fetchData();
         // set up subscriptions

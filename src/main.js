@@ -3,25 +3,39 @@ import App from "./App.vue";
 import router from "./router";
 import store from "@/thing-store";
 import Vuex from "vuex";
-import VueSocketIO from "vue-socket.io";
 import VueMeta from "vue-meta";
+import VueSocketIOExt from "vue-socket.io-extended";
+import { io } from "socket.io-client";
 
 Vue.use(Vuex);
 Vue.use(VueMeta);
-Vue.use(new VueSocketIO({
-    debug: true,
-    connection: "http://localhost:8901"
-}));
+
+const socket = io("http://localhost:8901", { transports: ["websocket", "polling"] });
+
+Vue.use(VueSocketIOExt, socket, { store });
 
 Vue.config.productionTip = false;
 
-const app = new Vue({
+new Vue({
     router,
     render: h => h(App),
-    store
+    store,
+    sockets: {
+        connect() {
+            console.log("[socket]", "connected");
+        },
+        data_update(d) {
+            // handled by vuex
+            console.log("[socket]", "data_update", d);
+        }
+    },
+    metaInfo: {
+        title: "SLMN.GG",
+        titleTemplate: "%s | SLMN.GG"
+    }
 }).$mount("#app");
 
-app.sockets.subscribe("data-update", ([id, data]) => {
-    console.log("[thing]", "data-update", id, data);
-    store.commit("push", { id, data });
-});
+// app.sockets.subscribe("data_UPDATE", ([id, data]) => {
+//     console.log("[thing]", "data_UPDATE", id, data);
+//     store.commit("push", { id, data });
+// });

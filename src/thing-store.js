@@ -5,7 +5,8 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        things: []
+        things: [],
+        subscribed_ids: []
     },
     mutations: {
         push(_store, { id, data }) {
@@ -24,10 +25,31 @@ export default new Vuex.Store({
             }
 
             // this.state.things.set(id, data);
-            // TODO: setup socket.io handler here for "data-update"
+            // TODO: setup socket.io handler here for "data_UPDATE"
+        },
+        SOCKET_DATA_UPDATE(state, [id, data]) {
+            console.log("[store][data_UPDATE]", data);
+            this.commit("push", { id, data });
+        },
+        subscribe(state, id) {
+            if (state.subscribed_ids.includes(id)) return;
+            this._vm.$socket.client.emit("subscribe", id);
+            console.log("[socket]", "subscribed to", id);
+            state.subscribed_ids.push(id);
+        },
+        unsubscribe(state, id) {
+            if (!state.subscribed_ids.includes(id)) return;
+            this._vm.$socket.client.emit("unsubscribe", id);
+            console.log("[socket]", "unsubscribed from", id);
+            state.subscribed_ids.splice(this.state.subscribed_ids.indexOf(id), 1);
         }
     },
     getters: {
-        things: state => state.things
+        things: state => state.things,
+        thing: (state) => (id) => state.things.find(item => item.id === id)
+    },
+    actions: {
+        subscribe: (state, data) => state.commit("subscribe", data),
+        unsubscribe: (state, data) => state.commit("unsubscribe", data)
     }
 });

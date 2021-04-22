@@ -3,8 +3,8 @@
         <div class="match-thumbnail-half flex-center"
              v-for="team in match.teams" v-bind:key="team.id"
              :style="teamBackground(team)">
-            <div class="match-loading-code" v-if="isLoading">LOADING: {{ team.code }}</div>
-            <div class="match-thumbnail-logo bg-center" :style="logo(team)" v-if="!isLoading"></div>
+<!--            <div class="match-loading-code" v-if="isLoading">LOADING: {{ team.code }}</div>-->
+            <div class="match-thumbnail-logo bg-center" :style="logo(team)"></div>
         </div>
         <div class="match-thumbnail-insert">
             <div class="match-event-logo bg-center" :style="logo(match.event, 50)"></div>
@@ -20,14 +20,6 @@ export default {
     name: "MatchThumbnail",
     props: ["match"],
     computed: {
-        isLoading() {
-            console.log("[match-thumbnail] [loading]", { match: !!this.match, event: !!this.match.event, teams: !!this.match.teams, team_themes: this.match.teams.every(t => !!t.theme) });
-            if (!this.match) return true;
-            if (!this.match.event) return true;
-            if (!this.match.teams) return true;
-            if (this.match.teams.every(t => t.theme && !!t.theme.id)) return false;
-            return false;
-        },
         temporaryBackground() {
             if (!this.match || !this.match.event || !this.match.event.theme) return { backgroundColor: "#333" };
 
@@ -60,7 +52,7 @@ export default {
 
 <style scoped>
     .match-thumbnail {
-        height: 100%;
+        height: auto;
         display: flex;
         border-bottom: 8px solid transparent;
         position: relative;

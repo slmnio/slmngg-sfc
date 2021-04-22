@@ -8,6 +8,7 @@ import Player from "@/views/Player";
 import PlayerMain from "@/views/sub-views/PlayerMain";
 import PlayerCasts from "@/views/sub-views/PlayerCasts";
 import PlayerNews from "@/views/sub-views/PlayerNews";
+import PlayerMatches from "@/views/sub-views/PlayerMatches";
 
 Vue.use(VueRouter);
 
@@ -37,7 +38,8 @@ const routes = [
         children: [
             { path: "", component: PlayerMain },
             { path: "casts", component: PlayerCasts },
-            { path: "news", component: PlayerNews }
+            { path: "news", component: PlayerNews },
+            { path: "matches", component: PlayerMatches }
         ]
     },
     {

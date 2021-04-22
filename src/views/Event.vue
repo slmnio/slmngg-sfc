@@ -6,6 +6,9 @@
             <ContentRow title="Teams">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in event.teams" v-bind:key="team.id" :show-logo="true"></ContentThing>
             </ContentRow>
+            <ContentRow title="Staff">
+                <ContentThing :thing="staff" type="player" :theme="event.theme" v-for="staff in event.staff" v-bind:key="staff.id"></ContentThing>
+            </ContentRow>
         </div>
     </div>
 </template>
@@ -16,6 +19,7 @@ import { fetchThing, fetchThings } from "@/utils/fetch";
 import ThingTop from "@/components/ThingTop";
 import ContentThing from "@/components/ContentThing";
 import ContentRow from "@/components/ContentRow";
+import { ReactiveRoot, ReactiveThing, ReactiveArray } from "@/utils/reactive";
 
 export default {
     name: "Event",
@@ -23,24 +27,16 @@ export default {
     components: {
         ThingTop, ContentThing, ContentRow
     },
-    computed: {},
-    data: () => ({
-        event: null
-    }),
-    methods: {
-        async fetchData () {
-            const event = await fetchThing(this.id);
-            if (event.theme) event.theme = await fetchThing(event.theme[0]);
-            event.teams = await fetchThings(event.teams);
-            event.teams.forEach(async team => {
-                if (team.theme) team.theme = await fetchThing(team.theme[0]);
+    computed: {
+        event() {
+            return ReactiveRoot(this.id, {
+                theme: ReactiveThing("theme"),
+                teams: ReactiveArray("teams", {
+                    theme: ReactiveThing("theme")
+                }),
+                staff: ReactiveArray("staff")
             });
-            this.event = event;
-            // this.event = event;
         }
-    },
-    async created () {
-        await this.fetchData();
     }
 };
 

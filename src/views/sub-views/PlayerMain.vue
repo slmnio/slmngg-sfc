@@ -9,8 +9,8 @@
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in player.captain_of"
                               v-bind:key="team.id" :show-logo="true"></ContentThing>
             </ContentRow>
-            <ContentRow title="Player for" v-if="player.member_of">
-                <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in player.member_of"
+            <ContentRow title="Player for" v-if="teams">
+                <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teams"
                               v-bind:key="team.id" :show-logo="true"></ContentThing>
             </ContentRow>
             <ContentRow title="Event staff for" v-if="player.event_staff">
@@ -40,24 +40,14 @@ export default {
                 // team things
                 ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => e.accolades).filter(e => !!e)) : [])
             ];
-            // const accolades = [];
-            // if (this.player && this.player.member_of) {
-            //     console.log(this.player.member_of);
-            //     this.player.member_of.forEach(team => {
-            //         if (team.accolades) {
-            //             team.accolades.forEach(a => {
-            //                 accolades.push(a);
-            //             });
-            //         }
-            //     });
-            // }
 
             console.log("accolades", accolades);
             return accolades;
-            // return [];
-            // return [
-            //     ...this.player?.member_of?.accolades
-            // ];
+        },
+        teams() {
+            const filtered = this.player.member_of.filter(t => !t.minor_team);
+            if (filtered.length === 0) return null;
+            return filtered;
         }
     }
 };

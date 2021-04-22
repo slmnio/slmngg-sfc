@@ -9,7 +9,7 @@ export async function fetchThing (id) {
             id, data: { __loading: true }
         });
 
-        let data = await fetch(`http://localhost:8901/thing/${id}`).then(res => res.json());
+        let data = await fetch(`https://data.slmn.gg/thing/${id}`).then(res => res.json());
         const debug = true;
         if (data.error) {
             console.error(data.message);
@@ -32,7 +32,7 @@ export async function fetchThings (ids) {
     try {
         ids = ids.map(id => cleanID(id)).join(",");
 
-        return await fetch(`http://localhost:8901/things/${ids}`).then(res => res.json());
+        return await fetch(`https://data.slmn.gg/things/${ids}`).then(res => res.json());
     } catch (e) {
         console.error(e);
         return null;

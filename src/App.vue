@@ -9,7 +9,7 @@
                 <router-link to="/news" class="nav-link" active-class="active">News</router-link>
             </ul>
         </nav>
-        <router-view class="mt-3 slmngg-page"/>
+        <router-view class="my-3 slmngg-page"/>
     </div>
 </template>
 

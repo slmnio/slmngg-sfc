@@ -188,3 +188,9 @@ a.link-text {
     justify-content: center;
     align-items: center;
 }
+
+a.no-link-style {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}

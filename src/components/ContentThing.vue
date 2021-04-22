@@ -1,5 +1,5 @@
 <template>
-    <router-link :to="url(type, thing)" class="link content-thing" :style="bgStyle">
+    <router-link :to="url(type, linkTo || thing)" class="link content-thing" :style="bgStyle">
         <span
             class="icon-internal bg-center icon-internal-left"
             :style="logo"
@@ -9,6 +9,8 @@
 
         <i class="fas fa-badge-check fa-fw" title="REAL" v-if="thing.verified"></i>
 
+        <i class="fas fa-spinner fa-pulse" v-if="thing.__loading"></i>
+
         <span
             class="icon-internal bg-center icon-internal-right"
             :style="logo"
@@ -16,18 +18,18 @@
 </template>
 
 <script>
-import { image, url } from "@/utils/content-utils";
+import { resizedImage, url } from "@/utils/content-utils";
 
 export default {
     name: "ContentThing",
-    props: ["theme", "thing", "showLogo", "type", "text", "logoRight"],
+    props: ["theme", "thing", "showLogo", "type", "text", "logoRight", "linkTo"],
     methods: {
         url
     },
     computed: {
         logo () {
             if (!this.theme) return {};
-            return { backgroundImage: image(this.theme, "default_logo") };
+            return { backgroundImage: `url(${resizedImage(this.theme, "default_logo", 30)})` };
         },
         bgStyle () {
             if (!this.theme) return {};

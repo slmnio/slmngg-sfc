@@ -44,7 +44,7 @@ export default {
     }),
     metaInfo() {
         return {
-            title: "test title",
+            title: this.team.name,
             meta: [
                 { name: "description", content: "test description" },
                 { name: "og:description", content: "test description" },

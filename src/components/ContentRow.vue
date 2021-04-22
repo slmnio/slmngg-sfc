@@ -1,6 +1,6 @@
 <template>
     <div class="content-row d-flex">
-        <div class="content-title font-weight-bold">{{ title }}</div>
+        <div class="content-title font-weight-bold" v-if="title">{{ title }}</div>
         <div class="content-item-list">
             <slot></slot>
         </div>
@@ -17,11 +17,13 @@ export default {
 <style scoped>
 .content-row {
     font-size: 1.25em;
+    margin-bottom: 8px;
 }
 
 .content-title {
     padding: .25em .5em;
     margin: .25em .5em;
+    flex-shrink: 0;
 }
 
 .content-item-list {

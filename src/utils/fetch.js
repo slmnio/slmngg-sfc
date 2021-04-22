@@ -4,6 +4,11 @@ import { cleanID } from "@/utils/content-utils";
 export async function fetchThing (id) {
     try {
         id = cleanID(id);
+
+        store.commit("push", {
+            id, data: { __loading: true }
+        });
+
         let data = await fetch(`http://localhost:8901/thing/${id}`).then(res => res.json());
         const debug = true;
         if (data.error) {
@@ -53,11 +58,12 @@ export async function resolveThings(things) {
 
 export async function getThing(id) {
     id = cleanID(id);
+    // TODO: some sort of queue system so it doesn't try to XHR things that are currently pending
     const findIndex = store.state.things.findIndex(t => t.id === id);
     if (findIndex !== -1) {
         return store.state.things[findIndex];
     }
-    console.log("getting from api", id);
+    console.log("[socket]", "resolving thing", id);
     const d = await fetchThing(id);
     // console.log(d);
     return d;

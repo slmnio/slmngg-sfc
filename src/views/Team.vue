@@ -132,7 +132,7 @@ export default {
             // this.team = team;
         },
         sub(id) {
-            this.$socket.emit("subscribe", id);
+            this.$socket.client.emit("subscribe", id);
         }
     },
     async created () {

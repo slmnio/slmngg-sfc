@@ -16,6 +16,7 @@ export function image (theme, key) {
 export function cleanID (id) {
     // console.log(">id", id);
     if (!id) return null;
+    if (typeof id !== "string") return null;
     if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
     return id;
 }

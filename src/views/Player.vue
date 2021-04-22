@@ -8,7 +8,7 @@
                     <div class="player-name">{{ player.name }} <i class="fas fa-badge-check" v-if="player.verified"></i>
                     </div>
                 </div>
-                <div class="player-socials" v-if="player.socials" :style="{ marginLeft: player.overwatch_icon ? '84px' : '0px'}">
+                <div class="player-socials" v-if="player.socials" :style="{ marginLeft: player.overwatch_icon ? '84px' : '16px'}">
                     <Social :social="social" v-for="social in player.socials" v-bind:key="social.id"/>
                 </div>
             </div>

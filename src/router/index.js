@@ -4,35 +4,45 @@ import Home from "../views/Home.vue";
 import Team from "@/views/Team";
 import Event from "@/views/Event";
 import Player from "@/views/Player";
+
+import PlayerMain from "@/views/sub-views/PlayerMain";
+import PlayerCasts from "@/views/sub-views/PlayerCasts";
+import PlayerNews from "@/views/sub-views/PlayerNews";
+
 Vue.use(VueRouter);
 
 const routes = [
     {
         path: "/",
-        name: "Home",
+        // name: "Home",
         component: Home
     },
     {
         path: "/team/:id",
-        name: "Team",
+        // name: "Team",
         component: Team,
         props: route => ({ id: route.params.id })
     },
     {
         path: "/event/:id",
-        name: "Event",
+        // name: "Event",
         component: Event,
         props: route => ({ id: route.params.id })
     },
     {
         path: "/player/:id",
-        name: "Player",
+        // name: "Player",
         component: Player,
-        props: route => ({ id: route.params.id })
+        props: route => ({ id: route.params.id }),
+        children: [
+            { path: "", component: PlayerMain },
+            { path: "casts", component: PlayerCasts },
+            { path: "news", component: PlayerNews }
+        ]
     },
     {
         path: "/about",
-        name: "About",
+        // name: "About",
         // route level code-splitting
         // this generates a separate chunk (about.[hash].js) for this route
         // which is lazy-loaded when the route is visited.

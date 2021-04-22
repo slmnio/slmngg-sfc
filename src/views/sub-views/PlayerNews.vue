@@ -1,0 +1,35 @@
+<template>
+    <div class="div">
+        <div class="container">
+            <div class="row">
+                <News class="col-md-3 mb-3" v-for="item in news" :item="item" v-bind:key="item.id" />
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
+import News from "@/components/News";
+
+export default {
+    name: "PlayerNews",
+    props: ["player"],
+    components: {
+        News
+    },
+    computed: {
+        news() {
+            if (!this.player || !this.player.news) return [];
+            return ReactiveArray("news", {
+                event: ReactiveThing("event", { theme: ReactiveThing("theme") })
+            })(this.player)
+                .filter(news => news.enabled && (!news.hide_from_global_listing || !news.hide_from_local_listing));
+        }
+    }
+};
+</script>
+
+<style scoped>
+
+</style>

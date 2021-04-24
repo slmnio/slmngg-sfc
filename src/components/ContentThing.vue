@@ -9,7 +9,7 @@
 
         <i class="fas fa-badge-check fa-fw" title="REAL" v-if="thing.verified"></i>
 
-        <i class="fas fa-spinner fa-pulse" v-if="thing.__loading"></i>
+        <i class="fas fa-spinner fa-pulse fa-fw" v-if="loading"></i>
 
         <span
             class="icon-internal bg-center icon-internal-right"
@@ -27,6 +27,9 @@ export default {
         url
     },
     computed: {
+        loading() {
+            return this.thing.__loading || !this.thing || !this.thing.id;
+        },
         logo () {
             if (!this.theme) return {};
             return { backgroundImage: `url(${resizedImage(this.theme, "default_logo", 30)})` };
@@ -66,4 +69,7 @@ export default {
     }
     .icon-internal.icon-internal-left { margin-right: .3em }
     .icon-internal.icon-internal-right { margin-left: .3em }
+    .content-thing i {
+      margin: 5px 0;
+    }
 </style>

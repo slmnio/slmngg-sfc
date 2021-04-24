@@ -12,14 +12,14 @@ import { url } from "@/utils/content-utils";
 
 export default {
     name: "Match",
-    props: ["id"],
+    props: ["id", "hydratedMatch"],
     components: {
         MatchThumbnail
     },
     methods: { url },
     computed: {
         match() {
-            return ReactiveRoot(this.id, {
+            return ReactiveRoot(this.id || this.hydratedMatch.id, {
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")
                 }),

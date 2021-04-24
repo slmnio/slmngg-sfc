@@ -3,10 +3,10 @@
         <ThingTop :thing="event" type="event"></ThingTop>
 
         <div class="container mt-3">
-            <ContentRow title="Teams">
+            <ContentRow title="Teams" v-if="event.teams && event.teams.length">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in event.teams" v-bind:key="team.id" :show-logo="true"></ContentThing>
             </ContentRow>
-            <ContentRow title="Staff">
+            <ContentRow title="Staff" v-if="event.staff && event.staff.length">
                 <ContentThing :thing="staff" type="player" :theme="event.theme" v-for="staff in event.staff" v-bind:key="staff.id"></ContentThing>
             </ContentRow>
         </div>

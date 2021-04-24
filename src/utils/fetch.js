@@ -61,7 +61,19 @@ export async function fetchThings (ids) {
             id, data: { __loading: true }
         }));
 
-        return await fetch(`https://data.slmn.gg/things/${ids}`).then(res => res.json());
+        const data = await fetch(`http://localhost:8901/things/${ids.join(",")}`).then(res => res.json());
+
+        if (data.error) {
+            console.error(data.message);
+        }
+
+        data.forEach(item => {
+            store.commit("push", {
+                id: cleanID(item.id),
+                data: item
+            });
+        });
+        return data;
     } catch (e) {
         console.error(e);
         return null;

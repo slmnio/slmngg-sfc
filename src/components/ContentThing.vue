@@ -9,7 +9,7 @@
 
         <i class="fas fa-badge-check fa-fw" title="REAL" v-if="thing.verified"></i>
 
-        <i class="fas fa-spinner fa-pulse fa-fw" v-if="loading"></i>
+        <LoadingIcon v-if="loading"/>
 
         <span
             class="icon-internal bg-center icon-internal-right"
@@ -19,10 +19,12 @@
 
 <script>
 import { resizedImage, url } from "@/utils/content-utils";
+import LoadingIcon from "@/components/LoadingIcon";
 
 export default {
     name: "ContentThing",
     props: ["theme", "thing", "showLogo", "type", "text", "logoRight", "linkTo"],
+    components: { LoadingIcon },
     methods: {
         url
     },

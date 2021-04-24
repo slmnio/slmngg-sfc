@@ -6,6 +6,11 @@
 <!--            <div class="match-loading-code" v-if="isLoading">LOADING: {{ team.code }}</div>-->
             <div class="match-thumbnail-logo bg-center" :style="logo(team)"></div>
         </div>
+
+      <div class="match-thumbnail-loading-holder flex-center" v-if="isLoading">
+        <LoadingIcon />
+      </div>
+
       <div class="match-thumbnail-event-full w-100 flex-center" v-if="noTeams">
         <div class="match-thumbnail-logo bg-center" :style="logo(match.event)"></div>
       </div>
@@ -18,11 +23,22 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { resizedImage } from "@/utils/content-utils";
+import LoadingIcon from "@/components/LoadingIcon";
 
 export default {
     name: "MatchThumbnail",
     props: ["match"],
+    components: {
+        LoadingIcon
+    },
     computed: {
+        isLoading() {
+            if (this.noTeams) {
+                return (this.match.__loading || this.match.event.__loading || this.match.event.theme.__loading);
+            } else {
+                return (this.match.__loading || this.match.event.__loading || this.match.event.theme.__loading || this.match.teams[0].__loading || this.match.teams[0].theme.__loading);
+            }
+        },
         noTeams() {
             return this.match.teams ? this.match.teams.length === 0 : true;
         },
@@ -93,4 +109,11 @@ export default {
         height: 33%;
     }
 
+    .match-thumbnail-loading-holder {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      left: 0;
+      font-size: 2em;
+    }
 </style>

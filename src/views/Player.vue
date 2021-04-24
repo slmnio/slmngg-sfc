@@ -14,7 +14,7 @@
             </div>
         </div>
         <SubPageNav>
-            <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Main</router-link></li>
+            <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
             <li class="nav-item" v-if="player.casts"><router-link class="nav-link" :to="subLink('casts')">Casts</router-link></li>
             <li class="nav-item" v-if="player.news"><router-link class="nav-link" :to="subLink('news')">News</router-link></li>
             <li class="nav-item"> <!-- need to do something to hide this --> <router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>

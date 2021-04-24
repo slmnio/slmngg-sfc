@@ -16,7 +16,7 @@ Vue.use(VueSocketIOExt, socket, { store });
 
 Vue.config.productionTip = false;
 
-new Vue({
+const app = new Vue({
     router,
     render: h => h(App),
     store,
@@ -32,6 +32,10 @@ new Vue({
     metaInfo: {
         title: "SLMN.GG",
         titleTemplate: "%s | SLMN.GG"
+    },
+    data: () => ({ interval: null }),
+    mounted() {
+        setInterval(() => app.$store.commit("executeRequestBuffer"), 300);
     }
 }).$mount("#app");
 

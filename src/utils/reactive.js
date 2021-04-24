@@ -1,5 +1,5 @@
 import store from "../thing-store";
-import { resolveThing } from "@/utils/fetch";
+import { queueThings, resolveThing, resolveThings } from "@/utils/fetch";
 import { cleanID } from "@/utils/content-utils";
 
 export function ReactiveRoot (id, structure) {
@@ -64,11 +64,13 @@ export function ReactiveArray (key, structure) {
         let data = originalData[key];
         const newIDs = [];
 
+        const idsToResolve = [];
+
         data = data.map(id => {
             id = cleanID(id);
             if (!id) return {};
             const d = store.getters.thing(id);
-            if (!d) resolveThing(id);
+            if (!d) idsToResolve.push(id);
             newIDs.push(id);
             store.dispatch("subscribe", id);
             if (!d) return {};
@@ -84,9 +86,28 @@ export function ReactiveArray (key, structure) {
             return updatedData;
         });
 
+        // console.log(idsToResolve, idsToResolve.length);
+
+        queueThings(idsToResolve);
+
         // unsubscriptions
         // oldIDs.forEach(id => { if (!newIDs.includes(id)) { store.dispatch("unsubscribe", id); } });
         oldIDs = newIDs;
         return data;
     };
+}
+
+/**
+ * @param {Array<string>} ids - Array of Airtable IDs to load in one call
+ */
+export function ReactiveCacheArray(ids) {
+    // Used to preload data in single requests when you know it'll be loaded further down the line
+    console.log("[reactive-cache]", ids.length);
+    const idsToResolve = [];
+    ids.map(id => {
+        id = cleanID(id);
+        const data = store.getters.thing(id);
+        if (!data) idsToResolve.push(id);
+    });
+    return queueThings(idsToResolve);
 }

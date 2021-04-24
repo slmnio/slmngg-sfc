@@ -1,7 +1,31 @@
 import store from "@/thing-store";
 import { cleanID } from "@/utils/content-utils";
 
+async function addToBuffer(id) {
+    return store.commit("addToRequestBuffer", id);
+}
+
+export async function queueThing(id) {
+    if (!store.getters.thing(id)) {
+        store.commit("push", {
+            id, data: { __loading: true }
+        });
+    }
+    return addToBuffer(id);
+}
+export async function queueThings(ids) {
+    return ids.map(id => queueThing(id));
+}
+
 export async function fetchThing (id) {
+    if (!store.getters.thing(id)) {
+        store.commit("push", {
+            id, data: { __loading: true }
+        });
+    }
+    return addToBuffer(id);
+
+    // eslint-disable-next-line no-unreachable
     try {
         id = cleanID(id);
 
@@ -29,8 +53,13 @@ export async function fetchThing (id) {
     }
 }
 export async function fetchThings (ids) {
+    console.log("[socket] fetching multiple ", ids.length);
     try {
-        ids = ids.map(id => cleanID(id)).join(",");
+        ids = ids.map(id => cleanID(id));
+
+        ids.forEach(id => store.commit("push", {
+            id, data: { __loading: true }
+        }));
 
         return await fetch(`https://data.slmn.gg/things/${ids}`).then(res => res.json());
     } catch (e) {
@@ -53,11 +82,14 @@ export async function resolveThing(thing) {
     return await getThing(resolveID(thing));
 }
 export async function resolveThings(things) {
-    return await Promise.all(things.map(thing => resolveThing(thing)));
+    if (!things || !things.length) return [];
+    return await getThings(things.map(t => resolveID(t)));
+    // return await Promise.all(things.map(thing => resolveThing(thing)));
 }
 
 export async function getThing(id) {
     id = cleanID(id);
+    if (!id) return null;
     // TODO: some sort of queue system so it doesn't try to XHR things that are currently pending
     const findIndex = store.state.things.findIndex(t => t.id === id);
     if (findIndex !== -1) {
@@ -76,5 +108,7 @@ export async function getThing(id) {
     // return await fetchThing(id);
 }
 export async function getThings(ids) {
+    console.log("[socket]", `resolving ${ids.length} things`);
+    await fetchThings(ids);
     return ids.map(id => getThing(id));
 }

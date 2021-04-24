@@ -15,7 +15,6 @@
 
 <script>
 
-import { fetchThing, fetchThings } from "@/utils/fetch";
 import ThingTop from "@/components/ThingTop";
 import ContentThing from "@/components/ContentThing";
 import ContentRow from "@/components/ContentRow";

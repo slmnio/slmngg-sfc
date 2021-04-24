@@ -1,12 +1,14 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import { cleanID } from "@/utils/content-utils";
+import { fetchThings } from "@/utils/fetch";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
         things: [],
-        subscribed_ids: []
+        subscribed_ids: [],
+        request_buffer: []
     },
     mutations: {
         push(_store, { id, data }) {
@@ -26,6 +28,18 @@ export default new Vuex.Store({
 
             // this.state.things.set(id, data);
             // TODO: setup socket.io handler here for "data_UPDATE"
+        },
+        addToRequestBuffer(state, id) {
+            state.request_buffer.push(id);
+        },
+        clearRequestBuffer(state) {
+            state.request_buffer = [];
+        },
+        executeRequestBuffer(state) {
+            const ids = state.request_buffer;
+            if (!ids.length) return;
+            this.commit("clearRequestBuffer");
+            return fetchThings(ids);
         },
         SOCKET_DATA_UPDATE(state, [id, data]) {
             console.log("[store][data_UPDATE]", data);

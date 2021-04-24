@@ -1,18 +1,28 @@
 <template>
     <div>
         <div class="container">
+          {{ matches.length }}
             <div class="role-group" v-for="rel in mainPlayerRelationships" v-bind:key="rel.meta.singular_name">
-                <h1>{{ rel.meta.singular_name }}</h1>
+                <h1>as {{ rel.meta.singular_name }}</h1>
                 <div class="row">
-                    <Match class="col-md-3 mb-3" v-for="item in rel.items" v-bind:key="item.item.id" :id="item.item" />
+                    <Match class="col-md-3 mb-3"
+                           v-for="item in rel.items"
+                           v-bind:key="item.item"
+                           :id="item.item"
+                    />
                 </div>
             </div>
         </div>
     </div>
 </template>
-
+<!--
+                           v-for="match in matches"
+                           v-bind:key="match.id"
+                           :hydrated-match="match"
+-->
 <script>
 import Match from "@/components/Match";
+import { ReactiveCacheArray } from "@/utils/reactive";
 
 export default {
     name: "PlayerMatches",
@@ -21,6 +31,12 @@ export default {
         Match
     },
     computed: {
+        matches() {
+            return ReactiveCacheArray(this.relationshipMatches);
+        },
+        relationshipMatches() {
+            return Object.values(this.mainPlayerRelationships).map(rel => rel.items).flat().map(i => i.item);
+        },
         mainPlayerRelationships() {
             if (!this.player?.player_relationships) return {};
             const groups = {};

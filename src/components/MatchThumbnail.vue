@@ -1,12 +1,15 @@
 <template>
-    <div class="match-thumbnail" :style="temporaryBackground">
+    <div class="match-thumbnail" :style="eventBackground">
         <div class="match-thumbnail-half flex-center"
              v-for="team in match.teams" v-bind:key="team.id"
              :style="teamBackground(team)">
 <!--            <div class="match-loading-code" v-if="isLoading">LOADING: {{ team.code }}</div>-->
             <div class="match-thumbnail-logo bg-center" :style="logo(team)"></div>
         </div>
-        <div class="match-thumbnail-insert">
+      <div class="match-thumbnail-event-full w-100 flex-center" v-if="noTeams">
+        <div class="match-thumbnail-logo bg-center" :style="logo(match.event)"></div>
+      </div>
+        <div class="match-thumbnail-insert" v-if="!noTeams">
             <div class="match-event-logo bg-center" :style="logo(match.event, 50)"></div>
         </div>
     </div>
@@ -20,7 +23,10 @@ export default {
     name: "MatchThumbnail",
     props: ["match"],
     computed: {
-        temporaryBackground() {
+        noTeams() {
+            return this.match.teams ? this.match.teams.length === 0 : true;
+        },
+        eventBackground() {
             if (!this.match || !this.match.event || !this.match.event.theme) return { backgroundColor: "#333" };
 
             return {

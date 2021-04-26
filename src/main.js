@@ -10,7 +10,7 @@ import { io } from "socket.io-client";
 Vue.use(Vuex);
 Vue.use(VueMeta);
 
-const socket = io("https://data.slmn.gg", { transports: ["websocket", "polling"] });
+const socket = io(process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://dev.slmn.gg", { transports: ["websocket", "polling"] });
 
 Vue.use(VueSocketIOExt, socket, { store });
 

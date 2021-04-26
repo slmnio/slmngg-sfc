@@ -26,31 +26,30 @@ export async function fetchThing (id) {
     return addToBuffer(id);
 
     // eslint-disable-next-line no-unreachable
-    try {
-        id = cleanID(id);
-
-        store.commit("push", {
-            id, data: { __loading: true }
-        });
-
-        let data = await fetch(`https://data.slmn.gg/thing/${id}`).then(res => res.json());
-        const debug = true;
-        if (data.error) {
-            console.error(data.message);
-            data = { id: id, __fetch_failed: true };
-        }
-        // console.log("[thing]", "Saving to store", id);
-        store.commit("push", {
-            id,
-            data
-        });
-        // return store.state.things.get(id);
-        // console.log(store.state.things);
-        return store.state.things.find(t => t.id === id);
-    } catch (e) {
-        console.error(e);
-        return null;
-    }
+    // try {
+    //     id = cleanID(id);
+    //
+    //     store.commit("push", {
+    //         id, data: { __loading: true }
+    //     });
+    //
+    //     let data = await fetch(`${process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://dev.slmn.gg"}/thing/${id}`).then(res => res.json());
+    //     if (data.error) {
+    //         console.error(data.message);
+    //         data = { id: id, __fetch_failed: true };
+    //     }
+    //     // console.log("[thing]", "Saving to store", id);
+    //     store.commit("push", {
+    //         id,
+    //         data
+    //     });
+    //     // return store.state.things.get(id);
+    //     // console.log(store.state.things);
+    //     return store.state.things.find(t => t.id === id);
+    // } catch (e) {
+    //     console.error(e);
+    //     return null;
+    // }
 }
 export async function fetchThings (ids) {
     console.log("[socket] fetching multiple ", ids.length);
@@ -61,7 +60,7 @@ export async function fetchThings (ids) {
             id, data: { __loading: true }
         }));
 
-        const data = await fetch(`http://localhost:8901/things/${ids.join(",")}`).then(res => res.json());
+        const data = await fetch(`${process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://dev.slmn.gg"}/things/${ids.join(",")}`).then(res => res.json());
 
         if (data.error) {
             console.error(data.message);
@@ -108,9 +107,8 @@ export async function getThing(id) {
         return store.state.things[findIndex];
     }
     // console.log("[socket]", "resolving thing", id);
-    const d = await fetchThing(id);
     // console.log(d);
-    return d;
+    return await fetchThing(id);
 
     // if (store.state.things.has(id)) {
     //     console.log("[thing]", "Getting from store", id, store.state.things.get(id));

@@ -40,6 +40,8 @@ export default {
     height: 40px;
     border-bottom: 4px solid;
     margin-right: 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 .event {
     align-items: center;

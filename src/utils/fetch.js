@@ -107,7 +107,7 @@ export async function getThing(id) {
     if (findIndex !== -1) {
         return store.state.things[findIndex];
     }
-    console.log("[socket]", "resolving thing", id);
+    // console.log("[socket]", "resolving thing", id);
     const d = await fetchThing(id);
     // console.log(d);
     return d;

@@ -4,3 +4,5 @@ RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ /index.html [NC,L,QSA]
+
+ErrorDocument 403 /403.html

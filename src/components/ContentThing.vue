@@ -33,7 +33,7 @@ export default {
             return this.thing.__loading || !this.thing || !this.thing.id;
         },
         logo () {
-            if (!this.theme) return {};
+            if (!this.theme || !this.theme.default_logo) return null;
             return { backgroundImage: `url(${resizedImage(this.theme, "default_logo", 30)})` };
         },
         bgStyle () {

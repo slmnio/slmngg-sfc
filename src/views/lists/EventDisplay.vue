@@ -21,7 +21,7 @@ export default {
             if (!this.event || !this.event.theme) return {};
             return {
                 backgroundColor: this.event.theme.color_logo_background,
-                color: this.event.theme.color_logo_accent
+                borderColor: this.event.theme.color_logo_accent
             };
         },
         blockLogo() {
@@ -42,6 +42,7 @@ export default {
     margin-right: 12px;
     background-color: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.2);
+    transition: background-color .2s, border-color .2s, color .2s;
 }
 .event {
     align-items: center;

@@ -23,6 +23,21 @@ export function ReactiveRoot (id, structure) {
     return updatedData;
 }
 
+export function ReactiveList(key, structure) {
+    // key = thing to resolve (/thing/Players) key = Players
+    // resolve returns array of IDs
+    // should use those and then follow structure
+    const data = store.getters.thing(key);
+    if (!data) resolveThing(key);
+
+    store.dispatch("subscribe", key);
+    if (!data || !data.ids) return [];
+
+    const updatedData = JSON.parse(JSON.stringify(data.ids));
+    return updatedData.map(id => ReactiveRoot(id, structure));
+    // return updatedData;
+}
+
 export function ReactiveThing(key, structure) {
     // console.log("[reactive-thing] !created!", key);
     return (originalData) => {

@@ -44,6 +44,7 @@ export default {
     },
     computed: {
         groupedTeams() {
+            if (!this.event || !this.event.teams) return null;
             if (!this.event?.teams.some(team => team.team_category)) return null;
             const categories = [];
             this.event.teams.forEach(team => {

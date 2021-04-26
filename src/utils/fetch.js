@@ -33,7 +33,7 @@ export async function fetchThing (id) {
     //         id, data: { __loading: true }
     //     });
     //
-    //     let data = await fetch(`${process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://dev.slmn.gg"}/thing/${id}`).then(res => res.json());
+    //     let data = await fetch(`${process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg"}/thing/${id}`).then(res => res.json());
     //     if (data.error) {
     //         console.error(data.message);
     //         data = { id: id, __fetch_failed: true };
@@ -60,7 +60,7 @@ export async function fetchThings (ids) {
             id, data: { __loading: true }
         }));
 
-        const data = await fetch(`${process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://dev.slmn.gg"}/things/${ids.join(",")}`).then(res => res.json());
+        const data = await fetch(`${process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg"}/things/${ids.join(",")}`).then(res => res.json());
 
         if (data.error) {
             console.error(data.message);

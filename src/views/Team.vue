@@ -14,6 +14,9 @@
             <ContentRow v-if="team.sister_teams" title="Sister teams">
                 <ContentThing type="team" :show-logo="true" :text="item.name" :thing="item" :theme="item.theme" v-for="item in team.sister_teams" v-bind:key="item.id"></ContentThing>
             </ContentRow>
+            <ContentRow v-if="team.team_in_other_tournaments" title="Team in other tournaments">
+                <ContentThing type="team" :show-logo="true" :text="item.event ? `${item.name} (${item.event.short})` : item.name" :thing="item" :theme="item.theme" v-for="item in team.team_in_other_tournaments" v-bind:key="item.id"></ContentThing>
+            </ContentRow>
         </div>
     </div>
 </template>
@@ -52,6 +55,10 @@ export default {
                 theme: ReactiveThing("theme"),
                 sister_teams: ReactiveArray("sister_teams", {
                     theme: ReactiveThing("theme")
+                }),
+                team_in_other_tournaments: ReactiveArray("team_in_other_tournaments", {
+                    theme: ReactiveThing("theme"),
+                    event: ReactiveThing("event")
                 }),
                 staff: ReactiveArray("staff"),
                 event: ReactiveThing("event", {

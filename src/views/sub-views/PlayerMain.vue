@@ -9,6 +9,10 @@
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in player.captain_of"
                               v-bind:key="team.id" :show-logo="true" />
             </ContentRow>
+            <ContentRow title="Team staff for" v-if="player.team_staff">
+              <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in player.team_staff"
+                            v-bind:key="team.id" :show-logo="true" />
+            </ContentRow>
             <ContentRow title="Player for" v-if="teams">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teams"
                               v-bind:key="team.id" :show-logo="true" />
@@ -52,7 +56,7 @@ export default {
             return accolades;
         },
         teams() {
-            if (!this.player?.member_of) return [];
+            if (!this.player?.member_of) return null;
             const filtered = this.player.member_of.filter(t => !t.minor_team);
             if (filtered.length === 0) return null;
             return filtered;

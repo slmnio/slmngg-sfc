@@ -17,7 +17,7 @@
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
             <li class="nav-item" v-if="player.casts"><router-link class="nav-link" :to="subLink('casts')">Casts</router-link></li>
             <li class="nav-item" v-if="player.news"><router-link class="nav-link" :to="subLink('news')">News</router-link></li>
-            <li class="nav-item"> <!-- need to do something to hide this --> <router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
+            <li class="nav-item" v-if="player.player_relationships"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
         </SubPageNav>
         <router-view :player="player"></router-view>
     </div>
@@ -54,6 +54,9 @@ export default {
                     theme: ReactiveThing("theme")
                 }),
                 event_staff: ReactiveArray("event_staff", {
+                    theme: ReactiveThing("theme")
+                }),
+                team_staff: ReactiveArray("team_staff", {
                     theme: ReactiveThing("theme")
                 }),
                 player_accolades: ReactiveArray("accolades"),

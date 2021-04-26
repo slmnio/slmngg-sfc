@@ -62,4 +62,7 @@ export default {
     padding-right: var(--pad);
     margin: var(--pad) 0;
 }
+.event-teams.row {
+  margin: 0 -6px;
+}
 </style>

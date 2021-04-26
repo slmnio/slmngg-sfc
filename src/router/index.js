@@ -10,6 +10,7 @@ import PlayerCasts from "@/views/sub-views/PlayerCasts";
 import PlayerNews from "@/views/sub-views/PlayerNews";
 import PlayerMatches from "@/views/sub-views/PlayerMatches";
 import Events from "@/views/lists/Events";
+import Teams from "@/views/lists/Teams";
 
 Vue.use(VueRouter);
 
@@ -26,6 +27,7 @@ const routes = [
         props: route => ({ id: route.params.id })
     },
     { path: "/events", component: Events },
+    { path: "/teams", component: Teams },
     {
         path: "/event/:id",
         // name: "Event",

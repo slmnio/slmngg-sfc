@@ -54,5 +54,10 @@ export default {
 }
 .event-name {
     font-size: 1.2em;
+    margin-bottom: 4px;
+}
+.event.team-display .event-name {
+    font-weight: bold;
+    /*font-size: 1.4em;*/
 }
 </style>

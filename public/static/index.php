@@ -82,7 +82,7 @@ if (isset($args[2]) && isset($activeRoute["sub_routes"])) {
 $meta->title = $thing->name . $meta->title;
 
 if ($thing->theme) {
-    $meta->color = $thing->theme->color_theme || $thing->theme->color_logo_background;
+    $meta->color = $thing->theme->color_theme;
     $meta->image = getThemeLogo($thing->theme);
 }
 

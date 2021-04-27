@@ -80,8 +80,7 @@ export default {
             return ReactiveRoot(this.id, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
-                    theme: ReactiveThing("theme"),
-                    players: ReactiveArray("players")
+                    theme: ReactiveThing("theme")
                 }),
                 staff: ReactiveArray("staff")
             });

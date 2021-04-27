@@ -101,4 +101,7 @@ export default {
       background-repeat: no-repeat;
       background-position: bottom;
     }
+    .link-text {
+      display: inline-flex;
+    }
 </style>

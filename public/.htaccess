@@ -1,7 +1,7 @@
 RewriteEngine on
 RewriteBase /
 
-RewriteCond %{HTTP_USER_AGENT} (googlebot|discordbot|bingbot|yahoo|duckduckbot|baiduspider|facebo) [NC]
+RewriteCond %{HTTP_USER_AGENT} (googlebot|discordbot|bingbot|yahoo|duckduckbot|baiduspider|facebo|twitterbot) [NC]
 RewriteCond %{REQUEST_URI} !^/static/(.*)$
 RewriteRule ^(.*)$ /static/index.php [L]
 

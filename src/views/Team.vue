@@ -9,7 +9,7 @@
                 <ContentThing type="player" :text="staff.name" :thing="staff" :theme="team.theme" v-for="staff in team.staff" v-bind:key="staff.id"></ContentThing>
             </ContentRow>
             <ContentRow v-if="team.players" title="Players">
-                <ContentThing type="player" :text="player.name" :thing="player" :theme="team.theme" v-for="player in team.players" v-bind:key="player.id"></ContentThing>
+                <ContentThing :show-headshot="team.show_headshots" type="player" :text="player.name" :thing="player" :theme="team.theme" v-for="player in team.players" v-bind:key="player.id"></ContentThing>
             </ContentRow>
             <ContentRow v-if="team.sister_teams" title="Sister teams">
                 <ContentThing type="team" :show-logo="true" :text="item.name" :thing="item" :theme="item.theme" v-for="item in team.sister_teams" v-bind:key="item.id"></ContentThing>

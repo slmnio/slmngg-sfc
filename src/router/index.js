@@ -13,6 +13,7 @@ import Events from "@/views/lists/Events";
 import Teams from "@/views/lists/Teams";
 import TeamMain from "@/views/sub-views/TeamMain";
 import TeamMatches from "@/views/sub-views/TeamMatches";
+import PlayerPlayedMatches from "@/views/sub-views/PlayerPlayedMatches";
 
 Vue.use(VueRouter);
 
@@ -49,7 +50,8 @@ const routes = [
             { path: "", component: PlayerMain },
             { path: "casts", component: PlayerCasts },
             { path: "news", component: PlayerNews },
-            { path: "matches", component: PlayerMatches }
+            { path: "matches", component: PlayerMatches },
+            { path: "played-matches", component: PlayerPlayedMatches }
         ]
     },
     {

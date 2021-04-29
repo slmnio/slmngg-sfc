@@ -23,6 +23,7 @@
 <script>
 import Match from "@/components/Match";
 import { ReactiveCacheArray } from "@/utils/reactive";
+import sortMatches from "@/utils/sortMatches";
 
 export default {
     name: "PlayerMatches",
@@ -62,6 +63,7 @@ export default {
                 if (val.items.length === 0) {
                     delete groups[key];
                 }
+                groups[key].matches = groups[key].matches.sort(sortMatches);
             });
 
             return groups;

@@ -11,6 +11,8 @@ import PlayerNews from "@/views/sub-views/PlayerNews";
 import PlayerMatches from "@/views/sub-views/PlayerMatches";
 import Events from "@/views/lists/Events";
 import Teams from "@/views/lists/Teams";
+import TeamMain from "@/views/sub-views/TeamMain";
+import TeamMatches from "@/views/sub-views/TeamMatches";
 
 Vue.use(VueRouter);
 
@@ -24,7 +26,11 @@ const routes = [
         path: "/team/:id",
         // name: "Team",
         component: Team,
-        props: route => ({ id: route.params.id })
+        props: route => ({ id: route.params.id }),
+        children: [
+            { path: "", component: TeamMain },
+            { path: "matches", component: TeamMatches }
+        ]
     },
     { path: "/events", component: Events },
     { path: "/teams", component: Teams },

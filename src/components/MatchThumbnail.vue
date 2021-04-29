@@ -33,10 +33,14 @@ export default {
     },
     computed: {
         isLoading() {
-            if (this.noTeams) {
-                return (this.match.__loading || this.match.event.__loading || this.match.event.theme.__loading);
-            } else {
-                return (this.match.__loading || this.match.event.__loading || this.match.event.theme.__loading || this.match.teams[0].__loading || this.match.teams[0].theme.__loading);
+            try {
+                if (this.noTeams) {
+                    return (this.match.__loading || this.match.event.__loading || this.match.event.theme.__loading);
+                } else {
+                    return (this.match.__loading || this.match.event.__loading || this.match.event.theme.__loading || this.match.teams[0].__loading || this.match.teams[0].theme.__loading);
+                }
+            } catch (e) {
+                return true;
             }
         },
         noTeams() {

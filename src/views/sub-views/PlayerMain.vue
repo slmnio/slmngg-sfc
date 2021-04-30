@@ -51,7 +51,8 @@ export default {
 
             const accolades = [
                 // team things
-                ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => e.accolades).filter(e => !!e)) : [])
+                ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => e.accolades).filter(e => !!e)) : []),
+                ...(this.player.accolades ? this.player.accolades : [])
             ];
             return accolades;
         },

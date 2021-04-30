@@ -60,7 +60,11 @@ export default {
                 team_staff: ReactiveArray("team_staff", {
                     theme: ReactiveThing("theme")
                 }),
-                player_accolades: ReactiveArray("accolades"),
+                accolades: ReactiveArray("accolades", {
+                    event: ReactiveThing("event", {
+                        theme: ReactiveThing("theme")
+                    })
+                }),
                 socials: ReactiveArray("socials"),
                 player_relationships: ReactiveArray("player_relationships", {
                     events: ReactiveArray("events", {

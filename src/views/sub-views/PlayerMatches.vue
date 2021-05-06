@@ -63,7 +63,7 @@ export default {
                 if (val.items.length === 0) {
                     delete groups[key];
                 }
-                groups[key].matches = groups[key].matches.sort(sortMatches);
+                if (groups[key] && groups[key].matches) groups[key].matches = groups[key].matches.sort(sortMatches);
             });
 
             return groups;

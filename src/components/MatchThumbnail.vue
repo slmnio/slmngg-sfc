@@ -17,6 +17,7 @@
         <div class="match-thumbnail-insert" v-if="!noTeams">
             <div class="match-event-logo bg-center" :style="logo(match.event, 50)"></div>
         </div>
+        <div class="match-thumbnail-border" :style="eventBorder"></div>
     </div>
 </template>
 
@@ -51,9 +52,12 @@ export default {
 
             return {
                 backgroundColor: this.match.event.theme.color_logo_background || this.match.event.theme.color_theme,
-                borderColor: this.match.event.theme.color_logo_background || this.match.event.theme.color_logo_background,
                 color: this.match.event.theme.color_text_on_logo_background || this.match.event.theme.color_text_on_theme
             };
+        },
+        eventBorder() {
+            if (!this.match || !this.match.event || !this.match.event.theme) return { backgroundColor: "#333" };
+            return { backgroundColor: this.match.event.theme.color_logo_background || this.match.event.theme.color_logo_background };
         }
     },
     methods: {
@@ -80,7 +84,7 @@ export default {
     .match-thumbnail {
         height: auto;
         display: flex;
-        border-bottom: 8px solid transparent;
+        /*border-bottom: 8px solid transparent;*/
         position: relative;
         background: #333;
     }
@@ -119,5 +123,18 @@ export default {
       height: 100%;
       left: 0;
       font-size: 2em;
+    }
+
+    .match-thumbnail-border:before {
+        content: " ";
+        display: block;
+        padding-top: 3.14%;
+    }
+    .match-thumbnail-border {
+        width: 100%;
+        position: absolute;
+        display: flex;
+        height: auto;
+        top: 100%;
     }
 </style>

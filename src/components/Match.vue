@@ -41,5 +41,6 @@ export default {
         width: 100%;
         line-height: 1;
         padding: 4px 0;
+        padding-top: calc(4px + 3%) !important;
     }
 </style>

@@ -14,6 +14,7 @@ import Teams from "@/views/lists/Teams";
 import TeamMain from "@/views/sub-views/TeamMain";
 import TeamMatches from "@/views/sub-views/TeamMatches";
 import PlayerPlayedMatches from "@/views/sub-views/PlayerPlayedMatches";
+import Match from "@/views/Match";
 
 Vue.use(VueRouter);
 
@@ -54,6 +55,7 @@ const routes = [
             { path: "played-matches", component: PlayerPlayedMatches }
         ]
     },
+    { path: "/match/:id", component: Match, props: route => ({ id: route.params.id }) },
     {
         path: "/about",
         // name: "About",

@@ -8,7 +8,7 @@
 <script>
 import MatchThumbnail from "@/components/MatchThumbnail";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { url } from "@/utils/content-utils";
+import { getMatchContext, url } from "@/utils/content-utils";
 
 export default {
     name: "Match",
@@ -29,23 +29,7 @@ export default {
             });
         },
         lowerText() {
-            const text = [];
-            let out = "";
-
-            if (this.match?.event?.short) {
-                out = this.match?.event?.short + ": ";
-            }
-
-            // sub_event: round
-            // week_text: round
-            // week
-            //
-
-            text.push(this.match?.week_text || "");
-            text.push(this.match?.round || "");
-            // text.push(this.match?.sub_event || ""); // round > sub_event
-            text.push((this.match?.week && (!this.match?.week_text) && `Week ${this.match?.week}`) || ""); // basically regular season
-            return out + text.filter((t, i, a) => !!t && a.indexOf(t) === i).join(" · ");
+            return getMatchContext(this.match);
         }
     }
 };

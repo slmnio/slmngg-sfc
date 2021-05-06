@@ -30,3 +30,23 @@ export function cleanID (id) {
     if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
     return id;
 }
+
+export function getMatchContext(match) {
+    const text = [];
+    let out = "";
+
+    if (match?.event?.short) {
+        out = match?.event?.short + ": ";
+    }
+
+    // sub_event: round
+    // week_text: round
+    // week
+    //
+
+    text.push(match?.week_text || "");
+    text.push(match?.round || "");
+    // text.push(match?.sub_event || ""); // round > sub_event
+    text.push((match?.week && (!match?.week_text) && `Week ${match?.week}`) || ""); // basically regular season
+    return out + text.filter((t, i, a) => !!t && a.indexOf(t) === i).join(" · ");
+}

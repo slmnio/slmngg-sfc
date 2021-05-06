@@ -8,7 +8,7 @@
 
 <script>
 import Match from "@/components/Match";
-import sortMatches from "@/utils/sortMatches";
+import { sortMatches } from "@/utils/sorts";
 
 export default {
     name: "PlayerPlayedMatches",

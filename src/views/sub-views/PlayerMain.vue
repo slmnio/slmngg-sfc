@@ -9,16 +9,16 @@
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in captainedTeams"
                               v-bind:key="team.id" :show-logo="true" />
             </ContentRow>
-            <ContentRow title="Team staff for" v-if="player.team_staff">
-              <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in player.team_staff"
+            <ContentRow title="Team staff for" v-if="teamStaff">
+              <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teamStaff"
                             v-bind:key="team.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Player for" v-if="teams">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teams"
                               v-bind:key="team.id" :show-logo="true" />
             </ContentRow>
-            <ContentRow title="Event staff for" v-if="player.event_staff">
-                <ContentThing :thing="event" type="event" :theme="event.theme" v-for="event in player.event_staff"
+            <ContentRow title="Event staff for" v-if="eventStaff">
+                <ContentThing :thing="event" type="event" :theme="event.theme" v-for="event in eventStaff"
                               v-bind:key="event.id" :show-logo="true" />
             </ContentRow>
             <ContentRow :title="group.meta.player_text" v-for="group in mainPlayerRelationships" v-bind:key="group.meta.singular_name">
@@ -37,7 +37,7 @@
 <script>
 import ContentRow from "@/components/ContentRow";
 import ContentThing from "@/components/ContentThing";
-import sortTeams from "@/utils/sortTeams";
+import { sortTeams, sortEvents } from "@/utils/sorts";
 
 export default {
     props: ["player"],
@@ -65,6 +65,16 @@ export default {
         captainedTeams() {
             if (!this.player?.captain_of) return null;
             const teams = this.player.captain_of;
+            return teams.sort(sortTeams);
+        },
+        eventStaff() {
+            if (!this.player?.event_staff) return null;
+            const events = this.player.event_staff;
+            return events.sort(sortEvents);
+        },
+        teamStaff() {
+            if (!this.player?.team_staff) return null;
+            const teams = this.player.team_staff;
             return teams.sort(sortTeams);
         },
         mainPlayerRelationships(useMatches = false) {

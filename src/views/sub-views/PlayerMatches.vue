@@ -23,7 +23,7 @@
 <script>
 import Match from "@/components/Match";
 import { ReactiveCacheArray } from "@/utils/reactive";
-import sortMatches from "@/utils/sortMatches";
+import { sortMatches } from "@/utils/sorts";
 
 export default {
     name: "PlayerMatches",

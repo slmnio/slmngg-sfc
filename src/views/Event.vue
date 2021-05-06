@@ -12,9 +12,11 @@
             <ContentRow title="Staff" v-if="event.staff && event.staff.length">
                 <ContentThing :thing="staff" type="player" :theme="event.theme" v-for="staff in event.staff" v-bind:key="staff.id"></ContentThing>
             </ContentRow>
-<!--            <ContentRow :title="team.name" v-for="team in event.teams" v-bind:key="team.id">-->
-<!--                <ContentThing :thing="player" type="player" :theme="team.theme" v-for="player in team.players" v-bind:key="player.id"></ContentThing>-->
-<!--            </ContentRow>-->
+
+            <ContentRow v-for="group in playerRelationshipGroups" v-bind:key="group.meta.singular_name"
+                        :title="group.items.length === 1 ? group.meta.singular_name : group.meta.plural_name">
+                <ContentThing v-for="player in group.items" v-bind:key="player.id" :thing="player" type="player" :theme="event.theme"/>
+            </ContentRow>
         </div>
     </div>
 </template>
@@ -82,8 +84,33 @@ export default {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
                 }),
-                staff: ReactiveArray("staff")
+                staff: ReactiveArray("staff"),
+                player_relationships: ReactiveArray("player_relationships", {
+                    player: ReactiveThing("player")
+                })
             });
+        },
+        playerRelationshipGroups() {
+            if (!this.event?.player_relationships) return [];
+            const groups = {};
+
+            this.event.player_relationships.forEach(rel => {
+                if (!groups[rel.singular_name]) {
+                    groups[rel.singular_name] = {
+                        meta: {
+                            player_text: rel.player_text,
+                            plural_name: rel.plural_name,
+                            singular_name: rel.singular_name
+                        },
+                        items: []
+                    };
+                }
+                groups[rel.singular_name].items = groups[rel.singular_name].items.concat(rel.player);
+            });
+
+            if (groups[undefined]) return [];
+
+            return Object.values(groups);
         }
     }
 };

@@ -26,6 +26,24 @@ $routes = [
         "sub_routes" => [""]
     ],
     [
+        "url" => "match",
+        "also_load" => ["event"],
+        "after_load" => function($thing) {
+            $thing->theme = getThing($thing->event->theme[0]);
+            $_teams = [];
+            foreach ($thing->teams as $teamID) {
+                array_push($_teams, getThing($teamID));
+            }
+            $thing->teams = $_teams;
+        },
+        "sub_routes" => [""],
+        "description" => function($thing) {
+            if (count($thing->teams) === 2) {
+                return implode(" vs ", array_map(function ($item) { return $item->name; }, $thing->teams)) . " from " . $thing->event->name . ".";
+            }
+        }
+    ],
+    [
         "url" => "player",
         "sub_routes" => [
             ["url" => "casts", "text" => "'s casts"],
@@ -60,6 +78,9 @@ if (isset($activeRoute["also_load"])) {
         $thing->$l = getThing($thing->$l[0]);
     }
 //    $thing->theme = getThing($thing->theme[0]);
+}
+if (isset($activeRoute["after_load"])) {
+    $activeRoute["after_load"]($thing);
 }
 
 $meta = (object)[

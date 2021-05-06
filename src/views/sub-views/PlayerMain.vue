@@ -50,12 +50,11 @@ export default {
         accolades() {
             if (!this.player) return [];
 
-            const accolades = [
+            return [
                 // team things
                 ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => e.accolades).filter(e => !!e)) : []),
                 ...(this.player.accolades ? this.player.accolades : [])
             ];
-            return accolades;
         },
         teams() {
             if (!this.player?.member_of) return null;

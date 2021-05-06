@@ -5,8 +5,8 @@
                 <ContentThing :thing="accolade" type="event" :link-to="accolade.event" :theme="accolade.event && accolade.event.theme" v-for="accolade in accolades"
                               v-bind:key="accolade.id" :show-logo="true" :text="accolade.player_text" />
             </ContentRow>
-            <ContentRow title="Captain of" v-if="player.captain_of">
-                <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in player.captain_of"
+            <ContentRow title="Captain of" v-if="captainedTeams">
+                <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in captainedTeams"
                               v-bind:key="team.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Team staff for" v-if="player.team_staff">
@@ -37,6 +37,7 @@
 <script>
 import ContentRow from "@/components/ContentRow";
 import ContentThing from "@/components/ContentThing";
+import sortTeams from "@/utils/sortTeams";
 
 export default {
     props: ["player"],
@@ -60,7 +61,12 @@ export default {
             if (!this.player?.member_of) return null;
             const filtered = this.player.member_of.filter(t => !t.minor_team);
             if (filtered.length === 0) return null;
-            return filtered;
+            return filtered.sort(sortTeams);
+        },
+        captainedTeams() {
+            if (!this.player?.captain_of) return null;
+            const teams = this.player.captain_of;
+            return teams.sort(sortTeams);
         },
         mainPlayerRelationships(useMatches = false) {
             if (!this.player?.player_relationships) return {};

@@ -8,6 +8,9 @@
             <div class="row">
                 <div class="col-12 col-md-9 mb-3">
                     <EmbeddedVideo :src="match.vod" v-if="match && match.vod" />
+                    <div class="embed embed-responsive embed-responsive-16by9" v-if="showNoVOD">
+                        <div class="no-embed-text flex-center">No VOD available for this match</div>
+                    </div>
                 </div>
                 <div class="col-12 col-md-3">
                     <table class="match-details table-sm">
@@ -18,7 +21,9 @@
                         </thead>
                         <tbody>
                             <tr v-if="match.start"><td colspan="2">{{ date }}</td></tr>
-                            <tr v-if="match.event && match.event.name"><td colspan="2"><b>{{ match.event.name }}</b></td></tr>
+                            <tr v-if="match.event && match.event.name"><td colspan="2" :style="eventStyle">
+                                <b><router-link :to="url('event', match.event)" class="match-event-link">{{ match.event.name }}</router-link></b>
+                            </td></tr>
                             <tr v-if="lowerText"><td colspan="2">{{ lowerText }}</td></tr>
                             <tr v-if="match.first_to">
                                 <td>First to</td><td>{{ match.first_to }}</td>
@@ -49,12 +54,13 @@ import MatchHero from "@/components/MatchHero";
 import MatchScore from "@/components/MatchScore";
 import EmbeddedVideo from "@/components/EmbeddedVideo";
 import LinkedPlayers from "@/components/LinkedPlayers";
-import { getMatchContext } from "@/utils/content-utils";
+import { getMatchContext, url } from "@/utils/content-utils";
 
 export default {
     name: "Match",
     props: ["id"],
     components: { MatchHero, MatchScore, EmbeddedVideo, LinkedPlayers },
+    methods: { url },
     computed: {
         match() {
             return ReactiveRoot(this.id, {
@@ -70,6 +76,20 @@ export default {
                 }),
                 mvp: ReactiveThing("mvp")
             });
+        },
+        showNoVOD() {
+            console.log("_match", this.match, !!this.match);
+            if (!this.match) return false;
+            if (this.match.__loading || !this.match.id) return false;
+            if (this.match && !this.match.vod) return true;
+            return false;
+        },
+        eventStyle() {
+            if (!this.match.event || !this.match.event.theme) return {};
+            return {
+                backgroundColor: this.match.event.theme.color_logo_background || this.match.event.theme.color_theme,
+                color: this.match.event.theme.color_text_on_logo_background || this.match.event.theme.color_text_on_theme
+            };
         },
         lowerText() {
             return getMatchContext(this.match);
@@ -164,5 +184,17 @@ export default {
         #match .large-container {
             max-width: 1400px;
         }
+    }
+    .match-event-link, .match-event-link:hover {
+        color: inherit;
+    }
+
+    .no-embed-text {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 1.5em;
     }
 </style>

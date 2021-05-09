@@ -31,6 +31,25 @@ export function cleanID (id) {
     return id;
 }
 
+export function cssImage(cssVar, theme, keys, minSize = 30, useResizer = true) {
+    const url = multiImage(theme, keys, minSize, useResizer);
+    const css = {};
+    if (url) {
+        css[cssVar] = url;
+    }
+    return css;
+}
+
+export function multiImage(theme, keys, minSize = 30, useResizer = true) {
+    let url;
+    if (useResizer) {
+        url = keys.map(key => resizedImage(theme, key, minSize)).find(u => !!u);
+    } else {
+        url = keys.map(key => getImage(theme[key])).find(u => !!u);
+    }
+    return url ? `url(${url})` : null;
+}
+
 export function getMatchContext(match) {
     const text = [];
     let out = "";

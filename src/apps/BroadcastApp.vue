@@ -1,8 +1,5 @@
 <template>
-<!--    <router-view id="overlay"/>-->
-    <div>
-        {{ broadcast }}
-    </div>
+    <router-view id="overlay" :broadcast="broadcast"/>
 </template>
 
 <script>

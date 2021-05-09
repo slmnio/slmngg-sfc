@@ -54,7 +54,7 @@ import MatchHero from "@/components/website/MatchHero";
 import MatchScore from "@/components/website/MatchScore";
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
-import { getMatchContext, url } from "@/utils/content-utils";
+import { getMatchContext, multiImage, url } from "@/utils/content-utils";
 
 export default {
     name: "Match",
@@ -147,7 +147,8 @@ export default {
     },
     metaInfo() {
         return {
-            title: this.match.name
+            title: this.match.name,
+            link: [{ rel: "icon", href: multiImage(this.match?.event?.theme, ["small_logo", "default_logo"]) }]
         };
     }
 };

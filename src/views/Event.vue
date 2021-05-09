@@ -27,6 +27,7 @@ import ThingTop from "@/components/website/ThingTop";
 import ContentThing from "@/components/website/ContentThing";
 import ContentRow from "@/components/website/ContentRow";
 import { ReactiveRoot, ReactiveThing, ReactiveArray } from "@/utils/reactive";
+import { multiImage } from "@/utils/content-utils";
 
 export default {
     name: "Event",
@@ -41,7 +42,8 @@ export default {
                 { name: "description", content: "test description" },
                 { name: "og:description", content: "test description" },
                 { name: "og:title", content: this.event.name }
-            ]
+            ],
+            link: [{ rel: "icon", href: multiImage(this.event.theme, ["small_logo", "default_logo"]) }]
         };
     },
     computed: {

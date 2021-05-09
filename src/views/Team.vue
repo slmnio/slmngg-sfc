@@ -13,6 +13,7 @@
 import ThingTop from "@/components/website/ThingTop";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import SubPageNav from "@/components/website/SubPageNav";
+import { multiImage } from "@/utils/content-utils";
 
 export default {
     name: "Team",
@@ -27,7 +28,8 @@ export default {
                 { name: "description", content: "test description" },
                 { name: "og:description", content: "test description" },
                 { name: "og:title", content: this.team.name }
-            ]
+            ],
+            link: [{ rel: "icon", href: multiImage(this.team.theme, ["small_logo", "default_logo"]) }]
         };
     },
     methods: {

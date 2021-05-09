@@ -45,7 +45,7 @@ export default {
             };
         },
         teamLogo() {
-            return cssImage("backgroundImage", this.team.theme, ["small_logo", "default_logo"], 40);
+            return cssImage("backgroundImage", this.team.theme, ["small_logo", "default_logo"], 36);
         }
     },
     watch: {

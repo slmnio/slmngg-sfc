@@ -13,6 +13,18 @@
     </div>
 </template>
 
-<style>
+<script>
+
+export default {
+    name: "WebsiteApp",
+    beforeCreate () {
+        document.body.className = "website";
+    }
+};
+</script>
+
+<style scoped>
+@import "~@/assets/bootstrap.css";
+@import "~@/assets/app.css";
 
 </style>

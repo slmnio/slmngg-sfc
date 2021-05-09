@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import LoadingIcon from "@/components/LoadingIcon";
+import LoadingIcon from "@/components/website/LoadingIcon";
 import { url } from "@/utils/content-utils";
 export default {
     name: "LinkedPlayers",

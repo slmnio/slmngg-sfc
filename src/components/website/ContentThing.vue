@@ -24,7 +24,7 @@
 
 <script>
 import { resizedImage, url } from "@/utils/content-utils";
-import LoadingIcon from "@/components/LoadingIcon";
+import LoadingIcon from "@/components/website/LoadingIcon";
 
 export default {
     name: "ContentThing",

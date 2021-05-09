@@ -10,9 +10,9 @@
 </template>
 
 <script>
-import ThingTop from "@/components/ThingTop";
+import ThingTop from "@/components/website/ThingTop";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import SubPageNav from "@/components/SubPageNav";
+import SubPageNav from "@/components/website/SubPageNav";
 
 export default {
     name: "Team",

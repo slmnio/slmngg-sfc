@@ -1,5 +1,5 @@
 import Vue from "vue";
-import App from "./App.vue";
+import GlobalApp from "./apps/GlobalApp";
 import router from "./router";
 import store from "@/thing-store";
 import Vuex from "vuex";
@@ -18,7 +18,7 @@ Vue.config.productionTip = false;
 
 const app = new Vue({
     router,
-    render: h => h(App),
+    render: h => h(GlobalApp),
     store,
     sockets: {
         connect() {

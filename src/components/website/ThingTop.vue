@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import ThemeLogo from "@/components/ThemeLogo";
+import ThemeLogo from "@/components/website/ThemeLogo";
 
 export default {
     name: "ThingTop",

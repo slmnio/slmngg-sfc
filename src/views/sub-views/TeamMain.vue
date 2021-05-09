@@ -19,8 +19,8 @@
 </template>
 
 <script>
-import ContentThing from "@/components/ContentThing";
-import ContentRow from "@/components/ContentRow";
+import ContentThing from "@/components/website/ContentThing";
+import ContentRow from "@/components/website/ContentRow";
 export default {
     name: "TeamMain",
     components: { ContentRow, ContentThing },

@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import MatchHeroTeam from "@/components/MatchHeroTeam";
+import MatchHeroTeam from "@/components/website/MatchHeroTeam";
 import { image } from "@/utils/content-utils";
 
 export default {

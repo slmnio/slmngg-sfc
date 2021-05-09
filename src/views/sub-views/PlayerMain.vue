@@ -35,8 +35,8 @@
 </template>
 
 <script>
-import ContentRow from "@/components/ContentRow";
-import ContentThing from "@/components/ContentThing";
+import ContentRow from "@/components/website/ContentRow";
+import ContentThing from "@/components/website/ContentThing";
 import { sortTeams, sortEvents } from "@/utils/sorts";
 
 export default {

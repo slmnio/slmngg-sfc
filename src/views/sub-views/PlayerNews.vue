@@ -10,7 +10,7 @@
 
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
-import News from "@/components/News";
+import News from "@/components/website/News";
 
 export default {
     name: "PlayerNews",

@@ -23,9 +23,9 @@
 
 <script>
 
-import ThingTop from "@/components/ThingTop";
-import ContentThing from "@/components/ContentThing";
-import ContentRow from "@/components/ContentRow";
+import ThingTop from "@/components/website/ThingTop";
+import ContentThing from "@/components/website/ContentThing";
+import ContentRow from "@/components/website/ContentRow";
 import { ReactiveRoot, ReactiveThing, ReactiveArray } from "@/utils/reactive";
 
 export default {

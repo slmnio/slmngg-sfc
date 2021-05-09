@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import NewsThumbnail from "@/components/NewsThumbnail";
+import NewsThumbnail from "@/components/website/NewsThumbnail";
 import { url } from "@/utils/content-utils";
 export default {
     name: "News",

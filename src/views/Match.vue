@@ -50,10 +50,10 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import MatchHero from "@/components/MatchHero";
-import MatchScore from "@/components/MatchScore";
-import EmbeddedVideo from "@/components/EmbeddedVideo";
-import LinkedPlayers from "@/components/LinkedPlayers";
+import MatchHero from "@/components/website/MatchHero";
+import MatchScore from "@/components/website/MatchScore";
+import EmbeddedVideo from "@/components/website/EmbeddedVideo";
+import LinkedPlayers from "@/components/website/LinkedPlayers";
 import { getMatchContext, url } from "@/utils/content-utils";
 
 export default {

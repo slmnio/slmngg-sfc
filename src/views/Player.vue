@@ -26,8 +26,8 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import Social from "@/components/Social";
-import SubPageNav from "@/components/SubPageNav";
+import Social from "@/components/website/Social";
+import SubPageNav from "@/components/website/SubPageNav";
 
 export default {
     name: "Player",

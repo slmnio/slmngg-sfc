@@ -56,13 +56,13 @@
     font-weight: 700;
 }
 
-body {
+body.website {
     background: var(--brand-dark);
     color: var(--brand-light);
     font-family: sans-serif;
 }
 
-body {
+body.website {
     font: 1rem/1.5 var(--font-family-sans-serif);
 }
 h1, h2, h3, h4, h5, h6 {

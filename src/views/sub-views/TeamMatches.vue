@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import Match from "@/components/Match";
+import Match from "@/components/website/Match";
 
 export default {
     name: "TeamMatches",

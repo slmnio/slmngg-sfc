@@ -4,6 +4,7 @@
 
 <script>
 import { ReactiveRoot } from "@/utils/reactive";
+import { fetchThing } from "@/utils/fetch";
 
 export default {
     name: "BroadcastApp",

@@ -18,6 +18,7 @@ import TeamMatches from "@/views/sub-views/TeamMatches";
 import PlayerPlayedMatches from "@/views/sub-views/PlayerPlayedMatches";
 import Match from "@/views/Match";
 import IngameOverlay from "@/components/broadcast/IngameOverlay";
+import BreakOverlay from "@/components/broadcast/BreakOverlay";
 
 Vue.use(VueRouter);
 
@@ -78,7 +79,8 @@ const routes = [
         component: OverlayApp,
         props: route => ({ id: route.params.broadcastID }),
         children: [
-            { path: "ingame", component: IngameOverlay }
+            { path: "ingame", component: IngameOverlay },
+            { path: "break", component: BreakOverlay }
         ]
     }
 ];

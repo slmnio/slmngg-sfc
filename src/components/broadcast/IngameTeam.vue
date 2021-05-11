@@ -11,9 +11,11 @@
                 <div class="flex-center team-logo-holder flex-center">
                     <div class="team-logo bg-center" :style="teamLogo"></div>
                 </div>
-                <div class="flex-center team-score">
-                    <span class="industry-align">{{ score || '0' }}</span>
-                </div>
+                <transition name="score">
+                    <div class="flex-center team-score" v-if="!hideScores">
+                        <span class="industry-align">{{ score || '0' }}</span>
+                    </div>
+                </transition>
                 <div class="team-alt-slice" :style="teamSlice"></div>
             </div>
         </div>
@@ -25,7 +27,7 @@ import { cssImage } from "@/utils/content-utils";
 
 export default {
     name: "IngameTeam",
-    props: ["team", "right", "score"],
+    props: ["team", "right", "score", "hideScores"],
     computed: {
         loaded() {
             console.log(!!this.team, !!this.team.theme, this.team.theme && this.team.theme.__loading);
@@ -206,4 +208,20 @@ function updateWidth(vueEl) {
         margin: 4px;
         box-sizing: border-box;
     }
+
+
+    .overlay[data-broadcast="resurge-4v4"] .ingame-team {
+        width: 595px;
+    }
+
+    /*.team-score {*/
+    /*    max-width: 0;*/
+    /*    overflow: hidden;*/
+    /*    transition: max-width .3s;*/
+    /*    !* max-width: 48px; *!*/
+    /*}*/
+
+    .score-enter-active, .score-leave-active { overflow: hidden; transition: max-width .3s; }
+    .score-enter-to, .score-leave { max-width: 48px; }
+    .score-enter, .score-leave-to { max-width: 0; }
 </style>

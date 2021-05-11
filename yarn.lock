@@ -8094,6 +8094,11 @@ source-map@^0.7.3:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.7.3.tgz#5302f8169031735226544092e64981f751750383"
   integrity sha512-CkCj6giN3S+n9qrYiBTX5gystlENnRW5jZeNLHpe6aue+SrHcG5VYwujhW9s4dY31mEGsxBDrHR6oI69fTXsaQ==
 
+spacetime@^6.16.0:
+  version "6.16.0"
+  resolved "https://registry.yarnpkg.com/spacetime/-/spacetime-6.16.0.tgz#f213963392eafc380716c3857b23251de87db97f"
+  integrity sha512-mkuniNOp6ssfPyJidj81tb54zKxK4vEKPTmcUsC/NEGIF8S07ppoSotdg6numT1/26rthQYmdxMY/M5a9WeJVQ==
+
 spdx-correct@^3.0.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/spdx-correct/-/spdx-correct-3.1.1.tgz#dece81ac9c1e6713e5f7d1b6f17d468fa53d89a9"

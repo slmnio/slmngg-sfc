@@ -3,12 +3,12 @@
       <div class="top-overlay" :style="broadcastMargin">
           <transition-group name="itah" mode="out-in">
               <IngameTeam :key="`${team.id}-${i}`" v-for="(team, i) in teams"
-                          :team="team" :right="i === 1" :score="[match.score_1, match.score_2][i]" />
+                          :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores" />
           </transition-group>
 
-          <transition-group name="mid" mode="out-in">
+          <transition name="mid" mode="out-in">
               <Middle v-if="teams.length === 2 && middleText" :text="middleText" :key="middleText" />
-          </transition-group>
+          </transition>
       </div>
   </div>
 </template>
@@ -36,6 +36,12 @@ export default {
             if (this.match.flip_teams && this.match.teams.length === 2) return [this.match.teams[1], this.match.teams[0]];
             return this.match.teams;
         },
+        scores() {
+            if (!this.match || !this.match.teams || !this.match.teams.every(t => t.theme && !t.theme.__loading && t.theme.id)) return [];
+            const scores = [this.match.score_1, this.match.score_2];
+            if (this.match.flip_teams && this.match.teams.length === 2) return [scores[1], scores[0]];
+            return scores;
+        },
         middleText() {
             if (!this.match) return null;
             if (this.match.middle_text) return this.match.middle_text;
@@ -46,6 +52,13 @@ export default {
         broadcastMargin() {
             if (!this.broadcast) return { marginTop: "0px" };
             return { marginTop: `${(this.broadcast.margin * 55)}px` };
+        }
+    },
+    watch: {
+        broadcast() {
+            if (this.broadcast) {
+                document.body.dataset.broadcast = this.broadcast.key;
+            }
         }
     }
 };
@@ -62,6 +75,8 @@ export default {
     /*background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/841070258440896602/ScreenShot_21-05-09_22-46-01-000.jpg");*/
     /* Margin: 0.0 */
     /*background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/841070262060974110/ScreenShot_21-05-09_22-48-02-000.jpg");*/
+    /* Margin: 0.5 4v4 */
+    background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/841443615557287956/ScreenShot_21-05-10_23-36-13-000.jpg");
     position: absolute;
     width: 100%;
     height: 100%;

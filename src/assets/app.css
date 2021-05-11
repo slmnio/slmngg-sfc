@@ -194,3 +194,11 @@ a.no-link-style {
     text-decoration: none;
     color: inherit;
 }
+
+
+
+/* global transitions */
+
+.fade-enter-active, .fade-leave-active { transition: opacity 250ms ease; }
+.fade-enter, .fade-leave-to { opacity: 0; }
+.fade-enter-to, .fade-leave { opacity: 1; }

@@ -202,3 +202,8 @@ a.no-link-style {
 .fade-enter-active, .fade-leave-active { transition: opacity 250ms ease; }
 .fade-enter, .fade-leave-to { opacity: 0; }
 .fade-enter-to, .fade-leave { opacity: 1; }
+
+body.overlay {
+    background: transparent;
+    background-color: transparent;
+}

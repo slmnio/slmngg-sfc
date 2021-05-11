@@ -76,7 +76,7 @@ export default {
     /* Margin: 0.0 */
     /*background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/841070262060974110/ScreenShot_21-05-09_22-48-02-000.jpg");*/
     /* Margin: 0.5 4v4 */
-    background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/841443615557287956/ScreenShot_21-05-10_23-36-13-000.jpg");
+    /*background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/841443615557287956/ScreenShot_21-05-10_23-36-13-000.jpg");*/
     position: absolute;
     width: 100%;
     height: 100%;

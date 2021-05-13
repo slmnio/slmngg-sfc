@@ -1,5 +1,8 @@
 <template>
     <div id="app">
+      <div class="development-bar bg-warning text-dark text-center py-1">
+        <b>In development:</b> things may break, be missing, or not appear as expected.
+      </div>
         <nav class="navbar navbar-expand-lg navbar-dark">
             <router-link to="/" class="navbar-brand">SLMN.GG</router-link>
             <ul class="navbar-nav mr-auto">

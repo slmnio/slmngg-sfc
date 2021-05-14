@@ -32,8 +32,12 @@ export default {
             });
         },
         teams() {
-            if (!this.match || !this.match.teams || !this.match.teams.every(t => t.theme && !t.theme.__loading && t.theme.id)) return [];
+            if (!this.match || !this.match.teams || !this.match.teams.every(t => {
+                if (t.theme === undefined && t.has_theme === 0) return true;
+                return t.theme && !t.theme.__loading && t.theme.id;
+            })) return [];
             if (this.match.flip_teams && this.match.teams.length === 2) return [this.match.teams[1], this.match.teams[0]];
+            if (this.match.teams.length !== 2) return [];
             return this.match.teams;
         },
         scores() {

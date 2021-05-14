@@ -30,7 +30,7 @@ export default {
     props: ["team", "right", "score", "hideScores"],
     computed: {
         loaded() {
-            console.log(!!this.team, !!this.team.theme, this.team.theme && this.team.theme.__loading);
+            if (this.team.theme === undefined && this.team.has_theme === 0) return true;
             return this.team && this.team.theme && !this.team.theme.__loading;
         },
         style() {

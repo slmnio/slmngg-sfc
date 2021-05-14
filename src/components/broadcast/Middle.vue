@@ -23,6 +23,7 @@ export default {
     display: flex;
     justify-content: center;
     top: 8px;
+    pointer-events: none;
 }
 
 .middle-holder {

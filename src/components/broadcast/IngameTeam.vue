@@ -78,6 +78,7 @@ export default {
 
 function updateWidth(vueEl) {
     const el = vueEl.querySelector(".team-name");
+    const text = el.children[0]; // target the .team-name > span.industry-align for width checking
 
     el.style.transform = "none";
     el.style.width = "auto";
@@ -89,11 +90,10 @@ function updateWidth(vueEl) {
         }
 
         const target = 445 - (smallText);
-        const width = el.getBoundingClientRect().width;
+        const width = text.getBoundingClientRect().width;
 
         if (width > target) {
             const scale = target / width;
-            // el.classList.add("squish");
             el.style.transform = `scaleX(${scale})`;
             el.style.width = `${scale * 100}%`;
         }

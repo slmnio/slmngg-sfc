@@ -40,6 +40,7 @@ export default {
     computed: {
         team() {
             return ReactiveRoot(this.id, {
+                owner: ReactiveThing("owner"),
                 captain: ReactiveThing("captain"),
                 players: ReactiveArray("players"),
                 theme: ReactiveThing("theme"),

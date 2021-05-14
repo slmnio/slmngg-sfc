@@ -51,6 +51,9 @@ export default {
                         })
                     })
                 }),
+                owned_teams: ReactiveArray("owned_teams", {
+                    theme: ReactiveThing("theme")
+                }),
                 captain_of: ReactiveArray("captain_of", {
                     theme: ReactiveThing("theme")
                 }),

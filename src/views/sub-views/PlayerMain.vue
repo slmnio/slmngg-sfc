@@ -5,6 +5,10 @@
                 <ContentThing :thing="accolade" type="event" :link-to="accolade.event" :theme="accolade.event && accolade.event.theme" v-for="accolade in accolades"
                               v-bind:key="accolade.id" :show-logo="true" :text="accolade.player_text" />
             </ContentRow>
+            <ContentRow title="Owner of" v-if="ownedTeams">
+                <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in ownedTeams"
+                              v-bind:key="team.id" :show-logo="true" />
+            </ContentRow>
             <ContentRow title="Captain of" v-if="captainedTeams">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in captainedTeams"
                               v-bind:key="team.id" :show-logo="true" />
@@ -65,6 +69,11 @@ export default {
         captainedTeams() {
             if (!this.player?.captain_of) return null;
             const teams = this.player.captain_of;
+            return teams.sort(sortTeams);
+        },
+        ownedTeams() {
+            if (!this.player?.owned_teams) return null;
+            const teams = this.player.owned_teams;
             return teams.sort(sortTeams);
         },
         eventStaff() {

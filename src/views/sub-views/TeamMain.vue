@@ -1,5 +1,8 @@
 <template>
         <div class="container">
+            <ContentRow v-if="team.owner" title="Owner">
+                <ContentThing type="player" :text="team.owner.name" :thing="team.owner" :theme="team.theme"></ContentThing>
+            </ContentRow>
             <ContentRow v-if="team.captain" title="Captain">
                 <ContentThing type="player" :text="team.captain.name" :thing="team.captain" :theme="team.theme"></ContentThing>
             </ContentRow>

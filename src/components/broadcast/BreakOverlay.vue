@@ -18,9 +18,17 @@
                     </div>
                     <Sponsors class="break-sponsors" :sponsors="sponsorThemes" />
                 </div>
-                <transition-group class="break-col break-schedule" name="a--match">
+                <transition name="break-content" mode="out-in">
+                    <transition-group class="break-col break-schedule" name="a--match" v-if="breakDisplay === 'Schedule'" key="Schedule">
                         <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" />
-                </transition-group>
+                    </transition-group>
+                    <div class="break-col break-standings" v-if="breakDisplay === 'Standings'" key="Standings">
+                        <Standings :event="event" :stage="broadcast.current_stage" />
+                    </div>
+                    <div class="break-col break-image" v-if="breakDisplay === 'Image'">
+                        <div class="break-image-inner" :style="cssImage('backgroundImage', broadcast, ['break_image'], 1080, false)"></div>
+                    </div>
+                </transition>
             </div>
         </div>
     </div>
@@ -32,11 +40,13 @@ import BreakMatch from "@/components/broadcast/BreakMatch";
 import { cssImage } from "@/utils/content-utils";
 import { sortMatches } from "@/utils/sorts";
 import Sponsors from "@/components/broadcast/Sponsors";
+import Standings from "@/components/broadcast/Standings";
 
 export default {
     name: "BreakOverlay",
     props: ["broadcast"],
-    components: { BreakMatch, Sponsors },
+    components: { Standings, BreakMatch, Sponsors },
+    methods: { cssImage },
     computed: {
         nextMatch() {
             if (!this.broadcast || !this.broadcast.live_match || !this.broadcast.show_live_match) return null;
@@ -59,7 +69,10 @@ export default {
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;
             return ReactiveRoot(this.broadcast.event[0], {
-                theme: ReactiveThing("theme")
+                theme: ReactiveThing("theme"),
+                teams: ReactiveArray("teams", {
+                    theme: ReactiveThing("theme")
+                })
             });
         },
         sponsorThemes() {
@@ -73,6 +86,10 @@ export default {
             return {
                 borderColor: this.event.theme.color_theme
             };
+        },
+        breakDisplay() {
+            if (!this.broadcast || !this.broadcast.break_display) return null;
+            return this.broadcast.break_display;
         }
     },
     watch: {
@@ -142,6 +159,8 @@ export default {
         justify-content: center;
         align-items: center;
         text-align: center;
+        width: 100%; height: 100%;
+        padding: 20px;
     }
     .break-left-col {
         width: 480px;
@@ -150,10 +169,11 @@ export default {
     }
     .break-schedule {
         flex-grow: 1;
-        padding: 20px;
+        padding: 20px 40px;
         box-sizing: border-box;
         /*justify-content: space-evenly;*/
         overflow: hidden;
+        background-color: rgba(0,0,0,0.2);
     }
     .break-next {
         width: 100%;
@@ -192,10 +212,38 @@ export default {
     .a--match-enter, .a--match-leave-to { max-height: 0; padding: 0 !important; }
     .a--match-enter-to, .a--match-leave { max-height: 100px; }
 
+    .break-content {
+        display: flex;
+        box-sizing: content-box;
+        width: 100%;
+        height: 100%;
+    }
+
+    .break-standings {
+        background-color: rgba(0,0,0,0.2);
+        padding: 40px;
+    }
+
+    .break-content-enter-active, .break-content-leave-active { transition: all .5s ease-in-out; overflow: hidden }
+    .break-content-enter, .break-content-leave-to { max-height: 0; padding: 0 40px; }
+    .break-content-enter-to, .break-content-leave { max-height: 100%; }
+
     .overlay[data-broadcast="resurge-4v4"] .break-main {
         margin-top: 50px;
     }
     .overlay[data-broadcast="resurge-4v4"] .break-center {
         padding: 60px 160px
+    }
+    .break-image {
+        background-color: rgba(0,0,0,0.2);
+        padding: 40px;
+    }
+    .break-image-inner {
+        width: 100%;
+        height: 100%;
+        /*background-size: contain;*/
+        background-size: 1040px;
+        background-position: center;
+        background-repeat: no-repeat;
     }
 </style>

@@ -9,13 +9,17 @@ import { image } from "@/utils/content-utils";
 
 export default {
     name: "ThemeLogo",
-    props: ["theme"],
+    props: ["theme", "iconPadding"],
     methods: {
     },
     computed: {
         logo () {
             if (!this.theme) return {};
-            return { backgroundImage: image(this.theme, "default_logo") };
+            return {
+                backgroundImage: image(this.theme, "default_logo"),
+                width: `calc(100% - ${this.iconPadding || 12}px)`,
+                height: `calc(100% - ${this.iconPadding || 12}px)`
+            };
         },
         bgStyle () {
             if (!this.theme) return { };
@@ -42,9 +46,5 @@ export default {
         color: rgba(255, 255, 255, 0.5);
 
         transition: background-color .2s, border-color .2s, color .2s;
-    }
-    .icon {
-        width: calc(100% - 12px);
-        height: calc(100% - 12px);
     }
 </style>

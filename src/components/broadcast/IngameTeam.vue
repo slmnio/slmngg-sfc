@@ -8,7 +8,7 @@
                 <div class="flex-center team-name">
                     <span class="industry-align">{{ team.name }}</span>
                 </div>
-                <div class="flex-center team-logo-holder flex-center">
+                <div class="flex-center team-logo-holder flex-center" v-if="teamLogo">
                     <div class="team-logo bg-center" :style="teamLogo"></div>
                 </div>
                 <transition name="score">
@@ -47,7 +47,9 @@ export default {
             };
         },
         teamLogo() {
-            return cssImage("backgroundImage", this.team.theme, ["small_logo", "default_logo"], 36);
+            const i = cssImage("backgroundImage", this.team.theme, ["small_logo", "default_logo"], 36);
+            if (!i.backgroundImage) return null;
+            return i;
         }
     },
     watch: {
@@ -199,7 +201,16 @@ function updateWidth(vueEl) {
     .team-logo-holder {
         width: 48px;
         flex-shrink: 0;
-        margin: 0 12px;
+        margin: 0 12px 0 0;
+    }
+    .team-name {
+        margin: 0 12px 0 0;
+    }
+    .ingame-team-holder.right .team-logo-holder {
+        margin: 0 0 0 12px;
+    }
+    .ingame-team-holder.right .team-name {
+        margin: 0 0 0 12px;
     }
 
     .team-logo {

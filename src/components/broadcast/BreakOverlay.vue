@@ -74,6 +74,13 @@ export default {
                 borderColor: this.event.theme.color_theme
             };
         }
+    },
+    watch: {
+        broadcast() {
+            if (this.broadcast) {
+                document.body.dataset.broadcast = this.broadcast.key;
+            }
+        }
     }
 };
 </script>
@@ -184,4 +191,11 @@ export default {
     .a--match-enter-active, .a--match-leave-active, .a--match-move { transition: all .5s ease; overflow: hidden; }
     .a--match-enter, .a--match-leave-to { max-height: 0; padding: 0 !important; }
     .a--match-enter-to, .a--match-leave { max-height: 100px; }
+
+    .overlay[data-broadcast="resurge-4v4"] .break-main {
+        margin-top: 50px;
+    }
+    .overlay[data-broadcast="resurge-4v4"] .break-center {
+        padding: 60px 160px
+    }
 </style>

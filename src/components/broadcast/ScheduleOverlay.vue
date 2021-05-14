@@ -1,6 +1,6 @@
 <template>
     <GenericOverlay title="Schedule" class="schedule-overlay" :accent-color="accentColor">
-        <transition-group class="break-col break-schedule" name="a--match" v-if="breakDisplay === 'Schedule'" key="Schedule">
+        <transition-group class="break-col break-schedule" name="a--match">
             <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" />
         </transition-group>
     </GenericOverlay>
@@ -17,10 +17,6 @@ export default {
     props: ["broadcast"],
     components: { GenericOverlay, BreakMatch },
     computed: {
-        breakDisplay() {
-            if (!this.broadcast || !this.broadcast.break_display) return null;
-            return this.broadcast.break_display;
-        },
         schedule() {
             if (!this.broadcast || !this.broadcast.schedule) return null;
             return ReactiveArray("schedule", {

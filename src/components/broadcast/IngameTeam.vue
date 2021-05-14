@@ -88,7 +88,7 @@ function updateWidth(vueEl) {
             smallText = smallText.getBoundingClientRect().width - 16;
         }
 
-        const target = 540 - (smallText);
+        const target = 445 - (smallText);
         const width = el.getBoundingClientRect().width;
 
         if (width > target) {

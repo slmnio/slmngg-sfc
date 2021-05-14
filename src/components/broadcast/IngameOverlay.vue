@@ -41,7 +41,7 @@ export default {
             return this.match.teams;
         },
         scores() {
-            if (!this.match || !this.match.teams || !this.match.teams.every(t => t.theme && !t.theme.__loading && t.theme.id)) return [];
+            if (!this.teams) return [];
             const scores = [this.match.score_1, this.match.score_2];
             if (this.match.flip_teams && this.match.teams.length === 2) return [scores[1], scores[0]];
             return scores;

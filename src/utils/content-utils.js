@@ -16,6 +16,7 @@ export function image (theme, key) {
 export function resizedImage(theme, key, minSize = 30) {
     if (!theme || !theme[key] || !theme[key][0]) return "";
     const image = theme[key][0];
+    if (!image.thumbnails) return image.url;
     const candidates = Object.values(image.thumbnails)
         .sort((a, b) => a.height - b.height)
         .filter((thumb) => thumb.height >= minSize && thumb.width >= minSize);

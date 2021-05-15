@@ -22,9 +22,17 @@ export default {
             return diff;
         },
         text() {
-            const mins = Math.floor(this.diff / 60);
-            const secs = this.diff % 60;
-            return [mins, secs].map(i => i.toString().padStart(2, "0")).join(":");
+            if (this.diff > 60 * 60) {
+                // hours
+                const diffMins = Math.floor(this.diff / 60);
+                const hours = Math.floor(diffMins / 60);
+                const mins = diffMins % 60;
+                return [hours, mins].map(i => i.toString().padStart(2, "0")).join(":");
+            } else {
+                const mins = Math.floor(this.diff / 60);
+                const secs = this.diff % 60;
+                return [mins, secs].map(i => i.toString().padStart(2, "0")).join(":");
+            }
         }
     },
     methods: {

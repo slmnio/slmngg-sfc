@@ -25,11 +25,16 @@
                     <div class="break-col break-standings" v-if="breakDisplay === 'Standings'" key="Standings">
                         <Standings :event="event" :stage="broadcast.current_stage" />
                     </div>
-                    <div class="break-col break-image" v-if="breakDisplay === 'Image'">
+                    <div class="break-col break-image" v-if="breakDisplay === 'Image'" key="Image">
                         <div class="break-image-inner" :style="cssImage('backgroundImage', broadcast, ['break_image'], 1080, false)"></div>
                     </div>
                 </transition>
             </div>
+        </div>
+        <div class="break-preload">
+            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" />
+            <Standings :event="event" :stage="broadcast.current_stage" />
+            <div class="break-image-inner" :style="cssImage('backgroundImage', broadcast, ['break_image'], 1080, false)"></div>
         </div>
     </div>
 </template>
@@ -245,5 +250,12 @@ export default {
         background-size: 1040px;
         background-position: center;
         background-repeat: no-repeat;
+    }
+
+    .break-preload {
+        opacity: 0;
+        max-width: 0px;
+        max-height: 0px;
+        overflow: hidden;
     }
 </style>

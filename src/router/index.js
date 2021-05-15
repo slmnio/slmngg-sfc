@@ -22,6 +22,7 @@ import BreakOverlay from "@/components/broadcast/BreakOverlay";
 import ScheduleOverlay from "@/components/broadcast/ScheduleOverlay";
 import StandingsOverlay from "@/components/broadcast/StandingsOverlay";
 import CustomOverlay from "@/components/broadcast/CustomOverlay";
+import RosterOverlay from "@/components/broadcast/RosterOverlay";
 
 Vue.use(VueRouter);
 
@@ -86,6 +87,7 @@ const routes = [
             { path: "break", component: BreakOverlay },
             { path: "schedule", component: ScheduleOverlay },
             { path: "standings", component: StandingsOverlay },
+            { path: "roster", component: RosterOverlay },
             { path: "custom", component: CustomOverlay, props: route => ({ title: route.query.title }) }
         ]
     }

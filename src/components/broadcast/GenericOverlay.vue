@@ -3,7 +3,7 @@
         <div class="generic-overlay-title flex-center" :style="{borderColor: accentColor}">
             <span class="industry-align">{{ title }}</span>
         </div>
-        <div class="generic-overlay-body flex-center">
+        <div class="generic-overlay-body flex-center" :style="{backgroundColor: bodyColor}">
             <slot></slot>
         </div>
     </div>
@@ -12,7 +12,7 @@
 <script>
 export default {
     name: "GenericOverlay",
-    props: ["title", "accentColor"]
+    props: ["title", "accentColor", "bodyColor"]
 };
 </script>
 

@@ -13,9 +13,7 @@
                             <BreakMatch :match="nextMatch" :expanded="false" />
                         </div>
                     </transition>
-                    <div class="break-countdown">
-                        <span class="industry-align">88:88</span>
-                    </div>
+                    <Countdown class="break-countdown" :to="broadcast.countdown_end" />
                     <Sponsors class="break-sponsors" :sponsors="sponsorThemes" />
                 </div>
                 <transition name="break-content" mode="out-in">
@@ -46,11 +44,12 @@ import { cssImage } from "@/utils/content-utils";
 import { sortMatches } from "@/utils/sorts";
 import Sponsors from "@/components/broadcast/Sponsors";
 import Standings from "@/components/broadcast/Standings";
+import Countdown from "@/components/broadcast/Countdown";
 
 export default {
     name: "BreakOverlay",
     props: ["broadcast"],
-    components: { Standings, BreakMatch, Sponsors },
+    components: { Standings, BreakMatch, Sponsors, Countdown },
     methods: { cssImage },
     computed: {
         nextMatch() {
@@ -190,6 +189,7 @@ export default {
         font-weight: bold;
         flex-grow: 1;
         height: 0;
+        letter-spacing: -5px;
     }
 
 

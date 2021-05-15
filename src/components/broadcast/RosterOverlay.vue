@@ -111,8 +111,9 @@ export default {
     /*width: 2em;*/
     /*height: 2em;*/
     flex-shrink: 0;
-    margin: 20px;
     opacity: 0.2;
+    top: 0;
+    overflow: hidden;
 }
 .team-icon {
     --pad: 0px;

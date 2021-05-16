@@ -23,6 +23,7 @@ import ScheduleOverlay from "@/components/broadcast/ScheduleOverlay";
 import StandingsOverlay from "@/components/broadcast/StandingsOverlay";
 import CustomOverlay from "@/components/broadcast/CustomOverlay";
 import RosterOverlay from "@/components/broadcast/RosterOverlay";
+import EventThumbnailCreator from "@/components/broadcast/EventThumbnailCreator";
 
 Vue.use(VueRouter);
 
@@ -88,6 +89,7 @@ const routes = [
             { path: "schedule", component: ScheduleOverlay },
             { path: "standings", component: StandingsOverlay },
             { path: "roster", component: RosterOverlay },
+            { path: "thumbnail", component: EventThumbnailCreator },
             { path: "custom", component: CustomOverlay, props: route => ({ title: route.query.title }) }
         ]
     }

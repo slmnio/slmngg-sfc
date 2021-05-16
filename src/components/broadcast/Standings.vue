@@ -77,7 +77,7 @@ export default {
                     maps_played: 0,
                     rank: null
                 };
-                if (this.settings.points) team.standings.points = team.extra_points || 0;
+                if (this.settings && this.settings.points) team.standings.points = team.extra_points || 0;
                 // get matches here
                 this.stageMatches.forEach(match => {
                     if (!match.teams) return;
@@ -97,18 +97,18 @@ export default {
                     team.standings.map_wins += scores[teamIndex];
                     team.standings.map_losses += scores[+!teamIndex];
 
-                    if (this.settings.points) team.standings.points += (this.settings.points.map_wins * team.standings.map_wins);
-                    if (this.settings.points) team.standings.points += (this.settings.points.map_losses * team.standings.map_losses);
+                    if (this.settings && this.settings.points) team.standings.points += (this.settings.points.map_wins * team.standings.map_wins);
+                    if (this.settings && this.settings.points) team.standings.points += (this.settings.points.map_losses * team.standings.map_losses);
 
                     const winIndex = match.score_1 === match.first_to ? 0 : 1;
                     const winner = match.teams[winIndex];
 
                     if (winner.id === team.id) {
                         team.standings.wins++;
-                        if (this.settings.points) team.standings.points += this.settings.points.wins;
+                        if (this.settings && this.settings.points) team.standings.points += this.settings.points.wins;
                     } else {
                         team.standings.losses++;
-                        if (this.settings.points) team.standings.points += this.settings.points.losses;
+                        if (this.settings && this.settings.points) team.standings.points += this.settings.points.losses;
                     }
                 });
 

@@ -24,6 +24,8 @@ import StandingsOverlay from "@/components/broadcast/StandingsOverlay";
 import CustomOverlay from "@/components/broadcast/CustomOverlay";
 import RosterOverlay from "@/components/broadcast/RosterOverlay";
 import EventThumbnailCreator from "@/components/broadcast/EventThumbnailCreator";
+import EventMain from "@/views/sub-views/EventMain";
+import EventRosters from "@/views/sub-views/EventRosters";
 
 Vue.use(VueRouter);
 
@@ -53,7 +55,11 @@ const routes = [
                 path: "/event/:id",
                 // name: "Event",
                 component: Event,
-                props: route => ({ id: route.params.id })
+                props: route => ({ id: route.params.id }),
+                children: [
+                    { path: "", component: EventMain },
+                    { path: "rosters", component: EventRosters }
+                ]
             },
             {
                 path: "/player/:id",

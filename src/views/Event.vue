@@ -2,22 +2,13 @@
     <div v-if="event">
         <ThingTop :thing="event" type="event"></ThingTop>
 
-        <div class="container mt-3">
-            <ContentRow :title="group.name" v-for="group in groupedTeams" v-bind:key="group.name">
-                <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in group.teams" v-bind:key="team.id" :show-logo="true"></ContentThing>
-            </ContentRow>
-            <ContentRow title="Teams" v-if="event.teams && event.teams.length && !groupedTeams">
-                <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in event.teams" v-bind:key="team.id" :show-logo="true"></ContentThing>
-            </ContentRow>
-            <ContentRow title="Staff" v-if="event.staff && event.staff.length">
-                <ContentThing :thing="staff" type="player" :theme="event.theme" v-for="staff in event.staff" v-bind:key="staff.id"></ContentThing>
-            </ContentRow>
+        <SubPageNav class="my-2">
+            <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
+            <li class="nav-item"><router-link class="nav-link" :to="subLink('rosters')">Rosters</router-link></li>
+<!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
+        </SubPageNav>
 
-            <ContentRow v-for="group in playerRelationshipGroups" v-bind:key="group.meta.singular_name"
-                        :title="group.items.length === 1 ? group.meta.singular_name : group.meta.plural_name">
-                <ContentThing v-for="player in group.items" v-bind:key="player.id" :thing="player" type="player" :theme="event.theme"/>
-            </ContentRow>
-        </div>
+        <router-view :event="event"></router-view>
     </div>
 </template>
 
@@ -28,12 +19,13 @@ import ContentThing from "@/components/website/ContentThing";
 import ContentRow from "@/components/website/ContentRow";
 import { ReactiveRoot, ReactiveThing, ReactiveArray } from "@/utils/reactive";
 import { multiImage } from "@/utils/content-utils";
+import SubPageNav from "@/components/website/SubPageNav";
 
 export default {
     name: "Event",
     props: ["id"],
     components: {
-        ThingTop, ContentThing, ContentRow
+        ThingTop, SubPageNav
     },
     metaInfo() {
         return {
@@ -47,39 +39,6 @@ export default {
         };
     },
     computed: {
-        groupedTeams() {
-            if (!this.event || !this.event.teams) return null;
-            if (!this.event?.teams.some(team => team.team_category)) return null;
-            const categories = [];
-            this.event.teams.forEach(team => {
-                let categoryName = team.team_category;
-                let categoryPosition = null;
-
-                if (!categoryName) {
-                    // default to other group
-                    categoryName = "-1;Other";
-                }
-
-                if (categoryName.includes(";")) {
-                    // custom ordering
-                    categoryName = categoryName.split(";");
-                    categoryPosition = parseInt(categoryName.shift());
-                    categoryName = categoryName.join(" ");
-                }
-
-                if (!categories.find(category => category.name === categoryName)) {
-                    categories.push({ name: categoryName, teams: [], position: categoryPosition });
-                }
-
-                categories.find(category => category.name === categoryName).teams.push(team);
-            });
-            return categories.sort((a, b) => {
-                if (a.position === b.position) {
-                    return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;
-                }
-                return a.position - b.position;
-            });
-        },
         event() {
             return ReactiveRoot(this.id, {
                 theme: ReactiveThing("theme"),
@@ -91,28 +50,11 @@ export default {
                     player: ReactiveThing("player")
                 })
             });
-        },
-        playerRelationshipGroups() {
-            if (!this.event?.player_relationships) return [];
-            const groups = {};
-
-            this.event.player_relationships.forEach(rel => {
-                if (!groups[rel.singular_name]) {
-                    groups[rel.singular_name] = {
-                        meta: {
-                            player_text: rel.player_text,
-                            plural_name: rel.plural_name,
-                            singular_name: rel.singular_name
-                        },
-                        items: []
-                    };
-                }
-                groups[rel.singular_name].items = groups[rel.singular_name].items.concat(rel.player);
-            });
-
-            if (groups[undefined]) return [];
-
-            return Object.values(groups);
+        }
+    },
+    methods: {
+        subLink(page) {
+            return `/event/${this.event.id}/${page}`;
         }
     }
 };

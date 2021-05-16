@@ -48,6 +48,7 @@ export function ReactiveThing(key, structure) {
             // console.log("[reactive-thing] rebased", id);
             id = id[0];
         }
+        if (typeof id === "object" && id.id && id.length === undefined) id = id.id;
         id = cleanID(id);
         // console.log("[reactive-thing]", key, id);
 
@@ -82,6 +83,7 @@ export function ReactiveArray (key, structure) {
         const idsToResolve = [];
 
         data = data.map(id => {
+            if (typeof id === "object" && id.id && id.length === undefined) id = id.id;
             id = cleanID(id);
             if (!id) return {};
             const d = store.getters.thing(id);

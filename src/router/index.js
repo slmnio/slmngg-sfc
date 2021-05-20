@@ -26,6 +26,7 @@ import RosterOverlay from "@/components/broadcast/RosterOverlay";
 import EventThumbnailCreator from "@/components/broadcast/EventThumbnailCreator";
 import EventMain from "@/views/sub-views/EventMain";
 import EventRosters from "@/views/sub-views/EventRosters";
+import EventBrackets from "@/views/sub-views/EventBrackets";
 
 Vue.use(VueRouter);
 
@@ -58,7 +59,8 @@ const routes = [
                 props: route => ({ id: route.params.id }),
                 children: [
                     { path: "", component: EventMain },
-                    { path: "rosters", component: EventRosters }
+                    { path: "rosters", component: EventRosters },
+                    { path: "bracket", component: EventBrackets }
                 ]
             },
             {

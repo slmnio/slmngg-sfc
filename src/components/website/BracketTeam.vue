@@ -1,0 +1,125 @@
+<template>
+    <div class="bracket-team" v-bind:class="{'text': !!text, 'empty': empty, 'highlighted': highlighted, 'lowlighted': lowlighted}"
+         @mouseover="highlight" @mouseout="unHighlight"
+         :style="background">
+        <div class="inner" v-if="!empty">
+            {{ text }}
+            <div class="team-logo-holder flex-center" v-if="team">
+                <div class="team-logo bg-center" :style="teamLogo"></div>
+            </div>
+            <div class="team-name-holder" v-if="team">
+                <div class="team-name">{{ team.name }}</div>
+            </div>
+            <div class="team-score flex-center" v-bind:class="{ 'win': win }" v-if="team && score !== null">{{ score }}</div>
+        </div>
+    </div>
+</template>
+
+<script>
+import { themeBackground, logoBackground1 } from "@/utils/theme-styles";
+import { cssImage } from "@/utils/content-utils";
+import Store from "@/thing-store";
+
+export default {
+    name: "BracketTeam",
+    props: ["team", "text", "empty", "score", "win"],
+    methods: {
+        highlight() { Store.commit("setHighlightedTeam", this.team?.id || null); },
+        unHighlight() { Store.commit("setHighlightedTeam", null); }
+    },
+    computed: {
+        highlighted() {
+            if (!this.team) return false;
+            return Store.getters.isHighlighted(this.team.id);
+        },
+        lowlighted() {
+            if (this.highlighted) return false;
+            return !!Store.state.highlighted_team;
+        },
+        background() {
+            if (this.empty) return { backgroundColor: "transparent" };
+            if (this.team && this.team.id) return logoBackground1(this.team);
+            return {};
+        },
+        teamLogo() {
+            if (!this.team) return {};
+            return cssImage("backgroundImage", this.team?.theme, ["small_logo", "default_logo"], 36);
+        }
+    }
+};
+</script>
+
+<style scoped>
+    .inner {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+    }
+
+    .bracket-team {
+        width: 100%;
+        --match-height: 38px;
+        height: var(--match-height);
+        background-color: #282828;
+    }
+    .team-logo-holder {
+        width: var(--match-height);
+        height: var(--match-height);
+        flex-shrink: 0;
+    }
+    .team-logo {
+        --padding: 4px;
+        width: calc(100% - var(--padding));
+        height: calc(100% - var(--padding));
+    }
+    .bracket-team.empty {
+        opacity: 0;
+    }
+    .bracket-team.text .inner {
+        text-align: center;
+        justify-content: center;
+    }
+
+    /* messy but works for now */
+    .team-name-holder {
+        flex-grow: 1;
+        padding: 0 4px;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+    }
+    .team-name {
+        line-height: 1;
+        transform: translate(0, -0.0925em); /* industry-align */
+
+        font-size: 17px;
+        padding: 2px 0;
+
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+    }
+
+    .team-score {
+        background-color: #444;
+        color: #aaa;
+        flex-shrink: 0;
+        width: 20px;
+        height: 100%;
+        font-weight: bold;
+    }
+
+    .team-score.win {
+        color: var(--win-background-color);
+        /*background-color: var(--win-background-color);*/
+    }
+
+    .bracket-team {
+        transition: opacity 150ms;
+    }
+    .bracket-team.lowlighted {
+        opacity: 0.2;
+    }
+</style>

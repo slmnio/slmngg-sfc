@@ -8,7 +8,9 @@ export default new Vuex.Store({
     state: {
         things: [],
         subscribed_ids: [],
-        request_buffer: []
+        request_buffer: [],
+
+        highlighted_team: null
     },
     mutations: {
         push(_store, { id, data }) {
@@ -56,11 +58,16 @@ export default new Vuex.Store({
             this._vm.$socket.client.emit("unsubscribe", id);
             // console.log("[socket]", "unsubscribed from", id);
             state.subscribed_ids.splice(this.state.subscribed_ids.indexOf(id), 1);
+        },
+
+        setHighlightedTeam(state, teamID) {
+            state.highlighted_team = teamID;
         }
     },
     getters: {
         things: state => state.things,
-        thing: (state) => (id) => state.things.find(item => item.id === id)
+        thing: (state) => (id) => state.things.find(item => item.id === id),
+        isHighlighted: state => (id) => state.highlighted_team === id
     },
     actions: {
         subscribe: (state, data) => state.commit("subscribe", data),

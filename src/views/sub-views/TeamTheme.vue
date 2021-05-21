@@ -3,10 +3,7 @@
 
         <h3>Themes</h3>
         <div class="theme-collection mb-3">
-            <div class="theme-bar" :style="{
-                backgroundColor: theme.color_theme,
-                color: theme.color_text_on_theme,
-                borderColor: theme.color_alt || theme.color_accent }">
+            <div class="theme-bar" :style="mainTheme">
                 Theme
             </div>
             <div class="theme-bar" :style="logoBackground">
@@ -25,7 +22,7 @@
 
         <h3>Logos</h3>
         <div class="logo-list mb-3">
-            <div class="logo-holder flex-center" v-for="logo in logos" v-bind:key="logo" :style="logoBackground">
+            <div class="logo-holder flex-center" v-for="logo in logos" v-bind:key="logo.key" :style="logoBackground">
                 <a :href="logo.image" target="_blank" class="bg-center logo" :style="{backgroundImage: `url(${logo.image})`}"></a>
                 <div class="logo-name">{{ logo.key }}</div>
             </div>
@@ -65,10 +62,19 @@ export default {
             if (!this.team || this.team.has_theme === 0 || !this.team.theme?.id) return null;
             return this.team.theme;
         },
+        mainTheme() {
+            if (!this.theme) return {};
+            return {
+                backgroundColor: this.theme.color_theme,
+                color: this.theme.color_text_on_theme,
+                borderColor: this.theme.color_alt || this.theme.color_accent
+            };
+        },
         logoBackground() {
             return logoBackground(this.theme);
         },
         colors() {
+            if (!this.theme) return [];
             const attrs = Object.entries(this.theme);
             const colors = [];
 
@@ -86,6 +92,7 @@ export default {
             return colors;
         },
         logos() {
+            if (!this.theme) return [];
             const keys = ["small_logo", "default_logo", "default_wordmark"];
             return keys.map(k => ({
                 key: cleanKey(k),
@@ -151,8 +158,8 @@ export default {
         margin-right: 16px;
     }
     .logo-holder a {
-        max-width: calc(100% - 4px);
-        max-height: calc(100% - 32px);
+        width: calc(100% - 8px);
+        height: calc(100% - 32px);
         display: flex;
         justify-content: center;
     }

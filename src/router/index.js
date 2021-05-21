@@ -27,6 +27,7 @@ import EventThumbnailCreator from "@/components/broadcast/EventThumbnailCreator"
 import EventMain from "@/views/sub-views/EventMain";
 import EventRosters from "@/views/sub-views/EventRosters";
 import EventBrackets from "@/views/sub-views/EventBrackets";
+import TeamTheme from "@/views/sub-views/TeamTheme";
 
 Vue.use(VueRouter);
 
@@ -47,7 +48,8 @@ const routes = [
                 props: route => ({ id: route.params.id }),
                 children: [
                     { path: "", component: TeamMain },
-                    { path: "matches", component: TeamMatches }
+                    { path: "matches", component: TeamMatches },
+                    { path: "theme", component: TeamTheme }
                 ]
             },
             { path: "/events", component: Events },

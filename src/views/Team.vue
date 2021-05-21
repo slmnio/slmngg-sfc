@@ -4,6 +4,7 @@
         <SubPageNav class="my-2">
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
             <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
+            <li class="nav-item" v-if="team.theme"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
         </SubPageNav>
         <router-view :team="team"></router-view>
     </div>

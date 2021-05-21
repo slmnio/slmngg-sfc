@@ -1,0 +1,167 @@
+<template>
+    <div class="team-theme container">
+
+        <h3>Themes</h3>
+        <div class="theme-collection mb-3">
+            <div class="theme-bar" :style="{
+                backgroundColor: theme.color_theme,
+                color: theme.color_text_on_theme,
+                borderColor: theme.color_alt || theme.color_accent }">
+                Theme
+            </div>
+            <div class="theme-bar" :style="logoBackground">
+                Logo Background
+            </div>
+        </div>
+
+
+        <h3>Colors</h3>
+        <div class="color-list mb-3">
+            <div class="color" v-for="color in colors" v-bind:key="color.name">
+                <div class="color-swatch" :style="{backgroundColor: color.value}"></div>
+                <div class="color-name">{{ color.name }}: <code>{{ color.value }}</code></div>
+            </div>
+        </div>
+
+        <h3>Logos</h3>
+        <div class="logo-list mb-3">
+            <div class="logo-holder flex-center" v-for="logo in logos" v-bind:key="logo" :style="logoBackground">
+                <a :href="logo.image" target="_blank" class="bg-center logo" :style="{backgroundImage: `url(${logo.image})`}"></a>
+                <div class="logo-name">{{ logo.key }}</div>
+            </div>
+        </div>
+
+        <h3>Ingame overlay</h3>
+        <div class="overlay-area ingame-overlay mb-3">
+            <IngameTeam :team="team"/>
+        </div>
+
+        <h3>Bracket</h3>
+        <div class="overlay-area">
+            <div class="bracket-match">
+                <BracketTeam :team="team" score="0"/>
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<script>
+import IngameTeam from "@/components/broadcast/IngameTeam";
+import BracketTeam from "@/components/website/BracketTeam";
+import { getImage } from "@/utils/content-utils";
+import { logoBackground } from "@/utils/theme-styles";
+
+function cleanKey(key) {
+    return key.replace(/_/g, " ");
+}
+
+export default {
+    name: "TeamTheme.vue",
+    components: { BracketTeam, IngameTeam },
+    props: ["team"],
+    computed: {
+        theme() {
+            if (!this.team || this.team.has_theme === 0 || !this.team.theme?.id) return null;
+            return this.team.theme;
+        },
+        logoBackground() {
+            return logoBackground(this.theme);
+        },
+        colors() {
+            const attrs = Object.entries(this.theme);
+            const colors = [];
+
+            attrs.forEach(([key, val]) => {
+                if (!key.startsWith("color_")) return;
+                const u = colors.find(c => c.value === val);
+                key = cleanKey(key.replace("color_", ""));
+                if (u) {
+                    u.name += ", " + key;
+                } else {
+                    colors.push({ name: key, value: val });
+                }
+            });
+
+            return colors;
+        },
+        logos() {
+            const keys = ["small_logo", "default_logo", "default_wordmark"];
+            return keys.map(k => ({
+                key: cleanKey(k),
+                image: getImage(this.theme[k])
+            })).filter(i => i.image);
+        }
+    }
+};
+</script>
+
+<style scoped>
+    .overlay-area {
+        position: relative;
+    }
+    .bracket-match {
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+    }
+    .overlay-area.ingame-overlay {
+        height: 60px;
+        margin-top: -12px;
+    }
+    .theme-collection {
+        display: flex;
+    }
+    .theme-bar {
+        font-size: 1.25em;
+        font-weight: bold;
+        padding: 2px 6px;
+        display: inline-flex;
+        min-width: 12em;
+        justify-content: center;
+        text-transform: uppercase;
+        margin-right: 12px;
+        border-bottom: 4px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .color-swatch {
+        width: 1em;
+        height: 1em;
+        margin-right: 4px;
+    }
+    .color-name {
+        text-transform: uppercase;
+    }
+    .color-name code {
+        margin-left: 4px;
+    }
+    .color {
+        display: flex;
+        align-items: center;
+    }
+
+
+    .logo-list {
+        display: inline-flex;
+    }
+    .logo-holder {
+        width: 200px;
+        height: 160px;
+        flex-direction: column;
+        margin-right: 16px;
+    }
+    .logo-holder a {
+        max-width: calc(100% - 4px);
+        max-height: calc(100% - 32px);
+        display: flex;
+        justify-content: center;
+    }
+    img.logo {
+        max-width: 100%;
+    }
+    .logo-name {
+        text-transform: uppercase;
+        font-weight: bold;
+        padding: 2px 4px;
+    }
+</style>

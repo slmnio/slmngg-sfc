@@ -12,16 +12,16 @@
         </div>
 
 
-        <h3>Colors</h3>
-        <div class="color-list mb-3">
+        <h3 v-if="colors.length">Colors</h3>
+        <div v-if="colors.length" class="color-list mb-3">
             <div class="color" v-for="color in colors" v-bind:key="color.name">
                 <div class="color-swatch" :style="{backgroundColor: color.value}"></div>
                 <div class="color-name">{{ color.name }}: <code>{{ color.value }}</code></div>
             </div>
         </div>
 
-        <h3>Logos</h3>
-        <div class="logo-list mb-3">
+        <h3 v-if="logos.length">Logos</h3>
+        <div v-if="logos.length" class="logo-list mb-3">
             <div class="logo-holder flex-center" v-for="logo in logos" v-bind:key="logo.key" :style="logoBackground">
                 <a :href="logo.image" target="_blank" class="bg-center logo" :style="{backgroundImage: `url(${logo.image})`}"></a>
                 <div class="logo-name">{{ logo.key }}</div>

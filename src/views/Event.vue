@@ -4,7 +4,7 @@
 
         <SubPageNav class="my-2">
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
-            <li class="nav-item"><router-link class="nav-link" :to="subLink('rosters')">Rosters</router-link></li>
+<!--            <li class="nav-item"><router-link class="nav-link" :to="subLink('rosters')">Rosters</router-link></li>-->
             <li class="nav-item" v-if="event.brackets"><router-link class="nav-link" :to="subLink('bracket')">{{ event.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link></li>
 <!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
         </SubPageNav>

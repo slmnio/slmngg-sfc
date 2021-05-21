@@ -9,7 +9,7 @@ import { image } from "@/utils/content-utils";
 
 export default {
     name: "ThemeLogo",
-    props: ["theme", "iconPadding"],
+    props: ["theme", "iconPadding", "borderWidth"],
     methods: {
     },
     computed: {
@@ -25,7 +25,7 @@ export default {
             if (!this.theme) return { };
             return {
                 backgroundColor: this.theme.color_logo_background || this.theme.color_theme,
-                borderColor: this.theme.color_logo_accent || this.theme.color_accent,
+                borderBottom: `${this.borderWidth === undefined ? 10 : this.borderWidth}px solid ${this.theme.color_logo_accent || this.theme.color_accent}`,
                 color: this.theme.color_text_on_logo_background || this.theme.color_text_on_theme
             };
         }

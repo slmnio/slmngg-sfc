@@ -113,8 +113,8 @@ a:not(.link-text), a:not(.link-text):hover {
     opacity: 1;
 }
 
-body {
-    /*padding-bottom: 80px;*/
+#slmngg-app {
+    padding-bottom: 32px;
 }
 .navbar-text b {
     padding: 0 1px;

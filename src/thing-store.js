@@ -10,7 +10,8 @@ export default new Vuex.Store({
         subscribed_ids: [],
         request_buffer: [],
 
-        highlighted_team: null
+        highlighted_team: null,
+        timezone: "local"
     },
     mutations: {
         push(_store, { id, data }) {
@@ -62,6 +63,9 @@ export default new Vuex.Store({
 
         setHighlightedTeam(state, teamID) {
             state.highlighted_team = teamID;
+        },
+        setTimezone(state, timezone) {
+            state.timezone = timezone;
         }
     },
     getters: {

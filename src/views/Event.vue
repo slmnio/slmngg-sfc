@@ -6,6 +6,7 @@
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
 <!--            <li class="nav-item"><router-link class="nav-link" :to="subLink('rosters')">Rosters</router-link></li>-->
             <li class="nav-item" v-if="event.brackets"><router-link class="nav-link" :to="subLink('bracket')">{{ event.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link></li>
+            <li class="nav-item" v-if="event.matches"><router-link class="nav-link" :to="subLink('schedule')">Schedule</router-link></li>
 <!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
         </SubPageNav>
 
@@ -16,8 +17,6 @@
 <script>
 
 import ThingTop from "@/components/website/ThingTop";
-import ContentThing from "@/components/website/ContentThing";
-import ContentRow from "@/components/website/ContentRow";
 import { ReactiveRoot, ReactiveThing, ReactiveArray } from "@/utils/reactive";
 import { multiImage } from "@/utils/content-utils";
 import SubPageNav from "@/components/website/SubPageNav";

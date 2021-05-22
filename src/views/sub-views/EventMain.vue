@@ -9,6 +9,9 @@
         <ContentRow title="Staff" v-if="event.staff && event.staff.length">
             <ContentThing :thing="staff" type="player" :theme="event.theme" v-for="staff in event.staff" v-bind:key="staff.id"></ContentThing>
         </ContentRow>
+        <ContentRow :title="event.casters.length === 1 ? 'Caster' : 'Casters'" v-if="event.casters && event.casters.length">
+            <ContentThing :thing="caster" type="player" :theme="event.theme" v-for="caster in event.casters" v-bind:key="caster.id"></ContentThing>
+        </ContentRow>
 
         <ContentRow v-for="group in playerRelationshipGroups" v-bind:key="group.meta.singular_name"
                     :title="group.items.length === 1 ? group.meta.singular_name : group.meta.plural_name">

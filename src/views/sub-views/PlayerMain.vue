@@ -25,6 +25,10 @@
                 <ContentThing :thing="event" type="event" :theme="event.theme" v-for="event in eventStaff"
                               v-bind:key="event.id" :show-logo="true" />
             </ContentRow>
+            <ContentRow title="Caster for" v-if="castedEvents">
+                <ContentThing :thing="event" type="event" :theme="event.theme" v-for="event in castedEvents"
+                              v-bind:key="event.id" :show-logo="true" />
+            </ContentRow>
             <ContentRow :title="group.meta.player_text" v-for="group in mainPlayerRelationships" v-bind:key="group.meta.singular_name">
                 <ContentThing
                     v-for="item in group.items"
@@ -79,6 +83,11 @@ export default {
         eventStaff() {
             if (!this.player?.event_staff) return null;
             const events = this.player.event_staff;
+            return events.sort(sortEvents);
+        },
+        castedEvents() {
+            if (!this.player?.casted_events) return null;
+            const events = this.player.casted_events;
             return events.sort(sortEvents);
         },
         teamStaff() {

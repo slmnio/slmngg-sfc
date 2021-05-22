@@ -48,7 +48,8 @@ export default {
                 staff: ReactiveArray("staff"),
                 player_relationships: ReactiveArray("player_relationships", {
                     player: ReactiveThing("player")
-                })
+                }),
+                casters: ReactiveArray("casters")
             });
         }
     },

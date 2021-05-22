@@ -60,6 +60,9 @@ export default {
                 event_staff: ReactiveArray("event_staff", {
                     theme: ReactiveThing("theme")
                 }),
+                casted_events: ReactiveArray("casted_events", {
+                    theme: ReactiveThing("theme")
+                }),
                 team_staff: ReactiveArray("team_staff", {
                     theme: ReactiveThing("theme")
                 }),

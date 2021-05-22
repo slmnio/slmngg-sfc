@@ -74,7 +74,7 @@ export function ReactiveThing(key, structure) {
 
 export function ReactiveArray (key, structure) {
     // console.log("[reactive-array] !created!", key);
-    let oldIDs = [];
+    // let oldIDs = [];
 
     return (originalData) => {
         let data = originalData[key];

@@ -4,7 +4,7 @@
   "description": "SLMN.GG Backend Server",
   "main": "index.js",
   "scripts": {
-    "serve": "nodemon src/index.js"
+    "serve-server": "nodemon src/index.js"
   },
   "repository": "git+https://github.com/slmnio/slmngg-server.git",
   "author": "",

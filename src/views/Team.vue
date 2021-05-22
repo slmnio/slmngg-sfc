@@ -55,6 +55,11 @@ export default {
                 staff: ReactiveArray("staff"),
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")
+                }),
+                accolades: ReactiveArray("accolades", {
+                    event: ReactiveThing("event", {
+                        theme: ReactiveThing("theme")
+                    })
                 })
             });
         }

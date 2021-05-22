@@ -1,5 +1,9 @@
 <template>
         <div class="container">
+            <ContentRow v-if="team.accolades">
+                <ContentThing :thing="accolade" type="event" :link-to="accolade.event" :theme="accolade.event && accolade.event.theme" v-for="accolade in team.accolades"
+                              v-bind:key="accolade.id" :show-logo="true" :text="accolade.name" />
+            </ContentRow>
             <ContentRow v-if="team.owner" title="Owner">
                 <ContentThing type="player" :text="team.owner.name" :thing="team.owner" :theme="team.theme"></ContentThing>
             </ContentRow>

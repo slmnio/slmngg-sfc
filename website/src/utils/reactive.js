@@ -1,5 +1,5 @@
 import store from "../thing-store";
-import { queueThings, resolveThing, resolveThings } from "@/utils/fetch";
+import { queueThings, resolveThing } from "@/utils/fetch";
 import { cleanID } from "@/utils/content-utils";
 
 export function ReactiveRoot (id, structure) {
@@ -109,7 +109,7 @@ export function ReactiveArray (key, structure) {
 
         // unsubscriptions
         // oldIDs.forEach(id => { if (!newIDs.includes(id)) { store.dispatch("unsubscribe", id); } });
-        oldIDs = newIDs;
+        // oldIDs = newIDs;
         return data;
     };
 }

@@ -102,7 +102,8 @@ const routes = [
             { path: "break", component: BreakOverlay },
             { path: "schedule", component: ScheduleOverlay },
             { path: "standings", component: StandingsOverlay },
-            { path: "roster", component: RosterOverlay },
+            { path: "roster", redirect: "rosters" },
+            { path: "rosters", component: RosterOverlay },
             { path: "thumbnail", component: EventThumbnailCreator },
             { path: "custom", component: CustomOverlay, props: route => ({ title: route.query.title }) }
         ]

@@ -70,7 +70,7 @@ export default {
             function clamp(number, min, max) {
                 return Math.max(min, Math.min(number, max));
             }
-            return clamp(300 / players, 16, 52) + "px";
+            return clamp(350 / players, 16, 64) + "px";
         }
     }
 };
@@ -99,7 +99,7 @@ export default {
 
 .team-top {
     font-size: 64px;
-    height: 2.75em;
+    height: 3em;
     width: 100%;
     border-bottom: 8px solid transparent;
     flex-shrink: 0;
@@ -142,5 +142,9 @@ export default {
 
 .team-top {
     position: relative;
+}
+
+.player {
+    transform: translate(0, -0.0925em);
 }
 </style>

@@ -7,7 +7,7 @@
                     <div class="team-icon bg-center" :style="icon(team)"></div>
                 </div>
             </div>
-            <div class="team-roster flex-center flex-column">
+            <div class="team-roster flex-center flex-column" :style="{ fontSize: rosterFontSize(team) }">
                 <div class="player" v-for="player in team.players" v-bind:key="player.id">
                     {{ player.name }}
                 </div>
@@ -62,6 +62,15 @@ export default {
         icon(team) {
             if (!team.theme) return {};
             return cssImage("backgroundImage", team.theme, ["default_logo", "default_wordmark"], 250);
+        },
+        rosterFontSize(team) {
+            const players = team?.players?.length;
+            if (!players) return "";
+
+            function clamp(number, min, max) {
+                return Math.max(min, Math.min(number, max));
+            }
+            return clamp(300 / players, 16, 52) + "px";
         }
     }
 };
@@ -90,9 +99,10 @@ export default {
 
 .team-top {
     font-size: 64px;
-    height: 3.5em;
+    height: 2.75em;
     width: 100%;
     border-bottom: 8px solid transparent;
+    flex-shrink: 0;
 }
 .team-name {
     line-height: 1;

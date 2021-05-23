@@ -5,6 +5,8 @@ const slmngg = airtable.base(process.env.AIRTABLE_APP);
 const ora = require("ora");
 const chalk = require("chalk");
 
+const logUpdates = false;
+
 // Starting with syncing Matches
 
 // const tables = ["Matches", "Teams", "Themes", "Events", "Players", "Player Relationships"];
@@ -24,13 +26,14 @@ function deAirtable(obj) {
 
 async function getAllTableData(tableName, options = {}) {
     const start = new Date();
-    let loading = ora({
+    let loading;
+    if (logUpdates) loading = ora({
         text: `Loading table ${chalk.bold(tableName)}`,
         prefixText: "Airtable"
     }).start();
     let data = await slmngg(tableName).select(options).all();
     const end = new Date();
-    loading.succeed(`Loaded table ${chalk.bold(tableName)} - ${data.length} records loaded in ${((end - start) / 1000).toFixed(2)}s`);
+    if (logUpdates) loading.succeed(`Loaded table ${chalk.bold(tableName)} - ${data.length} records loaded in ${((end - start) / 1000).toFixed(2)}s`);
     return data;
 }
 
@@ -45,7 +48,10 @@ async function processTableData(tableName, data) {
         customUpdater(tableName, data);
     });
     await Cache.set(tableName, {id: tableName, ids: data.map(d => d.id)});
+    customTableUpdate(tableName, Cache);
 }
+
+const customTableUpdate = require("./custom-datasets");
 
 function registerUpdater(tableName, options) {
     let pollRate = 3000;
@@ -63,8 +69,11 @@ function registerUpdater(tableName, options) {
         });
 
         if (data.length) {
-            console.log(`Airtable # Updates complete for table ${chalk.bold(tableName)} - ${data.length} records updated.`);
+            if (logUpdates) console.log(`Airtable # Updates complete for table ${chalk.bold(tableName)} - ${data.length} records updated.`);
         }
+
+        customTableUpdate(tableName, Cache);
+
     }, pollRate);
 
     setInterval(async function() {

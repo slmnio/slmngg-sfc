@@ -15,6 +15,9 @@
                     <router-link active-class="active" class="nav-link" to="/players">Players</router-link>
                     <router-link active-class="active" class="nav-link" to="/news">News</router-link>
                 </b-navbar-nav>
+                <b-navbar-nav>
+                    <NavLiveMatch v-for="match in liveMatches" :match="match" v-bind:key="match.id" />
+                </b-navbar-nav>
             </b-collapse>
         </b-navbar>
 
@@ -31,16 +34,29 @@ import {
     BNavbarToggle
 } from "bootstrap-vue";
 
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "../utils/reactive";
+import NavLiveMatch from "../components/website/NavLiveMatch";
+
 export default {
     name: "WebsiteApp",
     components: {
         BNavbar,
         BNavbarToggle,
         BCollapse,
-        BNavbarNav
+        BNavbarNav,
+        NavLiveMatch
     },
     beforeCreate () {
         document.body.className = "website";
+    },
+    computed: {
+        liveMatches() {
+            return ReactiveRoot("special:live-matches", {
+                matches: ReactiveArray("matches", {
+                    event: ReactiveThing("event")
+                })
+            }).matches;
+        }
     }
 };
 </script>
@@ -48,5 +64,12 @@ export default {
 <style scoped>
 @import "~@/assets/bootstrap.css";
 @import "~@/assets/app.css";
+
+.nav-link-match {
+    color: rgba(255,255,255,0.8) !important;
+}
+.nav-link-match:hover {
+    color: rgba(255,255,255,1) !important;
+}
 
 </style>

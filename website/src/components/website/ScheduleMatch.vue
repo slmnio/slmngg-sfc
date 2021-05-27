@@ -14,7 +14,7 @@
             <router-link :to="url('team', team)" class="team-code d-lg-none">{{ team.code }}</router-link>
 
 
-            <ThemeLogo v-if="team && team.has_theme" :theme="team.theme" border-width="4" class="team-logo" icon-padding="4"/>
+            <ThemeLogo v-if="team && !team.dummy" :theme="team.theme" border-width="4" class="team-logo" icon-padding="4"/>
             <div class="team-logo team-logo--spacer" v-else></div>
         </div>
 

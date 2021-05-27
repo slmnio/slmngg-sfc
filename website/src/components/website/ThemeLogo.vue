@@ -22,7 +22,11 @@ export default {
             };
         },
         bgStyle () {
-            if (!this.theme) return { };
+            if (!this.theme) {
+                return {
+                    borderBottom: `${this.borderWidth === undefined ? 10 : this.borderWidth}px solid rgba(255,255,255,0.2)`
+                };
+            }
             return {
                 backgroundColor: this.theme.color_logo_background || this.theme.color_theme,
                 borderBottom: `${this.borderWidth === undefined ? 10 : this.borderWidth}px solid ${this.theme.color_logo_accent || this.theme.color_accent}`,
@@ -37,7 +41,7 @@ export default {
     .icon-holder {
         width: 200px;
         height: 160px;
-        border-bottom: 10px solid transparent;
+        /*border-bottom: 10px solid transparent;*/
         flex-shrink: 0;
 
         /* default colouring */

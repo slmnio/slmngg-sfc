@@ -29,6 +29,7 @@ import EventRosters from "@/views/sub-views/EventRosters";
 import EventBrackets from "@/views/sub-views/EventBrackets";
 import TeamTheme from "@/views/sub-views/TeamTheme";
 import EventSchedule from "@/views/sub-views/EventSchedule";
+import EventScenarios from "@/components/website/EventScenarios";
 
 Vue.use(VueRouter);
 
@@ -66,7 +67,8 @@ const routes = [
                     { path: "bracket", component: EventBrackets },
                     { path: "brackets", redirect: "bracket" },
                     { path: "schedule", component: EventSchedule },
-                    { path: "matches", redirect: "schedule" }
+                    { path: "matches", redirect: "schedule" },
+                    { path: "scenarios", component: EventScenarios }
                 ]
             },
             {

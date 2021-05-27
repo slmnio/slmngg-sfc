@@ -7,6 +7,7 @@
 <!--            <li class="nav-item"><router-link class="nav-link" :to="subLink('rosters')">Rosters</router-link></li>-->
             <li class="nav-item" v-if="event.brackets"><router-link class="nav-link" :to="subLink('bracket')">{{ event.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link></li>
             <li class="nav-item" v-if="event.matches"><router-link class="nav-link" :to="subLink('schedule')">Schedule</router-link></li>
+            <li class="nav-item" v-if="showFoldy"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
 <!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
         </SubPageNav>
 
@@ -51,6 +52,16 @@ export default {
                 }),
                 casters: ReactiveArray("casters")
             });
+        },
+        showFoldy() {
+            if (!this.event?.blocks) return false;
+            try {
+                const settings = JSON.parse(this.event.blocks);
+                if (!settings?.foldy?.use) return false;
+            } catch (e) {
+                return false;
+            }
+            return true;
         }
     },
     methods: {

@@ -3,15 +3,23 @@
 // Any requests from crawlers or unfurls get redirected to this file.
 // This means you can render meta tags here on the server side
 
-$args = array_values(array_filter(explode("/", $_SERVER['REQUEST_URI']), function ($e) {
+$_URL = $_SERVER['REQUEST_URI'];
+if (strpos($_URL,"?") !== false) $_URL = substr_replace($_URL, "", strpos($_URL, "?"));
+if (strpos($_URL,"#") !== false) $_URL = substr_replace($_URL, "", strpos($_URL, "#"));
+$args = array_values(array_filter(explode("/", $_URL), function ($e) {
     return $e !== "";
 }));
+
+
 
 $routes = [
     [
         "url" => "team",
         "also_load" => ["theme", "event"],
-        "sub_routes" => [""],
+        "sub_routes" => [
+            ["url" => "matches", "title" => "Matches", "description" => "-"],
+            ["url" => "theme", "title" => "Theme", "description" => "-"],
+        ],
         "description" => function($thing) {
             if (isset($thing->event)) {
                 return $thing->name . ($thing->type_description ? ' - ' . strtolower($thing->type_description) . ' ' : ' from ') . $thing->event->name . ".";
@@ -23,7 +31,11 @@ $routes = [
     [
         "url" => "event",
         "also_load" => ["theme"],
-        "sub_routes" => [""]
+        "sub_routes" => [
+            ["url" => "bracket", "title" => "Bracket", "description" => "-"],
+            ["url" => "schedule", "title" => "Schedule", "description" => "-"],
+            ["url" => "scenarios", "title" => "Foldy Sheet", "description" => "-"],
+        ]
     ],
     [
         "url" => "match",
@@ -49,6 +61,7 @@ $routes = [
             ["url" => "casts", "text" => "'s casts"],
             ["url" => "matches", "text" => "'s matches"],
             ["url" => "news", "text" => "'s articles"],
+            ["url" => "played-matches", "text" => "'s played matches"],
         ],
         "description" => function($thing) {
             return $thing->name . "'s player profile.";
@@ -94,13 +107,20 @@ $meta = (object)[
     "color" => "#111111"
 ];
 
-if (isset($args[2]) && isset($activeRoute["sub_routes"])) {
-    foreach ($activeRoute["sub_routes"] as $sub_route) {
-
-    }
-}
 
 $meta->title = $thing->name . $meta->title;
+
+if (isset($args[2]) && isset($activeRoute["sub_routes"])) {
+    foreach ($activeRoute["sub_routes"] as $sub_route) {
+        if ($sub_route["url"] === $args[2] && isset($sub_route["title"])) {
+//             if ($sub_route["plurals"] && isset($thing->$sub_route["plurals"]) && count($thing->$sub_route["plurals"]) > 1) {
+//                 $meta->title = $sub_route["title"] . "s | " . $meta->title;
+//             } else {
+                $meta->title =  $sub_route["title"] . " | " . $meta->title;
+//             }
+        }
+    }
+}
 
 if ($thing->theme) {
     $meta->color = $thing->theme->color_theme;

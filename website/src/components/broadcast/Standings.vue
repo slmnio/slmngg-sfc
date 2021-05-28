@@ -4,8 +4,8 @@
         <div class="standings-header d-flex align-items-center">
             <div class="team-name flex-grow-1 text-left">Team</div>
             <div class="team-stats d-flex">
-                <div class="team-stat text-center">Matches</div>
                 <div class="team-stat text-center">Maps</div>
+                <div class="team-stat text-center">Matches</div>
 <!--                <div class="team-stat text-center">Points</div>-->
             </div>
         </div>

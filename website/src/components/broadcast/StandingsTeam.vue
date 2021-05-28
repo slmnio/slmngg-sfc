@@ -18,7 +18,7 @@ export default {
     components: { ThemeLogo },
     props: ["team"],
     data: () => ({
-        stats: ["diff", "map_diff"/*, "points" */]
+        stats: ["map_diff", "diff"/*, "points" */]
     }),
     computed: {
         teamStats() {

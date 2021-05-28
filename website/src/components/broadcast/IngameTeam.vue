@@ -6,7 +6,7 @@
                     <span class="industry-align">{{ team.small_overlay_text }}</span>
                 </div>
                 <div class="flex-center team-name">
-                    <span class="industry-align">{{ team.name }}</span>
+                        <span class="industry-align">{{ team.name }}</span>
                 </div>
                 <div class="flex-center team-logo-holder flex-center" v-if="teamLogo">
                     <div class="team-logo bg-center" :style="teamLogo"></div>
@@ -79,25 +79,33 @@ export default {
 };
 
 function updateWidth(vueEl) {
-    const el = vueEl.querySelector(".team-name");
-    const text = el.children[0]; // target the .team-name > span.industry-align for width checking
+    const holder = vueEl.querySelector(".team-name");
+    // const internal = holder.querySelector(".team-name-internal");
+    const span = holder.querySelector("span");
 
-    el.style.transform = "none";
-    el.style.width = "auto";
+    // console.log(holder, internal, span);
+
+    // const el = vueEl.querySelector(".team-name");
+    // const text = el.children[0]; // target the .team-name > span.industry-align for width checking
+
+    holder.style.transform = "none";
+    holder.style.width = "auto";
     requestAnimationFrame(() => {
         let smallText = vueEl.querySelector(".team-small-text");
 
         if (smallText) {
             smallText = smallText.getBoundingClientRect().width - 16;
         }
-
-        const target = 445 - (smallText);
-        const width = text.getBoundingClientRect().width;
+        // console.log("getting targets", [holder, internal, span].map(e => e && e.getBoundingClientRect().width));
+        const target = 530 - (smallText);
+        // const target = holder.getBoundingClientRect().width;
+        const width = span.getBoundingClientRect().width;
+        console.log(target, width);
 
         if (width > target) {
             const scale = target / width;
-            el.style.transform = `scaleX(${scale})`;
-            el.style.width = `${scale * 100}%`;
+            holder.style.transform = `scaleX(${scale})`;
+            holder.style.width = `${scale * 100}%`;
         }
     });
 }

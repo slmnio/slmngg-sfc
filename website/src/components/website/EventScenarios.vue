@@ -1,6 +1,17 @@
 <template>
     <div class="container">
 
+        <h2 class="text-center mb-3">Foldy Sheet</h2>
+        <div>
+            <p class="mb-1">A foldy sheet runs all potential scenarios to show you the remaining results of a groups stage. Please note:</p>
+            <ul>
+                <li>The simulation does not know how to handle more than a 2-team tie (so a 3-way tie may be broken incorrectly).</li>
+                <li>The simulation only deals in binary (win/loss) and doesn't take map scores into account yet.</li>
+                <li>You can choose live scenarios (any remaining possible scenario) or all scenarios (all possible scenarios from the start of the tournament).</li>
+            </ul>
+
+        </div>
+
         <div class="btn btn-dark mb-3" v-if="showAll" @click="showAll = false">Show live scenarios</div>
         <div class="btn btn-dark mb-3" v-if="!showAll" @click="showAll = true">Show all scenarios</div>
 
@@ -46,7 +57,7 @@
                 <td v-for="(winner, wi) in scenario.winners" v-bind:key="`w-${wi}`" v-bind:class="{ 'locked': scenarioMatches[wi].completed && !scenario.impossible }">
                     {{ winner }}
                 </td>
-                <td v-for="(team, ti) in scenario.standings" v-bind:key="`t-${ti}`">
+                <td v-for="(team, ti) in scenario.standings" v-bind:key="`t-${ti}`" class="no-wrap">
                     {{ team.code }}
 
                     <span class="badge badge-pill bg-info">{{ team.wins }}-{{ team.losses }}</span>
@@ -234,5 +245,8 @@ export default {
     }
     .impossible {
         background-color: #931a26
+    }
+    .no-wrap {
+        white-space: nowrap;
     }
 </style>

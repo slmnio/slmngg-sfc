@@ -6,7 +6,7 @@
             <div class="team-stats d-flex">
                 <div class="team-stat text-center">Matches</div>
                 <div class="team-stat text-center">Maps</div>
-                <div class="team-stat text-center">Points</div>
+<!--                <div class="team-stat text-center">Points</div>-->
             </div>
         </div>
         <div class="teams">
@@ -157,12 +157,12 @@ export default {
 
 <style scoped>
     .standings {
-        font-size: 32px;
+        font-size: 46px;
         width: 100%;
     }
 
     .team-stat {
-        width: 128px;
+        width: 5.3333em;
         font-size: .75em;
     }
 

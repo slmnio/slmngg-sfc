@@ -1,6 +1,6 @@
 <template>
     <div class="bracket row" :style="winVars">
-        <div class="internal-bracket d-flex mb-4" v-for="(bracket, i) in brackets" v-bind:key="i">
+        <div class="internal-bracket d-flex" v-for="(bracket, i) in brackets" v-bind:key="i">
             <div class="column" v-for="(column, ci) in bracket.columns" v-bind:key="ci">
                 <div class="header text-center mb-2" :style="logoBackground1(event)" v-if="showHeaders && column.header">{{ column.header }}</div>
                 <div class="column-matches flex-grow-1">
@@ -56,8 +56,8 @@ export default {
 
 <style scoped>
     .column {
-        width: 200px;
-        margin: 0 15px;
+        width: 12.5em;
+        margin: 0 1em;
         display: flex;
         flex-direction: column;
     }
@@ -65,6 +65,10 @@ export default {
         display: flex;
         flex-direction: column;
         justify-content: center;
+    }
+
+    .internal-bracket + .internal-bracket {
+        margin-top: 1.5em;
     }
 
 

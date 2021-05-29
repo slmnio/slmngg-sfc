@@ -59,7 +59,7 @@ export default {
 
     .bracket-team {
         width: 100%;
-        --match-height: 38px;
+        --match-height: 2.3em;
         height: var(--match-height);
         background-color: #282828;
     }
@@ -93,7 +93,7 @@ export default {
         line-height: 1;
         transform: translate(0, -0.0925em); /* industry-align */
 
-        font-size: 17px;
+        font-size: 1.1em;
         padding: 2px 0;
 
         display: -webkit-box;

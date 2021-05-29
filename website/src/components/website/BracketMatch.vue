@@ -73,6 +73,6 @@ export default {
 
 <style scoped>
     .bracket-match {
-        margin: 10px 0;
+        margin: 0.75em 0;
     }
 </style>

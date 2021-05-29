@@ -26,6 +26,7 @@
                     <div class="break-col break-image" v-if="breakDisplay === 'Image'" key="Image">
                         <div class="break-image-inner" :style="cssImage('backgroundImage', broadcast, ['break_image'], 1080, false)"></div>
                     </div>
+                    <Bracket class="break-col break-bracket" v-if="breakDisplay === 'Bracket'" key="Bracket" :event="event" :bracket="bracket" use-overlay-scale />
                 </transition>
             </div>
         </div>
@@ -45,11 +46,12 @@ import { sortMatches } from "@/utils/sorts";
 import Sponsors from "@/components/broadcast/Sponsors";
 import Standings from "@/components/broadcast/Standings";
 import Countdown from "@/components/broadcast/Countdown";
+import Bracket from "@/components/website/Bracket";
 
 export default {
     name: "BreakOverlay",
     props: ["broadcast"],
-    components: { Standings, BreakMatch, Sponsors, Countdown },
+    components: { Bracket, Standings, BreakMatch, Sponsors, Countdown },
     methods: { cssImage },
     computed: {
         nextMatch() {
@@ -76,6 +78,13 @@ export default {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
+                }),
+                brackets: ReactiveArray("brackets", {
+                    ordered_matches: ReactiveArray("ordered_matches", {
+                        teams: ReactiveArray("teams", {
+                            theme: ReactiveThing("theme")
+                        })
+                    })
                 })
             });
         },
@@ -94,6 +103,12 @@ export default {
         breakDisplay() {
             if (!this.broadcast || !this.broadcast.break_display) return null;
             return this.broadcast.break_display;
+        },
+        bracket() {
+            if (!this.event?.brackets) return null;
+            if (!this.bracketKey) return this.event.brackets[0];
+            const bracket = this.event.brackets.find(b => b && b.key === this.bracketKey);
+            return bracket || this.event.brackets[0];
         }
     },
     watch: {
@@ -257,5 +272,9 @@ export default {
         max-width: 0px;
         max-height: 0px;
         overflow: hidden;
+    }
+
+    .break-bracket {
+        zoom: 0.9;
     }
 </style>

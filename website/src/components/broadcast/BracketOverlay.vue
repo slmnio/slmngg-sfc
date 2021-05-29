@@ -1,6 +1,6 @@
 <template>
     <GenericOverlay title="Bracket" :accent-color="accentColor">
-        <Bracket :event="event" :bracket="bracket" :font-size="bracket.overlay_scale" />
+        <Bracket :event="event" :bracket="bracket" use-overlay-scale />
     </GenericOverlay>
 </template>
 

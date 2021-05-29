@@ -27,7 +27,7 @@ import { cssImage } from "@/utils/content-utils";
 
 export default {
     name: "IngameTeam",
-    props: ["team", "right", "score", "hideScores"],
+    props: ["team", "right", "score", "hideScores", "width"],
     computed: {
         loaded() {
             if (this.team.theme === undefined && this.team.has_theme === 0) return true;
@@ -37,7 +37,8 @@ export default {
             if (!this.team.theme) return {};
             return {
                 backgroundColor: this.team.theme.color_logo_background || this.team.theme.color_theme,
-                color: this.team.theme.color_text_on_logo_background || this.team.theme.color_text_on_theme
+                color: this.team.theme.color_text_on_logo_background || this.team.theme.color_text_on_theme,
+                ...this.teamWidthCSS
             };
         },
         teamSlice() {
@@ -50,6 +51,13 @@ export default {
             const i = cssImage("backgroundImage", this.team.theme, ["small_logo", "default_logo"], 36);
             if (!i.backgroundImage) return null;
             return i;
+        },
+        teamWidth() {
+            return this.width || 690;
+        },
+        teamWidthCSS() {
+            if (!this.teamWidth) return {};
+            return { width: `${this.teamWidth}px` };
         }
     },
     watch: {
@@ -64,7 +72,7 @@ export default {
         team() {
             if (this.$el && this.$el.querySelector) {
                 console.log("team watch");
-                updateWidth(this.$el);
+                updateWidth(this.$el, this.teamWidth);
             }
         }
     },
@@ -72,16 +80,17 @@ export default {
         this.$nextTick(() => {
             if (this.$el && this.$el.querySelector) {
                 console.log("mount - tick");
-                updateWidth(this.$el);
+                updateWidth(this.$el, this.teamWidth);
             }
         });
     }
 };
 
-function updateWidth(vueEl) {
+function updateWidth(vueEl, fullWidth) {
     const holder = vueEl.querySelector(".team-name");
-    // const internal = holder.querySelector(".team-name-internal");
+    const bigHolder = vueEl.querySelector(".ingame-team");
     const span = holder.querySelector("span");
+    console.log(vueEl.getBoundingClientRect());
 
     // console.log(holder, internal, span);
 
@@ -89,23 +98,26 @@ function updateWidth(vueEl) {
     // const text = el.children[0]; // target the .team-name > span.industry-align for width checking
 
     holder.style.transform = "none";
-    holder.style.width = "auto";
+    // holder.style.width = "auto";
     requestAnimationFrame(() => {
-        let smallText = vueEl.querySelector(".team-small-text");
+        let diff = 0;
+        [...bigHolder.children].map(el => {
+            if (["team-name"].some(cl => el.classList.contains(cl))) return;
+            console.log(el);
+            diff += el.getBoundingClientRect().width;
+        });
+        diff += 32; // extra padding
 
-        if (smallText) {
-            smallText = smallText.getBoundingClientRect().width - 16;
-        }
-        // console.log("getting targets", [holder, internal, span].map(e => e && e.getBoundingClientRect().width));
-        const target = 530 - (smallText);
-        // const target = holder.getBoundingClientRect().width;
+        // const target = 530 - (smallText);
+        const target = fullWidth - diff;
+        // const target = 0;
         const width = span.getBoundingClientRect().width;
-        console.log(target, width);
+        console.log(diff, target, width);
 
         if (width > target) {
             const scale = target / width;
             holder.style.transform = `scaleX(${scale})`;
-            holder.style.width = `${scale * 100}%`;
+            // holder.style.width = `${scale * 100}%`;
         }
     });
 }
@@ -150,6 +162,7 @@ function updateWidth(vueEl) {
         transform-origin: right;
 
         /*min-width: 572px;*/
+        width: 0;
     }
     .team-name span, .team-name {
         white-space: nowrap;
@@ -226,11 +239,6 @@ function updateWidth(vueEl) {
         height: calc(100% - 8px);
         margin: 4px;
         box-sizing: border-box;
-    }
-
-
-    .overlay[data-broadcast="resurge-4v4"] .ingame-team {
-        width: 595px;
     }
 
     /*.team-score {*/

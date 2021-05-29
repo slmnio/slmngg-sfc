@@ -3,7 +3,8 @@
       <div class="top-overlay" :style="broadcastMargin">
           <transition-group name="itah" mode="out-in">
               <IngameTeam :key="`${team.id}-${i}`" v-for="(team, i) in teams"
-                          :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores" />
+                          :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores"
+                          :width="teamWidth"/>
           </transition-group>
 
           <transition name="mid" mode="out-in">
@@ -56,6 +57,10 @@ export default {
         broadcastMargin() {
             if (!this.broadcast) return { marginTop: "0px" };
             return { marginTop: `${(this.broadcast.margin * 55)}px` };
+        },
+        teamWidth() {
+            if (!this.broadcast?.ingame_team_width) return null;
+            return this.broadcast.ingame_team_width;
         }
     },
     watch: {

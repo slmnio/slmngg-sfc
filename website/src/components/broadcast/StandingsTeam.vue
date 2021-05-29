@@ -1,7 +1,7 @@
 <template>
     <div class="standings-team d-flex">
-        <div class="team-rank">{{ teamStats["rank"] }}</div>
-        <ThemeLogo class="team-logo" :theme="team.theme" icon-padding="6" border-width="6" />
+        <div class="team-rank flex-shrink-0">{{ teamStats["rank"] }}</div>
+        <ThemeLogo class="team-logo flex-shrink-0" :theme="team.theme" icon-padding="6" border-width="6" />
         <div class="team-name flex-grow-1 text-left">{{ team.name }}</div>
         <div class="team-stats d-flex">
             <div class="team-stat text-center" v-for="stat in stats" v-bind:key="stat">
@@ -39,6 +39,11 @@ export default {
     }
     .standings-team {
         align-items: center;
+    }
+    .team-name {
+        line-height: 1;
+        transform: translate(0, -0.0925em);
+        padding: 8px 0px;
     }
     .team-logo {
         width: 1.25em;

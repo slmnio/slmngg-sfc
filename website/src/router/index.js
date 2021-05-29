@@ -30,6 +30,7 @@ import EventBrackets from "@/views/sub-views/EventBrackets";
 import TeamTheme from "@/views/sub-views/TeamTheme";
 import EventSchedule from "@/views/sub-views/EventSchedule";
 import EventScenarios from "@/components/website/EventScenarios";
+import BracketOverlay from "@/components/broadcast/BracketOverlay";
 
 Vue.use(VueRouter);
 
@@ -102,6 +103,7 @@ const routes = [
         children: [
             { path: "ingame", component: IngameOverlay },
             { path: "break", component: BreakOverlay },
+            { path: "bracket", component: BracketOverlay, props: route => ({ bracketKey: route.query.key }) },
             { path: "schedule", component: ScheduleOverlay },
             { path: "standings", component: StandingsOverlay },
             { path: "roster", redirect: "rosters" },

@@ -18,7 +18,7 @@ import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 export default {
     name: "Bracket",
     components: { BracketMatch },
-    props: ["bracket", "event"],
+    props: ["bracket", "event", "fontSize"],
     computed: {
         matches() {
             if (!this.bracket || !this.bracket.ordered_matches) return null;
@@ -37,9 +37,14 @@ export default {
         },
         winVars() {
             const css = themeBackground1(this.event);
+
+            let fontSize = 16;
+            if (this.fontSize && this.fontSize > 10) fontSize = this.fontSize;
+
             return {
                 "--win-background-color": css.backgroundColor,
-                "--win-color": css.color
+                "--win-color": css.color,
+                "font-size": `${fontSize}px`
             };
         }
     },

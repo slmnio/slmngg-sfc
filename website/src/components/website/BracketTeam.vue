@@ -84,7 +84,7 @@ export default {
     /* messy but works for now */
     .team-name-holder {
         flex-grow: 1;
-        padding: 0 4px;
+        padding: 0 .25em;
         display: flex;
         align-items: center;
         overflow: hidden;
@@ -94,7 +94,7 @@ export default {
         transform: translate(0, -0.0925em); /* industry-align */
 
         font-size: 1.1em;
-        padding: 2px 0;
+        padding: 0.15em 0;
 
         display: -webkit-box;
         -webkit-box-orient: vertical;
@@ -106,7 +106,7 @@ export default {
         background-color: #444;
         color: #aaa;
         flex-shrink: 0;
-        width: 20px;
+        width: 1.4em;
         height: 100%;
         font-weight: bold;
     }

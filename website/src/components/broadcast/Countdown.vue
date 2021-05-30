@@ -1,13 +1,15 @@
 <template>
     <div class="countdown">
-        <span class="industry-align">{{ text }}</span>
+        <span class="industry-align" v-html="text"></span>
     </div>
 </template>
 
 <script>
+import spacetime from "spacetime";
+
 export default {
     name: "Countdown",
-    props: ["to"],
+    props: ["to", "timezone"],
     mounted() {
         setInterval(this.tick, 1000);
     },
@@ -22,6 +24,12 @@ export default {
             return diff;
         },
         text() {
+            if (!this.to) {
+                // return current date if no time set
+                const utc = spacetime();
+                const local = utc.goto(this.timezone || "America/New_York");
+                return local.format("{hour}:{minute-pad}") + `<span class="ampm">${local.format("ampm")}</span>`;
+            }
             if (this.diff > 60 * 60) {
                 // hours
                 const diffMins = Math.floor(this.diff / 60);
@@ -49,5 +57,14 @@ export default {
     }
     .countdown {
         font-variant-numeric: tabular-nums;
+    }
+</style>
+<style>
+    .countdown .ampm {
+        font-size: .25em;
+        text-transform: uppercase;
+        letter-spacing: 0;
+        margin-left: .1em;
+        margin-bottom: .2em;
     }
 </style>

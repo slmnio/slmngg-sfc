@@ -13,7 +13,10 @@
                             <BreakMatch :match="nextMatch" :expanded="false" />
                         </div>
                     </transition>
-                    <Countdown class="break-countdown" :to="broadcast.countdown_end" />
+                    <transition name="anim-break-next">
+                    <div class="countdown-text" v-if="!broadcast.countdown_end && !nextMatch">Current time</div>
+                    </transition>
+                    <Countdown class="break-countdown" :to="broadcast.countdown_end" :timezone="broadcast.timezone" />
                     <Sponsors class="break-sponsors" :sponsors="sponsorThemes" />
                 </div>
                 <transition name="break-content" mode="out-in">
@@ -277,5 +280,16 @@ export default {
 
     .break-bracket {
         zoom: 0.9;
+    }
+
+    .countdown-text {
+        text-transform: uppercase;
+        font-size: 36px;
+        font-weight: bold;
+        height: 90px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transform: translateY(30px);
     }
 </style>

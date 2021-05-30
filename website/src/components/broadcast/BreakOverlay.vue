@@ -3,7 +3,7 @@
         <div class="break-center">
             <div class="break-top event-theme-border flex-center" :style="eventBorder">
                 <transition name="fade" mode="out-in">
-                    <span class="industry-align" :key="broadcast.name">{{ broadcast.name }}</span>
+                    <span class="industry-align" :key="broadcast.title || broadcast.name">{{ broadcast.title || broadcast.name }}</span>
                 </transition>
             </div>
             <div class="break-main event-theme-border" :style="eventBorder">

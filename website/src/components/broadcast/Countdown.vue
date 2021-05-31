@@ -26,7 +26,7 @@ export default {
         text() {
             if (!this.to) {
                 // return current date if no time set
-                const utc = spacetime();
+                const utc = spacetime(this.now);
                 const local = utc.goto(this.timezone || "America/New_York");
                 return local.format("{hour}:{minute-pad}") + `<span class="ampm">${local.format("ampm")}</span>`;
             }

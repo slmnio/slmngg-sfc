@@ -11,6 +11,6 @@ At the moment, there is no way to get the actual SLMN.GG dataset (nor a schema t
 
 ## Bugs and feature requests
 
-If you find a bug, please [create an issue](https://github.com/slmnio/slmngg-sfc/issues/new) with as much detail as possible. 
+If you find a bug, please [create an issue](https://github.com/slmnio/slmngg-sfc/issues/new/choose) with as much detail as possible. 
 
 Feature requests should probably be discussed in the #slmngg-requests channel in the BPL Discord server, but afterwards you can create an issue with the details from those conversations.  

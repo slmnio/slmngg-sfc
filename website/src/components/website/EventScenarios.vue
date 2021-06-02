@@ -16,6 +16,7 @@
                 <li>The simulation does not know how to handle more than a 2-team tie (so a 3-way tie may be broken incorrectly). It will detect when a 3-way tie occurs and remove it from scenario counts.</li>
                 <li>The simulation only deals in binary (win/loss) and doesn't take map scores into account yet.</li>
                 <li>You can choose live scenarios (any remaining possible scenario) or all scenarios (all possible scenarios from the start of the tournament).</li>
+                <li>You can click on matchups to override the winner and force new calculations. You can click on the match title to reset.</li>
             </ul>
 
         </div>
@@ -40,46 +41,50 @@
             </table>
         </div>
 
+        <div class="padder">
+            <table class="table table-dark table-hover table-sm">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th :colspan="scenarioMatches.length" class="text-center">Matchups</th>
+                    <th :colspan="scenarioTeams.length" class="text-center">Placement</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <td class="text-center">#</td>
+                    <td v-for="(match, i) in scenarioMatches" v-bind:key="`m-${i}`" v-bind:class="{ 'locked': match.completed }"
+                        @click="setOverride(i, null)">
+                        {{ match.teams.map((t, ti) => overrides[i] === ti ? `[${t}]` : t).join(" vs ") }}
+                    </td>
+                    <td v-for="(team, ti) in scenarioTeams" v-bind:key="`t2-${ti}`" class="text-center">
+                        #{{ ti+1 }}
+                    </td>
+                    <td class="text-center">Info</td>
+                </tr>
+                </thead>
 
-        <table class="table table-dark table-hover table-sm">
-            <thead>
-            <tr>
-                <th></th>
-                <th :colspan="scenarioMatches.length" class="text-center">Matchups</th>
-                <th :colspan="scenarioTeams.length" class="text-center">Placement</th>
-                <th></th>
-            </tr>
-            <tr>
-                <td class="text-center">#</td>
-                <td v-for="(match, i) in scenarioMatches" v-bind:key="`m-${i}`" v-bind:class="{ 'locked': match.completed }">
-                    {{ match.teams.join(" vs ") }}
-                </td>
-                <td v-for="(team, ti) in scenarioTeams" v-bind:key="`t2-${ti}`" class="text-center">
-                    #{{ ti+1 }}
-                </td>
-                <td class="text-center">Info</td>
-            </tr>
-            </thead>
+                <tbody>
+                <tr v-for="(scenario, i) in scenarios" v-bind:key="`scenario-${i}`" v-bind:class="{'impossible': scenario.impossible, 'tie-l': scenario.flags.includes('3-WAY-LAST'), 'tie-f': scenario.flags.includes('3-WAY-FIRST')}">
+                    <td class="text-center">{{ scenario.i + 1 }}</td>
+                    <td v-for="(winner, wi) in scenario.winners" v-bind:key="`w-${wi}`"
+                        v-bind:class="{ 'locked': scenarioMatches[wi].completed && !scenario.impossible, 'overridden': overrides[wi] === scenario.bits[wi] }"
+                        @click="setOverride(wi, scenario.bits[wi])">
+                        {{ winner }}
+                    </td>
+                    <td v-for="(team, ti) in scenario.standings" v-bind:key="`t-${ti}`" class="no-wrap">
+                        {{ team.code }}
 
-            <tbody>
-            <tr v-for="(scenario, i) in scenarios" v-bind:key="`scenario-${i}`" v-bind:class="{'impossible': scenario.impossible, 'tie-l': scenario.flags.includes('3-WAY-LAST'), 'tie-f': scenario.flags.includes('3-WAY-FIRST')}">
-                <td class="text-center">{{ scenario.i + 1 }}</td>
-                <td v-for="(winner, wi) in scenario.winners" v-bind:key="`w-${wi}`" v-bind:class="{ 'locked': scenarioMatches[wi].completed && !scenario.impossible }">
-                    {{ winner }}
-                </td>
-                <td v-for="(team, ti) in scenario.standings" v-bind:key="`t-${ti}`" class="no-wrap">
-                    {{ team.code }}
-
-                    <span class="badge badge-pill bg-info">{{ team.wins }}-{{ team.losses }}</span>
-                </td>
-                <td class="text-right">
-                    <span class="badge" v-if="scenario.flags.includes('3-WAY-LAST')">3-way L</span>
-                    <span class="badge" v-if="scenario.flags.includes('3-WAY-FIRST')">3-way F</span>
-                    <i class="fas fa-info-circle" v-if="scenario.notes.length" :title="scenario.notes.join(', ')"></i>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                        <span class="badge badge-pill bg-info">{{ team.wins }}-{{ team.losses }}</span>
+                    </td>
+                    <td class="text-right">
+                        <span class="badge" v-if="scenario.flags.includes('3-WAY-LAST')">3-way L</span>
+                        <span class="badge" v-if="scenario.flags.includes('3-WAY-FIRST')">3-way F</span>
+                        <i class="fas fa-info-circle" v-if="scenario.notes.length" :title="scenario.notes.join(', ')"></i>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
@@ -92,7 +97,8 @@ export default {
     data: () => ({
         highlighted: null,
         showAll: false,
-        activeMatchGroup: null
+        activeMatchGroup: null,
+        overrides: {}
     }),
     filters: {
         perc(num) {
@@ -192,6 +198,11 @@ export default {
 
                     scenario.teams.find(t => t.code === match.winner).wins++;
                     scenario.teams.find(t => t.code === match.loser).losses++;
+
+                    if (this.overrides[mi] !== undefined && this.overrides[mi] !== null) {
+                        // override for this match
+                        if (this.overrides[mi] !== bits[mi]) scenario.impossible = true;
+                    }
                 });
 
                 scenario.notes = [];
@@ -207,6 +218,7 @@ export default {
                     if (h2h && h2h.winner === b.code) { scenario.notes.push(`[${h2h.winner} > ${h2h.loser}] broken by h2h`); return 1; }
 
                     console.warn("still tied", a, b);
+                    if (!h2h) { scenario.notes.push(`[${a.code} - ${b.code}] no h2h to break the tie`); return 0; }
                     return 0;
                 });
 
@@ -302,6 +314,19 @@ export default {
                 }
             });
         }
+    },
+    methods: {
+        setOverride(index, num) {
+            console.log("override", index, num);
+            if (this.overrides[index] === num) {
+                // unset
+                // this.overrides[index] = null;
+                this.$set(this.overrides, index, null);
+            } else {
+                // this.overrides[index] = num;
+                this.$set(this.overrides, index, num);
+            }
+        }
     }
 };
 </script>
@@ -309,6 +334,9 @@ export default {
 <style scoped>
     .locked {
         background-color: #524223;
+    }
+    .overridden {
+        background-color: #887e30;
     }
     .tie-f {
         background-color: #23523e;
@@ -321,5 +349,8 @@ export default {
     }
     .no-wrap {
         white-space: nowrap;
+    }
+    .padder {
+        min-height: 100vh;
     }
 </style>

@@ -13,7 +13,7 @@
         <div>
             <p class="mb-1">A foldy sheet runs all potential scenarios to show you the remaining results of a groups stage. Please note:</p>
             <ul>
-                <li>The simulation does not know how to handle more than a 2-team tie (so a 3-way tie may be broken incorrectly).</li>
+                <li>The simulation does not know how to handle more than a 2-team tie (so a 3-way tie may be broken incorrectly). It will detect when a 3-way tie occurs and remove it from scenario counts.</li>
                 <li>The simulation only deals in binary (win/loss) and doesn't take map scores into account yet.</li>
                 <li>You can choose live scenarios (any remaining possible scenario) or all scenarios (all possible scenarios from the start of the tournament).</li>
             </ul>
@@ -175,19 +175,19 @@ export default {
                 scenario.matches.forEach((match, mi) => {
                     scenario.winners.push(match.teams[bits[mi]]);
                     if (match.completed) {
-                        match.winner = match.liveWinner;
-                        match.loser = match.teams.find(team => team !== match.liveWinner);
+                        // match.winner = match.liveWinner;
+                        // match.loser = match.teams.find(team => team !== match.liveWinner);
 
-                        if (match.winner === match.teams[bits[mi]]) {
+                        if (match.liveWinner === match.teams[bits[mi]]) {
                             // console.log("match pred won", bits[mi]);
                         } else {
                             // console.log("match pred lost");
                             scenario.impossible = true;
                         }
                     } else {
-                        match.winner = match.teams[bits[mi]];
-                        match.loser = match.teams[+!bits[mi]];
                     }
+                    match.winner = match.teams[bits[mi]];
+                    match.loser = match.teams[+!bits[mi]];
 
 
                     scenario.teams.find(t => t.code === match.winner).wins++;
@@ -310,14 +310,14 @@ export default {
     .locked {
         background-color: #524223;
     }
-    .impossible {
-        background-color: #931a26
-    }
     .tie-f {
         background-color: #23523e;
     }
     .tie-l {
         background-color: #234952;
+    }
+    .impossible {
+        background-color: #931a26
     }
     .no-wrap {
         white-space: nowrap;

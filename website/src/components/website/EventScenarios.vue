@@ -2,6 +2,14 @@
     <div class="container">
 
         <h2 class="text-center mb-3">Foldy Sheet</h2>
+
+        <div class="n-nav mb-2" v-if="_matchGroups">
+            <select name="match-group-selector" id="match-group-selector" v-model="activeMatchGroup">
+                <option selected disabled value="null">Select a group</option>
+                <option v-for="group in _matchGroups" :value="group" v-bind:key="group">{{ group }}</option>
+            </select>
+        </div>
+
         <div>
             <p class="mb-1">A foldy sheet runs all potential scenarios to show you the remaining results of a groups stage. Please note:</p>
             <ul>
@@ -36,9 +44,10 @@
         <table class="table table-dark table-hover table-sm">
             <thead>
             <tr>
-                <td></td>
+                <th></th>
                 <th :colspan="scenarioMatches.length" class="text-center">Matchups</th>
                 <th :colspan="scenarioTeams.length" class="text-center">Placement</th>
+                <th></th>
             </tr>
             <tr>
                 <td class="text-center">#</td>
@@ -48,11 +57,12 @@
                 <td v-for="(team, ti) in scenarioTeams" v-bind:key="`t2-${ti}`" class="text-center">
                     #{{ ti+1 }}
                 </td>
+                <td class="text-center">Info</td>
             </tr>
             </thead>
 
             <tbody>
-            <tr v-for="(scenario, i) in scenarios" v-bind:key="`scenario-${i}`" v-bind:class="{'impossible': scenario.impossible}">
+            <tr v-for="(scenario, i) in scenarios" v-bind:key="`scenario-${i}`" v-bind:class="{'impossible': scenario.impossible, 'tie-l': scenario.flags.includes('3-WAY-LAST'), 'tie-f': scenario.flags.includes('3-WAY-FIRST')}">
                 <td class="text-center">{{ scenario.i + 1 }}</td>
                 <td v-for="(winner, wi) in scenario.winners" v-bind:key="`w-${wi}`" v-bind:class="{ 'locked': scenarioMatches[wi].completed && !scenario.impossible }">
                     {{ winner }}
@@ -62,6 +72,11 @@
 
                     <span class="badge badge-pill bg-info">{{ team.wins }}-{{ team.losses }}</span>
                 </td>
+                <td class="text-right">
+                    <span class="badge" v-if="scenario.flags.includes('3-WAY-LAST')">3-way L</span>
+                    <span class="badge" v-if="scenario.flags.includes('3-WAY-FIRST')">3-way F</span>
+                    <i class="fas fa-info-circle" v-if="scenario.notes.length" :title="scenario.notes.join(', ')"></i>
+                </td>
             </tr>
             </tbody>
         </table>
@@ -69,17 +84,19 @@
 </template>
 
 <script>
-import { ReactiveArray } from "@/utils/reactive";
+import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "EventScenarios",
     props: ["event"],
     data: () => ({
         highlighted: null,
-        showAll: false
+        showAll: false,
+        activeMatchGroup: null
     }),
     filters: {
         perc(num) {
+            if (isNaN(num)) return "-";
             return (num * 100).toFixed(1) + "%";
         }
     },
@@ -94,18 +111,29 @@ export default {
                 return null;
             }
         },
+        _matchGroups() {
+            if (!this.settings) return null;
+            if (this.settings.group) return null;
+            return this.settings.groups || null;
+        },
+        _matchGroup() {
+            if (!this.settings) return null;
+            return this.settings.group || null;
+        },
         matches() {
             if (!this.event?.matches) return [];
             return ReactiveArray("matches", {
                 teams: ReactiveArray("teams")
             })(this.event).filter(match => {
-                if (!this.settings.group) return true;
-                return match.match_group === this.settings.group;
+                // if (!this._matchGroup || !this.activeMatchGroup) return true;
+                if (this.activeMatchGroup) return match.match_group === this.activeMatchGroup;
+                if (this._matchGroup) return match.match_group === this._matchGroup;
+                return !this._matchGroups;
             });
         },
         scenarioMatches() {
             if (!this.matches) return [];
-            return this.matches.map(m => ({
+            return this.matches.filter(m => !!m.teams && m.teams.length === 2).map(m => ({
                 teams: m.teams.map(t => t.code || t.name),
                 first_to: m.first_to,
                 completed: [m.score_1, m.score_2].some(s => s === m.first_to),
@@ -121,6 +149,7 @@ export default {
                     }
                 });
             });
+            console.log(teams);
             return teams;
         },
         scenarios() {
@@ -165,6 +194,8 @@ export default {
                     scenario.teams.find(t => t.code === match.loser).losses++;
                 });
 
+                scenario.notes = [];
+                scenario.flags = [];
 
                 scenario.standings = scenario.teams.sort((a, b) => {
                     if (a.wins > b.wins) return -1;
@@ -172,12 +203,30 @@ export default {
 
                     const h2h = scenario.matches.find(match => match.teams.every(t => [a.code, b.code].includes(t)));
                     // if (!h2h) return 0;
-                    if (h2h.winner === a.code) return -1;
-                    if (h2h.winner === b.code) return 1;
+                    if (h2h && h2h.winner === a.code) { scenario.notes.push(`[${h2h.winner} > ${h2h.loser}] broken by h2h`); return -1; }
+                    if (h2h && h2h.winner === b.code) { scenario.notes.push(`[${h2h.winner} > ${h2h.loser}] broken by h2h`); return 1; }
 
                     console.warn("still tied", a, b);
                     return 0;
                 });
+
+                // Check for 3-way ties
+                if (scenario.standings.length === 4 && scenario.standings[0].losses === 0) {
+                    const tiedScoreline = scenario.standings[1];
+                    if (scenario.standings.slice(2).every(s => s.wins === tiedScoreline.wins && s.losses === tiedScoreline.losses)) {
+                        scenario.notes.push("3-way tie for last detected");
+                        scenario.flags.push("3-WAY-LAST");
+                        console.warn("3-way tie", scenario);
+                    }
+                }
+                if (scenario.standings.length === 4 && scenario.standings[3].wins === 0) {
+                    const tiedScoreline = scenario.standings[0];
+                    if (scenario.standings.slice(0, 3).every(s => s.wins === tiedScoreline.wins && s.losses === tiedScoreline.losses)) {
+                        scenario.notes.push("3-way tie for first detected");
+                        scenario.flags.push("3-WAY-FIRST");
+                        console.warn("3-way tie (first)", scenario);
+                    }
+                }
 
                 scenarios.push(scenario);
             }
@@ -197,11 +246,20 @@ export default {
                     this.scenarioTeams.forEach(t => {
                         counts[t.code] = 0;
                     });
+                    counts["3-way tie"] = 0;
 
                     this.scenarios.forEach(scenario => {
-                        for (let i = 0; i < calc.top; i++) {
-                            const team = scenario.standings[i];
-                            counts[team.code]++;
+                        if (scenario.flags.includes("3-WAY-LAST") && calc.top > 1 && scenario.standings.length === 4) {
+                            console.log(`cannot count this scenario for top ${calc.top} since it has a 3-way tie (lower)`);
+                            counts["3-way tie"]++;
+                        } else if (scenario.flags.includes("3-WAY-FIRST") && calc.top < 3) {
+                            console.log(`cannot count this scenario for top ${calc.top} since it has a 3-way tie (higher)`);
+                            counts["3-way tie"]++;
+                        } else {
+                            for (let i = 0; i < calc.top; i++) {
+                                const team = scenario.standings[i];
+                                if (team) counts[team.code]++;
+                            }
                         }
                     });
 
@@ -217,12 +275,21 @@ export default {
                     this.scenarioTeams.forEach(t => {
                         counts[t.code] = 0;
                     });
+                    counts["3-way tie"] = 0;
 
                     this.scenarios.forEach(scenario => {
-                        for (let i = 0; i < calc.bottom; i++) {
-                            // bottom 1, 2
-                            const team = scenario.standings[scenario.standings.length - 1 - i];
-                            counts[team.code]++;
+                        if (scenario.flags.includes("3-WAY-LAST") && calc.bottom < 3) {
+                            console.log(`cannot count this scenario for bottom ${calc.bottom} since it has a 3-way tie`);
+                            counts["3-way tie"]++;
+                        } else if (scenario.flags.includes("3-WAY-FIRST") && (scenario.standings.length === 4 && [2, 3].includes(calc.bottom))) {
+                            console.log(`cannot count this scenario for bottom ${calc.bottom} since it has a 3-way tie (higher)`);
+                            counts["3-way tie"]++;
+                        } else {
+                            for (let i = 0; i < calc.bottom; i++) {
+                                // bottom 1, 2
+                                const team = scenario.standings[scenario.standings.length - 1 - i];
+                                if (team) counts[team.code]++;
+                            }
                         }
                     });
 
@@ -245,6 +312,12 @@ export default {
     }
     .impossible {
         background-color: #931a26
+    }
+    .tie-f {
+        background-color: #23523e;
+    }
+    .tie-l {
+        background-color: #234952;
     }
     .no-wrap {
         white-space: nowrap;

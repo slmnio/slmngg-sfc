@@ -1,6 +1,6 @@
 <template>
     <GenericOverlay title="Bracket" :accent-color="accentColor">
-        <Bracket :event="event" :bracket="bracket" use-overlay-scale />
+        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale />
     </GenericOverlay>
 </template>
 
@@ -41,5 +41,7 @@ export default {
 </script>
 
 <style scoped>
-
+    .bracket {
+        justify-content: center;
+    }
 </style>

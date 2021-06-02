@@ -29,7 +29,7 @@
                     <div class="break-col break-image" v-if="breakDisplay === 'Image'" key="Image">
                         <div class="break-image-inner" :style="cssImage('backgroundImage', broadcast, ['break_image'], 1080, false)"></div>
                     </div>
-                    <Bracket class="break-col break-bracket" v-if="breakDisplay === 'Bracket'" key="Bracket" :event="event" :bracket="bracket" use-overlay-scale />
+                    <Bracket class="break-col break-bracket" v-if="breakDisplay === 'Bracket'" key="Bracket" :event="event" :bracket="bracket" use-overlay-scale small />
                 </transition>
             </div>
         </div>
@@ -279,7 +279,9 @@ export default {
     }
 
     .break-bracket {
-        zoom: 0.9;
+        zoom: 0.85;
+        flex-direction: row;
+        overflow: hidden;
     }
 
     .countdown-text {

@@ -9,6 +9,7 @@
             </div>
             <div class="team-name-holder" v-if="team">
                 <div class="team-name">{{ team.name }}</div>
+                <div class="team-code">{{ team.code }}</div>
             </div>
             <div class="team-score flex-center" v-bind:class="{ 'win': win }" v-if="team && score !== null">{{ score }}</div>
         </div>
@@ -122,5 +123,21 @@ export default {
     }
     .bracket-team.lowlighted {
         opacity: 0.2;
+    }
+
+    .team-code {
+        display: none;
+        font-size: 2em;
+        transform: translate(0, -0.0925em); /* industry-align */
+    }
+
+    .bracket.small .team-code {
+        display: flex;
+    }
+    .bracket.small .team-name {
+        display: none;
+    }
+    .bracket.small .team-score {
+        font-size: 1.6em;
     }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="bracket row" :style="winVars">
+    <div class="bracket row" :style="winVars" v-bind:class="{ 'small': small && useOverlayScale && fontSize < 15 }">
         <div class="internal-bracket d-flex" v-for="(bracket, i) in brackets" v-bind:key="i">
             <div class="column" v-for="(column, ci) in bracket.columns" v-bind:key="ci">
                 <div class="header text-center mb-2" :style="logoBackground1(event)" v-if="showHeaders && column.header">{{ column.header }}</div>
@@ -21,7 +21,8 @@ export default {
     props: {
         bracket: {},
         event: {},
-        useOverlayScale: Boolean
+        useOverlayScale: Boolean,
+        small: Boolean
     },
     computed: {
         matches() {
@@ -39,16 +40,18 @@ export default {
         showHeaders() {
             return true;
         },
-        winVars() {
-            const css = themeBackground1(this.event);
-
+        fontSize() {
             let fontSize = 16;
             if (this.useOverlayScale && this.bracket && this.bracket.overlay_scale > 10) fontSize = this.bracket.overlay_scale;
+            return fontSize;
+        },
+        winVars() {
+            const css = themeBackground1(this.event);
 
             return {
                 "--win-background-color": css.backgroundColor,
                 "--win-color": css.color,
-                "font-size": `${fontSize}px`
+                "font-size": `${this.fontSize}px`
             };
         }
     },

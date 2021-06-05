@@ -1,5 +1,7 @@
 <template>
-    <router-link :to="url('match', this.match)" class="bracket-match no-link-style" v-if="!!match">
+    <router-link :to="url('match', this.match)" class="bracket-match no-link-style" v-if="!!match"
+                 v-bind:class="{'hover': hover}"
+                 @mouseover.native="matchHover" @mouseleave.native="matchEmpty">
         <div class="match-name d-none">{{ match && match.name }}</div>
         <div class="match-teams">
             <BracketTeam v-for="(team, i) in teams"
@@ -10,8 +12,17 @@
                          :score="scores[i]" :win="scores[i] === match.first_to"
             />
         </div>
+        <transition name="fade">
+            <div class="match-highlight-text" v-if="matchHighlight"
+                 :data-side="matchHighlight.side" v-bind:class="{ 'feeder': matchHighlight.feeder }">
+                {{ matchHighlight.text }}
+                <i class="fas fa-chevron-down" v-if="matchHighlight.feeder && matchHighlight.text === 'Loser'"></i>
+                <i class="fas fa-chevron-right" v-if="matchHighlight.feeder && matchHighlight.text !== 'Loser'"></i>
+            </div>
+        </transition>
     </router-link>
-    <div v-else class="bracket-match bracket-match-spacer">
+    <div v-else class="bracket-match bracket-match-spacer"
+         @mouseover="matchHover" @mouseleave="matchEmpty">
         <div class="match-name d-none"></div>
         <div class="match-teams">
             <BracketTeam v-for="(team, i) in teams"
@@ -28,13 +39,43 @@
 <script>
 import BracketTeam from "@/components/website/BracketTeam";
 import { url } from "@/utils/content-utils";
+import store from "@/thing-store";
 
 export default {
     name: "BracketMatch",
     components: { BracketTeam },
     props: ["match"],
+    data: () => ({
+        hover: false
+    }),
     methods: {
-        url
+        url,
+        matchHover() {
+            this.hover = true;
+            console.log(this.match);
+            const connections = this?.match?._bracket_data?.connections;
+            if (!connections) return;
+
+            const cons = [
+                { id: connections.winner.id, text: "Winner advances here", side: connections.winner.side },
+                { id: connections.loser.id, text: "Loser drops to here", side: connections.loser.side }
+            ];
+
+            connections.feederMatches.map(f => {
+                cons.push({
+                    id: f.id,
+                    text: f._m,
+                    feeder: true
+                });
+            });
+
+            store.commit("setHighlights", cons);
+        },
+        matchEmpty() {
+            this.hover = false;
+            console.log(this.match, "empty");
+            store.commit("setHighlights", []);
+        }
     },
     computed: {
         scores() {
@@ -74,6 +115,9 @@ export default {
 
             if (this.match.teams.length === 2) return this.match.teams;
             return [];
+        },
+        matchHighlight() {
+            return store.getters.getHighlight(this.match.id);
         }
     }
 };
@@ -81,6 +125,49 @@ export default {
 
 <style scoped>
     .bracket-match {
-        margin: 0.75em 0;
+        margin: 0.6em 0;
+        position: relative;
+        border: .15em solid transparent;
+        transition: border-color .15s ease;
+    }
+    .bracket-match.hover {
+        border: .15em solid white;
+    }
+
+    .match-highlight-text {
+        position: absolute;
+        background: white;
+        color: black;
+        bottom: 100%;
+        z-index: 1;
+        padding: 2px 8px;
+    }
+
+    .match-highlight-text[data-side="1"], .match-highlight-text[data-side="2"] {
+        width: 100%;
+        height: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .match-highlight-text[data-side="1"] {
+        top: 0;
+    }
+    .match-highlight-text[data-side="2"] {
+        bottom: 0;
+    }
+    .match-highlight-text.feeder {
+        right: 0;
+        left: auto;
+        height: 100%;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    .match-highlight-text.feeder  i {
+        font-size: 2em;
+        margin-top: .15em;
     }
 </style>

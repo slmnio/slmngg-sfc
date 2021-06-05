@@ -37,6 +37,10 @@ export default {
             if (!this.layout || !this.layout.brackets) return null;
             return this.layout.brackets;
         },
+        connections() {
+            if (!this.layout || !this.layout.connections) return null;
+            return this.layout.connections;
+        },
         showHeaders() {
             return true;
         },
@@ -56,10 +60,54 @@ export default {
         }
     },
     methods: {
+        getConnectionMatch(num) {
+            num = parseFloat(num);
+            if (num / 10 !== 0) {
+                // num = 2.1 2.2
+                return {
+                    ...this.matches[Math.floor(num) - 1],
+                    side: parseInt(num.toString().split(".")[1])
+                };
+            } else {
+                // num = 2
+                return this.matches[num - 1];
+            }
+        },
+        getBracketData(num) {
+            if (!this.connections) return {};
+            const connections = this.connections[num];
+            if (!connections) return {};
+            console.log("connections", connections);
+            const cons = {
+                winner: this.getConnectionMatch(connections.win),
+                loser: this.getConnectionMatch(connections.lose)
+            };
+            const feederMatches = [];
+            Object.entries(this.connections).forEach(([_n, connection]) => {
+                if (connection.win && Math.floor(connection.win) === parseInt(num)) {
+                    feederMatches.push({ ...this.getConnectionMatch(_n), _m: "Winner" });
+                }
+                if (connection.lose && Math.floor(connection.lose) === parseInt(num)) {
+                    feederMatches.push({ ...this.getConnectionMatch(_n), _m: "Loser" });
+                }
+            });
+            console.log("feeder matches", feederMatches);
+            if (feederMatches) cons.feederMatches = feederMatches;
+
+            return {
+                connections: cons
+            };
+        },
         getMatch(num) {
             if (num === null) return null;
             if (!this.matches) return null;
-            return this.matches[num - 1]; // stored as a 1-based number
+            return {
+                ...this.matches[num - 1],
+                _bracket_data: {
+                    num,
+                    ...this.getBracketData(num)
+                }
+            }; // stored as a 1-based number
         },
         logoBackground1
     }

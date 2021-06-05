@@ -11,6 +11,7 @@ export default new Vuex.Store({
         request_buffer: [],
 
         highlighted_team: null,
+        match_highlights: [],
         timezone: "local"
     },
     mutations: {
@@ -66,12 +67,16 @@ export default new Vuex.Store({
         },
         setTimezone(state, timezone) {
             state.timezone = timezone;
+        },
+        setHighlights(state, matchHighlights) {
+            state.match_highlights = matchHighlights;
         }
     },
     getters: {
         things: state => state.things,
         thing: (state) => (id) => state.things.find(item => item.id === id),
-        isHighlighted: state => (id) => state.highlighted_team === id
+        isHighlighted: state => (id) => state.highlighted_team === id,
+        getHighlight: state => (matchID) => state.match_highlights.find(match => match.id === matchID)
     },
     actions: {
         subscribe: (state, data) => state.commit("subscribe", data),

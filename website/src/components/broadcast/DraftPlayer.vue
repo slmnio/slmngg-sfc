@@ -84,8 +84,8 @@ C13.888,14.756,13.487,14.83,13.065,14.847z"/>
         border-bottom: 2px solid transparent;
         font-size: 20px;
         width: calc(50% - 4px);
-        margin: 0 2px 4px;
-        padding: 2px 8px;
+        margin: 0 2px 2px;
+        padding: 1px 8px;
         overflow: hidden;
         display: flex;
         align-items: center;

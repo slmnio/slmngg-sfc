@@ -106,6 +106,7 @@ export default {
         background: #111;
         color: #eee;
         font-family: "Industry", "SLMN-Industry", sans-serif;
+        overflow: hidden;
     }
     .available-players {
         display: flex;

@@ -31,6 +31,7 @@ import TeamTheme from "@/views/sub-views/TeamTheme";
 import EventSchedule from "@/views/sub-views/EventSchedule";
 import EventScenarios from "@/components/website/EventScenarios";
 import BracketOverlay from "@/components/broadcast/BracketOverlay";
+import DraftOverlay from "@/components/broadcast/DraftOverlay";
 
 Vue.use(VueRouter);
 
@@ -109,6 +110,7 @@ const routes = [
             { path: "roster", redirect: "rosters" },
             { path: "rosters", component: RosterOverlay },
             { path: "thumbnail", component: EventThumbnailCreator },
+            { path: "draft", component: DraftOverlay },
             { path: "custom", component: CustomOverlay, props: route => ({ title: route.query.title }) }
         ]
     }

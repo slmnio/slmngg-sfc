@@ -8,6 +8,7 @@
             <li class="nav-item" v-if="event.brackets"><router-link class="nav-link" :to="subLink('bracket')">{{ event.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link></li>
             <li class="nav-item" v-if="event.matches"><router-link class="nav-link" :to="subLink('schedule')">Schedule</router-link></li>
             <li class="nav-item" v-if="showFoldy"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
+            <li class="nav-item" v-if="showDraft"><router-link class="nav-link" :to="subLink('draft')">Draft</router-link></li>
 <!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
         </SubPageNav>
 
@@ -18,7 +19,7 @@
 <script>
 
 import ThingTop from "@/components/website/ThingTop";
-import { ReactiveRoot, ReactiveThing, ReactiveArray } from "@/utils/reactive";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { multiImage } from "@/utils/content-utils";
 import SubPageNav from "@/components/website/SubPageNav";
 
@@ -53,15 +54,19 @@ export default {
                 casters: ReactiveArray("casters")
             });
         },
-        showFoldy() {
-            if (!this.event?.blocks) return false;
+        settings() {
+            if (!this.event?.blocks) return null;
             try {
-                const settings = JSON.parse(this.event.blocks);
-                if (!settings?.foldy?.use) return false;
+                return JSON.parse(this.event.blocks);
             } catch (e) {
-                return false;
+                return null;
             }
-            return true;
+        },
+        showFoldy() {
+            return this.settings?.foldy?.use || false;
+        },
+        showDraft() {
+            return this.settings?.draft?.use || false;
         }
     },
     methods: {

@@ -32,6 +32,7 @@ import EventSchedule from "@/views/sub-views/EventSchedule";
 import EventScenarios from "@/components/website/EventScenarios";
 import BracketOverlay from "@/components/broadcast/BracketOverlay";
 import DraftOverlay from "@/components/broadcast/DraftOverlay";
+import EventDraft from "@/views/sub-views/EventDraft";
 
 Vue.use(VueRouter);
 
@@ -70,7 +71,8 @@ const routes = [
                     { path: "brackets", redirect: "bracket" },
                     { path: "schedule", component: EventSchedule },
                     { path: "matches", redirect: "schedule" },
-                    { path: "scenarios", component: EventScenarios }
+                    { path: "scenarios", component: EventScenarios },
+                    { path: "draft", component: EventDraft }
                 ]
             },
             {

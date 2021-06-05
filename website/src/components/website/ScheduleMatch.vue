@@ -18,7 +18,9 @@
             <div class="team-logo team-logo--spacer" v-else></div>
         </div>
 
-        <router-link :to="url('match', this.match)" class="match-center match-vs flex-center">vs</router-link>
+        <router-link :to="url('match', this.match)" class="match-center match-vs flex-center">
+            {{ match.score_1 }} - {{ match.score_2 }}
+        </router-link>
         <div class="match-right match-time flex-center">
             <ScheduleTime :time="match.start" :custom-text="match.custom_name"/>
         </div>

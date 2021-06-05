@@ -106,7 +106,7 @@ const routes = [
         children: [
             { path: "ingame", component: IngameOverlay },
             { path: "break", component: BreakOverlay },
-            { path: "bracket", component: BracketOverlay, props: route => ({ bracketKey: route.query.key }) },
+            { path: "bracket", component: BracketOverlay, props: route => ({ bracketKey: route.query.key, extended: !!route.query.extended, scale: route.query.scale }) },
             { path: "schedule", component: ScheduleOverlay },
             { path: "standings", component: StandingsOverlay },
             { path: "roster", redirect: "rosters" },

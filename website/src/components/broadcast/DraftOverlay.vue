@@ -79,6 +79,34 @@ export default {
                 }
                 if (!player.name) return false;
                 return true;
+            }).map(player => {
+                // attempt to get SR
+                try {
+                    const ow = JSON.parse(player.overwatch_data);
+                    if (ow && ow.ratings && player.role) {
+                        let sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
+                        if (sr) return { ...player, rating: { level: sr, note: "Pulled from their Battletag" } };
+                        sr = Math.floor(ow.ratings.reduce((p, c) => p + c.level, 0) / ow.ratings.length);
+                        console.log(sr);
+                        if (sr) return { ...player, rating: { level: sr, note: "Average of other roles" } };
+                    }
+                    if (player.manual_sr) {
+                        return { ...player, rating: { level: parseInt(player.manual_sr), note: "Manually added" } };
+                    }
+                } catch (e) {
+                    return player;
+                }
+
+                return player;
+            }).sort((a, b) => {
+                if (!a.role) return 1; if (!b.role) return -1;
+                if (a.role !== b.role) {
+                    const order = ["Tank", "DPS", "Support"];
+                    return order.indexOf(a.role) - order.indexOf(b.role);
+                }
+
+                if (!a.rating) return 1; if (!b.rating) return -1;
+                return b.rating.level - a.rating.level;
             });
         },
         draftTeams() {

@@ -6,7 +6,7 @@
       <p>Since it's been rewritten, I can do a lot more with the site and keep it updated better. It should be easier to use AND develop!</p>
 
       <h1>What is SLMN.GG?</h1>
-      <p>SLMN.GG is the one-stop place for every <a href="https://slmn.io">SLMN</a>-affiliated event, including BPL, Avast's Sub Tourneys, SI Not Found's Goats Tourney, Plat Chat's Timmy Tourneys and a host of other community events.</p>
+      <p>SLMN.GG is the one-stop place for every <a href="https://slmn.io">SLMN</a>-affiliated event, including BPL, Avast's Sub Tourneys, SI Not Found's Goats Tourney, Plat Chat's Timmy Tourneys and {{ count }} other community events.</p>
       <p>Get started by checking the different events pages. You can update your data on some pages. You can add socials links
           <a href="https://airtable.com/shr1AopIfNXXPuIIB" target="_blank"> here</a>! They will be manually checked and added every few days.</p>
   </div>
@@ -14,9 +14,20 @@
 
 <script>
 
+import { ReactiveList } from "@/utils/reactive";
+
 export default {
     name: "Home",
-    components: {
+    computed: {
+        events() {
+            return ReactiveList("Events").filter(event => event.show_in_events);
+        },
+        eventSeries() {
+            return ReactiveList("Event Series");
+        },
+        count() {
+            return this.events.length || "many" + (this.eventSeries.length.toString().slice(0, 0));
+        }
     }
 };
 </script>

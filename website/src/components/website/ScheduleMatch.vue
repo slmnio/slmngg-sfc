@@ -53,7 +53,6 @@ export default {
                 if (text.length === 2) {
                     return text.map(t => ({ ...dummy, text: t }));
                 } else if (text.length === 1) {
-                    // eslint-disable-next-line no-unreachable
                     if (this.match.placeholder_right) return [dummy, { ...dummy, text: text[0] }];
                     return [{ ...dummy, text: text[0] }, dummy];
                 } else if (text.length === 0) {
@@ -66,11 +65,12 @@ export default {
                     if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[1] }];
                     return [{ ...dummy, text: text[0] }, this.match.teams[0]];
                 } else if (text.length === 1) {
-                    if (this.match.placeholder_right) return [dummy, { ...dummy, text: text[0] }];
-                    return [{ ...dummy, text: text[0] }, dummy];
+                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[0] }];
+                    return [{ ...dummy, text: text[0] }, this.match.teams[0]];
                 } else if (text.length === 0) {
                     // no text, just use TBDs
-                    return [dummy, dummy];
+                    if (this.match.placeholder_right) return [this.match.teams[0], dummy];
+                    return [dummy, this.match.teams[0]];
                 }
             }
 
@@ -113,6 +113,7 @@ export default {
 
     .match-vs {
         color: white;
+        white-space: nowrap;
     }
 
     .team-name, .team-code {

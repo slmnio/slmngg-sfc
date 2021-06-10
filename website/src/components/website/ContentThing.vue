@@ -7,7 +7,7 @@
           <span
               class="icon-internal bg-center icon-internal-left"
               :style="logo"
-              v-if="showLogo && logo && !logoRight && theme"></span>
+              v-if="shouldShowLogo && !logoRight"></span>
 
         <span class="name">{{ text || thing.name }}</span>
 
@@ -18,7 +18,7 @@
         <span
             class="icon-internal bg-center icon-internal-right"
             :style="logo"
-            v-if="showLogo && logo && logoRight && theme"></span>
+            v-if="shouldShowLogo && logoRight"></span>
         </span></router-link>
 </template>
 
@@ -34,6 +34,26 @@ export default {
         url
     },
     computed: {
+        shouldShowLogo() {
+            /*
+            * Show logo when:
+            * - requested and loading
+            * - requested and found
+            *
+            * Hide logo when:
+            * - not requested
+            * - requested and not found
+            * */
+
+            if (this.showLogo) {
+                console.log(this.thing.name, this.theme);
+                if (this.logo) return true;
+                if ((this.text || this.thing.name) && (this.theme && !this.theme.id)) return true; // theme not started loading
+                // there is team.has_theme but that's not universal
+                if (this.theme?.__loading) return true; // theme loading
+            }
+            return false;
+        },
         loading() {
             return this.thing.__loading || !this.thing || !this.thing.id;
         },

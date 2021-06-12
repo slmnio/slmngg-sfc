@@ -6,9 +6,12 @@ import Vuex from "vuex";
 import VueMeta from "vue-meta";
 import VueSocketIOExt from "vue-socket.io-extended";
 import { io } from "socket.io-client";
+import { VBTooltip } from "bootstrap-vue";
 
 Vue.use(Vuex);
 Vue.use(VueMeta);
+
+Vue.directive("b-tooltip", VBTooltip);
 
 const socket = io(process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg", { transports: ["websocket", "polling"] });
 

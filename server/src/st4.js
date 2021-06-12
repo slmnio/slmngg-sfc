@@ -49,8 +49,9 @@ module.exports = function(airtable) {
                 "support": player.get("Support SR"),
                 "role": player.get("Role SR")
             },
-            "role": player.get("Role"),
-            "info_for_captains": player.get("Info for captains")
+            "role": player.get("Main role"),
+            "info_for_captains": player.get("Info for captains"),
+            "is_draftable": !player.get("Teams")
         };
     }
 

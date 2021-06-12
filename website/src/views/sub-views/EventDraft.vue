@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="row">
-            <div class="col-12 small-rosters">
+            <div class="col-12 my-2 small-rosters">
                 <h2>Rosters</h2>
                 <div class="team my-2 d-flex" v-for="team in draftTeams" v-bind:key="team.id">
                     <ThemeLogo class="team-logo" :theme="team.theme" border-width="6" />
@@ -11,18 +11,35 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12">
+            <div class="col-12 my-2 settings">
+                <h2>Settings</h2>
+                <b-form-checkbox :title="'Show where each player placed in SLMN.GG events. Takes a while to load every player\'s data.'" v-model="settings.slmn_events">Show SLMN event results (takes a while to load)</b-form-checkbox>
+                <b-form-checkbox :title="'Show what the players selected as their \'best heroes\''" v-model="settings.heroes">Show heroes</b-form-checkbox>
+                <b-form-checkbox :title="'Show what the players wrote for their \'info for captains\''" v-model="settings.info_for_captains">Show player's info for captains</b-form-checkbox>
+                <b-form-checkbox :title="'Show the notes you\'ve written for players. Will save to your browser.'" v-model="settings.custom_notes">Show your player notes</b-form-checkbox>
+                <div class="w-25 mt-1">
+                    <b-form-select v-model="filters.selected" :options="filters.options"></b-form-select>
+                </div>
+            </div>
+            <div class="col-12 my-2" v-if="playerGroup('starred').length">
+                <h2>Starred players</h2>
+                <table class="table table-bordered bg-warning table-warning table-sm">
+                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings"/>
+                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('starred')" :player="player" v-bind:key="player.id" :has-draft-data="hasDraftData"/>
+                </table>
+            </div>
+            <div class="col-12 my-2">
                 <h2>Available players</h2>
                 <table class="table table-bordered table-dark table-sm">
-                    <tr>
-                        <th>Name</th>
-                        <th>SR</th>
-                        <th>Role</th>
-                        <th v-if="hasDraftData">Best heroes</th>
-                        <th v-if="hasDraftData">Info for captains</th>
-                        <th v-if="!hasDraftData">Player information</th>
-                    </tr>
-                    <PlayerDraftRow v-for="player in availablePlayers" :player="player" v-bind:key="player.id" :has-draft-data="hasDraftData"/>
+                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings"/>
+                    <PlayerDraftRow :settings="settings" v-for="player in ungroupedPlayers" :player="player" v-bind:key="player.id" :has-draft-data="hasDraftData"/>
+                </table>
+            </div>
+            <div class="col-12 my-2" v-if="playerGroup('ignored').length">
+                <h2>Ignored players</h2>
+                <table class="table table-bordered bg-danger table-danger text-white table-sm">
+                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings"/>
+                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('ignored')" :player="player" v-bind:key="player.id" :has-draft-data="hasDraftData"/>
                 </table>
             </div>
         </div>
@@ -35,6 +52,9 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 import ContentThing from "@/components/website/ContentThing";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import PlayerDraftRow from "@/components/website/PlayerDraftRow";
+import store from "@/thing-store";
+import EventDraftHeaders from "@/components/website/EventDraftHeaders";
+import { BFormCheckbox, BFormSelect } from "bootstrap-vue";
 const { url } = require("@/utils/content-utils");
 
 
@@ -51,10 +71,28 @@ function getRoleString(sr) {
 export default {
     name: "EventDraft",
     props: ["event"],
-    components: { PlayerDraftRow, ContentThing, ThemeLogo },
+    components: { EventDraftHeaders, PlayerDraftRow, ContentThing, ThemeLogo, BFormCheckbox, BFormSelect },
     methods: {
-        url
+        url,
+        playerGroup(group) { return this.availablePlayers.filter(p => p.localNotes && p.localNotes.tag === group); }
     },
+    data: () => ({
+        settings: {
+            heroes: true,
+            slmn_events: false,
+            info_for_captains: true,
+            custom_notes: false
+        },
+        filters: {
+            options: [
+                { value: null, text: "Show all" },
+                { value: "DPS", text: "DPS only" },
+                { value: "Tank", text: "Tank only" },
+                { value: "Support", text: "Support only" }
+            ],
+            selected: null
+        }
+    }),
     computed: {
         _event() {
             if (!this.event) return null;
@@ -99,7 +137,7 @@ export default {
                         if (ow && ow.ratings && player.role) {
                             const sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
                             if (draftData.sr.role && sr) player.sr_err = sr - draftData.sr.role;
-                            if (sr) extraSRtext += ` Live SR on role: ${sr} ${player.sr_err && `(${player.sr_err})`}`;
+                            if (sr) extraSRtext += ` Live SR on role: ${sr} ${player.sr_err && `(${player.sr_err})`}.`;
                         }
 
 
@@ -110,7 +148,6 @@ export default {
                         let sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
                         if (sr) return { ...player, rating: { level: sr, note: "Pulled from their Battletag" } };
                         sr = Math.floor(ow.ratings.reduce((p, c) => p + c.level, 0) / ow.ratings.length);
-                        console.log(sr);
                         if (sr) return { ...player, rating: { level: sr, note: "Average of other roles" } };
                     }
                     if (player.manual_sr) {
@@ -129,7 +166,10 @@ export default {
                     const draftData = JSON.parse(player.draft_data);
                     player.heroes = draftData.best_heroes;
                     player.info_for_captains = draftData.info_for_captains;
+                    player.do_not_draft = draftData.is_draftable === false;
                 } catch (e) { }
+
+                player.localNotes = store.getters.getNotes(player.id);
 
 
                 return player;
@@ -139,11 +179,20 @@ export default {
                 // return b.sr_err - a.sr_err;
                 if (!a.rating) return 1; if (!b.rating) return -1;
                 return b.rating.level - a.rating.level;
+            }).filter(player => {
+                if (player.do_not_draft) return false;
+                if (!this.filters.selected) return true;
+                if (!player.role) return false;
+                return (player.role.toLowerCase() === this.filters.selected.toLowerCase());
             });
         },
         draftTeams() {
             if (!this._event?.teams) return [];
             return this._event.teams.filter(team => team.draft_order !== undefined).sort((a, b) => a.draft_order - b.draft_order);
+        },
+
+        ungroupedPlayers() {
+            return this.availablePlayers.filter(p => p.localNotes ? !p.localNotes.tag : true);
         }
     }
 };

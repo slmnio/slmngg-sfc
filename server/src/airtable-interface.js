@@ -5,6 +5,8 @@ const slmngg = airtable.base(process.env.AIRTABLE_APP);
 const ora = require("ora");
 const chalk = require("chalk");
 
+const st4 = require("./st4")(airtable);
+
 const logUpdates = false;
 
 // Starting with syncing Matches

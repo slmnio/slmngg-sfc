@@ -177,7 +177,7 @@ export default {
                 // if (!a.sr_err || !b.sr_err) return 0;
                 // if (!a.sr_err) return 1; if (!b.sr_err) return -1;
                 // return b.sr_err - a.sr_err;
-                if (!a.rating) return 1; if (!b.rating) return -1;
+                if (!a.rating?.level) return 1; if (!b.rating?.level) return -1;
                 return b.rating.level - a.rating.level;
             }).filter(player => {
                 if (player.do_not_draft) return false;

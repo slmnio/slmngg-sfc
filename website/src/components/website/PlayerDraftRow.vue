@@ -58,7 +58,7 @@ export default {
             store.commit("setPlayerDraftNotes", { playerID: this.player.id, tag, notes: note });
         },
         doNote() {
-            const text = prompt(`Set ${this.player.name}'s custom note`, this.notes.notes);
+            const text = prompt(`Set ${this.player.name}'s custom note`, this.notes?.notes);
             this.setNote(undefined, text);
         }
     },

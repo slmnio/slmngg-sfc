@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="row">
-            <div class="col-12 my-2 small-rosters">
+            <div class="col-12 my-2 small-rosters" v-if="settings.show_rosters">
                 <h2>Rosters</h2>
                 <div class="team my-2 d-flex" v-for="team in draftTeams" v-bind:key="team.id">
                     <ThemeLogo class="team-logo" :theme="team.theme" border-width="6" />
@@ -17,6 +17,7 @@
                 <b-form-checkbox :title="'Show what the players selected as their \'best heroes\''" v-model="settings.heroes">Show heroes</b-form-checkbox>
                 <b-form-checkbox :title="'Show what the players wrote for their \'info for captains\''" v-model="settings.info_for_captains">Show player's info for captains</b-form-checkbox>
                 <b-form-checkbox :title="'Show the notes you\'ve written for players. Will save to your browser.'" v-model="settings.custom_notes">Show your player notes</b-form-checkbox>
+                <b-form-checkbox v-model="settings.show_rosters">Show team rosters</b-form-checkbox>
                 <div class="w-25 mt-1">
                     <b-form-select v-model="filters.selected" :options="filters.options"></b-form-select>
                 </div>
@@ -81,7 +82,8 @@ export default {
             heroes: true,
             slmn_events: false,
             info_for_captains: true,
-            custom_notes: false
+            custom_notes: false,
+            show_rosters: false
         },
         filters: {
             options: [

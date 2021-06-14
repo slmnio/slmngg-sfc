@@ -13,10 +13,10 @@
             <tbody>
             <tr v-for="player in team.players" v-bind:key="player.id">
                 <td class="wide">{{ player.name }}</td>
-                <td class="wide">{{ player.discord_tag }}</td>
-                <td class="wide">{{ player.battletag }}</td>
                 <td class="wide">{{ player.pronouns }}</td>
                 <td>{{ player.pronunciation }}</td>
+                <td class="wide">{{ player.discord_tag }}</td>
+                <td class="wide">{{ player.battletag }}</td>
             </tr>
             </tbody>
         </table>

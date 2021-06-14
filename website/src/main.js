@@ -26,6 +26,12 @@ Vue.use(VueSocketIOExt, socket, { store });
 
 Vue.config.productionTip = false;
 
+Vue.component("v-style", {
+    render: function (createElement) {
+        return createElement("style", this.$slots.default);
+    }
+});
+
 const app = new Vue({
     router,
     render: h => h(GlobalApp),

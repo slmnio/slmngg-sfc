@@ -1,5 +1,10 @@
 <template>
-    <router-view id="overlay" :broadcast="broadcast"/>
+    <div class="broadcast-app">
+        <router-view id="overlay" :broadcast="broadcast"/>
+        <v-style v-if="broadcast && broadcast.event">
+            {{ broadcast.event.broadcast_css }}
+        </v-style>
+    </div>
 </template>
 
 <script>
@@ -17,6 +22,8 @@ export default {
     },
     mounted () {
         console.log("overlay app mounted", this.id);
+        // let css = document.createElement('style');;
+        // css.innerText = this.event.
     },
     beforeCreate () {
         document.body.className = "overlay";

@@ -12,7 +12,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="player in team.players" v-bind:key="player.id">
+            <tr v-for="player in people" v-bind:key="player.id">
                 <td class="wide">{{ player.name }}</td>
                 <td class="wide">{{ player.pronouns }}</td>
                 <td>{{ player.pronunciation }}</td>
@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import ContentRow from "@/components/website/ContentRow";
 import ContentThing from "@/components/website/ContentThing";
 import TwitterLink from "@/components/website/TwitterLink";
@@ -36,12 +36,23 @@ export default {
     props: ["team"],
     components: { TwitterLink },
     computed: {
-        teams() {
-            if (!this.event || !this.event.teams) return [];
-            return ReactiveArray("teams", {
+        _team() {
+            if (!this.team) return [];
+            return ReactiveRoot(this.team.id, {
                 theme: ReactiveThing("theme"),
-                players: ReactiveArray("players")
-            })(this.event);
+                players: ReactiveArray("players"),
+                staff: ReactiveArray("staff"),
+                captain: ReactiveThing("captain")
+            });
+        },
+        people() {
+            return [
+                this._team?.captain || [],
+                ...this._team?.staff || [],
+                ...this._team?.players || []
+            ].filter((player, index, array) => {
+                return array.findIndex(p => p.id === player.id) === index;
+            });
         }
     }
 };

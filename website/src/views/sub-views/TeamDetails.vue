@@ -6,6 +6,7 @@
                 <th>Name</th>
                 <th>Pronouns</th>
                 <th>Pronunciation</th>
+                <th class="wide"><i class="fab fa-twitter fa-fw"></i> Twitter</th>
                 <th class="wide"><i class="fab fa-discord fa-fw"></i> Discord tag</th>
                 <th class="wide"><i class="fab fa-battle-net fa-fw"></i> Battletag</th>
             </tr>
@@ -15,6 +16,7 @@
                 <td class="wide">{{ player.name }}</td>
                 <td class="wide">{{ player.pronouns }}</td>
                 <td>{{ player.pronunciation }}</td>
+                <td class="wide"><TwitterLink :thing="player" /></td>
                 <td class="wide">{{ player.discord_tag }}</td>
                 <td class="wide">{{ player.battletag }}</td>
             </tr>
@@ -27,11 +29,12 @@
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import ContentRow from "@/components/website/ContentRow";
 import ContentThing from "@/components/website/ContentThing";
+import TwitterLink from "@/components/website/TwitterLink";
 
 export default {
     name: "TeamDetails",
     props: ["team"],
-    components: { },
+    components: { TwitterLink },
     computed: {
         teams() {
             if (!this.event || !this.event.teams) return [];

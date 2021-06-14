@@ -3,15 +3,16 @@
 </template>
 
 <script>
-import { ReactiveRoot } from "@/utils/reactive";
-import { fetchThing } from "@/utils/fetch";
+import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "BroadcastApp",
     props: ["id"],
     computed: {
         broadcast() {
-            return ReactiveRoot(`broadcast-${this.id}`);
+            return ReactiveRoot(`broadcast-${this.id}`, {
+                event: ReactiveThing("event")
+            });
         }
     },
     mounted () {

@@ -29,7 +29,7 @@ export default {
         },
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;
-            return ReactiveRoot(this.broadcast.event[0], {
+            return ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme")
             });
         },

@@ -18,7 +18,7 @@ export default {
     computed: {
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;
-            return ReactiveRoot(this.broadcast.event[0], {
+            return ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme"),
                 brackets: ReactiveArray("brackets", {
                     ordered_matches: ReactiveArray("ordered_matches", {

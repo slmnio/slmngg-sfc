@@ -33,6 +33,7 @@ import EventScenarios from "@/components/website/EventScenarios";
 import BracketOverlay from "@/components/broadcast/BracketOverlay";
 import DraftOverlay from "@/components/broadcast/DraftOverlay";
 import EventDraft from "@/views/sub-views/EventDraft";
+import TeamDetails from "@/views/sub-views/TeamDetails";
 
 Vue.use(VueRouter);
 
@@ -54,7 +55,8 @@ const routes = [
                 children: [
                     { path: "", component: TeamMain },
                     { path: "matches", component: TeamMatches },
-                    { path: "theme", component: TeamTheme }
+                    { path: "theme", component: TeamTheme },
+                    { path: "details", component: TeamDetails }
                 ]
             },
             { path: "/events", component: Events },

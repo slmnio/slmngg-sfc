@@ -1,7 +1,7 @@
 <template>
     <div class="draft-player" :style="background">
         <div class="player-name">{{ player.name }}</div>
-        <div class="player-role flex-center" v-html="getSVG(player.role)"></div>
+        <div class="player-role flex-center" v-if="!player.dummy" v-html="getSVG(player.role)"></div>
     </div>
 </template>
 
@@ -81,10 +81,13 @@ C13.888,14.756,13.487,14.83,13.065,14.847z"/>
 
 <style scoped>
     .draft-player {
-        border-bottom: 2px solid transparent;
+        border-bottom: 2px solid rgba(255,255,255,0.2);
+        background-color: #2644FF;
+        background-image: linear-gradient(20deg, #20FC8F4f, transparent);
         font-size: 20px;
-        width: calc(50% - 4px);
-        margin: 0 2px 2px;
+        /*width: calc(50% - 4px);*/
+        width: 100%;
+        margin: 0 0 2px;
         padding: 1px 8px;
         overflow: hidden;
         display: flex;
@@ -92,11 +95,18 @@ C13.888,14.756,13.487,14.83,13.065,14.847z"/>
     }
     .player-name {
         flex-grow: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .player-role {
         --size: 1.25em;
         height: var(--size);
         width: var(--size);
+    }
+    .draft-player.dummy .player-name {
+        text-align: center;
+        opacity: 0.2;
     }
 </style>
 

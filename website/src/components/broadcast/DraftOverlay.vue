@@ -1,28 +1,31 @@
 <template>
     <div class="draft-overlay">
         <div class="draft d-flex w-100 h-100">
-            <div class="available-players">
-                <div class="title" :style="background">DRAFTABLE PLAYERS</div>
-                <!--<div class="player" v-for="player in availablePlayers" v-bind:key="player.id">
-                    {{ player.name }}
-                </div>-->
-                <transition-group class="players-transition" name="draftable">
-                    <DraftPlayer v-for="player in availablePlayers" v-bind:key="player.id" :player="player" :theme="event.theme" />
+            <div class="available-players" :style="leftSize">
+                <ThemeLogo class="top-event-logo" :theme="event && event.theme" />
+                <div class="title" :style="background">{{ leftHeaderText }}</div>
+<!--                <div class="player" v-for="player in availablePlayers" v-bind:key="player.id">-->
+<!--                    {{ player.name }}-->
+<!--                </div>-->
+                <transition-group class="players-transition" name="draftable" :duration="6000">
+                    <DraftPlayer v-for="player in availablePlayers" v-bind:key="player.id" :player="player" :theme="event && event.theme" />
                 </transition-group>
             </div>
-            <div class="teams d-flex">
-                <div class="team flex-grow-1" v-for="team in draftTeams" v-bind:key="team.id">
-                    <DraftTeam class="team-top" :team="team"></DraftTeam>
-                    <div class="team-staff-list" :style="logoBackground1(team)">
+<!--            <div class="teams" :style="teamsLayout">-->
+                <transition-group name="fade" class="teams teams-layout-holder" :style="teamsLayout">
+                <div class="team" v-for="team in draftTeams" v-bind:key="team.id">
+                    <DraftTeam class="team-top" :team="team" :each-team="eachTeam"></DraftTeam>
+                    <!-- <div class="team-staff-list" :style="logoBackground1(team)">
                         <div class="team-staff" v-for="staff in team.staff" v-bind:key="staff.id">
                             {{ staff.name }}
                         </div>
-                    </div>
-                    <transition-group name="player" class="team-players">
-                        <DraftPlayer class="drafted-player" v-for="player in team.players" v-bind:key="player.id" :player="player" :theme="event.theme" />
-                    </transition-group>
+                    </div> -->
+<!--                    <transition-group name="player" class="team-players" :style="teamLayout">-->
+<!--                        <DraftPlayer class="drafted-player" v-for="player in team.players" v-bind:key="player.id" :player="player" :theme="event.theme" />-->
+<!--                    </transition-group>-->
                 </div>
-            </div>
+                </transition-group>
+<!--            </div>-->
         </div>
 
         <div class="theme-bar" :style="{backgroundColor: accentColor}"></div>
@@ -34,10 +37,30 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import DraftTeam from "@/components/broadcast/DraftTeam";
 import DraftPlayer from "@/components/broadcast/DraftPlayer";
 import { logoBackground, logoBackground1 } from "@/utils/theme-styles";
+import ThemeLogo from "@/components/website/ThemeLogo";
 
+
+function getSR(player) {
+    try {
+        if (player.draft_data) {
+            const draftData = JSON.parse(player.draft_data);
+            try {
+                const nextHighestSR = Object.entries(draftData.sr).filter(([role, sr]) => !(role.toLowerCase() === player.role.toLowerCase() || role === "role")).map(e => e[1]).sort((a, b) => b - a)[0];
+                console.log(player.name, draftData.sr.role, nextHighestSR, (draftData.sr.role + nextHighestSR) / 2, Math.abs(draftData.sr.role - nextHighestSR));
+                // && Math.abs(draftData.sr.role - nextHighestSR) < 500
+                if (nextHighestSR && nextHighestSR > draftData.sr.role) return (draftData.sr.role + nextHighestSR) / 2;
+            } catch (e) { console.error(e); }
+
+            return draftData.sr.role;
+        }
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
 export default {
     name: "DraftOverlay",
-    components: { DraftTeam, DraftPlayer },
+    components: { ThemeLogo, DraftTeam, DraftPlayer },
     props: ["broadcast", "bracketKey"],
     data: () => ({
         dummy: false
@@ -83,6 +106,17 @@ export default {
                 // attempt to get SR
                 try {
                     const ow = JSON.parse(player.overwatch_data);
+
+                    if (player.draft_data) {
+                        const draftData = JSON.parse(player.draft_data);
+
+                        if (ow && ow.ratings && player.role) {
+                            const sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
+                            if (draftData.sr.role && sr) player.sr_err = sr - draftData.sr.role;
+                        }
+                        return { ...player, rating: { level: draftData.sr.role } };
+                    }
+
                     if (ow && ow.ratings && player.role) {
                         let sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
                         if (sr) return { ...player, rating: { level: sr, note: "Pulled from their Battletag" } };
@@ -99,6 +133,13 @@ export default {
 
                 return player;
             }).sort((a, b) => {
+                if (this.eventSettings?.draft?.left) {
+                    if (this.eventSettings.draft.left === "top") {
+                        if (!a.rating?.level) return 1; if (!b.rating?.level) return -1;
+                        return b.rating.level - a.rating.level;
+                    }
+                }
+
                 if (!a.role) return 1; if (!b.role) return -1;
                 if (a.role !== b.role) {
                     const order = ["Tank", "DPS", "Support"];
@@ -109,9 +150,58 @@ export default {
                 return b.rating.level - a.rating.level;
             });
         },
+        topHigh() {
+            return this.eventSettings?.draft?.left && this.eventSettings.draft.left === "top";
+        },
+        leftSize() {
+            if (!this.topHigh) return {};
+            return { width: "230px" };
+        },
+        eachTeam() {
+            return this.eventSettings?.draft?.each_team || null;
+        },
+        leftHeaderText() {
+            if (this.eventSettings?.draft?.left) {
+                if (this.eventSettings.draft.left === "top") {
+                    return "Top Players";
+                }
+            }
+            return "Draftable Players";
+        },
         draftTeams() {
             if (!this.event?.teams) return [];
-            return this.event.teams.filter(team => team.draft_order !== undefined).sort((a, b) => a.draft_order - b.draft_order);
+            return this.event.teams.filter(team => team.draft_order !== undefined).map(team => {
+                function teamSR(team) {
+                    const SRs = team.players.map(getSR).filter(sr => !!sr).sort((a, b) => b - a).slice(0, 6);
+                    const count = SRs.length;
+                    console.log(SRs);
+                    if (!count) return null;
+                    const average = SRs.reduce((prev, current) => prev + current, 0) / count;
+                    return Math.floor(average);
+                }
+
+                return { ...team, team_sr: teamSR(team) };
+            })/* .sort((a, b) => a.draft_order - b.draft_order) */.sort((a, b) => b.team_sr - a.team_sr);
+        },
+        eventSettings() {
+            if (!this.event?.blocks) return null;
+            try {
+                return JSON.parse(this.event.blocks);
+            } catch (e) {
+                return null;
+            }
+        },
+        teamsLayout() {
+            if (!this.eventSettings?.draft?.rows) return {};
+            return {
+                "grid-template-columns": `repeat(${Math.ceil(this.draftTeams.length / this.eventSettings.draft.rows)}, 1fr)`
+            };
+        },
+        teamLayout() {
+            if (!this.eventSettings?.draft?.rows) return {};
+            return {
+                "max-height": 100 / this.eventSettings.draft.rows + "%"
+            };
         }
     },
     mounted() {
@@ -151,7 +241,7 @@ export default {
         /*display: inline-block;*/
     }
     .draft-player {
-        width: 224px;
+        /*width: 224px;*/
         max-height: 2em;
     }
     .available-players .title {
@@ -160,25 +250,29 @@ export default {
         font-size: 32px;
         font-weight: bold;
         width: 100%;
-        margin: 0 2px 8px;
+        margin: 0 0 8px;
         padding: 2px 8px;
-        width: calc(100% - 4px);
+        /*width: calc(100% - 4px);*/
+        text-transform: uppercase;
     }
 
     .team {
         width: 0;
+        min-width: 0;
+        min-height: 0;
         flex-grow: 1;
         flex-shrink: 0;
         margin-right: 2px;
     }
     .team + .team {
-        border-left: 1px solid #333;
-        padding-left: 2px;
+        /*border-left: 1px solid #333;*/
+        /*padding-left: 2px;*/
     }
 
 
     .available-players {
         width: 25%;
+        flex-shrink: 0;
     }
     .teams {
         width: 75%;
@@ -190,6 +284,7 @@ export default {
         bottom: 0;
         width: 100%;
         height: 12px;
+        background-image: linear-gradient(to right, #2644FF, #20FC8F);
     }
 
     .team-staff-list {
@@ -255,4 +350,35 @@ export default {
         opacity: 0;
     }
 
+
+    /* new grid */
+    .team {
+        width: 100%;
+        height: 100%;
+    }
+    .teams {
+        display: grid;
+        /*grid-template-rows: 1fr 1fr;*/
+        /*grid-auto-columns: 1fr;*/
+        /*grid-auto-flow: column;*/
+        grid-gap: 8px;
+        width: 100%;
+        /*grid-auto-columns: 200px;*/
+        /*grid-auto-columns: 1fr;*/
+        /*grid-template-rows: 1fr 1fr;*/
+        /*grid-auto-flow: row;*/
+
+        /*grid-template-columns: repeat(9, 1fr);*/
+
+
+        /*display: grid;*/
+        /*grid-template-columns: repeat(3, 1fr);*/
+        /*grid-auto-rows: 200px;*/
+    }
+
+    .top-event-logo {
+        width: 100%;
+        height: 200px;
+        margin-bottom: 20px;
+    }
 </style>

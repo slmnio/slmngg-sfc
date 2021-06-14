@@ -48,7 +48,7 @@ export default {
         box-sizing: border-box;
         /*justify-content: space-evenly;*/
         overflow: hidden;
-        background-color: rgba(0, 0, 0, 0.2);
+        /*background-color: rgba(0, 0, 0, 0.2);*/
         display: flex;
         flex-direction: column;
         height: 100%;

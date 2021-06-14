@@ -5,20 +5,26 @@
                 <span :key="match ? match.round : 'empty'">UP NEXT: {{ match && match.round }}</span>
             </transition>
         </div>
+        <!--
         <div class="match-details" v-if="expanded && start">
             {{ start }}
         </div>
+        -->
 <!--        <transition-group name="fade" mode="out-in" class="match-teams flex-center">-->
         <div class="match-teams flex-center">
                 <div class="match-team" v-for="(team, i) in teams" v-bind:key="team ? `${team.id}-${team.name}-${team.code}-${i}` : i" :style="{ order: i*2 }">
                     <div :class="expanded ? 'match-team-name' : 'match-team-code'" v-if="team">
                         <span class="industry-align">{{ expanded ? team.name : team.code }}</span>
                     </div>
-                    <div class="match-team-logo-holder flex-center">
-                        <div class="match-team-logo bg-center" :style="teamTheme(team)"></div>
+                    <div class="match-team-logo-holder flex-center" :style="teamTheme(team)">
+                        <div class="match-team-logo bg-center" :style="teamLogo(team)"></div>
                     </div>
+                    <div class="match-team-logo-spacer"></div>
                 </div>
-            <div class="match-team-vs">vs</div>
+            <div class="match-team-center">
+                <span v-if="!hasScore">{{ start }}</span>
+                <span v-else>{{ scores.join(' - ') }}</span>
+            </div>
         </div>
 <!--        </transition-group>-->
     </div>
@@ -27,6 +33,7 @@
 <script>
 import { cssImage } from "@/utils/content-utils";
 import spacetime from "spacetime";
+import { logoBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "BreakMatch",
@@ -41,14 +48,28 @@ export default {
             const utc = spacetime(this.match.start);
             const local = utc.goto(this.timezone || "America/New_York");
             return local.format("time");
+        },
+        hasScore() {
+            return false;
+            // eslint-disable-next-line no-unreachable
+            if (!this.match) return false;
+            if (this.match.live) return true;
+            return this.scores.some(t => !!t);
+        },
+        scores() {
+            if (!this.match) return [];
+            return [this.match.score_1, this.match.score_2];
         }
     },
     methods: {
-        teamTheme(team) {
+        teamLogo(team) {
             if (!team || !team.theme) return {};
             return {
                 ...cssImage("backgroundImage", team.theme, ["small_logo", "default_logo"], 40, true)
             };
+        },
+        teamTheme(team) {
+            return logoBackground1(team) || {};
         }
     }
 };
@@ -120,6 +141,7 @@ export default {
     }
     span.industry-align {
         transform: translate(0, -.0925em);
+        display: inline-flex;
     }
 
     .match-details {
@@ -138,5 +160,47 @@ export default {
     }
     .match-team:first-of-type .match-team-name {
         text-align: right;
+    }
+</style>
+<style scoped>
+    .match-team {
+        background: white;
+        color: black;
+        border-radius: 20px;
+        position: relative;
+        height: 1.8em;
+        margin: .3em 0;
+    }
+    .match-team-center {
+        white-space: nowrap;
+    }
+    .match-team-logo-holder {
+        width: 2.25em;
+        height: 2.25em;
+        position: absolute;
+        border-radius: 20px;
+        margin: 0;
+    }
+    .match-team-logo {
+        --size: 80%; width: var(--size); height: var(--size);
+    }
+    .match-team-logo-spacer {
+        display: flex;
+        flex-shrink: 0;
+        width: 2em;
+        margin: 0 .15em;
+    }
+    .match-team-center {
+        font-weight: bold;
+        font-size: .75em;
+        width: 170px;
+        flex-shrink: 0;
+        text-align: center;
+    }
+    .match-team-name span {
+        transform: translate(0, -0.05em)
+    }
+    .match-team-name {
+        margin: 0 0.3em;
     }
 </style>

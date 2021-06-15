@@ -13,16 +13,16 @@
 <!--        <transition-group name="fade" mode="out-in" class="match-teams flex-center">-->
         <div class="match-teams flex-center">
                 <div class="match-team" v-for="(team, i) in teams" v-bind:key="team ? `${team.id}-${team.name}-${team.code}-${i}` : i" :style="{ order: i*2 }">
-                    <div :class="expanded ? 'match-team-name' : 'match-team-code'" v-if="team">
+                    <div :class="expanded ? 'match-team-name' : 'match-team-code'" v-if="team && expanded">
                         <span class="industry-align">{{ expanded ? team.name : team.code }}</span>
                     </div>
                     <div class="match-team-logo-holder flex-center" :style="teamTheme(team)">
                         <div class="match-team-logo bg-center" :style="teamLogo(team)"></div>
                     </div>
-                    <div class="match-team-logo-spacer"></div>
+                    <div class="match-team-logo-spacer" v-if="expanded"></div>
                 </div>
             <div class="match-team-center">
-                <span v-if="!hasScore">{{ start }}</span>
+                <span v-if="!hasScore">{{ expanded ? start : 'vs' }}</span>
                 <span v-else>{{ scores.join(' - ') }}</span>
             </div>
         </div>
@@ -82,7 +82,7 @@ export default {
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
-        padding: 10px 0;
+        /*padding: 10px 0;*/
     }
     .break-match.expanded {
         flex-direction: row;
@@ -109,7 +109,7 @@ export default {
         font-weight: bold;
         font-size: 0.6em;
         text-transform: uppercase;
-        margin-bottom: .2em;
+        margin-bottom: .3em;
         line-height: 1;
     }
 
@@ -164,12 +164,14 @@ export default {
 </style>
 <style scoped>
     .match-team {
-        background: white;
-        color: black;
         border-radius: 20px;
         position: relative;
         height: 1.8em;
         margin: .3em 0;
+    }
+    .break-match.expanded .match-team {
+        background: white;
+        color: black;
     }
     .match-team-center {
         white-space: nowrap;
@@ -193,9 +195,12 @@ export default {
     .match-team-center {
         font-weight: bold;
         font-size: .75em;
-        width: 170px;
+        width: 80px;
         flex-shrink: 0;
         text-align: center;
+    }
+    .break-match.expanded .match-team-center {
+        width: 170px;
     }
     .match-team-name span {
         transform: translate(0, -0.05em)

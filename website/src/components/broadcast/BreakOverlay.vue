@@ -189,6 +189,7 @@ export default {
         width: 480px;
         flex-shrink: 0;
         border-right: 1px solid white;
+        padding: 5px 20px;
     }
     .break-schedule {
         flex-grow: 1;
@@ -201,6 +202,7 @@ export default {
     .break-next {
         width: 100%;
         padding: 20px;
+        /*padding: 10px 0 15px 0px;*/
     }
 
     .break-countdown {

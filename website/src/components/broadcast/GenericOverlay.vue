@@ -1,7 +1,10 @@
 <template>
     <div class="generic-overlay flex-center flex-column">
-        <div class="generic-overlay-title flex-center" :style="{borderColor: accentColor}">
-            <span class="industry-align">{{ title }}</span>
+        <TourneyBar class="st4-top" v-if="top === 'st4'" :broadcast="broadcast" left="Schedule" :right="title"/>
+        <div v-else class="generic-overlay-title flex-center" :style="{borderColor: accentColor}">
+            <transition name="fade" mode="out-in">
+                <span class="industry-align">{{ title }}</span>
+            </transition>
         </div>
         <div class="generic-overlay-body flex-center" :style="{backgroundColor: bodyColor}">
             <slot></slot>
@@ -10,9 +13,11 @@
 </template>
 
 <script>
+import TourneyBar from "@/components/broadcast/TourneyBar";
 export default {
     name: "GenericOverlay",
-    props: ["title", "accentColor", "bodyColor"]
+    components: { TourneyBar },
+    props: ["title", "accentColor", "bodyColor", "top", "broadcast"]
 };
 </script>
 
@@ -62,5 +67,8 @@ export default {
 
 span.industry-align {
     transform: translate(0, -.0925em);
+}
+.st4-top {
+    margin: 20px 0;
 }
 </style>

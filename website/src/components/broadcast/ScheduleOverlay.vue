@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay title="Schedule" class="schedule-overlay" :accent-color="accentColor">
+    <GenericOverlay :title="title || 'Schedule'" class="schedule-overlay" :accent-color="accentColor" :top="top" :broadcast="broadcast">
         <transition-group class="break-col break-schedule" name="a--match">
             <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" />
         </transition-group>
@@ -14,7 +14,7 @@ import { sortMatches } from "@/utils/sorts";
 
 export default {
     name: "ScheduleOverlay",
-    props: ["broadcast"],
+    props: ["broadcast", "title", "top"],
     components: { GenericOverlay, BreakMatch },
     computed: {
         schedule() {

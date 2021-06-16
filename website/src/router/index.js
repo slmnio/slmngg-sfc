@@ -105,7 +105,7 @@ const routes = [
     {
         path: "/broadcast/:broadcastID",
         component: OverlayApp,
-        props: route => ({ id: route.params.broadcastID }),
+        props: route => ({ id: route.params.broadcastID, title: route.query.title, top: route.query.top }),
         children: [
             { path: "ingame", component: IngameOverlay },
             { path: "break", component: BreakOverlay },
@@ -117,7 +117,7 @@ const routes = [
             { path: "thumbnail", component: EventThumbnailCreator },
             { path: "draft", component: DraftOverlay },
             { path: "casters", component: DeskOverlay, props: route => ({ group: "casters" }) },
-            { path: "custom", component: CustomOverlay, props: route => ({ title: route.query.title }) }
+            { path: "custom", component: CustomOverlay }
         ]
     }
 ];

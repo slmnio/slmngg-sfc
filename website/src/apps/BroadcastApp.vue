@@ -1,6 +1,6 @@
 <template>
     <div class="broadcast-app">
-        <router-view id="overlay" :broadcast="broadcast"/>
+        <router-view id="overlay" :broadcast="broadcast" :title="title" :top="top"/>
         <v-style v-if="broadcast && broadcast.event">
             {{ broadcast.event.broadcast_css }}
         </v-style>
@@ -12,7 +12,7 @@ import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "BroadcastApp",
-    props: ["id"],
+    props: ["id", "title", "top"],
     computed: {
         broadcast() {
             return ReactiveRoot(`broadcast-${this.id}`, {
@@ -34,5 +34,10 @@ export default {
 </script>
 
 <style>
-
+    .broadcast-app, #overlay {
+        overflow: hidden;
+    }
+    body.overlay #slmngg-app {
+        padding-bottom: 0 !important;
+    }
 </style>

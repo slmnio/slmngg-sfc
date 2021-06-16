@@ -1,12 +1,13 @@
 <template>
     <div class="desk-overlay">
         <div class="top-holder">
-            <TourneyBar :left="broadcast.event.short" :right="broadcast.subtitle" :event="broadcast.event" />
+            <TourneyBar :left="broadcast.event && broadcast.event.short" :right="broadcast.subtitle" :event="broadcast.event" />
         </div>
-        <div class="casters" v-if="liveMatch">
-            <div class="caster" v-for="caster in liveMatch.casters" v-bind:key="caster.id">
-                {{ caster.name }}
-            </div>
+        <transition-group class="casters flex-center" v-if="liveMatch" name="anim-talent">
+            <Caster v-for="caster in liveMatch.casters" v-bind:key="caster.id" :caster="caster" />
+        </transition-group>
+        <div class="lower-holder flex-center">
+            <BreakMatch :match="liveMatch" expanded="true" live="true" />
         </div>
     </div>
 </template>
@@ -15,10 +16,12 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { cssImage } from "@/utils/content-utils";
 import TourneyBar from "@/components/broadcast/TourneyBar";
+import Caster from "@/components/broadcast/Caster";
+import BreakMatch from "@/components/broadcast/BreakMatch";
 
 export default {
     name: "DeskOverlay",
-    components: { TourneyBar },
+    components: { BreakMatch, Caster, TourneyBar },
     props: ["broadcast", "group"],
     methods: {
         cssImage
@@ -34,7 +37,8 @@ export default {
                     theme: ReactiveThing("theme")
                 }),
                 casters: ReactiveArray("casters", {
-                    live_guests: ReactiveThing("live_guests")
+                    live_guests: ReactiveThing("live_guests"),
+                    socials: ReactiveArray("socials")
                 }),
                 player_relationships: ReactiveArray("player_relationships", {
                     player: ReactiveThing("player")
@@ -48,8 +52,36 @@ export default {
 <style scoped>
     .desk-overlay {
         font-family: "Industry", "SLMN-Industry", sans-serif;
+        overflow: hidden;
     }
     .top-holder {
         margin: 10vh 15vw;
+        transform: scale(1.2);
     }
+
+    .casters {
+        margin: 0 4vw;
+    }
+
+    .lower-holder {
+        margin: 0 5vw;
+        margin-top: 2vh;
+    }
+
+
+    .anim-talent-enter-active, .anim-talent-leave-active {
+        /* all enter animation frames */
+        transition: all .3s ease-in-out;
+    }
+    .anim-talent-enter, .anim-talent-leave-to {
+        /* hide */
+        max-width: 0;
+        opacity: 0;
+    }
+    .anim-talent-enter-to, .anim-talent-leave {
+        /* show */
+        opacity: 1;
+    }
+
+
 </style>

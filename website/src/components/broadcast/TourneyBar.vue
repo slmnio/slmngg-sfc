@@ -1,16 +1,16 @@
 <template>
     <div class="tourney-bar">
-        <div class="bar-text bar-text-left">
+        <div class="bar-text flex-center bar-text-left">
             <transition name="fade" mode="out-in">
                 <span :key="left" v-if="left && right">{{ left }}</span>
             </transition>
         </div>
         <div class="bar-logo flex-center">
 <!--            <transition name="fade" mode="out-in">-->
-                <div class="bar-logo-holder bg-center h-100 w-100" :key="logo" :style="logo"></div>
+                <div class="bar-logo-holder bg-center h-100 w-100" :key="_theme && _theme.id" :style="logo"></div>
 <!--            </transition>-->
         </div>
-        <div class="bar-text bar-text-right">
+        <div class="bar-text flex-center bar-text-right">
             <transition name="fade" mode="out-in">
                 <span :key="right" v-if="left && right">{{ right }}</span>
             </transition>
@@ -23,11 +23,12 @@ import { cssImage } from "@/utils/content-utils";
 
 export default {
     name: "TourneyBar",
-    props: ["left", "right", "theme", "event"],
+    props: ["left", "right", "theme", "event", "broadcast"],
     computed: {
         _theme() {
             if (this.theme) return this.theme;
             if (this.event && this.event.theme) return this.event.theme;
+            if (this.broadcast && this.broadcast.event && this.broadcast.event.theme) return this.broadcast.event.theme;
             return null;
         },
         logo() {
@@ -48,6 +49,7 @@ export default {
         justify-content: center;
         align-items: center;
         font-size: 60px;
+        width: 100%;
     }
     .bar-text {
         text-transform: uppercase;

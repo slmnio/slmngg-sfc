@@ -34,6 +34,7 @@ import BracketOverlay from "@/components/broadcast/BracketOverlay";
 import DraftOverlay from "@/components/broadcast/DraftOverlay";
 import EventDraft from "@/views/sub-views/EventDraft";
 import TeamDetails from "@/views/sub-views/TeamDetails";
+import DeskOverlay from "@/components/broadcast/DeskOverlay";
 
 Vue.use(VueRouter);
 
@@ -115,6 +116,7 @@ const routes = [
             { path: "rosters", component: RosterOverlay },
             { path: "thumbnail", component: EventThumbnailCreator },
             { path: "draft", component: DraftOverlay },
+            { path: "casters", component: DeskOverlay, props: route => ({ group: "casters" }) },
             { path: "custom", component: CustomOverlay, props: route => ({ title: route.query.title }) }
         ]
     }

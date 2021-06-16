@@ -16,7 +16,9 @@ export default {
     computed: {
         broadcast() {
             return ReactiveRoot(`broadcast-${this.id}`, {
-                event: ReactiveThing("event")
+                event: ReactiveThing("event", {
+                    theme: ReactiveThing("theme")
+                })
             });
         }
     },

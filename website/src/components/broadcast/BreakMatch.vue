@@ -22,8 +22,13 @@
                     <div class="match-team-logo-spacer" v-if="expanded"></div>
                 </div>
             <div class="match-team-center">
-                <span v-if="!hasScore">{{ expanded ? start : 'vs' }}</span>
-                <span v-else>{{ scores.join(' - ') }}</span>
+                <div v-if="centerShow === 'scores'" class="center-scores d-flex">
+                    <div class="center-score" v-bind:class="{'win': scores[0] === match.first_to}">{{ scores[0] }}</div>
+                    <div class="center-dash">-</div>
+                    <div class="center-score" v-bind:class="{'win': scores[1] === match.first_to}">{{ scores[1] }}</div>
+                </div>
+                <div v-if="centerShow === 'time'" class="center-time">{{ start }}</div>
+                <div v-if="centerShow === 'vs'" class="center-vs">vs</div>
             </div>
         </div>
 <!--        </transition-group>-->
@@ -37,7 +42,7 @@ import { logoBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "BreakMatch",
-    props: ["match", "expanded", "timezone"],
+    props: ["match", "expanded", "timezone", "live"],
     computed: {
         teams() {
             if (!this.match || !this.match.teams) return [null, null];
@@ -50,7 +55,7 @@ export default {
             return local.format("time");
         },
         hasScore() {
-            return false;
+            // return false;
             // eslint-disable-next-line no-unreachable
             if (!this.match) return false;
             if (this.match.live) return true;
@@ -59,6 +64,22 @@ export default {
         scores() {
             if (!this.match) return [];
             return [this.match.score_1, this.match.score_2];
+        },
+        centerShow() {
+            if (this.live || this.hasScore) return "scores"; // return this.scores.join(" - ");
+
+            if (this.expanded) {
+                return "time";
+                // return this.start;
+            } else {
+                return "vs";
+            }
+            // return "vs";
+            // return " 0 - 0 ";
+            // return "6pm"
+
+
+            // return null;
         }
     },
     methods: {
@@ -208,4 +229,24 @@ export default {
     .match-team-name {
         margin: 0 0.3em;
     }
+
+    .center-scores {
+        justify-content: center;
+    }
+
+    .center-score {
+        background: white;
+        color: black;
+        width: 1.1em;
+        border-radius: 10px;
+        font-size: 48px;
+        line-height: 1;
+        padding: 0.15em 0;
+    }
+    .center-score.win {
+        background-color: #2644FF;
+        color: white;
+    }
+
+    .center-dash {margin: 0 .2em;line-height: 1;font-size: 36px;transform: translate(0, .35em);}
 </style>

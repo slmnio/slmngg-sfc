@@ -13,9 +13,9 @@
             </transition>
         </div>
         <transition mode="out-in" name="fade">
-            <div class="caster-lower flex-center" :key="`${caster.name}-${twitter}`" v-if="caster && caster.name">
+            <div class="caster-lower flex-center" :key="`${name}-${twitter}`" v-if="name">
                 <div class="caster-name flex-center flex-column">
-                    <div class="c-name">{{ caster.name }}</div>
+                    <div class="c-name">{{ name }}</div>
                     <div class="c-twitter" v-if="twitter">
                         <!--                        <i class="fab fa-twitter fa-fw"></i> -->
                         {{ twitter }}</div>
@@ -28,16 +28,19 @@
 <script>
 export default {
     name: "Caster",
-    props: ["caster"],
+    props: ["caster", "guest"],
     computed: {
+        player() {
+            return this.caster || this.guest.player;
+        },
         twitter() {
-            if (!this.caster.socials) return "";
-            const twitter = this.caster.socials.find(s => s.type === "Twitter");
+            if (!this.player.socials) return "";
+            const twitter = this.player.socials.find(s => s.type === "Twitter");
             if (!twitter) return "";
             return twitter.name;
         },
         liveGuestData() {
-            return this.caster?.live_guests;
+            return this.caster?.live_guests || this.guest;
         },
         cam() {
             console.log(this.liveGuestData);
@@ -48,6 +51,9 @@ export default {
         avatar() {
             if (!this.liveGuestData) return {};
             return { backgroundImage: `url(${this.liveGuestData.avatar})` };
+        },
+        name() {
+            return this.caster?.name || this.guest?.name;
         }
     }
 };

@@ -197,7 +197,7 @@ export default {
         box-sizing: border-box;
         /*justify-content: space-evenly;*/
         overflow: hidden;
-        background-color: rgba(0,0,0,0.2);
+        /*background-color: rgba(0,0,0,0.2);*/
     }
     .break-next {
         width: 100%;
@@ -246,7 +246,7 @@ export default {
     }
 
     .break-standings {
-        background-color: rgba(0,0,0,0.2);
+        /*background-color: rgba(0,0,0,0.2);*/
         padding: 40px;
     }
 
@@ -261,7 +261,7 @@ export default {
         padding: 60px 160px
     }
     .break-image {
-        background-color: rgba(0,0,0,0.2);
+        /*background-color: rgba(0,0,0,0.2);*/
         padding: 40px;
     }
     .break-image-inner {

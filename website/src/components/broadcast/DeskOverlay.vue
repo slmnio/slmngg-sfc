@@ -3,8 +3,8 @@
         <div class="top-holder">
             <TourneyBar :left="broadcast.event && broadcast.event.short" :right="broadcast.subtitle" :event="broadcast.event" />
         </div>
-        <transition-group class="casters flex-center" v-if="liveMatch" name="anim-talent">
-            <Caster v-for="caster in liveMatch.casters" v-bind:key="caster.id" :caster="caster" />
+        <transition-group class="casters flex-center" name="anim-talent">
+            <Caster v-for="caster in casters" v-bind:key="caster.id" :guest="caster" />
         </transition-group>
         <div class="lower-holder flex-center">
             <BreakMatch :match="liveMatch" expanded="true" live="true" />
@@ -44,6 +44,16 @@ export default {
                     player: ReactiveThing("player")
                 })
             });
+        },
+        guests: function() {
+            return ReactiveArray("guests", {
+                player: ReactiveThing("player", {
+                    socials: ReactiveArray("socials")
+                })
+            })(this.broadcast);
+        },
+        casters() {
+            return this.guests.filter(g => g.show);
         }
     }
 };

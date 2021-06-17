@@ -14,7 +14,8 @@
         <div class="match-teams flex-center">
                 <div class="match-team" v-for="(team, i) in teams" v-bind:key="team ? `${team.id}-${team.name}-${team.code}-${i}` : i" :style="{ order: i*2 }">
                     <div :class="expanded ? 'match-team-name' : 'match-team-code'" v-if="team && expanded">
-                        <span class="industry-align">{{ expanded ? team.name : team.code }}</span>
+                        <span class="industry-align" v-if="expanded && team.split_name" v-html="nbr(team.split_name)"></span>
+                        <span v-else class="industry-align">{{ expanded ? team.name : team.code }}</span>
                     </div>
                     <div class="match-team-logo-holder flex-center" :style="teamTheme(team)">
                         <div class="match-team-logo bg-center" :style="teamLogo(team)"></div>
@@ -91,6 +92,10 @@ export default {
         },
         teamTheme(team) {
             return logoBackground1(team) || {};
+        },
+        nbr(text) {
+            console.log(text);
+            return text.replaceAll("\\n", "<br>");
         }
     }
 };

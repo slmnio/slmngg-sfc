@@ -189,6 +189,7 @@ export default {
         width: 480px;
         flex-shrink: 0;
         border-right: 1px solid white;
+        padding: 5px 20px;
     }
     .break-schedule {
         flex-grow: 1;
@@ -196,11 +197,12 @@ export default {
         box-sizing: border-box;
         /*justify-content: space-evenly;*/
         overflow: hidden;
-        background-color: rgba(0,0,0,0.2);
+        /*background-color: rgba(0,0,0,0.2);*/
     }
     .break-next {
         width: 100%;
         padding: 20px;
+        /*padding: 10px 0 15px 0px;*/
     }
 
     .break-countdown {
@@ -244,7 +246,7 @@ export default {
     }
 
     .break-standings {
-        background-color: rgba(0,0,0,0.2);
+        /*background-color: rgba(0,0,0,0.2);*/
         padding: 40px;
     }
 
@@ -259,7 +261,7 @@ export default {
         padding: 60px 160px
     }
     .break-image {
-        background-color: rgba(0,0,0,0.2);
+        /*background-color: rgba(0,0,0,0.2);*/
         padding: 40px;
     }
     .break-image-inner {

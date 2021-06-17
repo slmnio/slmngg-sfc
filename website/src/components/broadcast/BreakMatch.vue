@@ -5,20 +5,32 @@
                 <span :key="match ? match.round : 'empty'">UP NEXT: {{ match && match.round }}</span>
             </transition>
         </div>
+        <!--
         <div class="match-details" v-if="expanded && start">
             {{ start }}
         </div>
+        -->
 <!--        <transition-group name="fade" mode="out-in" class="match-teams flex-center">-->
         <div class="match-teams flex-center">
                 <div class="match-team" v-for="(team, i) in teams" v-bind:key="team ? `${team.id}-${team.name}-${team.code}-${i}` : i" :style="{ order: i*2 }">
-                    <div :class="expanded ? 'match-team-name' : 'match-team-code'" v-if="team">
-                        <span class="industry-align">{{ expanded ? team.name : team.code }}</span>
+                    <div :class="expanded ? 'match-team-name' : 'match-team-code'" v-if="team && expanded">
+                        <span class="industry-align" v-if="expanded && team.split_name" v-html="nbr(team.split_name)"></span>
+                        <span v-else class="industry-align">{{ expanded ? team.name : team.code }}</span>
                     </div>
-                    <div class="match-team-logo-holder flex-center">
-                        <div class="match-team-logo bg-center" :style="teamTheme(team)"></div>
+                    <div class="match-team-logo-holder flex-center" :style="teamTheme(team)">
+                        <div class="match-team-logo bg-center" :style="teamLogo(team)"></div>
                     </div>
+                    <div class="match-team-logo-spacer" v-if="expanded"></div>
                 </div>
-            <div class="match-team-vs">vs</div>
+            <div class="match-team-center">
+                <div v-if="centerShow === 'scores'" class="center-scores d-flex">
+                    <div class="center-score" v-bind:class="{'win': scores[0] === match.first_to}">{{ scores[0] }}</div>
+                    <div class="center-dash">-</div>
+                    <div class="center-score" v-bind:class="{'win': scores[1] === match.first_to}">{{ scores[1] }}</div>
+                </div>
+                <div v-if="centerShow === 'time'" class="center-time">{{ start }}</div>
+                <div v-if="centerShow === 'vs'" class="center-vs">vs</div>
+            </div>
         </div>
 <!--        </transition-group>-->
     </div>
@@ -27,10 +39,11 @@
 <script>
 import { cssImage } from "@/utils/content-utils";
 import spacetime from "spacetime";
+import { logoBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "BreakMatch",
-    props: ["match", "expanded", "timezone"],
+    props: ["match", "expanded", "timezone", "live"],
     computed: {
         teams() {
             if (!this.match || !this.match.teams) return [null, null];
@@ -41,14 +54,48 @@ export default {
             const utc = spacetime(this.match.start);
             const local = utc.goto(this.timezone || "America/New_York");
             return local.format("time");
+        },
+        hasScore() {
+            // return false;
+            // eslint-disable-next-line no-unreachable
+            if (!this.match) return false;
+            if (this.match.live) return true;
+            return this.scores.some(t => !!t);
+        },
+        scores() {
+            if (!this.match) return [];
+            return [this.match.score_1, this.match.score_2];
+        },
+        centerShow() {
+            if (this.live || this.hasScore) return "scores"; // return this.scores.join(" - ");
+
+            if (this.expanded) {
+                return "time";
+                // return this.start;
+            } else {
+                return "vs";
+            }
+            // return "vs";
+            // return " 0 - 0 ";
+            // return "6pm"
+
+
+            // return null;
         }
     },
     methods: {
-        teamTheme(team) {
+        teamLogo(team) {
             if (!team || !team.theme) return {};
             return {
                 ...cssImage("backgroundImage", team.theme, ["small_logo", "default_logo"], 40, true)
             };
+        },
+        teamTheme(team) {
+            return logoBackground1(team) || {};
+        },
+        nbr(text) {
+            console.log(text);
+            return text.replaceAll("\\n", "<br>");
         }
     }
 };
@@ -61,7 +108,7 @@ export default {
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
-        padding: 10px 0;
+        /*padding: 10px 0;*/
     }
     .break-match.expanded {
         flex-direction: row;
@@ -88,7 +135,7 @@ export default {
         font-weight: bold;
         font-size: 0.6em;
         text-transform: uppercase;
-        margin-bottom: .2em;
+        margin-bottom: .3em;
         line-height: 1;
     }
 
@@ -120,6 +167,7 @@ export default {
     }
     span.industry-align {
         transform: translate(0, -.0925em);
+        display: inline-flex;
     }
 
     .match-details {
@@ -139,4 +187,71 @@ export default {
     .match-team:first-of-type .match-team-name {
         text-align: right;
     }
+</style>
+<style scoped>
+    .match-team {
+        border-radius: 20px;
+        position: relative;
+        height: 1.8em;
+        margin: .3em 0;
+    }
+    .break-match.expanded .match-team {
+        background: white;
+        color: black;
+    }
+    .match-team-center {
+        white-space: nowrap;
+    }
+    .match-team-logo-holder {
+        width: 2.25em;
+        height: 2.25em;
+        position: absolute;
+        border-radius: 20px;
+        margin: 0;
+    }
+    .match-team-logo {
+        --size: 80%; width: var(--size); height: var(--size);
+    }
+    .match-team-logo-spacer {
+        display: flex;
+        flex-shrink: 0;
+        width: 2em;
+        margin: 0 .15em;
+    }
+    .match-team-center {
+        font-weight: bold;
+        font-size: .75em;
+        width: 80px;
+        flex-shrink: 0;
+        text-align: center;
+    }
+    .break-match.expanded .match-team-center {
+        width: 170px;
+    }
+    .match-team-name span {
+        transform: translate(0, -0.05em)
+    }
+    .match-team-name {
+        margin: 0 0.3em;
+    }
+
+    .center-scores {
+        justify-content: center;
+    }
+
+    .center-score {
+        background: white;
+        color: black;
+        width: 1.1em;
+        border-radius: 10px;
+        font-size: 48px;
+        line-height: 1;
+        padding: 0.15em 0;
+    }
+    .center-score.win {
+        background-color: #2644FF;
+        color: white;
+    }
+
+    .center-dash {margin: 0 .2em;line-height: 1;font-size: 36px;transform: translate(0, .35em);}
 </style>

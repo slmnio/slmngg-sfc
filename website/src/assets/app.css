@@ -207,3 +207,6 @@ body.overlay {
     background: transparent;
     background-color: transparent;
 }
+.industry-align {
+    transform: translate(0, -0.0925em);
+}

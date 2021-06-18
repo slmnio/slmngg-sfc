@@ -7,7 +7,7 @@
             <Caster v-for="caster in casters" v-bind:key="caster.id" :guest="caster" />
         </transition-group>
         <div class="lower-holder flex-center">
-            <BreakMatch :match="liveMatch" expanded="true" live="true" />
+            <DeskMatch class="w-100" :_match="liveMatch" />
         </div>
     </div>
 </template>
@@ -17,11 +17,11 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { cssImage } from "@/utils/content-utils";
 import TourneyBar from "@/components/broadcast/TourneyBar";
 import Caster from "@/components/broadcast/Caster";
-import BreakMatch from "@/components/broadcast/BreakMatch";
+import DeskMatch from "@/components/broadcast/DeskMatch";
 
 export default {
     name: "DeskOverlay",
-    components: { BreakMatch, Caster, TourneyBar },
+    components: { DeskMatch, Caster, TourneyBar },
     props: ["broadcast", "group"],
     methods: {
         cssImage
@@ -54,7 +54,7 @@ export default {
             })(this.broadcast);
         },
         casters() {
-            return this.guests.filter(g => g.show);
+            return this.guests;/* .filter(g => g.show); */
         }
     }
 };
@@ -66,28 +66,32 @@ export default {
         overflow: hidden;
     }
     .top-holder {
-        margin: 10vh 15vw;
+        margin: 9vh 15vw;
         transform: scale(1.2);
     }
 
     .casters {
         margin: 0 4vw;
+        height: 570px;
     }
 
     .lower-holder {
-        margin: 0 5vw;
-        margin-top: 2vh;
+        margin: 0 9vw;
+        margin-top: 2.5vh;
     }
 
 
-    .anim-talent-enter-active, .anim-talent-leave-active {
-        /* all enter animation frames */
-        transition: all .3s ease-in-out;
+    .anim-talent-enter-active {
+        transition: all .4s ease-in-out, opacity .2s ease .2s;
+    }
+    .anim-talent-leave-active {
+        transition: all .4s ease-in-out, opacity .2s ease;
     }
     .anim-talent-enter, .anim-talent-leave-to {
         /* hide */
         max-width: 0;
         opacity: 0;
+        padding: 0 0;
     }
     .anim-talent-enter-to, .anim-talent-leave {
         /* show */

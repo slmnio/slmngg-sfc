@@ -102,6 +102,7 @@ export default {
         padding: 7px 20px;
         border-radius: 10px;
         line-height: 1;
+        box-shadow: 0 0 4px 0 #00000080;
     }
 
     .c-twitter {

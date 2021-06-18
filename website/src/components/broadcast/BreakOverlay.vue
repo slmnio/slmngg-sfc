@@ -30,6 +30,14 @@
                         <div class="break-image-inner" :style="cssImage('backgroundImage', broadcast, ['break_image'], 1080, false)"></div>
                     </div>
                     <Bracket class="break-col break-bracket" v-if="breakDisplay === 'Bracket'" key="Bracket" :event="event" :bracket="bracket" use-overlay-scale small />
+                    <div class="break-col break-others" v-if="breakDisplay === 'Other Broadcasts'">
+                        <div class="broadcast-previews-title">
+                            {{ broadcasts.length === 1 ? broadcasts[0].name : 'Other broadcasts' }}
+                        </div>
+                        <div class="broadcast-previews">
+                            <BroadcastPreview v-for="other in broadcasts" v-bind:key="other.id" :broadcast="other"/>
+                        </div>
+                    </div>
                 </transition>
             </div>
         </div>
@@ -51,13 +59,17 @@ import Sponsors from "@/components/broadcast/Sponsors";
 import Standings from "@/components/broadcast/Standings";
 import Countdown from "@/components/broadcast/Countdown";
 import Bracket from "@/components/website/Bracket";
+import BroadcastPreview from "@/components/broadcast/BroadcastPreview";
 
 export default {
     name: "BreakOverlay",
     props: ["broadcast"],
-    components: { Bracket, Standings, BreakMatch, Sponsors, Countdown },
+    components: { BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
     methods: { cssImage },
     computed: {
+        broadcasts() {
+            return this.broadcast?.other_broadcasts || [];
+        },
         nextMatch() {
             if (!this.broadcast || !this.broadcast.live_match || !this.broadcast.show_live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
@@ -295,5 +307,24 @@ export default {
         justify-content: center;
         align-items: center;
         transform: translateY(30px);
+    }
+    .break-others {
+        /*padding: 40px;*/ /* this should be set but the animation is worse */
+    }
+    .broadcast-previews {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+    }
+    .broadcast-preview:first-of-type { margin-left: 0; }
+    .broadcast-preview:last-of-type { margin-right: 0; }
+
+    .broadcast-previews-title {
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 60px;
+        line-height: 1;
     }
 </style>

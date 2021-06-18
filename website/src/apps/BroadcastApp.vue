@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "BroadcastApp",
@@ -18,7 +18,8 @@ export default {
             return ReactiveRoot(`broadcast-${this.id}`, {
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")
-                })
+                }),
+                other_broadcasts: ReactiveArray("other_broadcasts")
             });
         }
     },

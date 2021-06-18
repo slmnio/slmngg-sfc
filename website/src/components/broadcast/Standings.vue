@@ -2,7 +2,7 @@
     <div class="standings">
 <!--        <div>{{ event.name }} / {{ stage }} / {{ allMatches.length }} -> {{ stageMatches.length }} ({{ teams.length }} teams)</div>-->
         <div class="standings-header d-flex align-items-center">
-            <div class="team-name flex-grow-1 text-left">Team</div>
+            <div class="team-name flex-grow-1 text-left">{{ stage || 'Team' }}</div>
             <div class="team-stats d-flex">
                 <div class="team-stat text-center">Maps</div>
                 <div class="team-stat text-center">Matches</div>
@@ -36,7 +36,8 @@ export default {
         },
         stageMatches() {
             if (!this.allMatches || !this.allMatches.length || !this.stage) return [];
-            return this.allMatches.filter(match => match.match_group === this.stage);
+            if (!this.stage) return this.allMatches;
+            return this.allMatches.filter(match => match.match_group && match.match_group.toLowerCase() === this.stage.toLowerCase());
         },
         settings() {
             if (!this.event || !this.event.blocks) return null;

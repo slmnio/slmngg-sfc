@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay title="Rosters" :accent-color="accentColor" body-color="transparent">
+    <GenericOverlay class="roster-overlay" title="Rosters" :accent-color="accentColor" body-color="transparent">
         <div class="team" v-for="team in teams" v-bind:key="team.id">
             <div class="team-top flex-center" :style="themeColor(team)">
                 <div class="team-name flex-center">{{ team.name }}</div>

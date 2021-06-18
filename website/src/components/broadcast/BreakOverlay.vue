@@ -267,6 +267,7 @@ export default {
     .break-standings {
         /*background-color: rgba(0,0,0,0.2);*/
         padding: 40px;
+        overflow: hidden;
     }
 
     .break-content-enter-active, .break-content-leave-active { transition: all .5s ease-in-out; overflow: hidden }

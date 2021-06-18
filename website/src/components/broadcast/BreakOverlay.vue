@@ -5,6 +5,7 @@
                 <transition name="fade" mode="out-in">
                     <span class="industry-align" :key="broadcast.title || broadcast.name">{{ broadcast.title || broadcast.name }}</span>
                 </transition>
+                <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News" :borderCSS="eventBorder" />
             </div>
             <div class="break-main event-theme-border" :style="eventBorder">
                 <div class="break-col break-left-col">
@@ -60,11 +61,12 @@ import Standings from "@/components/broadcast/Standings";
 import Countdown from "@/components/broadcast/Countdown";
 import Bracket from "@/components/website/Bracket";
 import BroadcastPreview from "@/components/broadcast/BroadcastPreview";
+import BreakHeadlines from "@/components/broadcast/BreakHeadlines";
 
 export default {
     name: "BreakOverlay",
     props: ["broadcast"],
-    components: { BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
+    components: { BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
     methods: { cssImage },
     computed: {
         broadcasts() {
@@ -125,6 +127,9 @@ export default {
             if (!this.bracketKey) return this.event.brackets[0];
             const bracket = this.event.brackets.find(b => b && b.key === this.bracketKey);
             return bracket || this.event.brackets[0];
+        },
+        headlines() {
+            return (this.broadcast?.headlines || []).filter(b => b.ready);
         }
     },
     watch: {
@@ -177,6 +182,8 @@ export default {
         flex-shrink: 0;
         line-height: 1;
         text-align: center;
+        display: flex;
+        flex-direction: column;
     }
 
     .break-main {

@@ -19,7 +19,8 @@ export default {
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")
                 }),
-                other_broadcasts: ReactiveArray("other_broadcasts")
+                other_broadcasts: ReactiveArray("other_broadcasts"),
+                headlines: ReactiveArray("headlines")
             });
         }
     },

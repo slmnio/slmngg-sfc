@@ -12,7 +12,7 @@ const logUpdates = false;
 // Starting with syncing Matches
 
 // const tables = ["Matches", "Teams", "Themes", "Events", "Players", "Player Relationships"];
-const tables = ["Event Series", "News", "Matches", "Teams", "Themes", "Events", "Players", "Socials", "Accolades", "Player Relationships", "Broadcasts", "Brackets", "Live Guests"];
+const tables = ["Event Series", "News", "Matches", "Teams", "Themes", "Events", "Players", "Socials", "Accolades", "Player Relationships", "Broadcasts", "Brackets", "Live Guests", "Headlines"];
 
 function deAirtable(obj) {
     const data = {};
@@ -33,10 +33,12 @@ async function getAllTableData(tableName, options = {}) {
         text: `Loading table ${chalk.bold(tableName)}`,
         prefixText: "Airtable"
     }).start();
-    let data = await slmngg(tableName).select(options).all();
-    const end = new Date();
-    if (logUpdates) loading.succeed(`Loaded table ${chalk.bold(tableName)} - ${data.length} records loaded in ${((end - start) / 1000).toFixed(2)}s`);
-    return data;
+    try {
+        let data = await slmngg(tableName).select(options).all();
+        const end = new Date();
+        if (logUpdates) loading.succeed(`Loaded table ${chalk.bold(tableName)} - ${data.length} records loaded in ${((end - start) / 1000).toFixed(2)}s`);
+        return data;
+    } catch (e) { console.error("Airtable error", e); }
 }
 
 function customUpdater(tableName, item) {
@@ -59,23 +61,23 @@ function registerUpdater(tableName, options) {
     let pollRate = 3000;
     setInterval(async function() {
         let date = (new Date(new Date().getTime() - pollRate)).toISOString().slice(0, 19);
-        let data = (await slmngg(tableName).select({
-            ...options,
-            filterByFormula: `{Modified} > "${date}"`
-        }).all()).map(deAirtable);
+        try {
+            let data = (await slmngg(tableName).select({
+                ...options,
+                filterByFormula: `{Modified} > "${date}"`
+            }).all()).map(deAirtable);
 
+            data.forEach(data => {
+                Cache.set(data.id.slice(3), data);
+                customUpdater(tableName, data);
+            });
 
-        data.forEach(data => {
-            Cache.set(data.id.slice(3), data);
-            customUpdater(tableName, data);
-        });
+            if (data.length) {
+                if (logUpdates) console.log(`Airtable # Updates complete for table ${chalk.bold(tableName)} - ${data.length} records updated.`);
+            }
 
-        if (data.length) {
-            if (logUpdates) console.log(`Airtable # Updates complete for table ${chalk.bold(tableName)} - ${data.length} records updated.`);
-        }
-
-        customTableUpdate(tableName, Cache);
-
+            customTableUpdate(tableName, Cache);
+        } catch (e) { console.error("Airtable error", e); }
     }, pollRate);
 
     setInterval(async function() {

@@ -72,6 +72,7 @@ export default {
         text-align: center;
         line-height: 1;
         height: 110px;
-        border-bottom: 6px solid #2664f7
+        border-bottom: 6px solid #2664f7;
+        background-color: white;
     }
 </style>

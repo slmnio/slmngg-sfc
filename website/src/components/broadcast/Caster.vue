@@ -34,7 +34,7 @@ export default {
             return this.caster || this.guest.player;
         },
         twitter() {
-            if (!this.player.socials) return "";
+            if (!this.player?.socials) return "";
             const twitter = this.player.socials.find(s => s.type === "Twitter");
             if (!twitter) return "";
             return twitter.name;

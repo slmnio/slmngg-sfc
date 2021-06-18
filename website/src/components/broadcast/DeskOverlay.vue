@@ -46,6 +46,7 @@ export default {
             });
         },
         guests: function() {
+            if (!this.broadcast?.guests) return [];
             return ReactiveArray("guests", {
                 player: ReactiveThing("player", {
                     socials: ReactiveArray("socials")

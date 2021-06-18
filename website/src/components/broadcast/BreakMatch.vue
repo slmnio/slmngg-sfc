@@ -22,7 +22,7 @@
                     </div>
                     <div class="match-team-logo-spacer" v-if="expanded"></div>
                 </div>
-            <div class="match-team-center">
+            <div class="match-team-center" v-if="match">
                 <div v-if="centerShow === 'scores'" class="center-scores d-flex">
                     <div class="center-score" v-bind:class="{'win': scores[0] === match.first_to}">{{ scores[0] }}</div>
                     <div class="center-dash">-</div>

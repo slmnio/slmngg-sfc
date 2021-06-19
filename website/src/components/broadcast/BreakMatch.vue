@@ -14,7 +14,8 @@
         <div class="match-teams flex-center">
                 <div class="match-team" v-for="(team, i) in teams" v-bind:key="team ? `${team.id}-${team.name}-${team.code}-${i}` : i" :style="{ order: i*2 }">
                     <div :class="expanded ? 'match-team-name' : 'match-team-code'" v-if="team && expanded">
-                        <span class="industry-align" v-if="expanded && team.split_name" v-html="nbr(team.split_name)"></span>
+                        <span class="industry-align" v-if="team.dummy">{{ team.text }}</span>
+                        <span class="industry-align" v-else-if="expanded && team.split_name" v-html="nbr(team.split_name)"></span>
                         <span v-else class="industry-align">{{ expanded ? team.name : team.code }}</span>
                     </div>
                     <div class="match-team-logo-holder flex-center" :style="teamTheme(team)">
@@ -46,8 +47,38 @@ export default {
     props: ["match", "expanded", "timezone", "live"],
     computed: {
         teams() {
-            if (!this.match || !this.match.teams) return [null, null];
-            return this.match.teams;
+            const dummy = { text: "TBD", dummy: true, id: null };
+            if (!this.match) return [{ ...dummy, _empty: true }, { ...dummy, _empty: true }];
+
+            const text = (this.match.placeholder_teams || "").trim().split("|").filter(t => t !== "");
+
+            if (!this.match.teams || this.match.teams.length === 0) {
+                if (text.length === 2) {
+                    return text.map(t => ({ ...dummy, text: t }));
+                } else if (text.length === 1) {
+                    if (this.match.placeholder_right) return [dummy, { ...dummy, text: text[0] }];
+                    return [{ ...dummy, text: text[0] }, dummy];
+                } else if (text.length === 0) {
+                    // no text, just use TBDs
+                    return [dummy, dummy];
+                }
+            }
+            if (this.match.teams.length === 1) {
+                if (text.length === 2) {
+                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[1] }];
+                    return [{ ...dummy, text: text[0] }, this.match.teams[0]];
+                } else if (text.length === 1) {
+                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[0] }];
+                    return [{ ...dummy, text: text[0] }, this.match.teams[0]];
+                } else if (text.length === 0) {
+                    // no text, just use TBDs
+                    if (this.match.placeholder_right) return [this.match.teams[0], dummy];
+                    return [dummy, this.match.teams[0]];
+                }
+            }
+
+            if (this.match.teams.length === 2) return this.match.teams;
+            return [];
         },
         start() {
             if (!this.match || !this.match.start) return null;
@@ -203,6 +234,7 @@ export default {
         white-space: nowrap;
     }
     .match-team-logo-holder {
+        background-color: #333;
         width: 2.25em;
         height: 2.25em;
         position: absolute;
@@ -221,9 +253,11 @@ export default {
     .match-team-center {
         font-weight: bold;
         font-size: .75em;
-        width: 80px;
         flex-shrink: 0;
         text-align: center;
+    }
+    .center-vs {
+        padding: 0 .75em;
     }
     .break-match.expanded .match-team-center {
         width: 170px;
@@ -237,6 +271,7 @@ export default {
 
     .center-scores {
         justify-content: center;
+        padding: 0 .4em;
     }
 
     .center-score {

@@ -71,13 +71,15 @@ export default {
         max-width: var(--caster-width);
     }
 
-    .caster:nth-child(3n-2) { --theme-color: #2644F7; }
-    .caster:nth-child(3n-1) { --theme-color: #00af75; }
-    .caster:nth-child(3n) { --theme-color: #1E555C; }
+    .caster:nth-child(4n-3) { --theme-color: #256BE1; }
+    .caster:nth-child(4n-2) { --theme-color: #248FCD; }
+    .caster:nth-child(4n-1) { --theme-color: #23BBB5; }
+    .caster:nth-child(4n) { --theme-color: #21E79B; }
 
     .caster-cam-box {
         background-color: var(--theme-color);
         border-bottom: 6px solid var(--theme-color);
+        transition: background-color 300ms, border-bottom-color 300ms;
         color: white;
         height: var(--caster-height);
         width: 100%;

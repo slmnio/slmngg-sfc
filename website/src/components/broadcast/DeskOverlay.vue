@@ -76,7 +76,7 @@ export default {
     }
 
     .lower-holder {
-        margin: 0 9vw;
+        margin: 0 170px;
         margin-top: 2.5vh;
     }
 

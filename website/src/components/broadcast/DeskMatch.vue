@@ -10,7 +10,7 @@
                         <div class="score flex-center" v-bind:class="{'win': match.score_2 === match.first_to}"><span class="industry-align">{{ match.score_2 }}</span></div>
                     </div>
                     <div class="match-vs flex-center" v-if="show.vs">
-                        <span class="industry-align">vs</span>
+                        <span class="industry-align">{{ scoreText }}</span>
                     </div>
                 </div>
             </div>
@@ -38,6 +38,14 @@ export default {
                 score: false,
                 vs: true
             };
+        },
+        scores() {
+            if (!this.match?.id) return [];
+            return [this.match.score_1, this.match.score_2];
+        },
+        scoreText() {
+            if (this.scores && this.scores.some(s => !!s)) return this.scores.join("-");
+            return "vs";
         }
     }
 };
@@ -74,5 +82,7 @@ export default {
         height: 110px;
         border-bottom: 6px solid #2664f7;
         background-color: white;
+        white-space: nowrap;
+        min-width: 180px;
     }
 </style>

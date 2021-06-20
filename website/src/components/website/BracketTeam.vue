@@ -114,8 +114,8 @@ export default {
     }
 
     .team-score.win {
-        color: var(--win-background-color);
-        /*background-color: var(--win-background-color);*/
+        color: var(--win-color);
+        background-color: var(--win-background-color);
     }
 
     .bracket-team {

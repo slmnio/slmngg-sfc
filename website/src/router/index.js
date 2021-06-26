@@ -36,6 +36,7 @@ import EventDraft from "@/views/sub-views/EventDraft";
 import TeamDetails from "@/views/sub-views/TeamDetails";
 import DeskOverlay from "@/components/broadcast/DeskOverlay";
 import InfoOverlay from "@/components/broadcast/InfoOverlay";
+// import EventScenarios2 from "@/components/website/EventScenarios2";
 
 Vue.use(VueRouter);
 
@@ -76,7 +77,7 @@ const routes = [
                     { path: "schedule", component: EventSchedule },
                     { path: "matches", redirect: "schedule" },
                     { path: "scenarios", component: EventScenarios },
-                    { path: "scenarios2", component: EventScenarios2 },
+                    // { path: "scenarios2", component: EventScenarios2 },
                     { path: "draft", component: EventDraft }
                 ]
             },

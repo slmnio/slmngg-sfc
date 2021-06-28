@@ -12,7 +12,7 @@ const logUpdates = false;
 // Starting with syncing Matches
 
 // const tables = ["Matches", "Teams", "Themes", "Events", "Players", "Player Relationships"];
-const tables = ["Event Series", "News", "Matches", "Teams", "Themes", "Events", "Players", "Socials", "Accolades", "Player Relationships", "Broadcasts", "Brackets", "Live Guests", "Headlines"];
+const tables = ["Event Series", "News", "Matches", "Teams", "Themes", "Events", "Players", "Socials", "Accolades", "Player Relationships", "Broadcasts", "Brackets", "Live Guests", "Headlines", "Clients"];
 
 function deAirtable(obj) {
     const data = {};
@@ -43,6 +43,7 @@ async function getAllTableData(tableName, options = {}) {
 
 function customUpdater(tableName, item) {
     if (tableName === "Broadcasts" && item.key && item.active) Cache.set(`broadcast-${item.key}`, item);
+    if (tableName === "Clients" && item.key) Cache.set(`client-${item.key}`, item);
     if (tableName === "Events" && item.subdomain) Cache.set(`event-${item.subdomain}`, item);
 }
 

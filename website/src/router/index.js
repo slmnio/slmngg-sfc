@@ -17,26 +17,16 @@ import TeamMain from "@/views/sub-views/TeamMain";
 import TeamMatches from "@/views/sub-views/TeamMatches";
 import PlayerPlayedMatches from "@/views/sub-views/PlayerPlayedMatches";
 import Match from "@/views/Match";
-import IngameOverlay from "@/components/broadcast/IngameOverlay";
-import BreakOverlay from "@/components/broadcast/BreakOverlay";
-import ScheduleOverlay from "@/components/broadcast/ScheduleOverlay";
-import StandingsOverlay from "@/components/broadcast/StandingsOverlay";
-import CustomOverlay from "@/components/broadcast/CustomOverlay";
-import RosterOverlay from "@/components/broadcast/RosterOverlay";
-import EventThumbnailCreator from "@/components/broadcast/EventThumbnailCreator";
 import EventMain from "@/views/sub-views/EventMain";
 import EventRosters from "@/views/sub-views/EventRosters";
 import EventBrackets from "@/views/sub-views/EventBrackets";
 import TeamTheme from "@/views/sub-views/TeamTheme";
 import EventSchedule from "@/views/sub-views/EventSchedule";
 import EventScenarios from "@/components/website/EventScenarios";
-import BracketOverlay from "@/components/broadcast/BracketOverlay";
-import DraftOverlay from "@/components/broadcast/DraftOverlay";
 import EventDraft from "@/views/sub-views/EventDraft";
 import TeamDetails from "@/views/sub-views/TeamDetails";
-import DeskOverlay from "@/components/broadcast/DeskOverlay";
-import InfoOverlay from "@/components/broadcast/InfoOverlay";
-// import EventScenarios2 from "@/components/website/EventScenarios2";
+import BroadcastRoutes from "@/router/broadcast";
+import ClientApp from "@/apps/ClientApp";
 
 Vue.use(VueRouter);
 
@@ -106,23 +96,16 @@ const routes = [
         ]
     },
     {
-        path: "/broadcast/:broadcastID",
+        path: "/broadcast/:broadcastCode",
         component: OverlayApp,
-        props: route => ({ id: route.params.broadcastID, title: route.query.title, top: route.query.top }),
-        children: [
-            { path: "ingame", component: IngameOverlay },
-            { path: "break", component: BreakOverlay },
-            { path: "bracket", component: BracketOverlay, props: route => ({ bracketKey: route.query.key, extended: !!route.query.extended, scale: route.query.scale }) },
-            { path: "schedule", component: ScheduleOverlay },
-            { path: "standings", component: StandingsOverlay },
-            { path: "roster", redirect: "rosters" },
-            { path: "rosters", component: RosterOverlay },
-            { path: "thumbnail", component: EventThumbnailCreator },
-            { path: "draft", component: DraftOverlay },
-            { path: "casters", component: DeskOverlay, props: route => ({ group: "casters" }) },
-            { path: "custom", component: CustomOverlay },
-            { path: "info", component: InfoOverlay }
-        ]
+        props: route => ({ code: route.params.broadcastCode, title: route.query.title, top: route.query.top }),
+        children: BroadcastRoutes
+    },
+    {
+        path: "/client/:clientID",
+        component: ClientApp,
+        props: route => ({ client: route.params.clientID }),
+        children: BroadcastRoutes
     }
 ];
 

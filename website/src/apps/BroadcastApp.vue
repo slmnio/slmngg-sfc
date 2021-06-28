@@ -12,10 +12,10 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "BroadcastApp",
-    props: ["id", "title", "top"],
+    props: ["id", "title", "top", "code"],
     computed: {
         broadcast() {
-            return ReactiveRoot(`broadcast-${this.id}`, {
+            return ReactiveRoot(this.id || `broadcast-${this.code}`, {
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")
                 }),

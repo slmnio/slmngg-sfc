@@ -35,7 +35,6 @@ app.get("/things/:ids", cors({ origin: corsOrigins}), async (req, res) => {
 });
 
 function cleanID(id) {
-    console.log(id);
     if (!id) return null;
     if (typeof id !== "string") return id.id || null; // no real id oops
     if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
@@ -54,6 +53,12 @@ io.on("connection", (socket) => {
     socket.on("unsubscribe", (id) => {
         id = cleanID(id);
         socket.leave(id);
+    });
+    socket.on("subscribe-multiple", (ids) => {
+        console.log(`[multiple] client rejoining ${ids.length} rooms`);
+        ids.map(id => cleanID(id)).forEach(id => {
+            socket.join(id);
+        });
     });
 });
 

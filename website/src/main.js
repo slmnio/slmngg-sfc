@@ -38,7 +38,8 @@ const app = new Vue({
     store,
     sockets: {
         connect() {
-            console.log("[socket]", "connected");
+            console.log("[socket]", "connected", this.$store.state.subscribed_ids.length);
+            this.$socket.client.emit("subscribe-multiple", this.$store.state.subscribed_ids);
         },
         data_update(d) {
             // handled by vuex

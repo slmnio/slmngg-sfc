@@ -65,7 +65,7 @@ export default {
 
             if (!teams) return [];
 
-            console.log(this.settings);
+            // console.log(this.settings);
 
             teams.map(team => {
                 team.standings = {

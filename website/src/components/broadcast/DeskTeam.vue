@@ -29,9 +29,9 @@ export default {
         flex-grow: 1;
     }
     .team-logo-holder {
-        width:  150px;
+        width:  160px;
         height: 150px;
-        border-radius: 20px;
+        /*border-radius: 20px;*/
     }
     .team-logo {
         --size: 90%;

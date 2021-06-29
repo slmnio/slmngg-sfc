@@ -1,5 +1,5 @@
 <template>
-    <div class="tourney-bar">
+    <div class="tourney-bar" :style="gradient" v-bind:class="{'small-bar': !(left && right) }">
         <div class="bar-text flex-center bar-text-left">
             <transition name="fade" mode="out-in">
                 <span :key="left" v-if="left && right">{{ left }}</span>
@@ -31,6 +31,14 @@ export default {
             if (this.broadcast && this.broadcast.event && this.broadcast.event.theme) return this.broadcast.event.theme;
             return null;
         },
+        gradient() {
+            if (!this._theme) return {};
+            if (!this._theme.color_gradient) return { backgroundColor: this._theme.color_logo_background };
+            return {
+                backgroundColor: this._theme.color_logo_background,
+                backgroundImage: `linear-gradient(to right, ${this._theme.color_logo_background}, ${this._theme.color_gradient})`
+            };
+        },
         logo() {
             if (!this._theme) return {};
             return cssImage("backgroundImage", this._theme, ["default_wordmark", "default_logo"], null, false);
@@ -41,15 +49,20 @@ export default {
 
 <style scoped>
     .tourney-bar {
-        border-radius: 20px;
         display: flex;
-        background-image: linear-gradient(to right, #20FC8F, #2644F7);
         color: white;
         font-weight: bold;
         justify-content: center;
         align-items: center;
         font-size: 60px;
         width: 100%;
+    }
+
+    .tourney-bar.small-bar {
+        border-radius: 0;
+    }
+    .tourney-bar.small-bar .bar-logo {
+        height: 220px;
     }
     .bar-text {
         text-transform: uppercase;

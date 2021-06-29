@@ -11,7 +11,7 @@
                 <div class="break-col break-left-col">
                     <transition name="anim-break-next">
                         <div class="break-next" v-if="nextMatch">
-                            <BreakMatch :match="nextMatch" :expanded="false" />
+                            <BreakMatch :match="nextMatch" :expanded="false" :theme-color="themeColor" />
                         </div>
                     </transition>
                     <transition name="anim-break-next">
@@ -22,7 +22,7 @@
                 </div>
                 <transition name="break-content" mode="out-in">
                     <transition-group class="break-col break-schedule" name="a--match" v-if="breakDisplay === 'Schedule'" key="Schedule">
-                        <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" />
+                        <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
                     </transition-group>
                     <div class="break-col break-standings" v-if="breakDisplay === 'Standings'" key="Standings">
                         <Standings :event="event" :stage="broadcast.current_stage" />
@@ -43,7 +43,7 @@
             </div>
         </div>
         <div class="break-preload">
-            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" />
+            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
             <Standings :event="event" :stage="broadcast.current_stage" />
             <div class="break-image-inner" :style="cssImage('backgroundImage', broadcast, ['break_image'], 1080, false)"></div>
             <Bracket class="break-col break-bracket" v-if="breakDisplay === 'Bracket'" key="Bracket" :event="event" :bracket="bracket" use-overlay-scale />
@@ -62,6 +62,7 @@ import Countdown from "@/components/broadcast/Countdown";
 import Bracket from "@/components/website/Bracket";
 import BroadcastPreview from "@/components/broadcast/BroadcastPreview";
 import BreakHeadlines from "@/components/broadcast/BreakHeadlines";
+import { themeBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "BreakOverlay",
@@ -130,6 +131,9 @@ export default {
         },
         headlines() {
             return (this.broadcast?.headlines || []).filter(b => b.ready);
+        },
+        themeColor() {
+            return themeBackground1(this.event);
         }
     },
     watch: {

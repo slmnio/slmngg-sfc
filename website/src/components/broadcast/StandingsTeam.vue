@@ -38,12 +38,12 @@ export default {
         width: 4em;
     }
     .standings-team {
-        align-items: center;
+        align-items: flex-start;
+        padding: 8px 0px;
     }
-    .team-name {
+    .team-name, .team-rank, .team-stat {
         line-height: 1;
         transform: translate(0, -0.0925em);
-        padding: 8px 0px;
     }
     .team-logo {
         width: 1.25em;

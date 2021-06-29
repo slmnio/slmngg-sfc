@@ -24,13 +24,13 @@
                     <div class="match-team-logo-spacer" v-if="expanded"></div>
                 </div>
             <div class="match-team-center" v-if="match">
-                <div v-if="centerShow === 'scores'" class="center-scores d-flex">
-                    <div class="center-score" v-bind:class="{'win': scores[0] === match.first_to}">{{ scores[0] }}</div>
+                <div v-if="centerShow === 'scores'" class="center-scores flex-center">
+                    <div class="center-score" :style="winCSS(0)" v-bind:class="{'win': scores[0] === match.first_to}"><span class="industry-align">{{ scores[0] }}</span></div>
                     <div class="center-dash">-</div>
-                    <div class="center-score" v-bind:class="{'win': scores[1] === match.first_to}">{{ scores[1] }}</div>
+                    <div class="center-score" :style="winCSS(1)" v-bind:class="{'win': scores[1] === match.first_to}"><span class="industry-align">{{ scores[1] }}</span></div>
                 </div>
                 <div v-if="centerShow === 'time'" class="center-time">{{ start }}</div>
-                <div v-if="centerShow === 'vs'" class="center-vs">vs</div>
+                <div v-if="centerShow === 'vs'" class="center-vs" :style="centerBorder">vs</div>
             </div>
         </div>
 <!--        </transition-group>-->
@@ -44,7 +44,7 @@ import { logoBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "BreakMatch",
-    props: ["match", "expanded", "timezone", "live"],
+    props: ["match", "expanded", "timezone", "live", "themeColor"],
     computed: {
         teams() {
             const dummy = { text: "TBD", dummy: true, id: null };
@@ -127,6 +127,11 @@ export default {
         nbr(text) {
             console.log(text);
             return text.replaceAll("\\n", "<br>");
+        },
+        winCSS(index) {
+            console.log(index, this.themeColor);
+            if (this.scores[index] === this.match.first_to) return this.themeColor || {};
+            return {};
         }
     }
 };
@@ -221,7 +226,7 @@ export default {
 </style>
 <style scoped>
     .match-team {
-        border-radius: 20px;
+        /*border-radius: 20px;*/
         position: relative;
         height: 1.8em;
         margin: .3em 0;
@@ -238,7 +243,7 @@ export default {
         width: 2.25em;
         height: 2.25em;
         position: absolute;
-        border-radius: 20px;
+        /*border-radius: 20px;*/
         margin: 0;
     }
     .match-team-logo {
@@ -278,15 +283,20 @@ export default {
         background: white;
         color: black;
         width: 1.1em;
-        border-radius: 10px;
+        /*border-radius: 10px;*/
         font-size: 48px;
         line-height: 1;
         padding: 0.15em 0;
     }
     .center-score.win {
-        background-color: #2644FF;
+        background-color: #2644FF;  /* TODO: #38 */
         color: white;
     }
 
-    .center-dash {margin: 0 .2em;line-height: 1;font-size: 36px;transform: translate(0, .35em);}
+    .center-dash {
+        margin: 0 .2em;
+        line-height: 1;
+        font-size: 36px;
+        transform: translate(0, -0.0925em);
+    }
 </style>

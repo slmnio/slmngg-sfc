@@ -4,10 +4,10 @@
             <TourneyBar :left="broadcast.event && broadcast.event.short" :right="broadcast.subtitle" :event="broadcast.event" />
         </div>
         <transition-group class="casters flex-center" name="anim-talent">
-            <Caster v-for="caster in casters" v-bind:key="caster.id" :guest="caster" />
+            <Caster v-for="(caster, i) in casters" v-bind:key="caster.id" :guest="caster" :color="getColor(i)" />
         </transition-group>
         <div class="lower-holder flex-center">
-            <DeskMatch class="w-100" :_match="liveMatch" />
+            <DeskMatch class="w-100" :_match="liveMatch" :theme-color="themeColor" />
         </div>
     </div>
 </template>
@@ -18,13 +18,18 @@ import { cssImage } from "@/utils/content-utils";
 import TourneyBar from "@/components/broadcast/TourneyBar";
 import Caster from "@/components/broadcast/Caster";
 import DeskMatch from "@/components/broadcast/DeskMatch";
+import { themeBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "DeskOverlay",
     components: { DeskMatch, Caster, TourneyBar },
     props: ["broadcast", "group"],
     methods: {
-        cssImage
+        cssImage,
+        getColor(index) {
+            if (!this.deskColors) return null;
+            return this.deskColors[index % this.deskColors.length];
+        }
     },
     computed: {
         liveMatch: function () {
@@ -55,6 +60,14 @@ export default {
         },
         casters() {
             return this.guests;/* .filter(g => g.show); */
+        },
+        themeColor() {
+            if (!this.broadcast?.event?.theme) return {};
+            return themeBackground1(this.broadcast.event);
+        },
+        deskColors() {
+            if (!this.broadcast?.event?.theme?.desk_colors) return [];
+            return this.broadcast.event.theme.desk_colors.trim().split(/[\n,]/g).map(e => e.trim());
         }
     }
 };
@@ -68,6 +81,10 @@ export default {
     .top-holder {
         margin: 9vh 15vw;
         transform: scale(1.2);
+        min-height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .casters {

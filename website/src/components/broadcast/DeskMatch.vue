@@ -9,7 +9,7 @@
                         <div class="dash">-</div>
                         <div class="score flex-center" v-bind:class="{'win': match.score_2 === match.first_to}"><span class="industry-align">{{ match.score_2 }}</span></div>
                     </div>
-                    <div class="match-vs flex-center" v-if="show.vs">
+                    <div class="match-vs flex-center" :style="centerBorder" v-if="show.vs">
                         <span class="industry-align">{{ scoreText }}</span>
                     </div>
                 </div>
@@ -23,7 +23,7 @@ import DeskTeam from "@/components/broadcast/DeskTeam";
 export default {
     name: "DeskMatch",
     components: { DeskTeam },
-    props: ["_match"],
+    props: ["_match", "themeColor"],
     computed: {
         match() {
             if (!this._match?.teams) return null;
@@ -46,6 +46,12 @@ export default {
         scoreText() {
             if (this.scores && this.scores.some(s => !!s)) return this.scores.join("-");
             return "vs";
+        },
+        centerBorder() {
+            if (!this.themeColor) return {};
+            return {
+                borderColor: this.themeColor.backgroundColor
+            };
         }
     }
 };
@@ -56,7 +62,7 @@ export default {
     .match-center { order: 1; }
     .score {
         background: white;
-        border-radius: 20px;
+        /*border-radius: 20px;*/
         font-size: 100px;
         font-weight: bold;
         padding: 0 20px;

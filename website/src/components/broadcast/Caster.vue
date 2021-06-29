@@ -1,5 +1,5 @@
 <template>
-    <div class="caster flex-center flex-column" >
+    <div class="caster flex-center flex-column" :style="themeColor">
         <div class="caster-cam-box flex-center">
             <transition mode="out-in" name="fade">
                 <div class="caster-cam-wrapper" v-if="cam">
@@ -28,7 +28,7 @@
 <script>
 export default {
     name: "Caster",
-    props: ["caster", "guest"],
+    props: ["caster", "guest", "color"],
     computed: {
         player() {
             return this.caster || this.guest.player;
@@ -43,7 +43,6 @@ export default {
             return this.caster?.live_guests || this.guest;
         },
         cam() {
-            console.log(this.liveGuestData);
             if (!this.liveGuestData) return false;
             if (!this.liveGuestData.use_cam) return false;
             return this.liveGuestData.cam_code.includes("http") ? `${this.liveGuestData.cam_code}&z=04&mute` : `https://feeds.production.slmn.io/?view=${this.liveGuestData.cam_code}&z=04&mute`;
@@ -54,6 +53,12 @@ export default {
         },
         name() {
             return this.caster?.name || this.guest?.name;
+        },
+        themeColor() {
+            if (!this.color) return {};
+            return {
+                "--theme-color": this.color
+            };
         }
     }
 };
@@ -71,11 +76,6 @@ export default {
         max-width: var(--caster-width);
     }
 
-    .caster:nth-child(4n-3) { --theme-color: #256BE1; }
-    .caster:nth-child(4n-2) { --theme-color: #248FCD; }
-    .caster:nth-child(4n-1) { --theme-color: #23BBB5; }
-    .caster:nth-child(4n) { --theme-color: #21E79B; }
-
     .caster-cam-box {
         background-color: var(--theme-color);
         border-bottom: 6px solid var(--theme-color);
@@ -83,7 +83,7 @@ export default {
         color: white;
         height: var(--caster-height);
         width: 100%;
-        border-radius: 20px;
+        /*border-radius: 20px;*/
         overflow: hidden;
     }
     .caster-lower {
@@ -102,7 +102,7 @@ export default {
         font-weight: bold;
         font-size: 32px;
         padding: 7px 20px;
-        border-radius: 10px;
+        /*border-radius: 4px;*/
         line-height: 1;
         box-shadow: 0 0 4px 0 #00000080;
     }

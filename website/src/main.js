@@ -48,7 +48,10 @@ const app = new Vue({
     },
     metaInfo: {
         title: "SLMN.GG",
-        titleTemplate: "%s | SLMN.GG"
+        titleTemplate: "%s | SLMN.GG",
+        link: [
+            { rel: "icon", href: "https://slmn.io/slmn-new.png" }
+        ]
     },
     data: () => ({ interval: null }),
     mounted() {

@@ -53,6 +53,11 @@ export default {
                 .replace(/3/g, "e")
                 .replace(/2/g, "a");
         }
+    },
+    metaInfo() {
+        return {
+            title: "Players"
+        };
     }
 };
 </script>

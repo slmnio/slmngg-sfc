@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <h1 class="big mb-3">Teams</h1>
         <div v-for="event in events" v-bind:key="event.id" class="event mb-4">
             <EventDisplay class="team-display" :event="event"/>
             <div class="event-teams d-flex row">

@@ -27,6 +27,7 @@ import EventDraft from "@/views/sub-views/EventDraft";
 import TeamDetails from "@/views/sub-views/TeamDetails";
 import BroadcastRoutes from "@/router/broadcast";
 import ClientApp from "@/apps/ClientApp";
+import Players from "@/views/lists/Players";
 
 Vue.use(VueRouter);
 
@@ -54,6 +55,7 @@ const routes = [
             },
             { path: "/events", component: Events },
             { path: "/teams", component: Teams },
+            { path: "/players", component: Players },
             {
                 path: "/event/:id",
                 // name: "Event",

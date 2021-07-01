@@ -210,3 +210,7 @@ body.overlay {
 .industry-align {
     transform: translate(0, -0.09em);
 }
+
+h1.big {
+    font-size: 4em;
+}

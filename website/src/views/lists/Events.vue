@@ -53,9 +53,6 @@ export default {
 </script>
 
 <style scoped>
-    h1.big {
-        font-size: 4em;
-    }
     .series-events {
         margin: 8px -15px;
     }

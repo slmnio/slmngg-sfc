@@ -44,7 +44,7 @@ async function getAllTableData(tableName, options = {}) {
 function customUpdater(tableName, item) {
     if (tableName === "Broadcasts" && item.key && item.active) Cache.set(`broadcast-${item.key}`, item);
     if (tableName === "Clients" && item.key) Cache.set(`client-${item.key}`, item);
-    if (tableName === "Events" && item.subdomain) Cache.set(`event-${item.subdomain}`, item);
+    if (tableName === "Events" && item.subdomain) Cache.set(`subdomain-${item.subdomain}`, item);
 }
 
 async function processTableData(tableName, data) {

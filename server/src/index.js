@@ -4,8 +4,22 @@ const bodyParser = require("body-parser");
 const port = 8901;
 const http = require("http").Server(app);
 const cors = require("cors");
-let corsOrigins = ["http://localhost","http://localhost:8080", "http://dev.slmn.gg", "https://dev.slmn.gg"];
-const io = require("socket.io")(http, {cors: { origin: corsOrigins, methods: ["GET", "POST"], credentials: true}, allowEIO3: true});
+
+let domains = ["slmn.gg", "localslmn", "localhost"].map(d => new RegExp(`(?:^|.*\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
+
+function corsHandle(origin, callback) {
+    let url = new URL(origin);
+
+    if (domains.some(r => {
+        return r.test(url.hostname);
+    })) {
+        return callback(null, url.origin);
+    }
+
+    return callback(true);
+}
+
+const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials: true}, allowEIO3: true});
 
 const Cache = (require("./cache.js")).setup(io);
 require("./airtable-interface.js");
@@ -17,14 +31,14 @@ app.get("/", async (req, res) => {
 });
 
 
-app.get("/thing/:id", cors({ origin: corsOrigins}), async (req, res) => {
+app.get("/thing/:id", cors({ origin: corsHandle}), async (req, res) => {
     let id = req.params.id;
     let data = await Cache.get(id);
     if (!data) return res.status(404).send({ error: true, message: "Unknown ID"});
     console.log("[thing request]", id);
     res.end(JSON.stringify(data));
 });
-app.get("/things/:ids", cors({ origin: corsOrigins}), async (req, res) => {
+app.get("/things/:ids", cors({ origin: corsHandle}), async (req, res) => {
     let ids = req.params.ids.split(",");
     let promises = ids.map(async id => await Cache.get(id));
     let data = await Promise.all(promises);
@@ -47,7 +61,7 @@ io.on("connection", (socket) => {
 
     socket.on("subscribe", (id) => {
         id = cleanID(id);
-        console.log("joined", id);
+        // console.log("joined", id);
         socket.join(id);
     });
     socket.on("unsubscribe", (id) => {

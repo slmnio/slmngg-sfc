@@ -15,6 +15,7 @@ import EventRoutes from "@/router/event";
 import Event from "@/views/Event";
 import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp";
 import NotFoundPage from "@/views/NotFoundPage";
+import SharedRoutes from "@/router/shared-routes";
 
 Vue.use(Vuex);
 Vue.use(VueMeta);
@@ -73,7 +74,8 @@ if (subdomain) {
                             isMinisite: true
                         };
                     }
-                }
+                },
+                ...SharedRoutes
             ]
         },
         { path: "/*", component: NotFoundPage }

@@ -1,6 +1,5 @@
 import Vue from "vue";
 import GlobalApp from "./apps/GlobalApp";
-// import router from "./router";
 import store from "@/thing-store";
 import Vuex from "vuex";
 import VueMeta from "vue-meta";
@@ -10,14 +9,11 @@ import { io } from "socket.io-client";
 import { VBTooltip } from "bootstrap-vue";
 
 import defaultRoutes from "@/router/default";
-import WebsiteApp from "@/apps/WebsiteApp";
-import LoadingPage from "@/views/LoadingPage";
-import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { fetchThing, fetchThings } from "@/utils/fetch";
-import NotFoundPage from "@/views/NotFoundPage";
+import { fetchThings } from "@/utils/fetch";
 import EventRoutes from "@/router/event";
 
 import Event from "@/views/Event";
+import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp";
 
 Vue.use(Vuex);
 Vue.use(VueMeta);
@@ -49,6 +45,7 @@ const host = window.location.hostname;
 const domains = ["slmn.gg", "localslmn", "localhost"].map(d => new RegExp(`(?:^|(.*)\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
 let subdomain = null;
 let routes = [];
+let subID;
 
 domains.forEach(r => {
     const result = host.match(r);
@@ -61,7 +58,23 @@ if (subdomain) {
     // verify event from subdomain
     console.log("[subdomain]", subdomain);
     routes = [
-        { name: "main", path: "/", component: WebsiteApp, children: [{ path: "*", component: LoadingPage }] }
+        {
+            path: "/",
+            component: MinisiteWrapperApp,
+            children: [
+                {
+                    path: "/",
+                    component: Event,
+                    children: EventRoutes,
+                    props: (route) => {
+                        return {
+                            id: subID,
+                            isMinisite: true
+                        };
+                    }
+                }
+            ]
+        }
     ];
 } else {
     // default slmn.gg
@@ -113,9 +126,7 @@ const app = new Vue({
     },
     computed: {
         minisiteEvent() {
-            return ReactiveRoot(`subdomain-${subdomain}`, {
-                theme: ReactiveThing("theme")
-            });
+            return this.$store.getters.thing(`subdomain-${subdomain}`);
         }
     },
     methods: {
@@ -128,6 +139,8 @@ const app = new Vue({
             } else {
                 // add minisite routes
                 this.minisiteEventStatus = "success";
+                subID = data[0]._original_data_id || data[0].id;
+                console.log("[subID]", subID);
                 this.$router.addRoute("default", {
                     path: "/",
                     component: Event,
@@ -142,8 +155,3 @@ const app = new Vue({
         }
     }
 }).$mount("#app");
-
-// app.sockets.subscribe("data_UPDATE", ([id, data]) => {
-//     console.log("[thing]", "data_UPDATE", id, data);
-//     store.commit("push", { id, data });
-// });

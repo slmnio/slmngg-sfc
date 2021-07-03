@@ -17,8 +17,7 @@ export default new Vuex.Store({
     },
     mutations: {
         push(_store, { id, data }) {
-            // console.log(data);
-            data = JSON.parse(JSON.stringify({ ...data, id: cleanID(id), __stored: true }));
+            data = JSON.parse(JSON.stringify({ ...data, id: cleanID(id), _original_data_id: cleanID(data.id), __stored: true }));
             // if ()
 
             const index = this.state.things.findIndex(t => t.id === id);

@@ -20,6 +20,7 @@ import Match from "@/views/Match";
 import OverlayApp from "@/apps/BroadcastApp";
 import BroadcastRoutes from "@/router/broadcast";
 import ClientApp from "@/apps/ClientApp";
+import NotFoundPage from "@/views/NotFoundPage";
 
 export default [
     {
@@ -89,5 +90,9 @@ export default [
         component: ClientApp,
         props: route => ({ client: route.params.clientID }),
         children: BroadcastRoutes
+    },
+    {
+        path: "/*",
+        component: NotFoundPage
     }
 ];

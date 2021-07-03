@@ -25,7 +25,7 @@ import SubPageNav from "@/components/website/SubPageNav";
 
 export default {
     name: "Event",
-    props: ["id"],
+    props: ["id", "isMinisite"],
     components: {
         ThingTop, SubPageNav
     },
@@ -42,7 +42,7 @@ export default {
     },
     computed: {
         event() {
-            return ReactiveRoot(this.id, {
+            return ReactiveRoot(this.isMinisite ? this.$root.minisiteEvent.id : this.id, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -69,8 +69,14 @@ export default {
             return this.settings?.draft?.use || false;
         }
     },
+    mounted() {
+        console.log("[event mount]", this.id, this.event, this.$root.minisiteEvent);
+    },
     methods: {
         subLink(page) {
+            if (this.isMinisite) {
+                return `/${page}`;
+            }
             return `/event/${this.event.id}/${page}`;
         }
     }

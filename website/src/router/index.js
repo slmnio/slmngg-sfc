@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import WebsiteApp from "@/apps/WebsiteApp";
 import defaultRoutes from "@/router/default";
 import LoadingPage from "@/views/LoadingPage";
+import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp";
 
 Vue.use(VueRouter);
 
@@ -26,7 +27,7 @@ if (subdomain) {
     * if unverified, add a 404 */
 
     routes = [
-        { path: "/", name: "default", component: WebsiteApp, children: [{ path: "*", component: LoadingPage }] }
+        { path: "/", name: "default", component: WebsiteApp, children: [{ path: "*", component: MinisiteWrapperApp }] }
     ];
 } else {
     routes = defaultRoutes;

@@ -14,6 +14,7 @@ import EventRoutes from "@/router/event";
 
 import Event from "@/views/Event";
 import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp";
+import NotFoundPage from "@/views/NotFoundPage";
 
 Vue.use(Vuex);
 Vue.use(VueMeta);
@@ -74,7 +75,8 @@ if (subdomain) {
                     }
                 }
             ]
-        }
+        },
+        { path: "/*", component: NotFoundPage }
     ];
 } else {
     // default slmn.gg

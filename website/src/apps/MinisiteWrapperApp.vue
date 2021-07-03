@@ -1,6 +1,9 @@
 <template>
     <div class="minisite-wrapper-app">
-        <WebsiteApp v-if="event && (event._original_data_id || event.__loading)" :id="event._original_data_id"/>
+        <div id="app" v-if="event && (event._original_data_id || event.__loading)">
+            <WebsiteNav :minisite="event"/>
+            <router-view class="my-3 slmngg-page"/>
+        </div>
         <NotFoundPage v-else/>
     </div>
 </template>
@@ -9,13 +12,15 @@
 import Event from "@/views/Event";
 import NotFoundPage from "@/views/NotFoundPage";
 import WebsiteApp from "@/apps/WebsiteApp";
+import WebsiteNav from "@/components/website/WebsiteNav";
 
 export default {
     name: "MinisiteWrapperApp",
     components: {
         NotFoundPage,
         // Event,
-        WebsiteApp
+        // WebsiteApp,
+        WebsiteNav
     },
     computed: {
         event () {

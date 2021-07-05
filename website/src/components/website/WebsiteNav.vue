@@ -4,7 +4,10 @@
             <b>In development:</b> things may break, be missing, or not appear as expected.
         </div>
         <b-navbar toggleable="lg" type="dark">
-            <router-link class="navbar-brand" to="/">{{ minisite ? (minisite.navbar_name || minisite.series_name || minisite.name) : "SLMN.GG"}}</router-link>
+            <router-link class="navbar-brand " to="/">
+                <img v-if="minisiteIcon" :src="minisiteIcon" alt="" class="navbar-image d-inline-block align-top mr-2">
+                {{ minisite ? (minisite.navbar_name || minisite.series_name || minisite.name) : "SLMN.GG"}}
+            </router-link>
 
             <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
@@ -18,6 +21,13 @@
                 <b-navbar-nav v-if="minisite">
                     <router-link active-class="active" v-if="minisite.matches" class="nav-link" to="/schedule">Schedule</router-link>
                     <router-link active-class="active" v-if="minisite.brackets" class="nav-link" to="/bracket">{{ minisite.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link>
+
+                    <div class="nav-divider" v-if="navbarEvents.length"></div>
+
+                    <router-link v-for="event in navbarEvents" v-bind:key="event.id"
+                                 active-class="active"
+                                 class="nav-link" :to="event._link" >
+                        {{ event.navbar_short || event.short || event.series_subtitle || event.name }}</router-link>
                 </b-navbar-nav>
                 <b-navbar-nav class="mr-auto">
                     <NavLiveMatch v-for="match in liveMatches" :match="match" v-bind:key="match.id" />
@@ -39,6 +49,7 @@ import {
 } from "bootstrap-vue";
 import NavLiveMatch from "@/components/website/NavLiveMatch";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { getImage } from "@/utils/content-utils";
 
 export default {
     name: "WebsiteNav",
@@ -65,6 +76,30 @@ export default {
             } catch (e) {
                 return "https://dev.slmn.gg";
             }
+        },
+        navbarEvents() {
+            if (!this.minisite?.id) return [];
+            const events = ReactiveRoot(this.minisite.id, {
+                navbar_events: ReactiveArray("navbar_events")
+            })?.navbar_events;
+
+            if (events) {
+                return events.map(e => {
+                    return {
+                        ...e,
+                        _link: (this.minisite._original_data_id === e.id) ? "/" : `/event/${e.id}`
+                    };
+                });
+            }
+
+            return [];
+        },
+        minisiteIcon() {
+            if (!this.minisite?.id) return null;
+            const theme = ReactiveRoot(this.minisite.id, { theme: ReactiveThing("theme") })?.theme;
+            console.log("[theme]", theme);
+            if (!theme) return null;
+            return getImage(theme.small_logo) || getImage(theme.default_logo);
         }
     },
     methods: {
@@ -76,5 +111,17 @@ export default {
 </script>
 
 <style scoped>
+.nav-divider {
+    border-top: 1px solid;
+    margin: .5rem 0;
+    opacity: 0.25;
+}
 
+@media (min-width: 992px) {
+    .nav-divider {
+        border-top: none;
+        margin: .2rem .5rem;
+        border-left: 1px solid;
+    }
+}
 </style>

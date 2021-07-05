@@ -52,6 +52,11 @@ export default {
             });
             return groups;
         }
+    },
+    metaInfo() {
+        return {
+            title: "Teams"
+        };
     }
 };
 </script>

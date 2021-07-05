@@ -8,4 +8,7 @@
     #slmngg-app {
         background: transparent;
     }
+    body {
+        background-color: #202020;
+    }
 </style>

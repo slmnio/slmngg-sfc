@@ -33,7 +33,7 @@ export async function fetchThing (id) {
     //         id, data: { __loading: true }
     //     });
     //
-    //     let data = await fetch(`${process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg"}/thing/${id}`).then(res => res.json());
+    //     let data = await fetch(`${process.env.NODE_ENV === "development" ? "http://localslmn:8901" : "https://data.slmn.gg"}/thing/${id}`).then(res => res.json());
     //     if (data.error) {
     //         console.error(data.message);
     //         data = { id: id, __fetch_failed: true };
@@ -60,7 +60,7 @@ export async function fetchThings (ids) {
             id, data: { __loading: true }
         }));
 
-        const data = await fetch(`${process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg"}/things/${ids.join(",")}`).then(res => res.json());
+        const data = await fetch(`${process.env.NODE_ENV === "development" ? "http://localslmn:8901" : "https://data.slmn.gg"}/things/${ids.join(",")}`).then(res => res.json());
 
         if (data.error) {
             console.error(data.message);
@@ -72,7 +72,7 @@ export async function fetchThings (ids) {
                 data: item
             });
             if (cleanID(item.id) !== item.__id) {
-                console.log("[custom update]", item.__id);
+                console.log("[custom update]", item.__id, item.id);
                 store.commit("push", {
                     id: item.__id,
                     data: item
@@ -128,4 +128,8 @@ export async function getThings(ids) {
     console.log("[socket]", `resolving ${ids.length} things`);
     await fetchThings(ids);
     return ids.map(id => getThing(id));
+}
+
+export async function getAndWait(id) {
+
 }

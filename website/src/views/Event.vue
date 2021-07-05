@@ -5,8 +5,8 @@
         <SubPageNav class="my-2">
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
 <!--            <li class="nav-item"><router-link class="nav-link" :to="subLink('rosters')">Rosters</router-link></li>-->
-            <li class="nav-item" v-if="event.brackets"><router-link class="nav-link" :to="subLink('bracket')">{{ event.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link></li>
             <li class="nav-item" v-if="event.matches"><router-link class="nav-link" :to="subLink('schedule')">Schedule</router-link></li>
+            <li class="nav-item" v-if="event.brackets"><router-link class="nav-link" :to="subLink('bracket')">{{ event.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link></li>
             <li class="nav-item" v-if="showFoldy"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
             <li class="nav-item" v-if="showDraft"><router-link class="nav-link" :to="subLink('draft')">Draft</router-link></li>
 <!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
@@ -25,7 +25,7 @@ import SubPageNav from "@/components/website/SubPageNav";
 
 export default {
     name: "Event",
-    props: ["id"],
+    props: ["id", "isMinisite"],
     components: {
         ThingTop, SubPageNav
     },
@@ -42,7 +42,7 @@ export default {
     },
     computed: {
         event() {
-            return ReactiveRoot(this.id, {
+            return ReactiveRoot(this.isMinisite ? this.$root.minisiteEvent.id : this.id, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -69,8 +69,14 @@ export default {
             return this.settings?.draft?.use || false;
         }
     },
+    mounted() {
+        console.log("[event mount]", this.id, this.event, this.$root.minisiteEvent);
+    },
     methods: {
         subLink(page) {
+            if (this.isMinisite) {
+                return `/${page}`;
+            }
             return `/event/${this.event.id}/${page}`;
         }
     }

@@ -1,19 +1,18 @@
 <template>
     <div id="app">
         <WebsiteNav/>
-        <router-view class="my-3 slmngg-page"/>
+        <div class="container my-3">
+            <h1 class="text-center">Not Found</h1>
+        </div>
     </div>
 </template>
 
 <script>
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "../utils/reactive";
 import WebsiteNav from "@/components/website/WebsiteNav";
 
 export default {
-    name: "WebsiteApp",
-    components: {
-        WebsiteNav
-    },
+    name: "NotFoundPage",
+    components: { WebsiteNav },
     beforeCreate () {
         document.body.className = "website";
     }
@@ -23,12 +22,5 @@ export default {
 <style scoped>
 @import "~@/assets/bootstrap.css";
 @import "~@/assets/app.css";
-
-.nav-link-match {
-    color: rgba(255,255,255,0.8) !important;
-}
-.nav-link-match:hover {
-    color: rgba(255,255,255,1) !important;
-}
 
 </style>

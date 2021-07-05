@@ -51,7 +51,10 @@ let subID;
 
 domains.forEach(r => {
     const result = host.match(r);
-    if (result && result[1]) {
+    if (result && result[1] && result[1] !== "dev") {
+        if (result[1].endsWith(".dev")) {
+            result[1] = result[1].slice(0, -4);
+        }
         subdomain = result[1];
     }
 });

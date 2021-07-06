@@ -1,5 +1,5 @@
 <template>
-    <router-link :to="url('news', news)" class="news no-link-style">
+    <router-link :to="`/news/${news.slug}`" class="news no-link-style">
         <NewsThumbnail :item="news"/>
         <div class="news-headline">{{ news.headline }}</div>
     </router-link>

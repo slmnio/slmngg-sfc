@@ -45,10 +45,18 @@ function customUpdater(tableName, item) {
     if (tableName === "Broadcasts" && item.key && item.active) Cache.set(`broadcast-${item.key}`, item);
     if (tableName === "Clients" && item.key) Cache.set(`client-${item.key}`, item);
     if (tableName === "Events" && item.subdomain) Cache.set(`subdomain-${item.subdomain}`, item);
+    if (tableName === "News" && item.slug) Cache.set(`news-${item.slug}`, item);
+}
+
+function sluggify(text) {
+    return ((text.replace(/[^A-Za-z0-9-]+/g, "-")).trim()).toLowerCase().replace(/-+/g,"-").replace(/-+$/g,"");
 }
 
 async function processTableData(tableName, data) {
     data.map(deAirtable).forEach(data => {
+        if (tableName === "News") {
+            data.slug = sluggify(data.name);
+        }
         Cache.set(data.id.slice(3), data);
         customUpdater(tableName, data);
     });

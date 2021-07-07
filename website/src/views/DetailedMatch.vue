@@ -30,7 +30,7 @@
                         <PreviousMatch v-for="match in team.matches" :match="match" :team="team" v-bind:key="match.id" />
                     </div>
                 </div>
-                <div class="show-notes mt-3" v-if="showShowNotes">
+                <div class="show-notes mt-3" v-if="showShowNotes && match.show_notes">
                     <h2>Show notes</h2>
                     <Markdown :markdown="match.show_notes"/>
                 </div>

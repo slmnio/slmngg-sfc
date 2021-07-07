@@ -6,10 +6,10 @@
         <ContentRow title="Teams" v-if="event.teams && event.teams.length && !groupedTeams">
             <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in event.teams" v-bind:key="team.id" :show-logo="true"></ContentThing>
         </ContentRow>
-        <ContentRow title="Staff" v-if="event.staff && event.staff.length">
+        <ContentRow title="Staff" v-if="!useStaffPage && event.staff && event.staff.length">
             <ContentThing :thing="staff" type="player" :theme="event.theme" v-for="staff in event.staff" v-bind:key="staff.id"></ContentThing>
         </ContentRow>
-        <ContentRow :title="event.casters.length === 1 ? 'Caster' : 'Casters'" v-if="event.casters && event.casters.length">
+        <ContentRow :title="event.casters.length === 1 ? 'Caster' : 'Casters'" v-if="!useStaffPage && event.casters && event.casters.length">
             <ContentThing :thing="caster" type="player" :theme="event.theme" v-for="caster in event.casters" v-bind:key="caster.id"></ContentThing>
         </ContentRow>
 
@@ -32,6 +32,7 @@ export default {
     },
     computed: {
         playerRelationshipGroups() {
+            if (this.useStaffPage) return [];
             if (!this.event?.player_relationships) return [];
             const groups = {};
 
@@ -85,6 +86,17 @@ export default {
                 }
                 return a.position - b.position;
             });
+        },
+        eventSettings() {
+            if (!this.event?.blocks) return null;
+            try {
+                return JSON.parse(this.event.blocks);
+            } catch (e) {
+                return null;
+            }
+        },
+        useStaffPage() {
+            return this.eventSettings?.extendedStaffPage || false;
         }
     }
 };

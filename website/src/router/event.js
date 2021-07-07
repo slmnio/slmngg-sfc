@@ -4,6 +4,7 @@ import EventBrackets from "@/views/sub-views/EventBrackets";
 import EventSchedule from "@/views/sub-views/EventSchedule";
 import EventScenarios from "@/components/website/EventScenarios";
 import EventDraft from "@/views/sub-views/EventDraft";
+import EventStaff from "@/views/sub-views/EventStaff";
 
 export default [
     { path: "", component: EventMain },
@@ -14,5 +15,6 @@ export default [
     { path: "matches", redirect: "schedule" },
     { path: "scenarios", component: EventScenarios },
     // { path: "scenarios2", component: EventScenarios2 },
-    { path: "draft", component: EventDraft }
+    { path: "draft", component: EventDraft },
+    { path: "staff", component: EventStaff }
 ];

@@ -17,18 +17,30 @@
                     :title="group.items.length === 1 ? group.meta.singular_name : group.meta.plural_name">
             <ContentThing v-for="player in group.items" v-bind:key="player.id" :thing="player" type="player" :theme="event.theme"/>
         </ContentRow>
+
+        <div class="news mt-3">
+            <div class="news-category" v-for="([categoryName, category]) in Object.entries(newsCategories)" v-bind:key="categoryName">
+                <h2>{{ categoryName }}</h2>
+                <div class="row">
+                    <News class="col-md-3 mb-3" v-for="item in category" :item="item" v-bind:key="item.id" />
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
 <script>
 import ContentThing from "@/components/website/ContentThing";
 import ContentRow from "@/components/website/ContentRow";
+import News from "@/components/website/News";
 
 export default {
     name: "EventMain",
     props: ["event"],
     components: {
-        ContentThing, ContentRow
+        // eslint-disable-next-line vue/no-unused-components
+        ContentThing, ContentRow, News
     },
     computed: {
         playerRelationshipGroups() {
@@ -97,6 +109,26 @@ export default {
         },
         useStaffPage() {
             return this.eventSettings?.extendedStaffPage || false;
+        },
+        filteredNewsItems() {
+            if (!this.event.news_items) return [];
+            return this.event.news_items.filter(item => {
+                if (item.hide_from_local_listing) return false;
+                if (!item.enabled) return false;
+                if (!item.released) return false;
+                if (new Date(item.released) > new Date()) return false;
+                return true;
+            });
+        },
+        newsCategories() {
+            const categories = {};
+            this.filteredNewsItems.forEach(news => {
+                const category = news.category || "Uncategorized";
+                if (!categories[category]) categories[category] = [];
+                categories[category].push(news);
+            });
+
+            return categories;
         }
     }
 };

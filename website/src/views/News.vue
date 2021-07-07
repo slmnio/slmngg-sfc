@@ -4,10 +4,12 @@
         <h1 class="news-headline">{{ news.headline }}</h1>
         <div class="news-line">
             <div class="news-author" v-if="news.author_name">by <router-link :to="url('player', news.author)">{{ news.author.name }}<i class="fas fa-badge-check fa-fw" style="margin-left: .5ex" title="REAL" v-if="news.author.verified"></i></router-link><span v-if="news.author_role">, {{ news.author_role }}</span></div>
-            <div class="news-author" v-if="!news.author_name">from <span v-if="news.author_role">{{ news.author_role }}</span>{{ news.connection ? ', ' + (news.connection.series_name || news.connection.name) : '' }}</div>
+            <div class="news-author" v-if="!news.author_name">from <span v-if="news.author_role">{{ news.author_role }}, </span>{{ connection ? (connection.series_name || connection.name) : '' }}</div>
             <div class="news-date" v-if="news.released || news.updated">{{ news.updated ? `updated ${prettyDate(news.updated)}` : prettyDate(news.released) }}</div>
         </div>
-        <div class="news-content">
+        {{ news.connection }}
+        <EmbeddedVideo class="news-embed-container" :src="news.embed" v-if="news.embed"/>
+        <div class="news-content" v-if="news.content">
             <Markdown :markdown="news.content" />
         </div>
     </div>
@@ -18,10 +20,11 @@ import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { getImage, url } from "@/utils/content-utils";
 import NewsHeader from "@/components/website/NewsHeader";
 import Markdown from "@/components/website/Markdown";
+import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 
 export default {
     name: "News",
-    components: { Markdown, NewsHeader },
+    components: { EmbeddedVideo, Markdown, NewsHeader },
     props: ["slug"],
     methods: {
         url,
@@ -40,7 +43,8 @@ export default {
                 }),
                 team: ReactiveThing("team", {
                     theme: ReactiveThing("theme")
-                })
+                }),
+                connection: ReactiveThing("connection")
             });
         },
         headerImage() {
@@ -52,6 +56,9 @@ export default {
             if (this.news.event) return this.news.event.theme;
             if (this.news.team) return this.news.team.theme;
             return null;
+        },
+        connection() {
+            return this.news.event || this.news.team;
         }
     }
 };
@@ -68,7 +75,6 @@ export default {
         justify-content: space-between;
     }
     .news-content {
-        box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.5);
         margin: 16px 0;
         padding: 16px;
         background-color: #252525;
@@ -80,6 +86,16 @@ export default {
         display: flex;
         margin-bottom: 24px;
         max-width: 100%;
+    }
+
+    .news-embed-container, .news-content, .news-content >>> img {
         box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.5);
+    }
+
+    .news-embed-container {
+        margin: 16px 0;
+    }
+    .news-content >>> p:last-child {
+        margin-bottom: .25rem;
     }
 </style>

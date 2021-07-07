@@ -77,6 +77,9 @@ function registerUpdater(tableName, options) {
             }).all()).map(deAirtable);
 
             data.forEach(data => {
+                if (tableName === "News") {
+                    data.slug = sluggify(data.name);
+                }
                 Cache.set(data.id.slice(3), data);
                 customUpdater(tableName, data);
             });

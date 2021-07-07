@@ -8,6 +8,7 @@
 <script>
 import NewsThumbnail from "@/components/website/NewsThumbnail";
 import { url } from "@/utils/content-utils";
+import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "News",
     props: ["item"],
@@ -15,7 +16,16 @@ export default {
     computed: {
         news() {
             if (!this.item) return {};
-            return this.item;
+            return {
+                ...this.item,
+                event: this.event
+            };
+        },
+        event() {
+            if (!this.item?.event) return {};
+            return ReactiveRoot(this.item?.event?.id || this.item?.event[0], {
+                theme: ReactiveThing("theme")
+            });
         }
     },
     methods: {

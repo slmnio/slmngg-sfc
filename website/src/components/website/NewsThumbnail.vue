@@ -22,7 +22,18 @@ export default {
             };
         },
         customThumbnail() {
-            if (!this.item.thumbnail) return null;
+            if (!this.item.thumbnail) {
+                if (this.item.embed && this.item.use_embed_thumbnail) {
+                    const vodURL = new URL(this.item.embed);
+                    if (["www.youtube.com", "youtube.com"].includes(vodURL.host)) {
+                        return { backgroundImage: `url(https://i.ytimg.com/vi/${vodURL.searchParams.get("v")}/maxresdefault.jpg)` };
+                    }
+                    if (["youtu.be"].includes(vodURL.host)) {
+                        return { backgroundImage: `url(https://i.ytimg.com/vi/${vodURL.pathname.slice(1)}/maxresdefault.jpg)` };
+                    }
+                }
+                return null;
+            }
 
             return { backgroundImage: `url(${resizedImage(this.item, "thumbnail", 150)})` };
         },

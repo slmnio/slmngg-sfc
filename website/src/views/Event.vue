@@ -52,7 +52,8 @@ export default {
                 player_relationships: ReactiveArray("player_relationships", {
                     player: ReactiveThing("player")
                 }),
-                casters: ReactiveArray("casters")
+                casters: ReactiveArray("casters"),
+                news_items: ReactiveArray("news_items")
             });
         },
         settings() {

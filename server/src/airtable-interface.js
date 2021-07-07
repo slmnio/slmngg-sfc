@@ -12,7 +12,7 @@ const logUpdates = false;
 // Starting with syncing Matches
 
 // const tables = ["Matches", "Teams", "Themes", "Events", "Players", "Player Relationships"];
-const tables = ["Event Series", "News", "Matches", "Teams", "Themes", "Events", "Players", "Socials", "Accolades", "Player Relationships", "Broadcasts", "Brackets", "Live Guests", "Headlines", "Clients"];
+const tables = ["Event Series", "News", "Matches", "Teams", "Themes", "Events", "Players", "Socials", "Accolades", "Player Relationships", "Broadcasts", "Brackets", "Live Guests", "Headlines", "Clients", "Maps", "Map Data"];
 
 function deAirtable(obj) {
     const data = {};

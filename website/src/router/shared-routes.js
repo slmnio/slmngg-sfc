@@ -13,6 +13,7 @@ import PlayerMatches from "@/views/sub-views/PlayerMatches";
 import PlayerPlayedMatches from "@/views/sub-views/PlayerPlayedMatches";
 import Match from "@/views/Match";
 import News from "@/views/News";
+import DetailedMatch from "@/views/DetailedMatch";
 
 export default [
     {
@@ -48,6 +49,7 @@ export default [
         ]
     },
     { path: "/match/:id", component: Match, props: route => ({ id: route.params.id }) },
+    { path: "/detailed/:id", component: DetailedMatch, props: route => ({ id: route.params.id }) },
     {
         path: "/news/:slug",
         component: News,

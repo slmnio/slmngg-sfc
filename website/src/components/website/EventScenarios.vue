@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
+import { ReactiveArray } from "@/utils/reactive";
 
 export default {
     name: "EventScenarios",

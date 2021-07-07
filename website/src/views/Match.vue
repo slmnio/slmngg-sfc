@@ -11,12 +11,18 @@
                     <div class="embed embed-responsive embed-responsive-16by9" v-if="showNoVOD">
                         <div class="no-embed-text flex-center">No VOD available for this match</div>
                     </div>
+                    <!--  TODO: add spoilers? -->
+                    <div class="maps-holder mt-3 flex-center d-none" v-if="match.maps">
+                        <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="theme" v-bind:key="map.id"/>
+                    </div>
                 </div>
                 <div class="col-12 col-md-3">
                     <table class="match-details table-sm">
                         <thead>
                             <tr>
-                                <td colspan="2" class="match-details-header">MATCH DETAILS</td>
+                                <td colspan="2" class="match-details-header">
+                                    <router-link :to="`/detailed/${match.id}`" class="hidden-link">MATCH DETAILS</router-link>
+                                </td>
                             </tr>
                         </thead>
                         <tbody>
@@ -55,11 +61,12 @@ import MatchScore from "@/components/website/MatchScore";
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
 import { getMatchContext, multiImage, url } from "@/utils/content-utils";
+import MapDisplay from "@/components/website/MapDisplay";
 
 export default {
     name: "Match",
     props: ["id"],
-    components: { MatchHero, MatchScore, EmbeddedVideo, LinkedPlayers },
+    components: { MapDisplay, MatchHero, MatchScore, EmbeddedVideo, LinkedPlayers },
     methods: { url },
     computed: {
         match() {
@@ -74,7 +81,12 @@ export default {
                 player_relationships: ReactiveArray("player_relationships", {
                     player: ReactiveThing("player")
                 }),
-                mvp: ReactiveThing("mvp")
+                mvp: ReactiveThing("mvp"),
+                maps: ReactiveArray("maps", {
+                    winner: ReactiveThing("winner", {
+                        theme: ReactiveThing("theme")
+                    })
+                })
             });
         },
         showNoVOD() {
@@ -197,5 +209,10 @@ export default {
         top: 0;
         left: 0;
         font-size: 1.5em;
+    }
+    .hidden-link, .hidden-link:hover {
+        color: white;
+        text-decoration: none;
+        cursor: initial
     }
 </style>

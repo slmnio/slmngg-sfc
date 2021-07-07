@@ -10,6 +10,7 @@
             <li class="nav-item" v-if="showFoldy"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
             <li class="nav-item" v-if="showDraft"><router-link class="nav-link" :to="subLink('draft')">Draft</router-link></li>
             <li class="nav-item" v-if="useStaffPage"><router-link class="nav-link" :to="subLink('staff')">Staff</router-link></li>
+            <li class="nav-item" v-if="event.about"><router-link class="nav-link" :to="subLink('about')">About</router-link></li>
 <!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
         </SubPageNav>
 

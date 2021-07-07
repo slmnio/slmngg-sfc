@@ -95,7 +95,4 @@ export default {
     .news-embed-container {
         margin: 16px 0;
     }
-    .news-content >>> p:last-child {
-        margin-bottom: .25rem;
-    }
 </style>

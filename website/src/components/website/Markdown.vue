@@ -55,4 +55,7 @@ export default {
     .markdown >>> img:hover {
         transform: scale(1.02);
     }
+    .markdown >>> p:last-child {
+        margin-bottom: .5rem;
+    }
 </style>

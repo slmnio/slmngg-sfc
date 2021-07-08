@@ -289,7 +289,7 @@ export default {
         padding: 0.15em 0;
     }
     .center-score.win {
-        background-color: #2644FF;  /* TODO: #38 */
+        background-color: #333333;
         color: white;
     }
 

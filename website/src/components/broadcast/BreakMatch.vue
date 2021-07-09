@@ -30,7 +30,7 @@
                     <div class="center-score" :style="winCSS(1)" v-bind:class="{'win': scores[1] === match.first_to}"><span class="industry-align">{{ scores[1] }}</span></div>
                 </div>
                 <div v-if="centerShow === 'time'" class="center-time">{{ start }}</div>
-                <div v-if="centerShow === 'vs'" class="center-vs" :style="centerBorder">vs</div>
+                <div v-if="centerShow === 'vs'" class="center-vs">vs</div>
             </div>
         </div>
 <!--        </transition-group>-->

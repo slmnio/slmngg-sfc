@@ -114,6 +114,8 @@ export default {
     .match-vs {
         color: white;
         white-space: nowrap;
+        margin: 0 12px;
+        min-width: 40px;
     }
 
     .team-name, .team-code {

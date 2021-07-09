@@ -1,7 +1,7 @@
 <template>
     <div class="event-schedule container">
 
-        <div class="d-flex w-100 justify-content-end">
+        <div class="d-flex w-100 justify-content-end timezone-swapper-holder">
             <TimezoneSwapper/>
         </div>
 
@@ -122,5 +122,12 @@ export default {
     }
     .match.week-diff {
         margin-top: 2.5em !important;
+    }
+
+    @media (max-width: 767px) {
+        .timezone-swapper-holder {
+            margin-bottom: 1em;
+            margin-top: 1.5em;
+        }
     }
 </style>

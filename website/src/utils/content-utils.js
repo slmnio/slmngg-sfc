@@ -64,6 +64,7 @@ export function getMatchContext(match) {
     // week
     //
 
+    text.push(match?.sub_event || "");
     text.push(match?.week_text || "");
     text.push(match?.round || "");
     // text.push(match?.sub_event || ""); // round > sub_event

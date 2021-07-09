@@ -22,7 +22,7 @@
             <div class="news-category" v-for="([categoryName, category]) in Object.entries(newsCategories)" v-bind:key="categoryName">
                 <h2>{{ categoryName }}</h2>
                 <div class="row">
-                    <News class="col-md-3 mb-3" v-for="item in category" :item="item" v-bind:key="item.id" />
+                    <News class="col-6 col-md-4 col-lg-3 mb-3" v-for="item in category" :item="item" v-bind:key="item.id" />
                 </div>
             </div>
         </div>

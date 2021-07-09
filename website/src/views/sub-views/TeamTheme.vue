@@ -171,4 +171,17 @@ export default {
         font-weight: bold;
         padding: 2px 4px;
     }
+
+    @media (max-width: 575px) {
+        .theme-collection {
+            flex-direction: column;
+        }
+        .theme-collection .theme-bar {
+            margin: 6px 0;
+        }
+        .ingame-overlay {
+            transform: scale(0.5);
+            transform-origin: left;
+        }
+    }
 </style>

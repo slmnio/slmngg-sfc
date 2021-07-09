@@ -106,6 +106,7 @@ export default {
     width: 64px;
     height: 64px;
     margin-top: 6px;
+    flex-shrink: 0;
 }
 
 .player-name {
@@ -116,5 +117,11 @@ export default {
 .player-socials {
     margin-top: -12px;
     margin-bottom: 12px;
+}
+
+@media (max-width: 575px) {
+    .player-name {
+        font-size: 48px;
+    }
 }
 </style>

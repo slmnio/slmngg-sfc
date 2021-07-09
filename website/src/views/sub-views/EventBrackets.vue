@@ -67,4 +67,14 @@ export default {
     .event-bracket-container:hover::-webkit-scrollbar-thumb, .event-bracket-container:active::-webkit-scrollbar-thumb {
         background-color: #333;
     }
+
+    .bracket-name {
+        text-align: center;
+    }
+
+    @media (max-width: 575px) {
+        .bracket {
+            zoom: 0.8;
+        }
+    }
 </style>

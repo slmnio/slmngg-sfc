@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="top d-flex">
-            <ThemeLogo :theme="thing.theme"></ThemeLogo>
+            <ThemeLogo class="top-theme-logo" :theme="thing.theme"></ThemeLogo>
             <div class="thing-names">
                 <div class="thing-name d-flex flex-column">
                     <div class="series-title font-weight-bold" v-if="type === 'event' && thing.series_name && thing.series_subtitle">
@@ -59,5 +59,20 @@ export default {
     margin-top: 6px;
     font-size: 20px;
     margin-bottom: 3px;
+}
+
+@media (max-width: 575px) {
+    .top {
+        flex-direction: column;
+    }
+    .top-theme-logo {
+        width: 100%;
+    }
+    .top .thing-names {
+        text-align: center;
+        align-items: center;
+        margin-left: 0;
+        margin-top: 8px;
+    }
 }
 </style>

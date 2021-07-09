@@ -30,4 +30,10 @@ export default {
     display: flex;
     flex-wrap: wrap;
 }
+
+@media (max-width: 767px) {
+    .content-row {
+        flex-direction: column;
+    }
+}
 </style>

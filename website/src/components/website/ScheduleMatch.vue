@@ -110,6 +110,14 @@ export default {
             grid-template-columns: 0.25fr 1fr 0.2fr 1fr 0.5fr;
         }
     }
+    @media (max-width: 575px) {
+        .match-left.match-details, .match-time {
+            display: none;
+        }
+        .match {
+            grid-template-columns: 1fr 0.2fr 1fr;
+        }
+    }
 
     .match-vs {
         color: white;

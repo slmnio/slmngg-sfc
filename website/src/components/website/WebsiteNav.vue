@@ -1,6 +1,6 @@
 <template>
     <div class="website-nav">
-        <div class="development-bar bg-warning text-dark text-center py-1">
+        <div class="development-bar bg-warning text-dark text-center py-1 px-1">
             <b>In development:</b> things may break, be missing, or not appear as expected.
         </div>
         <b-navbar toggleable="lg" type="dark">
@@ -16,7 +16,7 @@
                     <router-link active-class="active" class="nav-link" to="/events">Events</router-link>
                     <router-link active-class="active" class="nav-link" to="/teams">Teams</router-link>
                     <router-link active-class="active" class="nav-link" to="/players">Players</router-link>
-                    <router-link active-class="active" class="nav-link" to="/news">News</router-link>
+<!--                    <router-link active-class="active" class="nav-link" to="/news">News</router-link>-->
                 </b-navbar-nav>
                 <b-navbar-nav v-if="minisite">
                     <router-link active-class="active" v-if="minisite.matches" class="nav-link" to="/schedule">Schedule</router-link>

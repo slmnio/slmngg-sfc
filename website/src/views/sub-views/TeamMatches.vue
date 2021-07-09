@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="row">
-            <Match v-for="match in matches" :id="match" v-bind:key="match" class="col-md-3 mb-3" />
+            <Match v-for="match in matches" :id="match" v-bind:key="match" class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3" />
         </div>
     </div>
 </template>

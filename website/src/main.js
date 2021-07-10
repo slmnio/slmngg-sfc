@@ -146,6 +146,8 @@ const app = new Vue({
                 // add minisite routes
                 this.minisiteEventStatus = "success";
                 subID = data[0]._original_data_id || data[0].id;
+                store.dispatch("subscribe", subID);
+                store.dispatch("subscribe", `subdomain-${subdomain}`);
                 console.log("[subID]", subID);
                 this.$router.addRoute("default", {
                     path: "/",

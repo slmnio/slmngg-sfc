@@ -16,7 +16,7 @@
 
                 <div class="thing-lower" v-if="thing.event">
                     <span>{{ thing.type_description || 'from'}} </span>
-                    <router-link :to="`/event/${thing.event.id}`">{{ thing.event.name }}</router-link>
+                    <router-link :to="url('event', thing.event)">{{ thing.event.name }}</router-link>
                 </div>
 
             </div>
@@ -26,6 +26,7 @@
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
+import { url } from "@/utils/content-utils";
 
 export default {
     name: "ThingTop",
@@ -33,8 +34,8 @@ export default {
     components: {
         ThemeLogo
     },
-    created () {
-        // console.log(this.thing, this.type);
+    methods: {
+        url
     }
 };
 </script>

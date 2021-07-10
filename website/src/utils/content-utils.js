@@ -6,6 +6,13 @@ export function getImage (i) {
 
 export function url (page, record) {
     if (record && record.id) record.id = cleanID(record.id);
+
+    if (this.$root.minisiteEvent &&
+        this.$root.minisiteEvent._original_data_id === record.id &&
+        page === "event") {
+        return "/";
+    }
+
     return `/${page}/${record.id}`;
 }
 

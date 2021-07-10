@@ -43,7 +43,15 @@ app.get("/things/:ids", cors({ origin: corsHandle}), async (req, res) => {
     let promises = ids.map(async id => await Cache.get(id));
     let data = await Promise.all(promises);
 
-    data = data.filter(d => d != null);
+    let themeRequests = [];
+    data.forEach(item => {
+        if (item.theme && item.theme.length === 1 && item.theme[0]) {
+            themeRequests.push(cleanID(item.theme[0]));
+        }
+    });
+    let themes = await Promise.all(themeRequests.map(async id => await Cache.get(id)));
+
+    data = [...data, ...themes].filter(d => d != null);
     // if (!data) return res.status(404).send({ error: true, message: "Unknown ID"});
     res.end(JSON.stringify(data));
 });

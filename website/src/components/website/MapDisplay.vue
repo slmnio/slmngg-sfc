@@ -11,7 +11,7 @@
             <div class="map-insert-text" v-if="!complete && !condensed && !winner && mapClass === 'tiebreaker'">TIEBREAKER</div>
             <div class="map-insert-text" v-if="!complete && !condensed && !winner && mapClass === 'extra'">IF REQUIRED</div>
         </div>
-        <div class="map-name">{{ name }}</div>
+        <div class="map-name">{{ name || '--' }}</div>
     </div>
 </template>
 
@@ -30,7 +30,7 @@ export default {
             return "required";
         },
         number() {
-            return this.map?.number || this.i;
+            return this.map?.number || this.i + 1;
         },
         winner() {
             if (!this.map.winner) return;
@@ -39,7 +39,7 @@ export default {
         imageCSS() {
             return {
                 ...cssImage("backgroundImage", this.map, ["image"], 160),
-                ...themeBackground(this.theme)
+                ...(this.theme ? themeBackground(this.theme) : {})
             };
         },
         complete() {

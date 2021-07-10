@@ -97,7 +97,7 @@ export default {
         minisiteIcon() {
             if (!this.minisite?.id) return null;
             const theme = ReactiveRoot(this.minisite.id, { theme: ReactiveThing("theme") })?.theme;
-            console.log("[theme]", theme);
+            // console.log("[theme]", theme);
             if (!theme) return null;
             return getImage(theme.small_logo) || getImage(theme.default_logo);
         }

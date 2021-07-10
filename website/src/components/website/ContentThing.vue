@@ -46,7 +46,7 @@ export default {
             * */
 
             if (this.showLogo) {
-                console.log(this.thing.name, this.theme);
+                // console.log(this.thing.name, this.theme);
                 if (this.logo) return true;
                 if ((this.text || this.thing.name) && (this.theme && !this.theme.id)) return true; // theme not started loading
                 // there is team.has_theme but that's not universal

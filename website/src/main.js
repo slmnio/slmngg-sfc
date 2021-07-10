@@ -126,7 +126,6 @@ const app = new Vue({
         try {
             if (localStorage.getItem("draft-notes")) {
                 const notes = JSON.parse(localStorage.getItem("draft-notes"));
-                console.log(notes);
                 this.$store.state.draft_notes = notes;
             }
         } catch (e) { console.error("Draft notes local storage error", e); }
@@ -157,7 +156,7 @@ const app = new Vue({
                 // EventRoutes.forEach(route => {
                 //     this.$router.addRoute("event", route);
                 // });
-                console.log("[route]", this.$router.getRoutes());
+                // console.log("[route]", this.$router.getRoutes());
             }
         }
     }

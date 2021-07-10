@@ -32,13 +32,10 @@ export default {
             return this.time && this._time.format("{date} {month-short}");
         },
         bottom() {
-            console.log(this.activeTimezone);
             const display = informal.display(this.activeTimezone);
             const abbrev = this._time.isDST() ? display.daylight.abbrev : display.standard.abbrev;
 
             return this.time && this._time.time() + " " + abbrev;
-
-
             // console.log(informal.display(this._time.format("timezone")));
             // return this._time.format("{time}") + this._time.isDST() ? "DAYLIGHT" : "display.standard.abbrev";
         }

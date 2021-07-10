@@ -61,7 +61,7 @@ export default {
     margin-bottom: 3px;
 }
 
-@media (max-width: 575px) {
+@media (max-width: 767px) {
     .top {
         flex-direction: column;
     }

@@ -1,7 +1,7 @@
 <template>
     <div class="event-schedule container">
 
-        <div class="d-flex w-100 justify-content-end timezone-swapper-holder">
+        <div class="d-sm-flex w-100 justify-content-end timezone-swapper-holder d-none">
             <TimezoneSwapper/>
         </div>
 
@@ -36,6 +36,18 @@ export default {
         activeScheduleNum: 0
     }),
     computed: {
+        defaultScheduleNum() {
+            const filtered = this.pagedMatches.filter(page => {
+                return !page.matches.every(m => {
+                    // is complete
+                    return [m.score_1, m.score_2].includes(m.first_to);
+                });
+            });
+            if (filtered.length) {
+                return filtered[0].num;
+            }
+            return 0;
+        },
         matches() {
             if (!this.event || !this.event.matches) return [];
             return ReactiveArray("matches", {
@@ -101,6 +113,18 @@ export default {
             }
 
             return Object.fromEntries(classes.map(c => ([c, true])));
+        }
+    },
+    watch: {
+        defaultScheduleNum(newNum, oldNum) {
+            if (oldNum !== newNum && !this.activeScheduleNum) {
+                this.activeScheduleNum = newNum;
+            }
+        }
+    },
+    mounted() {
+        if (this.defaultScheduleNum && !this.activeScheduleNum) {
+            this.activeScheduleNum = this.defaultScheduleNum;
         }
     }
 };

@@ -1,5 +1,5 @@
 <template>
-    <div class="match my-2">
+    <div class="match my-2" v-if="loaded" v-bind:class="{ 'bg-danger' : !loaded }">
         <div class="match-left match-details flex-center">FT{{ match.first_to }}</div>
 
         <div v-for="(team, i) in teams"
@@ -38,6 +38,10 @@ export default {
     methods: { url },
     props: ["match"],
     computed: {
+        loaded() {
+            if (this.match?.__loading) return false;
+            return !!this.match && !!this.match.name;
+        },
         scores() {
             if (!this.match) return [null, null];
             if (!this.match.teams || this.match.teams.length !== 2) return [null, null];
@@ -101,13 +105,18 @@ export default {
 
     .match {
         display: grid;
-        grid-template-columns: 0.5fr 2fr 0.25fr 2fr 0.5fr;
+        grid-template-columns: 0.75fr 2fr 0.25fr 2fr 0.75fr;
         grid-template-rows: 1fr;
         gap: 0px 0px;
     }
+    @media (max-width: 957px) {
+        .match {
+            grid-template-columns: 0.75fr 1fr 0.2fr 1fr 0.75fr;
+        }
+    }
     @media (max-width: 767px) {
         .match {
-            grid-template-columns: 0.25fr 1fr 0.2fr 1fr 0.5fr;
+            grid-template-columns: 0.25fr 1fr 0.2fr 1fr 0.75fr;
         }
     }
     @media (max-width: 575px) {

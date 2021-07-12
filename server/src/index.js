@@ -8,15 +8,22 @@ const cors = require("cors");
 let domains = ["slmn.gg", "localslmn", "localhost"].map(d => new RegExp(`(?:^|.*\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
 
 function corsHandle(origin, callback) {
-    let url = new URL(origin);
+    if (!origin) return callback(null);
 
-    if (domains.some(r => {
-        return r.test(url.hostname);
-    })) {
-        return callback(null, url.origin);
+    try {
+        let url = new URL(origin);
+
+        if (domains.some(r => {
+            return r.test(url.hostname);
+        })) {
+            return callback(null, url.origin);
+        }
+
+        return callback(true);
+    } catch (e) {
+        console.error(e);
+        return callback(null);
     }
-
-    return callback(true);
 }
 
 const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials: true}, allowEIO3: true});

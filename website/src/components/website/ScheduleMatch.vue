@@ -18,8 +18,12 @@
             <div class="team-logo team-logo--spacer" v-else></div>
         </div>
 
-        <router-link :to="url('match', this.match)" class="match-center match-vs flex-center">
-            {{ match.score_1 }} - {{ match.score_2 }}
+        <router-link :to="url('match', this.match)" class="match-center match-vs flex-center text-center">
+            <div class="scores-wrap" v-if="scores.some(s => s)">
+                <div class="scores">{{ match.score_1 }} - {{ match.score_2 }}</div>
+                <div class="scores-forfeit" v-if="match.forfeit">Forfeit</div>
+            </div>
+            <div class="vs" v-else>vs</div>
         </router-link>
         <div class="match-right match-time flex-center">
             <ScheduleTime :time="match.start" :custom-text="match.custom_name"/>
@@ -145,5 +149,11 @@ export default {
         text-align: right;
         line-height: 1.2em;
         justify-content: flex-end;
+    }
+
+    .scores-forfeit {
+        font-size: 0.7em;
+        line-height: 1;
+        margin-top: 2px;
     }
 </style>

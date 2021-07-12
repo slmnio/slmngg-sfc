@@ -12,7 +12,7 @@
                         <div class="no-embed-text flex-center">No VOD available for this match</div>
                     </div>
                     <!--  TODO: add spoilers? -->
-                    <div class="maps-holder mt-3 flex-center d-none" v-if="match.maps">
+                    <div class="maps-holder mt-3 flex-center" v-if="match.maps">
                         <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="theme" v-bind:key="map.id"/>
                     </div>
                 </div>
@@ -30,6 +30,7 @@
                             <tr v-if="match.event && match.event.name"><td colspan="2" :style="eventStyle">
                                 <b><router-link :to="url('event', match.event)" class="match-event-link">{{ match.event.name }}</router-link></b>
                             </td></tr>
+                            <tr v-if="match.forfeit"><td colspan="2"><i>Match was forfeited</i></td></tr>
                             <tr v-if="lowerText"><td colspan="2">{{ lowerText }}</td></tr>
                             <tr v-if="match.first_to">
                                 <td>First to</td><td>{{ match.first_to }}</td>
@@ -155,6 +156,9 @@ export default {
             }
 
             return `${date.getDate()}${z(date.getDate())} ${("Jan.Feb.Mar.Apr.May.Jun.Jul.Aug.Sep.Oct.Nov.Dec".split("."))[date.getMonth()]} ${date.getFullYear()} ${time}`;
+        },
+        theme() {
+            return this.match?.event?.theme;
         }
     },
     metaInfo() {

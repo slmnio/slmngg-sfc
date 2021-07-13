@@ -265,4 +265,7 @@ export default {
     .team-name {
         color: inherit !important;
     }
+    .maps-holder {
+        align-items: flex-start;
+    }
 </style>

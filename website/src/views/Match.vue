@@ -219,4 +219,7 @@ export default {
         text-decoration: none;
         cursor: initial
     }
+    .maps-holder {
+        align-items: flex-start;
+    }
 </style>

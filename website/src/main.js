@@ -9,13 +9,14 @@ import { io } from "socket.io-client";
 import { VBTooltip } from "bootstrap-vue";
 
 import defaultRoutes from "@/router/default";
-import { fetchThings } from "@/utils/fetch";
+import { getDataServerAddress, fetchThings } from "@/utils/fetch";
 import EventRoutes from "@/router/event";
 
 import Event from "@/views/Event";
 import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp";
 import NotFoundPage from "@/views/NotFoundPage";
 import SharedRoutes from "@/router/shared-routes";
+
 
 Vue.use(Vuex);
 Vue.use(VueMeta);
@@ -30,7 +31,7 @@ store.subscribe((mutation, state) => {
 
 Vue.directive("b-tooltip", VBTooltip);
 
-const socket = io(process.env.NODE_ENV === "development" ? "http://localslmn:8901" : "https://data.slmn.gg", { transports: ["websocket", "polling"] });
+const socket = io(getDataServerAddress(), { transports: ["websocket", "polling"] });
 
 Vue.use(VueSocketIOExt, socket, { store });
 

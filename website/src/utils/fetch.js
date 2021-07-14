@@ -4,6 +4,13 @@ import { cleanID } from "@/utils/content-utils";
 async function addToBuffer(id) {
     return store.commit("addToRequestBuffer", id);
 }
+export function getDataServerAddress() {
+    console.log("[data server address]", window.location.hostname);
+    if (process.env.NODE_ENV === "development") {
+        return `//${window.location.hostname}:8901`;
+    }
+    return "https://data.slmn.gg";
+}
 
 export async function queueThing(id) {
     if (!store.getters.thing(id)) {
@@ -60,7 +67,7 @@ export async function fetchThings (ids) {
             id, data: { __loading: true }
         }));
 
-        const data = await fetch(`${process.env.NODE_ENV === "development" ? "http://localslmn:8901" : "https://data.slmn.gg"}/things/${ids.join(",")}`).then(res => res.json());
+        const data = await fetch(`${getDataServerAddress()}/things/${ids.join(",")}`).then(res => res.json());
 
         if (data.error) {
             console.error(data.message);

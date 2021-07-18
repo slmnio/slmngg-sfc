@@ -75,14 +75,14 @@ export default new Vuex.Store({
         },
         setPlayerDraftNotes(state, { playerID, tag, notes }) {
             const index = state.draft_notes.findIndex(n => n.player_id === playerID);
-            console.log(playerID, tag, notes, index);
+            // console.log(playerID, tag, notes, index);
             if (index === -1) {
                 return state.draft_notes.push({ player_id: playerID, tag, notes });
             }
             const data = {};
             if (tag !== undefined) data.tag = tag;
             if (notes !== undefined) data.notes = notes;
-            console.log({ ...state.draft_notes[index], ...data });
+            // console.log({ ...state.draft_notes[index], ...data });
             state.draft_notes.splice(index, 1, { ...state.draft_notes[index], ...data });
         }
     },

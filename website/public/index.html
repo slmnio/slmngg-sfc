@@ -4,15 +4,16 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-      <script>
-          try {
-              if (window.obsstudio || ["client", "broadcast"].includes(window.location.pathname.split('/')[1])) {
-                  // stay transparent pls
-              } else {
-                  document.head.insertAdjacentHTML('beforeend', '<link rel="stylesheet" href="/assets/initial.css">')
-              }
-          } catch (e) { console.error(e); }
-      </script>
+      <link rel="stylesheet" href="<%= BASE_URL %>assets/initial.css">
+<!--      <script>-->
+<!--          try {-->
+<!--              if (window.obsstudio || ["client", "broadcast"].includes(window.location.pathname.split('/')[1])) {-->
+<!--                  // stay transparent pls-->
+<!--              } else {-->
+<!--                  document.head.insertAdjacentHTML('beforeend', '<link rel="stylesheet" href="/assets/initial.css">')-->
+<!--              }-->
+<!--          } catch (e) { console.error(e); }-->
+<!--      </script>-->
     <link rel="stylesheet" href="<%= BASE_URL %>assets/fa-all.css">
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>

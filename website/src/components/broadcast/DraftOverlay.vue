@@ -87,7 +87,7 @@ export default {
                         let sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
                         if (sr) return { ...player, rating: { level: sr, note: "Pulled from their Battletag" } };
                         sr = Math.floor(ow.ratings.reduce((p, c) => p + c.level, 0) / ow.ratings.length);
-                        console.log(sr);
+                        // console.log(sr);
                         if (sr) return { ...player, rating: { level: sr, note: "Average of other roles" } };
                     }
                     if (player.manual_sr) {

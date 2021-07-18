@@ -125,11 +125,11 @@ export default {
             return logoBackground1(team) || {};
         },
         nbr(text) {
-            console.log(text);
+            // console.log(text);
             return text.replaceAll("\\n", "<br>");
         },
         winCSS(index) {
-            console.log(index, this.themeColor);
+            // console.log(index, this.themeColor);
             if (this.scores[index] === this.match.first_to) return this.themeColor || {};
             return {};
         }

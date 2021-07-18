@@ -4,6 +4,8 @@
             <ThemeLogo class="top-theme-logo" :theme="thing.theme"></ThemeLogo>
             <div class="thing-names">
                 <div class="thing-name d-flex flex-column">
+                    <h3 class="subtitle m-0" v-if="type === 'team' && thing.subtitle">{{ thing.subtitle }}</h3>
+
                     <div class="series-title font-weight-bold" v-if="type === 'event' && thing.series_name && thing.series_subtitle">
                         {{ thing.series_name }}
                     </div>

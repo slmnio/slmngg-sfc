@@ -32,7 +32,7 @@ export default {
         events() {
             return ReactiveList("Events", {
                 theme: ReactiveThing("theme")
-            }).filter(event => event.teams).sort((a, b) => {
+            }).filter(event => event.teams && event.show_in_events).sort((a, b) => {
                 if (!a.start_date && !b.start_date) return 0;
                 if (!a.start_date) return 1;
                 if (!b.start_date) return -1;

@@ -8,6 +8,7 @@
             <BracketTeam v-for="(team, i) in teams"
                          :team="team.id && team"
                          :text="team.dummy && team.text"
+                         :short="team.dummy && team.short"
                          :empty="team._empty"
                          v-bind:key="team.id"
                          :score="scores[i]" :win="scores[i] === match.first_to"
@@ -29,6 +30,7 @@
             <BracketTeam v-for="(team, i) in teams"
                          :team="team.id && team"
                          :text="team.dummy && team.text"
+                         :short="team.dummy && team.short"
                          :empty="team._empty"
                          v-bind:key="team.id"
                          :score="scores[i]"
@@ -88,14 +90,20 @@ export default {
             const dummy = { text: "TBD", dummy: true, id: null };
             if (!this.match) return [{ ...dummy, _empty: true }, { ...dummy, _empty: true }];
 
-            const text = (this.match.placeholder_teams || "").trim().split("|").filter(t => t !== "");
+            let text = (this.match.placeholder_teams || "").trim().split("|").filter(t => t !== "");
+            let extraText = [null, null];
+
+            if (text.length === 4) {
+                extraText = [text[2], text[3]];
+                text = [text[0], text[1]];
+            }
 
             if (!this.match.teams || this.match.teams.length === 0) {
                 if (text.length === 2) {
-                    return text.map(t => ({ ...dummy, text: t }));
+                    return text.map((t, i) => ({ ...dummy, text: t, short: extraText[i] }));
                 } else if (text.length === 1) {
                     if (this.match.placeholder_right) return [dummy, { ...dummy, text: text[0] }];
-                    return [{ ...dummy, text: text[0] }, dummy];
+                    return [{ ...dummy, text: text[0], short: extraText[0] }, dummy];
                 } else if (text.length === 0) {
                     // no text, just use TBDs
                     return [dummy, dummy];
@@ -103,11 +111,11 @@ export default {
             }
             if (this.match.teams.length === 1) {
                 if (text.length === 2) {
-                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[1] }];
-                    return [{ ...dummy, text: text[0] }, this.match.teams[0]];
+                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[1], short: extraText[1] }];
+                    return [{ ...dummy, text: text[0], short: extraText[0] }, this.match.teams[0]];
                 } else if (text.length === 1) {
-                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[0] }];
-                    return [{ ...dummy, text: text[0] }, this.match.teams[0]];
+                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[0], short: extraText[0] }];
+                    return [{ ...dummy, text: text[0], short: extraText[0] }, this.match.teams[0]];
                 } else if (text.length === 0) {
                     // no text, just use TBDs
                     if (this.match.placeholder_right) return [this.match.teams[0], dummy];

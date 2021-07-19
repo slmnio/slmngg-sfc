@@ -132,4 +132,11 @@ export default {
     }
 
 
+    .bracket.small >>> .inner .short {
+        display: initial;
+        font-size: 1.75em;
+    }
+    .bracket.small >>> .inner .text {
+        display: none;
+    }
 </style>

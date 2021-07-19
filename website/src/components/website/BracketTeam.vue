@@ -3,7 +3,8 @@
          @mouseover="highlight" @mouseout="unHighlight"
          :style="background">
         <div class="inner" v-if="!empty">
-            {{ text }}
+            <span class="text">{{ text }}</span>
+            <span class="short">{{ short }}</span>
             <div class="team-logo-holder flex-center" v-if="team">
                 <div class="team-logo bg-center" :style="teamLogo"></div>
             </div>
@@ -23,7 +24,7 @@ import Store from "@/thing-store";
 
 export default {
     name: "BracketTeam",
-    props: ["team", "text", "empty", "score", "win"],
+    props: ["team", "text", "empty", "score", "win", "short"],
     methods: {
         highlight() { Store.commit("setHighlightedTeam", this.team?.id || null); },
         unHighlight() { Store.commit("setHighlightedTeam", null); }
@@ -139,5 +140,8 @@ export default {
     }
     .bracket.small .team-score {
         font-size: 1.6em;
+    }
+    .inner .short {
+        display: none;
     }
 </style>

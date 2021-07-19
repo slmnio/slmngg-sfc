@@ -1,7 +1,7 @@
 <template>
     <div class="website-nav">
         <div class="development-bar bg-warning text-dark text-center py-1 px-1">
-            <b>In development:</b> things may break, be missing, or not appear as expected.
+            <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-dark">In development:</a></b> things may break, be missing, or not appear as expected.
         </div>
         <b-navbar toggleable="lg" type="dark">
             <router-link class="navbar-brand " to="/">

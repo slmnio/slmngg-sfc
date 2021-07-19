@@ -3,6 +3,7 @@
                  v-bind:class="{'hover': hover}"
                  @mouseover.native="matchHover" @mouseleave.native="matchEmpty">
         <div class="match-name d-none">{{ match && match.name }}</div>
+        <div class="match-number" v-if="match.match_number">{{ match.match_number }}</div>
         <div class="match-teams">
             <BracketTeam v-for="(team, i) in teams"
                          :team="team.id && team"
@@ -170,5 +171,25 @@ export default {
     .match-highlight-text.feeder  i {
         font-size: 2em;
         margin-top: .15em;
+    }
+
+    .match-number {
+        position: absolute;
+        left: 0;
+        background: #333;
+        text-align: center;
+        bottom: 100%;
+        font-size: 12px;
+        line-height: 1;
+        padding-top: .1em;
+        padding: 0 .3em;
+        padding-bottom: .3em;
+        color: white;
+        border: 2px solid transparent;
+        border-bottom: none;
+    }
+
+    .bracket-match.hover .match-number {
+        border-color: white;
     }
 </style>

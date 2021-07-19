@@ -130,6 +130,8 @@ export default {
         margin: 0.6em 0;
         position: relative;
         border: .15em solid transparent;
+    }
+    .bracket-match, .match-number {
         transition: border-color .15s ease;
     }
     .bracket-match.hover {

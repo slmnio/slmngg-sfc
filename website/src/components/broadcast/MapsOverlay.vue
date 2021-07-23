@@ -49,29 +49,30 @@ export default {
             return this.broadcast.map_set.split(",");
         },
         maps() {
+            const images = {
+                Assault: "https://cdn.discordapp.com/attachments/855517740914573342/868231135224819743/44684849494984.png",
+                Escort: "https://cdn.discordapp.com/attachments/855517740914573342/868231132444000276/484444884949494949494948421651615641.png",
+                Hybrid: "https://cdn.discordapp.com/attachments/855517740914573342/868231133765201950/448489494949849494949494949494949.png",
+                Control: "https://cdn.discordapp.com/attachments/855517740914573342/868230457622396928/63541654456789487695.png"
+            };
             if (!this.match?.maps) {
                 const maps = [];
-                const images = {
-                    Assault: "https://cdn.discordapp.com/attachments/855517740914573342/868231135224819743/44684849494984.png",
-                    Escort: "https://cdn.discordapp.com/attachments/855517740914573342/868231132444000276/484444884949494949494948421651615641.png",
-                    Hybrid: "https://cdn.discordapp.com/attachments/855517740914573342/868231133765201950/448489494949849494949494949494949.png",
-                    Control: "https://cdn.discordapp.com/attachments/855517740914573342/868230457622396928/63541654456789487695.png"
-                };
                 for (let i = 0; i < this.mapCount; i++) {
                     maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[i]], image: [{ url: images[this.mapTypes[i]] }] } : {}) });
                 }
                 return maps;
             }
             const maps = [...this.match.maps];
-            const dummyMapCount = this.match.maps.length - this.mapCount;
+            const dummyMapCount = this.mapCount - this.match.maps.length;
             console.log("extra maps", dummyMapCount);
 
             if (dummyMapCount > 0) {
                 for (let i = 0; i < dummyMapCount; i++) {
-                    maps.push({ dummy: true });
+                    const num = this.match.maps.length + i;
+                    maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[num]], image: [{ url: images[this.mapTypes[num]] }] } : {}) });
                 }
             }
-            return this.match.maps;
+            return maps;
         },
         mapCount() {
             if (!this.match) return 0;

@@ -10,6 +10,7 @@ import DeskOverlay from "@/components/broadcast/DeskOverlay";
 import CustomOverlay from "@/components/broadcast/CustomOverlay";
 import InfoOverlay from "@/components/broadcast/InfoOverlay";
 import BroadcastBackground from "@/components/broadcast/BroadcastBackground";
+import SponsorOverlay from "@/components/broadcast/SponsorOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay },
@@ -24,5 +25,6 @@ export default [
     { path: "casters", component: DeskOverlay, props: route => ({ group: "casters" }) },
     { path: "custom", component: CustomOverlay },
     { path: "info", component: InfoOverlay },
-    { path: "background", component: BroadcastBackground, props: route => ({ index: route.query.index }) }
+    { path: "background", component: BroadcastBackground, props: route => ({ index: route.query.index }) },
+    { path: "sponsors", component: SponsorOverlay }
 ];

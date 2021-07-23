@@ -60,6 +60,8 @@ domains.forEach(r => {
     }
 });
 
+// TODO: add other domain support here
+
 if (subdomain) {
     // verify event from subdomain
     console.log("[subdomain]", subdomain);

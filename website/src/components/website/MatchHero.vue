@@ -37,6 +37,8 @@ export default {
 <style scoped>
     .match-hero {
         position: relative;
+        min-height: 10em;
+        background-color: rgba(0,0,0,0.15);
     }
     .match-hero-teams {
         /*height: 25vh;*/

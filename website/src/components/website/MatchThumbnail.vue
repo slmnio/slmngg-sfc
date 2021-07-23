@@ -94,7 +94,7 @@ export default {
         content: " ";
     }
     .match-thumbnail-half {
-        width: 100%;
+        width: 50%;
         /*height: 100%;*/
     }
     .match-thumbnail-logo {

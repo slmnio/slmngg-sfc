@@ -9,6 +9,7 @@ import DraftOverlay from "@/components/broadcast/DraftOverlay";
 import DeskOverlay from "@/components/broadcast/DeskOverlay";
 import CustomOverlay from "@/components/broadcast/CustomOverlay";
 import InfoOverlay from "@/components/broadcast/InfoOverlay";
+import BroadcastBackground from "@/components/broadcast/BroadcastBackground";
 
 export default [
     { path: "ingame", component: IngameOverlay },
@@ -22,5 +23,6 @@ export default [
     { path: "draft", component: DraftOverlay },
     { path: "casters", component: DeskOverlay, props: route => ({ group: "casters" }) },
     { path: "custom", component: CustomOverlay },
-    { path: "info", component: InfoOverlay }
+    { path: "info", component: InfoOverlay },
+    { path: "background", component: BroadcastBackground, props: route => ({ index: route.query.index }) }
 ];

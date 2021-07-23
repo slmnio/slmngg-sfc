@@ -1,5 +1,5 @@
 <template>
-    <BroadcastApp v-if="broadcastID" :id="broadcastID" />
+    <BroadcastApp v-if="broadcastID" :id="broadcastID" :title="title" />
 </template>
 
 <script>
@@ -8,7 +8,7 @@ import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "ClientApp",
     components: { BroadcastApp },
-    props: ["client"],
+    props: ["client", "title"],
     computed: {
         _client() {
             return ReactiveRoot(`client-${this.client}`, {

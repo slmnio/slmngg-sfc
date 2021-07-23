@@ -45,7 +45,7 @@ export default [
     {
         path: "/client/:clientID",
         component: ClientApp,
-        props: route => ({ client: route.params.clientID }),
+        props: route => ({ client: route.params.clientID, title: route.query.title }),
         children: BroadcastRoutes
     },
     {

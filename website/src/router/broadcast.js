@@ -11,6 +11,7 @@ import CustomOverlay from "@/components/broadcast/CustomOverlay";
 import InfoOverlay from "@/components/broadcast/InfoOverlay";
 import BroadcastBackground from "@/components/broadcast/BroadcastBackground";
 import SponsorOverlay from "@/components/broadcast/SponsorOverlay";
+import MapsOverlay from "@/components/broadcast/MapsOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay },
@@ -26,5 +27,6 @@ export default [
     { path: "custom", component: CustomOverlay },
     { path: "info", component: InfoOverlay },
     { path: "background", component: BroadcastBackground, props: route => ({ index: route.query.index }) },
-    { path: "sponsors", component: SponsorOverlay }
+    { path: "sponsors", component: SponsorOverlay },
+    { path: "maps", component: MapsOverlay }
 ];

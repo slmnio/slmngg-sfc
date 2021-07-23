@@ -1,6 +1,8 @@
 <template>
     <div class="match my-2" v-if="loaded" v-bind:class="{ 'bg-danger' : !loaded }">
-        <div class="match-left match-details flex-center">FT{{ match.first_to }}</div>
+        <div class="match-left match-details flex-center flex-column text-center">
+            <div class="match-detail" v-for="detail in details" v-bind:key="detail">{{ detail }}</div>
+        </div>
 
         <div v-for="(team, i) in teams"
              v-bind:key="team.id" :style="{order: i*2}"
@@ -90,6 +92,16 @@ export default {
 
             if (this.match.teams.length === 2) return this.match.teams;
             return [];
+        },
+        details() {
+            if (!this.match) return "";
+            const details = [];
+
+            if (this.match.match_number) details.push(`M${this.match.match_number}`);
+            if (this.match.stream_code) details.push(`${this.match.stream_code} stream`);
+            if (this.match.first_to) details.push(`FT${this.match.first_to}`);
+
+            return details.slice(0, 2);
         }
     }
 };
@@ -126,7 +138,7 @@ export default {
     }
     @media (max-width: 767px) {
         .match {
-            grid-template-columns: 0.25fr 1fr 0.2fr 1fr 0.75fr;
+            grid-template-columns: 0.5fr 1fr 0.2fr 1fr 0.75fr;
         }
     }
     @media (max-width: 575px) {
@@ -161,5 +173,9 @@ export default {
         font-size: 0.7em;
         line-height: 1;
         margin-top: 2px;
+    }
+
+    .team-logo--spacer {
+        display: none;
     }
 </style>

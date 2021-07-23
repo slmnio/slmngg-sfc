@@ -50,8 +50,12 @@ export default {
             const dummy = { text: "TBD", dummy: true, id: null };
             if (!this.match) return [{ ...dummy, _empty: true }, { ...dummy, _empty: true }];
 
-            const text = (this.match.placeholder_teams || "").trim().split("|").filter(t => t !== "");
-
+            let text = (this.match.placeholder_teams || "").trim().split("|").filter(t => t !== "");
+            let extraText = [];
+            if (text.length === 4) {
+                extraText = [text[2], text[3]];
+                text = [text[0], text[1]];
+            }
             if (!this.match.teams || this.match.teams.length === 0) {
                 if (text.length === 2) {
                     return text.map(t => ({ ...dummy, text: t }));

@@ -98,5 +98,10 @@ export default {
 </script>
 
 <style scoped>
-
+    .map:first-of-type {
+        margin-left: 0;
+    }
+    .map:last-of-type {
+        margin-right: 0;
+    }
 </style>

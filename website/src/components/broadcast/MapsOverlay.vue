@@ -65,10 +65,11 @@ export default {
             const maps = [...this.match.maps].filter(m => m.map);
             const dummyMapCount = this.mapCount - maps.length;
             console.log("extra maps", dummyMapCount);
+            const initialMapCount = maps.length;
 
             if (dummyMapCount > 0) {
                 for (let i = 0; i < dummyMapCount; i++) {
-                    const num = this.match.maps.length + i;
+                    const num = initialMapCount + i;
                     maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[num]], image: [{ url: images[this.mapTypes[num]] }] } : {}) });
                 }
             }

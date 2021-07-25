@@ -1,12 +1,14 @@
 <template>
     <div class="map w-100 d-flex position-relative">
-        <div class="map-bg w-100 h-100 bg-center" v-bind:class="{'grayscale': !!winnerBG}" :style="mapBackground"></div>
+        <div class="map-bg w-100 h-100 bg-center" v-bind:class="{'grayscale': !!winnerBG || (map && map.draw)}" :style="mapBackground"></div>
         <div class="map-gel w-100 h-100 position-absolute" :style="winnerBG"></div>
+        <div class="map-gel w-100 h-100 position-absolute draw-gel" v-if="map && map.draw"></div>
         <div class="map-main d-flex flex-column h-100 w-100 position-absolute">
             <div class="map-top flex-grow-1 h-100 w-100 flex-center">
-                <div class="map-logo-holder w-100 h-50 flex-center">
+                <div class="map-logo-holder w-100 h-50 flex-center" v-if="winnerBG">
                     <div class="map-logo bg-center" :style="winnerLogo"></div>
                 </div>
+                <div class="gel-text" v-if="map && map.draw">DRAW</div>
             </div>
             <div class="map-lower" :style="accent">
                 <span class="industry-align">{{ name }}</span>
@@ -87,5 +89,12 @@ export default {
     .map-logo {
         width: 90%;
         height: 90%;
+    }
+    .map-gel.draw-gel {
+        background-color: #555;
+    }
+    .gel-text {
+        color: white;
+        font-size: 60px;
     }
 </style>

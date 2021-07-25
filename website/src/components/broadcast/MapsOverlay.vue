@@ -62,8 +62,8 @@ export default {
                 }
                 return maps;
             }
-            const maps = [...this.match.maps];
-            const dummyMapCount = this.mapCount - this.match.maps.length;
+            const maps = [...this.match.maps].filter(m => m.map);
+            const dummyMapCount = this.mapCount - maps.length;
             console.log("extra maps", dummyMapCount);
 
             if (dummyMapCount > 0) {

@@ -1,7 +1,7 @@
 <template>
   <div class="ingame-overlay">
       <div class="top-overlay" :style="broadcastMargin">
-          <transition-group name="itah" mode="out-in">
+          <transition-group name="fade" mode="out-in">
               <IngameTeam :key="`${team.id}-${i}`" v-for="(team, i) in teams"
                           :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores"
                           :width="teamWidth"/>

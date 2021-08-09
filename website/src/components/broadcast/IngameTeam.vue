@@ -6,7 +6,8 @@
                     <span class="industry-align">{{ team.small_overlay_text }}</span>
                 </div>
                 <div class="flex-center team-name">
-                        <span class="industry-align">{{ team.name }}</span>
+                    <span class="industry-align team-sub-name">{{ team.name }}</span>
+                    <span class="industry-align team-sub-subtitle" v-if="team.subtitle">{{ team.subtitle }}</span>
                 </div>
                 <div class="flex-center team-logo-holder flex-center" v-if="teamLogo">
                     <div class="team-logo bg-center" :style="teamLogo"></div>
@@ -48,7 +49,7 @@ export default {
             };
         },
         teamLogo() {
-            const i = cssImage("backgroundImage", this.team.theme, ["small_logo", "default_logo"], 36);
+            const i = cssImage("backgroundImage", this.team.theme, ["small_logo", "default_logo"], 70);
             if (!i.backgroundImage) return null;
             return i;
         },

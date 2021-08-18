@@ -12,7 +12,8 @@ const logUpdates = false;
 // Starting with syncing Matches
 
 // const tables = ["Matches", "Teams", "Themes", "Events", "Players", "Player Relationships"];
-const tables = ["Event Series", "News", "Matches", "Teams", "Themes", "Events", "Players", "Socials", "Accolades", "Player Relationships", "Broadcasts", "Brackets", "Live Guests", "Headlines", "Clients", "Maps", "Map Data"];
+const tables = ["Event Series", "News", "Matches", "Teams", "Themes", "Events", "Players", "Socials", "Accolades", "Player Relationships", "Broadcasts", "Brackets", "Live Guests", "Headlines", "Clients", "Maps", "Map Data", "Heroes"];
+const staticTables = ["Redirects"];
 
 function deAirtable(obj) {
     const data = {};
@@ -52,7 +53,7 @@ function sluggify(text) {
     return ((text.replace(/[^A-Za-z0-9-]+/g, "-")).trim()).toLowerCase().replace(/-+/g,"-").replace(/-+$/g,"");
 }
 
-async function processTableData(tableName, data) {
+async function processTableData(tableName, data, linkRecords = false) {
     data.map(deAirtable).forEach(data => {
         if (tableName === "News") {
             data.slug = sluggify(data.name);
@@ -60,7 +61,11 @@ async function processTableData(tableName, data) {
         Cache.set(data.id.slice(3), data);
         customUpdater(tableName, data);
     });
-    await Cache.set(tableName, {id: tableName, ids: data.map(d => d.id)});
+    if (linkRecords) {
+        await Cache.set(tableName, {id: tableName, items: data.map(deAirtable) });
+    } else {
+        await Cache.set(tableName, {id: tableName, ids: data.map(d => d.id)});
+    }
     customTableUpdate(tableName, Cache);
 }
 
@@ -104,6 +109,10 @@ function t(ms) {
 }
 
 async function sync() {
+    for (let table of staticTables) {
+        await processTableData(table, await getAllTableData(table), true);
+        setInterval(async () => processTableData(table, await getAllTableData(table), true), 5 * 1000);
+    }
     for (let table of tables) {
         // await t(1000);
         await processTableData(table, await getAllTableData(table));

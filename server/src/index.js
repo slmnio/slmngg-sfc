@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const port = 8901;
 const http = require("http").Server(app);
 const cors = require("cors");
+const routes = require("./routes.js");
 
 let domains = ["slmn.gg", "localslmn", "localhost"].map(d => new RegExp(`(?:^|.*\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
 
@@ -62,6 +63,8 @@ app.get("/things/:ids", cors({ origin: corsHandle}), async (req, res) => {
     // if (!data) return res.status(404).send({ error: true, message: "Unknown ID"});
     res.end(JSON.stringify(data));
 });
+
+routes({ app, cors, Cache });
 
 function cleanID(id) {
     if (!id) return null;

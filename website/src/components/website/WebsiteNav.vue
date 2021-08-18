@@ -1,8 +1,8 @@
 <template>
     <div class="website-nav">
-<!--        <WebsiteNavBanner class="bg-danger text-white">-->
-<!--            <b>Live testing in progress</b>. Use the <a href="https://slmn.gg" class="text-white font-weight-bold">main site</a> if you experience problems.-->
-<!--        </WebsiteNavBanner>-->
+        <WebsiteNavBanner v-if="siteMode === 'live' || siteMode === 'production'" class="bg-primary text-white">
+            <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-light">Welcome to the new SLMN.GG!</a></b> Completely rewritten to be faster, cleaner and better. Please be patient with any teething problems from the big switch over.
+        </WebsiteNavBanner>
         <WebsiteNavBanner v-if="siteMode === 'staging'" class="bg-warning text-dark">
             <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-dark">Beta development version:</a></b> things may break, be missing, or not appear as expected.
         </WebsiteNavBanner>
@@ -81,7 +81,7 @@ export default {
         },
         slmnggDomain() {
             try {
-                console.log("[minisite]", this.minisite);
+                // console.log("[minisite]", this.minisite);
 
                 if (!this.minisite?.subdomain) {
                     // basically just defaults if we can't automatically go back up to the parent
@@ -99,8 +99,8 @@ export default {
             }
         },
         siteMode() {
-            console.log(process.env);
-            return process.env.VUE_APP_DEPLOY_MODE;
+            // console.log("env", process.env);
+            return process.env.VUE_APP_DEPLOY_MODE || process.env.NODE_ENV;
         },
         navbarEvents() {
             if (!this.minisite?.id) return [];

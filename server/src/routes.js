@@ -22,13 +22,13 @@ module.exports = ({ app, cors, Cache }) => {
             return (r.incoming_url === path);
         });
 
-        if (redirect) {
-            // temporary move to force everything to dev
-            redirect.outgoing_url = redirect.outgoing_url.replace("slmn.gg", "dev.slmn.gg");
-        }
 
         res.send({
-            redirect
+            redirect: {
+                ...redirect,
+                // temporary move to force everything to dev
+                outgoing_url: redirect.outgoing_url.replace("slmn.gg", "dev.slmn.gg")
+            }
         });
     });
 };

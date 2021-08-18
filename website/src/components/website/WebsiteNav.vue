@@ -4,7 +4,9 @@
             <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-light">Welcome to the new SLMN.GG!</a></b> Completely rewritten to be faster, cleaner and better. Please be patient with any teething problems from the big switch over.
         </WebsiteNavBanner>
         <WebsiteNavBanner v-if="siteMode === 'staging'" class="bg-warning text-dark">
-            <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-dark">Beta development version:</a></b> things may break, be missing, or not appear as expected.
+<!--            <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-dark">Beta development version:</a></b> things may break, be missing, or not appear as expected.-->
+            The new site has been deployed on <a href="https://slmn.gg" class="text-dark font-weight-bold">slmn.gg</a>! <br> <b>dev.slmn.gg</b> will be updated with the latest changes to the
+            <a href="https://github.com/slmnio/slmngg-sfc" class="text-dark font-weight-bold">repository</a>, but use <a href="https://slmn.gg" class="text-dark font-weight-bold">slmn.gg</a> for the latest stable update.
         </WebsiteNavBanner>
         <WebsiteNavBanner v-if="siteMode === 'local'" class="bg-primary text-light">
             SLMN.GG is running in local development mode.

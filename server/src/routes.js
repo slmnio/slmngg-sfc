@@ -28,11 +28,7 @@ module.exports = ({ app, cors, Cache }) => {
             }
 
             res.send({
-                redirect: {
-                    ...redirect,
-                    // temporary move to force everything to dev
-                    outgoing_url: redirect.outgoing_url.replace("slmn.gg", "dev.slmn.gg")
-                }
+                redirect
             });
         } catch (e) {
             console.error(e);

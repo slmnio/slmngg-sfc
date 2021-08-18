@@ -8,6 +8,6 @@ RewriteRule ^(.*)$ /static/index.php [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/static/(.*)$
-RewriteRule ^(.*)$ /index.html [NC,L,QSA]
+RewriteRule ^(.*)$ /index.php [NC,L,QSA]
 
 ErrorDocument 403 /403.html

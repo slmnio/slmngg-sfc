@@ -1,10 +1,5 @@
 <?php
 
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
-
-
     function fetch($url) {
         $ch = curl_init();
         $timeout = 3;
@@ -27,7 +22,11 @@
                 return null;
                 // just go to normal page and let the site handle or 404 it
             } else {
-                return $redirect->outgoing_url;
+                try {
+                    return $redirect->outgoing_url;
+                } catch (Exception $ee) {
+                    return null;
+                }
             }
         } catch (Exception $e) {
 //            echo "error: " . json_encode($e);

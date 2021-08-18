@@ -88,8 +88,8 @@ export default {
                     if (process.env.NODE_ENV === "development") return "http://localhost:8080";
                     if (process.env.VUE_APP_DEPLOY_MODE === "local") return "http://localhost:8080";
                     if (process.env.VUE_APP_DEPLOY_MODE === "staging") return "https://dev.slmn.gg";
-                    if (process.env.NODE_ENV === "production") return "https://live.slmn.gg";
-                    if (process.env.VUE_APP_DEPLOY_MODE === "production") return "http://live.slmn.gg";
+                    if (process.env.NODE_ENV === "production") return "https://slmn.gg";
+                    if (process.env.VUE_APP_DEPLOY_MODE === "production") return "http://slmn.gg";
                     return "http://dev.slmn.gg";
                 } else {
                     return window.location.origin.replace(`${this.minisite.subdomain}.`, "");

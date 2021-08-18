@@ -1,16 +1,20 @@
 <template>
     <div class="website-nav">
-<!--        <div class="development-bar bg-warning text-dark text-center py-1 px-1">-->
-<!--            <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-dark">In development:</a></b> things may break, be missing, or not appear as expected.-->
-<!--        </div>-->
-        <!-- hi :) -->
-<!--        <div class="development-bar bg-danger text-white text-center py-1 px-1">-->
+<!--        <WebsiteNavBanner class="bg-danger text-white">-->
 <!--            <b>Live testing in progress</b>. Use the <a href="https://slmn.gg" class="text-white font-weight-bold">main site</a> if you experience problems.-->
-<!--        </div>-->
+<!--        </WebsiteNavBanner>-->
+        <WebsiteNavBanner v-if="siteMode === 'staging'" class="bg-warning text-dark">
+            <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-dark">Beta development version:</a></b> things may break, be missing, or not appear as expected.
+        </WebsiteNavBanner>
+        <WebsiteNavBanner v-if="siteMode === 'local'" class="bg-primary text-light">
+            SLMN.GG is running in local development mode.
+        </WebsiteNavBanner>
+
         <b-navbar toggleable="lg" type="dark">
             <router-link class="navbar-brand " to="/">
                 <img v-if="minisiteIcon" :src="minisiteIcon" alt="" class="navbar-image d-inline-block align-top mr-2">
                 {{ minisite ? (minisite.navbar_name || minisite.series_name || minisite.name) : "SLMN.GG"}}
+
             </router-link>
 
             <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
@@ -54,10 +58,12 @@ import {
 import NavLiveMatch from "@/components/website/NavLiveMatch";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { getImage } from "@/utils/content-utils";
+import WebsiteNavBanner from "@/components/website/WebsiteNavBanner";
 
 export default {
     name: "WebsiteNav",
     components: {
+        WebsiteNavBanner,
         BNavbar,
         BNavbarToggle,
         BCollapse,
@@ -74,12 +80,25 @@ export default {
             }).matches;
         },
         slmnggDomain() {
-            console.log("env", process.env);
             try {
-                return process.env.NODE_ENV === "development" ? "http://localhost:8080" : "https://dev.slmn.gg";
+                console.log("[minisite]", this.minisite);
+                if (process.env.NODE_ENV === "development" || process.env.VUE_APP_DEPLOY_MODE === "staging") {
+                    if (!this.minisite?.subdomain) {
+                        return "http://localhost:8080";
+                    } else {
+                        return window.location.origin.replace(`${this.minisite.subdomain}.`, "");
+                    }
+                }
+                if (process.env.VUE_APP_DEPLOY_MODE === "live") return "https://live.slmn.gg";
+                // if (process.env.VUE_APP_DEPLOY_MODE === "staging") return "https://dev.slmn.gg";
+                return "https://dev.slmn.gg";
             } catch (e) {
                 return "https://dev.slmn.gg";
             }
+        },
+        siteMode() {
+            console.log(process.env);
+            return process.env.VUE_APP_DEPLOY_MODE;
         },
         navbarEvents() {
             if (!this.minisite?.id) return [];

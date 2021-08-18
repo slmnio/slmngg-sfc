@@ -82,16 +82,18 @@ export default {
         slmnggDomain() {
             try {
                 console.log("[minisite]", this.minisite);
-                if (process.env.NODE_ENV === "development" || process.env.VUE_APP_DEPLOY_MODE === "staging") {
-                    if (!this.minisite?.subdomain) {
-                        return "http://localhost:8080";
-                    } else {
-                        return window.location.origin.replace(`${this.minisite.subdomain}.`, "");
-                    }
+
+                if (!this.minisite?.subdomain) {
+                    // basically just defaults if we can't automatically go back up to the parent
+                    if (process.env.NODE_ENV === "development") return "http://localhost:8080";
+                    if (process.env.VUE_APP_DEPLOY_MODE === "local") return "http://localhost:8080";
+                    if (process.env.VUE_APP_DEPLOY_MODE === "staging") return "https://dev.slmn.gg";
+                    if (process.env.NODE_ENV === "production") return "https://live.slmn.gg";
+                    if (process.env.VUE_APP_DEPLOY_MODE === "production") return "http://live.slmn.gg";
+                    return "http://dev.slmn.gg";
+                } else {
+                    return window.location.origin.replace(`${this.minisite.subdomain}.`, "");
                 }
-                if (process.env.VUE_APP_DEPLOY_MODE === "live") return "https://live.slmn.gg";
-                // if (process.env.VUE_APP_DEPLOY_MODE === "staging") return "https://dev.slmn.gg";
-                return "https://dev.slmn.gg";
             } catch (e) {
                 return "https://dev.slmn.gg";
             }

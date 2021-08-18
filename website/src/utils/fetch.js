@@ -6,7 +6,7 @@ async function addToBuffer(id) {
 }
 export function getDataServerAddress() {
     console.log("[data server address]", window.location.hostname);
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.VUE_APP_DEPLOY_MODE === "local") {
         return `//${window.location.hostname}:8901`;
     }
     return "https://data.slmn.gg";

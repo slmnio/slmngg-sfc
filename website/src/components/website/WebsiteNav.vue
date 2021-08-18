@@ -3,9 +3,9 @@
 <!--        <div class="development-bar bg-warning text-dark text-center py-1 px-1">-->
 <!--            <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-dark">In development:</a></b> things may break, be missing, or not appear as expected.-->
 <!--        </div>-->
-        <div class="development-bar bg-danger text-white text-center py-1 px-1">
-            <b>Live testing in progress</b>. Use the <a href="https://slmn.gg" class="text-white font-weight-bold">main site</a> if you experience problems.
-        </div>
+<!--        <div class="development-bar bg-danger text-white text-center py-1 px-1">-->
+<!--            <b>Live testing in progress</b>. Use the <a href="https://slmn.gg" class="text-white font-weight-bold">main site</a> if you experience problems.-->
+<!--        </div>-->
         <b-navbar toggleable="lg" type="dark">
             <router-link class="navbar-brand " to="/">
                 <img v-if="minisiteIcon" :src="minisiteIcon" alt="" class="navbar-image d-inline-block align-top mr-2">

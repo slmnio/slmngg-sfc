@@ -5,7 +5,8 @@
   "scripts": {
     "serve-website": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "build-stage": "vue-cli-service build --mode staging"
   },
   "dependencies": {
     "bootstrap-vue": "^2.21.2",

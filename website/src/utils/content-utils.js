@@ -4,7 +4,7 @@ export function getImage (i) {
     return i[0].url;
 }
 
-export function url (page, record) {
+export function url (page, record, options = {}) {
     if (record && record.id) record.id = cleanID(record.id);
 
     if (this.$root.minisiteEvent &&
@@ -13,6 +13,31 @@ export function url (page, record) {
         return "/";
     }
 
+    let domain = "";
+
+    const subdomain = options.subdomain || options.partial_subdomain;
+    if (options.subdomain === options.partial_subdomain) {
+        options.partial_subdomain = null;
+    }
+
+    if (page === "event" && subdomain) {
+        const pageURL = window.location.origin.split("://");
+        domain = `${pageURL[0]}://${subdomain}.${pageURL[1]}`;
+    }
+
+    if (domain) {
+        // these are almost always use in vue router-link components and can't have external links
+        let url;
+        if (options.partial_subdomain) {
+            // use /event/x
+            url = `${domain}/${page}/${record.id}`;
+        } else if (options.subdomain && page === "event") {
+            // just use /
+            url = `${domain}/`;
+        }
+        // return `/redirect?url=${url}`;
+        return url;
+    }
     return `/${page}/${record.id}`;
 }
 

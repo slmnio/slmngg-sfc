@@ -1,12 +1,12 @@
 <template>
-    <router-link :to="url('event', event)" class="event no-link-style d-flex" :style="blockTheme">
+    <a :href="url('event', event, {subdomain: event.subdomain, partial_subdomain: event.partial_subdomain})" class="event no-link-style d-flex" :style="blockTheme">
         <div class="event-block flex-center">
             <div class="event-block-logo bg-center" :style="blockLogo"></div>
         </div>
         <div class="event-name">
             {{ event.name }}
         </div>
-    </router-link>
+    </a>
 </template>
 
 <script>

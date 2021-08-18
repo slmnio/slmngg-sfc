@@ -48,6 +48,12 @@ export default [
         props: route => ({ client: route.params.clientID, title: route.query.title }),
         children: BroadcastRoutes
     },
+    // {
+    //     path: "/redirect",
+    //     beforeEnter: (to, from, next) => {
+    //         window.location.href = to.query.url;
+    //     }
+    // },
     {
         path: "/*",
         component: NotFoundPage

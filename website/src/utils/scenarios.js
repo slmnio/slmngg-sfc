@@ -42,20 +42,23 @@ export function sortByMatchWins(a, b) {
 
 export function sortByHeadToHead(a, b) {
     // console.log("h2h", a, b);
+    if (!a || !a.h2h || !b || !b.id) return 0;
     return a.h2h[b.id];
 }
 
 export function sortByMapWins(a, b) {
-    const [aMapDiff, bMapDiff] = [a, b].map(x => x.map_wins - x.map_losses);
-    if (aMapDiff !== bMapDiff) {
-        // console.log("[map diff]", aMapDiff, bMapDiff, a, b, aMapDiff > bMapDiff);
-        if (aMapDiff > bMapDiff) return -1;
-        if (aMapDiff < bMapDiff) return 1;
-    }
     if (a.map_wins > b.map_wins) return -1;
     if (a.map_wins < b.map_wins) return 1;
     if (a.map_losses > b.map_losses) return 1;
     if (a.map_losses < b.map_losses) return -1;
+
+    const [aMapDiff, bMapDiff] = [a, b].map(x => x.map_wins - x.map_losses);
+    if (aMapDiff !== bMapDiff) {
+        // probably can't get down to here
+        console.log("[map diff]", aMapDiff, bMapDiff, a, b, aMapDiff > bMapDiff);
+        if (aMapDiff > bMapDiff) return -1;
+        if (aMapDiff < bMapDiff) return 1;
+    }
     return 0;
 }
 

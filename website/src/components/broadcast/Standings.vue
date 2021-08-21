@@ -10,8 +10,10 @@
             </div>
         </div>
         <div class="teams">
-            <div class="team" v-for="team in teams" v-bind:key="team.id">
-                <StandingsTeam :team="team" />
+            <div class="team-group" v-for="(group, i) in standings" v-bind:key="i">
+                <div class="team" v-for="team in group" v-bind:key="team.id">
+                    <StandingsTeam :team="team" />
+                </div>
             </div>
         </div>
     </div>
@@ -20,6 +22,7 @@
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import StandingsTeam from "@/components/broadcast/StandingsTeam";
+import { sortTeamsIntoStandings } from "@/utils/scenarios";
 
 export default {
     name: "Standings",
@@ -48,7 +51,7 @@ export default {
                 return null;
             }
         },
-        teams() {
+        standings() {
             if (!this.stageMatches || !this.event) return [];
             const teamMap = new Map();
             this.stageMatches.forEach(match => {
@@ -135,22 +138,37 @@ export default {
 
             teams = teams.sort(sortFunction);
 
-            let standingRank = 1;
-            teams.forEach((team, i) => {
-                if (i === 0) {
-                    team.standings.rank = standingRank;
-                    return;
-                }
-                if (sortFunction(team, teams[i - 1]) !== 0) {
-                    team.standings.rank = i + 1;
-                } else {
-                    team.standings.rank = standingRank;
-                }
-                standingRank = team.standings.rank;
+            const standings = sortTeamsIntoStandings(teams.map(t => ({ ...t, ...t.standings })));
+            console.log("[new standings]", standings);
+
+            let rank = 1; let display = 1;
+            standings.forEach(group => {
+                group.forEach(team => {
+                    team.standings.rank = display;
+                    rank++;
+                });
+                display = rank;
             });
 
+            return standings;
 
-            return teams;
+
+            // let standingRank = 1;
+            // teams.forEach((team, i) => {
+            //     if (i === 0) {
+            //         team.standings.rank = standingRank;
+            //         return;
+            //     }
+            //     if (sortFunction(team, teams[i - 1]) !== 0) {
+            //         team.standings.rank = i + 1;
+            //     } else {
+            //         team.standings.rank = standingRank;
+            //     }
+            //     standingRank = team.standings.rank;
+            // });
+            //
+            //
+            // return teams;
         }
     }
 };

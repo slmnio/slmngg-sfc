@@ -12,7 +12,7 @@
             </div>
         </td>
         <td v-if="settings.slmn_events">
-            <PlayerDraftTeamInfo v-for="team in _player.member_of" :team="team" v-bind:key="team.id"/>
+            <PlayerDraftTeamInfo v-for="team in teams" :team="team" v-bind:key="team.id"/>
         </td>
         <td v-if="hasDraftData && settings.info_for_captains" class="info-for-captains">{{  player.info_for_captains }}</td>
         <td v-if="settings.custom_notes">
@@ -37,6 +37,7 @@ import { BButton, BButtonGroup } from "bootstrap-vue";
 import store from "@/thing-store";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import PlayerDraftTeamInfo from "@/components/website/PlayerDraftTeamInfo";
+import { sortEvents } from "@/utils/sorts";
 
 export default {
     name: "PlayerDraftRow",
@@ -79,6 +80,10 @@ export default {
                     })
                 })
             });
+        },
+        teams() {
+            if (!this._player?.member_of) return [];
+            return this._player.member_of.slice().sort(sortEvents);
         },
         extendedRole() {
             if (!this.player?.draft_data) return null;

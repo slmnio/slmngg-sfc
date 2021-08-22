@@ -1,6 +1,6 @@
 <template>
     <tr v-bind:key="player.id">
-        <td class="draft--name"><router-link :to="url('player', player)">{{ player.name }}</router-link></td>
+        <td class="draft--name"><router-link :to="url('player', player)">{{ player.name }} <i class="fas fa-badge-check" v-if="player.verified"></i></router-link></td>
         <td class="draft--sr" v-if="player.rating" v-b-tooltip.top="player.rating.note">{{ player.rating.level }}</td>
         <td v-else></td>
         <td class="draft--role" v-b-tooltip.top="extendedRole">
@@ -22,8 +22,9 @@
         </td>
         <td class="draft--controls">
             <b-button-group>
-                <b-button size="sm" v-b-tooltip.left="tag === 'starred' ? 'Unstar' : 'Star'" variant="warning" @click="setNote('starred')"><i class="fas fa-star"></i></b-button>
-                <b-button size="sm" v-b-tooltip.right="tag === 'ignored' ? 'Unignore' : 'Ignore'" variant="danger" @click="setNote('ignored')"><i class="fas fa-ban"></i></b-button>
+                <b-button size="sm" v-b-tooltip.left="'Set note'" variant="primary" class="text-dark" @click="doNote()"><i class="fas fa-fw fa-user-edit"></i></b-button>
+                <b-button size="sm" v-b-tooltip.left="tag === 'starred' ? 'Unstar' : 'Star'" variant="warning" @click="setNote('starred')"><i class="fas fa-fw fa-star"></i></b-button>
+                <b-button size="sm" v-b-tooltip.right="tag === 'ignored' ? 'Unignore' : 'Ignore'" variant="danger" @click="setNote('ignored')"><i class="fas fa-fw fa-ban"></i></b-button>
             </b-button-group>
         </td>
     </tr>

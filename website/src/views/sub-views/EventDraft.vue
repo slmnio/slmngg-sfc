@@ -79,7 +79,7 @@ export default {
     },
     data: () => ({
         settings: {
-            heroes: true,
+            heroes: false,
             slmn_events: false,
             info_for_captains: true,
             custom_notes: false,
@@ -127,13 +127,10 @@ export default {
             }).map(player => {
                 // attempt to get SR
                 try {
-                    const ow = JSON.parse(player.overwatch_data);
-
+                    const ow = player.overwatch_data ? JSON.parse(player.overwatch_data) : null;
 
                     if (player.draft_data) {
                         const draftData = JSON.parse(player.draft_data);
-
-
                         let extraSRtext = "";
 
                         if (ow && ow.ratings && player.role) {

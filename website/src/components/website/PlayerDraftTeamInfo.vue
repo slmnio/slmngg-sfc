@@ -19,7 +19,7 @@ export default {
             return true;
         },
         title() {
-            return `${this.team.ranking_text} in ${this.team.event.name} on ${this.team.name}`;
+            return `${this.team.ranking_text} in ${this.team.event.short || this.team.event.name} on ${this.team.name}`;
         }
     }
 };

@@ -288,6 +288,13 @@ async function onApplicationApproved(application, message) {
         member.roles.add(event.talent_role_id);
     }
 
+    let channel = await guild.channels.fetch(event.staff_channel_id);
+    if (channel) {
+        // setting a delay so their Discord clients can catch up
+        setTimeout(() => {
+            channel.send(`Welcome ${member}!`);
+        }, 3000);
+    }
 
     if (message.partial) message = await message.fetch(); // force update
     message.edit({ embeds: [{

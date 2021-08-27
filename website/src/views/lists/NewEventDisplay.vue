@@ -1,5 +1,5 @@
 <template>
-    <a :href="url('event', event, {subdomain: event.subdomain, partial_subdomain: event.partial_subdomain})" class="event no-link-style d-flex" :style="blockTheme">
+    <a v-if="useRawTag" :href="url('event', event, {subdomain: event.subdomain, partial_subdomain: event.partial_subdomain})" class="event no-link-style d-flex" :style="blockTheme">
         <div class="event-block flex-center">
             <div class="event-block-logo bg-center" :style="blockLogo"></div>
         </div>
@@ -7,6 +7,14 @@
             {{ event.name }}
         </div>
     </a>
+    <router-link v-else :to="url('event', event)" class="event no-link-style d-flex" :style="blockTheme">
+        <div class="event-block flex-center">
+            <div class="event-block-logo bg-center" :style="blockLogo"></div>
+        </div>
+        <div class="event-name">
+            {{ event.name }}
+        </div>
+    </router-link>
 </template>
 
 <script>
@@ -16,6 +24,7 @@ export default {
     name: "NewEventDisplay",
     props: ["event"],
     methods: { url },
+    data: () => ({ useRawTag: false }),
     computed: {
         blockTheme() {
             if (!this.event || !this.event.theme) return {};

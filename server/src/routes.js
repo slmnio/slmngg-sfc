@@ -64,6 +64,7 @@ module.exports = ({ app, cors, Cache }) => {
     async function getLiveMatch(streamURL) {
         let broadcast = await getBroadcast(streamURL);
         if (broadcast.error) return { "error": true, message: broadcast.message };
+        if (!broadcast || !broadcast.data) return { "error": true, "message": "No broadcast data is available right now. Check https://slmn.gg for information." };
         broadcast = broadcast.data;
 
         if (!broadcast.live_match || broadcast.live_match.length === 0) return { "error": true, "message": "No match is live." };
@@ -128,7 +129,7 @@ module.exports = ({ app, cors, Cache }) => {
         let broadcast = await getBroadcast(streamURL);
         if (broadcast.error) return { "error": true, "message": broadcast.message };
         broadcast = broadcast.data;
-        if (!broadcast) return { "error": true, "message": "No event is on this channel at the moment. Check SLMN.GG for other event information." };
+        if (!broadcast) return { "error": true, "message": "No broadcast data is available right now. Check https://slmn.gg for information." };
         if (!broadcast.event) return { "error": true, "message": "No event is linked to this stream." };
         let event = await Cache.get(cleanID(broadcast.event[0]));
 

@@ -249,7 +249,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
     if (!application) {
         return console.warn(`No valid application found for https://discord.com/channels/${message.guildId}/${message.channelId}/${message.id}`);
     }
-    await onApplicationApproved(deAirtable(application), message);
+    await onApplicationApproved(deAirtable(application), message, user.username);
 });
 
 async function getMessage(id) {
@@ -277,12 +277,12 @@ async function checkForForceApprovedApplications() {
         // find message
         message = await getMessage(application.notification_message_id);
     }
-    await onApplicationApproved(application, message);
+    await onApplicationApproved(application, message, "Force via Airtable");
 }
 
 setInterval(checkForForceApprovedApplications, 8 * 1000);
 
-async function onApplicationApproved(application, message) {
+async function onApplicationApproved(application, message, approver) {
     let event = deAirtable(await base("Events").find(application.event[0]));
     if (!event.active) return console.warn("Event is no longer active but an application was approved");
     await base("Staff Applications").update(application.id, { "Approved": true });
@@ -331,7 +331,7 @@ async function onApplicationApproved(application, message) {
             ...message.embeds[0],
             color: "#77B255",
             author: {
-                "name": "Approved & given roles",
+                "name": approver ? `Approved by ${approver}` : "Approved",
                 "icon_url": "https://cdn.discordapp.com/attachments/485493459357007876/880277441392828486/check-mark-button_2705.png"
             }
         }]});

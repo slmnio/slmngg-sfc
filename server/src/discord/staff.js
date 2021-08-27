@@ -283,11 +283,10 @@ async function checkForForceApprovedApplications() {
 setInterval(checkForForceApprovedApplications, 8 * 1000);
 
 async function onApplicationApproved(application, message) {
+    let event = deAirtable(await base("Events").find(application.event[0]));
+    if (!event.active) return console.warn("Event is no longer active but an application was approved");
     await base("Staff Applications").update(application.id, { "Approved": true });
 
-    // then set roles etc - DM?
-
-    let event = deAirtable(await base("Events").find(application.event[0]));
     let guild = await client.guilds.fetch(process.env.STAFFAPPS_GUILD_ID);
     let member = await findMember(guild, application.discord_tag);
 

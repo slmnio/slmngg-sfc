@@ -146,12 +146,12 @@ module.exports = ({ app, cors, Cache }) => {
     app.get("/link", async (req, res) => {
         try {
             if (!req.query.stream) return res.send("The 'stream' query is required.");
-            if (!req.query.to) return res.send("The 'to' query is required.");
+            // if (!req.query.to) return res.send("The 'to' query is required.");
             let url = await getEventURL(req.query.stream);
             if (url.error) return res.send(url.message);
             url = url.data;
 
-            res.send(`${url}${req.query.to}`);
+            res.send(`${url}${req.query.to || ""}`);
         } catch (e) {
             console.error(e);
             return res.send("An error occurred loading data");

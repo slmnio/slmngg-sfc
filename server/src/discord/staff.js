@@ -252,6 +252,36 @@ client.on("messageReactionAdd", async (reaction, user) => {
     await onApplicationApproved(deAirtable(application), message);
 });
 
+async function getMessage(id) {
+    try {
+        const guild = await client.guilds.fetch(process.env.STAFFAPPS_GUILD_ID);
+        if (!guild) return null;
+        const channel = await guild.channels.fetch(process.env.STAFFAPPS_APPLICATION_CHANNEL_ID);
+        if (!channel) return null;
+        return await channel.messages.fetch(id);
+    } catch (e) {
+        return null;
+    }
+}
+
+async function checkForForceApprovedApplications() {
+    let [application] = await base("Staff Applications").select({
+        maxRecords: 1,
+        view: "Force approved"
+    }).all();
+    if (!application) return;
+    application = deAirtable(application);
+
+    let message = null;
+    if (application.notification_message_id) {
+        // find message
+        message = await getMessage(application.notification_message_id);
+    }
+    await onApplicationApproved(application, message);
+}
+
+setInterval(checkForForceApprovedApplications, 8 * 1000);
+
 async function onApplicationApproved(application, message) {
     await base("Staff Applications").update(application.id, { "Approved": true });
 
@@ -261,7 +291,7 @@ async function onApplicationApproved(application, message) {
     let guild = await client.guilds.fetch(process.env.STAFFAPPS_GUILD_ID);
     let member = await findMember(guild, application.discord_tag);
 
-    if (!member) {
+    if (!member && message) {
         if (message.partial) message = await message.fetch(); // force update
         message.edit({ embeds: [{
             ...message.embeds[0],
@@ -296,14 +326,15 @@ async function onApplicationApproved(application, message) {
         }, 3000);
     }
 
-    if (message.partial) message = await message.fetch(); // force update
-    message.edit({ embeds: [{
-        ...message.embeds[0],
-        color: "#77B255",
-        author: {
-            "name": "Approved & given roles",
-            "icon_url": "https://cdn.discordapp.com/attachments/485493459357007876/880277441392828486/check-mark-button_2705.png"
-        }
-    }]});
-
+    if (message) {
+        if (message.partial) message = await message.fetch(); // force update
+        message.edit({ embeds: [{
+            ...message.embeds[0],
+            color: "#77B255",
+            author: {
+                "name": "Approved & given roles",
+                "icon_url": "https://cdn.discordapp.com/attachments/485493459357007876/880277441392828486/check-mark-button_2705.png"
+            }
+        }]});
+    }
 }

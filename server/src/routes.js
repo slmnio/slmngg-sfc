@@ -128,6 +128,7 @@ module.exports = ({ app, cors, Cache }) => {
         let broadcast = await getBroadcast(streamURL);
         if (broadcast.error) return { "error": true, "message": broadcast.message };
         broadcast = broadcast.data;
+        if (!broadcast) return { "error": true, "message": "No event is on this channel at the moment. Check SLMN.GG for other event information." };
         if (!broadcast.event) return { "error": true, "message": "No event is linked to this stream." };
         let event = await Cache.get(cleanID(broadcast.event[0]));
 

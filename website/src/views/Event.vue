@@ -12,6 +12,13 @@
             <li class="nav-item" v-if="useStaffPage"><router-link class="nav-link" :to="subLink('staff')">Staff</router-link></li>
             <li class="nav-item" v-if="event.about"><router-link class="nav-link" :to="subLink('about')">About</router-link></li>
 <!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
+
+
+            <ul class="socials d-flex" v-if="event.socials">
+                <li class="nav-item">
+                    <Social :social="social" v-for="social in event.socials" v-bind:key="social.id"/>
+                </li>
+            </ul>
         </SubPageNav>
 
         <router-view :event="event"></router-view>
@@ -24,12 +31,13 @@ import ThingTop from "@/components/website/ThingTop";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { multiImage } from "@/utils/content-utils";
 import SubPageNav from "@/components/website/SubPageNav";
+import Social from "@/components/website/Social";
 
 export default {
     name: "Event",
     props: ["id", "isMinisite"],
     components: {
-        ThingTop, SubPageNav
+        ThingTop, SubPageNav, Social
     },
     metaInfo() {
         return {
@@ -54,7 +62,8 @@ export default {
                     player: ReactiveThing("player")
                 }),
                 casters: ReactiveArray("casters"),
-                news_items: ReactiveArray("news_items")
+                news_items: ReactiveArray("news_items"),
+                socials: ReactiveArray("socials")
             });
         },
         settings() {
@@ -91,5 +100,12 @@ export default {
 </script>
 
 <style scoped>
-
+    .socials {
+        list-style: none;
+        padding-left: 0;
+        margin: 0 .5em;
+    }
+    .socials li a {
+        padding: .25em .25em;
+    }
 </style>

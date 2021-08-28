@@ -1,12 +1,12 @@
 <template>
     <div class="generic-overlay flex-center flex-column">
         <TourneyBar class="st4-top" v-if="top === 'st4'" :broadcast="broadcast" left="Schedule" :right="title"/>
-        <div v-else class="generic-overlay-title flex-center" :style="{borderColor: accentColor}">
+        <div v-else class="generic-overlay-title overlay--bg flex-center" :style="{borderColor: accentColor}">
             <transition name="fade" mode="out-in">
                 <span class="industry-align">{{ title }}</span>
             </transition>
         </div>
-        <div class="generic-overlay-body flex-center" :style="{backgroundColor: bodyColor}">
+        <div class="generic-overlay-body overlay--bg flex-center" :style="{backgroundColor: bodyColor}">
             <slot></slot>
         </div>
     </div>

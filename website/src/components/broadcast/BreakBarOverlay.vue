@@ -4,13 +4,13 @@
         <div class="upper-bar">
             <transition name="seg" mode="out-in">
                 <div class="segment-wrapper" v-if="showBigSegment('Bracket')" :key="'Bracket'">
-                    <div class="bar-segment segment-bracket">
+                    <div class="overlay--bg bar-segment segment-bracket">
                         <Bracket class="segment-bracket-inner" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.6" />
                     </div>
                 </div>
 
                 <div class="segment-wrapper" v-if="showBigSegment('Schedule')" :key="'Schedule'">
-                    <div class="bar-segment segment-schedule flex-column">
+                    <div class="overlay--bg bar-segment segment-schedule flex-column">
                         <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
                     </div>
                 </div>
@@ -22,7 +22,7 @@
             <!--            <transition-group name="seg" is="div" class="break-bar" :style="eventCSS">-->
             <transition name="seg">
                 <div class="segment-wrapper" v-if="showSegment('Sponsors')" :key="'Sponsors'">
-                    <div class="bar-segment segment-sponsors">
+                    <div class="overlay--bg bar-segment segment-sponsors">
                         <Sponsors class="break-sponsors" :sponsors="sponsorThemes" />
                     </div>
                 </div>
@@ -32,14 +32,14 @@
 
             <transition name="seg">
                 <div class="segment-wrapper" v-if="showSegment('Next match') && nextMatch" :key="'Next match'">
-                    <div class="bar-segment segment-next-match">
+                    <div class="overlay--bg bar-segment segment-next-match">
                         <BreakMatch :match="nextMatch" :expanded="false" :theme-color="themeColor" />
                     </div>
                 </div>
             </transition>
             <transition name="seg">
                 <div class="segment-wrapper" v-if="showSegment('Countdown')" :key="'Countdown'">
-                    <div class="bar-segment segment-countdown flex-center flex-column">
+                    <div class="overlay--bg bar-segment segment-countdown flex-center flex-column">
                         <div class="segment-title">
                             <span class="industry-align">
                                 {{ broadcast.countdown_end ? 'BACK IN' : 'LOCAL TIME' }}
@@ -54,7 +54,7 @@
 
             <transition name="seg">
                 <div class="segment-wrapper" v-if="showSegment('Event logo') && event && event.theme" :key="'Event logo'">
-                    <div class="bar-segment segment-event-logo p-2">
+                    <div class="overlay--bg bar-segment segment-event-logo p-2" :style="eventLogoBackground">
                         <div :style="cssImage('backgroundImage', event.theme, ['default_logo'], 200)"
                              class="segment-image bg-center w-100 h-100"></div>
                     </div>
@@ -101,6 +101,13 @@ export default {
                     })
                 })
             });
+        },
+        eventLogoBackground() {
+            if (!this.event || !this.event.theme) return {};
+            return {
+                backgroundColor: this.event.theme.color_logo_background,
+                borderColor: this.event.theme.color_logo_accent
+            };
         },
         segments() {
             if (!this.broadcast || !this.broadcast.bar_options) return [];
@@ -246,7 +253,7 @@ export default {
         min-width: 330px;
     }
     .segment-next-match >>> .match-teams {
-        min-width: 400px;
+        min-width: 410px;
     }
     .segment-next-match >>> .break-match[data-center="vs"] .match-teams {
         min-width: 330px;
@@ -277,6 +284,7 @@ export default {
     }
     .segment-schedule {
         padding: 0 1em;
+        min-width: 500px;
     }
     .segment-schedule >>> .break-match {
         font-size: 25px;

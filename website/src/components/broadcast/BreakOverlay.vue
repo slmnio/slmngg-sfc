@@ -1,13 +1,13 @@
 <template>
     <div class="break-overlay">
         <div class="break-center">
-            <div class="break-top event-theme-border flex-center" :style="eventBorder">
+            <div class="break-top event-theme-border flex-center overlay--bg" :style="eventBorder">
                 <transition name="fade" mode="out-in">
                     <span class="industry-align" :key="broadcast.title || broadcast.name">{{ broadcast.title || broadcast.name }}</span>
                 </transition>
                 <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News" :borderCSS="eventBorder" />
             </div>
-            <div class="break-main event-theme-border" :style="eventBorder">
+            <div class="break-main event-theme-border overlay--bg" :style="eventBorder">
                 <div class="break-col break-left-col">
                     <transition name="anim-break-next">
                         <div class="break-next" v-if="nextMatch">

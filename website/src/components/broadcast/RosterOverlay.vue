@@ -7,7 +7,7 @@
                     <div class="team-icon bg-center" :style="icon(team)"></div>
                 </div>
             </div>
-            <div class="team-roster flex-center flex-column" :style="{ fontSize: rosterFontSize(team) }">
+            <div class="team-roster flex-center flex-column overlay--bg w-100" :style="{ fontSize: rosterFontSize(team) }">
                 <div class="player" v-for="player in team.players" v-bind:key="player.id">
                     {{ player.name }}
                 </div>

@@ -1,5 +1,5 @@
 <template>
-    <div class="break-match flex-center" v-bind:class="{'expanded': expanded}">
+    <div class="break-match flex-center" v-bind:class="{'expanded': expanded}" :data-center="centerShow">
         <div class="match-next-details" v-if="!expanded">
             <transition name="fade" mode="out-in">
                 <span :key="match ? match.round : 'empty'">UP NEXT: {{ match && match.round }}</span>
@@ -152,7 +152,7 @@ export default {
     }
     .break-match.expanded {
         flex-direction: row;
-        padding: 15px 0;
+        padding: .25em 0;
     }
 
     .match-teams {
@@ -269,7 +269,7 @@ export default {
         padding: 0 .75em;
     }
     .break-match.expanded .match-team-center {
-        width: 170px;
+        width: 4.75em;
     }
     .match-team-name span {
         transform: translate(0, -0.05em)
@@ -288,7 +288,7 @@ export default {
         color: black;
         width: 1.1em;
         /*border-radius: 10px;*/
-        font-size: 48px;
+        font-size: calc(4em * (1 / 3));
         line-height: 1;
         padding: 0.15em 0;
     }
@@ -300,7 +300,7 @@ export default {
     .center-dash {
         margin: 0 .2em;
         line-height: 1;
-        font-size: 36px;
+        font-size: calc(1.1em);
         transform: translate(0, -0.0925em);
     }
 </style>

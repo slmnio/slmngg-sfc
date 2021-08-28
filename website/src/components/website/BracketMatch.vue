@@ -189,7 +189,7 @@ export default {
         background: #333;
         text-align: center;
         bottom: 100%;
-        font-size: 12px;
+        font-size: 0.75em;
         line-height: 1;
         padding-top: .1em;
         padding: 0 .3em;

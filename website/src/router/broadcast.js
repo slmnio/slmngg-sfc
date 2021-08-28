@@ -12,10 +12,12 @@ import InfoOverlay from "@/components/broadcast/InfoOverlay";
 import BroadcastBackground from "@/components/broadcast/BroadcastBackground";
 import SponsorOverlay from "@/components/broadcast/SponsorOverlay";
 import MapsOverlay from "@/components/broadcast/MapsOverlay";
+import BreakBarOverlay from "@/components/broadcast/BreakBarOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay },
     { path: "break", component: BreakOverlay },
+    { path: "break-bar", component: BreakBarOverlay },
     { path: "bracket", component: BracketOverlay, props: route => ({ bracketKey: route.query.key, extended: !!route.query.extended, scale: route.query.scale }) },
     { path: "schedule", component: ScheduleOverlay },
     { path: "standings", component: StandingsOverlay },

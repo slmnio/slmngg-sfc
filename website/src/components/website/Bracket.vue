@@ -22,7 +22,8 @@ export default {
         bracket: {},
         event: {},
         useOverlayScale: Boolean,
-        small: Boolean
+        small: Boolean,
+        scale: Number
     },
     computed: {
         matches() {
@@ -42,11 +43,12 @@ export default {
             return this.layout.connections;
         },
         showHeaders() {
-            return true;
+            return !this.small;
         },
         fontSize() {
             let fontSize = 16;
             if (this.useOverlayScale && this.bracket && this.bracket.overlay_scale > 10) fontSize = this.bracket.overlay_scale;
+            if (this.scale) fontSize *= this.scale;
             return fontSize;
         },
         winVars() {
@@ -138,5 +140,8 @@ export default {
     }
     .bracket.small >>> .inner .text {
         display: none;
+    }
+    .bracket.small >>> .match-number {
+        display: none
     }
 </style>

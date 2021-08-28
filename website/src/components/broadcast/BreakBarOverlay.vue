@@ -21,7 +21,7 @@
         <div class="lower-bar">
             <!--            <transition-group name="seg" is="div" class="break-bar" :style="eventCSS">-->
             <transition name="seg">
-                <div class="segment-wrapper" v-if="showSegment('Sponsors')" :key="'Sponsors'">
+                <div class="segment-wrapper" v-if="showSegment('Sponsors') && sponsorThemes" :key="'Sponsors'">
                     <div class="overlay--bg bar-segment segment-sponsors">
                         <Sponsors class="break-sponsors" :sponsors="sponsorThemes" />
                     </div>

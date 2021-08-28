@@ -42,7 +42,7 @@
                     <div class="overlay--bg bar-segment segment-countdown flex-center flex-column">
                         <div class="segment-title">
                             <span class="industry-align">
-                                {{ broadcast.countdown_end ? 'BACK IN' : 'LOCAL TIME' }}
+                                {{ countdownText }}
                             </span>
                         </div>
                         <div class="segment-text">
@@ -152,6 +152,11 @@ export default {
             if (!this.bracketKey) return this.event.brackets[0];
             const bracket = this.event.brackets.find(b => b && b.key === this.bracketKey);
             return bracket || this.event.brackets[0];
+        },
+        countdownText() {
+            if (!this.broadcast.countdown_end) return "LOCAL TIME";
+            if (this.schedule && this.schedule.filter(s => [s.score_1, s.score_2].some(_s => _s)).length === 0) { return "STARTING IN"; }
+            return "BACK IN";
         }
     },
     watch: {

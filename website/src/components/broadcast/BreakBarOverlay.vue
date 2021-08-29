@@ -31,8 +31,8 @@
             <div class="segment-wrapper segment-spacer flex-grow-1"></div>
 
             <transition name="seg">
-                <div class="segment-wrapper" v-if="showSegment('Title') && broadcast.title" :key="'Title-' + broadcast.title">
-                    <div class="overlay--bg bar-segment segment-title" v-html="broadcast.title.replaceAll('\\n', '<br>')"></div>
+                <div class="segment-wrapper" v-if="showSegment('Title') && broadcast && broadcast.title" :key="'Title-' + broadcast.title">
+                    <div class="overlay--bg bar-segment segment-title" v-html="nbr(broadcast.title)"></div>
                 </div>
             </transition>
             <transition name="seg">
@@ -178,7 +178,10 @@ export default {
         showBigSegment(segmentName) {
             return (this.broadcast.break_display === segmentName);
         },
-        cssImage
+        cssImage,
+        nbr(text) {
+            return text.replace(/\\n/g, "<br>");
+        }
     }
 };
 </script>

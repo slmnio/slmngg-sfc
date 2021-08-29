@@ -130,7 +130,7 @@ export default {
         },
         nbr(text) {
             // console.log(text);
-            return text.replaceAll("\\n", "<br>");
+            return text.replace(/\\n/g, "<br>");
         },
         winCSS(index) {
             // console.log(index, this.themeColor);

@@ -31,6 +31,11 @@
             <div class="segment-wrapper segment-spacer flex-grow-1"></div>
 
             <transition name="seg">
+                <div class="segment-wrapper" v-if="showSegment('Title') && broadcast.title" :key="'Title-' + broadcast.title">
+                    <div class="overlay--bg bar-segment segment-title" v-html="broadcast.title.replaceAll('\\n', '<br>')"></div>
+                </div>
+            </transition>
+            <transition name="seg">
                 <div class="segment-wrapper" v-if="showSegment('Next match') && nextMatch" :key="'Next match'">
                     <div class="overlay--bg bar-segment segment-next-match">
                         <BreakMatch :match="nextMatch" :expanded="false" :theme-color="themeColor" />
@@ -304,6 +309,15 @@ export default {
         opacity: 0;
         max-width: 0px;
         max-height: 0px;
+        overflow: hidden;
+    }
+    .segment-title {
+        text-transform: uppercase;
+        text-align: center;
+        font-size: 60px;
+        font-weight: bold;
+        line-height: 1;
+        white-space: nowrap;
         overflow: hidden;
     }
 </style>

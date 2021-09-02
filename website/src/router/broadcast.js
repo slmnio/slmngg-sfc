@@ -15,7 +15,7 @@ import MapsOverlay from "@/components/broadcast/MapsOverlay";
 import BreakBarOverlay from "@/components/broadcast/BreakBarOverlay";
 
 export default [
-    { path: "ingame", component: IngameOverlay },
+    { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
     { path: "break", component: BreakOverlay },
     { path: "break-bar", component: BreakBarOverlay },
     { path: "bracket", component: BracketOverlay, props: route => ({ bracketKey: route.query.key, extended: !!route.query.extended, scale: route.query.scale }) },

@@ -4,7 +4,7 @@
           <transition-group name="fade" mode="out-in">
               <IngameTeam :key="`${team.id}-${i}`" v-for="(team, i) in teams"
                           :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores"
-                          :width="teamWidth"/>
+                          :width="teamWidth" :codes="codes"/>
           </transition-group>
 
           <transition name="mid" mode="out-in">
@@ -21,7 +21,7 @@ import Middle from "@/components/broadcast/Middle";
 
 export default {
     name: "IngameOverlay",
-    props: ["broadcast"],
+    props: ["broadcast", "codes"],
     components: { IngameTeam, Middle },
     computed: {
         match() {

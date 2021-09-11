@@ -74,6 +74,7 @@ export default {
         --caster-width: 800px;
         --caster-height: 570px;
         max-width: var(--caster-width);
+        transition: max-width .4s ease;
     }
 
     .caster-cam-box {
@@ -150,6 +151,7 @@ export default {
         border-radius: 50%;
         box-shadow: 0 0 8px 0 black;
         background-size: cover;
-        transform: translate(0, -10%)
+        transform: translate(0, -10%);
+        transition: all .4s ease;
     }
 </style>

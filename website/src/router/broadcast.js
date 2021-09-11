@@ -13,6 +13,7 @@ import BroadcastBackground from "@/components/broadcast/BroadcastBackground";
 import SponsorOverlay from "@/components/broadcast/SponsorOverlay";
 import MapsOverlay from "@/components/broadcast/MapsOverlay";
 import BreakBarOverlay from "@/components/broadcast/BreakBarOverlay";
+import PodcastOverlay from "@/components/broadcast/PodcastOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -26,6 +27,7 @@ export default [
     { path: "thumbnail", component: EventThumbnailCreator },
     { path: "draft", component: DraftOverlay },
     { path: "casters", component: DeskOverlay, props: route => ({ group: "casters" }) },
+    { path: "podcast", component: PodcastOverlay, props: route => ({ rows: route.query.rows }) },
     { path: "custom", component: CustomOverlay },
     { path: "info", component: InfoOverlay },
     { path: "background", component: BroadcastBackground, props: route => ({ index: route.query.index }) },

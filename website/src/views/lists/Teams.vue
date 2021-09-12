@@ -50,7 +50,7 @@ export default {
             }).sort((a, b) => sortEvents(a, b))
                 .reverse()
                 .map(e => {
-                    if (this.search && this.search.length > 2) {
+                    if (this.search && this.search.length > 2 && e.teams) {
                         return {
                             ...e,
                             teams: e.teams.filter(team => {
@@ -62,7 +62,7 @@ export default {
                     }
                     return e;
                 })
-                .filter(e => e.teams && e.show_in_events && e.teams.length !== 0);
+                .filter(e => e.show_in_events && e.teams && e.teams.length !== 0);
         }
         // groupedTeams() {
         //     const groups = new Map();

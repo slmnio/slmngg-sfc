@@ -54,6 +54,7 @@ function sluggify(text) {
 }
 
 async function processTableData(tableName, data, linkRecords = false) {
+    if (!data) return;
     data.map(deAirtable).forEach(data => {
         if (tableName === "News") {
             data.slug = sluggify(data.name);

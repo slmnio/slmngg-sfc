@@ -34,8 +34,9 @@
 
                     <router-link v-for="event in navbarEvents" v-bind:key="event.id"
                                  active-class="active"
-                                 class="nav-link" :to="event._link" >
+                                 class="nav-link" :to="event._link" :exact="event.__id === minisite.__id">
                         {{ event.navbar_short || event.short || event.series_subtitle || event.name }}</router-link>
+<!--                    <router-link :to="'/'" v-if="minisite.navbar_short" active-class="active" exact class="nav-link">{{ minisite.navbar_short }}</router-link>-->
                 </b-navbar-nav>
                 <b-navbar-nav class="mr-auto">
                     <NavLiveMatch v-for="match in liveMatches" :match="match" v-bind:key="match.id" />

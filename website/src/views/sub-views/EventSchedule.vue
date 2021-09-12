@@ -126,6 +126,12 @@ export default {
         if (this.defaultScheduleNum && !this.activeScheduleNum) {
             this.activeScheduleNum = this.defaultScheduleNum;
         }
+    },
+    metaInfo() {
+        return {
+            title: "Schedule"
+            // title: this.event?.name ? `Schedule | ${this.event?.name}` : "Schedule"
+        };
     }
 };
 </script>

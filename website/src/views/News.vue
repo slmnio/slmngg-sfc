@@ -17,7 +17,7 @@
 
 <script>
 import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { getImage, url } from "@/utils/content-utils";
+import { getImage, multiImage, url } from "@/utils/content-utils";
 import NewsHeader from "@/components/website/NewsHeader";
 import Markdown from "@/components/website/Markdown";
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
@@ -60,6 +60,12 @@ export default {
         connection() {
             return this.news.event || this.news.team;
         }
+    },
+    metaInfo() {
+        return {
+            title: [this.news?.headline, this.connection?.name].filter(t => t).join(" | "),
+            link: [{ rel: "icon", href: multiImage(this.theme, ["small_logo", "default_logo"]) }]
+        };
     }
 };
 </script>

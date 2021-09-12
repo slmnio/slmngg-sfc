@@ -1,13 +1,13 @@
 <template>
     <div class="container">
         <h1 class="big mb-3">Players</h1>
-
         <div class="input-group my-3 mx-1">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon1">Search</span>
             </div>
             <input type="text" class="form-control" v-model="search" placeholder="Type a player's name here" aria-label="Player name" aria-describedby="basic-addon1">
         </div>
+        <h1><LoadingIcon v-if="!players.length"></LoadingIcon></h1>
 
         <div class="player-list">
             <ContentThing v-for="player in filteredPlayers" v-bind:key="player.id"
@@ -19,10 +19,11 @@
 <script>
 import { ReactiveRoot } from "@/utils/reactive";
 import ContentThing from "@/components/website/ContentThing";
+import LoadingIcon from "@/components/website/LoadingIcon";
 
 export default {
     name: "Players",
-    components: { ContentThing },
+    components: { ContentThing, LoadingIcon },
     data: () => ({ search: null }),
     computed: {
         players() {

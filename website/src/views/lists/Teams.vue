@@ -1,10 +1,12 @@
 <template>
     <div class="container">
         <h1 class="big mb-3">Teams</h1>
+        <input type="text" class="form-control mb-3" placeholder="Start typing to filter" v-model="search">
+        <h1><LoadingIcon v-if="!events.length"></LoadingIcon></h1>
         <div v-for="event in events" v-bind:key="event.id" class="event mb-4">
             <EventDisplay class="team-display" :event="event"/>
             <div class="event-teams d-flex row">
-                <div class="team col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2 tight-col" v-for="team in groupedTeams.get(event.id)" v-bind:key="team.id">
+                <div class="team col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2 tight-col" v-for="team in event.teams" v-bind:key="team.id">
                     <TeamDisplay :team="team" />
                 </div>
             </div>
@@ -13,45 +15,68 @@
 </template>
 
 <script>
-import { ReactiveList, ReactiveThing } from "@/utils/reactive";
-import { cleanID } from "@/utils/content-utils";
+import { ReactiveArray, ReactiveList, ReactiveThing } from "@/utils/reactive";
 import TeamDisplay from "@/views/lists/TeamDisplay";
 import EventDisplay from "@/views/lists/EventDisplay";
+import { sortEvents } from "@/utils/sorts";
+import LoadingIcon from "@/components/website/LoadingIcon";
 
 export default {
     name: "Teams",
     components: {
-        TeamDisplay, EventDisplay
+        LoadingIcon,
+        TeamDisplay,
+        EventDisplay
+    },
+    data: function() {
+        return {
+            search: null
+        };
     },
     computed: {
-        teams() {
-            return ReactiveList("Teams", {
-                theme: ReactiveThing("theme")
-            });
-        },
+        // teams() {
+        //     // return [];
+        //     // eslint-disable-next-line no-unreachable
+        //     return ReactiveList("Teams", {
+        //         theme: ReactiveThing("theme")
+        //     });
+        // },
         events() {
             return ReactiveList("Events", {
-                theme: ReactiveThing("theme")
-            }).filter(event => event.teams && event.show_in_events).sort((a, b) => {
-                if (!a.start_date && !b.start_date) return 0;
-                if (!a.start_date) return 1;
-                if (!b.start_date) return -1;
-                return new Date(a.start_date) - new Date(b.start_date);
-            });
-        },
-        groupedTeams() {
-            const groups = new Map();
-            this.teams.forEach(team => {
-                const key = cleanID(team.event ? (team.event[0]) : "no-event");
-                const collection = groups.get(key);
-                if (!collection) {
-                    groups.set(key, [team]);
-                } else {
-                    collection.push(team);
-                }
-            });
-            return groups;
+                theme: ReactiveThing("theme"),
+                teams: ReactiveArray("teams", {
+                    theme: ReactiveThing("theme")
+                })
+            }).sort((a, b) => sortEvents(a, b))
+                .reverse()
+                .map(e => {
+                    if (this.search && this.search.length > 2) {
+                        return {
+                            ...e,
+                            teams: e.teams.filter(team => {
+                                return [
+                                    team.name.toLowerCase()
+                                ].some(text => text.indexOf(this.search) !== -1);
+                            })
+                        };
+                    }
+                    return e;
+                })
+                .filter(e => e.teams && e.show_in_events && e.teams.length !== 0);
         }
+        // groupedTeams() {
+        //     const groups = new Map();
+        //     this.teams.forEach(team => {
+        //         const key = cleanID(team.event ? (team.event[0]) : "no-event");
+        //         const collection = groups.get(key);
+        //         if (!collection) {
+        //             groups.set(key, [team]);
+        //         } else {
+        //             collection.push(team);
+        //         }
+        //     });
+        //     return groups;
+        // }
     },
     metaInfo() {
         return {

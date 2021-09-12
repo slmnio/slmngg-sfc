@@ -1,6 +1,7 @@
 <template>
     <div class="container">
         <h1 class="big">Events</h1>
+        <h1 v-if="!events.length"><LoadingIcon></LoadingIcon></h1>
         <div v-for="series in eventSeries" v-bind:key="series.id">
             <h2>{{ series.name }}</h2>
             <div class="series-events row">
@@ -21,10 +22,12 @@
 <script>
 import { ReactiveArray, ReactiveList, ReactiveThing } from "@/utils/reactive";
 import NewEventDisplay from "@/views/lists/NewEventDisplay";
+import { sortEvents } from "@/utils/sorts";
+import LoadingIcon from "@/components/website/LoadingIcon";
 
 export default {
     name: "Events",
-    components: { NewEventDisplay },
+    components: { NewEventDisplay, LoadingIcon },
     computed: {
         events() {
             return ReactiveList("Events", {
@@ -36,12 +39,12 @@ export default {
                 events: ReactiveArray("events", {
                     theme: ReactiveThing("theme")
                 })
-            });
+            }).sort((a, b) => a.order - b.order);
         },
         otherEvents() {
             return this.events.filter(event => {
                 return !this.eventSeries.some(es => es.events?.some(e => e.id === event.id));
-            });
+            }).sort(sortEvents);
         }
     },
     metaInfo() {

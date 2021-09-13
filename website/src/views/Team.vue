@@ -43,7 +43,7 @@ export default {
         team() {
             return ReactiveRoot(this.id, {
                 owner: ReactiveThing("owner"),
-                captain: ReactiveThing("captain"),
+                captains: ReactiveArray("captains"),
                 players: ReactiveArray("players"),
                 theme: ReactiveThing("theme"),
                 sister_teams: ReactiveArray("sister_teams", {

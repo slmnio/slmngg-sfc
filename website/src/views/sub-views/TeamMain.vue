@@ -7,8 +7,9 @@
             <ContentRow v-if="team.owner" title="Owner">
                 <ContentThing type="player" :text="team.owner.name" :thing="team.owner" :theme="team.theme"></ContentThing>
             </ContentRow>
-            <ContentRow v-if="team.captain" title="Captain">
-                <ContentThing type="player" :text="team.captain.name" :thing="team.captain" :theme="team.theme"></ContentThing>
+            <ContentRow v-if="team.captains" :title="team.captains.length === 1 ? 'Captain' : 'Captains'">
+                <ContentThing v-for="captain in team.captains" v-bind:key="captain.id"
+                              type="player" :text="captain.name" :thing="captain" :theme="team.theme"></ContentThing>
             </ContentRow>
             <ContentRow v-if="team.staff" title="Team staff">
                 <ContentThing type="player" :text="staff.name" :thing="staff" :theme="team.theme" v-for="staff in team.staff" v-bind:key="staff.id"></ContentThing>

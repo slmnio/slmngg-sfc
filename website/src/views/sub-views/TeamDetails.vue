@@ -27,8 +27,6 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import ContentRow from "@/components/website/ContentRow";
-import ContentThing from "@/components/website/ContentThing";
 import TwitterLink from "@/components/website/TwitterLink";
 
 export default {
@@ -42,13 +40,13 @@ export default {
                 theme: ReactiveThing("theme"),
                 players: ReactiveArray("players"),
                 staff: ReactiveArray("staff"),
-                captain: ReactiveThing("captain")
+                captains: ReactiveArray("captains")
             });
         },
         people() {
             return [
                 ...(this._team?.owner ? [this._team?.owner] : []),
-                ...(this._team?.captain ? [this._team?.captain] : []),
+                ...this._team?.captains || [],
                 ...this._team?.staff || [],
                 ...this._team?.players || []
             ].filter((player, index, array) => {

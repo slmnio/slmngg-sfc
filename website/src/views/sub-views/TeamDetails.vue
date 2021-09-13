@@ -45,7 +45,7 @@ export default {
         },
         people() {
             return [
-                ...(this._team?.owner ? [this._team?.owner] : []),
+                ...this._team?.owners || [],
                 ...this._team?.captains || [],
                 ...this._team?.staff || [],
                 ...this._team?.players || []

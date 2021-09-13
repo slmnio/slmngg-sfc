@@ -4,8 +4,9 @@
                 <ContentThing :thing="accolade" type="event" :link-to="accolade.event" :theme="accolade.event && accolade.event.theme" v-for="accolade in team.accolades"
                               v-bind:key="accolade.id" :show-logo="true" :text="accolade.name" />
             </ContentRow>
-            <ContentRow v-if="team.owner" title="Owner">
-                <ContentThing type="player" :text="team.owner.name" :thing="team.owner" :theme="team.theme"></ContentThing>
+            <ContentRow v-if="team.owners" :title="team.owners.length === 1 ? 'Owner' : 'Owners'">
+                <ContentThing v-for="owner in team.owners" v-bind:key="owner.id"
+                              type="player" :text="owner.name" :thing="owner" :theme="team.theme"></ContentThing>
             </ContentRow>
             <ContentRow v-if="team.captains" :title="team.captains.length === 1 ? 'Captain' : 'Captains'">
                 <ContentThing v-for="captain in team.captains" v-bind:key="captain.id"

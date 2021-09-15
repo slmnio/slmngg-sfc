@@ -3,7 +3,6 @@ class MapHandler {
         // console.log("Map constructor", {map, ids});
         this.map = new MapObject(map, true);
         this.ids = new MapObject(ids);
-        this.event = event;
         this.create_function = create_function;
     }
     get itemsToCreate() {

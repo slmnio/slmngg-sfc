@@ -41,7 +41,6 @@ async function setupEvent(event) {
         let roles = new MapHandler({
             map: event.role_map,
             ids: event.role_ids,
-            event: event,
             create_function: async (item) => {
                 console.log("create role", item);
                 return {
@@ -53,7 +52,7 @@ async function setupEvent(event) {
                 };
             }
         });
-        await roles.createMissingItems(([...roles.map.uniqueData, "Staff"]).filter(r => !roles.ids.data.find(m => m.key === r)).map(e => ({key: e})));
+        await roles.createMissingItems((["Staff", ...roles.map.uniqueData]).filter(r => !roles.ids.data.find(m => m.key === r)).map(e => ({key: e})));
         updatedData["Role IDs"] = roles.ids.textMap;
 
         // let channels = new MapHandler({
@@ -109,7 +108,6 @@ async function setupEvent(event) {
         let categories = new MapHandler({
             map: event.category_map,
             ids: event.category_ids,
-            event: event,
             create_function: async (item) => {
                 console.log("create", item);
                 return {
@@ -134,7 +132,6 @@ async function setupEvent(event) {
         let channels = new MapHandler({
             map: event.channel_map,
             ids: event.channel_ids,
-            event: event,
             create_function: async (item) => {
                 console.log("create channel", item);
 
@@ -176,7 +173,6 @@ async function setupEvent(event) {
         // let channels = new MapManager({
         //     map: event.channel_map,
         //     ids: event.channel_ids,
-        //     event: event,
         //     create_function: async (name) => {
         //         return {
         //             name,
@@ -471,18 +467,26 @@ async function onApplicationApproved(application, message, approver) {
         return console.error("Can't find member to auto give roles");
     }
 
-    if (event.staff_role_id) member.roles.add(event.staff_role_id);
+    // need to use new system for roles.
 
-    if (event.production_role_id && ["In-game observers", "Lobby admins", "Producers"].some(r => application.roles.includes(r))) {
-        // give prod role
-        member.roles.add(event.production_role_id);
-    }
-    if (event.talent_role_id && ["Casters", "Desk hosts / interviewers"].some(r => application.roles.includes(r))) {
-        // give talent role
-        member.roles.add(event.talent_role_id);
-    }
+    let roles = new MapHandler({
+        map: event.role_map,
+        ids: event.role_ids
+    });
 
-    let channel = await guild.channels.fetch(event.staff_channel_id);
+    let allRoles = [...application.roles].map(selectedRole => roles.map.get(selectedRole)).flat().filter((i, pos, arr) => arr.indexOf(i) === pos);
+
+    ["Staff", ...allRoles].map(r => roles.ids.get(r)).forEach(id => {
+        console.log(allRoles, id);
+        member.roles.add(id);
+    });
+
+    let channels = new MapHandler({
+        map: event.channel_map,
+        ids: event.channel_ids
+    });
+
+    let channel = await guild.channels.fetch(channels.ids.get("Staff"));
     if (channel) {
         // setting a delay so their Discord clients can catch up
         setTimeout(() => {
@@ -500,5 +504,8 @@ async function onApplicationApproved(application, message, approver) {
                 "icon_url": "https://cdn.discordapp.com/attachments/485493459357007876/880277441392828486/check-mark-button_2705.png"
             }
         }]});
+        setTimeout(() => {
+            message.delete();
+        }, 10 * 1000);
     }
 }

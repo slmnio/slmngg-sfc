@@ -13,6 +13,8 @@ const { MessageEmbed } = require("discord.js");
 const airtable = new Airtable({apiKey: process.env.AIRTABLE_KEY});
 const base = airtable.base("appQd7DO7rDiMUIEj");
 
+const { MapHandler } = require("./managers.js");
+
 function deAirtable(obj) {
     const data = {};
     Object.entries(obj.fields).forEach(([key, val]) => {
@@ -29,7 +31,170 @@ async function setupEvent(event) {
     const category = await guild.channels.fetch(process.env.STAFFAPPS_CATEGORY_ID);
     if (!category) return console.error("No event category found whilst setting up event.");
 
-    let updatedData = {};
+    let updatedData = {
+        "Re-setup": false
+    };
+
+    // console.log(event);
+
+    if (event.role_map) {
+        let roles = new MapHandler({
+            map: event.role_map,
+            ids: event.role_ids,
+            event: event,
+            create_function: async (item) => {
+                console.log("create role", item);
+                return {
+                    key: item.key,
+                    item: (await guild.roles.create({
+                        name: `${event.prefix} ${item.key}`,
+                        ...(item.key === "Staff" ? { color: event.color } : {})
+                    }))
+                };
+            }
+        });
+        await roles.createMissingItems(([...roles.map.uniqueData, "Staff"]).filter(r => !roles.ids.data.find(m => m.key === r)).map(e => ({key: e})));
+        updatedData["Role IDs"] = roles.ids.textMap;
+
+        // let channels = new MapHandler({
+        //     map: event.channel_map,
+        //     ids: event.channel_ids,
+        //     event
+        // })
+        // let allRoles = ["Staff"];
+        // responses.forEach(response => {
+        //     response.roles.forEach(role => {
+        //         if (allRoles.indexOf(role) === -1) allRoles.push(role);
+        //     });
+        // });
+        //
+        // let eventRoles = (event.role_ids || "").trim().split("\n").map(r => {
+        //     let [role, id] = r.split("=");
+        //     return {role, id};
+        // });
+        // let rolesToCreate = allRoles.filter(roleName => !eventRoles.find(e => e.role === roleName));
+        // let newRoles = await Promise.all(rolesToCreate.map(async roleName => {
+        //     return {
+        //         name: roleName,
+        //         role: (await guild.roles.create({
+        //             name: `${event.prefix} ${roleName}`
+        //         }))
+        //     };
+        // }));
+        // updatedData["Role IDs"] = ((event.role_ids ? event.role_ids + "\n" : "") + newRoles.map(r => [r.name, r.role.id].join("=")).join("\n")).trim();
+        // newRoles.forEach(r => {
+        //     eventRoles.push({ role: r.name, id: r.role.id });
+        // });
+        //
+        // let allCategories = ["Staff", "Live"];
+        // let eventCategories = (event.category_ids || "").trim().split("\n").map(r => {
+        //     let [category, id] = r.split("=");
+        //     return { category, id };
+        // });
+        // let categoriesToCreate = allCategories.filter(catName => !eventCategories.find(e => e.category === catName));
+        // let newCategories = await Promise.all(categoriesToCreate.map(async catName => {
+        //     return {
+        //         name: catName,
+        //         category: (await guild.channels.create(`${event.name} ${catName}`, {
+        //             type: "GUILD_CATEGORY",
+        //             permissionOverwrites: [
+        //                 { id: eventRoles.find(r => r.role === "Staff").id, allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.CONNECT] },
+        //                 { id: guild.roles.everyone, deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] }
+        //             ]
+        //         }))
+        //     };
+        // }));
+        // updatedData["Category IDs"] = ((event.category_ids ? event.category_ids + "\n" : "") + newCategories.map(c => [c.name, c.category.id].join("=")).join("\n")).trim();
+
+        let categories = new MapHandler({
+            map: event.category_map,
+            ids: event.category_ids,
+            event: event,
+            create_function: async (item) => {
+                console.log("create", item);
+                return {
+                    key: item.key,
+                    item: (await guild.channels.create(`${event.prefix} ${item.key}`, {
+                        type: "GUILD_CATEGORY",
+                        permissionOverwrites: [
+                            ...(item.data.map(roleName => {
+                                let id = roles.ids.get(roleName);
+                                if (!id) return null;
+                                return { id, allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT]};
+                            }).filter(i => i)),
+                            { id: guild.roles.everyone, deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT]}
+                        ]
+                    }))
+                };
+            }
+        });
+        await categories.createMissingItems();
+        updatedData["Category IDs"] = categories.ids.textMap;
+
+        let channels = new MapHandler({
+            map: event.channel_map,
+            ids: event.channel_ids,
+            event: event,
+            create_function: async (item) => {
+                console.log("create channel", item);
+
+                let category = categories.combined.find(c => c.data.includes(item.key));
+                console.log("category", category);
+
+                return {
+                    key: item.key,
+                    item: (await guild.channels.create(`${event.prefix}-${item.key}`, {
+                        permissionOverwrites: [
+                            ...(item.data.map(roleName => {
+                                let id = roles.ids.get(roleName);
+                                if (!id) return null;
+                                return { id, allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT]};
+                            }).filter(i => i)),
+                            { id: guild.roles.everyone, deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] }
+                        ],
+                        ...(category ? { parent: category.id } : {})
+                    }))
+                };
+            }
+        });
+        await channels.createMissingItems();
+        updatedData["Channel IDs"] = channels.ids.textMap;
+
+        // let channelMap = (event.channel_map || "").split("\n").map(m => m.split("="));
+        // let eventChannels = event.channel_ids.split("\n").map(c => {
+        //     let [channel, id] = c.split("=");
+        //     return {channel, id};
+        // });
+        // let channelsToCreate = allRoles.filter(roleName => !eventChannels.find(e => e.channel === roleName));
+        // let newChannels = await Promise.all(channelsToCreate.map(async roleName => {
+        //     return {
+        //         name: roleName,
+        //         channel: (await )
+        //     }
+        // }));
+
+        // let channels = new MapManager({
+        //     map: event.channel_map,
+        //     ids: event.channel_ids,
+        //     event: event,
+        //     create_function: async (name) => {
+        //         return {
+        //             name,
+        //             channel:
+        //         }
+        //     }
+        // });
+
+        await base("Events").update(event.id, updatedData);
+    }
+
+    /*
+    *  Make sure all requested roles are created (has ID stored)
+    *  Make sure all requested channels are created (has ID stored)
+    *
+    * */
+
+    return;
 
     /* - Make a general staff role with a colour
     *  - Make a general staff channel

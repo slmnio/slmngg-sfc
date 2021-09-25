@@ -57,7 +57,7 @@ export default {
         },
         eventBorder() {
             if (!this.match || !this.match.event || !this.match.event.theme) return { backgroundColor: "#333" };
-            return { backgroundColor: this.match.event.theme.color_logo_background || this.match.event.theme.color_logo_background };
+            return { backgroundColor: this.match.event.theme.color_theme || this.match.event.theme.color_logo_background };
         }
     },
     methods: {

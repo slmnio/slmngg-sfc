@@ -17,6 +17,15 @@
                 </div>
             </div>
             <div class="right w-25 px-2 d-flex flex-column">
+                <div class="sister mb-3 text-uppercase d-flex align-items-center" v-if="sister" :style="logoBackground1(sister)">
+                    <div class="sister-logo flex-center mx-2">
+                        <div class="logo-inner bg-center" :style="cssImage('backgroundImage', sister.theme, ['default_logo', 'default_wordmark', 'small_logo'], 100)"></div>
+                    </div>
+                    <div class="sister-text ml-1">
+                        <div class="industry-align">Sister team</div>
+                        <div class="industry-align font-weight-bold">{{ sister.name }}</div>
+                    </div>
+                </div>
                 <div class="designers mb-3 px-2 py-3 text-center" :style="teamBG" v-if="designers">
                     <div class="industry-align">Designed by: {{ designers }}</div>
                 </div>
@@ -29,6 +38,9 @@
                     <div class="swatch flex-grow-1 h-100 mx-2" v-for="color in colors" v-bind:key="color.value" :style="{ backgroundColor: color.value }"></div>
                 </div>
             </div>
+        </div>
+        <div class="event-logo-holder position-absolute d-none flex-center" v-if="broadcast.event && broadcast.event.theme">
+            <div class="logo-inner bg-center w-100 h-100" :style="cssImage('backgroundImage', broadcast.event.theme, ['default_logo'], 0, false)"></div>
         </div>
     </div>
 </template>
@@ -45,6 +57,7 @@ function cleanKey(key) {
 export default {
     name: "InfoOverlay",
     props: ["broadcast"],
+    methods: { logoBackground1, cssImage },
     data: () => ({
         logoI: 0
     }),
@@ -53,8 +66,15 @@ export default {
             if (!this.broadcast?.highlight_team?.length) return null;
             return ReactiveRoot(this.broadcast.highlight_team[0], {
                 theme: ReactiveThing("theme"),
-                brand_designers: ReactiveArray("brand_designers")
+                brand_designers: ReactiveArray("brand_designers"),
+                sister_teams: ReactiveArray("sister_teams", {
+                    theme: ReactiveThing("theme")
+                })
             });
+        },
+        sister() {
+            if (!this.highlightTeam?.sister_teams) return null;
+            return this.highlightTeam.sister_teams[0];
         },
         teamBG() {
             return logoBackground1(this.highlightTeam);
@@ -149,8 +169,23 @@ export default {
     .big-logo {
         border-bottom: 1.5rem solid transparent;
     }
-    .logos > .logo-holder, .designers {
+    .logos > .logo-holder, .designers, .sister {
         border-right: 0.5rem solid transparent;
         border-left: 0.5rem solid transparent;
+    }
+    .sister-logo {
+        width: 100px;
+        height: 100px;
+    }
+    .sister {
+        font-size: 1.75rem;
+        line-height: 1;
+    }
+    .event-logo-holder {
+        width: 10rem;
+        height: 5rem;
+        display: initial !important;
+        bottom: 3.5rem;
+        left: 3rem;
     }
 </style>

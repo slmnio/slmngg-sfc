@@ -14,6 +14,7 @@ import SponsorOverlay from "@/components/broadcast/SponsorOverlay";
 import MapsOverlay from "@/components/broadcast/MapsOverlay";
 import BreakBarOverlay from "@/components/broadcast/BreakBarOverlay";
 import PodcastOverlay from "@/components/broadcast/PodcastOverlay";
+import BrandingOverlay from "@/components/broadcast/BrandingOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -32,5 +33,6 @@ export default [
     { path: "info", component: InfoOverlay },
     { path: "background", component: BroadcastBackground, props: route => ({ index: route.query.index }) },
     { path: "sponsors", component: SponsorOverlay },
-    { path: "maps", component: MapsOverlay }
+    { path: "maps", component: MapsOverlay },
+    { path: "branding", component: BrandingOverlay }
 ];

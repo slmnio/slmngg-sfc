@@ -248,7 +248,7 @@ client.once("ready", () => {
     try {
         Auction.guild = client.guilds.resolve("646065580000149514");
         console.log("[auction]", "loaded guild", Auction.guild.name);
-        Auction.channel = Auction.guild.channels.resolve("648311334907281408");
+        Auction.channel = Auction.guild.channels.resolve("746461094654247003");
         console.log("[auction]", "loaded channel", Auction.channel.name);
     } catch (e) {
         console.error(e);

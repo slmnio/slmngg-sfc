@@ -36,7 +36,7 @@
                 <TeamPlayerList v-for="team in displayTeams" :team="team" v-bind:key="team.id" />
             </div>
             <div class="team-focus" v-if="rightDisplay === 'team-focus'">
-                <SignedTeamList :team="signedTeam" />
+                <SignedTeamList :team="signedTeam" :amount="signAmount" />
             </div>
         </div>
     </div>
@@ -60,7 +60,8 @@ export default {
         socketPlayer: null,
         bids: [],
         justSigned: null,
-        signedPlayer: null
+        signedPlayer: null,
+        signAmount: null
     }),
     computed: {
         broadcastPlayerID() {
@@ -178,6 +179,7 @@ export default {
         auction_signed({ player, team, amount }) {
             console.log({ player, team, amount });
             this.justSigned = team;
+            this.signAmount = amount;
             setTimeout(() => {
                 // TODO: uncomment
                 if (this.justSigned) {

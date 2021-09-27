@@ -306,7 +306,7 @@ client.on("messageCreate", async message => {
                 embed.setTitle(`Your team: ${team.get("Name")}`);
                 embed.setColor(getHex(team));
                 embed.setThumbnail(getImage(team));
-                embed.setDescription(`${money(team.get("Balance"))}`);
+                embed.setDescription(`Remaining: ${money(team.get("Balance"))}`);
                 message.reply({ embeds: [embed] });
             }
         },

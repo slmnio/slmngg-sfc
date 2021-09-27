@@ -3,7 +3,7 @@
         <ThemeLogo class="top-logo w-100" :theme="team.theme"/>
         <div class="signed-title pt-4 font-weight-bold text-center">SIGNED TO</div>
         <div class="signed-team pt-3 font-weight-bold text-center">{{ team.name }}</div>
-        <div class="signed-amount pt-1 font-weight-bold text-center">for $20k</div>
+        <div class="signed-amount pt-1 font-weight-bold text-center">for {{ money(amount) }}</div>
 
         <div class="player-list">
             <div class="player" v-bind:class="{empty: player.empty, latest: player.latest}" v-for="player in players" v-bind:key="player.id"  :style="(player.latest ? teamBG : {})">
@@ -23,7 +23,7 @@ import { money } from "@/utils/content-utils";
 export default {
     name: "SignedTeamList",
     components: { ThemeLogo },
-    props: ["team"],
+    props: ["team", "amount"],
     methods: {
         money
     },

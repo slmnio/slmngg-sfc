@@ -160,3 +160,7 @@ C13.888,14.756,13.487,14.83,13.065,14.847z"/>
 
     return "";
 }
+
+export function money(num) {
+    return `$${num || 0}k`;
+}

@@ -30,6 +30,12 @@ function corsHandle(origin, callback) {
 
 const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials: true}, allowEIO3: true});
 
+const auction = require("./discord/new_auction.js")({
+    emit: (...a) => io.emit(...a),
+    test: ["hi"]
+});
+
+
 const Cache = (require("./cache.js")).setup(io);
 require("./airtable-interface.js");
 
@@ -98,5 +104,4 @@ io.on("connection", (socket) => {
 http.listen(port, () => {
     console.log(`[slmngg-server] live on port ${port}`);
 });
-
 

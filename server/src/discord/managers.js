@@ -31,7 +31,10 @@ class MapObject {
         }).filter(e => e.key);
     }
     get(key) {
-        return this.data.find(n => n.key === key)?.data;
+        let data = this.data.find(n => n.key === key)?.data;
+        if (data === "false") return false;
+        if (data === "true") return true;
+        return data;
     }
     push(key, data) {
         if (!key) return;
@@ -61,4 +64,4 @@ class MapObject {
     }
 }
 
-module.exports = { MapHandler };
+module.exports = { MapHandler, MapObject };

@@ -112,7 +112,17 @@ const Auction = {
         if (!Auction.getLeadingBid()) return false;
         if (!team.get("Balance")) return false;
 
-        return bid <= parseInt(team.get("Balance"));
+        // let max = 8;
+        // let count = (team.get("Players") || []).length;
+        // let remaining = max - count;
+        // if (remaining < 0) remaining = 0;
+
+        let balance = parseInt(team.get("Balance"));
+        // let availableBalance = (balance - (10 * remaining));
+
+        // console.log("have", count, "need", remaining);
+
+        return bid <= balance;
     },
     getTeams: async function(bust) {
         if (Auction.cache.teams && !bust) return Auction.cache.teams;
@@ -131,7 +141,7 @@ const Auction = {
     findPlayer: async function(prompt) {
         if (!prompt) return null;
         let players = await Auction.getPlayers(true);
-        let teams = await Auction.getTeams();
+        let teams = await Auction.getTeams(true);
         let teamIDs = teams.map(t => t.id);
 
         let eligiblePlayers = players.filter(t => {
@@ -216,8 +226,14 @@ const Auction = {
                 team.id
             ]
         });
+
+        let max = 8;
+        let count = (team.get("Players") || []).length;
+        let remaining = max - count;
+        if (remaining < 0) remaining = 0;
+
         await update("Teams", team.id, {
-            "Balance": parseInt(team.get("Balance")) - bid.amount
+            "Balance": (parseInt(team.get("Balance")) - bid.amount) + (remaining ? 10 : 0)
         });
 
         // TODO: Update airtables
@@ -283,7 +299,7 @@ client.on("messageCreate", async message => {
             execute: async (args, message) => {
                 if (Auction.activePlayer) { try { await message.delete(); } catch (e) { } return; }
 
-                let team = await Auction.getTeam(message.author);
+                let team = await Auction.getTeam(message.author, true);
                 if (!team) return message.reply(red({title: "Can't find a team that you can control.", footer: { text: "+ ratio" }}));
 
                 let embed = new Discord.MessageEmbed();
@@ -301,7 +317,7 @@ client.on("messageCreate", async message => {
                 if (Auction.activePlayer) { try { await message.delete(); } catch (e) { } return; }
 
                 if (!args[0]) return message.reply(red({title: "usage: `.start <name>` eg `.start joshen`"}));
-
+                await Auction.getTeams(true);
                 let team = await Auction.getTeam(message.author, true);
                 if (!team) return message.reply(red({title: "Can't find the team you represent"}));
 
@@ -324,7 +340,7 @@ client.on("messageCreate", async message => {
                 Auction.Timer.proc();
                 let bid = getBid(args[0]);
                 if (!bid) return message.reply(red({ title: "Invalid bid" }));
-                if (!Auction.teamHasEnoughFor(team, bid)) return message.reply(red({ title: "Your team doesn't have enough funds", description: `${team.get("Name")} has ${money(team.get("Balance"))}`}));
+                if (!Auction.teamHasEnoughFor(team, bid)) return message.reply(red({ title: "Your team doesn't have enough funds", description: `${team.get("Name")} has ${money(team.get("Balance"))}, and the leading bid is ${money(Auction.getLeadingBid().amount)}`}));
                 if (!Auction.isBidInRange(bid)) return message.reply(red({ title: "Bid out of range", description: Auction.getBidRangeText() }));
 
 

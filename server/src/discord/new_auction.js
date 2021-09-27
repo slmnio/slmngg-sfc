@@ -222,7 +222,7 @@ const Auction = {
 
         await update("Players", player.id, {
             "Member Of": [
-                ...player.get("Member Of"),
+                ...(player.get("Member Of") || []),
                 team.id
             ]
         });

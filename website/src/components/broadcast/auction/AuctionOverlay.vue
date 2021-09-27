@@ -49,7 +49,7 @@ import { cleanID, cssImage, money } from "@/utils/content-utils";
 import PlayerTeamDisplay from "./PlayerTeamDisplay";
 import { sortEvents } from "@/utils/sorts";
 import SignedTeamList from "@/components/broadcast/auction/SignedTeamList";
-import { themeBackground1 } from "@/utils/theme-styles";
+import { logoBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "AuctionOverlay",
@@ -157,7 +157,7 @@ export default {
         },
         getTheme(teamID) {
             console.log(cleanID(teamID), this.teams);
-            return themeBackground1(this.teams.find(t => t.id === cleanID(teamID)));
+            return logoBackground1(this.teams.find(t => t.id === cleanID(teamID)));
         }
     },
     mounted() {
@@ -171,6 +171,7 @@ export default {
             console.log("auction_start", player);
             this.socketPlayer = player;
             this.justSigned = null;
+            this.bids = [];
         },
         auction_bids(bids) {
             console.log("auction_bids", bids);
@@ -186,7 +187,7 @@ export default {
                     this.justSigned = null;
                     this.signedPlayer = null;
                 }
-            }, 15 * 1000);
+            }, 20 * 1000);
         }
     }
 };
@@ -248,7 +249,7 @@ export default {
         width: 400px;
         overflow: hidden;
         flex-shrink: 1;
-        max-height: 800px;
+        max-height: 860px;
     }
 
     .bid .team-logo {

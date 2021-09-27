@@ -153,7 +153,7 @@ const Auction = {
     getBroadcast: async function() {
         try {
             return await select("Broadcasts", {
-                filterByFormula: "{Key} = \"st4\""
+                filterByFormula: "{Key} = \"bpl3\""
             });
         } catch (e) {
             console.error(e);

@@ -5,7 +5,10 @@ const port = 8901;
 const http = require("http").Server(app);
 const cors = require("cors");
 const routes = require("./routes.js");
-const staff = require("./discord/staff.js");
+// const staff = require("./discord/staff.js");
+// const api = require("./api/level_1.js");
+// const autodis = require("./discord/autodis.js");
+// const bpl3 = require("./bpl3.js");
 
 let domains = ["slmn.gg", "localslmn", "localhost"].map(d => new RegExp(`(?:^|.*\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
 

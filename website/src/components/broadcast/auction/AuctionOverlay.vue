@@ -35,11 +35,14 @@
             <div class="team-lists" v-if="['teams-1', 'teams-2'].includes(rightDisplay)">
                 <TeamPlayerList v-for="team in displayTeams" :team="team" v-bind:key="team.id" :leading="leadingBid" />
             </div>
-            <div class="team-focus" v-if="rightDisplay === 'team-focus'">
+            <div class="team-focus" v-if="rightDisplay === 'sign-focus'">
                 <SignedTeamList :team="signedTeam" :amount="signAmount" :signedPlayer="signedPlayer" />
             </div>
             <div class="bid-focus flex-center h-100 w-100" v-if="rightDisplay === 'bid-focus'">
                 <BidFocus :teams="teams" :bids="bids"/>
+            </div>
+            <div class="team-focus">
+                <TeamFocus :team="highlightedTeam"/>
             </div>
         </div>
     </div>
@@ -54,11 +57,12 @@ import { sortEvents } from "@/utils/sorts";
 import SignedTeamList from "@/components/broadcast/auction/SignedTeamList";
 import { logoBackground1 } from "@/utils/theme-styles";
 import BidFocus from "./BidFocus";
+import TeamFocus from "@/components/broadcast/auction/TeamFocus";
 
 export default {
     name: "AuctionOverlay",
     props: ["broadcast", "category"],
-    components: { TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus },
+    components: { TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus },
     data: () => ({
         tick: 0,
         socketPlayer: null,
@@ -91,6 +95,17 @@ export default {
                 })
             });
         },
+        highlightedTeamID() {
+            if (!this.broadcast?.highlight_team) return null;
+            return this.broadcast?.highlight_team[0];
+        },
+        highlightedTeam() {
+            if (!this.highlightedTeamID) return;
+            return ReactiveRoot(this.highlightedTeamID, {
+                players: ReactiveArray("players"),
+                theme: ReactiveThing("theme")
+            });
+        },
         playerTeams() {
             if (!this.player?.member_of) return [];
             return this.player.member_of.filter(t => {
@@ -120,7 +135,8 @@ export default {
             });
         },
         rightDisplay() {
-            if (this.justSigned) return "team-focus";
+            if (this.justSigned) return "sign-focus";
+            if (this.highlightedTeam) return "sign-focus";
             if (this.bids && this.biddingActive) {
                 if (this.bids.length >= 12) return "bid-focus";
                 if (this.leadingBid && this.leadingBid.amount >= 175) return "bid-focus";

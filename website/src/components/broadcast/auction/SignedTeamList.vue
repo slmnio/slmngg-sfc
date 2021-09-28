@@ -1,5 +1,5 @@
 <template>
-    <div class="signed-team-list p-3">
+    <div class="signed-team-list p-3" v-if="team">
         <ThemeLogo class="top-logo w-100" :theme="team.theme"/>
         <div class="signed-title pt-4 font-weight-bold text-center">SIGNED TO</div>
         <div class="signed-team pt-3 font-weight-bold text-center">{{ team.name }}</div>

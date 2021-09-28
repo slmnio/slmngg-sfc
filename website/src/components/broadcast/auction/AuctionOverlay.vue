@@ -41,8 +41,11 @@
             <div class="bid-focus flex-center h-100 w-100" v-if="rightDisplay === 'bid-focus'">
                 <BidFocus :teams="teams" :bids="bids"/>
             </div>
-            <div class="team-focus">
+            <div class="team-focus" v-if="rightDisplay === 'team-focus'">
                 <TeamFocus :team="highlightedTeam"/>
+            </div>
+            <div class="bidding-war" v-if="rightDisplay === 'bidding-war'">
+                <BiddingWar :teams="biddingWar"/>
             </div>
         </div>
     </div>
@@ -58,11 +61,12 @@ import SignedTeamList from "@/components/broadcast/auction/SignedTeamList";
 import { logoBackground1 } from "@/utils/theme-styles";
 import BidFocus from "./BidFocus";
 import TeamFocus from "@/components/broadcast/auction/TeamFocus";
+import BiddingWar from "@/components/broadcast/auction/BiddingWar";
 
 export default {
     name: "AuctionOverlay",
     props: ["broadcast", "category"],
-    components: { TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus },
+    components: { TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar },
     data: () => ({
         tick: 0,
         socketPlayer: null,
@@ -136,6 +140,7 @@ export default {
         },
         rightDisplay() {
             if (this.justSigned) return "sign-focus";
+            if (this.biddingWar) return "bidding-war";
             if (this.highlightedTeam) return "sign-focus";
             if (this.bids && this.biddingActive) {
                 if (this.bids.length >= 12) return "bid-focus";
@@ -169,6 +174,18 @@ export default {
         leadingBid() {
             if (!this.bids) return null;
             return this.bids[this.bids.length - 1];
+        },
+        biddingWar() {
+            // if (!this.biddingActive) return false;
+            const count = 5;
+            const latestBids = this.bids.slice(Math.max(this.bids.length - count, 0));
+            if (latestBids.length !== count) return false;
+            const teams = [];
+            latestBids.forEach((bid) => {
+                if (teams.indexOf(bid.team.id) === -1) teams.push(bid.team.id);
+            });
+            if (teams.length === 2) return teams;
+            return null;
         }
     },
     watch: {

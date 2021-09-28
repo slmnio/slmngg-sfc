@@ -169,7 +169,7 @@ export default {
             let teams = this._broadcast.event.teams;// .filter(t => t.players?.length);
             if (this.category) teams = teams.filter(t => t.team_category === this.category);
 
-            return teams;
+            return teams.sort((a, b) => a.draft_order - b.draft_order);
         },
         displayTeams() {
             if (!this.teams?.length) return [];

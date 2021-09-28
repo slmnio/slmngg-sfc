@@ -25,17 +25,8 @@ export default {
 .bid-focus-grid {
     display: grid;
     grid-auto-flow: column;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    /*grid-template-columns: 1fr 1fr;*/
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; /* max out on 8 vertically */
     gap: 0px 0px;
-    grid-template-areas:
-    ". ."
-    ". ."
-    ". ."
-    ". ."
-    ". ."
-    ". ."
-    ". ."
-    ". .";
 }
 </style>

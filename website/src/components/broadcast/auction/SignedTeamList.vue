@@ -18,7 +18,7 @@
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cleanID, money } from "@/utils/content-utils";
+import { cleanID, getAuctionMax, money } from "@/utils/content-utils";
 
 export default {
     name: "SignedTeamList",
@@ -32,11 +32,11 @@ export default {
             return logoBackground1(this.team);
         },
         players() {
-            const max = 8;
+            const max = getAuctionMax();
             let fill = max - (this.team?.players?.length || 0);
             if (fill < 0) fill = 0;
 
-            console.log("signedteamlist", this.signedPlayer, this.team.players);
+            // console.log("signedteamlist", this.signedPlayer, this.team.players);
 
             const arr = [
                 ...(this.team.players || []),

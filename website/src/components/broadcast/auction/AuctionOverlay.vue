@@ -7,9 +7,13 @@
                 </div>
                 <div class="event-name flex-grow-1 flex-center d-flex flex-column">
                     <div class="industry-align">{{ _broadcast.event ? (_broadcast.event.short || _broadcast.event.name): '' }}</div>
-                    <div class="industry-align">Player Auction</div>
+                    <div class="industry-align">{{ title || 'Player Auction' }}</div>
                 </div>
-                <div class="event-stats flex-center"></div>
+                <div class="event-stats flex-center d-flex flex-column">
+                    <div v-if="stats">{{ stats.remainingEligiblePlayers }} / {{ stats.allPlayers }} player{{ stats.remainingEligiblePlayers === 1 ? '' : 's' }} remaining</div>
+                    <div v-if="stats">{{ stats.remainingPlaces }} spot{{ stats.remainingPlaces === 1 ? '' : 's' }} remaining</div>
+                    <div v-if="stats">{{ stats.signedPlayers }} player{{ stats.signedPlayers === 1 ? '' : 's' }} signed</div>
+                </div>
             </div>
             <div class="player-middle d-flex flex-grow-1">
                 <div class="player-info w-100 flex-center flex-column">
@@ -65,7 +69,7 @@ import BiddingWar from "@/components/broadcast/auction/BiddingWar";
 
 export default {
     name: "AuctionOverlay",
-    props: ["broadcast", "category"],
+    props: ["broadcast", "category", "title"],
     components: { TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar },
     data: () => ({
         tick: 0,
@@ -74,7 +78,8 @@ export default {
         justSigned: null,
         signedPlayer: null,
         signAmount: null,
-        biddingActive: false
+        biddingActive: false,
+        stats: null
     }),
     computed: {
         broadcastPlayerID() {
@@ -139,12 +144,14 @@ export default {
             });
         },
         rightDisplay() {
+            // return "bid-focus";
+            // // eslint-disable-next-line no-unreachable
             if (this.justSigned) return "sign-focus";
             if (this.biddingWar) return "bidding-war";
             if (this.highlightedTeam) return "team-focus";
             if (this.bids && this.biddingActive) {
                 if (this.bids.length >= 12) return "bid-focus";
-                if (this.leadingBid && this.leadingBid.amount >= (this.average || 175)) return "bid-focus";
+                if (this.leadingBid && this.leadingBid.amount >= Math.min(this.average || 0, 200)) return "bid-focus";
             }
             if (this.tick % 2 === 0) return "teams-1";
             if (this.tick % 2 === 1) return "teams-2";
@@ -167,8 +174,10 @@ export default {
         displayTeams() {
             if (!this.teams?.length) return [];
             let teams = this.teams;
-            if (this.rightDisplay === "teams-1") teams = teams.slice(0, 8);
-            if (this.rightDisplay === "teams-2") teams = teams.slice(8, 16);
+            if (this.teams.length > 8) {
+                if (this.rightDisplay === "teams-1") teams = teams.slice(0, 8);
+                if (this.rightDisplay === "teams-2") teams = teams.slice(8, 16);
+            }
             return teams;
         },
         signedTeam() {
@@ -216,6 +225,8 @@ export default {
         }
     },
     mounted() {
+        this.$socket.client.emit("subscribe", "auction");
+
         setInterval(() => {
             this.tick++;
             if (this.tick >= 4) this.tick = 0;
@@ -248,6 +259,10 @@ export default {
                     this.bids = [];
                 }
             }, 20 * 1000);
+        },
+        auction_stats(stats) {
+            console.log(stats);
+            this.stats = stats;
         }
     }
 };
@@ -315,6 +330,15 @@ export default {
     .bid .team-logo {
         width: 80px;
         height: 80px;
+    }
+
+    .event-stats {
+        font-size: 24px;
+        text-align: center;
+        font-weight: bold;
+    }
+    .event-stats div {
+        margin: 2px 0;
     }
 
 

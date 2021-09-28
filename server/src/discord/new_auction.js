@@ -6,7 +6,10 @@ const Discord = require("discord.js");
 let io;
 
 function money(num) {
-    return `$${num}k`;
+    return `$${num || 0}k`;
+}
+function getAuctionMax() {
+    return 8;
 }
 
 function deAirtable(obj) {
@@ -61,6 +64,7 @@ const Auction = {
         afterInitial: 20,
         afterBid: 12
     },
+    stats: {},
     timeouts: {},
     bids: [],
     bid: function(bid) {
@@ -129,7 +133,15 @@ const Auction = {
         Auction.cache.teams = await select("Teams", {
             view: "Auction Teams"
         });
+
+        Auction.stats.signedPlayers = Auction.cache.teams.map(t => (t.get("Players") || []).length).reduce((p,c) => p + c, 0);
+        Auction.stats.remainingPlaces = (Auction.cache.teams.length * getAuctionMax()) - Auction.stats.signedPlayers;
+        Auction.updateStats();
         return Auction.cache.teams;
+    },
+    updateStats() {
+        console.log("emitting stats");
+        io.emit("auction_stats", Auction.stats);
     },
     getPlayers: async function(bust) {
         if (Auction.cache.players && !bust) return Auction.cache.players;
@@ -148,6 +160,13 @@ const Auction = {
             //        array of IDs
             return !(t.get("Member Of") || []).some(teamID => teamIDs.includes(teamID));
         });
+        Auction.stats = {
+            allPlayers: players.length,
+            remainingEligiblePlayers: eligiblePlayers.length,
+            signedPlayers: teams.map(t => (t.get("Players") || []).length).reduce((p,c) => p + c, 0),
+        };
+        Auction.stats.remainingPlaces = (teams.length * getAuctionMax()) - Auction.stats.signedPlayers;
+        Auction.updateStats();
         return eligiblePlayers.find(p => p.get("Name").toLowerCase() === prompt.toLowerCase());
     },
     getBroadcast: async function() {
@@ -221,6 +240,12 @@ const Auction = {
             amount: bid.amount,
         });
 
+
+        let max = getAuctionMax();
+        let count = (team.get("Players") || []).length;
+        let remaining = (max - (count + 1)); // we're adding an extra player so
+        if (remaining < 0) remaining = 0;
+
         await update("Players", player.id, {
             "Member Of": [
                 ...(player.get("Member Of") || []),
@@ -228,16 +253,15 @@ const Auction = {
             ]
         });
 
-        let max = 8;
-        let count = (team.get("Players") || []).length;
-        let remaining = max - count;
-        if (remaining < 0) remaining = 0;
-
         await update("Teams", team.id, {
-            "Balance": (parseInt(team.get("Balance")) - bid.amount) + (remaining ? 10 : 0)
+            "Balance": (parseInt(team.get("Balance")) - bid.amount) + (remaining - 1 ? 10 : 0)
         });
 
-        // TODO: Update airtables
+
+        Auction.stats.remainingEligiblePlayers--;
+        Auction.stats.signedPlayers++;
+        Auction.stats.remainingPlaces--;
+        Auction.updateStats();
     },
     checkAfterBid() {
         console.log("check after");
@@ -318,9 +342,11 @@ client.on("messageCreate", async message => {
                 if (Auction.activePlayer) { try { await message.delete(); } catch (e) { } return; }
 
                 if (!args[0]) return message.reply(red({title: "usage: `.start <name>` eg `.start joshen`"}));
+                await Auction.channel.sendTyping();
                 await Auction.getTeams(true);
                 let team = await Auction.getTeam(message.author, true);
                 if (!team) return message.reply(red({title: "Can't find the team you represent"}));
+                if ((team.get("Players") || []).length >= getAuctionMax()) return message.reply(red({title: "You're at your maximum player count."}));
 
                 let player = await Auction.findPlayer(args[0]);
                 if (!player) return message.reply(red({title: "idk who that is LOL"}));
@@ -347,6 +373,7 @@ client.on("messageCreate", async message => {
 
                 let embed = new Discord.MessageEmbed();
                 embed.setTitle(`New bid for ${Auction.activePlayer.get("Name")}: ${money(bid)}`);
+                // TODO: say how much a team has in their balance
                 embed.setColor(getHex(team));
                 embed.setThumbnail(getImage(team));
 
@@ -361,5 +388,22 @@ client.on("messageCreate", async message => {
 });
 
 module.exports = (_io) => {
-    io = _io;
+    io = {
+        emit: (...a) => {
+            console.log("socket emit", a);
+            _io.to("auction").emit(...a);
+        },
+        on: (...a) => {
+            return _io.on(...a);
+        }
+    };
+    io.on("connection", (socket) => {
+        socket.on("subscribe", (id) => {
+            // subscription is already handled by the main system, this just backfills auction stats
+            if (id === "auction") {
+                socket.join("auction");
+                socket.emit("auction_stats", Auction.stats);
+            }
+        });
+    });
 };

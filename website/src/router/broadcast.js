@@ -36,5 +36,5 @@ export default [
     { path: "sponsors", component: SponsorOverlay },
     { path: "maps", component: MapsOverlay },
     { path: "branding", component: BrandingOverlay },
-    { path: "auction", component: AuctionOverlay, props: route => ({ category: route.query.category }) }
+    { path: "auction", component: AuctionOverlay, props: route => ({ category: route.query.category, title: route.query.title }) }
 ];

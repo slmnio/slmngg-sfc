@@ -164,3 +164,7 @@ C13.888,14.756,13.487,14.83,13.065,14.847z"/>
 export function money(num) {
     return `$${num || 0}k`;
 }
+
+export function getAuctionMax() {
+    return 8;
+}

@@ -10,7 +10,7 @@
             </div>
         </div>
         <div class="player-list">
-            <div class="player" v-bind:class="{empty: player.empty}" v-for="player in players" v-bind:key="player.id">
+            <div class="player" v-bind:class="{empty: player.empty}" v-for="player in players" v-bind:key="player.id" :style="teamIsDone ? teamBG : {}">
                 <div v-if="!player.empty" >{{ player.name }}</div>
                 <div v-else style="opacity: 0;">...</div>
             </div>
@@ -20,7 +20,7 @@
 
 <script>
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cssImage, money } from "@/utils/content-utils";
+import { cleanID, cssImage, getAuctionMax, money } from "@/utils/content-utils";
 
 export default {
     name: "TeamPlayerList",
@@ -34,7 +34,7 @@ export default {
             return cssImage("backgroundImage", this.team?.theme, ["small_logo", "default_logo"], 100);
         },
         players() {
-            const max = 8;
+            const max = getAuctionMax();
             let fill = max - (this.team?.players?.length || 0);
             if (fill < 0) fill = 0;
             return [
@@ -42,9 +42,16 @@ export default {
                 ...(Array(fill).fill({ empty: true }))
             ];
         },
+        teamIsDone() {
+            if (!this.team?.players?.length) return false;
+            const max = getAuctionMax();
+            console.log(this.team.players.length, max);
+            return this.team.players.length >= max;
+        },
         canBid() {
+            // TODO: make sure they aren't out because they filled their roster
             if (!this.leading?.team) return true;
-            if (this.leading.team.id === this.team.id && this.leading.amount === this.team.balance) return true;
+            if (cleanID(this.leading.team.id) === this.team.id && this.leading.amount === this.team.balance) return true;
             return (this.leading.amount + 1) <= this.team.balance;
         }
     }

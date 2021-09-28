@@ -141,7 +141,7 @@ export default {
         rightDisplay() {
             if (this.justSigned) return "sign-focus";
             if (this.biddingWar) return "bidding-war";
-            if (this.highlightedTeam) return "sign-focus";
+            if (this.highlightedTeam) return "team-focus";
             if (this.bids && this.biddingActive) {
                 if (this.bids.length >= 12) return "bid-focus";
                 if (this.leadingBid && this.leadingBid.amount >= 175) return "bid-focus";

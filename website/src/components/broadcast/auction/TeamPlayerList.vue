@@ -1,6 +1,6 @@
 <template>
     <div class="team-player-list d-flex" v-if="team">
-        <div class="top" :style="teamBG">
+        <div class="top" :style="{...teamBG, ...(canBid ? {} : {opacity: 0.2})}">
             <div class="rotate-inner">
                 <div class="logo flex-center">
                     <div class="logo-inner bg-center" :style="teamLogo"></div>
@@ -24,7 +24,7 @@ import { cssImage, money } from "@/utils/content-utils";
 
 export default {
     name: "TeamPlayerList",
-    props: ["team"],
+    props: ["team", "leading"],
     methods: { money },
     computed: {
         teamBG() {
@@ -41,6 +41,11 @@ export default {
                 ...(this.team.players || []),
                 ...(Array(fill).fill({ empty: true }))
             ];
+        },
+        canBid() {
+            if (!this.leading?.team) return true;
+            if (this.leading.team.id === this.team.id && this.leading.amount === this.team.balance) return true;
+            return (this.leading.amount + 1) <= this.team.balance;
         }
     }
 };

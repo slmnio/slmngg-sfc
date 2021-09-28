@@ -33,7 +33,7 @@
         </div>
         <div class="right bg-dark flex-shrink-0">
             <div class="team-lists" v-if="['teams-1', 'teams-2'].includes(rightDisplay)">
-                <TeamPlayerList v-for="team in displayTeams" :team="team" v-bind:key="team.id" />
+                <TeamPlayerList v-for="team in displayTeams" :team="team" v-bind:key="team.id" :leading="leadingBid" />
             </div>
             <div class="team-focus" v-if="rightDisplay === 'team-focus'">
                 <SignedTeamList :team="signedTeam" :amount="signAmount" :signedPlayer="signedPlayer" />
@@ -70,10 +70,12 @@ export default {
     }),
     computed: {
         broadcastPlayerID() {
+            if (!this.biddingActive) return null;
             if (!this.broadcast?.highlight_player) return null;
             return this.broadcast?.highlight_player[0];
         },
         playerID() {
+            if (!this.biddingActive && !this.justSigned) return null;
             if (this.socketPlayer) return this.socketPlayer.id;
             if (!this.broadcast?.highlight_player) return null;
             return this.broadcast?.highlight_player[0];
@@ -119,9 +121,9 @@ export default {
         },
         rightDisplay() {
             if (this.justSigned) return "team-focus";
-            if (this.bids/* && this.biddingActive */) {
-                if (this.bids.length >= 10) return "bid-focus";
-                if (this.leadingBid && this.leadingBid.amount >= 200) return "bid-focus";
+            if (this.bids && this.biddingActive) {
+                if (this.bids.length >= 12) return "bid-focus";
+                if (this.leadingBid && this.leadingBid.amount >= 175) return "bid-focus";
             }
             if (this.tick % 2 === 0) return "teams-1";
             if (this.tick % 2 === 1) return "teams-2";
@@ -177,7 +179,7 @@ export default {
         setInterval(() => {
             this.tick++;
             if (this.tick >= 4) this.tick = 0;
-        }, 5000);
+        }, 8000);
     },
     sockets: {
         auction_start(player) {
@@ -192,7 +194,7 @@ export default {
             this.bids = bids;
         },
         auction_signed({ player, team, amount }) {
-            console.log({ player, team, amount });
+            console.log("signed", { player, team, amount });
             this.justSigned = team;
             this.signAmount = amount;
             this.biddingActive = false;
@@ -200,8 +202,10 @@ export default {
             setTimeout(() => {
                 // TODO: uncomment
                 if (this.justSigned) {
+                    this.socketPlayer = null;
                     this.justSigned = null;
                     this.signedPlayer = null;
+                    this.bids = [];
                 }
             }, 20 * 1000);
         }

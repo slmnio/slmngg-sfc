@@ -105,7 +105,7 @@ const Auction = {
     getBidRangeText() {
         if (!Auction.getLeadingBid()) return false;
         let leadingAmount = Auction.getLeadingBid().amount;
-        return `You must be between ${money(Auction.range.min)} and ${money(Auction.range.max)} above the last bid.\n In this case, you must bid **between ${money(leadingAmount + Auction.range.min)} and ${money(leadingAmount + Auction.range.max)}**.`;
+        return `You must be between ${money(Auction.range.min)} and ${money(Auction.range.max)} above the last bid.\n In this case, you must bid **between ${money(leadingAmount + Auction.range.min)} and ${money(leadingAmount + Auction.range.max)}**.\nThe current bid is **${money(leadingAmount)}**.`;
         // TODO: update bid range text here
     },
     teamHasEnoughFor(team, bid) {

@@ -30,6 +30,8 @@ export default {
             return cleanID(this.leading.team.id) === this.team.id;
         },
         canBid() {
+            if (!this.leading?.team) return true;
+            if (this.leading.team.id === this.team.id && this.leading.amount === this.team.balance) return true;
             return (this.leading.amount + 1) <= this.team.balance;
         },
         dark() {

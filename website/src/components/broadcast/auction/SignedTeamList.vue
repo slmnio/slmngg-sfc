@@ -18,7 +18,7 @@
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { logoBackground1 } from "@/utils/theme-styles";
-import { money } from "@/utils/content-utils";
+import { cleanID, money } from "@/utils/content-utils";
 
 export default {
     name: "SignedTeamList",
@@ -36,6 +36,8 @@ export default {
             let fill = max - (this.team?.players?.length || 0);
             if (fill < 0) fill = 0;
 
+            console.log("signedteamlist", this.signedPlayer, this.team.players);
+
             const arr = [
                 ...(this.team.players || []),
                 ...(Array(fill).fill({ empty: true }))
@@ -43,7 +45,7 @@ export default {
             if (this.signedPlayer) {
                 return arr.map((p, i) => ({
                     ...p,
-                    latest: this.signedPlayer?.id === p.id
+                    latest: cleanID(this.signedPlayer.id) === p.id
                 }));
             }
             return arr;

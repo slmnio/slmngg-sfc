@@ -376,6 +376,7 @@ client.on("messageCreate", async message => {
                 // TODO: say how much a team has in their balance
                 embed.setColor(getHex(team));
                 embed.setThumbnail(getImage(team));
+                embed.setDescription(`${team.get("Name")} has ${money(team.get("Balance"))}`);
 
                 Auction.channel.send({embeds: [embed]});
 

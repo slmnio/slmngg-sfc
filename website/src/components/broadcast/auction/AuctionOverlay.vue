@@ -144,11 +144,18 @@ export default {
             if (this.highlightedTeam) return "team-focus";
             if (this.bids && this.biddingActive) {
                 if (this.bids.length >= 12) return "bid-focus";
-                if (this.leadingBid && this.leadingBid.amount >= 175) return "bid-focus";
+                if (this.leadingBid && this.leadingBid.amount >= (this.average || 175)) return "bid-focus";
             }
             if (this.tick % 2 === 0) return "teams-1";
             if (this.tick % 2 === 1) return "teams-2";
             return null;
+        },
+        average() {
+            if (!this.teams) return 175;
+            const balances = this.teams.map(t => t.balance || 0);
+            const sum = balances.reduce((a, b) => a + b, 0);
+            const avg = (sum / balances.length) || 0;
+            return avg;
         },
         teams() {
             if (!this._broadcast?.event?.teams?.length) return null;

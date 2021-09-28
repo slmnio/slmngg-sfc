@@ -1,7 +1,7 @@
 <template>
     <div class="auction-overlay d-flex w-100 h-100 position-absolute">
         <div class="left flex-grow-1 d-flex flex-column overflow-hidden">
-            <div class="event-top d-flex bg-dark flex-center">
+            <div class="event-top d-flex bg-dark flex-center flex-shrink-0">
                 <div class="event-logo-holder flex-center">
                     <div class="logo-inner bg-center" :style="eventLogo"></div>
                 </div>
@@ -12,7 +12,7 @@
                 <div class="event-stats flex-center"></div>
             </div>
             <div class="player-middle d-flex flex-grow-1">
-                <div class="player-info w-100 h-100 flex-center flex-column">
+                <div class="player-info w-100 flex-center flex-column">
                     <div v-if="player">
                         <div class="player-name">{{ player.name }}</div>
                         <div class="player-teams d-flex flex-wrap flex-center">
@@ -36,7 +36,10 @@
                 <TeamPlayerList v-for="team in displayTeams" :team="team" v-bind:key="team.id" />
             </div>
             <div class="team-focus" v-if="rightDisplay === 'team-focus'">
-                <SignedTeamList :team="signedTeam" :amount="signAmount" />
+                <SignedTeamList :team="signedTeam" :amount="signAmount" :signedPlayer="signedPlayer" />
+            </div>
+            <div class="bid-focus flex-center h-100 w-100" v-if="rightDisplay === 'bid-focus'">
+                <BidFocus :teams="teams" :bids="bids"/>
             </div>
         </div>
     </div>
@@ -50,18 +53,20 @@ import PlayerTeamDisplay from "./PlayerTeamDisplay";
 import { sortEvents } from "@/utils/sorts";
 import SignedTeamList from "@/components/broadcast/auction/SignedTeamList";
 import { logoBackground1 } from "@/utils/theme-styles";
+import BidFocus from "./BidFocus";
 
 export default {
     name: "AuctionOverlay",
     props: ["broadcast", "category"],
-    components: { TeamPlayerList, PlayerTeamDisplay, SignedTeamList },
+    components: { TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus },
     data: () => ({
         tick: 0,
         socketPlayer: null,
         bids: [],
         justSigned: null,
         signedPlayer: null,
-        signAmount: null
+        signAmount: null,
+        biddingActive: false
     }),
     computed: {
         broadcastPlayerID() {
@@ -114,6 +119,10 @@ export default {
         },
         rightDisplay() {
             if (this.justSigned) return "team-focus";
+            if (this.bids/* && this.biddingActive */) {
+                if (this.bids.length >= 10) return "bid-focus";
+                if (this.leadingBid && this.leadingBid.amount >= 200) return "bid-focus";
+            }
             if (this.tick % 2 === 0) return "teams-1";
             if (this.tick % 2 === 1) return "teams-2";
             return null;
@@ -126,6 +135,7 @@ export default {
             return teams;
         },
         displayTeams() {
+            if (!this.teams?.length) return [];
             let teams = this.teams;
             if (this.rightDisplay === "teams-1") teams = teams.slice(0, 8);
             if (this.rightDisplay === "teams-2") teams = teams.slice(8, 16);
@@ -137,6 +147,10 @@ export default {
                 theme: ReactiveThing("theme"),
                 players: ReactiveArray("players")
             });
+        },
+        leadingBid() {
+            if (!this.bids) return null;
+            return this.bids[this.bids.length - 1];
         }
     },
     watch: {
@@ -156,7 +170,6 @@ export default {
                 100);
         },
         getTheme(teamID) {
-            console.log(cleanID(teamID), this.teams);
             return logoBackground1(this.teams.find(t => t.id === cleanID(teamID)));
         }
     },
@@ -172,6 +185,7 @@ export default {
             this.socketPlayer = player;
             this.justSigned = null;
             this.bids = [];
+            this.biddingActive = true;
         },
         auction_bids(bids) {
             console.log("auction_bids", bids);
@@ -181,6 +195,8 @@ export default {
             console.log({ player, team, amount });
             this.justSigned = team;
             this.signAmount = amount;
+            this.biddingActive = false;
+            this.signedPlayer = player;
             setTimeout(() => {
                 // TODO: uncomment
                 if (this.justSigned) {
@@ -256,4 +272,6 @@ export default {
         width: 80px;
         height: 80px;
     }
+
+
 </style>

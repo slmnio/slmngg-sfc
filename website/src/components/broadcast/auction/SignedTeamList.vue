@@ -23,7 +23,7 @@ import { money } from "@/utils/content-utils";
 export default {
     name: "SignedTeamList",
     components: { ThemeLogo },
-    props: ["team", "amount"],
+    props: ["team", "amount", "signedPlayer"],
     methods: {
         money
     },
@@ -36,14 +36,17 @@ export default {
             let fill = max - (this.team?.players?.length || 0);
             if (fill < 0) fill = 0;
 
-            return [
+            const arr = [
                 ...(this.team.players || []),
                 ...(Array(fill).fill({ empty: true }))
-            ].map((p, i) => ({
-                ...p,
-                latest: (max - (i + 1)) === fill,
-                l: ({ latest: (max - (i + 1)), fill })
-            }));
+            ];
+            if (this.signedPlayer) {
+                return arr.map((p, i) => ({
+                    ...p,
+                    latest: this.signedPlayer?.id === p.id
+                }));
+            }
+            return arr;
         }
     }
 };

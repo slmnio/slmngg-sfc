@@ -59,7 +59,7 @@ const Auction = {
     activePlayer: null,
     wait: {
         afterInitial: 20,
-        afterBid: 10
+        afterBid: 12
     },
     timeouts: {},
     bids: [],
@@ -202,6 +202,7 @@ const Auction = {
             if (startingTeam.get("Theme Color")) {
                 embed.setColor(getHex(startingTeam));
             }
+            embed.setFooter(`Auction will close in ${Auction.wait.afterBid} seconds if there are no further bids.`);
         }
         Auction.channel.send({ embeds: [embed] });
     },

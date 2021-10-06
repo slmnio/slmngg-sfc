@@ -47,10 +47,10 @@ export function sortByHeadToHead(a, b) {
 }
 
 export function sortByMapWins(a, b) {
-    if (a.map_wins > b.map_wins) return -1;
-    if (a.map_wins < b.map_wins) return 1;
-    if (a.map_losses > b.map_losses) return 1;
-    if (a.map_losses < b.map_losses) return -1;
+    // if (a.map_wins > b.map_wins) return -1;
+    // if (a.map_wins < b.map_wins) return 1;
+    // if (a.map_losses > b.map_losses) return 1;
+    // if (a.map_losses < b.map_losses) return -1;
 
     const [aMapDiff, bMapDiff] = [a, b].map(x => x.map_wins - x.map_losses);
     if (aMapDiff !== bMapDiff) {
@@ -210,7 +210,7 @@ export function sortTeamsIntoStandings(teams) {
     if (!standings.every(s => s.length === 1)) {
         // scenario.sorts++;
         // console.log(scenario.i + 1);
-        standings = sortIntoGroups2(sortByMapWins, standings);
+        // standings = sortIntoGroups2(sortByMapWins, standings);
 
         // console.log("sorting");
         // standings = standings.map(group => {

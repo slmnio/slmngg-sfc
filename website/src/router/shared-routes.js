@@ -14,6 +14,8 @@ import PlayerPlayedMatches from "@/views/sub-views/PlayerPlayedMatches";
 import Match from "@/views/Match";
 import News from "@/views/News";
 import DetailedMatch from "@/views/DetailedMatch";
+import MatchVOD from "@/views/sub-views/MatchVOD";
+import MatchHistory from "@/views/sub-views/MatchHistory";
 
 export default [
     {
@@ -48,7 +50,15 @@ export default [
             { path: "played-matches", component: PlayerPlayedMatches }
         ]
     },
-    { path: "/match/:id", component: Match, props: route => ({ id: route.params.id }) },
+    {
+        path: "/match/:id",
+        component: Match,
+        props: route => ({ id: route.params.id }),
+        children: [
+            { path: "", component: MatchVOD },
+            { path: "history", component: MatchHistory }
+        ]
+    },
     { path: "/detailed/:id", component: DetailedMatch, props: route => ({ id: route.params.id }) },
     {
         path: "/news/:slug",

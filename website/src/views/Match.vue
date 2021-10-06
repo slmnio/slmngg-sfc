@@ -7,16 +7,14 @@
         <div class="container mt-3 large-container">
             <div class="row">
                 <div class="col-12 col-md-9 mb-3">
-                    <EmbeddedVideo :src="match.vod" v-if="match && match.vod" />
-                    <div class="embed embed-responsive embed-responsive-16by9" v-if="showNoVOD">
-                        <div class="no-embed-text flex-center">No VOD available for this match</div>
-                    </div>
-                    <!--  TODO: add spoilers? -->
-                    <div class="maps-holder mt-3 flex-center" v-if="match.maps">
-                        <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="theme" v-bind:key="map.id"/>
-                    </div>
+                    <router-view :match="match" />
                 </div>
                 <div class="col-12 col-md-3">
+                    <ul class="match-sub-nav list-group mb-2">
+                        <router-link class="list-group-item" exact active-class="active" :to="subLink('')">VOD</router-link>
+                        <router-link class="list-group-item" active-class="active" :to="subLink('history')">Head to head</router-link>
+                    </ul>
+
                     <table class="match-details table-sm">
                         <thead>
                             <tr>
@@ -59,16 +57,19 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import MatchHero from "@/components/website/MatchHero";
 import MatchScore from "@/components/website/MatchScore";
-import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
 import { getMatchContext, multiImage, url } from "@/utils/content-utils";
-import MapDisplay from "@/components/website/MapDisplay";
 
 export default {
     name: "Match",
     props: ["id"],
-    components: { MapDisplay, MatchHero, MatchScore, EmbeddedVideo, LinkedPlayers },
-    methods: { url },
+    components: { MatchHero, MatchScore, LinkedPlayers },
+    methods: {
+        subLink(subLinkURL) {
+            return `/match/${this.match.id}/${subLinkURL}`;
+        },
+        url
+    },
     computed: {
         match() {
             return ReactiveRoot(this.id, {
@@ -89,13 +90,6 @@ export default {
                     })
                 })
             });
-        },
-        showNoVOD() {
-            console.log("_match", this.match, !!this.match);
-            if (!this.match) return false;
-            if (this.match.__loading || !this.match.id) return false;
-            if (this.match && !this.match.vod) return true;
-            return false;
         },
         eventStyle() {
             if (!this.match.event || !this.match.event.theme) return {};
@@ -177,9 +171,6 @@ export default {
     .match-details {
         width: 100%;
     }
-    .embed {
-        background: #171717;
-    }
     .match-details-header {
         text-align: center;
         font-weight: bold;
@@ -206,20 +197,23 @@ export default {
         color: inherit;
     }
 
-    .no-embed-text {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        font-size: 1.5em;
-    }
+
     .hidden-link, .hidden-link:hover {
         color: white;
         text-decoration: none;
         cursor: initial
     }
-    .maps-holder {
-        align-items: flex-start;
+
+    .match-sub-nav .list-group-item {
+        background-color: #282828;
+        padding: 0.5em .75em;
+        text-decoration: none;
+        border-radius: 0;
+    }
+
+    .match-sub-nav .list-group-item.active {
+        background-color: #333333;
+        color: #fff !important;
+        border-color: transparent;
     }
 </style>

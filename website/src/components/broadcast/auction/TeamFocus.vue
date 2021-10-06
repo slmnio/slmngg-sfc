@@ -1,6 +1,6 @@
 <template>
     <div class="team-focus p-3" v-if="team">
-        <ThemeLogo class="top-logo w-100" :theme="team.theme"/>
+        <ThemeLogo v-bind:class="{'leading': isLeading }" class="top-logo w-100" :theme="team.theme"/>
         <div class="title pt-3 font-weight-bold text-center">{{ team.name }}</div>
 
         <div class="player-list">
@@ -15,13 +15,13 @@
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { money } from "@/utils/content-utils";
+import { cleanID, money } from "@/utils/content-utils";
 
 
 export default {
     name: "TeamFocus",
     components: { ThemeLogo },
-    props: ["team"],
+    props: ["team", "leading"],
     methods: { money },
     computed: {
         players() {
@@ -33,6 +33,10 @@ export default {
                 ...(this.team.players || []),
                 ...(Array(fill).fill({ empty: true }))
             ];
+        },
+        isLeading() {
+            if (!this.leading) return false;
+            return cleanID(this.leading.team.id) === this.team.id;
         }
     }
 };

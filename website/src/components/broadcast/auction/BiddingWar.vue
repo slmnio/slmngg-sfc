@@ -1,6 +1,6 @@
 <template>
     <div class="bidding-war d-flex">
-        <TeamFocus class="team-focus" v-for="team in _teams" :team="team" v-bind:key="team.id" />
+        <TeamFocus class="team-focus" v-for="team in _teams" :team="team" v-bind:key="team.id" :leading="leading" />
     </div>
 </template>
 
@@ -11,7 +11,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "BiddingWar",
     components: { TeamFocus },
-    props: ["teams"],
+    props: ["teams", "leading"],
     computed: {
         _teams() {
             if (!this.teams) return [];
@@ -42,5 +42,13 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+    .bidding-war >>> .top-logo {
+        transform: scale(0.9);
+        transition: all .2s ease;
+    }
+    .bidding-war >>> .top-logo.leading {
+        box-shadow: 0 0 0px 4px white;
+        transform: scale(1);
     }
 </style>

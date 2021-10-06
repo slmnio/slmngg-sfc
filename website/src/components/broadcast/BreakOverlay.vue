@@ -3,7 +3,7 @@
         <div class="break-center">
             <div class="break-top event-theme-border flex-center overlay--bg" :style="eventBorder">
                 <transition name="fade" mode="out-in">
-                    <span class="industry-align" :key="broadcast.title || broadcast.name">{{ broadcast.title || broadcast.name }}</span>
+                    <span class="industry-align" :key="broadcast.title || broadcast.name" v-html="nbr(broadcast.title || broadcast.name)"></span>
                 </transition>
                 <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News" :borderCSS="eventBorder" />
             </div>
@@ -68,7 +68,12 @@ export default {
     name: "BreakOverlay",
     props: ["broadcast"],
     components: { BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
-    methods: { cssImage },
+    methods: {
+        nbr(text) {
+            return text.replace(/\\n/g, "<br>");
+        },
+        cssImage
+    },
     computed: {
         broadcasts() {
             return this.broadcast?.other_broadcasts || [];

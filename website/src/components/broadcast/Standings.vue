@@ -100,6 +100,7 @@ export default {
                     const teamIndex = match.teams[0].id === team.id ? 0 : 1;
                     team.standings.map_wins += scores[teamIndex];
                     team.standings.map_losses += scores[+!teamIndex];
+                    team.standings.map_diff += (scores[teamIndex] - scores[+!teamIndex]);
 
                     if (this.settings && this.settings.points) team.standings.points += (this.settings.points.map_wins * team.standings.map_wins);
                     if (this.settings && this.settings.points) team.standings.points += (this.settings.points.map_losses * team.standings.map_losses);
@@ -128,6 +129,10 @@ export default {
 
                 if (a.standings.losses > b.standings.losses) return 1;
                 if (a.standings.losses < b.standings.losses) return -1;
+
+                if (a.standings.map_diff > b.standings.map_diff) return -1;
+                if (a.standings.map_diff < b.standings.map_diff) return 1;
+
 
                 if (a.standings.map_wins > b.standings.map_wins) return -1;
                 if (a.standings.map_wins < b.standings.map_wins) return 1;

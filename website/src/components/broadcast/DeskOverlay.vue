@@ -99,10 +99,10 @@ export default {
 
 
     .anim-talent-enter-active {
-        transition: all .4s ease-in-out, opacity .2s ease .2s;
+        transition: all .3s ease, opacity .2s ease .2s;
     }
     .anim-talent-leave-active {
-        transition: all .4s ease-in-out, opacity .2s ease;
+        transition: all .3s ease, opacity .2s ease;
     }
     .anim-talent-enter, .anim-talent-leave-to {
         /* hide */
@@ -116,4 +116,48 @@ export default {
     }
 
 
+    .top-holder, .lower-holder {
+        height: 20% !important;
+    }
+    .casters {
+        height: 60% !important;
+        margin: 0 !important;
+    }
+
+    body, #slmngg-app, #overlay {
+        overflow: hidden;
+    }
+
+    .top-holder {
+        margin: 0 !important;
+    }
+
+    .desk-overlay {
+        padding: 2vh 10vw;
+        height: 100vh !important;
+        box-sizing: border-box;
+    }
+
+    .lower-holder {
+        margin: 0 !important;
+    }
+
+    .top-holder {
+        transform: none !important;
+    }
+
+    .casters .caster:first-child {
+        padding: 0 10px 0 0 !important;
+    }
+
+    .casters .caster:last-child {
+        padding: 0 0 0 10px !important;
+    }
+
+
+    /*.casters .caster:first-child .caster-lower { left: 0 !important; }*/
+    /*.casters .caster:first-child .caster-name {align-items: flex-start !important;}*/
+
+    /*.casters .caster:last-child .caster-lower { right: 0 !important; }*/
+    /*.casters .caster:last-child .caster-name { align-items: flex-end !important;}*/
 </style>

@@ -54,4 +54,10 @@ export default {
     .team-name, .team-logo-holder {
         border-bottom: 6px solid transparent;
     }
+
+
+    .team-logo-holder {
+        width: 200px;
+        height: 180px;
+    }
 </style>

@@ -49,7 +49,7 @@
                 <TeamFocus :team="highlightedTeam"/>
             </div>
             <div class="bidding-war" v-if="rightDisplay === 'bidding-war'">
-                <BiddingWar :teams="biddingWar"/>
+                <BiddingWar :teams="biddingWar" :leading="leadingBid"/>
             </div>
         </div>
     </div>

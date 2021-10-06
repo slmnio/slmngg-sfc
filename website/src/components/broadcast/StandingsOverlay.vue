@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay :title="broadcast.current_stage ? `Standings: ${broadcast.current_stage}` : 'Standings'" :accent-color="accentColor">
+    <GenericOverlay :title="title || (broadcast.current_stage ? `Standings: ${broadcast.current_stage}` : 'Standings')" :accent-color="accentColor">
         <Standings :event="event" :stage="broadcast.current_stage" />
     </GenericOverlay>
 </template>
@@ -12,7 +12,7 @@ import Standings from "@/components/broadcast/Standings";
 export default {
     name: "StandingsOverlay",
     components: { GenericOverlay, Standings },
-    props: ["broadcast"],
+    props: ["broadcast", "title"],
     computed: {
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;

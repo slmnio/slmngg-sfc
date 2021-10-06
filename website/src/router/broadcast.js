@@ -23,7 +23,7 @@ export default [
     { path: "break-bar", component: BreakBarOverlay },
     { path: "bracket", component: BracketOverlay, props: route => ({ bracketKey: route.query.key, extended: !!route.query.extended, scale: route.query.scale }) },
     { path: "schedule", component: ScheduleOverlay },
-    { path: "standings", component: StandingsOverlay },
+    { path: "standings", component: StandingsOverlay, props: route => ({ title: route.query.title }) },
     { path: "roster", redirect: "rosters" },
     { path: "rosters", component: RosterOverlay },
     { path: "thumbnail", component: EventThumbnailCreator },

@@ -2,7 +2,7 @@
     <div class="podcast-overlay">
         <div class="podcast-row" v-for="(row, i) in rowsOfGuests(rows || 2)" v-bind:key="i">
             <transition-group class="casters flex-center" name="anim-talent">
-                <Caster v-for="caster in row" v-bind:key="caster.id" :guest="caster" />
+                <Caster v-for="caster in row" v-bind:key="caster.id" :guest="caster" :disable-video="shouldDisablePodcastVideo" />
             </transition-group>
         </div>
         <v-style>{{ autoWidth }}</v-style>
@@ -18,6 +18,10 @@ export default {
     props: ["broadcast", "rows"],
     components: { Caster },
     computed: {
+        shouldDisablePodcastVideo() {
+            if (!this.broadcast?.video_settings) return true;
+            return !this.broadcast.video_settings.includes("Enable podcast");
+        },
         guests: function() {
             if (!this.broadcast?.guests) return [];
             return ReactiveArray("guests", {

@@ -28,7 +28,7 @@
 <script>
 export default {
     name: "Caster",
-    props: ["caster", "guest", "color"],
+    props: ["caster", "guest", "color", "disableVideo"],
     computed: {
         player() {
             return this.caster || this.guest.player;
@@ -43,6 +43,7 @@ export default {
             return this.caster?.live_guests || this.guest;
         },
         cam() {
+            if (this.disableVideo) return false;
             if (!this.liveGuestData) return false;
             if (!this.liveGuestData.use_cam) return false;
             return this.liveGuestData.cam_code.includes("http") ? `${this.liveGuestData.cam_code}&z=04&mute` : `https://feeds.production.slmn.io/?view=${this.liveGuestData.cam_code}&z=04&mute`;

@@ -41,7 +41,20 @@ export function sortByMatchWins(a, b) {
 }
 
 export function sortByHeadToHead(a, b) {
-    // console.log("h2h", a, b);
+    console.log("h2h", a, b);
+
+    // this is built for the eventscenarios2 page where it pre-calculates all h2hs.
+
+    if (!a.h2h && !b.h2h) {
+        // try to do it using team.matches and team.matches_won
+        const overlaps = a.matches.filter(id => b.matches.includes(id));
+        const aWins = a.matches_won ? overlaps.filter(id => a.matches_won.includes(id)) : [];
+        const bWins = b.matches_won ? overlaps.filter(id => b.matches_won.includes(id)) : [];
+        console.log("[h2h]", "overlaps", { overlaps, a_wins: aWins, b_wins: bWins });
+
+        return bWins.length - aWins.length;
+    }
+
     if (!a || !a.h2h || !b || !b.id) return 0;
     return a.h2h[b.id];
 }
@@ -54,8 +67,7 @@ export function sortByMapWins(a, b) {
 
     const [aMapDiff, bMapDiff] = [a, b].map(x => x.map_wins - x.map_losses);
     if (aMapDiff !== bMapDiff) {
-        // probably can't get down to here
-        console.log("[map diff]", aMapDiff, bMapDiff, a, b, aMapDiff > bMapDiff);
+        // console.log("[map diff]", aMapDiff, bMapDiff, a, b, aMapDiff > bMapDiff);
         if (aMapDiff > bMapDiff) return -1;
         if (aMapDiff < bMapDiff) return 1;
     }
@@ -221,6 +233,7 @@ export function sortTeamsIntoStandings(teams) {
     }
 
     if (!standings.every(s => s.length === 1)) {
+        console.log("[standings]", "not converged", standings);
         // scenario.sorts++;
         standings = sortIntoGroups2(sortByHeadToHead, standings, 2);
         // sortIntoGroups2(sortByHeadToHead, standings, 2);

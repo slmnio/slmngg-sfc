@@ -1,11 +1,12 @@
 <template>
-    <div class="standings">
+    <div class="standings" v-if="standings && standings.length">
 <!--        <div>{{ event.name }} / {{ stage }} / {{ allMatches.length }} -> {{ stageMatches.length }} ({{ teams.length }} teams)</div>-->
         <div class="standings-header d-flex align-items-center">
-            <div class="team-name flex-grow-1 text-left">{{ stage || 'Team' }}</div>
+            <div class="team-name flex-grow-1 text-left">{{ title || stage || 'Team' }}</div>
             <div class="team-stats d-flex">
-                <div class="team-stat text-center">Maps</div>
                 <div class="team-stat text-center">Matches</div>
+                <div class="team-stat text-center">Maps</div>
+                <div class="team-stat text-center">Map Diff</div>
 <!--                <div class="team-stat text-center">Points</div>-->
             </div>
         </div>
@@ -26,7 +27,12 @@ import { sortTeamsIntoStandings } from "@/utils/scenarios";
 
 export default {
     name: "Standings",
-    props: ["event", "stage"],
+    props: {
+        event: Object,
+        stage: String,
+        title: String,
+        showMapDiff: Boolean
+    },
     components: { StandingsTeam },
     computed: {
         allMatches() {
@@ -53,6 +59,8 @@ export default {
         },
         standings() {
             if (!this.stageMatches || !this.event) return [];
+            if (!this.stageMatches.some(m => m.match_group)) return []; // make sure there's matches to analyse
+
             const teamMap = new Map();
             this.stageMatches.forEach(match => {
                 match.teams && match.teams.forEach(team => {

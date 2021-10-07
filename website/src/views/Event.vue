@@ -6,6 +6,7 @@
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
 <!--            <li class="nav-item"><router-link class="nav-link" :to="subLink('rosters')">Rosters</router-link></li>-->
             <li class="nav-item" v-if="event.matches"><router-link class="nav-link" :to="subLink('schedule')">Schedule</router-link></li>
+            <li class="nav-item" v-if="showStandings"><router-link class="nav-link" :to="subLink('standings')">Standings</router-link></li>
             <li class="nav-item" v-if="event.brackets"><router-link class="nav-link" :to="subLink('bracket')">{{ event.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link></li>
             <li class="nav-item" v-if="showFoldy"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
             <li class="nav-item" v-if="showDraft"><router-link class="nav-link" :to="subLink('draft')">Draft</router-link></li>
@@ -76,6 +77,9 @@ export default {
         },
         showFoldy() {
             return this.settings?.foldy?.use || false;
+        },
+        showStandings() {
+            return this.settings?.standings?.length || false;
         },
         showDraft() {
             return this.settings?.draft?.use || false;

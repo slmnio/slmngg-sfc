@@ -7,29 +7,36 @@
 <script>
 import { image } from "@/utils/content-utils";
 
+function sizePadding(val, defaultVal) {
+    if (!val) return defaultVal;
+    if (["px", "em", "%"].some(test => val.includes(test))) {
+        // use raw input
+        return val;
+    }
+    return `${val}px`;
+}
+
 export default {
     name: "ThemeLogo",
     props: ["theme", "iconPadding", "borderWidth"],
-    methods: {
-    },
     computed: {
         logo () {
             if (!this.theme) return {};
             return {
                 backgroundImage: image(this.theme, "default_logo"),
-                width: `calc(100% - ${this.iconPadding || 12}px)`,
-                height: `calc(100% - ${this.iconPadding || 12}px)`
+                width: `calc(100% - ${sizePadding(this.iconPadding, "12px")})`,
+                height: `calc(100% - ${sizePadding(this.iconPadding, "12px")})`
             };
         },
         bgStyle () {
             if (!this.theme) {
                 return {
-                    borderBottom: `${this.borderWidth === undefined ? 10 : this.borderWidth}px solid rgba(255,255,255,0.2)`
+                    borderBottom: `${sizePadding(this.borderWidth, "10px")} solid rgba(255,255,255,0.2)`
                 };
             }
             return {
                 backgroundColor: this.theme.color_logo_background || this.theme.color_theme,
-                borderBottom: `${this.borderWidth === undefined ? 10 : this.borderWidth}px solid ${this.theme.color_logo_accent || this.theme.color_accent || "rgba(255,255,255,0.2)"}`,
+                borderBottom: `${sizePadding(this.borderWidth, "10px")} solid ${this.theme.color_logo_accent || this.theme.color_accent || "rgba(255,255,255,0.2)"}`,
                 color: this.theme.color_text_on_logo_background || this.theme.color_text_on_theme
             };
         }

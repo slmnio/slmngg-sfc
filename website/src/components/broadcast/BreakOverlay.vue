@@ -19,7 +19,6 @@
                     </transition>
                     <Countdown class="break-countdown" :to="broadcast.countdown_end" :timezone="broadcast.timezone" :update="(e) => countdownTick(e)" />
                     <Sponsors class="break-sponsors" :sponsors="sponsorThemes" />
-                    {{ suggestedShow }} {{ automatedShow }} {{ lastCountdownTick }} {{ tick }}
                 </div>
                 <transition name="break-content" mode="out-in">
                     <transition-group class="break-col break-schedule" name="a--match" v-if="automatedShow === 'Schedule'" key="Schedule">

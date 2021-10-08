@@ -90,7 +90,6 @@ import { ReactiveArray } from "@/utils/reactive";
 import {
     BitCounter, sortByHeadToHead, sortByMapWins,
     sortByMatch,
-    sortByMatchWins,
     sortIntoGroups, sortIntoGroups2,
     sortMatches, sortTeamsIntoStandings,
     sortWithinGroups

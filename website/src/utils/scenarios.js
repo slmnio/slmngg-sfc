@@ -35,28 +35,46 @@ export class BitCounter {
 }
 
 export function sortByMatchWins(a, b) {
-    if (a.wins > b.wins) return 1;
-    if (a.wins < b.wins) return -1;
+    const [aMatchDiff, bMatchDiff] = [a, b].map(x => x.wins - x.losses);
+
+    if (aMatchDiff < bMatchDiff) return 1;
+    if (aMatchDiff > bMatchDiff) return -1;
+
+    // if (a.standings.wins < b.standings.wins) return 1;
+    // if (a.standings.wins > b.standings.wins) return -1;
     return 0;
 }
 
 export function sortByHeadToHead(a, b) {
-    console.log("h2h", a, b);
+    console.log("h2h", a.standings, b.standings);
 
-    // this is built for the eventscenarios2 page where it pre-calculates all h2hs.
+    // try checking standings.h2h[opponent.id] for +/-
 
-    if (!a.h2h && !b.h2h) {
-        // try to do it using team.matches and team.matches_won
-        const overlaps = a.matches.filter(id => b.matches.includes(id));
-        const aWins = a.matches_won ? overlaps.filter(id => a.matches_won.includes(id)) : [];
-        const bWins = b.matches_won ? overlaps.filter(id => b.matches_won.includes(id)) : [];
-        console.log("[h2h]", "overlaps", { overlaps, a_wins: aWins, b_wins: bWins });
-
-        return bWins.length - aWins.length;
+    if (a.standings?.h2h) {
+        const diff = a.standings?.h2h[b.id];
+        console.log("[h2h] diff", diff, a.standings.h2h, b.id);
+        if (!isNaN(diff)) return diff;
     }
 
+    console.log(a.standings.h2h[b.id], b.standings.h2h[a.id]);
+
+
+    // This is a good idea but it uses any match a team has played (eg would include playoffs, not just reg season)
+
+    // if (!a.h2h && !b.h2h) {
+    //     // try to do it using team.matches and team.matches_won
+    //     if (!a.matches || !b.matches) return 0;
+    //
+    //     const overlaps = a.matches.filter(id => b.matches.includes(id));
+    //     const aWins = a.matches_won ? overlaps.filter(id => a.matches_won.includes(id)) : [];
+    //     const bWins = b.matches_won ? overlaps.filter(id => b.matches_won.includes(id)) : [];
+    //     // console.log("[h2h]", "overlaps", { overlaps, a_wins: aWins, b_wins: bWins });
+    //
+    //     return bWins.length - aWins.length;
+    // }
+
     if (!a || !a.h2h || !b || !b.id) return 0;
-    return a.h2h[b.id];
+    return a.h2h[b.id] || 0;
 }
 
 export function sortByMapWins(a, b) {
@@ -107,7 +125,7 @@ export function sortIntoGroups2(sortFunction, standings, maxInGroup) {
             continue;
         }
 
-        // console.log("[group]", JSON.parse(JSON.stringify(group)));
+        console.log("[group]", JSON.parse(JSON.stringify(group)));
 
         // sort the group
         group.sort(sortFunction);
@@ -126,22 +144,22 @@ export function sortIntoGroups2(sortFunction, standings, maxInGroup) {
 
             const shouldSplit = sortFunction(team, lastTeam);
 
-            if (shouldSplit === -1) {
+            if (shouldSplit <= -1) {
                 // nextTeam should go down (team > nextTeam)
                 // shouldn't ever happen since we sort first
-                // console.warn(`[${i + 1}], -1`, team, "should go above", lastTeam);
+                // console.warn("-1", team, "should go above", lastTeam);
             } else if (shouldSplit === 0) {
                 // teams should stay the same
-                // console.log(`[${i + 1}], 0`, team, "equal with", lastTeam);
+                // console.log("0", team, "equal with", lastTeam);
                 newGroup[newI].push(team);
-            } else if (shouldSplit === 1) {
+            } else if (shouldSplit >= 1) {
                 // nextTeam should go up (team < nextTeam)
-                // console.log(`[${i + 1}], 1`, team, "should go below", lastTeam);
+                // console.log("1", team, "should go below", lastTeam);
                 newI++;
                 newGroup.push([team]);
             }
 
-            // console.log("[split?]", shouldSplit, team.code, lastTeam.code);
+            // console.log("[split?]", shouldSplit, team.code, lastTeam.code, group.map(t => t.code), newGroup.map(arr => arr.map(t => t.code)));
         }
         standings[groupIndex] = newGroup;// .flat();
         // console.log("[group]", newGroup, newGroup.flat());
@@ -149,7 +167,7 @@ export function sortIntoGroups2(sortFunction, standings, maxInGroup) {
     const newStandings = [];
 
     standings.forEach(group => {
-        // console.log("[standing flat]", group.length, group[0].length);
+        // console.log("[standing flat]", group, group.length, group[0].length);
         if (group[0].length === undefined) {
             // group itself is an array
             newStandings.push(group);
@@ -214,7 +232,7 @@ export function sortWithinGroups(sortFunction, standings) {
 }
 
 export function sortTeamsIntoStandings(teams) {
-    let standings = sortIntoGroups2(sortByMapWins, [teams]);
+    let standings = sortIntoGroups2(sortByMatchWins, [teams]);
     // if (i === 4050) console.log(standings);
     // sortMatches(sortByMatchWins, scenario.teams, standings);
 
@@ -233,10 +251,13 @@ export function sortTeamsIntoStandings(teams) {
     }
 
     if (!standings.every(s => s.length === 1)) {
-        console.log("[standings]", "not converged", standings);
-        // scenario.sorts++;
+        console.log("[standings]", "not converged, trying map wins", standings);
+        standings = sortIntoGroups2(sortByMapWins, standings);
+    }
+    if (!standings.every(s => s.length === 1)) {
+        console.log("[standings]", "not converged, trying head to head", standings);
+        // i don't know why [standings] works here but not for the other one
         standings = sortIntoGroups2(sortByHeadToHead, standings, 2);
-        // sortIntoGroups2(sortByHeadToHead, standings, 2);
     }
 
     if (!standings.every(s => s.length === 1)) {

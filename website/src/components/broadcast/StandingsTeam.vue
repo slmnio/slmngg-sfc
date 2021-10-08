@@ -1,6 +1,6 @@
 <template>
     <div class="standings-team d-flex">
-        <div class="team-rank flex-shrink-0">{{ teamStats["rank"] }}</div>
+        <div class="team-rank flex-shrink-0">{{ tieText && !teamStats["tie_show_number"] ? tieText : teamStats["rank"] }}</div>
         <ThemeLogo class="team-logo flex-shrink-0" :theme="team.theme" icon-padding="0.2em" border-width="0.15em" />
         <router-link :to="url('team', team)" class="team-name no-link-style flex-grow-1 text-left">{{ team.name }}</router-link>
         <div class="team-stats d-flex">
@@ -24,7 +24,7 @@ function diffString(val) {
 export default {
     name: "StandingsTeam",
     components: { ThemeLogo },
-    props: ["team"],
+    props: ["team", "tieText"],
     data: () => ({
         // stats: ["diff", "map_diff"/*, "points" */]
         stats: ["matches", "maps", "map_diff"]
@@ -37,7 +37,8 @@ export default {
                 maps: `${this.team.standings.map_wins}-${this.team.standings.map_losses}`,
                 map_diff: diffString(this.team.standings.map_wins - this.team.standings.map_losses),
                 // points: this.team.standings.points,
-                rank: this.team.standings.rank
+                rank: this.team.standings.rank,
+                tie_show_number: this.team.standings.tie_show_number
             };
         }
     },

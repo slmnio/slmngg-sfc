@@ -13,7 +13,7 @@
         <div class="teams">
             <div class="team-group" v-for="(group, i) in standings" v-bind:key="i">
                 <div class="team" v-for="team in group" v-bind:key="team.id">
-                    <StandingsTeam :team="team" />
+                    <StandingsTeam :team="team" :tie-text="tieText" />
                 </div>
             </div>
         </div>
@@ -31,6 +31,7 @@ export default {
         event: Object,
         stage: String,
         title: String,
+        tieText: String,
         showMapDiff: Boolean
     },
     components: { StandingsTeam },
@@ -87,7 +88,8 @@ export default {
                     map_wins: 0,
                     map_losses: 0,
                     maps_played: 0,
-                    rank: null
+                    rank: null,
+                    h2h: {}
                 };
                 if (this.settings && this.settings.points) team.standings.points = team.extra_points || 0;
                 // get matches here
@@ -97,6 +99,8 @@ export default {
                     // one of the teams is current loop team
                     const scores = [match.score_1, match.score_2];
                     if (!scores.some(score => score === match.first_to)) return; // not finished
+
+                    const opponent = match.teams.find(t => t.id !== team.id);
 
                     team.standings.played++;
                     if (match.maps) {
@@ -116,12 +120,18 @@ export default {
                     const winIndex = match.score_1 === match.first_to ? 0 : 1;
                     const winner = match.teams[winIndex];
 
+                    if (!team.standings.h2h[opponent.id]) team.standings.h2h[opponent.id] = 0;
+
                     if (winner.id === team.id) {
                         team.standings.wins++;
                         if (this.settings && this.settings.points) team.standings.points += this.settings.points.wins;
+
+                        // update win/loss h2h against opponent
+                        team.standings.h2h[opponent.id]++;
                     } else {
                         team.standings.losses++;
                         if (this.settings && this.settings.points) team.standings.points += this.settings.points.losses;
+                        team.standings.h2h[opponent.id]--;
                     }
                 });
 
@@ -152,12 +162,13 @@ export default {
             teams = teams.sort(sortFunction);
 
             const standings = sortTeamsIntoStandings(teams.map(t => ({ ...t, ...t.standings })));
-            console.log("[new standings]", standings);
+            // console.log("[new standings]", standings);
 
             let rank = 1; let display = 1;
             standings.forEach(group => {
-                group.forEach(team => {
+                group.forEach((team, i) => {
                     team.standings.rank = display;
+                    team.standings.tie_show_number = i === 0;
                     rank++;
                 });
                 display = rank;

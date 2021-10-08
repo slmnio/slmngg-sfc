@@ -180,6 +180,7 @@ export default {
         },
         cssImage,
         nbr(text) {
+            if (!text) return "";
             return text.replace(/\\n/g, "<br>");
         }
     }

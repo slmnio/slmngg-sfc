@@ -9,7 +9,7 @@ import spacetime from "spacetime";
 
 export default {
     name: "Countdown",
-    props: ["to", "timezone"],
+    props: ["to", "timezone", "update"],
     mounted() {
         setInterval(this.tick, 1000);
     },
@@ -46,6 +46,11 @@ export default {
     methods: {
         tick() {
             this.now = new Date();
+        }
+    },
+    watch: {
+        diff(v) {
+            if (this.update) this.update(v);
         }
     }
 };

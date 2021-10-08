@@ -17,21 +17,22 @@
                     <transition name="anim-break-next">
                     <div class="countdown-text" v-if="!broadcast.countdown_end && !nextMatch">Current time</div>
                     </transition>
-                    <Countdown class="break-countdown" :to="broadcast.countdown_end" :timezone="broadcast.timezone" />
+                    <Countdown class="break-countdown" :to="broadcast.countdown_end" :timezone="broadcast.timezone" :update="(e) => countdownTick(e)" />
                     <Sponsors class="break-sponsors" :sponsors="sponsorThemes" />
+                    {{ suggestedShow }} {{ automatedShow }} {{ lastCountdownTick }} {{ tick }}
                 </div>
                 <transition name="break-content" mode="out-in">
-                    <transition-group class="break-col break-schedule" name="a--match" v-if="breakDisplay === 'Schedule'" key="Schedule">
+                    <transition-group class="break-col break-schedule" name="a--match" v-if="automatedShow === 'Schedule'" key="Schedule">
                         <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
                     </transition-group>
-                    <div class="break-col break-standings" v-if="breakDisplay === 'Standings'" key="Standings">
+                    <div class="break-col break-standings" v-if="automatedShow === 'Standings'" key="Standings">
                         <Standings :event="event" :stage="broadcast.current_stage" />
                     </div>
-                    <div class="break-col break-image" v-if="breakDisplay === 'Image'" key="Image">
+                    <div class="break-col break-image" v-if="automatedShow === 'Image'" key="Image">
                         <div class="break-image-inner" :style="cssImage('backgroundImage', broadcast, ['break_image'], 1080, false)"></div>
                     </div>
-                    <Bracket class="break-col break-bracket" v-if="breakDisplay === 'Bracket'" key="Bracket" :event="event" :bracket="bracket" use-overlay-scale small />
-                    <div class="break-col break-others" v-if="breakDisplay === 'Other Broadcasts'">
+                    <Bracket class="break-col break-bracket" v-if="automatedShow === 'Bracket'" key="Bracket" :event="event" :bracket="bracket" use-overlay-scale small />
+                    <div class="break-col break-others" v-if="automatedShow === 'Other Broadcasts'">
                         <div class="broadcast-previews-title">
                             {{ broadcasts.length === 1 ? broadcasts[0].name : 'Other broadcasts' }}
                         </div>
@@ -64,13 +65,23 @@ import BroadcastPreview from "@/components/broadcast/BroadcastPreview";
 import BreakHeadlines from "@/components/broadcast/BreakHeadlines";
 import { themeBackground1 } from "@/utils/theme-styles";
 
+const tickTime = 25;
+
 export default {
     name: "BreakOverlay",
     props: ["broadcast"],
     components: { BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
+    data: () => ({
+        tick: 0,
+        lastCountdownTick: 0
+    }),
     methods: {
         nbr(text) {
+            if (!text) return "";
             return text.replace(/\\n/g, "<br>");
+        },
+        countdownTick(x) {
+            this.lastCountdownTick = x;
         },
         cssImage
     },
@@ -139,6 +150,36 @@ export default {
         },
         themeColor() {
             return themeBackground1(this.event);
+        },
+        suggestedShow() {
+            if (!this.broadcast?.break_automation?.length) return null;
+
+            const slides = this.broadcast.break_automation.filter(s => s.startsWith("use:")).map(s => s.replace("use: ", ""));
+            console.log(slides);
+
+            // TODO: add stuff here that changes based on the countdown remaining
+
+
+            if (slides.includes("Schedule") && this.broadcast.countdown_end && this.lastCountdownTick <= 30) {
+                return "Schedule";
+            }
+
+            return slides[(this.tick % slides.length)];
+        },
+        automatedShow() {
+            if (this.broadcast?.break_automation?.length &&
+                this.broadcast.break_automation.includes("setting: Always do 30s Schedule") &&
+                this.lastCountdownTick <= 30 &&
+                this.broadcast.countdown_end) {
+                return "Schedule";
+            }
+            if (this.broadcast.break_display && this.broadcast.break_display !== "Automated") {
+                // do what it says
+                return this.broadcast.break_display;
+            } else {
+                // empty or automated - do automation
+                return this.suggestedShow;
+            }
         }
     },
     watch: {
@@ -147,6 +188,11 @@ export default {
                 document.body.dataset.broadcast = this.broadcast.key;
             }
         }
+    },
+    mounted() {
+        setInterval(() => {
+            this.tick++;
+        }, tickTime * 1000);
     }
 };
 </script>

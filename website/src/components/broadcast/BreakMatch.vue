@@ -13,7 +13,7 @@
 <!--        <transition-group name="fade" mode="out-in" class="match-teams flex-center">-->
         <div class="match-teams flex-center">
                 <div class="match-team" v-for="(team, i) in teams" v-bind:key="team ? `${team.id}-${team.name}-${team.code}-${i}` : i" :style="{ order: i*2 }">
-                    <div :class="expanded ? 'match-team-name' : 'match-team-code'" v-if="team && expanded">
+                    <div :class="expanded ? 'match-team-name' : 'match-team-code'" v-if="team && expanded" :data-code="team.code">
                         <span class="industry-align" v-if="team.dummy">{{ team.text }}</span>
                         <span class="industry-align" v-else-if="expanded && team.split_name" v-html="nbr(team.split_name)"></span>
                         <span v-else class="industry-align">{{ expanded ? team.name : team.code }}</span>

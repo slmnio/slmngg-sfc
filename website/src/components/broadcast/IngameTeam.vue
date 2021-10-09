@@ -119,6 +119,7 @@ function updateWidth(vueEl, fullWidth) {
         if (width > target) {
             const scale = target / width;
             holder.style.transform = `scaleX(${scale})`;
+            holder.style.setProperty("--scaleX", scale);
             // holder.style.width = `${scale * 100}%`;
         }
     });

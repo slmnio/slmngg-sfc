@@ -22,7 +22,7 @@ async function wait(ms) {
 
 export default {
     name: "AdReadOverlay",
-    props: ["broadcast"],
+    props: ["broadcast", "extraDelay"],
     data: () => ({
         activeRead: null,
         activeAudio: null,
@@ -79,7 +79,8 @@ export default {
             this.activeAudio = audio;
             await audio.play();
             return await new Promise((resolve, reject) => {
-                audio.addEventListener("ended", () => {
+                audio.addEventListener("ended", async () => {
+                    if (this.extraDelay) await wait(this.extraDelay);
                     this.activeAudio = null;
                     resolve();
                 });

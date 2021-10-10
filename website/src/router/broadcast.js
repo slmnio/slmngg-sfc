@@ -38,5 +38,5 @@ export default [
     { path: "maps", component: MapsOverlay },
     { path: "branding", component: BrandingOverlay },
     { path: "auction", component: AuctionOverlay, props: route => ({ category: route.query.category, title: route.query.title }) },
-    { path: "ad-read", component: AdReadOverlay }
+    { path: "ad-read", component: AdReadOverlay, props: route => ({ extraDelay: route.query.delay }) }
 ];

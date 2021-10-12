@@ -55,11 +55,11 @@ export default {
                 });
             });
             return groups.sort((a, b) => {
-                const [ha, hb] = [a, b].map(x => PRODUCTION_HIERARCHY.indexOf(x));
+                const [ha, hb] = [a, b].map(x => PRODUCTION_HIERARCHY.indexOf(x.singular_name));
                 if (ha === -1 && hb === -1) return 0;
                 if (ha === -1) return 1;
                 if (hb === -1) return -1;
-                return hb - ha;
+                return ha - hb;
             });
         }
     },

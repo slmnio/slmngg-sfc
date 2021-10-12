@@ -20,6 +20,10 @@
                     <Social :social="social" v-for="social in event.socials" v-bind:key="social.id"/>
                 </li>
             </ul>
+
+            <li class="nav-item mx-2 minisite-prompt" v-if="shouldShowMinisitePrompt" :style="themeBackground1(event)">
+                <a :href="minisiteDomain" class="nav-link no-link-style">See this page on the <b>{{ subdomain }}</b> minisite <i class="fas fa-chevron-right fa-fw ml-1"></i></a>
+            </li>
         </SubPageNav>
 
         <router-view :event="event"></router-view>
@@ -33,6 +37,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { multiImage } from "@/utils/content-utils";
 import SubPageNav from "@/components/website/SubPageNav";
 import Social from "@/components/website/Social";
+import { themeBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "Event",
@@ -86,6 +91,36 @@ export default {
         },
         useStaffPage() {
             return this.settings?.extendedStaffPage || false;
+        },
+        subdomain() {
+            return this.event?.subdomain || this.event?.partial_subdomain;
+        },
+        ownMinisiteStatus() {
+            // need to check if it's on A) the primary event for the subdomain (ie BPL3)
+            // or B) it's a valid secondary event (ie BPL1/BPL2)
+            if (!this.$root?.minisiteEvent?.subdomain) return "no-root-minisite";
+            const activeSubdomain = this.$root.minisiteEvent.subdomain;
+            if (!this.subdomain) return "no-this-minisite";
+            if (activeSubdomain === this.event.subdomain) return "on-main-subdomain";
+            if (activeSubdomain === this.event.partial_subdomain) return "on-partial-subdomain";
+            return "on-foreign-subdomain";
+        },
+        shouldShowMinisitePrompt() {
+            return ["no-root-minisite", "on-foreign-subdomain"].includes(this.ownMinisiteStatus);
+        },
+        minisiteDomain() {
+            if (!this.event) return null;
+
+            try {
+                if (process.env.NODE_ENV === "development") return `http://${this.subdomain}.localhost:8080`;
+                if (process.env.VUE_APP_DEPLOY_MODE === "local") return `http://${this.subdomain}.localhost:8080`;
+                if (process.env.VUE_APP_DEPLOY_MODE === "staging") return `https://${this.subdomain}.dev.slmn.gg`;
+                if (process.env.NODE_ENV === "production") return `https://${this.subdomain}.slmn.gg`;
+                if (process.env.VUE_APP_DEPLOY_MODE === "production") return `https://${this.subdomain}.slmn.gg`;
+                return null;
+            } catch (e) {
+                return null;
+            }
         }
     },
     mounted() {
@@ -97,7 +132,8 @@ export default {
                 return `/${page}`;
             }
             return `/event/${this.event.id}/${page}`;
-        }
+        },
+        themeBackground1
     }
 };
 
@@ -111,5 +147,8 @@ export default {
     }
     .socials li a {
         padding: .25em .25em;
+    }
+    .minisite-prompt a:hover {
+        color: inherit !important;
     }
 </style>

@@ -62,15 +62,6 @@ export default {
                 return ha - hb;
             });
         }
-    },
-    methods: {
-        niceJoin(array) {
-            if (array.length > 1) {
-                const last = array.pop();
-                return array.join(", ") + " and " + last;
-            }
-            return array[0];
-        }
     }
 };
 </script>

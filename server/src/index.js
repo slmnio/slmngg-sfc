@@ -42,7 +42,7 @@ const auction = require("./discord/new_auction.js")({
 
 
 const Cache = (require("./cache.js")).setup(io);
-require("./airtable-interface.js");
+(require("./airtable-interface.js")).setup(io);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 

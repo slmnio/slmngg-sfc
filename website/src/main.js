@@ -111,6 +111,10 @@ const app = new Vue({
         data_update(d) {
             // handled by vuex
             console.log("[socket]", "data_update", d);
+        },
+        server_rebuilding(x) {
+            console.log("rebuilding", x);
+            this.isRebuilding = x;
         }
     },
     metaInfo: {
@@ -120,7 +124,11 @@ const app = new Vue({
             { rel: "icon", href: "https://slmn.io/slmn-new.png" }
         ]
     },
-    data: () => ({ interval: null, minisiteEventStatus: subdomain ? "loading" : null }),
+    data: () => ({
+        interval: null,
+        minisiteEventStatus: subdomain ? "loading" : null,
+        isRebuilding: false
+    }),
     mounted() {
         console.log("[app]", "subdomain", subdomain);
         if (subdomain) {

@@ -1,5 +1,12 @@
 <template>
     <div class="website-nav">
+
+        <WebsiteNavBanner class="bg-danger" v-if="showDisconnectedMessage">
+            <i class="fas fa-wifi-slash fa-fw mr-1"></i> <b>No connection to the data server.</b> Don't refresh, we're trying to reconnect...
+        </WebsiteNavBanner>
+        <WebsiteNavBanner class="bg-warning text-dark" v-if="showRebuildingMessage">
+            <i class="fas fa-spinner fa-pulse fa-fw mr-1"></i> <b>Server rebuilding</b>: The server is rebuilding its data store. Some pages might not be accessible.</WebsiteNavBanner>
+
 <!--        <WebsiteNavBanner v-if="siteMode === 'live' || siteMode === 'production'" class="bg-primary text-white">-->
 <!--            <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-light">Welcome to the new SLMN.GG!</a></b> Completely rewritten to be faster, cleaner and better. Please be patient with any teething problems from the big switch over.-->
 <!--        </WebsiteNavBanner>-->
@@ -9,6 +16,7 @@
         <WebsiteNavBanner v-if="siteMode === 'local'" class="bg-primary text-light">
             SLMN.GG is running in local development mode.
         </WebsiteNavBanner>
+<!--       example: <WebsiteNavBanner class="bg-success" v-if="$socket.connected">Connected to the data server for live data updates!</WebsiteNavBanner>-->
 
         <b-navbar toggleable="lg" type="dark">
             <router-link class="navbar-brand " to="/">
@@ -72,6 +80,9 @@ export default {
         NavLiveMatch
     },
     props: ["minisite"],
+    data: () => ({
+        pageNoLongerNew: false
+    }),
     computed: {
         liveMatches() {
             return ReactiveRoot("special:live-matches", {
@@ -126,7 +137,20 @@ export default {
             // console.log("[theme]", theme);
             if (!theme) return null;
             return getImage(theme.small_logo) || getImage(theme.default_logo);
+        },
+        showDisconnectedMessage() {
+            return this.pageNoLongerNew && this.$socket.disconnected;
+        },
+        showRebuildingMessage() {
+            if (this.showDisconnectedMessage) return false;
+            return this.$root.isRebuilding;
         }
+    },
+    mounted() {
+        setTimeout(() => {
+            // ignore if the socket is disconnected for the first 3 seconds of loading
+            this.pageNoLongerNew = true;
+        }, 3000);
     },
     methods: {
         slmnggURL(page) {

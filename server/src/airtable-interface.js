@@ -9,6 +9,32 @@ const chalk = require("chalk");
 
 const logUpdates = false;
 
+
+/***
+ * @type {Server}
+ */
+let io = null;
+let _isRebuilding = true;
+function setup(_io) {
+    io = _io;
+
+    io.on("connect", (socket) => {
+        io.emit("server_rebuilding", _isRebuilding);
+    });
+
+    return this;
+}
+
+function setRebuilding(isRebuilding) {
+    _isRebuilding = isRebuilding;
+    if (isRebuilding) {
+        io.emit("server_rebuilding", true);
+    } else {
+        io.emit("server_rebuilding", false);
+    }
+}
+
+
 // Starting with syncing Matches
 
 // const tables = ["Matches", "Teams", "Themes", "Events", "Players", "Player Relationships"];
@@ -109,6 +135,8 @@ function t(ms) {
     });
 }
 
+let firstRun = true;
+
 async function sync() {
     for (let table of staticTables) {
         await processTableData(table, await getAllTableData(table), true);
@@ -120,6 +148,8 @@ async function sync() {
         setInterval(async () => processTableData(table, await getAllTableData(table)), 30 * 1000);
         registerUpdater(table);
     }
+    if (firstRun) setRebuilding(false);
+    firstRun = false;
 }
 
 sync();
@@ -131,5 +161,6 @@ module.exports = {
     },
     async select(table, filter) {
         return await slmngg(table).select(filter).all();
-    }
+    },
+    setup
 };

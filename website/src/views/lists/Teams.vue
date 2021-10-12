@@ -2,8 +2,8 @@
     <div class="container">
         <h1 class="big mb-3">Teams</h1>
         <input type="text" class="form-control mb-3" placeholder="Start typing to filter" v-model="search">
-        <h1><LoadingIcon v-if="!events.length"></LoadingIcon></h1>
-        <div v-for="event in events" v-bind:key="event.id" class="event mb-4">
+        <h1><LoadingIcon v-if="!sortedEvents.length"></LoadingIcon></h1>
+        <div v-for="event in sortedEvents" v-bind:key="event.id" class="event mb-4">
             <EventDisplay class="team-display" :event="event"/>
             <div class="event-teams d-flex row">
                 <div class="team col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2 tight-col" v-for="team in event.teams" v-bind:key="team.id">
@@ -48,7 +48,10 @@ export default {
                     theme: ReactiveThing("theme")
                 })
             }).sort((a, b) => sortEvents(a, b))
-                .reverse()
+                .reverse();
+        },
+        sortedEvents() {
+            return this.events
                 .map(e => {
                     if (this.search && this.search.length > 2 && e.teams) {
                         return {

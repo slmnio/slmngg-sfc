@@ -98,9 +98,9 @@ export default {
         ownMinisiteStatus() {
             // need to check if it's on A) the primary event for the subdomain (ie BPL3)
             // or B) it's a valid secondary event (ie BPL1/BPL2)
+            if (!this.subdomain) return "no-this-minisite";
             if (!this.$root?.minisiteEvent?.subdomain) return "no-root-minisite";
             const activeSubdomain = this.$root.minisiteEvent.subdomain;
-            if (!this.subdomain) return "no-this-minisite";
             if (activeSubdomain === this.event.subdomain) return "on-main-subdomain";
             if (activeSubdomain === this.event.partial_subdomain) return "on-partial-subdomain";
             return "on-foreign-subdomain";

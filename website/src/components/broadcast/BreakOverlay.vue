@@ -39,6 +39,7 @@
                             <BroadcastPreview v-for="other in broadcasts" v-bind:key="other.id" :broadcast="other"/>
                         </div>
                     </div>
+                    <BreakStaffList class="break-col break-staff-list" v-if="automatedShow === 'Staff'" :matches="fullSchedule"/>
                 </transition>
             </div>
         </div>
@@ -63,13 +64,14 @@ import Bracket from "@/components/website/Bracket";
 import BroadcastPreview from "@/components/broadcast/BroadcastPreview";
 import BreakHeadlines from "@/components/broadcast/BreakHeadlines";
 import { themeBackground1 } from "@/utils/theme-styles";
+import BreakStaffList from "@/components/broadcast/BreakStaffList";
 
 const tickTime = 25;
 
 export default {
     name: "BreakOverlay",
     props: ["broadcast"],
-    components: { BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
+    components: { BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
     data: () => ({
         tick: 0,
         lastCountdownTick: 0
@@ -96,13 +98,17 @@ export default {
                 })
             });
         },
-        schedule() {
+        fullSchedule() {
             if (!this.broadcast || !this.broadcast.schedule) return null;
             return ReactiveArray("schedule", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
                 })
-            })(this.broadcast).filter(m => {
+            })(this.broadcast).sort(sortMatches);
+        },
+        schedule() {
+            if (!this.broadcast || !this.broadcast.schedule || !this.fullSchedule) return null;
+            return this.fullSchedule.filter(m => {
                 return m.show_on_overlays;
             }).sort(sortMatches);
         },

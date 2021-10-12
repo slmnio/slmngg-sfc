@@ -48,7 +48,7 @@ export default {
 <style scoped>
     .break-schedule {
         flex-grow: 1;
-        padding: 20px 40px;
+        padding: 0 40px;
         box-sizing: border-box;
         /*justify-content: space-evenly;*/
         overflow: hidden;

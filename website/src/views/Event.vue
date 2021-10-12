@@ -22,7 +22,7 @@
             </ul>
 
             <li class="nav-item mx-2 minisite-prompt" v-if="shouldShowMinisitePrompt" :style="themeBackground1(event)">
-                <a :href="minisiteDomain" class="nav-link no-link-style">See this page on the <b>{{ subdomain }}</b> minisite <i class="fas fa-chevron-right fa-fw ml-1"></i></a>
+                <a :href="minisiteLink" class="nav-link no-link-style">See this page on the <b>{{ subdomain }}</b> minisite <i class="fas fa-chevron-right fa-fw ml-1"></i></a>
             </li>
         </SubPageNav>
 
@@ -108,7 +108,16 @@ export default {
         shouldShowMinisitePrompt() {
             return ["no-root-minisite", "on-foreign-subdomain"].includes(this.ownMinisiteStatus);
         },
+        minisiteLink() {
+            if (!this.event?.id || !this.minisiteDomain) return null;
+            if (this.subdomain === this.event.partial_subdomain) {
+                return `${this.minisiteDomain}/event/${this.event.id}`;
+            } else {
+                return this.minisiteDomain;
+            }
+        },
         minisiteDomain() {
+            // TODO: make this change
             if (!this.event) return null;
 
             try {

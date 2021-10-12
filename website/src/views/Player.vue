@@ -71,6 +71,9 @@ export default {
                         theme: ReactiveThing("theme")
                     })
                 }),
+                brands_designed: ReactiveArray("brands_designed", {
+                    theme: ReactiveThing("theme")
+                }),
                 socials: ReactiveArray("socials"),
                 player_relationships: ReactiveArray("player_relationships", {
                     events: ReactiveArray("events", {

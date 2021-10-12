@@ -1,6 +1,10 @@
 <template>
     <div class="team-theme container">
 
+        <ContentRow v-if="team.brand_designers" :title="team.brand_designers.length === 1 ? 'Brand designer' : 'Brand designers'">
+            <ContentThing type="player" :text="designer.name" :thing="designer" :theme="team.theme" v-for="designer in team.brand_designers" v-bind:key="designer.id"></ContentThing>
+        </ContentRow>
+
         <h3>Themes</h3>
         <div class="theme-collection mb-3">
             <div class="theme-bar" :style="mainTheme">
@@ -48,6 +52,8 @@ import IngameTeam from "@/components/broadcast/IngameTeam";
 import BracketTeam from "@/components/website/BracketTeam";
 import { getImage } from "@/utils/content-utils";
 import { logoBackground } from "@/utils/theme-styles";
+import ContentRow from "@/components/website/ContentRow";
+import ContentThing from "@/components/website/ContentThing";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");
@@ -55,7 +61,7 @@ function cleanKey(key) {
 
 export default {
     name: "TeamTheme.vue",
-    components: { BracketTeam, IngameTeam },
+    components: { BracketTeam, IngameTeam, ContentRow, ContentThing },
     props: ["team"],
     computed: {
         theme() {

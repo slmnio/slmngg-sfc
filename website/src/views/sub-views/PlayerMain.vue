@@ -17,6 +17,10 @@
               <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teamStaff"
                             v-bind:key="team.id" :show-logo="true" />
             </ContentRow>
+            <ContentRow title="Brand designer for" v-if="brandsDesigned">
+              <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in brandsDesigned"
+                            v-bind:key="team.id" :show-logo="true" :overrideURL="`/team/${team.id}/theme`" />
+            </ContentRow>
             <ContentRow title="Player for" v-if="teams">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teams"
                               v-bind:key="team.id" :show-logo="true" />
@@ -93,6 +97,11 @@ export default {
         teamStaff() {
             if (!this.player?.team_staff) return null;
             const teams = this.player.team_staff;
+            return teams.sort(sortTeams);
+        },
+        brandsDesigned() {
+            if (!this.player?.brands_designed) return null;
+            const teams = this.player.brands_designed;
             return teams.sort(sortTeams);
         },
         mainPlayerRelationships(useMatches = false) {

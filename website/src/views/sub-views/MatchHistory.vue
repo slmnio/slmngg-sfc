@@ -16,7 +16,7 @@
 
         <h2 class="text-center mt-4">This match</h2>
         <div class="this-match-maps d-flex flex-center">
-            <MapDisplay v-for="map in match.maps" :map="map" v-bind:key="map.id"/>
+            <MapDisplay v-for="map in match.maps" :map="map" v-bind:key="map.id" :match="match"/>
         </div>
 
 

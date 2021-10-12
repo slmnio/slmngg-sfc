@@ -48,7 +48,6 @@ export default {
         },
         name() {
             try {
-                console.log(this.map);
                 if (this.condensed) return this.map.short_name[0];
                 return this.map.name[0];
             } catch (e) { return ""; }

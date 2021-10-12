@@ -26,6 +26,9 @@ export default {
             if (this.match.__loading || !this.match.id) return false;
             if (this.match && !this.match.vod) return true;
             return false;
+        },
+        theme() {
+            return this.match?.event?.theme;
         }
     }
 };

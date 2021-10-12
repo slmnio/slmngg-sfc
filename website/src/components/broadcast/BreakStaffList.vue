@@ -13,16 +13,16 @@
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 
 const PRODUCTION_HIERARCHY = [
+    "Caster",
+    "Desk Host",
+    "Host",
+    "Interviewer",
     "Director",
     "Producer",
     "Observer Director",
     "Replay Operator",
     "Observer",
     "Lobby Admin",
-    "Caster",
-    "Desk Host",
-    "Host",
-    "Interviewer",
     "Stream Admin",
     "Moderator"
 ];

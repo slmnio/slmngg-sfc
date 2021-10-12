@@ -12,7 +12,7 @@ const logUpdates = false;
 // Starting with syncing Matches
 
 // const tables = ["Matches", "Teams", "Themes", "Events", "Players", "Player Relationships"];
-const tables = ["Broadcasts", "Clients", "Teams", "Ad Reads", "Ad Read Groups", "Events", "Players", "Event Series", "News", "Matches",  "Themes",  "Socials", "Accolades", "Player Relationships", "Brackets", "Live Guests", "Headlines", "Maps", "Map Data", "Heroes"];
+const tables = ["Broadcasts", "Clients", "Teams", "Ad Reads", "Ad Read Groups", "Events", "Players", "Event Series", "News", "Matches",  "Themes",  "Socials", "Accolades", "Player Relationships", "Brackets", "Live Guests", "Headlines", "Maps", "Map Data", "Heroes", "Log Files"];
 const staticTables = ["Redirects"];
 
 function deAirtable(obj) {

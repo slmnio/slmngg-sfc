@@ -45,6 +45,10 @@
                                 <td>MVP</td>
                                 <td><LinkedPlayers :players="[match.mvp]" /></td>
                             </tr>
+                            <tr v-if="match.log_files && match.log_files.replay_codes">
+                                <td>Replay codes</td>
+                                <td>{{ match.log_files.replay_codes }}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -88,7 +92,8 @@ export default {
                     winner: ReactiveThing("winner", {
                         theme: ReactiveThing("theme")
                     })
-                })
+                }),
+                log_files: ReactiveThing("log_files")
             });
         },
         eventStyle() {

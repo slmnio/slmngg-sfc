@@ -87,9 +87,7 @@ export function getMatchContext(match) {
     const text = [];
     let out = "";
 
-    if (match?.event?.short) {
-        out = match?.event?.short + ": ";
-    }
+    out = (match?.event?.short || match?.event?.name || "");
 
     // sub_event: round
     // week_text: round
@@ -97,11 +95,12 @@ export function getMatchContext(match) {
     //
 
     text.push(match?.sub_event || "");
-    text.push(match?.week_text || "");
+    if (!(text.length >= 1 && match.round)) text.push(match?.week_text || "");
     text.push(match?.round || "");
     // text.push(match?.sub_event || ""); // round > sub_event
     text.push((match?.week && (!match?.week_text) && `Week ${match?.week}`) || ""); // basically regular season
-    return out + text.filter((t, i, a) => !!t && a.indexOf(t) === i).join(" · ");
+    const pieces = text.filter((t, i, a) => !!t && a.indexOf(t) === i);
+    return out + (pieces.length > 0 ? ": " : "") + pieces.join(" · ");
 }
 
 export function getRoleSVG(name) {

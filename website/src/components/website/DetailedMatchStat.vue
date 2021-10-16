@@ -3,6 +3,9 @@
         <div class="stat-a"><slot></slot></div>
         <div class="stat-b" v-if="time">{{ prettyDate(match[data], ' ') }} local time</div>
         <div class="stat-b" v-else-if="raw" v-html="format ? format(match[data]) : match[data]"></div>
+        <div class="stat-b" v-else-if="players">
+            <LinkedPlayers :players="match[data] || override" />
+        </div>
         <div class="stat-b" v-else-if="override">{{ format ? format(override) : override }}</div>
         <div class="stat-b" v-else>{{ format ? format(match[data]) : match[data] }}</div>
 
@@ -10,14 +13,15 @@
 </template>
 
 <script>
+import { url } from "@/utils/content-utils";
+import LinkedPlayers from "@/components/website/LinkedPlayers";
+
 export default {
     name: "DetailedMatchStat",
-    props: ["data", "text", "format", "raw", "time", "override", "match"],
-
+    props: ["data", "text", "format", "raw", "time", "override", "match", "players"],
+    components: { LinkedPlayers },
     methods: {
-        getURL (text) {
-            return new URL(text);
-        },
+        url,
         prettyDate: (tstr, split = "<br>") => {
             if (!tstr) return "No time set";
             const date = new Date(tstr);

@@ -13,7 +13,6 @@
 </template>
 
 <script>
-import { url } from "@/utils/content-utils";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
 
 export default {
@@ -21,7 +20,6 @@ export default {
     props: ["data", "text", "format", "raw", "time", "override", "match", "players"],
     components: { LinkedPlayers },
     methods: {
-        url,
         prettyDate: (tstr, split = "<br>") => {
             if (!tstr) return "No time set";
             const date = new Date(tstr);

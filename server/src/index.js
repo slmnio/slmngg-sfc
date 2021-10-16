@@ -77,6 +77,7 @@ app.get("/things/:ids", cors({ origin: corsHandle}), async (req, res) => {
 });
 
 routes({ app, cors, Cache });
+meta({ app, cors, Cache });
 
 function cleanID(id) {
     if (!id) return null;

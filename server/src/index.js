@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const port = 8901;
 const http = require("http").Server(app);
 const cors = require("cors");
+const meta = require("./meta.js");
 const routes = require("./routes.js");
 // const staff = require("./discord/staff.js");
 // const api = require("./api/level_1.js");

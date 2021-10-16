@@ -85,7 +85,7 @@
                 <div class="info-block">
                     <stat :match="match" data="custom_name">Custom match name</stat>
                     <stat :match="match" data="match_number">Match number</stat>
-                    <stat :match="match" data="casters" :format="(d) => d.map(c => c.name).join(', ')">Casters</stat>
+                    <stat :match="match" data="casters" :players="true">Casters</stat>
                     <stat :match="match" data="sub_event">Sub Event</stat>
 <!-- TODO: change this to spacetime -->
                     <stat :match="match" data="start" time="true">Scheduled start time</stat>
@@ -93,8 +93,7 @@
                     <stat :match="match" data="clean_feed" :format="(e) => `<a href='${e}' target='_blank'>${getURL(e).hostname}</a>`" raw="true">Clean Feed</stat>
                     <stat :match="match" data="first_to">First to</stat>
                     <stat :match="match" v-for="relGroup in playerRelationshipGroups" v-bind:key="relGroup.meta.singular_name"
-                          :override="relGroup.items"
-                          :format="(d) => d.map(c => c.name).join(', ')">
+                          :override="relGroup.items" :players="true">
                         {{ relGroup.items.length === 1 ? relGroup.meta.singular_name : relGroup.meta.plural_name }}</stat>
                     <stat :match="match" data="replay_codes" :raw="true" :format="(t) => t[0].replace(/\n/g, '<br>')">Replay codes</stat>
                 </div>

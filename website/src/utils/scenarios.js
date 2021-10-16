@@ -50,9 +50,9 @@ export function sortByHeadToHead(a, b) {
 
     // try checking standings.h2h[opponent.id] for +/-
 
-    if (a.standings?.h2h) {
-        const diff = a.standings?.h2h[b.id];
-        console.log("[h2h] diff", diff, a.standings.h2h, b.id);
+    if (b.standings?.h2h) {
+        const diff = b.standings?.h2h[a.id];
+        console.log("[h2h] diff", diff, b.standings.h2h, a.id);
         if (!isNaN(diff)) return diff;
     }
 
@@ -74,7 +74,7 @@ export function sortByHeadToHead(a, b) {
     // }
 
     if (!a || !a.h2h || !b || !b.id) return 0;
-    return a.h2h[b.id] || 0;
+    return b.h2h[a.id] || 0;
 }
 
 export function sortByMapWins(a, b) {

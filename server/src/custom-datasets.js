@@ -36,8 +36,18 @@ async function playerList(Cache) {
     players = players.map(p => ({
         id: p.id,
         name: p.name,
-        verified: !!p.verified
-    })).filter(p => p.name);
+        verified: !!p.verified,
+        pro: p.pro
+    })); //.filter(p => p.name);
 
-    Cache.set("special:players", { players });
+    const publicPlayers = [];
+    const proPlayers = [];
+
+    players.forEach(player => {
+        if (player.pro) return proPlayers.push(player);
+        publicPlayers.push(player);
+    });
+
+    Cache.set("special:players", { players: publicPlayers });
+    Cache.set("special:pro-players", { players: proPlayers });
 }

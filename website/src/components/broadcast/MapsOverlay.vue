@@ -66,7 +66,7 @@ export default {
             //     }
             //     return maps;
             // }
-            const maps = [...this.match.maps].filter(m => m.map).slice(0, this.likelyNeededMaps);
+            const maps = [...(this.match.maps || [])].filter(m => m.map).slice(0, this.likelyNeededMaps);
             const dummyMapCount = this.likelyNeededMaps - maps.length;
             console.log("extra maps", this.mapCount, dummyMapCount);
             const initialMapCount = maps.length;
@@ -83,7 +83,7 @@ export default {
             const scores = [this.match.score_1, this.match.score_2].map(s => s || 0);
 
             // how many maps have a winner marked
-            const playedMaps = this.match.maps.filter(m => m.winner).length;
+            const playedMaps = (this.match.maps || []).filter(m => m.winner).length;
 
             // how many maps each team needs to win to complete
             const toWin = scores.map(s => this.match.first_to - s);
@@ -91,7 +91,7 @@ export default {
             // how many maps could be played with no draws
             const withoutDraws = (this.match.first_to * 2) - 1;
 
-            const draws = this.match.maps.filter(m => m.draw).length;
+            const draws = (this.match.maps || []).filter(m => m.draw).length;
 
             // if match is over (scores.some s == match.first_to)
 

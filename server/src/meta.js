@@ -129,10 +129,12 @@ module.exports = ({ app, cors, Cache }) => {
                 * */
 
 
+                let text = thing.content.split("\n\n")[0];
+                let cutoff = 300;
                 let data = {
                     title: thing.headline,
                     /* solo_description removes slmn.gg footer */
-                    solo_description: thing.content.split("\n\n")[0].slice(0, 200)
+                    solo_description: text.slice(0, 300) + (text.length > 300 ? "..." : "")
                 };
                 if (theme) {
                     data.color = theme.color_theme;
@@ -197,6 +199,21 @@ module.exports = ({ app, cors, Cache }) => {
                 return {
                     ...data,
                     title: `Schedule | ${data.title}`
+                };
+            }
+        },
+        {
+            url: "news",
+            async handle({ event, path, parts}) {
+                let eventMeta = await basicEventRoute({ event, path, parts });
+                let newsMeta = await routes.find(r => r.url === "news").handle({ path, parts });
+                if (!newsMeta) return null;
+                return {
+                    ...newsMeta,
+                    color: eventMeta.color || newsMeta.color,
+                    solo_description: newsMeta.solo_description || eventMeta.description,
+                    card_type: newsMeta.card_type || "summary",
+                    image: newsMeta.image || eventMeta.image
                 };
             }
         }

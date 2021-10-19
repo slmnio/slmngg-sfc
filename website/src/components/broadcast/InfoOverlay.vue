@@ -3,7 +3,7 @@
         <div class="info-side">
             <div class="team-text" :style="teamBG">
                 <transition mode="out-in" name="fade">
-                    <div class="industry-align" :key="broadcast.title">{{ broadcast.title }}</div>
+                    <div class="industry-align" :key="title || broadcast.title">{{ title || broadcast.title }}</div>
                 </transition>
             </div>
             <div class="event-logo bg-center" :style="eventLogo"></div>
@@ -18,7 +18,7 @@ import { cssImage } from "@/utils/content-utils";
 
 export default {
     name: "InfoOverlay",
-    props: ["broadcast"],
+    props: ["broadcast", "title"],
     computed: {
         highlightTeam() {
             if (!this.broadcast?.highlight_team?.length) return null;

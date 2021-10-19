@@ -31,8 +31,8 @@
             <div class="segment-wrapper segment-spacer flex-grow-1"></div>
 
             <transition name="seg">
-                <div class="segment-wrapper" v-if="showSegment('Title') && broadcast && broadcast.title" :key="'Title-' + broadcast.title">
-                    <div class="overlay--bg bar-segment segment-title" v-html="nbr(broadcast.title)"></div>
+                <div class="segment-wrapper" v-if="showSegment('Title') && (title || (broadcast && broadcast.title))" :key="'Title-' + (title || broadcast.title)">
+                    <div class="overlay--bg bar-segment segment-title" v-html="nbr(title || broadcast.title)"></div>
                 </div>
             </transition>
             <transition name="seg">
@@ -88,7 +88,7 @@ import { sortMatches } from "@/utils/sorts";
 
 export default {
     name: "BreakBarOverlay",
-    props: ["broadcast"],
+    props: ["broadcast", "title"],
     components: { Countdown, BreakMatch, Sponsors, Bracket },
     computed: {
         event() {

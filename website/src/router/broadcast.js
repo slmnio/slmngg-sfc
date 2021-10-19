@@ -24,7 +24,7 @@ export default [
     { path: "break-bar", component: BreakBarOverlay },
     { path: "bracket", component: BracketOverlay, props: route => ({ bracketKey: route.query.key, extended: !!route.query.extended, scale: route.query.scale }) },
     { path: "schedule", component: ScheduleOverlay },
-    { path: "standings", component: StandingsOverlay, props: route => ({ title: route.query.title }) },
+    { path: "standings", component: StandingsOverlay },
     { path: "roster", redirect: "rosters" },
     { path: "rosters", component: RosterOverlay },
     { path: "thumbnail", component: EventThumbnailCreator },
@@ -37,6 +37,6 @@ export default [
     { path: "sponsors", component: SponsorOverlay },
     { path: "maps", component: MapsOverlay },
     { path: "branding", component: BrandingOverlay },
-    { path: "auction", component: AuctionOverlay, props: route => ({ category: route.query.category, title: route.query.title }) },
+    { path: "auction", component: AuctionOverlay, props: route => ({ category: route.query.category }) },
     { path: "ad-read", component: AdReadOverlay, props: route => ({ extraDelay: route.query.delay }) }
 ];

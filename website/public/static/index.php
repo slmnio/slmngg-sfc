@@ -21,7 +21,7 @@ function fetch($url) {
 // }
 function getMeta($url) {
     $url = substr($url, 1);
-    $data = fetch("https://data.slmn.gg/meta/" . urlencode($url));
+    $data = fetch("https://data.slmn.gg/meta/" . urlencode($url) . "?domain=" . $_SERVER["HTTP_HOST"]);
     return $data;
 }
 $__meta = getMeta($_URL);

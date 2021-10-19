@@ -1,7 +1,7 @@
 <template>
     <GenericOverlay class="maps-overlay" v-if="match" :title="title || 'Map Set'" :accent-color="accentColor.theme">
         <div class="map-display d-flex w-100 h-100">
-            <BroadcastMapDisplay class="map" v-for="map in maps" v-bind:key="map.id" :map="map" :accent-color="accentColor"></BroadcastMapDisplay>
+            <BroadcastMapDisplay class="map" v-for="map in maps" v-bind:key="map.id" :map="map" :accent-color="accentColor" :show-map-video="showMapVideos"></BroadcastMapDisplay>
         </div>
     </GenericOverlay>
 </template>
@@ -40,7 +40,8 @@ export default {
                 maps: ReactiveArray("maps", {
                     winner: ReactiveThing("winner", {
                         theme: ReactiveThing("theme")
-                    })
+                    }),
+                    map: ReactiveThing("map")
                 })
             });
         },
@@ -58,25 +59,51 @@ export default {
                 SpikeRush: "https://cdn.discordapp.com/attachments/880305022716481639/883809271198924840/spikerush_default.png",
                 ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png"
             };
-            if (!this.match?.maps) {
-                const maps = [];
-                for (let i = 0; i < this.mapCount; i++) {
-                    maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[i]], image: [{ url: images[this.mapTypes[i]] }] } : {}) });
-                }
-                return maps;
-            }
-            const maps = [...this.match.maps].filter(m => m.map);
-            const dummyMapCount = this.mapCount - maps.length;
-            console.log("extra maps", dummyMapCount);
+            // if (!this.match?.maps) {
+            //     const maps = [];
+            //     for (let i = 0; i < this.mapCount; i++) {
+            //         maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[i]], image: [{ url: images[this.mapTypes[i]] }] } : {}) });
+            //     }
+            //     return maps;
+            // }
+            const maps = [...this.match.maps].filter(m => m.map).slice(0, this.likelyNeededMaps);
+            const dummyMapCount = this.likelyNeededMaps - maps.length;
+            console.log("extra maps", this.mapCount, dummyMapCount);
             const initialMapCount = maps.length;
 
             if (dummyMapCount > 0) {
                 for (let i = 0; i < dummyMapCount; i++) {
                     const num = initialMapCount + i;
-                    maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[num]], image: [{ url: images[this.mapTypes[num]] }] } : {}) });
+                    if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[num]], image: [{ url: images[this.mapTypes[num]] }] } : {}) });
                 }
             }
             return maps;
+        },
+        likelyNeededMaps() {
+            const scores = [this.match.score_1, this.match.score_2].map(s => s || 0);
+
+            // how many maps have a winner marked
+            const playedMaps = this.match.maps.filter(m => m.winner).length;
+
+            // how many maps each team needs to win to complete
+            const toWin = scores.map(s => this.match.first_to - s);
+
+            // how many maps could be played with no draws
+            const withoutDraws = (this.match.first_to * 2) - 1;
+
+            const draws = this.match.maps.filter(m => m.draw).length;
+
+            // if match is over (scores.some s == match.first_to)
+
+            // minimum (first to x2) -1
+
+            // currently played + 1 (tiebreakers, draws etc)
+
+            console.log({ playedMaps, toWin, withoutDraws, draws });
+
+            return withoutDraws + draws;
+
+            // return 0;
         },
         mapCount() {
             if (!this.match) return 0;
@@ -89,13 +116,18 @@ export default {
 
             if (scores.some(s => s === this.match.first_to)) {
                 // match complete
-                if (this.match.maps) return (this.match.maps || []).length;
-                return scores[0] + scores[1];
+                return Math.max(this.likelyNeededMaps, scores[0] + scores[1]);
+                // if (this.match.maps) return (this.match.maps || []).length;
+                // return ;
             }
 
             const toWin = scores.map(s => this.match.first_to - s);
             console.log("each team maps to win", toWin);
             return (scores[0] + scores[1]) + Math.min(...toWin);
+        },
+        showMapVideos() {
+            if (!this.broadcast?.video_settings?.length) return false;
+            return this.broadcast.video_settings.includes("Use map videos");
         }
     }
 };

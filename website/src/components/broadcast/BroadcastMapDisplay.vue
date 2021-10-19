@@ -1,6 +1,9 @@
 <template>
     <div class="map w-100 d-flex position-relative">
-        <div class="map-bg w-100 h-100 bg-center" v-bind:class="{'grayscale': !!winnerBG || (map && map.draw)}" :style="mapBackground"></div>
+        <div v-if="mapVideo" class="map-bg map-video w-100 h-100 bg-center" v-bind:class="{'grayscale': !!winnerBG || (map && map.draw)}" :style="mapBackground">
+            <video :src="mapVideo" autoplay muted loop></video>
+        </div>
+        <div v-else class="map-bg w-100 h-100 bg-center" v-bind:class="{'grayscale': !!winnerBG || (map && map.draw)}" :style="mapBackground"></div>
         <div class="map-gel w-100 h-100 position-absolute" :style="winnerBG"></div>
         <div class="map-gel w-100 h-100 position-absolute draw-gel" v-if="map && map.draw"></div>
         <div class="map-main d-flex flex-column h-100 w-100 position-absolute">
@@ -23,7 +26,7 @@ import { cssImage } from "@/utils/content-utils";
 
 export default {
     name: "BroadcastMapDisplay",
-    props: ["map", "accentColor"],
+    props: ["map", "accentColor", "showMapVideo"],
     computed: {
         mapBackground() {
             if (!(this.map?.big_image || this.map?.image)) return {};
@@ -54,6 +57,11 @@ export default {
         winnerLogo() {
             if (!this.map?.winner?.theme) return {};
             return cssImage("backgroundImage", this.map.winner.theme, ["default_wordmark", "default_logo", "small_logo"], 400);
+        },
+        mapVideo() {
+            if (!this.showMapVideo) return null;
+            if (!this.map?.map?.map_video?.length) return null;
+            return this.map.map.map_video[0].url;
         }
     }
 };
@@ -63,6 +71,7 @@ export default {
     .map {
         flex-direction: column;
         margin: 0 12px;
+        overflow: hidden;
     }
     .map-bg {
         background-size: cover;
@@ -96,5 +105,16 @@ export default {
     .gel-text {
         color: white;
         font-size: 60px;
+    }
+
+    .map-bg video {
+        height: 100%;
+    }
+
+    .map-bg.map-video {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
     }
 </style>

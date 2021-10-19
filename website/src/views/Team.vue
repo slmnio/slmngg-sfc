@@ -6,6 +6,13 @@
             <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
             <li class="nav-item" v-if="team.theme"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
 <!--            <li class="nav-item"><router-link class="nav-link" :to="subLink('details')">Details</router-link></li>-->
+
+            <ul class="socials d-flex" v-if="team.socials">
+                <li class="nav-item">
+                    <Social :social="social" v-for="social in team.socials" v-bind:key="social.id"/>
+                </li>
+            </ul>
+
         </SubPageNav>
         <router-view :team="team"></router-view>
     </div>
@@ -16,12 +23,13 @@ import ThingTop from "@/components/website/ThingTop";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import SubPageNav from "@/components/website/SubPageNav";
 import { multiImage } from "@/utils/content-utils";
+import Social from "@/components/website/Social";
 
 export default {
     name: "Team",
     props: ["id"],
     components: {
-        ThingTop, SubPageNav
+        ThingTop, SubPageNav, Social
     },
     metaInfo() {
         return {
@@ -62,7 +70,8 @@ export default {
                     event: ReactiveThing("event", {
                         theme: ReactiveThing("theme")
                     })
-                })
+                }),
+                socials: ReactiveArray("socials")
             });
         }
     }
@@ -71,5 +80,12 @@ export default {
 </script>
 
 <style scoped>
-
+    .socials {
+        list-style: none;
+        padding-left: 0;
+        margin: 0 .5em;
+    }
+    .socials li a {
+        padding: .25em .25em;
+    }
 </style>

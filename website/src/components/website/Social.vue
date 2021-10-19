@@ -1,5 +1,5 @@
 <template>
-    <a :href="social.url" class="social-link" target="_blank" :title="social.name">
+    <a v-if="social.approved" :href="social.url" class="social-link" target="_blank" :title="social.name">
         <i :class="icon"></i>
     </a>
 </template>

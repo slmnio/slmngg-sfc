@@ -3,7 +3,7 @@
         <div class="info-side">
             <div class="team-text" :style="teamBG">
                 <transition mode="out-in" name="fade">
-                    <div class="industry-align" :key="title || broadcast.title">{{ title || broadcast.title }}</div>
+                    <div class="industry-align" :key="title || broadcast.title" v-html="nbr( title || broadcast.title)"></div>
                 </transition>
             </div>
             <div class="event-logo bg-center" :style="eventLogo"></div>
@@ -38,6 +38,12 @@ export default {
             if (!this.broadcast?.event?.theme) return {};
             return cssImage("backgroundImage", this.broadcast.event.theme, ["default_logo"], 200);
         }
+    },
+    methods: {
+        nbr(text) {
+            if (!text) return "";
+            return text.replace(/\\n/g, "<br>");
+        }
     }
 };
 </script>
@@ -68,6 +74,9 @@ export default {
         background-color: #222;
         color: #eee;
         transition: all .3s ease;
+        line-height: 1;
+        padding-top: 4px;
+        padding-bottom: 4px;
     }
     .info-side {
         position: absolute;

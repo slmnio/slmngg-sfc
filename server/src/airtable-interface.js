@@ -15,9 +15,12 @@ const logUpdates = false;
  */
 let io = null;
 let _isRebuilding = true;
+let _rebuildStart = null;
 function setup(_io) {
     io = _io;
 
+    console.log("[rebuild] rebuilding...");
+    _rebuildStart = Date.now();
     io.on("connect", (socket) => {
         io.emit("server_rebuilding", _isRebuilding);
     });
@@ -31,6 +34,7 @@ function setRebuilding(isRebuilding) {
         io.emit("server_rebuilding", true);
     } else {
         io.emit("server_rebuilding", false);
+        console.log(`[rebuild] rebuild finished in ${(Date.now() - _rebuildStart)}ms`);
     }
 }
 
@@ -65,7 +69,13 @@ async function getAllTableData(tableName, options = {}) {
         const end = new Date();
         if (logUpdates) loading.succeed(`Loaded table ${chalk.bold(tableName)} - ${data.length} records loaded in ${((end - start) / 1000).toFixed(2)}s`);
         return data;
-    } catch (e) { console.error("Airtable error", e); }
+    } catch (e) {
+        if (e.code === "ETIMEDOUT") {
+            console.warn("Airtable request timed out (classic)");
+        } else {
+            console.error("Airtable error", e);
+        }
+    }
 }
 
 function customUpdater(tableName, item) {
@@ -121,7 +131,13 @@ function registerUpdater(tableName, options) {
             }
 
             customTableUpdate(tableName, Cache);
-        } catch (e) { console.error("Airtable error", e); }
+        } catch (e) {
+            if (e.code === "ETIMEDOUT") {
+                console.warn("Airtable request timed out (classic)");
+            } else {
+                console.error("Airtable error", e);
+            }
+        }
     }, pollRate);
 
     setInterval(async function() {
@@ -141,12 +157,14 @@ async function sync() {
     for (let table of staticTables) {
         await processTableData(table, await getAllTableData(table), true);
         setInterval(async () => processTableData(table, await getAllTableData(table), true), 5 * 1000);
+        if (firstRun) console.log(`[rebuild] static table ${table} complete`);
     }
     for (let table of tables) {
         // await t(1000);
         await processTableData(table, await getAllTableData(table));
         setInterval(async () => processTableData(table, await getAllTableData(table)), 30 * 1000);
         registerUpdater(table);
+        if (firstRun) console.log(`[rebuild] dynamic table ${table} complete`);
     }
     if (firstRun) setRebuilding(false);
     firstRun = false;

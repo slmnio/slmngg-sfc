@@ -87,9 +87,11 @@ function cleanID(id) {
     return id;
 }
 
+let connected = 0;
+
 // eslint-disable-next-line no-unused-vars
 io.on("connection", (socket) => {
-    console.log("[socket] New connection");
+    console.log(`[socket] on site: ${++connected}`);
 
     socket.on("subscribe", (id) => {
         id = cleanID(id);
@@ -101,10 +103,13 @@ io.on("connection", (socket) => {
         socket.leave(id);
     });
     socket.on("subscribe-multiple", (ids) => {
-        console.log(`[multiple] client rejoining ${ids.length} rooms`);
+        // console.log(`[multiple] client rejoining ${ids.length} rooms`);
         ids.map(id => cleanID(id)).forEach(id => {
             socket.join(id);
         });
+    });
+    socket.on("disconnect", () => {
+        connected--;
     });
 });
 

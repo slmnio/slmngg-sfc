@@ -109,6 +109,8 @@ export default {
 
     .map-bg video {
         height: 100%;
+        object-fit: cover;
+        width: 100%;
     }
 
     .map-bg.map-video {

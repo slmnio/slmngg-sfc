@@ -7,7 +7,9 @@
             <div class="news-author" v-if="!news.author_name">from <span v-if="news.author_role">{{ news.author_role }}, </span>{{ connection ? (connection.series_name || connection.name) : '' }}</div>
             <div class="news-date" v-if="news.released || news.updated">{{ news.updated ? `updated ${prettyDate(news.updated)}` : prettyDate(news.released) }}</div>
         </div>
-        {{ news.connection }}
+        <div class="post-link-holder my-3" v-if="news.redirect_url">
+            <a class="post-link p-2" :href="news.redirect_url" :style="themeBackground(theme)">See this post's link <i class="fa fa-chevron-right fa-fw"></i></a>
+        </div>
         <EmbeddedVideo class="news-embed-container" :src="news.embed" v-if="news.embed"/>
         <div class="news-content" v-if="news.content">
             <Markdown :markdown="news.content" />
@@ -21,6 +23,7 @@ import { getImage, multiImage, url } from "@/utils/content-utils";
 import NewsHeader from "@/components/website/NewsHeader";
 import Markdown from "@/components/website/Markdown";
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
+import { themeBackground } from "@/utils/theme-styles";
 
 export default {
     name: "News",
@@ -28,6 +31,7 @@ export default {
     props: ["slug"],
     methods: {
         url,
+        themeBackground,
         prettyDate(date) {
             date = new Date(date);
 

@@ -1,7 +1,7 @@
 <template>
-    <div class="match-hero-team flex-center" :style="teamBG" v-if="team">
+    <div class="match-hero-team flex-center default-thing" :style="teamBG" v-if="team">
         <div class="team-logo" :style="teamLogo"></div>
-        <router-link :to="url('team', team)" :style="teamText" class="team-name">{{ team.name }}</router-link>
+        <router-link :to="url('team', team)" :style="teamText" class="team-name no-link-style">{{ team.name }}</router-link>
     </div>
 </template>
 

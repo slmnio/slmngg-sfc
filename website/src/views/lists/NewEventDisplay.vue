@@ -1,5 +1,5 @@
 <template>
-    <a v-if="useRawTag" :href="url('event', event, {subdomain: event.subdomain, partial_subdomain: event.partial_subdomain})" class="event no-link-style d-flex" :style="blockTheme">
+    <a v-if="useRawTag" :href="url('event', event, {subdomain: event.subdomain, partial_subdomain: event.partial_subdomain})" class="event no-link-style d-flex default-thing" :style="blockTheme">
         <div class="event-block flex-center">
             <div class="event-block-logo bg-center" :style="blockLogo"></div>
         </div>
@@ -7,7 +7,7 @@
             {{ event.name }}
         </div>
     </a>
-    <router-link v-else :to="url('event', event)" class="event no-link-style d-flex" :style="blockTheme">
+    <router-link v-else :to="url('event', event)" class="event no-link-style d-flex default-thing" :style="blockTheme">
         <div class="event-block flex-center">
             <div class="event-block-logo bg-center" :style="blockLogo"></div>
         </div>
@@ -46,10 +46,8 @@ export default {
 
 <style scoped>
 .event {
-    border-bottom: 4px solid;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-    transition: background-color .2s, border-color .2s, color .2s;
+    border-bottom-width: 4px;
+    border-bottom-style: solid;
     min-height: 58px;
 }
 .event:hover {

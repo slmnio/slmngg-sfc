@@ -4,7 +4,7 @@
         <div class="prev-match-date" v-else-if="match.start">{{ goodDate }}</div>
         <div class="prev-match-result">{{ resultLetter }}</div>
         <router-link :to="url('detailed', match)" class="prev-match-vs">vs</router-link>
-        <div class="prev-match-opponent flex-center flex-shrink-0" :style="teamTheme(opponent)"><div class="prev-match-opponent-logo bg-center" :style="largeIcon(opponent)"></div></div>
+        <div class="prev-match-opponent default-thing flex-center flex-shrink-0" :style="teamTheme(opponent)"><div class="prev-match-opponent-logo bg-center" :style="largeIcon(opponent)"></div></div>
         <div class="prev-match-maps"><MapDisplay class="map"
                 v-for="map in (match.maps || []).filter(map => map.number <= match.first_to || map.winner)"
                 :key="map.id" :map="map" :theme="team.theme"

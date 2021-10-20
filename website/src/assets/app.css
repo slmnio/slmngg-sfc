@@ -189,7 +189,7 @@ a.link-text {
     align-items: center;
 }
 
-a.no-link-style {
+a.no-link-style, a.no-link-style:hover {
     display: block;
     text-decoration: none;
     color: inherit;
@@ -213,4 +213,25 @@ body.overlay {
 
 h1.big {
     font-size: 4em;
+}
+
+.default-thing {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgb(255, 255, 255);
+    transition: background-color .2s, border-color .2s, color .2s;
+}
+/* no-link-style has color:inherit which affects border-color if on some links
+   the extra specificity helps to override that */
+.no-link-style.default-thing {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+a.default-thing {
+    color: rgb(255,255,255);
+}
+
+.default-thing-border-bg {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: rgb(255, 255, 255);
+    transition: background-color .2s, border-color .2s, color .2s;
 }

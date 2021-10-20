@@ -3,7 +3,7 @@
         <div class="container">
             <div class="top">
                 <div class="player-top d-flex">
-                    <div class="player-icon bg-center" v-if="player.overwatch_icon"
+                    <div class="player-icon bg-center default-thing" v-if="player.overwatch_icon"
                          :style="{backgroundImage: `url(${player.overwatch_icon})`}"></div>
                     <div class="player-name">{{ player.name }} <i class="fas fa-badge-check" v-if="player.verified"></i>
                     </div>

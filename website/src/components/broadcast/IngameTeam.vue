@@ -1,7 +1,7 @@
 <template>
 <!--    <transition name="ingame-team-anim">-->
         <div class="ingame-team-holder" v-if="loaded" v-bind:class="{'right': right, 'left': !right}">
-            <div class="ingame-team" :style="style" :key="team.id">
+            <div class="ingame-team default-thing" :style="style" :key="team.id">
                 <div class="flex-center team-small-text" v-if="team.small_overlay_text">
                     <span class="industry-align">{{ team.small_overlay_text }}</span>
                 </div>
@@ -133,7 +133,6 @@ function updateWidth(vueEl, fullWidth) {
         height: 48px;
 
         display: flex;
-        background-color: #ccc;
     }
     .ingame-team-holder {
         position: absolute;

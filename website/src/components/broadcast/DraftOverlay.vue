@@ -13,7 +13,7 @@
             <div class="teams d-flex">
                 <div class="team flex-grow-1" v-for="team in draftTeams" v-bind:key="team.id">
                     <DraftTeam class="team-top" :team="team"></DraftTeam>
-                    <div class="team-staff-list" :style="logoBackground1(team)">
+                    <div class="team-staff-list default-thing" :style="logoBackground1(team)">
                         <div class="team-staff" v-for="staff in team.staff" v-bind:key="staff.id">
                             {{ staff.name }}
                         </div>
@@ -200,7 +200,8 @@ export default {
         margin-top: 4px;
         margin-bottom: 8px;
         flex-wrap: wrap;
-        border-bottom: 4px solid transparent;
+        border-bottom-width: 4px;
+        border-bottom-style: solid;
     }
 
     .team-staff {

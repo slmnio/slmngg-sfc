@@ -1,5 +1,5 @@
 <template>
-    <div class="bracket-team" v-bind:class="{'text': !!text, 'empty': empty, 'highlighted': highlighted, 'lowlighted': lowlighted}"
+    <div class="bracket-team default-thing" v-bind:class="{'text': !!text, 'empty': empty, 'highlighted': highlighted, 'lowlighted': lowlighted}"
          @mouseover="highlight" @mouseout="unHighlight"
          :style="background">
         <div class="inner" v-if="!empty">
@@ -63,7 +63,7 @@ export default {
         width: 100%;
         --match-height: 2.3em;
         height: var(--match-height);
-        background-color: #282828;
+        /*background-color: #282828;*/
     }
     .team-logo-holder {
         width: var(--match-height);

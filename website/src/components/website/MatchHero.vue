@@ -1,6 +1,6 @@
 <template>
     <div class="match-hero">
-        <div class="match-hero-event flex-center" v-if="match.event && !$root.minisiteEvent" :style="eventStyle"></div>
+        <div class="match-hero-event flex-center default-thing-border-bg" v-if="match.event && !$root.minisiteEvent" :style="eventStyle"></div>
         <div class="match-hero-teams">
             <MatchHeroTeam class="team" v-for="team in match.teams" v-bind:key="team.id" :team="team" />
             <div class="match-hero-event-logo" v-if="match.event" :style="eventLogo"></div>

@@ -1,6 +1,6 @@
 <template>
     <div class="match-scoreline" v-if="match.first_to">
-        <div class="match-score flex-center" v-for="(score, i) in scores"
+        <div class="match-score flex-center default-thing" v-for="(score, i) in scores"
              v-bind:class="{'match-score-win': score === match.first_to }"
              v-bind:key="i"
              :style="{order: i*2, ...(score === match.first_to ? {... pointColor} : {})}">{{ displayScores[i] }}</div>
@@ -62,8 +62,8 @@ export default {
         font-size: 1.5em;
         width: 1em;
     }
-    .match-score-win {
-        background-color: #555;
+    .default-thing.match-score-win {
+        background-color: rgba(255, 255, 255, 0.2);
         /* TODO: add hydration transition  */
     }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="news-thumbnail" :style="border">
+    <div class="news-thumbnail default-thing" :style="border">
         <div class="news-custom-thumbnail w-100 bg-center" v-if="customThumbnail" :style="customThumbnail"></div>
         <div class="news-generated-thumbnail w-100 flex-center" v-else :style="{ backgroundColor: generatedThumbnail.backgroundColor }">
             <div class="news-generated-thumbnail-logo bg-center" :style="{backgroundImage: generatedThumbnail.backgroundImage}"></div>
@@ -58,7 +58,8 @@ export default {
     .news-thumbnail {
         background: #333;
         display: flex;
-        border-bottom: 4px solid transparent;
+        border-bottom-width: 4px;
+        border-bottom-style: solid;
         position: relative;
     }
     .news-custom-thumbnail {

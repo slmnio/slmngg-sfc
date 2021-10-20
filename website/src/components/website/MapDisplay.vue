@@ -1,6 +1,6 @@
 <template>
     <div :class="`map ${mapClass} ${condensed ? 'condensed' : ''}`">
-        <div class="map-image" :style="imageCSS">
+        <div class="map-image default-thing" :style="imageCSS">
             <div class="map-color-overlay draw" v-if="map.draw"></div>
             <div class="map-color-overlay winner" v-if="winner" :style="logoBackground1(winner)"></div>
 

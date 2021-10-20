@@ -1,5 +1,5 @@
 <template>
-    <router-link :to="overrideURL || url(type, linkTo || thing)" class="link content-thing" :style="bgStyle" v-bind:class="{ 'has-headshot' : showHeadshot && headshot }">
+    <router-link :to="overrideURL || url(type, linkTo || thing)" class="link content-thing default-thing" :style="bgStyle" v-bind:class="{ 'has-headshot' : showHeadshot && headshot }">
       <span class="link-headshot" v-if="showHeadshot">
         <span class="headshot" :style="headshot"></span>
       </span>
@@ -84,17 +84,14 @@ export default {
     .content-thing {
         padding: .25em .5em;
         margin: .25em .25em;
-        border-bottom: .2em solid transparent;
+        border-bottom-width: .2em;
+        border-bottom-style: solid;
         display: flex;
         justify-content: center;
         align-items: center;
-
-        /* default colouring */
-        background-color: rgba(255,255,255,0.1);
-        border-color: rgba(255,255,255,0.2);
-        color: rgba(255,255,255,0.5);
-
-        transition: background-color .2s, border-color .2s, color .2s;
+    }
+    .content-thing:hover {
+        color: inherit;
     }
 
     .icon-internal {

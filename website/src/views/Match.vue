@@ -25,7 +25,7 @@
                         </thead>
                         <tbody>
                             <tr v-if="match.start"><td colspan="2">{{ date }}</td></tr>
-                            <tr v-if="match.event && match.event.name"><td colspan="2" :style="eventStyle">
+                            <tr v-if="match.event && match.event.name"><td colspan="2" class="default-thing" :style="eventStyle">
                                 <b><router-link :to="url('event', match.event)" class="match-event-link">{{ match.event.name }}</router-link></b>
                             </td></tr>
                             <tr v-if="match.forfeit"><td colspan="2"><i>Match was forfeited</i></td></tr>
@@ -223,5 +223,9 @@ export default {
         background-color: #333333;
         color: #fff !important;
         border-color: transparent;
+    }
+
+    td.default-thing {
+        background-color: rgba(255, 255, 255, 0.185);
     }
 </style>

@@ -7,7 +7,7 @@
                 </div>
                 <div class="team-holder f-row mt-3">
                     <div class="team f-col w-50" v-for="team in match.teams" v-bind:key="team.id">
-                        <div :style="theme(team)" class="team-header flex-center f-col">
+                        <div :style="theme(team)" class="team-header flex-center f-col default-thing">
                             <div class="team-code">{{ team.code }}</div>
                             <div class="team-overlay-text">{{ team.small_overlay_text }}</div>
                             <div class="team-logo bg-center" :style="icon(team)"></div>
@@ -212,7 +212,8 @@ export default {
         padding: 8px 4px;
         text-align: center;
         font-weight: bold;
-        border-bottom: 4px solid transparent;
+        border-bottom-width: 4px;
+        border-bottom-style: solid;
         position: relative;
     }
     .team-logo {

@@ -7,10 +7,10 @@
 
         <h3>Themes</h3>
         <div class="theme-collection mb-3">
-            <div class="theme-bar" :style="mainTheme">
+            <div class="theme-bar default-thing" :style="mainTheme">
                 Theme
             </div>
-            <div class="theme-bar" :style="logoBackground">
+            <div class="theme-bar default-thing" :style="logoBackground">
                 Logo Background
             </div>
         </div>
@@ -134,7 +134,8 @@ export default {
         justify-content: center;
         text-transform: uppercase;
         margin-right: 12px;
-        border-bottom: 4px solid rgba(255, 255, 255, 0.2);
+        border-bottom-width: 4px;
+        border-bottom-style: solid;
     }
 
     .color-swatch {

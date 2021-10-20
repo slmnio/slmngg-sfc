@@ -17,7 +17,7 @@
         <div class="match-thumbnail-insert" v-if="!noTeams">
             <div class="match-event-logo bg-center" :style="logo(match.event, 50)"></div>
         </div>
-        <div class="match-thumbnail-border" :style="eventBorder"></div>
+        <div class="match-thumbnail-border default-thing-border-bg" :style="eventBorder"></div>
     </div>
 </template>
 

@@ -21,7 +21,7 @@
                 </li>
             </ul>
 
-            <li class="nav-item mx-2 minisite-prompt" v-if="shouldShowMinisitePrompt" :style="themeBackground1(event)">
+            <li class="nav-item mx-2 minisite-prompt default-thing" v-if="shouldShowMinisitePrompt" :style="themeBackground1(event)">
                 <a :href="minisiteLink" class="nav-link no-link-style">See this page on the <b>{{ subdomain }}</b> minisite <i class="fas fa-chevron-right fa-fw ml-1"></i></a>
             </li>
         </SubPageNav>

@@ -1,6 +1,6 @@
 <template>
     <router-link :to="url('event', event)" class="event no-link-style d-flex">
-        <div class="event-block flex-center" :style="blockTheme">
+        <div class="event-block flex-center default-thing" :style="blockTheme">
             <div class="event-block-logo bg-center" :style="blockLogo"></div>
         </div>
         <div class="event-name">
@@ -38,11 +38,9 @@ export default {
 .event-block {
     width: 50px;
     height: 40px;
-    border-bottom: 4px solid;
+    border-bottom-width: 4px;
+    border-bottom-style: solid;
     margin-right: 12px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-    transition: background-color .2s, border-color .2s, color .2s;
 }
 .event {
     align-items: center;

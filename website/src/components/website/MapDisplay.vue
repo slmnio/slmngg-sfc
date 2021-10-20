@@ -26,7 +26,7 @@ export default {
         mapClass() {
             if (!this.match) return "";
             if ((this.match.first_to * 2) - 1 === this.map.number) return "tiebreaker";
-            if (this.match.first_to < this.map.number) return "extra";
+            if ((this.match.first_to * 2) - 1 < this.map.number) return "extra";
             return "required";
         },
         number() {

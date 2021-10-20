@@ -2,6 +2,17 @@
     <div class="container">
         <h1 class="big">Events</h1>
         <h1 v-if="!events.length"><LoadingIcon></LoadingIcon></h1>
+
+        <div v-if="inProgressEvents.length">
+            <h2>In progress</h2>
+            <div class="series-events row mb-4">
+                <div class="col-12 col-sm-6 col-md-4 col-xl-3 event-pad" v-for="event in inProgressEvents" v-bind:key="event.id">
+                    <NewEventDisplay :event="event"/>
+                </div>
+            </div>
+            <hr>
+        </div>
+
         <div v-for="series in eventSeries" v-bind:key="series.id">
             <h2>{{ series.name }}</h2>
             <div class="series-events row">
@@ -45,6 +56,10 @@ export default {
             return this.events.filter(event => {
                 return !this.eventSeries.some(es => es.events?.some(e => e.id === event.id));
             }).sort(sortEvents);
+        },
+        inProgressEvents() {
+            if (!this.events?.length) return [];
+            return this.events.filter(e => e.in_progress).sort(sortEvents);
         }
     },
     metaInfo() {
@@ -64,5 +79,8 @@ export default {
     }
     h2 {
         margin-top: 12px;
+    }
+    hr {
+        border-color: rgba(255,255,255,0.15);
     }
 </style>

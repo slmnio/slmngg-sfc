@@ -1,0 +1,54 @@
+<template>
+    <div class="logo-overlay h-100 w-100">
+        <div class="logo-container h-100 w-100">
+            <div class="logo h-100 flex-center" v-for="sponsor in sponsors" v-bind:key="sponsor.id">
+                <div class="logo-inner bg-center" :style="cssImage('backgroundImage', sponsor, ['default_wordmark', 'default_logo'], null, false)"></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+import { ReactiveArray } from "@/utils/reactive";
+import { cssImage } from "@/utils/content-utils";
+
+export default {
+    name: "LogoAdOverlay",
+    props: ["broadcast"],
+    computed: {
+        sponsors() {
+            if (!this.broadcast) return [];
+            if (this.broadcast?.persistent_sponsors?.length) {
+                return ReactiveArray("persistent_sponsors")(this.broadcast);
+            }
+            if (this.broadcast?.sponsors?.length) {
+                return ReactiveArray("sponsors")(this.broadcast);
+            }
+            return [];
+        }
+    },
+    methods: {
+        cssImage
+    }
+};
+</script>
+
+<style scoped>
+    .logo-overlay {
+        color: white;
+        position: absolute;
+        top: 0;
+    }
+    .logo-container {
+        display: flex;
+        justify-content: space-evenly;
+    }
+    .logo {
+        width: 33%;
+        margin: 0 10px;
+    }
+    .logo-inner {
+        width: 90%;
+        height: 90%;
+    }
+</style>

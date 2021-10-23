@@ -18,6 +18,7 @@ import BrandingOverlay from "@/components/broadcast/BrandingOverlay";
 import AuctionOverlay from "@/components/broadcast/auction/AuctionOverlay";
 import AdReadOverlay from "@/components/broadcast/AdReadOverlay";
 import SyncerOverlay from "@/components/broadcast/SyncerOverlay";
+import LogoAdOverlay from "@/components/broadcast/LogoAdOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -40,5 +41,6 @@ export default [
     { path: "maps", component: MapsOverlay },
     { path: "branding", component: BrandingOverlay },
     { path: "auction", component: AuctionOverlay, props: route => ({ category: route.query.category }) },
-    { path: "ad-read", component: AdReadOverlay, props: route => ({ extraDelay: route.query.delay }) }
+    { path: "ad-read", component: AdReadOverlay, props: route => ({ extraDelay: route.query.delay }) },
+    { path: "logos", component: LogoAdOverlay }
 ];

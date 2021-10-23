@@ -9,7 +9,8 @@
             </div>
             <div class="team-roster flex-center flex-column overlay--bg w-100" :style="{ fontSize: rosterFontSize(team) }">
                 <div class="player" v-for="player in team.players" v-bind:key="player.id">
-                    {{ player.name }}
+                    <svg class="player-role" v-if="showRoles && player.role" v-html="getRoleSVG(player.role)"></svg>
+                    <span class="player-name">{{ player.name }}</span>
                 </div>
             </div>
         </div>
@@ -19,12 +20,12 @@
 <script>
 import GenericOverlay from "@/components/broadcast/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cssImage } from "@/utils/content-utils";
+import { cssImage, getRoleSVG } from "@/utils/content-utils";
 
 export default {
     name: "RosterOverlay",
     components: { GenericOverlay },
-    props: ["broadcast", "title"],
+    props: ["broadcast", "title", "showRoles"],
     computed: {
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;
@@ -71,7 +72,8 @@ export default {
                 return Math.max(min, Math.min(number, max));
             }
             return clamp(350 / players, 16, 64) + "px";
-        }
+        },
+        getRoleSVG
     }
 };
 </script>
@@ -146,5 +148,18 @@ export default {
 
 .player {
     transform: translate(0, -0.0925em);
+}
+
+
+.player-role {
+    height: 1em;
+    width: 1em;
+    margin-right: .2em;
+}
+
+.player {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 </style>

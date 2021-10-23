@@ -144,6 +144,9 @@ export default {
             if (!this.broadcast || !this.broadcast.break_display) return null;
             return this.broadcast.break_display;
         },
+        bracketKey() {
+            return this.broadcast?.bracket_key;
+        },
         bracket() {
             if (!this.event?.brackets) return null;
             if (!this.bracketKey) return this.event.brackets[0];

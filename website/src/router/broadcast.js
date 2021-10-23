@@ -17,10 +17,12 @@ import PodcastOverlay from "@/components/broadcast/PodcastOverlay";
 import BrandingOverlay from "@/components/broadcast/BrandingOverlay";
 import AuctionOverlay from "@/components/broadcast/auction/AuctionOverlay";
 import AdReadOverlay from "@/components/broadcast/AdReadOverlay";
+import SyncerOverlay from "@/components/broadcast/SyncerOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
     { path: "break", component: BreakOverlay },
+    { path: "syncer", component: SyncerOverlay },
     { path: "break-bar", component: BreakBarOverlay },
     { path: "bracket", component: BracketOverlay, props: route => ({ bracketKey: route.query.key, extended: !!route.query.extended, scale: route.query.scale }) },
     { path: "schedule", component: ScheduleOverlay },

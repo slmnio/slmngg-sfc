@@ -16,11 +16,34 @@
                         <div class="team-players f-col p-1" v-if="showRosters">
                             <div class="team-player" v-for="player in team.players" v-bind:key="player.id">
                                 <div class="player-info player-name">
+                                    <span class="player-role-holder" v-if="player.role">
+                                        <svg class="player-role" v-html="getRoleSVG(player.role)"></svg>
+                                    </span>
                                     <router-link :to="url('player', player)">{{ player.name }} </router-link>
                                     <span v-if="showCastingInfo && player.pronouns" class="player-pronouns badge rounded-pill bg-light text-dark" :data-pronoun="player.pronouns">{{ player.pronouns }}</span></div>
                                 <div class="player-info player-pronounce" v-if="showCastingInfo"><i class="fas fa-w fa-lips"></i> {{ player.pronunciation }}</div>
                                 <div class="player-info player-dtag" v-if="showPlayerInfo"><i class="fab fa-fw fa-discord"></i> {{ player.discord_tag }}</div>
                                 <div class="player-info player-btag" v-if="showPlayerInfo"><i class="fab fa-fw fa-battle-net"></i> {{ player.battletag }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="team-holder f-row mt-3">
+                    <div class="team f-col w-50" v-for="team in match.teams" v-bind:key="team.id">
+                        <div class="team-players team-managers f-col p-1" v-if="showManagers">
+                            <div class="team-player" v-for="player in team.staff" v-bind:key="player.id">
+                                <div class="player-info player-name">
+                                    <span class="player-role-holder" v-if="player.role">
+                                        <span class="player-role" v-html="getRoleSVG(player.role)"></span>
+                                    </span>
+                                    <router-link :to="url('player', player)">{{ player.name }}</router-link>
+                                    <div class="player-info player-dtag" v-if="showPlayerInfo"><i
+                                        class="fab fa-fw fa-discord"></i> {{ player.discord_tag }}
+                                    </div>
+                                    <div class="player-info player-btag" v-if="showPlayerInfo"><i
+                                        class="fab fa-fw fa-battle-net"></i> {{ player.battletag }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -59,6 +82,11 @@
                          v-on:click="showPlayerInfo = !showPlayerInfo">
                         <i class="fa-fw far fa-id-card"></i>
                         Toggle player contacts
+                    </div>
+                    <div :class="`btn btn-block btn-${showManagers ? 'light' : 'secondary'} mb-2`"
+                         v-on:click="showManagers = !showManagers">
+                        <i class="fa-fw far fa-id-card"></i>
+                        Toggle managers
                     </div>
                     <div :class="`btn btn-block btn-${showMatchHistory ? 'light' : 'secondary'} mb-2`"
                          v-on:click="showMatchHistory = !showMatchHistory">
@@ -105,7 +133,7 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import MapDisplay from "@/components/website/MapDisplay";
-import { cssImage, multiImage, url } from "@/utils/content-utils";
+import { cssImage, getRoleSVG, multiImage, url } from "@/utils/content-utils";
 import { logoBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo";
 import PreviousMatch from "@/components/website/PreviousMatch";
@@ -123,7 +151,9 @@ export default {
         showShowNotes: true,
         showRosters: true,
         showMatchMaps: true,
-        showVod: false
+        showVod: false,
+
+        showManagers: false
     }),
     methods: {
         url,
@@ -132,7 +162,8 @@ export default {
         },
         theme(team) {
             return logoBackground1(team);
-        }
+        },
+        getRoleSVG
     },
     computed: {
         match () {
@@ -149,7 +180,8 @@ export default {
                                 theme: ReactiveThing("theme")
                             })
                         })
-                    })
+                    }),
+                    staff: ReactiveArray("staff")
                 }),
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")
@@ -267,5 +299,11 @@ export default {
     }
     .maps-holder {
         align-items: flex-start;
+    }
+    .player-role {
+        height: 1em;
+        width: 1em;
+        margin-right: .2em;
+        color: white;
     }
 </style>

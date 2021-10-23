@@ -1,7 +1,7 @@
 <template>
     <GenericOverlay class="maps-overlay" v-if="match" :title="title || 'Map Set'" :accent-color="accentColor.theme">
         <div class="map-display d-flex w-100 h-100">
-            <BroadcastMapDisplay class="map" v-for="map in maps" v-bind:key="map.id" :map="map" :accent-color="accentColor" :show-map-video="showMapVideos"></BroadcastMapDisplay>
+            <BroadcastMapDisplay class="map" v-bind:class="{ 'map-dummy' : map.dummy }" v-for="map in maps" v-bind:key="map.id" :map="map" :accent-color="accentColor" :show-map-video="showMapVideos"></BroadcastMapDisplay>
         </div>
     </GenericOverlay>
 </template>

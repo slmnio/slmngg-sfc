@@ -5,7 +5,6 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import GenericOverlay from "@/components/broadcast/GenericOverlay";
-import Standings from "@/components/broadcast/Standings";
 
 export default {
     name: "StandingsOverlay",

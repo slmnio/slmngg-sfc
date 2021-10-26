@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { themeBackground, logoBackground1 } from "@/utils/theme-styles";
+import { logoBackground1 } from "@/utils/theme-styles";
 import { cssImage } from "@/utils/content-utils";
 import Store from "@/thing-store";
 

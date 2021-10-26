@@ -88,11 +88,7 @@
 <script>
 import { ReactiveArray } from "@/utils/reactive";
 import {
-    BitCounter, sortByHeadToHead, sortByMapWins,
-    sortByMatch,
-    sortIntoGroups, sortIntoGroups2,
-    sortMatches, sortTeamsIntoStandings,
-    sortWithinGroups
+    BitCounter, sortTeamsIntoStandings
 } from "@/utils/scenarios";
 import { BFormCheckbox } from "bootstrap-vue";
 

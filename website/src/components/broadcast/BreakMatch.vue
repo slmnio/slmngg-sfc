@@ -51,9 +51,9 @@ export default {
             if (!this.match) return [{ ...dummy, _empty: true }, { ...dummy, _empty: true }];
 
             let text = (this.match.placeholder_teams || "").trim().split("|").filter(t => t !== "");
-            let extraText = [];
+            // let extraText = [];
             if (text.length === 4) {
-                extraText = [text[2], text[3]];
+                // extraText = [text[2], text[3]];
                 text = [text[0], text[1]];
             }
             if (!this.match.teams || this.match.teams.length === 0) {

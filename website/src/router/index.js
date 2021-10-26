@@ -2,7 +2,6 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import WebsiteApp from "@/apps/WebsiteApp";
 import defaultRoutes from "@/router/default";
-import LoadingPage from "@/views/LoadingPage";
 import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp";
 
 Vue.use(VueRouter);

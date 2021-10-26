@@ -7,7 +7,6 @@
 
 <script>
 import Standings from "@/components/broadcast/Standings";
-import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 export default {
     name: "EventStandings",
     components: { Standings },

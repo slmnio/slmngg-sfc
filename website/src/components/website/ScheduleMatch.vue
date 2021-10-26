@@ -130,6 +130,7 @@ export default {
         grid-template-columns: 0.75fr 2fr 0.25fr 2fr 0.75fr;
         grid-template-rows: 1fr;
         gap: 0px 0px;
+        min-height: 3em;
     }
     @media (max-width: 957px) {
         .match {

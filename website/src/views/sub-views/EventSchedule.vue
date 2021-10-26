@@ -38,14 +38,27 @@ export default {
     computed: {
         defaultScheduleNum() {
             const filtered = this.pagedMatches.filter(page => {
-                return !page.matches.every(m => {
-                    // is complete
-                    return [m.score_1, m.score_2].includes(m.first_to);
-                });
+                const allMatchesComplete = page.matches.every(m => [m.score_1, m.score_2].includes(m.first_to));
+                if (allMatchesComplete) return false; // don't show a page if all of the matches are complete by default
+
+                const anyMatchHasTeams = page.matches.some(m => m.teams);
+                if (anyMatchHasTeams) return true; // if there's any matches planned with teams then we should show it
+
+                return false; // catch all
             });
+
             if (filtered.length) {
                 return filtered[0].num;
             }
+
+            // nothing filtered, will show either: latest page or first page depending on if event is in progress
+            if (this.event.in_progress) {
+                const pagesWithPastMatches = this.pagedMatches.filter(page => page.matches.every(m => m.start && new Date(m.start) < new Date()));
+                if (pagesWithPastMatches.length) {
+                    return pagesWithPastMatches[pagesWithPastMatches.length - 1].num;
+                }
+            }
+
             return 0;
         },
         matches() {

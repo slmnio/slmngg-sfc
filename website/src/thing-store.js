@@ -13,7 +13,8 @@ export default new Vuex.Store({
         highlighted_team: null,
         match_highlights: [],
         timezone: "local",
-        draft_notes: []
+        draft_notes: [],
+        last_event_match_pages: []
     },
     mutations: {
         push(_store, { id, data }) {
@@ -84,6 +85,14 @@ export default new Vuex.Store({
             if (notes !== undefined) data.notes = notes;
             // console.log({ ...state.draft_notes[index], ...data });
             state.draft_notes.splice(index, 1, { ...state.draft_notes[index], ...data });
+        },
+        setEventMatchPage(state, { eventID, matchPage }) {
+            if (!eventID) return;
+            if (!matchPage) return;
+            const item = { eventID, matchPage };
+            const index = state.last_event_match_pages.findIndex(x => x.eventID === eventID);
+            if (index === -1) return state.last_event_match_pages.push(item);
+            state.last_event_match_pages.splice(index, 1, item);
         }
     },
     getters: {
@@ -91,7 +100,8 @@ export default new Vuex.Store({
         thing: (state) => (id) => state.things.find(item => item.id === id),
         isHighlighted: state => (id) => state.highlighted_team === id,
         getHighlight: state => (matchID) => state.match_highlights.find(match => match.id === matchID),
-        getNotes: state => (playerID) => state.draft_notes.find(notes => notes.player_id === playerID)
+        getNotes: state => (playerID) => state.draft_notes.find(notes => notes.player_id === playerID),
+        getLastMatchPage: state => (eventID) => state.last_event_match_pages.find(x => x.eventID === eventID)
     },
     actions: {
         subscribe: (state, data) => state.commit("subscribe", data),

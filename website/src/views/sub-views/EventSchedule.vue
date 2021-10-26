@@ -32,9 +32,6 @@ export default {
     name: "EventSchedule",
     components: { TimezoneSwapper, ScheduleMatch },
     props: ["event"],
-    data: () => ({
-        activeScheduleNum: 0
-    }),
     computed: {
         defaultScheduleNum() {
             const filtered = this.pagedMatches.filter(page => {
@@ -112,6 +109,20 @@ export default {
 
                 return 0;
             });
+        },
+        activeScheduleNum: {
+            set(newNum) {
+                this.$store.commit("setEventMatchPage", {
+                    eventID: this.event.id,
+                    matchPage: newNum
+                });
+            },
+            get() {
+                const lastPage = this.$store.getters.getLastMatchPage(this.event.id);
+                if (!lastPage) return this.defaultScheduleNum;
+                if (lastPage.matchPage > this.pagedMatches.length) return this.defaultScheduleNum;
+                return lastPage.matchPage;
+            }
         }
     },
     methods: {
@@ -128,18 +139,18 @@ export default {
             return Object.fromEntries(classes.map(c => ([c, true])));
         }
     },
-    watch: {
-        defaultScheduleNum(newNum, oldNum) {
-            if (oldNum !== newNum && !this.activeScheduleNum) {
-                this.activeScheduleNum = newNum;
-            }
-        }
-    },
-    mounted() {
-        if (this.defaultScheduleNum && !this.activeScheduleNum) {
-            this.activeScheduleNum = this.defaultScheduleNum;
-        }
-    },
+    // watch: {
+    //     defaultScheduleNum(newNum, oldNum) {
+    //         if (oldNum !== newNum && !this.activeScheduleNum) {
+    //             this.activeScheduleNum = newNum;
+    //         }
+    //     }
+    // },
+    // mounted() {
+    //     if (this.defaultScheduleNum && !this.activeScheduleNum) {
+    //         this.activeScheduleNum = this.defaultScheduleNum;
+    //     }
+    // },
     metaInfo() {
         return {
             title: "Schedule"

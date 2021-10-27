@@ -37,7 +37,7 @@
                 <b-navbar-nav v-if="minisite">
                     <router-link active-class="active" v-if="minisite.matches" class="nav-link" to="/schedule">Schedule</router-link>
                     <router-link active-class="active" v-if="minisite.brackets" class="nav-link" to="/bracket">{{ minisite.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link>
-
+                    <router-link active-class="active" v-if="minisiteSettings && minisiteSettings.standings" class="nav-link" to="/standings">Standings</router-link>
                     <div class="nav-divider" v-if="navbarEvents.length"></div>
 
                     <router-link v-for="event in navbarEvents" v-bind:key="event.id"
@@ -144,6 +144,14 @@ export default {
         showRebuildingMessage() {
             if (this.showDisconnectedMessage) return false;
             return this.$root.isRebuilding;
+        },
+        minisiteSettings() {
+            if (!this.minisite?.blocks) return null;
+            try {
+                return JSON.parse(this.minisite.blocks);
+            } catch {
+                return null;
+            }
         }
     },
     mounted() {

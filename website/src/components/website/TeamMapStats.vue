@@ -4,7 +4,9 @@
             <!--        <div class="stat team">{{ team.code }}</div>-->
             <ThemeLogo class="team-icon" :theme="team.theme" border-width="4" icon-padding="4" />
             <div class="stat scoreline">{{ scoreline }}</div>
+            <div class="stat recent"><i v-if="stats.played_recently" class="far fa-clock fa-fw" title="Played in their last match"></i></div>
             <!--        <div class="stat played">{{ stats.played }}</div>-->
+
         </div>
     </td>
 </template>
@@ -41,6 +43,10 @@ export default {
         margin: 0 0.5em;
     }
     .scoreline {
-
+        min-width: 2.5em;
+        text-align: center;
+    }
+    .recent {
+        margin: 0 0.2em;
     }
 </style>

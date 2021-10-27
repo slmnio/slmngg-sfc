@@ -71,10 +71,24 @@ export default {
                     draws: 0
                 };
 
+                const prevMatches = (team.matches || [])
+                    .filter(m => new Date(m.start) < new Date(this.match.start) && m.id !== this.match.id)
+                    .sort((a, b) => new Date(b.start) - new Date(a.start));
+
+                const latestMatch = prevMatches.length ? prevMatches[0] : null;
+
+
                 (team.matches || []).forEach(match => {
                     (match.maps || []).forEach(matchMap => {
                         if (!matchMap.map) return; // no proper map data
                         if (requestMap.id !== cleanID(matchMap.map[0])) return; // isn't this map
+
+                        if (this.match?.maps?.length) {
+                            const scheduledMap = this.match.maps.find(m => m.name?.length && matchMap.name?.length && (m.name[0] === matchMap.name[0]));
+                            console.log(matchMap.name, { scheduledMap, matchMap });
+                            if (scheduledMap) stat.scheduled_for_match = true;
+                        }
+
                         if (!(matchMap.draw || matchMap.winner)) return; // wasn't played fully
 
                         // woo right map
@@ -90,6 +104,13 @@ export default {
                                 stat.losses++;
                             }
                         }
+
+
+                        if (latestMatch?.maps) {
+                            // Check to see if the last played match played this map
+                            const playedMap = latestMatch.maps.find(m => m.winner?.length && m.name?.length && matchMap.name?.length && (m.name[0] === matchMap.name[0]));
+                            if (playedMap) stat.played_recently = true;
+                        }
                     });
                 });
                 return { stats: stat, team };
@@ -98,7 +119,8 @@ export default {
             return {
                 stats,
                 meta: {
-                    eitherTeamPlayed: stats.some(t => t.played > 0)
+                    eitherTeamPlayed: stats.some(t => t.stats?.played > 0),
+                    scheduledForMatch: stats.some(t => t.stats?.scheduled_for_match)
                 }
             };
         }

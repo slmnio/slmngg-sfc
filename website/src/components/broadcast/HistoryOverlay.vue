@@ -16,7 +16,6 @@
 import GenericOverlay from "@/components/broadcast/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { cssImage } from "@/utils/content-utils";
-import MatchHistory from "@/components/broadcast/MatchHistory";
 import TeamMatchHistory from "@/components/broadcast/TeamMatchHistory";
 
 export default {
@@ -24,7 +23,6 @@ export default {
     props: ["broadcast", "title", "max"],
     components: {
         TeamMatchHistory,
-        MatchHistory,
         GenericOverlay
     },
     computed: {

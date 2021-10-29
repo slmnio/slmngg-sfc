@@ -19,6 +19,7 @@ import AuctionOverlay from "@/components/broadcast/auction/AuctionOverlay";
 import AdReadOverlay from "@/components/broadcast/AdReadOverlay";
 import SyncerOverlay from "@/components/broadcast/SyncerOverlay";
 import LogoAdOverlay from "@/components/broadcast/LogoAdOverlay";
+import HistoryOverlay from "@/components/broadcast/HistoryOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -30,6 +31,7 @@ export default [
     { path: "standings", component: StandingsOverlay },
     { path: "roster", redirect: "rosters" },
     { path: "rosters", component: RosterOverlay, props: route => ({ showRoles: route.query.roles }) },
+    { path: "history", component: HistoryOverlay },
     { path: "thumbnail", component: EventThumbnailCreator },
     { path: "draft", component: DraftOverlay },
     { path: "casters", component: DeskOverlay, props: route => ({ group: "casters" }) },

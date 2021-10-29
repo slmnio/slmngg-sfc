@@ -7,7 +7,7 @@
                     <div class="team-icon bg-center" :style="icon(team)"></div>
                 </div>
             </div>
-            <TeamMatchHistory class="team-roster flex-center flex-column overlay--bg w-100" :team="team" :match="match" />
+            <TeamMatchHistory class="team-roster flex-center flex-column overlay--bg w-100" :team="team" :match="match" :max="max" />
         </div>
     </GenericOverlay>
 </template>
@@ -21,7 +21,7 @@ import TeamMatchHistory from "@/components/broadcast/TeamMatchHistory";
 
 export default {
     name: "HistoryOverlay",
-    props: ["broadcast", "title"],
+    props: ["broadcast", "title", "max"],
     components: {
         TeamMatchHistory,
         MatchHistory,

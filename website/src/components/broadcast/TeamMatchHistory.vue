@@ -10,7 +10,7 @@ import { sortMatches } from "@/utils/sorts";
 
 export default {
     name: "TeamMatchHistory",
-    props: ["team", "match"],
+    props: ["team", "match", "max"],
     components: {
         MatchHistory
     },
@@ -20,7 +20,8 @@ export default {
             return (this.team.matches || [])
                 .filter(m => m.id === this.match.id ? ([m.score_1, m.score_2].includes(m.first_to)) : true)
                 .sort(sortMatches) // in date order
-                .reverse(); // reverse date order
+                .reverse() // reverse date order
+                .slice(0, this.max);
         }
     }
 };
@@ -31,5 +32,6 @@ export default {
 .team-match-history {
     justify-content: flex-start;
     padding: 0.15em 0;
+    overflow: hidden;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
     <div class="match-history d-flex">
         <div class="item letter">{{ letter }}</div>
-        <div class="item opponent-icon-holder flex-center" :style="opponentTheme.theme">
+        <div class="item opponent-icon-holder flex-center default-thing" :style="opponentTheme.theme">
             <div class="opponent-icon bg-center" :style="opponentTheme.logo"></div>
         </div>
         <div class="item scores">{{ scores }}</div>
@@ -68,10 +68,20 @@ export default {
     align-items: center;
     font-size: 1.25em;
     margin: 0.1em 0;
+    line-height: 1;
 }
+
+.item.letter {
+    width: 1.5em;
+    text-align: center;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
 .opponent-icon-holder {
     width: 1.5em;
     height: 1.5em;
+    flex-shrink: 0;
 }
 
 .opponent-icon {
@@ -79,24 +89,16 @@ export default {
     height: 90%;
 }
 
-
-.item.letter {
-    width: 1.5em;
-    text-align: center;
-    font-weight: bold;
-}
-
 .item.scores {
+    padding: 0 .5em;
+    font-variant-numeric: tabular-nums;
     flex-grow: 1;
+    flex-shrink: 0;
 }
 
 .item.date {
     padding: 0 .5em;
     font-size: 0.6em;
-}
-
-.item.scores {
-    padding: 0 .5em;
-    font-variant-numeric: tabular-nums;
+    text-align: right;
 }
 </style>

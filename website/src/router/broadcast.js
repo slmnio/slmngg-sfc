@@ -31,7 +31,7 @@ export default [
     { path: "standings", component: StandingsOverlay },
     { path: "roster", redirect: "rosters" },
     { path: "rosters", component: RosterOverlay, props: route => ({ showRoles: route.query.roles }) },
-    { path: "history", component: HistoryOverlay },
+    { path: "history", component: HistoryOverlay, props: route => ({ max: route.query.max || 5 }) },
     { path: "thumbnail", component: EventThumbnailCreator },
     { path: "draft", component: DraftOverlay },
     { path: "casters", component: DeskOverlay, props: route => ({ group: "casters" }) },

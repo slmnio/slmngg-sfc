@@ -175,7 +175,7 @@ export default {
     opacity: 0.25;
 }
 
-@media (min-width: 992px) {
+@media (min-width: 958px) {
     .nav-divider {
         border-top: none;
         margin: .2rem .5rem;

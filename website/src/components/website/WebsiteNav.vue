@@ -32,6 +32,7 @@
                     <router-link active-class="active" class="nav-link" to="/events">Events</router-link>
                     <router-link active-class="active" class="nav-link" to="/teams">Teams</router-link>
                     <router-link active-class="active" class="nav-link" to="/players">Players</router-link>
+                    <a target="_blank" class="nav-link" href="https://slmn.statuspage.io/?utm_source=slmngg_nav">Status</a>
 <!--                    <router-link active-class="active" class="nav-link" to="/news">News</router-link>-->
                 </b-navbar-nav>
                 <b-navbar-nav v-if="minisite">
@@ -51,6 +52,9 @@
                 </b-navbar-nav>
                 <b-navbar-nav v-if="minisite">
                     <a :href="slmnggURL('')" class="nav-link">SLMN.GG</a>
+                </b-navbar-nav>
+                <b-navbar-nav v-else>
+                    <a target="_blank" class="nav-link" href="https://slmn.statuspage.io/?utm_source=slmngg_nav">SLMN.GG Status</a>
                 </b-navbar-nav>
             </b-collapse>
         </b-navbar>

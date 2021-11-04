@@ -34,7 +34,7 @@ export class BitCounter {
     }
 }
 
-export function sortByMatchWins(a, b) {
+export function sortByMatchDiff(a, b) {
     const [aMatchDiff, bMatchDiff] = [a, b].map(x => x.wins - x.losses);
 
     if (aMatchDiff < bMatchDiff) return 1;
@@ -46,17 +46,17 @@ export function sortByMatchWins(a, b) {
 }
 
 export function sortByHeadToHead(a, b) {
-    console.log("h2h", a.standings, b.standings);
+    // console.log("h2h", a.standings, b.standings);
 
     // try checking standings.h2h[opponent.id] for +/-
 
     if (a.standings?.h2h) {
         const diff = a.standings?.h2h[b.id];
-        console.log("[h2h] diff", diff, a.standings.h2h, b.id);
+        // console.log("[h2h] diff", diff, a.standings.h2h, b.id);
         if (!isNaN(diff)) return diff * -1; // gotta swap it
     }
 
-    console.log(a.standings.h2h[b.id], b.standings.h2h[a.id]);
+    // console.log(a.standings.h2h[b.id], b.standings.h2h[a.id]);
 
 
     // This is a good idea but it uses any match a team has played (eg would include playoffs, not just reg season)
@@ -77,7 +77,7 @@ export function sortByHeadToHead(a, b) {
     return a.h2h[b.id] || 0;
 }
 
-export function sortByMapWins(a, b) {
+export function sortByMapDiff(a, b) {
     // if (a.map_wins > b.map_wins) return -1;
     // if (a.map_wins < b.map_wins) return 1;
     // if (a.map_losses > b.map_losses) return 1;
@@ -89,6 +89,21 @@ export function sortByMapWins(a, b) {
         if (aMapDiff > bMapDiff) return -1;
         if (aMapDiff < bMapDiff) return 1;
     }
+    return 0;
+}
+export function sortByMapWins(a, b) {
+    /*
+    * see: https://cdn.discordapp.com/attachments/747939702341894198/904179166776287293/unknown.png
+    * if teams are tied by map diff, they should then be sorted by maps won
+    * this tiebreaking method won't be used much but it makes sense
+    * it could allow for this scenario:
+    *   team 1:  3-0  7-6
+    *   team 2:  3-0  6-0
+    * where a team has a bunch more losses - but this is very unlikely to occur
+    * AND it's unlikely to ever get to this tiebreaking method
+    * */
+    if (a.map_wins > b.map_wins) return -1;
+    if (a.map_wins < b.map_wins) return 1;
     return 0;
 }
 
@@ -121,11 +136,11 @@ export function sortIntoGroups2(sortFunction, standings, maxInGroup) {
         if (group.length <= 1) continue; // don't bother sorting if it's just one
 
         if (maxInGroup && group.length > maxInGroup) {
-            console.log(`[i] cannot sort this group because ${group.length} is too big for max ${maxInGroup} for this function`);
+            // console.log(`[i] cannot sort this group because ${group.length} is too big for max ${maxInGroup} for this function`);
             continue;
         }
 
-        console.log("[group]", JSON.parse(JSON.stringify(group)));
+        // console.log("[group]", JSON.parse(JSON.stringify(group)));
 
         // sort the group
         group.sort(sortFunction);
@@ -167,7 +182,7 @@ export function sortIntoGroups2(sortFunction, standings, maxInGroup) {
     const newStandings = [];
 
     standings.forEach(group => {
-        // console.log("[standing flat]", group, group.length, group[0].length);
+        // console.log("[standing flat]", group, group.length, group[0].length, group[0].length === undefined);
         if (group[0].length === undefined) {
             // group itself is an array
             newStandings.push(group);
@@ -232,7 +247,8 @@ export function sortWithinGroups(sortFunction, standings) {
 }
 
 export function sortTeamsIntoStandings(teams) {
-    let standings = sortIntoGroups2(sortByMatchWins, [teams]);
+    // console.log("[standings]", "starting sort", teams);
+    let standings = sortIntoGroups2(sortByMatchDiff, [teams]);
     // if (i === 4050) console.log(standings);
     // sortMatches(sortByMatchWins, scenario.teams, standings);
 
@@ -251,17 +267,21 @@ export function sortTeamsIntoStandings(teams) {
     }
 
     if (!standings.every(s => s.length === 1)) {
-        console.log("[standings]", "not converged, trying map wins", standings);
-        standings = sortIntoGroups2(sortByMapWins, standings);
+        console.log("[standings]", "not converged, trying map diff", standings);
+        standings = sortIntoGroups2(sortByMapDiff, standings);
     }
     if (!standings.every(s => s.length === 1)) {
         console.log("[standings]", "not converged, trying head to head", standings);
         // i don't know why [standings] works here but not for the other one
         standings = sortIntoGroups2(sortByHeadToHead, standings, 2);
     }
-
+    if (!standings.every(s => s.length === 1)) {
+        console.log("[standings]", "not converged, trying map wins", standings);
+        standings = sortIntoGroups2(sortByMapWins, standings);
+    }
     if (!standings.every(s => s.length === 1)) {
         // scenario.sorts++;
     }
+    // console.log("[standings]", "final standings", standings);
     return standings;
 }

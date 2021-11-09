@@ -27,9 +27,18 @@ export default {
     props: ["team", "tieText"],
     data: () => ({
         // stats: ["diff", "map_diff"/*, "points" */]
-        stats: ["matches", "maps", "map_diff"]
+
     }),
     computed: {
+        stats() {
+            return [
+                "matches",
+                "maps",
+                "map_diff",
+                ...(this.team.standings?.omw !== undefined ? ["omw"] : [])
+            /*, "winrate" */
+            ];
+        },
         teamStats() {
             return {
                 matches: `${this.team.standings.wins}-${this.team.standings.losses}`,
@@ -38,7 +47,9 @@ export default {
                 map_diff: diffString(this.team.standings.map_wins - this.team.standings.map_losses),
                 // points: this.team.standings.points,
                 rank: this.team.standings.rank,
-                tie_show_number: this.team.standings.tie_show_number
+                tie_show_number: this.team.standings.tie_show_number,
+                winrate: this.team.standings.winrate,
+                omw: this.team.standings?.omw !== undefined ? Math.floor(this.team.standings.omw * 100) + "%" : "-"
             };
         }
     },

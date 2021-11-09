@@ -7,6 +7,7 @@
                 <div class="team-stat text-center">Matches</div>
                 <div class="team-stat text-center">Maps</div>
                 <div class="team-stat text-center">Map Diff</div>
+                <div v-if="useOMW" class="team-stat text-center" title="Opponent Match Winrate">OMW</div>
 <!--                <div class="team-stat text-center">Points</div>-->
             </div>
         </div>
@@ -24,6 +25,15 @@
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import StandingsTeam from "@/components/broadcast/StandingsTeam";
 import { sortTeamsIntoStandings } from "@/utils/scenarios";
+
+
+function avg(arr) {
+    if (!arr?.length) return null;
+    const sum = arr.reduce((a, b) => a + b, 0);
+    const avg = (sum / arr.length) || 0;
+    return avg;
+}
+
 
 export default {
     name: "Standings",
@@ -57,6 +67,9 @@ export default {
             } catch (e) {
                 return null;
             }
+        },
+        useOMW() {
+            return this.settings?.useOMW && this.stageMatches.every(m => [m.score_1, m.score_2].some(s => s === m.first_to));
         },
         standings() {
             if (!this.stageMatches || !this.event) return [];
@@ -135,8 +148,32 @@ export default {
                     }
                 });
 
+                team.standings.winrate = team.standings.wins / team.standings.played;
+
                 return team;
             });
+
+
+            if (this.useOMW) {
+                teams.map(team => {
+                    team.standings.opponentWinrates = [];
+
+                    this.stageMatches.forEach(match => {
+                        if (!(match.teams || []).some(t => t.code === team.code)) return;
+                        const scores = [match.score_1, match.score_2];
+                        if (!scores.some(score => score === match.first_to)) return; // not finished
+                        const opponent = match.teams.find(t => t.code !== team.code);
+                        if (!opponent) return null;
+                        const localOpponent = teams.find(t => t.code === opponent.code);
+                        const opponentWinrate = localOpponent.standings.winrate;
+                        team.standings.opponentWinrates.push(opponentWinrate);
+                    });
+
+                    // console.log(team.standings.opponentWinrates, avg(team.standings.opponentWinrates));
+                    team.standings.omw = avg(team.standings.opponentWinrates);
+                    return team;
+                });
+            }
 
             const sortFunction = (a, b) => {
                 if (a.standings.points > b.standings.points) return -1;
@@ -161,7 +198,10 @@ export default {
 
             teams = teams.sort(sortFunction);
 
-            const standings = sortTeamsIntoStandings(teams.map(t => ({ ...t, ...t.standings })));
+            console.log("[standings teams]", teams);
+            const standings = sortTeamsIntoStandings(teams.map(t => ({ ...t, ...t.standings })), {
+                useOMW: this.useOMW
+            });
             // console.log("[new standings]", standings);
 
             let rank = 1; let display = 1;

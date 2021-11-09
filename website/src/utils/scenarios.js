@@ -107,6 +107,24 @@ export function sortByMapWins(a, b) {
     return 0;
 }
 
+function avg(arr) {
+    if (!arr?.length) return null;
+    const sum = arr.reduce((a, b) => a + b, 0);
+    const avg = (sum / arr.length) || 0;
+    return avg;
+}
+
+export function sortByOMW(a, b) {
+    // console.log("opp match winrate", a.standings.opponentWinrates, avg(a.standings.opponentWinrates), b.standings.opponentWinrates, avg(b.standings.opponentWinrates));
+
+    const [aa, ab] = [a, b].map(x => avg(x.standings.opponentWinrates));
+
+    if (aa < ab) return 1;
+    if (aa > ab) return -1;
+
+    return 0;
+}
+
 export function sortMatches(i, sortFunction, teams, standings) {
     outer:
     for (const team of teams) {
@@ -246,7 +264,7 @@ export function sortWithinGroups(sortFunction, standings) {
     return standings.map(group => group.sort(sortFunction));
 }
 
-export function sortTeamsIntoStandings(teams) {
+export function sortTeamsIntoStandings(teams, settings = {}) {
     // console.log("[standings]", "starting sort", teams);
     let standings = sortIntoGroups2(sortByMatchDiff, [teams]);
     // if (i === 4050) console.log(standings);
@@ -278,6 +296,10 @@ export function sortTeamsIntoStandings(teams) {
     if (!standings.every(s => s.length === 1)) {
         console.log("[standings]", "not converged, trying map wins", standings);
         standings = sortIntoGroups2(sortByMapWins, standings);
+    }
+    if (!standings.every(s => s.length === 1) && settings.useOMW) {
+        console.log("[standings]", "not converged, trying opponent winrate", standings);
+        standings = sortIntoGroups2(sortByOMW, standings);
     }
     if (!standings.every(s => s.length === 1)) {
         // scenario.sorts++;

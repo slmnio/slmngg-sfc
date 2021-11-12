@@ -8,7 +8,7 @@
                 </div>
             </div>
             <div class="team-roster flex-center flex-column overlay--bg w-100" :style="{ fontSize: rosterFontSize(team) }">
-                <div class="player" v-for="player in team.players" v-bind:key="player.id">
+                <div class="player" v-for="player in sort ? sortedTeamPlayers(team) : team.players" v-bind:key="player.id">
                     <svg class="player-role" v-if="showRoles && player.role" v-html="getRoleSVG(player.role)"></svg>
                     <span class="player-name">{{ player.name }}</span>
                 </div>
@@ -25,7 +25,7 @@ import { cssImage, getRoleSVG } from "@/utils/content-utils";
 export default {
     name: "RosterOverlay",
     components: { GenericOverlay },
-    props: ["broadcast", "title", "showRoles"],
+    props: ["broadcast", "title", "showRoles", "sort"],
     computed: {
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;
@@ -72,6 +72,23 @@ export default {
                 return Math.max(min, Math.min(number, max));
             }
             return clamp(350 / players, 16, 64) + "px";
+        },
+        sortedTeamPlayers(team) {
+            if (!team?.players) return [];
+            try {
+                const order = ["DPS", "Tank", "Support", "Flex"];
+                const players = [...team.players];
+
+                return players.sort((a, b) => {
+                    const [oa, ob] = [a, b].map(x => order.indexOf(x.role));
+                    if (oa === ob) return 0;
+                    if (oa === -1) return 1;
+                    if (ob === -1) return -1;
+                    return oa - ob;
+                });
+            } catch (e) {
+                return team.players;
+            }
         },
         getRoleSVG
     }

@@ -5,8 +5,8 @@
                 <div class="maps-holder mt-1" v-if="match.maps && showMatchMaps">
                     <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="_theme" v-bind:key="map.id"/>
                 </div>
-                <div class="team-holder f-row mt-3">
-                    <div class="team f-col w-50" v-for="team in match.teams" v-bind:key="team.id">
+                <div class="team-holder f-row mb-2">
+                    <div class="team f-col w-50 mt-2" v-for="team in match.teams" v-bind:key="team.id">
                         <div :style="theme(team)" class="team-header flex-center f-col default-thing">
                             <div class="team-code">{{ team.code }}</div>
                             <div class="team-overlay-text">{{ team.small_overlay_text }}</div>
@@ -15,34 +15,34 @@
                         </div>
                         <div class="team-players f-col p-1" v-if="showRosters">
                             <div class="team-player" v-for="player in team.players" v-bind:key="player.id">
-                                <div class="player-info player-name">
-                                    <span class="player-role-holder" v-if="player.role">
-                                        <svg class="player-role" v-html="getRoleSVG(player.role)"></svg>
-                                    </span>
+                                <div class="player-info player-name flex-center">
+                                    <div class="player-role-holder player-icon-holder flex-center" v-if="player.role">
+                                        <div class="player-role" v-html="getRoleSVG(player.role)"></div>
+                                    </div>
                                     <router-link :to="url('player', player)">{{ player.name }} </router-link>
                                     <span v-if="showCastingInfo && player.pronouns" class="player-pronouns badge rounded-pill bg-light text-dark" :data-pronoun="player.pronouns">{{ player.pronouns }}</span></div>
-                                <div class="player-info player-pronounce" v-if="showCastingInfo"><i class="fas fa-w fa-lips"></i> {{ player.pronunciation }}</div>
-                                <div class="player-info player-dtag" v-if="showPlayerInfo"><i class="fab fa-fw fa-discord"></i> {{ player.discord_tag }}</div>
-                                <div class="player-info player-btag" v-if="showPlayerInfo"><i class="fab fa-fw fa-battle-net"></i> {{ player.battletag }}</div>
+                                <div class="player-info player-pronounce" v-if="showCastingInfo"><i class="fas fa-w fa-lips player-icon-holder"></i> {{ player.pronunciation }}</div>
+                                <div class="player-info player-dtag" v-if="showPlayerInfo"><i class="fab fa-fw fa-discord player-icon-holder"></i> {{ player.discord_tag }}</div>
+                                <div class="player-info player-btag" v-if="showPlayerInfo"><i class="fab fa-fw fa-battle-net player-icon-holder"></i> {{ player.battletag }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="team-holder f-row mt-3">
+                <div class="team-holder f-row mb-2" v-if="showManagers">
                     <div class="team f-col w-50" v-for="team in match.teams" v-bind:key="team.id">
-                        <div class="team-players team-managers f-col p-1" v-if="showManagers">
+                        <div class="team-players team-managers f-col p-1">
                             <div class="team-player" v-for="player in team.staff" v-bind:key="player.id">
                                 <div class="player-info player-name">
-                                    <span class="player-role-holder" v-if="player.role">
-                                        <span class="player-role" v-html="getRoleSVG(player.role)"></span>
-                                    </span>
+                                    <div class="player-role-holder player-icon-holder" v-if="player.staff_role">
+                                        <div class="player-role" v-html="getRoleSVG(player.staff_role)"></div>
+                                    </div>
                                     <router-link :to="url('player', player)">{{ player.name }}</router-link>
-                                    <div class="player-info player-dtag" v-if="showPlayerInfo"><i
-                                        class="fab fa-fw fa-discord"></i> {{ player.discord_tag }}
-                                    </div>
-                                    <div class="player-info player-btag" v-if="showPlayerInfo"><i
-                                        class="fab fa-fw fa-battle-net"></i> {{ player.battletag }}
-                                    </div>
+                                </div>
+                                <div class="player-info player-dtag" v-if="showPlayerInfo && player.discord_tag">
+                                    <i class="fab fa-fw fa-discord player-icon-holder"></i> {{ player.discord_tag }}
+                                </div>
+                                <div class="player-info player-btag" v-if="showPlayerInfo && player.battletag">
+                                    <i class="fab fa-fw fa-battle-net player-icon-holder"></i> {{ player.battletag }}
                                 </div>
                             </div>
                         </div>
@@ -59,7 +59,7 @@
                 </div>
             </div>
             <div class="right-holder col-3">
-                <ThemeLogo class="top-right-logo mb-3" :theme="_theme"/>
+                <ThemeLogo class="top-right-logo mb-3" :theme="_theme" border-width="8"/>
                 <div class="info-block">
 
                     <router-link :to="`/match/${this.match.id}`" class="btn btn-block btn-primary text-dark">
@@ -67,36 +67,36 @@
                         See match page
                     </router-link>
 
-                    <div v-if="match.maps" :class="`btn btn-block btn-${showMatchMaps ? 'light' : 'secondary'} mb-2`" v-on:click="showMatchMaps = !showMatchMaps">
-                        <i class="fa-fw fas fa-map"></i> Toggle match maps
+                    <div :class="`mt-3 btn btn-block btn-${showRosters ? 'light' : 'secondary'} mb-2`" v-on:click="showRosters = !showRosters">
+                        <i class="fa-fw fas fa-users"></i> Rosters
                     </div>
-                    <div :class="`btn btn-block btn-${showRosters ? 'light' : 'secondary'} mb-2`" v-on:click="showRosters = !showRosters">
-                        <i class="fa-fw fas fa-users"></i> Toggle rosters
+                    <div :class="`mb-3 btn btn-block btn-${showManagers ? 'light' : 'secondary'} mb-2`"
+                         v-on:click="showManagers = !showManagers">
+                        <i class="fa-fw fas fa-user-tie"></i>
+                        Team staff
                     </div>
-                    <div :class="`btn btn-block btn-${showCastingInfo ? 'light' : 'secondary'} mb-2`" v-if="showRosters"
+                    <div :class="`btn btn-block btn-${showCastingInfo ? 'light' : 'secondary'} mb-2`" v-if="showRosters || showManagers"
                          v-on:click="showCastingInfo = !showCastingInfo">
                         <i class="fa-fw fas fa-headset"></i>
-                        Toggle casting info
+                        Casting info
                     </div>
-                    <div :class="`btn btn-block btn-${showPlayerInfo ? 'light' : 'secondary'} mb-2`" v-if="showRosters"
+                    <div :class="`mb-3 btn btn-block btn-${showPlayerInfo ? 'light' : 'secondary'} mb-2`" v-if="showRosters || showManagers"
                          v-on:click="showPlayerInfo = !showPlayerInfo">
                         <i class="fa-fw far fa-id-card"></i>
-                        Toggle player contacts
+                        Contacts
                     </div>
-                    <div :class="`btn btn-block btn-${showManagers ? 'light' : 'secondary'} mb-2`"
-                         v-on:click="showManagers = !showManagers">
-                        <i class="fa-fw far fa-id-card"></i>
-                        Toggle managers
+                    <div v-if="match.maps" :class="`btn btn-block btn-${showMatchMaps ? 'light' : 'secondary'} mb-2`" v-on:click="showMatchMaps = !showMatchMaps">
+                        <i class="fa-fw fas fa-map"></i> Match maps
                     </div>
                     <div :class="`btn btn-block btn-${showMatchHistory ? 'light' : 'secondary'} mb-2`"
                          v-on:click="showMatchHistory = !showMatchHistory">
                         <i class="fa-fw fas fa-history"></i>
-                        Toggle match history
+                        Match history
                     </div>
                     <div v-if="match.show_notes" :class="`btn btn-block btn-${showShowNotes ? 'light' : 'secondary'} mb-2`"
                          v-on:click="showShowNotes = !showShowNotes">
                         <i class="fa-fw far fa-file-video"></i>
-                        Toggle show notes
+                        Show notes
                     </div>
 <!--                    <div :class="`btn btn-block btn-${showVod ? 'light' : 'secondary'} mb-2`" v-if="match.vod"-->
 <!--                         v-on:click="showVod = !showVod">-->
@@ -264,6 +264,13 @@ export default {
         top: 0;
         padding: 2px 10px;
     }
+    .team-player {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
     .team:nth-of-type(2) .team-code { left: 0; right: auto; }
     .team:nth-of-type(2) .team-overlay-text { left: auto; right: 0; }
 
@@ -303,7 +310,9 @@ export default {
     .player-role {
         height: 1em;
         width: 1em;
-        margin-right: .2em;
         color: white;
+        display: inline-flex;
     }
+
+    .player-icon-holder {width: 1.5em;}
 </style>

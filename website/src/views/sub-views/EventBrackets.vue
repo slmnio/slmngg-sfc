@@ -1,6 +1,6 @@
 <template>
     <div class="event-brackets container-fluid">
-         <div class="event-bracket-container" v-for="bracket in brackets" v-bind:key="bracket.id">
+         <div class="event-bracket-container mb-4" v-for="bracket in brackets" v-bind:key="bracket.id">
                  <h1 class="bracket-name mb-3">{{ bracket.name }}</h1>
                  <Bracket class="event-bracket" :bracket="bracket" :event="event" />
          </div>

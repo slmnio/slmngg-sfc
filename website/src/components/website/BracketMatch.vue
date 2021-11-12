@@ -3,7 +3,7 @@
                  v-bind:class="{'hover': hover}"
                  @mouseover.native="matchHover" @mouseleave.native="matchEmpty">
         <div class="match-name d-none">{{ match && match.name }}</div>
-        <div class="match-number" v-if="match.match_number">{{ match.match_number }}</div>
+        <div class="match-number" v-bind:class="{'lowlight': lowlight}" v-if="match.match_number">{{ match.match_number }}</div>
         <div class="match-teams">
             <BracketTeam v-for="(team, i) in teams"
                          :team="team.id && team"
@@ -128,6 +128,9 @@ export default {
         },
         matchHighlight() {
             return store.getters.getHighlight(this.match.id);
+        },
+        lowlight() {
+            return !!store.state.highlighted_team;
         }
     }
 };
@@ -141,9 +144,6 @@ export default {
     }
     .bracket-match, .match-number {
         transition: border-color .15s ease;
-    }
-    .bracket-match.hover {
-        border: .15em solid white;
     }
 
     .match-highlight-text {
@@ -191,15 +191,19 @@ export default {
         bottom: 100%;
         font-size: 0.75em;
         line-height: 1;
-        padding-top: .1em;
         padding: 0 .3em;
         padding-bottom: .3em;
         color: white;
         border: 2px solid transparent;
         border-bottom: none;
+        transition: opacity 150ms;
     }
 
+    .bracket-match.hover,
     .bracket-match.hover .match-number {
-        border-color: white;
+        border-color:  rgba(255, 255, 255, 0.5);
+    }
+    .bracket-match:not(:hover) .match-number.lowlight {
+        opacity: 0.2;
     }
 </style>

@@ -14,6 +14,7 @@
 <script>
 import BracketMatch from "@/components/website/BracketMatch";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
+import Store from "@/thing-store";
 
 export default {
     name: "Bracket",
@@ -112,6 +113,9 @@ export default {
             }; // stored as a 1-based number
         },
         logoBackground1
+    },
+    beforeDestroy() {
+        Store.commit("setHighlightedTeam", null);
     }
 };
 </script>

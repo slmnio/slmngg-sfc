@@ -35,7 +35,7 @@ export default {
             return this.match.teams.findIndex(t => t.id === this.thisTeam.id);
         },
         letter() {
-            if (this.thisGameIndex === null) return "VS";
+            if (this.thisGameIndex === null) return "-";
             const scores = [(this.match.score_1 || 0), (this.match.score_2 || 0)];
             if (scores[this.thisGameIndex] === this.match.first_to) {
                 // win
@@ -45,7 +45,7 @@ export default {
                 return "L";
             } else {
                 // undecided
-                return "VS";
+                return "-";
             }
         },
         scores() {

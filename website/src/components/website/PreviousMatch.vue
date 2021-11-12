@@ -33,7 +33,7 @@ export default {
             }
         },
         resultLetter() {
-            if (!this.winner) return "VS";
+            if (!this.winner) return "-";
             if (this.winner.id === this.team.id) return "W";
             return "L";
         },

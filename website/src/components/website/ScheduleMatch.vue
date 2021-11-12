@@ -13,7 +13,8 @@
             <router-link v-else-if="!team.dummy" :to="url('team', team)" class="team-name d-none d-lg-flex">{{ team.name }}</router-link>
 
 
-            <router-link :to="url('team', team)" class="team-code d-lg-none">{{ team.code }}</router-link>
+            <div v-if="team.dummy" class="team-code d-lg-none">{{ team.code || team.text || 'TBD' }}</div>
+            <router-link v-else-if="!team.dummy" :to="url('team', team)" class="team-code d-lg-none">{{ team.code }}</router-link>
 
 
             <ThemeLogo v-if="team && !team.dummy" :theme="team.theme" border-width="4" class="team-logo" icon-padding="4"/>
@@ -58,19 +59,19 @@ export default {
             if (!this.match) return [{ ...dummy, _empty: true }, { ...dummy, _empty: true }];
 
             let text = (this.match.placeholder_teams || "").trim().split("|").filter(t => t !== "");
-            // let extraText = [null, null];
+            let extraText = null;
 
             if (text.length === 4) {
-                // extraText = [text[2], text[3]];
+                extraText = [text[2], text[3]];
                 text = [text[0], text[1]];
             }
 
             if (!this.match.teams || this.match.teams.length === 0) {
                 if (text.length === 2) {
-                    return text.map(t => ({ ...dummy, text: t }));
+                    return text.map((t, ti) => ({ ...dummy, text: t, ...(extraText ? { code: extraText[ti] } : {}) }));
                 } else if (text.length === 1) {
-                    if (this.match.placeholder_right) return [dummy, { ...dummy, text: text[0] }];
-                    return [{ ...dummy, text: text[0] }, dummy];
+                    if (this.match.placeholder_right) return [dummy, { ...dummy, text: text[0], ...(extraText ? { code: extraText[0] } : {}) }];
+                    return [{ ...dummy, text: text[0], ...(extraText ? { code: extraText[0] } : {}) }, dummy];
                 } else if (text.length === 0) {
                     // no text, just use TBDs
                     return [dummy, dummy];
@@ -78,11 +79,11 @@ export default {
             }
             if (this.match.teams.length === 1) {
                 if (text.length === 2) {
-                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[1] }];
-                    return [{ ...dummy, text: text[0] }, this.match.teams[0]];
+                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[1], ...(extraText ? { code: extraText[1] } : {}) }];
+                    return [{ ...dummy, text: text[0], ...(extraText ? { code: extraText[0] } : {}) }, this.match.teams[0]];
                 } else if (text.length === 1) {
-                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[0] }];
-                    return [{ ...dummy, text: text[0] }, this.match.teams[0]];
+                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[0], ...(extraText ? { code: extraText[0] } : {}) }];
+                    return [{ ...dummy, text: text[0], ...(extraText ? { code: extraText[0] } : {}) }, this.match.teams[0]];
                 } else if (text.length === 0) {
                     // no text, just use TBDs
                     if (this.match.placeholder_right) return [this.match.teams[0], dummy];

@@ -55,6 +55,10 @@ export default {
     }
     .standings >>> .team-name {
         margin-right: 32px;
-        min-width: 300px;
+        min-width: 250px;
+    }
+    .standings >>> .team-name.team-code {
+        margin-right: 32px;
+        min-width: 50px;
     }
 </style>

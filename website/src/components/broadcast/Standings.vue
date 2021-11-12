@@ -1,13 +1,15 @@
 <template>
     <div class="standings" v-if="standings && standings.length">
 <!--        <div>{{ event.name }} / {{ stage }} / {{ allMatches.length }} -> {{ stageMatches.length }} ({{ teams.length }} teams)</div>-->
+        <h3 class="top-standings-name text-center d-md-none">{{ title || stage || 'Team' }}</h3>
         <div class="standings-header d-flex align-items-center">
-            <div class="team-name flex-grow-1 text-left">{{ title || stage || 'Team' }}</div>
+            <div class="team-name flex-grow-1 text-left d-none d-md-flex">{{ title || stage || 'Team' }}</div>
+            <div class="team-name team-code flex-grow-1 text-left d-md-none"></div>
             <div class="team-stats d-flex">
                 <div class="team-stat text-center">Matches</div>
                 <div class="team-stat text-center">Maps</div>
                 <div class="team-stat text-center">Map Diff</div>
-                <div v-if="useOMW" class="team-stat text-center" title="Opponent Match Winrate">OMW</div>
+                <div v-if="useOMW" class="team-stat text-center d-none d-md-block" title="Opponent Match Winrate">OMW</div>
 <!--                <div class="team-stat text-center">Points</div>-->
             </div>
         </div>
@@ -249,7 +251,7 @@ export default {
         font-size: .75em;
     }
 
-    .standings-header {
+    .standings-header, .top-standings-name {
         font-weight: bold;
         text-transform: uppercase;
     }

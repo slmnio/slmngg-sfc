@@ -3,7 +3,7 @@
         <div class="container">
           {{ matches.length }}
             <div class="role-group" v-for="rel in mainPlayerRelationships" v-bind:key="rel.meta.singular_name">
-                <h1>as {{ rel.meta.singular_name }}</h1>
+                <h1>as {{ rel.meta.singular_name }} ({{ rel.items.length }})</h1>
                 <div class="row">
                     <Match class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3"
                            v-for="item in rel.items"

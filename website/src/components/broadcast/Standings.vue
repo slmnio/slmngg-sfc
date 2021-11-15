@@ -61,17 +61,33 @@ export default {
             if (!this.stage) return this.allMatches;
             return this.allMatches.filter(match => match.match_group && match.match_group.toLowerCase() === this.stage.toLowerCase());
         },
-        settings() {
+        blocks() {
             if (!this.event || !this.event.blocks) return null;
             try {
                 const blocks = JSON.parse(this.event.blocks);
-                return blocks.settings || null;
+                return blocks || null;
             } catch (e) {
                 return null;
             }
         },
+        settings() {
+            if (!this.blocks) return null;
+            return this.blocks?.settings || null;
+        },
         useOMW() {
             return this.settings?.useOMW && this.stageMatches.every(m => [m.score_1, m.score_2].some(s => s === m.first_to));
+        },
+        standingsSort() {
+            try {
+                const sorters = this.blocks.standingsSort;
+                if (sorters && sorters.length) {
+                    const sorter = sorters.find(s => s.group === this.stage);
+                    return sorter?.sort;
+                }
+            } catch (e) {
+                return null;
+            }
+            return null;
         },
         standings() {
             if (!this.stageMatches || !this.event) return [];
@@ -200,9 +216,10 @@ export default {
 
             teams = teams.sort(sortFunction);
 
-            console.log("[standings teams]", teams);
+            // console.log("[standings teams]", teams);
             const standings = sortTeamsIntoStandings(teams.map(t => ({ ...t, ...t.standings })), {
-                useOMW: this.useOMW
+                useOMW: this.useOMW,
+                sort: this.standingsSort
             });
             // console.log("[new standings]", standings);
 

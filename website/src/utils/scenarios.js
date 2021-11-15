@@ -45,6 +45,13 @@ export function sortByMatchDiff(a, b) {
     return 0;
 }
 
+export function miniLeagueMatchDiff(a, b) {
+    const [aMatchDiff, bMatchDiff] = [a, b].map(x => x.standings.minileague.wins - x.standings.minileague.losses);
+    if (aMatchDiff < bMatchDiff) return 1;
+    if (aMatchDiff > bMatchDiff) return -1;
+    return 0;
+}
+
 export function sortByHeadToHead(a, b) {
     // console.log("h2h", a.standings, b.standings);
 
@@ -154,7 +161,7 @@ export function sortIntoGroups2(sortFunction, standings, maxInGroup) {
         if (group.length <= 1) continue; // don't bother sorting if it's just one
 
         if (maxInGroup && group.length > maxInGroup) {
-            // console.log(`[i] cannot sort this group because ${group.length} is too big for max ${maxInGroup} for this function`);
+            console.log(`[i] cannot sort this group because ${group.length} is too big for max ${maxInGroup} for this function`, { group, standings });
             continue;
         }
 
@@ -264,8 +271,71 @@ export function sortWithinGroups(sortFunction, standings) {
     return standings.map(group => group.sort(sortFunction));
 }
 
+function miniLeaguePrep(standings) {
+    for (const group of standings) {
+        if (group.length <= 1) continue;
+        console.log("minileagueprep", group);
+
+        const groupIDs = group.map(g => g.id);
+
+        group.forEach(team => {
+            // console.log("minileague setup", team.id, groupIDs, team.standings.h2h);
+            team.standings.minileague = {
+                wins: 0,
+                losses: 0
+            };
+            groupIDs.forEach(opponentID => {
+                const diff = team.standings.h2h[opponentID];
+                if (diff === 1) team.standings.minileague.wins++;
+                if (diff === -1) team.standings.minileague.losses++;
+            });
+        });
+
+        console.log(group.sort(miniLeagueMatchDiff).map(t => `|${t.code.padStart(6, " ")} ${t.standings.minileague.wins}-${t.standings.minileague.losses}`).join("\n"));
+
+        /*
+        * Set up a minileague
+        * - Take all the head to heads from all the teams in the tied group
+        * - Sort it by whatever required
+        * */
+    }
+    return standings;
+}
+
+function getSortMethod(stringMethod) {
+    if (stringMethod === "MatchDiff") return { method: sortByMatchDiff, max: null };
+    if (stringMethod === "MapDiff") return { method: sortByMapDiff, max: null };
+    if (stringMethod === "HeadToHead") return { method: sortByHeadToHead, max: 2 };
+    if (stringMethod === "MapWins") return { method: sortByMapWins, max: null };
+    if (stringMethod === "OMW") return { method: sortByOMW, max: null };
+    if (stringMethod === "MiniLeague") return { prep: miniLeaguePrep, method: miniLeagueMatchDiff, max: null };
+    return null;
+}
+
 export function sortTeamsIntoStandings(teams, settings = {}) {
-    // console.log("[standings]", "starting sort", teams);
+    const log = false;
+    if (log) console.log("[standings]", "starting sort", teams, settings);
+
+    if (settings.sort) {
+        // Custom sort
+        console.log("[standings]", `Sorting in custom order: ${settings.sort}`);
+        let standings = [teams];
+        for (const mode of settings.sort) {
+            const _method = getSortMethod(mode);
+            if (!_method) continue;
+            const { prep, method, max } = _method;
+
+            if (prep) standings = prep(standings);
+
+            if (max) {
+                standings = sortIntoGroups2(method, standings, max);
+            } else {
+                standings = sortIntoGroups2(method, standings);
+            }
+        }
+        return standings;
+    }
+
     let standings = sortIntoGroups2(sortByMatchDiff, [teams]);
     // if (i === 4050) console.log(standings);
     // sortMatches(sortByMatchWins, scenario.teams, standings);
@@ -285,20 +355,20 @@ export function sortTeamsIntoStandings(teams, settings = {}) {
     }
 
     if (!standings.every(s => s.length === 1)) {
-        console.log("[standings]", "not converged, trying map diff", standings);
+        if (log) console.log("[standings]", "not converged, trying map diff", standings);
         standings = sortIntoGroups2(sortByMapDiff, standings);
     }
     if (!standings.every(s => s.length === 1)) {
-        console.log("[standings]", "not converged, trying head to head", standings);
+        if (log) console.log("[standings]", "not converged, trying head to head", standings);
         // i don't know why [standings] works here but not for the other one
         standings = sortIntoGroups2(sortByHeadToHead, standings, 2);
     }
     if (!standings.every(s => s.length === 1)) {
-        console.log("[standings]", "not converged, trying map wins", standings);
+        if (log) console.log("[standings]", "not converged, trying map wins", standings);
         standings = sortIntoGroups2(sortByMapWins, standings);
     }
     if (!standings.every(s => s.length === 1) && settings.useOMW) {
-        console.log("[standings]", "not converged, trying opponent winrate", standings);
+        if (log) console.log("[standings]", "not converged, trying opponent winrate", standings);
         standings = sortIntoGroups2(sortByOMW, standings);
     }
     if (!standings.every(s => s.length === 1)) {

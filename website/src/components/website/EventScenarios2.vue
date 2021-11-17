@@ -41,7 +41,7 @@
 
         <table class="table-bordered text-light mb-3" v-if="counts && counts[0] && counts[0].positions">
             <tr v-if="counts" class="font-weight-bold">
-                <th class="p-2 border-dark text-right">{{ showCountsAsPercentages ? `% of ${currentScenarioView.length} scenarios` : `/${currentScenarioView.length} scenarios`}}</th>
+                <th class="p-2 border-dark text-right" style="min-width: 8.5em">{{ showCountsAsPercentages ? `% of ${currentScenarioView.length} scenarios` : `/${currentScenarioView.length} scenarios`}}</th>
                 <th class="p-2 border-dark" v-for="(x, i) in (counts[0].positions).slice(0, -1)" v-bind:key="i">
                     #{{ i + 1 }}
                 </th>
@@ -49,7 +49,10 @@
             </tr>
             <tr v-for="team in counts" v-bind:key="team.code">
                 <td class="p-2 border-dark text-right font-weight-bold">{{ team.code }}</td>
-                <td class="p-2 border-dark" v-for="(pos, posi) in team.positions" v-bind:key="posi">
+                <td class="p-2 border-dark cell-num" v-for="(pos, posi) in team.positions" v-bind:key="posi"
+                    @click="() => showWhen(team.code, posi)"
+                    v-bind:class="{ 'bg-info': manualScenarioFilters.find((f) => f.team === team.code && f.position === posi ) }"
+                >
                     <span v-if="showCountsAsPercentages">{{ (pos / currentScenarioView.length) | perc }}</span>
                     <span v-else>{{ pos }}</span>
                 </td>
@@ -105,7 +108,8 @@ export default {
         activeScenarioView: "all",
         showCountsAsPercentages: true,
         showOnlyPossible: true,
-        showOnlyIncomplete: false
+        showOnlyIncomplete: false,
+        manualScenarioFilters: []
     }),
     computed: {
         blocks() {
@@ -127,6 +131,12 @@ export default {
             if (!scenarios) return [];
             if (this.showOnlyIncomplete) scenarios = scenarios.filter(s => s.standings.length !== s.teams.length);
             if (this.showOnlyPossible) scenarios = scenarios.filter(s => !s.impossible);
+
+            if (this.manualScenarioFilters?.length) {
+                scenarios = scenarios.filter(s => this.manualScenarioFilters.some(({ team, position }) => {
+                    return s.standings[position].some(t => t.code === team);
+                }));
+            }
             return scenarios;
         },
         matchGroups() {
@@ -429,7 +439,7 @@ export default {
                 // // quick default sort
                 // scenario.teams.sort(sortFunction);
 
-                console.log("sort", i + 1, this.blocks.standingsSort);
+                // console.log("sort", i + 1, this.blocks.standingsSort);
                 if (this.sortingMethods) {
                     scenario.standings = sortTeamsIntoStandings(scenario.teams, {
                         sort: this.sortingMethods
@@ -437,7 +447,7 @@ export default {
                 } else {
                     scenario.standings = sortTeamsIntoStandings(scenario.teams);
                 }
-                console.log(scenario.standings);
+                // console.log(scenario.standings);
                 //
                 // scenario.standings = sortIntoGroups2(sortByMapWins, [scenario.teams]);
                 // if (i === 4050) console.log(i, scenario.standings);
@@ -494,6 +504,18 @@ export default {
             return (x * 100).toFixed(1) + "%";
             // console.log(x, this.currentScenarioView.length);
         }
+    },
+    methods: {
+        showWhen(team, position) {
+            if (this.filterHas(team, position)) return this.manualScenarioFilters.splice(this.filterIndex(team, position), 1);
+            this.manualScenarioFilters.push({ team, position });
+        },
+        filterIndex(team, position) {
+            return this.manualScenarioFilters.findIndex((f) => f.team === team && f.position === position);
+        },
+        filterHas(team, position) {
+            return this.filterIndex(team, position) !== -1;
+        }
     }
 };
 </script>
@@ -501,5 +523,9 @@ export default {
 <style scoped>
     td {
         border-bottom: 1px solid #555;
+    }
+    .cell-num {
+        min-width: 3em;
+        text-align: center;
     }
 </style>

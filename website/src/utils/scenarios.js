@@ -283,13 +283,13 @@ export function sortWithinGroups(sortFunction, standings) {
 function miniLeaguePrep(standings) {
     for (const group of standings) {
         if (group.length <= 1) continue;
-        console.log("minileagueprep", group);
-        if (group.length === 2) console.log("minileague h2h", group);
+        // console.log("minileagueprep", group);
+        // if (group.length === 2) console.log("minileague h2h", group);
 
         const groupIDs = group.map(g => g.id);
 
         group.forEach(team => {
-            console.log("minileague setup", team.id, groupIDs, team.standings.h2h);
+            // console.log("minileague setup", team.id, groupIDs, team.standings.h2h);
             team.standings.minileague = {
                 wins: 0,
                 losses: 0,
@@ -307,10 +307,10 @@ function miniLeaguePrep(standings) {
             });
         });
 
-        console.log(group);
-        console.log(group.sort(miniLeagueMatchDiff).map(t => `|${t.code.padStart(6, " ")} ${t.standings.minileague.wins}-${t.standings.minileague.losses} (${t.standings.minileague.map_diff})`).join("\n"));
+        // console.log(group);
+        // console.log(group.sort(miniLeagueMatchDiff).map(t => `|${t.code.padStart(6, " ")} ${t.standings.minileague.wins}-${t.standings.minileague.losses} (${t.standings.minileague.map_diff})`).join("\n"));
 
-        if (group.length === 2) console.log("minileague h2h", standings);
+        // if (group.length === 2) console.log("minileague h2h", standings);
         /*
         * Set up a minileague
         * - Take all the head to heads from all the teams in the tied group
@@ -332,12 +332,12 @@ function getSortMethod(stringMethod) {
 }
 
 export function sortTeamsIntoStandings(teams, settings = {}) {
-    const log = true;
+    const log = false;
     if (log) console.log("[standings]", "starting sort", teams, settings);
 
     if (settings.sort) {
         // Custom sort
-        console.log("[standings]", `Sorting in custom order: ${settings.sort}`);
+        if (log) console.log("[standings]", `Sorting in custom order: ${settings.sort}`);
         let standings = [teams];
         for (const mode of settings.sort) {
             const _method = getSortMethod(mode);
@@ -351,7 +351,7 @@ export function sortTeamsIntoStandings(teams, settings = {}) {
             } else {
                 standings = sortIntoGroups2(method, standings);
             }
-            console.log("[standings]", `[${mode}]`, standings);
+            if (log) console.log("[standings]", `[${mode}]`, standings);
         }
         return standings;
     }

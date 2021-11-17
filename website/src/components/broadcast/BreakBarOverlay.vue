@@ -32,7 +32,9 @@
 
             <transition name="seg">
                 <div class="segment-wrapper" v-if="showSegment('Title') && (title || (broadcast && broadcast.title))" :key="'Title-' + (title || broadcast.title)">
-                    <div class="overlay--bg bar-segment segment-title" v-html="nbr(title || broadcast.title)"></div>
+                    <div class="overlay--bg bar-segment segment-title">
+                        <span class="segment-text" v-html="nbr(title || broadcast.title)"></span>
+                    </div>
                 </div>
             </transition>
             <transition name="seg">
@@ -315,7 +317,7 @@ export default {
         max-height: 0px;
         overflow: hidden;
     }
-    .segment-title {
+    .segment-title .segment-text {
         text-transform: uppercase;
         text-align: center;
         font-size: 60px;
@@ -323,5 +325,6 @@ export default {
         line-height: 1;
         white-space: nowrap;
         overflow: hidden;
+        padding: 0 0.25em;
     }
 </style>

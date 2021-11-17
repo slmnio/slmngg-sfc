@@ -9,7 +9,7 @@
                 <div class="team-stat text-center">Matches</div>
                 <div class="team-stat text-center">Maps</div>
                 <div class="team-stat text-center">Map Diff</div>
-                <div v-if="useOMW" class="team-stat text-center d-none d-md-block" title="Opponent Match Winrate">OMW</div>
+                <div v-if="useOMW" class="team-stat text-center d-none d-md-block" v-b-tooltip:top="'Opponent Match Winrate'">OMW</div>
 <!--                <div class="team-stat text-center">Points</div>-->
             </div>
         </div>
@@ -120,7 +120,8 @@ export default {
                     map_losses: 0,
                     maps_played: 0,
                     rank: null,
-                    h2h: {}
+                    h2h: {},
+                    h2h_maps: {}
                 };
                 if (this.settings && this.settings.points) team.standings.points = team.extra_points || 0;
                 // get matches here
@@ -164,6 +165,8 @@ export default {
                         if (this.settings && this.settings.points) team.standings.points += this.settings.points.losses;
                         team.standings.h2h[opponent.id]--;
                     }
+                    if (!team.standings.h2h_maps[opponent.id]) team.standings.h2h_maps[opponent.id] = 0;
+                    team.standings.h2h_maps[opponent.id] += scores[teamIndex] - scores[+!teamIndex];
                 });
 
                 team.standings.winrate = team.standings.wins / team.standings.played;

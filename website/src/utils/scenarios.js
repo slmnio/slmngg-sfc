@@ -35,7 +35,7 @@ export class BitCounter {
 }
 
 export function sortByMatchDiff(a, b) {
-    const [aMatchDiff, bMatchDiff] = [a, b].map(x => x.wins - x.losses);
+    const [aMatchDiff, bMatchDiff] = [a, b].map(x => (x.wins || x.standings.wins) - (x.losses || x.standings.losses));
 
     if (aMatchDiff < bMatchDiff) return 1;
     if (aMatchDiff > bMatchDiff) return -1;
@@ -49,6 +49,15 @@ export function miniLeagueMatchDiff(a, b) {
     const [aMatchDiff, bMatchDiff] = [a, b].map(x => x.standings.minileague.wins - x.standings.minileague.losses);
     if (aMatchDiff < bMatchDiff) return 1;
     if (aMatchDiff > bMatchDiff) return -1;
+    // return sortByHeadToHead(a, b);
+    return 0;
+}
+
+export function miniLeagueMapDiff(a, b) {
+    const [aMapDiff, bMapDiff] = [a, b].map(x => x.standings.minileague.map_diff);
+    if (aMapDiff < bMapDiff) return 1;
+    if (aMapDiff > bMapDiff) return -1;
+    // return sortByHeadToHead(a, b);
     return 0;
 }
 
@@ -90,7 +99,7 @@ export function sortByMapDiff(a, b) {
     // if (a.map_losses > b.map_losses) return 1;
     // if (a.map_losses < b.map_losses) return -1;
 
-    const [aMapDiff, bMapDiff] = [a, b].map(x => x.map_wins - x.map_losses);
+    const [aMapDiff, bMapDiff] = [a, b].map(x => (x.standings.map_wins || x.map_wins) - (x.standings.map_losses || x.map_losses));
     if (aMapDiff !== bMapDiff) {
         // console.log("[map diff]", aMapDiff, bMapDiff, a, b, aMapDiff > bMapDiff);
         if (aMapDiff > bMapDiff) return -1;
@@ -109,8 +118,8 @@ export function sortByMapWins(a, b) {
     * where a team has a bunch more losses - but this is very unlikely to occur
     * AND it's unlikely to ever get to this tiebreaking method
     * */
-    if (a.map_wins > b.map_wins) return -1;
-    if (a.map_wins < b.map_wins) return 1;
+    if ((a.standings.map_wins || a.map_wins) > (b.standings.map_wins || b.map_wins)) return -1;
+    if ((a.standings.map_wins || a.map_wins) < (b.standings.map_wins || b.map_wins)) return 1;
     return 0;
 }
 
@@ -161,7 +170,7 @@ export function sortIntoGroups2(sortFunction, standings, maxInGroup) {
         if (group.length <= 1) continue; // don't bother sorting if it's just one
 
         if (maxInGroup && group.length > maxInGroup) {
-            console.log(`[i] cannot sort this group because ${group.length} is too big for max ${maxInGroup} for this function`, { group, standings });
+            // console.log(`[i] cannot sort this group because ${group.length} is too big for max ${maxInGroup} for this function`, { group, standings });
             continue;
         }
 
@@ -275,24 +284,33 @@ function miniLeaguePrep(standings) {
     for (const group of standings) {
         if (group.length <= 1) continue;
         console.log("minileagueprep", group);
+        if (group.length === 2) console.log("minileague h2h", group);
 
         const groupIDs = group.map(g => g.id);
 
         group.forEach(team => {
-            // console.log("minileague setup", team.id, groupIDs, team.standings.h2h);
+            console.log("minileague setup", team.id, groupIDs, team.standings.h2h);
             team.standings.minileague = {
                 wins: 0,
-                losses: 0
+                losses: 0,
+                map_diff: 0
             };
             groupIDs.forEach(opponentID => {
                 const diff = team.standings.h2h[opponentID];
                 if (diff === 1) team.standings.minileague.wins++;
                 if (diff === -1) team.standings.minileague.losses++;
+
+                if (team.standings.h2h_maps) {
+                    const mapDiff = team.standings.h2h_maps[opponentID];
+                    if (!isNaN(mapDiff)) team.standings.minileague.map_diff += mapDiff;
+                }
             });
         });
 
-        console.log(group.sort(miniLeagueMatchDiff).map(t => `|${t.code.padStart(6, " ")} ${t.standings.minileague.wins}-${t.standings.minileague.losses}`).join("\n"));
+        console.log(group);
+        console.log(group.sort(miniLeagueMatchDiff).map(t => `|${t.code.padStart(6, " ")} ${t.standings.minileague.wins}-${t.standings.minileague.losses} (${t.standings.minileague.map_diff})`).join("\n"));
 
+        if (group.length === 2) console.log("minileague h2h", standings);
         /*
         * Set up a minileague
         * - Take all the head to heads from all the teams in the tied group
@@ -309,11 +327,12 @@ function getSortMethod(stringMethod) {
     if (stringMethod === "MapWins") return { method: sortByMapWins, max: null };
     if (stringMethod === "OMW") return { method: sortByOMW, max: null };
     if (stringMethod === "MiniLeague") return { prep: miniLeaguePrep, method: miniLeagueMatchDiff, max: null };
+    if (stringMethod === "MiniLeagueMaps") return { prep: miniLeaguePrep, method: miniLeagueMapDiff, max: null };
     return null;
 }
 
 export function sortTeamsIntoStandings(teams, settings = {}) {
-    const log = false;
+    const log = true;
     if (log) console.log("[standings]", "starting sort", teams, settings);
 
     if (settings.sort) {
@@ -332,6 +351,7 @@ export function sortTeamsIntoStandings(teams, settings = {}) {
             } else {
                 standings = sortIntoGroups2(method, standings);
             }
+            console.log("[standings]", `[${mode}]`, standings);
         }
         return standings;
     }

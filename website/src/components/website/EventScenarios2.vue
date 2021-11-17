@@ -20,14 +20,19 @@
 
 
         <div v-if="scenarios" class="mb-2">
-            {{ currentScenarioView && currentScenarioView.length }} view ~ {{ scenarios.scenarios && scenarios.scenarios.length }} / {{ scenarios.scenarioCount }}
+            {{ currentScenarioView && currentScenarioView.length }} in view ~ {{ scenarios.scenarios && scenarios.scenarios.length }} / {{ scenarios.scenarioCount }}
 <!--            {{ scenarios.maxBits }}-->
 <!--            {{ scenarios.bitCounter }}-->
 <!--            {{ scenarios.bits }}-->
+             --- {{ matchesForHistorical.length }} historical matches added
+        </div>
+
+        <div class="mb-2" v-if="sortingMethods">
+            Sorting methods: {{ sortingMethods.join(' / ') }}
         </div>
 
 
-        <div class="n-nav" v-if="matchGroups">
+        <div class="n-nav mb-3" v-if="matchGroups">
             <select name="match-group-selector" id="match-group-selector" v-model="activeMatchGroup">
                 <option selected disabled value="null">Select a group</option>
                 <option v-for="group in matchGroups" :value="group" v-bind:key="group">{{ group }}</option>
@@ -40,7 +45,7 @@
                 <th class="p-2 border-dark" v-for="(x, i) in (counts[0].positions).slice(0, -1)" v-bind:key="i">
                     #{{ i + 1 }}
                 </th>
-                <th class="p-2 border-dark">Incomplete</th>
+                <th class="p-2 border-dark" v-b-tooltip:top="'Standings haven\'t converged into separate groups'">Incomplete</th>
             </tr>
             <tr v-for="team in counts" v-bind:key="team.code">
                 <td class="p-2 border-dark text-right font-weight-bold">{{ team.code }}</td>
@@ -54,7 +59,7 @@
         <table class="table text-white" v-if="scenarios">
             <tr class="sticky-top bg-dark">
                 <td>#</td>
-                <td class="text-center" v-for="match in scenarioMatches" v-bind:key="match.id">
+                <td class="text-center" v-for="match in matchesForScenarios" v-bind:key="match.id">
                     {{ match.teams.map(t => t.code).join(' vs ') }}
                 </td>
                 <td class="text-center">Standings</td>
@@ -76,7 +81,7 @@
 <!--                    first round of sorting (match wins)-->
                     <ol class="mb-0 small">
                         <li v-for="(g, gi) in scenario.standings" v-bind:key="gi">
-                            <div v-for="(team,ei) in g" v-bind:key="ei">{{ team.code }} ({{ team.wins }}-{{ team.losses }}) (m{{ team.map_wins }}-{{ team.map_losses }})</div>
+                            <div v-for="(team,ei) in g" v-bind:key="ei">{{ team.code }} ({{ team.standings.wins }}-{{ team.standings.losses }}) (m{{ team.standings.map_wins }}-{{ team.standings.map_losses }})</div>
                         </li>
                     </ol>
                 </td>
@@ -87,9 +92,7 @@
 
 <script>
 import { ReactiveArray } from "@/utils/reactive";
-import {
-    BitCounter, sortTeamsIntoStandings
-} from "@/utils/scenarios";
+import { BitCounter, sortTeamsIntoStandings } from "@/utils/scenarios";
 import { BFormCheckbox } from "bootstrap-vue";
 
 
@@ -98,26 +101,30 @@ export default {
     props: ["event"],
     components: { BFormCheckbox },
     data: () => ({
-        activeMatchGroup: "Groups Stage", // todo: return this to null
+        activeMatchGroup: "B League Regular Season", // todo: return this to null
         activeScenarioView: "all",
         showCountsAsPercentages: true,
         showOnlyPossible: true,
         showOnlyIncomplete: false
     }),
     computed: {
-        settings() {
+        blocks() {
             if (!this.event?.blocks) return null;
             try {
-                const settings = JSON.parse(this.event.blocks);
-                if (!settings?.foldy?.use) return null;
-                return settings.foldy;
+                return JSON.parse(this.event.blocks);
+                // if (!settings?.foldy?.use) return null;
             } catch (e) {
                 return null;
             }
         },
+        settings() {
+            if (!this.blocks?.foldy) return null;
+            return this.blocks.foldy;
+        },
         currentScenarioView() {
             if (!this.scenarios) return [];
             let scenarios = this.scenarios.scenarios;
+            if (!scenarios) return [];
             if (this.showOnlyIncomplete) scenarios = scenarios.filter(s => s.standings.length !== s.teams.length);
             if (this.showOnlyPossible) scenarios = scenarios.filter(s => !s.impossible);
             return scenarios;
@@ -144,7 +151,7 @@ export default {
         },
         scenarioMatches() {
             if (!this.matches) return [];
-            return this.matches.filter(m => !!m.teams && m.teams.length === 2).map(m => {
+            const matches = this.matches.filter(m => !!m.teams && m.teams.length === 2).map(m => {
                 m.teams = m.teams.map(t => ({
                     code: t.code || t.name,
                     id: t.id
@@ -156,13 +163,53 @@ export default {
                     first_to: m.first_to,
                     completed: [m.score_1, m.score_2].some(s => s === m.first_to),
                     liveWinner: (m.score_1 === m.first_to ? m.teams[0] : m.teams[1])?.code,
-                    scores: [m.score_1, m.score_2]
+                    scores: [m.score_1, m.score_2],
+                    week: m.week
                 };
             });
+            return matches;
+        },
+        matchesForScenarios() {
+            if (this.settings?.week) return this.matches.filter(m => m.week && m.week >= this.settings.week);
+            return this.matches;
+        },
+        matchesForHistorical() {
+            if (this.settings?.week) return this.matches.filter(m => !(m.week && m.week >= this.settings.week));
+            return [];
+        },
+        historicalTeams() {
+            const teams = this.scenarioTeams;
+
+            this.matchesForHistorical.forEach(match => {
+                const scores = [match.score_1, match.score_2];
+                match.teams.forEach((_team, ti) => {
+                    const team = teams.find(t => t.id === _team.id);
+                    const otherTeam = teams.find(t => t.id === match.teams[+!ti].id);
+
+                    const teamWonThisMatch = match.first_to === scores[ti];
+                    if (teamWonThisMatch) {
+                        team.standings.wins++;
+
+                        if (!team.standings.h2h[otherTeam.id]) team.standings.h2h[otherTeam.id] = 0;
+                        team.standings.h2h[otherTeam.id]++;
+                    } else {
+                        team.standings.losses++;
+                        if (!team.standings.h2h[otherTeam.id]) team.standings.h2h[otherTeam.id] = 0;
+                        team.standings.h2h[otherTeam.id]--;
+                    }
+                    team.standings.map_wins += scores[ti];
+                    team.standings.map_losses += scores[+!ti];
+
+                    if (!team.standings.h2h_maps[otherTeam.id]) team.standings.h2h_maps[otherTeam.id] = 0;
+                    team.standings.h2h_maps[otherTeam.id] += scores[ti] - scores[+!ti];
+                });
+            });
+
+            return teams;
         },
         scenarioMatchesWithOutcomes() {
-            if (!this.scenarioMatches) return [];
-            return this.scenarioMatches.map(m => {
+            if (!this.matchesForScenarios) return [];
+            return this.matchesForScenarios.map(m => {
                 const outcomes = [];
 
                 for (let i = 0; i < m.first_to * 2; i++) {
@@ -179,10 +226,26 @@ export default {
         },
         scenarioTeams() {
             const teams = [];
-            this.scenarioMatches.forEach(match => {
+            this.matchesForScenarios.forEach(match => {
                 match.teams.forEach(team => {
                     if (!teams.find(t => t.code === team.code)) {
-                        teams.push({ id: team.id, code: team.code, wins: 0, losses: 0, map_wins: 0, map_losses: 0, h2h: {} });
+                        const standings = {
+                            wins: 0,
+                            losses: 0,
+                            played: 0,
+
+                            map_wins: 0,
+                            map_losses: 0,
+                            maps_played: 0,
+                            rank: null,
+                            h2h: {},
+                            h2h_maps: {}
+                        };
+                        teams.push({
+                            id: team.id,
+                            code: team.code,
+                            standings
+                        });
                     }
                 });
             });
@@ -221,19 +284,33 @@ export default {
 
             return teams;
         },
+        sortingMethods() {
+            try {
+                const sorters = this.blocks.standingsSort;
+                if (sorters && sorters.length) {
+                    const sorter = sorters.find(s => s.group === this.activeMatchGroup);
+                    return sorter?.sort;
+                }
+            } catch (e) {
+                return null;
+            }
+            return null;
+        },
         scenarios() {
-            if (!this.scenarioMatches?.length) return null;
+            if (!this.matchesForScenarios?.length) return null;
             if (!this.scenarioTeams?.length) return null;
             console.log("teams", this.scenarioTeams);
             const matches = this.scenarioMatchesWithOutcomes;
             const maxBits = matches.map(m => m.first_to * 2);
             const scenarioCount = maxBits.reduce((last, curr) => last * curr, 1);
-            // const scenarioCount = 65;
-            const _json = { teams: JSON.stringify(this.scenarioTeams), matches: JSON.stringify(this.scenarioMatches) };
+            // const scenarioCount = 1;
+            const _json = { teams: JSON.stringify(this.historicalTeams), matches: JSON.stringify(this.matchesForScenarios) };
             const scenarios = [];
 
-            if (scenarioCount > 2 ** 16) {
-                // return { error: "too many computations required" };
+
+            if (scenarioCount > 2 ** 12) {
+                console.warn({ error: "too many computations required", scenarioCount });
+                return [];
             }
 
             // const bitCounter = maxBits.map(() => 0);
@@ -257,9 +334,10 @@ export default {
                 });
                 scenario.outcomes.forEach((outcome, i) => {
                     const match = scenario.matches[i];
-                    // console.log("match", match, outcome.scores);
+                    // console.log("match", match, match.completed, match.scores, outcome.scores);
                     if (match.completed && (match.scores[0] !== outcome.scores[0] || match.scores[1] !== outcome.scores[1])) {
                         // if anything is incorrect
+                        console.log("impossible match", match, match.completed, match.scores, outcome.scores);
                         scenario.impossible = true;
                     }
 
@@ -271,19 +349,23 @@ export default {
                         // console.log(team, otherTeam);
                         // todo: error here when not all data is loaded properly
 
+                        // const teamWonThisMatch = match.first_to === outcome.scores[ti];
                         const teamWonThisMatch = match.first_to === outcome.scores[ti];
                         if (teamWonThisMatch) {
-                            team.wins++;
+                            team.standings.wins++;
 
-                            if (!team.h2h[otherTeam.id]) team.h2h[otherTeam.id] = 0;
-                            team.h2h[otherTeam.id]--;
+                            if (!team.standings.h2h[otherTeam.id]) team.standings.h2h[otherTeam.id] = 0;
+                            team.standings.h2h[otherTeam.id]++;
                         } else {
-                            team.losses++;
-                            if (!team.h2h[otherTeam.id]) team.h2h[otherTeam.id] = 0;
-                            team.h2h[otherTeam.id]++;
+                            team.standings.losses++;
+                            if (!team.standings.h2h[otherTeam.id]) team.standings.h2h[otherTeam.id] = 0;
+                            team.standings.h2h[otherTeam.id]--;
                         }
-                        team.map_wins += outcome.scores[ti];
-                        team.map_losses += outcome.scores[+!ti];
+                        team.standings.map_wins += outcome.scores[ti];
+                        team.standings.map_losses += outcome.scores[+!ti];
+
+                        if (!team.standings.h2h_maps[otherTeam.id]) team.standings.h2h_maps[otherTeam.id] = 0;
+                        team.standings.h2h_maps[otherTeam.id] += outcome.scores[ti] - outcome.scores[+!ti];
                     });
                 });
 
@@ -312,7 +394,7 @@ export default {
                         }
                     }
                     if (!isIn) {
-                        // console.log("last place so far", team.code, team.wins);
+                        // console.log("last place so far", team.code, team.standings.wins);
                         scenario.standings.push([team]);
                     }
                 });
@@ -323,7 +405,39 @@ export default {
                 // sortMatches(scenario.i, sortByMatchWins, scenario.teams, scenario.standings);
                 // console.log(scenario);
 
-                scenario.standings = sortTeamsIntoStandings(scenario.teams);
+                // const sortFunction = (a, b) => {
+                //     if (a.standings.points > b.standings.points) return -1;
+                //     if (a.standings.points < b.standings.points) return 1;
+                //
+                //     if (a.standings.wins > b.standings.wins) return -1;
+                //     if (a.standings.wins < b.standings.wins) return 1;
+                //
+                //     if (a.standings.losses > b.standings.losses) return 1;
+                //     if (a.standings.losses < b.standings.losses) return -1;
+                //
+                //     if (a.standings.map_diff > b.standings.map_diff) return -1;
+                //     if (a.standings.map_diff < b.standings.map_diff) return 1;
+                //
+                //
+                //     if (a.standings.map_wins > b.standings.map_wins) return -1;
+                //     if (a.standings.map_wins < b.standings.map_wins) return 1;
+                //
+                //     if (a.standings.map_losses > b.standings.map_losses) return 1;
+                //     if (a.standings.map_losses < b.standings.map_losses) return -1;
+                // };
+                //
+                // // quick default sort
+                // scenario.teams.sort(sortFunction);
+
+                console.log("sort", i + 1, this.blocks.standingsSort);
+                if (this.sortingMethods) {
+                    scenario.standings = sortTeamsIntoStandings(scenario.teams, {
+                        sort: this.sortingMethods
+                    });
+                } else {
+                    scenario.standings = sortTeamsIntoStandings(scenario.teams);
+                }
+                console.log(scenario.standings);
                 //
                 // scenario.standings = sortIntoGroups2(sortByMapWins, [scenario.teams]);
                 // if (i === 4050) console.log(i, scenario.standings);

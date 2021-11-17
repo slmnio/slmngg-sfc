@@ -1,8 +1,8 @@
 <template>
     <div class="container news-item">
-        <router-link :to="url('event', connection)">
+        <OptionalLink :condition="connection" :url="['event', connection]">
             <NewsHeader class="news-header" :url="headerImage" :theme="theme" />
-        </router-link>
+        </OptionalLink>
         <h1 class="news-headline">{{ news.headline }}</h1>
         <div class="news-line">
             <div class="news-author" v-if="news.author_name">by <router-link :to="url('player', news.author)">{{ news.author.name }}<i class="fas fa-badge-check fa-fw" style="margin-left: .5ex" title="REAL" v-if="news.author.verified"></i></router-link><span v-if="news.author_role">, {{ news.author_role }}</span></div>
@@ -26,10 +26,11 @@ import NewsHeader from "@/components/website/NewsHeader";
 import Markdown from "@/components/website/Markdown";
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 import { themeBackground } from "@/utils/theme-styles";
+import OptionalLink from "@/components/website/OptionalLink";
 
 export default {
     name: "News",
-    components: { EmbeddedVideo, Markdown, NewsHeader },
+    components: { EmbeddedVideo, Markdown, NewsHeader, OptionalLink },
     props: ["slug"],
     methods: {
         url,

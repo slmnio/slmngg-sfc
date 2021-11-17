@@ -1,5 +1,5 @@
 <template>
-    <router-link :to="url('event', event)" class="event no-link-style d-flex">
+    <router-link :to="url('event', event)" class="event no-link-style d-flex ct-passive">
         <div class="event-block flex-center default-thing" :style="blockTheme">
             <div class="event-block-logo bg-center" :style="blockLogo"></div>
         </div>

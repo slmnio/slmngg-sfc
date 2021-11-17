@@ -3,26 +3,26 @@
         <ThingTop :thing="event" type="event"></ThingTop>
 
         <SubPageNav class="my-2">
-            <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
+            <li class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
 <!--            <li class="nav-item"><router-link class="nav-link" :to="subLink('rosters')">Rosters</router-link></li>-->
-            <li class="nav-item" v-if="event.matches"><router-link class="nav-link" :to="subLink('schedule')">Schedule</router-link></li>
-            <li class="nav-item" v-if="showStandings"><router-link class="nav-link" :to="subLink('standings')">Standings</router-link></li>
-            <li class="nav-item" v-if="event.brackets"><router-link class="nav-link" :to="subLink('bracket')">{{ event.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link></li>
-            <li class="nav-item" v-if="showFoldy"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
-            <li class="nav-item" v-if="showDraft"><router-link class="nav-link" :to="subLink('draft')">Draft</router-link></li>
-            <li class="nav-item" v-if="useStaffPage"><router-link class="nav-link" :to="subLink('staff')">Staff</router-link></li>
-            <li class="nav-item" v-if="event.about"><router-link class="nav-link" :to="subLink('about')">About</router-link></li>
+            <li class="nav-item ct-passive" v-if="event.matches"><router-link class="nav-link" :to="subLink('schedule')">Schedule</router-link></li>
+            <li class="nav-item ct-passive" v-if="showStandings"><router-link class="nav-link" :to="subLink('standings')">Standings</router-link></li>
+            <li class="nav-item ct-passive" v-if="event.brackets"><router-link class="nav-link" :to="subLink('bracket')">{{ event.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link></li>
+            <li class="nav-item ct-passive" v-if="showFoldy"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
+            <li class="nav-item ct-passive" v-if="showDraft"><router-link class="nav-link" :to="subLink('draft')">Draft</router-link></li>
+            <li class="nav-item ct-passive" v-if="useStaffPage"><router-link class="nav-link" :to="subLink('staff')">Staff</router-link></li>
+            <li class="nav-item ct-passive" v-if="event.about"><router-link class="nav-link" :to="subLink('about')">About</router-link></li>
 <!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
 
 
             <ul class="socials d-flex" v-if="event.socials">
                 <li class="nav-item">
-                    <Social :social="social" v-for="social in event.socials" v-bind:key="social.id"/>
+                    <Social class="ct-active" :social="social" v-for="social in event.socials" v-bind:key="social.id"/>
                 </li>
             </ul>
 
             <li class="nav-item mx-2 minisite-prompt default-thing" v-if="shouldShowMinisitePrompt" :style="themeBackground1(event)">
-                <a :href="minisiteLink" class="nav-link no-link-style">See this page on the <b>{{ subdomain }}</b> minisite <i class="fas fa-chevron-right fa-fw ml-1"></i></a>
+                <a :href="minisiteLink" class="nav-link no-link-style themed">See this page on the <b>{{ subdomain }}</b> minisite <i class="fas fa-chevron-right fa-fw ml-1"></i></a>
             </li>
         </SubPageNav>
 

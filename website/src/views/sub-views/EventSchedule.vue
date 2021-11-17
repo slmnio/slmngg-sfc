@@ -9,8 +9,8 @@
             <h2 class="text-center">Schedule</h2>
             <ul class="schedule-group-holder nav justify-content-center" v-if="pagedMatches.length > 1">
                 <li class="nav-item schedule-group" v-for="(pm) in pagedMatches" v-bind:key="pm.num"
-                    v-bind:class="{ 'active': activeScheduleGroup.num === pm.num }">
-                    <a @click="activeScheduleNum = pm.num" class="nav-link">{{ pm.text }}</a>
+                    v-bind:class="{ 'active': activeScheduleGroup.num === pm.num, 'ct-active': activeScheduleGroup.num === pm.num, 'ct-passive': activeScheduleGroup.num !== pm.num }">
+                    <a @click="activeScheduleNum = pm.num" class="nav-link no-link-style">{{ pm.text }}</a>
                 </li>
             </ul>
         </div>
@@ -161,9 +161,6 @@ export default {
 </script>
 
 <style scoped>
-    .nav-item.active .nav-link {
-        color: var(--alt)
-    }
     .nav-link {
         cursor: pointer;
     }

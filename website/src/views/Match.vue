@@ -11,8 +11,8 @@
                 </div>
                 <div class="col-12 col-md-3">
                     <ul class="match-sub-nav list-group mb-2" v-if="showHeadToHead"> <!-- only because it'd be the only one -->
-                        <router-link class="list-group-item" exact active-class="active" :to="subLink('')">VOD</router-link>
-                        <router-link v-if="showHeadToHead" class="list-group-item" active-class="active" :to="subLink('history')">Head to head</router-link>
+                        <router-link class="list-group-item ct-passive" exact active-class="active ct-active" :to="subLink('')">VOD</router-link>
+                        <router-link v-if="showHeadToHead" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('history')">Head to head</router-link>
                     </ul>
 
                     <table class="match-details table-sm">
@@ -221,7 +221,7 @@ export default {
 
     .match-sub-nav .list-group-item.active {
         background-color: #333333;
-        color: #fff !important;
+        /*color: #fff !important;*/
         border-color: transparent;
     }
 

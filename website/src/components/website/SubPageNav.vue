@@ -13,7 +13,15 @@ export default {
 </script>
 
 <style scoped>
+    .sub-page-nav >>> .nav-link:not(.themed) {
+        color: var(--theme-passive, #ffffff);
+    }
     .sub-page-nav .nav-link.router-link-exact-active {
-        color: var(--alt);
+        color: var(--theme);
+    }
+    .sub-page-nav >>> .nav-link.active,
+    .sub-page-nav >>> .nav-link.router-link-exact-active,
+    .sub-page-nav >>> .nav-link:not(.themed):hover  {
+        color: var(--theme-active, #66D9FF);
     }
 </style>

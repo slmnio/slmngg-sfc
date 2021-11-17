@@ -189,7 +189,8 @@ a.link-text {
     align-items: center;
 }
 
-a.no-link-style, a.no-link-style:hover {
+a.no-link-style, a.no-link-style:hover,
+a.nav-link.no-link-style, a.nav-link.no-link-style:hover {
     display: block;
     text-decoration: none;
     color: inherit;
@@ -234,4 +235,27 @@ a.default-thing {
     background-color: rgba(255, 255, 255, 0.2);
     color: rgb(255, 255, 255);
     transition: background-color .2s, border-color .2s, color .2s;
+}
+.border-transparent {
+    border-color: transparent !important;
+}
+
+.text-dark-low {
+    color: #343a40
+}
+
+a.text-dark-low:focus, a.text-dark-low:hover {
+    color: #121416
+}
+
+
+.ct-passive { color: var(--theme-passive, #ffffff); }
+.ct-active { color: var(--theme-active, #66d9ff); }
+.ct-dark { color: var(--theme-dark, #222222); }
+.ct-ondark { color: var(--theme-ondark, #ffffff); }
+
+a.ct-passive:hover,
+.ct-passive a:hover,
+.ct-passive:hover a {
+    color: var(--theme-active, #66d9ff);
 }

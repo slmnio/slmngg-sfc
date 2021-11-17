@@ -10,23 +10,23 @@
              v-bind:class="{'right': i === 1}">
 
             <div v-if="team.dummy" class="team-name team-name--spacer d-none d-lg-flex">{{ team.text }}</div>
-            <router-link v-else-if="!team.dummy" :to="url('team', team)" class="team-name d-none d-lg-flex">{{ team.name }}</router-link>
+            <router-link v-else-if="!team.dummy" :to="url('team', team)" class="team-name d-none d-lg-flex ct-passive">{{ team.name }}</router-link>
 
 
             <div v-if="team.dummy" class="team-code d-lg-none">{{ team.code || team.text || 'TBD' }}</div>
-            <router-link v-else-if="!team.dummy" :to="url('team', team)" class="team-code d-lg-none">{{ team.code }}</router-link>
+            <router-link v-else-if="!team.dummy" :to="url('team', team)" class="team-code d-lg-none ct-passive">{{ team.code }}</router-link>
 
 
             <ThemeLogo v-if="team && !team.dummy" :theme="team.theme" border-width="4" class="team-logo" icon-padding="4"/>
             <div class="team-logo team-logo--spacer" v-else></div>
         </div>
 
-        <router-link :to="url('match', this.match)" class="match-center match-vs flex-center text-center">
+        <router-link :to="url('match', this.match)" class="match-center match-vs flex-center text-center ct-passive">
             <div class="scores-wrap" v-if="scores.some(s => s)">
                 <div class="scores">{{ match.score_1 }} - {{ match.score_2 }}</div>
                 <div class="scores-forfeit" v-if="match.forfeit">Forfeit</div>
             </div>
-            <div class="vs" v-else>vs</div>
+            <div class="vs ct-passive" v-else>vs</div>
         </router-link>
         <div class="match-right match-time flex-center">
             <ScheduleTime :time="match.start" :custom-text="match.custom_name"/>

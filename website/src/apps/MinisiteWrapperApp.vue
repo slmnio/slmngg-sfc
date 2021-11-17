@@ -6,7 +6,22 @@
                 body.minisite {
                     background-color: {{ theme.color_body }};
                     color: {{ theme.color_text_on_body }};
+                    {{/* Having an empty string (eg --theme-passive: ; ) won't trigger the fallbacks below  */}}
+                    {{ theme.color_website_passive && `--theme-passive: ${theme.color_website_passive};` }}
+                    {{ theme.color_website_active && `--theme-active: ${theme.color_website_active};` }}
+                    {{ theme.color_website_dark && `--theme-dark: ${theme.color_website_dark};` }}
+                    {{ theme.color_website_text_on_dark && `--theme-ondark: ${theme.color_website_text_on_dark};` }}
                 }
+                body.minisite .ct-passive { color: var(--theme-passive, #ffffff); }
+                body.minisite .ct-active { color: var(--theme-active, #66d9ff); }
+                body.minisite .ct-dark { color: var(--theme-dark, #222222); }
+                body.minisite .ct-ondark { color: var(--theme-ondark, #ffffff); }
+
+                body.minisite a.ct-passive:hover,
+                body.minisite .ct-passive a:hover {
+                    color: var(--theme-active, #66d9ff);
+                }
+
                 body.minisite nav {
                     background-color: {{ theme.color_navbar }};
                 }

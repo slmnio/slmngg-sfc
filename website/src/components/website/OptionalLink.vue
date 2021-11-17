@@ -12,7 +12,7 @@ import { url } from "@/utils/content-utils";
 export default {
     name: "OptionalLink",
     props: {
-        condition: Boolean,
+        condition: [Object, Boolean],
         to: String,
         url: Array
     },

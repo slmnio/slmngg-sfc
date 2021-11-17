@@ -1,7 +1,8 @@
 <template>
-    <router-link :to="url('match', match)" class="match no-link-style">
+    <router-link :to="url('match', match)" class="match no-link-style ct-passive">
         <MatchThumbnail :match="match" />
-        <div class="match-lower-text">{{ lowerText }}</div>
+        <div v-if="lowerText" class="match-lower-text">{{ lowerText }}</div>
+        <div v-else class="match-lower-text">&nbsp;</div>
     </router-link>
 </template>
 

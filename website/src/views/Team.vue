@@ -9,7 +9,7 @@
 
             <ul class="socials d-flex" v-if="team.socials">
                 <li class="nav-item">
-                    <Social :social="social" v-for="social in team.socials" v-bind:key="social.id"/>
+                    <Social class="ct-active" :social="social" v-for="social in team.socials" v-bind:key="social.id"/>
                 </li>
             </ul>
 

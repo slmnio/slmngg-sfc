@@ -58,4 +58,7 @@ export default {
     .markdown >>> p:last-child {
         margin-bottom: .5rem;
     }
+    .markdown >>> a {
+        color: var(--theme-active, #66d9ff);
+    }
 </style>

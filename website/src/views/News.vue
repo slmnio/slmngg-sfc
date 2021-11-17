@@ -1,6 +1,6 @@
 <template>
     <div class="container news-item">
-        <OptionalLink :condition="connection" :url="['event', connection]">
+        <OptionalLink :condition="!!connection" :url="['event', connection]">
             <NewsHeader class="news-header" :url="headerImage" :theme="theme" />
         </OptionalLink>
         <h1 class="news-headline">{{ news.headline }}</h1>
@@ -107,5 +107,8 @@ export default {
 
     .news-embed-container {
         margin: 16px 0;
+    }
+    a {
+        color: var(--theme-active, #66d9ff);
     }
 </style>

@@ -1,8 +1,9 @@
 <template>
     <span class="linked-players" v-if="html">
         <router-link v-for="(player, i) in players" v-bind:key="player.id"
-                     :style="{order: i*2}"
-                     :to="url('player', player)">{{ player.name }}</router-link>
+                     :style="{order: i*2}" class="ct-active"
+                     :to="url('player', player)">{{ player.name }}<span v-if="player.verified">&nbsp;<i class="fas fa-badge-check" title="REAL"></i></span>
+        </router-link>
             <span v-for="i in parseInt(commas)" v-bind:key="i" :style="{order: (i*2)-1}">, </span>
             <span v-if="and" :style="{order: (players.length - 1) * 2 - 1}"> & </span>
     </span>

@@ -1,9 +1,9 @@
 <template>
     <div class="caster-cam-wrapper flex-center">
-        <iframe v-if="extendedIframeUse" v-show="extendedIframeVisible" allow="autoplay;camera;microphone;fullscreen;picture-in-picture;display-capture;" :src="src" class="caster-frame"></iframe>
+        <iframe v-if="manualCamera ? useCam : extendedIframeUse" v-show="manualCamera || extendedIframeVisible" allow="autoplay;camera;microphone;fullscreen;picture-in-picture;display-capture;" :src="src" class="caster-frame"></iframe>
         <transition name="mid-split">
 <!--            <slot v-if="useCam ? !apiVisible : true">-->
-                <div v-if="useCam ? !apiVisible : true" class="caster-bg flex-center" :style="{backgroundColor: color}">
+                <div v-if="useCam ? !cameraIsOn : true" class="caster-bg flex-center" :style="{backgroundColor: color}">
                     <div v-if="avatar" class="caster-avatar" :style="avatar"></div>
                 </div>
 <!--            </slot>-->
@@ -14,7 +14,7 @@
 <script>
 export default {
     name: "CasterCam",
-    props: ["guest", "disableVideo", "color"],
+    props: ["guest", "disableVideo", "color", "extraParams"],
     data: () => ({
         iframe: null,
         apiVisible: false,
@@ -23,6 +23,12 @@ export default {
         extendedIframeUse: false
     }),
     computed: {
+        manualCamera() {
+            return this.streamID?.includes("http");
+        },
+        cameraIsOn() {
+            return this.manualCamera ? true : this.apiVisible;
+        },
         useCam() {
             if (this.disableVideo) return false;
             return this.guest?.use_cam || false;
@@ -34,9 +40,9 @@ export default {
             const vdoDomain = "https://cams.prod.slmn.gg";
             if (this.streamID.includes("http")) {
                 // custom link
-                return this.streamID;
+                return this.streamID + (this.extraParams || "");
             }
-            return `${vdoDomain}/?view=${this.streamID}&mute`;
+            return `${vdoDomain}/?view=${this.streamID}&mute` + (this.extraParams || "");
         },
         avatar() {
             if (!this.guest) return null;

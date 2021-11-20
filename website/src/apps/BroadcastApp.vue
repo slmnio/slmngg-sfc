@@ -36,7 +36,7 @@ export default {
 </script>
 
 <style>
-    .broadcast-app, #overlay {
+    .broadcast-app, #overlay, body.overlay {
         overflow: hidden;
     }
     body.overlay #slmngg-app {

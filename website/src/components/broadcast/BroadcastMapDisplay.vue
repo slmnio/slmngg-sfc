@@ -14,7 +14,9 @@
                 <div class="gel-text" v-if="map && map.draw">DRAW</div>
             </div>
             <div class="map-lower" :style="accent">
-                <span class="industry-align">{{ name }}</span>
+                <span class="industry-align">{{ name }} <br /> 
+                <div v-if="mode" class="map-lower-lower">{{mode}}</div> 
+                <div v-else class="map-lower-lower">{{type}}</div></span>
             </div>
         </div>
     </div>
@@ -23,6 +25,7 @@
 <script>
 import { logoBackground } from "@/utils/theme-styles";
 import { cssImage } from "@/utils/content-utils";
+
 
 export default {
     name: "BroadcastMapDisplay",
@@ -42,6 +45,14 @@ export default {
         name() {
             if (!this.map?.name) return null;
             return this.map.name[0];
+        },
+        type() {
+            if (!this.map?.type) return null;
+            return this.map.type[0];
+        },
+        mode() {
+            if (!this.map?.mode) return null;
+            return this.map.mode;
         },
         accent() {
             if (!this.accentColor) return {};
@@ -84,10 +95,16 @@ export default {
         text-align: center;
         padding: 10px 5px;
         line-height: 1;
-        min-height: 85px;
+        min-height: 100px;
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+    .map-lower-lower {
+        font-size: 15px;
+        text-align: center;
+        font-weight: 100;
+        padding: 5px;
     }
     .map-main {
         z-index: 2;

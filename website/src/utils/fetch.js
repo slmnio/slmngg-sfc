@@ -9,7 +9,7 @@ export function getDataServerAddress() {
     if (process.env.VUE_APP_DEPLOY_MODE === "local") {
         return `//${window.location.hostname}:8901`;
     }
-    return "https://data.slmn.gg";
+    return process.env.SLMNGG_DATA_SERVER;
 }
 
 export async function queueThing(id) {

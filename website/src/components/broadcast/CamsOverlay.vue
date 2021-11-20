@@ -86,8 +86,8 @@ export default {
     }
 
 
-    .slide-in-enter-active { transition: bottom 500ms var(--reversedCurve); }
-    .slide-in-leave-active { transition: bottom 500ms var(--originalCurve); }
+    .slide-in-enter-active { transition: bottom 300ms var(--reversedCurve); }
+    .slide-in-leave-active { transition: bottom 300ms var(--originalCurve); }
     .slide-in-enter, .slide-in-leave-to { bottom: -320px }
     .slide-in-enter-to, .slide-in-leave { bottom: 0; }
 

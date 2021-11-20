@@ -1,6 +1,6 @@
 <template>
     <div class="cam-overlay">
-        <div class="guest" v-if="activeGuest" :style="theme">
+        <div class="guest" v-if="activeGuest && activeGuest.use_cam" :style="theme">
             <CasterCam class="team-cam" :guest="activeGuest" :extra-params="params" :disable-video="false" />
         </div>
     </div>

@@ -30,7 +30,7 @@ export default {
             return this.manualCamera ? true : this.apiVisible;
         },
         useCam() {
-            if (this.disableVideo) return false;
+            if (this.disableVideo) return null;
             return this.guest?.use_cam || false;
         },
         streamID() {
@@ -80,8 +80,7 @@ export default {
                 console.log("track added, loaded");
             }
             if (data.action === "end-view-connection" && data.value === this.streamID) {
-                this.apiVisible = false;
-                // this.slowDisableCam(); // we need it to stay open if they reconnect
+                this.slowDisableCam(); // we need it to stay open if they reconnect
                 console.log("view dc, unloaded");
             }
 

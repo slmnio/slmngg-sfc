@@ -4,7 +4,7 @@
             <div class="industry-align">{{ team.name }}</div>
         </div>
         <div class="team-guests d-flex">
-            <div class="guest" v-for="guest in _guests" v-bind:key="guest.id" >
+            <div class="guest" v-for="guest in _guests" v-bind:key="guest.id">
                 <CasterCam class="team-cam" :guest="guest" :extra-params="params" />
                 <div class="guest-name">{{ guest.name }}</div>
             </div>

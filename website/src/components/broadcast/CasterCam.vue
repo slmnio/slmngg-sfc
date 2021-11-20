@@ -1,6 +1,6 @@
 <template>
     <div class="caster-cam-wrapper flex-center">
-        <iframe v-if="manualCamera ? useCam : extendedIframeUse" v-show="manualCamera || extendedIframeVisible" allow="autoplay;camera;microphone;fullscreen;picture-in-picture;display-capture;" :src="src" class="caster-frame"></iframe>
+        <iframe v-if="manualCamera ? useCam : (useCam || extendedIframeUse)" v-show="manualCamera || extendedIframeVisible" allow="autoplay;camera;microphone;fullscreen;picture-in-picture;display-capture;" :src="src" class="caster-frame"></iframe>
         <transition name="mid-split">
 <!--            <slot v-if="useCam ? !apiVisible : true">-->
                 <div v-if="useCam ? !cameraIsOn : true" class="caster-bg flex-center" :style="{backgroundColor: color}">

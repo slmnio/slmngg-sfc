@@ -5,7 +5,7 @@
         </div>
         <div class="team-guests d-flex">
             <div class="guest" v-for="guest in _guests" v-bind:key="guest.id">
-                <CasterCam class="team-cam" :guest="guest" :extra-params="params" />
+                <CasterCam class="team-cam" :guest="guest" :extra-params="params" :event="event" />
                 <div class="guest-name">{{ guest.name }}</div>
             </div>
         </div>
@@ -20,7 +20,7 @@ import { logoBackground1 } from "@/utils/theme-styles";
 export default {
     name: "TeamCamsGroup",
     components: { CasterCam },
-    props: ["team", "guests", "params"],
+    props: ["team", "guests", "params", "event"],
     computed: {
         _guests() {
             return ReactiveArray("guests")({ guests: this.guests }).slice(0, 6);

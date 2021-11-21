@@ -4,7 +4,7 @@
         <transition name="mid-split">
 <!--            <slot v-if="useCam ? !apiVisible : true">-->
                 <div v-if="useCam ? !cameraIsOn : true" class="caster-bg flex-center" :style="{backgroundColor: color}">
-                    <div v-if="avatar" class="caster-avatar" :style="avatar"></div>
+                    <div v-if="avatar" class="caster-avatar" v-bind:class="{'event-fallback': avatar.eventFallback}" :style="avatar"></div>
                 </div>
 <!--            </slot>-->
         </transition>
@@ -12,9 +12,12 @@
 </template>
 
 <script>
+import { logoBackground1 } from "@/utils/theme-styles";
+import { cssImage } from "@/utils/content-utils";
+
 export default {
     name: "CasterCam",
-    props: ["guest", "disableVideo", "color", "extraParams"],
+    props: ["guest", "disableVideo", "color", "extraParams", "fallbackAvatar", "event"],
     data: () => ({
         iframe: null,
         apiVisible: false,
@@ -34,7 +37,7 @@ export default {
             return this.guest?.use_cam || false;
         },
         streamID() {
-            return this.guest?.cam_code;
+            return this.guest?.cam_code || "";
         },
         src() {
             const vdoDomain = "https://cams.prod.slmn.gg";
@@ -42,10 +45,18 @@ export default {
                 // custom link
                 return this.streamID + (this.extraParams || "");
             }
-            return `${vdoDomain}/?view=${this.streamID}&mute` + (this.extraParams || "");
+            return `${vdoDomain}/?view=${this.streamID}&vm` + (this.extraParams || "");
         },
         avatar() {
             if (!this.guest) return null;
+            if (!this.guest.avatar) {
+                if (this.fallbackAvatar) return this.fallbackAvatar;
+                return {
+                    ...logoBackground1(this.event),
+                    ...cssImage("backgroundImage", this.event?.theme, ["default_logo"], 200),
+                    eventFallback: true
+                };
+            }
             return { backgroundImage: `url(${this.guest.avatar})` };
         }
     },
@@ -159,5 +170,10 @@ export default {
     }
     .caster-cam-wrapper, .caster-bg {
         background-color: rgba(0,0,0,1);
+    }
+    .caster-avatar.event-fallback {
+        background-size: 60%;
+        background-repeat: no-repeat;
+        background-position: center;
     }
 </style>

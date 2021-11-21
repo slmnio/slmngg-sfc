@@ -1,14 +1,15 @@
 <template>
     <div class="cam-overlay">
         <div class="guest" v-if="activeGuest && activeGuest.use_cam" :style="theme">
-            <CasterCam class="team-cam" :guest="activeGuest" :extra-params="params" :disable-video="false" />
+            <CasterCam class="team-cam" :guest="activeGuest" :extra-params="params" :disable-video="false"
+                       :event="broadcast && broadcast.event" />
         </div>
     </div>
 </template>
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { logoBackground1 } from "@/utils/theme-styles";
+import { themeBackground1 } from "@/utils/theme-styles";
 import CasterCam from "@/components/broadcast/CasterCam";
 
 export default {
@@ -58,7 +59,11 @@ export default {
         },
         theme() {
             if (!this.activeTeam) return {};
-            return logoBackground1(this.activeTeam);
+            const theme = themeBackground1(this.activeTeam);
+            return {
+                ...theme,
+                borderColor: theme.backgroundColor
+            };
         }
     }
 };
@@ -68,10 +73,10 @@ export default {
     .guest {
         position: absolute;
         bottom: 123px;
-        left: 491px;
-        height: 116px;
+        left: 494px;
+        height: 151px;
         width: 220px;
-        transform: rotate(-4deg) skewX(-16deg);
+        transform: rotate(-4deg) skewX(-16.5deg);
         border-radius: 4px;
         overflow: hidden;
         border-bottom: 6px solid transparent;
@@ -85,6 +90,7 @@ export default {
         /* Margin: 0.5 */
         height: 100vh;
         /*background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/911722398015950878/ScreenShot_21-09-19_04-29-37-000.jpg");*/
+        /*background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/912065307122733066/ScreenShot_21-11-09_01-06-41-000.jpg");*/
         /*background-size: 1920px 1080px;*/
         font-family: "Industry", "SLMN-Industry", sans-serif;
         overflow: hidden;

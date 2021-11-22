@@ -34,7 +34,7 @@
                     <router-link active-class="active" class="nav-link" to="/players">Players</router-link>
 <!--                    <router-link active-class="active" class="nav-link" to="/news">News</router-link>-->
                 </b-navbar-nav>
-                <b-navbar-nav v-if="minisite">
+                <b-navbar-nav v-if="minisite" class="flex-wrap">
                     <router-link active-class="active" v-if="minisite.matches" class="nav-link" to="/schedule">Schedule</router-link>
                     <router-link active-class="active" v-if="minisite.brackets" class="nav-link" to="/bracket">{{ minisite.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link>
                     <router-link active-class="active" v-if="minisiteSettings && minisiteSettings.standings" class="nav-link" to="/standings">Standings</router-link>
@@ -46,7 +46,7 @@
                         {{ event.navbar_short || event.short || event.series_subtitle || event.name }}</router-link>
 <!--                    <router-link :to="'/'" v-if="minisite.navbar_short" active-class="active" exact class="nav-link">{{ minisite.navbar_short }}</router-link>-->
                 </b-navbar-nav>
-                <b-navbar-nav class="mr-auto">
+                <b-navbar-nav class="mr-auto flex-wrap">
                     <NavLiveMatch v-for="match in liveMatches" :match="match" v-bind:key="match.id" />
                 </b-navbar-nav>
                 <b-navbar-nav v-if="minisite">

@@ -104,7 +104,7 @@ export default {
         centerShow() {
             if (this.live || this.hasScore) return "scores"; // return this.scores.join(" - ");
 
-            if (this.expanded) {
+            if (this.expanded && this.start) {
                 return "time";
                 // return this.start;
             } else {

@@ -135,7 +135,7 @@ const app = new Vue({
             this.loadMinisite(subdomain);
         }
 
-        setInterval(() => app.$store.commit("executeRequestBuffer"), 300);
+        setInterval(() => app.$store.commit("executeRequestBuffer"), 100);
 
         try {
             if (localStorage.getItem("draft-notes")) {

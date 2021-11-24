@@ -14,9 +14,10 @@
                 <div class="gel-text" v-if="map && map.draw">DRAW</div>
             </div>
             <div class="map-lower" :style="accent">
-                <span class="industry-align">{{ name }} <br /> 
-                <div v-if="mode" class="map-lower-lower">{{mode}}</div> 
-                <div v-else class="map-lower-lower">{{type}}</div></span>
+                <span class="industry-align">{{ name }} <br />
+                <div v-if="mode" class="map-lower-lower">{{mode}}</div>
+                <div v-else-if="type" class="map-lower-lower">{{type}}</div>
+                </span>
             </div>
         </div>
     </div>
@@ -29,7 +30,7 @@ import { cssImage } from "@/utils/content-utils";
 
 export default {
     name: "BroadcastMapDisplay",
-    props: ["map", "accentColor", "showMapVideo"],
+    props: ["broadcast", "map", "accentColor", "showMapVideo"],
     computed: {
         mapBackground() {
             if (!(this.map?.big_image || this.map?.image)) return {};
@@ -47,10 +48,13 @@ export default {
             return this.map.name[0];
         },
         type() {
+            if (!this.broadcast.map_settings.includes("Show mode")) return null;
             if (!this.map?.type) return null;
             return this.map.type[0];
         },
+
         mode() {
+            if (!this.broadcast.map_settings.includes("Show mode")) return null;
             if (!this.map?.mode) return null;
             return this.map.mode;
         },

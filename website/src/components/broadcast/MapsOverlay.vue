@@ -57,11 +57,7 @@ export default {
                 Control: "https://cdn.discordapp.com/attachments/855517740914573342/868230457622396928/63541654456789487695.png",
                 Spike: "https://cdn.discordapp.com/attachments/880305022716481639/883811894463447110/newspikeplant.png",
                 SpikeRush: "https://cdn.discordapp.com/attachments/880305022716481639/883809271198924840/spikerush_default.png",
-                ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png",
-                Slayer: "https://media.discordapp.net/attachments/855517740914573342/913747752729595904/slayer.png",
-                Strongholds: "https://media.discordapp.net/attachments/855517740914573342/913747753086107668/strongholds.png",
-                CTF: "https://media.discordapp.net/attachments/855517740914573342/913747753392304158/ctf.png",
-                Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png"
+                ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png"
             };
             // if (!this.match?.maps) {
             //     const maps = [];

@@ -22,6 +22,7 @@ const PlayerBrands = () => import("@/views/sub-views/PlayerBrands");
 const MatchEditor = () => import("@/components/website/dashboard/MatchEditor");
 const PlayerParticipation = () => import("@/views/sub-views/PlayerParticipation");
 const Me = () => import("@/views/Me");
+const PlayerBannerCreator = () => import("@/views/sub-views/PlayerBannerCreator");
 
 export default [
     {
@@ -56,7 +57,8 @@ export default [
             { path: "matches", component: PlayerMatches },
             { path: "played-matches", component: PlayerPlayedMatches },
             { path: "brands", component: PlayerBrands },
-            { path: "participation", component: PlayerParticipation }
+            { path: "participation", component: PlayerParticipation },
+            { path: "banner", component: PlayerBannerCreator }
         ]
     },
     {

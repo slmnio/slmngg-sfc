@@ -16,6 +16,7 @@ import News from "@/views/News";
 import DetailedMatch from "@/views/DetailedMatch";
 import MatchVOD from "@/views/sub-views/MatchVOD";
 import MatchHistory from "@/views/sub-views/MatchHistory";
+import PlayerBannerCreator from "@/views/sub-views/PlayerBannerCreator";
 
 export default [
     {
@@ -47,7 +48,8 @@ export default [
             { path: "casts", component: PlayerCasts },
             { path: "news", component: PlayerNews },
             { path: "matches", component: PlayerMatches },
-            { path: "played-matches", component: PlayerPlayedMatches }
+            { path: "played-matches", component: PlayerPlayedMatches },
+            { path: "banner", component: PlayerBannerCreator }
         ]
     },
     {

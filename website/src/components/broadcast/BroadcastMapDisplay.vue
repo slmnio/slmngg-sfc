@@ -13,11 +13,9 @@
                 </div>
                 <div class="gel-text" v-if="map && map.draw">DRAW</div>
             </div>
-            <div class="map-lower" :style="accent">
-                <span class="industry-align">{{ name }} <br />
-                <div v-if="mode" class="map-lower-lower">{{mode}}</div>
-                <div v-else-if="type" class="map-lower-lower">{{type}}</div>
-                </span>
+            <div class="map-lower flex-center flex-column" :style="accent">
+                <div class="map-lower-name"><span class="industry-align">{{ name }}</span></div>
+                <div class="map-lower-type" v-if="type"><span class="industry-align">{{ type }}</span></div>
             </div>
         </div>
     </div>
@@ -49,13 +47,9 @@ export default {
         },
         type() {
             if (!this.broadcast?.map_settings?.includes("Show mode")) return null;
-            if (!this.map?.type) return null;
-            return this.map.type[0];
-        },
-
-        mode() {
-            if (!this.broadcast?.map_settings?.includes("Show mode")) return null;
-            if (!this.map?.mode) return null;
+            // Do the map specific name first, then the map data first
+            if (this.map?.mode) return this.map.mode; // Custom map instance text
+            if (this.map?.type?.length) return this.map.type[0]; // Map data (.map.type is a rollup from Airtable)
             return this.map.mode;
         },
         accent() {
@@ -95,20 +89,20 @@ export default {
         filter: grayscale(1);
     }
     .map-lower {
-        font-size: 30px;
+        font-size: 36px;
         text-align: center;
         padding: 10px 5px;
         line-height: 1;
         min-height: 100px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+
+        /* default */
+        background-color: #333333;
+        color: #ffffff;
     }
-    .map-lower-lower {
-        font-size: 15px;
+    .map-lower-type {
+        font-size: 0.6em;
         text-align: center;
-        font-weight: 100;
-        padding: 5px;
+        padding-top: 0.25em;
     }
     .map-main {
         z-index: 2;

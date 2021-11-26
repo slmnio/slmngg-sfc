@@ -13,8 +13,9 @@
                 </div>
                 <div class="gel-text" v-if="map && map.draw">DRAW</div>
             </div>
-            <div class="map-lower" :style="accent">
-                <span class="industry-align">{{ name }}</span>
+            <div class="map-lower flex-center flex-column" :style="accent">
+                <div class="map-lower-name"><span class="industry-align">{{ name }}</span></div>
+                <div class="map-lower-type" v-if="type"><span class="industry-align">{{ type }}</span></div>
             </div>
         </div>
     </div>
@@ -24,9 +25,10 @@
 import { logoBackground } from "@/utils/theme-styles";
 import { cssImage } from "@/utils/content-utils";
 
+
 export default {
     name: "BroadcastMapDisplay",
-    props: ["map", "accentColor", "showMapVideo"],
+    props: ["broadcast", "map", "accentColor", "showMapVideo"],
     computed: {
         mapBackground() {
             if (!(this.map?.big_image || this.map?.image)) return {};
@@ -42,6 +44,13 @@ export default {
         name() {
             if (!this.map?.name) return null;
             return this.map.name[0];
+        },
+        type() {
+            if (!this.broadcast?.map_settings?.includes("Show mode")) return null;
+            // Do the map specific name first, then the map data first
+            if (this.map?.mode) return this.map.mode; // Custom map instance text
+            if (this.map?.type?.length) return this.map.type[0]; // Map data (.map.type is a rollup from Airtable)
+            return this.map.mode;
         },
         accent() {
             if (!this.accentColor) return {};
@@ -80,14 +89,20 @@ export default {
         filter: grayscale(1);
     }
     .map-lower {
-        font-size: 30px;
+        font-size: 36px;
         text-align: center;
         padding: 10px 5px;
         line-height: 1;
-        min-height: 85px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        min-height: 100px;
+
+        /* default */
+        background-color: #333333;
+        color: #ffffff;
+    }
+    .map-lower-type {
+        font-size: 0.6em;
+        text-align: center;
+        padding-top: 0.25em;
     }
     .map-main {
         z-index: 2;

@@ -48,13 +48,13 @@ export default {
             return this.map.name[0];
         },
         type() {
-            if (!this.broadcast.map_settings.includes("Show mode")) return null;
+            if (!this.broadcast?.map_settings?.includes("Show mode")) return null;
             if (!this.map?.type) return null;
             return this.map.type[0];
         },
 
         mode() {
-            if (!this.broadcast.map_settings.includes("Show mode")) return null;
+            if (!this.broadcast?.map_settings?.includes("Show mode")) return null;
             if (!this.map?.mode) return null;
             return this.map.mode;
         },

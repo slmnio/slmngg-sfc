@@ -5,7 +5,10 @@ async function addToBuffer(id) {
     return store.commit("addToRequestBuffer", id);
 }
 export function getDataServerAddress() {
-    console.log("[data server address]", window.location.hostname);
+    console.log("[data server address]", window.location.hostname, process.env.VUE_APP_DATA_SERVER);
+    // can override this with .env.development etc
+    if (process.env.VUE_APP_DATA_SERVER) return process.env.VUE_APP_DATA_SERVER;
+
     if (process.env.VUE_APP_DEPLOY_MODE === "local") {
         return `//${window.location.hostname}:8901`;
     }

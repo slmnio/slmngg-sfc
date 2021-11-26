@@ -11,7 +11,7 @@ const routes = require("./routes.js");
 // const autodis = require("./discord/autodis.js");
 // const bpl3 = require("./bpl3.js");
 
-let domains = ["slmn.gg", "localslmn", "localhost"].map(d => new RegExp(`(?:^|.*\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
+let domains = (process.env.CORS_VALID_DOMAINS || "slmn.gg,localhost").split(/, */g).map(d => new RegExp(`(?:^|.*\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
 
 function corsHandle(origin, callback) {
     if (!origin) return callback(null);

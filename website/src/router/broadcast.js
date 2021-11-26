@@ -20,9 +20,15 @@ import AdReadOverlay from "@/components/broadcast/AdReadOverlay";
 import SyncerOverlay from "@/components/broadcast/SyncerOverlay";
 import LogoAdOverlay from "@/components/broadcast/LogoAdOverlay";
 import HistoryOverlay from "@/components/broadcast/HistoryOverlay";
+import CamsOverlay from "@/components/broadcast/CamsOverlay";
+import CamOverlay from "@/components/broadcast/CamOverlay";
+import DeskCamsOverlay from "@/components/broadcast/DeskCamsOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
+    { path: "cams", component: CamsOverlay, props: route => ({ buffer: route.query.buffer || route.query.delay, bitrate: route.query.bitrate }) },
+    { path: "desk-cams", component: DeskCamsOverlay, props: route => ({ buffer: route.query.buffer || route.query.delay, bitrate: route.query.bitrate }) },
+    { path: "pov", component: CamOverlay, props: route => ({ number: route.query.number || route.query.player, buffer: route.query.buffer || route.query.delay, bitrate: route.query.bitrate }) },
     { path: "break", component: BreakOverlay },
     { path: "syncer", component: SyncerOverlay },
     { path: "break-bar", component: BreakBarOverlay },

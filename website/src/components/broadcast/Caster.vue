@@ -1,16 +1,8 @@
 <template>
     <div class="caster flex-center flex-column" :style="themeColor">
         <div class="caster-cam-box flex-center">
-            <transition mode="out-in" name="fade">
-                <div class="caster-cam-wrapper" v-if="cam">
-                    <iframe class="caster-frame" :src="cam"></iframe>
-                </div>
-            </transition>
-            <transition mode="out-in" name="fade">
-                <div class="caster-bg flex-center" v-if="!cam">
-                    <div class="caster-avatar" :style="avatar"></div>
-                </div>
-            </transition>
+            <CasterCam class="caster-cam-wrapper" :guest="liveGuestData" :disableVideo="disableVideo" :color="color">
+            </CasterCam>
         </div>
         <transition mode="out-in" name="fade">
             <div class="caster-lower flex-center" :key="`${name}-${twitter}`" v-if="name">
@@ -26,9 +18,12 @@
 </template>
 
 <script>
+import CasterCam from "@/components/broadcast/CasterCam";
+
 export default {
     name: "Caster",
     props: ["caster", "guest", "color", "disableVideo"],
+    components: { CasterCam },
     computed: {
         player() {
             return this.caster || this.guest.player;
@@ -46,11 +41,7 @@ export default {
             if (this.disableVideo) return false;
             if (!this.liveGuestData?.cam_code) return false;
             if (!this.liveGuestData.use_cam) return false;
-            return this.liveGuestData.cam_code.includes("http") ? `${this.liveGuestData.cam_code}&z=04&mute` : `https://feeds.production.slmn.io/?view=${this.liveGuestData.cam_code}&z=04&mute`;
-        },
-        avatar() {
-            if (!this.liveGuestData) return {};
-            return { backgroundImage: `url(${this.liveGuestData.avatar})` };
+            return this.liveGuestData.cam_code.includes("http") ? `${this.liveGuestData.cam_code}&z=04&mute` : `https://cams.prod.slmn.gg/?view=${this.liveGuestData.cam_code}&z=04&mute`;
         },
         name() {
             return this.caster?.name || this.guest?.name;
@@ -117,11 +108,6 @@ export default {
         transform: translate(0, -.0925em);
     }
 
-    iframe {
-        border: none;
-        width: 100%;
-        height: 100%;
-    }
     .caster-cam-box {
         position: relative;
     }
@@ -129,30 +115,5 @@ export default {
         width: calc(var(--caster-height) * (16 / 9));
         height: 100%;
         position: absolute;
-    }
-    .caster-frame {
-        --oversize: 5%;
-        width: calc(100% + var(--oversize));
-        height: calc(100% + var(--oversize));
-        position: absolute;
-        left: calc(var(--oversize) * -0.5);
-        top: calc(var(--oversize) * -0.5);
-    }
-    .caster-cam-wrapper, .caster-bg {
-        background-color: rgba(0,0,0,0.5);
-    }
-    .caster-bg {
-        width: 100%;
-        height: 100%;
-    }
-    .caster-avatar {
-        width: calc(var(--caster-width) * 0.3);
-        height: calc(var(--caster-width) * 0.3);
-        position: absolute;
-        border-radius: 50%;
-        box-shadow: 0 0 8px 0 black;
-        background-size: cover;
-        transform: translate(0, -10%);
-        transition: all .4s ease;
     }
 </style>

@@ -6,7 +6,7 @@ const http = require("http").Server(app);
 const cors = require("cors");
 const meta = require("./meta.js");
 const routes = require("./routes.js");
-// const staff = require("./discord/staff.js");
+const staff = require("./discord/staff.js");
 // const api = require("./api/level_1.js");
 // const autodis = require("./discord/autodis.js");
 // const bpl3 = require("./bpl3.js");
@@ -34,12 +34,12 @@ function corsHandle(origin, callback) {
 
 const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials: true}, allowEIO3: true});
 
-const auction = require("./discord/new_auction.js")({
-    to: (...a) => io.to(...a),
-    emit: (...a) => io.emit(...a),
-    on: (...a) => io.on(...a),
-    test: ["hi"]
-});
+// const auction = require("./discord/new_auction.js")({
+//     to: (...a) => io.to(...a),
+//     emit: (...a) => io.emit(...a),
+//     on: (...a) => io.on(...a),
+//     test: ["hi"]
+// });
 
 
 const Cache = (require("./cache.js")).setup(io);

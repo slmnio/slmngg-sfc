@@ -2,7 +2,7 @@
 
 const client = require("./client.js");
 const Airtable = require("airtable");
-const { MessageEmbed } = require("discord.js");
+const { MessageEmbed, Permissions } = require("discord.js");
 const airtable = new Airtable({apiKey: process.env.AIRTABLE_KEY});
 const base = airtable.base("appQd7DO7rDiMUIEj");
 
@@ -19,6 +19,7 @@ function deAirtable(obj) {
 
 
 async function setupEvent(event) {
+    console.log(`[events] Setting up ${event.name}`);
     const guild = await client.guilds.fetch(process.env.STAFFAPPS_GUILD_ID);
     if (!guild) return console.error("No guild found whilst setting up event.");
     const category = await guild.channels.fetch(process.env.STAFFAPPS_CATEGORY_ID);
@@ -315,6 +316,41 @@ async function checkAndSetupEvent() {
 
 checkAndSetupEvent();
 setInterval(checkAndSetupEvent, 20 * 1000);
+
+
+async function checkForEventsToEmpty() {
+    try {
+        let [event] = await base("Events").select({
+            "view": "Events to empty roles",
+            "maxRecords": 1
+        }).all();
+        if (!event) return;
+        await emptyEmptyRoles(deAirtable(event));
+    } catch (e) {
+        console.error(e);
+    }
+}
+async function emptyEmptyRoles(event) {
+    const guild = await client.guilds.fetch(process.env.STAFFAPPS_GUILD_ID);
+    if (!guild) return console.error("No guild found whilst setting up event.");
+    // Load members into cache
+    await guild.members.list({ limit: 1000 });
+
+    let checkRoles = guild.roles.cache.filter(r => r.name !== "@everyone" && r.members.size !== 0);
+
+    if (checkRoles.length === 0) return console.warn("Didn't want to empty roles - all roles appear to be empty");
+
+    let eligibleRoles = guild.roles.cache.filter(r => r.name.startsWith(event.prefix) && r.members.size === 0);
+    console.log(`Deleting these roles from [${guild.id}] ${guild.name}`);
+    eligibleRoles.forEach(r => console.log(`${r.id}\t${r.name}\t${r.members.size}`));
+
+    await base("Events").update(event.id, { "Wipe empty roles": false });
+
+    await Promise.all(eligibleRoles.map(r => r.delete()));
+}
+checkForEventsToEmpty();
+setInterval(checkForEventsToEmpty, 20 * 1000);
+
 
 async function checkForApplications() {
     let [application] = await base("Staff Applications").select({

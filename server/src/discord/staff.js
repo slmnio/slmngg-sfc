@@ -7,6 +7,7 @@ const airtable = new Airtable({apiKey: process.env.AIRTABLE_KEY});
 const base = airtable.base("appQd7DO7rDiMUIEj");
 
 const { MapHandler } = require("./managers.js");
+const { log } = require("./slmngg-log.js");
 
 function deAirtable(obj) {
     const data = {};
@@ -20,6 +21,7 @@ function deAirtable(obj) {
 
 async function setupEvent(event) {
     console.log(`[events] Setting up ${event.name}`);
+    log(`Setting up new event: **${event.name}**.`);
     const guild = await client.guilds.fetch(process.env.STAFFAPPS_GUILD_ID);
     if (!guild) return console.error("No guild found whilst setting up event.");
     const category = await guild.channels.fetch(process.env.STAFFAPPS_CATEGORY_ID);
@@ -341,8 +343,8 @@ async function emptyEmptyRoles(event) {
     if (checkRoles.length === 0) return console.warn("Didn't want to empty roles - all roles appear to be empty");
 
     let eligibleRoles = guild.roles.cache.filter(r => r.name.startsWith(event.prefix) && r.members.size === 0);
-    console.log(`Deleting these roles from [${guild.id}] ${guild.name}`);
-    eligibleRoles.forEach(r => console.log(`${r.id}\t${r.name}\t${r.members.size}`));
+
+    log(`Requested empty role deletion for **${event.name}**. The roles were:\n\`\`\`${eligibleRoles.map(r => `${r.id} - ${r.name}`)}\`\`\``);
 
     await base("Events").update(event.id, { "Wipe empty roles": false });
 
@@ -420,6 +422,7 @@ async function sendApplicationMessage(application) {
         "Notification Message ID": message.id
     });
     await message.react(APPLICATION_APPROVE_EMOJI);
+    log(`**Applications**: New application from **${ application.name }** for **${ application.event.name }**.`);
 }
 
 client.on("messageReactionAdd", async (reaction, user) => {
@@ -493,6 +496,7 @@ async function onApplicationApproved(application, message, approver) {
                 }
             ]
         }]});
+        log(`**Applications**: Couldn't autorole **${application.discord_tag}**${approver ? ` (approved by **${approver}**)` : ""}`);
         return console.error("Can't find member to auto give roles");
     }
 
@@ -533,6 +537,7 @@ async function onApplicationApproved(application, message, approver) {
                 "icon_url": "https://cdn.discordapp.com/attachments/485493459357007876/880277441392828486/check-mark-button_2705.png"
             }
         }]});
+        log(`**Applications**: **${application.name}** approved for **${event.name}** ${approver ? ` by **${approver}**` : ""}`);
         setTimeout(() => {
             message.delete();
         }, 10 * 1000);

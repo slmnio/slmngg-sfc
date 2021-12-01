@@ -537,7 +537,7 @@ async function onApplicationApproved(application, message, approver) {
                 "icon_url": "https://cdn.discordapp.com/attachments/485493459357007876/880277441392828486/check-mark-button_2705.png"
             }
         }]});
-        log(`**Applications**: **${application.name}** approved for **${event.name}** ${approver ? ` by **${approver}**` : ""}`);
+        log(`**Applications**: **${application.name}** approved for **${event.name}**${approver ? ` by **${approver}**` : ""}.`);
         setTimeout(() => {
             message.delete();
         }, 10 * 1000);

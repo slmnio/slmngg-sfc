@@ -82,10 +82,10 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import Countdown from "@/components/broadcast/Countdown";
 import { cssImage } from "@/utils/content-utils";
-import BreakMatch from "@/components/broadcast/BreakMatch";
+import BreakMatch from "@/components/broadcast/break/BreakMatch";
 import { themeBackground1 } from "@/utils/theme-styles";
 import Sponsors from "@/components/broadcast/Sponsors";
-import Bracket from "@/components/website/Bracket";
+import Bracket from "@/components/website/bracket/Bracket";
 import { sortMatches } from "@/utils/sorts";
 
 export default {

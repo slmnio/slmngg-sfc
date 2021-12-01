@@ -25,8 +25,8 @@
 
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
-import ScheduleMatch from "@/components/website/ScheduleMatch";
-import TimezoneSwapper from "@/components/website/TimezoneSwapper";
+import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
+import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 
 export default {
     name: "EventSchedule",

@@ -11,7 +11,7 @@
 
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
-import Caster from "@/components/broadcast/Caster";
+import Caster from "@/components/broadcast/desk/Caster";
 
 export default {
     name: "PodcastOverlay",

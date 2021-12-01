@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import GenericOverlay from "@/components/broadcast/GenericOverlay";
+import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import BroadcastMapDisplay from "@/components/broadcast/BroadcastMapDisplay";
 export default {

@@ -8,9 +8,9 @@
 </template>
 
 <script>
-import GenericOverlay from "@/components/broadcast/GenericOverlay";
+import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import Bracket from "@/components/website/Bracket";
+import Bracket from "@/components/website/bracket/Bracket";
 export default {
     name: "BracketOverlay",
     components: { Bracket, GenericOverlay },

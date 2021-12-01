@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import BracketTeam from "@/components/website/BracketTeam";
+import BracketTeam from "@/components/website/bracket/BracketTeam";
 import { url } from "@/utils/content-utils";
 import store from "@/thing-store";
 

@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import CasterCam from "@/components/broadcast/CasterCam";
+import CasterCam from "@/components/broadcast/desk/CasterCam";
 
 export default {
     name: "Caster",

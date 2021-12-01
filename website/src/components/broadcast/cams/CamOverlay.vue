@@ -10,7 +10,7 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { themeBackground1 } from "@/utils/theme-styles";
-import CasterCam from "@/components/broadcast/CasterCam";
+import CasterCam from "@/components/broadcast/desk/CasterCam";
 
 export default {
     name: "CamOverlay",

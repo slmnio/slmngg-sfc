@@ -22,7 +22,7 @@
 <script>
 import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { getImage, multiImage, url } from "@/utils/content-utils";
-import NewsHeader from "@/components/website/NewsHeader";
+import NewsHeader from "@/components/website/news/NewsHeader";
 import Markdown from "@/components/website/Markdown";
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 import { themeBackground } from "@/utils/theme-styles";

@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import GenericOverlay from "@/components/broadcast/GenericOverlay";
+import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { cssImage } from "@/utils/content-utils";
 import TeamMatchHistory from "@/components/broadcast/TeamMatchHistory";

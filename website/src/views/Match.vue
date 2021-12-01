@@ -59,8 +59,8 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import MatchHero from "@/components/website/MatchHero";
-import MatchScore from "@/components/website/MatchScore";
+import MatchHero from "@/components/website/match/MatchHero";
+import MatchScore from "@/components/website/match/MatchScore";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
 import { getMatchContext, multiImage, url } from "@/utils/content-utils";
 

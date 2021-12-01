@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import TeamMapStats from "@/components/website/TeamMapStats";
+import TeamMapStats from "@/components/website/match/TeamMapStats";
 
 export default {
     name: "MatchMapHistory",

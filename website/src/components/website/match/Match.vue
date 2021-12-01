@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import MatchThumbnail from "@/components/website/MatchThumbnail";
+import MatchThumbnail from "@/components/website/match/MatchThumbnail";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { getMatchContext, url } from "@/utils/content-utils";
 

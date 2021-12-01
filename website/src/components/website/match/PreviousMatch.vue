@@ -14,7 +14,7 @@
 
 <script>
 import { cssImage, url } from "@/utils/content-utils";
-import MapDisplay from "@/components/website/MapDisplay";
+import MapDisplay from "@/components/website/match/MapDisplay";
 import { logoBackground1 } from "@/utils/theme-styles";
 
 export default {

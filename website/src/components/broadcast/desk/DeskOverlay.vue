@@ -16,8 +16,8 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { cssImage } from "@/utils/content-utils";
 import TourneyBar from "@/components/broadcast/TourneyBar";
-import Caster from "@/components/broadcast/Caster";
-import DeskMatch from "@/components/broadcast/DeskMatch";
+import Caster from "@/components/broadcast/desk/Caster";
+import DeskMatch from "@/components/broadcast/desk/DeskMatch";
 import { themeBackground1 } from "@/utils/theme-styles";
 
 export default {

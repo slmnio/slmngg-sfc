@@ -133,12 +133,12 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import MapDisplay from "@/components/website/MapDisplay";
+import MapDisplay from "@/components/website/match/MapDisplay";
 import { cssImage, getRoleSVG, multiImage, url } from "@/utils/content-utils";
 import { logoBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo";
-import PreviousMatch from "@/components/website/PreviousMatch";
-import DetailedMatchStat from "@/components/website/DetailedMatchStat";
+import PreviousMatch from "@/components/website/match/PreviousMatch";
+import DetailedMatchStat from "@/components/website/match/DetailedMatchStat";
 import Markdown from "@/components/website/Markdown";
 
 export default {

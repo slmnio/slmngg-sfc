@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import CasterCam from "@/components/broadcast/CasterCam";
+import CasterCam from "@/components/broadcast/desk/CasterCam";
 import { ReactiveArray } from "@/utils/reactive";
 import { logoBackground1 } from "@/utils/theme-styles";
 

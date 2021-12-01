@@ -11,7 +11,7 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import TeamCamsGroup from "@/components/broadcast/TeamCamsGroup";
+import TeamCamsGroup from "@/components/broadcast/cams/TeamCamsGroup";
 
 export default {
     name: "CamsOverlay",

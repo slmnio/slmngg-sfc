@@ -8,8 +8,8 @@
 </template>
 
 <script>
-import GenericOverlay from "@/components/broadcast/GenericOverlay";
-import TeamCamsGroup from "@/components/broadcast/TeamCamsGroup";
+import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
+import TeamCamsGroup from "@/components/broadcast/cams/TeamCamsGroup";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export default {

@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import DeskTeam from "@/components/broadcast/DeskTeam";
+import DeskTeam from "@/components/broadcast/desk/DeskTeam";
 export default {
     name: "DeskMatch",
     components: { DeskTeam },

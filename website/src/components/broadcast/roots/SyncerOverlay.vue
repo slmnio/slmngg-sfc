@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import IngameOverlay from "@/components/broadcast/IngameOverlay";
+import IngameOverlay from "@/components/broadcast/roots/IngameOverlay";
 export default {
     name: "SyncerOverlay",
     components: { IngameOverlay },

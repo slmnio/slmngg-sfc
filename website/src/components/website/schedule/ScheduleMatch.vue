@@ -37,7 +37,7 @@
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { url } from "@/utils/content-utils";
-import ScheduleTime from "@/components/website/ScheduleTime";
+import ScheduleTime from "@/components/website/schedule/ScheduleTime";
 
 export default {
     name: "ScheduleMatch",

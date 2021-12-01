@@ -54,17 +54,17 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import BreakMatch from "@/components/broadcast/BreakMatch";
+import BreakMatch from "@/components/broadcast/break/BreakMatch";
 import { cssImage } from "@/utils/content-utils";
 import { sortMatches } from "@/utils/sorts";
 import Sponsors from "@/components/broadcast/Sponsors";
 import Standings from "@/components/broadcast/Standings";
 import Countdown from "@/components/broadcast/Countdown";
-import Bracket from "@/components/website/Bracket";
+import Bracket from "@/components/website/bracket/Bracket";
 import BroadcastPreview from "@/components/broadcast/BroadcastPreview";
-import BreakHeadlines from "@/components/broadcast/BreakHeadlines";
+import BreakHeadlines from "@/components/broadcast/break/BreakHeadlines";
 import { themeBackground1 } from "@/utils/theme-styles";
-import BreakStaffList from "@/components/broadcast/BreakStaffList";
+import BreakStaffList from "@/components/broadcast/break/BreakStaffList";
 
 const tickTime = 25;
 

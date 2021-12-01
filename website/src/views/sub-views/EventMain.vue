@@ -33,7 +33,7 @@
 <script>
 import ContentThing from "@/components/website/ContentThing";
 import ContentRow from "@/components/website/ContentRow";
-import News from "@/components/website/News";
+import News from "@/components/website/news/News";
 
 export default {
     name: "EventMain",

@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import BracketMatch from "@/components/website/BracketMatch";
+import BracketMatch from "@/components/website/bracket/BracketMatch";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import Store from "@/thing-store";
 

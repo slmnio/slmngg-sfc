@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import NewsThumbnail from "@/components/website/NewsThumbnail";
+import NewsThumbnail from "@/components/website/news/NewsThumbnail";
 import { url } from "@/utils/content-utils";
 import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {

@@ -35,6 +35,7 @@ export default [
             number: route.query.number || route.query.player,
             buffer: route.query.buffer || route.query.delay,
             bitrate: route.query.bitrate,
+            scale: route.query.scale,
             full: !!route.query.full || !!route.query.relay,
             alwaysShow: !!route.query.alwaysShow || !!route.query.relay,
             relay: !!route.query.relay

@@ -2,7 +2,8 @@
     <GenericOverlay class="desk-cams-overlay" :title="title || 'Player Cams'" :accent-color="accentColor">
         <div class="team-cams flex-center w-100 flex-column">
             <TeamCamsGroup v-for="(team, ti) in teams" v-bind:key="team.id"
-                           :team="team" :guests="guests[ti]" :params="params" :event="broadcast && broadcast.event" />
+                           :team="team" :guests="guests[ti]" :params="params" :event="broadcast && broadcast.event"
+            :relay-prefix="relayPrefix" :ti="ti"/>
         </div>
     </GenericOverlay>
 </template>
@@ -19,6 +20,9 @@ export default {
         GenericOverlay, TeamCamsGroup
     },
     computed: {
+        relayPrefix() {
+            return this.broadcast?.cams_relay_prefix;
+        },
         match() {
             if (!this.broadcast || !this.broadcast.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {

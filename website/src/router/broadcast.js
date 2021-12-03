@@ -28,7 +28,17 @@ export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
     { path: "cams", component: CamsOverlay, props: route => ({ buffer: route.query.buffer || route.query.delay, bitrate: route.query.bitrate }) },
     { path: "desk-cams", component: DeskCamsOverlay, props: route => ({ buffer: route.query.buffer || route.query.delay, bitrate: route.query.bitrate }) },
-    { path: "pov", component: CamOverlay, props: route => ({ number: route.query.number || route.query.player, buffer: route.query.buffer || route.query.delay, bitrate: route.query.bitrate }) },
+    {
+        path: "pov",
+        component: CamOverlay,
+        props: route => ({
+            number: route.query.number || route.query.player,
+            buffer: route.query.buffer || route.query.delay,
+            bitrate: route.query.bitrate,
+            full: !!route.query.full,
+            alwaysShow: !!route.query.alwaysShow || !!route.query.full
+        })
+    },
     { path: "break", component: BreakOverlay },
     { path: "syncer", component: SyncerOverlay },
     { path: "break-bar", component: BreakBarOverlay },

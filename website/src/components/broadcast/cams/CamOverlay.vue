@@ -1,6 +1,6 @@
 <template>
     <div class="cam-overlay">
-        <div class="guest" v-if="activeGuest && activeGuest.use_cam" :style="theme">
+        <div class="guest" v-bind:class="{ full }" v-if="shouldShow" :style="theme">
             <CasterCam class="team-cam" :guest="activeGuest" :extra-params="params" :disable-video="false"
                        :event="broadcast && broadcast.event" />
         </div>
@@ -14,9 +14,16 @@ import CasterCam from "@/components/broadcast/desk/CasterCam";
 
 export default {
     name: "CamOverlay",
-    props: ["broadcast", "bitrate", "buffer", "number"],
+    props: ["broadcast", "bitrate", "buffer", "number", "full", "alwaysShow"],
     components: { CasterCam },
     computed: {
+        shouldShow() {
+            if (this.alwaysShow) {
+                return this.activeGuest; // needs at least a guest
+            } else {
+                return this.activeGuest?.use_cam;
+            }
+        },
         match() {
             if (!this.broadcast || !this.broadcast.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
@@ -105,5 +112,22 @@ export default {
     .guest >>> .caster-bg,
     .guest >>> .caster-cam-wrapper {
         background-color: rgba(0,0,0,0.3)
+    }
+
+
+    .guest.full {
+        left: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        transform: none;
+        border-bottom: none;
+        border-radius: 0;
+        --caster-width: 100vw;
+    }
+    .guest.full >>> .caster-cam-wrapper {
+        transform: none;
+        height: 100%;
+        width: 100%;
     }
 </style>

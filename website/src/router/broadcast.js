@@ -35,8 +35,9 @@ export default [
             number: route.query.number || route.query.player,
             buffer: route.query.buffer || route.query.delay,
             bitrate: route.query.bitrate,
-            full: !!route.query.full,
-            alwaysShow: !!route.query.alwaysShow || !!route.query.full
+            full: !!route.query.full || !!route.query.relay,
+            alwaysShow: !!route.query.alwaysShow || !!route.query.relay,
+            relay: !!route.query.relay
         })
     },
     { path: "break", component: BreakOverlay },

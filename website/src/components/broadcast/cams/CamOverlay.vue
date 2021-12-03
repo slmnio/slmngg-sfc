@@ -2,7 +2,7 @@
     <div class="cam-overlay">
         <div class="guest" v-bind:class="{ full }" v-if="shouldShow" :style="theme">
             <CasterCam class="team-cam" :guest="activeGuest" :extra-params="params" :disable-video="false"
-                       :event="broadcast && broadcast.event" />
+                       :event="broadcast && broadcast.event" :relay-prefix="relayPrefix" />
         </div>
     </div>
 </template>
@@ -14,7 +14,7 @@ import CasterCam from "@/components/broadcast/desk/CasterCam";
 
 export default {
     name: "CamOverlay",
-    props: ["broadcast", "bitrate", "buffer", "number", "full", "alwaysShow"],
+    props: ["broadcast", "bitrate", "buffer", "number", "full", "alwaysShow", "relay"],
     components: { CasterCam },
     computed: {
         shouldShow() {
@@ -23,6 +23,12 @@ export default {
             } else {
                 return this.activeGuest?.use_cam;
             }
+        },
+        relayPrefix() {
+            if (this.relay) return null; // this page is what we're relaying from - show original feed
+            if (!this.broadcast?.cams_relay_prefix) return null;
+            // this.number will change if teams swap, but that should be fine?
+            return `${this.broadcast?.cams_relay_prefix}${this.number}`;
         },
         match() {
             if (!this.broadcast || !this.broadcast.live_match) return null;
@@ -71,7 +77,22 @@ export default {
                 ...theme,
                 borderColor: theme.backgroundColor
             };
+        },
+        title() {
+            let str = "";
+            if (this.relay) {
+                str += "Relay: ";
+            } else {
+                str += "POV: ";
+            }
+            str += this.number;
+            return str;
         }
+    },
+    metaInfo() {
+        return {
+            title: this.title
+        };
     }
 };
 </script>

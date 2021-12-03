@@ -17,7 +17,7 @@ import { cssImage } from "@/utils/content-utils";
 
 export default {
     name: "CasterCam",
-    props: ["guest", "disableVideo", "color", "extraParams", "fallbackAvatar", "event"],
+    props: ["guest", "disableVideo", "color", "extraParams", "fallbackAvatar", "event", "relayPrefix"],
     data: () => ({
         iframe: null,
         apiVisible: false,
@@ -37,6 +37,7 @@ export default {
             return this.guest?.use_cam || false;
         },
         streamID() {
+            if (this.relayPrefix) return this.relayPrefix;
             return this.guest?.cam_code || "";
         },
         src() {

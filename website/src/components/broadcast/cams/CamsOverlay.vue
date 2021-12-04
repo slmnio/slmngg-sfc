@@ -3,7 +3,7 @@
         <transition name="slide-in">
             <div class="team-cams" v-show="broadcast.show_cams">
                 <TeamCamsGroup :style="{ order: match.flip_teams ? +!ti : ti }" v-for="(team, ti) in teams" v-bind:key="team.id"
-                               :team="team" :guests="guests[ti]" :params="params" :event="broadcast && broadcast.event" />
+                               :team="team" :guests="guests[ti]" :params="params" :event="broadcast && broadcast.event" :relay-prefix="relayPrefix" :ti="match.flip_teams ? +!ti : ti" />
             </div>
         </transition>
     </div>
@@ -25,6 +25,9 @@ export default {
                     theme: ReactiveThing("theme")
                 })
             });
+        },
+        relayPrefix() {
+            return this.broadcast?.cams_relay_prefix;
         },
         teams() {
             if (!this.match || !this.match.teams || !this.match.teams.every(t => {

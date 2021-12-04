@@ -64,6 +64,12 @@ export default {
             console.log("click");
             this.runGroup(this.activeGroup);
         });
+        document.body.addEventListener("contextmenu", e => {
+            e.preventDefault();
+            console.log("rclick");
+            localStorage.setItem("ad-reads", "{}");
+            this.localData = {};
+        });
 
         this.localData = JSON.parse(localStorage.getItem("ad-reads") || "{}");
     },
@@ -98,7 +104,7 @@ export default {
             if (group.opening_read) {
                 await this.runAudio(group.opening_read);
                 console.log("finished opener read");
-                await wait(600);
+                await wait(400);
             }
             if (group.ad_reads?.length) {
                 let i = 0;

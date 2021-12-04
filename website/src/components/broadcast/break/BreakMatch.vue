@@ -177,6 +177,7 @@ export default {
         text-transform: uppercase;
         margin-bottom: .3em;
         line-height: 1;
+        text-align: center;
     }
 
     .match-team { flex-direction: row-reverse; justify-content: flex-end; }

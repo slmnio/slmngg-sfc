@@ -333,9 +333,14 @@ export default {
         overflow: hidden;
     }
 
-    .break-content-enter-active, .break-content-leave-active { transition: all .5s ease-in-out; overflow: hidden }
-    .break-content-enter, .break-content-leave-to { max-height: 0; padding: 0 40px; }
-    .break-content-enter-to, .break-content-leave { max-height: 100%; }
+    /*.break-content-enter-active, .break-content-leave-active { transition: all .5s ease-in-out; overflow: hidden }*/
+    /*.break-content-enter, .break-content-leave-to { max-height: 0; padding: 0 40px; }*/
+    /*.break-content-enter-to, .break-content-leave { max-height: 100%; }*/
+
+    .break-content-enter-active, .break-content-leave-active { transition: all .35s ease; overflow: hidden }
+    .break-content-enter { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); }
+    .break-content-leave-to { clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); }
+    .break-content-enter-to, .break-content-leave { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
 
     .overlay[data-broadcast="resurge-4v4"] .break-main {
         margin-top: 50px;

@@ -132,20 +132,27 @@ export default {
 
     .mid-split-enter-active {
         overflow: hidden;
-        will-change: max-width;
-        transition: max-width 500ms var(--reversedCurve);
+        max-width: 100%;
+        transition: all 400ms var(--reversedCurve);
     }
     .mid-split-leave-active {
         overflow: hidden;
-        will-change: max-width;
-        transition: max-width 500ms var(--originalCurve);
+        max-width: 100%;
+        transition: all 400ms var(--originalCurve);
     }
-    .mid-split-enter, .mid-split-leave-to { max-width: 0; }
-    .mid-split-enter-to, .mid-split-leave { max-width: 100%; }
+    .mid-split-enter, .mid-split-leave-to {
+        /*clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);*/
+        clip-path: polygon(0% 0%, 0% 100%, 0% 100%, 0% 0, 100% 0, 100% 100%, 100% 100%, 100% 0%);
+    }
+    .mid-split-enter-to, .mid-split-leave {
+        /*clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);*/
+        clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 100% 100%, 100% 0%);
+    }
 
 
     .caster-bg {
         width: 100%;
+        width: min(var(--caster-width), 100%);
         height: 100%;
         position: absolute;
         top: 0;

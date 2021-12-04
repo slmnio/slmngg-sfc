@@ -56,7 +56,7 @@ export default {
             return _teams;
         },
         params() {
-            return `&cover&scale=${this.scale || 20}&bitrate=${this.bitrate || 500}&buffer=${this.buffer || 0}`;
+            return `&cover&scale=${this.scale || 100}&bitrate=${this.bitrate || 500}&buffer=${this.buffer || 0}`;
         },
         activeGuest() {
             if (this.number >= 7) {

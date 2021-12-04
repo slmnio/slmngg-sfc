@@ -15,7 +15,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "DeskCamsOverlay",
-    props: ["title", "broadcast", "bitrate", "buffer"],
+    props: ["title", "broadcast", "bitrate", "buffer", "scale"],
     components: {
         GenericOverlay, TeamCamsGroup
     },
@@ -54,7 +54,7 @@ export default {
             return _teams;
         },
         params() {
-            return `&cover&scale=20&bitrate=${this.bitrate || 500}&buffer=${this.buffer || 0}`;
+            return `&cover&scale=${this.scale || 100}&bitrate=${this.bitrate || 500}&buffer=${this.buffer || 0}`;
         }
     }
 };

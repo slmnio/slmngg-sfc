@@ -27,7 +27,7 @@ import DeskCamsOverlay from "@/components/broadcast/cams/DeskCamsOverlay";
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
     { path: "cams", component: CamsOverlay, props: route => ({ buffer: route.query.buffer || route.query.delay, bitrate: route.query.bitrate }) },
-    { path: "desk-cams", component: DeskCamsOverlay, props: route => ({ buffer: route.query.buffer || route.query.delay, bitrate: route.query.bitrate }) },
+    { path: "desk-cams", component: DeskCamsOverlay, props: route => ({ buffer: route.query.buffer || route.query.delay, bitrate: route.query.bitrate, scale: route.query.scale }) },
     {
         path: "pov",
         component: CamOverlay,

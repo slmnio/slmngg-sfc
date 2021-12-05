@@ -54,7 +54,7 @@ export default {
             return _teams;
         },
         params() {
-            return `&cover&scale=${this.scale || 100}&bitrate=${this.bitrate || 500}&buffer=${this.buffer || 0}`;
+            return `&cover&na&scale=${this.scale || 100}&bitrate=${this.bitrate || 500}&buffer=${this.buffer || 0}`;
         }
     }
 };

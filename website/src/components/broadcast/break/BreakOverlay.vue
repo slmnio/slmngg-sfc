@@ -27,8 +27,8 @@
                     <div class="break-col break-standings" v-if="automatedShow === 'Standings'" key="Standings">
                         <Standings :event="event" :stage="broadcast.current_stage" />
                     </div>
-                    <div class="break-col break-image" v-if="automatedShow === 'Image'" key="Image">
-                        <div class="break-image-inner" :style="cssImage('backgroundImage', broadcast, ['break_image'], 1080, false)"></div>
+                    <div class="break-col break-image" v-if="automatedShow === 'Image'" :key="`image-${breakImageURL}`">
+                        <div class="break-image-inner" :style="breakImage"></div>
                     </div>
                     <Bracket class="break-col break-bracket" v-if="automatedShow === 'Bracket'" key="Bracket" :event="event" :bracket="bracket" use-overlay-scale small />
                     <div class="break-col break-others" v-if="automatedShow === 'Other Broadcasts'">
@@ -89,6 +89,12 @@ export default {
     computed: {
         broadcasts() {
             return this.broadcast?.other_broadcasts || [];
+        },
+        breakImage() {
+            return cssImage("backgroundImage", this.broadcast, ["break_image"], 1080, false);
+        },
+        breakImageURL() {
+            return this.breakImage?.backgroundImage;
         },
         nextMatch() {
             if (!this.broadcast || !this.broadcast.live_match || !this.broadcast.show_live_match) return null;

@@ -46,7 +46,7 @@ export default {
                 // custom link
                 return this.streamID + (this.extraParams || "");
             }
-            return `${vdoDomain}/?view=${this.streamID}&vm` + (this.extraParams || "");
+            return `${vdoDomain}/?view=${this.streamID}&na` + (this.extraParams || "");
         },
         avatar() {
             if (!this.guest) return null;

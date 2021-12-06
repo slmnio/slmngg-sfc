@@ -38,7 +38,8 @@ export default [
             scale: route.query.scale,
             full: !!route.query.full || !!route.query.relay,
             alwaysShow: !!route.query.alwaysShow || !!route.query.relay,
-            relay: !!route.query.relay
+            relay: !!route.query.relay,
+            codec: route.query.codec
         })
     },
     { path: "break", component: BreakOverlay },

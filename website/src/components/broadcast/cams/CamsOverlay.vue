@@ -15,7 +15,7 @@ import TeamCamsGroup from "@/components/broadcast/cams/TeamCamsGroup";
 
 export default {
     name: "CamsOverlay",
-    props: ["broadcast", "bitrate", "buffer"],
+    props: ["broadcast", "bitrate", "buffer", "codec"],
     components: { TeamCamsGroup },
     computed: {
         match() {
@@ -47,7 +47,7 @@ export default {
             return _teams;
         },
         params() {
-            return `&cover&na&scale=${this.scale || 100}&bitrate=${this.bitrate || 500}&buffer=${this.buffer || 0}`;
+            return `&cover&na&scale=${this.scale || 100}&bitrate=${this.bitrate || 500}&buffer=${this.buffer || 0}${this.codec ? `&codec=${this.codec}` : ""}`;
         }
     }
 };

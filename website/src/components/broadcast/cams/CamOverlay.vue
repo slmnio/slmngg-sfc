@@ -14,7 +14,7 @@ import CasterCam from "@/components/broadcast/desk/CasterCam";
 
 export default {
     name: "CamOverlay",
-    props: ["broadcast", "bitrate", "buffer", "scale", "number", "full", "alwaysShow", "relay"],
+    props: ["broadcast", "bitrate", "buffer", "scale", "number", "full", "alwaysShow", "relay", "codec"],
     components: { CasterCam },
     computed: {
         shouldShow() {
@@ -56,7 +56,7 @@ export default {
             return _teams;
         },
         params() {
-            return `&cover&na&scale=${this.scale || 100}&bitrate=${this.bitrate || 500}&buffer=${this.buffer || 0}`;
+            return `&cover&na&scale=${this.scale || 100}&bitrate=${this.bitrate || 500}&buffer=${this.buffer || 0}${this.codec ? `&codec=${this.codec}` : ""}`;
         },
         activeGuest() {
             if (this.number >= 7) {

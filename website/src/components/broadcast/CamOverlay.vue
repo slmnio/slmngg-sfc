@@ -4,6 +4,9 @@
             <CasterCam class="team-cam" :guest="activeGuest" :extra-params="params" :disable-video="false"
                        :event="broadcast && broadcast.event" />
         </div>
+        <div class="guest-name-wrapper" :style="theme">
+            <div class="guest-name"><span>{{ "ChknNuggtGod" }}</span></div>
+        </div>
     </div>
 </template>
 

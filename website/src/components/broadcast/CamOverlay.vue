@@ -4,6 +4,8 @@
             <CasterCam class="team-cam" :guest="activeGuest" :extra-params="params" :disable-video="false"
                        :event="broadcast && broadcast.event" />
         </div>
+        <!-- TODO: Load Name from Guest based on current camera -->
+        <!-- TODO: Add a toggle in Airtable to hide or show cam name -->
         <div class="guest-name-wrapper" :style="theme">
             <div class="guest-name"><span>{{ "ChknNuggtGod" }}</span></div>
         </div>
@@ -101,6 +103,31 @@ export default {
 
     .guest {
         --caster-width: 300px;
+    }
+    .guest-name-wrapper {
+        transform: rotate(-4deg) skewX(-16.5deg);
+        position: absolute;
+        justify-content: center;
+        text-align: left;
+        line-height: 37px;
+        bottom: 60px;
+        left: 470px;
+        width: 220px;
+        height: 45px;
+        border-radius: 4px;
+        overflow: hidden;
+        border-bottom: 6px solid transparent;
+
+    }
+    .guest-name{
+        width: calc(100% + 50px);
+        height: calc(100% + 50px);
+        height: 100%;
+        background-color: rgba(0,0,0,0.3);
+        /*transform: skewX(12.5deg) translateX(-15px) rotate(4deg) scale(1.1) translateY(0.05em);*/
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 24px;
     }
     .guest >>> .caster-avatar {
         transform: translate(0, 0);

@@ -7,7 +7,7 @@
         <!-- TODO: Load Name from Guest based on current camera -->
         <!-- TODO: Add a toggle in Airtable to hide or show cam name -->
         <div class="guest-name-wrapper" :style="theme">
-            <div class="guest-name"><span>{{ "ChknNuggtGod" }}</span></div>
+            <div class="guest-name"><span>{{ activeGuest.name }}</span></div>
         </div>
     </div>
 </template>

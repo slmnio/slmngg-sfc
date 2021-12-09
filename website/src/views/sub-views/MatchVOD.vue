@@ -13,7 +13,7 @@
 
 <script>
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
-import MapDisplay from "@/components/website/MapDisplay";
+import MapDisplay from "@/components/website/match/MapDisplay";
 
 export default {
     name: "MatchVOD",

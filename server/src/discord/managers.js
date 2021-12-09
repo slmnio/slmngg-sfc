@@ -27,7 +27,7 @@ class MapObject {
         this.arrays = arrays;
         this.data = (text || "").split("\n").map(e => {
             let [key, data] = e.split("=");
-            return { key, data: arrays ? data.split(",") : data };
+            return { key, data: arrays ? (data || "").split(",") : data };
         }).filter(e => e.key);
     }
     get(key) {

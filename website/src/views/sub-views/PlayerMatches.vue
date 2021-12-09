@@ -21,7 +21,7 @@
                            :hydrated-match="match"
 -->
 <script>
-import Match from "@/components/website/Match";
+import Match from "@/components/website/match/Match";
 import { ReactiveCacheArray } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
 

@@ -35,6 +35,7 @@ function setRebuilding(isRebuilding) {
     } else {
         io.emit("server_rebuilding", false);
         console.log(`[rebuild] rebuild finished in ${(Date.now() - _rebuildStart)}ms`);
+        log(`SLMN.GG has restarted and finished rebuilding in ${(Date.now() - _rebuildStart)}ms.`);
     }
 }
 
@@ -107,6 +108,7 @@ async function processTableData(tableName, data, linkRecords = false) {
 }
 
 const customTableUpdate = require("./custom-datasets");
+const { log } = require("./discord/slmngg-log");
 
 function registerUpdater(tableName, options) {
     let pollRate = 3000;

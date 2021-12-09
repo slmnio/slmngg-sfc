@@ -52,9 +52,9 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import ThemeLogo from "@/components/website/ThemeLogo";
 import ContentThing from "@/components/website/ContentThing";
 import "bootstrap-vue/dist/bootstrap-vue.css";
-import PlayerDraftRow from "@/components/website/PlayerDraftRow";
+import PlayerDraftRow from "@/components/website/draft/PlayerDraftRow";
 import store from "@/thing-store";
-import EventDraftHeaders from "@/components/website/EventDraftHeaders";
+import EventDraftHeaders from "@/components/website/draft/EventDraftHeaders";
 import { BFormCheckbox, BFormSelect } from "bootstrap-vue";
 const { url } = require("@/utils/content-utils");
 

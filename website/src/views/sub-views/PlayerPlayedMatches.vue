@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import Match from "@/components/website/Match";
+import Match from "@/components/website/match/Match";
 import { sortMatches } from "@/utils/sorts";
 
 export default {

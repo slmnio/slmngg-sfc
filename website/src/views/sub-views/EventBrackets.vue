@@ -9,7 +9,7 @@
 
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
-import Bracket from "@/components/website/Bracket";
+import Bracket from "@/components/website/bracket/Bracket";
 
 export default {
     name: "EventBrackets",

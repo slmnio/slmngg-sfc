@@ -26,8 +26,8 @@
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { cleanID } from "@/utils/content-utils";
-import MatchMapHistory from "@/components/website/MatchMapHistory";
-import MapDisplay from "@/components/website/MapDisplay";
+import MatchMapHistory from "@/components/website/match/MatchMapHistory";
+import MapDisplay from "@/components/website/match/MapDisplay";
 
 export default {
     name: "MatchHistory",

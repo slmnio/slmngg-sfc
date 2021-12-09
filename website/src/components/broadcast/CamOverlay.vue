@@ -129,6 +129,9 @@ export default {
         font-weight: bold;
         font-size: 24px;
     }
+    .guest-name > span{
+        margin: 5px;
+    }
     .guest >>> .caster-avatar {
         transform: translate(0, 0);
     }

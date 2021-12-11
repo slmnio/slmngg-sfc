@@ -23,6 +23,7 @@ import HistoryOverlay from "@/components/broadcast/roots/HistoryOverlay";
 import CamsOverlay from "@/components/broadcast/cams/CamsOverlay";
 import CamOverlay from "@/components/broadcast/cams/CamOverlay";
 import DeskCamsOverlay from "@/components/broadcast/cams/DeskCamsOverlay";
+import StaffOverlay from "@/components/broadcast/roots/StaffOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -63,5 +64,6 @@ export default [
     { path: "branding", component: BrandingOverlay },
     { path: "auction", component: AuctionOverlay, props: route => ({ category: route.query.category }) },
     { path: "ad-read", component: AdReadOverlay, props: route => ({ extraDelay: route.query.delay }) },
-    { path: "logos", component: LogoAdOverlay }
+    { path: "logos", component: LogoAdOverlay },
+    { path: "staff", component: StaffOverlay }
 ];

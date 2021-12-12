@@ -12,12 +12,12 @@
 </template>
 
 <script>
-import { logoBackground1 } from "@/utils/theme-styles";
+import { logoBackground, logoBackground1 } from "@/utils/theme-styles";
 import { cssImage } from "@/utils/content-utils";
 
 export default {
     name: "CasterCam",
-    props: ["guest", "disableVideo", "color", "extraParams", "fallbackAvatar", "event", "relayPrefix"],
+    props: ["guest", "disableVideo", "color", "extraParams", "fallbackAvatar", "event", "relayPrefix", "team"],
     data: () => ({
         iframe: null,
         apiVisible: false,
@@ -52,9 +52,18 @@ export default {
             if (!this.guest) return null;
             if (!this.guest.avatar) {
                 if (this.fallbackAvatar) return this.fallbackAvatar;
+                console.log({
+                    guest: this.guest,
+                    event: this.event,
+                    team: this.team
+                });
                 return {
                     ...logoBackground1(this.event),
                     ...cssImage("backgroundImage", this.event?.theme, ["default_logo"], 200),
+                    ...logoBackground(this.team?.theme),
+                    ...cssImage("backgroundImage", this.team?.theme, ["default_logo"], 200),
+                    ...logoBackground(this.guest?.theme),
+                    ...cssImage("backgroundImage", this.guest?.theme, ["default_logo"], 200),
                     eventFallback: true
                 };
             }

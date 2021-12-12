@@ -63,8 +63,8 @@ export default {
         },
         guests() {
             const _teams = [
-                ReactiveArray("cams")({ cams: this.broadcast.team_1_cams || [] }),
-                ReactiveArray("cams")({ cams: this.broadcast.team_2_cams || [] })
+                ReactiveArray("cams", { theme: ReactiveThing("theme") })({ cams: this.broadcast.team_1_cams || [] }),
+                ReactiveArray("cams", { theme: ReactiveThing("theme") })({ cams: this.broadcast.team_2_cams || [] })
             ];
             if (this.match?.flip_teams) return _teams.reverse();
             return _teams;

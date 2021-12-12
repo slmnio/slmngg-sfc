@@ -5,6 +5,7 @@
             :broadcast="broadcast"
             :title="title"
             :params="stringify(paramsWithDefaults)"
+            :client="client"
         ></router-view>
     </div>
 </template>
@@ -12,7 +13,7 @@
 <script>
 export default {
     name: "CamsWrapper",
-    props: ["broadcast", "title", "params"],
+    props: ["broadcast", "title", "params", "client"],
     computed: {
         paramsWithDefaults() {
             const defaultParams = this.paramObject("bitrate=400");

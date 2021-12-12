@@ -3,7 +3,7 @@
         <div class="team-cams flex-center w-100 flex-column">
             <TeamCamsGroup v-for="(team, ti) in teams" v-bind:key="team.id"
                            :team="team" :guests="guests[ti]" :params="camParams" :event="broadcast && broadcast.event"
-            :relay-prefix="relayPrefix" :ti="ti"/>
+            :relay-prefix="relayPrefix" :ti="ti" :disable-cams="disable"/>
         </div>
     </GenericOverlay>
 </template>
@@ -20,6 +20,9 @@ export default {
         GenericOverlay, TeamCamsGroup
     },
     computed: {
+        disable() {
+            return this.broadcast?.observer_settings?.includes("Disable team cams");
+        },
         relayPrefix() {
             return this.broadcast?.cams_relay_prefix;
         },

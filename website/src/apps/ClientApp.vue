@@ -1,5 +1,5 @@
 <template>
-    <BroadcastApp v-if="broadcastID" :id="broadcastID" :title="title" />
+    <BroadcastApp v-if="broadcastID" :id="broadcastID" :title="title" :client="_client" />
 </template>
 
 <script>

@@ -1,6 +1,6 @@
 <template>
     <div class="broadcast-app">
-        <router-view id="overlay" :broadcast="broadcast" :title="title" :top="top"/>
+        <router-view id="overlay" :broadcast="broadcast" :client="client" :title="title" :top="top"/>
         <v-style v-if="broadcast && broadcast.event">
             {{ broadcast.event.broadcast_css }}
         </v-style>
@@ -12,7 +12,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "BroadcastApp",
-    props: ["id", "title", "top", "code"],
+    props: ["id", "title", "top", "code", "client"],
     computed: {
         broadcast() {
             return ReactiveRoot(this.id || `broadcast-${this.code}`, {

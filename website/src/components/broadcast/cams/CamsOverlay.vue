@@ -3,7 +3,8 @@
         <transition name="slide-in">
             <div class="team-cams" v-show="broadcast.show_cams">
                 <TeamCamsGroup :style="{ order: match.flip_teams ? +!ti : ti }" v-for="(team, ti) in teams" v-bind:key="team.id"
-                               :team="team" :guests="guests[ti]" :params="camParams" :event="broadcast && broadcast.event" :relay-prefix="relayPrefix" :ti="match.flip_teams ? +!ti : ti" />
+                               :team="team" :guests="guests[ti]" :params="camParams" :event="broadcast && broadcast.event"
+                               :relay-prefix="relayPrefix" :ti="match.flip_teams ? +!ti : ti" :disable-cams="disable" />
             </div>
         </transition>
     </div>
@@ -18,6 +19,9 @@ export default {
     props: ["broadcast", "params"],
     components: { TeamCamsGroup },
     computed: {
+        disable() {
+            return this.broadcast?.observer_settings?.includes("Disable team cams");
+        },
         match() {
             if (!this.broadcast || !this.broadcast.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {

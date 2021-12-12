@@ -14,13 +14,27 @@ import CasterCam from "@/components/broadcast/desk/CasterCam";
 
 export default {
     name: "CamOverlay",
-    props: ["broadcast", "params", "number", "full", "alwaysShow", "relay"],
+    props: ["broadcast", "params", "number", "full", "alwaysShow", "relay", "client"],
     components: { CasterCam },
     computed: {
         shouldShow() {
+            if (this.broadcast?.observer_settings?.includes("Disable POV cams")) {
+                console.warn("Cam disabled by broadcast settings");
+                return false;
+            }
             if (this.alwaysShow) {
                 return this.activeGuest; // needs at least a guest
             } else {
+                if (this.client?.cams) {
+                    const attemptedTeam = this.number >= 7 ? 2 : 1;
+                    const cams = this.client.cams;
+                    console.log(this.client.cams, attemptedTeam);
+                    if (cams.includes(`Team ${attemptedTeam}`)) {
+                        return this.activeGuest?.use_cam;
+                    }
+                    console.warn("Cam disabled from client whitelist");
+                    return false;
+                }
                 return this.activeGuest?.use_cam;
             }
         },
@@ -132,7 +146,7 @@ export default {
     }
     .guest >>> .caster-bg,
     .guest >>> .caster-cam-wrapper {
-        background-color: rgba(0,0,0,0.3)
+        background-color: rgba(0,0,0,0)
     }
 
 

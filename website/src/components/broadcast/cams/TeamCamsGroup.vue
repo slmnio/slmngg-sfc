@@ -6,7 +6,7 @@
         <div class="team-guests d-flex">
             <div class="guest" v-for="(guest, gi) in _guests" v-bind:key="guest.id">
                 <CasterCam class="team-cam" :guest="guest" :extra-params="params" :event="event"
-                 :relay-prefix="relayPrefix + getNumber(ti, gi)"/>
+                 :relay-prefix="relayPrefix + getNumber(ti, gi)" :disable-video="disableCams"/>
                 <div class="guest-name">{{ guest.name }}</div>
             </div>
         </div>
@@ -21,7 +21,7 @@ import { logoBackground1 } from "@/utils/theme-styles";
 export default {
     name: "TeamCamsGroup",
     components: { CasterCam },
-    props: ["team", "guests", "params", "event", "relayPrefix", "ti"],
+    props: ["team", "guests", "params", "event", "relayPrefix", "ti", "disableCams"],
     computed: {
         _guests() {
             return ReactiveArray("guests")({ guests: this.guests }).slice(0, 6);

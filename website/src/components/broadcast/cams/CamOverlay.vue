@@ -25,17 +25,13 @@ export default {
             if (this.alwaysShow) {
                 return this.activeGuest; // needs at least a guest
             } else {
-                if (this.client?.cams) {
-                    const attemptedTeam = this.number >= 7 ? 2 : 1;
-                    const cams = this.client.cams;
-                    console.log(this.client.cams, attemptedTeam);
-                    if (cams.includes(`Team ${attemptedTeam}`)) {
-                        return this.activeGuest?.use_cam;
-                    }
-                    console.warn("Cam disabled from client whitelist");
-                    return false;
+                const attemptedTeam = this.number >= 7 ? 2 : 1;
+                const cams = this.client?.cams;
+                if (cams.length && cams.includes(`Team ${attemptedTeam}`)) {
+                    return this.activeGuest?.use_cam;
                 }
-                return this.activeGuest?.use_cam;
+                console.warn("Cam disabled from client whitelist");
+                return false;
             }
         },
         relayPrefix() {

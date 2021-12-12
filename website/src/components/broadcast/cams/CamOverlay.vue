@@ -2,7 +2,7 @@
     <div class="cam-overlay">
         <div class="guest" v-bind:class="{ full }" v-if="shouldShow" :style="theme">
             <CasterCam class="team-cam" :guest="activeGuest" :extra-params="camParams" :disable-video="false"
-                       :event="broadcast && broadcast.event" :relay-prefix="relayPrefix" />
+                       :event="broadcast && broadcast.event" :relay-prefix="relayPrefix" :team="activeTeam" />
         </div>
     </div>
 </template>

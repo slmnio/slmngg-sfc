@@ -2,7 +2,7 @@
     <GenericOverlay class="desk-cams-overlay" :title="title || 'Player Cams'" :accent-color="accentColor">
         <div class="team-cams flex-center w-100 flex-column">
             <TeamCamsGroup v-for="(team, ti) in teams" v-bind:key="team.id"
-                           :team="team" :guests="guests[ti]" :params="params" :event="broadcast && broadcast.event"
+                           :team="team" :guests="guests[ti]" :params="camParams" :event="broadcast && broadcast.event"
             :relay-prefix="relayPrefix" :ti="ti"/>
         </div>
     </GenericOverlay>
@@ -15,7 +15,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "DeskCamsOverlay",
-    props: ["title", "broadcast", "bitrate", "buffer", "scale", "codec"],
+    props: ["title", "broadcast", "params"],
     components: {
         GenericOverlay, TeamCamsGroup
     },
@@ -53,8 +53,8 @@ export default {
             if (this.match.flip_teams) return _teams.reverse();
             return _teams;
         },
-        params() {
-            return `&cover&na&scale=${this.scale || 100}&bitrate=${this.bitrate || 500}&buffer=${this.buffer || 0}${this.codec ? `&codec=${this.codec}` : ""}`;
+        camParams() {
+            return `&cover&na${this.params}`;
         }
     }
 };

@@ -1,7 +1,7 @@
 <template>
     <div class="cam-overlay">
         <div class="guest" v-bind:class="{ full }" v-if="shouldShow" :style="theme">
-            <CasterCam class="team-cam" :guest="activeGuest" :extra-params="params" :disable-video="false"
+            <CasterCam class="team-cam" :guest="activeGuest" :extra-params="camParams" :disable-video="false"
                        :event="broadcast && broadcast.event" :relay-prefix="relayPrefix" />
         </div>
     </div>
@@ -14,7 +14,7 @@ import CasterCam from "@/components/broadcast/desk/CasterCam";
 
 export default {
     name: "CamOverlay",
-    props: ["broadcast", "bitrate", "buffer", "scale", "number", "full", "alwaysShow", "relay", "codec"],
+    props: ["broadcast", "params", "number", "full", "alwaysShow", "relay"],
     components: { CasterCam },
     computed: {
         shouldShow() {
@@ -55,8 +55,8 @@ export default {
             if (this.match?.flip_teams) return _teams.reverse();
             return _teams;
         },
-        params() {
-            return `&cover&na&scale=${this.scale || 100}&bitrate=${this.bitrate || 500}&buffer=${this.buffer || 0}${this.codec ? `&codec=${this.codec}` : ""}`;
+        camParams() {
+            return `&cover&na${this.params}`;
         },
         activeGuest() {
             if (this.number >= 7) {

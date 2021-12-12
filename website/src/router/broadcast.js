@@ -24,24 +24,28 @@ import CamsOverlay from "@/components/broadcast/cams/CamsOverlay";
 import CamOverlay from "@/components/broadcast/cams/CamOverlay";
 import DeskCamsOverlay from "@/components/broadcast/cams/DeskCamsOverlay";
 import StaffOverlay from "@/components/broadcast/roots/StaffOverlay";
+import CamsWrapper from "@/components/broadcast/cams/CamsWrapper";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
-    { path: "cams", component: CamsOverlay, props: route => ({ buffer: route.query.buffer || route.query.delay, bitrate: route.query.bitrate }) },
-    { path: "desk-cams", component: DeskCamsOverlay, props: route => ({ buffer: route.query.buffer || route.query.delay, bitrate: route.query.bitrate, scale: route.query.scale }) },
     {
-        path: "pov",
-        component: CamOverlay,
-        props: route => ({
-            number: route.query.number || route.query.player,
-            buffer: route.query.buffer || route.query.delay,
-            bitrate: route.query.bitrate,
-            scale: route.query.scale,
-            full: !!route.query.full || !!route.query.relay,
-            alwaysShow: !!route.query.alwaysShow || !!route.query.relay,
-            relay: !!route.query.relay,
-            codec: route.query.codec
-        })
+        path: "cams",
+        component: CamsWrapper,
+        props: route => ({ params: route.query.params?.split(",") }),
+        children: [
+            { path: "desk", component: DeskCamsOverlay },
+            { path: "ingame", component: CamsOverlay },
+            {
+                path: "pov",
+                component: CamOverlay,
+                props: route => ({
+                    number: route.query.number || route.query.player,
+                    full: !!route.query.full || !!route.query.relay,
+                    alwaysShow: !!route.query.alwaysShow || !!route.query.relay,
+                    relay: !!route.query.relay
+                })
+            }
+        ]
     },
     { path: "break", component: BreakOverlay },
     { path: "syncer", component: SyncerOverlay },

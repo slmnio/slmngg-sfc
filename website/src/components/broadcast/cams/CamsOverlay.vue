@@ -3,7 +3,7 @@
         <transition name="slide-in">
             <div class="team-cams" v-show="broadcast.show_cams">
                 <TeamCamsGroup :style="{ order: match.flip_teams ? +!ti : ti }" v-for="(team, ti) in teams" v-bind:key="team.id"
-                               :team="team" :guests="guests[ti]" :params="params" :event="broadcast && broadcast.event" :relay-prefix="relayPrefix" :ti="match.flip_teams ? +!ti : ti" />
+                               :team="team" :guests="guests[ti]" :params="camParams" :event="broadcast && broadcast.event" :relay-prefix="relayPrefix" :ti="match.flip_teams ? +!ti : ti" />
             </div>
         </transition>
     </div>
@@ -15,7 +15,7 @@ import TeamCamsGroup from "@/components/broadcast/cams/TeamCamsGroup";
 
 export default {
     name: "CamsOverlay",
-    props: ["broadcast", "bitrate", "buffer", "codec"],
+    props: ["broadcast", "params"],
     components: { TeamCamsGroup },
     computed: {
         match() {
@@ -46,8 +46,8 @@ export default {
             // if (this.match?.flip_teams) return _teams.reverse();
             return _teams;
         },
-        params() {
-            return `&cover&na&scale=${this.scale || 100}&bitrate=${this.bitrate || 500}&buffer=${this.buffer || 0}${this.codec ? `&codec=${this.codec}` : ""}`;
+        camParams() {
+            return `&cover&na${this.params}`;
         }
     }
 };

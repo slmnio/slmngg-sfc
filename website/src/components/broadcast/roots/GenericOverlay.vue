@@ -3,7 +3,7 @@
         <TourneyBar class="st4-top" v-if="top === 'st4'" :broadcast="broadcast" left="Schedule" :right="title"/>
         <div v-else class="generic-overlay-title overlay--bg flex-center" :style="{borderColor: accentColor}">
             <transition name="fade" mode="out-in">
-                <span class="industry-align">{{ title }}</span>
+                <span class="industry-align" :key="title" v-bind:class="{'has-br': title.includes('\\n') }" v-html="nbr(title)"></span>
             </transition>
         </div>
         <div class="generic-overlay-body overlay--bg flex-center" :style="{backgroundColor: bodyColor}">
@@ -17,7 +17,13 @@ import TourneyBar from "@/components/broadcast/TourneyBar";
 export default {
     name: "GenericOverlay",
     components: { TourneyBar },
-    props: ["title", "accentColor", "bodyColor", "top", "broadcast"]
+    props: ["title", "accentColor", "bodyColor", "top", "broadcast"],
+    methods: {
+        nbr(text) {
+            if (!text) return "";
+            return text.replace(/\\n/g, "<br>");
+        }
+    }
 };
 </script>
 
@@ -70,5 +76,8 @@ span.industry-align {
 }
 .st4-top {
     margin: 20px 0;
+}
+.generic-overlay-title .has-br {
+    font-size: 0.72em;
 }
 </style>

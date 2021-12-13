@@ -50,7 +50,16 @@ export default [
     { path: "break", component: BreakOverlay },
     { path: "syncer", component: SyncerOverlay },
     { path: "break-bar", component: BreakBarOverlay },
-    { path: "bracket", component: BracketOverlay, props: route => ({ bracketKey: route.query.key, extended: !!route.query.extended || !!route.query.expanded || !!route.query.full, scale: route.query.scale }) },
+    {
+        path: "bracket",
+        component: BracketOverlay,
+        props: route => ({
+            bracketKey: route.query.key,
+            extended: !!route.query.extended || !!route.query.expanded || !!route.query.full,
+            scale: route.query.scale,
+            small: !!route.query.small
+        })
+    },
     { path: "schedule", component: ScheduleOverlay },
     { path: "standings", component: StandingsOverlay },
     { path: "roster", redirect: "rosters" },

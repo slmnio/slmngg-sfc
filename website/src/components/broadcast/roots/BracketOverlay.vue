@@ -1,9 +1,9 @@
 <template>
     <GenericOverlay v-if="!extended" :title="title || 'Bracket'" :accent-color="accentColor">
-        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale />
+        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :small="small" />
     </GenericOverlay>
     <div class="bracket-extended" :style="zoom" v-else>
-        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale />
+        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :small="small" />
     </div>
 </template>
 
@@ -14,7 +14,7 @@ import Bracket from "@/components/website/bracket/Bracket";
 export default {
     name: "BracketOverlay",
     components: { Bracket, GenericOverlay },
-    props: ["broadcast", "title", "bracketKey", "extended", "scale"],
+    props: ["broadcast", "title", "bracketKey", "extended", "scale", "small"],
     computed: {
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;

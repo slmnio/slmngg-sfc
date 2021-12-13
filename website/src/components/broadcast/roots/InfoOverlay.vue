@@ -3,7 +3,8 @@
         <div class="info-side">
             <div class="team-text" :style="teamBG">
                 <transition mode="out-in" name="fade">
-                    <div class="industry-align" :key="title || broadcast.title" v-html="nbr( title || broadcast.title)"></div>
+                    <div class="industry-align" :key="title || broadcast.title" v-html="nbr( title || broadcast.title)"
+                         v-bind:class="{'has-br': (title || broadcast.title || '').includes('\\n') }"></div>
                 </transition>
             </div>
             <div class="event-logo bg-center" :style="eventLogo"></div>

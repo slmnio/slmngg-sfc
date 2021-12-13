@@ -3,7 +3,8 @@
         <div class="break-center">
             <div class="break-top event-theme-border flex-center overlay--bg" :style="eventBorder">
                 <transition name="fade" mode="out-in">
-                    <span class="industry-align" :key="title || broadcast.title || broadcast.name" v-html="nbr(title || broadcast.title || broadcast.name)"></span>
+                    <span class="industry-align" v-bind:class="{'has-br': (title || broadcast.title || broadcast.name || '').includes('\\n') }"
+                          :key="title || broadcast.title || broadcast.name" v-html="nbr(title || broadcast.title || broadcast.name)"></span>
                 </transition>
                 <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News" :borderCSS="eventBorder" />
             </div>
@@ -174,7 +175,7 @@ export default {
             // TODO: add stuff here that changes based on the countdown remaining
 
 
-            if (slides.includes("Schedule") && this.broadcast.countdown_end && this.lastCountdownTick <= 30) {
+            if (slides?.includes("Schedule") && this.broadcast.countdown_end && this.lastCountdownTick <= 30) {
                 return "Schedule";
             }
 
@@ -253,6 +254,9 @@ export default {
         text-align: center;
         display: flex;
         flex-direction: column;
+    }
+    .break-top .has-br {
+        font-size: 0.75em;
     }
 
     .break-main {

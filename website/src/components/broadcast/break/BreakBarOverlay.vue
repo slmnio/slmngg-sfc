@@ -33,7 +33,8 @@
             <transition name="seg">
                 <div class="segment-wrapper" v-if="showSegment('Title') && (title || (broadcast && broadcast.title))" :key="'Title-' + (title || broadcast.title)">
                     <div class="overlay--bg bar-segment segment-title">
-                        <span class="segment-text" v-html="nbr(title || broadcast.title)"></span>
+                        <span class="segment-text" v-html="nbr(title || broadcast.title)"
+                        v-bind:class="{'has-br': (title || broadcast.title || '').includes('\\n')}"></span>
                     </div>
                 </div>
             </transition>
@@ -326,5 +327,8 @@ export default {
         white-space: nowrap;
         overflow: hidden;
         padding: 0 0.25em;
+    }
+    .segment-text.has-br {
+        font-size: 40px;
     }
 </style>

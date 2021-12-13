@@ -253,4 +253,10 @@ function updateWidth(vueEl, fullWidth) {
     .score-enter-active, .score-leave-active { overflow: hidden; transition: max-width .3s; }
     .score-enter-to, .score-leave { max-width: 48px; }
     .score-enter, .score-leave-to { max-width: 0; }
+
+    .ingame-team.default-thing {
+        background-color: #373737;
+        color: white;
+        border-color: #5F5F5F
+    }
 </style>

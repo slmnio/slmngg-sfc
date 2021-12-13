@@ -7,7 +7,8 @@
                     {{ player.name }}
                 </div>-->
                 <transition-group class="players-transition" name="draftable">
-                    <DraftPlayer v-for="player in availablePlayers" v-bind:key="player.id" :player="player" :theme="event.theme" />
+                    <DraftPlayer :style="draftPlayerStyle" v-for="player in availablePlayers" v-bind:key="player.id"
+                                 :player="player" :theme="event.theme" :show-icon="icons" />
                 </transition-group>
             </div>
             <div class="teams d-flex">
@@ -19,7 +20,8 @@
                         </div>
                     </div>
                     <transition-group name="player" class="team-players">
-                        <DraftPlayer class="drafted-player" v-for="player in team.players" v-bind:key="player.id" :player="player" :theme="event.theme" />
+                        <DraftPlayer class="drafted-player" v-for="player in team.players" v-bind:key="player.id"
+                                     :player="player" :theme="event.theme" :show-icon="icons" />
                     </transition-group>
                 </div>
             </div>
@@ -38,7 +40,7 @@ import { logoBackground, logoBackground1 } from "@/utils/theme-styles";
 export default {
     name: "DraftOverlay",
     components: { DraftTeam, DraftPlayer },
-    props: ["broadcast", "bracketKey"],
+    props: ["broadcast", "bracketKey", "columns", "icons"],
     data: () => ({
         dummy: false
     }),
@@ -129,6 +131,11 @@ export default {
         draftTeams() {
             if (!this.event?.teams) return [];
             return this.event.teams.filter(team => team.draft_order !== undefined).sort((a, b) => a.draft_order - b.draft_order);
+        },
+        draftPlayerStyle() {
+            return {
+                width: `calc(100% / ${this.columns} - 4px)`
+            };
         }
     },
     mounted() {
@@ -225,7 +232,6 @@ export default {
         padding: 0 8px;
         font-weight: bold;
         line-height: 1;
-        border-bottom: 2px solid transparent;
     }
     .drafted-player {
         margin: 4px 0;

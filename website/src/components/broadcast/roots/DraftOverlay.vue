@@ -14,7 +14,7 @@
                 <div class="team flex-grow-1" v-for="team in draftTeams" v-bind:key="team.id">
                     <DraftTeam class="team-top" :team="team"></DraftTeam>
                     <div class="team-staff-list default-thing" :style="logoBackground1(team)">
-                        <div class="team-staff" v-for="staff in team.staff" v-bind:key="staff.id">
+                        <div class="team-staff" v-for="staff in getTeamStaff(team)" v-bind:key="staff.id">
                             {{ staff.name }}
                         </div>
                     </div>
@@ -43,7 +43,23 @@ export default {
         dummy: false
     }),
     methods: {
-        logoBackground1
+        logoBackground1,
+        getTeamStaff(team) {
+            const staff = [];
+            if (team.captains) {
+                team.captains.forEach(person => {
+                    console.log(staff, person);
+                    if (!staff.find(s => s.id === person.id)) staff.push(person);
+                });
+            }
+            if (team.staff) {
+                team.staff.forEach(person => {
+                    if (!staff.find(s => s.id === person.id)) staff.push(person);
+                });
+            }
+            console.log(staff, team);
+            return staff;
+        }
     },
     computed: {
         event() {
@@ -53,7 +69,8 @@ export default {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
                     staff: ReactiveArray("staff"),
-                    players: ReactiveArray("players")
+                    players: ReactiveArray("players"),
+                    captains: ReactiveArray("captains")
                 }),
                 draftable_players: ReactiveArray("draftable_players")
             });
@@ -67,7 +84,7 @@ export default {
             return this.event.theme.color_theme;
         },
         availablePlayers() {
-            if (!this.event?.draftable_players || !this.event?.teams) return [];
+            if (!this.event?.draftable_players) return [];
             // if (this.dummy) {
             //     players.unshift({ name: "Solomon", id: "x" });
             // };

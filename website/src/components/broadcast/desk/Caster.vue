@@ -1,8 +1,8 @@
 <template>
     <div class="caster flex-center flex-column" :style="themeColor">
         <div class="caster-cam-box flex-center">
-            <CasterCam class="caster-cam-wrapper" :guest="liveGuestData" :disableVideo="disableVideo" :color="color">
-            </CasterCam>
+            <CasterCam class="caster-cam-wrapper" :guest="liveGuestData" :disableVideo="disableVideo" :color="color"
+            :event="event" />
         </div>
         <transition mode="out-in" name="fade">
             <div class="caster-lower flex-center" :key="`${name}-${twitter}`" v-if="name">
@@ -22,7 +22,7 @@ import CasterCam from "@/components/broadcast/desk/CasterCam";
 
 export default {
     name: "Caster",
-    props: ["caster", "guest", "color", "disableVideo"],
+    props: ["caster", "guest", "color", "disableVideo", "event"],
     components: { CasterCam },
     computed: {
         player() {

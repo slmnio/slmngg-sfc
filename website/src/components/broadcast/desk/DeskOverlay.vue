@@ -4,7 +4,8 @@
             <TourneyBar :left="broadcast.event && broadcast.event.short" :right="broadcast.subtitle" :event="broadcast.event" />
         </div>
         <transition-group class="casters flex-center" name="anim-talent">
-            <Caster v-for="(caster, i) in casters" v-bind:key="caster.id" :guest="caster" :color="getColor(i)" :disable-video="shouldDisableCasterVideo" />
+            <Caster v-for="(caster, i) in casters" v-bind:key="caster.id" :guest="caster" :color="getColor(i)"
+                    :event="event" :disable-video="shouldDisableCasterVideo" />
         </transition-group>
         <div class="lower-holder flex-center">
             <DeskMatch class="w-100" :_match="liveMatch" :theme-color="themeColor" />
@@ -32,6 +33,9 @@ export default {
         }
     },
     computed: {
+        event() {
+            return this.broadcast?.event;
+        },
         shouldDisableCasterVideo() {
             if (!this.broadcast?.video_settings) return false;
             return this.broadcast.video_settings.includes("Disable casters");
@@ -59,7 +63,8 @@ export default {
             return ReactiveArray("guests", {
                 player: ReactiveThing("player", {
                     socials: ReactiveArray("socials")
-                })
+                }),
+                theme: ReactiveThing("theme")
             })(this.broadcast);
         },
         casters() {

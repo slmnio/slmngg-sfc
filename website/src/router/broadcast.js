@@ -66,7 +66,7 @@ export default [
     { path: "rosters", component: RosterOverlay, props: route => ({ showRoles: route.query.roles, sort: route.query.sort }) },
     { path: "history", component: HistoryOverlay, props: route => ({ max: route.query.max || 5 }) },
     { path: "thumbnail", component: EventThumbnailCreator },
-    { path: "draft", component: DraftOverlay, props: route => ({ columns: route.query.columns || 1, icons: route.query.icons !== "false" }) },
+    { path: "draft", component: DraftOverlay, props: route => ({ columns: route.query.columns || 1, icons: route.query.icons !== "false", showStaff: route.query.staff !== "false" }) },
     { path: "casters", component: DeskOverlay, props: route => ({ group: "casters" }) },
     { path: "podcast", component: PodcastOverlay, props: route => ({ rows: route.query.rows }) },
     { path: "custom", component: CustomOverlay },

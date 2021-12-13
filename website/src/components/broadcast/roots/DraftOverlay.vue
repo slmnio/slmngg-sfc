@@ -13,8 +13,8 @@
             </div>
             <div class="teams d-flex">
                 <div class="team flex-grow-1" v-for="team in draftTeams" v-bind:key="team.id">
-                    <DraftTeam class="team-top" :team="team"></DraftTeam>
-                    <div class="team-staff-list default-thing" :style="logoBackground1(team)">
+                    <DraftTeam class="team-top" v-bind:class="{'team-bottom-border': !showStaff}" :team="team"></DraftTeam>
+                    <div class="team-staff-list default-thing" v-if="showStaff" :style="logoBackground1(team)">
                         <div class="team-staff" v-for="staff in getTeamStaff(team)" v-bind:key="staff.id">
                             {{ staff.name }}
                         </div>
@@ -40,7 +40,7 @@ import { logoBackground, logoBackground1 } from "@/utils/theme-styles";
 export default {
     name: "DraftOverlay",
     components: { DraftTeam, DraftPlayer },
-    props: ["broadcast", "bracketKey", "columns", "icons"],
+    props: ["broadcast", "bracketKey", "columns", "icons", "showStaff"],
     data: () => ({
         dummy: false
     }),
@@ -279,4 +279,8 @@ export default {
         opacity: 0;
     }
 
+    .draft-team-top.team-bottom-border {
+        border-bottom: 4px solid transparent;
+        margin-bottom: 8px;
+    }
 </style>

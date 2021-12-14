@@ -8,7 +8,7 @@
           </transition-group>
 
           <transition name="mid" mode="out-in">
-              <Middle v-if="teams.length === 2 && middleText" :text="middleText" :key="middleText" />
+              <Middle v-if="shouldShowMiddle" :text="middleText" :key="middleText" />
           </transition>
       </div>
   </div>
@@ -46,6 +46,12 @@ export default {
             const scores = [this.match.score_1, this.match.score_2];
             if (this.match.flip_teams && this.match.teams.length === 2) return [scores[1], scores[0]];
             return scores;
+        },
+        shouldShowMiddle() {
+            if (this.match?.special_event) {
+                return this.middleText;
+            }
+            return this.teams?.length === 2 && this.middleText;
         },
         middleText() {
             if (!this.match) return null;

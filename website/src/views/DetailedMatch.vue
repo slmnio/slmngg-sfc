@@ -5,6 +5,12 @@
                 <div class="maps-holder mt-1" v-if="match.maps && showMatchMaps">
                     <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="_theme" v-bind:key="map.id"/>
                 </div>
+
+                <div class="special-event-notice" v-if="match.special_event">
+                    <h2>Special event</h2>
+                    This is a special event and doesn't have team information.
+                </div>
+
                 <div class="team-holder f-row mb-2">
                     <div class="team f-col w-50 mt-2" v-for="team in match.teams" v-bind:key="team.id">
                         <div :style="theme(team)" class="team-header flex-center f-col default-thing">

@@ -1,7 +1,7 @@
 <template>
     <transition name="fade" mode="out-in">
         <div class="desk-match" v-if="match">
-            <div class="teams d-flex">
+            <div class="teams d-flex" v-if="!match.special_event">
                 <DeskTeam class="team" v-for="(team, i) in match.teams" v-bind:key="team.id" :team="team" :style="{order: i * 2}" />
                 <div class="match-center flex-center">
                     <div class="match-score flex-center" v-if="show.score">
@@ -13,6 +13,11 @@
                         <span class="industry-align">{{ scoreText }}</span>
                     </div>
                 </div>
+            </div>
+            <div class="desk-match-text flex-center" v-if="match.special_event" :style="textBackground">
+                <transition name="fade" mode="out-in">
+                    <span :key="match.custom_name">{{ match.custom_name }}</span>
+                </transition>
             </div>
         </div>
     </transition>
@@ -26,11 +31,11 @@ export default {
     props: ["_match", "themeColor"],
     computed: {
         match() {
-            if (!this._match?.teams) return null;
-            if (this._match.teams.length !== 2) return null;
-
-            if (this._match.teams.some(t => !t.theme || t.theme.__loading)) return null;
-
+            if (!this._match?.special_event) {
+                if (!this._match?.teams) return null;
+                if (this._match.teams.length !== 2) return null;
+                if (this._match.teams.some(t => !t.theme || t.theme.__loading)) return null;
+            }
             return this._match;
         },
         show() {
@@ -51,6 +56,12 @@ export default {
             if (!this.themeColor) return {};
             return {
                 borderColor: this.themeColor.backgroundColor
+            };
+        },
+        textBackground() {
+            console.log(this.themeColor);
+            return {
+                ...this.themeColor
             };
         }
     }
@@ -90,5 +101,11 @@ export default {
         background-color: white;
         white-space: nowrap;
         min-width: 180px;
+    }
+
+    .desk-match-text {
+        font-size: 4em;
+        border-bottom: 6px solid transparent;
+        height: 110px;
     }
 </style>

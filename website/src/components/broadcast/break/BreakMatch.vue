@@ -11,7 +11,14 @@
         </div>
         -->
 <!--        <transition-group name="fade" mode="out-in" class="match-teams flex-center">-->
+
+
         <div class="match-teams flex-center">
+
+            <div class="match-special-event-name" v-if="match.special_event">
+                {{ match.custom_name }}
+            </div>
+
                 <div class="match-team" v-for="(team, i) in teams" v-bind:key="team ? `${team.id}-${team.name}-${team.code}-${i}` : i" :style="{ order: i*2 }">
                     <div :class="expanded ? 'match-team-name' : 'match-team-code'" v-if="team && expanded" :data-code="team.code">
                         <span class="industry-align" v-if="team.dummy">{{ team.text }}</span>
@@ -47,6 +54,7 @@ export default {
     props: ["match", "expanded", "timezone", "live", "themeColor"],
     computed: {
         teams() {
+            if (this.match?.special_event) return [];
             const dummy = { text: "TBD", dummy: true, id: null };
             if (!this.match) return [{ ...dummy, _empty: true }, { ...dummy, _empty: true }];
 
@@ -108,6 +116,7 @@ export default {
                 return "time";
                 // return this.start;
             } else {
+                if (this.match?.special_event) return "";
                 return "vs";
             }
             // return "vs";
@@ -303,5 +312,10 @@ export default {
         line-height: 1;
         font-size: calc(1.1em);
         transform: translate(0, -0.0925em);
+    }
+    .match-special-event-name {
+        flex-grow: 1;
+        line-height: 1;
+        text-align: center;
     }
 </style>

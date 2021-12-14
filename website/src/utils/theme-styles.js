@@ -15,7 +15,8 @@ export function themeBackground(theme) {
     if (!theme) return {};
     return {
         backgroundColor: theme.color_theme || theme.color_logo_background,
-        color: theme.color_text_on_theme || theme.color_alt || theme.color_text_on_logo_background
+        color: theme.color_text_on_theme || theme.color_alt || theme.color_text_on_logo_background,
+        borderColor: theme.color_accent
     };
 }
 export function themeBackground1(item) {

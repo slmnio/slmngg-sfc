@@ -1,7 +1,7 @@
 <template>
     <div id="match" v-if="match">
         <MatchHero :match="match" />
-        <div class="container mt-3 text-center">
+        <div class="container mt-3 text-center" v-if="match.special_event ? [match.score_1, match.score_2].some(x => x) : true">
             <MatchScore :match="match" />
         </div>
         <div class="container mt-3 large-container">
@@ -160,6 +160,7 @@ export default {
             return this.match?.event?.theme;
         },
         showHeadToHead() {
+            if (this.match?.special_event) return false;
             return this.match?.event?.map_pool;
         }
     },

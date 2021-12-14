@@ -1,8 +1,13 @@
 <template>
-    <div class="match my-2" v-if="loaded" v-bind:class="{ 'bg-danger' : !loaded }">
+    <div class="match my-2" v-if="loaded" v-bind:class="{ 'bg-danger' : !loaded, 'special-event': match.special_event }">
         <div class="match-left match-details flex-center flex-column text-center">
             <div class="match-detail" v-for="detail in details" v-bind:key="detail">{{ detail }}</div>
         </div>
+
+        <router-link :to="url('match', this.match)" v-if="match.special_event"
+                     class="match-special-event-name flex-center text-center ct-passive link-text">
+            {{ match.custom_name }}
+        </router-link>
 
         <div v-for="(team, i) in teams"
              v-bind:key="team.id" :style="{order: i*2}"
@@ -21,7 +26,7 @@
             <div class="team-logo team-logo--spacer" v-else></div>
         </div>
 
-        <router-link :to="url('match', this.match)" class="match-center match-vs flex-center text-center ct-passive">
+        <router-link :to="url('match', this.match)" class="match-center match-vs flex-center text-center ct-passive" v-if="!match.special_event">
             <div class="scores-wrap" v-if="scores.some(s => s)">
                 <div class="scores">{{ match.score_1 }} - {{ match.score_2 }}</div>
                 <div class="scores-forfeit" v-if="match.forfeit">Forfeit</div>
@@ -29,7 +34,7 @@
             <div class="vs ct-passive" v-else>vs</div>
         </router-link>
         <div class="match-right match-time flex-center">
-            <ScheduleTime :time="match.start" :custom-text="match.custom_name"/>
+            <ScheduleTime :time="match.start" :custom-text="match.special_event ? null : match.custom_name"/>
         </div>
     </div>
 </template>
@@ -55,6 +60,7 @@ export default {
             return [this.match.score_1, this.match.score_2];
         },
         teams() {
+            if (this.match?.special_event) return [];
             const dummy = { text: "TBD", dummy: true, id: null };
             if (!this.match) return [{ ...dummy, _empty: true }, { ...dummy, _empty: true }];
 
@@ -133,14 +139,23 @@ export default {
         gap: 0px 0px;
         min-height: 3em;
     }
+    .match.special-event {
+        grid-template-columns: 0.75fr 4.25fr 0.75fr;
+    }
     @media (max-width: 957px) {
         .match {
             grid-template-columns: 0.75fr 1fr 0.2fr 1fr 0.75fr;
+        }
+        .match.special-event {
+            grid-template-columns: 0.75fr 2.2fr 0.75fr;
         }
     }
     @media (max-width: 767px) {
         .match {
             grid-template-columns: 0.5fr 1fr 0.2fr 1fr 0.75fr;
+        }
+        .match.special-event {
+            grid-template-columns: 0.5fr 2.2fr 0.5fr;
         }
     }
     @media (max-width: 575px) {
@@ -150,6 +165,13 @@ export default {
         .match {
             grid-template-columns: 1fr 0.2fr 1fr;
         }
+        .match.special-event {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .match-special-event-name {
+        font-size: 1.2em;
     }
 
     .match-vs {

@@ -39,14 +39,6 @@ export default {
                 and_read: ReactiveThing("and_read")
             })(this.broadcast);
         },
-        activeGroup() {
-            if (!this.groups?.length) return null;
-
-
-            const sortedGroups = [...this.groups].sort((a, b) => this.sortGroup(a) - this.sortGroup(b));
-            console.log(sortedGroups);
-            return sortedGroups[0]; // get least biased one
-        },
         readImage() {
             if (!this.activeRead) return {};
             try {
@@ -62,7 +54,7 @@ export default {
         document.body.removeEventListener("click", this.clickHandler);
         document.body.addEventListener("click", () => {
             console.log("click");
-            this.runGroup(this.activeGroup);
+            this.runGroup(this.getActiveGroup());
         });
         document.body.addEventListener("contextmenu", e => {
             e.preventDefault();
@@ -74,6 +66,15 @@ export default {
         this.localData = JSON.parse(localStorage.getItem("ad-reads") || "{}");
     },
     methods: {
+        getActiveGroup() {
+            console.log(this.groups?.length);
+            if (!this.groups?.length) return null;
+
+
+            const sortedGroups = [...this.groups].sort((a, b) => this.sortGroup(a) - this.sortGroup(b));
+            console.log("sorted groups", sortedGroups);
+            return sortedGroups[0]; // get least biased one
+        },
         async runAudio(read) {
             if (this.activeAudio) return;
             console.log("running audio", read);

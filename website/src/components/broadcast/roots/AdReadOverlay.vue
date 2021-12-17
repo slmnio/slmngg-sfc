@@ -7,6 +7,7 @@
                 </div>
             </div>
         </transition>
+        <div class="d-none">{{ groups }}</div>
     </div>
 </template>
 
@@ -101,6 +102,8 @@ export default {
         },
         async runGroup(group) {
             console.log("running", group);
+
+
             if (group.opening_read) {
                 await this.runAudio(group.opening_read);
                 console.log("finished opener read");

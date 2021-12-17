@@ -14,6 +14,9 @@ export default {
     name: "MapsOverlay",
     components: { BroadcastMapDisplay, GenericOverlay },
     props: ["broadcast", "title"],
+    data: () => ({
+        activeAudio: null
+    }),
     computed: {
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;
@@ -41,7 +44,9 @@ export default {
                     winner: ReactiveThing("winner", {
                         theme: ReactiveThing("theme")
                     }),
-                    map: ReactiveThing("map")
+                    map: ReactiveThing("map", {
+                        map: ReactiveThing("map")
+                    })
                 })
             });
         },
@@ -132,6 +137,39 @@ export default {
         showMapVideos() {
             if (!this.broadcast?.video_settings?.length) return false;
             return this.broadcast.video_settings.includes("Use map videos");
+        },
+        nextMap() {
+            const unplayedMaps = this.maps.filter(m => !m.dummy);
+            return unplayedMaps[0];
+        }
+    },
+    sockets: {
+        map_music(e) {
+            console.log(e, this.nextMap);
+            if (this.nextMap?.map?.map_audio) {
+                this.runAudio({
+                    audio: this.nextMap.map.map_audio,
+                    volume: this.nextMap.map.map_audio_volume || 100
+                });
+            }
+        }
+    },
+    methods: {
+        async runAudio(read) {
+            if (this.activeAudio) return;
+            console.log("running audio", read);
+            if (!read?.audio?.length || !read?.audio[0]?.url) return console.warn("no valid data", read);
+            const url = read.audio[0].url;
+            const audio = new Audio(url);
+            audio.volume = (read.volume || 100) / 100;
+            this.activeAudio = audio;
+            await audio.play();
+            return await new Promise((resolve, reject) => {
+                audio.addEventListener("ended", async () => {
+                    this.activeAudio = null;
+                    resolve();
+                });
+            });
         }
     }
 };

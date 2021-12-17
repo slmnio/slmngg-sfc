@@ -77,7 +77,7 @@ app.get("/things/:ids", cors({ origin: corsHandle}), async (req, res) => {
     res.end(JSON.stringify(data));
 });
 
-routes({ app, cors, Cache });
+routes({ app, cors, Cache, io });
 meta({ app, cors, Cache });
 
 function cleanID(id) {
@@ -110,6 +110,11 @@ io.on("connection", (socket) => {
     });
     socket.on("disconnect", () => {
         connected--;
+    });
+
+    socket.on("prod-join", (clientName) => {
+        console.log("prod-join", clientName);
+        socket.join(`prod:client-${clientName}`);
     });
 });
 

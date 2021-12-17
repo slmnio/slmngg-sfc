@@ -7,7 +7,6 @@
                 </div>
             </div>
         </transition>
-        <div class="d-none">{{ activeGroup }}</div>
     </div>
 </template>
 
@@ -129,6 +128,11 @@ export default {
             localStorage.setItem("ad-reads-latest", group.id);
 
             this.activeRead = null;
+        }
+    },
+    sockets: {
+        ad_read_start() {
+            this.runGroup(this.getActiveGroup());
         }
     }
 };

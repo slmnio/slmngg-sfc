@@ -13,7 +13,7 @@ function niceJoin(array) {
     return array[0];
 }
 
-module.exports = ({ app, cors, Cache }) => {
+module.exports = ({ app, cors, Cache, io }) => {
     app.get("/redirect", async (req, res) => {
         try {
             let redirects = (await Cache.get("Redirects"))?.items;
@@ -156,5 +156,12 @@ module.exports = ({ app, cors, Cache }) => {
             console.error(e);
             return res.send("An error occurred loading data");
         }
+    });
+
+    app.get("/trigger", async (req, res) => {
+        console.log(req.query.client, req.query.event, `prod:client-${req.query.client}`);
+        if (!req.query?.event || !req.query?.client) return res.send("event and client are required.");
+        io.to(`prod:client-${req.query.client}`).emit(req.query.event, "go");
+        return res.send(":) ok bet");
     });
 };

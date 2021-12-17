@@ -18,6 +18,10 @@ export default {
         broadcastID() {
             return this._client?.broadcast?.id;
         }
+    },
+    mounted() {
+        console.log("prod-join", this.client);
+        this.$socket.client.emit("prod-join", this.client);
     }
 };
 </script>

@@ -1,8 +1,16 @@
 <template>
     <div class="cam-overlay">
-        <div class="guest" v-bind:class="{ full }" v-if="shouldShow" :style="theme">
+        <div class="guest" v-bind:class="{ full }" v-if="shouldShowCam" :style="theme">
             <CasterCam class="team-cam" :guest="activeGuest" :extra-params="camParams" :disable-video="false"
                        :event="broadcast && broadcast.event" :relay-prefix="relayPrefix" :team="activeTeam" />
+        </div>
+        <div class="guest-name-holder" v-if="shouldShowName">
+            <div class="team-logo-holder" v-if="activeTeam">
+                <ThemeLogo class="top-theme-logo" :theme="activeTeam.theme" border-width="4" icon-padding="6"></ThemeLogo>
+            </div>
+            <div class="guest-name">
+                <span class="industry-align">{{ name }}</span>
+            </div>
         </div>
     </div>
 </template>
@@ -11,28 +19,39 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { themeBackground1 } from "@/utils/theme-styles";
 import CasterCam from "@/components/broadcast/desk/CasterCam";
+import ThemeLogo from "@/components/website/ThemeLogo";
 
 export default {
     name: "CamOverlay",
     props: ["broadcast", "params", "number", "full", "alwaysShow", "relay", "client"],
-    components: { CasterCam },
+    components: { CasterCam, ThemeLogo },
     computed: {
-        shouldShow() {
-            if (this.broadcast?.observer_settings?.includes("Disable POV cams")) {
+        shouldShowCam() {
+            if (this.broadcast?.video_settings?.includes("Disable POV cams")) {
                 console.warn("Cam disabled by broadcast settings");
                 return false;
             }
             if (this.alwaysShow) {
                 return this.activeGuest; // needs at least a guest
             } else {
+                if (this.broadcast?.video_settings?.includes("Ignore client cam whitelists")) return this.activeGuest?.use_cam;
+
                 const attemptedTeam = this.number >= 7 ? 2 : 1;
                 const cams = this.client?.cams;
-                if (cams.length && cams.includes(`Team ${attemptedTeam}`)) {
+                if (cams?.length && cams.includes(`Team ${attemptedTeam}`)) {
                     return this.activeGuest?.use_cam;
                 }
                 console.warn("Cam disabled from client whitelist");
                 return false;
             }
+        },
+        shouldShowName() {
+            if (!this.broadcast?.video_settings?.includes("Enable player names")) return false;
+
+            return this.activeGuest?.name;
+        },
+        name() {
+            return this.activeGuest?.name;
         },
         relayPrefix() {
             if (this.relay) return null; // this page is what we're relaying from - show original feed
@@ -160,5 +179,34 @@ export default {
         transform: none;
         height: 100%;
         width: 100%;
+    }
+
+    .guest-name-holder >>> .icon-holder {
+        width: 80px;
+        height: 60px;
+    }
+    .guest-name-holder {
+        position: absolute;
+        bottom: 80px;
+        left: 20px;
+        display: flex;
+        min-width: 320px;
+        background: white;
+        color: black;
+    }
+
+    .guest-name {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        width: 100%;
+        padding: .75em;
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    #overlay {
+        background-image: url(https://cdn.discordapp.com/attachments/485493459357007876/921883053968728074/unknown.png);
+        background-size: 1920px 1080px;
     }
 </style>

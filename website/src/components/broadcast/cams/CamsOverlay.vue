@@ -20,7 +20,7 @@ export default {
     components: { TeamCamsGroup },
     computed: {
         disable() {
-            return this.broadcast?.observer_settings?.includes("Disable team cams");
+            return this.broadcast?.video_settings?.includes("Disable team cams");
         },
         match() {
             if (!this.broadcast || !this.broadcast.live_match) return null;

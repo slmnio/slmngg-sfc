@@ -21,7 +21,7 @@ export default {
     },
     computed: {
         disable() {
-            return this.broadcast?.observer_settings?.includes("Disable team cams");
+            return this.broadcast?.video_settings?.includes("Disable team cams");
         },
         relayPrefix() {
             return this.broadcast?.cams_relay_prefix;

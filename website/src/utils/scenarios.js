@@ -133,7 +133,7 @@ function avg(arr) {
 export function sortByOMW(a, b) {
     // console.log("opp match winrate", a.standings.opponentWinrates, avg(a.standings.opponentWinrates), b.standings.opponentWinrates, avg(b.standings.opponentWinrates));
 
-    const [aa, ab] = [a, b].map(x => avg(x.standings.opponentWinrates));
+    const [aa, ab] = [a, b].map(x => avg(x.standings.opponentWinrates).toFixed(6));
 
     if (aa < ab) return 1;
     if (aa > ab) return -1;

@@ -44,6 +44,7 @@ async function playerList(Cache) {
     const proPlayers = [];
 
     players.forEach(player => {
+        if (!player.name) return;
         if (player.pro) return proPlayers.push(player);
         publicPlayers.push(player);
     });

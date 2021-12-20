@@ -116,6 +116,7 @@ export default {
                 if (item.hide_from_local_listing) return false;
                 if (!item.enabled) return false;
                 if (!item.released) return false;
+                if (item.hide_from_event) return false;
                 if (new Date(item.released) > new Date()) return false;
                 return true;
             });
@@ -123,7 +124,7 @@ export default {
         newsCategories() {
             const categories = {};
             this.filteredNewsItems.forEach(news => {
-                const category = news.category || "Uncategorized";
+                const category = news.category || "Articles";
                 if (!categories[category]) categories[category] = [];
                 categories[category].push(news);
             });

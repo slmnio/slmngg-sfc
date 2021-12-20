@@ -71,7 +71,15 @@ export default {
                         theme: ReactiveThing("theme")
                     })
                 }),
-                socials: ReactiveArray("socials")
+                socials: ReactiveArray("socials"),
+                news_items: ReactiveArray("news_items", {
+                    event: ReactiveThing("event", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    team: ReactiveThing("team", {
+                        theme: ReactiveThing("theme")
+                    })
+                })
             });
         }
     }

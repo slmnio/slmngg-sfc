@@ -17,8 +17,8 @@ export default {
         border() {
             return {
                 borderColor: this.customThumbnail
-                    ? (this.item?.event?.theme?.color_theme || this.item?.event?.theme?.color_logo_background)
-                    : (this.item?.event?.theme?.color_accent || this.item?.event?.theme?.color_logo_accent || this.item?.event?.theme?.color_theme)
+                    ? (this.connectionTheme?.color_theme || this.connectionTheme?.color_logo_background || this.connectionTheme?.color_logo_accent)
+                    : (this.connectionTheme?.color_accent || this.connectionTheme?.color_logo_accent || this.connectionTheme?.color_theme)
             };
         },
         customThumbnail() {
@@ -37,12 +37,17 @@ export default {
 
             return { backgroundImage: `url(${resizedImage(this.item, "thumbnail", 150)})` };
         },
+        connectionTheme() {
+            if (this.item?.team?.theme) return this.item.team.theme;
+            if (this.item?.event?.theme) return this.item.event.theme;
+            return null;
+        },
         generatedThumbnail() {
-            if (!this.item?.event?.theme) return {};
+            if (!this.connectionTheme) return {};
 
             return {
-                backgroundColor: this.item.event.theme.color_logo_background,
-                backgroundImage: `url(${resizedImage(this.item.event.theme, "default_wordmark", 150) || resizedImage(this.item.event.theme, "default_logo", 150)})`
+                backgroundColor: this.connectionTheme.color_logo_background,
+                backgroundImage: `url(${resizedImage(this.connectionTheme, "default_wordmark", 150) || resizedImage(this.connectionTheme, "default_logo", 150)})`
             };
         }
     }

@@ -1,13 +1,17 @@
 <template>
     <div class="container news-item">
-        <OptionalLink :condition="!!connection" :url="['event', connection]">
+        <OptionalLink :condition="!!connection" :url="connection">
             <NewsHeader class="news-header" :url="headerImage" :theme="theme" />
         </OptionalLink>
         <h1 class="news-headline">{{ news.headline }}</h1>
         <div class="news-line">
-            <div class="news-author" v-if="news.author_name">by <router-link :to="url('player', news.author)">{{ news.author.name }}<i class="fas fa-badge-check fa-fw" style="margin-left: .5ex" title="REAL" v-if="news.author.verified"></i></router-link><span v-if="news.author_role">, {{ news.author_role }}</span></div>
-            <div class="news-author" v-if="!news.author_name">from <span v-if="news.author_role">{{ news.author_role }}, </span>{{ connection ? (connection.series_name || connection.name) : '' }}</div>
-            <div class="news-date" v-if="news.released || news.updated">{{ news.updated ? `updated ${prettyDate(news.updated)}` : prettyDate(news.released) }}</div>
+            <span v-if="newsLine && newsLine.author">
+                {{  newsLine.ahead }} <router-link :to="url('player', news.author)">{{ news.author.name }}<i class="fas fa-badge-check fa-fw" style="margin-left: .5ex" title="REAL" v-if="news.author.verified"></i></router-link>{{ newsLine.after ? ", " + newsLine.after : "" }}
+            </span>
+            <span v-if="newsLine && !newsLine.author">from {{ newsLine.text }}</span>
+<!--            <div class="news-author" v-if="news.author_name">by <router-link :to="url('player', news.author)">{{ news.author.name }}<i class="fas fa-badge-check fa-fw" style="margin-left: .5ex" title="REAL" v-if="news.author.verified"></i></router-link><span v-if="news.author_role">, {{ news.author_role }}</span></div>-->
+<!--            <div class="news-author" v-if="!news.author_name">from <span v-if="news.author_role">{{ news.author_role }}, </span>{{ connection && connection[1] ? (connection[1].series_name || connection[1].name) : '' }}</div>-->
+<!--            <div class="news-date" v-if="news.released || news.updated">{{ news.updated ? `updated ${prettyDate(news.updated)}` : prettyDate(news.released) }}</div>-->
         </div>
         <div class="post-link-holder my-3" v-if="news.redirect_url">
             <a class="post-link p-2" :href="news.redirect_url" :style="themeBackground(theme)">See this post's link <i class="fa fa-chevron-right fa-fw"></i></a>
@@ -59,13 +63,52 @@ export default {
             return getImage(this.news.header);
         },
         theme() {
-            if (!(this.news?.team?.theme || this.news?.event?.theme)) return null;
-            if (this.news.event) return this.news.event.theme;
-            if (this.news.team) return this.news.team.theme;
+            if (this.news?.team?.theme) return this.news.team.theme;
+            if (this.news?.event?.theme) return this.news.event.theme;
             return null;
         },
         connection() {
-            return this.news.event || this.news.team;
+            return this.news.team ? ["team", this.news.team] : ["event", this.news.event];
+        },
+        connectionName() {
+            if (!this.connection?.length) return null;
+            if (this.connection[0] === "team") return this.connection[1].name;
+            if (this.connection[0] === "event") return this.connection[1].series_name || this.connection[1].name;
+            return null;
+        },
+        newsLine() {
+            if (this.news.author_name) {
+                return {
+                    author: true,
+                    // after: str.slice(1, 2),
+                    ahead: this.news.author_role ? "by" : "from"
+                };
+            }
+
+            let str = [];
+            // if (this.news.author_name) str.push(this.news.author_name);
+            if (this.news.author_role) str.push(this.news.author_role);
+            if (this.connectionName) str.push(this.connectionName);
+
+            if (this.connection[0] === "team" && (this.news.event.name) && !this.news.author_name && this.news.author_role) {
+                str = [
+                    this.news.author_role,
+                    this.news.event.name
+                ];
+            }
+
+            /* if (this.news.author_name) {
+                return {
+                    author: true,
+                    after: str.slice(1, 2),
+                    ahead: this.news.author_role ? "by" : "from"
+                };
+            } else { */
+            return {
+                author: false,
+                text: str.slice(0, 2).join(", ")
+            };
+            // }
         }
     },
     metaInfo() {

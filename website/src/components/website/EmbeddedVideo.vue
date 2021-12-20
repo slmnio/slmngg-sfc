@@ -43,6 +43,20 @@ export default {
                 return { service: (vodURL.pathname.split("/").length === 3 ? "twitch" : "twitch-live"), key: vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1) };
             }
 
+            if (this.src.endsWith(".pdf")) {
+                return {
+                    service: "pdf",
+                    key: this.src
+                };
+            }
+
+            if (["mp4", "webm"].some(file => this.src.endsWith("." + file))) {
+                return {
+                    service: "unknown-video",
+                    key: this.src
+                };
+            }
+
             return { service: "unknown", url: this.src };
         },
         renderEmbed() {
@@ -55,8 +69,14 @@ export default {
             if (this.embed.service === "twitch-live") {
                 return `<iframe src="https://player.twitch.tv/?channel=${this.embed.key}&parent=${window.location.hostname}${this.embed.timestamp ? `&t=${this.embed.timestamp}` : ""}" allowfullscreen="true"></iframe>`;
             }
-            if (this.embed.service === "unknown") {
+            if (this.embed.service === "unknown-video") {
                 return `<video src="${this.embed.url}" autoplay controls></video>`;
+            }
+            if (this.embed.service === "pdf") {
+                return `<iframe src="https://docs.google.com/gview?embedded=true&url=${this.src}" class="embed-pdf"></iframe>`;
+            }
+            if (this.embed.service === "unknown") {
+                return `<iframe src="${this.src}" class="embed-iframe"></iframe>`;
             }
             return `<div class="embed-fail">The VOD couldn't be embedded here. Head to the full link on the external website.<br><a href="${this.src}" target="_blank"></a></div>`;
         }
@@ -65,5 +85,8 @@ export default {
 </script>
 
 <style scoped>
-
+    .embed >>> .embed-pdf,
+    .embed >>> .embed-iframe {
+        min-height: calc(100vh - 430px) !important;
+    }
 </style>

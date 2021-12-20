@@ -68,7 +68,9 @@ export default {
             return null;
         },
         connection() {
-            return this.news.team ? ["team", this.news.team] : ["event", this.news.event];
+            if (this.news.team) return ["team", this.news.team];
+            if (this.news.event) return ["event", this.news.event];
+            return null;
         },
         connectionName() {
             if (!this.connection?.length) return null;
@@ -90,7 +92,7 @@ export default {
             if (this.news.author_role) str.push(this.news.author_role);
             if (this.connectionName) str.push(this.connectionName);
 
-            if (this.connection[0] === "team" && (this.news.event.name) && !this.news.author_name && this.news.author_role) {
+            if (this.connection && this.connection[0] === "team" && (this.news.event.name) && !this.news.author_name && this.news.author_role) {
                 str = [
                     this.news.author_role,
                     this.news.event.name
@@ -150,7 +152,9 @@ export default {
 
     .news-embed-container {
         margin: 16px 0;
+        overflow: visible !important;
     }
+
     a {
         color: var(--theme-active, #66d9ff);
     }

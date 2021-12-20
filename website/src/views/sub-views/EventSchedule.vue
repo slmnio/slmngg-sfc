@@ -120,7 +120,7 @@ export default {
             get() {
                 const lastPage = this.$store.getters.getLastMatchPage(this.event.id);
                 if (!lastPage) return this.defaultScheduleNum;
-                if (lastPage.matchPage > this.pagedMatches.length) return this.defaultScheduleNum;
+                // if (lastPage.matchPage > this.pagedMatches.length) return this.defaultScheduleNum;
                 return lastPage.matchPage;
             }
         }

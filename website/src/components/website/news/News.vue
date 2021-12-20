@@ -1,5 +1,9 @@
 <template>
-    <router-link :to="`/news/${news.slug}`" class="news no-link-style">
+    <a v-if="news && news.redirect_url" :href="news.redirect_url" target="_blank">
+        <NewsThumbnail :item="news"/>
+        <div class="news-headline">{{ news.headline }}</div>
+    </a>
+    <router-link v-else :to="`/news/${news.slug}`" class="news no-link-style">
         <NewsThumbnail :item="news"/>
         <div class="news-headline">{{ news.headline }}</div>
     </router-link>

@@ -25,6 +25,7 @@ import CamOverlay from "@/components/broadcast/cams/CamOverlay";
 import DeskCamsOverlay from "@/components/broadcast/cams/DeskCamsOverlay";
 import StaffOverlay from "@/components/broadcast/roots/StaffOverlay";
 import CamsWrapper from "@/components/broadcast/cams/CamsWrapper";
+import SoloOverlay from "@/components/broadcast/SoloOverlay";
 import SeasonHistoryOverlay from "@/components/broadcast/roots/SeasonHistoryOverlay";
 import IframeOverlay from "@/components/broadcast/roots/IframeOverlay";
 import TallyTransmitter from "@/components/broadcast/roots/TallyTransmitter";
@@ -91,5 +92,6 @@ export default [
     { path: "logos", component: LogoAdOverlay },
     { path: "staff", component: StaffOverlay },
     { path: "player-history", component: PlayerHistory, props: route => ({ showMinor: route.query.minor }) },
-    { path: "overview", component: OverviewOverlay }
+    { path: "overview", component: OverviewOverlay },
+    { path: "solo", component: SoloOverlay }
 ];

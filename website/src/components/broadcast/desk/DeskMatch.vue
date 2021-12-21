@@ -10,7 +10,9 @@
                         <div class="score flex-center" v-bind:class="{'win': match.score_2 === match.first_to}"><span class="industry-align">{{ match.score_2 }}</span></div>
                     </div>
                     <div class="match-vs flex-center" :style="centerBorder" v-if="show.vs">
-                        <span class="industry-align">{{ scoreText }}</span>
+                        <transition mode="out-in" name="fade">
+                            <span class="industry-align" :key="scoreText">{{ scoreText }}</span>
+                        </transition>
                     </div>
                 </div>
             </div>
@@ -28,7 +30,7 @@ import DeskTeam from "@/components/broadcast/desk/DeskTeam";
 export default {
     name: "DeskMatch",
     components: { DeskTeam },
-    props: ["_match", "themeColor"],
+    props: ["_match", "themeColor", "customScores"],
     computed: {
         match() {
             if (!this._match?.special_event) {
@@ -45,6 +47,7 @@ export default {
             };
         },
         scores() {
+            if (this.customScores) return this.customScores;
             if (!this.match?.id) return [];
             return [this.match.score_1, this.match.score_2];
         },

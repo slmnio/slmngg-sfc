@@ -25,6 +25,7 @@ import CamOverlay from "@/components/broadcast/cams/CamOverlay";
 import DeskCamsOverlay from "@/components/broadcast/cams/DeskCamsOverlay";
 import StaffOverlay from "@/components/broadcast/roots/StaffOverlay";
 import CamsWrapper from "@/components/broadcast/cams/CamsWrapper";
+import SoloOverlay from "@/components/broadcast/SoloOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -78,5 +79,6 @@ export default [
     { path: "auction", component: AuctionOverlay, props: route => ({ category: route.query.category }) },
     { path: "ad-read", component: AdReadOverlay, props: route => ({ extraDelay: route.query.delay }) },
     { path: "logos", component: LogoAdOverlay },
-    { path: "staff", component: StaffOverlay }
+    { path: "staff", component: StaffOverlay },
+    { path: "solo", component: SoloOverlay }
 ];

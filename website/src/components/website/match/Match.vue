@@ -20,7 +20,7 @@ export default {
     methods: { url },
     computed: {
         match() {
-            return ReactiveRoot(this.id || this.hydratedMatch.id, {
+            return this.hydratedMatch || ReactiveRoot(this.id, {
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")
                 }),

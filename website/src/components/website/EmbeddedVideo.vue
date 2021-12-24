@@ -46,14 +46,14 @@ export default {
             if (this.src.endsWith(".pdf")) {
                 return {
                     service: "pdf",
-                    key: this.src
+                    url: this.src
                 };
             }
 
             if (["mp4", "webm"].some(file => this.src.endsWith("." + file))) {
                 return {
                     service: "unknown-video",
-                    key: this.src
+                    url: this.src
                 };
             }
 
@@ -73,10 +73,10 @@ export default {
                 return `<video src="${this.embed.url}" autoplay controls></video>`;
             }
             if (this.embed.service === "pdf") {
-                return `<iframe src="https://docs.google.com/gview?embedded=true&url=${this.src}" class="embed-pdf"></iframe>`;
+                return `<iframe src="https://docs.google.com/gview?embedded=true&url=${this.embed.url}" class="embed-pdf"></iframe>`;
             }
             if (this.embed.service === "unknown") {
-                return `<iframe src="${this.src}" class="embed-iframe"></iframe>`;
+                return `<iframe src="${this.embed.url}" class="embed-iframe"></iframe>`;
             }
             return `<div class="embed-fail">The VOD couldn't be embedded here. Head to the full link on the external website.<br><a href="${this.src}" target="_blank"></a></div>`;
         }

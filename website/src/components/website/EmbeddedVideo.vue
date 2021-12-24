@@ -1,5 +1,5 @@
 <template>
-    <div class="embed embed-responsive embed-responsive-16by9" v-html="renderEmbed"></div>
+    <div class="embed embed-responsive embed-responsive-16by9" v-bind:class="{'embed--pdf': embed.service === 'pdf', 'embed--iframe': embed.service === 'unknown'}" v-html="renderEmbed"></div>
 </template>
 
 <script>
@@ -85,8 +85,13 @@ export default {
 </script>
 
 <style scoped>
-    .embed >>> .embed-pdf,
-    .embed >>> .embed-iframe {
+    .embed.embed--pdf, .embed.embed--iframe {
         min-height: calc(100vh - 430px) !important;
+    }
+    .embed.embed--pdf:before, .embed.embed--iframe:before {
+        display: none;
+    }
+    .embed {
+        background-color: #222;
     }
 </style>

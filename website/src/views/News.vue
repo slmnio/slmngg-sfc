@@ -4,21 +4,23 @@
             <NewsHeader class="news-header" :url="headerImage" :theme="theme" />
         </OptionalLink>
         <h1 class="news-headline">{{ news.headline }}</h1>
-        <div class="news-line">
+        <div class="content">
+            <div class="news-line">
             <span v-if="newsLine && newsLine.author">
                 {{  newsLine.ahead }} <router-link :to="url('player', news.author)">{{ news.author.name }}<i class="fas fa-badge-check fa-fw" style="margin-left: .5ex" title="REAL" v-if="news.author.verified"></i></router-link>{{ newsLine.after ? ", " + newsLine.after : "" }}
             </span>
-            <span v-if="newsLine && !newsLine.author">from {{ newsLine.text }}</span>
-<!--            <div class="news-author" v-if="news.author_name">by <router-link :to="url('player', news.author)">{{ news.author.name }}<i class="fas fa-badge-check fa-fw" style="margin-left: .5ex" title="REAL" v-if="news.author.verified"></i></router-link><span v-if="news.author_role">, {{ news.author_role }}</span></div>-->
-<!--            <div class="news-author" v-if="!news.author_name">from <span v-if="news.author_role">{{ news.author_role }}, </span>{{ connection && connection[1] ? (connection[1].series_name || connection[1].name) : '' }}</div>-->
-<!--            <div class="news-date" v-if="news.released || news.updated">{{ news.updated ? `updated ${prettyDate(news.updated)}` : prettyDate(news.released) }}</div>-->
-        </div>
-        <div class="post-link-holder my-3" v-if="news.redirect_url">
-            <a class="post-link p-2" :href="news.redirect_url" :style="themeBackground(theme)">See this post's link <i class="fa fa-chevron-right fa-fw"></i></a>
-        </div>
-        <EmbeddedVideo class="news-embed-container" :src="news.embed" v-if="news.embed"/>
-        <div class="news-content" v-if="news.content">
-            <Markdown :markdown="news.content" />
+                <span v-if="newsLine && !newsLine.author">from {{ newsLine.text }}</span>
+                <!--            <div class="news-author" v-if="news.author_name">by <router-link :to="url('player', news.author)">{{ news.author.name }}<i class="fas fa-badge-check fa-fw" style="margin-left: .5ex" title="REAL" v-if="news.author.verified"></i></router-link><span v-if="news.author_role">, {{ news.author_role }}</span></div>-->
+                <!--            <div class="news-author" v-if="!news.author_name">from <span v-if="news.author_role">{{ news.author_role }}, </span>{{ connection && connection[1] ? (connection[1].series_name || connection[1].name) : '' }}</div>-->
+                <!--            <div class="news-date" v-if="news.released || news.updated">{{ news.updated ? `updated ${prettyDate(news.updated)}` : prettyDate(news.released) }}</div>-->
+            </div>
+            <div class="post-link-holder my-3" v-if="news.redirect_url">
+                <a class="post-link p-2" :href="news.redirect_url" :style="themeBackground(theme)">See this post's link <i class="fa fa-chevron-right fa-fw"></i></a>
+            </div>
+            <EmbeddedVideo class="news-embed-container" :src="news.embed" v-if="news.embed"/>
+            <div class="news-content" v-if="news.content">
+                <Markdown :markdown="news.content" />
+            </div>
         </div>
     </div>
 </template>
@@ -132,12 +134,23 @@ export default {
         display: flex;
         justify-content: space-between;
     }
+    .news-item {
+        font-size: 18px;
+    }
+    .content {
+        max-width: 90ex;
+        margin: 0 auto;
+    }
+
     .news-content {
-        margin: 16px 0;
+        margin: 12px 0;
         padding: 16px;
         background-color: #252525;
     }
 
+    .news-content >>> p:first-child {
+        font-size: 1.15em !important;
+    }
     .news-content >>> img {
         width: 800px;
         margin: 10px auto;

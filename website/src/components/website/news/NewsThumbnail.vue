@@ -68,7 +68,7 @@ export default {
         position: relative;
     }
     .news-custom-thumbnail {
-        background-size: 100%;
+        background-size: cover;
         /* crops 16:9 to 2:1 */
     }
     .news-generated-thumbnail-logo {

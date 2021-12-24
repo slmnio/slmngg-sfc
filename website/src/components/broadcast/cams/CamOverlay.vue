@@ -206,7 +206,7 @@ export default {
     }
 
     #overlay {
-        background-image: url(https://cdn.discordapp.com/attachments/485493459357007876/921883053968728074/unknown.png);
-        background-size: 1920px 1080px;
+        /*background-image: url(https://cdn.discordapp.com/attachments/485493459357007876/921883053968728074/unknown.png);*/
+        /*background-size: 1920px 1080px;*/
     }
 </style>

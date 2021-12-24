@@ -94,7 +94,7 @@ export default {
             if (this.news.author_role) str.push(this.news.author_role);
             if (this.connectionName) str.push(this.connectionName);
 
-            if (this.connection && this.connection[0] === "team" && (this.news.event.name) && !this.news.author_name && this.news.author_role) {
+            if (this.connection && this.connection[0] === "team" && (this.news.event?.name) && !this.news.author_name && this.news.author_role) {
                 str = [
                     this.news.author_role,
                     this.news.event.name

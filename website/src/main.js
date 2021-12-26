@@ -147,6 +147,9 @@ const app = new Vue({
     computed: {
         minisiteEvent() {
             return this.$store.getters.thing(`subdomain-${subdomain}`);
+        },
+        version() {
+            return process.env?.VUE_APP_SLMNGG_VERSION;
         }
     },
     methods: {

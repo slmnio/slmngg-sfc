@@ -4,6 +4,7 @@
         <SubPageNav class="my-2">
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
             <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
+            <li class="nav-item" v-if="useTeamCompositions"><router-link class="nav-link" :to="subLink('composition')">Composition</router-link></li>
             <li class="nav-item" v-if="team.theme"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
 <!--            <li class="nav-item"><router-link class="nav-link" :to="subLink('details')">Details</router-link></li>-->
 
@@ -81,6 +82,17 @@ export default {
                     })
                 })
             });
+        },
+        eventSettings() {
+            if (!this.team?.event?.blocks) return null;
+            try {
+                return JSON.parse(this.team?.event.blocks);
+            } catch (e) {
+                return null;
+            }
+        },
+        useTeamCompositions() {
+            return this.eventSettings?.composition?.use && (this.team?.players || []).some(p => p.composition_tank_sr || p.composition_dps_sr || p.composition_support_sr);
         }
     }
 };

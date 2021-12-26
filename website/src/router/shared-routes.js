@@ -16,6 +16,7 @@ import News from "@/views/News";
 import DetailedMatch from "@/views/DetailedMatch";
 import MatchVOD from "@/views/sub-views/MatchVOD";
 import MatchHistory from "@/views/sub-views/MatchHistory";
+import TeamComposition from "@/views/sub-views/TeamComposition";
 
 export default [
     {
@@ -27,7 +28,8 @@ export default [
             { path: "", component: TeamMain },
             { path: "matches", component: TeamMatches },
             { path: "theme", component: TeamTheme },
-            { path: "details", component: TeamDetails }
+            { path: "details", component: TeamDetails },
+            { path: "composition", component: TeamComposition }
         ]
     },
     {

@@ -25,6 +25,7 @@ import CamOverlay from "@/components/broadcast/cams/CamOverlay";
 import DeskCamsOverlay from "@/components/broadcast/cams/DeskCamsOverlay";
 import StaffOverlay from "@/components/broadcast/roots/StaffOverlay";
 import CamsWrapper from "@/components/broadcast/cams/CamsWrapper";
+import SeasonHistoryOverlay from "@/components/broadcast/roots/SeasonHistoryOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -65,6 +66,7 @@ export default [
     { path: "roster", redirect: "rosters" },
     { path: "rosters", component: RosterOverlay, props: route => ({ showRoles: route.query.roles, sort: route.query.sort }) },
     { path: "history", component: HistoryOverlay, props: route => ({ max: route.query.max || 5 }) },
+    { path: "season-history", component: SeasonHistoryOverlay },
     { path: "thumbnail", component: EventThumbnailCreator },
     { path: "draft", component: DraftOverlay, props: route => ({ columns: route.query.columns || 1, icons: route.query.icons !== "false", showStaff: route.query.staff !== "false" }) },
     { path: "casters", component: DeskOverlay, props: route => ({ group: "casters" }) },

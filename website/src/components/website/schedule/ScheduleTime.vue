@@ -13,9 +13,15 @@ import store from "@/thing-store";
 
 export default {
     name: "ScheduleTime",
-    props: ["time", "customText"],
+    props: {
+        time: [String, Number],
+        customText: String,
+        noTimes: Boolean,
+        customTimezone: String
+    },
     computed: {
         activeTimezone() {
+            if (this.customTimezone) return this.customTimezone;
             const stz = store.state.timezone;
             if (stz === "local") return this.localTimezone;
             return stz;
@@ -32,6 +38,7 @@ export default {
             return this.time && this._time.format("{date} {month-short}");
         },
         bottom() {
+            if (this.noTimes) return null;
             const display = informal.display(this.activeTimezone);
             const abbrev = this._time.isDST() ? display.daylight.abbrev : display.standard.abbrev;
 

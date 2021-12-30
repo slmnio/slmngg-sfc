@@ -74,6 +74,9 @@
                 <Middle v-if="middle" :text="middle" :key="middle" />
             </transition>
         </div>
+        <div class="solo-part solo--rosters">
+            <RosterOverlay :virtual-match="virtualMatch" :broadcast="broadcast" :client="client" :title="title" />
+        </div>
         <div class="solo-loader d-none">
             {{ event && event.name }}
         </div>
@@ -87,11 +90,13 @@ import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import SoloTeamControlButton from "@/components/broadcast/SoloTeamControlButton";
 import DeskMatch from "@/components/broadcast/desk/DeskMatch";
 import Middle from "@/components/broadcast/Middle";
+import RosterOverlay from "@/components/broadcast/roots/RosterOverlay";
 
 export default {
     name: "SoloOverlay",
-    props: ["broadcast"],
+    props: ["broadcast", "client", "title"],
     components: {
+        RosterOverlay,
         SoloControlButton,
         SoloTeamControlButton,
         IngameTeam,
@@ -141,7 +146,8 @@ export default {
             return ReactiveThing("event", {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
-                    theme: ReactiveThing("theme")
+                    theme: ReactiveThing("theme"),
+                    players: ReactiveArray("players")
                 })
             })(this.broadcast);
         },
@@ -186,8 +192,10 @@ export default {
         height: 200px;
         width: 100%;
         overflow: hidden;
+        position: relative;
         /* TODO: remove dev */ border: 2px solid red;
     }
+    .solo-part.solo--rosters { height: 1080px; }
 
     .solo--controls {
         background-color: #222;

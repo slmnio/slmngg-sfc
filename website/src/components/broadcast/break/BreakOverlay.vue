@@ -40,7 +40,8 @@
                             <BroadcastPreview v-for="other in broadcasts" v-bind:key="other.id" :broadcast="other"/>
                         </div>
                     </div>
-                    <BreakStaffList class="break-col break-staff-list" v-if="automatedShow === 'Staff'" :matches="fullSchedule"/>
+                    <BreakStaffList class="break-col break-staff-list" v-if="automatedShow === 'Staff'" key="Staff" :matches="fullSchedule"/>
+                    <BreakMatchup class="break-col break-matchup" v-if="automatedShow === 'Matchup'" :key="`Matchup-${nextMatch ? nextMatch.id : ''}`" :match="nextMatch" />
                 </transition>
             </div>
         </div>
@@ -48,7 +49,9 @@
             <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
             <Standings :event="event" :stage="broadcast.current_stage" />
             <div class="break-image-inner" :style="cssImage('backgroundImage', broadcast, ['break_image'], 1080, false)"></div>
-            <Bracket class="break-col break-bracket" v-if="breakDisplay === 'Bracket'" key="Bracket" :event="event" :bracket="bracket" use-overlay-scale />
+            <Bracket class="break-col break-bracket" :event="event" :bracket="bracket" use-overlay-scale />
+            <BreakMatchup class="break-col break-matchup" :match="nextMatch" />
+            <BreakStaffList class="break-col break-staff-list" :matches="fullSchedule"/>
         </div>
     </div>
 </template>
@@ -66,13 +69,14 @@ import BroadcastPreview from "@/components/broadcast/BroadcastPreview";
 import BreakHeadlines from "@/components/broadcast/break/BreakHeadlines";
 import { themeBackground1 } from "@/utils/theme-styles";
 import BreakStaffList from "@/components/broadcast/break/BreakStaffList";
+import BreakMatchup from "@/components/broadcast/break/BreakMatchup";
 
 const tickTime = 25;
 
 export default {
     name: "BreakOverlay",
     props: ["broadcast", "title"],
-    components: { BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
+    components: { BreakMatchup, BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
     data: () => ({
         tick: 0,
         lastCountdownTick: 0

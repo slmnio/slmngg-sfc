@@ -37,7 +37,7 @@ export default {
                 player_relationships: ReactiveArray("player_relationships", {
                     player: ReactiveThing("player")
                 })
-            })({ matches: this.matches });
+            })({ matches: this.matches || [] });
         },
         staffGroups() {
             if (!this._matches?.length) return [];

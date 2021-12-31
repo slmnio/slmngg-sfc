@@ -2,7 +2,7 @@
     <div class="break-match flex-center" v-bind:class="{'expanded': expanded}" :data-center="centerShow">
         <div class="match-next-details" v-if="!expanded">
             <transition name="fade" mode="out-in">
-                <span :key="match ? match.round : 'empty'">UP NEXT: {{ match && match.round }}</span>
+                <span :key="match ? match.round : 'empty'">{{ hasFinished ? 'FINAL SCORE:' : 'UP NEXT:'}} {{ match && match.round }}</span>
             </transition>
         </div>
         <!--
@@ -104,6 +104,10 @@ export default {
             if (!this.match) return false;
             if (this.match.live) return true;
             return this.scores.some(t => !!t);
+        },
+        hasFinished() {
+            if (!this.scores) return false;
+            return this.scores.some(s => s === this.match.first_to);
         },
         scores() {
             if (!this.match) return [];

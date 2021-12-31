@@ -6,7 +6,7 @@
         </div>
 
         <div class="schedule-top mb-3">
-            <h2 class="text-center">Schedule</h2>
+            <h2 class="text-center" @click="showAll = true">Schedule</h2>
             <ul class="schedule-group-holder nav justify-content-center" v-if="pagedMatches.length > 1">
                 <li class="nav-item schedule-group" v-for="(pm) in pagedMatches" v-bind:key="pm.num"
                     v-bind:class="{ 'active': activeScheduleGroup.num === pm.num, 'ct-active': activeScheduleGroup.num === pm.num, 'ct-passive': activeScheduleGroup.num !== pm.num }">
@@ -17,7 +17,7 @@
 
         <div class="schedule-matches" v-if="activeScheduleGroup">
             <ScheduleMatch v-for="(match, i) in groupMatches" v-bind:key="match.id" :match="match"
-                           v-bind:class="i > 0 && getMatchClass(match, groupMatches[i-1])"
+                           v-bind:class="i > 0 && getMatchClass(match, groupMatches[i-1])" :custom-text="showAll && match.match_group ? match.match_group : null"
             />
         </div>
     </div>
@@ -32,6 +32,9 @@ export default {
     name: "EventSchedule",
     components: { TimezoneSwapper, ScheduleMatch },
     props: ["event"],
+    data: () => ({
+        showAll: false
+    }),
     computed: {
         defaultScheduleNum() {
             const filtered = this.pagedMatches.filter(page => {
@@ -76,6 +79,12 @@ export default {
             return Object.values(groups).sort((a, b) => a.num - b.num);
         },
         activeScheduleGroup() {
+            if (this.showAll) {
+                return {
+                    matches: this.matches
+                };
+            }
+
             let group = this.pagedMatches.find(group => group.num === this.activeScheduleNum);
             if (!group || group.matches.length === 0) {
                 // this is where to set the default
@@ -88,6 +97,11 @@ export default {
             if (!this.activeScheduleGroup) return [];
 
             return [...this.activeScheduleGroup.matches].sort((a, b) => {
+                if (this.showAll) {
+                    if (a.start > b.start) return 1;
+                    if (a.start < b.start) return -1;
+                }
+
                 if (a.week > b.week) return 1;
                 if (a.week < b.week) return -1;
 
@@ -112,6 +126,7 @@ export default {
         },
         activeScheduleNum: {
             set(newNum) {
+                this.showAll = false;
                 this.$store.commit("setEventMatchPage", {
                     eventID: this.event.id,
                     matchPage: newNum
@@ -133,7 +148,7 @@ export default {
                 classes.push("day-diff");
             }
             if (thisMatch.week !== lastMatch.week) {
-                classes.push("week-diff");
+                if (!this.showAll) classes.push("week-diff");
             }
 
             return Object.fromEntries(classes.map(c => ([c, true])));

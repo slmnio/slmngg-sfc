@@ -34,7 +34,7 @@
             <div class="vs ct-passive" v-else>vs</div>
         </router-link>
         <div class="match-right match-time flex-center">
-            <ScheduleTime :time="match.start" :custom-text="match.special_event ? null : match.custom_name"/>
+            <ScheduleTime :time="match.start" :custom-text="timeCustomText"/>
         </div>
     </div>
 </template>
@@ -48,7 +48,7 @@ export default {
     name: "ScheduleMatch",
     components: { ScheduleTime, ThemeLogo },
     methods: { url },
-    props: ["match"],
+    props: ["match", "customText"],
     computed: {
         loaded() {
             if (this.match?.__loading) return false;
@@ -109,6 +109,14 @@ export default {
             if (this.match.first_to) details.push(`FT${this.match.first_to}`);
 
             return details.slice(0, 2);
+        },
+        timeCustomText() {
+            if (this.customText) return this.customText;
+            if (this.match?.special_event) {
+                return null;
+            } else {
+                return this.match?.custom_name;
+            }
         }
     }
 };

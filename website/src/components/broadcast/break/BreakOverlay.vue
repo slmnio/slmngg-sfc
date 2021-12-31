@@ -25,7 +25,7 @@
                     <transition-group class="break-col break-schedule" name="a--match" v-if="automatedShow === 'Schedule'" key="Schedule">
                         <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
                     </transition-group>
-                    <div class="break-col break-standings" v-if="automatedShow === 'Standings'" key="Standings">
+                    <div class="break-col break-standings" v-if="automatedShow === 'Standings'" :key="`Standings-${broadcast.current_stage || ''}`">
                         <Standings :event="event" :stage="broadcast.current_stage" />
                     </div>
                     <div class="break-col break-image" v-if="automatedShow === 'Image'" :key="`image-${breakImageURL}`">
@@ -173,8 +173,11 @@ export default {
         suggestedShow() {
             if (!this.broadcast?.break_automation?.length) return null;
 
-            const slides = this.broadcast.break_automation.filter(s => s.startsWith("use:")).map(s => s.replace("use: ", ""));
+            let slides = this.broadcast.break_automation.filter(s => s.startsWith("use:")).map(s => s.replace("use: ", ""));
             console.log(slides);
+            if (!this.nextMatch) slides = slides.filter(s => s !== "Matchup");
+
+            console.log(slides, this.nextMatch);
 
             // TODO: add stuff here that changes based on the countdown remaining
 

@@ -1,5 +1,6 @@
 <template>
-    <div class="break-overlay">
+    <transition name="broadcast-mid-split">
+    <div class="break-overlay" v-if="animationActive">
         <div class="break-center">
             <div class="break-top event-theme-border flex-center overlay--bg" :style="eventBorder">
                 <transition name="fade" mode="out-in">
@@ -54,6 +55,7 @@
             <BreakStaffList class="break-col break-staff-list" :matches="fullSchedule"/>
         </div>
     </div>
+    </transition>
 </template>
 
 <script>
@@ -75,7 +77,7 @@ const tickTime = 25;
 
 export default {
     name: "BreakOverlay",
-    props: ["broadcast", "title"],
+    props: ["broadcast", "title", "animationActive"],
     components: { BreakMatchup, BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
     data: () => ({
         tick: 0,
@@ -419,5 +421,29 @@ export default {
         font-weight: bold;
         font-size: 60px;
         line-height: 1;
+    }
+    .broadcast-mid-split-enter-active {
+        overflow: hidden;
+        max-width: 100%;
+        transition: all 800ms ease;
+    }
+    .broadcast-mid-split-leave-active {
+        overflow: hidden;
+        max-width: 100%;
+        transition: opacity 0s;
+    }
+    .broadcast-mid-split-enter {
+        /*clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);*/
+        /*clip-path: polygon(0% 0%, 0% 100%, 0% 100%, 0% 0, 100% 0, 100% 100%, 100% 100%, 100% 0%);*/
+        clip-path: polygon(50% 0, 50% 100%, 50% 100%, 50% 1%, 50% 0%, 50% 100%, 50% 100%, 50% 0);
+    }
+    .broadcast-mid-split-enter-to {
+        /*clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);*/
+        /*clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 100% 100%, 100% 0%); */
+        clip-path: polygon(0% 0, 0% 100%, 50% 100%, 50% 0%, 50% 0%, 50% 100%, 100% 100%, 100% 0);
+    }
+
+    .broadcast-mid-split-leave-to {
+        opacity: 0;
     }
 </style>

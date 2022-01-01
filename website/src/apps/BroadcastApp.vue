@@ -1,6 +1,6 @@
 <template>
     <div class="broadcast-app">
-        <router-view id="overlay" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active" />
+        <router-view id="overlay" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active" :animation-active="animationActive" />
         <v-style v-if="broadcast && broadcast.event">
             {{ broadcast.event.broadcast_css }}
         </v-style>
@@ -14,7 +14,8 @@ export default {
     name: "BroadcastApp",
     props: ["id", "title", "top", "code", "client"],
     data: () => ({
-        active: false
+        active: false,
+        animationActive: true
     }),
     computed: {
         broadcast() {
@@ -34,6 +35,25 @@ export default {
         window.addEventListener("obsSourceActiveChanged", (e) => {
             this.active = e.detail.active;
         });
+
+        document.body.addEventListener("click", () => {
+            this.active = !this.active;
+        });
+    },
+    watch: {
+        active(isActive) {
+            if (isActive) {
+                this.animationActive = false;
+                this.$root.animationActive = false;
+
+                setTimeout(() => {
+                    requestAnimationFrame(() => {
+                        this.animationActive = true;
+                        this.$root.animationActive = true;
+                    });
+                }, this.broadcast?.transition_offset || 0);
+            }
+        }
     },
     beforeCreate () {
         document.body.className = "overlay";

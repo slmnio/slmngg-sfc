@@ -1,14 +1,18 @@
 <template>
     <div class="generic-overlay flex-center flex-column">
         <TourneyBar class="st4-top" v-if="top === 'st4'" :broadcast="broadcast" left="Schedule" :right="title"/>
-        <div v-else class="generic-overlay-title overlay--bg flex-center" :style="{borderColor: accentColor}">
-            <transition name="fade" mode="out-in">
-                <span class="industry-align" :key="title" v-bind:class="{'has-br': title.includes('\\n') }" v-html="nbr(title)"></span>
-            </transition>
-        </div>
-        <div class="generic-overlay-body overlay--bg flex-center" :style="{backgroundColor: bodyColor}">
-            <slot></slot>
-        </div>
+        <transition name="broadcast-mid-split">
+            <div v-if="top !== 'st4'" class="generic-overlay-title overlay--bg flex-center" :style="{borderColor: accentColor}" v-show="$root.animationActive">
+                <transition name="fade" mode="out-in">
+                    <span class="industry-align" :key="title" v-bind:class="{'has-br': title.includes('\\n') }" v-html="nbr(title)"></span>
+                </transition>
+            </div>
+        </transition>
+        <transition name="broadcast-mid-split">
+            <div class="generic-overlay-body overlay--bg flex-center" :style="{backgroundColor: bodyColor}" v-show="$root.animationActive">
+                <slot></slot>
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -79,5 +83,33 @@ span.industry-align {
 }
 .generic-overlay-title .has-br {
     font-size: 0.72em;
+}
+
+.broadcast-mid-split-enter-active {
+    overflow: hidden;
+    max-width: 100%;
+    transition: all 800ms ease;
+}
+.broadcast-mid-split-leave-active {
+    overflow: hidden;
+    max-width: 100%;
+    transition: opacity 0s;
+}
+.broadcast-mid-split-enter {
+    /*clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);*/
+    /*clip-path: polygon(0% 0%, 0% 100%, 0% 100%, 0% 0, 100% 0, 100% 100%, 100% 100%, 100% 0%);*/
+    clip-path: polygon(50% 0, 50% 100%, 50% 100%, 50% 1%, 50% 0%, 50% 100%, 50% 100%, 50% 0);
+}
+.broadcast-mid-split-enter-to {
+    /*clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);*/
+    /*clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 100% 100%, 100% 0%); */
+    clip-path: polygon(0% 0, 0% 100%, 50% 100%, 50% 0%, 50% 0%, 50% 100%, 100% 100%, 100% 0);
+}
+
+.broadcast-mid-split-leave-to {
+    opacity: 0;
+}
+.generic-overlay-body.broadcast-mid-split-enter-active {
+    transition-delay: 200ms !important;
 }
 </style>

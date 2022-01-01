@@ -1,6 +1,6 @@
 <template>
     <GenericOverlay class="maps-overlay" v-if="match" :title="title || 'Map Set'" :accent-color="accentColor.theme">
-        <div class="map-display d-flex w-100 h-100">
+        <div class="map-display d-flex w-100 h-100" v-bind:class="{'show-next-map': showNextMap}">
             <BroadcastMapDisplay class="map" v-bind:class="{ 'map-dummy' : map.dummy }" v-for="map in maps" v-bind:key="map.id" :map="map" :accent-color="accentColor" :show-map-video="showMapVideos" :broadcast="broadcast"></BroadcastMapDisplay>
         </div>
     </GenericOverlay>
@@ -13,9 +13,10 @@ import BroadcastMapDisplay from "@/components/broadcast/BroadcastMapDisplay";
 export default {
     name: "MapsOverlay",
     components: { BroadcastMapDisplay, GenericOverlay },
-    props: ["broadcast", "title"],
+    props: ["broadcast", "title", "animationActive"],
     data: () => ({
-        activeAudio: null
+        activeAudio: null,
+        showNextMap: false
     }),
     computed: {
         event() {
@@ -80,6 +81,9 @@ export default {
             console.log("extra maps", this.mapCount, dummyMapCount);
             const initialMapCount = maps.length;
 
+            const next = maps.find(m => !m.winner);
+            if (next) next._next = true;
+
             if (dummyMapCount > 0) {
                 for (let i = 0; i < dummyMapCount; i++) {
                     const num = initialMapCount + i;
@@ -139,7 +143,7 @@ export default {
             return this.broadcast.video_settings.includes("Use map videos");
         },
         nextMap() {
-            const unplayedMaps = this.maps.filter(m => !m.dummy);
+            const unplayedMaps = this.maps.filter(m => !m.dummy && !m.winner);
             return unplayedMaps[0];
         }
     },
@@ -171,6 +175,18 @@ export default {
                 });
             });
         }
+    },
+    watch: {
+        animationActive(isActive) {
+            this.showNextMap = false;
+
+            if (isActive) {
+                console.log("Animation trigger");
+                setTimeout(() => {
+                    this.showNextMap = true;
+                }, 2000);
+            }
+        }
     }
 };
 </script>
@@ -181,5 +197,16 @@ export default {
     }
     .map:last-of-type {
         margin-right: 0;
+    }
+
+    .map-display.show-next-map >>> .map.next-map {
+        flex-grow: 5;
+    }
+
+    .map-display >>> .map-lower-name {
+        transition: all 500ms ease;
+    }
+    .map-display.show-next-map >>> .map:not(.next-map) .map-lower-name {
+        font-size: 0.75em;
     }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="map w-100 d-flex position-relative">
+    <div class="map d-flex position-relative" v-bind:class="{'next-map': map._next }">
         <div v-if="mapVideo" class="map-bg map-video w-100 h-100 bg-center" v-bind:class="{'grayscale': !!winnerBG || (map && map.draw)}" :style="mapBackground">
             <video :src="mapVideo" autoplay muted loop></video>
         </div>
@@ -81,6 +81,10 @@ export default {
         flex-direction: column;
         margin: 0 12px;
         overflow: hidden;
+
+        width: 0 !important;
+        flex-grow: 2;
+        transition: all 500ms ease;
     }
     .map-bg {
         background-size: cover;

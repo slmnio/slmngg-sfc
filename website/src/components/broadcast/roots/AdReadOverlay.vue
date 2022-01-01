@@ -22,7 +22,7 @@ async function wait(ms) {
 
 export default {
     name: "AdReadOverlay",
-    props: ["broadcast", "extraDelay"],
+    props: ["broadcast", "extraDelay", "active"],
     data: () => ({
         activeRead: null,
         activeAudio: null,
@@ -65,6 +65,15 @@ export default {
 
         this.localData = JSON.parse(localStorage.getItem("ad-reads") || "{}");
     },
+    watch: {
+        active(isActive) {
+            if (isActive) {
+                setTimeout(() => {
+                    this.runGroup(this.getActiveGroup());
+                }, this.broadcast?.transition_offset || 500);
+            }
+        }
+    },
     methods: {
         getActiveGroup() {
             console.log(this.groups?.length);
@@ -101,6 +110,7 @@ export default {
             return group.bias;
         },
         async runGroup(group) {
+            if (this.activeRead || this.activeAudio) return console.warn("already running", { read: this.activeRead, audio: this.activeAudio });
             console.log("running", group);
 
 

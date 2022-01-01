@@ -1,6 +1,6 @@
 <template>
     <div class="broadcast-app">
-        <router-view id="overlay" :broadcast="broadcast" :client="client" :title="title" :top="top"/>
+        <router-view id="overlay" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active" />
         <v-style v-if="broadcast && broadcast.event">
             {{ broadcast.event.broadcast_css }}
         </v-style>
@@ -13,6 +13,9 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "BroadcastApp",
     props: ["id", "title", "top", "code", "client"],
+    data: () => ({
+        active: false
+    }),
     computed: {
         broadcast() {
             return ReactiveRoot(this.id || `broadcast-${this.code}`, {
@@ -28,6 +31,9 @@ export default {
         console.log("overlay app mounted", this.id);
         // let css = document.createElement('style');;
         // css.innerText = this.event.
+        window.addEventListener("obsSourceActiveChanged", (e) => {
+            this.active = e.detail.active;
+        });
     },
     beforeCreate () {
         document.body.className = "overlay";

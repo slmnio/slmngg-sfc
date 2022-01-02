@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { image } from "@/utils/content-utils";
+import { cssImage } from "@/utils/content-utils";
 
 function sizePadding(val, defaultVal) {
     if (!val) return defaultVal;
@@ -18,12 +18,19 @@ function sizePadding(val, defaultVal) {
 
 export default {
     name: "ThemeLogo",
-    props: ["theme", "iconPadding", "borderWidth"],
+    props: ["theme", "iconPadding", "borderWidth", "logoSize"],
     computed: {
+        image() {
+            if (this.logoSize && this.logoSize >= 100) {
+                // use smalls if possible
+                return cssImage("backgroundImage", this.theme, ["small_logo", "default_logo"], this.logoSize, true);
+            }
+            return cssImage("backgroundImage", this.theme, ["default_logo"], this.logoSize, !!this.logoSize);
+        },
         logo () {
             if (!this.theme) return {};
             return {
-                backgroundImage: image(this.theme, "default_logo"),
+                ...this.image,
                 width: `calc(100% - ${sizePadding(this.iconPadding, "12px")})`,
                 height: `calc(100% - ${sizePadding(this.iconPadding, "12px")})`
             };

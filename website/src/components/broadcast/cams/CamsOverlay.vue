@@ -1,7 +1,7 @@
 <template>
     <div class="cams-overlay">
         <transition name="slide-in">
-            <div class="team-cams" v-show="broadcast.show_cams">
+            <div class="team-cams" v-show="showCams">
                 <TeamCamsGroup :style="{ order: match.flip_teams ? +!ti : ti }" v-for="(team, ti) in teams" v-bind:key="team.id"
                                :team="team" :guests="guests[ti]" :params="camParams" :event="broadcast && broadcast.event"
                                :relay-prefix="relayPrefix" :ti="match.flip_teams ? +!ti : ti" :disable-cams="disable" />
@@ -18,6 +18,9 @@ export default {
     name: "CamsOverlay",
     props: ["broadcast", "params"],
     components: { TeamCamsGroup },
+    data: () => ({
+        showCams: false
+    }),
     computed: {
         disable() {
             return this.broadcast?.video_settings?.includes("Disable team cams");
@@ -52,6 +55,21 @@ export default {
         },
         camParams() {
             return `&cover&na${this.params}`;
+        },
+        broadcastShowCams() {
+            return this.broadcast?.show_cams;
+        }
+    },
+    sockets: {
+        toggle_cams() {
+            this.showCams = !this.showCams;
+        }
+    },
+    watch: {
+        broadcastShowCams(show) {
+            if (show !== this.showCams) {
+                this.showCams = show;
+            }
         }
     }
 };

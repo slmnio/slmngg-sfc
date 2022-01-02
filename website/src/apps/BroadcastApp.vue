@@ -1,5 +1,6 @@
 <template>
     <div class="broadcast-app">
+<!--        <div style="font-size: 5em; color: black">{{ $root.activeScene }}</div>-->
         <router-view id="overlay" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active" :animation-active="animationActive" />
         <v-style v-if="broadcast && broadcast.event">
             {{ broadcast.event.broadcast_css }}
@@ -15,7 +16,8 @@ export default {
     props: ["id", "title", "top", "code", "client"],
     data: () => ({
         active: false,
-        animationActive: true
+        animationActive: true,
+        obs: null
     }),
     computed: {
         broadcast() {
@@ -42,6 +44,10 @@ export default {
     },
     watch: {
         active(isActive) {
+            window.obsstudio.getCurrentScene((scene) => {
+                this.$root.activeScene = scene;
+            });
+
             if (isActive) {
                 this.animationActive = false;
                 this.$root.animationActive = false;

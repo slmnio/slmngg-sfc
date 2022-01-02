@@ -149,18 +149,25 @@ export default {
     },
     sockets: {
         map_music(e) {
-            console.log(e, this.nextMap);
-            if (this.nextMap?.map?.map_audio) {
-                this.runAudio({
-                    audio: this.nextMap.map.map_audio,
-                    volume: this.nextMap.map.map_audio_volume || 100
-                });
-            }
+            this.playAudio();
         }
     },
     methods: {
+        playAudio() {
+            if (this.nextMap?.map?.map_audio) {
+                try {
+                    this.runAudio({
+                        audio: this.nextMap.map.map_audio,
+                        volume: this.nextMap.map.map_audio_volume || 100
+                    });
+                } catch (e) {
+                    this.activeAudio.stop();
+                    this.activeAudio = null;
+                }
+            }
+        },
         async runAudio(read) {
-            if (this.activeAudio) return;
+            if (this.activeAudio) return this.fadeOutAudio(0, 5);
             console.log("running audio", read);
             if (!read?.audio?.length || !read?.audio[0]?.url) return console.warn("no valid data", read);
             const url = read.audio[0].url;
@@ -174,6 +181,44 @@ export default {
                     resolve();
                 });
             });
+        },
+        async fadeOutAudio(targetVolume, duration) {
+            if (!this.activeAudio) return;
+            const climbAmount = (targetVolume - this.activeAudio.volume) / (duration * 10);
+
+            console.log(`Climbing to ${targetVolume} at ${climbAmount}p`);
+
+            const interval = setInterval(() => {
+                if (this.activeAudio.volume + climbAmount >= 1) {
+                    this.activeAudio.volume = 1;
+                } else if (this.activeAudio.volume + climbAmount <= 0) {
+                    this.activeAudio.volume = 0;
+                } else {
+                    this.activeAudio.volume += climbAmount;
+                }
+                if (this.activeAudio.volume === targetVolume) {
+                    clearInterval(interval);
+                    this.activeAudio.volume = targetVolume;
+                }
+
+                if (climbAmount > 0 && this.activeAudio.volume >= targetVolume) {
+                    // climbing up & over
+                    clearInterval(interval);
+                    this.activeAudio.volume = targetVolume;
+                    if (targetVolume === 0) this.activeAudio = null;
+                }
+                if (climbAmount < 0 && this.activeAudio.volume <= targetVolume) {
+                    // climbing down and under
+                    clearInterval(interval);
+                    this.activeAudio.volume = targetVolume;
+                    if (targetVolume === 0) this.activeAudio = null;
+                }
+            }, 100);
+            setTimeout(() => {
+                clearInterval(interval);
+                console.log("climbed");
+                if (targetVolume === 0) this.activeAudio = null;
+            }, (duration + 1) * 1000);
         }
     },
     watch: {
@@ -182,6 +227,7 @@ export default {
 
             if (isActive) {
                 console.log("Animation trigger");
+                if (!this.activeAudio && (this.$root?.activeScene?.name?.toLowerCase().includes("maps"))) this.playAudio();
                 setTimeout(() => {
                     this.showNextMap = true;
                 }, 2000);

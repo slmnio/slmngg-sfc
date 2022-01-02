@@ -84,7 +84,7 @@ export default {
 
         width: 0 !important;
         flex-grow: 2;
-        transition: all 500ms ease;
+        transition: all 800ms ease;
     }
     .map-bg {
         background-size: cover;

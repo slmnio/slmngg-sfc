@@ -230,7 +230,7 @@ export default {
                 if (!this.activeAudio && (this.$root?.activeScene?.name?.toLowerCase().includes("maps"))) this.playAudio();
                 setTimeout(() => {
                     this.showNextMap = true;
-                }, 2000);
+                }, 3000);
             }
         }
     }
@@ -250,7 +250,7 @@ export default {
     }
 
     .map-display >>> .map-lower-name {
-        transition: all 500ms ease;
+        transition: all 800ms ease;
     }
     .map-display.show-next-map >>> .map:not(.next-map) .map-lower-name {
         font-size: 0.75em;

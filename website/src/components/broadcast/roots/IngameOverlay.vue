@@ -1,7 +1,7 @@
 <template>
   <div class="ingame-overlay">
       <div class="top-overlay" :style="broadcastMargin">
-          <transition-group name="fade" mode="out-in">
+          <transition-group name="itah" mode="out-in">
               <IngameTeam :key="`${team.id}-${i}`" v-for="(team, i) in teams"
                           :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores"
                           :width="teamWidth" :codes="codes"/>
@@ -21,7 +21,7 @@ import Middle from "@/components/broadcast/Middle";
 
 export default {
     name: "IngameOverlay",
-    props: ["broadcast", "codes"],
+    props: ["broadcast", "codes", "animationActive"],
     components: { IngameTeam, Middle },
     computed: {
         match() {
@@ -37,6 +37,7 @@ export default {
                 if (t.theme === undefined && t.has_theme === 0) return true;
                 return t.theme && !t.theme.__loading && t.theme.id;
             })) return [];
+            if (!this.animationActive) return [];
             if (this.match.flip_teams && this.match.teams.length === 2) return [this.match.teams[1], this.match.teams[0]];
             if (this.match.teams.length !== 2) return [];
             return this.match.teams;
@@ -48,6 +49,7 @@ export default {
             return scores;
         },
         shouldShowMiddle() {
+            if (!this.animationActive) return false;
             if (this.match?.special_event) {
                 return this.middleText;
             }

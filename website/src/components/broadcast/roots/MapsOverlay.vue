@@ -225,7 +225,7 @@ export default {
         animationActive(isActive) {
             this.showNextMap = false;
 
-            if (isActive) {
+            if (isActive && this.nextMap?.map) {
                 console.log("Animation trigger");
                 if (!this.activeAudio && (this.$root?.activeScene?.name?.toLowerCase().includes("maps"))) this.playAudio();
                 setTimeout(() => {

@@ -191,11 +191,9 @@ export default {
             return slides[(this.tick % slides.length)];
         },
         automatedShow() {
-            if (this.broadcast?.break_automation?.length &&
-                this.broadcast.break_automation.includes("setting: Always do 30s Schedule") &&
-                this.lastCountdownTick <= 30 &&
-                this.broadcast.countdown_end) {
-                return "Schedule";
+            if (this.broadcast?.break_automation?.length && this.lastCountdownTick <= 30 && this.broadcast.countdown_end) {
+                if (this.broadcast.break_automation.includes("setting: Always do 30s Schedule")) return "Schedule";
+                if (this.broadcast.break_automation.includes("setting: Always do 30s Matchup")) return "Matchup";
             }
             if (this.broadcast.break_display && this.broadcast.break_display !== "Automated") {
                 // do what it says
@@ -210,6 +208,11 @@ export default {
         broadcast() {
             if (this.broadcast) {
                 document.body.dataset.broadcast = this.broadcast.key;
+            }
+        },
+        animationActive(isActive) {
+            if (isActive) {
+                this.tick = 0;
             }
         }
     },
@@ -294,7 +297,6 @@ export default {
     }
     .break-schedule {
         flex-grow: 1;
-        padding: 20px 40px;
         box-sizing: border-box;
         /*justify-content: space-evenly;*/
         overflow: hidden;
@@ -304,6 +306,9 @@ export default {
         width: 100%;
         padding: 20px;
         /*padding: 10px 0 15px 0px;*/
+    }
+    .break-schedule, .break-matchup, .break-standings {
+        padding: 20px 40px;
     }
 
     .break-countdown {
@@ -348,7 +353,6 @@ export default {
 
     .break-standings {
         /*background-color: rgba(0,0,0,0.2);*/
-        padding: 40px;
         overflow: hidden;
     }
 

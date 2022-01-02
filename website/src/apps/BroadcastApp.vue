@@ -44,7 +44,7 @@ export default {
     },
     watch: {
         active(isActive) {
-            window.obsstudio.getCurrentScene((scene) => {
+            window.obsstudio?.getCurrentScene((scene) => {
                 this.$root.activeScene = scene;
             });
 

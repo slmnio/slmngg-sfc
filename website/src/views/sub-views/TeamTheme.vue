@@ -34,7 +34,7 @@
 
         <h3>Ingame overlay</h3>
         <div class="overlay-area ingame-overlay mb-3">
-            <IngameTeam :team="team"/>
+            <IngameTeam :team="team" :event="team.event" />
         </div>
 
         <h3>Bracket</h3>

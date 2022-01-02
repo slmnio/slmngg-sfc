@@ -4,7 +4,7 @@
           <transition-group name="itah" mode="out-in">
               <IngameTeam :key="`${team.id}-${i}`" v-for="(team, i) in teams"
                           :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores"
-                          :width="teamWidth" :codes="codes"/>
+                          :width="teamWidth" :codes="codes" :event="broadcast.event"/>
           </transition-group>
 
           <transition name="mid" mode="out-in">

@@ -2,6 +2,11 @@
 <!--    <transition name="ingame-team-anim">-->
         <div class="ingame-team-holder" v-if="loaded" v-bind:class="{'right': right, 'left': !right}">
             <div class="ingame-team default-thing" :style="style" :key="team.id">
+                <div class="texture-holder position-absolute w-100 h-100" v-if="texture">
+                    <div class="ingame-texture">
+                        <img :src="texture" alt="">
+                    </div>
+                </div>
                 <div class="flex-center team-small-text" v-if="team.small_overlay_text">
                     <span class="industry-align">{{ team.small_overlay_text }}</span>
                 </div>
@@ -29,8 +34,37 @@ import { cssImage } from "@/utils/content-utils";
 
 export default {
     name: "IngameTeam",
-    props: ["team", "right", "score", "hideScores", "width", "codes"],
+    props: ["team", "right", "score", "hideScores", "width", "codes", "event"],
+    data: () => ({
+        textureData: {
+            url: null,
+            svg: null,
+            loading: true
+        }
+    }),
+    methods: {
+        async loadSVG(url) {
+            this.textureData.loading = true;
+            this.textureData.url = url;
+            const data = await fetch(url).then(res => res.text());
+            // console.log(data);
+            this.textureData.svg = data;
+            this.textureData.loading = false;
+        }
+    },
     computed: {
+        texture() {
+            const texture = this.event?.broadcast_texture?.[0];
+            if (!texture) return null;
+            if (this.textureData.loading && this.textureData.url === texture.url) return null;
+
+            if (this.textureData.url !== texture.url) {
+                return this.loadSVG(texture.url);
+            }
+            // console.log(texture);
+            return "data:image/svg+xml;base64," + btoa(this.textureData.svg.replace(/#696969/g, this.svgColor).trim());
+            // return texture;
+        },
         loaded() {
             if (this.team.theme === undefined && this.team.has_theme === 0) return true;
             return this.team && this.team.theme && !this.team.theme.__loading;
@@ -42,6 +76,12 @@ export default {
                 color: this.team.theme.color_text_on_logo_background || this.team.theme.color_text_on_theme,
                 ...this.teamWidthCSS
             };
+        },
+        svgColor() {
+            if (this.style?.backgroundColor === this.teamSlice?.backgroundColor) {
+                return this.style?.color;
+            }
+            return this.teamSlice?.backgroundColor || this.style?.color;
         },
         teamSlice() {
             if (!this.team.theme) return {};
@@ -65,7 +105,7 @@ export default {
     watch: {
         style() {
             if (this.$el && this.$el.querySelector) {
-                console.log("tick", this.$el.querySelector(".team-name"));
+                // console.log("tick", this.$el.querySelector(".team-name"));
             }
         },
         loaded() {
@@ -73,7 +113,7 @@ export default {
         },
         team() {
             if (this.$el && this.$el.querySelector) {
-                console.log("team watch");
+                // console.log("team watch");
                 updateWidth(this.$el, this.teamWidth);
             }
         }
@@ -81,7 +121,7 @@ export default {
     mounted() {
         this.$nextTick(() => {
             if (this.$el && this.$el.querySelector) {
-                console.log("mount - tick");
+                // console.log("mount - tick");
                 updateWidth(this.$el, this.teamWidth);
             }
         });
@@ -92,7 +132,7 @@ function updateWidth(vueEl, fullWidth) {
     const holder = vueEl.querySelector(".team-name");
     const bigHolder = vueEl.querySelector(".ingame-team");
     const span = holder.querySelector("span");
-    console.log(vueEl.getBoundingClientRect());
+    // console.log(vueEl.getBoundingClientRect());
 
     // console.log(holder, internal, span);
 
@@ -104,8 +144,8 @@ function updateWidth(vueEl, fullWidth) {
     requestAnimationFrame(() => {
         let diff = 0;
         [...bigHolder.children].map(el => {
-            if (["team-name"].some(cl => el.classList.contains(cl))) return;
-            console.log(el);
+            if (["team-name", "texture-holder"].some(cl => el.classList.contains(cl))) return;
+            // console.log(el);
             diff += el.getBoundingClientRect().width;
         });
         diff += 32; // extra padding
@@ -114,7 +154,7 @@ function updateWidth(vueEl, fullWidth) {
         const target = fullWidth - diff;
         // const target = 0;
         const width = span.getBoundingClientRect().width;
-        console.log(diff, target, width);
+        // console.log(diff, target, width);
 
         if (width > target) {
             const scale = target / width;
@@ -258,5 +298,23 @@ function updateWidth(vueEl, fullWidth) {
         background-color: #373737;
         color: white;
         border-color: #5F5F5F
+    }
+
+    .ingame-texture {
+        position: absolute;
+        width: 70% !important;
+        height: 100% !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0.6;
+        -webkit-mask-image: -webkit-gradient(linear, 15% 0%, 50% 0%, from(rgba(0,0,0,1)), to(rgba(0,0,0,0.15)));
+    }
+    .ingame-team-holder.right .ingame-texture {
+        transform: scaleX(-1);
+        right: 0;
+    }
+    .ingame-texture img {
+        min-height: 121px;
     }
 </style>

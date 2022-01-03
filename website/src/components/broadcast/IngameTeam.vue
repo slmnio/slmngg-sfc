@@ -78,6 +78,8 @@ export default {
             };
         },
         svgColor() {
+            if (this.team?.theme?.color_alt) return this.team.theme.color_alt;
+
             if (this.style?.backgroundColor === this.teamSlice?.backgroundColor) {
                 return this.style?.color;
             }

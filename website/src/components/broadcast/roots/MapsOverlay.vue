@@ -250,9 +250,14 @@ export default {
     }
 
     .map-display >>> .map-lower-name {
+        transform: scale(1);
         transition: all 800ms ease;
+        width: 100%;
+    }
+    .map-display.show-next-map >>> .map.next-map .map-lower-name {
+        width: 40%;
     }
     .map-display.show-next-map >>> .map:not(.next-map) .map-lower-name {
-        font-size: 0.75em;
+        transform: scale(0.75);
     }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="bracket row" :style="winVars" v-bind:class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
+    <div class="bracket row flex-column" :style="winVars" v-bind:class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
         <div class="internal-bracket d-flex" v-for="(bracket, i) in brackets" v-bind:key="i">
             <div class="column" v-for="(column, ci) in bracket.columns" v-bind:key="ci">
                 <div class="header text-center mb-3" :style="logoBackground1(event)" v-if="showHeaders && column.header">{{ column.header }}</div>

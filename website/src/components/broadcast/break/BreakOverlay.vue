@@ -393,7 +393,6 @@ export default {
 
     .break-bracket {
         zoom: 0.85;
-        flex-direction: row;
         overflow: hidden;
     }
 

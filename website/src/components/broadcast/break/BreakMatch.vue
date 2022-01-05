@@ -41,6 +41,13 @@
             </div>
         </div>
 <!--        </transition-group>-->
+
+        <div class="match-schedule-text w-100 flex-center" v-if="expanded && match.schedule_text">
+            <transition name="fade" mode="out-in">
+                <div class="industry-align" :key="match.schedule_text">{{ match.schedule_text }}</div>
+            </transition>
+        </div>
+
     </div>
 </template>
 
@@ -164,8 +171,18 @@ export default {
         /*padding: 10px 0;*/
     }
     .break-match.expanded {
-        flex-direction: row;
+        /*flex-direction: row;*/
         padding: .25em 0;
+    }
+
+    .match-schedule-text {
+        font-size: 0.5em;
+        text-transform: uppercase;
+        font-weight: bold;
+        margin-top: .25em;
+        margin-bottom: -0.1em;
+        /*margin-bottom: 0;*/
+        /*margin-top: -0.1em;*/
     }
 
     .match-teams {

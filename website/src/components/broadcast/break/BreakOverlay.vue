@@ -342,7 +342,7 @@ export default {
 
     .a--match-enter-active, .a--match-leave-active, .a--match-move { transition: all .5s ease; overflow: hidden; }
     .a--match-enter, .a--match-leave-to { max-height: 0; padding: 0 !important; }
-    .a--match-enter-to, .a--match-leave { max-height: 140px; }
+    .a--match-enter-to, .a--match-leave { max-height: 180px; }
 
     .break-content {
         display: flex;

@@ -4,7 +4,7 @@
             <IngameOverlay id="overlay" :broadcast="broadcast" v-if="showOverlay" />
         </transition>
         <transition name="fade">
-            <iframe class="w-100 h-100 position-absolute border-0" src="https://syncer.live/?embed" v-if="showSyncer"/>
+            <iframe class="w-100 h-100 position-absolute border-0" src="https://syncer.live/?embed&noCenter" v-if="showSyncer"/>
         </transition>
     </div>
 </template>

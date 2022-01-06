@@ -4,8 +4,8 @@
         <div class="break-center">
             <div class="break-top event-theme-border flex-center overlay--bg" :style="eventBorder">
                 <transition name="fade" mode="out-in">
-                    <span class="industry-align" v-bind:class="{'has-br': (title || broadcast.title || broadcast.name || '').includes('\\n') }"
-                          :key="title || broadcast.title || broadcast.name" v-html="nbr(title || broadcast.title || broadcast.name)"></span>
+                    <span class="industry-align" v-bind:class="{'has-br': (overlayTitle).includes('\\n') }"
+                          :key="overlayTitle" v-html="nbr(overlayTitle)"></span>
                 </transition>
                 <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News" :borderCSS="eventBorder" />
             </div>
@@ -202,6 +202,28 @@ export default {
                 // empty or automated - do automation
                 return this.suggestedShow;
             }
+        },
+        matchIsLast() {
+            if (!this.schedule?.length) return true; // no schedule - assume last
+            if (!this.nextMatch?.first_to) return false; // no match - assume others??
+            const index = this.schedule.findIndex(match => match.id === this.nextMatch.id);
+            if (index === -1) return true; // not in schedule - assume it's a schedule for tomorrow
+            if (index === (this.schedule.length - 1)) return true; // last of the day!
+            return false; // is not last
+        },
+        autoTitle() {
+            if (!this.nextMatch?.first_to) return ""; // probably nothing for now
+            console.log(this.nextMatch);
+            const scores = [this.nextMatch.score_1 || 0, this.nextMatch.score_2 || 0];
+            if (scores.every(s => s === 0)) return "Starting soon"; // 0-0
+            if (scores.some(s => s === this.nextMatch.first_to) && this.matchIsLast) return "Thanks for watching";
+            return "Be right back";
+        },
+        overlayTitle() {
+            const title = this.title || this.broadcast?.title || this.broadcast?.name || "";
+            const titleWithAuto = title.replace("{auto}", this.autoTitle);
+            if (!titleWithAuto || titleWithAuto.trim().length === 0) return title; // make sure we have something here
+            return titleWithAuto;
         }
     },
     watch: {

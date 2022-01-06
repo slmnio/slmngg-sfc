@@ -1,7 +1,7 @@
 <template>
     <div class="syncer-overlay">
         <transition name="fade">
-            <IngameOverlay id="overlay" :broadcast="broadcast" v-if="showOverlay" />
+            <IngameOverlay id="overlay" :broadcast="broadcast" v-if="showOverlay" :animation-active="true" />
         </transition>
         <transition name="fade">
             <iframe class="w-100 h-100 position-absolute border-0" src="https://syncer.live/?embed&noCenter" v-if="showSyncer"/>

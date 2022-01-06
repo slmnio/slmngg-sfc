@@ -26,6 +26,7 @@ import DeskCamsOverlay from "@/components/broadcast/cams/DeskCamsOverlay";
 import StaffOverlay from "@/components/broadcast/roots/StaffOverlay";
 import CamsWrapper from "@/components/broadcast/cams/CamsWrapper";
 import SeasonHistoryOverlay from "@/components/broadcast/roots/SeasonHistoryOverlay";
+import IframeOverlay from "@/components/broadcast/roots/IframeOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -62,6 +63,7 @@ export default [
         })
     },
     { path: "schedule", component: ScheduleOverlay },
+    { path: "iframe", component: IframeOverlay, props: route => ({ url: route.query.url }) },
     { path: "standings", component: StandingsOverlay },
     { path: "roster", redirect: "rosters" },
     { path: "rosters", component: RosterOverlay, props: route => ({ showRoles: route.query.roles, sort: route.query.sort }) },

@@ -1,6 +1,9 @@
 <template>
     <div>
         <div class="container">
+            <div>
+                <h6>Games: <a class="role-tag" v-for="rel in mainPlayerRelationships" v-bind:key="rel.meta.singular_name" :href="'#' + rel.meta.singular_name">{{ rel.items.length }} as {{ rel.meta.singular_name }}</a></h6>
+            </div>
             <div class="role-group" v-for="rel in mainPlayerRelationships" v-bind:key="rel.meta.singular_name">
                 <h1>as {{ rel.meta.singular_name }} ({{ rel.items.length }})</h1>
                 <div class="row">

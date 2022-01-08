@@ -1,8 +1,3 @@
-<template>
-  <div class="text-white">
-  </div>
-</template>
-
 <script>
 export default {
     name: "TallyTransmitter",

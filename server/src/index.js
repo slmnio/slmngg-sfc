@@ -116,6 +116,10 @@ io.on("connection", (socket) => {
         console.log("prod-join", clientName);
         socket.join(`prod:client-${clientName}`);
     });
+
+    socket.on("tally_change", ({ clientName, state, sceneName }) => {
+        socket.to(`prod:client-${clientName}`).emit("tally_change", { state, sceneName });
+    });
 });
 
 http.listen(port, () => {

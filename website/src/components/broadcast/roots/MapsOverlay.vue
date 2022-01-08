@@ -76,13 +76,18 @@ export default {
             //     }
             //     return maps;
             // }
-            const maps = [...(this.match.maps || [])].filter(m => m.map).slice(0, this.likelyNeededMaps);
+
+            if (!this.match?.first_to) return this.match.maps;
+
+            const maps = this.match?.first_to ? [...(this.match.maps || [])].filter(m => m.map).slice(0, this.likelyNeededMaps) : [...(this.match.maps || [])];
             const dummyMapCount = this.likelyNeededMaps - maps.length;
             console.log("extra maps", this.mapCount, dummyMapCount);
             const initialMapCount = maps.length;
 
             const next = maps.find(m => !m.winner);
             if (next) next._next = true;
+
+            if (!this.match?.first_to) return maps;
 
             if (dummyMapCount > 0) {
                 for (let i = 0; i < dummyMapCount; i++) {

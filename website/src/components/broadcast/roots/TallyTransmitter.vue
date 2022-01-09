@@ -4,7 +4,8 @@ export default {
     props: ["client"],
     data: () => ({
         active: false,
-        visible: false
+        visible: false,
+        scene: ""
     }),
     computed: {
         state() {
@@ -20,18 +21,24 @@ export default {
 
     methods: {
         transmitState() {
-            this.$socket.client.emit("tally_change", { clientName: this.client.key, state: this.state, sceneName: this?.$root?.activeScene?.name });
+            this.$socket.client.emit("tally_change", { clientName: this.client.key, state: this.state, sceneName: this.scene });
         }
     },
     mounted() {
         window.addEventListener("obsSourceActiveChanged", (e) => {
             if (!this.client) return;
+            window.obsstudio?.getCurrentScene((scene) => {
+                this.scene = scene?.name;
+            });
             this.active = e.detail.active;
             this.transmitState();
         });
 
         window.addEventListener("obsSourceVisibleChanged", (e) => {
             if (!this.client) return;
+            window.obsstudio?.getCurrentScene((scene) => {
+                this.scene = scene?.name;
+            });
             this.visible = e.detail.visible;
             this.transmitState();
         });

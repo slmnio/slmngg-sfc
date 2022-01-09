@@ -7,8 +7,12 @@
                         <img :src="texture" alt="">
                     </div>
                 </div>
-                <div class="flex-center team-small-text" v-if="team.small_overlay_text">
-                    <span class="industry-align">{{ team.small_overlay_text }}</span>
+                <div class="flex-center team-small-text">
+                    <transition name="fade" mode="out-in">
+                        <span :key="smallText" v-if="smallText">
+                        {{ smallText }}
+                        </span>
+                    </transition>
                 </div>
                 <div class="flex-center team-name">
                     <span class="industry-align team-sub-name" v-if="!codes">{{ team.name }}</span>
@@ -34,7 +38,7 @@ import { cssImage } from "@/utils/content-utils";
 
 export default {
     name: "IngameTeam",
-    props: ["team", "right", "score", "hideScores", "width", "codes", "event"],
+    props: ["team", "right", "score", "hideScores", "width", "codes", "event", "autoSmall"],
     data: () => ({
         textureData: {
             url: null,
@@ -53,6 +57,38 @@ export default {
         }
     },
     computed: {
+        record() {
+            if (this.autoSmall?.show !== "record") return null;
+            const stage = this.autoSmall?.stage;
+            if (!stage) return null;
+
+            const matches = this.team?.matches?.filter(m => m.match_group === stage);
+
+            console.log(matches);
+            if (!matches?.length) return null;
+
+            let [wins, losses] = [0, 0];
+
+            matches.forEach(m => {
+                const scores = [m.score_1 || 0, m.score_2 || 0];
+                if (!scores.some(s => s === m.first_to)) return; // not finished
+                const won = scores[0] === m.first_to ? this.team.id === m.teams[0].id : this.team.id === m.teams[1].id;
+                if (won) {
+                    wins++;
+                } else {
+                    losses++;
+                }
+            });
+
+            return [wins, losses].join(" - ");
+        },
+        smallText() {
+            if (this.team?.small_overlay_text) return this.team.small_overlay_text;
+            if (this.autoSmall) {
+                return this.record;
+            }
+            return null;
+        },
         texture() {
             const texture = this.event?.broadcast_texture?.[0];
             if (!texture) return null;
@@ -237,6 +273,8 @@ function updateWidth(vueEl, fullWidth) {
         font-size: 24px;
         padding: 0 16px;
         white-space: nowrap;
+        position: relative;
+        letter-spacing: -1px;
     }
 
     .team-score {

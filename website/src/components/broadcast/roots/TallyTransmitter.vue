@@ -20,25 +20,29 @@ export default {
     },
 
     methods: {
-        transmitState() {
+        transmit() {
             this.$socket.client.emit("tally_change", { clientName: this.client.key, state: this.state, sceneName: this.scene });
+        },
+        transmitState() {
+            if (window.obsstudio) {
+                window.obsstudio.getCurrentScene((scene) => {
+                    this.scene = scene?.name;
+                    this.transmit();
+                });
+            } else {
+                this.transmit();
+            }
         }
     },
     mounted() {
         window.addEventListener("obsSourceActiveChanged", (e) => {
             if (!this.client) return;
-            window.obsstudio?.getCurrentScene((scene) => {
-                this.scene = scene?.name;
-            });
             this.active = e.detail.active;
             this.transmitState();
         });
 
         window.addEventListener("obsSourceVisibleChanged", (e) => {
             if (!this.client) return;
-            window.obsstudio?.getCurrentScene((scene) => {
-                this.scene = scene?.name;
-            });
             this.visible = e.detail.visible;
             this.transmitState();
         });

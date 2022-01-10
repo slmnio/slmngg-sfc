@@ -14,9 +14,10 @@ async function getChannel() {
 }
 
 async function log(text) {
+    console.log("[Log]", text);
+    if (!client) return;
     let channel = await getChannel();
     if (!channel) return;
-    console.log("[Log]", text);
     return channel.send(text);
 }
 

@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay class="maps-overlay" v-if="match" :title="title || 'Map Set'" :accent-color="accentColor.theme">
+    <GenericOverlay class="maps-overlay" v-if="match" :title="customTitle" :accent-color="accentColor.theme">
         <div class="map-display d-flex w-100 h-100" v-bind:class="{'show-next-map': showNextMap}">
             <BroadcastMapDisplay class="map" v-bind:class="{ 'map-dummy' : map.dummy }" v-for="map in maps" v-bind:key="map.id" :map="map" :accent-color="accentColor" :show-map-video="showMapVideos" :broadcast="broadcast"></BroadcastMapDisplay>
         </div>
@@ -13,12 +13,25 @@ import BroadcastMapDisplay from "@/components/broadcast/BroadcastMapDisplay";
 export default {
     name: "MapsOverlay",
     components: { BroadcastMapDisplay, GenericOverlay },
-    props: ["broadcast", "title", "animationActive"],
+    props: ["broadcast", "title", "animationActive", "autoTitle"],
     data: () => ({
         activeAudio: null,
         showNextMap: false
     }),
     computed: {
+        customTitle() {
+            if (this.title) return this.title;
+            if (this.autoTitle === "score" && this.match) {
+                return [
+                    this.match.teams?.[0]?.code,
+                    this.match.score_1,
+                    "-",
+                    this.match.score_2,
+                    this.match.teams?.[1]?.code
+                ].join(" ");
+            }
+            return "Map Set";
+        },
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;
             return ReactiveRoot(this.broadcast.event.id, {

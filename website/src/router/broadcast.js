@@ -77,7 +77,7 @@ export default [
     { path: "info", component: InfoOverlay },
     { path: "background", component: BroadcastBackground, props: route => ({ index: route.query.index }) },
     { path: "sponsors", component: SponsorOverlay },
-    { path: "maps", component: MapsOverlay },
+    { path: "maps", component: MapsOverlay, props: route => ({ autoTitle: route.query.auto }) },
     { path: "branding", component: BrandingOverlay },
     { path: "auction", component: AuctionOverlay, props: route => ({ category: route.query.category }) },
     { path: "ad-read", component: AdReadOverlay, props: route => ({ extraDelay: route.query.delay }) },

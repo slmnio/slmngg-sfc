@@ -8,9 +8,6 @@
         <div>
           {{ client.name }}
         </div>
-        <div>
-          {{ sceneName }}
-        </div>
       </div>
     </div>
   </div>

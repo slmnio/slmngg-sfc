@@ -27,6 +27,8 @@ import StaffOverlay from "@/components/broadcast/roots/StaffOverlay";
 import CamsWrapper from "@/components/broadcast/cams/CamsWrapper";
 import SeasonHistoryOverlay from "@/components/broadcast/roots/SeasonHistoryOverlay";
 import IframeOverlay from "@/components/broadcast/roots/IframeOverlay";
+import TallyTransmitter from "@/components/broadcast/roots/TallyTransmitter";
+import TallyViewer from "@/components/broadcast/roots/TallyViewer";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -51,6 +53,8 @@ export default [
     },
     { path: "break", component: BreakOverlay },
     { path: "syncer", component: SyncerOverlay },
+    { path: "tally-transmitter", component: TallyTransmitter },
+    { path: "tally-viewer", component: TallyViewer },
     { path: "break-bar", component: BreakBarOverlay },
     {
         path: "bracket",

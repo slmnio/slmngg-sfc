@@ -7,7 +7,7 @@
             <div class="event-logo-inner bg-center" :style="eventLogo"></div>
         </div>
         <div class="team-rank box flex-center">
-            <div class="ranking-text">{{ team.ranking_text }}</div>
+            <div class="ranking-text">{{ rankingText }}</div>
         </div>
     </div>
   </div>
@@ -29,6 +29,10 @@ export default {
         },
         eventLogo() {
             return cssImage("backgroundImage", this.team?.event?.theme, ["small_logo", "default_logo"], 100);
+        },
+        rankingText() {
+            if (!this.team?.ranking_text) return "N/A";
+            return this.team?.ranking_text;
         }
     }
 };

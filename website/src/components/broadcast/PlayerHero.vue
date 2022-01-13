@@ -10,7 +10,7 @@
 
 export default {
     name: "PlayerHero",
-    props: ["hero", "british"],
+    props: ["hero"],
     computed: {
         heroName() {
             if (!this.hero?.name) return null;

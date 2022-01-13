@@ -1,5 +1,7 @@
 <template>
-    <div class="player-team-display d-flex" :style="teamBG">
+  <div class="player-team-display d-flex flex-column" :style="teamBG">
+    <div class="team-name flex-center text-center font-weight-bold" v-if="showName">{{team.name}}</div>
+    <div class="team-full-box d-flex">
         <div class="team-logo box flex-center">
             <div class="team-logo-inner bg-center" :style="teamLogo"></div>
             <div class="event-logo-inner bg-center" :style="eventLogo"></div>
@@ -8,6 +10,7 @@
             <div class="ranking-text">{{ team.ranking_text }}</div>
         </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -16,7 +19,7 @@ import { cssImage } from "@/utils/content-utils";
 
 export default {
     name: "PlayerTeamDisplay",
-    props: ["team"],
+    props: ["team", "showName"],
     computed: {
         teamBG() {
             return logoBackground1(this.team);

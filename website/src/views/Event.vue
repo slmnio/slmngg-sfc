@@ -68,7 +68,11 @@ export default {
                     player: ReactiveThing("player")
                 }),
                 casters: ReactiveArray("casters"),
-                news_items: ReactiveArray("news_items"),
+                news_items: ReactiveArray("news_items", {
+                    team: ReactiveThing("team", {
+                        theme: ReactiveThing("theme")
+                    })
+                }),
                 socials: ReactiveArray("socials")
             });
         },

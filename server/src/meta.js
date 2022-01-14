@@ -173,7 +173,11 @@ module.exports = ({ app, cors, Cache }) => {
         if (event.news_items?.length) things.push("articles");
         if (event.player_relationships?.length) things.push("staff");
 
-        data.description = `See the ${niceJoin(things)} for the ${event.name}!`;
+        if (things.length > 0) {
+            data.description = `See the ${niceJoin(things)} for the ${event.name}!`;
+        } else {
+            data.description = `See information for the ${event.name}!`;
+        }
 
         return meta(data);
     };

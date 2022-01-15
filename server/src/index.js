@@ -6,10 +6,12 @@ const http = require("http").Server(app);
 const cors = require("cors");
 const meta = require("./meta.js");
 const routes = require("./routes.js");
-const staff = require("./discord/staff.js");
-// const api = require("./api/level_1.js");
-// const autodis = require("./discord/autodis.js");
-// const bpl3 = require("./bpl3.js");
+
+/* The staff module should only run on the server, probably not your local machine. */
+let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEGORY_ID", "STAFFAPPS_APPLICATION_CHANNEL_ID", "IS_SLMNGG_MAIN_SERVER"];
+if (staffKeysRequired.every(key => process.env[key])) {
+    require("./discord/staff.js");
+}
 
 let domains = (process.env.CORS_VALID_DOMAINS || "slmn.gg,localhost").split(/, */g).map(d => new RegExp(`(?:^|.*\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
 

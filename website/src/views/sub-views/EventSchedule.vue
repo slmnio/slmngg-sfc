@@ -5,23 +5,31 @@
             <TimezoneSwapper/>
         </div>
 
-        <div class="schedule-top mb-3">
+        <div class="schedule-top mb-2">
             <h2 class="text-center">Schedule</h2>
             <ul class="schedule-group-holder nav justify-content-center" v-if="pagedMatches.length > 1">
-
-                <li class="nav-item schedule-group nav-link no-link-style" @click="showAll = true"
-                v-bind:class="{'active ct-active': showAll === true, 'ct-passive': showAll !== true }">
-                    <b>All matches</b>
-                </li>
-
                 <li class="nav-item schedule-group" v-for="(pm) in pagedMatches" v-bind:key="pm.num"
                     v-bind:class="{ 'active': activeScheduleGroup.num === pm.num, 'ct-active': activeScheduleGroup.num === pm.num, 'ct-passive': activeScheduleGroup.num !== pm.num }">
                     <a @click="activeScheduleNum = pm.num" class="nav-link no-link-style">{{ pm.text }}</a>
                 </li>
+
+                <li class="nav-item schedule-group nav-link no-link-style" @click="showAll = true"
+                    v-bind:class="{'active ct-active': showAll === true, 'ct-passive': showAll !== true }">
+                    <b>All matches</b>
+                </li>
             </ul>
         </div>
 
-        <div class="schedule-matches" v-if="activeScheduleGroup">
+        <div class="schedule-filter flex-center text-center mb-2" v-if="showAll">
+            <div class="btn btn-sm mx-2" @click="hideCompleted = !hideCompleted" v-bind:class="{'btn-light': hideCompleted, 'btn-dark': !hideCompleted}">
+                Hide completed matches
+            </div>
+            <div class="btn btn-sm mx-2" @click="hideNoVods = !hideNoVods" v-bind:class="{'btn-light': hideNoVods, 'btn-dark': !hideNoVods}">
+                Hide matches without VODs
+            </div>
+        </div>
+
+        <div class="schedule-matches mt-3" v-if="activeScheduleGroup">
             <ScheduleMatch v-for="(match, i) in groupMatches" v-bind:key="match.id" :match="match"
                            v-bind:class="i > 0 && getMatchClass(match, groupMatches[i-1])" :custom-text="showAll && match.match_group ? match.match_group : null"
             />
@@ -39,7 +47,9 @@ export default {
     components: { TimezoneSwapper, ScheduleMatch },
     props: ["event"],
     data: () => ({
-        showAll: false
+        showAll: false,
+        hideCompleted: false,
+        hideNoVods: false
     }),
     computed: {
         defaultScheduleNum() {
@@ -87,7 +97,21 @@ export default {
         activeScheduleGroup() {
             if (this.showAll) {
                 return {
-                    matches: this.matches
+                    matches: this.matches.filter(m => {
+                        if (this.hideCompleted) {
+                            if (m.special_event) {
+                                // if it's a special event, it might not have a score. Check to see if it's in the past
+                                if (!m.start) return false; // no date no show
+                                if (new Date(m.start) < new Date()) return false;
+                            }
+                            if (m.forfeit) return false;
+                            if (m.first_to && [m.score_1, m.score_2].some(score => score === m.first_to)) return false;
+                        }
+
+                        if (this.hideNoVods && !m.vod) return false;
+
+                        return true;
+                    })
                 };
             }
 
@@ -133,6 +157,9 @@ export default {
         activeScheduleNum: {
             set(newNum) {
                 this.showAll = false;
+                this.hideCompleted = false;
+                this.hideNoVods = false;
+
                 this.$store.commit("setEventMatchPage", {
                     eventID: this.event.id,
                     matchPage: newNum

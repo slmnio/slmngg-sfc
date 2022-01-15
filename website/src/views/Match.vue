@@ -148,9 +148,11 @@ export default {
 
 
             function z(n) {
-                if (n.toString().slice(-1) === "1") return "st";
-                if (n.toString().slice(-1) === "2") return "nd";
-                if (n.toString().slice(-1) === "3") return "rd";
+                n = n.toString();
+                if (["11", "12", "13"].includes(n.slice(-2))) return "th";
+                if (n.slice(-1) === "1") return "st";
+                if (n.slice(-1) === "2") return "nd";
+                if (n.slice(-1) === "3") return "rd";
                 return "th";
             }
 

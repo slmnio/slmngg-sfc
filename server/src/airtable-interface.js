@@ -35,7 +35,7 @@ function setRebuilding(isRebuilding) {
     } else {
         io.emit("server_rebuilding", false);
         console.log(`[rebuild] rebuild finished in ${(Date.now() - _rebuildStart)}ms`);
-        log(`SLMN.GG has restarted and finished rebuilding in ${(Date.now() - _rebuildStart)}ms.`);
+        if (process.env.IS_SLMNGG_MAIN_SERVER) log(`SLMN.GG has restarted and finished rebuilding in ${(Date.now() - _rebuildStart)}ms.`);
     }
 }
 

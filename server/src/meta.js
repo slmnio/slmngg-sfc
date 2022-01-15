@@ -111,6 +111,33 @@ module.exports = ({ app, cors, Cache }) => {
             }
         },
         {
+            url: ["match", "detailed"],
+            async handle({ path, parts }) {
+                let thing = await Cache.get(cleanID(parts[1]));
+                let data = {};
+
+                if (thing.special_event) {
+                    data.title = thing.custom_name;
+                } else {
+                    // standard match
+                    let teams = await Promise.all((thing.teams || []).map(tID => Cache.get(tID)));
+                    data.title = thing.custom_name || teams.map(t => t.name).join(" vs ");
+                }
+
+                let event = await Cache.get(thing.event?.[0]);
+                if (event) {
+                    if (event?.name) data.title += ` | ${event.name}`;
+                    let theme = await Cache.get(event.theme?.[0]);
+
+                    if (!data.image && theme?.default_wordmark) data.image = aImg(theme.default_wordmark);
+                    if (!data.image && theme?.default_logo) data.image = aImg(theme.default_logo);
+                    if (theme.color_theme) data.color = theme.color_theme;
+                }
+
+                return meta(data);
+            }
+        },
+        {
             url: "news",
             async handle({ path, parts }) {
                 let thing = await Cache.get(`news-${parts[1]}`);
@@ -278,7 +305,7 @@ module.exports = ({ app, cors, Cache }) => {
             const path = req.params.path;
             let parts = path.split("/");
 
-            const route = routes.find(r => r.url === parts[0]);
+            const route = routes.find(r => (typeof r.url === "object" ? r.url.includes(parts[0]) : r.url === parts[0]));
 
             if (route) {
                 let data = await route.handle({ path, parts });

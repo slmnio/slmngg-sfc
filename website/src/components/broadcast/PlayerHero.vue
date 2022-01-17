@@ -31,8 +31,7 @@ export default {
             return null;
         },
         heroPortraitURL() {
-            if (!this.hero?.main_image) return null;
-            return this.hero?.main_image[0].url;
+            return this.hero?.main_image?.[0]?.url;
         }
     }
 

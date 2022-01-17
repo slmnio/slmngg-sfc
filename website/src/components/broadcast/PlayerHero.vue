@@ -22,16 +22,9 @@ export default {
             return this.hero.role;
         },
         roleIcon() {
-            switch (this.heroRole) {
-            case "Tank":
-                return "<i class=\"fas fa-shield-alt\"></i>";
-            case "Support":
-                return "<i class=\"fas fa-plus-circle\"></i>";
-            case "DPS":
-                return "<i class=\"fas fa-crosshairs\"></i>";
-            }
-            return null;
+            return getRoleSVG(this.heroRole);
         },
+
         heroPortraitURL() {
             return this.hero?.main_image?.[0]?.url;
         }

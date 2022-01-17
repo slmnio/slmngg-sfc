@@ -13,8 +13,7 @@ export default {
     props: ["hero"],
     computed: {
         heroName() {
-            if (!this.hero?.name) return null;
-            return this.hero.name;
+            return this.hero?.name || null;
         },
         heroRole() {
             if (!this.hero?.name) return null;

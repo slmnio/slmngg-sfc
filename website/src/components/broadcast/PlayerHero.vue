@@ -2,7 +2,7 @@
   <div class="hero-card d-flex flex-column flex-center" v-if="hero">
     <div class="hero-name d-flex flex-row text-center font-weight-bold"><span v-if="roleIcon" class="icon" v-html="roleIcon"></span> {{heroName}}</div>
     <div class="hero-role d-flex flex-row text-center">{{heroRole}}</div>
-    <div class="hero-portrait d-flex flex-row flex-center"><img :src="heroPortraitURL"/></div>
+    <div class="hero-portrait d-flex flex-row flex-center" v-if="heroPortraitURL"><img :src="heroPortraitURL"/></div>
   </div>
 </template>
 

@@ -8,6 +8,8 @@
 
 <script>
 
+import { getRoleSVG } from "@/utils/content-utils";
+
 export default {
     name: "PlayerHero",
     props: ["hero"],
@@ -33,6 +35,9 @@ export default {
         heroPortraitURL() {
             return this.hero?.main_image?.[0]?.url;
         }
+    },
+    methods: {
+        getRoleSVG
     }
 
 

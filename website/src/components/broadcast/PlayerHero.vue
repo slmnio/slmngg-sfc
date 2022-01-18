@@ -49,6 +49,8 @@ export default {
   }
   .icon {
     margin-right: 5px;
+    height: 50px;
+    width: 50px;
   }
   .hero-portrait {
     height: auto;

@@ -1,16 +1,16 @@
 <template>
-  <div class="player-team-display d-flex flex-column" :style="teamBG">
-    <div class="team-name flex-center text-center font-weight-bold" v-if="showName">{{team.name}}</div>
-    <div class="team-full-box d-flex">
-        <div class="team-logo box flex-center">
-            <div class="team-logo-inner bg-center" :style="teamLogo"></div>
-            <div class="event-logo-inner bg-center" :style="eventLogo"></div>
-        </div>
-        <div class="team-rank box flex-center">
-            <div class="ranking-text">{{ rankingText }}</div>
+    <div class="player-team-display d-flex flex-column" :style="teamBG">
+        <div class="team-name flex-center text-center font-weight-bold" v-if="showName">{{ team.name }}</div>
+        <div class="team-full-box d-flex">
+            <div class="team-logo box flex-center">
+                <div class="team-logo-inner bg-center" :style="teamLogo"></div>
+                <div class="event-logo-inner bg-center" :style="eventLogo"></div>
+            </div>
+            <div class="team-rank box flex-center">
+                <div class="ranking-text">{{ rankingText }}</div>
+            </div>
         </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -39,6 +39,10 @@ export default {
 </script>
 
 <style scoped>
+    .team-name {
+        line-height: .8;
+        min-height: 28px;
+    }
     .player-team-display {
         margin: .5em;
     }

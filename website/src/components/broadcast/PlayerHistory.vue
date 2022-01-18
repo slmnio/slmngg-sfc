@@ -1,21 +1,19 @@
 <template>
-  <GenericOverlay class="player-history-overlay" :title="customTitle">
-    <div class="career-wrapper d-flex flex-center">
-      <div class="hero-segment d-flex flex-column flex-center" v-if="hero">
-        <div class="hero-card h-100 d-flex flex-column">
-            <PlayerHero class="h-100" :hero="hero"></PlayerHero>
+    <GenericOverlay class="player-history-overlay" :title="customTitle">
+        <div class="career-wrapper d-flex flex-center">
+            <div class="hero-segment d-flex flex-column flex-center" v-if="hero">
+                <div class="hero-card h-100 d-flex flex-column">
+                    <PlayerHero class="h-100" :hero="hero"></PlayerHero>
+                </div>
+            </div>
+            <div class="teams-wrapper flex-column flex-center">
+                <h3 class="teams-label d-flex flex-column text-center mb-3">Team History</h3>
+                <div class="player-teams d-flex flex-wrap flex-center">
+                    <PlayerTeamDisplay :team="team" v-for="team in playerTeams" v-bind:key="team.id" :showName="true"/>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="teams-wrapper flex-column flex-center">
-      <div class="teams-label d-flex flex-column text-center">Team History</div>
-      <div class="player-teams d-flex flex-wrap flex-center">
-        <PlayerTeamDisplay :team="team" v-for="team in playerTeams" v-bind:key="team.id" :showName="true"/>
-      </div>
-    </div>
-    </div>
-
-
-  </GenericOverlay>
+    </GenericOverlay>
 </template>
 
 <script>
@@ -90,13 +88,8 @@ export default {
     font-size: 3em;
     float: top;
 }
-.teams-wrapper >>> .player-team-display {
-    height: 110px;
-    width: 180px;
-}
+.teams-wrapper >>> .player-team-display,
 .teams-wrapper >>> .team-name {
-    min-height: 24px;
-    min-width: 180px;
-    width: 180px;
+    width: 176px;
 }
 </style>

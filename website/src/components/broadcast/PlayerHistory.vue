@@ -2,14 +2,12 @@
   <GenericOverlay class="player-history-overlay" :title="customTitle">
     <div class="career-wrapper d-flex flex-center">
       <div class="hero-segment d-flex flex-column flex-center" v-if="hero">
-        <div class="hero-card-title d-flex flex-column flex-center">Favorite Hero
-        </div>
-        <div class="hero-card d-flex flex-column"><PlayerHero :hero="hero"></PlayerHero>
+        <div class="hero-card h-100 d-flex flex-column">
+            <PlayerHero class="h-100" :hero="hero"></PlayerHero>
         </div>
     </div>
     <div class="teams-wrapper flex-column flex-center">
-      <div class="teams-label d-flex flex-column text-center">Team History
-      </div>
+      <div class="teams-label d-flex flex-column text-center">Team History</div>
       <div class="player-teams d-flex flex-wrap flex-center">
         <PlayerTeamDisplay :team="team" v-for="team in playerTeams" v-bind:key="team.id" :showName="true"/>
       </div>
@@ -69,43 +67,36 @@ export default {
 </script>
 
 <style scoped>
-  .career-wrapper {
+.player-history-overlay >>> .generic-overlay-body {
+    padding: 0;
+}
+.career-wrapper {
     height: 100%;
     width: 100%;
-  }
-  .hero-segment {
+}
+.hero-segment {
     overflow: hidden;
     height: 740px;
-    width: 300px;
-    margin-left: -80px;
-    margin-top: -100px;
-    margin-bottom: -100px;
-    background-color: rgba(0,0,0,.2);
-  }
-  .hero-card-title {
-    font-size: 1.5em;
-    padding-top: 50px;
-  }
-  .teams-wrapper {
-    min-height: 600px;
-    max-height: 700px;
+    width: 296px;
+    flex-shrink: 0;
+    background-color: rgba(0, 0, 0, .2);
+}
+.teams-wrapper {
     min-width: 900px;
-    width: 900px;
-    padding-left: 50px;
-  }
-  .teams-label {
+    flex-grow: 1;
+    padding: 0 50px;
+}
+.teams-label {
     font-size: 3em;
     float: top;
-  }
-  .teams-wrapper >>> .player-team-display {
+}
+.teams-wrapper >>> .player-team-display {
     height: 110px;
     width: 180px;
-  }
-  .teams-wrapper >>> .team-name {
+}
+.teams-wrapper >>> .team-name {
     min-height: 24px;
     min-width: 180px;
     width: 180px;
-  }
-
-
+}
 </style>

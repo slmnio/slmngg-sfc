@@ -7,7 +7,7 @@
         <div class="hero-card d-flex flex-column"><PlayerHero :hero="hero"></PlayerHero>
         </div>
     </div>
-    <div class="teams-wrapper">
+    <div class="teams-wrapper flex-column flex-center">
       <div class="teams-label d-flex flex-column text-center">Team History
       </div>
       <div class="player-teams d-flex flex-wrap flex-center">
@@ -77,22 +77,35 @@ export default {
     overflow: hidden;
     height: 740px;
     width: 300px;
-    margin-left: -170px;
+    margin-left: -80px;
     margin-top: -100px;
     margin-bottom: -100px;
     background-color: rgba(0,0,0,.2);
   }
   .hero-card-title {
     font-size: 1.5em;
+    padding-top: 50px;
   }
   .teams-wrapper {
-    margin: 5px;
     min-height: 600px;
-    width: 800px;
+    max-height: 700px;
+    min-width: 900px;
+    width: 900px;
+    padding-left: 50px;
   }
   .teams-label {
-    font-size: 5em;
+    font-size: 3em;
     float: top;
   }
+  .teams-wrapper >>> .player-team-display {
+    height: 110px;
+    width: 180px;
+  }
+  .teams-wrapper >>> .team-name {
+    min-height: 24px;
+    min-width: 180px;
+    width: 180px;
+  }
+
 
 </style>

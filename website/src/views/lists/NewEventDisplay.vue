@@ -46,7 +46,7 @@ export default {
 
 <style scoped>
 .event {
-    border-bottom-width: 4px;
+    border-bottom-width: .25em;
     border-bottom-style: solid;
     min-height: 58px;
 }
@@ -54,22 +54,22 @@ export default {
     color: inherit;
 }
 .event-block {
-    width: 50px;
-    height: 40px;
+    width: 3em;
+    height: 2.5em;
     flex-shrink: 0;
-    margin-right: 2px;
+    margin-right: .125em;
 }
 .event {
     align-items: center;
 }
 .event-block-logo {
-    width: calc(100% - 8px);
-    height: calc(100% - 6px);
+    width: calc(100% - .5em);
+    height: calc(100% - .3em);
 }
 .event-name {
     font-size: 1.2em;
     line-height: 1;
-    margin: 0 4px 4px 0;
+    margin: 0 .25em .25em 0;
 }
 .event.team-display .event-name {
     font-weight: bold;

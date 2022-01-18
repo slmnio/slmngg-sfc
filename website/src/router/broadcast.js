@@ -29,6 +29,7 @@ import SeasonHistoryOverlay from "@/components/broadcast/roots/SeasonHistoryOver
 import IframeOverlay from "@/components/broadcast/roots/IframeOverlay";
 import TallyTransmitter from "@/components/broadcast/roots/TallyTransmitter";
 import TallyViewer from "@/components/broadcast/roots/TallyViewer";
+import PlayerHistory from "@/components/broadcast/PlayerHistory";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -86,5 +87,6 @@ export default [
     { path: "auction", component: AuctionOverlay, props: route => ({ category: route.query.category }) },
     { path: "ad-read", component: AdReadOverlay, props: route => ({ extraDelay: route.query.delay }) },
     { path: "logos", component: LogoAdOverlay },
-    { path: "staff", component: StaffOverlay }
+    { path: "staff", component: StaffOverlay },
+    { path: "player-history", component: PlayerHistory, props: route => ({ showMinor: route.query.minor }) }
 ];

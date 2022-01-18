@@ -7,7 +7,12 @@
                 </div>
             </div>
             <div class="teams-wrapper flex-column flex-center">
-                <h3 class="teams-label d-flex flex-column text-center mb-3">Team History</h3>
+                <div class="first-event d-flex flex-center mb-3" v-if="firstEvent">
+                    <div class="first-event-text mr-3">First event</div>
+                    <NewEventDisplay :event="firstEvent"/>
+                </div>
+
+                <div class="title d-flex flex-column text-center mb-2">Team History</div>
                 <div class="player-teams d-flex flex-wrap flex-center">
                     <PlayerTeamDisplay :team="team" v-for="team in playerTeams" v-bind:key="team.id" :showName="true"/>
                 </div>
@@ -22,9 +27,10 @@ import { sortEvents } from "@/utils/sorts";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import PlayerTeamDisplay from "@/components/broadcast/auction/PlayerTeamDisplay";
 import PlayerHero from "@/components/broadcast/PlayerHero";
+import NewEventDisplay from "@/views/lists/NewEventDisplay";
 export default {
     name: "PlayerHistory",
-    components: { PlayerTeamDisplay, GenericOverlay, PlayerHero },
+    components: { PlayerTeamDisplay, GenericOverlay, PlayerHero, NewEventDisplay },
     props: ["title", "broadcast", "showMinor", "britishSpelling"],
     computed: {
         customTitle() {
@@ -58,6 +64,13 @@ export default {
                 // if (!t.ranking_sort) return false;
                 return true;
             }).sort((a, b) => sortEvents(a.event, b.event));
+        },
+        firstEvent() {
+            const events = [...(this.player?.member_of || [])]
+                .map(t => t.event)
+                .filter(e => e?.start_date)
+                .sort(sortEvents);
+            return events[0];
         }
         // TODO: Get a list of all events a player has participated in, sort by date, and display the start date of the earliest event as "Player Since"
     }
@@ -85,11 +98,29 @@ export default {
     padding: 0 50px;
 }
 .teams-label {
-    font-size: 3em;
     float: top;
 }
 .teams-wrapper >>> .player-team-display,
 .teams-wrapper >>> .team-name {
     width: 176px;
+}
+.teams-wrapper .title {
+    font-size: 3em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.first-event {
+    font-size: 1.25em;
+}
+.first-event-text {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+.first-event >>> .event-name {
+    margin: 0 0.3em 0 0  !important;
+}
+.player-teams {
+    max-height: 530px;
+    overflow: hidden;
 }
 </style>

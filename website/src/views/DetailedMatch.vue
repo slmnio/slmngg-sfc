@@ -37,10 +37,11 @@
                 <div class="team-holder f-row mb-2" v-if="showManagers">
                     <div class="team f-col w-50" v-for="team in match.teams" v-bind:key="team.id">
                         <div class="team-players team-managers f-col p-1">
-                            <div class="team-player" v-for="player in team.staff" v-bind:key="player.id">
-                                <div class="player-info player-name">
-                                    <div class="player-role-holder player-icon-holder" v-if="player.staff_role">
-                                        <div class="player-role" v-html="getRoleSVG(player.staff_role)"></div>
+                            <div class="team-player" v-for="player in getTeamStaff(team)" v-bind:key="player.id">
+                                <div class="player-info player-name flex-center">
+                                    <div class="player-role-holder player-icon-holder">
+                                        <div v-for="role in player.is" v-bind:key="role" class="player-role" v-html="getRoleSVG(role)" v-b-tooltip="role"></div>
+                                        <div v-if="!player.is.length" class="player-role" v-html="getRoleSVG('Staff')" v-b-tooltip="'Team staff'"></div>
                                     </div>
                                     <router-link class="ct-active" :to="url('player', player)">{{ player.name }} <i class="fas fa-badge-check fa-fw" title="REAL" v-if="player.verified"></i></router-link>
                                 </div>
@@ -182,8 +183,29 @@ export default {
         teamMatches(team) {
             if (this.showNonEventMatches) return team?.matches || [];
             return (team?.matches || []).filter(m => {
-                console.log(this.match.event, m.event);
-                return m.event.id === this.match?.event.id;
+                return m.event?.id === this.match?.event?.id;
+            });
+        },
+        getTeamStaff(team) {
+            const people = [
+                ...(team.owners || []),
+                ...(team.captains || []),
+                ...(team.staff || [])
+            ].filter((person, position, array) => array.findIndex(p => p.id === person.id) === position);
+            console.log({ people });
+            return people.map(person => {
+                const roles = [];
+
+                if ((team.owners || []).find(x => x.id === person.id)) roles.push("Owner");
+                if ((team.captains || []).find(x => x.id === person.id)) roles.push("Captain");
+                if ((team.staff || []).find(x => x.id === person.id) && person.staff_role) {
+                    roles.push(person.staff_role);
+                }
+
+                return {
+                    ...person,
+                    is: roles
+                };
             });
         }
     },
@@ -193,6 +215,8 @@ export default {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
                     players: ReactiveArray("players"),
+                    captains: ReactiveArray("captains"),
+                    owners: ReactiveArray("owners"),
                     matches: ReactiveArray("matches", {
                         event: ReactiveThing("event"),
                         teams: ReactiveArray("teams", {

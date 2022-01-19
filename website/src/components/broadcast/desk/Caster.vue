@@ -1,6 +1,6 @@
 <template>
     <div class="caster flex-center flex-column" :style="themeColor">
-        <div class="caster-cam-box flex-center">
+        <div class="caster-cam-box flex-center" :style="{borderColor}">
             <CasterCam class="caster-cam-wrapper" :guest="liveGuestData" :disableVideo="disableVideo" :color="color"
             :event="event" />
         </div>
@@ -25,6 +25,18 @@ export default {
     props: ["caster", "guest", "color", "disableVideo", "event"],
     components: { CasterCam },
     computed: {
+        borderColor() {
+            const theme = this.event?.theme;
+            if (!theme) return;
+            const desk = (theme.desk_colors || "").trim().split(/[\n,]/g).filter(col => col);
+            console.log({ desk, theme, default: (theme.color_logo_background ? theme.color_logo_accent : theme.color_text_on_theme) || theme.color_alt });
+            if (!desk?.length) {
+                // no desk set, this.color is default
+                return (theme.color_logo_background ? theme.color_logo_accent : theme.color_text_on_theme) || theme.color_alt;
+            }
+
+            return this.color;
+        },
         player() {
             return this.caster || this.guest.player;
         },

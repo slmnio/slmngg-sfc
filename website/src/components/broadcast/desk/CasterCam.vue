@@ -161,7 +161,7 @@ export default {
 
     .caster-bg {
         width: 100%;
-        width: min(var(--caster-width), 100%);
+        /*width: min(var(--caster-width), 100%);*/ /* I think OBS has a problem with this */
         height: 100%;
         position: absolute;
         top: 0;

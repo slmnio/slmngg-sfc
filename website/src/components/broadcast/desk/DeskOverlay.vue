@@ -28,7 +28,7 @@ export default {
     methods: {
         cssImage,
         getColor(index) {
-            if (!this.deskColors) return null;
+            if (!this.deskColors?.length) return this.broadcast?.event?.theme?.color_logo_background || this.broadcast?.event?.theme?.color_theme;
             return this.deskColors[index % this.deskColors.length];
         }
     },

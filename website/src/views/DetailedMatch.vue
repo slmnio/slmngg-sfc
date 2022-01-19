@@ -56,7 +56,7 @@
                 </div>
                 <div class="prev-matches-holder d-flex mt-2" v-if="showMatchHistory">
                     <div class="team-prev-wrapper w-50" v-for="team in match.teams" v-bind:key="team.id">
-                        <PreviousMatch v-for="match in team.matches" :match="match" :team="team" v-bind:key="match.id" />
+                        <PreviousMatch v-for="match in teamMatches(team)" :match="match" :team="team" v-bind:key="match.id" />
                     </div>
                 </div>
                 <div class="show-notes mt-3" v-if="showShowNotes && match.show_notes">
@@ -99,6 +99,13 @@
                          v-on:click="showMatchHistory = !showMatchHistory">
                         <i class="fa-fw fas fa-history"></i>
                         Match history
+                    </div>
+                    <div :class="`btn btn-block btn-${showNonEventMatches ? 'light' : 'secondary'} mb-2`"
+                         title="Show/hide past matches that aren't from this match's event"
+                         v-if="showMatchHistory"
+                         v-on:click="showNonEventMatches = !showNonEventMatches">
+                        <i class="fa-fw far fa-calendar-alt"></i>
+                        Show non-event matches
                     </div>
                     <div v-if="match.show_notes" :class="`btn btn-block btn-${showShowNotes ? 'light' : 'secondary'} mb-2`"
                          v-on:click="showShowNotes = !showShowNotes">
@@ -155,6 +162,7 @@ export default {
         showPlayerInfo: false,
         showCastingInfo: false,
         showMatchHistory: true,
+        showNonEventMatches: false,
         showShowNotes: true,
         showRosters: true,
         showMatchMaps: true,
@@ -170,7 +178,14 @@ export default {
         theme(team) {
             return logoBackground1(team);
         },
-        getRoleSVG
+        getRoleSVG,
+        teamMatches(team) {
+            if (this.showNonEventMatches) return team?.matches || [];
+            return (team?.matches || []).filter(m => {
+                console.log(this.match.event, m.event);
+                return m.event.id === this.match?.event.id;
+            });
+        }
     },
     computed: {
         match () {
@@ -179,6 +194,7 @@ export default {
                     theme: ReactiveThing("theme"),
                     players: ReactiveArray("players"),
                     matches: ReactiveArray("matches", {
+                        event: ReactiveThing("event"),
                         teams: ReactiveArray("teams", {
                             theme: ReactiveThing("theme")
                         }),

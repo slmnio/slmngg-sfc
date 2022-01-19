@@ -5,12 +5,10 @@
             :event="event" />
         </div>
         <transition mode="out-in" name="fade">
-            <div class="caster-lower flex-center" :key="`${name}-${twitter}`" v-if="name">
-                <div class="caster-name flex-center flex-column">
+            <div class="caster-lower flex-center" :key="`${name}-${twitter}-${lowerType}`" v-bind:class="{'cl-traditional': lowerType === 'traditional'}">
+                <div class="caster-name flex-center">
                     <div class="c-name">{{ name }}</div>
-                    <div class="c-twitter" v-if="twitter">
-                        <!--                        <i class="fab fa-twitter fa-fw"></i> -->
-                        {{ twitter }}</div>
+                    <div class="c-twitter" v-if="twitter">{{ twitter }}</div>
                 </div>
             </div>
         </transition>
@@ -63,6 +61,10 @@ export default {
             return {
                 "--theme-color": this.color
             };
+        },
+        lowerType() {
+            if ((this.$root.broadcast?.broadcast_settings || []).includes("Cams lower: traditional")) return "traditional";
+            return "normal";
         }
     }
 };
@@ -110,6 +112,7 @@ export default {
         /*border-radius: 4px;*/
         line-height: 1;
         box-shadow: 0 0 4px 0 #00000080;
+        flex-direction: column;
     }
 
     .c-twitter {
@@ -128,4 +131,32 @@ export default {
         height: 100%;
         position: absolute;
     }
+
+    .caster-lower.cl-traditional {
+        bottom: 4px;
+        width: calc(100% - 20px);
+        min-height: auto;
+    }
+    .caster:first-child .caster-lower.cl-traditional,
+    .caster:last-child .caster-lower.cl-traditional {
+        width: calc(100% - 10px);
+    }
+
+    .caster-lower.cl-traditional .caster-name {
+        box-shadow: none;
+        width: 100%;
+        padding: 10px 15px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+
+    .caster-lower.cl-traditional .c-name,
+    .caster-lower.cl-traditional .c-twitter {
+        text-align: center;
+    }
+
+    /*.caster-lower.cl-traditional .c-name { text-align: left; }*/
+    /*.caster-lower.cl-traditional .c-twitter { text-align: right; }*/
 </style>

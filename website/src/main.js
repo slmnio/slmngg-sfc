@@ -129,7 +129,8 @@ const app = new Vue({
         minisiteEventStatus: subdomain ? "loading" : null,
         isRebuilding: false,
         animationActive: true,
-        activeScene: null
+        activeScene: null,
+        broadcast: null
     }),
     mounted() {
         console.log("[app]", "subdomain", subdomain);

@@ -59,6 +59,9 @@ export default {
                     });
                 }, this.broadcast?.transition_offset || 0);
             }
+        },
+        broadcast() {
+            this.$root.broadcast = this.broadcast;
         }
     },
     beforeCreate () {

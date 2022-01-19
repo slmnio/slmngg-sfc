@@ -50,6 +50,7 @@ export default {
         text-align: center;
         line-height: 1;
         height: 110px;
+        color: #fff;
     }
     .team-name, .team-logo-holder {
         border-bottom: 6px solid transparent;

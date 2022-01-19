@@ -46,7 +46,7 @@ export default {
             return this.map.name[0];
         },
         type() {
-            if (!this.broadcast?.map_settings?.includes("Show mode")) return null;
+            if (!this.broadcast?.broadcast_settings?.includes("Show map modes text")) return null;
             // Do the map specific name first, then the map data first
             if (this.map?.mode) return this.map.mode; // Custom map instance text
             if (this.map?.type?.length) return this.map.type[0]; // Map data (.map.type is a rollup from Airtable)

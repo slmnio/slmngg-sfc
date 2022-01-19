@@ -19,8 +19,8 @@ export default {
     components: { Caster },
     computed: {
         shouldDisablePodcastVideo() {
-            if (!this.broadcast?.video_settings) return true;
-            return !this.broadcast.video_settings.includes("Enable podcast");
+            if (!this.broadcast?.broadcast_settings) return true;
+            return !this.broadcast.broadcast_settings.includes("Enable podcast");
         },
         guests: function() {
             if (!this.broadcast?.guests) return [];

@@ -157,8 +157,8 @@ export default {
             return (scores[0] + scores[1]) + Math.min(...toWin);
         },
         showMapVideos() {
-            if (!this.broadcast?.video_settings?.length) return false;
-            return this.broadcast.video_settings.includes("Use map videos");
+            if (!this.broadcast?.broadcast_settings?.length) return false;
+            return this.broadcast.broadcast_settings.includes("Use map videos");
         },
         nextMap() {
             const unplayedMaps = this.maps.filter(m => !m.dummy && !m.winner);

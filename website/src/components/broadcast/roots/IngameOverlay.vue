@@ -46,7 +46,7 @@ export default {
             return this.match.teams;
         },
         autoSmall() {
-            return this.broadcast?.video_settings?.includes("Show match records ingame") ? { show: "record", stage: this.broadcast?.current_stage } : null;
+            return this.broadcast?.broadcast_settings?.includes("Show match records ingame") ? { show: "record", stage: this.broadcast?.current_stage } : null;
         },
         scores() {
             if (!this.teams) return [];

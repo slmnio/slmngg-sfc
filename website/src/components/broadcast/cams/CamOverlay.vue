@@ -27,14 +27,14 @@ export default {
     components: { CasterCam, ThemeLogo },
     computed: {
         shouldShowCam() {
-            if (this.broadcast?.video_settings?.includes("Disable POV cams")) {
+            if (this.broadcast?.broadcast_settings?.includes("Disable POV cams")) {
                 console.warn("Cam disabled by broadcast settings");
                 return false;
             }
             if (this.alwaysShow) {
                 return this.activeGuest; // needs at least a guest
             } else {
-                if (this.broadcast?.video_settings?.includes("Ignore client cam whitelists")) return this.activeGuest?.use_cam;
+                if (this.broadcast?.broadcast_settings?.includes("Ignore client cam whitelists")) return this.activeGuest?.use_cam;
 
                 const attemptedTeam = this.number >= 7 ? 2 : 1;
                 const cams = this.client?.cams;
@@ -46,7 +46,7 @@ export default {
             }
         },
         shouldShowName() {
-            if (!this.broadcast?.video_settings?.includes("Enable player names")) return false;
+            if (!this.broadcast?.broadcast_settings?.includes("Enable player names")) return false;
 
             return this.activeGuest?.name;
         },

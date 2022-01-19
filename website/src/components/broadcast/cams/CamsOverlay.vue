@@ -23,7 +23,7 @@ export default {
     }),
     computed: {
         disable() {
-            return this.broadcast?.video_settings?.includes("Disable team cams");
+            return this.broadcast?.broadcast_settings?.includes("Disable team cams");
         },
         match() {
             if (!this.broadcast || !this.broadcast.live_match) return null;

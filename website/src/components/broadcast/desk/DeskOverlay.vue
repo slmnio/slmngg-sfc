@@ -37,8 +37,8 @@ export default {
             return this.broadcast?.event;
         },
         shouldDisableCasterVideo() {
-            if (!this.broadcast?.video_settings) return false;
-            return this.broadcast.video_settings.includes("Disable casters");
+            if (!this.broadcast?.broadcast_settings) return false;
+            return this.broadcast.broadcast_settings.includes("Disable casters");
         },
         liveMatch: function () {
             if (!this.broadcast?.live_match) return null;

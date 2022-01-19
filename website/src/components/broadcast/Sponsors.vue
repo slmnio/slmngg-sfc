@@ -30,7 +30,7 @@ export default {
     methods: {
         bg(theme) {
             if (!theme) return null;
-            return { backgroundColor: theme.color_logo_background };
+            return { backgroundColor: theme.color_logo_background || theme.color_theme };
         },
         logo (theme) {
             return cssImage("backgroundImage", theme, ["default_wordmark", "default_logo"], 100, true);

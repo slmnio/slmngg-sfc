@@ -26,7 +26,7 @@
                                         <div class="player-role" v-html="getRoleSVG(player.role)"></div>
                                     </div>
                                     <router-link class="ct-active" :to="url('player', player)">{{ player.name }} </router-link>
-                                    <span v-if="showCastingInfo && player.pronouns" class="player-pronouns badge rounded-pill bg-light text-dark" :data-pronoun="player.pronouns">{{ player.pronouns }}</span></div>
+                                    <span v-if="showCastingInfo && player.pronouns" class="player-pronouns ml-1 badge rounded-pill bg-light text-dark" :data-pronoun="player.pronouns">{{ player.pronouns }}</span></div>
                                 <div class="player-info player-pronounce" v-if="showCastingInfo"><i class="fas fa-w fa-lips player-icon-holder"></i> {{ player.pronunciation }}</div>
                                 <div class="player-info player-dtag" v-if="showPlayerInfo"><i class="fab fa-fw fa-discord player-icon-holder"></i> {{ player.discord_tag }}</div>
                                 <div class="player-info player-btag" v-if="showPlayerInfo"><i class="fab fa-fw fa-battle-net player-icon-holder"></i> {{ player.battletag }}</div>
@@ -325,6 +325,12 @@ export default {
         font-weight: bold;
     }
 
+    .player-pronouns {
+        background: #fff194 !important;
+    }
+    .player-pronouns[data-pronoun="he/him"] {
+        background: #f8f9fa !important;
+    }
     .player-pronouns[data-pronoun="they/them"] {
         background: #96ff94 !important;
     }

@@ -15,7 +15,7 @@ import { themeBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "ScheduleOverlay",
-    props: ["broadcast", "title", "top"],
+    props: ["broadcast", "title", "top", "secondary"],
     components: { GenericOverlay, BreakMatch },
     computed: {
         schedule() {
@@ -25,7 +25,7 @@ export default {
                     theme: ReactiveThing("theme")
                 })
             })(this.broadcast).filter(m => {
-                return m.show_on_overlays;
+                return this.secondary ? m.show_on_secondary_overlays : m.show_on_overlays;
             }).sort(sortMatches);
         },
         event() {

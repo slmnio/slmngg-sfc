@@ -67,7 +67,7 @@ export default [
             small: !!route.query.small
         })
     },
-    { path: "schedule", component: ScheduleOverlay },
+    { path: "schedule", component: ScheduleOverlay, props: route => ({ secondary: !!route.query.secondary }) },
     { path: "iframe", component: IframeOverlay, props: route => ({ url: route.query.url }) },
     { path: "standings", component: StandingsOverlay },
     { path: "roster", redirect: "rosters" },

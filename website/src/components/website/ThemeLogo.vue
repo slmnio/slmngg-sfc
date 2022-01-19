@@ -21,7 +21,7 @@ export default {
     props: ["theme", "iconPadding", "borderWidth", "logoSize"],
     computed: {
         image() {
-            if (this.logoSize && this.logoSize >= 100) {
+            if (this.logoSize && parseInt(this.logoSize) <= 100) {
                 // use smalls if possible
                 return cssImage("backgroundImage", this.theme, ["small_logo", "default_logo"], this.logoSize, true);
             }

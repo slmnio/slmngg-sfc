@@ -38,6 +38,7 @@ export default {
             return { backgroundImage: `url(${resizedImage(this.item, "thumbnail", 150)})` };
         },
         connectionTheme() {
+            if (this.item?.event?.theme && this.item?.prefer_event) return this.item.event.theme;
             if (this.item?.team?.theme) return this.item.team.theme;
             if (this.item?.event?.theme) return this.item.event.theme;
             return null;

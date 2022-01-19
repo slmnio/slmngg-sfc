@@ -65,11 +65,13 @@ export default {
             return getImage(this.news.header);
         },
         theme() {
+            if (this.news?.event?.theme && this.news?.prefer_event) return this.news.event.theme;
             if (this.news?.team?.theme) return this.news.team.theme;
             if (this.news?.event?.theme) return this.news.event.theme;
             return null;
         },
         connection() {
+            if (this.news.team && this.news.event && this.news.prefer_event) return ["event", this.news.event];
             if (this.news.team) return ["team", this.news.team];
             if (this.news.event) return ["event", this.news.event];
             return null;

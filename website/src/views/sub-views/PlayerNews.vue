@@ -22,7 +22,12 @@ export default {
         news() {
             if (!this.player || !this.player.news) return [];
             return ReactiveArray("news", {
-                event: ReactiveThing("event", { theme: ReactiveThing("theme") })
+                event: ReactiveThing("event", {
+                    theme: ReactiveThing("theme")
+                }),
+                team: ReactiveThing("team", {
+                    theme: ReactiveThing("theme")
+                })
             })(this.player)
                 .filter(news => news.enabled && (!news.hide_from_global_listing || !news.hide_from_local_listing));
         }

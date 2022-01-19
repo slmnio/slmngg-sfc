@@ -22,12 +22,19 @@ export default {
             if (!this.item) return {};
             return {
                 ...this.item,
-                event: this.event
+                event: this.event,
+                team: this.team
             };
         },
         event() {
             if (!this.item?.event) return {};
             return ReactiveRoot(this.item?.event?.id || this.item?.event[0], {
+                theme: ReactiveThing("theme")
+            });
+        },
+        team() {
+            if (!this.item?.team) return {};
+            return ReactiveRoot(this.item?.team?.id || this.item?.team[0], {
                 theme: ReactiveThing("theme")
             });
         }

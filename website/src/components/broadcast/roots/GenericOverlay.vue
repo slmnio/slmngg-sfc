@@ -9,7 +9,7 @@
             </div>
         </transition>
         <transition name="broadcast-mid-split">
-            <div class="generic-overlay-body overlay--bg flex-center" :style="{backgroundColor: bodyColor}" v-show="$root.animationActive">
+            <div class="generic-overlay-body overlay--bg flex-center" :style="{backgroundColor: bodyColor, borderColor: accentColor}" v-show="$root.animationActive">
                 <slot></slot>
             </div>
         </transition>
@@ -54,6 +54,7 @@ export default {
 
 .generic-overlay-title, .generic-overlay-body {
     background-color: #222;
+    border-bottom: 8px solid transparent;
 }
 .generic-overlay-title {
     height: 160px;
@@ -65,7 +66,6 @@ export default {
     flex-shrink: 0;
     line-height: 1;
     text-align: center;
-    border-bottom: 8px solid transparent;
 }
 .generic-overlay-body {
     margin-top: 60px;

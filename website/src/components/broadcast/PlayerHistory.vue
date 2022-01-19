@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay class="player-history-overlay" :title="customTitle">
+    <GenericOverlay class="player-history-overlay" :title="customTitle" :accent-color="accentColor">
         <div class="career-wrapper d-flex flex-center">
             <div class="hero-segment d-flex flex-column flex-center" v-if="hero">
                 <div class="hero-card h-100 d-flex flex-column">
@@ -33,6 +33,9 @@ export default {
     components: { PlayerTeamDisplay, GenericOverlay, PlayerHero, NewEventDisplay },
     props: ["title", "broadcast", "showMinor", "britishSpelling"],
     computed: {
+        accentColor() {
+            return this.broadcast?.event?.theme?.color_theme;
+        },
         customTitle() {
             if (this.player?.name) return (this.player.name + "'s Career");
             return "Player Career";

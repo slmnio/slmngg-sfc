@@ -116,6 +116,7 @@ export default {
         color: var(--theme-active, #66d9ff);
     }
     .markdown >>> .clip-holder {
+        background-color: rgba(0,0,0,0.2);
         margin-bottom: 1em;
     }
     .markdown >>> .clip.clip-error {
@@ -124,7 +125,6 @@ export default {
         padding: 10px 20px;
     }
     .markdown >>> .clip-caption {
-        background-color: rgba(0,0,0,0.2);
         padding: 10px 15px;
     }
 </style>

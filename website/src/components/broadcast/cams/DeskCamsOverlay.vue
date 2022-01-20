@@ -35,8 +35,7 @@ export default {
             });
         },
         accentColor() {
-            if (!this.event || !this.event.theme) return null;
-            return this.event.theme.color_theme;
+            return this.broadcast?.event?.theme?.color_theme;
         },
         teams() {
             if (!this.match || !this.match.teams || !this.match.teams.every(t => {

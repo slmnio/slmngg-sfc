@@ -5,7 +5,7 @@ import Players from "@/views/lists/Players";
 import NotFoundPage from "@/views/NotFoundPage";
 
 import WebsiteApp from "@/apps/WebsiteApp";
-import OverlayApp from "@/apps/BroadcastApp";
+import BroadcastApp from "@/apps/BroadcastApp";
 import ClientApp from "@/apps/ClientApp";
 
 import BroadcastRoutes from "@/router/broadcast";
@@ -38,14 +38,14 @@ export default [
     },
     {
         path: "/broadcast/:broadcastCode",
-        component: OverlayApp,
-        props: route => ({ code: route.params.broadcastCode, title: route.query.title, top: route.query.top }),
+        component: BroadcastApp,
+        props: route => ({ code: route.params.broadcastCode, title: route.query.title, top: route.query.top, noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation) }),
         children: BroadcastRoutes
     },
     {
         path: "/client/:clientID",
         component: ClientApp,
-        props: route => ({ client: route.params.clientID, title: route.query.title }),
+        props: route => ({ client: route.params.clientID, title: route.query.title, noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation) }),
         children: BroadcastRoutes
     },
     // {

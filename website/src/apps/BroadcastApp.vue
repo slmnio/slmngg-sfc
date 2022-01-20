@@ -13,7 +13,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "BroadcastApp",
-    props: ["id", "title", "top", "code", "client"],
+    props: ["id", "title", "top", "code", "client", "noAnimation"],
     data: () => ({
         active: false,
         animationActive: true,
@@ -28,22 +28,29 @@ export default {
                 other_broadcasts: ReactiveArray("other_broadcasts"),
                 headlines: ReactiveArray("headlines")
             });
+        },
+        haltAnimations() {
+            return this.noAnimation || (this.broadcast?.broadcast_settings || []).includes("No animations");
         }
     },
     mounted () {
         console.log("overlay app mounted", this.id);
-        // let css = document.createElement('style');;
-        // css.innerText = this.event.
-        window.addEventListener("obsSourceActiveChanged", (e) => {
-            this.active = e.detail.active;
-        });
 
-        document.body.addEventListener("click", () => {
-            this.active = !this.active;
-        });
+        if (this.haltAnimations) {
+            this.active = true;
+        } else {
+            window.addEventListener("obsSourceActiveChanged", (e) => {
+                this.active = e.detail.active;
+            });
+            document.body.addEventListener("click", () => {
+                this.active = !this.active;
+            });
+        }
     },
     watch: {
         active(isActive) {
+            if (this.haltAnimations) return;
+
             window.obsstudio?.getCurrentScene((scene) => {
                 this.$root.activeScene = scene;
             });

@@ -30,7 +30,9 @@
                         <Standings :event="event" :stage="broadcast.current_stage" />
                     </div>
                     <div class="break-col break-image" v-if="automatedShow === 'Image'" :key="`image-${breakImageURL}`">
-                        <div class="break-image-inner" :style="breakImage"></div>
+                        <div v-if="breakImageURL" class="break-image-inner" :style="breakImage"></div>
+                        <ThemeLogo v-else class="break-image-inner break-image-default" :theme="event.theme"
+                                   icon-padding="10%" border-width="0" :logo-size="450" />
                     </div>
                     <Bracket class="break-col break-bracket" v-if="automatedShow === 'Bracket'" key="Bracket" :event="event" :bracket="bracket" use-overlay-scale small />
                     <div class="break-col break-others" v-if="automatedShow === 'Other Broadcasts'">
@@ -72,13 +74,14 @@ import BreakHeadlines from "@/components/broadcast/break/BreakHeadlines";
 import { themeBackground1 } from "@/utils/theme-styles";
 import BreakStaffList from "@/components/broadcast/break/BreakStaffList";
 import BreakMatchup from "@/components/broadcast/break/BreakMatchup";
+import ThemeLogo from "@/components/website/ThemeLogo";
 
 const tickTime = 25;
 
 export default {
     name: "BreakOverlay",
     props: ["broadcast", "title", "animationActive"],
-    components: { BreakMatchup, BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
+    components: { ThemeLogo, BreakMatchup, BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
     data: () => ({
         tick: 0,
         lastCountdownTick: 0

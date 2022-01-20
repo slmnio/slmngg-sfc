@@ -81,7 +81,7 @@ export default {
             console.log("extra maps", this.mapCount, dummyMapCount);
             const initialMapCount = maps.length;
 
-            const next = maps.find(m => !m.winner);
+            const next = maps.find(m => !m.winner && !m.draw);
             if (next) next._next = true;
 
             if (!this.match?.first_to) return maps;
@@ -145,7 +145,7 @@ export default {
             return this.broadcast.broadcast_settings.includes("Use map videos");
         },
         nextMap() {
-            const unplayedMaps = this.maps.filter(m => !m.dummy && !m.winner);
+            const unplayedMaps = this.maps.filter(m => !m.dummy && !m.winner && !m.draw);
             return unplayedMaps[0];
         }
     },

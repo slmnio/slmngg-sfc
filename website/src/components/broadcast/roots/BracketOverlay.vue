@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay v-if="!extended" :title="title || 'Bracket'" :accent-color="accentColor">
+    <GenericOverlay v-if="!extended" :title="title || 'Bracket'">
         <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :small="small" />
     </GenericOverlay>
     <div class="bracket-extended" :style="zoom" v-else>
@@ -34,10 +34,6 @@ export default {
             if (!this.bracketKey) return this.event.brackets[0];
             const bracket = this.event.brackets.find(b => b && b.key === this.bracketKey);
             return bracket || this.event.brackets[0];
-        },
-        accentColor() {
-            if (!this.event || !this.event.theme) return null;
-            return this.event.theme.color_theme;
         },
         zoom() {
             if (!this.scale) return {};

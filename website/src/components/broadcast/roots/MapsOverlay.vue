@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay class="maps-overlay" v-if="match" :title="customTitle" :accent-color="accentColor.theme">
+    <GenericOverlay class="maps-overlay" v-if="match" :title="customTitle">
         <div class="map-display d-flex w-100 h-100" v-bind:class="{'show-next-map': showNextMap}">
             <BroadcastMapDisplay class="map" v-bind:class="{ 'map-dummy' : map.dummy }" v-for="map in maps" v-bind:key="map.id" :map="map" :accent-color="accentColor" :show-map-video="showMapVideos" :broadcast="broadcast"></BroadcastMapDisplay>
         </div>
@@ -31,22 +31,6 @@ export default {
                 ].join(" ");
             }
             return "Map Set";
-        },
-        event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
-            return ReactiveRoot(this.broadcast.event.id, {
-                theme: ReactiveThing("theme"),
-                teams: ReactiveArray("teams", {
-                    theme: ReactiveThing("theme")
-                })
-            });
-        },
-        accentColor() {
-            if (!this.event || !this.event.theme) return {};
-            return {
-                theme: this.event.theme.color_theme,
-                text_on_theme: this.event.theme.color_text_on_theme
-            };
         },
         match() {
             if (!this.broadcast?.live_match) return null;

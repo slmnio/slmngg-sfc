@@ -2,14 +2,14 @@
     <div class="generic-overlay flex-center flex-column">
         <TourneyBar class="st4-top" v-if="top === 'st4'" :broadcast="broadcast" left="Schedule" :right="title"/>
         <transition name="broadcast-mid-split">
-            <div v-if="top !== 'st4'" class="generic-overlay-title overlay--bg flex-center" :style="{borderColor: accentColor}" v-show="$root.animationActive">
+            <div v-if="top !== 'st4'" class="generic-overlay-title overlay--bg flex-center" :style="{borderColor: _accentColor}" v-show="$root.animationActive">
                 <transition name="fade" mode="out-in">
                     <span class="industry-align" :key="title" v-bind:class="{'has-br': title.includes('\\n') }" v-html="nbr(title)"></span>
                 </transition>
             </div>
         </transition>
         <transition name="broadcast-mid-split">
-            <div class="generic-overlay-body overlay--bg flex-center" :style="{backgroundColor: bodyColor, borderColor: accentColor}" v-show="$root.animationActive">
+            <div class="generic-overlay-body overlay--bg flex-center" :style="{backgroundColor: bodyColor, borderColor: _accentColor}" v-show="$root.animationActive">
                 <slot></slot>
             </div>
         </transition>
@@ -26,6 +26,11 @@ export default {
         nbr(text) {
             if (!text) return "";
             return text.replace(/\\n/g, "<br>");
+        }
+    },
+    computed: {
+        _accentColor() {
+            return this.accentColor || this.$root?.broadcast?.event?.theme?.color_theme;
         }
     }
 };

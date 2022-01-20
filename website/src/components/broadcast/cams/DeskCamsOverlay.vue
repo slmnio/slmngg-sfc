@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay class="desk-cams-overlay" :title="title || 'Player Cams'" :accent-color="accentColor">
+    <GenericOverlay class="desk-cams-overlay" :title="title || 'Player Cams'">
         <div class="team-cams flex-center w-100 flex-column">
             <TeamCamsGroup v-for="(team, ti) in teams" v-bind:key="team.id"
                            :team="team" :guests="guests[ti]" :params="camParams" :event="broadcast && broadcast.event"
@@ -33,9 +33,6 @@ export default {
                     theme: ReactiveThing("theme")
                 })
             });
-        },
-        accentColor() {
-            return this.broadcast?.event?.theme?.color_theme;
         },
         teams() {
             if (!this.match || !this.match.teams || !this.match.teams.every(t => {

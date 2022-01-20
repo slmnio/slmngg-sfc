@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay :title="title || (broadcast.current_stage ? `Standings: ${broadcast.current_stage}` : 'Standings')" :accent-color="accentColor">
+    <GenericOverlay :title="title || (broadcast.current_stage ? `Standings: ${broadcast.current_stage}` : 'Standings')">
         <Standings :event="event" :stage="broadcast.current_stage" />
     </GenericOverlay>
 </template>
@@ -22,13 +22,8 @@ export default {
                     theme: ReactiveThing("theme")
                 })
             });
-        },
-        accentColor() {
-            if (!this.event || !this.event.theme) return null;
-            return this.event.theme.color_theme;
         }
     }
-
 };
 </script>
 

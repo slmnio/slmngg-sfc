@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay class="season-history-overlay" :title="title || 'Season History'" :accent-color="accentColor">
+    <GenericOverlay class="season-history-overlay" :title="title || 'Season History'">
         <div class="team-wrapper flex-center flex-column w-100 h-100">
             <TeamSeasonHistory class="team-season-history" v-for="team in teams" v-bind:key="team.id"
                                :team="team" :live-match="match" :timezone="broadcast.timezone || 'America/New_York'" />
@@ -35,9 +35,6 @@ export default {
                     })
                 })
             });
-        },
-        accentColor() {
-            return this.broadcast?.event?.theme?.color_theme;
         }
     }
 };

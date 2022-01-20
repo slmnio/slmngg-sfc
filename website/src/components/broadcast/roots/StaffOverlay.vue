@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay class="staff-overlay" :title="title || 'Staff'" :accent-color="accentColor">
+    <GenericOverlay class="staff-overlay" :title="title || 'Staff'">
         <div class="staff-holder">
             <div class="staff-name m-2" v-for="person in staff" v-bind:key="person">
                 {{ person }}
@@ -17,9 +17,6 @@ export default {
     components: { GenericOverlay },
     props: ["broadcast", "title"],
     computed: {
-        accentColor() {
-            return this.broadcast?.event?.theme?.color_theme;
-        },
         event() {
             return this.broadcast?.event;
         },

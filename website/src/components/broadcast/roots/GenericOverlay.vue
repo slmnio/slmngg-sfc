@@ -9,7 +9,7 @@
             </div>
         </transition>
         <transition name="broadcast-mid-split">
-            <div class="generic-overlay-body overlay--bg flex-center" :style="{backgroundColor: bodyColor, borderColor: _accentColor}" v-show="$root.animationActive">
+            <div class="generic-overlay-body overlay--bg flex-center" :style="{backgroundColor: bodyColor, borderColor: noBottom ? 'transparent' : _accentColor}" v-show="$root.animationActive">
                 <slot></slot>
             </div>
         </transition>
@@ -21,7 +21,7 @@ import TourneyBar from "@/components/broadcast/TourneyBar";
 export default {
     name: "GenericOverlay",
     components: { TourneyBar },
-    props: ["title", "accentColor", "bodyColor", "top", "broadcast"],
+    props: ["title", "accentColor", "bodyColor", "top", "broadcast", "noBottom"],
     methods: {
         nbr(text) {
             if (!text) return "";

@@ -1,6 +1,6 @@
 <template>
-    <GenericOverlay class="roster-overlay" :title="title || 'Rosters'" body-color="transparent !important">
-        <div class="team" v-for="team in teams" v-bind:key="team.id">
+    <GenericOverlay class="roster-overlay" :title="title || 'Rosters'" body-color="transparent !important" no-bottom="true">
+        <div class="team" v-for="team in teams" v-bind:key="team.id" :style="{ borderColor: accentColor }">
             <div class="team-top flex-center" :style="themeColor(team)">
                 <div class="team-name flex-center">{{ team.name }}</div>
                 <div class="team-icon-holder flex-center">
@@ -27,6 +27,9 @@ export default {
     components: { GenericOverlay },
     props: ["broadcast", "title", "showRoles", "sort"],
     computed: {
+        accentColor() {
+            return this.$root?.broadcast?.event?.theme?.color_theme;
+        },
         match() {
             if (!this.broadcast || !this.broadcast.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
@@ -96,6 +99,7 @@ export default {
     align-items: center;
     background: #222;
     margin: -40px;
+    border-bottom: 8px solid transparent;
 }
 
 .team:first-child {

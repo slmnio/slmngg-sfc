@@ -40,7 +40,14 @@ export default {
                 return { service: "youtube", key: vodURL.pathname.slice(1), timestamp: vodURL.searchParams.get("t") || null };
             }
             if (["www.twitch.tv", "twitch.tv"].includes(vodURL.host)) {
-                return { service: (vodURL.pathname.split("/").length === 3 ? "twitch" : "twitch-live"), key: vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1) };
+                const embed = {
+                    service: (vodURL.pathname.split("/").length === 3 ? "twitch" : "twitch-live"),
+                    key: vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1)
+                };
+                if (embed.service === "twitch") {
+                    embed.timestamp = vodURL.searchParams.get("t") || null;
+                }
+                return embed;
             }
 
             if (this.src.endsWith(".pdf")) {

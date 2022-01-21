@@ -9,6 +9,7 @@
                 <th class="text-center" colspan="5">{{ category }}</th>
             </tr>
             <tr>
+                <th v-if="hasFeederEvents" v-b-tooltip="'Feeder event eligibility'"><i class="far fa-star"></i></th>
                 <th>Name</th>
                 <th>Battletag</th>
                 <th>Tank SR</th>
@@ -17,7 +18,10 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="player in team.players" v-bind:key="player.id">
+            <tr v-for="player in players" v-bind:key="player.id">
+                <td v-if="hasFeederEvents" v-b-tooltip="player.feederEligible ? 'Played in feeder events' : 'Did not play in feeder events'">
+                    <i class="fas fa-star" v-if="player.feederEligible"></i>
+                </td>
                 <td><LinkedPlayers :players="[player]"/></td>
                 <td>{{ player.battletag }}</td>
                 <td>{{ player.composition_tank_sr }}</td>
@@ -37,6 +41,7 @@
 
 <script>
 import LinkedPlayers from "@/components/website/LinkedPlayers";
+import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "TeamComposition.vue",
     components: { LinkedPlayers },
@@ -71,6 +76,40 @@ export default {
             });
 
             return data.join(";");
+        },
+        feederEvents() {
+            return this.team?.event?.feeder_events;
+        },
+        hasFeederEvents() {
+            return !!this.feederEvents?.length;
+        },
+        playerData() {
+            if (!this.team?.players?.length) return [];
+            if (!this.feederEvents?.length) return this.team.players;
+            return ReactiveArray("players", {
+                member_of: ReactiveArray("member_of", {
+                    event: ReactiveThing("event")
+                })
+            })({ players: this.team.players });
+        },
+        players() {
+            return this.playerData.map(p => {
+                let feederEligible = false;
+                console.log({
+                    player: p,
+                    feeders: this.feederEvents,
+                    events: p.member_of.map(t => t.event)
+                });
+
+                if (p.member_of?.length) {
+                    feederEligible = p.member_of.some(team => team?.event?.id && this.feederEvents.some(event => event.id === team.event.id));
+                }
+
+                return {
+                    ...p,
+                    feederEligible
+                };
+            });
         }
     }
 };

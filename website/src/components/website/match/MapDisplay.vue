@@ -37,9 +37,13 @@ export default {
             return this.match.teams.find(t => t.id === cleanID(this.map.winner.id));
         },
         imageCSS() {
+            let mapTheme = { color: "#ffffff" };
+            if (!this.map?.image && this.theme) {
+                mapTheme = themeBackground(this.theme);
+            }
             return {
                 ...cssImage("backgroundImage", this.map, ["image"], 160),
-                ...(this.theme ? themeBackground(this.theme) : {})
+                ...mapTheme
             };
         },
         complete() {

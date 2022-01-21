@@ -38,10 +38,15 @@
         </div>
 
         <h3>Bracket</h3>
-        <div class="overlay-area">
+        <div class="overlay-area mb-3">
             <div class="bracket-match">
                 <BracketTeam :team="team" score="0"/>
             </div>
+        </div>
+
+        <h3>Standings</h3>
+        <div class="standings mb-3">
+            <StandingsTeam :team="standingsData" />
         </div>
 
     </div>
@@ -54,6 +59,7 @@ import { getImage } from "@/utils/content-utils";
 import { logoBackground } from "@/utils/theme-styles";
 import ContentRow from "@/components/website/ContentRow";
 import ContentThing from "@/components/website/ContentThing";
+import StandingsTeam from "@/components/broadcast/StandingsTeam";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");
@@ -61,9 +67,17 @@ function cleanKey(key) {
 
 export default {
     name: "TeamTheme.vue",
-    components: { BracketTeam, IngameTeam, ContentRow, ContentThing },
+    components: { BracketTeam, IngameTeam, ContentRow, ContentThing, StandingsTeam },
     props: ["team"],
     computed: {
+        standingsData() {
+            return {
+                ...this.team,
+                standings: {
+                    wins: 0, losses: 0, map_wins: 0, map_losses: 0, rank: 1, winrate: 0.5
+                }
+            };
+        },
         theme() {
             if (!this.team || this.team.has_theme === 0 || !this.team.theme?.id) return null;
             return this.team.theme;
@@ -190,5 +204,14 @@ export default {
             transform: scale(0.5);
             transform-origin: left;
         }
+    }
+
+    .standings {
+        font-size: 24px;
+        width: fit-content;
+    }
+    .standings >>> .team-name {
+        margin-right: 32px;
+        min-width: 250px;
     }
 </style>

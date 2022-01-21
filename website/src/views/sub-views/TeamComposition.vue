@@ -71,8 +71,8 @@ export default {
         },
         dataString() {
             const data = [];
-            this.team.players.forEach(p => {
-                data.push([p.name, p.composition_tank_sr || "", p.composition_dps_sr || "", p.composition_support_sr || ""].join(","));
+            this.players.forEach(p => {
+                data.push([p.name, p.composition_tank_sr || "", p.composition_dps_sr || "", p.composition_support_sr || "", !this.hasFeederEvents ? 0 : p.feederEligible ? 1 : 2].join(","));
             });
 
             return data.join(";");

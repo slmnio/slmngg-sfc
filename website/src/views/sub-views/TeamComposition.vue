@@ -6,7 +6,7 @@
         <table class="table table-bordered table-dark table-sm">
             <thead>
             <tr v-if="category">
-                <th class="text-center" colspan="5">{{ category }}</th>
+                <th class="text-center" :colspan="hasFeederEvents ? 6 : 5">{{ category }}</th>
             </tr>
             <tr>
                 <th v-if="hasFeederEvents" v-b-tooltip="'Feeder event eligibility'"><i class="far fa-star"></i></th>

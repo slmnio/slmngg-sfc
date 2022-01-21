@@ -4,13 +4,10 @@
         <div class="stat-b" v-if="raw" v-html="formattedTargetData"></div>
         <div class="stat-b" v-else-if="time">{{ prettyDate(targetData) }} local time</div>
         <div class="stat-b" v-else-if="players">
-            <LinkedPlayers :players="targetData" />
+            <LinkedPlayers :players="targetData" :show-tally="showTally" />
         </div>
         <div class="stat-b" v-else-if="externalLink">
             <a class="ct-active" :href="targetData" target="_blank">{{ targetData.replace('https://', '') }}</a>
-        </div>
-        <div class="stat-b" v-else-if="tallyLinks">
-            <router-link v-for="tallyClient in targetData" v-bind:key="tallyClient.id" :to="`/client/${tallyClient.key}/tally-viewer`">{{ tallyClient.name }}</router-link>
         </div>
         <div class="stat-b" v-else>{{ formattedTargetData }}</div>
     </div>
@@ -22,7 +19,7 @@ import spacetime from "spacetime";
 
 export default {
     name: "DetailedMatchStat",
-    props: ["match", "data", "override", "format", "raw", "time", "players", "externalLink", "tallyLinks"],
+    props: ["match", "data", "override", "format", "raw", "time", "players", "externalLink", "showTally"],
     components: { LinkedPlayers },
     methods: {
         prettyDate(timeString) {

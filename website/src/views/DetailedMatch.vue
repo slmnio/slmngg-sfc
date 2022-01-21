@@ -134,10 +134,9 @@
                     <stat :match="match" data="vod" :external-link="true">VOD Link</stat>
                     <stat :match="match" data="clean_feed" :external-link="true">Clean Feed</stat>
                     <stat :match="match" data="first_to">First to</stat>
-                    <stat :override="relGroup.items" v-for="relGroup in playerRelationshipGroups" v-bind:key="relGroup.meta.singular_name" :players="true">
+                    <stat :override="relGroup.items" v-for="relGroup in playerRelationshipGroups" v-bind:key="relGroup.meta.singular_name" :players="true" :show-tally="relGroup.meta.singular_name === 'Observer'">
                         {{ relGroup.items.length === 1 ? relGroup.meta.singular_name : relGroup.meta.plural_name }}
                     </stat>
-                    <stat :override="observerClients" :tally-links="true">Tally Lights</stat>
                     <stat :match="match" data="replay_codes" :raw="true" :format="(t) => t[0].replace(/\n/g, '<br>')">Replay codes</stat>
                 </div>
             </div>
@@ -270,12 +269,6 @@ export default {
             if (groups[undefined]) return [];
 
             return Object.values(groups);
-        },
-        observerClients() {
-            if (!this.match?.player_relationships) return [];
-            return this.match?.player_relationships
-                .filter(rel => rel.singular_name === "Observer" && rel.player?.clients?.[0])
-                .map(rel => rel.player.clients[0]);
         }
     },
     metaInfo() {

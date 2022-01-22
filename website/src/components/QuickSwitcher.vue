@@ -36,7 +36,7 @@ export default {
     name: "QuickSwitcher",
     components: { LoadingIcon, QuickSwitcherResult },
     data: () => ({
-        active: true,
+        active: false,
         input: null,
         lastSearchInput: null,
         searchTimeout: null,

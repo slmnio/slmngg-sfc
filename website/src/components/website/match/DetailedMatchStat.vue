@@ -1,54 +1,40 @@
 <template>
-    <div class="stat mb-2" v-if="override || match[data]">
+    <div class="stat mb-2" v-if="shouldShow">
         <div class="stat-a"><slot></slot></div>
-        <div class="stat-b" v-if="time">{{ prettyDate(match[data], ' ') }} local time</div>
-        <div class="stat-b" v-else-if="raw" v-html="format ? format(match[data]) : match[data]"></div>
+        <div class="stat-b" v-if="raw" v-html="formattedTargetData"></div>
+        <div class="stat-b" v-else-if="time">{{ prettyDate(targetData) }} local time</div>
         <div class="stat-b" v-else-if="players">
-            <LinkedPlayers :players="match[data] || override" />
+            <LinkedPlayers :players="targetData" :show-tally="showTally" />
         </div>
-        <div class="stat-b" v-else-if="override">{{ format ? format(override) : override }}</div>
-        <div class="stat-b" v-else>{{ format ? format(match[data]) : match[data] }}</div>
-
+        <div class="stat-b" v-else-if="externalLink">
+            <a class="ct-active" :href="targetData" target="_blank">{{ targetData.replace('https://', '') }}</a>
+        </div>
+        <div class="stat-b" v-else>{{ formattedTargetData }}</div>
     </div>
 </template>
 
 <script>
 import LinkedPlayers from "@/components/website/LinkedPlayers";
+import spacetime from "spacetime";
 
 export default {
     name: "DetailedMatchStat",
-    props: ["data", "text", "format", "raw", "time", "override", "match", "players"],
+    props: ["match", "data", "override", "format", "raw", "time", "players", "externalLink", "showTally"],
     components: { LinkedPlayers },
     methods: {
-        prettyDate: (tstr, split = "<br>") => {
-            if (!tstr) return "No time set";
-            const date = new Date(tstr);
-
-            let time = "";
-
-            if (date.getHours() >= 12) {
-                // pm
-                if (date.getHours() % 12 === 0) {
-                    time += 12;
-                } else {
-                    time += (date.getHours() % 12);
-                }
-                time += ":";
-                time += date.getMinutes().toString().padStart(2, "0");
-                time += "pm";
-            } else {
-                if (date.getHours() === 0) {
-                    time += 12;
-                } else {
-                    time += (date.getHours() % 12);
-                }
-                time += ":";
-                time += date.getMinutes().toString().padStart(2, "0");
-                time += "am";
-            }
-
-
-            return `${date.getDate()} ${("Jan.Feb.Mar.Apr.May.Jun.Jul.Aug.Sep.Oct.Nov.Dec".split("."))[date.getMonth()]}${split}${time}`;
+        prettyDate(timeString) {
+            return spacetime(timeString).goto(null).format("{date} {month-short} {time}");
+        }
+    },
+    computed: {
+        targetData() {
+            return this.override || this.match[this.data];
+        },
+        shouldShow() {
+            return this.targetData && this.targetData?.length !== 0;
+        },
+        formattedTargetData() {
+            return this.format ? this.format(this.targetData) : this.targetData;
         }
     }
 };

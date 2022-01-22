@@ -165,6 +165,7 @@ export default {
         height: 100%;
         position: absolute;
         top: 0;
+        transition: background-color .5s ease;
     }
     .caster-avatar {
         width: calc(var(--caster-width) * 0.3);

@@ -28,7 +28,7 @@ import { cssImage } from "@/utils/content-utils";
 
 export default {
     name: "BroadcastMapDisplay",
-    props: ["broadcast", "map", "accentColor", "showMapVideo"],
+    props: ["broadcast", "map", "accentColor", "showMapVideo", "firstTo"],
     computed: {
         mapBackground() {
             if (!(this.map?.big_image || this.map?.image)) return {};
@@ -65,7 +65,7 @@ export default {
         },
         winnerLogo() {
             if (!this.map?.winner?.theme) return {};
-            return cssImage("backgroundImage", this.map.winner.theme, ["default_wordmark", "default_logo", "small_logo"], 400);
+            return cssImage("backgroundImage", this.map.winner.theme, this.firstTo && this.firstTo > 2 ? ["default_logo", "small_logo"] : ["default_wordmark", "default_logo", "small_logo"], 400);
         },
         mapVideo() {
             if (!this.showMapVideo) return null;

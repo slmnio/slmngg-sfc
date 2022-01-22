@@ -142,12 +142,12 @@ export default {
     .mid-split-enter-active {
         overflow: hidden;
         max-width: 100%;
-        transition: all 400ms var(--reversedCurve);
+        transition: all 400ms var(--reversedCurve) 250ms;
     }
     .mid-split-leave-active {
         overflow: hidden;
         max-width: 100%;
-        transition: all 400ms var(--originalCurve);
+        transition: all 400ms var(--originalCurve) 250ms;
     }
     .mid-split-enter, .mid-split-leave-to {
         /*clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);*/

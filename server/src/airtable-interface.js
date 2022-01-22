@@ -80,10 +80,10 @@ async function getAllTableData(tableName, options = {}) {
 }
 
 function customUpdater(tableName, item) {
-    if (tableName === "Broadcasts" && item.key) Cache.set(`broadcast-${item.key}`, item);
-    if (tableName === "Clients" && item.key) Cache.set(`client-${item.key}`, item);
-    if (tableName === "Events" && item.subdomain) Cache.set(`subdomain-${item.subdomain}`, item);
-    if (tableName === "News" && item.slug) Cache.set(`news-${item.slug}`, item);
+    if (tableName === "Broadcasts" && item.key) Cache.set(`broadcast-${item.key}`, item, { custom: true });
+    if (tableName === "Clients" && item.key) Cache.set(`client-${item.key}`, item, { custom: true });
+    if (tableName === "Events" && item.subdomain) Cache.set(`subdomain-${item.subdomain}`, item, { custom: true });
+    if (tableName === "News" && item.slug) Cache.set(`news-${item.slug}`, item, { custom: true });
 }
 
 function sluggify(text) {
@@ -93,6 +93,7 @@ function sluggify(text) {
 async function processTableData(tableName, data, linkRecords = false) {
     if (!data) return;
     data.map(deAirtable).forEach(data => {
+        data.__tableName = tableName;
         if (tableName === "News") {
             data.slug = sluggify(data.name);
         }
@@ -121,6 +122,7 @@ function registerUpdater(tableName, options) {
             }).all()).map(deAirtable);
 
             data.forEach(data => {
+                data.__tableName = tableName;
                 if (tableName === "News") {
                     data.slug = sluggify(data.name);
                 }

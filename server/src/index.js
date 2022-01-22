@@ -6,6 +6,7 @@ const http = require("http").Server(app);
 const cors = require("cors");
 const meta = require("./meta.js");
 const routes = require("./routes.js");
+const { getFromSearch } = require("./cache");
 
 /* The staff module should only run on the server, probably not your local machine. */
 let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEGORY_ID", "STAFFAPPS_APPLICATION_CHANNEL_ID", "IS_SLMNGG_MAIN_SERVER"];
@@ -77,6 +78,19 @@ app.get("/things/:ids", cors({ origin: corsHandle}), async (req, res) => {
     data = [...data, ...themes].filter(d => d != null);
     // if (!data) return res.status(404).send({ error: true, message: "Unknown ID"});
     res.end(JSON.stringify(data));
+});
+
+app.get("/search", cors({ origin: corsHandle }), async (req, res) => {
+    try {
+        let items = await getFromSearch(req.query.input);
+        return res.send({
+            success: true,
+            items
+        });
+    } catch (e) {
+        console.error(e);
+        res.send({ success: false });
+    }
 });
 
 routes({ app, cors, Cache, io });

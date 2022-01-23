@@ -46,7 +46,7 @@
                         {{ event.navbar_short || event.short || event.series_subtitle || event.name }}</router-link>
 <!--                    <router-link :to="'/'" v-if="minisite.navbar_short" active-class="active" exact class="nav-link">{{ minisite.navbar_short }}</router-link>-->
                 </b-navbar-nav>
-                <b-navbar-nav class="w-100"></b-navbar-nav>
+                <b-navbar-nav class="flex-grow-1"></b-navbar-nav>
                 <b-navbar-nav v-if="minisite">
                     <a :href="slmnggURL('')" class="nav-link">SLMN.GG</a>
                 </b-navbar-nav>

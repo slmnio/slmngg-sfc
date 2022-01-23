@@ -46,9 +46,7 @@
                         {{ event.navbar_short || event.short || event.series_subtitle || event.name }}</router-link>
 <!--                    <router-link :to="'/'" v-if="minisite.navbar_short" active-class="active" exact class="nav-link">{{ minisite.navbar_short }}</router-link>-->
                 </b-navbar-nav>
-                <b-navbar-nav class="mr-auto flex-wrap">
-                    <NavLiveMatch v-for="match in liveMatches" :match="match" v-bind:key="match.id" />
-                </b-navbar-nav>
+                <b-navbar-nav class="w-100"></b-navbar-nav>
                 <b-navbar-nav v-if="minisite">
                     <a :href="slmnggURL('')" class="nav-link">SLMN.GG</a>
                 </b-navbar-nav>
@@ -58,6 +56,11 @@
                 </b-navbar-nav>
             </b-collapse>
         </b-navbar>
+
+        <div class="live-matches flex-wrap flex-center" v-if="liveMatches.length">
+            <div class="live-matches-text">🔴 LIVE</div>
+            <NavLiveMatch v-for="match in liveMatches" :match="match" v-bind:key="match.id" />
+        </div>
     </div>
 </template>
 
@@ -91,9 +94,14 @@ export default {
         liveMatches() {
             return ReactiveRoot("special:live-matches", {
                 matches: ReactiveArray("matches", {
-                    event: ReactiveThing("event")
+                    event: ReactiveThing("event", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    teams: ReactiveArray("teams", {
+                        theme: ReactiveThing("theme")
+                    })
                 })
-            }).matches;
+            }).matches || [];
         },
         slmnggDomain() {
             try {
@@ -185,5 +193,21 @@ export default {
         margin: .2rem .5rem;
         border-left: 1px solid;
     }
+}
+
+@media (max-width: 957px) {
+    .live-matches-text {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+.live-matches {
+    gap: 1em;
+    padding: .5em 0;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+.live-matches-text {
+    font-size: 1.5em;
 }
 </style>

@@ -3,7 +3,7 @@
 * */
 
 function tableUpdated(tableName, Cache) {
-    // if (tableName === "Matches") matchUpdate(Cache);
+    if (tableName === "Matches") matchUpdate(Cache);
     if (tableName === "Broadcasts") broadcastUpdate(Cache);
     if (tableName === "Players") playerList(Cache);
 }
@@ -13,7 +13,7 @@ async function matchUpdate(Cache) {
     let allMatches = await Cache.get("Matches");
     if (!allMatches.ids) return;
     let liveMatches = (await Promise.all(allMatches.ids.map(id => (Cache.get(id.slice(3)))))).filter(match => match.live);
-    Cache.set("special:live-matches", { matches: liveMatches.map(m => m.id) });
+    Cache.set("internal:live-matches", { matches: liveMatches.map(m => m.id) });
 }
 
 async function broadcastUpdate(Cache) {
@@ -22,6 +22,15 @@ async function broadcastUpdate(Cache) {
     if (!allBroadcasts.ids) return;
     let broadcasts = (await Promise.all(allBroadcasts.ids.map(id => Cache.get(id.slice(3)))));
     let matchIDs = broadcasts.filter(b => b.advertise && b.live_match).map(b => b.live_match[0]);
+
+    // also find matches
+    let liveMatches = await Cache.get("internal:live-matches");
+    if (liveMatches?.matches?.length) {
+        matchIDs = [
+            ...matchIDs,
+            ...liveMatches.matches
+        ].filter((i, p, a) => a.indexOf(i) === p);
+    }
 
     Cache.set("special:live-matches", { matches: matchIDs });
 }

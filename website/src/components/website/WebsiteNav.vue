@@ -21,7 +21,8 @@
         <b-navbar toggleable="lg" type="dark">
             <router-link class="navbar-brand " to="/">
                 <img v-if="minisiteIcon" :src="minisiteIcon" alt="" class="navbar-image d-inline-block align-top mr-2">
-                {{ minisite ? (minisite.navbar_name || minisite.series_name || minisite.name) : "SLMN.GG"}}
+                <span class="d-lg-inline d-none">{{ minisite ? (minisite.navbar_name || minisite.series_name || minisite.name) : "SLMN.GG"}}</span>
+                <span class="d-inline d-lg-none">{{ minisite ? (minisite.short || minisite.series_name || minisite.name) : "SLMN.GG"}}</span>
 
             </router-link>
 

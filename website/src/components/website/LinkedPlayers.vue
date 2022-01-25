@@ -2,7 +2,10 @@
     <span class="linked-players" v-if="html">
         <span class="linked-player" v-for="(player, i) in players" v-bind:key="player.id" :style="{order: i*2}">
             <router-link class="ct-active" :to="url('player', player)">{{ player.name }}<span v-if="player.verified">&nbsp;<i class="fas fa-badge-check" title="REAL"></i></span></router-link>
-            <router-link class="ct-active" v-if="showTally && player.clients && player.clients.length > 0 "  :to="`/client/${player.clients[0].key}/tally-viewer`"><i class="fas fa-tv" title="Tally"></i></router-link>
+            <span v-if="showTally && player.clients && player.clients.length > 0">
+              <a v-if="$root.minisiteEvent" class="ct-active" :href="`//dev.slmn.gg/client/${player.clients[0].key}/tally-viewer`"><i class="fas fa-tv" title="Tally"></i></a>
+              <router-link v-else class="ct-active" :to="`/client/${player.clients[0].key}/tally-viewer`"><i class="fas fa-tv" title="Tally"></i></router-link>
+            </span>
         </span>
             <span v-for="i in parseInt(commas)" v-bind:key="i" :style="{order: (i*2)-1}">, </span>
             <span v-if="and" :style="{order: (players.length - 1) * 2 - 1}"> & </span>

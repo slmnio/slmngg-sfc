@@ -1,5 +1,5 @@
 <template>
-    <div class="standings" v-if="standings && standings.length">
+    <div class="standings" v-if="standings && standings.standings.length">
 <!--        <div>{{ event.name }} / {{ stage }} / {{ allMatches.length }} -> {{ stageMatches.length }} ({{ teams.length }} teams)</div>-->
         <h3 class="top-standings-name text-center d-md-none">{{ title || stage || 'Team' }}</h3>
         <div class="standings-header d-flex align-items-center">
@@ -14,11 +14,14 @@
             </div>
         </div>
         <div class="teams">
-            <div class="team-group" v-for="(group, i) in standings" v-bind:key="i">
+            <div class="team-group" v-for="(group, i) in standings.standings" v-bind:key="i">
                 <div class="team" v-for="team in group" v-bind:key="team.id">
                     <StandingsTeam :team="team" :tie-text="tieText" />
                 </div>
             </div>
+        </div>
+        <div class="warnings mt-2" v-if="standings && standings.warnings.length">
+            <div class="warning bg-warning text-dark p-1 px-2" v-for="warn in standings.warnings" v-bind:key="warn">{{ warn }}</div>
         </div>
     </div>
 </template>
@@ -220,7 +223,7 @@ export default {
             teams = teams.sort(sortFunction);
 
             // console.log("[standings teams]", teams);
-            const standings = sortTeamsIntoStandings(teams.map(t => ({ ...t, ...t.standings })), {
+            const { standings, warnings } = sortTeamsIntoStandings(teams.map(t => ({ ...t, ...t.standings })), {
                 useOMW: this.useOMW,
                 sort: this.standingsSort
             });
@@ -236,7 +239,10 @@ export default {
                 display = rank;
             });
 
-            return standings;
+            return {
+                standings,
+                warnings
+            };
 
 
             // let standingRank = 1;
@@ -277,5 +283,9 @@ export default {
     }
     .team-name {
         margin-left: 2em;
+    }
+    .warnings {
+        font-weight: bold;
+        font-size: 18px;
     }
 </style>

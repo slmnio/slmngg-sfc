@@ -28,7 +28,7 @@ export default {
     },
     computed: {
         matches() {
-            if (!this.bracket || !this.bracket.ordered_matches) return null;
+            if (!this.bracket || !this.bracket.ordered_matches) return [];
             return this.bracket.ordered_matches;
         },
         layout() {

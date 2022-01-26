@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="row">
-            <Match v-for="match in matches" :id="match" v-bind:key="match" class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3" />
+            <Match v-for="match in matches" :hydrated-match="match" v-bind:key="match.id" class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3" />
         </div>
     </div>
 </template>
@@ -9,6 +9,7 @@
 <script>
 import Match from "@/components/website/match/Match";
 import { sortMatches } from "@/utils/sorts";
+import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "PlayerPlayedMatches",
@@ -17,16 +18,26 @@ export default {
         Match
     },
     computed: {
+        teams() {
+            if (!this.player?.member_of?.length) return [];
+            return ReactiveArray("member_of", {
+                matches: ReactiveArray("matches", {
+                    teams: ReactiveArray("teams", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    event: ReactiveThing("event", {
+                        theme: ReactiveThing("theme")
+                    })
+                })
+            })(this.player);
+        },
         matches() {
+            if (!this.teams) return [];
             let matches = [];
-            if (!this.player) return [];
-            if (!this.player.member_of) return [];
-            this.player.member_of.forEach(team => {
-                if (team.matches) {
-                    matches = matches.concat(team.matches);
-                }
+            this.teams.forEach(team => {
+                console.log(team.matches);
+                if (team.matches) matches = matches.concat(team.matches);
             });
-            // TODO: fix this - it's just IDs at this point, has no extra data
             return matches.sort(sortMatches);
         }
     }

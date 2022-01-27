@@ -334,7 +334,7 @@ function getSortMethod(stringMethod) {
 export function sortTeamsIntoStandings(teams, settings = {}) {
     const log = false;
     if (log) console.log("[standings]", "starting sort", teams, settings);
-    const warnings = [];
+    let warnings = [];
 
     if (settings.sort) {
         // Custom sort
@@ -344,7 +344,7 @@ export function sortTeamsIntoStandings(teams, settings = {}) {
             const _method = getSortMethod(mode);
             if (!_method) {
                 console.warn(`No sorting method for ${mode}`);
-                warnings.push(`Warning: theses standings needs to be sorted by "${mode}" but it has not been implemented on the site. The real standings may be different, or need to be manually calculated. The sorting order is: ${settings.sort.join(", ")}`);
+                warnings.push(mode);
                 continue;
             }
             const { prep, method, max } = _method;
@@ -358,6 +358,9 @@ export function sortTeamsIntoStandings(teams, settings = {}) {
             }
             if (log) console.log("[standings]", `[${mode}]`, standings);
         }
+
+        if (warnings?.length) warnings = [`Warning: theses standings needs to be sorted by ${warnings.map(e => `[${e}]`).join(", ")} but it has not been implemented on the site. It has been sorted with the available sorting methods, but may need to be manually sorted to be fully accurate.`, `The sorting order for these standings are: ${settings.sort.join(", ")}.`];
+
         return { standings, warnings };
     }
 

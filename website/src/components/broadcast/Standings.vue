@@ -20,8 +20,8 @@
                 </div>
             </div>
         </div>
-        <div class="warnings mt-2" v-if="standings && standings.warnings.length">
-            <div class="warning bg-warning text-dark p-1 px-2" v-for="warn in standings.warnings" v-bind:key="warn">{{ warn }}</div>
+        <div class="warnings flex-center flex-column mt-2 mx-2" v-if="standings && standings.warnings.length">
+            <div class="warning bg-warning text-dark p-1 px-2 mb-1" v-for="warn in standings.warnings" v-bind:key="warn">{{ warn }}</div>
         </div>
     </div>
 </template>
@@ -287,5 +287,8 @@ export default {
     .warnings {
         font-weight: bold;
         font-size: 18px;
+    }
+    .warning {
+        max-width: calc(100vw - 2em);
     }
 </style>

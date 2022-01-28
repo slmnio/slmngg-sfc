@@ -17,6 +17,16 @@ function aImg(airtableImage) {
     };
 }
 
+function stripMarkdown(md) {
+    try {
+        return md.replace(/\[([^\]]*)\]\(([^)]*)\)/g, "$1") // replace links [$1]($2) with $1
+            .replace(/\*\*([^\*]*)\*\*/g, "$1"); // replace bold **$1** with $1
+    } catch (e) {
+        console.error(e);
+        return md;
+    }
+}
+
 function niceJoin(array) {
     if (array.length > 1) {
         let last = array.pop();
@@ -156,7 +166,7 @@ module.exports = ({ app, cors, Cache }) => {
                 * */
 
 
-                let text = thing.content.split("\n\n")[0];
+                let text = stripMarkdown(thing.content).split("\n\n")[0];
                 let cutoff = 300;
                 let data = {
                     title: thing.headline,

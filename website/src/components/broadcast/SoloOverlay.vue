@@ -1,5 +1,19 @@
 <template>
     <div class="solo-overlay flex-center">
+        <div class="solo-part solo--ingame">
+            <transition-group name="fade" mode="out-in">
+                <IngameTeam :key="`${team.name}-${i}`" v-for="(team, i) in teams"
+                            :team="team" :right="i === 1" :score="scores[i]"/>
+            </transition-group>
+            <!--  :score="scores[i]" :hideScores="broadcast.hide_scores"
+                        :width="teamWidth" :codes="codes" -->
+
+            <transition name="mid" mode="out-in">
+                <Middle v-if="middle" :text="middle" :key="middle" />
+            </transition>
+        </div>
+
+
         <div class="solo-part solo--controls">
             <div class="control-group" v-if="controlMode === 'default'">
                 <SoloControlButton noclick left rotate>SLMN.GG</SoloControlButton>
@@ -9,6 +23,7 @@
                 <SoloControlButton color="#f22cf2" :click="() => controlMode = 'set-scores'">Set Scores</SoloControlButton>
                 <SoloControlButton :color="middle ? '#2cd1f2' : ''" :click="() => controlMode = 'set-middle'">Set Middle</SoloControlButton>
                 <div class="spacer"></div>
+                <SoloControlButton noclick style="font-size: 2.75em">Overlay height: {{ pageHeight }}<small>px</small></SoloControlButton>
                 <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
             </div>
             <div class="control-group" v-if="controlMode === 'set-team-1'">
@@ -57,25 +72,15 @@
         </div>
 
 
-        <div class="solo-part solo--desk flex-center">
+        <div class="solo-part solo--desk flex-center" v-if="showModule('desk')">
             <DeskMatch class="w-100" :_match="virtualMatch" :custom-scores="scores" />
         </div>
 
-
-        <div class="solo-part solo--ingame">
-            <transition-group name="fade" mode="out-in">
-                <IngameTeam :key="`${team.name}-${i}`" v-for="(team, i) in teams"
-                            :team="team" :right="i === 1" :score="scores[i]"/>
-            </transition-group>
-            <!--  :score="scores[i]" :hideScores="broadcast.hide_scores"
-                        :width="teamWidth" :codes="codes" -->
-
-            <transition name="mid" mode="out-in">
-                <Middle v-if="middle" :text="middle" :key="middle" />
-            </transition>
-        </div>
-        <div class="solo-part solo--rosters">
+        <div class="solo-part solo--rosters" v-if="showModule('rosters')">
             <RosterOverlay :virtual-match="virtualMatch" :broadcast="broadcast" :client="client" :title="title" />
+        </div>
+        <div class="solo-part solo--break" v-if="showModule('break')">
+            <BreakOverlay :virtual-match="virtualMatch" :broadcast="broadcast" :client="client" :title="title" />
         </div>
         <div class="solo-loader d-none">
             {{ event && event.name }}
@@ -91,12 +96,14 @@ import SoloTeamControlButton from "@/components/broadcast/SoloTeamControlButton"
 import DeskMatch from "@/components/broadcast/desk/DeskMatch";
 import Middle from "@/components/broadcast/Middle";
 import RosterOverlay from "@/components/broadcast/roots/RosterOverlay";
+import BreakOverlay from "@/components/broadcast/break/BreakOverlay";
 
 export default {
     name: "SoloOverlay",
-    props: ["broadcast", "client", "title"],
+    props: ["broadcast", "client", "title", "modules"],
     components: {
         RosterOverlay,
+        BreakOverlay,
         SoloControlButton,
         SoloTeamControlButton,
         IngameTeam,
@@ -134,6 +141,9 @@ export default {
         setMiddle() {
             this.middle = this.tempMiddle.toUpperCase();
             this.controlMode = "default";
+        },
+        showModule(module) {
+            return (this.modules || []).includes(module);
         }
     },
     watch: {
@@ -155,7 +165,7 @@ export default {
             if (!this.event?.teams) return [];
             let i, j;
             const chunkLength = 9;
-            const array = this.event.teams;
+            const array = [...this.event.teams].sort((a, b) => a.team_category < b.team_category ? 1 : -1);
             const chunked = [];
 
             for (i = 0, j = array.length; i < j; i += chunkLength) {
@@ -172,11 +182,35 @@ export default {
         },
         virtualMatch() {
             return {
-                teams: this.teams
+                teams: this.teams,
+                show_on_overlays: true,
+                id: "virtual",
+                _virtual_match_category: this.matchCategory
             };
         },
         scoreArray() {
             return [0, 1, 2, 3];
+        },
+        pageHeight() {
+            let height = 0;
+
+            // defaults
+            height += 200; // control panel
+            height += 200; // ingame
+            if (this.showModule("desk")) height += 200; // rosters, full
+            if (this.showModule("rosters")) height += 1080; // rosters, full
+            if (this.showModule("break")) height += 1080; // rosters, full
+
+            return height;
+        },
+        matchCategory() {
+            // assuming match category matches team category
+            if (this.teams[0]?.team_category) {
+                // B League or 3;B League
+                const data = this.teams[0]?.team_category.split(";");
+                return data[data.length - 1];
+            }
+            return null;
         }
     }
 };
@@ -195,7 +229,10 @@ export default {
         position: relative;
         /* TODO: remove dev */ border: 2px solid red;
     }
-    .solo-part.solo--rosters { height: 1080px; }
+    .solo-part.solo--rosters,
+    .solo-part.solo--break {
+        height: 1080px;
+    }
 
     .solo--controls {
         background-color: #222;

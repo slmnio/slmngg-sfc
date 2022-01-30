@@ -93,5 +93,5 @@ export default [
     { path: "staff", component: StaffOverlay },
     { path: "player-history", component: PlayerHistory, props: route => ({ showMinor: route.query.minor }) },
     { path: "overview", component: OverviewOverlay },
-    { path: "solo", component: SoloOverlay }
+    { path: "solo", component: SoloOverlay, props: route => ({ modules: route.query.modules?.split(",") }) }
 ];

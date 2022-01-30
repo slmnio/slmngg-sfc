@@ -27,7 +27,7 @@ import { cssImage } from "@/utils/content-utils";
 
 
 export default {
-    name: "BroadcastMapDisplay",
+    name: "MapSegment",
     props: ["broadcast", "map", "accentColor", "showMapVideo", "firstTo"],
     computed: {
         mapBackground() {

@@ -1,6 +1,6 @@
 {
   "name": "slmngg-server",
-  "versone ion": "1.0.0",
+  "version": "1.0.0",
   "description": "SLMN.GG Backend Server",
   "main": "index.js",
   "scripts": {

@@ -1,0 +1,34 @@
+{
+  "name": "slmngg",
+  "workspaces": [
+    "server",
+    "website"
+  ],
+  "private": true,
+  "repository": "git+https://github.com/slmnio/slmngg-sfc.git",
+  "bugs": {
+    "url": "https://github.com/slmnio/slmngg-sfc/issues"
+  },
+  "homepage": "https://github.com/slmnio/slmngg-sfc#readme",
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.23.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "eslint-plugin-vue": "^6.2.2",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.3.2",
+    "prettier": "^2.5.1"
+  },
+  "scripts": {
+    "postinstall": "husky install",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "server/**/*.js": "eslint --fix",
+    "website/**/*.{js,vue,html}": "eslint --fix"
+  }
+}

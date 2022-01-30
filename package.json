@@ -26,10 +26,10 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "format": "prettier-eslint --write \"**/*.{js,json,vue}\""
+    "lint": "eslint --fix --ext .js,.vue,.html .",
+    "format": "prettier-eslint --write \"**/*.{js,vue,html}\""
   },
   "lint-staged": {
-    "server/**/*.js": "eslint --fix",
-    "website/**/*.{js,vue,html}": "eslint --fix"
+    "**/*.{js,vue,html}": "prettier --write --ignore-unknown"
   }
 }

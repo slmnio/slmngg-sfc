@@ -38,7 +38,7 @@ export default {
     color: white;
     font-family: "Industry", "SLMN-Industry", sans-serif;
 
-    padding: 60px;
+    padding: 60px 100px;
 
     display: flex;
     flex-direction: column;
@@ -51,5 +51,8 @@ export default {
 .desk-match >>> .match-vs,
 .desk-match >>> .team-logo-holder {
     height: 120px !important;
+}
+.part-map-display >>> .map-lower {
+    padding: 10px;
 }
 </style>

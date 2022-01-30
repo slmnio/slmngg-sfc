@@ -80,5 +80,5 @@ export default [
     { path: "ad-read", component: AdReadOverlay, props: route => ({ extraDelay: route.query.delay }) },
     { path: "logos", component: LogoAdOverlay },
     { path: "staff", component: StaffOverlay },
-    { path: "solo", component: SoloOverlay }
+    { path: "solo", component: SoloOverlay, props: route => ({ modules: route.query.modules?.split(",") }) }
 ];

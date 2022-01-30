@@ -26,7 +26,7 @@
                         <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
                     </transition-group>
                     <div class="break-col break-standings" v-if="automatedShow === 'Standings'" key="Standings">
-                        <Standings :event="event" :stage="broadcast.current_stage" />
+                        <Standings :event="event" :stage="currentStage" />
                     </div>
                     <div class="break-col break-image" v-if="automatedShow === 'Image'" :key="`image-${breakImageURL}`">
                         <div class="break-image-inner" :style="breakImage"></div>
@@ -46,7 +46,7 @@
         </div>
         <div class="break-preload">
             <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
-            <Standings :event="event" :stage="broadcast.current_stage" />
+            <Standings :event="event" :stage="currentStage" />
             <div class="break-image-inner" :style="cssImage('backgroundImage', broadcast, ['break_image'], 1080, false)"></div>
             <Bracket class="break-col break-bracket" v-if="breakDisplay === 'Bracket'" key="Bracket" :event="event" :bracket="bracket" use-overlay-scale />
         </div>
@@ -71,7 +71,7 @@ const tickTime = 25;
 
 export default {
     name: "BreakOverlay",
-    props: ["broadcast", "title"],
+    props: ["broadcast", "title", "virtualMatch"],
     components: { BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
     data: () => ({
         tick: 0,
@@ -98,6 +98,8 @@ export default {
             return this.breakImage?.backgroundImage;
         },
         nextMatch() {
+            if (this.virtualMatch) return this.virtualMatch;
+
             if (!this.broadcast || !this.broadcast.live_match || !this.broadcast.show_live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
@@ -106,6 +108,8 @@ export default {
             });
         },
         fullSchedule() {
+            if (this.virtualMatch) return [this.virtualMatch];
+
             if (!this.broadcast || !this.broadcast.schedule) return null;
             return ReactiveArray("schedule", {
                 teams: ReactiveArray("teams", {
@@ -195,6 +199,9 @@ export default {
                 // empty or automated - do automation
                 return this.suggestedShow;
             }
+        },
+        currentStage() {
+            return this.virtualMatch?._virtual_match_category || this.broadcast?.current_stage;
         }
     },
     watch: {

@@ -25,18 +25,29 @@
 
 <script>
 import DeskTeam from "@/components/broadcast/desk/DeskTeam";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "DeskMatch",
     components: { DeskTeam },
-    props: ["_match", "themeColor"],
+    props: ["_match", "themeColor", "matchID"],
     computed: {
+        matchData() {
+            return this._match || ReactiveRoot(this.matchID, {
+                teams: ReactiveArray("teams", {
+                    theme: ReactiveThing("theme")
+                }),
+                event: ReactiveThing("event", {
+                    theme: ReactiveThing("theme")
+                })
+            });
+        },
         match() {
-            if (!this._match?.special_event) {
-                if (!this._match?.teams) return null;
-                if (this._match.teams.length !== 2) return null;
-                if (this._match.teams.some(t => !t.theme || t.theme.__loading)) return null;
+            if (!this.matchData?.special_event) {
+                if (!this.matchData?.teams) return null;
+                if (this.matchData.teams.length !== 2) return null;
+                if (this.matchData.teams.some(t => !t.theme || t.theme.__loading)) return null;
             }
-            return this._match;
+            return this.matchData;
         },
         show() {
             return {
@@ -99,6 +110,7 @@ export default {
         height: 110px;
         border-bottom: 6px solid #2664f7;
         background-color: white;
+        color: #111;
         white-space: nowrap;
         min-width: 180px;
     }

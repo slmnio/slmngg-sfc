@@ -61,6 +61,11 @@ export async function fetchThing (id) {
     //     return null;
     // }
 }
+
+export async function rawFetch(url) {
+    return await fetch(`${getDataServerAddress()}/${url}`).then(res => res.json());
+}
+
 export async function fetchThings (ids) {
     console.log("[socket] fetching multiple ", ids.length);
     try {

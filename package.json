@@ -21,11 +21,12 @@
     "eslint-plugin-vue": "^6.2.2",
     "husky": "^7.0.4",
     "lint-staged": "^12.3.2",
-    "prettier": "^2.5.1"
+    "prettier": "^2.5.1",
+    "prettier-eslint-cli": "^5.0.1"
   },
   "scripts": {
-    "postinstall": "husky install",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "format": "prettier-eslint --write \"**/*.{js,json,vue}\""
   },
   "lint-staged": {
     "server/**/*.js": "eslint --fix",

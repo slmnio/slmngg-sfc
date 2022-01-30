@@ -1,5 +1,11 @@
 <template>
-    <div class="map-display d-flex w-100 h-100" v-bind:class="{'show-next-map': showNextMap}">
+    <transition v-if="useTransitions" mode="out-in" name="break-content" class="map-anim-holder">
+        <div :key="autoKey" class="map-display d-flex w-100 h-100" v-bind:class="{'show-next-map': showNextMap && nextMap}">
+            <MapSegment class="map" v-bind:class="{ 'map-dummy' : map.dummy }" v-for="map in maps" v-bind:key="map.id"
+                :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to"></MapSegment>
+        </div>
+    </transition>
+    <div v-else class="map-display d-flex w-100 h-100" v-bind:class="{'show-next-map': showNextMap && nextMap}">
         <MapSegment class="map" v-bind:class="{ 'map-dummy' : map.dummy }" v-for="map in maps" v-bind:key="map.id"
                     :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to"></MapSegment>
     </div>
@@ -12,7 +18,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "MapDisplay",
     components: { MapSegment },
-    props: ["broadcast", "animationActive"],
+    props: ["broadcast", "animationActive", "useTransitions"],
     data: () => ({
         activeAudio: null,
         showNextMap: false
@@ -60,9 +66,9 @@ export default {
             //     return maps;
             // }
 
-            if (!this.match?.first_to) return this.match.maps;
+            if (!this.match?.first_to) return this.match?.maps;
 
-            const maps = this.match?.first_to ? [...(this.match.maps || [])].filter(m => m.map).slice(0, this.likelyNeededMaps) : [...(this.match.maps || [])];
+            const maps = this.match?.first_to ? [...(this.match?.maps || [])].filter(m => m.map).slice(0, this.likelyNeededMaps) : [...(this.match.maps || [])];
             const dummyMapCount = this.likelyNeededMaps - maps.length;
             console.log("extra maps", this.mapCount, dummyMapCount);
             const initialMapCount = maps.length;
@@ -133,6 +139,12 @@ export default {
         nextMap() {
             const unplayedMaps = this.maps.filter(m => !m.dummy && !m.winner && !m.draw);
             return unplayedMaps[0];
+        },
+        autoKey() {
+            return [
+                this.match?.id,
+                ...(this.maps || []).map(m => [m.name, m.winner?.id || "live", m.draw].join("-"))
+            ].join("_");
         }
     },
     sockets: {
@@ -247,5 +259,16 @@ export default {
     }
     .map-display.show-next-map >>> .map:not(.next-map) .map-lower-name {
         transform: scale(0.75);
+    }
+    .break-content-enter-active, .break-content-leave-active { transition: all .35s ease; overflow: hidden }
+    .break-content-enter { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); }
+    .break-content-leave-to { clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); }
+    .break-content-enter-to, .break-content-leave { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+
+    .map-anim-holder {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: block;
     }
 </style>

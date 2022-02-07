@@ -28,7 +28,7 @@
                             <tr v-if="match.event && match.event.name"><td colspan="2" class="default-thing" :style="eventStyle">
                                 <b><router-link :to="url('event', match.event)" class="match-event-link">{{ match.event.name }}</router-link></b>
                             </td></tr>
-                            <tr v-if="match.forfeit"><td colspan="2"><i>Match was forfeited</i></td></tr>
+                            <tr v-if="match.forfeit"><td colspan="2"><b><i>Match was forfeited</i></b><span v-if="match.forfeit_reason"><br>{{ match.forfeit_reason }}</span></td></tr>
                             <tr v-if="lowerText"><td colspan="2">{{ lowerText }}</td></tr>
                             <tr v-if="match.first_to">
                                 <td>First to</td><td>{{ match.first_to }}</td>

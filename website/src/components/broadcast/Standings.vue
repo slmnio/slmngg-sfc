@@ -1,5 +1,5 @@
 <template>
-    <div class="standings" v-if="standings && standings.standings.length">
+    <div class="standings" v-if="standings && standings.standings && standings.standings.length">
 <!--        <div>{{ event.name }} / {{ stage }} / {{ allMatches.length }} -> {{ stageMatches.length }} ({{ teams.length }} teams)</div>-->
         <h3 class="top-standings-name text-center d-md-none">{{ title || stage || 'Team' }}</h3>
         <div class="standings-header d-flex align-items-center">

@@ -31,7 +31,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "DeskMatch",
     components: { DeskTeam },
-    props: ["_match", "themeColor", "matchID", "customScores"],
+    props: ["_match", "themeColor", "matchID"],
     computed: {
         matchData() {
             return this._match || ReactiveRoot(this.matchID, {
@@ -47,7 +47,7 @@ export default {
             if (!this.matchData?.special_event) {
                 if (!this.matchData?.teams) return null;
                 if (this.matchData.teams.length !== 2) return null;
-                if (this.matchData.teams.some(t => !t.theme || t.theme.__loading)) return null;
+                // if (this.matchData.teams.some(t => !t.theme || t.theme.__loading)) return null;
             }
             return this.matchData;
         },
@@ -58,7 +58,6 @@ export default {
             };
         },
         scores() {
-            if (this.customScores) return this.customScores;
             if (!this.match?.id) return [];
             return [this.match.score_1, this.match.score_2];
         },

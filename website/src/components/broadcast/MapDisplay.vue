@@ -18,13 +18,14 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "MapDisplay",
     components: { MapSegment },
-    props: ["broadcast", "animationActive", "useTransitions"],
+    props: ["broadcast", "animationActive", "useTransitions", "virtualMatch"],
     data: () => ({
         activeAudio: null,
         showNextMap: false
     }),
     computed: {
         match() {
+            if (this.virtualMatch) return this.virtualMatch;
             if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {

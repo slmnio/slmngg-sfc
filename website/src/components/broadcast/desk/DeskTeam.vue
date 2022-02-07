@@ -17,8 +17,20 @@ export default {
     name: "DeskTeam",
     props: ["team"],
     computed: {
-        bg() { return logoBackground1(this.team); },
-        logo() { return cssImage("backgroundImage", this.team.theme, ["default_wordmark", "default_logo"], null, false); }
+        bg() {
+            if (!this.team?.theme) {
+                return {
+                    backgroundColor: "#373737",
+                    color: "white",
+                    borderColor: "#5F5F5F"
+                };
+            }
+            return logoBackground1(this.team);
+        },
+        logo() {
+            if (!this.team?.theme) return {};
+            return cssImage("backgroundImage", this.team.theme, ["default_wordmark", "default_logo"], null, false);
+        }
     }
 };
 </script>

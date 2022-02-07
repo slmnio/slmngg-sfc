@@ -1,6 +1,7 @@
 <template>
-    <div class="control-button" v-bind:class="elClass" @click="() => click()" :style="css">
-        <span><slot></slot></span>
+    <div class="control-button d-flex flex-column" v-bind:class="elClass" @click="() => click()" :style="css">
+        <span class="icon" v-if="icon"><i :class="icon"></i></span>
+        <span class="slot"><slot></slot></span>
     </div>
 </template>
 
@@ -13,7 +14,8 @@ export default {
         rotate: Boolean,
         noclick: Boolean,
         click: Function,
-        color: String
+        color: String,
+        icon: String
     },
     computed: {
         css() {
@@ -28,7 +30,8 @@ export default {
                 "control-left": this.left,
                 "control-right": this.right,
                 rotate: this.rotate,
-                noclick: this.noclick
+                noclick: this.noclick,
+                "has-icon": !!this.icon
             };
         }
     }
@@ -60,6 +63,11 @@ export default {
     .control-button span {
         pointer-events: none;
         user-select: none
+    }
+    .control-button.has-icon .slot {
+        margin-top: .25em;
+        font-size: 0.9em;
+        line-height: 1;
     }
     .control-button.noclick {
         cursor: default;

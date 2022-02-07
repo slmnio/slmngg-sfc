@@ -31,8 +31,12 @@ export default {
         },
         bracket() {
             if (!this.event?.brackets) return null;
-            if (!this.bracketKey) return this.event.brackets[0];
-            const bracket = this.event.brackets.find(b => b && b.key === this.bracketKey);
+            let key;
+            if (this.broadcast?.bracket_key) key = this.broadcast.bracket_key;
+            if (this.bracketKey) key = this.bracketKey;
+
+            if (!key) return this.event.brackets[0];
+            const bracket = this.event.brackets.find(b => b && b.key === key);
             return bracket || this.event.brackets[0];
         },
         zoom() {

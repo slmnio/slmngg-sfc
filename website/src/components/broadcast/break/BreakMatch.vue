@@ -113,7 +113,8 @@ export default {
             return this.scores.some(t => !!t);
         },
         hasFinished() {
-            if (!this.scores) return false;
+            if (!this.scores?.length) return false;
+            if (!this.match.first_to) return false;
             return this.scores.some(s => s === this.match.first_to);
         },
         scores() {

@@ -22,7 +22,10 @@
                 <td v-if="hasFeederEvents" v-b-tooltip="player.feederEligible ? 'Played in feeder events' : 'Did not play in feeder events'">
                     <i class="fas fa-star" v-if="player.feederEligible"></i>
                 </td>
-                <td><LinkedPlayers :players="[player]"/></td>
+                <td>
+                    <span v-if="isCaptain(player)" v-html="getRoleSVG('Captain')" class="mr-1" v-b-tooltip="'Captain'"></span>
+                    <LinkedPlayers :players="[player]"/>
+                </td>
                 <td>{{ player.battletag }}</td>
                 <td>{{ player.composition_tank_sr }}</td>
                 <td>{{ player.composition_dps_sr }}</td>
@@ -42,6 +45,7 @@
 <script>
 import LinkedPlayers from "@/components/website/LinkedPlayers";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
+import { getRoleSVG } from "@/utils/content-utils";
 export default {
     name: "TeamComposition.vue",
     components: { LinkedPlayers },
@@ -111,6 +115,13 @@ export default {
                 };
             });
         }
+    },
+    methods: {
+        isCaptain(player) {
+            if (!player?.id || !this.team?.captains) return false;
+            return (this.team.captains.map(c => c.id).includes(player.id));
+        },
+        getRoleSVG
     }
 };
 </script>

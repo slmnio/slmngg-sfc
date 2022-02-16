@@ -25,12 +25,13 @@ import { cssImage, getRoleSVG } from "@/utils/content-utils";
 export default {
     name: "RosterOverlay",
     components: { GenericOverlay },
-    props: ["broadcast", "title", "showRoles", "sort"],
+    props: ["broadcast", "title", "showRoles", "sort", "virtualMatch"],
     computed: {
         accentColor() {
             return this.$root?.broadcast?.event?.theme?.color_theme;
         },
         match() {
+            if (this.virtualMatch) return this.virtualMatch;
             if (!this.broadcast || !this.broadcast.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {

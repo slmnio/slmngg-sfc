@@ -139,6 +139,11 @@ export default {
             // return null;
         }
     },
+    watch: {
+        match() {
+            console.log(this.match);
+        }
+    },
     methods: {
         teamLogo(team) {
             if (!team || !team.theme) return {};

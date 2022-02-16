@@ -26,8 +26,8 @@
                     <transition-group class="break-col break-schedule" name="a--match" v-if="automatedShow === 'Schedule'" key="Schedule">
                         <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
                     </transition-group>
-                    <div class="break-col break-standings" v-if="automatedShow === 'Standings'" :key="`Standings-${broadcast.current_stage || ''}`">
-                        <Standings :event="event" :stage="broadcast.current_stage" />
+                    <div class="break-col break-standings" v-if="automatedShow === 'Standings'" :key="`Standings-${currentStage || ''}`">
+                        <Standings :event="event" :stage="currentStage" />
                     </div>
                     <div class="break-col break-image" v-if="automatedShow === 'Image'" :key="`image-${breakImageURL}`">
                         <div v-if="breakImageURL" class="break-image-inner" :style="breakImage"></div>
@@ -50,7 +50,7 @@
         </div>
         <div class="break-preload">
             <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
-            <Standings :event="event" :stage="broadcast.current_stage" />
+            <Standings :event="event" :stage="currentStage" />
             <div class="break-image-inner" :style="cssImage('backgroundImage', broadcast, ['break_image'], 1080, false)"></div>
             <Bracket class="break-col break-bracket" :event="event" :bracket="bracket" use-overlay-scale />
             <BreakMatchup class="break-col break-matchup" :match="nextMatch" />
@@ -80,7 +80,7 @@ const tickTime = 25;
 
 export default {
     name: "BreakOverlay",
-    props: ["broadcast", "title", "animationActive"],
+    props: ["broadcast", "title", "animationActive", "virtualMatch"],
     components: { ThemeLogo, BreakMatchup, BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
     data: () => ({
         tick: 0,
@@ -107,6 +107,7 @@ export default {
             return this.breakImage?.backgroundImage;
         },
         nextMatch() {
+            if (this.virtualMatch) return this.virtualMatch;
             if (!this.broadcast || !this.broadcast.live_match || !this.broadcast.show_live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
@@ -115,6 +116,7 @@ export default {
             });
         },
         fullSchedule() {
+            if (this.virtualMatch) return [this.virtualMatch];
             if (!this.broadcast || !this.broadcast.schedule) return null;
             return ReactiveArray("schedule", {
                 teams: ReactiveArray("teams", {
@@ -181,8 +183,7 @@ export default {
             let slides = this.broadcast.break_automation.filter(s => s.startsWith("use:")).map(s => s.replace("use: ", ""));
             console.log(slides);
             if (!this.nextMatch) slides = slides.filter(s => s !== "Matchup");
-
-            console.log(slides, this.nextMatch);
+            // console.log(slides, this.nextMatch);
 
             // TODO: add stuff here that changes based on the countdown remaining
 
@@ -205,6 +206,9 @@ export default {
                 // empty or automated - do automation
                 return this.suggestedShow;
             }
+        },
+        currentStage() {
+            return this.virtualMatch?._virtual_match_category || this.broadcast?.current_stage;
         },
         matchIsLast() {
             if (!this.schedule?.length) return true; // no schedule - assume last

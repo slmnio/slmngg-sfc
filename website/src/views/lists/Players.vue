@@ -18,6 +18,7 @@
 
 <script>
 import { ReactiveRoot } from "@/utils/reactive";
+import { searchInCollection } from "@/utils/search";
 import ContentThing from "@/components/website/ContentThing";
 import LoadingIcon from "@/components/website/LoadingIcon";
 
@@ -39,20 +40,7 @@ export default {
             });
         },
         filteredPlayers() {
-            if (!this.search) return this.players;
-            const unleetSearch = this.unleet(this.search);
-            return this.players.filter(p =>
-                p.name && (p.name.toLowerCase().includes(this.search.toLowerCase()) ||
-                this.unleet(p.name).includes(unleetSearch))
-            );
-        }
-    },
-    methods: {
-        unleet(text) {
-            return text.toLowerCase().replace(/0/g, "o")
-                .replace(/4/g, "a")
-                .replace(/3/g, "e")
-                .replace(/2/g, "a");
+            return searchInCollection(this.players, this.search, "name");
         }
     },
     metaInfo() {

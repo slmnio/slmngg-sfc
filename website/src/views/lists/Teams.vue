@@ -16,6 +16,7 @@
 
 <script>
 import { ReactiveArray, ReactiveList, ReactiveThing } from "@/utils/reactive";
+import { searchInCollection } from "@/utils/search";
 import TeamDisplay from "@/views/lists/TeamDisplay";
 import EventDisplay from "@/views/lists/EventDisplay";
 import { sortEvents } from "@/utils/sorts";
@@ -56,11 +57,7 @@ export default {
                     if (this.search && this.search.length > 2 && e.teams) {
                         return {
                             ...e,
-                            teams: e.teams.filter(team => {
-                                return [
-                                    team.name.toLowerCase()
-                                ].some(text => text.indexOf(this.search) !== -1);
-                            })
+                            teams: searchInCollection(e.teams, this.search, "name")
                         };
                     }
                     return e;

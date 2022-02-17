@@ -3,15 +3,28 @@
         <div class="desk-match" v-if="match">
             <div class="teams d-flex" v-if="!match.special_event">
                 <DeskTeam class="team" v-for="(team, i) in match.teams" v-bind:key="team.id" :team="team" :style="{order: i * 2}" />
-                <div class="match-center flex-center">
-                    <div class="match-score flex-center" v-if="show.score">
-                        <div class="score flex-center" v-bind:class="{'win': match.score_1 === match.first_to}"><span class="industry-align">{{ match.score_1 }}</span></div>
-                        <div class="dash">-</div>
-                        <div class="score flex-center" v-bind:class="{'win': match.score_2 === match.first_to}"><span class="industry-align">{{ match.score_2 }}</span></div>
-                    </div>
-                    <div class="match-vs flex-center" :style="centerBorder" v-if="show.vs">
-                        <span class="industry-align">{{ scoreText }}</span>
-                    </div>
+
+                <div class="match-middle flex-center w-100">
+                    <transition name="break-content" mode="out-in">
+                        <div class="match-middle-match flex-center" v-if="middleMode === 'Match'">
+                            <DeskTeamName v-for="(team, i) in match.teams" :key="team.id" :team="team" :style="{order: i*2}" />
+
+                            <div class="match-center flex-center">
+                                <div class="match-score flex-center" v-if="show.score">
+                                    <div class="score flex-center" v-bind:class="{'win': match.score_1 === match.first_to}"><span class="industry-align">{{ match.score_1 }}</span></div>
+                                    <div class="dash">-</div>
+                                    <div class="score flex-center" v-bind:class="{'win': match.score_2 === match.first_to}"><span class="industry-align">{{ match.score_2 }}</span></div>
+                                </div>
+                                <div class="match-vs flex-center" :style="centerBorder" v-if="show.vs">
+                                    <span class="industry-align">{{ scoreText }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="match-middle-notice flex-center" v-if="middleMode === 'Notice'" :key="broadcast.notice_text + '-' + broadcast.desk_display">
+                            <DeskNotice class="notice" :notice="broadcast.notice_text" :main-theme="middleTheme" :alt-theme="altTheme"
+                                        :right="broadcast.desk_display.includes('2')" />
+                        </div>
+                    </transition>
                 </div>
             </div>
             <div class="desk-match-text flex-center" v-if="match.special_event" :style="textBackground">
@@ -25,11 +38,14 @@
 
 <script>
 import DeskTeam from "@/components/broadcast/desk/DeskTeam";
+import DeskNotice from "@/components/broadcast/desk/DeskNotice";
+import DeskTeamName from "@/components/broadcast/desk/DeskTeamName";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 export default {
     name: "DeskMatch",
-    components: { DeskTeam },
-    props: ["_match", "themeColor", "matchID"],
+    components: { DeskTeam, DeskNotice, DeskTeamName },
+    props: ["_match", "themeColor", "matchID", "broadcast"],
     computed: {
         matchData() {
             return this._match || ReactiveRoot(this.matchID, {
@@ -74,6 +90,41 @@ export default {
             return {
                 ...this.themeColor
             };
+        },
+        middleMode() {
+            let display = this.broadcast?.desk_display || "";
+
+            if (display.indexOf("(") !== -1) {
+                display = display.slice(0, display.indexOf("(") - 1).trim();
+            }
+            return display || "Match";
+        },
+        middleTheme() {
+            const display = this.broadcast?.desk_display || "";
+            if (!display) return this.lowerBackground;
+            try {
+                if (display.includes("Team 1")) return logoBackground1(this.matchData.teams[0]);
+                if (display.includes("Team 2")) return logoBackground1(this.matchData.teams[1]);
+            } catch (e) { }
+            return this.lowerBackground;
+        },
+        lowerBackground() {
+            return logoBackground1(this.broadcast.event);
+        },
+        altTheme() {
+            const display = this.broadcast?.desk_display || "";
+            if (!display) return themeBackground1(this.broadcast.event);
+            try {
+                if (display.includes("Team 1")) return themeBackground1(this.matchData.teams[0]);
+                if (display.includes("Team 2")) return themeBackground1(this.matchData.teams[1]);
+            } catch (e) { }
+            return themeBackground1(this.broadcast.event);
+        }
+    },
+    methods: {
+        nbr(text) {
+            if (!text) return "";
+            return text.replace(/\\n/g, "<br>");
         }
     }
 };
@@ -120,4 +171,18 @@ export default {
         border-bottom: 6px solid transparent;
         height: 110px;
     }
+
+    .match-middle {
+        width: 100%;
+        flex-grow: 1;
+    }
+    .match-middle > div {
+        width: 100%;
+        height: 100%;
+    }
+
+    .break-content-enter-active, .break-content-leave-active { transition: all .35s ease; overflow: hidden }
+    .break-content-enter { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); }
+    .break-content-leave-to { clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); }
+    .break-content-enter-to, .break-content-leave { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
 </style>

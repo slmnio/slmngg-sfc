@@ -3,9 +3,6 @@
         <div class="team-logo-holder flex-shrink-0 flex-center" :style="bg">
             <div class="team-logo bg-center" :style="logo"></div>
         </div>
-        <div class="team-name flex-center w-100" :style="bg">
-            <span class="industry-align">{{ team.name }}</span>
-        </div>
     </div>
 </template>
 
@@ -25,8 +22,6 @@ export default {
 
 <style scoped>
     .team {
-        width: 100%;
-        flex-grow: 1;
     }
     .team-logo-holder {
         width:  160px;

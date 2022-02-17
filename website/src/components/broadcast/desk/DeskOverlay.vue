@@ -8,7 +8,9 @@
                     :event="event" :disable-video="shouldDisableCasterVideo" />
         </transition-group>
         <div class="lower-holder flex-center">
-            <DeskMatch class="w-100" :_match="liveMatch" :theme-color="themeColor" />
+            <transition mode="out-in" name="break-content">
+                <DeskMatch :broadcast="broadcast" class="w-100" :_match="liveMatch" :theme-color="themeColor" />
+            </transition>
         </div>
     </div>
 </template>

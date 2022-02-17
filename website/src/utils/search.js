@@ -39,7 +39,6 @@ function unleet(text) {
 
     for (const key in charMap) {
         // Replace all the other characters from the charMap
-        console.log(key);
         unleetText = unleetText.replaceAll(new RegExp(key, "g"), charMap[key]);
     }
 

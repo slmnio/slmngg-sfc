@@ -9,7 +9,7 @@
         </transition-group>
         <div class="lower-holder flex-center">
             <transition mode="out-in" name="break-content">
-                <DeskMatch :broadcast="broadcast" class="w-100" :_match="liveMatch" :theme-color="themeColor" />
+                <DeskMatch :broadcast="broadcast" class="w-100" :_match="liveMatch" :theme-color="themeColor" :guests="guests" />
             </transition>
         </div>
     </div>
@@ -66,7 +66,10 @@ export default {
                 player: ReactiveThing("player", {
                     socials: ReactiveArray("socials")
                 }),
-                theme: ReactiveThing("theme")
+                theme: ReactiveThing("theme"),
+                prediction_team: ReactiveThing("prediction_team", {
+                    theme: ReactiveThing("theme")
+                })
             })(this.broadcast);
         },
         casters() {

@@ -24,6 +24,9 @@
                             <DeskNotice class="notice" :notice="broadcast.notice_text" :main-theme="middleTheme" :alt-theme="altTheme"
                                         :right="broadcast.desk_display.includes('2')" />
                         </div>
+                        <div class="match-middle-predictions flex-center" v-if="middleMode === 'Predictions'" key="Predictions">
+                            <DeskPrediction v-for="guest in guests" :key="guest.id" :guest="guest" :event="broadcast.event" />
+                        </div>
                     </transition>
                 </div>
             </div>
@@ -42,10 +45,11 @@ import DeskNotice from "@/components/broadcast/desk/DeskNotice";
 import DeskTeamName from "@/components/broadcast/desk/DeskTeamName";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
+import DeskPrediction from "@/components/broadcast/desk/DeskPrediction";
 export default {
     name: "DeskMatch",
-    components: { DeskTeam, DeskNotice, DeskTeamName },
-    props: ["_match", "themeColor", "matchID", "broadcast"],
+    components: { DeskPrediction, DeskTeam, DeskNotice, DeskTeamName },
+    props: ["_match", "themeColor", "matchID", "broadcast", "guests"],
     computed: {
         matchData() {
             return this._match || ReactiveRoot(this.matchID, {
@@ -179,6 +183,10 @@ export default {
     .match-middle > div {
         width: 100%;
         height: 100%;
+    }
+
+    .match-middle-predictions {
+        margin: 0 12px;
     }
 
     .break-content-enter-active, .break-content-leave-active { transition: all .35s ease; overflow: hidden }

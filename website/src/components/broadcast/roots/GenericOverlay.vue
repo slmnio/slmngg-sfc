@@ -9,7 +9,7 @@
             </div>
         </transition>
         <transition name="broadcast-mid-split">
-            <div class="generic-overlay-body overlay--bg flex-center" :style="{backgroundColor: bodyColor, borderColor: noBottom ? 'transparent' : _accentColor}" v-show="$root.animationActive">
+            <div class="generic-overlay-body overlay--bg flex-center" :style="bodyStyle" v-show="$root.animationActive">
                 <slot></slot>
             </div>
         </transition>
@@ -31,6 +31,17 @@ export default {
     computed: {
         _accentColor() {
             return this.accentColor || this.$root?.broadcast?.event?.theme?.color_theme;
+        },
+        bodyStyle() {
+            const css = {
+                backgroundColor: this.bodyColor,
+                borderColor: this._accentColor
+            };
+            if (this.noBottom) {
+                css.borderColor = "transparent";
+                css.borderBottomWidth = "0";
+            }
+            return css;
         }
     }
 };

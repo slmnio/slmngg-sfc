@@ -7,6 +7,7 @@ import VueRouter from "vue-router";
 import VueSocketIOExt from "vue-socket.io-extended";
 import { io } from "socket.io-client";
 import { VBTooltip } from "bootstrap-vue";
+import VueYoutubeEmbed from "vue-youtube-embed";
 
 import defaultRoutes from "@/router/default";
 import { getDataServerAddress, fetchThings } from "@/utils/fetch";
@@ -21,6 +22,7 @@ import SharedRoutes from "@/router/shared-routes";
 Vue.use(Vuex);
 Vue.use(VueMeta);
 Vue.use(VueRouter);
+Vue.use(VueYoutubeEmbed, { global: false });
 
 store.subscribe((mutation, state) => {
     if (mutation.type === "setPlayerDraftNotes") {

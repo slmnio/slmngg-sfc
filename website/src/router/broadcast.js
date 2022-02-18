@@ -31,6 +31,7 @@ import TallyTransmitter from "@/components/broadcast/roots/TallyTransmitter";
 import TallyViewer from "@/components/broadcast/roots/TallyViewer";
 import PlayerHistory from "@/components/broadcast/PlayerHistory";
 import OverviewOverlay from "@/components/broadcast/roots/OverviewOverlay";
+import MediaOverlay from "@/components/broadcast/roots/MediaOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -91,5 +92,6 @@ export default [
     { path: "logos", component: LogoAdOverlay },
     { path: "staff", component: StaffOverlay },
     { path: "player-history", component: PlayerHistory, props: route => ({ showMinor: route.query.minor }) },
-    { path: "overview", component: OverviewOverlay }
+    { path: "overview", component: OverviewOverlay },
+    { path: "media", component: MediaOverlay }
 ];

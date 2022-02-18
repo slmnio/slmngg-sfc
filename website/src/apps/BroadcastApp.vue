@@ -26,7 +26,8 @@ export default {
                     theme: ReactiveThing("theme")
                 }),
                 other_broadcasts: ReactiveArray("other_broadcasts"),
-                headlines: ReactiveArray("headlines")
+                headlines: ReactiveArray("headlines"),
+                highlight_media: ReactiveThing("highlight_media")
             });
         },
         haltAnimations() {

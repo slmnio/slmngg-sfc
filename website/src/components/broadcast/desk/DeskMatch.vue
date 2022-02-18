@@ -27,6 +27,9 @@
                         <div class="match-middle-predictions flex-center" v-if="middleMode === 'Predictions'" key="Predictions">
                             <DeskPrediction v-for="guest in guests" :key="guest.id" :guest="guest" :event="broadcast.event" />
                         </div>
+                        <div class="match-middle-maps flex-center" v-if="middleMode === 'Maps'" key="Maps">
+                            <MapDisplay :broadcast="broadcast" no-map-videos="true" />
+                        </div>
                     </transition>
                 </div>
             </div>
@@ -46,9 +49,10 @@ import DeskTeamName from "@/components/broadcast/desk/DeskTeamName";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import DeskPrediction from "@/components/broadcast/desk/DeskPrediction";
+import MapDisplay from "@/components/broadcast/MapDisplay";
 export default {
     name: "DeskMatch",
-    components: { DeskPrediction, DeskTeam, DeskNotice, DeskTeamName },
+    components: { DeskPrediction, DeskTeam, DeskNotice, DeskTeamName, MapDisplay },
     props: ["_match", "themeColor", "matchID", "broadcast", "guests"],
     computed: {
         matchData() {
@@ -188,9 +192,26 @@ export default {
     .match-middle-predictions {
         margin: 0 12px;
     }
+    .match-middle-maps {
+        margin: 0 36px;
+    }
 
     .break-content-enter-active, .break-content-leave-active { transition: all .35s ease; overflow: hidden }
     .break-content-enter { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); }
     .break-content-leave-to { clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); }
     .break-content-enter-to, .break-content-leave { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+
+    .match-middle-maps >>> .map-lower {
+        font-size: 20px !important;
+        padding: 0 3px;
+        min-height: 50px;
+        line-height: 0.9;
+        border-top-width: 4px;
+    }
+    .match-middle-maps >>> .map-logo-holder {
+        height: 70% !important;
+    }
+    .match-middle-maps >>> .map-bg {
+        transform: translate(0, -12%);
+    }
 </style>

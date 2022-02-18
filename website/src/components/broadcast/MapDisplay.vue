@@ -18,7 +18,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "MapDisplay",
     components: { MapSegment },
-    props: ["broadcast", "animationActive", "useTransitions"],
+    props: ["broadcast", "animationActive", "useTransitions", "noMapVideos"],
     data: () => ({
         activeAudio: null,
         showNextMap: false
@@ -133,6 +133,7 @@ export default {
             return (scores[0] + scores[1]) + Math.min(...toWin);
         },
         showMapVideos() {
+            if (this.noMapVideos) return false;
             if (!this.broadcast?.broadcast_settings?.length) return false;
             return this.broadcast.broadcast_settings.includes("Use map videos");
         },

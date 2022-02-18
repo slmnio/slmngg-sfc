@@ -9,7 +9,7 @@
             {{ match.custom_name }}
         </router-link>
 
-        <div v-for="(team, i) in teams"
+        <div v-for="(team, i) in swappedTeams"
              v-bind:key="team.id" :style="{order: i*2}"
              class="match-team flex-grow-1 d-flex align-items-center justify-content-end"
              v-bind:class="{'right': i === 1}">
@@ -28,7 +28,7 @@
 
         <router-link :to="url('match', this.match)" class="match-center match-vs flex-center text-center ct-passive" v-if="!match.special_event">
             <div class="scores-wrap" v-if="scores.some(s => s)">
-                <div class="scores">{{ match.score_1 }} - {{ match.score_2 }}</div>
+                <div class="scores">{{ scores[0] }} - {{ scores[1] }}</div>
                 <div class="scores-forfeit" v-if="match.forfeit">Forfeit</div>
             </div>
             <div class="vs ct-passive" v-else>vs</div>
@@ -48,8 +48,13 @@ export default {
     name: "ScheduleMatch",
     components: { ScheduleTime, ThemeLogo },
     methods: { url },
-    props: ["match", "customText"],
+    props: ["match", "customText", "leftTeam"],
     computed: {
+        shouldSwapTeams() {
+            if (!this.leftTeam?.id) return false;
+            if (this.teams?.length !== 2) return false;
+            return this.teams[1].id === this.leftTeam.id;
+        },
         loaded() {
             if (this.match?.__loading) return false;
             return !!this.match && !!this.match.name;
@@ -57,7 +62,13 @@ export default {
         scores() {
             if (!this.match) return [null, null];
             if (!this.match.teams || this.match.teams.length !== 2) return [null, null];
+
+            if (this.shouldSwapTeams) return [this.match.score_2, this.match.score_1];
             return [this.match.score_1, this.match.score_2];
+        },
+        swappedTeams() {
+            if (this.shouldSwapTeams) return [this.teams[1], this.teams[0]];
+            return this.teams;
         },
         teams() {
             if (this.match?.special_event) return [];

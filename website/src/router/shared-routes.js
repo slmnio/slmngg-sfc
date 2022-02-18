@@ -1,6 +1,7 @@
 import Team from "@/views/Team";
 import TeamMain from "@/views/sub-views/TeamMain";
-import TeamMatches from "@/views/sub-views/TeamMatches";
+// import TeamMatches from "@/views/sub-views/TeamMatches";
+import TeamSchedule from "@/views/sub-views/TeamSchedule";
 import TeamTheme from "@/views/sub-views/TeamTheme";
 import TeamDetails from "@/views/sub-views/TeamDetails";
 import Event from "@/views/Event";
@@ -26,7 +27,7 @@ export default [
         props: route => ({ id: route.params.id }),
         children: [
             { path: "", component: TeamMain },
-            { path: "matches", component: TeamMatches },
+            { path: "matches", component: TeamSchedule },
             { path: "theme", component: TeamTheme },
             { path: "details", component: TeamDetails },
             { path: "composition", component: TeamComposition }

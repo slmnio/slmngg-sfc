@@ -87,7 +87,7 @@ export default {
 }
 .hero-segment {
     overflow: hidden;
-    height: 740px;
+    height: 100%;
     width: 296px;
     flex-shrink: 0;
     background-color: rgba(0, 0, 0, .2);

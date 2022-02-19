@@ -96,6 +96,7 @@ async function processTableData(tableName, data, linkRecords = false) {
         if (tableName === "News") {
             data.slug = sluggify(data.name);
         }
+        data.__tableName = tableName;
         Cache.set(data.id.slice(3), data);
         customUpdater(tableName, data);
     });
@@ -124,6 +125,7 @@ function registerUpdater(tableName, options) {
                 if (tableName === "News") {
                     data.slug = sluggify(data.name);
                 }
+                data.__tableName = tableName;
                 Cache.set(data.id.slice(3), data);
                 customUpdater(tableName, data);
             });

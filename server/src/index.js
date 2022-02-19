@@ -6,6 +6,7 @@ const http = require("http").Server(app);
 const cors = require("cors");
 const meta = require("./meta.js");
 const routes = require("./routes.js");
+const images = require("./images.js");
 
 /* The staff module should only run on the server, probably not your local machine. */
 let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEGORY_ID", "STAFFAPPS_APPLICATION_CHANNEL_ID", "IS_SLMNGG_MAIN_SERVER"];
@@ -81,6 +82,7 @@ app.get("/things/:ids", cors({ origin: corsHandle}), async (req, res) => {
 
 routes({ app, cors, Cache, io });
 meta({ app, cors, Cache });
+images({ app, cors, Cache });
 
 function cleanID(id) {
     if (!id) return null;

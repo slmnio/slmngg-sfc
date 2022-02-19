@@ -37,7 +37,13 @@ async function ensureFolder(folderName) {
     // console.log(data);
     if (!data) {
         console.log("[image]", `making new folder ${folderName}`);
-        fs.mkdirSync(getPath("", folderName));
+        try {
+            fs.mkdirSync(getPath("", folderName));
+        } catch (e) {
+            // if directory was made between the too calls
+            if (e.code === "EEXIST") return null;
+            console.error(e);
+        }
     }
 }
 
@@ -49,7 +55,15 @@ async function resizeImage(filename, sizeText, sizeData) {
     // let sizeInfo = getSizeInfo(sizeText);
     // if (!sizeInfo) return null;
 
-    return await sharp(origFilePath).resize(sizeData).toFile(resizedFilePath);
+    try {
+        return await sharp(origFilePath).resize(sizeData).toFile(resizedFilePath);
+    } catch (e) {
+        console.warn(e);
+        if (e.code === "EEXIST") {
+            return await getImage(filename, sizeText);
+        }
+        return null;
+    }
 }
 
 module.exports = ({ app, cors, Cache }) => {
@@ -62,7 +76,8 @@ module.exports = ({ app, cors, Cache }) => {
             const url = req.query.url;
             let parts = url.split("/");
             const originalFilename = parts[parts.length - 1];
-            const filename = parts[4] + "." + originalFilename.split(".")[1];
+            const originalFileType = originalFilename.split(".")[1];
+            const filename = parts[4] + "." + originalFileType;
 
             if (!["dl.airtable.com", "media.slmn.io"].some(domain => domain === parts[2])) {
                 return res.status(400).send("Domain not whitelisted");
@@ -77,7 +92,8 @@ module.exports = ({ app, cors, Cache }) => {
             if (req.query.square) { mode = "square"; num = parseInt(req.query.square); }
 
             if (!mode && req.query.size) {
-                if (req.query.size.indexOf("-") === -1) res.status(400).send("Size needs to be correct format {mode}-{val}");
+
+                if (req.query.size.indexOf("-") === -1) return res.status(400).send("Size needs to be correct format {mode}-{val}");
                 const [sizeMode, sizeVal] = req.query.size.split("-");
 
                 if (sizeMode === "w") mode = "width";
@@ -93,7 +109,7 @@ module.exports = ({ app, cors, Cache }) => {
                 sizeData = { width: num };
             }
             if (mode === "height") {
-                size = "h-" + parseInt(req.query.height);
+                size = "h-" + num;
                 sizeData = { height: num };
             }
             if (mode === "square") {
@@ -104,6 +120,11 @@ module.exports = ({ app, cors, Cache }) => {
                     fit: "contain",
                     background: { r: 0, g: 0, b: 0, alpha: 0 }
                 };
+            }
+
+            if (originalFileType === "svg") {
+                // just do orig if svg
+                size = "orig";
             }
 
 
@@ -136,7 +157,7 @@ module.exports = ({ app, cors, Cache }) => {
             if (resizedImagePath) return res.sendFile(resizedImagePath);
 
         } catch (e) {
-            res.status(400).send(e.message);
+            return res.status(400).send(e.message);
         }
         res.status(400).send("An error occurred");
     });

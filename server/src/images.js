@@ -92,14 +92,17 @@ module.exports = ({ app, cors, Cache }) => {
             if (req.query.square) { mode = "square"; num = parseInt(req.query.square); }
 
             if (!mode && req.query.size) {
+                if (req.query.size === "orig") {
+                    size = "orig";
+                } else {
+                    if (req.query.size.indexOf("-") === -1) return res.status(400).send("Size needs to be correct format {mode}-{val}");
+                    const [sizeMode, sizeVal] = req.query.size.split("-");
 
-                if (req.query.size.indexOf("-") === -1) return res.status(400).send("Size needs to be correct format {mode}-{val}");
-                const [sizeMode, sizeVal] = req.query.size.split("-");
-
-                if (sizeMode === "w") mode = "width";
-                if (sizeMode === "h") mode = "height";
-                if (sizeMode === "s") mode = "square";
-                num = parseInt(sizeVal);
+                    if (sizeMode === "w") mode = "width";
+                    if (sizeMode === "h") mode = "height";
+                    if (sizeMode === "s") mode = "square";
+                    num = parseInt(sizeVal);
+                }
             }
 
             if (num > 3000) return res.status(400).send("Image too large");

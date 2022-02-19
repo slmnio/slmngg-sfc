@@ -8,7 +8,8 @@
 </template>
 
 <script>
-import { resizedImage, url } from "@/utils/content-utils";
+import { url } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "TeamDisplay",
@@ -28,9 +29,7 @@ export default {
         },
         logo() {
             if (!this.team || !this.team.theme) return {};
-            return {
-                backgroundImage: `url(${resizedImage(this.team.theme, "small_logo", 50) || resizedImage(this.team.theme, "default_logo", 50)})`
-            };
+            return resizedImage(this.team.theme, ["small_logo", "default_logo"], "h-50");
         }
     }
 };

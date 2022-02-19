@@ -34,10 +34,10 @@
 
 import ThingTop from "@/components/website/ThingTop";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { multiImage } from "@/utils/content-utils";
 import SubPageNav from "@/components/website/SubPageNav";
 import Social from "@/components/website/Social";
 import { themeBackground1 } from "@/utils/theme-styles";
+import { resizedImageNoWrap } from "@/utils/images";
 
 export default {
     name: "Event",
@@ -53,7 +53,7 @@ export default {
                 { name: "og:description", content: "test description" },
                 { name: "og:title", content: this.event.name }
             ],
-            link: [{ rel: "icon", href: multiImage(this.event.theme, ["small_logo", "default_logo"]) }]
+            link: [{ rel: "icon", href: resizedImageNoWrap(this.event.theme, ["small_logo", "default_logo"], "s-128") }]
         };
     },
     computed: {

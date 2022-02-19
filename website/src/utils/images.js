@@ -3,6 +3,10 @@ import { getDataServerAddress } from "@/utils/fetch";
 export function bg(url) { return { backgroundImage: `url(${url})` }; }
 
 export function getImageURL(airtableURL, size) {
+    if (!size) {
+        console.warn("[Image Utils]", `No size set for ${airtableURL}`);
+        size = "orig";
+    }
     const dataServer = getDataServerAddress();
     return `${dataServer}/image?size=${size}&url=${airtableURL}`;
 }
@@ -17,8 +21,13 @@ function keyedImage(theme, keys) {
     return null;
 }
 
-export function resizedImage(theme, keys, size) {
+export function resizedImageNoWrap(theme, keys, size) {
+    if (!theme) return {}; // fallback css
     const imageURL = keyedImage(theme, keys);
     if (!imageURL) return null;
-    return bg(getImageURL(imageURL, size));
+    return getImageURL(imageURL, size);
+}
+
+export function resizedImage(theme, keys, size) {
+    return bg(resizedImageNoWrap(theme, keys, size));
 }

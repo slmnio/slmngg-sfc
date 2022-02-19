@@ -10,8 +10,8 @@
 </template>
 
 <script>
-import { cssImage } from "@/utils/content-utils";
 import { logoBackground1 } from "@/utils/theme-styles";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "MatchHistory",
@@ -25,7 +25,7 @@ export default {
         opponentTheme() {
             if (!this.opponent?.theme) return {};
             return {
-                logo: cssImage("backgroundImage", this.opponent.theme, ["small_logo", "default_logo"], 100),
+                logo: resizedImage(this.opponent.theme, ["small_logo", "default_logo"], "w-100"),
                 theme: logoBackground1(this.opponent)
             };
         },

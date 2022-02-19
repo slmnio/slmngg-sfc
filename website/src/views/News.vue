@@ -1,7 +1,7 @@
 <template>
     <div class="container news-item">
         <OptionalLink :condition="!!connection" :url="connection">
-            <NewsHeader class="news-header" :url="headerImage" :theme="theme" />
+            <NewsHeader class="news-header" :header-image="headerImage" :theme="theme" />
         </OptionalLink>
         <h1 class="news-headline">{{ news.headline }}</h1>
         <div class="content">
@@ -27,12 +27,13 @@
 
 <script>
 import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { getImage, multiImage, url } from "@/utils/content-utils";
+import { url } from "@/utils/content-utils";
 import NewsHeader from "@/components/website/news/NewsHeader";
 import Markdown from "@/components/website/Markdown";
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 import { themeBackground } from "@/utils/theme-styles";
 import OptionalLink from "@/components/website/OptionalLink";
+import { resizedImage, resizedImageNoWrap } from "@/utils/images";
 
 export default {
     name: "News",
@@ -62,7 +63,7 @@ export default {
         },
         headerImage() {
             if (!this.news?.header) return null;
-            return getImage(this.news.header);
+            return resizedImage(this.news, ["header"], "h-400");
         },
         theme() {
             if (this.news?.event?.theme && this.news?.prefer_event) return this.news.event.theme;
@@ -120,7 +121,7 @@ export default {
     metaInfo() {
         return {
             title: [this.news?.headline, this.connection?.name].filter(t => t).join(" | "),
-            link: [{ rel: "icon", href: multiImage(this.theme, ["small_logo", "default_logo"]) }]
+            link: [{ rel: "icon", href: resizedImageNoWrap(this.theme, ["small_logo", "default_logo"], "s-128") }]
         };
     }
 };

@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "TourneyBar",
@@ -41,7 +41,7 @@ export default {
         },
         logo() {
             if (!this._theme) return {};
-            return cssImage("backgroundImage", this._theme, ["default_wordmark", "default_logo"], null, false);
+            return resizedImage(this._theme, ["default_wordmark", "default_logo"], "h-500");
         }
     }
 };

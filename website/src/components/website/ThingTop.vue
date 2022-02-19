@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="top d-flex">
-            <ThemeLogo class="top-theme-logo" :theme="thing.theme"></ThemeLogo>
+            <ThemeLogo class="top-theme-logo" :theme="thing.theme" logo-size="w-200"></ThemeLogo>
             <div class="thing-names">
                 <div class="thing-name d-flex flex-column">
                     <h3 class="subtitle m-0" v-if="type === 'team' && thing.subtitle">{{ thing.subtitle }}</h3>

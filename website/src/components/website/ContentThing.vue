@@ -23,7 +23,8 @@
 </template>
 
 <script>
-import { resizedImage, url, cssImage } from "@/utils/content-utils";
+import { url } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 import LoadingIcon from "@/components/website/LoadingIcon";
 
 export default {
@@ -59,7 +60,7 @@ export default {
         },
         logo () {
             if (!this.theme || !this.theme.default_logo) return null;
-            return cssImage("backgroundImage", this.theme, ["small_logo", "default_logo"], 30);
+            return resizedImage(this.theme, ["small_logo", "default_logo"], "h-30");
         },
         headshot () {
             if (!this.thing) return null;

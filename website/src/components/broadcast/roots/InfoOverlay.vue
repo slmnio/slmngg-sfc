@@ -15,7 +15,7 @@
 <script>
 import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "InfoOverlay",
@@ -37,7 +37,7 @@ export default {
         },
         eventLogo() {
             if (!this.broadcast?.event?.theme) return {};
-            return cssImage("backgroundImage", this.broadcast.event.theme, ["default_logo"], 200);
+            return resizedImage(this.broadcast.event.theme, ["default_logo"], "h-200");
         }
     },
     methods: {

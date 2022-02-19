@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { resizedImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "NewsThumbnail",
@@ -35,7 +35,7 @@ export default {
                 return null;
             }
 
-            return { backgroundImage: `url(${resizedImage(this.item, "thumbnail", 150)})` };
+            return resizedImage(this.item, ["thumbnail"], "h-150"); // gets centered vertically
         },
         connectionTheme() {
             if (this.item?.event?.theme && this.item?.prefer_event) return this.item.event.theme;
@@ -48,7 +48,7 @@ export default {
 
             return {
                 backgroundColor: this.connectionTheme.color_logo_background,
-                backgroundImage: `url(${resizedImage(this.connectionTheme, "default_wordmark", 150) || resizedImage(this.connectionTheme, "default_logo", 150)})`
+                ...resizedImage(this.connectionTheme, ["default_wordmark", "default_logo"], "h-150")
             };
         }
     }

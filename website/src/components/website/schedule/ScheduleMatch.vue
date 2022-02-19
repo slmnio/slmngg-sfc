@@ -22,7 +22,7 @@
             <router-link v-else-if="!team.dummy" :to="url('team', team)" class="team-code d-lg-none ct-passive">{{ team.code }}</router-link>
 
 
-            <ThemeLogo v-if="team && !team.dummy" :theme="team.theme" border-width="4" class="team-logo" icon-padding="4"/>
+            <ThemeLogo v-if="team && !team.dummy" :theme="team.theme" border-width="4" class="team-logo" icon-padding="4" logo-size="w-60"/>
             <div class="team-logo team-logo--spacer" v-else></div>
         </div>
 

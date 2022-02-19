@@ -19,7 +19,7 @@
             <div class="right w-25 px-2 d-flex flex-column">
                 <div class="sister mb-3 text-uppercase d-flex align-items-center" v-if="sister" :style="logoBackground1(sister)">
                     <div class="sister-logo flex-center mx-2">
-                        <div class="logo-inner bg-center" :style="cssImage('backgroundImage', sister.theme, ['default_logo', 'default_wordmark', 'small_logo'], 100)"></div>
+                        <div class="logo-inner bg-center" :style="resizedImage(sister.theme, ['default_logo', 'default_wordmark', 'small_logo'], 'h-100')"></div>
                     </div>
                     <div class="sister-text ml-1">
                         <div class="industry-align">Sister team</div>
@@ -40,7 +40,7 @@
             </div>
         </div>
         <div class="event-logo-holder position-absolute d-none flex-center" v-if="broadcast.event && broadcast.event.theme">
-            <div class="logo-inner bg-center w-100 h-100" :style="cssImage('backgroundImage', broadcast.event.theme, ['default_logo'], 0, false)"></div>
+            <div class="logo-inner bg-center w-100 h-100" :style="resizedImage(broadcast.event.theme, ['default_logo'], 'orig')"></div>
         </div>
     </div>
 </template>
@@ -48,7 +48,7 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");
@@ -57,7 +57,7 @@ function cleanKey(key) {
 export default {
     name: "InfoOverlay",
     props: ["broadcast"],
-    methods: { logoBackground1, cssImage },
+    methods: { logoBackground1, resizedImage },
     data: () => ({
         logoI: 0
     }),
@@ -90,7 +90,7 @@ export default {
         },
         eventLogo() {
             if (!this.broadcast?.event?.theme) return {};
-            return cssImage("backgroundImage", this.broadcast.event.theme, ["default_logo"], 200);
+            return resizedImage(this.broadcast.event.theme, ["default_logo"], "h-200");
         },
         colors() {
             if (!this.highlightTeam?.theme) return [];

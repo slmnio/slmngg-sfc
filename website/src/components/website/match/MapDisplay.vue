@@ -4,7 +4,7 @@
             <div class="map-color-overlay draw" v-if="map.draw"></div>
             <div class="map-color-overlay winner" v-if="winner" :style="logoBackground1(winner)"></div>
 
-            <div class="map-winner-image bg-center" v-if="winner" :style="cssImage('backgroundImage', winner.theme, ['default_logo', 'small_logo'], 90)"></div>
+            <div class="map-winner-image bg-center" v-if="winner" :style="resizedImage(winner.theme, ['default_logo', 'small_logo'], 'h-90')"></div>
             <div class="map-insert-number" v-if="number && !condensed">{{ number }}</div>
 
             <div class="map-insert-text" v-if="map.draw && complete && !condensed">DRAW</div>
@@ -16,8 +16,9 @@
 </template>
 
 <script>
-import { cleanID, cssImage } from "@/utils/content-utils";
+import { cleanID } from "@/utils/content-utils";
 import { logoBackground1, themeBackground } from "@/utils/theme-styles";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "MapDisplay",
@@ -42,7 +43,7 @@ export default {
                 mapTheme = themeBackground(this.theme);
             }
             return {
-                ...cssImage("backgroundImage", this.map, ["image"], 160),
+                ...resizedImage(this.map, ["image"], "h-160"),
                 ...mapTheme
             };
         },
@@ -58,7 +59,7 @@ export default {
         }
     },
     methods: {
-        logoBackground1, cssImage
+        logoBackground1, resizedImage
     }
 };
 </script>

@@ -23,8 +23,8 @@
 import ThingTop from "@/components/website/ThingTop";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import SubPageNav from "@/components/website/SubPageNav";
-import { multiImage } from "@/utils/content-utils";
 import Social from "@/components/website/Social";
+import { resizedImageNoWrap } from "@/utils/images";
 
 export default {
     name: "Team",
@@ -40,7 +40,7 @@ export default {
                 { name: "og:description", content: "test description" },
                 { name: "og:title", content: this.team.name }
             ],
-            link: [{ rel: "icon", href: multiImage(this.team.theme, ["small_logo", "default_logo"]) }]
+            link: [{ rel: "icon", href: resizedImageNoWrap(this.team.theme, ["small_logo", "default_logo"], "s-128") }]
         };
     },
     methods: {

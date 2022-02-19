@@ -52,9 +52,9 @@
 </template>
 
 <script>
-import { cssImage } from "@/utils/content-utils";
 import spacetime from "spacetime";
 import { logoBackground1 } from "@/utils/theme-styles";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "BreakMatch",
@@ -143,7 +143,7 @@ export default {
         teamLogo(team) {
             if (!team || !team.theme) return {};
             return {
-                ...cssImage("backgroundImage", team.theme, ["small_logo", "default_logo"], 40, true)
+                ...resizedImage(team.theme, ["small_logo", "default_logo"], "h-40")
             };
         },
         teamTheme(team) {

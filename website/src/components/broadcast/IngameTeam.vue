@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "IngameTeam",
@@ -128,9 +128,7 @@ export default {
             };
         },
         teamLogo() {
-            const i = cssImage("backgroundImage", this.team.theme, ["small_logo", "default_logo"], 70);
-            if (!i.backgroundImage) return null;
-            return i;
+            return resizedImage(this.team.theme, ["small_logo", "default_logo"], "h-80");
         },
         teamWidth() {
             return this.width || 690;

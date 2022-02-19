@@ -20,7 +20,8 @@
 <script>
 import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cssImage, getRoleSVG } from "@/utils/content-utils";
+import { getRoleSVG } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "RosterOverlay",
@@ -55,7 +56,7 @@ export default {
         },
         icon(team) {
             if (!team.theme) return {};
-            return cssImage("backgroundImage", team.theme, ["default_logo", "default_wordmark"], 250);
+            return resizedImage(team.theme, ["default_logo", "default_wordmark"], "h-250");
         },
         rosterFontSize(team) {
             const players = team?.players?.length;

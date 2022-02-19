@@ -15,7 +15,7 @@
 
 <script>
 import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "EventThumbnailCreator",
@@ -29,7 +29,7 @@ export default {
         },
         eventIcon() {
             if (!this.event || !this.event.theme) return {};
-            return cssImage("backgroundImage", this.event.theme, ["default_wordmark", "default_logo"], 1920, false);
+            return resizedImage(this.event.theme, ["default_wordmark", "default_logo", "small_logo"], "orig");
         },
         thumbnailBackground() {
             if (!this.event || !this.event.theme) return {};

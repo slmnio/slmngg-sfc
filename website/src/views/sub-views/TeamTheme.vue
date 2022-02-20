@@ -55,11 +55,11 @@
 <script>
 import IngameTeam from "@/components/broadcast/IngameTeam";
 import BracketTeam from "@/components/website/bracket/BracketTeam";
-import { getImage } from "@/utils/content-utils";
 import { logoBackground } from "@/utils/theme-styles";
 import ContentRow from "@/components/website/ContentRow";
 import ContentThing from "@/components/website/ContentThing";
 import StandingsTeam from "@/components/broadcast/StandingsTeam";
+import { resizedImageNoWrap } from "@/utils/images";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");
@@ -116,7 +116,7 @@ export default {
             const keys = ["small_logo", "default_logo", "default_wordmark"];
             return keys.map(k => ({
                 key: cleanKey(k),
-                image: getImage(this.theme[k])
+                image: resizedImageNoWrap(this.theme, [k], "orig")
             })).filter(i => i.image);
         }
     }

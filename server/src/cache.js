@@ -73,7 +73,23 @@ async function dataUpdate(id, data, options) {
     }
 }
 
+const longTextMap = {
+    "Events": ["about"],
+    "News": ["content"]
+};
+
 async function set(id, data, options) {
+
+    if (data?.__tableName) {
+        // Airtable bug where long textboxes that are cleared are just "\n" (and is not falsy)
+        let m = longTextMap[data?.__tableName];
+        if (m?.length) {
+            m.forEach(key => {
+                if (data[key] === "\n") delete data[key];
+            });
+        }
+    }
+
     if (data?.__tableName === "Events") {
         // update antileak
         if (!data.antileak?.length) {

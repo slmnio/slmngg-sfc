@@ -18,7 +18,8 @@
 </template>
 
 <script>
-import { resizedImage, url } from "@/utils/content-utils";
+import { url } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "NewEventDisplay",
@@ -36,9 +37,7 @@ export default {
         },
         blockLogo() {
             if (!this.event || !this.event.theme) return {};
-            return {
-                backgroundImage: `url(${resizedImage(this.event.theme, "default_logo", 50)})`
-            };
+            return resizedImage(this.event.theme, ["default_logo"], "h-50");
         }
     }
 };

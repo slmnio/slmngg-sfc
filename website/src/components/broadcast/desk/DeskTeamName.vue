@@ -8,14 +8,12 @@
 
 <script>
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cssImage } from "@/utils/content-utils";
 
 export default {
     name: "DeskTeamName",
     props: ["team"],
     computed: {
-        bg() { return logoBackground1(this.team); },
-        logo() { return cssImage("backgroundImage", this.team.theme, ["default_wordmark", "default_logo"], null, false); }
+        bg() { return logoBackground1(this.team); }
     }
 };
 </script>

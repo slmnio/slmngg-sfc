@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "Sponsors",
@@ -33,7 +33,7 @@ export default {
             return { backgroundColor: theme.color_logo_background || theme.color_theme };
         },
         logo (theme) {
-            return cssImage("backgroundImage", theme, ["default_wordmark", "default_logo"], 100, true);
+            return resizedImage(theme, ["default_wordmark", "default_logo"], "h-150");
         },
         nextSponsor() {
             this.sponsorIndex++;

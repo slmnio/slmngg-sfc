@@ -76,6 +76,7 @@ import NavLiveMatch from "@/components/website/NavLiveMatch";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { getImage } from "@/utils/content-utils";
 import WebsiteNavBanner from "@/components/website/WebsiteNavBanner";
+import { resizedImageNoWrap } from "@/utils/images";
 
 export default {
     name: "WebsiteNav",
@@ -149,7 +150,7 @@ export default {
             const theme = ReactiveRoot(this.minisite.id, { theme: ReactiveThing("theme") })?.theme;
             // console.log("[theme]", theme);
             if (!theme) return null;
-            return getImage(theme.small_logo) || getImage(theme.default_logo);
+            return resizedImageNoWrap(theme, ["small_logo", "default_logo"], "h-40");
         },
         showDisconnectedMessage() {
             return this.pageNoLongerNew && this.$socket.disconnected;

@@ -1,3 +1,4 @@
+require("dotenv").config();
 function cleanID(id) {
     if (!id) return null;
     if (typeof id !== "string") return id.id || null; // no real id oops
@@ -5,16 +6,16 @@ function cleanID(id) {
     return id;
 }
 
-function aImg(airtableImage) {
+function getResizedImage(airtableURL, size = "s-500") {
+    const dataServer = process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg";
+    return `${dataServer}/image?size=${size}&url=${airtableURL}`;
+}
+
+function aImg(airtableImage, size) {
     // console.log(airtableImage);
     if (!airtableImage.length) return null;
     let i = airtableImage[0];
-    return {
-        url: i.url,
-        width: i.width,
-        height: i.height,
-        type: i.type
-    };
+    return getResizedImage(i.url, size);
 }
 
 function stripMarkdown(md) {
@@ -177,11 +178,11 @@ module.exports = ({ app, cors, Cache }) => {
                     data.color = theme.color_theme;
                 }
                 if (thing.thumbnail) {
-                    data.image = aImg(thing.thumbnail);
+                    data.image = aImg(thing.thumbnail, "w-1000");
                     data.card_type = "summary_large_image";
                 }
                 if (!data.image && thing.header) {
-                    data.image = aImg(thing.header);
+                    data.image = aImg(thing.header, "w-1000");
                     data.card_type = "summary_large_image";
                 }
                 if (!data.image && theme?.default_wordmark) data.image = aImg(theme.default_wordmark);

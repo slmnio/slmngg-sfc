@@ -13,7 +13,7 @@
 
 <script>
 import { logoBackground, logoBackground1 } from "@/utils/theme-styles";
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "CasterCam",
@@ -59,11 +59,11 @@ export default {
                 });
                 return {
                     ...logoBackground1(this.event),
-                    ...cssImage("backgroundImage", this.event?.theme, ["default_logo"], 200),
+                    ...resizedImage(this.event?.theme, ["default_logo"], "h-200"),
                     ...logoBackground(this.team?.theme),
-                    ...cssImage("backgroundImage", this.team?.theme, ["default_logo"], 200),
+                    ...resizedImage(this.team?.theme, ["default_logo"], "h-200"),
                     ...logoBackground(this.guest?.theme),
-                    ...cssImage("backgroundImage", this.guest?.theme, ["default_logo"], 200),
+                    ...resizedImage(this.guest?.theme, ["default_logo"], "h-200"),
                     eventFallback: true
                 };
             }

@@ -147,12 +147,13 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import MapDisplay from "@/components/website/match/MapDisplay";
-import { cssImage, getRoleSVG, multiImage, url } from "@/utils/content-utils";
+import { getRoleSVG, url } from "@/utils/content-utils";
 import { logoBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo";
 import PreviousMatch from "@/components/website/match/PreviousMatch";
 import DetailedMatchStat from "@/components/website/match/DetailedMatchStat";
 import Markdown from "@/components/website/Markdown";
+import { resizedImage, resizedImageNoWrap } from "@/utils/images";
 
 export default {
     name: "DetailedMatch",
@@ -173,7 +174,7 @@ export default {
     methods: {
         url,
         icon(team) {
-            return cssImage("backgroundImage", team.theme, ["default_logo", "small_logo"], 60);
+            return resizedImage(team.theme, ["default_logo", "small_logo"], "h-60");
         },
         theme(team) {
             return logoBackground1(team);
@@ -274,7 +275,7 @@ export default {
     metaInfo() {
         return {
             title: this.match ? (this.match.custom_name || this.match.name) + " | Detailed view" : "Detailed match view",
-            link: [{ rel: "icon", href: multiImage(this._theme, ["small_logo", "default_logo"]) }]
+            link: [{ rel: "icon", href: resizedImageNoWrap(this._theme, ["small_logo", "default_logo"], "s-128") }]
         };
     }
 };

@@ -10,8 +10,9 @@
 </template>
 
 <script>
-import { cleanID, cssImage, money } from "@/utils/content-utils";
+import { cleanID, money } from "@/utils/content-utils";
 import { logoBackground1 } from "@/utils/theme-styles";
+import { resizedImage } from "@/utils/images";
 
 
 export default {
@@ -23,7 +24,7 @@ export default {
             return logoBackground1(this.team);
         },
         teamLogo() {
-            return cssImage("backgroundImage", this.team?.theme, ["small_logo", "default_logo"], 100);
+            return resizedImage(this.team?.theme, ["small_logo", "default_logo"], "h-100");
         },
         isLeading() {
             if (!this.leading) return false;

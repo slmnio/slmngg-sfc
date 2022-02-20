@@ -15,7 +15,7 @@
 
 <script>
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "PlayerTeamDisplay",
@@ -25,10 +25,10 @@ export default {
             return logoBackground1(this.team);
         },
         teamLogo() {
-            return cssImage("backgroundImage", this.team?.theme, ["small_logo", "default_logo"], 100);
+            return resizedImage(this.team?.theme, ["small_logo", "default_logo"], "h-100");
         },
         eventLogo() {
-            return cssImage("backgroundImage", this.team?.event?.theme, ["small_logo", "default_logo"], 100);
+            return resizedImage(this.team?.event?.theme, ["small_logo", "default_logo"], "h-100");
         },
         rankingText() {
             if (!this.team?.ranking_text) return "N/A";

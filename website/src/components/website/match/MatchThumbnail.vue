@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { resizedImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 import LoadingIcon from "@/components/website/LoadingIcon";
 
 export default {
@@ -70,10 +70,7 @@ export default {
         },
         logo(team, minSize = 120) {
             if (!team || !team.theme) return {};
-            const image = resizedImage(team.theme, "small_logo", minSize) || resizedImage(team.theme, "default_logo", minSize);
-            return {
-                backgroundImage: `url(${image})`
-            };
+            return resizedImage(team.theme, ["small_logo", "default_logo"], `h-${minSize}`);
         }
     }
 };
@@ -97,8 +94,8 @@ export default {
         /*height: 100%;*/
     }
     .match-thumbnail-logo {
-        width: calc(100% - 16px);
-        height: calc(100% - 16px);
+        width: calc(85%);
+        height: calc(70%);
     }
 
     .match-thumbnail-insert {

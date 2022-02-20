@@ -15,8 +15,8 @@
 <script>
 import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cssImage } from "@/utils/content-utils";
 import TeamMatchHistory from "@/components/broadcast/TeamMatchHistory";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "HistoryOverlay",
@@ -59,7 +59,7 @@ export default {
         },
         icon(team) {
             if (!team.theme) return {};
-            return cssImage("backgroundImage", team.theme, ["default_logo", "default_wordmark"], 250);
+            return resizedImage(team.theme, ["default_logo", "default_wordmark"], "h-250");
         }
     }
 };

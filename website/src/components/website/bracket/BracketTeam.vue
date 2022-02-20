@@ -19,8 +19,8 @@
 
 <script>
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cssImage } from "@/utils/content-utils";
 import Store from "@/thing-store";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "BracketTeam",
@@ -45,7 +45,7 @@ export default {
         },
         teamLogo() {
             if (!this.team) return {};
-            return cssImage("backgroundImage", this.team?.theme, ["small_logo", "default_logo"], 36);
+            return resizedImage(this.team?.theme, ["small_logo", "default_logo"], "s-40");
         }
     }
 };

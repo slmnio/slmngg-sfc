@@ -62,7 +62,8 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import MatchHero from "@/components/website/match/MatchHero";
 import MatchScore from "@/components/website/match/MatchScore";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
-import { getMatchContext, multiImage, url } from "@/utils/content-utils";
+import { getMatchContext, url } from "@/utils/content-utils";
+import { resizedImageNoWrap } from "@/utils/images";
 
 export default {
     name: "Match",
@@ -169,7 +170,7 @@ export default {
     metaInfo() {
         return {
             title: this.match.name,
-            link: [{ rel: "icon", href: multiImage(this.match?.event?.theme, ["small_logo", "default_logo"]) }]
+            link: [{ rel: "icon", href: resizedImageNoWrap(this.match?.event?.theme, ["small_logo", "default_logo"], "s-128") }]
         };
     }
 };

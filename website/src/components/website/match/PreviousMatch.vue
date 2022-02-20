@@ -13,9 +13,10 @@
 </template>
 
 <script>
-import { cssImage, url } from "@/utils/content-utils";
+import { url } from "@/utils/content-utils";
 import MapDisplay from "@/components/website/match/MapDisplay";
 import { logoBackground1 } from "@/utils/theme-styles";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "PreviousMatch",
@@ -60,7 +61,7 @@ export default {
     },
     methods: {
         teamTheme: (team) => logoBackground1(team),
-        largeIcon: (team) => cssImage("backgroundImage", team?.theme, ["default_logo", "small_logo"], 50),
+        largeIcon: (team) => resizedImage(team?.theme, ["default_logo", "small_logo"], "h-50"),
         url
     }
 };

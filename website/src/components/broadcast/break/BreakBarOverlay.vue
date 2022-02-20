@@ -63,7 +63,7 @@
             <transition name="seg">
                 <div class="segment-wrapper" v-if="showSegment('Event logo') && event && event.theme" :key="'Event logo'">
                     <div class="overlay--bg bar-segment segment-event-logo p-2" :style="eventLogoBackground">
-                        <div :style="cssImage('backgroundImage', event.theme, ['default_logo'], 200)"
+                        <div :style="resizedImage(event.theme, ['default_logo'], 'h-200')"
                              class="segment-image bg-center w-100 h-100"></div>
                     </div>
                 </div>
@@ -82,12 +82,12 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import Countdown from "@/components/broadcast/Countdown";
-import { cssImage } from "@/utils/content-utils";
 import BreakMatch from "@/components/broadcast/break/BreakMatch";
 import { themeBackground1 } from "@/utils/theme-styles";
 import Sponsors from "@/components/broadcast/Sponsors";
 import Bracket from "@/components/website/bracket/Bracket";
 import { sortMatches } from "@/utils/sorts";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "BreakBarOverlay",
@@ -181,7 +181,7 @@ export default {
         showBigSegment(segmentName) {
             return (this.broadcast.break_display === segmentName);
         },
-        cssImage,
+        resizedImage,
         nbr(text) {
             if (!text) return "";
             return text.replace(/\\n/g, "<br>");

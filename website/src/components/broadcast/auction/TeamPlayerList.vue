@@ -20,7 +20,8 @@
 
 <script>
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cleanID, cssImage, getAuctionMax, money } from "@/utils/content-utils";
+import { cleanID, getAuctionMax, money } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "TeamPlayerList",
@@ -31,7 +32,7 @@ export default {
             return logoBackground1(this.team);
         },
         teamLogo() {
-            return cssImage("backgroundImage", this.team?.theme, ["small_logo", "default_logo"], 100);
+            return resizedImage(this.team?.theme, ["small_logo", "default_logo"], "h-100");
         },
         players() {
             const max = getAuctionMax();

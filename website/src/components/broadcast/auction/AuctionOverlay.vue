@@ -58,7 +58,7 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import TeamPlayerList from "./TeamPlayerList";
-import { cleanID, cssImage, money } from "@/utils/content-utils";
+import { cleanID, money } from "@/utils/content-utils";
 import PlayerTeamDisplay from "./PlayerTeamDisplay";
 import { sortEvents } from "@/utils/sorts";
 import SignedTeamList from "@/components/broadcast/auction/SignedTeamList";
@@ -66,6 +66,7 @@ import { logoBackground1 } from "@/utils/theme-styles";
 import BidFocus from "./BidFocus";
 import TeamFocus from "@/components/broadcast/auction/TeamFocus";
 import BiddingWar from "@/components/broadcast/auction/BiddingWar";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "AuctionOverlay",
@@ -127,7 +128,7 @@ export default {
         },
         eventLogo() {
             if (!this._broadcast?.event?.theme) return {};
-            return cssImage("backgroundImage", this._broadcast.event.theme, ["default_logo", "default_wordmark"], 200);
+            return resizedImage(this._broadcast.event.theme, ["default_logo", "default_wordmark"], "h-200");
         },
         _broadcast() {
             return ReactiveRoot(this.broadcast.id, {
@@ -215,10 +216,7 @@ export default {
     methods: {
         money,
         getLogo(teamID) {
-            return cssImage("backgroundImage",
-                this.teams.find(t => t.id === cleanID(teamID))?.theme,
-                ["small_logo", "default_logo"],
-                100);
+            return resizedImage(this.teams.find(t => t.id === cleanID(teamID))?.theme, ["small_logo", "default_logo"], "h-100");
         },
         getTheme(teamID) {
             return logoBackground1(this.teams.find(t => t.id === cleanID(teamID)));

@@ -15,7 +15,7 @@
 
 <script>
 import { logoBackground } from "@/utils/theme-styles";
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "DeskPrediction",
@@ -44,9 +44,9 @@ export default {
         },
         logo() {
             if (this.hasPredicted) {
-                return cssImage("backgroundImage", this.guest.prediction_team.theme, ["default_logo", "small_logo"], 100, true);
+                return resizedImage(this.guest.prediction_team.theme, ["default_logo", "small_logo"], "h-100");
             } else {
-                return cssImage("backgroundImage", this.event.theme, ["default_logo", "small_logo"], 100, true);
+                return resizedImage(this.event.theme, ["default_logo", "small_logo"], "h-100");
             }
         },
         eventTheme() {

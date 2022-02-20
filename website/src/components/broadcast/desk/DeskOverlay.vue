@@ -17,7 +17,6 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cssImage } from "@/utils/content-utils";
 import TourneyBar from "@/components/broadcast/TourneyBar";
 import Caster from "@/components/broadcast/desk/Caster";
 import DeskMatch from "@/components/broadcast/desk/DeskMatch";
@@ -28,7 +27,6 @@ export default {
     components: { DeskMatch, Caster, TourneyBar },
     props: ["broadcast", "group"],
     methods: {
-        cssImage,
         getColor(index) {
             if (!this.deskColors?.length) return this.broadcast?.event?.theme?.color_logo_background || this.broadcast?.event?.theme?.color_theme;
             return this.deskColors[index % this.deskColors.length];

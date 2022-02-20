@@ -51,7 +51,7 @@
         <div class="break-preload">
             <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
             <Standings :event="event" :stage="broadcast.current_stage" />
-            <div class="break-image-inner" :style="cssImage('backgroundImage', broadcast, ['break_image'], 1080, false)"></div>
+            <div class="break-image-inner" :style="breakimage"></div>
             <Bracket class="break-col break-bracket" :event="event" :bracket="bracket" use-overlay-scale />
             <BreakMatchup class="break-col break-matchup" :match="nextMatch" />
             <BreakStaffList class="break-col break-staff-list" :matches="fullSchedule"/>
@@ -63,7 +63,6 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import BreakMatch from "@/components/broadcast/break/BreakMatch";
-import { cssImage } from "@/utils/content-utils";
 import { sortMatches } from "@/utils/sorts";
 import Sponsors from "@/components/broadcast/Sponsors";
 import Standings from "@/components/broadcast/Standings";
@@ -75,6 +74,7 @@ import { themeBackground1 } from "@/utils/theme-styles";
 import BreakStaffList from "@/components/broadcast/break/BreakStaffList";
 import BreakMatchup from "@/components/broadcast/break/BreakMatchup";
 import ThemeLogo from "@/components/website/ThemeLogo";
+import { resizedImage } from "@/utils/images";
 
 const tickTime = 25;
 
@@ -94,14 +94,14 @@ export default {
         countdownTick(x) {
             this.lastCountdownTick = x;
         },
-        cssImage
+        resizedImage
     },
     computed: {
         broadcasts() {
             return this.broadcast?.other_broadcasts || [];
         },
         breakImage() {
-            return cssImage("backgroundImage", this.broadcast, ["break_image"], 1080, false);
+            return resizedImage(this.broadcast, ["break_image"], "h-1080");
         },
         breakImageURL() {
             return this.breakImage?.backgroundImage;

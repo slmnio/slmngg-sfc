@@ -23,7 +23,7 @@
 
 <script>
 import { logoBackground } from "@/utils/theme-styles";
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 
 export default {
@@ -65,7 +65,11 @@ export default {
         },
         winnerLogo() {
             if (!this.map?.winner?.theme) return {};
-            return cssImage("backgroundImage", this.map.winner.theme, this.firstTo && this.firstTo > 2 ? ["default_logo", "small_logo"] : ["default_wordmark", "default_logo", "small_logo"], 400);
+            const keys = ["default_logo", "small_logo"];
+            if (this.firstTo && this.firstTo > 2) {
+                keys.unshift("default_wordmark");
+            }
+            return resizedImage(this.map.winner.theme, keys, "w-400");
         },
         mapVideo() {
             if (!this.showMapVideo) return null;

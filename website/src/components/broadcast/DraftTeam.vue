@@ -11,7 +11,7 @@
 
 <script>
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "DraftTeam",
@@ -19,8 +19,7 @@ export default {
     computed: {
         background() { return logoBackground1(this.team); },
         logo() {
-            return cssImage("backgroundImage", this.team.theme,
-                ["default_wormark", "default_logo", "small_logo"], 200);
+            return resizedImage(this.team.theme, ["default_wordmark", "default_logo", "small_logo"], "w-200");
         }
     }
 };

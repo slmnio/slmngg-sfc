@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { getImage, url } from "@/utils/content-utils";
+import { url } from "@/utils/content-utils";
 import { resizedImage } from "@/utils/images";
 
 export default {

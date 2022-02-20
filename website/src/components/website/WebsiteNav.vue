@@ -74,7 +74,6 @@ import {
 } from "bootstrap-vue";
 import NavLiveMatch from "@/components/website/NavLiveMatch";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { getImage } from "@/utils/content-utils";
 import WebsiteNavBanner from "@/components/website/WebsiteNavBanner";
 import { resizedImageNoWrap } from "@/utils/images";
 

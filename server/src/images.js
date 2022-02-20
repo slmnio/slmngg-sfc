@@ -67,6 +67,9 @@ async function resizeImage(filename, sizeText, sizeData) {
 }
 
 module.exports = ({ app, cors, Cache }) => {
+
+    ensureFolder("orig").then(r => console.log("[images] orig folder ensured"));
+
     app.get("/image", async (req, res) => {
         try {
             if (!req.query.url) {

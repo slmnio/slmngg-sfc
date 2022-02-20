@@ -2,7 +2,7 @@
   <div class="ingame-overlay">
       <div class="top-overlay" :style="broadcastMargin">
           <transition-group name="itah" mode="out-in">
-              <IngameTeam :key="`${team.id}-${i}`" v-for="(team, i) in teams"
+              <IngameTeam :key="`${team.id}-${i}`" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
                           :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores"
                           :width="teamWidth" :codes="codes" :event="broadcast.event" :auto-small="autoSmall"/>
           </transition-group>
@@ -29,6 +29,8 @@ export default {
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
+                    red_theme: ReactiveThing("red_theme"),
+                    blue_theme: ReactiveThing("blue_theme"),
                     matches: ReactiveArray("matches", {
                         teams: ReactiveArray("teams")
                     })
@@ -82,6 +84,33 @@ export default {
             if (this.broadcast) {
                 document.body.dataset.broadcast = this.broadcast.key;
             }
+        }
+    },
+    methods: {
+        getAltTheme(team, i) {
+            console.log({ team, i });
+            if (!(this.broadcast?.broadcast_settings || []).includes("Use coloured team themes")) return team.theme;
+
+            if (i === 0) {
+                // try blue
+                if (team.blue_theme && !team.blue_theme?.__loading) {
+                    return {
+                        ...team.theme,
+                        ...team.blue_theme
+                    };
+                }
+            } else {
+                // try red
+                if (team.red_theme && !team.red_theme?.__loading) {
+                    console.log(team.red_theme);
+                    return {
+                        ...team.theme,
+                        ...team.red_theme
+                    };
+                }
+            }
+
+            return team.theme;
         }
     }
 };

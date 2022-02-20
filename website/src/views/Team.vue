@@ -55,6 +55,8 @@ export default {
                 captains: ReactiveArray("captains"),
                 players: ReactiveArray("players"),
                 theme: ReactiveThing("theme"),
+                red_theme: ReactiveThing("red_theme"),
+                blue_theme: ReactiveThing("blue_theme"),
                 brand_designers: ReactiveArray("brand_designers"),
                 sister_teams: ReactiveArray("sister_teams", {
                     theme: ReactiveThing("theme")

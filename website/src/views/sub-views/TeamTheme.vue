@@ -66,7 +66,7 @@ function cleanKey(key) {
 }
 
 export default {
-    name: "TeamTheme.vue",
+    name: "TeamTheme",
     components: { BracketTeam, IngameTeam, ContentRow, ContentThing, StandingsTeam },
     props: ["team"],
     computed: {

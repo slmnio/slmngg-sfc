@@ -38,7 +38,7 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "IngameTeam",
-    props: ["team", "right", "score", "hideScores", "width", "codes", "event", "autoSmall"],
+    props: ["team", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme"],
     data: () => ({
         textureData: {
             url: null,
@@ -57,6 +57,9 @@ export default {
         }
     },
     computed: {
+        _theme() {
+            return this.theme || this.team.theme;
+        },
         record() {
             if (this.autoSmall?.show !== "record") return null;
             const stage = this.autoSmall?.stage;
@@ -102,19 +105,19 @@ export default {
             // return texture;
         },
         loaded() {
-            if (this.team.theme === undefined && this.team.has_theme === 0) return true;
-            return this.team && this.team.theme && !this.team.theme.__loading;
+            if (this._theme === undefined && this.team.has_theme === 0) return true;
+            return this.team && this._theme && !this._theme.__loading;
         },
         style() {
-            if (!this.team.theme) return {};
+            if (!this._theme) return {};
             return {
-                backgroundColor: this.team.theme.color_logo_background || this.team.theme.color_theme,
-                color: this.team.theme.color_text_on_logo_background || this.team.theme.color_text_on_theme,
+                backgroundColor: this._theme.color_logo_background || this._theme.color_theme,
+                color: this._theme.color_text_on_logo_background || this._theme.color_text_on_theme,
                 ...this.teamWidthCSS
             };
         },
         svgColor() {
-            if (this.team?.theme?.color_alt) return this.team.theme.color_alt;
+            if (this.team?.theme?.color_alt) return this._theme.color_alt;
 
             if (this.style?.backgroundColor === this.teamSlice?.backgroundColor) {
                 return this.style?.color;
@@ -122,13 +125,13 @@ export default {
             return this.teamSlice?.backgroundColor || this.style?.color;
         },
         teamSlice() {
-            if (!this.team.theme) return {};
+            if (!this._theme) return {};
             return {
-                backgroundColor: this.team.theme.color_accent || this.team.theme.color_logo_accent || this.team.theme.color_theme
+                backgroundColor: this._theme.color_accent || this._theme.color_logo_accent || this._theme.color_theme
             };
         },
         teamLogo() {
-            return resizedImage(this.team.theme, ["small_logo", "default_logo"], "h-80");
+            return resizedImage(this._theme, ["small_logo", "default_logo"], "h-80");
         },
         teamWidth() {
             return this.width || 690;
@@ -182,7 +185,7 @@ function updateWidth(vueEl, fullWidth) {
         [...bigHolder.children].map(el => {
             if (["team-name", "texture-holder"].some(cl => el.classList.contains(cl))) return;
             // console.log(el);
-            diff += el.getBoundingClientRect().width;
+            if (el) diff += el.getBoundingClientRect().width;
         });
         diff += 32; // extra padding
 

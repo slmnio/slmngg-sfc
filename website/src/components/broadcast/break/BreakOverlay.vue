@@ -32,7 +32,7 @@
                     <div class="break-col break-image" v-if="automatedShow === 'Image'" :key="`image-${breakImageURL}`">
                         <div v-if="breakImageURL" class="break-image-inner" :style="breakImage"></div>
                         <ThemeLogo v-else class="break-image-inner break-image-default" :theme="event.theme"
-                                   icon-padding="10%" border-width="0" :logo-size="450" />
+                                   icon-padding="10%" border-width="0" logo-size="h-500" />
                     </div>
                     <Bracket class="break-col break-bracket" v-if="automatedShow === 'Bracket'" :key="`Bracket-${bracket && bracket.key}`" :event="event" :bracket="bracket" use-overlay-scale small />
                     <div class="break-col break-others" v-if="automatedShow === 'Other Broadcasts'">
@@ -51,7 +51,7 @@
         <div class="break-preload">
             <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
             <Standings :event="event" :stage="broadcast.current_stage" />
-            <div class="break-image-inner" :style="breakimage"></div>
+            <div class="break-image-inner" :style="breakImage"></div>
             <Bracket class="break-col break-bracket" :event="event" :bracket="bracket" use-overlay-scale />
             <BreakMatchup class="break-col break-matchup" :match="nextMatch" />
             <BreakStaffList class="break-col break-staff-list" :matches="fullSchedule"/>
@@ -74,7 +74,7 @@ import { themeBackground1 } from "@/utils/theme-styles";
 import BreakStaffList from "@/components/broadcast/break/BreakStaffList";
 import BreakMatchup from "@/components/broadcast/break/BreakMatchup";
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { resizedImage } from "@/utils/images";
+import { resizedImage, resizedImageNoWrap } from "@/utils/images";
 
 const tickTime = 25;
 
@@ -104,7 +104,7 @@ export default {
             return resizedImage(this.broadcast, ["break_image"], "h-1080");
         },
         breakImageURL() {
-            return this.breakImage?.backgroundImage;
+            return resizedImageNoWrap(this.broadcast, ["break_image"], "h-1080");
         },
         nextMatch() {
             if (!this.broadcast || !this.broadcast.live_match || !this.broadcast.show_live_match) return null;

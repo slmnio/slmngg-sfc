@@ -28,6 +28,11 @@ export default {
         count() {
             return this.events.length || "many" + (this.eventSeries.length.toString().slice(0, 0));
         }
+    },
+    metaInfo() {
+        return {
+            title: "Home"
+        };
     }
 };
 </script>

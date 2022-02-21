@@ -132,9 +132,10 @@ module.exports = ({ app, cors, Cache }) => {
             if (["svg", "gif"].includes(originalFileType)) {
                 // just do orig if svg
                 size = "orig";
-            } else if (!["png", "jpeg", "webp"].includes(originalFileType)) {
-                return res.status(400).send("Unsupported image type");
             }
+            /* else if (!["png", "jpeg", "webp"].includes(originalFileType)) {
+                return res.status(400).send("Unsupported image type");
+            }*/
 
 
             let imagePath = await getImage(filename, size);

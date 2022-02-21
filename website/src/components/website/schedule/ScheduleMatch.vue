@@ -1,7 +1,7 @@
 <template>
     <div class="match my-2" v-if="loaded" v-bind:class="{ 'bg-danger' : !loaded, 'special-event': match.special_event }">
         <div class="match-left match-details flex-center flex-column text-center">
-            <div class="match-detail" v-for="detail in details" v-bind:key="detail">{{ detail }}</div>
+            <div class="match-detail" v-for="detail in details" v-bind:key="detail.sort" v-b-tooltip="detail.long">{{ detail.short }}</div>
         </div>
 
         <router-link :to="url('match', this.match)" v-if="match.special_event"
@@ -115,9 +115,9 @@ export default {
             if (!this.match) return "";
             const details = [];
 
-            if (this.match.match_number) details.push(`M${this.match.match_number}`);
-            if (this.match.stream_code) details.push(`${this.match.stream_code} stream`);
-            if (this.match.first_to) details.push(`FT${this.match.first_to}`);
+            if (this.match.match_number) details.push({ short: `M${this.match.match_number}`, long: `Match number ${this.match.match_number}` });
+            if (this.match.stream_code) details.push({ short: `${this.match.stream_code} stream`, long: `Broadcast on the ${this.match.stream_code} stream` });
+            if (this.match.first_to) details.push({ short: `FT${this.match.first_to}`, long: `First to ${this.match.first_to} maps` });
 
             return details.slice(0, 2);
         },

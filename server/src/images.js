@@ -79,7 +79,8 @@ module.exports = ({ app, cors, Cache }) => {
             const url = req.query.url;
             let parts = url.split("/");
             const originalFilename = parts[parts.length - 1];
-            const originalFileType = originalFilename.split(".")[1];
+            const dots = originalFilename.split(".");
+            const originalFileType = dots[dots.length - 1]; // last . (now works with .svg.png)
             const filename = parts[4] + "." + originalFileType;
 
             if (!["dl.airtable.com", "media.slmn.io"].some(domain => domain === parts[2])) {
@@ -128,9 +129,11 @@ module.exports = ({ app, cors, Cache }) => {
                 };
             }
 
-            if (originalFileType === "svg") {
+            if (["svg", "gif"].includes(originalFileType)) {
                 // just do orig if svg
                 size = "orig";
+            } else if (!["png", "jpeg", "webp"].includes(originalFileType)) {
+                return res.status(400).send("Unsupported image type");
             }
 
 

@@ -143,7 +143,7 @@ export default {
         teamLogo(team) {
             if (!team || !team.theme) return {};
             return {
-                ...resizedImage(team.theme, ["small_logo", "default_logo"], "h-40")
+                ...resizedImage(team.theme, ["small_logo", "default_logo"], "h-100")
             };
         },
         teamTheme(team) {

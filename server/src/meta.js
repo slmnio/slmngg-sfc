@@ -9,7 +9,7 @@ function cleanID(id) {
 function getResizedImage(airtableURL, size = "s-500") {
     const dataServer = process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg";
     // just using orig for now
-    return `${dataServer}/image?size=orig&url=${airtableURL}`;
+    return `${dataServer}/image?size=orig&url=${encodeURIComponent(airtableURL)}`;
 }
 
 function aImg(airtableImage, size) {

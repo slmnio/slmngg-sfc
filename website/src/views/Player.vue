@@ -44,6 +44,7 @@ export default {
         player () {
             return ReactiveRoot(this.id, {
                 member_of: ReactiveArray("member_of", {
+                    event: ReactiveThing("event"),
                     theme: ReactiveThing("theme"),
                     accolades: ReactiveArray("accolades", {
                         event: ReactiveThing("event", {
@@ -52,9 +53,11 @@ export default {
                     })
                 }),
                 owned_teams: ReactiveArray("owned_teams", {
+                    event: ReactiveThing("event"),
                     theme: ReactiveThing("theme")
                 }),
                 captain_of: ReactiveArray("captain_of", {
+                    event: ReactiveThing("event"),
                     theme: ReactiveThing("theme")
                 }),
                 event_staff: ReactiveArray("event_staff", {
@@ -64,6 +67,7 @@ export default {
                     theme: ReactiveThing("theme")
                 }),
                 team_staff: ReactiveArray("team_staff", {
+                    event: ReactiveThing("event"),
                     theme: ReactiveThing("theme")
                 }),
                 accolades: ReactiveArray("accolades", {
@@ -72,6 +76,7 @@ export default {
                     })
                 }),
                 brands_designed: ReactiveArray("brands_designed", {
+                    event: ReactiveThing("event"),
                     theme: ReactiveThing("theme")
                 }),
                 socials: ReactiveArray("socials"),

@@ -7,23 +7,23 @@
             </ContentRow>
             <ContentRow title="Owner of" v-if="ownedTeams">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in ownedTeams"
-                              v-bind:key="team.id" :show-logo="true" />
+                              :text="clarifyTeam(team)" v-bind:key="team.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Captain of" v-if="captainedTeams">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in captainedTeams"
-                              v-bind:key="team.id" :show-logo="true" />
+                              :text="clarifyTeam(team)" v-bind:key="team.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Team staff for" v-if="teamStaff">
               <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teamStaff"
-                            v-bind:key="team.id" :show-logo="true" />
+                            :text="clarifyTeam(team)" v-bind:key="team.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Brand designer for" v-if="brandsDesigned">
               <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in brandsDesigned"
-                            v-bind:key="team.id" :show-logo="true" :overrideURL="`/team/${team.id}/theme`" />
+                            :text="clarifyTeam(team)" v-bind:key="team.id" :show-logo="true" :overrideURL="`/team/${team.id}/theme`" />
             </ContentRow>
             <ContentRow title="Player for" v-if="teams">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teams"
-                              v-bind:key="team.id" :show-logo="true" />
+                              :text="clarifyTeam(team)" v-bind:key="team.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Event staff for" v-if="eventStaff">
                 <ContentThing :thing="event" type="event" :theme="event.theme" v-for="event in eventStaff"
@@ -50,6 +50,7 @@
 import ContentRow from "@/components/website/ContentRow";
 import ContentThing from "@/components/website/ContentThing";
 import { sortTeams, sortEvents } from "@/utils/sorts";
+import { clarifyTeam } from "@/utils/content-utils";
 
 export default {
     props: ["player"],
@@ -135,6 +136,9 @@ export default {
 
             return groups;
         }
+    },
+    methods: {
+        clarifyTeam
     }
 };
 </script>

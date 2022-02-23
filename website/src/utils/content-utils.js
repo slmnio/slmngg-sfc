@@ -167,3 +167,14 @@ export function money(num) {
 export function getAuctionMax() {
     return 8;
 }
+
+export function clarifyTeam(team) {
+    console.log({
+        team,
+        event: team.event
+    });
+    if (team.event && team.event.clarify_teams && team.event.short) {
+        return `${team.name} (${team.event.short})`;
+    }
+    return team.name;
+}

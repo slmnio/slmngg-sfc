@@ -8,14 +8,20 @@ function cleanID(id) {
 
 function getResizedImage(airtableURL, size = "s-500") {
     const dataServer = process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg";
-    return `${dataServer}/image?size=${size}&url=${airtableURL}`;
+    // just using orig for now
+    return `${dataServer}/image?size=orig&url=${airtableURL}`;
 }
 
 function aImg(airtableImage, size) {
     // console.log(airtableImage);
     if (!airtableImage.length) return null;
     let i = airtableImage[0];
-    return getResizedImage(i.url, size);
+    return {
+        width: i.width,
+        height: i.height,
+        type: i.type,
+        url: getResizedImage(i.url, size)
+    };
 }
 
 function stripMarkdown(md) {

@@ -63,7 +63,7 @@ export default {
         },
         headerImage() {
             if (!this.news?.header) return null;
-            return resizedImage(this.news, ["header"], "h-400");
+            return resizedImage(this.news, ["header"], "w-1200");
         },
         theme() {
             if (this.news?.event?.theme && this.news?.prefer_event) return this.news.event.theme;

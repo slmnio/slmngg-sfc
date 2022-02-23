@@ -21,7 +21,7 @@ export default {
         },
         logo() {
             if (!this.theme) return {};
-            return resizedImage(this.theme, ["default_wordmark", "default_logo"], "h-300");
+            return resizedImage(this.theme, ["default_wordmark", "default_logo"], "w-1200");
         }
     }
 };

@@ -131,7 +131,6 @@ export default {
 
 <style scoped>
     .branding-overlay {
-        background-color: #222;
         font-family: "Industry", "SLMN-Industry", sans-serif;
         color: white;
         display: flex;

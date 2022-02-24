@@ -13,34 +13,34 @@
             </div>
             <div class="col-12 my-2 settings">
                 <h2>Settings</h2>
-                <b-form-checkbox :title="'Show where each player placed in SLMN.GG events. Takes a while to load every player\'s data.'" v-model="settings.slmn_events">Show SLMN event results (takes a while to load)</b-form-checkbox>
-                <b-form-checkbox :title="'Show what the players selected as their \'best heroes\''" v-model="settings.heroes">Show heroes</b-form-checkbox>
+                <b-form-checkbox v-if="game === 'Overwatch'" :title="'Show where each player placed in SLMN.GG events. Takes a while to load every player\'s data.'" v-model="settings.slmn_events">Show SLMN event results (takes a while to load)</b-form-checkbox>
+                <b-form-checkbox v-if="game === 'Overwatch'" :title="'Show what the players selected as their \'best heroes\''" v-model="settings.heroes">Show heroes</b-form-checkbox>
                 <b-form-checkbox :title="'Show what the players wrote for their \'info for captains\''" v-model="settings.info_for_captains">Show player's info for captains</b-form-checkbox>
                 <b-form-checkbox :title="'Show the notes you\'ve written for players. Will save to your browser.'" v-model="settings.custom_notes">Show your player notes</b-form-checkbox>
-                <b-form-checkbox v-model="settings.show_rosters">Show team rosters</b-form-checkbox>
-                <div class="w-25 mt-1">
+                <b-form-checkbox v-if="draftTeams && draftTeams.length" v-model="settings.show_rosters">Show team rosters</b-form-checkbox>
+                <div v-if="game === 'Overwatch'" class="w-25 mt-1">
                     <b-form-select v-model="filters.selected" :options="filters.options"></b-form-select>
                 </div>
             </div>
             <div class="col-12 my-2" v-if="playerGroup('starred').length">
                 <h2>Starred players</h2>
                 <table class="table table-bordered bg-warning table-warning table-sm">
-                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings"/>
-                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('starred')" :player="player" v-bind:key="player.id" :has-draft-data="hasDraftData"/>
+                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
+                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('starred')" :player="player" v-bind:key="player.id" :has-draft-data="hasDraftData" :game="game"/>
                 </table>
             </div>
             <div class="col-12 my-2">
                 <h2>Available players</h2>
                 <table class="table table-bordered table-dark table-sm">
-                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings"/>
-                    <PlayerDraftRow :settings="settings" v-for="player in ungroupedPlayers" :player="player" v-bind:key="player.id" :has-draft-data="hasDraftData"/>
+                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
+                    <PlayerDraftRow :settings="settings" v-for="player in ungroupedPlayers" :player="player" v-bind:key="player.id" :has-draft-data="hasDraftData" :game="game"/>
                 </table>
             </div>
             <div class="col-12 my-2" v-if="playerGroup('ignored').length">
                 <h2>Ignored players</h2>
                 <table class="table table-bordered bg-danger table-danger text-white table-sm">
-                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings"/>
-                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('ignored')" :player="player" v-bind:key="player.id" :has-draft-data="hasDraftData"/>
+                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
+                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('ignored')" :player="player" v-bind:key="player.id" :has-draft-data="hasDraftData" :game="game"/>
                 </table>
             </div>
         </div>
@@ -75,7 +75,46 @@ export default {
     components: { EventDraftHeaders, PlayerDraftRow, ContentThing, ThemeLogo, BFormCheckbox, BFormSelect },
     methods: {
         url,
-        playerGroup(group) { return this.availablePlayers.filter(p => p.localNotes && p.localNotes.tag === group); }
+        playerGroup(group) { return this.availablePlayers.filter(p => p.localNotes && p.localNotes.tag === group); },
+        fixData(rank) {
+            return rank.replace("Plat ", "Platinum ").replace("Immortal+", "Immortal");
+        },
+        sortRankingSystem(ranks, aRank, bRank) {
+            aRank = this.fixData(aRank).trim().split(" ");
+            bRank = this.fixData(bRank).trim().split(" ");
+
+            // lowest in system: [0] -> [1] -> ... -> highest in system
+            let diff = ranks.indexOf(bRank[0]) - ranks.indexOf(aRank[0]);
+            // console.log(aRank, bRank, diff);
+
+            if (diff === 0 && aRank.length === 2 && bRank.length === 2) {
+                // lowest in rank:  1 -> 2 -> 3  :highest in rank
+                diff = parseInt(bRank[1]) - parseInt(aRank[1]);
+            }
+            return diff;
+        },
+        sortValorant(a, b) {
+            const ranks = [
+                "Unranked",
+                "Iron",
+                "Bronze",
+                "Silver",
+                "Gold",
+                "Platinum",
+                "Diamond",
+                "Immortal",
+                "Radiant"
+            ];
+            // sort by highest, then break with current
+            if (!a._draftData || !b._draftData) return 0;
+
+            let diff = this.sortRankingSystem(ranks, a._draftData.highest_rank, b._draftData.highest_rank);
+            if (diff === 0) {
+                diff = this.sortRankingSystem(ranks, a._draftData.current_rank, b._draftData.current_rank);
+            }
+            // console.log(a.name, b.name, diff);
+            return diff;
+        }
     },
     data: () => ({
         settings: {
@@ -108,11 +147,14 @@ export default {
                 draftable_players: ReactiveArray("draftable_players")
             });
         },
+        game() {
+            return this._event?.game || "Overwatch";
+        },
         hasDraftData() {
             return this.availablePlayers.some(p => !!p.draft_data);
         },
         availablePlayers() {
-            if (!this._event?.draftable_players || !this._event?.teams) return [];
+            if (!this._event?.draftable_players) return [];
             // if (this.dummy) {
             //     players.unshift({ name: "Solomon", id: "x" });
             // };
@@ -126,34 +168,37 @@ export default {
                 return true;
             }).map(player => {
                 // attempt to get SR
-                try {
-                    const ow = player.overwatch_data ? JSON.parse(player.overwatch_data) : null;
 
-                    if (player.draft_data) {
-                        const draftData = JSON.parse(player.draft_data);
-                        let extraSRtext = "";
+                if (this.game === "Overwatch") {
+                    try {
+                        const ow = player.overwatch_data ? JSON.parse(player.overwatch_data) : null;
 
-                        if (ow && ow.ratings && player.role) {
-                            const sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
-                            if (draftData.sr.role && sr) player.sr_err = sr - draftData.sr.role;
-                            if (sr) extraSRtext += ` Live SR on role: ${sr} ${player.sr_err && `(${player.sr_err})`}.`;
+                        if (player.draft_data) {
+                            const draftData = JSON.parse(player.draft_data);
+                            let extraSRtext = "";
+
+                            if (ow && ow.ratings && player.role) {
+                                const sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
+                                if (draftData.sr.role && sr) player.sr_err = sr - draftData.sr.role;
+                                if (sr) extraSRtext += ` Live SR on role: ${sr} ${player.sr_err && `(${player.sr_err})`}.`;
+                            }
+
+
+                            return { ...player, rating: { level: draftData.sr.role, note: `${getRoleString(draftData.sr)}${extraSRtext}` } };
                         }
 
-
-                        return { ...player, rating: { level: draftData.sr.role, note: `${getRoleString(draftData.sr)}${extraSRtext}` } };
+                        if (ow && ow.ratings && player.role) {
+                            let sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
+                            if (sr) return { ...player, rating: { level: sr, note: "Pulled from their Battletag" } };
+                            sr = Math.floor(ow.ratings.reduce((p, c) => p + c.level, 0) / ow.ratings.length);
+                            if (sr) return { ...player, rating: { level: sr, note: "Average of other roles" } };
+                        }
+                        if (player.manual_sr) {
+                            return { ...player, rating: { level: parseInt(player.manual_sr), note: "Manually added" } };
+                        }
+                    } catch (e) {
+                        return player;
                     }
-
-                    if (ow && ow.ratings && player.role) {
-                        let sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
-                        if (sr) return { ...player, rating: { level: sr, note: "Pulled from their Battletag" } };
-                        sr = Math.floor(ow.ratings.reduce((p, c) => p + c.level, 0) / ow.ratings.length);
-                        if (sr) return { ...player, rating: { level: sr, note: "Average of other roles" } };
-                    }
-                    if (player.manual_sr) {
-                        return { ...player, rating: { level: parseInt(player.manual_sr), note: "Manually added" } };
-                    }
-                } catch (e) {
-                    return player;
                 }
 
                 return player;
@@ -163,6 +208,7 @@ export default {
                 }
                 try {
                     const draftData = JSON.parse(player.draft_data);
+                    player._draftData = draftData;
                     player.heroes = draftData.best_heroes;
                     player.info_for_captains = draftData.info_for_captains;
                     player.do_not_draft = draftData.is_draftable === false;
@@ -176,6 +222,11 @@ export default {
                 // if (!a.sr_err || !b.sr_err) return 0;
                 // if (!a.sr_err) return 1; if (!b.sr_err) return -1;
                 // return b.sr_err - a.sr_err;
+
+                if (this.game === "Valorant") {
+                    return this.sortValorant(a, b);
+                }
+
                 if (!a.rating?.level) return 1; if (!b.rating?.level) return -1;
                 return b.rating.level - a.rating.level;
             }).filter(player => {

@@ -56,6 +56,11 @@ export default {
         },
         eventBorder() {
             if (!this.match || !this.match.event || !this.match.event.theme) return { backgroundColor: "#333" };
+            if (this.noTeams) {
+                return {
+                    backgroundColor: this.match.event.theme.color_logo_accent || this.match.event.theme.color_accent || this.match.event.theme.color_theme
+                };
+            }
             return { backgroundColor: this.match.event.theme.color_theme || this.match.event.theme.color_logo_background };
         }
     },

@@ -12,17 +12,19 @@
                 </transition-group>
             </div>
             <div class="teams d-flex">
-                <div class="team flex-grow-1" v-for="team in draftTeams" v-bind:key="team.id">
-                    <DraftTeam class="team-top" v-bind:class="{'team-bottom-border': !showStaff}" :team="team"></DraftTeam>
-                    <div class="team-staff-list default-thing" v-if="showStaff" :style="logoBackground1(team)">
-                        <div class="team-staff" v-for="staff in getTeamStaff(team)" v-bind:key="staff.id">
-                            {{ staff.name }}
+                <div class="team-row" v-for="(row, rowI) in draftRows" v-bind:key="rowI">
+                    <div class="team flex-grow-1" v-for="team in row" v-bind:key="team.id">
+                        <DraftTeam class="team-top" v-bind:class="{'team-bottom-border': !showStaff}" :team="team"></DraftTeam>
+                        <div class="team-staff-list default-thing" v-if="showStaff" :style="logoBackground1(team)">
+                            <div class="team-staff" v-for="staff in getTeamStaff(team)" v-bind:key="staff.id">
+                                {{ staff.name }}
+                            </div>
                         </div>
+                        <transition-group name="player" class="team-players">
+                            <DraftPlayer class="drafted-player" v-for="player in team.players" v-bind:key="player.id"
+                                         :player="player" :theme="event.theme" :show-icon="icons" />
+                        </transition-group>
                     </div>
-                    <transition-group name="player" class="team-players">
-                        <DraftPlayer class="drafted-player" v-for="player in team.players" v-bind:key="player.id"
-                                     :player="player" :theme="event.theme" :show-icon="icons" />
-                    </transition-group>
                 </div>
             </div>
         </div>
@@ -36,11 +38,12 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import DraftTeam from "@/components/broadcast/DraftTeam";
 import DraftPlayer from "@/components/broadcast/DraftPlayer";
 import { logoBackground, logoBackground1 } from "@/utils/theme-styles";
+import store from "@/thing-store";
 
 export default {
     name: "DraftOverlay",
     components: { DraftTeam, DraftPlayer },
-    props: ["broadcast", "bracketKey", "columns", "icons", "showStaff"],
+    props: ["broadcast", "bracketKey", "columns", "icons", "showStaff", "teamRows"],
     data: () => ({
         dummy: false
     }),
@@ -61,6 +64,45 @@ export default {
             }
             console.log(staff, team);
             return staff;
+        },
+        fixData(rank) {
+            return rank.replace("Plat ", "Platinum ").replace("Immortal+", "Immortal");
+        },
+        sortRankingSystem(ranks, aRank, bRank) {
+            aRank = this.fixData(aRank).trim().split(" ");
+            bRank = this.fixData(bRank).trim().split(" ");
+
+            // lowest in system: [0] -> [1] -> ... -> highest in system
+            let diff = ranks.indexOf(bRank[0]) - ranks.indexOf(aRank[0]);
+            // console.log(aRank, bRank, diff);
+
+            if (diff === 0 && aRank.length === 2 && bRank.length === 2) {
+                // lowest in rank:  1 -> 2 -> 3  :highest in rank
+                diff = parseInt(bRank[1]) - parseInt(aRank[1]);
+            }
+            return diff;
+        },
+        sortValorant(a, b) {
+            const ranks = [
+                "Unranked",
+                "Iron",
+                "Bronze",
+                "Silver",
+                "Gold",
+                "Platinum",
+                "Diamond",
+                "Immortal",
+                "Radiant"
+            ];
+            // sort by highest, then break with current
+            if (!a._draftData || !b._draftData) return 0;
+
+            let diff = this.sortRankingSystem(ranks, a._draftData.highest_rank, b._draftData.highest_rank);
+            if (diff === 0) {
+                diff = this.sortRankingSystem(ranks, a._draftData.current_rank, b._draftData.current_rank);
+            }
+            // console.log(a.name, b.name, diff);
+            return diff;
         }
     },
     computed: {
@@ -76,6 +118,9 @@ export default {
                 }),
                 draftable_players: ReactiveArray("draftable_players")
             });
+        },
+        game() {
+            return this.event?.game || "Overwatch";
         },
         background() {
             if (!this.event?.theme) return null;
@@ -117,7 +162,18 @@ export default {
                 }
 
                 return player;
+            }).map(player => {
+                try {
+                    const draftData = JSON.parse(player.draft_data);
+                    player._draftData = draftData;
+                } catch (e) { return player; }
+
+                return player;
             }).sort((a, b) => {
+                if (this.game === "Valorant") {
+                    return this.sortValorant(a, b);
+                }
+
                 if (!a.role) return 1; if (!b.role) return -1;
                 if (a.role !== b.role) {
                     const order = ["Tank", "DPS", "Support"];
@@ -131,6 +187,19 @@ export default {
         draftTeams() {
             if (!this.event?.teams) return [];
             return this.event.teams.filter(team => team.draft_order !== undefined).sort((a, b) => a.draft_order - b.draft_order);
+        },
+        draftRows() {
+            if (!this.draftTeams) return [];
+            const rows = [];
+
+            const chunkSize = this.draftTeams.length / this.teamRows;
+
+            this.draftTeams.forEach((team, i) => {
+                const group = Math.ceil((i + 1) / chunkSize) - 1;
+                if (!rows[group]) rows[group] = [];
+                rows[group].push(team);
+            });
+            return rows;
         },
         draftPlayerStyle() {
             return {
@@ -282,5 +351,14 @@ export default {
     .draft-team-top.team-bottom-border {
         border-bottom: 4px solid transparent;
         margin-bottom: 8px;
+    }
+
+    .team-row {
+        display: flex;
+        width: 100%;
+        height: 100%;
+    }
+    .teams {
+        flex-direction: column;
     }
 </style>

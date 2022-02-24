@@ -77,7 +77,16 @@ export default [
     { path: "history", component: HistoryOverlay, props: route => ({ max: route.query.max || 5 }) },
     { path: "season-history", component: SeasonHistoryOverlay },
     { path: "thumbnail", component: EventThumbnailCreator },
-    { path: "draft", component: DraftOverlay, props: route => ({ columns: route.query.columns || 1, icons: route.query.icons !== "false", showStaff: route.query.staff !== "false" }) },
+    {
+        path: "draft",
+        component: DraftOverlay,
+        props: route => ({
+            columns: route.query.columns || 1,
+            icons: route.query.icons !== "false",
+            showStaff: route.query.staff !== "false",
+            teamRows: route.query.rows || route.query.teamRows || 1
+        })
+    },
     { path: "casters", redirect: "desk" },
     { path: "desk", component: DeskOverlay, props: route => ({ group: "casters" }) },
     { path: "podcast", component: PodcastOverlay, props: route => ({ rows: route.query.rows }) },

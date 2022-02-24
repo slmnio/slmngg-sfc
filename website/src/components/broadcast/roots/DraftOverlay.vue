@@ -2,6 +2,7 @@
     <div class="draft-overlay">
         <div class="draft d-flex w-100 h-100">
             <div class="available-players">
+                <ThemeLogo v-if="event && event.theme" class="event-logo" :theme="event.theme" border-width="6px" logo-size="w-500" icon-padding="24px"></ThemeLogo>
                 <div class="title" :style="background">DRAFTABLE PLAYERS</div>
                 <!--<div class="player" v-for="player in availablePlayers" v-bind:key="player.id">
                     {{ player.name }}
@@ -39,10 +40,11 @@ import DraftTeam from "@/components/broadcast/DraftTeam";
 import DraftPlayer from "@/components/broadcast/DraftPlayer";
 import { logoBackground, logoBackground1 } from "@/utils/theme-styles";
 import store from "@/thing-store";
+import ThemeLogo from "@/components/website/ThemeLogo";
 
 export default {
     name: "DraftOverlay",
-    components: { DraftTeam, DraftPlayer },
+    components: { ThemeLogo, DraftTeam, DraftPlayer },
     props: ["broadcast", "bracketKey", "columns", "icons", "showStaff", "teamRows"],
     data: () => ({
         dummy: false
@@ -360,5 +362,10 @@ export default {
     }
     .teams {
         flex-direction: column;
+    }
+    .event-logo {
+        margin-bottom: 8px;
+        width: calc(100% - 4px) !important;
+        height: 200px;
     }
 </style>

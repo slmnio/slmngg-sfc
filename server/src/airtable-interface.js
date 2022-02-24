@@ -87,7 +87,7 @@ function customUpdater(tableName, item) {
 }
 
 function sluggify(text) {
-    return ((text.replace(/[^A-Za-z0-9-]+/g, "-")).trim()).toLowerCase().replace(/-+/g,"-").replace(/-+$/g,"");
+    return (((text || "").replace(/[^A-Za-z0-9-]+/g, "-")).trim()).toLowerCase().replace(/-+/g,"-").replace(/-+$/g,"");
 }
 
 async function processTableData(tableName, data, linkRecords = false) {

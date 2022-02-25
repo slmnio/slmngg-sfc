@@ -39,7 +39,6 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import DraftTeam from "@/components/broadcast/DraftTeam";
 import DraftPlayer from "@/components/broadcast/DraftPlayer";
 import { logoBackground, logoBackground1 } from "@/utils/theme-styles";
-import store from "@/thing-store";
 import ThemeLogo from "@/components/website/ThemeLogo";
 
 export default {

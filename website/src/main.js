@@ -136,6 +136,7 @@ const app = new Vue({
     }),
     mounted() {
         console.log("[app]", "subdomain", subdomain);
+        console.log("[app]", "data server", getDataServerAddress());
         if (subdomain) {
             this.loadMinisite(subdomain);
         }

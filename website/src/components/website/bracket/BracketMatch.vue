@@ -87,7 +87,7 @@ export default {
             return [this.match.score_1, this.match.score_2];
         },
         displayScores() {
-            if (this.match.first_to === 1 && this.match.maps?.length === 1) {
+            if (this.match && this.match.first_to === 1 && this.match.maps?.length === 1) {
                 const map = this.match.maps[0];
                 if (map.id && (map.score_1 !== undefined && map.score_2 !== undefined)) {
                     if (this.shouldSwapTeams) return [map.score_2, map.score_1];

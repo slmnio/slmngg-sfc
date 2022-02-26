@@ -80,7 +80,7 @@ const tickTime = 25;
 
 export default {
     name: "BreakOverlay",
-    props: ["broadcast", "title", "animationActive"],
+    props: ["broadcast", "title", "animationActive", "secondary"],
     components: { ThemeLogo, BreakMatchup, BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
     data: () => ({
         tick: 0,
@@ -125,7 +125,7 @@ export default {
         schedule() {
             if (!this.broadcast || !this.broadcast.schedule || !this.fullSchedule) return null;
             return this.fullSchedule.filter(m => {
-                return m.show_on_overlays;
+                return this.secondary ? m.show_on_secondary_overlays : m.show_on_overlays;
             }).sort(sortMatches);
         },
         event() {

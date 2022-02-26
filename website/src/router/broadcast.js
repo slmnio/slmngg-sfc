@@ -54,7 +54,7 @@ export default [
             }
         ]
     },
-    { path: "break", component: BreakOverlay },
+    { path: "break", component: BreakOverlay, props: route => ({ secondary: !!route.query.secondary }) },
     { path: "syncer", component: SyncerOverlay },
     { path: "tally-transmitter", component: TallyTransmitter },
     { path: "tally-viewer", component: TallyViewer },

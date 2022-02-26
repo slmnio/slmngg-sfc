@@ -11,7 +11,7 @@
                          :short="team.dummy && team.short"
                          :empty="team._empty"
                          v-bind:key="team.id"
-                         :score="scores[i]" :win="scores[i] === match.first_to"
+                         :score="displayScores[i]" :win="scores[i] === match.first_to"
             />
         </div>
         <transition name="fade">
@@ -33,7 +33,7 @@
                          :short="team.dummy && team.short"
                          :empty="team._empty"
                          v-bind:key="team.id"
-                         :score="scores[i]"
+                         :score="displayScores[i]"
             />
         </div>
     </div>
@@ -55,7 +55,7 @@ export default {
         url,
         matchHover() {
             this.hover = true;
-            console.log(this.match);
+            // console.log(this.match);
             const connections = this?.match?._bracket_data?.connections;
             if (!connections) return;
 
@@ -76,7 +76,7 @@ export default {
         },
         matchEmpty() {
             this.hover = false;
-            console.log(this.match, "empty");
+            // console.log(this.match, "empty");
             store.commit("setHighlights", []);
         }
     },
@@ -85,6 +85,16 @@ export default {
             if (!this.match) return [null, null];
             if (!this.match.teams || this.match.teams.length !== 2) return [null, null];
             return [this.match.score_1, this.match.score_2];
+        },
+        displayScores() {
+            if (this.match.first_to === 1 && this.match.maps?.length === 1) {
+                const map = this.match.maps[0];
+                if (map.id && (map.score_1 !== undefined && map.score_2 !== undefined)) {
+                    if (this.shouldSwapTeams) return [map.score_2, map.score_1];
+                    return [map.score_1, map.score_2];
+                }
+            }
+            return this.scores;
         },
         teams() {
             const dummy = { text: "TBD", dummy: true, id: null };

@@ -12,6 +12,7 @@
             <div class="map-insert-text" v-if="!complete && !condensed && !winner && mapClass === 'extra'">IF REQUIRED</div>
         </div>
         <div class="map-name">{{ name || '--' }}</div>
+        <div class="map-scores">{{  scores  }}</div>
     </div>
 </template>
 
@@ -56,6 +57,10 @@ export default {
                 if (this.condensed) return this.map.short_name[0];
                 return this.map.name[0];
             } catch (e) { return ""; }
+        },
+        scores() {
+            if (this.map.score_1 === undefined || this.map.score_2 === undefined) return null;
+            return [this.map.score_1, this.map.score_2].join(" - ");
         }
     },
     methods: {
@@ -117,5 +122,21 @@ export default {
     .map.condensed .map-name {
         font-size: 0.6em;
         margin-top: 3px;
+    }
+    .map-score {
+        line-height: 1;
+        text-align: center;
+        margin-top: 6px;
+    }
+
+    .map-scores {
+        line-height: 1;
+        font-size: 0.85em;
+        text-align: center;
+        margin-top: 4px;
+    }
+    .map.condensed .map-scores {
+        font-size: 0.6em;
+        margin-top: 1px;
     }
 </style>

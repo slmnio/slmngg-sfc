@@ -141,6 +141,11 @@ export function sortByOMW(a, b) {
     return 0;
 }
 
+export function mapRoundsDiff(a, b) {
+    const [aDiff, bDiff] = [a, b].map(x => x.standings.map_round_wins - x.standings.map_round_losses);
+    return bDiff - aDiff;
+}
+
 export function sortMatches(i, sortFunction, teams, standings) {
     outer:
     for (const team of teams) {
@@ -328,6 +333,7 @@ function getSortMethod(stringMethod) {
     if (stringMethod === "OMW") return { method: sortByOMW, max: null };
     if (stringMethod === "MiniLeague") return { prep: miniLeaguePrep, method: miniLeagueMatchDiff, max: null };
     if (stringMethod === "MiniLeagueMaps") return { prep: miniLeaguePrep, method: miniLeagueMapDiff, max: null };
+    if (stringMethod === "MapRoundsDiff") return { method: mapRoundsDiff, max: null };
     return null;
 }
 

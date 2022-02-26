@@ -6,17 +6,20 @@
             <div class="team-name flex-grow-1 text-left d-none d-md-flex">{{ title || stage || 'Team' }}</div>
             <div class="team-name team-code flex-grow-1 text-left d-md-none"></div>
             <div class="team-stats d-flex">
-                <div class="team-stat text-center">Matches</div>
-                <div class="team-stat text-center">Maps</div>
-                <div class="team-stat text-center">Map Diff</div>
-                <div v-if="useOMW" class="team-stat text-center d-none d-md-block" v-b-tooltip:top="'Opponent Match Winrate'">OMW</div>
+                <div class="team-stat text-center" v-for="col in showColumns" v-bind:key="col" v-b-tooltip="getColumnText(col).title">
+                    {{ getColumnText(col).header }}
+                </div>
+<!--                <div class="team-stat text-center">Matches</div>-->
+<!--                <div class="team-stat text-center">Maps</div>-->
+<!--                <div class="team-stat text-center">Map Diff</div>-->
+<!--                <div v-if="useOMW" class="team-stat text-center d-none d-md-block" v-b-tooltip:top="'Opponent Match Winrate'">OMW</div>-->
 <!--                <div class="team-stat text-center">Points</div>-->
             </div>
         </div>
         <div class="teams">
             <div class="team-group" v-for="(group, i) in standings.standings" v-bind:key="i">
                 <div class="team" v-for="team in group" v-bind:key="team.id">
-                    <StandingsTeam :team="team" :tie-text="tieText" />
+                    <StandingsTeam :team="team" :tie-text="tieText" :showColumns="showColumns" />
                 </div>
             </div>
         </div>
@@ -50,13 +53,41 @@ export default {
         showMapDiff: Boolean
     },
     components: { StandingsTeam },
+    methods: {
+        getColumnText(col) {
+            /* eslint-disable quote-props */
+            return ({
+                "MatchWinrate": { header: "W%", title: "Match winrate" },
+                "MapWinrate": { header: "MW%", title: "Map winrate" },
+                "OMatchWinrate": { header: "OW%", title: "Opponents' match winrate" },
+                "OMapWinrate": { header: "OMW%", title: "Opponents' map winrate" },
+                "Matches": { header: "Matches", title: "Matches won and lost" },
+                "MatchDiff": { header: "Match Diff", title: "Matches won - matches lost" },
+                "Maps": { header: "Maps", title: "Maps won and lost" },
+                "MapDiff": { header: "Map Diff", title: "Maps won - maps lost" },
+                "ValorantRounds": { header: "RW-RL", title: "Rounds won - rounds lost" },
+                "ValorantRoundDiff": { header: "ΔR", title: "Round diff" }
+            })[col] || {
+                header: "-", title: col
+            };
+
+
+            /* eslint-enable quote-props */
+        },
+        hasColumns(...cols) {
+            // TODO: needs to be either shown columns or has columns? feel like it's getting a little tangled
+            console.log("cols", cols, this.showColumns);
+            return this.showColumns.some(col => cols.includes(col));
+        }
+    },
     computed: {
         allMatches() {
             if (!this.event || !this.event.matches) return [];
             return ReactiveArray("matches", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
-                })
+                }),
+                maps: ReactiveArray("maps")
             })(this.event);
         },
         stageMatches() {
@@ -81,16 +112,15 @@ export default {
             return this.settings?.useOMW && this.stageMatches.every(m => [m.score_1, m.score_2].some(s => s === m.first_to));
         },
         standingsSort() {
-            try {
-                const sorters = this.blocks.standingsSort;
-                if (sorters && sorters.length) {
-                    const sorter = sorters.find(s => s.group === this.stage);
-                    return sorter?.sort;
-                }
-            } catch (e) {
-                return null;
-            }
-            return null;
+            return this.standingsSettings?.sort;
+        },
+        standingsSettings() {
+            return (this.blocks?.standings || []).find(s => s.group === this.stage);
+        },
+        showColumns() {
+            return this.standingsSettings?.show || [
+                "Matches", "Maps", "MapDiff"
+            ];
         },
         standings() {
             if (!this.stageMatches || !this.event) return [];
@@ -115,6 +145,17 @@ export default {
 
             teams.map(team => {
                 team.standings = {
+                    matches: {
+                        wins: 0,
+                        losses: 0,
+                        played: 0
+                    },
+                    maps: {
+                        wins: 0,
+                        losses: 0,
+                        played: 0
+                    },
+
                     wins: 0,
                     losses: 0,
                     played: 0,
@@ -122,10 +163,19 @@ export default {
                     map_wins: 0,
                     map_losses: 0,
                     maps_played: 0,
+                    map_round_wins: 0,
+                    map_round_losses: 0,
+
                     rank: null,
                     h2h: {},
                     h2h_maps: {}
                 };
+
+                // if (this.hasColumns("MatchWinrate", "OMatchWinrate")) {
+                //     team.standings.matches = { wins: 0, losses: 0, played: 0 };
+                // }
+
+
                 if (this.settings && this.settings.points) team.standings.points = team.extra_points || 0;
                 // get matches here
                 this.stageMatches.forEach(match => {
@@ -138,6 +188,8 @@ export default {
                     const opponent = match.teams.find(t => t.id !== team.id);
 
                     team.standings.played++;
+                    if (team.standings.matches) team.standings.matches.played++;
+
                     if (match.maps) {
 
                     } else {
@@ -148,6 +200,16 @@ export default {
                     team.standings.map_wins += scores[teamIndex];
                     team.standings.map_losses += scores[+!teamIndex];
                     team.standings.map_diff += (scores[teamIndex] - scores[+!teamIndex]);
+
+                    if (match.maps?.length) {
+                        match.maps.forEach(map => {
+                            if (!map.id) return;
+                            if (map.score_1 === undefined || map.score_2 === undefined) return;
+                            const mapScores = [map.score_1, map.score_2];
+                            team.standings.map_round_wins += mapScores[teamIndex];
+                            team.standings.map_round_losses += mapScores[+!teamIndex];
+                        });
+                    }
 
                     if (this.settings && this.settings.points) team.standings.points += (this.settings.points.map_wins * team.standings.map_wins);
                     if (this.settings && this.settings.points) team.standings.points += (this.settings.points.map_losses * team.standings.map_losses);

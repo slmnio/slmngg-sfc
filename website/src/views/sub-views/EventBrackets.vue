@@ -22,7 +22,8 @@ export default {
                 ordered_matches: ReactiveArray("ordered_matches", {
                     teams: ReactiveArray("teams", {
                         theme: ReactiveThing("theme")
-                    })
+                    }),
+                    maps: ReactiveArray("maps")
                 })
             })(this.event);
             // return this.event.brackets;

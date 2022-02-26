@@ -82,7 +82,8 @@ export default {
             return ReactiveArray("matches", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
-                })
+                }),
+                maps: ReactiveArray("maps")
             })(this.event);
         },
         pagedMatches() {

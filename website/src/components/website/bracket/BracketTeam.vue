@@ -61,7 +61,7 @@ export default {
 
     .bracket-team {
         width: 100%;
-        --match-height: 2.3em;
+        --match-height: 2.25em;
         height: var(--match-height);
         /*background-color: #282828;*/
     }
@@ -92,8 +92,10 @@ export default {
         overflow: hidden;
     }
     .team-name {
-        line-height: 1;
-        transform: translate(0, -0.0925em); /* industry-align */
+        line-height: 0.92;
+        transform: translate(0, -0.05em);
+        /*line-height: 1;*/
+        /*transform: translate(0, -0.0925em); !* industry-align *!*/
 
         font-size: 1.1em;
         padding: 0.15em 0;

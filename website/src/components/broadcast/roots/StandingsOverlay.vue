@@ -1,6 +1,6 @@
 <template>
     <GenericOverlay :title="title || (broadcast.current_stage ? `Standings: ${broadcast.current_stage}` : 'Standings')">
-        <Standings :event="event" :stage="broadcast.current_stage" />
+        <Standings class="standings" :event="event" :stage="broadcast.current_stage" />
     </GenericOverlay>
 </template>
 
@@ -28,5 +28,7 @@ export default {
 </script>
 
 <style scoped>
-
+    .standings >>> .team-name {
+        color: inherit !important;
+    }
 </style>

@@ -29,6 +29,12 @@ export default {
                     return score;
                 }
             }
+            if (this.match.first_to === 1 && this.match.maps?.length === 1) {
+                const map = this.match.maps[0];
+                if (map.id && (map.score_1 !== undefined && map.score_2 !== undefined)) {
+                    return [map.score_1, map.score_2];
+                }
+            }
             return this.scores;
         },
         pointColor() {

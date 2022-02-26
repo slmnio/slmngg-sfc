@@ -5,7 +5,7 @@
         <router-link :to="url('team', team)" class="team-name ct-passive flex-grow-1 text-left d-none d-md-flex">{{ team.name }}</router-link>
         <router-link :to="url('team', team)" class="team-name team-code ct-passive flex-grow-1 text-left d-md-none">{{ team.code }}</router-link>
         <div class="team-stats d-flex">
-            <div class="team-stat text-center" v-for="stat in stats" v-bind:key="stat" v-bind:class="{'d-none d-md-block': ['omw'].includes(stat) }">
+            <div class="team-stat text-center" v-for="(stat, i) in stats" v-bind:key="stat + i" v-bind:class="{'d-none d-md-block': ['omw'].includes(stat) }">
                 {{ teamStats[stat] }}
             </div>
         </div>
@@ -25,20 +25,52 @@ function diffString(val) {
 export default {
     name: "StandingsTeam",
     components: { ThemeLogo },
-    props: ["team", "tieText"],
+    props: ["team", "tieText", "showColumns"],
     data: () => ({
         // stats: ["diff", "map_diff"/*, "points" */]
 
     }),
     computed: {
+        show() { return this.showColumns || []; },
         stats() {
-            return [
-                "matches",
-                "maps",
-                "map_diff",
-                ...(this.team.standings?.omw !== undefined ? ["omw"] : [])
-            /*, "winrate" */
-            ];
+            const stats = [];
+
+            this.show.forEach(key => {
+                switch (key) {
+                case "MatchWinrate":
+                    stats.push("winrate_text");
+                    break;
+                case "MapWinrate":
+                    stats.push("mapwinrate_text");
+                    break;
+                case "Matches":
+                    stats.push("matches");
+                    break;
+                case "MatchDiff":
+                    stats.push("diff");
+                    break;
+                case "Maps":
+                    stats.push("maps");
+                    break;
+                case "MapDiff":
+                    stats.push("map_diff");
+                    break;
+                case "ValorantRounds":
+                    stats.push("map_rounds");
+                    break;
+                case "ValorantRoundDiff":
+                    stats.push("map_rounds_diff");
+                    break;
+                default:
+                    stats.push("empty");
+                }
+            });
+
+            // stats.push("matches");
+            // stats.push("maps");
+            // stats.push("map_diff");
+
+            return stats;
         },
         teamStats() {
             return {
@@ -50,7 +82,12 @@ export default {
                 rank: this.team.standings.rank,
                 tie_show_number: this.team.standings.tie_show_number,
                 winrate: this.team.standings.winrate,
-                omw: this.team.standings?.omw !== undefined ? Math.floor(this.team.standings.omw * 100) + "%" : "-"
+                winrate_text: (this.team.standings.winrate * 100).toFixed(0) + "%",
+                mapwinrate_text: "---",
+                omw: this.team.standings?.omw !== undefined ? Math.floor(this.team.standings.omw * 100) + "%" : "-",
+                empty: "-",
+                map_rounds: `${this.team.standings.map_round_wins}-${this.team.standings.map_round_losses}`,
+                map_rounds_diff: diffString(this.team.standings.map_round_wins - this.team.standings.map_round_losses)
             };
         }
     },

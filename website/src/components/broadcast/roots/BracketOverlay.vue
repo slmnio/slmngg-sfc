@@ -102,7 +102,7 @@ export default {
     }
 
     .bracket {
-        --anim-jump: 150ms;
+        --anim-jump: 300ms;
         --anim-base: 700ms;
     }
     .broadcast--animation-active .bracket >>> .column {
@@ -118,19 +118,33 @@ export default {
     .bracket >>> .column:nth-child(8) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 7); }
     .bracket >>> .column:nth-child(9) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 8); }
 
+    .bracket >>> .connection[data-column-num] {
+        animation: colreveal 600ms backwards;
+        animation-delay: var(--anim-base);
+    }
+    .bracket >>> .connection[data-column-num="1"] { animation-delay: calc(var(--anim-base)); }
+    .bracket >>> .connection[data-column-num="2"] { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 1); }
+    .bracket >>> .connection[data-column-num="3"] { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 2); }
+    .bracket >>> .connection[data-column-num="4"] { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 3); }
+    .bracket >>> .connection[data-column-num="5"] { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 4); }
+    .bracket >>> .connection[data-column-num="6"] { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 5); }
+    .bracket >>> .connection[data-column-num="7"] { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 6); }
+    .bracket >>> .connection[data-column-num="8"] { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 7); }
     @keyframes colreveal {
         0% {
-            clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
+            clip-path: polygon(-10% -10%, -10% -10%, -10% 110%, -10% 110%);
+            /*clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);*/
         }
         100% {
-            clip-path: polygon(0% 0%, 100% 0, 100% 100%, 0% 100%);
+            clip-path: polygon(-10% -10%, 110% -10%, 110% 110%, -10% 110%);
+            /*clip-path: polygon(0% 0%, 100% 0, 100% 100%, 0% 100%);*/
         }
     }
 
-    .broadcast--animation-active .bracket >>> .connections {
-        animation: conreveal 400ms backwards;
-        animation-delay: calc(var(--anim-base) + (var(--bracket-columns, 1) + 2) * var(--anim-jump))
-    }
+    /*.broadcast--animation-active .bracket >>> .connections {*/
+    /*    animation: conreveal 400ms backwards;*/
+    /*    animation-delay: calc(var(--anim-base) + (var(--bracket-columns, 1) + 2) * var(--anim-jump))*/
+    /*}*/
 
     @keyframes conreveal {
         0% { opacity: 0; }

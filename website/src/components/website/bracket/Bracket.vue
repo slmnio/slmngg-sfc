@@ -1,7 +1,8 @@
 <template>
     <div class="bracket row flex-column" :style="winVars" v-bind:class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
         <div class="connections" ref="connections-holder">
-            <div class="connection" v-for="bug in connectionBugs" :key="bug.key" :class="connectionBugClass(bug)" :style="bug.style">
+            <div class="connection" v-for="bug in connectionBugs" :key="bug.key" :class="connectionBugClass(bug)" :style="bug.style"
+                :data-column-num="bug.column">
                 <div class="c-top"></div><div class="c-middle"></div><div class="c-bottom"></div>
             </div>
         </div>
@@ -127,6 +128,17 @@ export default {
                 return this.matches[num - 1];
             }
         },
+        getMatchColumnNum(matchNum) {
+            let columnNum = 0;
+            (this.brackets || []).forEach(bracket => {
+                bracket.columns.forEach((col, colI) => {
+                    if ((col.games || []).includes(parseInt(matchNum))) {
+                        columnNum = colI + 1;
+                    }
+                });
+            });
+            return columnNum;
+        },
         connectionBugClass(bug) {
             const classes = [`dir-${bug.direction}`];
             let highlight = null;
@@ -134,6 +146,9 @@ export default {
             if (this.connectionsToHighlight?.matches) {
                 // console.log("bug highlight", bug, this.connectionsToHighlight);
                 const bugMatches = bug.key.split("->");
+
+                // TODO: make sure the connection (11 -> 14.1) is what the team did
+                //  (ie upper finals -> lower finals -> grand finals shouldn't highlight upper -> grands connection)
 
                 this.connectionsToHighlight.matches = this.connectionsToHighlight.matches.filter(m => m); // no nulls/0s
 
@@ -293,6 +308,7 @@ export default {
 
             this.connectionBugs.push({
                 key: `${sourceNum}->${destNum}`,
+                column: Math.max(this.getMatchColumnNum(sourceNum), this.getMatchColumnNum(destNum)),
                 direction: coord.direction,
                 style: {
                     left: `${coord.leftSide - alignmentDiff.left}px`,

@@ -9,7 +9,7 @@
                         <div class="match-middle-match flex-center" v-if="middleMode === 'Match'">
                             <DeskTeamName v-for="(team, i) in match.teams" :key="team.id" :team="team" :style="{order: i*2}" />
 
-                            <div class="match-center flex-center">
+                            <div class="match-center flex-center" v-if="!splitMatchScore">
                                 <div class="match-score flex-center" v-if="show.score">
                                     <div class="score flex-center" v-bind:class="{'win': match.score_1 === match.first_to}"><span class="industry-align">{{ match.score_1 }}</span></div>
                                     <div class="dash">-</div>
@@ -17,6 +17,14 @@
                                 </div>
                                 <div class="match-vs flex-center" :style="centerBorder" v-if="show.vs">
                                     <span class="industry-align">{{ scoreText }}</span>
+                                </div>
+                            </div>
+                            <div class="match-center flex-center" v-else>
+                                <div class="match-score-split">
+                                    <div class="score flex-center" :style="centerBorder"><span class="industry-align">{{ match.score_1 }}</span></div>
+                                    <div class="vs flex-center" :style="themeColor"><span class="industry-align">VS</span></div>
+<!--                                    <div class="vs-empty"></div>-->
+                                    <div class="score flex-center" :style="centerBorder"><span class="industry-align">{{ match.score_2 }}</span></div>
                                 </div>
                             </div>
                         </div>
@@ -127,6 +135,9 @@ export default {
                 if (display.includes("Team 2")) return themeBackground1(this.matchData.teams[1]);
             } catch (e) { }
             return themeBackground1(this.broadcast.event);
+        },
+        splitMatchScore() {
+            return (this.broadcast?.broadcast_settings || []).includes("Split desk match score");
         }
     },
     methods: {
@@ -213,5 +224,27 @@ export default {
     }
     .match-middle-maps >>> .map-bg {
         transform: translate(0, -12%);
+    }
+    .match-score-split {
+        display: flex;
+        height: 110px;
+    }
+
+    .match-score-split .vs {
+        width: auto;
+        font-size: 58px;
+        padding: 0 20px;
+    }
+
+    .match-score-split .score {
+        font-size: 90px;
+        width: 100px;
+    }
+    .vs-empty {
+        width: 50px;
+        opacity: 0;
+    }
+    .match-score-split .score, .match-score-split .vs {
+        border-bottom: 6px solid transparent;
     }
 </style>

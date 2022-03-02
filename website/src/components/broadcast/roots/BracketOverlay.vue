@@ -1,9 +1,9 @@
 <template>
-    <GenericOverlay v-if="!extended" :title="title || 'Bracket'">
+    <GenericOverlay class="bracket-overlay" v-if="!extended" :title="title || 'Bracket'">
         <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :small="small"
                  :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" />
     </GenericOverlay>
-    <div class="bracket-extended" :style="zoom" v-else>
+    <div class="bracket-overlay bracket-extended" :style="zoom" v-else>
         <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :small="small"
                  :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" />
     </div>

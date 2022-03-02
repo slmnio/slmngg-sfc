@@ -34,7 +34,7 @@
                         <ThemeLogo v-else class="break-image-inner break-image-default" :theme="event.theme"
                                    icon-padding="10%" border-width="0" logo-size="h-500" />
                     </div>
-                    <Bracket class="break-col break-bracket" v-if="automatedShow === 'Bracket'" :key="`Bracket-${bracket && bracket.key}`" :event="event" :bracket="bracket" use-overlay-scale small />
+                    <Bracket class="break-col break-bracket" v-if="automatedShow === 'Bracket'" :key="`Bracket-${bracket && bracket.key}`" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.85" />
                     <div class="break-col break-others" v-if="automatedShow === 'Other Broadcasts'">
                         <div class="broadcast-previews-title">
                             {{ broadcasts.length === 1 ? broadcasts[0].name : 'Other broadcasts' }}
@@ -417,7 +417,7 @@ export default {
     }
 
     .break-bracket {
-        zoom: 0.85;
+        /*zoom: 0.85;*/
         overflow: hidden;
     }
 

@@ -11,6 +11,7 @@ export default new Vuex.Store({
         request_buffer: [],
 
         highlighted_team: null,
+        highlighted_match: null,
         match_highlights: [],
         timezone: "local",
         draft_notes: [],
@@ -68,6 +69,9 @@ export default new Vuex.Store({
         setHighlightedTeam(state, teamID) {
             state.highlighted_team = teamID;
         },
+        setHighlightedMatch(state, matchID) {
+            state.highlighted_match = matchID;
+        },
         setTimezone(state, timezone) {
             state.timezone = timezone;
         },
@@ -101,7 +105,9 @@ export default new Vuex.Store({
         isHighlighted: state => (id) => state.highlighted_team === id,
         getHighlight: state => (matchID) => state.match_highlights.find(match => match.id === matchID),
         getNotes: state => (playerID) => state.draft_notes.find(notes => notes.player_id === playerID),
-        getLastMatchPage: state => (eventID) => state.last_event_match_pages.find(x => x.eventID === eventID)
+        getLastMatchPage: state => (eventID) => state.last_event_match_pages.find(x => x.eventID === eventID),
+        // highlightedMatch: (state, getters) => () => getters.thing(state.highlighted_match)
+        highlightedMatch: state => () => state.highlighted_match
     },
     actions: {
         subscribe: (state, data) => state.commit("subscribe", data),

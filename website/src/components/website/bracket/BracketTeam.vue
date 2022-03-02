@@ -122,7 +122,7 @@ export default {
     }
 
     .bracket-team {
-        transition: opacity 150ms;
+        transition: opacity 150ms ease;
     }
     .bracket-team.lowlighted {
         opacity: 0.2;

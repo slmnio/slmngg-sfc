@@ -1,10 +1,20 @@
 <template>
     <div class="bracket row flex-column" :style="winVars" v-bind:class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
+        <div class="connections" ref="connections-holder">
+            <div class="connection" v-for="bug in connectionBugs" :key="bug.key" :class="connectionBugClass(bug)" :style="bug.style">
+                <div class="c-top"></div><div class="c-middle"></div><div class="c-bottom"></div>
+            </div>
+        </div>
+        <v-style>
+            .bracket {
+                --bracket-columns: {{ bracketCols || 0 }};
+            }
+        </v-style>
         <div class="internal-bracket d-flex" v-for="(bracket, i) in brackets" v-bind:key="i">
             <div class="column" v-for="(column, ci) in bracket.columns" v-bind:key="ci">
                 <div class="header text-center mb-3" :style="logoBackground1(event)" v-if="showHeaders && column.header">{{ column.header }}</div>
                 <div class="column-matches flex-grow-1">
-                    <BracketMatch v-for="matchNum in column.games" :match="getMatch(matchNum)" v-bind:key="matchNum"/>
+                    <BracketMatch :ref="`match-${matchNum}`" v-for="matchNum in column.games" :match="getMatch(matchNum)" v-bind:key="matchNum"/>
                 </div>
             </div>
         </div>
@@ -24,8 +34,14 @@ export default {
         event: {},
         useOverlayScale: Boolean,
         small: Boolean,
-        scale: Number
+        scale: Number,
+        broadcastHighlightMatch: {},
+        broadcastHighlightTeam: {}
     },
+    data: () => ({
+        connectionElements: [],
+        connectionBugs: []
+    }),
     computed: {
         matches() {
             if (!this.bracket || !this.bracket.ordered_matches) return [];
@@ -42,6 +58,9 @@ export default {
         connections() {
             if (!this.layout || !this.layout.connections) return null;
             return this.layout.connections;
+        },
+        bracketCols() {
+            return Math.max(...(this.brackets || []).map(b => b.columns.length));
         },
         showHeaders() {
             return !this.small;
@@ -60,6 +79,38 @@ export default {
                 "--win-color": css.color,
                 "font-size": `${this.fontSize}px`
             };
+        },
+        highlightedTeam() {
+            return this.$store.state.highlighted_team || this.broadcastHighlightTeam || null;
+        },
+        highlightedMatch() {
+            return this.getOrderedMatchNum(this.$store.getters.highlightedMatch());
+        },
+        connectionsToHighlight() {
+            // If a team is highlighted: highlight their path
+            // If an empty match is highlighted: highlight the connections it touches
+            if (this.highlightedTeam) {
+                const teamMatches = this.matches.filter(match => {
+                    return (match.teams || []).some(t => t.id === this.highlightedTeam);
+                }).map(match => this.getOrderedMatchNum(match.id));
+                return {
+                    focus: "team",
+                    matches: teamMatches
+                };
+            }
+            if (this.highlightedMatch) {
+                return {
+                    focus: "match",
+                    matches: [this.highlightedMatch]
+                };
+            }
+            if (this.broadcastHighlightMatch) {
+                return {
+                    focus: "match",
+                    matches: [this.getOrderedMatchNum(this.broadcastHighlightMatch.id)]
+                };
+            }
+            return {};
         }
     },
     methods: {
@@ -76,11 +127,51 @@ export default {
                 return this.matches[num - 1];
             }
         },
+        connectionBugClass(bug) {
+            const classes = [`dir-${bug.direction}`];
+            let highlight = null;
+
+            if (this.connectionsToHighlight?.matches) {
+                // console.log("bug highlight", bug, this.connectionsToHighlight);
+                const bugMatches = bug.key.split("->");
+
+                this.connectionsToHighlight.matches = this.connectionsToHighlight.matches.filter(m => m); // no nulls/0s
+
+                if (this.connectionsToHighlight.focus === "match") {
+                    // highlight either end of the connection
+                    this.connectionsToHighlight.matches.forEach(matchNum => {
+                        if (bugMatches.includes(matchNum.toString())) highlight = true;
+                    });
+                }
+                if (this.connectionsToHighlight.focus === "team") {
+                    // highlight if both ends of the connection are part of the team's history
+                    if (bugMatches.every(bNum => this.connectionsToHighlight.matches.includes(parseInt(bNum)))) {
+                        highlight = true;
+                    }
+                }
+
+                if (!highlight) highlight = false;
+            }
+            if (highlight === true) {
+                classes.push("bug-highlight");
+            } else if (highlight === false) {
+                classes.push("bug-lowlight");
+            }
+            // classes.push(`debug--key-${bug.key}`);
+            // console.log(bug.key, classes);
+            return classes;
+        },
+        getOrderedMatchNum(matchID) {
+            if (!matchID) return null;
+            const idx = this.matches.findIndex(match => match.id === matchID);
+            if (idx === -1) return null;
+            return idx + 1;
+        },
         getBracketData(num) {
             if (!this.connections) return {};
             const connections = this.connections[num];
             if (!connections) return {};
-            console.log("connections", connections);
+            // console.log("connections", connections);
             const cons = {
                 winner: this.getConnectionMatch(connections.win),
                 loser: this.getConnectionMatch(connections.lose)
@@ -94,7 +185,7 @@ export default {
                     feederMatches.push({ ...this.getConnectionMatch(_n), _m: "Loser" });
                 }
             });
-            console.log("feeder matches", feederMatches);
+            // console.log("feeder matches", feederMatches);
             if (feederMatches) cons.feederMatches = feederMatches;
 
             return {
@@ -112,15 +203,133 @@ export default {
                 }
             }; // stored as a 1-based number
         },
-        logoBackground1
+        logoBackground1,
+        createConnections() {
+            console.log("creating connections");
+            this.connectionElements.forEach(el => el.remove());
+            this.connectionBugs = [];
+
+            if (!this.connections) return;
+
+            Object.entries(this.connections).forEach(([matchNum, connectionData]) => {
+                const matchRef = this.getMatchRef(matchNum);
+                if (!matchRef) return;
+
+                if (connectionData.win) {
+                    const [otherMatchNum, destNum] = connectionData.win.toString().split(".");
+                    this.createConnectionBetweenRefs(matchRef, this.getMatchRef(otherMatchNum), matchNum, otherMatchNum, parseInt(destNum || "0"));
+                }
+                // if (connectionData.lose) {
+                //     const [otherMatchNum, destNum] = connectionData.lose.toString().split(".");
+                //     this.createConnectionBetweenRefs(matchRef, this.getMatchRef(otherMatchNum), matchNum, parseInt(destNum || "0"));
+                // }
+            });
+        },
+        getMatchRef(matchNum) {
+            // console.log(this.$refs);
+            return this.$refs[`match-${matchNum}`];
+        },
+        createConnectionBetweenRefs(source, dest, sourceNum, destNum, destSide) {
+            if (!source || !dest || !destSide) return;
+            const container = this.$refs["connections-holder"];
+            // console.log({ container });
+
+            // console.log("connection between", { source, dest });
+            const [sourceBox, destBox] = [source, dest].map(c => c[0].$el.getBoundingClientRect());
+            // console.log({ sourceBox, destBox });
+
+            const connection = document.createElement("div");
+            connection.className = "connection";
+            // connection.dataset.data = JSON.stringify(data);
+
+            const HalfLine = 1;
+
+            const coord = {};
+            coord.leftSide = sourceBox.right;
+            coord.rightSide = destBox.left;
+
+            const sourcePoint = (sourceBox.bottom - (sourceBox.height / 2));
+            let destPoint = (destBox.bottom - (destBox.height / 2));
+
+            if (destSide) {
+                const quarterHeight = destBox.height / 4;
+                if (destSide === 1) {
+                    destPoint -= quarterHeight;
+                } else if (destSide === 2) {
+                    destPoint += quarterHeight;
+                }
+            }
+
+            connection.dataset.points = JSON.stringify({ sourcePoint, destPoint });
+
+            const alignmentDiff = container.getBoundingClientRect();
+
+
+            coord.topSide = Math.min(sourcePoint, destPoint);
+            coord.bottomSide = Math.max(sourcePoint, destPoint);
+
+            coord.direction = sourcePoint > destPoint ? "up" : "down";
+
+            if (coord.direction === "up") {
+                coord.topSide -= (HalfLine * 2);
+                coord.bottomSide += HalfLine;
+            } else {
+                coord.topSide -= HalfLine;
+                coord.bottomSide += HalfLine * 2;
+            }
+
+            connection.classList.add(`dir-${coord.direction}`);
+
+
+            connection.style.left = `${coord.leftSide - alignmentDiff.left}px`;
+            connection.style.top = `${coord.topSide - alignmentDiff.bottom}px`;
+
+            connection.style.height = `${coord.bottomSide - coord.topSide}px`;
+            connection.style.width = `${coord.rightSide - coord.leftSide}px`;
+
+
+            connection.innerHTML = "<div class=\"c-top\"></div><div class=\"c-middle\"></div><div class=\"c-bottom\"></div>";
+
+
+            this.connectionBugs.push({
+                key: `${sourceNum}->${destNum}`,
+                direction: coord.direction,
+                style: {
+                    left: `${coord.leftSide - alignmentDiff.left}px`,
+                    top: `${coord.topSide - alignmentDiff.bottom}px`,
+                    height: `${coord.bottomSide - coord.topSide}px`,
+                    width: `${coord.rightSide - coord.leftSide}px`
+                }
+            });
+
+            // container.appendChild(connection);
+            this.connectionElements.push(connection);
+        }
     },
     beforeDestroy() {
         Store.commit("setHighlightedTeam", null);
+    },
+    beforeUpdate() {
+        // console.log("[bracket rerender]");
+        // this.createConnections();
+    },
+    watch: {
+        bracket() {
+            console.log("[bracket data update]");
+            this.createConnections();
+        }
+    },
+    mounted() {
+        console.log("[bracket mounted]");
+        this.createConnections();
     }
 };
 </script>
 
 <style scoped>
+    .bracket {
+        position: relative;
+    }
     .column {
         width: 12.5em;
         margin: 0 1em;
@@ -148,4 +357,76 @@ export default {
     .bracket.small >>> .match-number {
         display: none
     }
+    .bracket >>> .connection {
+        /*background-color: rgba(255,0,0,0.25);*/
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 150ms ease, border-color 150ms ease, background-color 150ms ease;
+    }
+    /*.bracket >>> .connection.dir-up { background-color: rgba(255,255,0,0.25); }*/
+    /*.bracket >>> .connection.dir-down { background-color: rgba(0, 255,255,0.25); }*/
+    .connections {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+
+    .bracket >>> .connections {
+        --b-width: 2px;
+        --b-color: rgba(255,255,255,0.75);
+        --b-curve: 4px;
+    }
+    .bracket >>> .connection.dir-down .c-top { border-top-right-radius: var(--b-curve); }
+    .bracket >>> .connection.dir-down .c-bottom { border-bottom-left-radius: var(--b-curve); }
+    .bracket >>> .connection.dir-up .c-top { border-top-left-radius: var(--b-curve); }
+    .bracket >>> .connection.dir-up .c-bottom { border-bottom-right-radius: var(--b-curve); }
+
+    .bracket >>> .connection.bug-lowlight {
+        opacity: 0.2;
+    }
+    .bracket >>> .connection.bug-highlight {
+        --b-color: rgba(255,255,255,1);
+    }
+
+    .bracket >>> .connection .c-top {
+        width: calc(50% + var(--b-width));
+        height: 32px;
+        margin-right: 50%;
+        border-top: var(--b-width) solid var(--b-color);
+        border-right: var(--b-width) solid var(--b-color);
+    }
+
+    .bracket >>> .connection .c-middle {
+        width: var(--b-width);
+        background-color: var(--b-color);
+        flex-grow: 1;
+    }
+
+    .bracket >>> .connection .c-bottom {
+        width: calc(50% + var(--b-width));
+        height: 32px;
+        margin-left: 50%;
+        border-bottom: var(--b-width) solid var(--b-color);
+        border-left: var(--b-width) solid var(--b-color);
+    }
+
+    .bracket >>> .connection.dir-up .c-top {
+        margin-right: 0;
+        margin-left: 50%;
+        border: none;
+        border-top: var(--b-width) solid var(--b-color);
+        border-left: var(--b-width) solid var(--b-color);
+    }
+    .bracket >>> .connection.dir-up .c-bottom {
+        margin-left: 0;
+        margin-right: 50%;
+        border: none;
+        border-bottom: var(--b-width) solid var(--b-color);
+        border-right: var(--b-width) solid var(--b-color);
+    }
+
 </style>

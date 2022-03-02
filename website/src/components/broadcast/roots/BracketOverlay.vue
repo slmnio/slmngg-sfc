@@ -1,9 +1,11 @@
 <template>
     <GenericOverlay v-if="!extended" :title="title || 'Bracket'">
-        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :small="small" />
+        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :small="small"
+                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" />
     </GenericOverlay>
     <div class="bracket-extended" :style="zoom" v-else>
-        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :small="small" />
+        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :small="small"
+                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" />
     </div>
 </template>
 
@@ -11,6 +13,7 @@
 import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import Bracket from "@/components/website/bracket/Bracket";
+import { cleanID } from "@/utils/content-utils";
 export default {
     name: "BracketOverlay",
     components: { Bracket, GenericOverlay },
@@ -42,6 +45,36 @@ export default {
         zoom() {
             if (!this.scale) return {};
             return { zoom: this.scale };
+        },
+        liveMatch() {
+            if (!this.broadcast?.live_match) return null;
+            return ReactiveRoot(this.broadcast.live_match[0], {
+                teams: ReactiveArray("teams")
+            });
+        },
+        highlightMatch() {
+            if ((this.broadcast?.broadcast_settings || []).includes("Highlight live match on bracket")) {
+                return this.liveMatch || null;
+            }
+            return null;
+        },
+        highlightTeam() {
+            if ((this.broadcast?.broadcast_settings || []).includes("Highlight team on bracket")) {
+                return this.broadcast?.highlight_team || null;
+            }
+            return null;
+        }
+    },
+    watch: {
+        highlightTeam(team) {
+            const id = cleanID(team?.id || team?.[0]);
+            this.$store.commit("setHighlightedTeam", id);
+            console.log("[set highlight] team", id);
+        },
+        highlightMatch(match) {
+            const id = cleanID(match?.id || match?.[0]);
+            this.$store.commit("setHighlightedMatch", id);
+            console.log("[set highlight] match", id);
         }
     }
 };
@@ -66,5 +99,52 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    .bracket {
+        --anim-jump: 150ms;
+        --anim-base: 700ms;
+    }
+    .broadcast--animation-active .bracket >>> .column {
+        animation: colreveal 500ms backwards;
+        animation-delay: var(--anim-base);
+    }
+    .bracket >>> .column:nth-child(2) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 1); }
+    .bracket >>> .column:nth-child(3) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 2); }
+    .bracket >>> .column:nth-child(4) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 3); }
+    .bracket >>> .column:nth-child(5) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 4); }
+    .bracket >>> .column:nth-child(6) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 5); }
+    .bracket >>> .column:nth-child(7) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 6); }
+    .bracket >>> .column:nth-child(8) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 7); }
+    .bracket >>> .column:nth-child(9) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 8); }
+
+    @keyframes colreveal {
+        0% {
+            clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
+        }
+        100% {
+            clip-path: polygon(0% 0%, 100% 0, 100% 100%, 0% 100%);
+        }
+    }
+
+    .broadcast--animation-active .bracket >>> .connections {
+        animation: conreveal 400ms backwards;
+        animation-delay: calc(var(--anim-base) + (var(--bracket-columns, 1) + 2) * var(--anim-jump))
+    }
+
+    @keyframes conreveal {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+</style>
+<style>
+    .broadcast-app .bracket-team.lowlighted {
+        opacity: 0.3 !important;
+    }
+    .broadcast-app .match-number.lowlight {
+        opacity: 0.3 !important;
+    }
+    .broadcast-app .connection.bug-lowlight {
+        opacity: 0.3 !important;
     }
 </style>

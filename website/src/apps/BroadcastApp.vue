@@ -1,9 +1,13 @@
 <template>
-    <div class="broadcast-app">
+    <div class="broadcast-app" :class="{'broadcast--no-anim': noAnimation, 'broadcast--active': active, 'broadcast--animation-active': animationActive}">
 <!--        <div style="font-size: 5em; color: black">{{ $root.activeScene }}</div>-->
         <router-view id="overlay" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active" :animation-active="animationActive" />
         <v-style v-if="broadcast && broadcast.event">
             {{ broadcast.event.broadcast_css }}
+
+            :root {
+                --broadcast-transition-offset: {{ broadcast.transition_offset || 0}}ms;
+            }
         </v-style>
     </div>
 </template>

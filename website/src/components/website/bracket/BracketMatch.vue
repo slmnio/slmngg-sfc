@@ -60,8 +60,8 @@ export default {
             if (!connections) return;
 
             const cons = [
-                { id: connections.winner.id, text: "Winner advances here", side: connections.winner.side },
-                { id: connections.loser.id, text: "Loser drops to here", side: connections.loser.side }
+                { id: connections.winner.id, text: "Winner advances here", side: connections.winner.side, number: connections.winner?.match_number },
+                { id: connections.loser.id, text: "Loser drops to here", side: connections.loser.side, number: connections.loser?.match_number }
             ];
 
             connections.feederMatches.map(f => {
@@ -72,12 +72,14 @@ export default {
                 });
             });
 
-            store.commit("setHighlights", cons);
+            // store.commit("setHighlights", cons); // disable this for now
+            store.commit("setHighlightedMatch", this.match.id);
         },
         matchEmpty() {
             this.hover = false;
             // console.log(this.match, "empty");
             store.commit("setHighlights", []);
+            store.commit("setHighlightedMatch", null);
         }
     },
     computed: {
@@ -150,9 +152,9 @@ export default {
     .bracket-match {
         margin: 0.6em 0;
         position: relative;
-        border: .15em solid transparent;
+        border: .125em solid transparent;
     }
-    .bracket-match, .match-number {
+    .bracket-match {
         transition: border-color .15s ease;
     }
 
@@ -206,7 +208,7 @@ export default {
         color: white;
         border: 2px solid transparent;
         border-bottom: none;
-        transition: opacity 150ms;
+        transition: opacity 150ms, border-color 150ms;
     }
 
     .bracket-match.hover,

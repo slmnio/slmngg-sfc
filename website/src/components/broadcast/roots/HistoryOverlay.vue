@@ -1,6 +1,6 @@
 <template>
     <GenericOverlay class="history-overlay" :broadcast="broadcast" :title="title || 'Match History'" body-color="transparent !important">
-        <div class="team" v-for="team in teams" v-bind:key="team.id">
+        <div class="team overlay--bg" v-for="team in teams" v-bind:key="team.id">
             <div class="team-top flex-center" :style="themeColor(team)">
                 <div class="team-name flex-center">{{ team.name }}</div>
                 <div class="team-icon-holder flex-center">
@@ -77,6 +77,7 @@ export default {
     align-items: center;
     background: #222;
     margin: -40px;
+    border-bottom: 8px solid transparent;
 }
 
 .team:first-child {
@@ -131,5 +132,8 @@ export default {
 
 .team-top {
     position: relative;
+}
+.history-overlay >>> .generic-overlay-body.overlay--bg {
+    border-bottom: none !important;
 }
 </style>

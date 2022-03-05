@@ -286,7 +286,6 @@ function updateWidth(vueEl, fullWidth) {
         font-size: 42px;
         width: 48px;
         flex-shrink: 0;
-        letter-spacing: -3px;
     }
     span.industry-align {
         transform: translate(0, -.0925em);

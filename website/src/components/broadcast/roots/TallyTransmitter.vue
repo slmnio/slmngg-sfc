@@ -1,7 +1,7 @@
 <script>
 export default {
     name: "TallyTransmitter",
-    props: ["client"],
+    props: ["client", "number"],
     data: () => ({
         active: false,
         visible: false,
@@ -9,7 +9,7 @@ export default {
     }),
     computed: {
         state() {
-            if (this.active && this.visible) {
+            if (this.active) {
                 return "active";
             } else if (this.visible) {
                 return "preview";
@@ -21,7 +21,12 @@ export default {
 
     methods: {
         transmit() {
-            this.$socket.client.emit("tally_change", { clientName: this.client.key, state: this.state, sceneName: this.scene });
+            this.$socket.client.emit("tally_change", {
+                clientName: this.client.key,
+                state: this.state,
+                sceneName: this.scene,
+                number: this.number
+            });
         },
         transmitState() {
             if (window.obsstudio) {

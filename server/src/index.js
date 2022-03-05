@@ -121,8 +121,9 @@ io.on("connection", (socket) => {
         socket.join(`prod:client-${clientName}`);
     });
 
-    socket.on("tally_change", ({ clientName, state, sceneName }) => {
-        socket.to(`prod:client-${clientName}`).emit("tally_change", { state, sceneName });
+    socket.on("tally_change", ({ clientName, state, number, sceneName, data }) => {
+        // console.log("[tally]", clientName, state, number, data);
+        socket.to(`prod:client-${clientName}`).emit("tally_change", { state, number, sceneName });
     });
 });
 

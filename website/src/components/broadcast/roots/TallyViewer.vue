@@ -1,16 +1,17 @@
 <template>
-  <div class="tally-block" v-bind:class="{ preview: state === 'preview', active: state === 'active' }">
-    <div class="d-flex flex-column align-items-center">
-      <div class="state">
-        {{ state.toLocaleUpperCase() }}
-      </div>
-      <div class="metadata d-flex flex-column align-items-center">
-        <div>
-          {{ client.name }}
+    <div class="tally-block" v-bind:class="{ preview: state === 'preview', active: state === 'active' }">
+        <div class="d-flex flex-column align-items-center">
+            <div class="state">
+                {{ state.toLocaleUpperCase() }}
+            </div>
+            <div class="metadata d-flex flex-column align-items-center">
+                <div>
+                    <span v-if="number">{{ number }} &middot; </span>
+                    <span>{{ client.name }}</span>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -18,14 +19,16 @@ export default {
     name: "TallyViewer",
     props: ["client"],
     sockets: {
-        tally_change({ state, sceneName }) {
+        tally_change({ state, number, sceneName }) {
             this.state = state;
+            this.number = number;
             this.sceneName = sceneName;
         }
     },
     data: () => ({
         state: "disconnected",
-        sceneName: "N/A"
+        sceneName: "N/A",
+        number: null
     })
 };
 </script>

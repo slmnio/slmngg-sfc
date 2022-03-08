@@ -77,7 +77,7 @@ export default {
         --theme-color: #2F2F30;
         position: relative;
 
-        --caster-width: 800px;
+        --caster-width: 810px;
         --caster-height: 570px;
         max-width: var(--caster-width);
         transition: max-width .4s ease;

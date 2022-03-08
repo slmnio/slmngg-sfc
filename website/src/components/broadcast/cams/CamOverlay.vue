@@ -85,7 +85,7 @@ export default {
             return _teams;
         },
         camParams() {
-            return `&cover&na${this.params}`;
+            return `&${this.$root.defaults.camParams || "_"}&${this.params}`;
         },
         activeGuest() {
             if (this.number >= 7) {

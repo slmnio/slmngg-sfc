@@ -27,6 +27,7 @@ export default {
         width:  160px;
         height: 150px;
         /*border-radius: 20px;*/
+        background-color: #373737; /* basic, overriden by bg() */
     }
     .team-logo {
         --size: 90%;

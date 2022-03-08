@@ -46,20 +46,16 @@ export default {
                 // custom link
                 return this.streamID + (this.extraParams || "");
             }
-            return `${vdoDomain}/?view=${this.streamID}&na` + (this.extraParams || "");
+            return `${vdoDomain}/?view=${this.streamID}&${this.$root.defaults.camParams || "_"}&` + (this.extraParams || "");
         },
         avatar() {
             if (!this.guest) return null;
             if (!this.guest.avatar) {
                 if (this.fallbackAvatar) return this.fallbackAvatar;
-                console.log({
-                    guest: this.guest,
-                    event: this.event,
-                    team: this.team
-                });
+
                 return {
                     ...logoBackground1(this.event),
-                    ...resizedImage(this.event?.theme, ["default_logo"], "h-200"),
+                    ...resizedImage(this.event?.theme, ["default_logo", "default_wordmark"], "h-200"),
                     ...logoBackground(this.team?.theme),
                     ...resizedImage(this.team?.theme, ["default_logo"], "h-200"),
                     ...logoBackground(this.guest?.theme),
@@ -142,12 +138,12 @@ export default {
     .mid-split-enter-active {
         overflow: hidden;
         max-width: 100%;
-        transition: all 400ms var(--reversedCurve) 250ms;
+        transition: all 400ms var(--reversedCurve) 250ms !important;
     }
     .mid-split-leave-active {
         overflow: hidden;
         max-width: 100%;
-        transition: all 400ms var(--originalCurve) 250ms;
+        transition: all 400ms var(--originalCurve) 250ms !important;
     }
     .mid-split-enter, .mid-split-leave-to {
         /*clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);*/

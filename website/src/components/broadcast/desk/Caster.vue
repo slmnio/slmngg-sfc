@@ -4,11 +4,11 @@
             <CasterCam class="caster-cam-wrapper" :guest="liveGuestData" :disableVideo="disableVideo" :color="color"
             :event="event" />
         </div>
-        <transition mode="out-in" name="fade">
+        <transition name="fade">
             <div class="caster-lower flex-center" :key="`${name}-${twitter}-${lowerType}`" v-bind:class="{'cl-traditional': lowerType === 'traditional'}">
                 <div class="caster-name flex-center">
-                    <div class="c-name">{{ name }}</div>
-                    <div class="c-twitter" v-if="twitter">{{ twitter }}</div>
+                    <div class="c-name industry-align">{{ name }}</div>
+                    <div class="c-twitter industry-align" v-if="twitter">{{ twitter }}</div>
                 </div>
             </div>
         </transition>
@@ -120,9 +120,6 @@ export default {
         font-size: 0.8em;
         margin-bottom: .15em;
     }
-    .c-name {
-        transform: translate(0, -.0925em);
-    }
 
     .caster-cam-box {
         position: relative;
@@ -149,13 +146,14 @@ export default {
         padding: 10px 15px;
         flex-direction: row;
         flex-wrap: wrap;
-        justify-content: space-between;
+        justify-content: center;
     }
 
 
     .caster-lower.cl-traditional .c-name,
     .caster-lower.cl-traditional .c-twitter {
         text-align: center;
+        margin: 0 20px;
     }
 
     /*.caster-lower.cl-traditional .c-name { text-align: left; }*/

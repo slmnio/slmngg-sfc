@@ -1,6 +1,9 @@
 import { getDataServerAddress } from "@/utils/fetch";
 
-export function bg(url) { return { backgroundImage: `url(${url})` }; }
+export function bg(url) {
+    if (!url) return {};
+    return { backgroundImage: `url(${url})` };
+}
 
 export function getImageURL(airtableURL, size) {
     if (!size) {
@@ -22,7 +25,7 @@ function keyedImage(theme, keys) {
 }
 
 export function resizedImageNoWrap(theme, keys, size) {
-    if (!theme) return {}; // fallback css
+    if (!theme) return null;
     const imageURL = keyedImage(theme, keys);
     if (!imageURL) return null;
     return getImageURL(imageURL, size);

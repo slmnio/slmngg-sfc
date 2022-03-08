@@ -30,6 +30,7 @@ export default {
     text-align: center;
     line-height: 1;
     height: 110px;
+    background-color: #373737; /* basic, overriden by bg() */
     color: #fff;
     border-bottom: 6px solid transparent;
     width: 100%;

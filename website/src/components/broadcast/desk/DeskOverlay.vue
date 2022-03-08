@@ -145,7 +145,7 @@ export default {
     }
 
     .desk-overlay {
-        padding: 2vh 10vw;
+        padding: 2vh 8vw;
         height: 100vh !important;
         box-sizing: border-box;
     }

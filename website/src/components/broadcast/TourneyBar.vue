@@ -62,7 +62,8 @@ export default {
         border-radius: 0;
     }
     .tourney-bar.small-bar .bar-logo {
-        height: 220px;
+        width: 75%;
+        height: 200px;
     }
     .bar-text {
         text-transform: uppercase;
@@ -73,7 +74,11 @@ export default {
         transform: translate(0, -0.08em)
     }
 
-    .bar-logo {width: 300px;height: 300px;margin: -100px 0;}
+    .bar-logo {
+        width: 300px;
+        height: 300px;
+        margin: -90px 0;
+    }
 
     .bar-logo-holder {}
 </style>

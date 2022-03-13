@@ -132,7 +132,10 @@ const app = new Vue({
         isRebuilding: false,
         animationActive: true,
         activeScene: null,
-        broadcast: null
+        broadcast: null,
+        defaults: {
+            camParams: (["cover", "na", "animate=0"]).join("&")
+        }
     }),
     mounted() {
         console.log("[app]", "subdomain", subdomain);

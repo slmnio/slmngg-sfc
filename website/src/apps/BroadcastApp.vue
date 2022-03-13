@@ -1,23 +1,31 @@
 <template>
-    <div class="broadcast-app" :class="{'broadcast--no-anim': noAnimation, 'broadcast--active': active, 'broadcast--animation-active': animationActive}">
-<!--        <div style="font-size: 5em; color: black">{{ $root.activeScene }}</div>-->
-        <router-view id="overlay" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active" :animation-active="animationActive" />
-        <v-style v-if="broadcast && broadcast.event">
-            {{ broadcast.event.broadcast_css }}
+    <StingerWrap :theme="broadcast.event.theme" :active="active" :should-use="useBuiltInStingers">
+        <div class="broadcast-app"
+             :class="{'broadcast--no-anim': noAnimation, 'broadcast--active': active, 'broadcast--animation-active': animationActive}">
+            <!--        <div style="font-size: 5em; color: black">{{ $root.activeScene }}</div>-->
+            <router-view id="overlay" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active"
+                         :animation-active="animationActive"/>
+            <v-style v-if="broadcast && broadcast.event">
+                {{ broadcast.event.broadcast_css }}
 
-            :root {
-                --broadcast-transition-offset: {{ broadcast.transition_offset || 0}}ms;
-            }
-        </v-style>
-    </div>
+                :root {
+                --broadcast-transition-offset: {{ broadcast.transition_offset || 0 }}ms;
+                }
+            </v-style>
+        </div>
+    </StingerWrap>
 </template>
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import StingerWrap from "@/components/broadcast/StingerWrap";
 
 export default {
     name: "BroadcastApp",
     props: ["id", "title", "top", "code", "client", "noAnimation"],
+    components: {
+        StingerWrap
+    },
     data: () => ({
         active: false,
         animationActive: true,
@@ -36,6 +44,9 @@ export default {
         },
         haltAnimations() {
             return this.noAnimation || (this.broadcast?.broadcast_settings || []).includes("No animations");
+        },
+        useBuiltInStingers() {
+            return (this.broadcast?.broadcast_settings || []).includes("Use built-in stingers");
         }
     },
     mounted () {

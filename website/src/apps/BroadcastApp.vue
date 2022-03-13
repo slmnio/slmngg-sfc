@@ -22,7 +22,7 @@ import StingerWrap from "@/components/broadcast/StingerWrap";
 
 export default {
     name: "BroadcastApp",
-    props: ["id", "title", "top", "code", "client", "noAnimation"],
+    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger"],
     components: {
         StingerWrap
     },
@@ -46,6 +46,8 @@ export default {
             return this.noAnimation || (this.broadcast?.broadcast_settings || []).includes("No animations");
         },
         useBuiltInStingers() {
+            console.log("use", this.noStinger, this.broadcast?.broadcast_settings);
+            if (this.noStinger) return false;
             return (this.broadcast?.broadcast_settings || []).includes("Use built-in stingers");
         }
     },

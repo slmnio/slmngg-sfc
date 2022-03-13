@@ -39,13 +39,13 @@ export default [
     {
         path: "/broadcast/:broadcastCode",
         component: BroadcastApp,
-        props: route => ({ code: route.params.broadcastCode, title: route.query.title, top: route.query.top, noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation) }),
+        props: route => ({ code: route.params.broadcastCode, title: route.query.title, top: route.query.top, noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation), noStinger: (route.query.noStinger || route.query.stinger === "false") }),
         children: BroadcastRoutes
     },
     {
         path: "/client/:clientID",
         component: ClientApp,
-        props: route => ({ client: route.params.clientID, title: route.query.title, noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation) }),
+        props: route => ({ client: route.params.clientID, title: route.query.title, noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation), noStinger: (route.query.noStinger || route.query.stinger === "false") }),
         children: BroadcastRoutes
     },
     // {

@@ -21,7 +21,8 @@ export default {
             mute: 1
         },
         prepared: false,
-        ended: false
+        ended: false,
+        emitTimeTimeout: 0
     }),
     computed: {
         media() {

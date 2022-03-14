@@ -14,7 +14,7 @@ function getResizedImage(airtableURL, size = "s-500") {
 
 function aImg(airtableImage, size) {
     // console.log(airtableImage);
-    if (!airtableImage.length) return null;
+    if (!airtableImage || !airtableImage.length) return null;
     let i = airtableImage[0];
     return {
         width: i.width,

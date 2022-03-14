@@ -58,6 +58,11 @@ function niceJoin(array) {
 
 module.exports = ({ app, Cache }) => {
 
+    async function subArrayNames(ids) {
+        if (!ids?.length) return [];
+        let things = await Promise.all((ids || []).map(id => Cache.get(id)));
+        return things.filter(p => p.name).map(p => p.name);
+    }
 
     //     $meta = (object)[
     //         "title" => " | SLMN.GG",
@@ -138,6 +143,47 @@ module.exports = ({ app, Cache }) => {
                     title: thing.name,
                     color: theme?.color_theme,
                     image: themeSquare(theme?.id)
+                });
+            }
+        },
+        {
+            url: "team",
+            async handle({ parts }) {
+                let thing = await Cache.get(cleanID(parts[1]));
+                if (!thing.name) {
+                    return null;
+                }
+
+                let theme = thing?.theme && await Cache.get(thing.theme[0]);
+                let event = thing?.event && await Cache.get(thing.event[0]);
+                let captains = await subArrayNames(thing?.captains);
+                let owners = await subArrayNames(thing?.owners);
+                let players = await subArrayNames(thing?.players);
+                let staff = await subArrayNames(thing?.staff);
+
+                console.log(captains);
+
+                let description = [];
+                if (event?.name) description.push(`${thing.name} from ${event.name}.\n`);
+                if (captains.length) description.push(`Captained by ${niceJoin(captains)}.`);
+                if (owners.length) description.push(`Owned by ${niceJoin(owners)}.`);
+
+                if (staff.length && players.length) {
+                    // staff AND players
+                    description.push(`The roster includes ${niceJoin(players)} and they're supported by their staff of ${niceJoin(staff)}.`);
+                } else if (staff.length) {
+                    // staff only
+                    description.push(`The team staff are ${niceJoin(staff)}.`);
+                } else if (players.length) {
+                    // players only
+                    description.push(`The roster includes ${niceJoin(players)}.`);
+                }
+
+                return meta({
+                    title: thing.name,
+                    color: theme?.color_theme,
+                    image: themeSquare(theme?.id),
+                    description: description.join(" ")
                 });
             }
         },

@@ -32,6 +32,7 @@ import TallyViewer from "@/components/broadcast/roots/TallyViewer";
 import PlayerHistory from "@/components/broadcast/PlayerHistory";
 import OverviewOverlay from "@/components/broadcast/roots/OverviewOverlay";
 import MediaOverlay from "@/components/broadcast/roots/MediaOverlay";
+import MediaClock from "@/components/broadcast/roots/MediaClock";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -102,5 +103,6 @@ export default [
     { path: "staff", component: StaffOverlay },
     { path: "player-history", component: PlayerHistory, props: route => ({ showMinor: route.query.minor }) },
     { path: "overview", component: OverviewOverlay },
-    { path: "media", component: MediaOverlay }
+    { path: "media", component: MediaOverlay },
+    { path: "clock", component: MediaClock }
 ];

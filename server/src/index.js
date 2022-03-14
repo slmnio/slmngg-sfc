@@ -118,12 +118,18 @@ io.on("connection", (socket) => {
 
     socket.on("prod-join", (clientName) => {
         console.log("prod-join", clientName);
+        socket._clientName = clientName;
         socket.join(`prod:client-${clientName}`);
     });
 
     socket.on("tally_change", ({ clientName, state, number, sceneName, data }) => {
         // console.log("[tally]", clientName, state, number, data);
         socket.to(`prod:client-${clientName}`).emit("tally_change", { state, number, sceneName });
+    });
+
+    socket.on("media_update", (status, value) => {
+        if (!socket._clientName) return;
+        socket.to(`prod:client-${socket._clientName}`).emit(`media_update_${status}`, value);
     });
 });
 

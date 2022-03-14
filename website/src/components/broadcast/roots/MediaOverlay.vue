@@ -43,6 +43,10 @@ export default {
             this.player.unMute();
             this.player.seekTo(0);
 
+            this.player.addEventListener("timeupdate", (d) => {
+                console.log("timeupdate", { d });
+            });
+
             this.prepared = true;
         },
         playerReady(e) {
@@ -58,6 +62,12 @@ export default {
         },
         playerEnded() {
             this.ended = true;
+        },
+        emitTimes() {
+            this.$socket.client.emit("media_update", "time", {
+                duration: this.player.getDuration(),
+                current: this.player.getCurrentTime()
+            });
         }
     },
     watch: {
@@ -68,8 +78,21 @@ export default {
             console.log("play media", this.player);
             if (isActive && this.player) {
                 this.player.playVideo();
+                this.$socket.client.emit("media_update", "playing", true);
+                this.$socket.client.emit("media_update", "remaining", this.player.getDuration() - this.player.getCurrentTime());
             }
+        },
+        prepared(isPrepared) {
+            this.$socket.client.emit("media_update", "prepared", isPrepared);
+            console.log({ isPrepared });
+        },
+        ended(ended) {
+            this.$socket.client.emit("media_update", "ended", ended);
         }
+    },
+    mounted() {
+        if (this.emitTimeTimeout) clearInterval(this.emitTimeTimeout);
+        this.emitTimeTimeout = setInterval(this.emitTimes, 500);
     }
 };
 </script>

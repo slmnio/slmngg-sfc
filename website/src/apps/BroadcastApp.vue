@@ -1,5 +1,5 @@
 <template>
-    <StingerWrap :theme="broadcast.event.theme" :active="active" :should-use="useBuiltInStingers">
+    <StingerWrap :theme="broadcast.event && broadcast.event.theme" :active="active" :should-use="useBuiltInStingers">
         <div class="broadcast-app"
              :class="{'broadcast--no-anim': noAnimation, 'broadcast--active': active, 'broadcast--animation-active': animationActive}">
             <!--        <div style="font-size: 5em; color: black">{{ $root.activeScene }}</div>-->

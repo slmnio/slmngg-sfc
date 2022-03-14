@@ -14,7 +14,7 @@ function getResizedImage(airtableURL, size = "s-500") {
 
 function aImg(airtableImage, size) {
     // console.log(airtableImage);
-    if (!airtableImage.length) return null;
+    if (!airtableImage || !airtableImage.length) return null;
     let i = airtableImage[0];
     return {
         width: i.width,
@@ -42,7 +42,7 @@ function niceJoin(array) {
     return array[0];
 }
 
-module.exports = ({ app, cors, Cache }) => {
+module.exports = ({ app, Cache }) => {
 
 
     //     $meta = (object)[
@@ -69,19 +69,23 @@ module.exports = ({ app, cors, Cache }) => {
             card_type: "summary"
         };
 
+        // remove any keys that don't have a value so that they can be overridden by the default
+        // this allows using optional chaining for values as one does not need to check that the result exists
+        let cleanData = Object.fromEntries(Object.entries(data || {}).filter(([_, v]) => v != null));
+
         let response = {
             ...defaultResponse,
-            ...data,
+            ...cleanData,
         };
 
-        if (data.title) response.title = `${data.title} | SLMN.GG`;
-        if (data.name) response.title = `${data.name} | SLMN.GG`;
-        if (data.image) response.image = data.image;
-        if (data.imageURL) response.image = { url: data.image };
-        if (data.description) response.description = data.description + "\n" + defaultResponse.description;
-        if (data.solo_description) response.description = data.solo_description;
+        if (cleanData.title) response.title = `${cleanData.title} | SLMN.GG`;
+        if (cleanData.name) response.title = `${cleanData.name} | SLMN.GG`;
+        if (cleanData.image) response.image = cleanData.image;
+        if (cleanData.imageURL) response.image = { url: cleanData.image };
+        if (cleanData.description) response.description = cleanData.description + "\n" + defaultResponse.description;
+        if (cleanData.solo_description) response.description = cleanData.solo_description;
 
-        if (data.card_type) response.card_type = data.card_type;
+        if (cleanData.card_type) response.card_type = cleanData.card_type;
 
         return response;
     }
@@ -89,7 +93,7 @@ module.exports = ({ app, cors, Cache }) => {
     const routes = [
         {
             url: "player",
-            async handle({ path, parts }) {
+            async handle({ parts }) {
                 let thing = await Cache.get(cleanID(parts[1]));
 
                 if (!thing.name) {
@@ -108,7 +112,7 @@ module.exports = ({ app, cors, Cache }) => {
         },
         {
             url: "event",
-            async handle({ path, parts }) {
+            async handle({ parts }) {
                 let thing = await Cache.get(cleanID(parts[1]));
 
                 if (!thing.name) {
@@ -116,20 +120,16 @@ module.exports = ({ app, cors, Cache }) => {
                 }
                 let theme = thing?.theme && await Cache.get(thing.theme[0]);
 
-                let data = {
-                    title: thing.name
-                };
-                if (theme) {
-                    data.color = theme.color_theme;
-                }
-                if (!data.image && theme?.default_wordmark) data.image = aImg(theme.default_wordmark);
-                if (!data.image && theme?.default_logo) data.image = aImg(theme.default_logo);
-                return meta(data);
+                return meta({
+                    title: thing.name,
+                    color: theme?.color_theme,
+                    image: aImg(theme?.default_wordmark) || aImg(theme?.default_logo)
+                });
             }
         },
         {
             url: ["match", "detailed"],
-            async handle({ path, parts }) {
+            async handle({ parts }) {
                 let thing = await Cache.get(cleanID(parts[1]));
                 let data = {};
 
@@ -145,10 +145,8 @@ module.exports = ({ app, cors, Cache }) => {
                 if (event) {
                     if (event?.name) data.title += ` | ${event.name}`;
                     let theme = await Cache.get(event.theme?.[0]);
-
-                    if (!data.image && theme?.default_wordmark) data.image = aImg(theme.default_wordmark);
-                    if (!data.image && theme?.default_logo) data.image = aImg(theme.default_logo);
-                    if (theme.color_theme) data.color = theme.color_theme;
+                    data.image = aImg(theme?.default_wordmark) || aImg(theme?.default_logo);
+                    data.color = theme?.color_theme;
                 }
 
                 return meta(data);
@@ -156,11 +154,11 @@ module.exports = ({ app, cors, Cache }) => {
         },
         {
             url: "news",
-            async handle({ path, parts }) {
+            async handle({ parts }) {
                 let thing = await Cache.get(`news-${parts[1]}`);
                 if (!thing.headline) return;
 
-                let event = thing.event && await Cache.get(thing.event[0]);
+                let event = thing?.event && await Cache.get(thing.event[0]);
                 let theme = event?.theme && await Cache.get(event.theme[0]);
 
 
@@ -178,37 +176,26 @@ module.exports = ({ app, cors, Cache }) => {
                 let data = {
                     title: thing.headline,
                     /* solo_description removes slmn.gg footer */
-                    solo_description: text.slice(0, 300) + (text.length > 300 ? "..." : "")
+                    solo_description: text.slice(0, cutoff) + (text.length > cutoff ? "..." : ""),
+                    color: theme?.color_theme,
+                    image: aImg(thing?.thumbnail, "w-1000") || aImg(thing?.header, "w-1000") || aImg(theme?.default_wordmark) || aImg(theme?.default_logo),
+                    card_type: (thing?.thumbnail || thing?.header) ? "summary_large_image" : null
                 };
-                if (theme) {
-                    data.color = theme.color_theme;
-                }
-                if (thing.thumbnail) {
-                    data.image = aImg(thing.thumbnail, "w-1000");
-                    data.card_type = "summary_large_image";
-                }
-                if (!data.image && thing.header) {
-                    data.image = aImg(thing.header, "w-1000");
-                    data.card_type = "summary_large_image";
-                }
-                if (!data.image && theme?.default_wordmark) data.image = aImg(theme.default_wordmark);
-                if (!data.image && theme?.default_logo) data.image = aImg(theme.default_logo);
 
                 return meta(data);
             }
         }
     ];
 
-    const basicEventRoute = async ({ event, path, parts }) => {
+    const basicEventRoute = async ({ event }) => {
+        let theme = event?.theme && await Cache.get(event.theme[0]);
+
         let data = {
-            title: event.name
+            title: event.name,
+            color: theme?.color_theme,
+            image: aImg(theme?.default_wordmark) || aImg(theme?.default_logo)
         };
 
-        let theme = event?.theme && await Cache.get(event.theme[0]);
-        // console.log(event);
-        if (theme) data.color = theme.color_theme;
-        if (!data.image && theme?.default_wordmark) data.image = aImg(theme.default_wordmark);
-        if (!data.image && theme?.default_logo) data.image = aImg(theme.default_logo);
 
         let things = [];
         if (event.teams?.length) things.push("team" + (event.teams.length === 1 ? "" : "s"));

@@ -7,6 +7,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         things: [],
+        thing_map: {},
         subscribed_ids: [],
         request_buffer: [],
 
@@ -22,13 +23,14 @@ export default new Vuex.Store({
             data = JSON.parse(JSON.stringify({ ...data, id: cleanID(id), _original_data_id: cleanID(data.id), __stored: true }));
             // if ()
 
-            const index = this.state.things.findIndex(t => t.id === id);
+            const index = this.state.thing_map[id] || -1;
             // console.log(">update", id, this.state.things, index);
             if (index !== -1) {
                 this.state.things.splice(index, 1, data);
                 return this.state.things[index];
             } else {
                 this.state.things.push(data);
+                this.state.thing_map[id] = this.state.things.length - 1;
                 return this.state.things[this.state.things.length - 1];
             }
 
@@ -101,7 +103,7 @@ export default new Vuex.Store({
     },
     getters: {
         things: state => state.things,
-        thing: (state) => (id) => state.things.find(item => item.id === id),
+        thing: (state) => (id) => state.things[state.thing_map[id]],
         isHighlighted: state => (id) => state.highlighted_team === id,
         getHighlight: state => (matchID) => state.match_highlights.find(match => match.id === matchID),
         getNotes: state => (playerID) => state.draft_notes.find(notes => notes.player_id === playerID),

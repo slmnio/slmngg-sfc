@@ -119,7 +119,7 @@ export async function getThing(id) {
     id = cleanID(id);
     if (!id) return null;
     // TODO: some sort of queue system so it doesn't try to XHR things that are currently pending
-    const findIndex = store.state.things.findIndex(t => t.id === id);
+    const findIndex = store.state.thing_map[id] || -1;
     if (findIndex !== -1) {
         return store.state.things[findIndex];
     }

@@ -199,7 +199,7 @@ export default {
         width: 100%;
         color: white;
 
-        font-family: "Industry", "SLMN-Industry", sans-serif;
+        font-family: "SLMN-Industry", "Industry", sans-serif;
 
         /*background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/881082194095902730/unknown.png");*/
 

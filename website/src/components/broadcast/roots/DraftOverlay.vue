@@ -227,7 +227,7 @@ export default {
         padding-bottom: calc(2em + 12px);
         background: #111;
         color: #eee;
-        font-family: "Industry", "SLMN-Industry", sans-serif;
+        font-family: "SLMN-Industry", "Industry", sans-serif;
         overflow: hidden;
     }
     .available-players {

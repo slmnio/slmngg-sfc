@@ -149,7 +149,7 @@ export default {
         /*background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/911722398015950878/ScreenShot_21-09-19_04-29-37-000.jpg");*/
         /*background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/912065307122733066/ScreenShot_21-11-09_01-06-41-000.jpg");*/
         /*background-size: 1920px 1080px;*/
-        font-family: "Industry", "SLMN-Industry", sans-serif;
+        font-family: "SLMN-Industry", "Industry", sans-serif;
         overflow: hidden;
     }
 

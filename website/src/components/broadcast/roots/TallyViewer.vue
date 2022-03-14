@@ -43,7 +43,7 @@ export default {
   place-items: center;
   font-size: 5em;
   transition: background-color 0.2s ease;
-  font-family: "Industry", "SLMN-Industry", sans-serif;
+  font-family: "SLMN-Industry", "Industry", sans-serif;
 }
 
 .state {

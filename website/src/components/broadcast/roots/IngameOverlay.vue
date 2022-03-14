@@ -136,7 +136,7 @@ export default {
     top: 0;
     overflow: hidden;
 
-    font-family: "Industry", "SLMN-Industry", sans-serif;
+    font-family: "SLMN-Industry", "Industry", sans-serif;
 }
 
 .top-overlay {

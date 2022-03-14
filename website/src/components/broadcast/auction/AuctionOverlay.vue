@@ -269,7 +269,7 @@ export default {
 <style scoped>
     .auction-overlay {
         background-color: #222;
-        font-family: "Industry", "SLMN-Industry", sans-serif;
+        font-family: "SLMN-Industry", "Industry", sans-serif;
         color: white;
         display: flex;
     }

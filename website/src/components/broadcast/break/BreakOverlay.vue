@@ -263,7 +263,7 @@ export default {
         width: 100%;
         color: white;
 
-        font-family: "Industry", "SLMN-Industry", sans-serif;
+        font-family: "SLMN-Industry", "Industry", sans-serif;
     }
 
     span.industry-align {

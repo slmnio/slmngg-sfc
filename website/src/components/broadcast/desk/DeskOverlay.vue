@@ -87,7 +87,7 @@ export default {
 
 <style scoped>
     .desk-overlay {
-        font-family: "Industry", "SLMN-Industry", sans-serif;
+        font-family: "SLMN-Industry", "Industry", sans-serif;
         overflow: hidden;
     }
     .top-holder {

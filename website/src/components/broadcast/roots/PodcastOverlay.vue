@@ -62,7 +62,7 @@ export default {
 
 <style scoped>
     .podcast-overlay {
-        font-family: "Industry", "SLMN-Industry", sans-serif;
+        font-family: "SLMN-Industry", "Industry", sans-serif;
         overflow: hidden;
         display: flex;
         flex-direction: column;

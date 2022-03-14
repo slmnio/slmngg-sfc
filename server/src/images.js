@@ -288,4 +288,91 @@ module.exports = ({ app, cors, Cache }) => {
     app.get("/theme", handleThemeRequests);
     app.get("/theme.:fileFormat", handleThemeRequests);
 
+    async function handleMatchRequests(req, res) {
+        try {
+            let id = req.query.id;
+            if (!id) return res.status(404).send("No match ID requested");
+            let size = parseInt(req.query.size) || 500;
+            let padding = size * ((req.query.padding || 5) / 100);
+
+            let match = await Cache.get(id);
+            if (!match?.id) return res.status(400).send("No valid match data");
+
+            if ((match.teams || []).length === 2) {
+                // do 2 teams side by side
+                let teams = await Promise.all(match.teams.map(async tID => {
+                    let data = await Cache.get(tID);
+                    if (data?.theme?.[0]) data.theme = await Cache.get(data.theme[0]);
+                    console.log(data, data.theme);
+                    return data;
+                }));
+
+                let thumb = await sharp({ create: {
+                    width: size * 2,
+                    height: size,
+                    channels: 3,
+                    background: "#222222"
+                }});
+
+                let logos = await Promise.all(teams.map(async team => {
+                    let filePath = await fullGetURL(team.theme.default_logo[0].url, "orig", null);
+                    let themeColor = team.theme.color_logo_background || team.theme.color_theme || "#222222";
+
+                    let resizedLogo = await sharp(filePath).resize({
+                        width: size - padding,
+                        height: size - padding,
+                        fit: "contain",
+                        background: { r: 0, g: 0, b: 0, alpha: 0 }
+                    }).toBuffer();
+
+                    return await sharp({ create: { width: size, height: size, channels: 4, background: themeColor }})
+                        .composite([{ input: resizedLogo }]).png().toBuffer();
+                }));
+
+                thumb.composite(logos.map((shp, i) => ({
+                    input: shp,
+                    left: i * size,
+                    top: 0
+                })));
+
+                let thumbBuffer = await thumb.png().toBuffer();
+                return res.header("Content-Type", "image/png").send(thumbBuffer);
+
+
+            } else {
+                // do event only
+                if (!match.event) return res.status(400).send("No event data");
+                let event = await Cache.get(match.event[0]);
+                if (event.theme) event.theme = await Cache.get(event.theme[0]);
+                if (!event.theme?.id) return res.status(400).send("No event theme data");
+                let themeColor = event.theme.color_logo_background || event.theme.color_theme || "#222222";
+
+                let filePath = await fullGetURL(event.theme.default_logo[0].url, "orig", null);
+
+                let resizedLogo = await sharp(filePath).resize({
+                    width: size - padding,
+                    height: size - padding,
+                    fit: "contain",
+                    background: { r: 0, g: 0, b: 0, alpha: 0 }
+                }).toBuffer();
+
+                let thumb = await sharp({ create: {
+                    width: size * 2,
+                    height: size,
+                    channels: 3,
+                    background: themeColor
+                }}).composite([
+                    { input: resizedLogo }
+                ]);
+                let thumbBuffer = await thumb.png().toBuffer();
+                return res.header("Content-Type", "image/png").send(thumbBuffer);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+        res.status(400).send("An error occurred");
+    }
+    app.get("/match", handleMatchRequests);
+    app.get("/match.:fileFormat", handleMatchRequests);
+
 };

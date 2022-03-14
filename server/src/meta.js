@@ -37,6 +37,15 @@ function themeSquare(id, size = 500) {
         url: `${dataServer}/theme.png?id=${id}&size=${size}&padding=20`
     };
 }
+function matchWide(id, size = 500) {
+    if (!id) return null;
+    return {
+        width: size * 2,
+        height: size,
+        type: "image/png",
+        url: `${dataServer}/match.png?id=${id}&size=${size}&padding=20`
+    };
+}
 
 function stripMarkdown(md) {
     try {
@@ -170,13 +179,13 @@ module.exports = ({ app, Cache }) => {
 
                 if (staff.length && players.length) {
                     // staff AND players
-                    description.push(`The roster includes ${niceJoin(players)} and they're supported by their staff of ${niceJoin(staff)}.`);
+                    description.push(`The roster is ${niceJoin(players)}, and they're supported by their staff of ${niceJoin(staff)}.`);
                 } else if (staff.length) {
                     // staff only
                     description.push(`The team staff are ${niceJoin(staff)}.`);
                 } else if (players.length) {
                     // players only
-                    description.push(`The roster includes ${niceJoin(players)}.`);
+                    description.push(`The roster is ${niceJoin(players)}.`);
                 }
 
                 return meta({
@@ -205,7 +214,9 @@ module.exports = ({ app, Cache }) => {
                 if (event) {
                     if (event?.name) data.title += ` | ${event.name}`;
                     let theme = await Cache.get(event.theme?.[0]);
-                    data.image = aImg(theme?.default_wordmark) || aImg(theme?.default_logo);
+                    if (thing.teams.length === 2 || theme.id) {
+                        data.image = matchWide(thing.id);
+                    }
                     data.color = theme?.color_theme;
                 }
 
@@ -350,6 +361,7 @@ module.exports = ({ app, Cache }) => {
                     let parts = path.split("/");
 
                     let route = eventRoutes.find(r => (typeof r.url === "object" ? r.url.includes(parts[0]) : r.url === parts[0]));
+                    if (!route) route = routes.find(r => (typeof r.url === "object" ? r.url.includes(parts[0]) : r.url === parts[0]));
 
                     if (route) {
                         let data = await route.handle({ event, path, parts });

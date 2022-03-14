@@ -85,6 +85,39 @@ async function resizeImage(filename, sizeText, sizeData) {
     })());
 }
 
+function getFilename(url) {
+    let parts = url.split("/");
+    const originalFilename = parts[parts.length - 1];
+    const dots = originalFilename.split(".");
+    const originalFileType = dots[dots.length - 1]; // last . (now works with .svg.png)
+    return parts[4] + "." + originalFileType; // specific to airtable urls
+}
+
+/***
+ *
+ * @returns {Promise<string>} localFilePath - local file path to a stored image
+ */
+async function fullGetURL(url, sizeText, sizeData) {
+    let filename = getFilename(url);
+    let previouslyStoredImage = await getImage(filename, sizeText);
+    if (previouslyStoredImage) return previouslyStoredImage;
+    console.log("[image|fg] no stored image, creating it");
+
+    // download if needed
+    // will always need an orig copy regardless
+    let storedOrig = await getImage(filename, "orig");
+    if (!storedOrig) {
+        await downloadImage(url, filename, "orig");
+        storedOrig = await getImage(filename, "orig");
+        console.log("[image|fg] downloaded orig copy");
+    }
+    if (sizeText === "orig") return storedOrig;
+    // resize if needed
+    await resizeImage(filename, sizeText, sizeData);
+    console.log("[image|fg] resized image");
+    return await getImage(filename, sizeText);
+}
+
 module.exports = ({ app, cors, Cache }) => {
 
     ensureFolder("orig").then(r => console.log("[images] orig folder ensured"));
@@ -193,5 +226,66 @@ module.exports = ({ app, cors, Cache }) => {
     }
     app.get("/image", handleImageRequests);
     app.get("/image.:fileFormat", handleImageRequests); // ignoring requested file format here
+
+    async function handleThemeRequests(req, res) {
+        try {
+            if (!req.query.id) {
+                return res.status(404).send("No theme ID requested");
+            }
+            let size = parseInt(req.query.size) || 500;
+            let padding = size * ((req.query.padding || 5) / 100);
+
+            if (size > 3000) return res.status(400).send("Requested image too large");
+
+
+            let theme = await Cache.get(req.query.id);
+            if (!theme.default_logo?.[0]?.url) return res.status(400).send("No logo to use");
+            let logoURL = theme.default_logo?.[0]?.url;
+            let themeColor = theme.color_logo_background || theme.color_theme || "#222222";
+
+            // background: logo background
+            // centered logo
+            // with ?padding around it
+
+            let filePath = await fullGetURL(logoURL, "orig", null);
+
+            let resizedImage = await sharp(filePath).resize({
+                width: size - padding,
+                height: size - padding,
+                fit: "contain",
+                background: themeColor
+            }).toBuffer();
+
+            res.header("Content-Type", "image/png");
+
+            sharp({
+                create: {
+                    width: size,
+                    height: size,
+                    channels: 3,
+                    background: themeColor
+                }
+            })
+                .composite([
+                    { input: resizedImage }
+                ])
+                .png()
+                .toBuffer()
+                .then(data => res.end(data));
+
+        } catch (e) {
+            console.error(e);
+        }
+        res.status(400).send("An error occurred");
+
+
+        // sharp(filePath)
+        //     .flatten({ background: theme.color_logo_background })
+        //     .toBuffer()
+        //     .then(data => res.end(data));
+
+    }
+    app.get("/theme", handleThemeRequests);
+    app.get("/theme.:fileFormat", handleThemeRequests);
 
 };

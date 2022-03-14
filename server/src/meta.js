@@ -11,8 +11,8 @@ function getFileEnding(url) {
     return splits[splits.length - 1];
 }
 
+const dataServer = process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg";
 function getResizedImage(airtableURL, size = "s-500") {
-    const dataServer = process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg";
     // just using orig for now
     return `${dataServer}/image.${getFileEnding(airtableURL) || "png"}?size=orig&url=${encodeURIComponent(airtableURL)}`;
 }
@@ -26,6 +26,15 @@ function aImg(airtableImage, size) {
         height: i.height,
         type: i.type,
         url: getResizedImage(i.url, size)
+    };
+}
+function themeSquare(id, size = 500) {
+    if (!id) return null;
+    return {
+        width: size,
+        height: size,
+        type: "image/png",
+        url: `${dataServer}/theme.png?id=${id}&size=${size}&padding=20`
     };
 }
 
@@ -128,7 +137,7 @@ module.exports = ({ app, Cache }) => {
                 return meta({
                     title: thing.name,
                     color: theme?.color_theme,
-                    image: aImg(theme?.default_wordmark) || aImg(theme?.default_logo)
+                    image: themeSquare(theme?.id)
                 });
             }
         },
@@ -198,7 +207,7 @@ module.exports = ({ app, Cache }) => {
         let data = {
             title: event.name,
             color: theme?.color_theme,
-            image: aImg(theme?.default_wordmark) || aImg(theme?.default_logo)
+            image: themeSquare(theme?.id)
         };
 
 

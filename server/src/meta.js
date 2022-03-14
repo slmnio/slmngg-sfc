@@ -6,10 +6,15 @@ function cleanID(id) {
     return id;
 }
 
+function getFileEnding(url) {
+    let splits = url.split(".");
+    return splits[splits.length - 1];
+}
+
 function getResizedImage(airtableURL, size = "s-500") {
     const dataServer = process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg";
     // just using orig for now
-    return `${dataServer}/image?size=orig&url=${encodeURIComponent(airtableURL)}`;
+    return `${dataServer}/image.${getFileEnding(airtableURL) || "png"}?size=orig&url=${encodeURIComponent(airtableURL)}`;
 }
 
 function aImg(airtableImage, size) {

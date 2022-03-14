@@ -4,6 +4,22 @@ const fs = require("fs");
 const path = require("path");
 const https = require("https");
 
+const heldPromises = [];
+function getHeldPromise(parts) {
+    return heldPromises[parts.join("-")];
+}
+function setHeldPromise(parts, promise) {
+    heldPromises[parts.join("-")] = promise;
+}
+async function heldPromise(parts, promise) {
+    if (getHeldPromise(parts)) {
+        console.log("[image] promise held", parts);
+        return getHeldPromise(parts);
+    }
+    setHeldPromise(parts, promise);
+    return getHeldPromise(parts);
+}
+
 function getPath(filename, size) {
     return path.join(__dirname, "..", "images", size, filename);
 }
@@ -19,17 +35,18 @@ async function getImage(filename, size) {
 }
 
 async function downloadImage(url, filename, size) {
-    return new Promise((resolve, reject) => {
+    return await heldPromise(["download", url, size, filename], new Promise((resolve, reject) => {
         const pathName = getPath(filename, size);
         const file = fs.createWriteStream(pathName);
         https.get(url, res => {
             res.pipe(file);
             file.on("finish", () => file.close(resolve));
         }).on("error", err => {
+            console.error(`[image] file error for ${filename} ${err.code} ${err.message}`);
             fs.unlink(pathName);
             reject(err);
         });
-    });
+    }));
 }
 
 async function ensureFolder(folderName) {
@@ -49,28 +66,30 @@ async function ensureFolder(folderName) {
 
 async function resizeImage(filename, sizeText, sizeData) {
     // console.log("resize", filename, sizeText);
-    let origFilePath = getPath(filename, "orig");
-    let resizedFilePath = getPath(filename, sizeText);
-    await ensureFolder(sizeText);
-    // let sizeInfo = getSizeInfo(sizeText);
-    // if (!sizeInfo) return null;
+    return heldPromise(["resize", sizeText, filename], (async () => {
+        let origFilePath = getPath(filename, "orig");
+        let resizedFilePath = getPath(filename, sizeText);
+        await ensureFolder(sizeText);
+        // let sizeInfo = getSizeInfo(sizeText);
+        // if (!sizeInfo) return null;
 
-    try {
-        return await sharp(origFilePath).resize(sizeData).toFile(resizedFilePath);
-    } catch (e) {
-        console.warn(e);
-        if (e.code === "EEXIST") {
-            return await getImage(filename, sizeText);
+        try {
+            return await sharp(origFilePath).resize(sizeData).toFile(resizedFilePath);
+        } catch (e) {
+            console.warn(e);
+            if (e.code === "EEXIST") {
+                return await getImage(filename, sizeText);
+            }
+            return null;
         }
-        return null;
-    }
+    })());
 }
 
 module.exports = ({ app, cors, Cache }) => {
 
     ensureFolder("orig").then(r => console.log("[images] orig folder ensured"));
 
-    app.get("/image", async (req, res) => {
+    async function handleImageRequests(req, res) {
         try {
             if (!req.query.url) {
                 return res.status(404).send("No URL requested");
@@ -146,9 +165,10 @@ module.exports = ({ app, cors, Cache }) => {
 
             // first download or retrieve to orig/
             let orig = await getImage(filename, "orig");
+            // console.log("[image]", "orig", orig);
             if (!orig) {
                 const t = Date.now();
-                console.log("[image]", `downloading ${originalFilename} @ orig...`);
+                // console.log("[image]", `downloading ${originalFilename} @ orig...`);
                 await downloadImage(url, filename, "orig");
                 console.log("[image]", `downloaded ${originalFilename} @ orig in ${Date.now() - t}ms`);
                 orig = await getImage(filename, "orig");
@@ -156,7 +176,7 @@ module.exports = ({ app, cors, Cache }) => {
             }
 
             // resize time!
-            console.log("[image]", `resizing ${originalFilename} @ ${size}`);
+            // console.log("[image]", `resizing ${originalFilename} @ ${size}`);
             const t = Date.now();
 
             await resizeImage(filename, size, sizeData);
@@ -170,5 +190,8 @@ module.exports = ({ app, cors, Cache }) => {
             return res.status(400).send(e.message);
         }
         res.status(400).send("An error occurred");
-    });
+    }
+    app.get("/image", handleImageRequests);
+    app.get("/image.:fileFormat", handleImageRequests); // ignoring requested file format here
+
 };

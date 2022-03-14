@@ -293,6 +293,7 @@ module.exports = ({ app, cors, Cache }) => {
             let id = req.query.id;
             if (!id) return res.status(404).send("No match ID requested");
             let size = parseInt(req.query.size) || 500;
+            if (size > 3000) return res.status(400).send("Requested image too large");
             let padding = size * ((req.query.padding || 5) / 100);
 
             let match = await Cache.get(id);

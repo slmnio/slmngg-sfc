@@ -258,7 +258,7 @@ module.exports = ({ app, cors, Cache }) => {
 
             res.header("Content-Type", "image/png");
 
-            sharp({
+            return sharp({
                 create: {
                     width: size,
                     height: size,

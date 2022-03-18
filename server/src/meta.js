@@ -249,7 +249,7 @@ module.exports = ({ app, Cache }) => {
                     /* solo_description removes slmn.gg footer */
                     solo_description: text.slice(0, cutoff) + (text.length > cutoff ? "..." : ""),
                     color: theme?.color_theme,
-                    image: aImg(thing?.thumbnail, "w-1000") || aImg(thing?.header, "w-1000") || aImg(theme?.default_wordmark) || aImg(theme?.default_logo),
+                    image: aImg(thing?.thumbnail, "w-1000") || aImg(thing?.header, "w-1000") || themeSquare(theme?.id),
                     card_type: (thing?.thumbnail || thing?.header) ? "summary_large_image" : null
                 };
 

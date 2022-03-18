@@ -71,7 +71,7 @@ export default {
                 if (val.items.length === 0) {
                     delete groups[key];
                 }
-                if (groups[key] && groups[key].matches) groups[key].matches = groups[key].matches.sort(sortMatches);
+                if (groups[key] && groups[key].items) groups[key].items = groups[key].items.sort((a, b) => sortMatches(a.item, b.item));
             });
             return groups;
         }

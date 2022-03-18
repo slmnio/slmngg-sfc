@@ -410,8 +410,8 @@ async function sendApplicationMessage(application) {
     }
     embed.setDescription(description.join("\n"));
 
-    if (application.background_and_experience) embed.addField("Background and experience", application.background_and_experience);
-    if (application.technical_details) embed.addField("Technical details", application.technical_details);
+    if (application.background_and_experience) embed.addField("Background and experience", application.background_and_experience.slice(0, 500));
+    if (application.technical_details) embed.addField("Technical details", application.technical_details.slice(0, 500));
 
     embed.addField("Discord tag", application.discord_tag, true);
     if (application.battletag) embed.addField("Battletag", application.battletag, true);

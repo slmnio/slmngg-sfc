@@ -229,6 +229,7 @@ module.exports = ({ app, cors, Cache }) => {
 
     async function handleThemeRequests(req, res) {
         try {
+            let t = new Date();
             if (!req.query.id) {
                 return res.status(404).send("No theme ID requested");
             }
@@ -271,7 +272,10 @@ module.exports = ({ app, cors, Cache }) => {
                 ])
                 .png()
                 .toBuffer()
-                .then(data => res.end(data));
+                .then(data => {
+                    res.end(data);
+                    console.log("[image]", `theme processed @${size} in ${Date.now() - t}ms`);
+                });
 
         } catch (e) {
             console.error(e);

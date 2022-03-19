@@ -34,6 +34,7 @@ import OverviewOverlay from "@/components/broadcast/roots/OverviewOverlay";
 import MediaOverlay from "@/components/broadcast/roots/MediaOverlay";
 import MediaClock from "@/components/broadcast/roots/MediaClock";
 import FullCamOverlay from "@/components/broadcast/cams/FullCamOverlay";
+import CasterBackground from "@/components/broadcast/CasterBackground";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -99,6 +100,14 @@ export default [
         })
     },
     { path: "casters", redirect: "desk" },
+    {
+        path: "caster-bg",
+        component: CasterBackground,
+        props: route => ({
+            defaultMap: (route.query.map || route.query.default || "").toLowerCase() || null,
+            useVideo: (route.query.video !== "false")
+        })
+    },
     { path: "desk", component: DeskOverlay, props: route => ({ group: "casters" }) },
     { path: "podcast", component: PodcastOverlay, props: route => ({ rows: route.query.rows }) },
     { path: "custom", component: CustomOverlay },

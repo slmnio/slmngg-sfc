@@ -298,6 +298,8 @@ module.exports = ({ app, cors, Cache }) => {
             if (!id) return res.status(404).send("No match ID requested");
             let size = parseInt(req.query.size) || 500;
             if (size > 3000) return res.status(400).send("Requested image too large");
+            let width = Math.floor(size * (16 / 9));
+            let halfWidth = Math.floor(width / 2);
             let padding = size * ((req.query.padding || 5) / 100);
 
             let match = await Cache.get(id);
@@ -308,12 +310,12 @@ module.exports = ({ app, cors, Cache }) => {
                 let teams = await Promise.all(match.teams.map(async tID => {
                     let data = await Cache.get(tID);
                     if (data?.theme?.[0]) data.theme = await Cache.get(data.theme[0]);
-                    console.log(data, data.theme);
+                    // console.log(data, data.theme);
                     return data;
                 }));
 
                 let thumb = await sharp({ create: {
-                    width: size * 2,
+                    width: width,
                     height: size,
                     channels: 3,
                     background: "#222222"
@@ -324,19 +326,19 @@ module.exports = ({ app, cors, Cache }) => {
                     let themeColor = team.theme.color_logo_background || team.theme.color_theme || "#222222";
 
                     let resizedLogo = await sharp(filePath).resize({
-                        width: size - padding,
+                        width: halfWidth - padding,
                         height: size - padding,
                         fit: "contain",
                         background: { r: 0, g: 0, b: 0, alpha: 0 }
                     }).toBuffer();
 
-                    return await sharp({ create: { width: size, height: size, channels: 4, background: themeColor }})
+                    return await sharp({ create: { width: halfWidth, height: size, channels: 4, background: themeColor }})
                         .composite([{ input: resizedLogo }]).png().toBuffer();
                 }));
 
                 thumb.composite(logos.map((shp, i) => ({
                     input: shp,
-                    left: i * size,
+                    left: i * halfWidth,
                     top: 0
                 })));
 
@@ -355,14 +357,14 @@ module.exports = ({ app, cors, Cache }) => {
                 let filePath = await fullGetURL(event.theme.default_logo[0].url, "orig", null);
 
                 let resizedLogo = await sharp(filePath).resize({
-                    width: size - padding,
+                    width: width - padding,
                     height: size - padding,
                     fit: "contain",
                     background: { r: 0, g: 0, b: 0, alpha: 0 }
                 }).toBuffer();
 
                 let thumb = await sharp({ create: {
-                    width: size * 2,
+                    width: width,
                     height: size,
                     channels: 3,
                     background: themeColor

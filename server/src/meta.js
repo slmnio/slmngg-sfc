@@ -43,7 +43,7 @@ function matchWide(id, size = 500) {
         width: size * 2,
         height: size,
         type: "image/png",
-        url: `${dataServer}/match.png?id=${id}&size=${size}&padding=20`
+        url: `${dataServer}/match.png?id=${id}&size=${size}&padding=30`
     };
 }
 
@@ -201,20 +201,29 @@ module.exports = ({ app, Cache }) => {
             async handle({ parts }) {
                 let thing = await Cache.get(cleanID(parts[1]));
                 let data = {};
+                let teams = await Promise.all((thing.teams || []).map(tID => Cache.get(tID)));
 
                 if (thing.special_event) {
                     data.title = thing.custom_name;
+                    if (teams.length === 2) data.description = teams.map(t => t.name).join(" vs ");
+                } else if (thing.custom_name) {
+                    // has custom name
+                    data.title = thing.custom_name;
+                    if (teams.length === 2) data.description = teams.map(t => t.name).join(" vs ");
                 } else {
                     // standard match
-                    let teams = await Promise.all((thing.teams || []).map(tID => Cache.get(tID)));
-                    data.title = thing.custom_name || teams.map(t => t.name).join(" vs ");
+                    if (teams.length === 2) {
+                        data.title = teams.map(t => t.name).join(" vs ");
+                    } else {
+                        data.title = thing.name;
+                    }
                 }
 
                 let event = await Cache.get(thing.event?.[0]);
                 if (event) {
                     if (event?.name) data.title += ` | ${event.name}`;
                     let theme = await Cache.get(event.theme?.[0]);
-                    if (thing.teams.length === 2 || theme.id) {
+                    if (thing.teams?.length === 2 || theme.id) {
                         data.image = matchWide(thing.id);
                     }
                     data.color = theme?.color_theme;

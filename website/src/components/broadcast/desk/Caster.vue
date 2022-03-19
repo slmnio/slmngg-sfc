@@ -1,6 +1,6 @@
 <template>
     <div class="caster flex-center flex-column" :style="themeColor">
-        <div class="caster-cam-box flex-center" :style="{borderColor}">
+        <div class="caster-cam-box flex-center" :style="{borderColor}" :class="align">
             <CasterCam class="caster-cam-wrapper" :guest="liveGuestData" :disableVideo="disableVideo" :color="color"
             :event="event" />
         </div>
@@ -23,6 +23,13 @@ export default {
     props: ["caster", "guest", "color", "disableVideo", "event"],
     components: { CasterCam },
     computed: {
+        align() {
+            const alignSettings = (this.guest.align || []);
+            const aligns = [];
+            if (alignSettings.indexOf("Right") !== -1) aligns.push("align-right");
+            if (alignSettings.indexOf("Left") !== -1) aligns.push("align-left");
+            return aligns;
+        },
         borderColor() {
             const theme = this.event?.theme;
             if (!theme) return;
@@ -158,4 +165,7 @@ export default {
 
     /*.caster-lower.cl-traditional .c-name { text-align: left; }*/
     /*.caster-lower.cl-traditional .c-twitter { text-align: right; }*/
+
+    .caster-cam-box.align-right { justify-content: flex-end; }
+    .caster-cam-box.align-left { justify-content: flex-start; }
 </style>

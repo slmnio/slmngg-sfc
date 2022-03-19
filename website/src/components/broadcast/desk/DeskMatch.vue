@@ -1,6 +1,5 @@
 <template>
-    <transition name="fade" mode="out-in">
-        <div class="desk-match" v-if="match">
+        <div class="desk-match">
             <div class="teams d-flex" v-if="!match.special_event">
                 <DeskTeam class="team" v-for="(team, i) in match.teams" v-bind:key="team.id" :team="team" :style="{order: i * 2}" />
 
@@ -47,7 +46,6 @@
                 </transition>
             </div>
         </div>
-    </transition>
 </template>
 
 <script>

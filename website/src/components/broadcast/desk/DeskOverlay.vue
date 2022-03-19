@@ -9,7 +9,7 @@
         </transition-group>
         <div class="lower-holder flex-center">
             <transition mode="out-in" name="break-content">
-                <DeskMatch :broadcast="broadcast" class="w-100" :_match="liveMatch" :theme-color="themeColor" :guests="guests" />
+                <DeskMatch :broadcast="broadcast" class="w-100" :_match="liveMatch" :theme-color="themeColor" :guests="guests" v-if="liveMatch" />
             </transition>
         </div>
     </div>

@@ -87,7 +87,7 @@ export default {
         --caster-width: 810px;
         --caster-height: 570px;
         max-width: var(--caster-width);
-        transition: max-width .4s ease;
+        transition: max-width .4s ease, min-width .4s ease;
     }
 
     .caster-cam-box {

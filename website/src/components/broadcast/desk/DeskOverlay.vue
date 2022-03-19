@@ -5,7 +5,7 @@
         </div>
         <transition-group class="casters flex-center" name="anim-talent">
             <Caster v-for="(caster, i) in casters" v-bind:key="caster.id" :guest="caster" :color="getColor(i)"
-                    :event="event" :disable-video="shouldDisableCasterVideo" />
+                    :event="event" :disable-video="shouldDisableCasterVideo" :class="{'wide-feed': caster.wide_feed}" />
         </transition-group>
         <div class="lower-holder flex-center">
             <transition mode="out-in" name="break-content">
@@ -119,6 +119,7 @@ export default {
     .anim-talent-enter, .anim-talent-leave-to {
         /* hide */
         max-width: 0;
+        min-width: 0 !important;
         opacity: 0;
         padding: 0 0;
     }
@@ -172,4 +173,11 @@ export default {
 
     /*.casters .caster:last-child .caster-lower { right: 0 !important; }*/
     /*.casters .caster:last-child .caster-name { align-items: flex-end !important;}*/
+
+    .caster.wide-feed {
+        min-width: var(--caster-width)
+    }
+    .caster.wide-feed >>> .caster-frame {
+        --oversize: 1% !important;
+    }
 </style>

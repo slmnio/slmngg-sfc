@@ -33,6 +33,7 @@ import PlayerHistory from "@/components/broadcast/PlayerHistory";
 import OverviewOverlay from "@/components/broadcast/roots/OverviewOverlay";
 import MediaOverlay from "@/components/broadcast/roots/MediaOverlay";
 import MediaClock from "@/components/broadcast/roots/MediaClock";
+import FullCamOverlay from "@/components/broadcast/cams/FullCamOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -51,6 +52,15 @@ export default [
                     full: !!route.query.full || !!route.query.relay,
                     alwaysShow: !!route.query.alwaysShow || !!route.query.relay,
                     relay: !!route.query.relay
+                })
+            },
+            {
+                path: "full",
+                component: FullCamOverlay,
+                props: route => ({
+                    number: route.query.number || route.query.num || 1,
+                    showName: !!route.query.name,
+                    showSocials: !!route.query.socials
                 })
             }
         ]

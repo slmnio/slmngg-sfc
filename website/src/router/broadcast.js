@@ -35,6 +35,7 @@ import MediaOverlay from "@/components/broadcast/roots/MediaOverlay";
 import MediaClock from "@/components/broadcast/roots/MediaClock";
 import FullCamOverlay from "@/components/broadcast/cams/FullCamOverlay";
 import CasterBackground from "@/components/broadcast/CasterBackground";
+import MusicOverlay from "@/components/broadcast/roots/MusicOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -123,5 +124,6 @@ export default [
     { path: "player-history", component: PlayerHistory, props: route => ({ showMinor: route.query.minor }) },
     { path: "overview", component: OverviewOverlay },
     { path: "media", component: MediaOverlay },
-    { path: "clock", component: MediaClock }
+    { path: "clock", component: MediaClock },
+    { path: "music", component: MusicOverlay, props: route => ({ break: route.query.break }) }
 ];

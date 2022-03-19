@@ -25,10 +25,31 @@ export default {
             this.sceneName = sceneName;
         }
     },
+    methods: {
+        async getWakeLock() {
+            this.wakeLock = await navigator.wakeLock.request();
+            this.wakeLock.addEventListener("release", () => {
+                console.log("Screen Wake Lock released:", this.wakeLock.released);
+            });
+            console.log("Screen Wake Lock released:", this.wakeLock.released);
+        }
+    },
+    async mounted() {
+        if ("wakeLock" in navigator) {
+            // screen will stay on in supported browsers
+            await this.getWakeLock();
+            document.addEventListener("visibilitychange", async () => {
+                if (this.wakeLock !== null && document.visibilityState === "visible") {
+                    await this.getWakeLock();
+                }
+            });
+        }
+    },
     data: () => ({
         state: "disconnected",
         sceneName: "N/A",
-        number: null
+        number: null,
+        wakeLock: null
     })
 };
 </script>

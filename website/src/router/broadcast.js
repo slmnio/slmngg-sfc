@@ -125,5 +125,5 @@ export default [
     { path: "overview", component: OverviewOverlay },
     { path: "media", component: MediaOverlay },
     { path: "clock", component: MediaClock },
-    { path: "music", component: MusicOverlay, props: route => ({ break: route.query.break }) }
+    { path: "music", component: MusicOverlay, props: route => ({ break: route.query.break, showTitle: ["showTitle", "showText", "text", "title", "song"].some(t => route.query[t]) }) }
 ];

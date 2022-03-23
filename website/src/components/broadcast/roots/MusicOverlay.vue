@@ -52,21 +52,15 @@ class Track {
     }
 }
 
-// solomon@solomon.eu.com
 
 export default {
     name: "MusicOverlay",
-    props: ["broadcast", "break", "showTitle"],
+    props: ["broadcast", "role", "showTitle", "volume", "crossfadeDuration"],
     data: () => ({
         started: false,
         mainPlayer: null,
         crossfadePlayer: null,
-        intervals: {
-            main: null
-        },
         crossfading: false,
-        crossfadeDuration: 10, // seconds
-        volume: 0.2,
         playedTrackIds: []
     }),
     computed: {
@@ -78,8 +72,11 @@ export default {
                 };
             }
             return ReactiveRoot(this.broadcast.id, {
-                caster_tracks: ReactiveArray("caster_tracks", {
-                    tracks: ReactiveArray("tracks")
+                track_group_roles: ReactiveArray("track_group_roles", {
+                    track_groups: ReactiveArray("track_groups", {
+                        tracks: ReactiveArray("tracks")
+
+                    })
                 }),
                 break_tracks: ReactiveArray("break_tracks", {
                     tracks: ReactiveArray("tracks")
@@ -87,15 +84,18 @@ export default {
             });
         },
         trackList() {
-            return this.break ? this.tracksData?.break_tracks?.flatMap(tl => tl?.tracks).filter(tl => tl) : this.tracksData?.caster_tracks?.flatMap(tl => tl?.tracks).filter(tl => tl);
+            return this.tracksData?.track_group_roles
+                ?.filter(trackGroupRole => trackGroupRole?.role?.toLowerCase() === this.role?.toLowerCase())
+                ?.map(trackGroupRole => trackGroupRole.track_groups.map(trackGroup => trackGroup.tracks)).flat(2) || [];
         },
         unplayedTracks() {
             return this.trackList?.filter(t => t && !this.playedTrackIds.includes(t?.id));
         },
         loaded() {
             if (!this.trackList) return false;
-            if (this.trackList?.length === 0) return false;
-            return !this.trackList?.some(t => t.__loading);
+            // This makes sure that [null] and [{}, {}] are ignored
+            if (this?.trackList.filter(t => t && Object.keys(t).length !== 0)?.length === 0) return false;
+            return !this.trackList?.some(t => t && t.__loading);
         }
     },
     watch: {
@@ -116,11 +116,10 @@ export default {
             deep: true,
             handler(newData, oldData) {
                 if (!this.loaded) return;
-                const channel = this.break ? "break_tracks" : "caster_tracks";
-                const oldTrackIds = oldData?.[channel]?.map(t => t?.id).join(",");
-                const newTrackIds = newData?.[channel]?.map(t => t?.id).join(",");
+                const oldTrackGroupRolesIds = oldData?.track_group_roles?.filter(trackGroupRole => trackGroupRole?.role?.toLowerCase() === this.role?.toLowerCase())?.map(t => t?.id).join(",");
+                const newTrackGroupRolesIds = newData?.track_group_roles?.filter(trackGroupRole => trackGroupRole?.role?.toLowerCase() === this.role?.toLowerCase())?.map(t => t?.id).join(",");
 
-                if (oldTrackIds !== newTrackIds) {
+                if (oldTrackGroupRolesIds !== newTrackGroupRolesIds) {
                     console.log("Track list changed");
                     this.startCrossfade();
                 }

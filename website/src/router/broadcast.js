@@ -125,5 +125,14 @@ export default [
     { path: "overview", component: OverviewOverlay },
     { path: "media", component: MediaOverlay },
     { path: "clock", component: MediaClock },
-    { path: "music", component: MusicOverlay, props: route => ({ break: route.query.break, showTitle: ["showTitle", "showText", "text", "title", "song"].some(t => route.query[t]) }) }
+    {
+        path: "music",
+        component: MusicOverlay,
+        props: route => ({
+            role: route.query.group || route.query.role,
+            showTitle: ["showTitle", "showText", "text", "title", "song"].some(t => route.query[t]),
+            volume: parseFloat(route.query.volume) || 0.2,
+            crossfadeDuration: parseFloat(route.query.crossfade || route.query.fade) || 10
+        })
+    }
 ];

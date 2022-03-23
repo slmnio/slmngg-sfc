@@ -47,8 +47,8 @@ class Track {
         clearInterval(this.interval);
     }
 
-    rampVolume(targetVolume, duration) {
-        this.audio.fade(this.audio.volume(), targetVolume, duration * 1000);
+    rampVolume(startingVolume, targetVolume, duration) {
+        this.audio.fade(startingVolume, targetVolume, duration * 1000);
     }
 }
 
@@ -161,8 +161,8 @@ export default {
             this.crossfadePlayer = new Track(next);
             this.crossfadePlayer.play(0);
 
-            this.mainPlayer.rampVolume(0, this.crossfadeDuration);
-            this.crossfadePlayer.rampVolume(this.volume, this.crossfadeDuration);
+            this.mainPlayer.rampVolume(this.volume, 0, this.crossfadeDuration);
+            this.crossfadePlayer.rampVolume(0, this.volume, this.crossfadeDuration);
 
             setTimeout(() => {
                 console.log("Crossfade at middle point, players are swapped");

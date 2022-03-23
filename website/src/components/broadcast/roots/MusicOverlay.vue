@@ -1,7 +1,7 @@
 <template>
     <div class="song-holder">
         <transition name="song" mode="out-in">
-            <div v-if="mainPlayer && showTitle" class="song-title industry-align">
+            <div v-if="mainPlayer && showTitle" class="song-title industry-align" v-show="visible">
                 <i class="fas fa-music song-icon"></i>
                 <transition name="song" mode="out-in">
                     <span class="song-text" :key="mainPlayer.title">
@@ -68,14 +68,15 @@ class Track {
 
 export default {
     name: "MusicOverlay",
-    props: ["broadcast", "role", "showTitle", "volume", "crossfadeDuration"],
+    props: ["broadcast", "role", "showTitle", "volume", "crossfadeDuration", "active"],
     data: () => ({
         started: false,
         mainPlayer: null,
         crossfadePlayer: null,
         crossfading: false,
         playedTrackIds: [],
-        loadedTrackList: []
+        loadedTrackList: [],
+        visible: true
     }),
     computed: {
         tracksData() {
@@ -103,14 +104,14 @@ export default {
                 ?.map(trackGroupRole => trackGroupRole.track_groups.map(trackGroup => trackGroup.tracks)).flat(2) || [];
         },
         unplayedTracks() {
-            return this.trackList?.filter(t => t && !this.playedTrackIds.includes(t?.id));
-        },
-        loaded() {
-            if (!this.trackList) return false;
-            // This makes sure that [null] and [{}, {}] are ignored
-            if (this?.trackList.filter(t => t && Object.keys(t).length !== 0)?.length === 0) return false;
-            return !this.trackList?.some(t => t && t.__loading);
+            return this.loadedTrackList?.filter(t => t && !this.playedTrackIds.includes(t?.id));
         }
+        // loaded() {
+        //     if (!this.trackList) return false;
+        //     // This makes sure that [null] and [{}, {}] are ignored
+        //     if (this?.trackList.filter(t => t && Object.keys(t).length !== 0)?.length === 0) return false;
+        //     return !this.trackList?.some(t => t && t.__loading);
+        // }
     },
     watch: {
         mainPlayer: {
@@ -122,10 +123,8 @@ export default {
             }
         },
         trackList(list) {
-            console.log("list", list);
             if (!list.length) return console.log("list empty");
             if (list.some(t => !t || t.__loading)) return console.log("some loading");
-            console.log("list set!");
             this.loadedTrackList = list;
         },
         loadedTrackList(list) {
@@ -135,6 +134,19 @@ export default {
             if (!list.map(track => track.id).includes(this.mainPlayer.id)) {
                 // Song currently playing isn't in the newest list, skip
                 this.startCrossfade();
+            }
+        },
+        active(isActive) {
+            if (this.crossfading) return; // already crossfading, dw about it
+            if (isActive) {
+                this.mainPlayer?.stop();
+                this.mainPlayer = null;
+                this.start();
+                setTimeout(() => {
+                    this.visible = true;
+                }, this.broadcast?.transition_offset + 500 || 500);
+            } else {
+                this.visible = false;
             }
         }
     },
@@ -149,7 +161,10 @@ export default {
                 this.playedTrackIds = this.trackList?.length > 1 ? [this.mainPlayer.id] : [];
             }
             const nextTrack = this.unplayedTracks[Math.floor(this.unplayedTracks.length * Math.random())];
-            if (!nextTrack) console.warn("No track up next");
+            if (!nextTrack) {
+                console.warn("No track up next");
+                return null;
+            }
             // TODO: check here to see if there is a next track or not
             // that might happen if tracks haven't loaded yet? not sure
             // also if there are no unplayed tracks remaining
@@ -157,10 +172,14 @@ export default {
             return nextTrack;
         },
         start() {
-            if (this.started) return console.warn(".start() called but the party's already started");
+            // if (this.started) return console.warn(".start() called but the party's already started");
+            if (this.mainPlayer?.id) return console.warn(".start() called but the party's already started");
             console.log("Loaded, starting playback");
-            this.started = true;
+
             const next = this.getNextTrack();
+            if (!next) return;
+
+            this.started = true;
             this.mainPlayer = new Track(next);
             this.mainPlayer.play(this.volume);
         },

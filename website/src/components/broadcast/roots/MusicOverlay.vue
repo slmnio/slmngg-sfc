@@ -11,6 +11,18 @@
                 </transition>
             </div>
         </transition>
+<!--        <ol style="margin-top: 3em">-->
+<!--            <b>trackList</b>-->
+<!--            <li v-for="track in trackList" :key="track && track.id">{{ track && track.title }}</li>-->
+<!--        </ol>-->
+<!--        <ol style="-->
+<!--    margin-top: 3em;-->
+<!--    position: absolute;-->
+<!--    right: 3em;-->
+<!--    top: 0;">-->
+<!--            <b>loadedTrackList</b>-->
+<!--            <li v-for="track in loadedTrackList" :key="track && track.id">{{ track && track.title }}</li>-->
+<!--        </ol>-->
     </div>
 </template>
 
@@ -37,6 +49,7 @@ class Track {
     }
 
     play(startingVolume) {
+        console.log("playing @ ", startingVolume);
         this.duration = this.audio.duration();
         this.audio.volume(startingVolume);
         this.audio.play();
@@ -61,7 +74,8 @@ export default {
         mainPlayer: null,
         crossfadePlayer: null,
         crossfading: false,
-        playedTrackIds: []
+        playedTrackIds: [],
+        loadedTrackList: []
     }),
     computed: {
         tracksData() {
@@ -99,11 +113,6 @@ export default {
         }
     },
     watch: {
-        loaded(loaded) {
-            if (loaded) {
-                this.start();
-            }
-        },
         mainPlayer: {
             deep: true,
             handler(p) {
@@ -112,17 +121,20 @@ export default {
                 }
             }
         },
-        tracksData: {
-            deep: true,
-            handler(newData, oldData) {
-                if (!this.loaded) return;
-                const oldTrackGroupRolesIds = oldData?.track_group_roles?.filter(trackGroupRole => trackGroupRole?.role?.toLowerCase() === this.role?.toLowerCase())?.map(t => t?.id).join(",");
-                const newTrackGroupRolesIds = newData?.track_group_roles?.filter(trackGroupRole => trackGroupRole?.role?.toLowerCase() === this.role?.toLowerCase())?.map(t => t?.id).join(",");
-
-                if (oldTrackGroupRolesIds !== newTrackGroupRolesIds) {
-                    console.log("Track list changed");
-                    this.startCrossfade();
-                }
+        trackList(list) {
+            console.log("list", list);
+            if (!list.length) return console.log("list empty");
+            if (list.some(t => !t || t.__loading)) return console.log("some loading");
+            console.log("list set!");
+            this.loadedTrackList = list;
+        },
+        loadedTrackList(list) {
+            if (!this.mainPlayer?.id && list.length) {
+                return this.start();
+            }
+            if (!list.map(track => track.id).includes(this.mainPlayer.id)) {
+                // Song currently playing isn't in the newest list, skip
+                this.startCrossfade();
             }
         }
     },
@@ -154,7 +166,7 @@ export default {
         },
         startCrossfade() {
             if (this.crossfading || this.crossfadePlayer) return;
-            console.log(`${this.mainPlayer.id} - ${this.mainPlayer.title}: Crossfading (${this.crossfadeDuration}s)`);
+            console.log(`Crossfading (${this.crossfadeDuration}s) - ${this.mainPlayer.id} - ${this.mainPlayer.title}`);
             this.crossfading = true;
             const next = this.getNextTrack();
 
@@ -182,10 +194,16 @@ export default {
 </script>
 
 <style scoped>
+.song-holder {
+    font-family: "SLMN-Industry", "Industry", sans-serif;
+}
 .song-title {
     position: absolute;
     left: 0;
     top: 0;
+}
+.song-text {
+    font-weight: bold;
 }
 .song-enter-active, .song-leave-active {
     transition: all 400ms ease;

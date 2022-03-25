@@ -46,7 +46,7 @@ export default {
             return this.noAnimation || (this.broadcast?.broadcast_settings || []).includes("No animations");
         },
         useBuiltInStingers() {
-            console.log("use", this.noStinger, this.broadcast?.broadcast_settings);
+            // console.log("use", this.noStinger, this.broadcast?.broadcast_settings);
             if (this.noStinger) return false;
             return (this.broadcast?.broadcast_settings || []).includes("Use built-in stingers");
         }
@@ -63,6 +63,10 @@ export default {
             document.body.addEventListener("click", () => {
                 this.active = !this.active;
             });
+        }
+        if (!this.client) {
+            console.log("loading with broadcast client");
+            this.$socket.client.emit("prod-join", `broadcast--${this.code}`);
         }
     },
     watch: {

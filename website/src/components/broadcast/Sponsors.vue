@@ -2,7 +2,7 @@
     <div class="break-sponsors">
 
         <div class="sponsors-holder">
-            <transition class="sponsors" name="spon-anim">
+            <transition class="sponsors" name="spon-anim" :mode="mode || 'in-out'">
                 <div class="break-sponsor flex-center" :style="bg(activeSponsor)"
                      v-bind:key="activeSponsor ? activeSponsor.id : 'empty'">
                     <div class="break-sponsor-logo bg-center" :style="logo(activeSponsor)"></div>
@@ -17,7 +17,7 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "Sponsors",
-    props: ["sponsors"],
+    props: ["sponsors", "size", "mode"],
     data: () => ({
         sponsorIndex: 0
     }),
@@ -33,7 +33,7 @@ export default {
             return { backgroundColor: theme.color_logo_background || theme.color_theme };
         },
         logo (theme) {
-            return resizedImage(theme, ["default_wordmark", "default_logo"], "h-150");
+            return resizedImage(theme, ["default_wordmark", "default_logo"], this.size || "h-150");
         },
         nextSponsor() {
             this.sponsorIndex++;
@@ -75,7 +75,7 @@ export default {
         left: 0;
     }
 
-    .spon-anim-enter {
+    .spon-anim-enter, .spon-anim-leave-to {
         opacity: 0;
     }
     .spon-anim-enter-to, .spon-anim-leave {

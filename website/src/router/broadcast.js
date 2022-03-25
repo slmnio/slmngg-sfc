@@ -36,6 +36,7 @@ import MediaClock from "@/components/broadcast/roots/MediaClock";
 import FullCamOverlay from "@/components/broadcast/cams/FullCamOverlay";
 import CasterBackground from "@/components/broadcast/CasterBackground";
 import ThemeTransitionTester from "@/components/broadcast/roots/ThemeTransitionTester";
+import DeskGraphicsOverlay from "@/components/broadcast/roots/DeskGraphicsOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -125,5 +126,6 @@ export default [
     { path: "overview", component: OverviewOverlay },
     { path: "media", component: MediaOverlay },
     { path: "clock", component: MediaClock },
-    { path: "tester", component: ThemeTransitionTester }
+    { path: "tester", component: ThemeTransitionTester },
+    { path: "desk-graphics", component: DeskGraphicsOverlay }
 ];

@@ -1,6 +1,6 @@
 <template>
     <transition name="tt" mode="out-in" :duration="calculatedDuration">
-        <div v-if="isActive" :key="_key || 'transition'" class="theme-transition" :style="animDurations" :class="{ left: this.left, right: !this.left }">
+        <div v-if="isActive" :key="_key || 'transition'" class="theme-transition" :style="animDurations" :class="{ 'start-left': directions.start === 'left', 'start-right': directions.start === 'right',  'end-left': directions.end === 'left', 'end-right': directions.end === 'right',  }">
             <div class="theme-transition-outer" :style="outerStyle">
                 <div class="theme-transition-inner" :style="innerStyle">
                     <slot></slot>
@@ -15,7 +15,7 @@ import { logoBackground } from "@/utils/theme-styles";
 
 export default {
     name: "ThemeTransition",
-    props: ["theme", "active", "borderWidth", "_key", "autoStart", "duration", "startingDelay", "innerDelay", "left", "oneColor"],
+    props: ["theme", "active", "borderWidth", "_key", "autoStart", "duration", "startingDelay", "innerDelay", "left", "oneColor", "start", "end"],
     data: () => ({
         manuallyActive: false
     }),
@@ -58,6 +58,14 @@ export default {
                 "--tt-inner-delay": `${this.innerDelay === undefined ? 250 : this.innerDelay}ms`,
                 "--tt-border-width": `${this.borderWidth === undefined ? 6 : this.borderWidth}px`
             };
+        },
+        directions() {
+            let start = this.start || "right";
+            let end = this.end || "left";
+            if (this.left && !this.start) start = "left";
+            if (this.left && !this.end) end = "right";
+
+            return { start, end };
         }
     },
     mounted() {
@@ -104,18 +112,22 @@ export default {
 .tt-enter-to .theme-transition-inner,
 .tt-leave .theme-transition-outer,
 .tt-leave .theme-transition-inner {
+    /* full open */
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
 }
-.tt-enter .theme-transition-outer,
-.tt-enter .theme-transition-inner,
-.tt-leave-to .theme-transition-outer,
-.tt-leave-to .theme-transition-inner {
+.theme-transition.start-right.tt-enter .theme-transition-outer,
+.theme-transition.start-right.tt-enter .theme-transition-inner,
+.theme-transition.end-left.tt-leave-to .theme-transition-outer,
+.theme-transition.end-left.tt-leave-to .theme-transition-inner {
+    /* closed left */
     clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
 }
-.theme-transition.left.tt-enter .theme-transition-outer,
-.theme-transition.left.tt-enter .theme-transition-inner,
-.theme-transition.left.tt-leave-to .theme-transition-outer,
-.theme-transition.left.tt-leave-to .theme-transition-inner {
+
+.theme-transition.start-left.tt-enter .theme-transition-outer,
+.theme-transition.start-left.tt-enter .theme-transition-inner,
+.theme-transition.end-right.tt-leave-to .theme-transition-outer,
+.theme-transition.end-right.tt-leave-to .theme-transition-inner {
+    /* closed right */
     clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%)
 }
 

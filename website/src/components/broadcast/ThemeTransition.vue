@@ -1,6 +1,6 @@
 <template>
     <transition name="tt" mode="out-in" :duration="calculatedDuration">
-        <div v-if="isActive" :key="_key || 'transition'" class="theme-transition" :style="animDurations" :class="{ 'start-left': directions.start === 'left', 'start-right': directions.start === 'right',  'end-left': directions.end === 'left', 'end-right': directions.end === 'right',  }">
+        <div v-if="isActive" :key="_key || 'transition'" class="theme-transition" :style="animDurations" :class="{ 'start-left': directions.start === 'left', 'start-right': directions.start === 'right',  'end-left': directions.end === 'left', 'end-right': directions.end === 'right', ...borderClasses }">
             <div class="theme-transition-outer" :style="outerStyle">
                 <div class="theme-transition-inner" :style="innerStyle">
                     <slot></slot>
@@ -15,7 +15,7 @@ import { logoBackground } from "@/utils/theme-styles";
 
 export default {
     name: "ThemeTransition",
-    props: ["theme", "active", "borderWidth", "_key", "autoStart", "duration", "startingDelay", "innerDelay", "left", "oneColor", "start", "end"],
+    props: ["theme", "active", "borderWidth", "_key", "autoStart", "duration", "startingDelay", "innerDelay", "left", "oneColor", "start", "end", "border"],
     data: () => ({
         manuallyActive: false
     }),
@@ -66,6 +66,17 @@ export default {
             if (this.left && !this.end) end = "right";
 
             return { start, end };
+        },
+        borderClasses() {
+            if (!this.border) return {};
+            if (this.border === "left") return { "border-left": true };
+            if (this.border === "right") return { "border-right": true };
+            if (this.border === "top") return { "border-top": true };
+            if (this.border === "bottom") return { "border-bottom": true };
+            if (this.border === "x") return { "border-left": true, "border-right": true };
+            if (this.border === "y") return { "border-top": true, "border-bottom": true };
+            if (this.border === "all") return { "border-top": true, "border-bottom": true, "border-left": true, "border-right": true };
+            return {};
         }
     },
     mounted() {
@@ -91,12 +102,10 @@ export default {
     height: 100%;
 }
 
-.theme-transition.left .theme-transition-inner {
-    border-left: var(--tt-border-width) solid transparent;
-}
-.theme-transition.right .theme-transition-inner {
-    border-right: var(--tt-border-width) solid transparent;
-}
+.theme-transition.border-left .theme-transition-inner { border-left: var(--tt-border-width) solid transparent; }
+.theme-transition.border-right .theme-transition-inner { border-right: var(--tt-border-width) solid transparent; }
+.theme-transition.border-top .theme-transition-inner { border-top: var(--tt-border-width) solid transparent; }
+.theme-transition.border-bottom .theme-transition-inner { border-bottom: var(--tt-border-width) solid transparent; }
 
 .tt-enter-active,
 .tt-enter-active .theme-transition-inner,

@@ -35,6 +35,7 @@ import MediaOverlay from "@/components/broadcast/roots/MediaOverlay";
 import MediaClock from "@/components/broadcast/roots/MediaClock";
 import FullCamOverlay from "@/components/broadcast/cams/FullCamOverlay";
 import CasterBackground from "@/components/broadcast/CasterBackground";
+import MusicOverlay from "@/components/broadcast/roots/MusicOverlay";
 import ThemeTransitionTester from "@/components/broadcast/roots/ThemeTransitionTester";
 import DeskGraphicsOverlay from "@/components/broadcast/roots/DeskGraphicsOverlay";
 
@@ -126,6 +127,16 @@ export default [
     { path: "overview", component: OverviewOverlay },
     { path: "media", component: MediaOverlay },
     { path: "clock", component: MediaClock },
+    {
+        path: "music",
+        component: MusicOverlay,
+        props: route => ({
+            role: route.query.group || route.query.role,
+            showTitle: ["showTitle", "showText", "text", "title", "song"].some(t => route.query[t]),
+            volume: parseFloat(route.query.volume) || 0.2,
+            crossfadeDuration: parseFloat(route.query.crossfade || route.query.fade) || 10
+        })
+    },
     { path: "tester", component: ThemeTransitionTester },
     { path: "desk-graphics", component: DeskGraphicsOverlay }
 ];

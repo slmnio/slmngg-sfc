@@ -410,8 +410,8 @@ async function sendApplicationMessage(application) {
     }
     embed.setDescription(description.join("\n"));
 
-    if (application.background_and_experience) embed.addField("Background and experience", application.background_and_experience.slice(0, 750) + application.background_and_experience.length > 750 ? "..." : "");
-    if (application.technical_details) embed.addField("Technical details", application.technical_details.slice(0, 250) + application.technical_details.length > 250 ? "..." : "");
+    if (application.background_and_experience) embed.addField("Background and experience", application.background_and_experience.slice(0, 750) + (application.background_and_experience.length > 750 ? "..." : ""));
+    if (application.technical_details) embed.addField("Technical details", application.technical_details.slice(0, 250) *+ (application.technical_details.length > 250 ? "..." : ""));
 
     embed.addField("Discord tag", application.discord_tag, true);
     if (application.battletag) embed.addField("Battletag", application.battletag, true);

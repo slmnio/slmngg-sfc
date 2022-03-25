@@ -36,6 +36,8 @@ import MediaClock from "@/components/broadcast/roots/MediaClock";
 import FullCamOverlay from "@/components/broadcast/cams/FullCamOverlay";
 import CasterBackground from "@/components/broadcast/CasterBackground";
 import MusicOverlay from "@/components/broadcast/roots/MusicOverlay";
+import ThemeTransitionTester from "@/components/broadcast/roots/ThemeTransitionTester";
+import DeskGraphicsOverlay from "@/components/broadcast/roots/DeskGraphicsOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -134,5 +136,7 @@ export default [
             volume: parseFloat(route.query.volume) || 0.2,
             crossfadeDuration: parseFloat(route.query.crossfade || route.query.fade) || 10
         })
-    }
+    },
+    { path: "tester", component: ThemeTransitionTester },
+    { path: "desk-graphics", component: DeskGraphicsOverlay }
 ];

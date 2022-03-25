@@ -1,18 +1,26 @@
 <template>
-    <GenericOverlay class="roster-overlay" :title="title || 'Rosters'" body-color="transparent !important" no-bottom="true">
-        <div class="team" v-for="team in teams" v-bind:key="team.id" :style="{ borderColor: accentColor }">
-            <div class="team-top flex-center" :style="themeColor(team)">
-                <div class="team-name flex-center">{{ team.name }}</div>
-                <div class="team-icon-holder flex-center">
-                    <div class="team-icon bg-center" :style="icon(team)"></div>
+    <GenericOverlay class="roster-overlay" :title="title || 'Rosters'" body-color="transparent !important" no-bottom="true" no-bottom-animate="true">
+        <div class="team" v-for="(team, i) in teams" v-bind:key="team.id">
+            <ThemeTransition :border-width="0" :theme="team.theme" :active="animationActive" :left="i === 0"
+            :startingDelay="200" :inner-delay="200" :duration="600" :one-color="true">
+                <div class="team-inner" :style="{ borderColor: accentColor }">
+                    <div class="team-top flex-center" :style="themeColor(team)">
+                        <div class="team-name flex-center">{{ team.name }}</div>
+                        <div class="team-icon-holder flex-center">
+                            <div class="team-icon bg-center" :style="icon(team)"></div>
+                        </div>
+                    </div>
+                    <div class="team-roster flex-center flex-column overlay--bg w-100"
+                         :style="{ fontSize: rosterFontSize(team) }">
+                        <div class="player" v-for="player in sort ? sortedTeamPlayers(team) : team.players"
+                             v-bind:key="player.id">
+                            <svg class="player-role" v-if="showRoles && player.role"
+                                 v-html="getRoleSVG(player.role)"></svg>
+                            <span class="player-name">{{ player.name }}</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="team-roster flex-center flex-column overlay--bg w-100" :style="{ fontSize: rosterFontSize(team) }">
-                <div class="player" v-for="player in sort ? sortedTeamPlayers(team) : team.players" v-bind:key="player.id">
-                    <svg class="player-role" v-if="showRoles && player.role" v-html="getRoleSVG(player.role)"></svg>
-                    <span class="player-name">{{ player.name }}</span>
-                </div>
-            </div>
+            </ThemeTransition>
         </div>
     </GenericOverlay>
 </template>
@@ -22,11 +30,12 @@ import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { getRoleSVG } from "@/utils/content-utils";
 import { resizedImage } from "@/utils/images";
+import ThemeTransition from "@/components/broadcast/ThemeTransition";
 
 export default {
     name: "RosterOverlay",
-    components: { GenericOverlay },
-    props: ["broadcast", "title", "showRoles", "sort"],
+    components: { ThemeTransition, GenericOverlay },
+    props: ["broadcast", "title", "showRoles", "sort", "animationActive"],
     computed: {
         accentColor() {
             return this.$root?.broadcast?.event?.theme?.color_theme;
@@ -98,9 +107,8 @@ export default {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    background: #222;
+    /*background: #222;*/
     margin: -40px;
-    border-bottom: 8px solid transparent;
 }
 
 .team:first-child {
@@ -173,5 +181,13 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+.team-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #222;
+    color: white;
+    border-bottom: 8px solid transparent;
 }
 </style>

@@ -4,6 +4,9 @@
             <ThemeTransition class="lower-third" :active="active" :theme="theme">
                 <div class="lower-third-text">Signups open now!</div>
             </ThemeTransition>
+            <ThemeTransition class="lower-third" :active="active" :theme="theme" left="true">
+                <div class="lower-third-text">Signups open now!</div>
+            </ThemeTransition>
         </div>
     </div>
 </template>
@@ -33,6 +36,6 @@ export default {
     }
     .lower-third-area >>> .lower-third-text {
         font-size: 3em;
-        padding: 0.25em;
+        padding: 0.25em .5em;
     }
 </style>

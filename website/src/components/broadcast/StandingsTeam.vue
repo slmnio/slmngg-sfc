@@ -82,7 +82,7 @@ export default {
                 rank: this.team.standings.rank,
                 tie_show_number: this.team.standings.tie_show_number,
                 winrate: this.team.standings.winrate,
-                winrate_text: (this.team.standings.winrate * 100).toFixed(0) + "%",
+                winrate_text: isNaN(this.team.standings.winrate) ? "---" : (this.team.standings.winrate * 100).toFixed(0) + "%",
                 mapwinrate_text: "---",
                 omw: this.team.standings?.omw !== undefined ? Math.floor(this.team.standings.omw * 100) + "%" : "-",
                 empty: "-",

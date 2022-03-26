@@ -86,7 +86,7 @@ export default [
     },
     { path: "schedule", component: ScheduleOverlay, props: route => ({ secondary: !!route.query.secondary }) },
     { path: "iframe", component: IframeOverlay, props: route => ({ url: route.query.url }) },
-    { path: "standings", component: StandingsOverlay },
+    { path: "standings", component: StandingsOverlay, props: route => ({ stage: route.query.stage || route.query.group }) },
     { path: "roster", redirect: "rosters" },
     { path: "rosters", component: RosterOverlay, props: route => ({ showRoles: route.query.roles, sort: route.query.sort }) },
     { path: "history", component: HistoryOverlay, props: route => ({ max: route.query.max || 5 }) },

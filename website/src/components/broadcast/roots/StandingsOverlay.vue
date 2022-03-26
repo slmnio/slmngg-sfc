@@ -1,6 +1,6 @@
 <template>
-    <GenericOverlay :title="title || (broadcast.current_stage ? `Standings: ${broadcast.current_stage}` : 'Standings')">
-        <Standings class="standings" :event="event" :stage="broadcast.current_stage" />
+    <GenericOverlay :title="title || (_stage ? `Standings: ${_stage}` : 'Standings')">
+        <Standings class="standings" :event="event" :stage="_stage" />
     </GenericOverlay>
 </template>
 
@@ -12,7 +12,7 @@ import Standings from "@/components/broadcast/Standings";
 export default {
     name: "StandingsOverlay",
     components: { GenericOverlay, Standings },
-    props: ["broadcast", "title"],
+    props: ["broadcast", "title", "stage"],
     computed: {
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;
@@ -22,6 +22,9 @@ export default {
                     theme: ReactiveThing("theme")
                 })
             });
+        },
+        _stage() {
+            return this.stage || this.broadcast?.current_stage;
         }
     }
 };

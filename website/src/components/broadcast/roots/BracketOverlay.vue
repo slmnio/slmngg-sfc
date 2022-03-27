@@ -105,6 +105,10 @@ export default {
         --anim-jump: 300ms;
         --anim-base: 700ms;
     }
+
+    .broadcast--active:not(.broadcast--animation-active) .bracket {
+        display: none;
+    }
     .broadcast--animation-active .bracket >>> .column {
         animation: colreveal 500ms backwards;
         animation-delay: var(--anim-base);

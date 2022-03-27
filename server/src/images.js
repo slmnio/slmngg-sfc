@@ -33,6 +33,14 @@ async function getImage(filename, size) {
         return null;
     }
 }
+async function getOrWaitForDownload(url, filename, size) {
+    let p = getHeldPromise(["download", url, size, filename]);
+    if (p) {
+        console.log("[image] downloading in other promise, waiting for it");
+        await p;
+    }
+    return getImage(filename, size);
+}
 
 async function downloadImage(url, filename, size) {
     return await heldPromise(["download", url, size, filename], new Promise((resolve, reject) => {
@@ -76,7 +84,7 @@ async function resizeImage(filename, sizeText, sizeData) {
         try {
             return await sharp(origFilePath).resize(sizeData).toFile(resizedFilePath);
         } catch (e) {
-            console.warn(e);
+            console.error("Resize image error", e, origFilePath, sizeData);
             if (e.code === "EEXIST") {
                 return await getImage(filename, sizeText);
             }
@@ -197,11 +205,12 @@ module.exports = ({ app, cors, Cache }) => {
             // no image
 
             // first download or retrieve to orig/
-            let orig = await getImage(filename, "orig");
+            let orig = await getOrWaitForDownload(url, filename, "orig");
+            // let orig = await getImage(filename, "orig");
             // console.log("[image]", "orig", orig);
             if (!orig) {
                 const t = Date.now();
-                // console.log("[image]", `downloading ${originalFilename} @ orig...`);
+                console.log("[image]", `downloading ${originalFilename} @ orig...`);
                 await downloadImage(url, filename, "orig");
                 console.log("[image]", `downloaded ${originalFilename} @ orig in ${Date.now() - t}ms`);
                 orig = await getImage(filename, "orig");
@@ -220,6 +229,7 @@ module.exports = ({ app, cors, Cache }) => {
             if (resizedImagePath) return res.sendFile(resizedImagePath);
 
         } catch (e) {
+            console.error("Image error", e);
             return res.status(400).send(e.message);
         }
         res.status(400).send("An error occurred");
@@ -278,7 +288,7 @@ module.exports = ({ app, cors, Cache }) => {
                 });
 
         } catch (e) {
-            console.error(e);
+            console.error("Theme image error", e);
         }
         res.status(400).send("An error occurred");
 
@@ -375,7 +385,7 @@ module.exports = ({ app, cors, Cache }) => {
                 return res.header("Content-Type", "image/png").send(thumbBuffer);
             }
         } catch (e) {
-            console.error(e);
+            console.error("Match image error", e);
         }
         res.status(400).send("An error occurred");
     }

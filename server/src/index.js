@@ -1,17 +1,24 @@
-require("dotenv").config();
-const app = require("express")();
-const bodyParser = require("body-parser");
-const port = 8901;
-const http = require("http").Server(app);
-const cors = require("cors");
-const meta = require("./meta.js");
-const routes = require("./routes.js");
-const images = require("./images.js");
+import "dotenv/config";
+import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import bodyParser from "body-parser";
 
+import cors from "cors";
+import meta from "./meta.js";
+import routes from "./routes.js";
+import images from "./images.js";
+import { setup as setupCache } from "./cache.js";
+import { setup as setupAirtableInterface } from "./airtable-interface.js";
+import "./twitch.js";
+
+const app = express();
+const port = 8901;
+const http = createServer(app);
 /* The staff module should only run on the server, probably not your local machine. */
 let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEGORY_ID", "STAFFAPPS_APPLICATION_CHANNEL_ID", "IS_SLMNGG_MAIN_SERVER"];
 if (staffKeysRequired.every(key => process.env[key])) {
-    require("./discord/staff.js");
+    await import("./discord/staff.js");
 }
 
 let domains = (process.env.CORS_VALID_DOMAINS || "slmn.gg,localhost").split(/, */g).map(d => new RegExp(`(?:^|.*\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
@@ -35,7 +42,7 @@ function corsHandle(origin, callback) {
     }
 }
 
-const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials: true}, allowEIO3: true});
+const io = new Server(http, {cors: { origin: corsHandle,  credentials: true}, allowEIO3: true});
 
 // const auction = require("./discord/new_auction.js")({
 //     to: (...a) => io.to(...a),
@@ -45,8 +52,8 @@ const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials:
 // });
 
 
-const Cache = (require("./cache.js")).setup(io);
-(require("./airtable-interface.js")).setup(io);
+const Cache = setupCache(io);
+setupAirtableInterface(io);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 

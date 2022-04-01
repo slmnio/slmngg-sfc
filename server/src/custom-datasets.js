@@ -2,12 +2,11 @@
 * Functions to create custom datasets as we load data
 * */
 
-function tableUpdated(tableName, Cache) {
+export default function tableUpdated(tableName, Cache) {
     if (tableName === "Matches") matchUpdate(Cache);
     if (tableName === "Broadcasts") broadcastUpdate(Cache);
     if (tableName === "Players") playerList(Cache);
 }
-module.exports = tableUpdated;
 
 async function matchUpdate(Cache) {
     let allMatches = await Cache.get("Matches");

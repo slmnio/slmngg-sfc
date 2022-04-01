@@ -26,7 +26,7 @@ function getAntiLeakIDs() {
  */
 let io = null;
 
-function setup(_io) {
+export function setup(_io) {
     io = _io;
     return this;
 }
@@ -38,7 +38,7 @@ async function broadcast(room, command, ...data) {
 }
 
 let updateFunctions = [];
-function onUpdate(fn) {
+export function onUpdate(fn) {
     updateFunctions.push(fn);
 }
 
@@ -78,7 +78,7 @@ const longTextMap = {
     "News": ["content"]
 };
 
-async function set(id, data, options) {
+export async function set(id, data, options) {
 
     if (data?.__tableName) {
         // Airtable bug where long textboxes that are cleared are just "\n" (and is not falsy)
@@ -136,7 +136,7 @@ function cleanID(id) {
     if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
     return id;
 }
-async function get(id) {
+export async function get(id) {
     id = cleanID(id);
     let data = store.get(id);
     if (data) data = await removeAntiLeak(id, data);
@@ -147,6 +147,3 @@ async function get(id) {
 }
 
 
-module.exports = {
-    set, get, setup, onUpdate
-};

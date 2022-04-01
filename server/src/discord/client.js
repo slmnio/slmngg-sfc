@@ -1,4 +1,4 @@
-const { Client, Intents, Permissions } = require("discord.js");
+import { Client, Intents, Permissions } from "discord.js";
 
 let client = null;
 
@@ -11,4 +11,4 @@ if (process.env.DISCORD_TOKEN) {
     client.once("ready", () => console.log(`[discord] Logged in as ${client.user.tag}`));
 }
 
-module.exports = client;
+export default client;

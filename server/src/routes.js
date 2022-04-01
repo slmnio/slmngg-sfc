@@ -13,7 +13,7 @@ function niceJoin(array) {
     return array[0];
 }
 
-module.exports = ({ app, cors, Cache, io }) => {
+export default ({ app, cors, Cache, io }) => {
     app.get("/redirect", async (req, res) => {
         try {
             let redirects = (await Cache.get("Redirects"))?.items;

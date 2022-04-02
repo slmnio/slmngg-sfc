@@ -34,6 +34,9 @@
                         <ThemeLogo v-else class="break-image-inner break-image-default" :theme="event.theme"
                                    icon-padding="10%" border-width="0" logo-size="h-500" />
                     </div>
+                    <div class="break-col break-title" v-if="automatedShow === 'Title'" :key="`title-${breakContentTitle}`">
+                        <div :style="themeBG" class="break-title-inner" v-html="breakContentTitle"></div>
+                    </div>
                     <Bracket class="break-col break-bracket" v-if="automatedShow === 'Bracket'" :key="`Bracket-${bracket && bracket.key}`" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.85" />
                     <div class="break-col break-others" v-if="automatedShow === 'Other Broadcasts'">
                         <div class="broadcast-previews-title">
@@ -227,6 +230,12 @@ export default {
             const titleWithAuto = title.replace("{auto}", this.autoTitle);
             if (!titleWithAuto || titleWithAuto.trim().length === 0) return title; // make sure we have something here
             return titleWithAuto;
+        },
+        breakContentTitle() {
+            return (this.overlayTitle || "").replace(/\\n/g, "<br>");
+        },
+        themeBG() {
+            return themeBackground1(this.event);
         }
     },
     watch: {
@@ -473,5 +482,22 @@ export default {
 
     .broadcast-mid-split-leave-to {
         opacity: 0;
+    }
+    .break-title-inner {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 5.75em;
+        line-height: 1.1em;
+        padding: 0 .2em;
+        flex-direction: column;
+    }
+
+    .break-title-inner >>> br {
+        margin-top: .25em !important;
+        display: block;
+        content: " ";
     }
 </style>

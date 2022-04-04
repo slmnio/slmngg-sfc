@@ -1,21 +1,21 @@
 <template>
     <div class="break-bar-overlay" :style="eventCSS">
 
-        <div class="upper-bar">
-            <transition name="seg" mode="out-in">
-                <div class="segment-wrapper" v-if="showBigSegment('Bracket')" :key="'Bracket'">
-                    <div class="overlay--bg bar-segment segment-bracket">
-                        <Bracket class="segment-bracket-inner" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.6" />
-                    </div>
-                </div>
+<!--        <div class="upper-bar">-->
+<!--            <transition name="seg" mode="out-in">-->
+<!--                <div class="segment-wrapper" v-if="showBigSegment('Bracket')" :key="'Bracket'">-->
+<!--                    <div class="overlay&#45;&#45;bg bar-segment segment-bracket">-->
+<!--                        <Bracket class="segment-bracket-inner" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.6" />-->
+<!--                    </div>-->
+<!--                </div>-->
 
-                <div class="segment-wrapper" v-if="showBigSegment('Schedule')" :key="'Schedule'">
-                    <div class="overlay--bg bar-segment segment-schedule flex-column">
-                        <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
-                    </div>
-                </div>
-            </transition>
-        </div>
+<!--                <div class="segment-wrapper" v-if="showBigSegment('Schedule')" :key="'Schedule'">-->
+<!--                    <div class="overlay&#45;&#45;bg bar-segment segment-schedule flex-column">-->
+<!--                        <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </transition>-->
+<!--        </div>-->
 
 
         <div class="lower-bar">

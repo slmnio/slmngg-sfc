@@ -21,6 +21,7 @@ module.exports = ({ app, cors, Cache, io }) => {
             let subdomain = req.query.subdomain || null;
             let path = req.query.path;
             if (!path.startsWith("/")) path = "/" + path;
+            path = path.trim().toLowerCase();
 
 
             if (!redirects) return res.send({ redirect: null, warn: "no redirects loaded" });
@@ -28,14 +29,14 @@ module.exports = ({ app, cors, Cache, io }) => {
             let redirect = redirects.find(r => {
                 if (!r.active) return false;
                 // check subdomain & urls match
-                return (r.subdomain || null) === subdomain && r.incoming_url === path;
+                return (r.subdomain || null) === subdomain && r.incoming_url.trim().toLowerCase() === path;
             });
 
             if (!redirect) redirect = redirects.find(r => {
                 if (!r.active) return false;
                 // if we can't find anything on the specific subdomain, use a global one
                 if (r.subdomain) return false;
-                return (r.incoming_url === path);
+                return (r.incoming_url.trim().toLowerCase() === path);
             });
 
             if (!redirect) {

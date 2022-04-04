@@ -342,6 +342,32 @@ module.exports = ({ app, Cache }) => {
         ].includes(domain.toLowerCase());
     }
 
+    async function getRedirect(path, subdomain) {
+        // get all redirects
+        // see if any match path/subdomain combo
+        // if it does, send back data for indexer
+
+        let redirects = (await Cache.get("Redirects"))?.items;
+        if (!path.startsWith("/")) path = "/" + path;
+        path = path.trim().toLowerCase();
+        if (!redirects?.length) return null;
+
+        let redirect = redirects.find(r => {
+            if (!r.active) return false;
+            return (r.subdomain || null) === subdomain && r.incoming_url.trim().toLowerCase() === path;
+        }) || redirects.find(r => {
+            if (!r.active) return false;
+            return (r.incoming_url.trim().toLowerCase() === path);
+        });
+
+        if (!redirect) return null;
+        return {
+            error: false,
+            redirect: true,
+            url: redirect.outgoing_url
+        };
+    }
+
     app.get("/meta/:path?", async (req, res) => {
 
         /*
@@ -359,6 +385,9 @@ module.exports = ({ app, Cache }) => {
             if (domain) {
             // domain = SUBDOMAIN.SLMN.GG
                 let subdomain = domain.split(".")[0];
+
+                let redirect = await getRedirect(req.params.path, subdomain);
+                if (redirect) return res.send(redirect);
 
                 let event = await Cache.get(`subdomain-${subdomain}`);
 
@@ -386,6 +415,8 @@ module.exports = ({ app, Cache }) => {
 
             // standard slmn.gg/event
 
+            let redirect = await getRedirect(req.params.path);
+            if (redirect) return res.send(redirect);
 
             const path = req.params.path;
             let parts = path.split("/");

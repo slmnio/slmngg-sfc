@@ -7,7 +7,8 @@ export default {
     data: () => ({
         active: false,
         visible: false,
-        scene: ""
+        scene: "",
+        heartbeatInterval: null
     }),
     computed: {
         state() {
@@ -61,6 +62,12 @@ export default {
             } else {
                 this.transmit();
             }
+        },
+        heartbeat() {
+            this.$socket.client.emit("tally_heartbeat", {
+                clientName: this.observer,
+                number: this.number
+            });
         }
     },
     mounted() {
@@ -75,6 +82,11 @@ export default {
             this.visible = e.detail.visible;
             this.transmitState();
         });
+
+        this.heartbeatInterval = setInterval(() => {
+            if (!this.observer) return;
+            this.heartbeat();
+        }, 1000);
     }
 };
 </script>

@@ -23,6 +23,12 @@ export default {
             this.state = state;
             this.number = number;
             this.sceneName = sceneName;
+        },
+        tally_heartbeat({ number }) {
+            this.number = number;
+            if (this.state === "disconnected") {
+                this.state = "connected";
+            }
         }
     },
     methods: {

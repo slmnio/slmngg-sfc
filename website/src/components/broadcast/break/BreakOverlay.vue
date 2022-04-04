@@ -1,7 +1,7 @@
 <template>
-    <transition name="broadcast-mid-split">
-    <div class="break-overlay" v-if="animationActive">
-        <div class="break-center">
+    <div class="break-overlay">
+        <transition name="broadcast-mid-split">
+        <div class="break-center" v-if="animationActive">
             <div class="break-top event-theme-border flex-center overlay--bg" :style="eventBorder">
                 <transition name="fade" mode="out-in">
                     <span class="industry-align" v-bind:class="{'has-br': (overlayTitle).includes('\\n') }"
@@ -51,6 +51,7 @@
                 </transition>
             </div>
         </div>
+        </transition>
         <div class="break-preload">
             <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
             <Standings :event="event" :stage="broadcast.current_stage" />
@@ -60,7 +61,6 @@
             <BreakStaffList class="break-col break-staff-list" :matches="fullSchedule"/>
         </div>
     </div>
-    </transition>
 </template>
 
 <script>
@@ -271,6 +271,7 @@ export default {
         height: 100%;
         width: 100%;
         color: white;
+        padding: 120px 180px;
 
         font-family: "SLMN-Industry", "Industry", sans-serif;
     }
@@ -281,7 +282,6 @@ export default {
 
     .break-center {
         width: 100%; height: 100%;
-        padding: 120px 180px;
         box-sizing: border-box;
 
         display: flex;

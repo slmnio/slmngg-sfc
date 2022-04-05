@@ -70,7 +70,7 @@ export default {
     /*    clip-path: polygon(0% 0%, 0% 0, 0% 100%, 0% 100%);*/
     /*}*/
     .stinger.stinging .icon-holder {
-        animation: zoom 1s forwards;
+        animation: zoom 1.5s forwards;
     }
 
     @keyframes zoom {

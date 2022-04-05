@@ -1,8 +1,8 @@
 <template>
     <transition name="tt" mode="out-in" :duration="calculatedDuration">
-        <div v-if="isActive" :key="_key || 'transition'" class="theme-transition" :style="animDurations" :class="{ 'start-left': directions.start === 'left', 'start-right': directions.start === 'right',  'end-left': directions.end === 'left', 'end-right': directions.end === 'right', ...borderClasses, 'start-inner-full': startInnerFull }">
+        <div v-if="isActive" :key="_key || 'transition'" class="theme-transition" :style="animDurations" :class="{ ...directionClasses, ...borderClasses, 'start-inner-full': startInnerFull }">
             <div class="theme-transition-outer" :style="outerStyle">
-                <div class="theme-transition-inner" :style="innerStyle">
+                <div class="theme-transition-inner" :style="innerStyle" :class="innerClass">
                     <slot></slot>
                 </div>
             </div>
@@ -15,7 +15,7 @@ import { logoBackground } from "@/utils/theme-styles";
 
 export default {
     name: "ThemeTransition",
-    props: ["theme", "active", "borderWidth", "_key", "autoStart", "duration", "startingDelay", "innerDelay", "left", "oneColor", "start", "end", "border", "startInnerFull", "trigger", "triggerDuration", "startingInnerDelay"],
+    props: ["theme", "active", "borderWidth", "_key", "autoStart", "duration", "startingDelay", "innerDelay", "left", "oneColor", "start", "end", "border", "startInnerFull", "trigger", "triggerDuration", "startingInnerDelay", "innerClass"],
     data: () => ({
         manuallyActive: false
     }),
@@ -62,12 +62,19 @@ export default {
             };
         },
         directions() {
+            console.log("directions", this.start, this.end, this.left);
             let start = this.start || "right";
             let end = this.end || "left";
             if (this.left && !this.start) start = "left";
             if (this.left && !this.end) end = "right";
+            console.log({ start, end });
 
             return { start, end };
+        },
+        directionClasses() {
+            const o = {};
+            Object.entries(this.directions).map(([key, val]) => `${key}-${val}`).forEach(c => { o[c] = true; });
+            return o;
         },
         borderClasses() {
             if (!this.border) return {};
@@ -155,6 +162,22 @@ export default {
 .theme-transition.end-right.tt-leave-to .theme-transition-inner {
     /* closed right */
     clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%)
+}
+
+.theme-transition.end-middle.tt-enter-to .theme-transition-outer,
+.theme-transition.end-middle.tt-enter-to .theme-transition-inner,
+.theme-transition.start-middle.tt-leave .theme-transition-outer,
+.theme-transition.start-middle.tt-leave .theme-transition-inner {
+    /* middle open */
+    clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 100% 100%, 100% 0%);
+}
+
+.theme-transition.end-middle.tt-enter .theme-transition-outer,
+.theme-transition.end-middle.tt-enter .theme-transition-inner,
+.theme-transition.start-middle.tt-leave-to .theme-transition-outer,
+.theme-transition.start-middle.tt-leave-to .theme-transition-inner {
+    /* middle closed */
+    clip-path: polygon(50% 0, 50% 100%, 50% 100%, 50% 0%, 50% 0%, 50% 100%, 50% 100%, 50% 0);
 }
 
 /*.tt-enter .theme-transition-inner,*/

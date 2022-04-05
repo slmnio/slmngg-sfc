@@ -103,7 +103,7 @@ export default {
 
     .bracket {
         --anim-jump: 300ms;
-        --anim-base: 700ms;
+        --anim-base: 450ms;
     }
 
     .broadcast--active:not(.broadcast--animation-active) .bracket {

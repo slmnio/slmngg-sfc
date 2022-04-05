@@ -472,7 +472,7 @@ export default {
     .broadcast-mid-split-enter {
         /*clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);*/
         /*clip-path: polygon(0% 0%, 0% 100%, 0% 100%, 0% 0, 100% 0, 100% 100%, 100% 100%, 100% 0%);*/
-        clip-path: polygon(50% 0, 50% 100%, 50% 100%, 50% 1%, 50% 0%, 50% 100%, 50% 100%, 50% 0);
+        clip-path: polygon(50% 0, 50% 100%, 50% 100%, 50% 0%, 50% 0%, 50% 100%, 50% 100%, 50% 0);
     }
     .broadcast-mid-split-enter-to {
         /*clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);*/

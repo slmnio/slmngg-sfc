@@ -1,16 +1,21 @@
 <template>
     <div class="theme-transition-tester">
         <div class="lower-third-area flex-column">
+            <div><ThemeTransition class="lower-third" :active="active" :theme="theme" start="left" end="left"
+                                  start-inner-full="true" :duration="500" :inner-delay="250" :trigger-duration="1000" :trigger="true">
+                <div class="lower-third-text">Signups open now! (inner start)</div>
+            </ThemeTransition></div>
+
             <div><ThemeTransition class="lower-third" :active="active" :theme="theme">
                 <div class="lower-third-text">Signups open now! (R)</div>
             </ThemeTransition></div>
             <div><ThemeTransition class="lower-third" :active="active" :theme="theme" left="true">
                 <div class="lower-third-text">Signups open now! (L)</div>
             </ThemeTransition></div>
-            <div><ThemeTransition class="lower-third" :active="active" :theme="theme" start="left" end="left"
-                                  start-inner-full="true" :duration="500" :inner-delay="250" :trigger-duration="1000" :trigger="true">
-                <div class="lower-third-text">Signups open now! (inner start)</div>
+            <div><ThemeTransition class="lower-third" :active="active" :theme="theme" start="middle" end="middle">
+                <div class="lower-third-text">Middle split!</div>
             </ThemeTransition></div>
+
         </div>
     </div>
 </template>
@@ -41,5 +46,8 @@ export default {
     .lower-third-area >>> .lower-third-text {
         font-size: 3em;
         padding: 0.25em .5em;
+    }
+    .lower-third-area div {
+        width: fit-content;
     }
 </style>

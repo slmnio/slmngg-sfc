@@ -1,7 +1,6 @@
-const client = require("./client.js");
-const Cache = require("../cache.js");
-const { update, select } = require("../airtable-interface.js");
-const Discord = require("discord.js");
+import client from "./client.js";
+import { select, update } from "../airtable-interface.js";
+import Discord from "discord.js";
 
 let io;
 
@@ -388,7 +387,7 @@ client.on("messageCreate", async message => {
     if (c) c.execute(args, message);
 });
 
-module.exports = (_io) => {
+export default (_io) => {
     io = {
         emit: (...a) => {
             console.log("socket emit", a);

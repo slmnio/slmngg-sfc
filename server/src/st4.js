@@ -6,7 +6,7 @@
 * 3) Update the ST4 Airtable records with how the process went.
 * */
 
-module.exports = function(airtable) {
+export default function(airtable) {
 
     const bases = {
         st4: airtable.base("appauIFW019nLZJ5t"),
@@ -120,6 +120,4 @@ module.exports = function(airtable) {
         if (!player) return;
         await processPlayer(player);
     }, 3000);
-
-
-};
+}

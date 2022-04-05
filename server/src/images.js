@@ -1,8 +1,8 @@
-const sharp = require("sharp");
-const fp = require("fs/promises");
-const fs = require("fs");
-const path = require("path");
-const https = require("https");
+import sharp from "sharp";
+import fp from "fs/promises";
+import fs from "fs";
+import path from "path";
+import https from "https";
 
 const heldPromises = [];
 function getHeldPromise(parts) {
@@ -21,7 +21,7 @@ async function heldPromise(parts, promise) {
 }
 
 function getPath(filename, size) {
-    return path.join(__dirname, "..", "images", size, filename);
+    return path.join(path.resolve("."), "images", size, filename);
 }
 
 async function getImage(filename, size) {
@@ -126,7 +126,7 @@ async function fullGetURL(url, sizeText, sizeData) {
     return await getImage(filename, sizeText);
 }
 
-module.exports = ({ app, cors, Cache }) => {
+export default ({ app, cors, Cache }) => {
 
     ensureFolder("orig").then(r => console.log("[images] orig folder ensured"));
 

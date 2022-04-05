@@ -1,6 +1,4 @@
-const { handle } = require("express/lib/router");
-
-class EventHandler {
+export class EventHandler {
     constructor(props) {
         this.fns = [];
     }
@@ -14,7 +12,7 @@ class EventHandler {
     }
 }
 
-class DistributedEventHandler {
+export class DistributedEventHandler {
     constructor(props) {
         this.handlers = {};
     }
@@ -32,4 +30,3 @@ class DistributedEventHandler {
     }
 }
 
-module.exports = { EventHandler, DistributedEventHandler };

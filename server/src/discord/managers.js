@@ -1,4 +1,4 @@
-class MapHandler {
+export class MapHandler {
     constructor({ map, ids, event, create_function }) {
         // console.log("Map constructor", {map, ids});
         this.map = new MapObject(map, true);
@@ -22,7 +22,7 @@ class MapHandler {
     }
 }
 
-class MapObject {
+export class MapObject {
     constructor(text, arrays=false) {
         this.arrays = arrays;
         this.data = (text || "").split("\n").map(e => {
@@ -64,4 +64,3 @@ class MapObject {
     }
 }
 
-module.exports = { MapHandler, MapObject };

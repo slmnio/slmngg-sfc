@@ -1,4 +1,4 @@
-const client = require("./client.js");
+import client from "./client.js";
 
 async function getChannel() {
     if (!process.env.SLMNGG_LOGS_GUILD_ID) return null;
@@ -13,14 +13,10 @@ async function getChannel() {
     return channel;
 }
 
-async function log(text) {
+export async function log(text) {
     console.log("[Log]", text);
     if (!client) return;
     let channel = await getChannel();
     if (!channel) return;
     return channel.send(text);
 }
-
-module.exports = {
-    log
-};

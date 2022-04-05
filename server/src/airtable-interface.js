@@ -1,10 +1,14 @@
-const Airtable = require("airtable");
-const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
-const Cache = require("./cache.js");
-const slmngg = airtable.base(process.env.AIRTABLE_APP);
-const ora = require("ora");
-const chalk = require("chalk");
+import Airtable from "airtable";
+import * as Cache from "./cache.js";
+import ora from "ora";
+import chalk from "chalk";
 
+import customTableUpdate from "./custom-datasets.js";
+
+import { log } from "./discord/slmngg-log.js";
+
+const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
+const slmngg = airtable.base(process.env.AIRTABLE_APP);
 // const st4 = require("./st4")(airtable);
 
 const logUpdates = false;
@@ -16,7 +20,7 @@ const logUpdates = false;
 let io = null;
 let _isRebuilding = true;
 let _rebuildStart = null;
-function setup(_io) {
+export function setup(_io) {
     io = _io;
 
     console.log("[rebuild] rebuilding...");
@@ -108,8 +112,6 @@ async function processTableData(tableName, data, linkRecords = false) {
     customTableUpdate(tableName, Cache);
 }
 
-const customTableUpdate = require("./custom-datasets");
-const { log } = require("./discord/slmngg-log");
 
 function registerUpdater(tableName, options) {
     let pollRate = 3000;
@@ -177,12 +179,9 @@ async function sync() {
 sync();
 // setInterval(sync, 5 * 1000);
 
-module.exports = {
-    async update(table, id, data) {
-        return await slmngg(table).update(id, data);
-    },
-    async select(table, filter) {
-        return await slmngg(table).select(filter).all();
-    },
-    setup
-};
+export async function update(table, id, data) {
+    return await slmngg(table).update(id, data);
+}
+export async function select(table, filter) {
+    return await slmngg(table).select(filter).all();
+}

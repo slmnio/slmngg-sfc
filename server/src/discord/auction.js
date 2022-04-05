@@ -1,6 +1,7 @@
-const creds = require("../config/creds.json");
-const Airtable = require("airtable");
-const Discord = require("discord.js");
+import creds from "../config/creds.json";
+import Airtable from "airtable";
+import Discord from "discord.js";
+
 const at = new Airtable({apiKey: creds.airtable.key});
 
 const balances = {};

@@ -4,7 +4,7 @@
           <transition-group name="itah" mode="out-in">
               <IngameTeam :key="`${team.id}-${i}`" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
                           :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores"
-                          :width="teamWidth" :codes="codes" :event="broadcast.event" :auto-small="autoSmall"/>
+                          :width="teamWidth" :codes="codes" :event="broadcast.event" :auto-small="autoSmall" :map-attack="attacks[i]"/>
           </transition-group>
 
           <transition name="mid" mode="out-in">
@@ -21,7 +21,7 @@ import Middle from "@/components/broadcast/Middle";
 
 export default {
     name: "IngameOverlay",
-    props: ["broadcast", "codes", "animationActive"],
+    props: ["broadcast", "codes", "animationActive", "mapattack"],
     components: { IngameTeam, Middle },
     computed: {
         match() {
@@ -77,6 +77,12 @@ export default {
         teamWidth() {
             if (!this.broadcast?.ingame_team_width) return null;
             return this.broadcast.ingame_team_width;
+        },
+        attacks() {
+            if (this.broadcast?.map_attack === "Left") return ["atk", "def"];
+            if (this.broadcast?.map_attack === "Right") return ["def", "atk"];
+            if (this.broadcast?.map_attack === "Both") return ["atk", "atk"];
+            return [null, null];
         }
     },
     watch: {

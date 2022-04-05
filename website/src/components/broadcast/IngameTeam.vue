@@ -27,6 +27,13 @@
                         <span class="industry-align">{{ score || '0' }}</span>
                     </div>
                 </transition>
+                <transition name="slide" mode="out-in">
+                    <div class="attack-holder" v-if="mapAttack">
+                        <transition name="attack" mode="out-in">
+                            <div class="attack" :key="mapAttack" :class="`icon-${mapAttack}`"></div>
+                        </transition>
+                    </div>
+                </transition>
                 <div class="team-alt-slice" :style="teamSlice"></div>
             </div>
         </div>
@@ -38,7 +45,7 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "IngameTeam",
-    props: ["team", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme"],
+    props: ["team", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack"],
     data: () => ({
         textureData: {
             url: null,
@@ -360,4 +367,37 @@ function updateWidth(vueEl, fullWidth) {
     .ingame-texture img {
         min-height: 121px;
     }
+
+    .attack-holder {
+        background-color: white;
+        color: white;
+    }
+    .attack {
+        background-color: #222;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-position: center;
+        background-size: 36px;
+        background-repeat: no-repeat;
+    }
+    .icon-atk { background-image: url("https://media.slmn.io/atk.png"); }
+    .icon-def { background-image: url("https://media.slmn.io/def.png"); }
+    .slide-enter-active, .slide-leave-active {
+        transition: all 300ms ease;
+        overflow: hidden;
+    }
+    .slide-enter, .slide-leave-to {
+        width: 0;
+    }
+    .slide-enter-to, .slide-leave {
+        width: 48px;
+    }
+    .attack-enter-active, .attack-leave-active { transition: all 200ms ease; }
+
+    .attack-enter { clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); }
+    .attack-enter-to, .attack-leave { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+    .attack-leave-to { clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); }
 </style>

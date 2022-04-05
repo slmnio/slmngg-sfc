@@ -126,8 +126,11 @@ export default {
         },
         teamSlice() {
             if (!this._theme) return {};
+            let color = this._theme.color_accent;
+            if (!color || color.toLowerCase() === "#ffffff") color = this._theme.color_logo_accent;
+            if (!color || color.toLowerCase() === "#ffffff") color = this._theme.color_logo_theme;
             return {
-                backgroundColor: this._theme.color_accent || this._theme.color_logo_accent || this._theme.color_theme
+                backgroundColor: color
             };
         },
         teamLogo() {

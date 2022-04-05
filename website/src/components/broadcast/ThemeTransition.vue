@@ -1,6 +1,6 @@
 <template>
     <transition name="tt" mode="out-in" :duration="calculatedDuration">
-        <div v-if="isActive" :key="_key || 'transition'" class="theme-transition" :style="animDurations" :class="{ 'start-left': directions.start === 'left', 'start-right': directions.start === 'right',  'end-left': directions.end === 'left', 'end-right': directions.end === 'right', ...borderClasses }">
+        <div v-if="isActive" :key="_key || 'transition'" class="theme-transition" :style="animDurations" :class="{ 'start-left': directions.start === 'left', 'start-right': directions.start === 'right',  'end-left': directions.end === 'left', 'end-right': directions.end === 'right', ...borderClasses, 'start-inner-full': startInnerFull }">
             <div class="theme-transition-outer" :style="outerStyle">
                 <div class="theme-transition-inner" :style="innerStyle">
                     <slot></slot>
@@ -15,7 +15,7 @@ import { logoBackground } from "@/utils/theme-styles";
 
 export default {
     name: "ThemeTransition",
-    props: ["theme", "active", "borderWidth", "_key", "autoStart", "duration", "startingDelay", "innerDelay", "left", "oneColor", "start", "end", "border"],
+    props: ["theme", "active", "borderWidth", "_key", "autoStart", "duration", "startingDelay", "innerDelay", "left", "oneColor", "start", "end", "border", "startInnerFull", "trigger", "triggerDuration", "startingInnerDelay"],
     data: () => ({
         manuallyActive: false
     }),
@@ -24,6 +24,7 @@ export default {
             return (this.startingDelay || 0) + (this.duration || 750) + (this.innerDelay || 250);
         },
         isActive() {
+            if (this.trigger) return this.manuallyActive;
             if (this.active) return this.active;
             return this.manuallyActive;
         },
@@ -56,7 +57,8 @@ export default {
                 "--tt-starting-delay": `${this.startingDelay === undefined ? 0 : this.startingDelay}ms`,
                 "--tt-duration": `${this.duration === undefined ? 750 : this.duration}ms`,
                 "--tt-inner-delay": `${this.innerDelay === undefined ? 250 : this.innerDelay}ms`,
-                "--tt-border-width": `${this.borderWidth === undefined ? 6 : this.borderWidth}px`
+                "--tt-border-width": `${this.borderWidth === undefined ? 6 : this.borderWidth}px`,
+                "--tt-starting-inner-delay": `${this.startingInnerDelay || 0}ms`
             };
         },
         directions() {
@@ -91,6 +93,12 @@ export default {
             if (!isActive) {
                 this.manuallyActive = false;
             }
+            if (this.trigger && isActive) {
+                this.manuallyActive = true;
+                setTimeout(() => {
+                    this.manuallyActive = false;
+                }, this.triggerDuration || 500);
+            }
         }
     }
 };
@@ -115,6 +123,15 @@ export default {
 .tt-leave-active .theme-transition-outer {
     transition: all var(--tt-duration, .75s) ease;
     transition-delay: var(--tt-starting-delay);
+
+}
+
+.tt-enter-active.start-inner-full .theme-transition-outer {
+    transition-duration: 0s;
+}
+
+.tt-enter-active.start-inner-full .theme-transition-inner {
+    transition-delay: var(--tt-starting-inner-delay, 300ms) !important;
 }
 
 .tt-enter-to .theme-transition-outer,

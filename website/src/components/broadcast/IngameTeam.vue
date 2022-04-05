@@ -1,7 +1,7 @@
 <template>
 <!--    <transition name="ingame-team-anim">-->
         <div class="ingame-team-holder" v-if="loaded" v-bind:class="{'right': right, 'left': !right}">
-            <div class="ingame-team default-thing" :style="style" :key="team.id">
+            <div class="ingame-team default-thing" :style="style" :key="team.id" :class="{ 'extend-map-icon': extendIcons && mapAttack }">
                 <div class="texture-holder position-absolute w-100 h-100" v-if="texture">
                     <div class="ingame-texture">
                         <img :src="texture" alt="">
@@ -45,7 +45,7 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "IngameTeam",
-    props: ["team", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack"],
+    props: ["team", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons"],
     data: () => ({
         textureData: {
             url: null,
@@ -148,7 +148,7 @@ export default {
         },
         teamWidthCSS() {
             if (!this.teamWidth) return {};
-            return { width: `${this.teamWidth}px` };
+            return { width: `calc(${this.teamWidth}px + var(--team-expand))` };
         }
     },
     watch: {
@@ -218,7 +218,8 @@ function updateWidth(vueEl, fullWidth) {
 
 <style scoped>
     .ingame-team {
-        width: 690px;
+        --team-expand: 0px;
+        width: calc(690px + var(--team-expand));
         height: 48px;
 
         display: flex;
@@ -383,10 +384,18 @@ function updateWidth(vueEl, fullWidth) {
         background-size: 36px;
         background-repeat: no-repeat;
     }
+    .ingame-team.extend-map-icon {
+        --team-expand: 48px;
+    }
+
+    .ingame-team {
+        transition: background-color .2s, border-color .2s, color .2s, width 200ms ease;
+    }
+
     .icon-atk { background-image: url("https://media.slmn.io/atk.png"); }
     .icon-def { background-image: url("https://media.slmn.io/def.png"); }
     .slide-enter-active, .slide-leave-active {
-        transition: all 300ms ease;
+        transition: all 200ms ease .2s;
         overflow: hidden;
     }
     .slide-enter, .slide-leave-to {

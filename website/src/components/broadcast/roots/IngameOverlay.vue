@@ -3,7 +3,7 @@
       <div class="top-overlay" :style="broadcastMargin">
           <transition-group name="itah" mode="out-in">
               <IngameTeam :key="`${team.id}-${i}`" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
-                          :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores"
+                          :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores" :extend-icons="extendIcons"
                           :width="teamWidth" :codes="codes" :event="broadcast.event" :auto-small="autoSmall" :map-attack="attacks[i]"/>
           </transition-group>
 
@@ -83,6 +83,9 @@ export default {
             if (this.broadcast?.map_attack === "Right") return ["def", "atk"];
             if (this.broadcast?.map_attack === "Both") return ["atk", "atk"];
             return [null, null];
+        },
+        extendIcons() {
+            return (this.broadcast?.broadcast_settings || []).includes("Extend ingame map icons");
         }
     },
     watch: {

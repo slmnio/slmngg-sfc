@@ -117,6 +117,10 @@ const app = new Vue({
         server_rebuilding(x) {
             console.log("rebuilding", x);
             this.isRebuilding = x;
+        },
+        high_error_rate(x) {
+            console.log("high error rate", x);
+            this.highErrorRate = x;
         }
     },
     metaInfo: {

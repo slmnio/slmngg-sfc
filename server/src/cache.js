@@ -63,10 +63,26 @@ async function removeAntiLeak(id, data) {
     return data;
 }
 
+let recents = {
+    triggered: 0,
+    sent: 0,
+};
+
+(() => {
+    let seconds = 15;
+    setInterval(() => {
+        console.log(`[Cache log] secs=${seconds} triggered=${recents.triggered} sent=${recents.sent}`);
+        recents.triggered = 0;
+        recents.sent = 0;
+    }, seconds * 1000);
+})();
+
 async function dataUpdate(id, data, options) {
     // broadcast something here
+    recents.triggered++;
     if (JSON.stringify(store.get(id)) !== JSON.stringify(data)) {
         // console.log(`Data update on [${id}]`);
+        recents.sent++;
         if (!(options && options.custom)) updateFunction(id, { oldData: store.get(id), newData: data });
         if (data) data = await removeAntiLeak(id, data);
         await broadcast(id, "data_update", id, data);

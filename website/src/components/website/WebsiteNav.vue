@@ -4,6 +4,9 @@
         <WebsiteNavBanner class="bg-danger" v-if="showDisconnectedMessage">
             <i class="fas fa-wifi-slash fa-fw mr-1"></i> <b>No connection to the data server.</b> Don't refresh, we're trying to reconnect...
         </WebsiteNavBanner>
+        <WebsiteNavBanner class="bg-warning text-dark" v-if="showHighErrorRateMessage">
+            <i class="fas fa-exclamation-triangle fa-fw mr-1"></i> <b>Data server errors.</b> We are having some errors requesting data from our upstream provider. Some data maybe inaccurate, incomplete or inaccessible.
+        </WebsiteNavBanner>
         <WebsiteNavBanner class="bg-warning text-dark" v-if="showRebuildingMessage">
             <i class="fas fa-spinner fa-pulse fa-fw mr-1"></i> <b>Server rebuilding</b>: The server is rebuilding its data store. Some pages might not be accessible.</WebsiteNavBanner>
 
@@ -157,6 +160,10 @@ export default {
         showRebuildingMessage() {
             if (this.showDisconnectedMessage) return false;
             return this.$root.isRebuilding;
+        },
+        showHighErrorRateMessage() {
+            if (this.showDisconnectedMessage || this.showRebuildingMessage) return false;
+            return this.$root.highErrorRate;
         },
         minisiteSettings() {
             if (!this.minisite?.blocks) return null;

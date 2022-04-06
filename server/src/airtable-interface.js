@@ -16,6 +16,50 @@ const logUpdates = false;
 let io = null;
 let _isRebuilding = true;
 let _rebuildStart = null;
+
+const reqLog = {
+    highErrorRate: false,
+    counts: {
+        started: 0,
+        succeeded: 0,
+        failed: 0,
+    },
+    period: 30 * 1000,
+    trigger(key) {
+        this.counts[key]++;
+        setTimeout(() => this.counts[key]--, this.period);
+    },
+    start() {
+        this.trigger("started");
+    },
+    success() {
+        this.trigger("succeeded");
+    },
+    fail() {
+        this.trigger("failed");
+    },
+    output() {
+        console.log(`[Request log] last ${this.period}ms: ${this.counts.started} started, ${this.counts.succeeded} succeeded (${Math.floor((this.counts.succeeded / this.counts.started) * 100)}% success), ${this.counts.failed} failed (${Math.floor((this.counts.failed / this.counts.started) * 100)}% start-fails)`);
+        if (this.counts.started > 20 && this.counts.failed / this.counts.started > 0.5) {
+            if (!this.highErrorRate) {
+                this.broadcastHighRate();
+            }
+            this.highErrorRate = true;
+        } else {
+            if (this.highErrorRate) {
+                this.broadcastHighRate();
+            }
+        }
+    },
+    broadcastHighRate() {
+        console.log(("high_error_rate", this.highErrorRate));
+        io.emit("high_error_rate", this.highErrorRate);
+    }
+};
+setInterval(() => {
+    reqLog.output();
+}, reqLog.period);
+
 function setup(_io) {
     io = _io;
 
@@ -23,6 +67,7 @@ function setup(_io) {
     _rebuildStart = Date.now();
     io.on("connect", (socket) => {
         io.emit("server_rebuilding", _isRebuilding);
+        io.emit("high_error_rate", reqLog.highErrorRate);
     });
 
     return this;
@@ -66,14 +111,21 @@ async function getAllTableData(tableName, options = {}) {
         prefixText: "Airtable"
     }).start();
     try {
+        reqLog.start();
         let data = await slmngg(tableName).select(options).all();
         const end = new Date();
         if (logUpdates) loading.succeed(`Loaded table ${chalk.bold(tableName)} - ${data.length} records loaded in ${((end - start) / 1000).toFixed(2)}s`);
+        reqLog.success();
         return data;
     } catch (e) {
+        reqLog.fail(e.statusCode || e.code);
         if (e.code === "ETIMEDOUT") {
             console.warn("Airtable request timed out (classic)");
         } else {
+            if (e.statusCode === 503) {
+                // Airtable down
+                return console.error("Airtable 503");
+            }
             console.error("Airtable error", e);
         }
     }
@@ -116,10 +168,12 @@ function registerUpdater(tableName, options) {
     setInterval(async function() {
         let date = (new Date(new Date().getTime() - pollRate)).toISOString().slice(0, 19);
         try {
+            reqLog.start();
             let data = (await slmngg(tableName).select({
                 ...options,
                 filterByFormula: `{Modified} > "${date}"`
             }).all()).map(deAirtable);
+            reqLog.success();
 
             data.forEach(data => {
                 if (tableName === "News") {
@@ -136,9 +190,14 @@ function registerUpdater(tableName, options) {
 
             customTableUpdate(tableName, Cache);
         } catch (e) {
+            reqLog.fail(e.statusCode || e.code);
             if (e.code === "ETIMEDOUT") {
                 console.warn("Airtable request timed out (classic)");
             } else {
+                if (e.statusCode === 503) {
+                    // Airtable down
+                    return console.error("Airtable 503");
+                }
                 console.error("Airtable error", e);
             }
         }

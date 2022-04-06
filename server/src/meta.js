@@ -342,7 +342,7 @@ module.exports = ({ app, Cache }) => {
         ].includes(domain.toLowerCase());
     }
 
-    async function getRedirect(path, subdomain) {
+    async function getRedirect(path = "", subdomain) {
         // get all redirects
         // see if any match path/subdomain combo
         // if it does, send back data for indexer

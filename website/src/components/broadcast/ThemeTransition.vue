@@ -1,6 +1,6 @@
 <template>
     <transition name="tt" mode="out-in" :duration="calculatedDuration">
-        <div v-if="isActive" :key="_key || 'transition'" class="theme-transition" :style="animDurations" :class="{ ...directionClasses, ...borderClasses, 'start-inner-full': startInnerFull }">
+        <div v-show="isActive" :key="_key || 'transition'" class="theme-transition" :style="animDurations" :class="{ ...directionClasses, ...borderClasses, 'start-inner-full': startInnerFull }">
             <div class="theme-transition-outer" :style="outerStyle">
                 <div class="theme-transition-inner" :style="innerStyle" :class="innerClass">
                     <slot></slot>

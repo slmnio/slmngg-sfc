@@ -170,10 +170,11 @@ export default {
                 // attempt to get SR
 
                 if (this.game === "Overwatch") {
+                    console.log(player);
                     try {
                         const ow = player.overwatch_data ? JSON.parse(player.overwatch_data) : null;
 
-                        if (player.draft_data) {
+                        if (player.draft_data && player.draft_data.slice(0, 1) === "{") {
                             const draftData = JSON.parse(player.draft_data);
                             let extraSRtext = "";
 
@@ -197,6 +198,7 @@ export default {
                             return { ...player, rating: { level: parseInt(player.manual_sr), note: "Manually added" } };
                         }
                     } catch (e) {
+                        console.warn("overwatch processing error", e);
                         return player;
                     }
                 }
@@ -206,13 +208,17 @@ export default {
                 if (player.notes && player.notes.includes("#split#")) {
                     player.notes = player.notes.split("#split#").map(e => e.replace(/\|/g, "\n").trim()).join("\n");
                 }
-                try {
-                    const draftData = JSON.parse(player.draft_data);
-                    player._draftData = draftData;
-                    player.heroes = draftData.best_heroes;
-                    player.info_for_captains = draftData.info_for_captains;
-                    player.do_not_draft = draftData.is_draftable === false;
-                } catch (e) { }
+                if (player.draft_data && player.draft_data.slice(0, 1) === "{") {
+                    try {
+                        const draftData = JSON.parse(player.draft_data);
+                        player._draftData = draftData;
+                        player.heroes = draftData.best_heroes;
+                        player.info_for_captains = draftData.info_for_captains;
+                        player.do_not_draft = draftData.is_draftable === false;
+                    } catch (e) { }
+                } else {
+                    player.info_for_captains = player.draft_data;
+                }
 
                 player.localNotes = store.getters.getNotes(player.id);
 

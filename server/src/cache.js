@@ -94,6 +94,46 @@ const longTextMap = {
     "News": ["content"]
 };
 
+const slmnggAttachments = {
+    "Events": ["broadcast_texture"],
+    "Players": ["headshot"],
+    "Themes": ["default_logo", "default_wordmark", "small_logo", "other_images"],
+    "Broadcasts": ["break_image", "background"],
+    "News": ["header", "thumbnail"],
+    "Map Data": ["map_image", "map_big_image", "map_video", "map_audio"],
+    "Log Files": ["log_file"],
+    "Heroes": ["main_image"],
+    "Ad Reads": ["audio", "image"],
+    "Tracks": ["file"]
+};
+
+function stripValidation(str) {
+    let idx = str.indexOf("ts=");
+    if (idx !== -1) return str.slice(0, idx -1);
+    return str;
+}
+
+async function removeAttachmentTimestamps(data) {
+    if (!data?.__tableName) return data;
+
+    let tableData = slmnggAttachments[data.__tableName];
+    if (tableData) {
+        tableData.forEach(key => {
+            if (data[key]) {
+                data[key].forEach(attachment => {
+                    attachment.url = stripValidation(attachment.url);
+                    for (let size in attachment.thumbnails) {
+                        size = attachment.thumbnails[size];
+                        size.url = stripValidation(size.url);
+                    }
+                });
+            }
+        });
+    }
+
+    return data;
+}
+
 async function set(id, data, options) {
 
     if (data?.__tableName) {
@@ -139,6 +179,8 @@ async function set(id, data, options) {
         // other attributes will need to be fully refreshed (probably)
         data = await removeAntiLeak(id, data);
     }
+
+    data = await removeAttachmentTimestamps(data);
 
     // Check antileak to see if this should be hidden or redacted
     // data = await removeAntiLeak(id, data);

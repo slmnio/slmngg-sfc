@@ -95,7 +95,9 @@ async function resizeImage(filename, sizeText, sizeData) {
 
 function getFilename(url) {
     let parts = url.split("/");
-    const originalFilename = parts[parts.length - 1];
+    let originalFilename = parts[parts.length - 1];
+    let [strippedName, args] = originalFilename.split("?");
+    originalFilename = strippedName;
     const dots = originalFilename.split(".");
     const originalFileType = dots[dots.length - 1]; // last . (now works with .svg.png)
     return parts[4] + "." + originalFileType; // specific to airtable urls
@@ -138,8 +140,10 @@ module.exports = ({ app, cors, Cache }) => {
 
             const url = req.query.url;
             let parts = url.split("/");
-            const originalFilename = parts[parts.length - 1];
-            const dots = originalFilename.split(".");
+            let originalFilename = parts[parts.length - 1];
+            let [strippedName, args] = originalFilename.split("?");
+            originalFilename = strippedName;
+            const dots = strippedName.split(".");
             const originalFileType = dots[dots.length - 1]; // last . (now works with .svg.png)
             const filename = parts[4] + "." + originalFileType;
 

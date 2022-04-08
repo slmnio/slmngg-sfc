@@ -38,13 +38,16 @@
                         <div :style="themeBG" class="break-title-inner" v-html="breakContentTitle"></div>
                     </div>
                     <Bracket class="break-col break-bracket" v-if="automatedShow === 'Bracket'" :key="`Bracket-${bracket && bracket.key}`" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.85" />
-                    <div class="break-col break-others" v-if="automatedShow === 'Other Broadcasts'">
+                    <div class="break-col break-others" v-if="automatedShow === 'Other Streams'">
                         <div class="broadcast-previews-title">
                             {{ broadcasts.length === 1 ? broadcasts[0].name : 'Other broadcasts' }}
                         </div>
                         <div class="broadcast-previews">
                             <BroadcastPreview v-for="other in broadcasts" v-bind:key="other.id" :broadcast="other"/>
                         </div>
+                    </div>
+                    <div class="break-col break-others-info" v-if="automatedShow === 'Other Info'">
+                        <OtherBroadcasts :starting-broadcast="broadcast" />
                     </div>
                     <BreakStaffList class="break-col break-staff-list" v-if="automatedShow === 'Staff'" key="Staff" :matches="fullSchedule"/>
                     <BreakMatchup class="break-col break-matchup" v-if="automatedShow === 'Matchup'" :key="`Matchup-${nextMatch ? nextMatch.id : ''}`" :match="nextMatch" />
@@ -59,6 +62,7 @@
             <Bracket class="break-col break-bracket" :event="event" :bracket="bracket" use-overlay-scale />
             <BreakMatchup class="break-col break-matchup" :match="nextMatch" />
             <BreakStaffList class="break-col break-staff-list" :matches="fullSchedule"/>
+            <OtherBroadcasts :starting-broadcast="broadcast" />
         </div>
     </div>
 </template>
@@ -78,13 +82,14 @@ import BreakStaffList from "@/components/broadcast/break/BreakStaffList";
 import BreakMatchup from "@/components/broadcast/break/BreakMatchup";
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { resizedImage, resizedImageNoWrap } from "@/utils/images";
+import OtherBroadcasts from "@/components/broadcast/OtherBroadcasts";
 
 const tickTime = 25;
 
 export default {
     name: "BreakOverlay",
     props: ["broadcast", "title", "animationActive", "secondary"],
-    components: { ThemeLogo, BreakMatchup, BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
+    components: { OtherBroadcasts, ThemeLogo, BreakMatchup, BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown },
     data: () => ({
         tick: 0,
         lastCountdownTick: 0
@@ -500,4 +505,10 @@ export default {
         display: block;
         content: " ";
     }
+
+    .break-others-info {
+        font-size: 12px;
+    }
+    .break-others-info >>> .broadcast-match {font-size: 38px !important;width: 300px !important;}
+    .break-others-info >>> .broadcast {margin-bottom: 0.75em !important;}
 </style>

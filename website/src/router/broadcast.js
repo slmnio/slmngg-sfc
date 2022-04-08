@@ -39,6 +39,7 @@ import MusicOverlay from "@/components/broadcast/roots/MusicOverlay";
 import ThemeTransitionTester from "@/components/broadcast/roots/ThemeTransitionTester";
 import DeskGraphicsOverlay from "@/components/broadcast/roots/DeskGraphicsOverlay";
 import EmptyStingerOverlay from "@/components/broadcast/roots/EmptyStingerOverlay";
+import OtherBroadcastsOverlay from "@/components/broadcast/roots/OtherBroadcastsOverlay";
 
 export default [
     { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
@@ -142,5 +143,6 @@ export default [
     { path: "tester", component: ThemeTransitionTester },
     { path: "desk-graphics", component: DeskGraphicsOverlay },
     { path: "stinger", component: EmptyStingerOverlay },
-    { path: "empty", redirect: "stinger" }
+    { path: "empty", redirect: "stinger" },
+    { path: "broadcasts", component: OtherBroadcastsOverlay }
 ];

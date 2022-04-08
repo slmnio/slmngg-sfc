@@ -38,7 +38,7 @@
                         <div :style="themeBG" class="break-title-inner" v-html="breakContentTitle"></div>
                     </div>
                     <Bracket class="break-col break-bracket" v-if="automatedShow === 'Bracket'" :key="`Bracket-${bracket && bracket.key}`" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.85" />
-                    <div class="break-col break-others" v-if="automatedShow === 'Other Streams'">
+                    <div class="break-col break-others" v-if="automatedShow === 'Other Streams'" key="Other-Streams">
                         <div class="broadcast-previews-title">
                             {{ broadcasts.length === 1 ? broadcasts[0].name : 'Other broadcasts' }}
                         </div>
@@ -46,7 +46,7 @@
                             <BroadcastPreview v-for="other in broadcasts" v-bind:key="other.id" :broadcast="other"/>
                         </div>
                     </div>
-                    <div class="break-col break-others-info" v-if="automatedShow === 'Other Info'">
+                    <div class="break-col break-others-info" v-if="automatedShow === 'Other Info'" key="Other-Info">
                         <OtherBroadcasts :starting-broadcast="broadcast" />
                     </div>
                     <BreakStaffList class="break-col break-staff-list" v-if="automatedShow === 'Staff'" key="Staff" :matches="fullSchedule"/>

@@ -61,6 +61,12 @@ export default {
                 case "ValorantRoundDiff":
                     stats.push("map_rounds_diff");
                     break;
+                case "OMatchWinrate":
+                    stats.push("o_match_winrate_text");
+                    break;
+                case "OMapWinrate":
+                    stats.push("o_map_winrate_text");
+                    break;
                 default:
                     stats.push("empty");
                 }
@@ -82,8 +88,11 @@ export default {
                 rank: this.team.standings.rank,
                 tie_show_number: this.team.standings.tie_show_number,
                 winrate: this.team.standings.winrate,
-                winrate_text: isNaN(this.team.standings.winrate) ? "---" : (this.team.standings.winrate * 100).toFixed(0) + "%",
-                mapwinrate_text: "---",
+                winrate_text: this.winrateText(this.team.standings.winrate),
+                mapwinrate: this.team.standings.map_winrate,
+                mapwinrate_text: this.winrateText(this.team.standings.map_winrate),
+                o_match_winrate_text: this.winrateText(this.team.standings.opponent_winrate),
+                o_map_winrate_text: this.winrateText(this.team.standings.opponent_map_winrate),
                 omw: this.team.standings?.omw !== undefined ? Math.floor(this.team.standings.omw * 100) + "%" : "-",
                 empty: "-",
                 map_rounds: `${this.team.standings.map_round_wins}-${this.team.standings.map_round_losses}`,
@@ -92,7 +101,10 @@ export default {
         }
     },
     methods: {
-        url
+        url,
+        winrateText(num) {
+            return isNaN(num) ? "-" : (num * 100).toFixed(0) + "%";
+        }
     }
 };
 </script>

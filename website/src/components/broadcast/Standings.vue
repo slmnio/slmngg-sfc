@@ -235,14 +235,16 @@ export default {
                 });
 
                 team.standings.winrate = team.standings.wins / team.standings.played;
+                team.standings.map_winrate = team.standings.map_wins / (team.standings.map_losses + team.standings.map_wins);
 
                 return team;
             });
 
 
-            if (this.useOMW) {
+            if (this.useOMW || this.standingsSort.includes("OMapWinrate")) {
                 teams.map(team => {
                     team.standings.opponentWinrates = [];
+                    team.standings.opponentMapWinrates = [];
 
                     this.stageMatches.forEach(match => {
                         if (!(match.teams || []).some(t => t.code === team.code)) return;
@@ -251,12 +253,13 @@ export default {
                         const opponent = match.teams.find(t => t.code !== team.code);
                         if (!opponent) return null;
                         const localOpponent = teams.find(t => t.code === opponent.code);
-                        const opponentWinrate = localOpponent.standings.winrate;
-                        team.standings.opponentWinrates.push(opponentWinrate);
+                        team.standings.opponentWinrates.push(localOpponent.standings.winrate);
+                        team.standings.opponentMapWinrates.push(localOpponent.standings.map_winrate);
                     });
 
                     // console.log(team.standings.opponentWinrates, avg(team.standings.opponentWinrates));
-                    team.standings.omw = avg(team.standings.opponentWinrates);
+                    team.standings.opponent_winrate = avg(team.standings.opponentWinrates);
+                    team.standings.opponent_map_winrate = avg(team.standings.opponentMapWinrates);
                     return team;
                 });
             }

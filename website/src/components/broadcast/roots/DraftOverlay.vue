@@ -22,7 +22,7 @@
                             </div>
                         </div>
                         <transition-group name="player" class="team-players">
-                            <DraftPlayer class="drafted-player" v-for="player in team.players" v-bind:key="player.id"
+                            <DraftPlayer class="drafted-player" v-for="player in insertDummies(team.players)" v-bind:key="player.id"
                                          :player="player" :theme="event.theme" :show-icon="icons" />
                         </transition-group>
                     </div>
@@ -44,11 +44,34 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 export default {
     name: "DraftOverlay",
     components: { ThemeLogo, DraftTeam, DraftPlayer },
-    props: ["broadcast", "bracketKey", "columns", "icons", "showStaff", "teamRows"],
+    props: ["broadcast", "bracketKey", "columns", "icons", "showStaff", "teamRows", "eachTeam"],
     data: () => ({
         dummy: false
     }),
     methods: {
+        insertDummies(players) {
+            if (!this.eachTeam) return players;
+            const dummyRecord = { dummy: true };
+            const dummiedPlayers = [];
+
+            const nonSortedPlayers = players.filter(p => !p.draft_position);
+            const sortedPlayers = players.filter(p => p.draft_position);
+            for (let i = 1; i <= this.eachTeam; i++) {
+                const playerAtIndex = sortedPlayers.find(p => p.draft_position === i);
+                if (playerAtIndex) {
+                    dummiedPlayers.push({ ...playerAtIndex, forceIndex: true });
+                } else {
+                    if (nonSortedPlayers.length) {
+                        dummiedPlayers.push(nonSortedPlayers.shift());
+                    } else {
+                        dummiedPlayers.push({ ...dummyRecord, id: `dummy-${i}`, name: i });
+                    }
+                }
+            }
+            nonSortedPlayers.forEach(p => dummiedPlayers.push(p));
+            // return this.team.players;
+            return dummiedPlayers;
+        },
         logoBackground1,
         getTeamStaff(team) {
             const staff = [];
@@ -296,6 +319,7 @@ export default {
         flex-wrap: wrap;
         border-bottom-width: 4px;
         border-bottom-style: solid;
+        align-content: center;
     }
 
     .team-staff {
@@ -304,7 +328,7 @@ export default {
         line-height: 1;
     }
     .drafted-player {
-        margin: 4px 0;
+        margin-bottom: 4px;
         font-size: 24px;
         padding: 6px 8px;
         width: 100%;
@@ -325,7 +349,7 @@ export default {
 
     .draftable-enter {
         max-height: 0;
-        padding: 0 8px;
+        padding: 0 8px !important;
         opacity: 0;
     }
 
@@ -342,11 +366,14 @@ export default {
 
     .player-enter-active, .player-leave-active, .player-move {
         transition: all .5s ease;
+        /*transition: none !important;*/
     }
     .player-enter, .player-leave-to {
         max-height: 0;
-        padding: 0 8px;
+        padding: 0 8px !important;
         opacity: 0;
+        border-bottom-width: 0 !important;
+        margin-bottom: 0 !important;
     }
 
     .draft-team-top.team-bottom-border {

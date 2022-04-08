@@ -1,7 +1,10 @@
 <template>
-    <div class="draft-player" :style="background">
+    <div class="draft-player" v-if="player && !player.dummy" :style="background">
         <div class="player-name">{{ player.name }}</div>
         <div class="player-role flex-center" v-if="showIcon" v-html="getSVG(player.role)"></div>
+    </div>
+    <div class="draft-player dummy" v-else :style="background">
+        <div class="player-name">dummy</div>
     </div>
 </template>
 
@@ -44,6 +47,12 @@ export default {
         --size: 1.25em;
         height: var(--size);
         width: var(--size);
+    }
+    .draft-player.dummy {
+        opacity: 0.6;
+    }
+    .draft-player.dummy .player-name {
+        opacity: 0;
     }
 </style>
 

@@ -97,10 +97,11 @@ export default [
         path: "draft",
         component: DraftOverlay,
         props: route => ({
-            columns: route.query.columns || 1,
+            columns: route.query.columns || route.query.cols || 1,
             icons: route.query.icons !== "false",
             showStaff: route.query.staff !== "false",
-            teamRows: route.query.rows || route.query.teamRows || 1
+            teamRows: route.query.rows || route.query.teamRows || 1,
+            eachTeam: route.query.eachTeam || route.query.players
         })
     },
     { path: "casters", redirect: "desk" },

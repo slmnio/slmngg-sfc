@@ -97,14 +97,16 @@ const longTextMap = {
 const slmnggAttachments = {
     "Events": ["broadcast_texture"],
     "Players": ["headshot"],
-    "Themes": ["default_logo", "default_wordmark", "small_logo", "other_images"],
+    "Themes": ["default_logo", "default_wordmark", "small_logo", "other_images", "logo_on_dark", "logo_on_light", "logo_on_theme", "wordmark_on_dark", "wordmark_on_light", "wordmark_on_theme"],
     "Broadcasts": ["break_image", "background"],
     "News": ["header", "thumbnail"],
     "Map Data": ["map_image", "map_big_image", "map_video", "map_audio"],
+    "Maps": ["image", "big_image"],
     "Log Files": ["log_file"],
     "Heroes": ["main_image"],
     "Ad Reads": ["audio", "image"],
-    "Tracks": ["file"]
+    "Tracks": ["file"],
+    "Teams": ["icon"]
 };
 
 function stripValidation(str) {

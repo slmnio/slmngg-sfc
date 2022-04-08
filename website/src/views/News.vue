@@ -151,7 +151,7 @@ export default {
         background-color: #252525;
     }
 
-    .news-content >>> p:first-child {
+    .news-content >>> .markdown > p:first-child {
         font-size: 1.15em !important;
     }
     .news-content >>> img {

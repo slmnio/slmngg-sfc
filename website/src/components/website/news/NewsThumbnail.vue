@@ -35,7 +35,7 @@ export default {
                 return null;
             }
 
-            return resizedImage(this.item, ["thumbnail"], "h-150"); // gets centered vertically
+            return resizedImage(this.item, ["thumbnail"], "h-300"); // gets centered vertically
         },
         connectionTheme() {
             if (this.item?.event?.theme && this.item?.prefer_event) return this.item.event.theme;
@@ -48,7 +48,7 @@ export default {
 
             return {
                 backgroundColor: this.connectionTheme.color_logo_background,
-                ...resizedImage(this.connectionTheme, ["default_wordmark", "default_logo"], "h-150")
+                ...resizedImage(this.connectionTheme, ["default_wordmark", "default_logo"], "h-200")
             };
         }
     }

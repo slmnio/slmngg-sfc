@@ -108,6 +108,7 @@ export default {
     margin-top: 60px;
     width: 100%;
     flex-grow: 1;
+    overflow: hidden;
 }
 
 span.industry-align {

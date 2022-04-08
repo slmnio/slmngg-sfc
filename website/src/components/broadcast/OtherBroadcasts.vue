@@ -50,7 +50,7 @@ export default {
                 }),
                 other_broadcasts: ReactiveArray("other_broadcasts", {
                     live_match: ReactiveThing("live_match", {
-                        casters: ReactiveArray(""),
+                        casters: ReactiveArray("casters"),
                         teams: ReactiveArray("teams", {
                             theme: ReactiveThing("theme")
                         })
@@ -59,7 +59,7 @@ export default {
             })({ broadcast: this.startingBroadcast.id });
         },
         broadcasts() {
-            if (!this.broadcast) return [];
+            if (!this.broadcast?.other_broadcasts?.length) return [];
             return [
                 this.broadcast,
                 ...(this.broadcast?.other_broadcasts || [])

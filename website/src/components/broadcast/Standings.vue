@@ -109,7 +109,8 @@ export default {
             return this.blocks?.settings || null;
         },
         useOMW() {
-            return this.settings?.useOMW && this.stageMatches.every(m => [m.score_1, m.score_2].some(s => s === m.first_to));
+            return this.settings?.useOMW || ["OMatchWinrate", "OMapWinrate"].some(k => this.standingsSort.includes(k) || this.showColumns.includes(k));
+            // return this.settings?.useOMW && this.stageMatches.every(m => [m.score_1, m.score_2].some(s => s === m.first_to));
         },
         standingsSort() {
             return this.standingsSettings?.sort;

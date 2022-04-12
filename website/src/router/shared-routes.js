@@ -2,7 +2,7 @@ import Team from "@/views/Team";
 import TeamMain from "@/views/sub-views/TeamMain";
 // import TeamMatches from "@/views/sub-views/TeamMatches";
 import TeamSchedule from "@/views/sub-views/TeamSchedule";
-import TeamTheme from "@/views/sub-views/TeamTheme";
+import TeamTheme from "@/views/sub-views/ThingTheme";
 import TeamDetails from "@/views/sub-views/TeamDetails";
 import Event from "@/views/Event";
 import EventRoutes from "@/router/event";

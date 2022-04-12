@@ -1,6 +1,6 @@
 <template>
     <div v-if="team">
-        <ThingTop :thing="team" type="team"></ThingTop>
+        <ThingTop :thing="team" type="team" :themeURL="subLink('theme')"></ThingTop>
         <SubPageNav class="my-2">
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
             <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>

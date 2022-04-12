@@ -1,6 +1,6 @@
 <template>
     <div v-if="event">
-        <ThingTop :thing="event" type="event"></ThingTop>
+        <ThingTop :thing="event" type="event" :themeURL="subLink('theme')"></ThingTop>
 
         <SubPageNav class="my-2">
             <li class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
@@ -11,6 +11,7 @@
             <li class="nav-item ct-passive" v-if="showFoldy"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
             <li class="nav-item ct-passive" v-if="showDraft"><router-link class="nav-link" :to="subLink('draft')">Draft</router-link></li>
             <li class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('staff')">Staff</router-link></li>
+            <li class="nav-item ct-passive" v-if="event.theme"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
             <li class="nav-item ct-passive" v-if="event.about"><router-link class="nav-link" :to="subLink('about')">About</router-link></li>
 <!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
 

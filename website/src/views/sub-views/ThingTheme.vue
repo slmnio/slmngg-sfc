@@ -1,8 +1,8 @@
 <template>
-    <div class="team-theme container">
+    <div class="thing-theme container">
 
-        <ContentRow v-if="team.brand_designers" :title="team.brand_designers.length === 1 ? 'Brand designer' : 'Brand designers'">
-            <ContentThing type="player" :text="designer.name" :thing="designer" :theme="team.theme" v-for="designer in team.brand_designers" v-bind:key="designer.id"></ContentThing>
+        <ContentRow v-if="thing.brand_designers" :title="thing.brand_designers.length === 1 ? 'Brand designer' : 'Brand designers'">
+            <ContentThing type="player" :text="designer.name" :thing="designer" :theme="thing.theme" v-for="designer in thing.brand_designers" v-bind:key="designer.id"></ContentThing>
         </ContentRow>
 
         <h3>Themes</h3>
@@ -32,21 +32,23 @@
             </div>
         </div>
 
-        <h3>Ingame overlay</h3>
-        <div class="overlay-area ingame-overlay mb-3">
-            <IngameTeam :team="team" :event="team.event" />
-        </div>
-
-        <h3>Bracket</h3>
-        <div class="overlay-area mb-3">
-            <div class="bracket-match">
-                <BracketTeam :team="team" score="0"/>
+        <div class="team-specific" v-if="team">
+            <h3>Ingame overlay</h3>
+            <div class="overlay-area ingame-overlay mb-3">
+                <IngameTeam :team="team" :event="team.event" />
             </div>
-        </div>
 
-        <h3>Standings</h3>
-        <div class="standings mb-3">
-            <StandingsTeam :team="standingsData" />
+            <h3>Bracket</h3>
+            <div class="overlay-area mb-3">
+                <div class="bracket-match">
+                    <BracketTeam :team="team" score="0"/>
+                </div>
+            </div>
+
+            <h3>Standings</h3>
+            <div class="standings mb-3">
+                <StandingsTeam :team="standingsData" />
+            </div>
         </div>
 
     </div>
@@ -66,10 +68,13 @@ function cleanKey(key) {
 }
 
 export default {
-    name: "TeamTheme",
+    name: "ThingTheme",
     components: { BracketTeam, IngameTeam, ContentRow, ContentThing, StandingsTeam },
-    props: ["team"],
+    props: ["team", "event"],
     computed: {
+        thing() {
+            return this.team || this.event;
+        },
         standingsData() {
             return {
                 ...this.team,
@@ -79,8 +84,8 @@ export default {
             };
         },
         theme() {
-            if (!this.team || this.team.has_theme === 0 || !this.team.theme?.id) return null;
-            return this.team.theme;
+            if (!this.thing || this.thing.has_theme === 0 || !this.thing.theme?.id) return null;
+            return this.thing.theme;
         },
         mainTheme() {
             if (!this.theme) return {};
@@ -100,6 +105,7 @@ export default {
 
             attrs.forEach(([key, val]) => {
                 if (!key.startsWith("color_")) return;
+                if (val) val = val.toUpperCase();
                 const u = colors.find(c => c.value === val);
                 key = cleanKey(key.replace("color_", ""));
                 if (u) {

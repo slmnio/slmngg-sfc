@@ -17,10 +17,6 @@
               <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teamStaff"
                             :text="clarifyTeam(team)" v-bind:key="team.id" :show-logo="true" />
             </ContentRow>
-            <ContentRow title="Brand designer for" v-if="brandsDesigned">
-              <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in brandsDesigned"
-                            :text="clarifyTeam(team)" v-bind:key="team.id" :show-logo="true" :overrideURL="`/team/${team.id}/theme`" />
-            </ContentRow>
             <ContentRow title="Player for" v-if="teams">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teams"
                               :text="clarifyTeam(team)" v-bind:key="team.id" :show-logo="true" />

@@ -17,6 +17,7 @@
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
             <li class="nav-item" v-if="player.casts"><router-link class="nav-link" :to="subLink('casts')">Casts</router-link></li>
             <li class="nav-item" v-if="player.news"><router-link class="nav-link" :to="subLink('news')">News</router-link></li>
+            <li class="nav-item" v-if="player.brands_designed"><router-link class="nav-link" :to="subLink('brands')">Brands</router-link></li>
             <li class="nav-item" v-if="hasMatchPlayerRelationships"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
             <li class="nav-item" v-if="player.member_of && player.member_of.some(t => t.matches)"><router-link class="nav-link" :to="subLink('played-matches')">Played Matches</router-link></li>
         </SubPageNav>

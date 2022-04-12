@@ -131,6 +131,8 @@ export default {
             Object.entries(groups).forEach(([key, val]) => {
                 if (val.items.length === 0) {
                     delete groups[key];
+                } else {
+                    val.items.sort((a, b) => sortEvents(a.item, b.item));
                 }
             });
 

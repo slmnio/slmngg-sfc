@@ -354,10 +354,7 @@ module.exports = ({ app, Cache }) => {
 
         let redirect = redirects.find(r => {
             if (!r.active) return false;
-            return (r.subdomain || null) === subdomain && r.incoming_url.trim().toLowerCase() === path;
-        }) || redirects.find(r => {
-            if (!r.active) return false;
-            return (r.incoming_url.trim().toLowerCase() === path);
+            return (r.subdomain || undefined) === subdomain && r.incoming_url.trim().toLowerCase() === path;
         });
 
         if (!redirect) return null;
@@ -381,6 +378,7 @@ module.exports = ({ app, Cache }) => {
             }
 
             let domain = req.query.domain;
+            if (["slmn.gg", "dev.slmn.gg", "localhost"].includes(domain)) domain = null;
 
             if (domain) {
             // domain = SUBDOMAIN.SLMN.GG

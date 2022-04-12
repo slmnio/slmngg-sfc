@@ -8,6 +8,7 @@ import EventStaff from "@/views/sub-views/EventStaff";
 import EventAbout from "@/views/sub-views/EventAbout";
 import EventScenarios2 from "@/views/sub-views/EventScenarios2";
 import EventStandings from "@/views/sub-views/EventStandings";
+import EventStaffing from "@/components/website/EventStaffing";
 
 export default [
     { path: "", component: EventMain },

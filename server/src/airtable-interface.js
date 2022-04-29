@@ -41,19 +41,17 @@ const reqLog = {
     output() {
         console.log(`[Request log] last ${this.period}ms: ${this.counts.started} started, ${this.counts.succeeded} succeeded (${Math.floor((this.counts.succeeded / this.counts.started) * 100)}% success), ${this.counts.failed} failed (${Math.floor((this.counts.failed / this.counts.started) * 100)}% start-fails)`);
         if (this.counts.started > 20 && this.counts.failed / this.counts.started > 0.5) {
-            if (!this.highErrorRate) {
-                this.broadcastHighRate();
-            }
-            this.highErrorRate = true;
+            this.setHighRate(false);
         } else {
-            if (this.highErrorRate) {
-                this.broadcastHighRate();
-            }
+            this.setHighRate(true);
         }
     },
-    broadcastHighRate() {
-        console.log(("high_error_rate", this.highErrorRate));
-        io.emit("high_error_rate", this.highErrorRate);
+    setHighRate(newRate) {
+        if (this.highErrorRate !== newRate) {
+            console.log("high_error_rate", this.highErrorRate);
+            io.emit("high_error_rate", this.highErrorRate);
+        }
+        this.highErrorRate = newRate;
     }
 };
 setInterval(() => {

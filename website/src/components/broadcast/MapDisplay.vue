@@ -50,7 +50,7 @@ export default {
                 Escort: "https://cdn.discordapp.com/attachments/855517740914573342/868231132444000276/484444884949494949494948421651615641.png",
                 Hybrid: "https://cdn.discordapp.com/attachments/855517740914573342/868231133765201950/448489494949849494949494949494949.png",
                 Control: "https://cdn.discordapp.com/attachments/855517740914573342/868230457622396928/63541654456789487695.png",
-                Push: "https://cdn.discordapp.com/attachments/855517740914573342/969093252680679424/46464646464646464646464.png",
+                Push: "https://cdn.discordapp.com/attachments/855517740914573342/969692510249177098/puuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuush.png",
                 Spike: "https://cdn.discordapp.com/attachments/880305022716481639/883811894463447110/newspikeplant.png",
                 SpikeRush: "https://cdn.discordapp.com/attachments/880305022716481639/883809271198924840/spikerush_default.png",
                 ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png",

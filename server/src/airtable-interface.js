@@ -40,11 +40,7 @@ const reqLog = {
     },
     output() {
         console.log(`[Request log] last ${this.period}ms: ${this.counts.started} started, ${this.counts.succeeded} succeeded (${Math.floor((this.counts.succeeded / this.counts.started) * 100)}% success), ${this.counts.failed} failed (${Math.floor((this.counts.failed / this.counts.started) * 100)}% start-fails)`);
-        if (this.counts.started > 20 && this.counts.failed / this.counts.started > 0.5) {
-            this.setHighRate(false);
-        } else {
-            this.setHighRate(true);
-        }
+        this.setHighRate(this.counts.started > 20 && this.counts.failed / this.counts.started > 0.5);
     },
     setHighRate(newRate) {
         if (this.highErrorRate !== newRate) {

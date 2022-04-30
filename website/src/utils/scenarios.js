@@ -101,6 +101,22 @@ export function sortByOMatchWinrate(a, b) {
     }
     return 0;
 }
+export function sortByMapWinrate(a, b) {
+    const [aDiff, bDiff] = [a, b].map(x => x.standings.map_winrate);
+    if (aDiff !== bDiff) {
+        if (aDiff > bDiff) return -1;
+        if (aDiff < bDiff) return 1;
+    }
+    return 0;
+}
+export function sortByMatchWinrate(a, b) {
+    const [aDiff, bDiff] = [a, b].map(x => x.standings.winrate);
+    if (aDiff !== bDiff) {
+        if (aDiff > bDiff) return -1;
+        if (aDiff < bDiff) return 1;
+    }
+    return 0;
+}
 export function sortByOMapWinrate(a, b) {
     const [aDiff, bDiff] = [a, b].map(x => x.standings.opponent_map_winrate);
     if (aDiff !== bDiff) {
@@ -349,6 +365,8 @@ function miniLeaguePrep(standings) {
 function getSortMethod(stringMethod) {
     if (stringMethod === "MatchDiff") return { method: sortByMatchDiff, max: null };
     if (stringMethod === "MapDiff") return { method: sortByMapDiff, max: null };
+    if (stringMethod === "MatchWinrate") return { method: sortByMatchWinrate, max: null };
+    if (stringMethod === "MapWinrate") return { method: sortByMapWinrate, max: null };
     if (stringMethod === "HeadToHead") return { method: sortByHeadToHead, max: 2 };
     if (stringMethod === "MapWins") return { method: sortByMapWins, max: null };
     if (stringMethod === "OMW") return { method: sortByOMW, max: null };

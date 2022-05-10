@@ -221,6 +221,7 @@ module.exports = ({ app, cors, Cache, io }) => {
         return [
             "BEGIN:VEVENT",
             `UID:evt-${match.id}@slmn.gg`,
+            `DTSTAMP:${getdtz(new Date(match.created))}`,
             `DTSTART:${getdtz(start)}`,
             `DTEND:${getdtz(end)}`,
             `SUMMARY:${match.name}`,

@@ -165,4 +165,98 @@ module.exports = ({ app, cors, Cache, io }) => {
         io.to(`prod:client-${req.query.client}`).emit(req.query.event, "go");
         return res.send(":) ok bet");
     });
+
+    function getdtz(time) {
+        return [
+            time.getUTCFullYear().toString().padStart(4, "0"),
+            (time.getUTCMonth() + 1).toString().padStart(2, "0"),
+            time.getUTCDate().toString().padStart(2, "0"),
+            "T",
+            time.getUTCHours().toString().padStart(2, "0"),
+            time.getUTCMinutes().toString().padStart(2, "0"),
+            time.getUTCSeconds().toString().padStart(2, "0"),
+            "Z"
+        ].join("");
+    }
+
+    function addHours(date = new Date(), num) {
+        // console.log(date, "+", num, date.getTime(), (num * 60 * 60 * 1000), date.getTime() + (num * 60 * 60 * 1000), new Date(date.getTime() + (num * 60 * 60 * 1000)));
+        return new Date(date.getTime() + (num * 60 * 60 * 1000));
+    }
+    function addMins(date = new Date(), num) {
+        // console.log(date, "+m", num, date.getTime(), (num * 60 * 1000), date.getTime() + (num * 60 * 1000), new Date(date.getTime() + (num * 60 * 1000)));
+        return new Date(date.getTime() + (num * 60 * 1000));
+    }
+
+    function getMatchCal(match, event) {
+        let start = new Date(match.start);
+        let end = new Date(match.start);
+
+        if (match.duration) {
+            end = addMins(start, match.duration);
+        } else {
+            if (match.first_to === 2) {
+                end = addHours(start, 1);
+            }
+            if (match.first_to === 3) {
+                end = addHours(start, 2);
+            }
+        }
+
+        if (start.getTime() === end.getTime()) {
+            end = addHours(start, 1);
+        }
+
+        let matchDesc = [];
+        if (event && event.name) { matchDesc.push("Event: " + event.name); }
+        if (match.vod) { matchDesc.push("Stream: " + match.vod); }
+        matchDesc.push(`Match details: https://slmn.gg/match/${match.id.slice(3)}`);
+
+        return [
+            "BEGIN:VEVENT",
+            `UID:evt-${match.id}@slmn.gg`,
+            `DTSTART:${getdtz(start)}`,
+            `DTEND:${getdtz(end)}`,
+            `SUMMARY:${match.name}`,
+            `DESCRIPTION:${matchDesc.join("\\n")}`,
+            "END:VEVENT"
+        ];
+    }
+
+    async function generateCal(event) {
+        let matches = await Promise.all(event.matches.map(id => Cache.get(id)));
+        matches = matches.filter(m => m.start).map(m => getMatchCal(m, event));
+        if (!matches.length) return null;
+        let cal = [
+            "BEGIN:VCALENDAR",
+            "VERSION:2.0",
+            "PRODID:-//2022//SLMN.GG//EN",
+            "METHOD:PUBLISH",
+            "X-PUBLISHED-TTL:PT1H"
+        ];
+        matches.forEach(matchCal => {
+            cal = [
+                ...cal,
+                ...matchCal,
+            ];
+        });
+        cal.push("END:VCALENDAR");
+        return cal.join("\n");
+    }
+
+    app.get("/ical", async (req, res) => {
+        try {
+            if (!req.query.event) return res.status(400).send("The 'event' query is required");
+            let event = await Cache.get(req.query.event);
+            if (!event || event.__tableName !== "Events") return res.status(400).send("Unknown event");
+
+            let ical = await generateCal(event);
+            if (!ical) return res.status(400).send("No matches scheduled");
+
+            return res.header("Content-Type", "text/calendar").send(ical);
+        } catch (e) {
+            console.error(e);
+            return res.status(500).send(e.message);
+        }
+    });
 };

@@ -210,7 +210,13 @@ module.exports = ({ app, cors, Cache, io }) => {
         let matchDesc = [];
         if (event && event.name) { matchDesc.push("Event: " + event.name); }
         if (match.vod) { matchDesc.push("Stream: " + match.vod); }
-        matchDesc.push(`Match details: https://slmn.gg/match/${match.id.slice(3)}`);
+        let subdomain = event.subdomain || event.partial_subdomain;
+        matchDesc.push(`Match details: https://${subdomain ? `${subdomain}.` : ""}slmn.gg/match/${match.id.slice(3)}`);
+
+        matchDesc.push("");
+        matchDesc.push("Synced from SLMN.GG");
+        if (match.modified) matchDesc.push(`Last updated: ${new Date(match.modified).toUTCString()}.`);
+        matchDesc.push(`Last synced: ${new Date().toUTCString()}.`);
 
         return [
             "BEGIN:VEVENT",
@@ -223,7 +229,17 @@ module.exports = ({ app, cors, Cache, io }) => {
         ];
     }
 
+    function getCalCol(hex) {
+        hex = hex.replace("#", "");
+        return [
+            hex.slice(0,2),
+            hex.slice(2,4),
+            hex.slice(4,6)
+        ].map(hex => parseInt(hex, 16)).join(":");
+    }
+
     async function generateCal(event) {
+        let theme = (event.theme ? await Cache.get(event.theme[0]) : null);
         let matches = await Promise.all(event.matches.map(id => Cache.get(id)));
         matches = matches.filter(m => m.start).map(m => getMatchCal(m, event));
         if (!matches.length) return null;
@@ -232,7 +248,12 @@ module.exports = ({ app, cors, Cache, io }) => {
             "VERSION:2.0",
             "PRODID:-//2022//SLMN.GG//EN",
             "METHOD:PUBLISH",
-            "X-PUBLISHED-TTL:PT1H"
+            "CALSCALE:GREGORIAN",
+            `NAME:${event.name} (SLMN.GG)`,
+            `X-WR-CALNAME:${event.name} (SLMN.GG)`,
+            `COLOR:${theme ? getCalCol(theme.color_theme) : "64:64:64"}`,
+            "REFRESH-INTERVAL;VALUE=DURATION:PT10M",
+            "X-PUBLISHED-TTL:PT10M"
         ];
         matches.forEach(matchCal => {
             cal = [

@@ -299,7 +299,7 @@ function updateWidth(vueEl, fullWidth) {
         flex-shrink: 0;
     }
     span.industry-align {
-        transform: translate(0, -.0925em);
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
     }
 
     .ingame-team-anim-enter-active, .ingame-team-anim-leave-active {

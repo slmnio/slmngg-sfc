@@ -88,5 +88,8 @@ export default {
         align-items: center;
     }
 
-    .industry-align { transform: translate(0, -0.075em); }
+    .industry-align {
+        /* this was slightly less than normal: -0.0075em */
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
+    }
 </style>

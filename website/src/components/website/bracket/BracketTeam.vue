@@ -95,7 +95,7 @@ export default {
         line-height: 0.92;
         transform: translate(0, -0.05em);
         /*line-height: 1;*/
-        /*transform: translate(0, -0.0925em); !* industry-align *!*/
+        /* transform: var(--overlay-line-height-adjust, translate(0, -0.0925em)); !* industry-align *!*/
 
         font-size: 1.1em;
         padding: 0.15em 0;
@@ -131,7 +131,7 @@ export default {
     .team-code {
         display: none;
         font-size: 2em;
-        transform: translate(0, -0.0925em); /* industry-align */
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));/* industry-align */
     }
 
     .bracket.small .team-code {

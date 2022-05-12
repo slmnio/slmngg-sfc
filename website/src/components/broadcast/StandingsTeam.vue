@@ -119,7 +119,7 @@ export default {
     }
     .team-name, .team-rank, .team-stat {
         line-height: 1;
-        transform: translate(0, -0.0925em);
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
     }
     .team-logo {
         width: 1.25em;

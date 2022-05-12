@@ -106,4 +106,7 @@ export default {
     body.overlay #slmngg-app {
         padding-bottom: 0 !important;
     }
+    body.overlay {
+        --overlay-line-height-adjust: translate(0, -0.0925em);
+    }
 </style>

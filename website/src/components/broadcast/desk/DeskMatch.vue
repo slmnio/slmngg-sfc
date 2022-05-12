@@ -148,7 +148,9 @@ export default {
 </script>
 
 <style scoped>
-    span.industry-align { transform: translate(0, -0.09em) }
+    span.industry-align {
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
+    }
     .match-center { order: 1; }
     .score {
         background: white;

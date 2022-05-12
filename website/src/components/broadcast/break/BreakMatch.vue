@@ -238,7 +238,7 @@ export default {
         height: 100%;
     }
     span.industry-align {
-        transform: translate(0, -.0925em);
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
         display: inline-flex;
     }
 
@@ -333,7 +333,7 @@ export default {
         margin: 0 .2em;
         line-height: 1;
         font-size: calc(1.1em);
-        transform: translate(0, -0.0925em);
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
     }
     .match-special-event-name {
         flex-grow: 1;

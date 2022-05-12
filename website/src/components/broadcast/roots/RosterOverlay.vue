@@ -167,7 +167,7 @@ export default {
 }
 
 .player {
-    transform: translate(0, -0.0925em);
+    transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
 }
 
 

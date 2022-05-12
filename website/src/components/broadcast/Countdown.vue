@@ -58,7 +58,7 @@ export default {
 
 <style scoped>
     span.industry-align {
-        transform: translate(0, -.0925em);
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
     }
     .countdown {
         font-variant-numeric: tabular-nums;

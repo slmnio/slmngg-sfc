@@ -19,6 +19,7 @@
                             </div>
                         </transition>
                         <transition name="anim-break-next">
+                            <!-- TODO: make this mirror the actual countdown, handling the not-starting-on-zero thing -->
                             <div class="countdown-text" v-if="!broadcast.countdown_end && !nextMatch">Current time</div>
                         </transition>
                         <Countdown class="break-countdown" :to="broadcast.countdown_end" :timezone="broadcast.timezone"

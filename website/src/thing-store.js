@@ -41,10 +41,10 @@ export default new Vuex.Store({
             state.request_buffer.push(id);
         },
         clearRequestBuffer(state) {
-            state.request_buffer = [];
+            state.request_buffer = state.request_buffer.slice(100);
         },
         executeRequestBuffer(state) {
-            const ids = state.request_buffer;
+            const ids = state.request_buffer.slice(0, 100);
             if (!ids.length) return;
             this.commit("clearRequestBuffer");
             return fetchThings(ids);

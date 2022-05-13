@@ -157,6 +157,8 @@ export default {
     /*background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/841070262060974110/ScreenShot_21-05-09_22-48-02-000.jpg");*/
     /* Margin: 0.5 4v4 */
     /*background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/841443615557287956/ScreenShot_21-05-10_23-36-13-000.jpg");*/
+    /*background-image: url(https://cdn.discordapp.com/attachments/485493459357007876/974757857188794378/unknown.png);*/
+    background-size: contain;
     position: absolute;
     width: 100%;
     height: 100%;
@@ -182,13 +184,6 @@ export default {
 .itah-enter, .itah-leave-to {
     max-width: 0;
 }
-
-
-.ingame-overlay {
-    background-image: url(https://cdn.discordapp.com/attachments/485493459357007876/974757857188794378/unknown.png);
-    background-size: contain;
-}
-
 
 .ingame-fade-sponsors {
     position: absolute;

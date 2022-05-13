@@ -42,7 +42,11 @@ import EmptyStingerOverlay from "@/components/broadcast/roots/EmptyStingerOverla
 import OtherBroadcastsOverlay from "@/components/broadcast/roots/OtherBroadcastsOverlay";
 
 export default [
-    { path: "ingame", component: IngameOverlay, props: route => ({ codes: route.query.codes }) },
+    {
+        path: "ingame",
+        component: IngameOverlay,
+        props: route => ({ codes: route.query.codes, sponsorFadeSpeed: (route.query.sponsorSpeed || route.query.sponsorFadeSpeed) })
+    },
     {
         path: "cams",
         component: CamsWrapper,

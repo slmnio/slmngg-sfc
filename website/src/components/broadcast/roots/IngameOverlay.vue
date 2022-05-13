@@ -10,7 +10,12 @@
           <transition name="mid" mode="out-in">
               <Middle v-if="shouldShowMiddle" :text="middleText" :key="middleText" />
           </transition>
+
       </div>
+      <transition name="fade" mode="out-in">
+          {{ fadeSponsors }}
+          <Sponsors v-if="showFadeSponsors" class="ingame-fade-sponsors" :sponsors="fadeSponsors" mode="out-in" :speed="sponsorFadeSpeed" />
+      </transition>
   </div>
 </template>
 
@@ -18,11 +23,12 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import IngameTeam from "@/components/broadcast/IngameTeam";
 import Middle from "@/components/broadcast/Middle";
+import Sponsors from "@/components/broadcast/Sponsors";
 
 export default {
     name: "IngameOverlay",
-    props: ["broadcast", "codes", "animationActive", "mapattack"],
-    components: { IngameTeam, Middle },
+    props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed"],
+    components: { IngameTeam, Middle, Sponsors },
     computed: {
         match() {
             if (!this.broadcast || !this.broadcast.live_match) return null;
@@ -62,6 +68,19 @@ export default {
                 return this.middleText;
             }
             return this.teams?.length === 2 && this.middleText;
+        },
+        showFadeSponsors() {
+            return (this.broadcast?.broadcast_settings || [])?.includes("Fade ingame sponsors");
+        },
+        sponsorData() {
+            if (!this.broadcast.id) return {};
+            return ReactiveRoot(this.broadcast.id, {
+                persistent_sponsors: ReactiveArray("persistent_sponsors"),
+                sponsors: ReactiveArray("sponsors")
+            });
+        },
+        fadeSponsors() {
+            return this.sponsorData?.persistent_sponsors || this.sponsorData?.sponsors;
         },
         middleText() {
             if (!this.match) return null;
@@ -165,4 +184,33 @@ export default {
 }
 
 
+.ingame-overlay {
+    background-image: url(https://cdn.discordapp.com/attachments/485493459357007876/974757857188794378/unknown.png);
+    background-size: contain;
+}
+
+
+.ingame-fade-sponsors {
+    position: absolute;
+    bottom: 0;
+    padding: 0 !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 80px;
+}
+
+.ingame-fade-sponsors >>> .sponsors-holder {
+    height: 100% !important;
+    width: 320px !important;
+}
+
+.ingame-fade-sponsors >>> .break-sponsor {
+    background-color: transparent !important;
+}
+
+.ingame-fade-sponsors >>> .break-sponsor-logo {
+    height: calc(100% - 1.5em) !important;
+}
 </style>

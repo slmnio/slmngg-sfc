@@ -17,7 +17,7 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "Sponsors",
-    props: ["sponsors", "size", "mode"],
+    props: ["sponsors", "size", "mode", "speed"],
     data: () => ({
         sponsorIndex: 0
     }),
@@ -41,7 +41,8 @@ export default {
         }
     },
     mounted() {
-        setInterval(this.nextSponsor, 10000);
+        console.log(this.sponsors);
+        setInterval(this.nextSponsor, this.speed || 10000);
     }
 };
 </script>

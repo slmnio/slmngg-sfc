@@ -9,7 +9,7 @@ function money(num) {
     return `$${num || 0}k`;
 }
 function getAuctionMax() {
-    return 8;
+    return 7;
 }
 
 function deAirtable(obj) {
@@ -62,7 +62,7 @@ const Auction = {
     activePlayer: null,
     wait: {
         afterInitial: 20,
-        afterBid: 12
+        afterBid: 15
     },
     stats: {},
     timeouts: {},
@@ -172,7 +172,7 @@ const Auction = {
     getBroadcast: async function() {
         try {
             return await select("Broadcasts", {
-                filterByFormula: "{Key} = \"bpl3\""
+                filterByFormula: "{Key} = \"vvl\""
             });
         } catch (e) {
             console.error(e);

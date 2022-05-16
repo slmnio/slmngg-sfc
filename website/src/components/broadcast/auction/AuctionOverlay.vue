@@ -19,8 +19,8 @@
                 <div class="player-info w-100 flex-center flex-column">
                     <div v-if="player">
                         <div class="player-name">{{ player.name }}</div>
-                        <div class="player-teams d-flex flex-wrap flex-center">
-                            <PlayerTeamDisplay :team="team" v-for="team in playerTeams" v-bind:key="team.id" />
+                        <div class="player-teams d-flex flex-wrap flex-center" v-for="group in groupedTeams" :key="group.group" :class="`group-${group.group}`">
+                            <PlayerTeamDisplay :team="team" v-for="team in group.teams" v-bind:key="team.id" />
                         </div>
                     </div>
                 </div>
@@ -126,6 +126,22 @@ export default {
                 return true;
             }).sort((a, b) => sortEvents(a.event, b.event));
         },
+        groupedTeams() {
+            if (!this.broadcast?.event?.game) return [{ teams: this.playerTeams, group: "all" }];
+            const sameGame = [];
+            const diffGame = [];
+            this.playerTeams.forEach(team => {
+                if (team.game?.[0] === this.broadcast.event.game) {
+                    sameGame.push(team);
+                } else {
+                    diffGame.push(team);
+                }
+            });
+            return [
+                { teams: sameGame, group: "same" },
+                { teams: diffGame, group: "diff" }
+            ];
+        },
         eventLogo() {
             if (!this._broadcast?.event?.theme) return {};
             return resizedImage(this._broadcast.event.theme, ["default_logo", "default_wordmark"], "h-200");
@@ -174,12 +190,13 @@ export default {
         },
         displayTeams() {
             if (!this.teams?.length) return [];
-            let teams = this.teams;
-            if (this.teams.length > 8) {
-                if (this.rightDisplay === "teams-1") teams = teams.slice(0, 8);
-                if (this.rightDisplay === "teams-2") teams = teams.slice(8, 16);
-            }
+            const teams = this.teams;
             return teams;
+            // if (this.teams.length > 8) {
+            //     if (this.rightDisplay === "teams-1") teams = teams.slice(0, 8);
+            //     if (this.rightDisplay === "teams-2") teams = teams.slice(8, 16);
+            // }
+            // return teams;
         },
         signedTeam() {
             if (!this.justSigned?.id) return null;
@@ -338,6 +355,7 @@ export default {
     .event-stats div {
         margin: 2px 0;
     }
-
-
+    .group-diff {
+        transform: scale(0.75);
+    }
 </style>

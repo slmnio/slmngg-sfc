@@ -139,6 +139,11 @@ const app = new Vue({
         broadcast: null,
         defaults: {
             camParams: (["cover", "na", "animate=0"]).join("&")
+        },
+        auth: {
+            authorized: false,
+            token: null,
+            user: null
         }
     }),
     mounted() {

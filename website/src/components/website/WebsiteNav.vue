@@ -57,6 +57,10 @@
                 <b-navbar-nav v-else>
                     <a v-if="$root.version" class="nav-link" target="_blank" href="https://github.com/slmnio/slmngg-sfc">SLMN.GG {{ $root.version }}</a>
                     <a target="_blank" class="nav-link" href="https://slmn.statuspage.io/?utm_source=slmngg_nav">Status</a>
+
+                    <router-link class="nav-link" to="/login" v-if="!$root.auth.user">Login</router-link>
+                    <LoggedInUser v-if="$root.auth.user"/>
+
                 </b-navbar-nav>
             </b-collapse>
         </b-navbar>
@@ -79,10 +83,12 @@ import NavLiveMatch from "@/components/website/NavLiveMatch";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import WebsiteNavBanner from "@/components/website/WebsiteNavBanner";
 import { resizedImageNoWrap } from "@/utils/images";
+import LoggedInUser from "@/components/website/LoggedInUser";
 
 export default {
     name: "WebsiteNav",
     components: {
+        LoggedInUser,
         WebsiteNavBanner,
         BNavbar,
         BNavbarToggle,

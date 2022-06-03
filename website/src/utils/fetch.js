@@ -82,7 +82,7 @@ export async function fetchThings (ids) {
                 data: item
             });
             if (cleanID(item.id) !== item.__id) {
-                console.log("[custom update]", item.__id, item.id);
+                // console.log("[custom update]", item.__id, item.id);
                 store.commit("push", {
                     id: item.__id,
                     data: item

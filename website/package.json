@@ -17,6 +17,7 @@
     "spacetime": "^6.16.0",
     "spacetime-informal": "^0.6.1",
     "vue": "^2.6.11",
+    "vue-cookies": "^1.8.1",
     "vue-meta": "^2.4.0",
     "vue-router": "^3.2.0",
     "vue-server-renderer": "^2.6.12",

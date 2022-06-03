@@ -150,6 +150,12 @@ async function set(id, data, options) {
             });
         }
     }
+    if (options?.eager) {
+        console.log({
+            id,
+            data
+        });
+    }
 
     if (data?.__tableName === "Events") {
         // update antileak
@@ -231,7 +237,14 @@ async function authStart(storedData) {
 }
 
 async function getAuthenticatedData(token) {
-    return auth.get(token);
+    let data = auth.get(token);
+
+    // update airtable data
+    if (data?.airtableID) {
+        data.user.airtable = await get(data.airtableID);
+    }
+
+    return data;
 }
 
 async function getPlayer(discordID) {

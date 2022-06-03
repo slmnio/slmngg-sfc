@@ -169,10 +169,6 @@ export function getAuctionMax() {
 }
 
 export function clarifyTeam(team) {
-    console.log({
-        team,
-        event: team.event
-    });
     if (team.event && team.event.clarify_teams && team.event.short) {
         return `${team.name} (${team.event.short})`;
     }

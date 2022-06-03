@@ -11,6 +11,7 @@ import ClientApp from "@/apps/ClientApp";
 import BroadcastRoutes from "@/router/broadcast";
 import SharedRoutes from "@/router/shared-routes";
 import Authenticator from "@/views/Authenticator";
+import Dashboard from "@/views/Dashboard";
 
 export default [
     {
@@ -43,6 +44,11 @@ export default [
                 // this generates a separate chunk (about.[hash].js) for this route
                 // which is lazy-loaded when the route is visited.
                 component: () => import(/* webpackChunkName: "about" */ "../views/About.vue")
+            },
+            {
+                path: "/dashboard",
+                meta: { requiresAuth: true },
+                component: Dashboard
             },
             {
                 path: "/auth/discord/return",

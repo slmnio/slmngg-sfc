@@ -8,6 +8,7 @@ import VueSocketIOExt from "vue-socket.io-extended";
 import { io } from "socket.io-client";
 import { VBTooltip } from "bootstrap-vue";
 import VueYoutubeEmbed from "vue-youtube-embed";
+import VueCookies from "vue-cookies";
 
 import defaultRoutes from "@/router/default";
 import { getDataServerAddress, fetchThings } from "@/utils/fetch";
@@ -17,12 +18,15 @@ import Event from "@/views/Event";
 import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp";
 import NotFoundPage from "@/views/NotFoundPage";
 import SharedRoutes from "@/router/shared-routes";
+import { ReactiveRoot } from "@/utils/reactive";
+import { authenticateWithToken } from "@/utils/auth";
 
 
 Vue.use(Vuex);
 Vue.use(VueMeta);
 Vue.use(VueRouter);
 Vue.use(VueYoutubeEmbed, { global: false });
+Vue.use(VueCookies);
 
 store.subscribe((mutation, state) => {
     if (mutation.type === "setPlayerDraftNotes") {
@@ -141,12 +145,11 @@ const app = new Vue({
             camParams: (["cover", "na", "animate=0"]).join("&")
         },
         auth: {
-            authorized: false,
             token: null,
             user: null
         }
     }),
-    mounted() {
+    async mounted() {
         console.log("[app]", "subdomain", subdomain);
         console.log("[app]", "data server", getDataServerAddress());
         if (subdomain) {
@@ -161,6 +164,14 @@ const app = new Vue({
                 this.$store.state.draft_notes = notes;
             }
         } catch (e) { console.error("Draft notes local storage error", e); }
+
+        if (!this.auth.user) {
+            const token = this.$cookies.get("token");
+            if (token) {
+                // authenticate
+                await authenticateWithToken(this, token);
+            }
+        }
     },
     computed: {
         minisiteEvent() {
@@ -168,6 +179,10 @@ const app = new Vue({
         },
         version() {
             return process.env?.VUE_APP_SLMNGG_VERSION;
+        },
+        authUser() {
+            if (!this.auth.user?.airtableID) return null;
+            return ReactiveRoot(this.auth.user.airtableID);
         }
     },
     methods: {
@@ -198,3 +213,16 @@ const app = new Vue({
         }
     }
 }).$mount("#app");
+
+
+// TODO: this doesn't really work very well nor work on the first run
+app.$router.beforeResolve((to, from, next) => {
+    console.log("routerResolve", to, this);
+    if (to.meta.requiresAuth && !app.auth.user) {
+        // authenticating!
+        return next({ path: "/login" });
+        // TODO: to.fullPath can be used to return
+    }
+    next();
+});
+

@@ -11,10 +11,11 @@ module.exports = ({ app, router, cors, Cache, io }) => {
     const authApp = router;
     authApp.use(bodyParser.json());
 
-    authApp.options("/login", cors());
-    authApp.post("/login", cors(), async (req, res) => {
+    authApp.options("/*", cors());
+
+    authApp.post("/discord-login", cors(), async (req, res) => {
         console.log("[auth] attempt", req.body);
-        const code = req.body.code;
+        const code = req.body?.code;
         if (!code) return res.status(400).send({ error: true, message: "No code sent to SLMN.GG server for Discord auth" });
 
         let tokens = await getToken(code);
@@ -28,7 +29,7 @@ module.exports = ({ app, router, cors, Cache, io }) => {
         }
 
         let user = await getUser(tokens.access_token);
-        console.log("user", user);
+        // console.log("user", user);
 
         if (!user.discord) {
             return res.send({
@@ -62,12 +63,25 @@ module.exports = ({ app, router, cors, Cache, io }) => {
     });
 
 
-    app.use("/auth", authApp);
+    authApp.post("/login", cors(), async (req, res) => {
+        const token = req.body?.token;
+        if (!token) return res.status(400).send({ error: true, message: "No token sent to SLMN.GG server for Discord auth" });
 
+        let userData = await Cache.auth.getData(token);
+        if (!userData?.user) return res.status(404).send({ error: true, message: "Unknown token", for_a_developer: "No data associated with that token" });
+
+        return res.send({
+            error: false,
+            user: cleanUser(userData.user)
+        });
+    });
+
+
+    app.use("/auth", authApp);
 
     async function getToken(code) {
 
-        console.log("ZOOM DISCORD TIME");
+        // console.log("ZOOM DISCORD TIME");
         const data = {
             client_id: process.env.DISCORD_CLIENT_ID,
             client_secret: process.env.DISCORD_CLIENT_SECRET,
@@ -81,7 +95,6 @@ module.exports = ({ app, router, cors, Cache, io }) => {
             .map(parts => parts.map(part => encodeURIComponent(part)).join("="))
             .join("&");
 
-        console.log(data);
         const tokens = await fetch("https://discord.com/api/oauth2/token", {
             method: "POST",
             body: stringParams,
@@ -90,7 +103,6 @@ module.exports = ({ app, router, cors, Cache, io }) => {
             }
         }).then(res => res.json());
 
-        console.log(tokens);
         return tokens;
     }
 
@@ -122,9 +134,10 @@ function cleanID(id) {
 }
 
 function cleanUser(user) {
+    // console.log("clean user", user);
     return ({
-        discordID: user.discord.id,
-        airtableID: cleanID(user.airtable.id),
+        discordID: user.discord?.id,
+        airtableID: cleanID(user.airtable?.id),
         name: user.airtable.name,
         avatar: `https://cdn.discordapp.com/avatars/${user.discord.id}/${user.discord.avatar}.png`
     });

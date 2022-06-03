@@ -36,6 +36,7 @@
                     <router-link active-class="active" class="nav-link" to="/events">Events</router-link>
                     <router-link active-class="active" class="nav-link" to="/teams">Teams</router-link>
                     <router-link active-class="active" class="nav-link" to="/players">Players</router-link>
+                    <router-link active-class="active" class="nav-link" to="/dashboard">Dashboard</router-link>
 <!--                    <router-link active-class="active" class="nav-link" to="/news">News</router-link>-->
                 </b-navbar-nav>
                 <b-navbar-nav v-if="minisite" class="flex-wrap">

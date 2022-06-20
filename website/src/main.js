@@ -101,12 +101,42 @@ if (subdomain) {
     routes = defaultRoutes;
 }
 
+const router = new VueRouter({
+    mode: "history",
+    base: process.env.BASE_URL,
+    routes
+});
+
+let preloadAuthCheckRequired = false;
+
+// TODO: this doesn't really work very well nor work on the first run
+router.beforeEach((to, from, next) => {
+    try {
+        console.log("routerResolve", to, this, app);
+        if (to.meta.requiresAuth) {
+            // authenticating!
+
+            if (app && !app.auth.user) {
+                return next({ path: "/login" });
+                // TODO: to.fullPath can be used for return (set in localstorage or something  /redirect?to=)
+            } else {
+                console.warn("Need to check if authenticated, but the app hasn't loaded yet.");
+                preloadAuthCheckRequired = true;
+                // console.log(document.cookie);
+                // return next({ path: "/login" });
+            }
+        }
+
+        next();
+    } catch (e) {
+        console.error("Vue navigation error", e);
+        next();
+    }
+});
+
+
 const app = new Vue({
-    router: new VueRouter({
-        mode: "history",
-        base: process.env.BASE_URL,
-        routes
-    }),
+    router,
     render: h => h(GlobalApp),
     store,
     sockets: {
@@ -172,6 +202,12 @@ const app = new Vue({
                 await authenticateWithToken(this, token);
             }
         }
+
+        if (!this.auth.user && preloadAuthCheckRequired) {
+            console.warn("App loaded, recognising preload check is required and we're not authenticated. Sending to login");
+            preloadAuthCheckRequired = false;
+            this.$router.push("/login");
+        }
     },
     computed: {
         minisiteEvent() {
@@ -213,16 +249,3 @@ const app = new Vue({
         }
     }
 }).$mount("#app");
-
-
-// TODO: this doesn't really work very well nor work on the first run
-app.$router.beforeResolve((to, from, next) => {
-    console.log("routerResolve", to, this);
-    if (to.meta.requiresAuth && !app.auth.user) {
-        // authenticating!
-        return next({ path: "/login" });
-        // TODO: to.fullPath can be used to return
-    }
-    next();
-});
-

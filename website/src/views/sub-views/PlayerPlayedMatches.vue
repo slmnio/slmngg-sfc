@@ -38,7 +38,12 @@ export default {
                 console.log(team.matches);
                 if (team.matches) matches = matches.concat(team.matches);
             });
-            return matches.sort(sortMatches);
+
+            const sortIndex = {};
+            matches.forEach((match, i) => {
+                sortIndex[match.id] = i;
+            });
+            return matches.filter((val, i) => sortIndex[val.id] === i).sort(sortMatches);
         }
     }
 };

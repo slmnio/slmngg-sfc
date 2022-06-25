@@ -4,6 +4,7 @@
             <div class="avatar" :style="avatar"></div>
             <div class="name">{{ user.name }}</div>
         </template>
+        <b-dropdown-item variant="dark" to="/profile" active-class="active">Profile</b-dropdown-item>
         <b-dropdown-item variant="dark" :to="url('player', { id: playerID })" active-class="active">Player page</b-dropdown-item>
         <b-dropdown-item variant="dark" to="/dashboard" active-class="active">Dashboard</b-dropdown-item>
     </b-nav-item-dropdown>

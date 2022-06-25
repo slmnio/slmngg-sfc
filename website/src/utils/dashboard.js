@@ -20,3 +20,10 @@ export async function setActiveBroadcast(auth, client, broadcast) {
         client: client.id || client, broadcast: broadcast.id || broadcast
     });
 }
+
+export async function updateProfileData(auth, profileData) {
+    if (!auth?.user) return { error: true, message: "Not authenticated" };
+    return await authenticatedRequest(auth, "dashboard/update-profile-data", {
+        profileData
+    });
+}

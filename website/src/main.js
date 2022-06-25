@@ -116,6 +116,8 @@ router.beforeEach((to, from, next) => {
         if (to.meta.requiresAuth) {
             // authenticating!
 
+            localStorage.setItem("auth_next", to.fullPath);
+
             if (app && !app.auth.user) {
                 return next({ path: "/login" });
                 // TODO: to.fullPath can be used for return (set in localstorage or something  /redirect?to=)

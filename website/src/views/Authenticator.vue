@@ -29,7 +29,13 @@ export default {
         if (authResult.error) {
             this.errorMessage = authResult.errorMessage;
         } else {
-            this.$router.push("/dashboard"); // TODO: add previous route to storage
+            const next = localStorage.getItem("auth_next");
+            if (next) {
+                localStorage.removeItem("auth_next");
+                this.$router.push(next);
+            } else {
+                this.$router.push("/dashboard");
+            }
         }
     }
 };

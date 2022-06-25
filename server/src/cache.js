@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 
 /*
     - Get and set data
@@ -7,6 +8,8 @@
 
 const store = new Map();
 const hiddenEvents = new Map();
+const auth = new Map();
+const players = new Map();
 
 function getAntiLeakIDs() {
     if (process.env.DISABLE_ANTILEAK === "true") return []; // don't hide anything on local
@@ -147,6 +150,12 @@ async function set(id, data, options) {
             });
         }
     }
+    if (options?.eager) {
+        console.log({
+            id,
+            data
+        });
+    }
 
     if (data?.__tableName === "Events") {
         // update antileak
@@ -182,6 +191,10 @@ async function set(id, data, options) {
         data = await removeAntiLeak(id, data);
     }
 
+    if (data?.__tableName === "Players") {
+        if (data.discord_id) players.set(data.discord_id, data);
+    }
+
     data = await removeAttachmentTimestamps(data);
 
     // Check antileak to see if this should be hidden or redacted
@@ -206,7 +219,44 @@ async function get(id) {
     };
 }
 
+async function createToken() {
+    return new Promise((resolve, reject) => {
+        crypto.randomBytes(32, (err, buffer) => {
+            if (err) reject(err);
+            const token = buffer.toString("hex");
+            resolve(token);
+        });
+    });
+}
+
+async function authStart(storedData) {
+    const token = await createToken();
+    // console.log(token, storedData);
+    auth.set(token, storedData);
+    return token;
+}
+
+async function getAuthenticatedData(token) {
+    let data = auth.get(token);
+
+    // update airtable data
+    if (data?.airtableID) {
+        data.user.airtable = await get(data.airtableID);
+    }
+
+    return data;
+}
+
+async function getPlayer(discordID) {
+    return players.get(discordID);
+}
+
 
 module.exports = {
-    set, get, setup, onUpdate
+    set, get, setup, onUpdate,
+    auth: {
+        start: authStart,
+        getData: getAuthenticatedData,
+        getPlayer
+    }
 };

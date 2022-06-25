@@ -8,6 +8,7 @@ import VueSocketIOExt from "vue-socket.io-extended";
 import { io } from "socket.io-client";
 import { VBTooltip } from "bootstrap-vue";
 import VueYoutubeEmbed from "vue-youtube-embed";
+import VueCookies from "vue-cookies";
 
 import defaultRoutes from "@/router/default";
 import { getDataServerAddress, fetchThings } from "@/utils/fetch";
@@ -17,12 +18,15 @@ import Event from "@/views/Event";
 import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp";
 import NotFoundPage from "@/views/NotFoundPage";
 import SharedRoutes from "@/router/shared-routes";
+import { ReactiveRoot } from "@/utils/reactive";
+import { authenticateWithToken } from "@/utils/auth";
 
 
 Vue.use(Vuex);
 Vue.use(VueMeta);
 Vue.use(VueRouter);
 Vue.use(VueYoutubeEmbed, { global: false });
+Vue.use(VueCookies);
 
 store.subscribe((mutation, state) => {
     if (mutation.type === "setPlayerDraftNotes") {
@@ -97,12 +101,44 @@ if (subdomain) {
     routes = defaultRoutes;
 }
 
+const router = new VueRouter({
+    mode: "history",
+    base: process.env.BASE_URL,
+    routes
+});
+
+let preloadAuthCheckRequired = false;
+
+// TODO: this doesn't really work very well nor work on the first run
+router.beforeEach((to, from, next) => {
+    try {
+        console.log("routerResolve", to, this, app);
+        if (to.meta.requiresAuth) {
+            // authenticating!
+
+            localStorage.setItem("auth_next", to.fullPath);
+
+            if (app && !app.auth.user) {
+                return next({ path: "/login" });
+                // TODO: to.fullPath can be used for return (set in localstorage or something  /redirect?to=)
+            } else {
+                console.warn("Need to check if authenticated, but the app hasn't loaded yet.");
+                preloadAuthCheckRequired = true;
+                // console.log(document.cookie);
+                // return next({ path: "/login" });
+            }
+        }
+
+        next();
+    } catch (e) {
+        console.error("Vue navigation error", e);
+        next();
+    }
+});
+
+
 const app = new Vue({
-    router: new VueRouter({
-        mode: "history",
-        base: process.env.BASE_URL,
-        routes
-    }),
+    router,
     render: h => h(GlobalApp),
     store,
     sockets: {
@@ -139,9 +175,13 @@ const app = new Vue({
         broadcast: null,
         defaults: {
             camParams: (["cover", "na", "animate=0"]).join("&")
+        },
+        auth: {
+            token: null,
+            user: null
         }
     }),
-    mounted() {
+    async mounted() {
         console.log("[app]", "subdomain", subdomain);
         console.log("[app]", "data server", getDataServerAddress());
         if (subdomain) {
@@ -156,6 +196,20 @@ const app = new Vue({
                 this.$store.state.draft_notes = notes;
             }
         } catch (e) { console.error("Draft notes local storage error", e); }
+
+        if (!this.auth.user) {
+            const token = this.$cookies.get("token");
+            if (token) {
+                // authenticate
+                await authenticateWithToken(this, token);
+            }
+        }
+
+        if (!this.auth.user && preloadAuthCheckRequired) {
+            console.warn("App loaded, recognising preload check is required and we're not authenticated. Sending to login");
+            preloadAuthCheckRequired = false;
+            this.$router.push("/login");
+        }
     },
     computed: {
         minisiteEvent() {
@@ -163,6 +217,10 @@ const app = new Vue({
         },
         version() {
             return process.env?.VUE_APP_SLMNGG_VERSION;
+        },
+        authUser() {
+            if (!this.auth.user?.airtableID) return null;
+            return ReactiveRoot(this.auth.user.airtableID);
         }
     },
     methods: {

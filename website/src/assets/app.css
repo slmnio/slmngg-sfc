@@ -181,7 +181,7 @@ a.link-text {
 .f-col { display: flex; flex-direction: column; }
 .f-row { display: flex; flex-direction: row; }
 
-.navbar-nav .nav-item>*, .navbar-nav>* {
+.navbar-nav .nav-item, .navbar-nav div {
     line-height: 1;
     text-align: center;
     display: flex;
@@ -258,4 +258,8 @@ a.ct-passive:hover,
 .ct-passive a:hover,
 .ct-passive:hover a {
     color: var(--theme-active, #66d9ff);
+}
+
+.modal-content {
+    color: #222;
 }

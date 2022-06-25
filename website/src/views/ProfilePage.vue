@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container" v-if="player && player.name">
         <h1>Profile Page</h1>
         <b-alert v-model="showAlert" dismissible variant="danger">
             {{ errorMessage }}
@@ -28,6 +28,7 @@
             <div>
                 <b-button type="submit" variant="success">
                     <span v-if="submitting"><i class="fa fa-spin fa-cog fa-fw"></i> Saving</span>
+                    <span v-else-if="success"><i class="fa fa-check fa-fw"></i> Saved</span>
                     <span v-else>Save</span>
                 </b-button>
             </div>
@@ -123,7 +124,9 @@ export default {
         },
         submitting: false,
         errorMessage: null,
-        showAlert: false
+        showAlert: false,
+        success: null,
+        successShowTimeout: null
     }),
     watch: {
         player: {
@@ -172,6 +175,11 @@ export default {
             } else {
                 this.errorMessage = null;
                 this.showAlert = false;
+                this.success = true;
+                if (this.successShowTimeout) clearTimeout(this.successShowTimeout);
+                this.successShowTimeout = setTimeout(() => {
+                    this.success = null;
+                }, 3000);
             }
 
             this.submitting = false;

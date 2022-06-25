@@ -73,7 +73,7 @@ export default [
             console.log("ZOOM DISCORD TIME");
             const params = {
                 client_id: process.env.VUE_APP_DISCORD_CLIENT_ID,
-                redirect_uri: "http://localhost:8080/auth/discord/return",
+                redirect_uri: process.env.VUE_APP_DISCORD_REDIRECT_URI,
                 response_type: "code",
                 scope: ["identify"].join(" ")
             };

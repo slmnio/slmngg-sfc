@@ -231,7 +231,7 @@ async function createToken() {
 
 async function authStart(storedData) {
     const token = await createToken();
-    console.log(token, storedData);
+    // console.log(token, storedData);
     auth.set(token, storedData);
     return token;
 }

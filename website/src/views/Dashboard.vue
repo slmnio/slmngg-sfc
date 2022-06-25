@@ -3,9 +3,6 @@
         <h1>SLMN.GG Dashboard</h1>
         <div class="client-broadcasts" v-if="client && client.broadcast">
             <BroadcastSwitcher :broadcasts="client.broadcast" />
-<!--            <div class="client" v-for="(broadcast, i) in client.broadcast" :key="broadcast.id">-->
-<!--                {{ broadcast.name }} {{ i === 0 ? '✅' : '' }}-->
-<!--            </div>-->
         </div>
     </div>
 </template>

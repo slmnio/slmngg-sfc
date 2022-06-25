@@ -369,7 +369,7 @@ async function findMember(guild, discordTag) {
     let [username, discriminator] = discordTag.split("#");
     let checkFunction = (m) => m.user && m.user.username.toLowerCase() === username.toLowerCase() && m.user.discriminator === discriminator;
 
-    let member = guild.members.cache.find(checkFunction);
+    let member = guild.members?.cache?.find(checkFunction);
     if (member) return member;
 
     let results = await guild.members.search({ query: username });

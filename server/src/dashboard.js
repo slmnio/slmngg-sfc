@@ -83,7 +83,7 @@ module.exports = ({ app, router, cors, Cache, io }) => {
             }
 
 
-            // console.log(userData.user.airtable.name, "is setting", validatedData);
+            console.log("[profile]", userData.user.airtable.name, userData.user.airtable.id, "is setting", validatedData);
             let recordResponse = await updateRecord("Players", userData.user.airtable, {
                 ...validatedData
             });

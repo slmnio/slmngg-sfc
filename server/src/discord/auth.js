@@ -14,7 +14,7 @@ module.exports = ({ app, router, cors, Cache, io }) => {
     authApp.options("/*", cors());
 
     authApp.post("/discord-login", cors(), async (req, res) => {
-        console.log("[auth] attempt", req.body);
+        // console.log("[auth] attempt", req.body);
         const code = req.body?.code;
         if (!code) return res.status(400).send({ error: true, message: "No code sent to SLMN.GG server for Discord auth" });
 
@@ -53,6 +53,8 @@ module.exports = ({ app, router, cors, Cache, io }) => {
             tokens
         });
 
+        console.log(`[login] Successful auth & login by ${user.airtable.name} ${user.airtable.id}`);
+
         return res.send({
             error: false,
             token: localToken,
@@ -69,6 +71,9 @@ module.exports = ({ app, router, cors, Cache, io }) => {
 
         let userData = await Cache.auth.getData(token);
         if (!userData?.user) return res.status(404).send({ error: true, message: "Unknown token", for_a_developer: "No data associated with that token" });
+
+
+        console.log(`[login] Successful token login by ${userData.user.airtable.name} ${userData.user.airtable.id}`);
 
         return res.send({
             error: false,

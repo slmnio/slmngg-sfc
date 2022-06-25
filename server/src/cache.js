@@ -151,10 +151,10 @@ async function set(id, data, options) {
         }
     }
     if (options?.eager) {
-        console.log({
-            id,
-            data
-        });
+        // console.log({
+        //     id,
+        //     data
+        // });
     }
 
     if (data?.__tableName === "Events") {

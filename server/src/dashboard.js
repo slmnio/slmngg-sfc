@@ -56,8 +56,8 @@ module.exports = ({ app, router, cors, Cache, io }) => {
         required: ["profileData"],
         handler: async (req, res, { profileData: profileData }, token) => {
             let userData = await Cache.auth.getData(token);
-            if (!userData?.user?.airtable.id) return res.status(403).send({ error: true, message: "Not authenticated - try logging in again." });
-
+            if (!userData?.user?.airtable.id) return res.status(401).send({ error: true, message: "Not authenticated - try logging in again." });
+            if (userData.user.airtable?.website_settings?.includes("No profile editing")) return res.status(403).send({ error: true, message: "You are restricted from editing your profile."});
             let validatedData = {};
 
             if (profileData.pronouns) {

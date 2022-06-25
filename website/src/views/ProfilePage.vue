@@ -5,10 +5,10 @@
             {{ errorMessage }}
         </b-alert>
 
-        <b-form class="mt-4 opacity-changes" @submit="onSubmit" :class="{'low-opacity': submitting}">
+        <b-form class="mt-4 opacity-changes" @submit="onSubmit" :class="{'low-opacity': submitting || isRestricted }">
 
             <b-form-group label="Name" label-cols="2">
-                <div class="fake-input">{{ player.name }}</div>
+                <div class="fake-input" v-b-tooltip.bottom="'To change your player name, send a message to #slmngg-requests or send in a ModMail.'">{{ player.name }}</div>
             </b-form-group>
             <b-form-group label="Pronouns" label-cols="2">
                 <b-form-select :options="pronouns" v-model="profile.pronouns"/>
@@ -50,6 +50,9 @@ export default {
             return ReactiveRoot(this.$root.auth.user.airtableID, {
 
             });
+        },
+        isRestricted() {
+            return this.player?.website_settings?.includes("No profile editing");
         },
         _heroes() {
             const heroes = ReactiveRoot("Heroes", {
@@ -147,6 +150,12 @@ export default {
                     });
                 }
             }
+        },
+        isRestricted(restricted) {
+            if (restricted) {
+                this.errorMessage = "You are restricted from editing your profile.";
+                this.showAlert = true;
+            }
         }
     },
     methods: {
@@ -179,6 +188,10 @@ export default {
     },
     mounted() {
         this.updateProfile(this.player);
+        if (this.isRestricted) {
+            this.errorMessage = "You are restricted from editing your profile.";
+            this.showAlert = true;
+        }
     }
 };
 </script>

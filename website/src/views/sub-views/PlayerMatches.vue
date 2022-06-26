@@ -2,7 +2,7 @@
     <div>
         <div class="container">
             <div>
-                <h6 class="d-flex matches-bar">Games: <a v-for="rel in mainPlayerRelationships" v-bind:key="rel.meta.singular_name" :href="'#' + convertToSlug(rel.meta.singular_name)">{{ rel.items.length }} as {{ rel.meta.singular_name }}</a></h6>
+                <h6 class="d-flex flex-wrap matches-bar">Games: <a v-for="rel in mainPlayerRelationships" v-bind:key="rel.meta.singular_name" :href="'#' + convertToSlug(rel.meta.singular_name)">{{ rel.items.length }} as {{ rel.meta.singular_name }}</a></h6>
             </div>
             <div class="role-group" v-for="rel in mainPlayerRelationships" v-bind:key="rel.meta.singular_name">
                 <h1 :id="convertToSlug(rel.meta.singular_name)">as {{ rel.meta.singular_name }} ({{ rel.items.length }})</h1>
@@ -86,6 +86,6 @@ export default {
 
 <style scoped>
     .matches-bar {
-        gap: 2rem;
+        gap: .5rem 1.5rem;
     }
 </style>

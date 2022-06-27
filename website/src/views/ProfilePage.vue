@@ -7,21 +7,21 @@
 
         <b-form class="mt-4 opacity-changes" @submit="onSubmit" :class="{'low-opacity': submitting || isRestricted }">
 
-            <b-form-group label="Name" label-cols="2">
+            <b-form-group label="Name" label-cols-lg="2" label-cols-sm="3" label-cols="12">
                 <div class="fake-input" v-b-tooltip.bottom="'To change your player name, send a message to #slmngg-requests or send in a ModMail.'">{{ player.name }}</div>
             </b-form-group>
-            <b-form-group label="Pronouns" label-cols="2">
+            <b-form-group label="Pronouns" label-cols-lg="2" label-cols-sm="3" label-cols="12">
                 <b-form-select :options="pronouns" v-model="profile.pronouns"/>
             </b-form-group>
-            <b-form-group label="Pronunciation" label-cols="2">
+            <b-form-group label="Pronunciation" label-cols-lg="2" label-cols-sm="3" label-cols="12">
                 <b-form-input v-model="profile.pronunciation" :state="profile.pronunciation && profile.pronunciation.length > 100 ? false : null "/>
                 <b-form-invalid-feedback>Please keep your pronunciation to less than 100 characters.</b-form-invalid-feedback>
             </b-form-group>
             <hr>
-            <b-form-group label="Overwatch Role" label-cols="2">
+            <b-form-group label="Overwatch Role" label-cols-lg="2" label-cols-sm="3" label-cols="12">
                 <b-form-select :options="roles" v-model="profile.role"/>
             </b-form-group>
-            <b-form-group label="Favourite Hero" label-cols="2" class="hero-form-group">
+            <b-form-group label="Favourite Hero" label-cols-lg="2" label-cols-sm="3" label-cols="12" class="hero-form-group">
                 <div class="hero-image mr-2" :style="heroImage"></div>
                 <b-form-select :options="heroes" v-model="profile.favourite_hero" :disabled="heroes.length === 0" />
             </b-form-group>
@@ -112,8 +112,8 @@ export default {
         ],
         roles: [
             "DPS",
-            "Support",
             "Tank",
+            "Support",
             "Flex"
         ],
         profile: {
@@ -234,7 +234,8 @@ export default {
         background-repeat: no-repeat;
         flex-shrink: 0;
         border-radius: 4px;
-        background-color: rgba(255,255,255,0.1)
+        background-color: rgba(255,255,255,0.1);
+        background-size: 100%;
     }
     .hero-form-group >>> .col {
         display: flex;

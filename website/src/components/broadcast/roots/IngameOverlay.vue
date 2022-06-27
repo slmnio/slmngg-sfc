@@ -4,7 +4,7 @@
           <transition-group name="itah" mode="out-in">
               <IngameTeam :key="`${team.id}-${i}`" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
                           :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores" :extend-icons="extendIcons"
-                          :width="teamWidth" :codes="codes" :event="broadcast.event" :auto-small="autoSmall" :map-attack="attacks[i]"/>
+                          :width="teamWidth" :codes="useCodes" :event="broadcast.event" :auto-small="autoSmall" :map-attack="attacks[i]"/>
           </transition-group>
 
           <transition name="mid" mode="out-in">
@@ -105,6 +105,9 @@ export default {
         },
         extendIcons() {
             return (this.broadcast?.broadcast_settings || []).includes("Extend ingame map icons");
+        },
+        useCodes() {
+            return this.codes || (this.broadcast?.broadcast_settings || []).includes("Use team codes");
         }
     },
     watch: {

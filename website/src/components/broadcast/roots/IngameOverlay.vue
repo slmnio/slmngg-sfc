@@ -40,7 +40,8 @@ export default {
                     matches: ReactiveArray("matches", {
                         teams: ReactiveArray("teams")
                     })
-                })
+                }),
+                maps: ReactiveArray("maps")
             });
         },
         teams() {
@@ -85,6 +86,36 @@ export default {
         middleText() {
             if (!this.match) return null;
             if (this.match.middle_text) return this.match.middle_text;
+
+            if ((this.broadcast?.broadcast_settings || [])?.includes("Use map number in middle text")) {
+                console.log("middle match maps", this.match.maps);
+
+                let mapText;
+
+                const currentMap = this.match.maps.map((map, i) => ({
+                    ...map,
+                    number: map.number || i + 1
+                })).find(map => !(map.draw || map.winner));
+
+
+                if ([this.match.score_1, this.match.score_2].includes(this.match.first_to)) {
+                    // match has finished
+                    mapText = "Final Score"; // maybe
+                    // mapText = `Map ${currentMap.number - 1}`;
+                } else {
+                    mapText = `Map ${currentMap.number}`;
+                }
+
+
+                if (this.match.first_to) {
+                    // Map X - First to Y
+                    return `${mapText} - First to ${this.match.first_to}`;
+                } else {
+                    // Semifinals - Map X
+                    return `${this.match.round || this.match.week_text} - First to ${this.match.first_to}`;
+                }
+            }
+
             if (this.match.round && this.match.first_to) { return `${this.match.round.toUpperCase()} - FIRST TO ${this.match.first_to}`; }
             if (this.match.week_text && this.match.first_to) { return `${this.match.week_text.toUpperCase()} - FIRST TO ${this.match.first_to}`; }
             return null;

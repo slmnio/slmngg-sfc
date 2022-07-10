@@ -1,7 +1,7 @@
 <template>
     <div class="auction-overlay d-flex w-100 h-100 position-absolute">
         <div class="left flex-grow-1 d-flex flex-column overflow-hidden">
-            <div class="event-top d-flex bg-dark flex-center flex-shrink-0">
+            <div class="event-top d-flex flex-center flex-shrink-0" :style="background">
                 <div class="event-logo-holder flex-center">
                     <div class="logo-inner bg-center" :style="eventLogo"></div>
                 </div>
@@ -10,21 +10,24 @@
                     <div class="industry-align">{{ title || 'Player Auction' }}</div>
                 </div>
                 <div class="event-stats flex-center d-flex flex-column">
-                    <div v-if="stats">{{ stats.remainingEligiblePlayers }} / {{ stats.allPlayers }} player{{ stats.remainingEligiblePlayers === 1 ? '' : 's' }} remaining</div>
-                    <div v-if="stats">{{ stats.remainingPlaces }} spot{{ stats.remainingPlaces === 1 ? '' : 's' }} remaining</div>
-                    <div v-if="stats">{{ stats.signedPlayers }} player{{ stats.signedPlayers === 1 ? '' : 's' }} signed</div>
+                    <div v-if="stats && stats.allPlayers">{{ stats.remainingEligiblePlayers }} / {{ stats.allPlayers }} player{{ stats.remainingEligiblePlayers === 1 ? '' : 's' }} remaining</div>
+                    <div v-if="stats && stats.remainingPlaces">{{ stats.remainingPlaces }} spot{{ stats.remainingPlaces === 1 ? '' : 's' }} remaining</div>
+                    <div v-if="stats && stats.signedPlayers">{{ stats.signedPlayers }} player{{ stats.signedPlayers === 1 ? '' : 's' }} signed</div>
                 </div>
             </div>
             <div class="player-middle d-flex flex-grow-1">
                 <div class="player-info w-100 flex-center flex-column">
-                    <div v-if="player">
-                        <div class="player-name">{{ player.name }}</div>
-                        <div class="player-teams d-flex flex-wrap flex-center" v-for="group in groupedTeams" :key="group.group" :class="`group-${group.group}`">
-                            <PlayerTeamDisplay :team="team" v-for="team in group.teams" v-bind:key="team.id" />
+                    <transition name="fade-right">
+                        <div v-if="player">
+                            <div class="player-name">{{ player.name }}</div>
+                            <div class="player-teams d-flex flex-wrap flex-center" v-for="group in groupedTeams"
+                                 :key="group.group" :class="`group-${group.group}`">
+                                <PlayerTeamDisplay :team="team" v-for="team in group.teams" v-bind:key="team.id"/>
+                            </div>
                         </div>
-                    </div>
+                    </transition>
                 </div>
-                <div class="bids flex-column-reverse d-flex justify-content-end">
+                <div class="bids flex-column-reverse d-flex justify-content-end" :class="{ 'has-bids': (player || bids.length) }">
                     <div class="bid d-flex align-content-center" v-for="(bid, i) in bids" v-bind:key="i" :style="getTheme(bid.team.id)">
                         <div class="team-logo flex-center">
                             <div class="logo-inner bg-center" :style="getLogo(bid.team.id)"></div>
@@ -35,22 +38,35 @@
             </div>
 <!--            <div class="left-bottom flex-center">bottom</div>-->
         </div>
-        <div class="right bg-dark flex-shrink-0">
-            <div class="team-lists" v-if="['teams-1', 'teams-2'].includes(rightDisplay)">
-                <TeamPlayerList v-for="team in displayTeams" :team="team" v-bind:key="team.id" :leading="leadingBid" />
-            </div>
-            <div class="team-focus" v-if="rightDisplay === 'sign-focus'">
-                <SignedTeamList :team="signedTeam" :amount="signAmount" :signedPlayer="signedPlayer" />
-            </div>
-            <div class="bid-focus flex-center h-100 w-100" v-if="rightDisplay === 'bid-focus'">
-                <BidFocus :teams="teams" :bids="bids"/>
-            </div>
-            <div class="team-focus" v-if="rightDisplay === 'team-focus'">
-                <TeamFocus :team="highlightedTeam"/>
-            </div>
-            <div class="bidding-war" v-if="rightDisplay === 'bidding-war'">
-                <BiddingWar :teams="biddingWar" :leading="leadingBid"/>
-            </div>
+        <div class="right flex-shrink-0 flex-center">
+<!--            <div class="team-list-holder" v-if="['teams', 'teams-1', 'teams-2'].includes(rightDisplay)" :key="rightDisplay">-->
+<!--                <transition-group tag="div" name="move" class="team-lists">-->
+<!--                    <TeamPlayerList v-for="team in displayTeams" :team="team" :key="team.id" :leading="leadingBid" :auction-settings="auctionSettings" />-->
+<!--                </transition-group>-->
+<!--            </div>-->
+<!--            <div class="team-lists" v-if="['teams', 'teams-1', 'teams-2'].includes(rightDisplay)">-->
+<!--                <TeamPlayerList v-for="team in displayTeams" :team="team" v-bind:key="team.id" :leading="leadingBid" :auction-settings="auctionSettings" />-->
+<!--            </div>-->
+            <transition name="fade-left" mode="out-in">
+                <transition-group  :style="background" tag="div" v-if="['teams-1', 'teams-2', 'teams'].includes(rightDisplay)" name="move" class="team-rows-holder">
+                    <div class="team-row" v-for="row in displayTeamRows" :key="row.i">
+                        <TeamPlayerList v-for="team in row.teams" :team="team" :key="team.id"
+                                        :auction-settings="auctionSettings"></TeamPlayerList>
+                    </div>
+                </transition-group>
+                <div :style="background" class="team-focus h-100" v-if="rightDisplay === 'sign-focus'">
+                    <SignedTeamList :team="signedTeam" :amount="signAmount" :signedPlayer="signedPlayer" :auction-settings="auctionSettings" />
+                </div>
+                <div :style="background" class="bid-focus flex-center h-100 w-100" v-if="rightDisplay === 'bid-focus'">
+                    <BidFocus :teams="teams" :bids="bids"/>
+                </div>
+                <div :style="background" class="team-focus" v-if="rightDisplay === 'team-focus'">
+                    <TeamFocus :team="highlightedTeam" :auction-settings="auctionSettings" />
+                </div>
+                <div :style="background" class="bidding-war" v-if="rightDisplay === 'bidding-war'">
+                    <BiddingWar :teams="biddingWar" :leading="leadingBid"/>
+                </div>
+            </transition>
         </div>
     </div>
 </template>
@@ -83,13 +99,26 @@ export default {
         stats: null
     }),
     computed: {
+        background() {
+            return logoBackground1(this.broadcast?.event);
+        },
+        auctionSettings() {
+            const json = this.broadcast?.event?.blocks;
+            if (!json) return {};
+            try {
+                return JSON.parse(json)?.auction;
+            } catch (e) {
+                console.warn(e);
+                return {};
+            }
+        },
         broadcastPlayerID() {
             if (!this.biddingActive) return null;
             if (!this.broadcast?.highlight_player) return null;
             return this.broadcast?.highlight_player[0];
         },
         playerID() {
-            if (!this.biddingActive && !this.justSigned) return null;
+            // if (!this.biddingActive && !this.justSigned) return null;
             if (this.socketPlayer) return this.socketPlayer.id;
             if (!this.broadcast?.highlight_player) return null;
             return this.broadcast?.highlight_player[0];
@@ -170,8 +199,8 @@ export default {
                 if (this.bids.length >= 12) return "bid-focus";
                 if (this.leadingBid && this.leadingBid.amount >= Math.min(this.average || 0, 200)) return "bid-focus";
             }
-            if (this.tick % 2 === 0) return "teams-1";
-            if (this.tick % 2 === 1) return "teams-2";
+            // if (this.teams?.length <= 8) return "teams";
+            if (this.teams?.length) return "teams";
             return null;
         },
         average() {
@@ -184,19 +213,54 @@ export default {
         teams() {
             if (!this._broadcast?.event?.teams?.length) return null;
             let teams = this._broadcast.event.teams;// .filter(t => t.players?.length);
-            if (this.category) teams = teams.filter(t => t.team_category === this.category);
+            if (this.category) teams = teams.filter(t => (t.team_category.includes(";") ? t.team_category.split(";")[1] : t.team_category) === this.category);
 
             return teams.sort((a, b) => a.draft_order - b.draft_order);
         },
         displayTeams() {
             if (!this.teams?.length) return [];
             const teams = this.teams;
-            return teams;
-            // if (this.teams.length > 8) {
-            //     if (this.rightDisplay === "teams-1") teams = teams.slice(0, 8);
-            //     if (this.rightDisplay === "teams-2") teams = teams.slice(8, 16);
-            // }
             // return teams;
+
+            return teams;
+        },
+        displayTeamRows() {
+            if (!this.teams?.length) return [];
+            const rowCount = (Math.ceil(this.teams.length / 2) - 1);
+            const maxRows = 4;
+            const rows = [...Array(rowCount).keys()];
+            const start = this.tick % rowCount;
+
+            // console.log({ start, tick: this.tick, rowCount, maxRows, rowSlides: (rowCount + (maxRows - 1)) });
+
+            let displayRows = rows.slice(start, start + maxRows);
+
+            if (displayRows.length !== maxRows) {
+                const diff = maxRows - displayRows.length;
+                console.log(diff);
+                displayRows = [
+                    ...displayRows,
+                    ...rows.slice(0, diff)
+                ];
+            }
+
+
+            const _rows = [];
+
+            displayRows.forEach(row => {
+                const newRow = {
+                    i: row,
+                    teams: []
+                };
+
+                newRow.teams.push(this.teams[(row * 2)]);
+                if (this.teams[(row * 2) + 1]) newRow.teams.push(this.teams[(row * 2) + 1]);
+                _rows.push(newRow);
+            });
+
+            return _rows;
+            // if (this.rightDisplay === "teams-1") teams = teams.slice(0, 8);
+            // if (this.rightDisplay === "teams-2") teams = teams.slice(8, 16);
         },
         signedTeam() {
             if (!this.justSigned?.id) return null;
@@ -244,8 +308,8 @@ export default {
 
         setInterval(() => {
             this.tick++;
-            if (this.tick >= 4) this.tick = 0;
-        }, 8000);
+            // if (this.tick >= 4) this.tick = 0;
+        }, 6000);
     },
     sockets: {
         auction_start(player) {
@@ -292,7 +356,7 @@ export default {
     }
     .team-lists {
         display: grid;
-        grid-auto-flow: column;
+        /*grid-auto-flow: column;*/
         grid-template-columns: 1fr 1fr;
         grid-template-rows: 1fr 1fr 1fr 1fr;
         gap: 0px 0px;
@@ -306,7 +370,8 @@ export default {
         margin: 0 -5px;
     }
     .right {
-        width: 600px
+        width: 600px;
+        background-color: rgba(24,24,24);
     }
     .event-logo-holder, .event-stats {
         width: 300px;
@@ -357,5 +422,128 @@ export default {
     }
     .group-diff {
         transform: scale(0.75);
+    }
+
+    .team-lists {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+    .right {
+        position: relative;
+        /*overflow-x: hidden;*/
+    }
+
+    .scroll-enter-active, .scroll-leave-active {
+        transition: all 500ms ease;
+    }
+    .scroll-enter { transform: translate(0%, 100%) }
+    .scroll-leave-to { transform: translate(0%, -100%) }
+    .scroll-enter-to,
+    .scroll-leave {
+        transform: translate(0,0)
+    }
+
+    .fade-scroll-enter-active, .fade-scroll-leave-active {
+        transition: all 500ms ease;
+    }
+    .fade-scroll-enter {
+        opacity: 0;
+        transform: translate(0, 30px)
+    }
+    .fade-scroll-leave-to {
+        opacity: 0;
+        transform: translate(0, -30px)
+    }
+    .fade-scroll-enter-to,
+    .fade-scroll-leave {
+        transform: translate(0, 0%)
+    }
+
+    .move-enter-active,
+    .move-leave-active,
+    .move-move {
+        transition: transform 800ms ease-in-out;
+    }
+    .move-enter-active,
+    .move-leave-active {
+        position: absolute;
+        /*width: 50%;*/
+        /*width: 270px;*/
+        /*height: 260px;*/
+    }
+    .move-leave-to {
+        transform: translate(0, -105%);
+    }
+    .move-enter-active {
+        bottom: 0;
+    }
+    /*.move-enter-active:nth-of-type(10) {*/
+    /*    right: 0;*/
+    /*}*/
+    /*.move-leave-active:nth-of-type(2) {*/
+    /*    right: 0;*/
+    /*}*/
+    .move-enter {
+        transform: translate(0, 105%);
+    }
+    .team-list-holder, .team-rows-holder {
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+    .team-row {
+        display: flex;
+        width: 100%;
+        height: calc(25% - 10px);
+        margin: 5px 0;
+    }
+
+    .team-rows-holder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .team-player-list {
+        width: 100%;
+        height: 100%;
+    }
+
+
+    .fade-right-enter-active,
+    .fade-right-leave-active {
+        transition: opacity 500ms ease, transform 500ms ease;
+    }
+    .fade-right-enter, .fade-right-leave-to {
+        transform: translate(-100%, 0);
+        opacity: 0;
+    }
+
+    .fade-left-enter-active,
+    .fade-left-leave-active {
+        transition: opacity 500ms ease, transform 500ms ease;
+    }
+    .fade-left-enter, .fade-left-leave-to {
+        transform: translate(100%, 0);
+        opacity: 0;
+    }
+
+    .bids {
+        transition: background-color 500ms ease;
+        background-color: rgba(0,0,0,0);
+    }
+    .bids.has-bids {
+        background-color: rgba(0,0,0,0.15);
+    }
+    .team-focus {
+        height: 100%;
+        width: 100%;
+    }
+
+    .right>div {
+        box-shadow: 0px 0px 7px 0px rgba(0,0,0,0.6);
     }
 </style>

@@ -9,23 +9,26 @@
                 <div v-else style="opacity: 0;">...</div>
             </div>
         </div>
-        <div class="remaining font-weight-bold text-center">Remaining: {{ money(team.balance) }}</div>
+
+        <MoneyBar class="team-focus-bar" :team="team" :auction-settings="auctionSettings"></MoneyBar>
+<!--        <div class="remaining font-weight-bold text-center">Remaining: {{ money(team.balance) }}</div>-->
     </div>
 </template>
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { cleanID, money } from "@/utils/content-utils";
+import { cleanID, getAuctionMax, money } from "@/utils/content-utils";
+import MoneyBar from "@/components/broadcast/auction/MoneyBar";
 
 
 export default {
     name: "TeamFocus",
-    components: { ThemeLogo },
-    props: ["team", "leading"],
+    components: { MoneyBar, ThemeLogo },
+    props: ["team", "leading", "auctionSettings"],
     methods: { money },
     computed: {
         players() {
-            const max = 8;
+            const max = (this.auctionSettings?.each_team || getAuctionMax());
             let fill = max - (this.team?.players?.length || 0);
             if (fill < 0) fill = 0;
 
@@ -68,5 +71,10 @@ export default {
 .remaining {
     font-size: 40px;
     margin-top: 10px;
+}
+
+.money-bar.team-focus-bar {
+    font-size: 36px;
+    margin-top: 4px;
 }
 </style>

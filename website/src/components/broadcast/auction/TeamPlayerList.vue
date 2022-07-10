@@ -6,12 +6,16 @@
                     <div class="logo-inner bg-center" :style="teamLogo"></div>
                 </div>
                 <div class="name">{{ team.name }}</div>
-                <div class="amount">{{ (money(team.balance).slice(-4)) }}</div>
+<!--                <div class="amount">{{ (money(team.balance).slice(-4)) }}</div>-->
             </div>
         </div>
         <div class="player-list">
+            <MoneyBar :team="team"  :auction-settings="auctionSettings"  />
             <div class="player" v-bind:class="{empty: player.empty}" v-for="player in players" v-bind:key="player.id" :style="teamIsDone ? teamBG : {}">
-                <div v-if="!player.empty" >{{ player.name }}</div>
+                <div class="player-internal" v-if="!player.empty" >
+                    <span class="player-name">{{ player.name }}</span>
+                    <span class="player-money" v-if="player.auction_price">{{ money(player.auction_price) }}</span>
+                </div>
                 <div v-else style="opacity: 0;">...</div>
             </div>
         </div>
@@ -22,10 +26,12 @@
 import { logoBackground1 } from "@/utils/theme-styles";
 import { cleanID, getAuctionMax, money } from "@/utils/content-utils";
 import { resizedImage } from "@/utils/images";
+import MoneyBar from "@/components/broadcast/auction/MoneyBar";
 
 export default {
     name: "TeamPlayerList",
-    props: ["team", "leading"],
+    components: { MoneyBar },
+    props: ["team", "leading", "auctionSettings"],
     methods: { money },
     computed: {
         teamBG() {
@@ -35,7 +41,7 @@ export default {
             return resizedImage(this.team?.theme, ["small_logo", "default_logo"], "h-100");
         },
         players() {
-            const max = getAuctionMax();
+            const max = (this.auctionSettings?.each_team || getAuctionMax());
             let fill = max - (this.team?.players?.length || 0);
             if (fill < 0) fill = 0;
             return [
@@ -45,8 +51,8 @@ export default {
         },
         teamIsDone() {
             if (!this.team?.players?.length) return false;
-            const max = getAuctionMax();
-            console.log(this.team.players.length, max);
+            const max = (this.auctionSettings?.each_team || getAuctionMax());
+            // console.log(this.team.players.length, max);
             return this.team.players.length >= max;
         },
         canBid() {
@@ -61,7 +67,7 @@ export default {
 
 <style scoped>
     .team-player-list {
-        margin: 5px 15px;
+        margin: 0 15px;
     }
     .team-logo {
         width: 100%;
@@ -118,5 +124,13 @@ export default {
         text-align: center;
         background-color: #111;
         color: white;
+    }
+
+    .player-name {
+        flex-grow: 1;
+    }
+
+    .player-internal {
+        display: flex;
     }
 </style>

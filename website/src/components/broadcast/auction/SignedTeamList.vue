@@ -23,7 +23,7 @@ import { cleanID, getAuctionMax, money } from "@/utils/content-utils";
 export default {
     name: "SignedTeamList",
     components: { ThemeLogo },
-    props: ["team", "amount", "signedPlayer"],
+    props: ["team", "amount", "signedPlayer", "auctionSettings"],
     methods: {
         money
     },
@@ -32,7 +32,7 @@ export default {
             return logoBackground1(this.team);
         },
         players() {
-            const max = getAuctionMax();
+            const max = (this.auctionSettings?.each_team || getAuctionMax());
             let fill = max - (this.team?.players?.length || 0);
             if (fill < 0) fill = 0;
 

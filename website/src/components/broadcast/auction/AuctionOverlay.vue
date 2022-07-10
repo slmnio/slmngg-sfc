@@ -16,7 +16,10 @@
                 </div>
             </div>
             <div class="player-middle d-flex flex-grow-1">
-                <div class="player-info w-100 flex-center flex-column">
+                <div class="player-info w-100 flex-center flex-column position-relative">
+                    <transition name="fade-down">
+                        <AuctionCountdown v-if="player && bids.length" />
+                    </transition>
                     <transition name="fade-right">
                         <div v-if="player">
                             <div class="player-name">{{ player.name }}</div>
@@ -86,11 +89,12 @@ import BidFocus from "./BidFocus";
 import TeamFocus from "@/components/broadcast/auction/TeamFocus";
 import BiddingWar from "@/components/broadcast/auction/BiddingWar";
 import { resizedImage } from "@/utils/images";
+import AuctionCountdown from "@/components/broadcast/auction/AuctionCountdown";
 
 export default {
     name: "AuctionOverlay",
     props: ["broadcast", "category", "title"],
-    components: { TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar },
+    components: { TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar, AuctionCountdown },
     data: () => ({
         tick: 0,
         socketPlayer: null,
@@ -216,7 +220,7 @@ export default {
         teams() {
             if (!this._broadcast?.event?.teams?.length) return null;
             let teams = this._broadcast.event.teams;// .filter(t => t.players?.length);
-            if (this.category) teams = teams.filter(t => (t.team_category.includes(";") ? t.team_category.split(";")[1] : t.team_category) === this.category);
+            if (this.category) teams = teams.filter(t => (t.team_category?.includes(";") ? t.team_category.split(";")[1] : t.team_category) === this.category);
 
             return teams.sort((a, b) => a.draft_order - b.draft_order);
         },
@@ -312,7 +316,7 @@ export default {
         setInterval(() => {
             this.tick++;
             // if (this.tick >= 4) this.tick = 0;
-        }, 6000);
+        }, 10000);
     },
     sockets: {
         auction_start(player) {
@@ -539,6 +543,14 @@ export default {
     }
     .fade-up-enter, .fade-up-leave-to {
         transform: translate(0, 100%);
+        opacity: 0;
+    }
+    .fade-down-enter-active,
+    .fade-down-leave-active {
+        transition: opacity 500ms ease, transform 500ms ease;
+    }
+    .fade-down-enter, .fade-down-leave-to {
+        transform: translate(0, -100%);
         opacity: 0;
     }
 

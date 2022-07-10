@@ -7,11 +7,15 @@
 
         <div class="player-list">
             <div class="player" v-bind:class="{empty: player.empty, latest: player.latest}" v-for="player in players" v-bind:key="player.id"  :style="(player.latest ? teamBG : {})">
-                <div v-if="!player.empty">{{ player.name }}</div>
+                <div class="player-internal" v-if="!player.empty" >
+                    <span class="player-name">{{ player.name }}</span>
+                    <span class="player-money" v-if="player.auction_price">{{ money(player.auction_price) }}</span>
+                </div>
                 <div v-else style="opacity: 0;">...</div>
             </div>
         </div>
-        <div class="remaining font-weight-bold text-center">Remaining: {{ money(team.balance) }}</div>
+        <MoneyBar class="team-focus-bar" :team="team" :auction-settings="auctionSettings"></MoneyBar>
+<!--        <div class="remaining font-weight-bold text-center">Remaining: {{ money(team.balance) }}</div>-->
     </div>
 </template>
 
@@ -55,6 +59,13 @@ export default {
 </script>
 
 <style scoped>
+    .player-name {
+        flex-grow: 1;
+    }
+
+    .player-internal {
+        display: flex;
+    }
     .top-logo {
         height: 300px;
     }
@@ -87,5 +98,10 @@ export default {
     }
     .remaining {
         font-size: 30px;
+    }
+
+    .money-bar.team-focus-bar {
+        font-size: 36px;
+        margin-top: 4px;
     }
 </style>

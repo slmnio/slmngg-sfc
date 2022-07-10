@@ -81,10 +81,18 @@ const Auction = {
         },
         initial() {
             Auction.Timer.clear();
+            io.emit("auction_timer", {
+                name: "after_initial",
+                duration: Auction.wait.afterInitial * 1000
+            });
             Auction.Timer.timeout = setTimeout(Auction.checkAfterBid, Auction.wait.afterInitial * 1000);
         },
         proc() {
             Auction.Timer.clear();
+            io.emit("auction_timer", {
+                name: "after_bid",
+                duration: Auction.wait.afterBid * 1000
+            });
             Auction.Timer.timeout = setTimeout(Auction.checkAfterBid, Auction.wait.afterBid * 1000);
         }
     },
@@ -361,6 +369,7 @@ client.on("messageCreate", async message => {
                 if (!Auction.activePlayer) { try { await message.delete(); } catch (e) { } return; }
                 let team = await Auction.getTeam(message.author);
                 if (!team) return;
+                if ((team.get("Players") || []).length >= getAuctionMax()) return message.reply(red({title: "You're at your maximum player count."}));
 
                 let leadingBid = Auction.getLeadingBid();
                 if (leadingBid && leadingBid.team.id === team.id) return message.reply(red({title: "You're already the leading bid"}));

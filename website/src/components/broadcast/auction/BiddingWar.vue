@@ -1,5 +1,6 @@
 <template>
     <div class="bidding-war d-flex">
+        <div class="bidding-war-text">BIDDING WAR</div>
         <TeamFocus class="team-focus" v-for="team in _teams" :team="team" v-bind:key="team.id" :leading="leading" />
     </div>
 </template>

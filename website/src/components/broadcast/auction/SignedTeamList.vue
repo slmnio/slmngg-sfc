@@ -23,10 +23,11 @@
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { logoBackground1 } from "@/utils/theme-styles";
 import { cleanID, getAuctionMax, money } from "@/utils/content-utils";
+import MoneyBar from "@/components/broadcast/auction/MoneyBar";
 
 export default {
     name: "SignedTeamList",
-    components: { ThemeLogo },
+    components: { ThemeLogo, MoneyBar },
     props: ["team", "amount", "signedPlayer", "auctionSettings"],
     methods: {
         money

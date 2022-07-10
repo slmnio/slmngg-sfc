@@ -3,7 +3,7 @@
         <div class="countdown-holder">
             <div class="countdown">
                 <div class="countdown-bar-text">Current Auction</div>
-                <div class="countdown-bar" :style="{ width: `${countdownLeft / 200}%` }"></div>
+                <div class="countdown-bar" :style="{ width: `${countdownLeft / 180}%` }"></div>
             </div>
         </div>
     </transition>
@@ -13,7 +13,7 @@
 export default {
     name: "AuctionCountdown",
     data: () => ({
-        countdownLeft: 25000
+        countdownLeft: 20000
     }),
     sockets: {
         auction_timer(timer) {
@@ -51,6 +51,7 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 
 .countdown-bar-text {

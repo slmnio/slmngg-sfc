@@ -31,7 +31,7 @@
                     </transition>
                 </div>
                 <div class="bids flex-column-reverse d-flex justify-content-end" :class="{ 'has-bids': (player || bids.length) }">
-                    <transition-group name="fade-up">
+                    <transition-group name="fade-down">
                         <div class="bid d-flex align-content-center" v-for="(bid, i) in bids" v-bind:key="i"
                              :style="getTheme(bid.team.id)">
                             <div class="team-logo flex-center">
@@ -316,7 +316,7 @@ export default {
         setInterval(() => {
             this.tick++;
             // if (this.tick >= 4) this.tick = 0;
-        }, 10000);
+        }, 8000);
     },
     sockets: {
         auction_start(player) {
@@ -573,5 +573,11 @@ export default {
     .bidding-war {
         width: 100%;
         height: 100%;
+    }
+
+    .bids span {
+        display: flex !important;
+        flex-direction: column !important;
+        flex-direction: column-reverse !important;
     }
 </style>

@@ -67,7 +67,10 @@ export default {
 
 <style scoped>
     .team-player-list {
-        margin: 0 15px;
+        margin: 0 10px;
+    }
+    .team-player-list + .team-player-list {
+        margin-left: 0 !important;
     }
     .team-logo {
         width: 100%;

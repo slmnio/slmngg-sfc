@@ -28,12 +28,15 @@
                     </transition>
                 </div>
                 <div class="bids flex-column-reverse d-flex justify-content-end" :class="{ 'has-bids': (player || bids.length) }">
-                    <div class="bid d-flex align-content-center" v-for="(bid, i) in bids" v-bind:key="i" :style="getTheme(bid.team.id)">
-                        <div class="team-logo flex-center">
-                            <div class="logo-inner bg-center" :style="getLogo(bid.team.id)"></div>
+                    <transition-group name="fade-up">
+                        <div class="bid d-flex align-content-center" v-for="(bid, i) in bids" v-bind:key="i"
+                             :style="getTheme(bid.team.id)">
+                            <div class="team-logo flex-center">
+                                <div class="logo-inner bg-center" :style="getLogo(bid.team.id)"></div>
+                            </div>
+                            <div class="team-text flex-center ml-2">{{ money(bid.amount) }}</div>
                         </div>
-                        <div class="team-text flex-center ml-2">{{ money(bid.amount) }}</div>
-                    </div>
+                    </transition-group>
                 </div>
             </div>
 <!--            <div class="left-bottom flex-center">bottom</div>-->
@@ -530,6 +533,14 @@ export default {
         transform: translate(100%, 0);
         opacity: 0;
     }
+    .fade-up-enter-active,
+    .fade-up-leave-active {
+        transition: opacity 500ms ease, transform 500ms ease;
+    }
+    .fade-up-enter, .fade-up-leave-to {
+        transform: translate(0, 100%);
+        opacity: 0;
+    }
 
     .bids {
         transition: background-color 500ms ease;
@@ -545,5 +556,10 @@ export default {
 
     .right>div {
         box-shadow: 0px 0px 7px 0px rgba(0,0,0,0.6);
+    }
+
+    .bidding-war {
+        width: 100%;
+        height: 100%;
     }
 </style>

@@ -250,7 +250,8 @@ const Auction = {
             "Member Of": [
                 ...(player.get("Member Of") || []),
                 team.id
-            ]
+            ],
+            "Auction Price": bid.amount
         });
 
         await update("Teams", team.id, {

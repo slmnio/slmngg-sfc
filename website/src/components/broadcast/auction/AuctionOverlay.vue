@@ -23,6 +23,10 @@
                     <transition name="fade-right">
                         <div v-if="player">
                             <div class="player-name">{{ player.name }}</div>
+                            <div class="accolades" v-if="accolades.length">
+                                <ContentThing :thing="accolade" type="event" :link-to="accolade.event" :theme="accolade.event && accolade.event.theme" v-for="accolade in accolades"
+                                              v-bind:key="accolade.id" :show-logo="true" :text="accolade.player_text" />
+                            </div>
                             <div class="player-teams d-flex flex-wrap flex-center" v-for="group in groupedTeams"
                                  :key="group.group" :class="`group-${group.group}`">
                                 <PlayerTeamDisplay :team="team" v-for="team in group.teams" v-bind:key="team.id"/>
@@ -90,11 +94,12 @@ import TeamFocus from "@/components/broadcast/auction/TeamFocus";
 import BiddingWar from "@/components/broadcast/auction/BiddingWar";
 import { resizedImage } from "@/utils/images";
 import AuctionCountdown from "@/components/broadcast/auction/AuctionCountdown";
+import ContentThing from "@/components/website/ContentThing";
 
 export default {
     name: "AuctionOverlay",
     props: ["broadcast", "category", "title"],
-    components: { TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar, AuctionCountdown },
+    components: { TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar, AuctionCountdown, ContentThing },
     data: () => ({
         tick: 0,
         socketPlayer: null,
@@ -137,9 +142,28 @@ export default {
                     theme: ReactiveThing("theme"),
                     event: ReactiveThing("event", {
                         theme: ReactiveThing("theme")
+                    }),
+                    accolades: ReactiveArray("accolades", {
+                        event: ReactiveThing("event", {
+                            theme: ReactiveThing("theme")
+                        })
+                    })
+                }),
+                accolades: ReactiveArray("accolades", {
+                    event: ReactiveThing("event", {
+                        theme: ReactiveThing("theme")
                     })
                 })
             });
+        },
+        accolades() {
+            if (!this.player) return [];
+
+            return [
+                // team things
+                ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => e.accolades).filter(e => !!e)) : []),
+                ...(this.player.accolades ? this.player.accolades : [])
+            ];
         },
         highlightedTeamID() {
             if (!this.broadcast?.highlight_team) return null;
@@ -233,18 +257,24 @@ export default {
         },
         displayTeamRows() {
             if (!this.teams?.length) return [];
-            const rowCount = (Math.ceil(this.teams.length / 2));
+            const perRow = 2;
+            const rowCount = (Math.ceil(this.teams.length / perRow));
             const maxRows = 4;
             const rows = [...Array(rowCount).keys()];
             const start = this.tick % rowCount;
+
 
             // console.log({ start, tick: this.tick, rowCount, maxRows, rowSlides: (rowCount + (maxRows - 1)) });
 
             let displayRows = rows.slice(start, start + maxRows);
 
+            if (this.teams.length <= perRow * maxRows) {
+                displayRows = rows;
+            }
+
             if (displayRows.length !== maxRows) {
                 const diff = maxRows - displayRows.length;
-                console.log(diff);
+
                 displayRows = [
                     ...displayRows,
                     ...rows.slice(0, diff)
@@ -403,7 +433,7 @@ export default {
         font-weight: bold;
         text-align: center;
         line-height: 1;
-        margin-bottom: 32px;
+        margin-bottom: 24px;
     }
     .bids {
         font-size: 36px;
@@ -569,6 +599,12 @@ export default {
     .right>div {
         box-shadow: 0px 0px 7px 0px rgba(0,0,0,0.6);
     }
+    .event-top {
+        box-shadow: 0px 0px 7px 0px rgba(0,0,0,0.6);
+    }
+    .player-middle {
+        overflow: hidden;
+    }
 
     .bidding-war {
         width: 100%;
@@ -579,5 +615,14 @@ export default {
         display: flex !important;
         flex-direction: column !important;
         flex-direction: column-reverse !important;
+    }
+    .accolades {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 22px;
+        flex-wrap: wrap;
+        margin-bottom: 32px;
+        padding: 0 24px;
     }
 </style>

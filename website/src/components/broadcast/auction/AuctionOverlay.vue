@@ -233,7 +233,7 @@ export default {
         },
         displayTeamRows() {
             if (!this.teams?.length) return [];
-            const rowCount = (Math.ceil(this.teams.length / 2) - 1);
+            const rowCount = (Math.ceil(this.teams.length / 2));
             const maxRows = 4;
             const rows = [...Array(rowCount).keys()];
             const start = this.tick % rowCount;

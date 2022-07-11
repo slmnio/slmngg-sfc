@@ -17,7 +17,7 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "BidFocusTeam",
-    props: ["team", "leading"],
+    props: ["team", "leading", "auctionSettings"],
     methods: { money },
     computed: {
         teamBG() {
@@ -31,6 +31,8 @@ export default {
             return cleanID(this.leading.team.id) === this.team.id;
         },
         canBid() {
+            if (this.auctionSettings?.each_team <= this.team?.players?.length) return false;
+            // TODO: add something about the amount of players they have
             if (!this.leading?.team) return true;
             if (cleanID(this.leading.team.id) === this.team.id && this.leading.amount === this.team.balance) return true;
             return (this.leading.amount + 1) <= this.team.balance;

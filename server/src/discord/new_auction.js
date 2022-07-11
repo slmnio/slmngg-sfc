@@ -263,7 +263,7 @@ const Auction = {
         });
 
         await update("Teams", team.id, {
-            "Balance": (parseInt(team.get("Balance")) - bid.amount) + (remaining - 1 ? 10 : 0)
+            "Balance": (parseInt(team.get("Balance")) - bid.amount) + (remaining ? 10 : 0)
         });
 
 

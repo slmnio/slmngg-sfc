@@ -5,8 +5,10 @@
 
         <div class="player-list">
             <div class="player" v-bind:class="{empty: player.empty, latest: player.latest}" v-for="player in players" v-bind:key="player.id"  :style="(player.latest ? teamBG : {})">
-                <div v-if="!player.empty">{{ player.name }}</div>
-                <div v-else style="opacity: 0;">...</div>
+                <div class="player-internal" v-if="!player.empty" >
+                    <span class="player-name">{{ player.name }}</span>
+                    <span class="player-money" v-if="player.auction_price">{{ money(player.auction_price) }}</span>
+                </div>
             </div>
         </div>
 
@@ -76,5 +78,13 @@ export default {
 .money-bar.team-focus-bar {
     font-size: 36px;
     margin-top: 4px;
+}
+
+.player-name {
+    flex-grow: 1;
+}
+
+.player-internal {
+    display: flex;
 }
 </style>

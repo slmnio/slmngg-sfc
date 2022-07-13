@@ -174,3 +174,8 @@ export function clarifyTeam(team) {
     }
     return team.name;
 }
+
+export function pronounsFilter(pronouns) {
+    if (pronouns === "any") return "any pronouns";
+    return pronouns;
+}

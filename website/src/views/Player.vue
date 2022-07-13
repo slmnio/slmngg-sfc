@@ -5,7 +5,10 @@
                 <div class="player-top d-flex">
                     <div class="player-icon bg-center default-thing" v-if="player.overwatch_icon"
                          :style="{backgroundImage: `url(${player.overwatch_icon})`}"></div>
-                    <div class="player-name">{{ player.name }} <i class="fas fa-badge-check" v-if="player.verified"></i>
+                    <div class="player-name">
+                        {{ player.name }}
+                        <i class="fas fa-badge-check mr-3" v-if="player.verified"></i>
+                        <span class="pronouns-display ml-1" v-if="player.pronouns">{{ player.pronouns | pronounsFilter }}</span>
                     </div>
                 </div>
                 <div class="player-socials" v-if="player.socials" :style="{ marginLeft: player.overwatch_icon ? '84px' : '16px'}">
@@ -29,6 +32,7 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import Social from "@/components/website/Social";
 import SubPageNav from "@/components/website/SubPageNav";
+import { pronounsFilter } from "@/utils/content-utils";
 
 export default {
     name: "Player",
@@ -101,6 +105,9 @@ export default {
         return {
             title: this.player.name
         };
+    },
+    filters: {
+        pronounsFilter
     }
 };
 
@@ -132,5 +139,15 @@ export default {
     .player-name {
         font-size: 48px;
     }
+}
+
+.pronouns-display {
+    font-size: .25em;
+    vertical-align: 1em;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgb(255, 255, 255);
+    padding: .25em .5em;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+    white-space: nowrap;
 }
 </style>

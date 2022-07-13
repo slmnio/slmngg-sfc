@@ -92,6 +92,9 @@ export default {
                 maps: ReactiveArray("maps", {
                     winner: ReactiveThing("winner", {
                         theme: ReactiveThing("theme")
+                    }),
+                    picker: ReactiveThing("picker", {
+                        theme: ReactiveThing("theme")
                     })
                 }),
                 log_files: ReactiveThing("log_files")

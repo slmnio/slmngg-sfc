@@ -12,7 +12,8 @@
             <div class="map-insert-text" v-if="!complete && !condensed && !winner && mapClass === 'extra'">IF REQUIRED</div>
         </div>
         <div class="map-name">{{ name || '--' }}</div>
-        <div class="map-scores">{{  scores  }}</div>
+        <div class="map-scores" v-if="scores">{{  scores  }}</div>
+        <div class="map-pick" v-if="pickText">{{ pickText }}</div>
     </div>
 </template>
 
@@ -61,6 +62,10 @@ export default {
         scores() {
             if (this.map.score_1 === undefined || this.map.score_2 === undefined) return null;
             return [this.map.score_1, this.map.score_2].join(" - ");
+        },
+        pickText() {
+            if (!this.map?.picker) return null;
+            return `picked by ${this.map.picker.code || this.map.picker.name}`;
         }
     },
     methods: {
@@ -129,13 +134,14 @@ export default {
         margin-top: 6px;
     }
 
-    .map-scores {
+    .map-scores, .map-pick {
         line-height: 1;
         font-size: 0.85em;
         text-align: center;
         margin-top: 4px;
     }
-    .map.condensed .map-scores {
+    .map.condensed .map-scores,
+    .map.condensed .map-pick {
         font-size: 0.6em;
         margin-top: 1px;
     }

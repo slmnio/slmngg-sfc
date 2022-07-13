@@ -225,4 +225,7 @@ export default {
 .live-matches-text {
     font-size: 1.5em;
 }
+.website-nav >>> .dropdown-item {
+    padding: 0.5rem 1.5rem;
+}
 </style>

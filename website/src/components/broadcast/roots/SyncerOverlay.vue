@@ -4,7 +4,7 @@
             <IngameOverlay id="overlay" :broadcast="broadcast" v-if="showOverlay" :animation-active="true" />
         </transition>
         <transition name="fade">
-            <iframe class="w-100 h-100 position-absolute border-0" src="https://syncer.live/?embed&noCenter" v-if="showSyncer"/>
+            <iframe class="w-100 h-100 position-absolute border-0" :src="syncerURL" v-show="showSyncer"/>
         </transition>
     </div>
 </template>
@@ -14,7 +14,7 @@ import IngameOverlay from "@/components/broadcast/roots/IngameOverlay";
 export default {
     name: "SyncerOverlay",
     components: { IngameOverlay },
-    props: ["broadcast"],
+    props: ["broadcast", "client"],
     computed: {
         settings() {
             if (!this.broadcast) return;
@@ -25,6 +25,11 @@ export default {
         },
         showOverlay() {
             return this.settings.includes("Show overlay");
+        },
+        syncerURL() {
+            let base = "https://syncer.live/?embed&noCenter";
+            if (this.client?.name) base += `&label=${this.client.name}`;
+            return base;
         }
     }
 };

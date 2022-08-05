@@ -2,12 +2,12 @@
     <transition v-if="useTransitions" mode="out-in" name="break-content" class="map-anim-holder">
         <div :key="autoKey" class="map-display d-flex w-100 h-100" v-bind:class="{'show-next-map': showNextMap && nextMap}">
             <MapSegment class="map" v-bind:class="{ 'map-dummy' : map.dummy }" v-for="map in maps" v-bind:key="map.id"
-                :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to"></MapSegment>
+                :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
         </div>
     </transition>
     <div v-else class="map-display d-flex w-100 h-100" v-bind:class="{'show-next-map': showNextMap && nextMap}">
         <MapSegment class="map" v-bind:class="{ 'map-dummy' : map.dummy }" v-for="map in maps" v-bind:key="map.id"
-                    :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to"></MapSegment>
+                    :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
     </div>
 </template>
 
@@ -147,6 +147,9 @@ export default {
                 this.match?.id,
                 ...(this.maps || []).map(m => [m.name, m.winner?.id || "live", m.draw].join("-"))
             ].join("_");
+        },
+        useShorterMapNames() {
+            return this.broadcast?.broadcast_settings?.includes("Use shorter map names");
         }
     },
     sockets: {

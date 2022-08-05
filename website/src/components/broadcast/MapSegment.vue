@@ -28,7 +28,7 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "MapSegment",
-    props: ["broadcast", "map", "accentColor", "showMapVideo", "firstTo"],
+    props: ["broadcast", "map", "accentColor", "showMapVideo", "firstTo", "useShorterNames"],
     computed: {
         mapBackground() {
             if (!(this.map?.big_image || this.map?.image)) return {};
@@ -43,6 +43,7 @@ export default {
         },
         name() {
             if (!this.map?.name) return null;
+            if (this.useShorterNames && this.map?.map?.shorter_name) return this.map.map.shorter_name;
             return this.map.name[0];
         },
         type() {

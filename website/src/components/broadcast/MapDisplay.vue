@@ -139,8 +139,8 @@ export default {
             return this.broadcast.broadcast_settings.includes("Use map videos");
         },
         nextMap() {
-            const unplayedMaps = this.maps.filter(m => !m.dummy && !m.winner && !m.draw);
-            return unplayedMaps[0];
+            const unplayedMaps = (this.maps || []).filter(m => !m.dummy && !m.winner && !m.draw);
+            return unplayedMaps?.[0];
         },
         autoKey() {
             return [

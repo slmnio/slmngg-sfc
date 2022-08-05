@@ -10,13 +10,29 @@
                             <div class="team-icon bg-center" :style="icon(team)"></div>
                         </div>
                     </div>
-                    <div class="team-roster flex-center flex-column overlay--bg w-100"
-                         :style="{ fontSize: rosterFontSize(team) }">
-                        <div class="player" v-for="player in sort ? sortedTeamPlayers(team) : team.players"
-                             v-bind:key="player.id">
-                            <svg class="player-role" v-if="showRoles && player.role"
-                                 v-html="getRoleSVG(player.role)"></svg>
-                            <span class="player-name">{{ player.name }}</span>
+                    <div class="team-roster-holder flex-center flex-column overlay--bg w-100 h-100" :style="{ fontSize: rosterFontSize(team) }">
+                        <div class="team-roster flex-center flex-column">
+                            <div class="player" v-for="player in teamPlayerGroups(team)[0]"
+                                 v-bind:key="player.id">
+                                <div class="player-role flex-center" v-if="showRoles && player.role"
+                                     v-html="getRoleSVG(player.role)"></div>
+                                <span class="player-name">{{ player.name }}</span>
+                            </div>
+                        </div>
+                        <div class="team-roster team-sub-roster flex-center flex-column" v-if="teamPlayerGroups(team)[1]">
+                            <div class="player" v-for="player in teamPlayerGroups(team)[1]"
+                                 v-bind:key="player.id">
+                                <div class="player-role flex-center" v-if="showRoles && player.role"
+                                     v-html="getRoleSVG(player.role)"></div>
+                                <span class="player-name">{{ player.name }}</span>
+                            </div>
+                        </div>
+                        <div class="team-roster team-staff-roster flex-center flex-column" v-if="showStaff">
+                            <div class="player" v-for="player in getTeamStaff(team)"
+                                 v-bind:key="player.id">
+                                <div class="player-role flex-center" v-html="getRoleSVG(player.staff_role || player.role)"></div>
+                                <span class="player-name">{{ player.name }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -35,7 +51,7 @@ import ThemeTransition from "@/components/broadcast/ThemeTransition";
 export default {
     name: "RosterOverlay",
     components: { ThemeTransition, GenericOverlay },
-    props: ["broadcast", "title", "showRoles", "sort", "animationActive"],
+    props: ["broadcast", "title", "showRoles", "sort", "animationActive", "showStaff", "splitPlayers"],
     computed: {
         accentColor() {
             return this.$root?.broadcast?.event?.theme?.color_theme;
@@ -45,7 +61,8 @@ export default {
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
-                    players: ReactiveArray("players")
+                    players: ReactiveArray("players"),
+                    staff: ReactiveArray("staff")
                 })
             });
         },
@@ -93,6 +110,22 @@ export default {
                 return team.players;
             }
         },
+        teamPlayerGroups(team) {
+            const players = (this.sort ? this.sortedTeamPlayers(team) : team.players) || [];
+            if (this.splitPlayers) {
+                // group of 0 to splitPlayers
+                // group of excess
+                return [
+                    players.slice(0, this.splitPlayers),
+                    players.slice(this.splitPlayers)
+                ];
+            } else {
+                return [players, []];
+            }
+        },
+        getTeamStaff(team) {
+            return team.staff;
+        },
         getRoleSVG
     }
 };
@@ -137,7 +170,6 @@ export default {
 
 .team-roster {
     flex-grow: 1;
-    font-size: 48px;
 }
 .team-icon-holder {
     /*width: 2em;*/
@@ -176,6 +208,9 @@ export default {
     width: 1em;
     margin-right: .2em;
 }
+.player-role >>> i {
+     font-size: .75em;
+ }
 
 .player {
     display: flex;
@@ -190,4 +225,6 @@ export default {
     color: white;
     border-bottom: 8px solid transparent;
 }
+
+.team-staff-roster {font-size: .75em;}
 </style>

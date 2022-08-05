@@ -76,7 +76,8 @@ export default {
         crossfading: false,
         playedTrackIds: [],
         loadedTrackList: [],
-        visible: true
+        visible: true,
+        lastTrack: null
     }),
     computed: {
         tracksData() {
@@ -158,7 +159,13 @@ export default {
         getNextTrack() {
             if (this.unplayedTracks.length === 0) {
                 // if theres only one song in the list we can play it again
-                this.playedTrackIds = this.trackList?.length > 1 ? [this.mainPlayer.id] : [];
+                if (this.lastTrack) {
+                    console.log(`Reshuffling player, but putting ${this.lastTrack} out of rotation since it played last.`);
+                    this.playedTrackIds = this.trackList?.length > 1 ? [this.lastTrack] : [];
+                } else {
+                    console.warn("Nothing played last, we could have a duplicate");
+                    this.playedTrackIds = [];
+                }
             }
             const nextTrack = this.unplayedTracks[Math.floor(this.unplayedTracks.length * Math.random())];
             if (!nextTrack) {
@@ -169,6 +176,8 @@ export default {
             // that might happen if tracks haven't loaded yet? not sure
             // also if there are no unplayed tracks remaining
             this.playedTrackIds.push(nextTrack.id);
+            this.lastTrack = nextTrack.id;
+            console.log(`[Next track] Played ${this.playedTrackIds.length}, unplayed: ${this.unplayedTracks.length} (list has ${this.trackList.length})`);
             return nextTrack;
         },
         start() {

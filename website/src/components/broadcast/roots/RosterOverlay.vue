@@ -28,9 +28,10 @@
                             </div>
                         </div>
                         <div class="team-roster team-staff-roster flex-center flex-column" v-if="showStaff">
+                            <div class="staff-text d-none">Staff</div>
                             <div class="player" v-for="player in getTeamStaff(team)"
                                  v-bind:key="player.id">
-                                <div class="player-role flex-center" v-html="getRoleSVG(player.staff_role || player.role)"></div>
+                                <div class="player-role flex-center" v-if="player.staff_role || player.role" v-html="getRoleSVG(player.staff_role || player.role)"></div>
                                 <span class="player-name">{{ player.name }}</span>
                             </div>
                         </div>

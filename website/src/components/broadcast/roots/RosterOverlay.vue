@@ -10,7 +10,7 @@
                             <div class="team-icon bg-center" :style="icon(team)"></div>
                         </div>
                     </div>
-                    <div class="team-roster-holder flex-center flex-column overlay--bg w-100 h-100" :style="{ fontSize: rosterFontSize(team) }">
+                    <div class="team-roster-holder flex-center flex-column overlay--bg w-100" :style="{ fontSize: rosterFontSize(team) }">
                         <div class="team-roster flex-center flex-column">
                             <div class="player" v-for="player in teamPlayerGroups(team)[0]"
                                  v-bind:key="player.id">
@@ -169,7 +169,7 @@ export default {
     padding: 0 20px;
 }
 
-.team-roster {
+.team-roster, .team-roster-holder {
     flex-grow: 1;
 }
 .team-icon-holder {

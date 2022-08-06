@@ -92,7 +92,7 @@ export default {
 
                 let mapText;
 
-                const currentMap = this.match.maps.map((map, i) => ({
+                const currentMap = (this.match.maps || []).map((map, i) => ({
                     ...map,
                     number: map.number || i + 1
                 })).find(map => !(map.draw || map.winner));
@@ -102,12 +102,12 @@ export default {
                     // match has finished
                     mapText = "Final Score"; // maybe
                     // mapText = `Map ${currentMap.number - 1}`;
-                } else {
+                } else if (currentMap) {
                     mapText = `Map ${currentMap.number}`;
                 }
 
 
-                if (this.match.first_to) {
+                if (this.match.first_to && mapText) {
                     // Map X - First to Y
                     return `${mapText} - First to ${this.match.first_to}`;
                 } else {

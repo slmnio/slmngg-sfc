@@ -19,7 +19,7 @@
                                 <span class="player-name">{{ player.name }}</span>
                             </div>
                         </div>
-                        <div class="team-roster team-sub-roster flex-center flex-column" v-if="teamPlayerGroups(team)[1]">
+                        <div class="team-roster team-sub-roster flex-center flex-column" v-if="teamPlayerGroups(team)[1] && teamPlayerGroups(team)[1].length">
                             <div class="player" v-for="player in teamPlayerGroups(team)[1]"
                                  v-bind:key="player.id">
                                 <div class="player-role flex-center" v-if="showRoles && player.role"

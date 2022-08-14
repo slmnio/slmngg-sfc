@@ -60,8 +60,8 @@ function setup(_io) {
     console.log("[rebuild] rebuilding...");
     _rebuildStart = Date.now();
     io.on("connect", (socket) => {
-        io.emit("server_rebuilding", _isRebuilding);
-        io.emit("high_error_rate", reqLog.highErrorRate);
+        socket.emit("server_rebuilding", _isRebuilding);
+        socket.emit("high_error_rate", reqLog.highErrorRate);
     });
 
     return this;

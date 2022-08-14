@@ -112,7 +112,7 @@ let preloadAuthCheckRequired = false;
 // TODO: this doesn't really work very well nor work on the first run
 router.beforeEach((to, from, next) => {
     try {
-        console.log("routerResolve", to, this, app);
+        // console.log("routerResolve", to, this, app);
         if (to.meta.requiresAuth) {
             // authenticating!
 

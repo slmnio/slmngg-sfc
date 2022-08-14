@@ -35,7 +35,7 @@ export default {
         },
         top() {
             // console.log(informal.display(this._time));
-            return this.time && this._time.format("{date} {month-short}");
+            return this.time && (this._time.format("{date} {month-short}") + (this._time.year() === spacetime.now().year() ? "" : ` ${this._time.format("{year-short}")}`));
         },
         bottom() {
             if (this.noTimes) return null;

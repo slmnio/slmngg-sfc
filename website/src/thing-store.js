@@ -14,7 +14,7 @@ export default new Vuex.Store({
         highlighted_team: null,
         highlighted_match: null,
         match_highlights: [],
-        timezone: "local",
+        timezone: localStorage.getItem("timezone") || "local",
         draft_notes: [],
         last_event_match_pages: []
     },
@@ -75,6 +75,7 @@ export default new Vuex.Store({
             state.highlighted_match = matchID;
         },
         setTimezone(state, timezone) {
+            localStorage.setItem("timezone", timezone);
             state.timezone = timezone;
         },
         setHighlights(state, matchHighlights) {

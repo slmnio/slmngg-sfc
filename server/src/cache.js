@@ -200,6 +200,22 @@ async function set(id, data, options) {
     // Check antileak to see if this should be hidden or redacted
     // data = await removeAntiLeak(id, data);
 
+    let oldData = store.get(id);
+    if (oldData && (data.modified !== oldData.modified)) {
+        let [oldDate, newDate] = [oldData.modified, data.modified].map(x => new Date(x));
+        if (newDate.getTime() < oldDate.getTime()) {
+            console.log(`[old] id=${id} \n     old=${oldDate.toLocaleString()} \n     new=${newDate.toLocaleString()}`);
+            console.warn("     old data is newer, keeping it!");
+
+            console.log("old data:");
+            console.log(oldData);
+            console.log("new data:");
+            console.log(data);
+
+            return;
+        }
+    }
+
     await dataUpdate(id, data, options);
     store.set(id, data);
 }

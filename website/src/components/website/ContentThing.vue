@@ -9,7 +9,7 @@
               :style="logo"
               v-if="shouldShowLogo && !logoRight"></span>
 
-        <span class="name">{{ text || thing.name }}</span>
+        <span class="name" v-if="text !== ''">{{ text || thing.name }}</span>
 
         <i class="fas fa-badge-check fa-fw" title="REAL" v-if="thing.verified"></i>
 
@@ -60,7 +60,7 @@ export default {
         },
         logo () {
             if (!this.theme || !this.theme.default_logo) return null;
-            return resizedImage(this.theme, ["small_logo", "default_logo"], "h-30");
+            return resizedImage(this.theme, ["small_logo", "default_logo"], "h-120");
         },
         headshot () {
             if (!this.thing) return null;
@@ -99,8 +99,8 @@ export default {
         height: 1.5em;
         width: 1.5em;
     }
-    .icon-internal.icon-internal-left { margin-right: .3em }
-    .icon-internal.icon-internal-right { margin-left: .3em }
+    .icon-internal.icon-internal-left + .name { margin-left: .3em }
+    .icon-internal.icon-internal-right + .name { margin-right: .3em }
     .content-thing i {
       margin: 5px 0;
     }

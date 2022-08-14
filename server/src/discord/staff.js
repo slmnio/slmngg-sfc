@@ -338,11 +338,11 @@ async function emptyEmptyRoles(event) {
     // Load members into cache
     await guild.members.list({ limit: 1000 });
 
-    let checkRoles = guild.roles.cache.filter(r => r.name !== "@everyone" && r.members.size !== 0);
+    let checkRoles = (guild.roles?.cache || []).filter(r => r.name !== "@everyone" && r.members.size !== 0);
 
     if (checkRoles.length === 0) return console.warn("Didn't want to empty roles - all roles appear to be empty");
 
-    let eligibleRoles = guild.roles.cache.filter(r => r.name.startsWith(event.prefix) && r.members.size === 0);
+    let eligibleRoles = (guild.roles?.cache || []).filter(r => r.name.startsWith(event.prefix) && r.members.size === 0);
 
     log(`Requested empty role deletion for **${event.name}**. The roles were:\n\`\`\`${eligibleRoles.map(r => `${r.id} - ${r.name}`)}\`\`\``);
 

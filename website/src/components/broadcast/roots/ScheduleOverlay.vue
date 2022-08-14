@@ -9,7 +9,7 @@
 <script>
 import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import BreakMatch from "@/components/broadcast/break/BreakMatch";
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
 import { themeBackground1 } from "@/utils/theme-styles";
 

@@ -10,7 +10,6 @@
 </template>
 
 <script>
-import { getDataServerAddress } from "@/utils/fetch";
 import LoadingIcon from "@/components/website/LoadingIcon";
 import { authenticateWithDiscord } from "@/utils/auth";
 

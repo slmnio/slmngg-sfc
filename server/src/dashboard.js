@@ -161,7 +161,10 @@ async function updateRecord(tableName, item, data) {
     // TODO: need to also do aliases eg: client-slmn
     // see: airtable-interface.js customUpdater
 
-    let slmnggData = deAirtable({ ...item, ...data });
+    let slmnggData = {
+        ...deAirtable({ ...item, ...data }),
+        modified: new Date()
+    };
     // Eager update
     defaults.Cache.set(cleanID(item.id), slmnggData, { eager: true });
 

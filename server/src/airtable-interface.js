@@ -218,10 +218,12 @@ async function sync() {
     }
     for (let table of tables) {
         // await t(1000);
+        let t = new Date();
+        if (firstRun) console.log(`[rebuild] starting: dynamic table ${table}`);
         await processTableData(table, await getAllTableData(table));
         setInterval(async () => processTableData(table, await getAllTableData(table)), 30 * 1000);
         registerUpdater(table);
-        if (firstRun) console.log(`[rebuild] dynamic table ${table} complete`);
+        if (firstRun) console.log(`[rebuild] complete: dynamic table ${table} (in ${((new Date().getTime() - t.getTime()) / 1000).toFixed(2)}s)`);
     }
     if (firstRun) setRebuilding(false);
     firstRun = false;

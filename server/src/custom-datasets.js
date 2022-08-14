@@ -39,7 +39,7 @@ async function matchUpdate(Cache) {
 
 
         return false;
-    }).sort((a,b) => b.start - a.start);
+    }).sort((a,b) => new Date(a.start) - new Date(b.start));
 
     Cache.set("special:upcoming-matches", { matches: upcomingMatches.map(m => m.id) });
 }

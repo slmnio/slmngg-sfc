@@ -1,5 +1,6 @@
 <template>
   <div class="container home mt-3">
+      <UpcomingMatches />
       <h1 class="mb-3">Welcome to the new SLMN.GG!</h1>
       <p>I've rewritten the entire site to be lightning fast and have auto-updates built in.</p>
       <p>As you travel across the site, you'll see everything load in gracefully, and if anything is updated, it'll change right before your eyes.</p>
@@ -15,9 +16,11 @@
 <script>
 
 import { ReactiveList } from "@/utils/reactive";
+import UpcomingMatches from "@/components/website/UpcomingMatches";
 
 export default {
     name: "Home",
+    components: { UpcomingMatches },
     computed: {
         events() {
             return ReactiveList("Events").filter(event => event.show_in_events);

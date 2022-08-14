@@ -16,7 +16,7 @@ export default {
     components: { UpcomingMatch },
     computed: {
         matches() {
-            return ReactiveRoot("special:upcoming-matches", {
+            return (ReactiveRoot("special:upcoming-matches", {
                 matches: ReactiveArray("matches", {
                     teams: ReactiveArray("teams", {
                         theme: ReactiveThing("theme")
@@ -25,7 +25,7 @@ export default {
                         theme: ReactiveThing("theme")
                     })
                 })
-            })?.matches || [];
+            })?.matches || []).slice(0, 6);
         }
     }
 };

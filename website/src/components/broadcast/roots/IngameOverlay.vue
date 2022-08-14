@@ -112,7 +112,8 @@ export default {
                     return `${mapText} - First to ${this.match.first_to}`;
                 } else {
                     // Semifinals - Map X
-                    return `${this.match.round || this.match.week_text} - First to ${this.match.first_to}`;
+                    const matchRound = this.match.round || this.match.week_text;
+                    return `${matchRound ? `${matchRound} - ` : ""}First to ${this.match.first_to}`;
                 }
             }
 

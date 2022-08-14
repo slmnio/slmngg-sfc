@@ -32,6 +32,17 @@
             </div>
         </div>
 
+        <h3 v-if="theme && theme.id">Generated images</h3>
+        <div v-if="theme && theme.id" class="logo-list mb-3">
+            <div class="logo-holder square-logo-holder flex-center" :style="logoBackground">
+                <a :href="dataServerURL(`theme.png?id=${theme.id}&size=500&padding=20`)" target="_blank" class="bg-center square-logo logo" :style="{backgroundImage: `url(${dataServerURL(`theme.png?id=${theme.id}&size=500&padding=20`)})`}"></a>
+            </div>
+            <div class="logo-holder circle-logo-holder flex-center" :style="logoBackground">
+                <a :href="dataServerURL(`theme.png?id=${theme.id}&size=500&padding=30`)" target="_blank" class="bg-center square-logo logo" :style="{backgroundImage: `url(${dataServerURL(`theme.png?id=${theme.id}&size=500&padding=30`)})`}"></a>
+            </div>
+        </div>
+
+
         <div class="team-specific" v-if="team">
             <h3>Ingame overlay</h3>
             <div class="overlay-area ingame-overlay mb-3">
@@ -62,6 +73,7 @@ import ContentRow from "@/components/website/ContentRow";
 import ContentThing from "@/components/website/ContentThing";
 import StandingsTeam from "@/components/broadcast/StandingsTeam";
 import { resizedImageNoWrap } from "@/utils/images";
+import { getDataServerAddress } from "@/utils/fetch";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");
@@ -124,6 +136,11 @@ export default {
                 key: cleanKey(k),
                 image: resizedImageNoWrap(this.theme, [k], "orig")
             })).filter(i => i.image);
+        }
+    },
+    methods: {
+        dataServerURL(path) {
+            return `${getDataServerAddress()}/${path}`;
         }
     }
 };
@@ -219,5 +236,21 @@ export default {
     .standings >>> .team-name {
         margin-right: 32px;
         min-width: 250px;
+    }
+
+    .square-logo-holder,
+    .circle-logo-holder {
+        width: 160px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .circle-logo-holder {
+        border-radius: 50%;
+    }
+
+    .square-logo-holder a,
+    .circle-logo-holder a {
+        width: 100%;
+        height: 100%;
     }
 </style>

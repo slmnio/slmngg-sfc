@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const algolia = require("./algolia.js");
 
 /*
     - Get and set data
@@ -89,6 +90,7 @@ async function dataUpdate(id, data, options) {
         if (!(options && options.custom)) updateFunction(id, { oldData: store.get(id), newData: data });
         if (data) data = await removeAntiLeak(id, data);
         await broadcast(id, "data_update", id, data);
+        algolia.addToQueue(id, data);
     }
 }
 

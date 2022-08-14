@@ -10,6 +10,7 @@ const routes = require("./routes.js");
 const images = require("./images.js");
 const discordAuth = require("./discord/auth.js");
 const dashboardAPI = require("./dashboard");
+const algoliaWorker = require("./algolia");
 
 /* The staff module should only run on the server, probably not your local machine. */
 let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEGORY_ID", "STAFFAPPS_APPLICATION_CHANNEL_ID", "IS_SLMNGG_MAIN_SERVER"];

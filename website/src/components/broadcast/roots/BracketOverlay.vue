@@ -76,6 +76,11 @@ export default {
             this.$store.commit("setHighlightedMatch", id);
             console.log("[set highlight] match", id);
         }
+    },
+    metaInfo() {
+        return {
+            title: `Bracket ${this.bracketKey || this.broadcast?.bracket_key || ""}${this.extended ? " (extended)" : ""}${this.small ? " (small)" : ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

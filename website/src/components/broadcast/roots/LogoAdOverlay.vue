@@ -29,6 +29,11 @@ export default {
     },
     methods: {
         resizedImage
+    },
+    metaInfo() {
+        return {
+            title: `Logos | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

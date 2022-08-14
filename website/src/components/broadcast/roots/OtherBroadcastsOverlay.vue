@@ -10,7 +10,12 @@ import OtherBroadcasts from "@/components/broadcast/OtherBroadcasts";
 export default {
     name: "OtherBroadcastsOverlay",
     components: { OtherBroadcasts, GenericOverlay },
-    props: ["broadcast", "title"]
+    props: ["broadcast", "title"],
+    metaInfo() {
+        return {
+            title: `Other Broadcasts | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
+    }
 };
 </script>
 

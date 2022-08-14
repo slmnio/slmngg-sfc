@@ -71,6 +71,11 @@ export default {
                 this.showCams = show;
             }
         }
+    },
+    metaInfo() {
+        return {
+            title: `Ingame Cams | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

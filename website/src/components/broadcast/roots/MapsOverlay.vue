@@ -43,6 +43,11 @@ export default {
             }
             return "Map Set";
         }
+    },
+    metaInfo() {
+        return {
+            title: `Maps | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

@@ -34,6 +34,11 @@ export default {
                 "--event": this.event.theme.color_theme
             };
         }
+    },
+    metaInfo() {
+        return {
+            title: `Full Cam #${this.number} | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

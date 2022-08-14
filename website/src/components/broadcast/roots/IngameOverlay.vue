@@ -175,6 +175,11 @@ export default {
 
             return team.theme;
         }
+    },
+    metaInfo() {
+        return {
+            title: `Ingame | ${this.match?.name || this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

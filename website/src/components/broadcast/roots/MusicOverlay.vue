@@ -216,6 +216,11 @@ export default {
                 this.crossfadePlayer = null;
             }, this.crossfadeDuration * 1000);
         }
+    },
+    metaInfo() {
+        return {
+            title: `Music (${this.role || ""}) | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 

@@ -110,11 +110,12 @@ export default {
         title() {
             let str = "";
             if (this.relay) {
-                str += "Relay: ";
+                str += "Relay #";
             } else {
-                str += "POV: ";
+                str += "POV #";
             }
             str += this.number;
+            str += ` | ${this.broadcast?.code || this.broadcast?.name || ""}`;
             return str;
         }
     },

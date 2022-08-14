@@ -21,7 +21,8 @@
 import spacetime from "spacetime";
 
 export default {
-    name: "MediaClock.vue",
+    name: "MediaClock",
+    props: ["broadcast", "client"],
     data: () => ({
         prepared: null,
         playing: null,
@@ -80,6 +81,11 @@ export default {
         setInterval(() => {
             this.now = new Date();
         }, 1000);
+    },
+    metaInfo() {
+        return {
+            title: `Clock | ${this.client?.name || this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

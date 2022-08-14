@@ -75,6 +75,11 @@ export default {
             if (!video) return null;
             return video.url;
         }
+    },
+    metaInfo() {
+        return {
+            title: `Caster Background | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

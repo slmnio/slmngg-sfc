@@ -21,6 +21,11 @@ export default {
             if (!this.broadcast?.live_match) return null;
             return this.broadcast.live_match[0];
         }
+    },
+    metaInfo() {
+        return {
+            title: `Overview | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

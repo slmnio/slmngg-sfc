@@ -81,6 +81,11 @@ export default {
             if (!this.broadcast?.event?.theme?.desk_colors) return [];
             return this.broadcast.event.theme.desk_colors.trim().split(/[\n,]/g).map(e => e.trim());
         }
+    },
+    metaInfo() {
+        return {
+            title: `Desk | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

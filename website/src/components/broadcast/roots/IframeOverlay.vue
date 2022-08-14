@@ -9,7 +9,12 @@ import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 export default {
     name: "IframeOverlay",
     props: ["broadcast", "title", "url"],
-    components: { GenericOverlay }
+    components: { GenericOverlay },
+    metaInfo() {
+        return {
+            title: `Iframe "${this.title}" | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
+    }
 };
 </script>
 

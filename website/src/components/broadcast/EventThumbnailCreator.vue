@@ -60,6 +60,11 @@ export default {
                 color: this.event.theme.color_text_on_logo_background || this.event.theme.color_text_on_theme
             };
         }
+    },
+    metaInfo() {
+        return {
+            title: `Event Thumbnail | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

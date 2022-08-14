@@ -76,6 +76,11 @@ export default {
         sting(shouldSting) {
             this.stingerActive = shouldSting;
         }
+    },
+    metaInfo() {
+        return {
+            title: `Desk Graphics | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

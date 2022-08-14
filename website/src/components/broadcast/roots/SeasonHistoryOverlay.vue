@@ -36,6 +36,11 @@ export default {
                 })
             });
         }
+    },
+    metaInfo() {
+        return {
+            title: `Season History | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

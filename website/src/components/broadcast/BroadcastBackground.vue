@@ -22,6 +22,11 @@ export default {
             const types = this.background.type.split("/");
             return types[0];
         }
+    },
+    metaInfo() {
+        return {
+            title: `Background${this.index ? ` #${this.index}` : ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

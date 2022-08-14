@@ -147,6 +147,11 @@ export default {
         ad_read_start() {
             this.runGroup(this.getActiveGroup());
         }
+    },
+    metaInfo() {
+        return {
+            title: `Ad Read | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

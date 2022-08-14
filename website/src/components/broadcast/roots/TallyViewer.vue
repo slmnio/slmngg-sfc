@@ -50,7 +50,12 @@ export default {
         sceneName: "N/A",
         number: null,
         wakeLock: null
-    })
+    }),
+    metaInfo() {
+        return {
+            title: `Tally Viewer | ${this.client?.name || this.client?.key || ""}`
+        };
+    }
 };
 </script>
 

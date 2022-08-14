@@ -274,6 +274,11 @@ export default {
         setInterval(() => {
             this.tick++;
         }, tickTime * 1000);
+    },
+    metaInfo() {
+        return {
+            title: `Break ${this.secondary ? " (Secondary)" : ""}| ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

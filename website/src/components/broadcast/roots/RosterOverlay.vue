@@ -128,6 +128,11 @@ export default {
             return team.staff;
         },
         getRoleSVG
+    },
+    metaInfo() {
+        return {
+            title: `Rosters | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

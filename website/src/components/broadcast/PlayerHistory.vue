@@ -72,7 +72,11 @@ export default {
                 .sort(sortEvents);
             return events[0];
         }
-        // TODO: Get a list of all events a player has participated in, sort by date, and display the start date of the earliest event as "Player Since"
+    },
+    metaInfo() {
+        return {
+            title: `Player History | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

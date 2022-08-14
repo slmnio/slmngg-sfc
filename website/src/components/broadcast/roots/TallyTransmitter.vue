@@ -75,6 +75,11 @@ export default {
             this.visible = e.detail.visible;
             this.transmitState();
         });
+    },
+    metaInfo() {
+        return {
+            title: `Tally Transmitter #${this.number} | ${this.client?.name || this.client?.key || ""}`
+        };
     }
 };
 </script>

@@ -125,6 +125,11 @@ export default {
             this.logoI++;
             if (this.logoI >= this.bigLogos.length) this.logoI = 0;
         }, 8000);
+    },
+    metaInfo() {
+        return {
+            title: `Branding | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

@@ -62,6 +62,11 @@ export default {
 
             return staff;
         }
+    },
+    metaInfo() {
+        return {
+            title: `Staff | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

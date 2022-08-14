@@ -380,6 +380,11 @@ export default {
             console.log(stats);
             this.stats = stats;
         }
+    },
+    metaInfo() {
+        return {
+            title: `Auction ${this.category || ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

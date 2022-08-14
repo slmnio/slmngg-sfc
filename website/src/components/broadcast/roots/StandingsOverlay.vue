@@ -26,6 +26,11 @@ export default {
         _stage() {
             return this.stage || this.broadcast?.current_stage;
         }
+    },
+    metaInfo() {
+        return {
+            title: `Standings ${this._stage || ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

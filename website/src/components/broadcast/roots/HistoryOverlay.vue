@@ -61,6 +61,11 @@ export default {
             if (!team.theme) return {};
             return resizedImage(team.theme, ["default_logo", "default_wordmark"], "h-250");
         }
+    },
+    metaInfo() {
+        return {
+            title: `History | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

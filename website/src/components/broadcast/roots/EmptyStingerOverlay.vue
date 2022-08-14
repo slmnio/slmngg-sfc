@@ -4,7 +4,12 @@
 
 <script>
 export default {
-    name: "EmptyStingerOverlay"
+    name: "EmptyStingerOverlay",
+    metaInfo() {
+        return {
+            title: `Empty Stinger | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
+    }
 };
 </script>
 

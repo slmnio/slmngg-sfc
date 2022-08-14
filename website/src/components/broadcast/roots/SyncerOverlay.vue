@@ -31,6 +31,11 @@ export default {
             if (this.client?.name) base += `&label=${this.client.name}`;
             return base;
         }
+    },
+    metaInfo() {
+        return {
+            title: `Syncer | ${this.client?.name || this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

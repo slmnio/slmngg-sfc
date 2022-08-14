@@ -45,6 +45,11 @@ export default {
             if (!text) return "";
             return text.replace(/\\n/g, "<br>");
         }
+    },
+    metaInfo() {
+        return {
+            title: `Info "${this.title}" | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

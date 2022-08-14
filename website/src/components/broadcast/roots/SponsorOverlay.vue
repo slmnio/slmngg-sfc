@@ -16,6 +16,11 @@ export default {
                 theme: ReactiveThing("theme")
             })(this.broadcast);
         }
+    },
+    metaInfo() {
+        return {
+            title: `Sponsors | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

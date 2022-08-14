@@ -235,6 +235,11 @@ export default {
         setInterval(() => {
             this.dummy = !this.dummy;
         }, 2500);
+    },
+    metaInfo() {
+        return {
+            title: `Draft | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

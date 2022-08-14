@@ -52,12 +52,15 @@
 <!--                    <router-link :to="'/'" v-if="minisite.navbar_short" active-class="active" exact class="nav-link">{{ minisite.navbar_short }}</router-link>-->
                 </b-navbar-nav>
                 <b-navbar-nav class="flex-grow-1"></b-navbar-nav>
+                <b-navbar-nav>
+                    <div class="nav-link" v-b-modal.timezone-swapper-modal>Timezone</div>
+                    <a target="_blank" class="nav-link" href="https://slmn.statuspage.io/?utm_source=slmngg_nav">Status</a>
+                </b-navbar-nav>
                 <b-navbar-nav v-if="minisite">
                     <a :href="slmnggURL('')" class="nav-link">SLMN.GG</a>
                 </b-navbar-nav>
                 <b-navbar-nav v-else>
                     <a v-if="$root.version" class="nav-link" target="_blank" href="https://github.com/slmnio/slmngg-sfc">SLMN.GG {{ $root.version }}</a>
-                    <a target="_blank" class="nav-link" href="https://slmn.statuspage.io/?utm_source=slmngg_nav">Status</a>
 
                     <router-link class="nav-link" to="/login" v-if="!$root.auth.user">Login</router-link>
                     <LoggedInUser v-if="$root.auth.user"/>
@@ -70,32 +73,43 @@
             <div class="live-matches-text">🔴 LIVE</div>
             <NavLiveMatch v-for="match in liveMatches" :match="match" v-bind:key="match.id" />
         </div>
+
+        <b-modal ref="timezone-swapper-modal" id="timezone-swapper-modal" title="Timezone swapper" hide-footer>
+            <p>Change your timezone for dates and times across SLMN.GG:</p>
+            <TimezoneSwapper align="left" />
+        </b-modal>
     </div>
 </template>
 
 <script>
 import {
-    BCollapse,
+    BCollapse, BModal,
     BNavbar,
     BNavbarNav,
-    BNavbarToggle
+    BNavbarToggle, VBModal
 } from "bootstrap-vue";
 import NavLiveMatch from "@/components/website/NavLiveMatch";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import WebsiteNavBanner from "@/components/website/WebsiteNavBanner";
 import { resizedImageNoWrap } from "@/utils/images";
 import LoggedInUser from "@/components/website/LoggedInUser";
+import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 
 export default {
     name: "WebsiteNav",
     components: {
+        TimezoneSwapper,
         LoggedInUser,
         WebsiteNavBanner,
         BNavbar,
         BNavbarToggle,
         BCollapse,
         BNavbarNav,
-        NavLiveMatch
+        NavLiveMatch,
+        BModal
+    },
+    directives: {
+        BModal: VBModal
     },
     props: ["minisite"],
     data: () => ({

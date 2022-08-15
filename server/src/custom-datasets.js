@@ -24,6 +24,9 @@ async function matchUpdate(Cache) {
         // - live right now (.live)
         // - scheduled to be live soon
         // - scheduled to be live recently but it should in its duration (ie it's 5:30pm on a 5:00pm match with 60m duration)
+
+        if (match.first_to && (match.score_1 === match.first_to || match.score_2 === match.first_to)) return false; // remove completed matches
+
         if (!match.start) return false;
         if (allLiveMatchIDs.includes(match.id)) return true;
 

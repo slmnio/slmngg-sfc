@@ -77,7 +77,7 @@ export default {
         url,
         playerGroup(group) { return this.availablePlayers.filter(p => p.localNotes && p.localNotes.tag === group); },
         fixData(rank) {
-            return rank.replace("Plat ", "Platinum ").replace("Immortal+", "Immortal");
+            return (rank || "").replace("Plat ", "Platinum ").replace("Immortal+", "Immortal");
         },
         sortRankingSystem(ranks, aRank, bRank) {
             aRank = this.fixData(aRank).trim().split(" ");

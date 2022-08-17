@@ -9,13 +9,13 @@
                 </div>-->
                 <transition-group class="players-transition" name="draftable">
                     <DraftPlayer :style="draftPlayerStyle" v-for="player in availablePlayers" v-bind:key="player.id"
-                                 :player="player" :theme="event.theme" :show-icon="icons" />
+                                 :player="player" :theme="event.theme" :show-icon="icons" :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
                 </transition-group>
             </div>
             <div class="teams d-flex">
                 <div class="team-row" v-for="(row, rowI) in draftRows" v-bind:key="rowI">
                     <div class="team flex-grow-1" v-for="team in row" v-bind:key="team.id">
-                        <DraftTeam class="team-top" v-bind:class="{'team-bottom-border': !showStaff}" :team="team"></DraftTeam>
+                        <DraftTeam class="team-top" v-bind:class="{'team-bottom-border': !showStaff}" :show-logo="showLogos" :team="team"></DraftTeam>
                         <div class="team-staff-list default-thing" v-if="showStaff" :style="logoBackground1(team)">
                             <div class="team-staff" v-for="staff in getTeamStaff(team)" v-bind:key="staff.id">
                                 {{ staff.name }}
@@ -23,7 +23,7 @@
                         </div>
                         <transition-group name="player" class="team-players">
                             <DraftPlayer class="drafted-player" v-for="player in insertDummies(team.players)" v-bind:key="player.id"
-                                         :player="player" :theme="event.theme" :show-icon="icons" />
+                                         :player="player" :theme="event.theme" :show-icon="icons" :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
                         </transition-group>
                     </div>
                 </div>
@@ -44,7 +44,7 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 export default {
     name: "DraftOverlay",
     components: { ThemeLogo, DraftTeam, DraftPlayer },
-    props: ["broadcast", "bracketKey", "columns", "icons", "showStaff", "teamRows", "eachTeam"],
+    props: ["broadcast", "bracketKey", "columns", "icons", "showStaff", "teamRows", "eachTeam", "showLogos"],
     data: () => ({
         dummy: false
     }),
@@ -90,7 +90,7 @@ export default {
             return staff;
         },
         fixData(rank) {
-            return rank.replace("Plat ", "Platinum ").replace("Immortal+", "Immortal");
+            return (rank || "").replace("Plat ", "Platinum ").replace("Immortal+", "Immortal");
         },
         sortRankingSystem(ranks, aRank, bRank) {
             aRank = this.fixData(aRank).trim().split(" ");
@@ -116,6 +116,7 @@ export default {
                 "Platinum",
                 "Diamond",
                 "Immortal",
+                "Ascendant",
                 "Radiant"
             ];
             // sort by highest, then break with current
@@ -127,6 +128,10 @@ export default {
             }
             // console.log(a.name, b.name, diff);
             return diff;
+        },
+        getHighlightEventTeam(player) {
+            if (!this.highlight_event?.teams?.length) return null;
+            return this.highlight_event.teams.find(team => (team.players || []).find(p => p.id === player.id) || (team.captains || []).find(p => p.id === player.id));
         }
     },
     computed: {
@@ -142,6 +147,20 @@ export default {
                 }),
                 draftable_players: ReactiveArray("draftable_players")
             });
+        },
+        highlight_event() {
+            if (!this.broadcast?.highlight_event) return null;
+            return ReactiveRoot(this.broadcast.highlight_event?.[0], {
+                theme: ReactiveThing("theme"),
+                teams: ReactiveArray("teams", {
+                    theme: ReactiveThing("theme"),
+                    players: ReactiveArray("players"),
+                    captains: ReactiveArray("captains")
+                })
+            });
+        },
+        useHighlightEventBadges() {
+            return (this.broadcast?.broadcast_settings || []).includes("Use highlight event team badges");
         },
         game() {
             return this.event?.game || "Overwatch";
@@ -169,6 +188,11 @@ export default {
                 return true;
             }).map(player => {
                 // attempt to get SR
+                if (this.useHighlightEventBadges) {
+                    // get team from highlight event
+                    player._highlight_team = this.getHighlightEventTeam(player) || null;
+                }
+
                 try {
                     const ow = JSON.parse(player.overwatch_data);
                     if (ow && ow.ratings && player.role) {
@@ -184,6 +208,7 @@ export default {
                 } catch (e) {
                     return player;
                 }
+
 
                 return player;
             }).map(player => {

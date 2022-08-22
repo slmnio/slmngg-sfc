@@ -23,8 +23,13 @@
                     <div class="team-logo bg-center" :style="teamLogo"></div>
                 </div>
                 <transition name="score">
-                    <div class="flex-center team-score" v-if="!hideScores">
-                        <span class="industry-align">{{ score || '0' }}</span>
+                    <div class="flex-center team-score" v-if="!hideScores && !useDots">
+                        <span class="industry-align" v-if="useDots">{{ score || '0' }}</span>
+                    </div>
+                </transition>
+                <transition name="score">
+                    <div class="flex-center team-dots" v-if="!hideScores && useDots">
+                        <div class="dot" v-for="(dot, i) in dots" :class="{'active': dot.active}" :key="i" :style="dot.active ? teamSlice : {}"></div>
                     </div>
                 </transition>
                 <transition name="slide" mode="out-in">
@@ -45,7 +50,7 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "IngameTeam",
-    props: ["team", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons"],
+    props: ["team", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo"],
     data: () => ({
         textureData: {
             url: null,
@@ -64,6 +69,18 @@ export default {
         }
     },
     computed: {
+        dots() {
+            const _dots = [];
+            for (let i = 1; i <= (this.firstTo || 2); i++) {
+                console.log(this.score, i);
+                if (this.score === i) {
+                    _dots.push({ active: true });
+                } else {
+                    _dots.push({ active: false });
+                }
+            }
+            return _dots;
+        },
         _theme() {
             return this.theme || this.team.theme;
         },
@@ -409,4 +426,12 @@ function updateWidth(vueEl, fullWidth) {
     .attack-enter { clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); }
     .attack-enter-to, .attack-leave { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
     .attack-leave-to { clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); }
+
+    .dot {
+        border: 1px solid #222;
+        background-color: #333;
+        width: 1.5em;
+        height: .8em;
+        margin: 0 2px;
+    }
 </style>

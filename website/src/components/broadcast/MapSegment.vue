@@ -171,4 +171,8 @@ export default {
         align-items: center;
         width: 100%;
     }
+    .pick-ban-team {
+        width: 55px;
+        height: 100%;
+    }
 </style>

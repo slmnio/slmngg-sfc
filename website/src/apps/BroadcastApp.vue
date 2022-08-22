@@ -1,9 +1,8 @@
 <template>
     <StingerWrap :theme="broadcast.event && broadcast.event.theme" :active="active" :should-use="useBuiltInStingers">
-        <div class="broadcast-app"
-             :class="{'broadcast--no-anim': noAnimation, 'broadcast--active': active, 'broadcast--animation-active': animationActive}">
+        <div class="broadcast-app" :class="broadcastClass">
             <!--        <div style="font-size: 5em; color: black">{{ $root.activeScene }}</div>-->
-            <router-view id="overlay" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active"
+            <router-view id="overlay" :class="bodyClass" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active"
                          :animation-active="animationActive"/>
             <v-style v-if="broadcast && broadcast.event">
                 {{ broadcast.event.broadcast_css }}
@@ -22,7 +21,7 @@ import StingerWrap from "@/components/broadcast/StingerWrap";
 
 export default {
     name: "BroadcastApp",
-    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger"],
+    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass"],
     components: {
         StingerWrap
     },
@@ -32,6 +31,14 @@ export default {
         obs: null
     }),
     computed: {
+        broadcastClass() {
+            const classes = [];
+            if (this.noAnimation) classes.push("broadcast--no-anim");
+            if (this.active) classes.push("broadcast--active");
+            if (this.animationActive) classes.push("broadcast--animation-active");
+
+            return classes.join(" ");
+        },
         broadcast() {
             return ReactiveRoot(this.id || `broadcast-${this.code}`, {
                 event: ReactiveThing("event", {

@@ -7,7 +7,7 @@
                         <img :src="texture" alt="">
                     </div>
                 </div>
-                <div class="flex-center team-small-text">
+                <div class="flex-center team-small-text" v-if="smallText">
                     <transition name="fade" mode="out-in">
                         <span :key="smallText" v-if="smallText">
                         {{ smallText }}

@@ -94,7 +94,17 @@ export default [
     { path: "iframe", component: IframeOverlay, props: route => ({ url: route.query.url }) },
     { path: "standings", component: StandingsOverlay, props: route => ({ stage: route.query.stage || route.query.group }) },
     { path: "roster", redirect: "rosters" },
-    { path: "rosters", component: RosterOverlay, props: route => ({ showRoles: route.query.roles, sort: route.query.sort, showStaff: route.query.staff, splitPlayers: route.query.split ? parseInt(route.query.split) : null }) },
+    {
+        path: "rosters",
+        component: RosterOverlay,
+        props: route => ({
+            showRoles: route.query.roles,
+            sort: route.query.sort,
+            showStaff: route.query.staff,
+            showBadges: route.query.badge || route.query.badges,
+            splitPlayers: route.query.split ? parseInt(route.query.split) : null
+        })
+    },
     { path: "history", component: HistoryOverlay, props: route => ({ max: route.query.max || 5 }) },
     { path: "season-history", component: SeasonHistoryOverlay },
     { path: "thumbnail", component: EventThumbnailCreator },

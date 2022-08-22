@@ -17,6 +17,9 @@
                                 <div class="player-role flex-center" v-if="showRoles && player.role"
                                      v-html="getRoleSVG(player.role)"></div>
                                 <span class="player-name">{{ player.name }}</span>
+                                <div class="player-badge" v-if="showBadges && getHighlightEventTeam(player)">
+                                    <ThemeLogo class="badge-logo" :theme="getHighlightEventTeam(player) && getHighlightEventTeam(player).theme" icon-padding="0.2em" logo-size="w-100" />
+                                </div>
                             </div>
                         </div>
                         <div class="team-roster team-sub-roster flex-center flex-column" v-if="teamPlayerGroups(team)[1] && teamPlayerGroups(team)[1].length">
@@ -25,6 +28,9 @@
                                 <div class="player-role flex-center" v-if="showRoles && player.role"
                                      v-html="getRoleSVG(player.role)"></div>
                                 <span class="player-name">{{ player.name }}</span>
+                                <div class="player-badge" v-if="showBadges && getHighlightEventTeam(player)">
+                                    <ThemeLogo class="badge-logo" :theme="getHighlightEventTeam(player) && getHighlightEventTeam(player).theme" icon-padding="0.2em" logo-size="w-100" />
+                                </div>
                             </div>
                         </div>
                         <div class="team-roster team-staff-roster flex-center flex-column" v-if="showStaff">
@@ -33,6 +39,9 @@
                                  v-bind:key="player.id">
                                 <div class="player-role flex-center" v-if="player.staff_role || player.role" v-html="getRoleSVG(player.staff_role || player.role)"></div>
                                 <span class="player-name">{{ player.name }}</span>
+                                <div class="player-badge" v-if="showBadges && getHighlightEventTeam(player)">
+                                    <ThemeLogo class="badge-logo" :theme="getHighlightEventTeam(player) && getHighlightEventTeam(player).theme" icon-padding="0.2em" logo-size="w-100" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -48,11 +57,12 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { getRoleSVG } from "@/utils/content-utils";
 import { resizedImage } from "@/utils/images";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
+import ThemeLogo from "@/components/website/ThemeLogo";
 
 export default {
     name: "RosterOverlay",
-    components: { ThemeTransition, GenericOverlay },
-    props: ["broadcast", "title", "showRoles", "sort", "animationActive", "showStaff", "splitPlayers"],
+    components: { ThemeTransition, GenericOverlay, ThemeLogo },
+    props: ["broadcast", "title", "showRoles", "sort", "animationActive", "showStaff", "splitPlayers", "showBadges"],
     computed: {
         accentColor() {
             return this.$root?.broadcast?.event?.theme?.color_theme;
@@ -70,6 +80,18 @@ export default {
         teams() {
             if (!this.match) return [];
             return this.match.teams;
+        },
+        highlight_event() {
+            const eventID = this.broadcast?.highlight_event?.[0];
+            if (!eventID) return null;
+            return ReactiveRoot(eventID, {
+                theme: ReactiveThing("theme"),
+                teams: ReactiveArray("teams", {
+                    theme: ReactiveThing("theme"),
+                    players: ReactiveArray("players"),
+                    captains: ReactiveArray("captains")
+                })
+            });
         }
     },
     methods: {
@@ -127,7 +149,11 @@ export default {
         getTeamStaff(team) {
             return team.staff;
         },
-        getRoleSVG
+        getRoleSVG,
+        getHighlightEventTeam(player) {
+            if (!this.highlight_event?.teams?.length) return null;
+            return this.highlight_event.teams.find(team => (team.players || []).find(p => p.id === player.id) || (team.captains || []).find(p => p.id === player.id));
+        }
     },
     metaInfo() {
         return {
@@ -233,4 +259,11 @@ export default {
 }
 
 .team-staff-roster {font-size: .75em;}
+
+.player-badge .badge-logo {
+    width: 1.2em;
+    height: 1em;
+    border-bottom-width: .15em !important;
+    margin-left: .4em;
+}
 </style>

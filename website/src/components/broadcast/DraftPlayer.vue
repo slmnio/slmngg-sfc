@@ -1,5 +1,5 @@
 <template>
-    <div class="draft-player" v-if="player && !player.dummy" :style="background">
+    <div class="draft-player" v-if="player && !player.dummy" :style="background" :data-player-id="player && player.id || 'empty'">
         <div class="player-name">{{ player.name }}</div>
         <div class="player-role flex-center" v-if="showIcon" v-html="getSVG(player.role)"></div>
         <div class="player-badge" v-if="badge">

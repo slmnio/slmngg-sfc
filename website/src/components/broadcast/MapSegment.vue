@@ -1,12 +1,17 @@
 <template>
     <div class="map d-flex position-relative" v-bind:class="{'next-map': map._next }">
-        <div v-if="mapVideo" class="map-bg map-video w-100 h-100 bg-center" v-bind:class="{'grayscale': !!winnerBG || (map && map.draw)}" :style="mapBackground">
+        <div v-if="mapVideo" class="map-bg map-video w-100 h-100 bg-center" v-bind:class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground">
             <video :src="mapVideo" autoplay muted loop></video>
         </div>
-        <div v-else class="map-bg w-100 h-100 bg-center" v-bind:class="{'grayscale': !!winnerBG || (map && map.draw)}" :style="mapBackground"></div>
+        <div v-else class="map-bg w-100 h-100 bg-center" v-bind:class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground"></div>
         <div class="map-gel w-100 h-100 position-absolute" :style="winnerBG"></div>
         <div class="map-gel w-100 h-100 position-absolute draw-gel" v-if="map && map.draw"></div>
+        <div class="map-gel w-100 h-100 position-absolute ban-gel" v-if="map && map.banner"></div>
         <div class="map-main d-flex flex-column h-100 w-100 position-absolute">
+            <div class="map-upper flex-center" :style="accent" v-if="map.picker || map.banner">
+                <ThemeLogo class="pick-ban-team" :theme="pickBanTheme" border-width="4px" logo-size="w-100" icon-padding="2" />
+                <div class="pick-ban-text" :style="pickBanBorder">{{ map.banner ? 'Ban' : (map.picker ? 'Pick' : '')  }}</div>
+            </div>
             <div class="map-top flex-grow-1 h-100 w-100 flex-center">
                 <div class="map-logo-holder w-100 h-50 flex-center" v-if="winnerBG">
                     <div class="map-logo bg-center" :style="winnerLogo"></div>
@@ -24,12 +29,24 @@
 <script>
 import { logoBackground } from "@/utils/theme-styles";
 import { resizedImage } from "@/utils/images";
+import ThemeLogo from "@/components/website/ThemeLogo";
 
 
 export default {
     name: "MapSegment",
     props: ["broadcast", "map", "accentColor", "showMapVideo", "firstTo", "useShorterNames"],
+    components: {
+        ThemeLogo
+    },
     computed: {
+        pickBanTheme() {
+            return (this.map.banner || this.map.picker)?.theme;
+        },
+        pickBanBorder() {
+            return {
+                borderBottom: `4px solid ${this.pickBanTheme?.color_logo_accent || this.pickBanTheme?.color_accent || "rgba(255,255,255,0.2)"}`
+            };
+        },
         mapBackground() {
             if (!(this.map?.big_image || this.map?.image)) return {};
 
@@ -97,7 +114,8 @@ export default {
     .map-bg.grayscale {
         filter: grayscale(1);
     }
-    .map-lower {
+    .map-lower,
+    .map-upper {
         font-size: 36px;
         text-align: center;
         padding: 10px 5px;
@@ -107,6 +125,16 @@ export default {
         /* default */
         background-color: #333333;
         color: #ffffff;
+    }
+    .map-upper {
+        font-size: 24px;
+        min-height: 2em;
+        padding: 0;
+    }
+    .pick-ban-text {
+        padding: 10px 5px;
+        width: 100%;
+        text-align: center;
     }
     .map-lower-type {
         font-size: 0.6em;

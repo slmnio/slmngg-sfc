@@ -1,19 +1,21 @@
 <template>
-    <div :class="`map ${mapClass} ${condensed ? 'condensed' : ''}`">
+    <div :class="`map ${mapClass} ${condensed ? 'condensed' : ''} ${banned ? 'is-banned' : ''}`" v-if="showBannedMaps ? true : !banned">
         <div class="map-image default-thing" :style="imageCSS">
             <div class="map-color-overlay draw" v-if="map.draw"></div>
+            <div class="map-color-overlay banned" v-if="banned"></div>
             <div class="map-color-overlay winner" v-if="winner" :style="logoBackground1(winner)"></div>
 
             <div class="map-winner-image bg-center" v-if="winner" :style="resizedImage(winner.theme, ['default_logo', 'small_logo'], 'h-90')"></div>
-            <div class="map-insert-number" v-if="number && !condensed">{{ number }}</div>
+            <div class="map-insert-number" v-if="number && !condensed && !banned">{{ number }}</div>
 
+            <div class="map-insert-text" v-if="banned && !condensed">BANNED</div>
             <div class="map-insert-text" v-if="map.draw && complete && !condensed">DRAW</div>
             <div class="map-insert-text" v-if="!complete && !condensed && !winner && mapClass === 'tiebreaker'">TIEBREAKER</div>
             <div class="map-insert-text" v-if="!complete && !condensed && !winner && mapClass === 'extra'">IF REQUIRED</div>
         </div>
         <div class="map-name">{{ name || '--' }}</div>
-        <div class="map-scores" v-if="scores">{{  scores  }}</div>
-        <div class="map-pick" v-if="pickText">{{ pickText }}</div>
+        <div class="map-scores" v-if="scores">{{ scores }}</div>
+        <div class="map-pick" v-if="banText || pickText">{{ banText || pickText  || ''}}</div>
     </div>
 </template>
 
@@ -24,7 +26,7 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "MapDisplay",
-    props: ["map", "theme", "match", "i", "condensed"],
+    props: ["map", "theme", "match", "i", "condensed", "showBannedMaps"],
     computed: {
         mapClass() {
             if (!this.match) return "";
@@ -36,8 +38,16 @@ export default {
             return this.map?.number || this.i + 1;
         },
         winner() {
-            if (!this.map.winner) return;
-            return this.match.teams.find(t => t.id === cleanID(this.map.winner.id));
+            return this.getTeamFromID(this.map.winner);
+        },
+        banned() {
+            return this.map.banned || this.banned_by;
+        },
+        banned_by() {
+            return this.getTeamFromID(this.map.banner);
+        },
+        picked_by() {
+            return this.getTeamFromID(this.map.picker);
         },
         imageCSS() {
             let mapTheme = { color: "#ffffff" };
@@ -66,10 +76,19 @@ export default {
         pickText() {
             if (!this.map?.picker) return null;
             return `picked by ${this.map.picker.code || this.map.picker.name}`;
+        },
+        banText() {
+            if (!this.map?.banner) return null;
+            return `banned by ${this.map.banner.code || this.map.banner.name}`;
         }
     },
     methods: {
-        logoBackground1, resizedImage
+        logoBackground1,
+        resizedImage,
+        getTeamFromID(id) {
+            if (!id) return null;
+            return (this.match.teams || []).find(t => t.id === cleanID(id));
+        }
     }
 };
 </script>
@@ -93,6 +112,9 @@ export default {
         opacity: 0.7;
     }
     .map-color-overlay.draw {
+        background-color: #555;
+    }
+    .map-color-overlay.banned {
         background-color: #555;
     }
     .map-winner-image {

@@ -57,6 +57,7 @@ export function resizedImage(theme, key, minSize = 30) {
 }
 
 export function cleanID (id) {
+    if (id?.id) return id.id;
     // console.log(">id", id);
     if (!id) return null;
     if (typeof id !== "string") return null;

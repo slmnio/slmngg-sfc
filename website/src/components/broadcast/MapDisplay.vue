@@ -21,7 +21,8 @@ export default {
     props: ["broadcast", "animationActive", "useTransitions", "noMapVideos"],
     data: () => ({
         activeAudio: null,
-        showNextMap: false
+        showNextMap: false,
+        showBannedMaps: true
     }),
     computed: {
         match() {
@@ -32,6 +33,12 @@ export default {
                 }),
                 maps: ReactiveArray("maps", {
                     winner: ReactiveThing("winner", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    banner: ReactiveThing("banner", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    picker: ReactiveThing("picker", {
                         theme: ReactiveThing("theme")
                     }),
                     map: ReactiveThing("map", {
@@ -69,12 +76,24 @@ export default {
 
             if (!this.match?.first_to) return this.match?.maps;
 
-            const maps = this.match?.first_to ? [...(this.match?.maps || [])].filter(m => m.map).slice(0, this.likelyNeededMaps) : [...(this.match.maps || [])];
+            let maps = [...(this.match?.maps || [])].filter(m => m.map);
+
+            console.log("maps 75", maps);
+            if (this.showBannedMaps) {
+            } else {
+                maps = maps.filter(m => !(m.banner || m.banned));
+
+                if (this.match?.first_to) {
+                    maps = maps.slice(0, this.likelyNeededMaps);
+                }
+            }
+
+
             const dummyMapCount = this.likelyNeededMaps - maps.length;
             console.log("extra maps", this.mapCount, dummyMapCount);
             const initialMapCount = maps.length;
 
-            const next = maps.find(m => !m.winner && !m.draw);
+            const next = maps.find(m => !m.winner && !m.draw && !m.banner);
             if (next) next._next = true;
 
             if (!this.match?.first_to) return maps;

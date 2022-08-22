@@ -3,7 +3,7 @@
         <div class="main-content row">
             <div class="center-holder col-9">
                 <div class="maps-holder mt-1" v-if="match.maps && showMatchMaps">
-                    <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="_theme" v-bind:key="map.id"/>
+                    <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="_theme" v-bind:key="map.id" :show-banned-maps="true"/>
                 </div>
 
                 <div class="special-event-notice" v-if="match.special_event">
@@ -228,6 +228,9 @@ export default {
                             }),
                             picker: ReactiveThing("picker", {
                                 theme: ReactiveThing("theme")
+                            }),
+                            banner: ReactiveThing("banner", {
+                                theme: ReactiveThing("theme")
                             })
                         })
                     }),
@@ -238,6 +241,12 @@ export default {
                 }),
                 maps: ReactiveArray("maps", {
                     winner: ReactiveThing("winner", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    picker: ReactiveThing("picker", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    banner: ReactiveThing("banner", {
                         theme: ReactiveThing("theme")
                     })
                 }),

@@ -105,6 +105,7 @@ export default [
             columns: route.query.columns || route.query.cols || 1,
             icons: route.query.icons !== "false",
             showStaff: route.query.staff !== "false",
+            showLogos: route.query.logos !== "false",
             teamRows: route.query.rows || route.query.teamRows || 1,
             eachTeam: route.query.eachTeam || route.query.players
         })

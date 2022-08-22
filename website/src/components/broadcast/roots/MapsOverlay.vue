@@ -26,6 +26,12 @@ export default {
                     }),
                     map: ReactiveThing("map", {
                         map: ReactiveThing("map")
+                    }),
+                    picker: ReactiveThing("picker", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    banner: ReactiveThing("banner", {
+                        theme: ReactiveThing("theme")
                     })
                 })
             });

@@ -6,7 +6,7 @@
         <div v-else class="map-bg w-100 h-100 bg-center" v-bind:class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground"></div>
         <div class="map-gel w-100 h-100 position-absolute" :style="winnerBG"></div>
         <div class="map-gel w-100 h-100 position-absolute draw-gel" v-if="map && map.draw"></div>
-        <div class="map-gel w-100 h-100 position-absolute ban-gel" v-if="map && map.banner"></div>
+        <div class="map-gel w-100 h-100 position-absolute ban-gel flex-center" v-if="map && map.banner"></div>
         <div class="map-main d-flex flex-column h-100 w-100 position-absolute">
             <div class="map-upper flex-center" :style="accent" v-if="map.picker || map.banner">
                 <ThemeLogo class="pick-ban-team" :theme="pickBanTheme" border-width="4px" logo-size="w-100" icon-padding="2" />
@@ -17,6 +17,9 @@
                     <div class="map-logo bg-center" :style="winnerLogo"></div>
                 </div>
                 <div class="gel-text" v-if="map && map.draw">DRAW</div>
+                <div class="ban-icon-holder" v-if="map.banner">
+                    <i class="ban-icon fas fa-ban"></i>
+                </div>
             </div>
             <div class="map-lower flex-center flex-column" :style="accent">
                 <div class="map-lower-name"><span class="industry-align">{{ name }}</span></div>
@@ -174,5 +177,12 @@ export default {
     .pick-ban-team {
         width: 55px;
         height: 100%;
+    }
+    .ban-icon-holder {
+        font-size: 4em;
+    }
+    .ban-icon {
+        color: white;
+        opacity: 0.75;
     }
 </style>

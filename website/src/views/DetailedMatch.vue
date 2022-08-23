@@ -66,10 +66,12 @@
                 </div>
             </div>
             <div class="right-holder col-3">
-                <ThemeLogo class="top-right-logo mb-3" :theme="_theme" border-width="8"/>
+                <router-link :to="url('event', match.event)">
+                    <ThemeLogo class="top-right-logo mb-3" :theme="_theme" border-width="8"/>
+                </router-link>
                 <div class="info-block">
 
-                    <router-link :to="`/match/${this.match.id}`" class="btn btn-block border-transparent btn-primary text-dark-low"
+                    <router-link :to="`/match/${match.id}`" class="btn btn-block border-transparent btn-primary text-dark-low"
                     :style="theme(match.event)">
                         <i class="fa-fw fas fa-external-link"></i>
                         See match page

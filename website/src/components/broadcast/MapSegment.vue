@@ -12,13 +12,18 @@
                 <ThemeLogo class="pick-ban-team" :theme="pickBanTheme" border-width="4px" logo-size="w-100" icon-padding="2" />
                 <div class="pick-ban-text" :style="pickBanBorder">{{ map.banner ? 'Ban' : (map.picker ? 'Pick' : '')  }}</div>
             </div>
-            <div class="map-top flex-grow-1 h-100 w-100 flex-center">
+            <div class="map-top flex-grow-1 h-100 w-100 flex-center flex-column">
                 <div class="map-logo-holder w-100 h-50 flex-center" v-if="winnerBG">
                     <div class="map-logo bg-center" :style="winnerLogo"></div>
                 </div>
                 <div class="gel-text" v-if="map && map.draw">DRAW</div>
                 <div class="ban-icon-holder" v-if="map.banner">
                     <i class="ban-icon fas fa-ban"></i>
+                </div>
+                <div class="map-score flex-center" v-if="showMapScores && (map.score_1 || map.score_2)">
+                    <div class="map-score">{{ map.score_1 }}</div>
+                    <div class="map-dash">-</div>
+                    <div class="map-score">{{ map.score_2 }}</div>
                 </div>
             </div>
             <div class="map-lower flex-center flex-column" :style="accent">
@@ -65,6 +70,9 @@ export default {
             if (!this.map?.name) return null;
             if (this.useShorterNames && this.map?.map?.shorter_name) return this.map.map.shorter_name;
             return this.map.name[0];
+        },
+        showMapScores() {
+            return (this.broadcast?.broadcast_settings || [])?.includes("Show map scores");
         },
         type() {
             if (!this.broadcast?.broadcast_settings?.includes("Show map modes text")) return null;
@@ -184,5 +192,11 @@ export default {
     .ban-icon {
         color: white;
         opacity: 0.75;
+    }
+    .map-score {
+        font-size: 1.5em;
+    }
+    .map-dash {
+        margin: 0 .2em;
     }
 </style>

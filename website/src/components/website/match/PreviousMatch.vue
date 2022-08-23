@@ -72,7 +72,7 @@ export default {
         display: flex;
         align-items: center;
         position: relative;
-        min-height: 70px;
+        min-height: 74px;
     }
     .prev-match-maps {
         display: flex;

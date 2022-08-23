@@ -3,7 +3,7 @@
         <div class="main-content row">
             <div class="center-holder col-9">
                 <div class="maps-holder mt-1" v-if="match.maps && showMatchMaps">
-                    <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="_theme" v-bind:key="map.id" :show-banned-maps="true"/>
+                    <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="_theme" v-bind:key="map.id" :show-banned-maps="showMapBans"/>
                 </div>
 
                 <div class="special-event-notice" v-if="match.special_event">
@@ -96,6 +96,9 @@
                     <div v-if="match.maps" :class="`btn btn-block btn-${showMatchMaps ? 'light' : 'secondary'} mb-2`" v-on:click="showMatchMaps = !showMatchMaps">
                         <i class="fa-fw fas fa-map"></i> Match maps
                     </div>
+                    <div v-if="match.maps && showMatchMaps" :class="`btn btn-block btn-${showMapBans ? 'light' : 'secondary'} mb-2`" v-on:click="showMapBans = !showMapBans">
+                        <i class="fa-fw fas fa-ban"></i> Show map bans
+                    </div>
                     <div :class="`btn btn-block btn-${showMatchHistory ? 'light' : 'secondary'} mb-2`"
                          v-on:click="showMatchHistory = !showMatchHistory">
                         <i class="fa-fw fas fa-history"></i>
@@ -167,6 +170,7 @@ export default {
         showShowNotes: true,
         showRosters: true,
         showMatchMaps: true,
+        showMapBans: true,
         showVod: false,
 
         showManagers: false

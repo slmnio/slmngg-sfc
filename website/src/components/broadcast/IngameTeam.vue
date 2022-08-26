@@ -24,7 +24,7 @@
                 </div>
                 <transition name="score">
                     <div class="flex-center team-score" v-if="!hideScores && !useDots">
-                        <span class="industry-align" v-if="useDots">{{ score || '0' }}</span>
+                        <span class="industry-align">{{ score || '0' }}</span>
                     </div>
                 </transition>
                 <transition name="score">

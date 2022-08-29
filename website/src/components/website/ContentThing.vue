@@ -1,5 +1,5 @@
 <template>
-    <component :is="noLink ? 'div' : 'router-link'" :to="link" class="link content-thing default-thing" :style="bgStyle" v-bind:class="{ 'has-headshot' : showHeadshot && headshot }">
+    <component :is="noLink ? 'div' : 'router-link'" :to="noLink ? null : this.overrideURL || url(this.type, this.linkTo || this.thing)" class="link content-thing default-thing" :style="bgStyle" v-bind:class="{ 'has-headshot' : showHeadshot && headshot }">
       <span class="link-headshot" v-if="showHeadshot">
         <span class="headshot" :style="headshot"></span>
       </span>
@@ -35,10 +35,6 @@ export default {
         url
     },
     computed: {
-        link() {
-            if (this.noLink) return null;
-            return this.overrideURL || url(this.type, this.linkTo || this.thing);
-        },
         shouldShowLogo() {
             /*
             * Show logo when:

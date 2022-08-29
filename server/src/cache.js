@@ -139,6 +139,37 @@ async function removeAttachmentTimestamps(data) {
     return data;
 }
 
+function keyDeAirtable(key) {
+    return key.replace(/ +/g, "_").replace(/[:()]/g, "_").replace(/_+/g,"_").toLowerCase();
+}
+
+function generateLimitedPlayers(longText) {
+    return longText.split("\n").filter(e => e).map(line => {
+        let player = {
+            limited: true
+        };
+
+        let parts = line.split("|");
+        parts.forEach(part => {
+            let split = part.indexOf("=");
+            let key = keyDeAirtable(part.slice(0, split));
+            let val = part.slice(split + 1);
+
+            if (!key || !val) return;
+
+            if (key === "role") {
+                if (val === "Damage") val = "DPS";
+            }
+            if (key === "pronouns") {
+                val = val.toLowerCase();
+            }
+            player[key] = val;
+        });
+
+        return player;
+    });
+}
+
 async function set(id, data, options) {
 
     if (data?.__tableName) {
@@ -193,6 +224,12 @@ async function set(id, data, options) {
 
     if (data?.__tableName === "Players") {
         if (data.discord_id) players.set(data.discord_id, data);
+    }
+    if (data?.__tableName === "Teams") {
+        // Limited Players
+        if (data.limited_players) {
+            data.limited_players = generateLimitedPlayers(data.limited_players);
+        }
     }
 
     data = await removeAttachmentTimestamps(data);

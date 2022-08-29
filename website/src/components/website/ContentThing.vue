@@ -1,5 +1,5 @@
 <template>
-    <router-link :to="overrideURL || url(type, linkTo || thing)" class="link content-thing default-thing" :style="bgStyle" v-bind:class="{ 'has-headshot' : showHeadshot && headshot }">
+    <component :is="noLink ? 'div' : 'router-link'" :to="link" class="link content-thing default-thing" :style="bgStyle" v-bind:class="{ 'has-headshot' : showHeadshot && headshot }">
       <span class="link-headshot" v-if="showHeadshot">
         <span class="headshot" :style="headshot"></span>
       </span>
@@ -19,7 +19,7 @@
             class="icon-internal bg-center icon-internal-right"
             :style="logo"
             v-if="shouldShowLogo && logoRight"></span>
-        </span></router-link>
+        </span></component>
 </template>
 
 <script>
@@ -29,12 +29,16 @@ import LoadingIcon from "@/components/website/LoadingIcon";
 
 export default {
     name: "ContentThing",
-    props: ["theme", "thing", "showLogo", "type", "text", "logoRight", "linkTo", "showHeadshot", "overrideURL"],
+    props: ["theme", "thing", "showLogo", "type", "text", "logoRight", "linkTo", "showHeadshot", "overrideURL", "noLink"],
     components: { LoadingIcon },
     methods: {
         url
     },
     computed: {
+        link() {
+            if (this.noLink) return null;
+            return this.overrideURL || url(this.type, this.linkTo || this.thing);
+        },
         shouldShowLogo() {
             /*
             * Show logo when:
@@ -56,6 +60,7 @@ export default {
             return false;
         },
         loading() {
+            if (this.thing?.limited) return false;
             return this.thing.__loading || !this.thing || !this.thing.id;
         },
         logo () {

@@ -18,6 +18,9 @@
             <ContentRow v-if="team.players" title="Players">
                 <ContentThing :show-headshot="team.show_headshots" type="player" :text="player.name" :thing="player" :theme="team.theme" v-for="player in team.players" v-bind:key="player.id"></ContentThing>
             </ContentRow>
+            <ContentRow v-if="showLimitedPlayers" title="Players">
+                <ContentThing type="player" :thing="player" no-link="true" :text="player.name" :theme="team.theme" v-for="player in team.limited_players" v-bind:key="player.name"></ContentThing>
+            </ContentRow>
             <ContentRow v-if="team.sister_teams" title="Sister teams">
                 <ContentThing type="team" :show-logo="true" :text="item.name" :thing="item" :theme="item.theme" v-for="item in team.sister_teams" v-bind:key="item.id"></ContentThing>
             </ContentRow>
@@ -64,6 +67,9 @@ export default {
             });
 
             return categories;
+        },
+        showLimitedPlayers() {
+            return ((this.team.players || [])?.length === 0) && (this.team.limited_players || []).length !== 0;
         }
     }
 };

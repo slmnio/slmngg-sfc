@@ -79,7 +79,11 @@ export default {
         },
         teams() {
             if (!this.match) return [];
-            return this.match.teams;
+            return (this.match.teams || []).map(team => {
+                team.showLimitedPlayers = ((team.players || [])?.length === 0) && (team.limited_players || []).length !== 0;
+                team.showablePlayers = team.showLimitedPlayers ? team.limited_players : team.players;
+                return team;
+            });
         },
         highlight_event() {
             const eventID = this.broadcast?.highlight_event?.[0];
@@ -108,7 +112,7 @@ export default {
             return resizedImage(team.theme, ["default_logo", "default_wordmark"], "h-250");
         },
         rosterFontSize(team) {
-            const players = team?.players?.length;
+            const players = team?.showablePlayers?.length;
             if (!players) return "";
 
             function clamp(number, min, max) {
@@ -117,10 +121,10 @@ export default {
             return clamp(350 / players, 16, 64) + "px";
         },
         sortedTeamPlayers(team) {
-            if (!team?.players) return [];
+            if (!team?.showablePlayers) return [];
             try {
                 const order = ["DPS", "Tank", "Support", "Flex"];
-                const players = [...team.players];
+                const players = [...team.showablePlayers];
 
                 return players.sort((a, b) => {
                     const [oa, ob] = [a, b].map(x => order.indexOf(x.role));
@@ -130,11 +134,11 @@ export default {
                     return oa - ob;
                 });
             } catch (e) {
-                return team.players;
+                return team.showablePlayers;
             }
         },
         teamPlayerGroups(team) {
-            const players = (this.sort ? this.sortedTeamPlayers(team) : team.players) || [];
+            const players = (this.sort ? this.sortedTeamPlayers(team) : team.showablePlayers) || [];
             if (this.splitPlayers) {
                 // group of 0 to splitPlayers
                 // group of excess

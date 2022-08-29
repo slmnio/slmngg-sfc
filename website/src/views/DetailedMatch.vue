@@ -20,12 +20,12 @@
                             <router-link :to="url('team', team, match.event)" class="team-name">{{ team.name }}</router-link>
                         </div>
                         <div class="team-players f-col p-1" v-if="showRosters">
-                            <div class="team-player" v-for="player in team.players" v-bind:key="player.id">
+                            <div class="team-player" v-for="player in showLimitedPlayers(team) ? team.limited_players : team.players" v-bind:key="player.id">
                                 <div class="player-info player-name flex-center">
                                     <div class="player-role-holder player-icon-holder flex-center" v-if="player.role">
                                         <div class="player-role" v-html="getRoleSVG(player.role)"></div>
                                     </div>
-                                    <router-link class="ct-active" :to="url('player', player)">{{ player.name }} </router-link>
+                                    <div :is="player.limited ? 'div' : 'router-link'" class="ct-active" :to="url('player', player)">{{ player.name }} </div>
                                     <span v-if="showCastingInfo && player.pronouns" class="player-pronouns ml-1 badge rounded-pill bg-light text-dark" :data-pronoun="player.pronouns">{{ player.pronouns }}</span></div>
                                 <div class="player-info player-pronounce" v-if="showCastingInfo"><i class="fas fa-w fa-lips player-icon-holder"></i> {{ player.pronunciation }}</div>
                                 <div class="player-info player-dtag" v-if="showPlayerInfo"><i class="fab fa-fw fa-discord player-icon-holder"></i> {{ player.discord_tag }}</div>
@@ -213,6 +213,9 @@ export default {
                     is: roles
                 };
             });
+        },
+        showLimitedPlayers(team) {
+            return ((team.players || [])?.length === 0) && (team.limited_players || []).length !== 0;
         }
     },
     computed: {

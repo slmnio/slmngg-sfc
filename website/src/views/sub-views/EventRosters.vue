@@ -2,7 +2,7 @@
     <div class="container event-rosters">
 
         <ContentRow :title="team.name" v-for="team in teams" v-bind:key="team.id">
-            <ContentThing :thing="player" type="player" :theme="team.theme" v-for="player in team.players" v-bind:key="player.id"></ContentThing>
+            <ContentThing :thing="player" type="player" :theme="team.theme" v-for="player in (team.showLimitedPlayers ? team.limited_players : team.players)" v-bind:key="player.id" :no-link="team.showLimitedPlayers"></ContentThing>
         </ContentRow>
     </div>
 </template>
@@ -22,7 +22,10 @@ export default {
             return ReactiveArray("teams", {
                 theme: ReactiveThing("theme"),
                 players: ReactiveArray("players")
-            })(this.event);
+            })(this.event).map(team => {
+                team.showLimitedPlayers = ((team.players || [])?.length === 0) && (team.limited_players || []).length !== 0;
+                return team;
+            });
         }
     }
 };

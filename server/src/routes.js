@@ -84,7 +84,7 @@ module.exports = ({ app, cors, Cache, io }) => {
 
             if (!live_match.casters || live_match.casters.length === 0) return res.send("No casters are linked to this match.");
             let casters = (await Promise.all(live_match.casters.map(id => Cache.get(cleanID(id))))).map(caster => caster.name + (caster.twitter_link?.length ? ": " + caster.twitter_link[0].replace("https://", "").toLowerCase() + " ": ""));
-            return res.send(`Your casters for this match are ${niceJoin(casters)}!`);
+            return res.send(`Your casters for this match are ${niceJoin(casters)}`);
 
         } catch (e) {
             console.error(e);

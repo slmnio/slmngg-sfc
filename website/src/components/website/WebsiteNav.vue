@@ -62,7 +62,7 @@
                 <b-navbar-nav v-else>
                     <a v-if="$root.version" class="nav-link" target="_blank" href="https://github.com/slmnio/slmngg-sfc">SLMN.GG {{ $root.version }}</a>
 
-                    <router-link class="nav-link" to="/login" v-if="!$root.auth.user">Login</router-link>
+                    <router-link class="nav-link" to="/login" v-if="!$root.auth.user && !$root.isRebuilding">Login</router-link>
                     <LoggedInUser v-if="$root.auth.user"/>
 
                 </b-navbar-nav>

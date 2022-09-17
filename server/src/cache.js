@@ -82,12 +82,14 @@ let recents = {
 
 async function dataUpdate(id, data, options) {
     // broadcast something here
+    if (options?.eager) console.log("Eager update on", id);
     recents.triggered++;
     if (JSON.stringify(store.get(id)) !== JSON.stringify(data)) {
         // console.log(`Data update on [${id}]`);
         recents.sent++;
         if (!(options && options.custom)) updateFunction(id, { oldData: store.get(id), newData: data });
         if (data) data = await removeAntiLeak(id, data);
+        if (options?.eager) console.log("Sending");
         await broadcast(id, "data_update", id, data);
     }
 }

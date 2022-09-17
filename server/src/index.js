@@ -89,7 +89,7 @@ discordAuth({ app, router: express.Router(), cors, Cache, io });
 dashboardAPI({ app, router: express.Router(), cors, Cache, io });
 
 meta({ app, cors, Cache });
-images({ app, cors, Cache });
+images({ app, cors, Cache, corsHandle });
 
 function cleanID(id) {
     if (!id) return null;
@@ -123,6 +123,13 @@ io.on("connection", (socket) => {
         connected--;
     });
 
+    socket.on("get_and_subscribe", async (id) => {
+        console.log("get and subscribe in:", id);
+        id = cleanID(id);
+        socket.join(id);
+        socket.emit("data_update", id, await Cache.get(id));
+        console.log("get and subscribe out:", id);
+    });
     socket.on("prod-join", (clientName) => {
         console.log("prod-join", clientName);
         socket._clientName = clientName;
@@ -137,6 +144,10 @@ io.on("connection", (socket) => {
     socket.on("media_update", (status, value) => {
         if (!socket._clientName) return;
         socket.to(`prod:client-${socket._clientName}`).emit(`media_update_${status}`, value);
+    });
+    socket.on("prod_trigger", (event, ...args) => {
+        if (!socket._clientName) return console.warn(`Socket connection tried to ${event} without client`);
+        io.to(`prod:client-${socket._clientName}`).emit(event, args);
     });
 });
 

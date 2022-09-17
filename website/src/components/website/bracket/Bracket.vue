@@ -324,15 +324,26 @@ export default {
     },
     beforeDestroy() {
         Store.commit("setHighlightedTeam", null);
+        Store.commit("setHighlightedMatch", null);
     },
     beforeUpdate() {
         // console.log("[bracket rerender]");
         // this.createConnections();
     },
     watch: {
-        bracket() {
-            console.log("[bracket data update]");
-            this.createConnections();
+        layout: {
+            deep: true,
+            handler() {
+                console.log("[layout data update]");
+                this.createConnections();
+            }
+        },
+        bracket: {
+            deep: true,
+            handler() {
+                console.log("[bracket data update]");
+                this.createConnections();
+            }
         }
     },
     mounted() {

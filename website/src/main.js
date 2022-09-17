@@ -179,6 +179,12 @@ const app = new Vue({
         auth: {
             token: null,
             user: null
+        },
+        // this is mainly for development, probably won't stay
+        colorControls: {
+            schema: {
+                hue: 0, saturation: 0, overlay: 0, multiply: 0
+            }
         }
     }),
     async mounted() {

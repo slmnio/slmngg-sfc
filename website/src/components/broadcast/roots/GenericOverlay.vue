@@ -3,7 +3,7 @@
         <TourneyBar class="st4-top" v-if="top === 'st4'" :broadcast="broadcast" left="Schedule" :right="title"/>
         <div class="g-title-wrapper">
             <theme-transition :theme="theme" :active="$root.animationActive" end="middle"  :duration="500" :inner-delay="150" one-color="true">
-                <div class="generic-overlay-title g-title overlay--bg flex-center" :style="{borderColor: _accentColor}">
+                <div class="generic-overlay-title g-title overlay--bg flex-center" :style="{borderColor: _accentColor, ...(titleStyle || {})}">
                     <transition name="fade" mode="out-in">
                         <span class="industry-align" :key="title" v-bind:class="{'has-br': title.includes('\\n') }" v-html="nbr(title)"></span>
                     </transition>
@@ -29,7 +29,7 @@ import ThemeTransition from "@/components/broadcast/ThemeTransition";
 export default {
     name: "GenericOverlay",
     components: { ThemeTransition, TourneyBar },
-    props: ["title", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate"],
+    props: ["title", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "titleStyle"],
     methods: {
         nbr(text) {
             if (!text) return "";

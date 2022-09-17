@@ -24,6 +24,11 @@
             </div>
         </div>
 
+<!--        <h3>Hero</h3>-->
+<!--        <div class="heroes d-flex">-->
+<!--            <RecoloredHero :show-controls="true" class="recolored-hero" v-for="hero in heroes" :theme="theme" :hero="hero" :key="hero.id"></RecoloredHero>-->
+<!--        </div>-->
+<!--        <HeroColorControls :theme="theme"></HeroColorControls>-->
         <h3 v-if="logos.length">Logos</h3>
         <div v-if="logos.length" class="logo-list mb-3">
             <div class="logo-holder flex-center" v-for="logo in logos" v-bind:key="logo.key" :style="logoBackground">
@@ -74,6 +79,9 @@ import ContentThing from "@/components/website/ContentThing";
 import StandingsTeam from "@/components/broadcast/StandingsTeam";
 import { resizedImageNoWrap } from "@/utils/images";
 import { getDataServerAddress } from "@/utils/fetch";
+// import RecoloredHero from "@/components/broadcast/RecoloredHero";
+// import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
+// import HeroColorControls from "@/components/broadcast/HeroColorControls";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");
@@ -81,9 +89,14 @@ function cleanKey(key) {
 
 export default {
     name: "ThingTheme",
-    components: { BracketTeam, IngameTeam, ContentRow, ContentThing, StandingsTeam },
+    components: { /* HeroColorControls, RecoloredHero, */ BracketTeam, IngameTeam, ContentRow, ContentThing, StandingsTeam },
     props: ["team", "event"],
     computed: {
+        // heroes() {
+        //     return (ReactiveRoot("Heroes", {
+        //         ids: ReactiveArray("ids")
+        //     })?.ids || []).filter(h => h.recolor_base);
+        // },
         thing() {
             return this.team || this.event;
         },
@@ -253,4 +266,10 @@ export default {
         width: 100%;
         height: 100%;
     }
+    /*.recolored-hero {*/
+    /*    width: 200px;*/
+    /*}*/
+    /*.recolored-hero >>> .color-holder {*/
+    /*    height: 500px;*/
+    /*}*/
 </style>

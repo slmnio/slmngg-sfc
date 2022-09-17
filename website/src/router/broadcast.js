@@ -40,6 +40,7 @@ import ThemeTransitionTester from "@/components/broadcast/roots/ThemeTransitionT
 import DeskGraphicsOverlay from "@/components/broadcast/roots/DeskGraphicsOverlay";
 import EmptyStingerOverlay from "@/components/broadcast/roots/EmptyStingerOverlay";
 import OtherBroadcastsOverlay from "@/components/broadcast/roots/OtherBroadcastsOverlay";
+import HeroRosterOverlay from "@/components/broadcast/roots/HeroRosterOverlay";
 
 export default [
     {
@@ -103,6 +104,15 @@ export default [
             showStaff: route.query.staff,
             showBadges: route.query.badge || route.query.badges,
             splitPlayers: route.query.split ? parseInt(route.query.split) : null
+        })
+    },
+    { path: "hero-rosters", redirect: "hero-roster" },
+    {
+        path: "hero-roster",
+        component: HeroRosterOverlay,
+        props: route => ({
+            teamNum: route.query.team || route.query.teamNum,
+            playerCount: route.query.players || route.query.playerCount
         })
     },
     { path: "history", component: HistoryOverlay, props: route => ({ max: route.query.max || 5 }) },

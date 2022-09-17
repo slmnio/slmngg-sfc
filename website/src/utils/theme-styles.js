@@ -20,7 +20,7 @@ export function themeBackground(theme) {
     const style = {
         backgroundColor: theme.color_theme || theme.color_logo_background,
         color: theme.color_text_on_theme || theme.color_alt || theme.color_text_on_logo_background,
-        borderColor: theme.color_accent
+        borderColor: theme.color_accent || theme.color_logo_accent
     };
     if (!style.backgroundColor) delete style.backgroundColor;
     if (!style.color) delete style.color;

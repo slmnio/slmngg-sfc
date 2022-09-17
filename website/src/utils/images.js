@@ -14,7 +14,8 @@ export function getImageURL(airtableURL, size) {
     return `${dataServer}/image?size=${size}&url=${airtableURL}`;
 }
 
-function getAirtableURL(attachment) {
+export function getAirtableURL(attachment) {
+    if (attachment?.url) return attachment.url;
     return attachment?.[0]?.url || null;
 }
 
@@ -33,4 +34,8 @@ export function resizedImageNoWrap(theme, keys, size) {
 
 export function resizedImage(theme, keys, size) {
     return bg(resizedImageNoWrap(theme, keys, size));
+}
+
+export function resizedAttachment(attachment, size) {
+    return getImageURL(getAirtableURL(attachment), size || "orig");
 }

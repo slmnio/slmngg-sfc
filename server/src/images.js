@@ -128,11 +128,12 @@ async function fullGetURL(url, sizeText, sizeData) {
     return await getImage(filename, sizeText);
 }
 
-module.exports = ({ app, cors, Cache }) => {
+module.exports = ({ app, cors, Cache, corsHandle }) => {
 
     ensureFolder("orig").then(r => console.log("[images] orig folder ensured"));
 
     async function handleImageRequests(req, res) {
+
         try {
             if (!req.query.url) {
                 return res.status(404).send("No URL requested");
@@ -238,8 +239,8 @@ module.exports = ({ app, cors, Cache }) => {
         }
         res.status(400).send("An error occurred");
     }
-    app.get("/image", handleImageRequests);
-    app.get("/image.:fileFormat", handleImageRequests); // ignoring requested file format here
+    app.get("/image", cors({ origin: corsHandle}), handleImageRequests);
+    app.get("/image.:fileFormat", cors({ origin: corsHandle}), handleImageRequests); // ignoring requested file format here
 
     async function handleThemeRequests(req, res) {
         try {

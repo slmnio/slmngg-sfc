@@ -10,6 +10,7 @@
         <h1><LoadingIcon v-if="!players.length"></LoadingIcon></h1>
 
         <div class="player-list">
+            <div class="search-helper default-thing" v-if="search && search.length < minCharacters">Use {{ minCharacters }} or more characters to search</div>
             <ContentThing v-for="player in filteredPlayers" v-bind:key="player.id"
                           :text="player.name" :thing="player" type="player" />
         </div>
@@ -25,7 +26,10 @@ import LoadingIcon from "@/components/website/LoadingIcon";
 export default {
     name: "Players",
     components: { ContentThing, LoadingIcon },
-    data: () => ({ search: null }),
+    data: () => ({
+        search: null,
+        minCharacters: 3
+    }),
     computed: {
         players() {
             const data = ReactiveRoot("special:players")?.players;
@@ -40,6 +44,8 @@ export default {
             });
         },
         filteredPlayers() {
+            if (!this.search || this.search.length === 0) return this.players;
+            if (this.search.length < this.minCharacters) return [];
             return searchInCollection(this.players, this.search, "name");
         }
     },
@@ -59,5 +65,13 @@ export default {
     }
     .player-list .content-thing {
         color: #eee;
+    }
+
+    .search-helper {
+        padding: 0.25em 1em;
+        margin: 0.25em 0.25em;
+        border-bottom: 0.2em solid transparent;
+        background-color: rgba(255, 255, 255, 0.05);
+        color: rgba(255,255,255,0.8);
     }
 </style>

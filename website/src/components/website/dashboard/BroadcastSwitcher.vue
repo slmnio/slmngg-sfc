@@ -41,7 +41,7 @@ export default {
             this.error = null;
 
             const request = await setActiveBroadcast(this.$root.auth, "self", broadcast);
-            if (request.error) this.error = request.message;
+            if (request.error) this.error = request.errorMessage;
             // this.setting = false;
         }
     },

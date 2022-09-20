@@ -2,7 +2,7 @@ import { getDataServerAddress } from "@/utils/fetch";
 
 async function authenticatedRequest(auth, url, data) {
     const token = auth?.token;
-    if (!token) return { error: true, message: "No token" };
+    if (!token) return { error: true, errorMessage: "No token" };
     return await fetch(`${getDataServerAddress()}/${url}`, {
         method: "POST",
         headers: {
@@ -14,16 +14,32 @@ async function authenticatedRequest(auth, url, data) {
 }
 
 export async function setActiveBroadcast(auth, client, broadcast) {
-    if (!auth?.user) return { error: true, message: "Not authenticated" };
+    if (!auth?.user) return { error: true, errorMessage: "Not authenticated" };
 
-    return await authenticatedRequest(auth, "dashboard/set-active-broadcast", {
+    return await authenticatedRequest(auth, "actions/set-active-broadcast", {
         client: client.id || client, broadcast: broadcast.id || broadcast
     });
 }
 
 export async function updateProfileData(auth, profileData) {
-    if (!auth?.user) return { error: true, message: "Not authenticated" };
-    return await authenticatedRequest(auth, "dashboard/update-profile-data", {
+    if (!auth?.user) return { error: true, errorMessage: "Not authenticated" };
+    return await authenticatedRequest(auth, "actions/update-profile-data", {
         profileData
+    });
+}
+
+export async function updateMatchData(auth, match, updatedData) {
+    if (!auth?.user) return { error: true, errorMessage: "Not authenticated" };
+    return await authenticatedRequest(auth, "actions/update-match-data", {
+        matchID: match.id,
+        updatedData
+    });
+}
+
+export async function updateMapData(auth, match, mapData) {
+    if (!auth?.user) return { error: true, errorMessage: "Not authenticated" };
+    return await authenticatedRequest(auth, "actions/update-map-data", {
+        matchID: match.id,
+        mapData
     });
 }

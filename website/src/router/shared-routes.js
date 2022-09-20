@@ -19,6 +19,7 @@ import MatchVOD from "@/views/sub-views/MatchVOD";
 import MatchHistory from "@/views/sub-views/MatchHistory";
 import TeamComposition from "@/views/sub-views/TeamComposition";
 import PlayerBrands from "@/views/sub-views/PlayerBrands";
+import MatchEditor from "@/components/website/dashboard/MatchEditor";
 
 export default [
     {
@@ -61,7 +62,8 @@ export default [
         props: route => ({ id: route.params.id }),
         children: [
             { path: "", component: MatchVOD },
-            { path: "history", component: MatchHistory }
+            { path: "history", component: MatchHistory },
+            { path: "editor", component: MatchEditor, meta: { requiresAuth: true } }
         ]
     },
     { path: "/detailed/:id", component: DetailedMatch, props: route => ({ id: route.params.id }) },

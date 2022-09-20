@@ -144,6 +144,7 @@ function cleanUser(user) {
         discordID: user.discord?.id,
         airtableID: cleanID(user.airtable?.id),
         name: user.airtable.name,
-        avatar: `https://cdn.discordapp.com/avatars/${user.discord.id}/${user.discord.avatar}.png`
+        avatar: `https://cdn.discordapp.com/avatars/${user.discord.id}/${user.discord.avatar}.png`,
+        website_settings: user.airtable.website_settings || []
     });
 }

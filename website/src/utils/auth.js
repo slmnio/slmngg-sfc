@@ -66,3 +66,7 @@ export async function authenticateWithToken(app, token) {
 export async function getAuthenticationRedirect() {
     // redirect to Discord for auth
 }
+
+export function isAuthenticated(app) {
+    return !!app.auth?.user;
+}

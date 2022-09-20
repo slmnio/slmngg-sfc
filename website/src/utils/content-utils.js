@@ -10,7 +10,7 @@ export function url (page, record, options = {}) {
     if (this.$root.minisiteEvent &&
         this.$root.minisiteEvent._original_data_id === record.id &&
         page === "event") {
-        return "/";
+        return `${(options && options.subPage) ? `/${options.subPage}` : "/"}`;
     }
 
     let domain = "";
@@ -22,7 +22,7 @@ export function url (page, record, options = {}) {
 
     if (page === "event" && subdomain) {
         const pageURL = window.location.origin.split("://");
-        domain = `${pageURL[0]}://${subdomain}.${pageURL[1]}`;
+        domain = `${pageURL[0]}://${subdomain}.${pageURL[1]}${(options && options.subPage) ? `/${options.subPage}` : ""}`;
     }
 
     if (domain) {
@@ -30,15 +30,15 @@ export function url (page, record, options = {}) {
         let url;
         if (options.partial_subdomain) {
             // use /event/x
-            url = `${domain}/${page}/${record.id}`;
+            url = `${domain}/${page}/${record.id}${(options && options.subPage) ? `/${options.subPage}` : ""}`;
         } else if (options.subdomain && page === "event") {
             // just use /
-            url = `${domain}/`;
+            url = `${domain}/${(options && options.subPage) || ""}`;
         }
         // return `/redirect?url=${url}`;
         return url;
     }
-    return `/${page}/${record.id}`;
+    return `/${page}/${record.id}${(options && options.subPage) ? `/${options.subPage}` : ""}`;
 }
 
 export function image (theme, key) {
@@ -179,4 +179,10 @@ export function clarifyTeam(team) {
 export function pronounsFilter(pronouns) {
     if (pronouns === "any") return "any pronouns";
     return pronouns;
+}
+
+export function textSort(a, b) {
+    if (a < b) return -1;
+    if (a > b) return 1;
+    return 0;
 }

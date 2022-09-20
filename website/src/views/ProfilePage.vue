@@ -170,7 +170,7 @@ export default {
             const response = await updateProfileData(this.$root.auth, this.profile);
 
             if (response.error) {
-                this.errorMessage = response.message;
+                this.errorMessage = response.errorMessage;
                 this.showAlert = true;
             } else {
                 this.errorMessage = null;

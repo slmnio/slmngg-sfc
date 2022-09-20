@@ -10,9 +10,10 @@
                     <router-view :match="match" />
                 </div>
                 <div class="col-12 col-md-3">
-                    <ul class="match-sub-nav list-group mb-2" v-if="showHeadToHead"> <!-- only because it'd be the only one -->
-                        <router-link class="list-group-item ct-passive" exact active-class="active ct-active" :to="subLink('')">VOD</router-link>
-                        <router-link v-if="showHeadToHead" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('history')">Head to head</router-link>
+                    <ul class="match-sub-nav list-group mb-2" v-if="sidebarItems.length > 1"> <!-- only because it'd be the only one -->
+                        <router-link v-if="sidebarItems.includes('vod')" class="list-group-item ct-passive" exact active-class="active ct-active" :to="subLink('')">VOD</router-link>
+                        <router-link v-if="sidebarItems.includes('head-to-head')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('history')">Head to head</router-link>
+                        <router-link v-if="sidebarItems.includes('editor')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('editor')">Match editor</router-link>
                     </ul>
 
                     <table class="match-details table-sm">
@@ -64,6 +65,7 @@ import MatchScore from "@/components/website/match/MatchScore";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
 import { getMatchContext, url } from "@/utils/content-utils";
 import { resizedImageNoWrap } from "@/utils/images";
+import { isAuthenticated } from "@/utils/auth";
 
 export default {
     name: "Match",
@@ -90,6 +92,7 @@ export default {
                 }),
                 mvp: ReactiveThing("mvp"),
                 maps: ReactiveArray("maps", {
+                    map: ReactiveThing("map"),
                     winner: ReactiveThing("winner", {
                         theme: ReactiveThing("theme")
                     }),
@@ -171,6 +174,20 @@ export default {
         showHeadToHead() {
             if (this.match?.special_event) return false;
             return this.match?.event?.map_pool;
+        },
+        showEditor() {
+            if (!isAuthenticated(this.$root)) return false;
+            console.log("match editor show", this.$root.auth?.user?.website_settings?.includes("Can edit any match"));
+            // TODO: Make sure user is an admin or has perms here
+            return true;
+        },
+        sidebarItems() {
+            const items = ["vod"];
+
+            if (this.showHeadToHead) items.push("head-to-head");
+            if (this.showEditor) items.push("editor");
+
+            return items;
         }
     },
     metaInfo() {

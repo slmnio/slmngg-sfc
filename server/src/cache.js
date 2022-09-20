@@ -89,7 +89,7 @@ async function dataUpdate(id, data, options) {
         recents.sent++;
         if (!(options && options.custom)) updateFunction(id, { oldData: store.get(id), newData: data });
         if (data) data = await removeAntiLeak(id, data);
-        if (options?.eager) console.log("Sending");
+        // if (options?.eager) console.log("Sending");
         await broadcast(id, "data_update", id, data);
     }
 }
@@ -245,12 +245,10 @@ async function set(id, data, options) {
         if (newDate.getTime() < oldDate.getTime()) {
             console.log(`[old] id=${id} \n     old=${oldDate.toLocaleString()} \n     new=${newDate.toLocaleString()}`);
             console.warn("     old data is newer, keeping it!");
-
-            console.log("old data:");
-            console.log(oldData);
-            console.log("new data:");
-            console.log(data);
-
+            // console.log("old data:");
+            // console.log(oldData);
+            // console.log("new data:");
+            // console.log(data);
             return;
         }
     }

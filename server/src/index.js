@@ -9,7 +9,6 @@ const meta = require("./meta.js");
 const routes = require("./routes.js");
 const images = require("./images.js");
 const discordAuth = require("./discord/auth.js");
-const dashboardAPI = require("./dashboard");
 
 /* The staff module should only run on the server, probably not your local machine. */
 let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEGORY_ID", "STAFFAPPS_APPLICATION_CHANNEL_ID", "IS_SLMNGG_MAIN_SERVER"];
@@ -38,6 +37,8 @@ function corsHandle(origin, callback) {
     }
 }
 
+const localCors =  () => cors({ origin: corsHandle });
+
 const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials: true}, allowEIO3: true});
 
 const auction = require("./discord/new_auction.js")({
@@ -50,6 +51,9 @@ const auction = require("./discord/new_auction.js")({
 
 const Cache = (require("./cache.js")).setup(io);
 (require("./airtable-interface.js")).setup(io);
+
+const actions = require("./action-manager.js");
+actions.load(app, localCors, Cache);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -86,7 +90,6 @@ app.get("/things/:ids", cors({ origin: corsHandle}), async (req, res) => {
 routes({ app, cors, Cache, io });
 
 discordAuth({ app, router: express.Router(), cors, Cache, io });
-dashboardAPI({ app, router: express.Router(), cors, Cache, io });
 
 meta({ app, cors, Cache });
 images({ app, cors, Cache, corsHandle });

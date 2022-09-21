@@ -21,7 +21,8 @@ export async function authenticateWithDiscord(app, code) {
     }
 
     app.auth.token = authenticationRequest.token;
-    app.$cookies.set("token", authenticationRequest.token, "3d");
+    const rootDomain = window.location.host.includes("slmn.gg") ? "slmn.gg" : window.location.hostname;
+    app.$cookies.set("token", authenticationRequest.token, "3d", null, rootDomain);
     app.auth.user = authenticationRequest.user;
 
     return {
@@ -51,6 +52,7 @@ export async function authenticateWithToken(app, token) {
         if (authenticationRequest.message === "Unknown token") {
             console.log("[Auth] removing token since the server doesn't recognise it.");
             app.$cookies.remove("token");
+            localStorage.removeItem("token");
         }
 
         return { error: true, errorMessage: authenticationRequest.message };

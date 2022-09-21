@@ -416,7 +416,7 @@ module.exports = ({ app, Cache }) => {
             let redirect = await getRedirect(req.params.path);
             if (redirect) return res.send(redirect);
 
-            const path = req.params.path;
+            const path = req.params.path || "";
             let parts = path.split("/");
 
             const route = routes.find(r => (typeof r.url === "object" ? r.url.includes(parts[0]) : r.url === parts[0]));

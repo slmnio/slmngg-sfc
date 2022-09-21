@@ -71,6 +71,7 @@ export default [
         path: "/auth/discord/redirect",
         beforeEnter(to, from, next) {
             console.log("ZOOM DISCORD TIME");
+            localStorage.setItem("auth_next", from.fullPath);
             const params = {
                 client_id: process.env.VUE_APP_DISCORD_CLIENT_ID,
                 redirect_uri: process.env.VUE_APP_DISCORD_REDIRECT_URI,

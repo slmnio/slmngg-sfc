@@ -20,6 +20,8 @@ import MatchHistory from "@/views/sub-views/MatchHistory";
 import TeamComposition from "@/views/sub-views/TeamComposition";
 import PlayerBrands from "@/views/sub-views/PlayerBrands";
 import MatchEditor from "@/components/website/dashboard/MatchEditor";
+import PlayerParticipation from "@/views/sub-views/PlayerParticipation";
+import Me from "@/views/Me";
 
 export default [
     {
@@ -53,8 +55,24 @@ export default [
             { path: "news", component: PlayerNews },
             { path: "matches", component: PlayerMatches },
             { path: "played-matches", component: PlayerPlayedMatches },
-            { path: "brands", component: PlayerBrands }
+            { path: "brands", component: PlayerBrands },
+            { path: "participation", component: PlayerParticipation }
         ]
+    },
+    {
+        path: "/me",
+        component: Me,
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: "/me/:subPage",
+        component: Me,
+        props: route => ({ subPage: route.params.subPage }),
+        meta: {
+            requiresAuth: true
+        }
     },
     {
         path: "/match/:id",

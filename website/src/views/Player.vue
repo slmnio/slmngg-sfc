@@ -8,7 +8,10 @@
                     <div class="player-name">
                         {{ player.name }}
                         <i class="fas fa-badge-check mr-3" v-if="player.verified"></i>
-                        <span class="pronouns-display ml-1" v-if="player.pronouns">{{ player.pronouns | pronounsFilter }}</span>
+                        <span class="mini-label pronouns-display ml-1" v-if="player.pronouns">{{ player.pronouns | pronounsFilter }}</span>
+                        <router-link class="no-link-style d-inline" :to="subLink('participation')">
+                            <span class="mini-label participation-points" v-if="participationPoints">{{ participationPoints }} pts</span>
+                        </router-link>
                     </div>
                 </div>
                 <div class="player-socials" v-if="player.socials" :style="{ marginLeft: player.overwatch_icon ? '84px' : '16px'}">
@@ -24,7 +27,7 @@
             <li class="nav-item" v-if="hasMatchPlayerRelationships"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
             <li class="nav-item" v-if="player.member_of && player.member_of.some(t => t.matches)"><router-link class="nav-link" :to="subLink('played-matches')">Played Matches</router-link></li>
         </SubPageNav>
-        <router-view :player="player"></router-view>
+        <router-view :player="{...player, participationEvents, participationPoints }"></router-view>
     </div>
 </template>
 
@@ -33,6 +36,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import Social from "@/components/website/Social";
 import SubPageNav from "@/components/website/SubPageNav";
 import { pronounsFilter } from "@/utils/content-utils";
+import { sortEvents } from "@/utils/sorts";
 
 export default {
     name: "Player",
@@ -49,7 +53,9 @@ export default {
         player () {
             return ReactiveRoot(this.id, {
                 member_of: ReactiveArray("member_of", {
-                    event: ReactiveThing("event"),
+                    event: ReactiveThing("event", {
+                        theme: ReactiveThing("theme")
+                    }),
                     theme: ReactiveThing("theme"),
                     accolades: ReactiveArray("accolades", {
                         event: ReactiveThing("event", {
@@ -99,6 +105,19 @@ export default {
         hasMatchPlayerRelationships() {
             if (!this.player?.player_relationships) return false;
             return this.player.player_relationships.some(rel => !!rel.matches);
+        },
+        participationEvents() {
+            const events = (this.player.member_of || []).map(team => team?.event).filter(f => f?.participation_points);
+            const uniqueEvents = new Map();
+            events.forEach(ev => {
+                if (uniqueEvents.has(ev.id)) return;
+                uniqueEvents.set(ev.id, ev);
+            });
+            return [...uniqueEvents.values()].sort(sortEvents);
+        },
+
+        participationPoints() {
+            return (this.participationEvents).map(e => e.participation_points).filter(f => f).reduce((c, v) => c + v, 0);
         }
     },
     metaInfo() {
@@ -141,7 +160,7 @@ export default {
     }
 }
 
-.pronouns-display {
+.mini-label {
     font-size: .25em;
     vertical-align: 1em;
     background-color: rgba(255, 255, 255, 0.1);
@@ -149,5 +168,6 @@ export default {
     padding: .25em .5em;
     border-bottom: 2px solid rgba(255,255,255,0.2);
     white-space: nowrap;
+    margin-right: .5em;
 }
 </style>

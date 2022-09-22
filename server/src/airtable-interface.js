@@ -24,10 +24,10 @@ const reqLog = {
         succeeded: 0,
         failed: 0,
     },
-    period: 30 * 1000,
+    period: 60,
     trigger(key) {
         this.counts[key]++;
-        setTimeout(() => this.counts[key]--, this.period);
+        setTimeout(() => this.counts[key]--, this.period * 1000);
     },
     start() {
         this.trigger("started");
@@ -39,7 +39,7 @@ const reqLog = {
         this.trigger("failed");
     },
     output() {
-        console.log(`[Request log] last ${this.period}ms: ${this.counts.started} started, ${this.counts.succeeded} succeeded (${Math.floor((this.counts.succeeded / this.counts.started) * 100)}% success), ${this.counts.failed} failed (${Math.floor((this.counts.failed / this.counts.started) * 100)}% start-fails)`);
+        console.log(`[Request log] last ${this.period}s: ${this.counts.started} started, ${this.counts.succeeded} succeeded (${Math.floor((this.counts.succeeded / this.counts.started) * 100)}% success), ${this.counts.failed} failed (${Math.floor((this.counts.failed / this.counts.started) * 100)}% start-fails)`);
         this.setHighRate(this.counts.started > 20 && this.counts.failed / this.counts.started > 0.5);
     },
     setHighRate(newRate) {
@@ -52,7 +52,7 @@ const reqLog = {
 };
 setInterval(() => {
     reqLog.output();
-}, reqLog.period);
+}, reqLog.period * 1000);
 
 function setup(_io) {
     io = _io;

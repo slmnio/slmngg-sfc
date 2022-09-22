@@ -72,7 +72,7 @@ let recents = {
 };
 
 (() => {
-    let seconds = 15;
+    let seconds = 60;
     setInterval(() => {
         console.log(`[Cache log] secs=${seconds} triggered=${recents.triggered} sent=${recents.sent}`);
         recents.triggered = 0;

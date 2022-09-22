@@ -59,17 +59,25 @@ async function load(expressApp, cors, Cache) {
                 });
             }
 
-            await action.handler(
-                async (data) => res.send({ error: false, ...data }),
-                async (errorMessage, errorCode) => res.status(errorCode || 400).send({ error: true, errorMessage }),
-                params,
-                authObjects,
-                {
-                    updateRecord: (tableName, item, data) => updateRecord(Cache, tableName, item, data),
-                    get: Cache.get,
-                    createRecord: (tableName, data) => createRecord(Cache, tableName, data),
-                }
-            );
+            try {
+                await action.handler(
+                    async (data) => res.send({ error: false, ...data }),
+                    async (errorMessage, errorCode) => res.status(errorCode || 400).send({
+                        error: true,
+                        errorMessage
+                    }),
+                    params,
+                    authObjects,
+                    {
+                        updateRecord: (tableName, item, data) => updateRecord(Cache, tableName, item, data),
+                        get: Cache.get,
+                        createRecord: (tableName, data) => createRecord(Cache, tableName, data),
+                    }
+                );
+            } catch (e) {
+                console.error(`Error in action [${action.key}]`, e);
+                res.status(500).send({ error: true, errorMessage: "Internal error" });
+            }
         });
     });
 

@@ -42,6 +42,10 @@ module.exports = {
             newMap.banner = dirtyID(newMap.banner);
             newMap.picker = dirtyID(newMap.picker);
 
+            if (newMap.number === null || newMap.number === "") {
+                newMap.number = null;
+            }
+
             let existingMap = existingMaps[i];
 
             if (!newMap.existingID) {
@@ -117,7 +121,7 @@ module.exports = {
             console.log({ recordCreations });
 
             let createResponses = await createRecord("Maps", recordCreations);
-            if ((createResponses || []).some(r => r?.error)) error("Airtable error", 500);
+            if ((createResponses || []).some(r => r?.error)) return error("Airtable error", 500);
         }
         success();
     }

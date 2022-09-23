@@ -43,8 +43,7 @@ export default {
             return bracket || this.event.brackets[0];
         },
         zoom() {
-            if (!this.scale) return {};
-            return { zoom: this.scale };
+            return { zoom: (this.scale || 1) + (this.extended ? 0.45 : 0) };
         },
         liveMatch() {
             if (!this.broadcast?.live_match) return null;

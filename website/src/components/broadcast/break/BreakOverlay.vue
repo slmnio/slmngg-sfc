@@ -451,6 +451,7 @@ export default {
     .break-bracket {
         /*zoom: 0.85;*/
         overflow: hidden;
+        flex-wrap: nowrap;
     }
 
     .countdown-text {

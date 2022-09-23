@@ -5,7 +5,7 @@
     </GenericOverlay>
     <div class="bracket-overlay bracket-extended" :style="zoom" v-else>
         <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :small="small"
-                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" />
+                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" :extended="extended" />
     </div>
 </template>
 
@@ -43,7 +43,8 @@ export default {
             return bracket || this.event.brackets[0];
         },
         zoom() {
-            return { zoom: (this.scale || 1) + (this.extended ? 0.45 : 0) };
+            return {};
+            // return { zoom: (this.scale || 1) + (this.extended ? 0.5 : 0) };
         },
         liveMatch() {
             if (!this.broadcast?.live_match) return null;

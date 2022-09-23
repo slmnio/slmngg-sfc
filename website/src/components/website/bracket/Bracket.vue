@@ -10,6 +10,9 @@
             .bracket {
                 --bracket-columns: {{ bracketCols || 0 }};
             }
+            .bracket .connections {
+                --b-width: {{ connectionWidth }}px !important;
+            }
         </v-style>
         <div class="internal-bracket d-flex" v-for="(bracket, i) in brackets" v-bind:key="i">
             <div class="column" v-for="(column, ci) in bracket.columns" v-bind:key="ci">
@@ -36,6 +39,7 @@ export default {
         useOverlayScale: Boolean,
         small: Boolean,
         scale: Number,
+        extended: Boolean,
         broadcastHighlightMatch: {},
         broadcastHighlightTeam: {}
     },
@@ -70,7 +74,14 @@ export default {
             let fontSize = 16;
             if (this.useOverlayScale && this.bracket && this.bracket.overlay_scale > 4) fontSize = this.bracket.overlay_scale;
             if (this.scale) fontSize *= this.scale;
+            if (this.extended) fontSize *= 1.5;
             return fontSize;
+        },
+        connectionWidth() {
+            let width = 2;
+            if (this.scale) width *= this.scale;
+            if (this.extended) width *= 1.5;
+            return Math.max(1, Math.floor(width));
         },
         winVars() {
             const css = themeBackground1(this.event);

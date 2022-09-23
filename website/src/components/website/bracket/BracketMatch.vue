@@ -3,7 +3,7 @@
                  v-bind:class="{'hover': hover, 'forfeit': match && match.forfeit }"
                  @mouseover.native="matchHover" @mouseleave.native="matchEmpty">
         <div class="match-name d-none">{{ match && match.name }}</div>
-        <div class="match-number" v-bind:class="{'lowlight': lowlight}" v-if="match.match_number">{{ match.match_number }}</div>
+        <div class="match-number" v-bind:class="{'lowlight': lowlight}" v-if="matchNumber">{{ matchNumber }}</div>
         <div class="match-teams">
             <BracketTeam v-for="(team, i) in teams"
                          :team="team.id && team"
@@ -64,13 +64,13 @@ export default {
                 { id: connections.loser.id, text: "Loser drops to here", side: connections.loser.side, number: connections.loser?.match_number }
             ];
 
-            connections.feederMatches.map(f => {
-                cons.push({
-                    id: f.id,
-                    text: f._m,
-                    feeder: true
-                });
-            });
+            // connections.feederMatches.map(f => {
+            //     cons.push({
+            //         id: f.id,
+            //         text: f._m,
+            //         feeder: true
+            //     });
+            // });
 
             // store.commit("setHighlights", cons); // disable this for now
             store.commit("setHighlightedMatch", this.match.id);
@@ -80,9 +80,40 @@ export default {
             // console.log(this.match, "empty");
             store.commit("setHighlights", []);
             store.commit("setHighlightedMatch", null);
+        },
+        generateDummies(dummy, match) {
+            const feederMatches = match?._bracket_data?.connections?.feederMatches;
+            console.log("cons", match?._bracket_data?.num, match?._bracket_data?.connections);
+            if (!feederMatches || (!feederMatches["1"] && !feederMatches["2"])) return [dummy, dummy];
+            const dummies = [dummy, dummy];
+            if (feederMatches["1"]) {
+                console.log("f1", feederMatches["1"]);
+                dummies[0] = {
+                    ...dummy,
+                    text: `${feederMatches["1"]._m} M${feederMatches["1"].side}`
+                };
+            }
+
+            if (feederMatches["2"]) {
+                console.log("f2", feederMatches["2"]);
+                dummies[1] = {
+                    ...dummy,
+                    text: `${feederMatches["2"]._m} M${feederMatches["2"].side}`
+                };
+            }
+
+            console.log("dummies", match._bracket_data.num, dummies);
+
+            return dummies;
         }
     },
     computed: {
+        matchNumber() {
+            const localNumber = this.match?._bracket_data?.num;
+
+            if (!this.match) return localNumber;
+            return this.match.match_number || localNumber;
+        },
         scores() {
             if (!this.match) return [null, null];
             if (!this.match.teams || this.match.teams.length !== 2) return [null, null];
@@ -100,7 +131,9 @@ export default {
         },
         teams() {
             const dummy = { text: "TBD", dummy: true, id: null };
-            if (!this.match) return [{ ...dummy, _empty: true }, { ...dummy, _empty: true }];
+            const dummies = this.generateDummies(dummy, this.match);
+            if (!this.match) return [{ ...dummies[0], _empty: true }, { ...dummies[1], _empty: true }];
+            console.log("dummies", this.match._bracket_data.num, dummies);
 
             let text = (this.match.placeholder_teams || "").trim().split("|").filter(t => t !== "");
             let extraText = [null, null];
@@ -112,26 +145,26 @@ export default {
 
             if (!this.match.teams || this.match.teams.length === 0) {
                 if (text.length === 2) {
-                    return text.map((t, i) => ({ ...dummy, text: t, short: extraText[i] }));
+                    return text.map((t, i) => ({ ...dummies[i], text: t, short: extraText[i] }));
                 } else if (text.length === 1) {
-                    if (this.match.placeholder_right) return [dummy, { ...dummy, text: text[0] }];
-                    return [{ ...dummy, text: text[0], short: extraText[0] }, dummy];
+                    if (this.match.placeholder_right) return [dummies[0], { ...dummies[1], text: text[0] }];
+                    return [{ ...dummies[0], text: text[0], short: extraText[0] }, dummies[1]];
                 } else if (text.length === 0) {
                     // no text, just use TBDs
-                    return [dummy, dummy];
+                    return dummies;
                 }
             }
             if (this.match.teams.length === 1) {
                 if (text.length === 2) {
-                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[1], short: extraText[1] }];
-                    return [{ ...dummy, text: text[0], short: extraText[0] }, this.match.teams[0]];
+                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummies[1], text: text[1], short: extraText[1] }];
+                    return [{ ...dummies[0], text: text[0], short: extraText[0] }, this.match.teams[0]];
                 } else if (text.length === 1) {
-                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[0], short: extraText[0] }];
-                    return [{ ...dummy, text: text[0], short: extraText[0] }, this.match.teams[0]];
+                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummies[1], text: text[0], short: extraText[0] }];
+                    return [{ ...dummies[0], text: text[0], short: extraText[0] }, this.match.teams[0]];
                 } else if (text.length === 0) {
                     // no text, just use TBDs
-                    if (this.match.placeholder_right) return [this.match.teams[0], dummy];
-                    return [dummy, this.match.teams[0]];
+                    if (this.match.placeholder_right) return [this.match.teams[0], dummies[1]];
+                    return [dummies[0], this.match.teams[0]];
                 }
             }
 

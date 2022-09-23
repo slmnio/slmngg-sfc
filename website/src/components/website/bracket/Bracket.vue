@@ -68,7 +68,7 @@ export default {
         },
         fontSize() {
             let fontSize = 16;
-            if (this.useOverlayScale && this.bracket && this.bracket.overlay_scale > 10) fontSize = this.bracket.overlay_scale;
+            if (this.useOverlayScale && this.bracket && this.bracket.overlay_scale > 4) fontSize = this.bracket.overlay_scale;
             if (this.scale) fontSize *= this.scale;
             return fontSize;
         },
@@ -121,7 +121,7 @@ export default {
                 // num = 2.1 2.2
                 return {
                     ...this.matches[Math.floor(num) - 1],
-                    side: parseInt(num.toString().split(".")[1])
+                    side: parseInt(num.toString().split(".").pop())
                 };
             } else {
                 // num = 2
@@ -191,16 +191,19 @@ export default {
                 winner: this.getConnectionMatch(connections.win),
                 loser: this.getConnectionMatch(connections.lose)
             };
-            const feederMatches = [];
+            const feederMatches = {
+                1: null,
+                2: null
+            };
             Object.entries(this.connections).forEach(([_n, connection]) => {
                 if (connection.win && Math.floor(connection.win) === parseInt(num)) {
-                    feederMatches.push({ ...this.getConnectionMatch(_n), _m: "Winner" });
+                    feederMatches[connection.win.split(".").pop()] = { ...this.getConnectionMatch(_n), _m: "Winner" };
                 }
                 if (connection.lose && Math.floor(connection.lose) === parseInt(num)) {
-                    feederMatches.push({ ...this.getConnectionMatch(_n), _m: "Loser" });
+                    feederMatches[connection.lose.split(".").pop()] = { ...this.getConnectionMatch(_n), _m: "Loser" };
                 }
             });
-            // console.log("feeder matches", feederMatches);
+            console.log(`feeder matches n=${num}`, feederMatches);
             if (feederMatches) cons.feederMatches = feederMatches;
 
             return {

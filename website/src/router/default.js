@@ -74,7 +74,7 @@ export default [
             localStorage.setItem("auth_next", from.fullPath);
             const params = {
                 client_id: process.env.VUE_APP_DISCORD_CLIENT_ID,
-                redirect_uri: process.env.VUE_APP_DISCORD_REDIRECT_URI,
+                redirect_uri: `${window.location.origin}/auth/discord/return`,
                 response_type: "code",
                 scope: ["identify"].join(" ")
             };

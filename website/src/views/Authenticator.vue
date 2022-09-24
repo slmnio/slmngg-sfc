@@ -33,7 +33,7 @@ export default {
                 localStorage.removeItem("auth_next");
                 this.$router.push(next);
             } else {
-                this.$router.push("/dashboard");
+                this.$router.push("/profile");
             }
         }
     }

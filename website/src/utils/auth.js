@@ -23,6 +23,7 @@ export async function authenticateWithDiscord(app, code) {
     app.auth.token = authenticationRequest.token;
     const rootDomain = window.location.host.includes("slmn.gg") ? "slmn.gg" : window.location.hostname;
     app.$cookies.set("token", authenticationRequest.token, "3d", null, rootDomain);
+    app.$cookies.set("token", authenticationRequest.token, "3d", null, "." + rootDomain);
     app.auth.user = authenticationRequest.user;
 
     return {

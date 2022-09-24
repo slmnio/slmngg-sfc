@@ -2,7 +2,7 @@ const bodyParser = require("body-parser");
 const fetch = require("node-fetch");
 
 function discordEnvSet() {
-    return ["DISCORD_CLIENT_ID", "DISCORD_CLIENT_SECRET", "DISCORD_CLIENT_REDIRECT_URI"].every(key => !!process.env[key]);
+    return ["DISCORD_CLIENT_ID", "DISCORD_CLIENT_SECRET", "DISCORD_REDIRECT_URI"].every(key => !!process.env[key]);
 }
 
 module.exports = ({ app, router, cors, Cache, io }) => {

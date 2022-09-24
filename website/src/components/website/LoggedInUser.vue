@@ -6,13 +6,14 @@
         </template>
         <b-dropdown-item variant="dark" :to="url('player', { id: playerID })" active-class="active">Player page</b-dropdown-item>
         <b-dropdown-item variant="dark" to="/profile" active-class="active">Edit profile</b-dropdown-item>
-        <b-dropdown-item variant="dark" to="/dashboard" active-class="active">Dashboard</b-dropdown-item>
+        <b-dropdown-item v-if="isProduction" variant="dark" to="/dashboard" active-class="active">Dashboard</b-dropdown-item>
     </b-nav-item-dropdown>
 </template>
 
 <script>
 import { url } from "@/utils/content-utils.js";
 import { BDropdownItem, BNavItemDropdown } from "bootstrap-vue";
+import { isAuthenticated } from "@/utils/auth";
 
 export default {
     name: "LoggedInUser",
@@ -30,6 +31,10 @@ export default {
             return {
                 backgroundImage: `url(${this.user.avatar})`
             };
+        },
+        isProduction() {
+            if (!isAuthenticated(this.$root)) return false;
+            return this.$root.authUser?.clients?.length;
         }
     },
     methods: {

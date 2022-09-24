@@ -36,7 +36,8 @@
                     <router-link active-class="active" class="nav-link" to="/events">Events</router-link>
                     <router-link active-class="active" class="nav-link" to="/teams">Teams</router-link>
                     <router-link active-class="active" class="nav-link" to="/players">Players</router-link>
-                    <router-link active-class="active" class="nav-link" to="/dashboard">Dashboard</router-link>
+                    <router-link v-if="isAuthenticated" active-class="active" class="nav-link" to="/profile">Profile</router-link>
+                    <router-link v-if="isProduction" active-class="active" class="nav-link" to="/dashboard">Dashboard</router-link>
 <!--                    <router-link active-class="active" class="nav-link" to="/news">News</router-link>-->
                 </b-navbar-nav>
                 <b-navbar-nav v-if="minisite" class="flex-wrap">
@@ -94,6 +95,7 @@ import WebsiteNavBanner from "@/components/website/WebsiteNavBanner";
 import { resizedImageNoWrap } from "@/utils/images";
 import LoggedInUser from "@/components/website/LoggedInUser";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
+import { isAuthenticated } from "@/utils/auth";
 
 export default {
     name: "WebsiteNav",
@@ -193,6 +195,10 @@ export default {
             } catch {
                 return null;
             }
+        },
+        isProduction() {
+            if (!isAuthenticated(this.$root)) return false;
+            return this.$root.authUser?.clients?.length;
         }
     },
     mounted() {
@@ -202,6 +208,7 @@ export default {
         }, 3000);
     },
     methods: {
+        isAuthenticated,
         slmnggURL(page) {
             return `${this.slmnggDomain}/${page}`;
         }

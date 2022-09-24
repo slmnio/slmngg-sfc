@@ -2,7 +2,7 @@ const bodyParser = require("body-parser");
 const fetch = require("node-fetch");
 
 function discordEnvSet() {
-    return ["DISCORD_CLIENT_ID", "DISCORD_CLIENT_SECRET"].every(key => process.env[key]);
+    return ["DISCORD_CLIENT_ID", "DISCORD_CLIENT_SECRET", "DISCORD_CLIENT_REDIRECT_URI"].every(key => !!process.env[key]);
 }
 
 module.exports = ({ app, router, cors, Cache, io }) => {
@@ -90,7 +90,7 @@ module.exports = ({ app, router, cors, Cache, io }) => {
         const data = {
             client_id: process.env.DISCORD_CLIENT_ID,
             client_secret: process.env.DISCORD_CLIENT_SECRET,
-            redirect_uri: process.env.DISCORD_REDIRECT_URI,
+            redirect_uri: process.env.DISCORD_REDIRECT_URI, // TODO: use request data to use request domain
             grant_type: "authorization_code",
             code: code,
             scope: "identify"
@@ -100,13 +100,22 @@ module.exports = ({ app, router, cors, Cache, io }) => {
             .map(parts => parts.map(part => encodeURIComponent(part)).join("="))
             .join("&");
 
-        const tokens = await fetch("https://discord.com/api/oauth2/token", {
+        let tokens = await fetch("https://discord.com/api/oauth2/token", {
             method: "POST",
             body: stringParams,
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             }
-        }).then(res => res.json());
+        });
+        let statusCode = tokens.status;
+        tokens = await tokens.json();
+
+        if (statusCode !== 200) {
+            return {
+                error: true,
+                error_description: tokens,
+            };
+        }
 
         return tokens;
     }

@@ -202,7 +202,8 @@ export default {
                 colors: colors,
                 images: [this.mainImage?.backgroundImage, ...this.layers]
             };
-            if (JSON.stringify(payload) === JSON.stringify(this.lastRecolor)) return console.warn("[muffle]", "Same payload requested", payload);
+            // muffling stops some colours mix down properly on changes, not sure why
+            // if (JSON.stringify(payload) === JSON.stringify(this.lastRecolor)) return console.warn("[muffle]", "Same payload requested", payload);
             this.lastRecolor = payload;
 
             this.layers.forEach((layer, i) => {

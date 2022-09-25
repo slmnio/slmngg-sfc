@@ -32,6 +32,11 @@ export default {
                 })
             });
         },
+        heroes() {
+            return ReactiveRoot("Heroes", {
+                ids: ReactiveArray("ids")
+            })?.ids;
+        },
         team() {
             if ([2, "2", "right", "alt"].includes(this.teamNum)) {
                 return this.match?.teams?.[1];
@@ -39,10 +44,23 @@ export default {
             return this.match?.teams?.[0];
         },
         players() {
-            return (this.team?.players || []).slice(0, 6 || this.teamNum);
+            const players = this.team?.players || this.team?.limited_players;
+            if (!this.team?.players && this.team?.limited_players) {
+                players.forEach(player => {
+                    // set hero from lookup
+                    player.favourite_hero = this.getFavouriteHero(player.favourite_hero);
+                });
+            }
+            return (players || []).slice(0, 6 || this.playerCount);
         },
         titleStyle() {
             return themeBackground1(this.team);
+        }
+    },
+    methods: {
+        getFavouriteHero(heroName) {
+            if (!heroName || !this.heroes.length) return null;
+            return this.heroes.find(h => h.name && h.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() === heroName.toLowerCase());
         }
     }
 };
@@ -51,7 +69,7 @@ export default {
 <style scoped>
     .player >>> .color-holder {
         height: 100%;
-        --over: 130%;
+        --over: 250%;
         width: calc(100% + var(--over));
         margin-left: calc(-0.5 * var(--over));
     }

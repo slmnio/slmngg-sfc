@@ -9,6 +9,7 @@ import EventAbout from "@/views/sub-views/EventAbout";
 import EventScenarios2 from "@/views/sub-views/EventScenarios2";
 import EventStandings from "@/views/sub-views/EventStandings";
 import ThingTheme from "@/views/sub-views/ThingTheme";
+import EventBrands from "@/views/sub-views/EventBrands";
 
 export default [
     { path: "", component: EventMain },
@@ -23,5 +24,6 @@ export default [
     { path: "staff", component: EventStaff },
     { path: "about", component: EventAbout },
     { path: "standings", component: EventStandings },
-    { path: "theme", component: ThingTheme }
+    { path: "theme", component: ThingTheme },
+    { path: "brands", component: EventBrands }
 ];

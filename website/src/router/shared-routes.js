@@ -4,6 +4,7 @@ import TeamMain from "@/views/sub-views/TeamMain";
 import TeamSchedule from "@/views/sub-views/TeamSchedule";
 import TeamTheme from "@/views/sub-views/ThingTheme";
 import TeamDetails from "@/views/sub-views/TeamDetails";
+import TeamCams from "@/views/sub-views/TeamCams";
 import Event from "@/views/Event";
 import EventRoutes from "@/router/event";
 import Player from "@/views/Player";
@@ -34,7 +35,8 @@ export default [
             { path: "matches", component: TeamSchedule },
             { path: "theme", component: TeamTheme },
             { path: "details", component: TeamDetails },
-            { path: "composition", component: TeamComposition }
+            { path: "composition", component: TeamComposition },
+            { path: "cams", component: TeamCams }
         ]
     },
     {

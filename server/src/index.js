@@ -53,7 +53,7 @@ const Cache = (require("./cache.js")).setup(io);
 (require("./airtable-interface.js")).setup(io);
 
 const actions = require("./action-manager.js");
-actions.load(app, localCors, Cache);
+actions.load(app, localCors, Cache, io);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -117,7 +117,7 @@ io.on("connection", (socket) => {
         socket.leave(id);
     });
     socket.on("subscribe-multiple", (ids) => {
-        // console.log(`[multiple] client rejoining ${ids.length} rooms`);
+        console.log(`[multiple] client rejoining ${ids.length} rooms`);
         ids.map(id => cleanID(id)).forEach(id => {
             socket.join(id);
         });

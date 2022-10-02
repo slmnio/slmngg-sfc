@@ -7,6 +7,7 @@
                 <MatchThumbnail class="mini-thumbnail" :match="liveMatch" stripe-height="2px"/>
             </router-link>
             <div class="match-thumbnail-ghost default-thing mini-thumbnail" v-if="!liveMatch"></div>
+            <div class="m-2 d-none"><b-form-checkbox v-model="broadcast.show_cams" @change="() => togglePlayerCams($root.auth)">Show Cams</b-form-checkbox></div>
         </div>
         <div class="broadcast-match-editor" v-if="liveMatch">
             <MatchEditor :match="liveMatch"></MatchEditor>
@@ -20,10 +21,12 @@ import { url } from "@/utils/content-utils";
 import BroadcastSwitcher from "@/components/website/dashboard/BroadcastSwitcher";
 import MatchThumbnail from "@/components/website/match/MatchThumbnail";
 import MatchEditor from "@/components/website/dashboard/MatchEditor";
+import { BFormCheckbox } from "bootstrap-vue";
+import { togglePlayerCams } from "@/utils/dashboard";
 
 export default {
     name: "Dashboard",
-    components: { MatchEditor, MatchThumbnail, BroadcastSwitcher },
+    components: { MatchEditor, MatchThumbnail, BroadcastSwitcher, BFormCheckbox },
     computed: {
         user() {
             if (!this.$root.auth.user?.airtableID) return {};
@@ -64,7 +67,7 @@ export default {
         }
     },
     methods: {
-        url
+        url, togglePlayerCams
     }
 };
 </script>

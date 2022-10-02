@@ -21,13 +21,16 @@ async function loadActions(directory) {
     return files.map(file => require(path.join(directory, file)));
 }
 
-async function load(expressApp, cors, Cache) {
+async function load(expressApp, cors, Cache, io) {
     const actionApp = express.Router();
     actionApp.use(bodyParser.json());
     actionApp.options("/*", cors());
     actions = (await loadActions(path.join(__dirname, "actions"))) || [];
 
+    let ioFunctions = [];
+
     actions.forEach(action => {
+
         let requireAuth = true;
         actionApp.post(`/${action.key}`, cors(), async(req, res) => {
             let token;
@@ -50,7 +53,7 @@ async function load(expressApp, cors, Cache) {
             }
             if (action.auth?.includes("client")) {
                 authObjects.client = await getSelfClient(Cache, token);
-                if (!authObjects.client) return res.status(403).send({ error: true, errorMessage: "No client data associated with this user" });
+                if (!authObjects.client) return res.status(403).send({ error: true, errorMessage: "No client data associated with this token" });
             }
 
             if (action.requiredParams) {
@@ -79,6 +82,66 @@ async function load(expressApp, cors, Cache) {
                 res.status(500).send({ error: true, errorMessage: "Internal error" });
             }
         });
+
+        ioFunctions.push((socket) => {
+            socket.on(action.key, async(args) => {
+
+                let token = socket.handshake?.query?.token;
+                console.log("socket action", action.key, args, `token=${!!token}`);
+
+                let params = {};
+                let authObjects = {};
+
+                if (requireAuth) {
+                    if (!token || token === "") return socket.emit("action_error", { action: action.key, error: true, errorCode: 401, errorMessage: "Unauthorized" });
+                }
+
+                if (action.requiredParams && !action.requiredParams.every(key => args[key])) {
+                    return socket.emit("action_error", { action: action.key, error: true, errorCode: 400, errorMessage: "Missing required parameter" });
+                }
+                if (action.auth?.includes("user")) {
+                    authObjects.user = (await Cache.auth.getData(token))?.user;
+                    if (!authObjects.user) return socket.emit("action_error", { action: action.key, error: true, errorCode: 401, errorMessage: "Unauthorized operation. You might have a stale token (try logging in again)" });
+                }
+                if (action.auth?.includes("client")) {
+                    authObjects.client = await getSelfClient(Cache, token);
+                    if (!authObjects.client) return socket.emit("action_error", { action: action.key, error: true, errorCode: 403, errorMessage: "No client data associated with this user" });
+                }
+
+                if (action.requiredParams) {
+                    (action.requiredParams || []).forEach(key => {
+                        params[key] = args[key];
+                    });
+                }
+
+                try {
+                    await action.handler(
+                        async (data) => socket.emit(action.key, { error: false, ...data }),
+                        async (errorMessage, errorCode) => socket.emit("action_error", {
+                            action: action.key,
+                            error: true,
+                            errorCode: errorCode || 400,
+                            errorMessage
+                        }),
+                        params,
+                        authObjects,
+                        {
+                            updateRecord: (tableName, item, data) => updateRecord(Cache, tableName, item, data),
+                            get: Cache.get,
+                            createRecord: (tableName, data) => createRecord(Cache, tableName, data),
+                        }
+                    );
+                } catch (e) {
+                    console.error(`Error in action [${action.key}]`, e);
+                    socket.emit("action_error", { action: action.key, error: true, errorCode: 500, errorMessage: "Internal error" });
+                }
+            });
+        });
+
+    });
+
+    io.on("connection", (socket) => {
+        ioFunctions.forEach(fn => fn(socket));
     });
 
     // web api

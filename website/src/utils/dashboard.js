@@ -43,3 +43,9 @@ export async function updateMapData(auth, match, mapData) {
         mapData
     });
 }
+export async function togglePlayerCams(auth) {
+    console.log(auth);
+    if (!auth?.user) return { error: true, errorMessage: "Not authenticated" };
+    console.log(auth);
+    return await authenticatedRequest(auth, "actions/toggle-player-cams");
+}

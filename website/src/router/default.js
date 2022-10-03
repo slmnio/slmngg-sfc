@@ -2,7 +2,6 @@ import Home from "@/views/Home";
 import Events from "@/views/lists/Events";
 import Teams from "@/views/lists/Teams";
 import Players from "@/views/lists/Players";
-import NotFoundPage from "@/views/NotFoundPage";
 
 import WebsiteApp from "@/apps/WebsiteApp";
 import BroadcastApp from "@/apps/BroadcastApp";

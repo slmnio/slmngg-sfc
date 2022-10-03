@@ -53,20 +53,24 @@
 <!--                    <router-link :to="'/'" v-if="minisite.navbar_short" active-class="active" exact class="nav-link">{{ minisite.navbar_short }}</router-link>-->
                 </b-navbar-nav>
                 <b-navbar-nav class="flex-grow-1"></b-navbar-nav>
+
                 <b-navbar-nav>
                     <div class="nav-link" v-b-modal.timezone-swapper-modal>Timezone</div>
                     <a target="_blank" class="nav-link" href="https://slmn.statuspage.io/?utm_source=slmngg_nav">Status</a>
                 </b-navbar-nav>
+
                 <b-navbar-nav v-if="minisite">
                     <a :href="slmnggURL('')" class="nav-link">SLMN.GG</a>
                 </b-navbar-nav>
                 <b-navbar-nav v-else>
                     <a v-if="$root.version" class="nav-link" target="_blank" href="https://github.com/slmnio/slmngg-sfc">SLMN.GG {{ $root.version }}</a>
+                </b-navbar-nav>
 
+                <b-navbar-nav>
                     <router-link class="nav-link" to="/login" v-if="!$root.auth.user && !$root.isRebuilding">Login</router-link>
                     <LoggedInUser v-if="$root.auth.user"/>
-
                 </b-navbar-nav>
+
             </b-collapse>
         </b-navbar>
 
@@ -96,6 +100,7 @@ import { resizedImageNoWrap } from "@/utils/images";
 import LoggedInUser from "@/components/website/LoggedInUser";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 import { isAuthenticated } from "@/utils/auth";
+import { getMainDomain } from "@/utils/fetch";
 
 export default {
     name: "WebsiteNav",
@@ -131,23 +136,7 @@ export default {
             }).matches || [];
         },
         slmnggDomain() {
-            try {
-                // console.log("[minisite]", this.minisite);
-
-                if (!this.minisite?.subdomain) {
-                    // basically just defaults if we can't automatically go back up to the parent
-                    if (process.env.NODE_ENV === "development") return "http://localhost:8080";
-                    if (process.env.VUE_APP_DEPLOY_MODE === "local") return "http://localhost:8080";
-                    if (process.env.VUE_APP_DEPLOY_MODE === "staging") return "https://dev.slmn.gg";
-                    if (process.env.NODE_ENV === "production") return "https://slmn.gg";
-                    if (process.env.VUE_APP_DEPLOY_MODE === "production") return "http://slmn.gg";
-                    return "http://dev.slmn.gg";
-                } else {
-                    return window.location.origin.replace(`${this.minisite.subdomain}.`, "");
-                }
-            } catch (e) {
-                return "https://dev.slmn.gg";
-            }
+            return getMainDomain(this.minisite?.subdomain);
         },
         siteMode() {
             // console.log("env", process.env);

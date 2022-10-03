@@ -29,7 +29,7 @@ export default {
             if (!isAuthenticated(this.$root)) return console.warn("Not authenticated");
             const playerID = this.$root.auth?.user?.airtableID;
             if (!playerID) return console.warn("No player ID to redirect to");
-            return this.$router.push({ path: `/player/${playerID}/${this.subPage || ""}` });
+            return this.$router.replace({ path: `/player/${playerID}/${this.subPage || ""}` });
         }
     },
     beforeMount() {

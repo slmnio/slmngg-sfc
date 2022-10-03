@@ -11,7 +11,7 @@
 
 <script>
 import LoadingIcon from "@/components/website/LoadingIcon";
-import { authenticateWithDiscord } from "@/utils/auth";
+import { authenticateWithDiscord, getAuthNext } from "@/utils/auth";
 
 export default {
     name: "Authenticator",
@@ -28,10 +28,15 @@ export default {
         if (authResult.error) {
             this.errorMessage = authResult.errorMessage;
         } else {
-            const next = localStorage.getItem("auth_next");
+            const next = getAuthNext(this.$root);
+
             if (next) {
-                localStorage.removeItem("auth_next");
-                this.$router.push(next);
+                if (next.startsWith("http")) {
+                    console.log("[auth]", "Redirecting to 'external' page");
+                    window.location.replace(next);
+                } else {
+                    this.$router.replace(next);
+                }
             } else {
                 this.$router.push("/profile");
             }

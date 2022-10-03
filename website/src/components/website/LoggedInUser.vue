@@ -5,7 +5,7 @@
             <div class="name">{{ user.name }}</div>
         </template>
         <b-dropdown-item variant="dark" :to="url('player', { id: playerID })" active-class="active">Player page</b-dropdown-item>
-        <b-dropdown-item variant="dark" to="/profile" active-class="active">Edit profile</b-dropdown-item>
+        <b-dropdown-item variant="dark" :href="rootLinkExternal('/profile')" :to="rootLinkRouter('/profile')" active-class="active">Edit profile</b-dropdown-item>
         <b-dropdown-item v-if="isProduction" variant="dark" to="/dashboard" active-class="active">Dashboard</b-dropdown-item>
     </b-nav-item-dropdown>
 </template>
@@ -13,7 +13,8 @@
 <script>
 import { url } from "@/utils/content-utils.js";
 import { BDropdownItem, BNavItemDropdown } from "bootstrap-vue";
-import { isAuthenticated } from "@/utils/auth";
+import { isAuthenticated, isOnMainDomain } from "@/utils/auth";
+import { getMainDomain } from "@/utils/fetch";
 
 export default {
     name: "LoggedInUser",
@@ -38,7 +39,19 @@ export default {
         }
     },
     methods: {
-        url
+        url,
+
+        /*
+        * for simplicity's sake, I'm having any editable stuff on the root domain
+        * these use either href or to for external/routable links
+        * */
+        rootLinkExternal(url) {
+            return isOnMainDomain() ? null : getMainDomain() + url;
+        },
+        rootLinkRouter(url) {
+            return isOnMainDomain() ? url : null;
+        }
+
     }
 };
 </script>

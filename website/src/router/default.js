@@ -64,29 +64,6 @@ export default [
         ]
     },
     {
-        path: "/login",
-        redirect: "/auth/discord/redirect"
-    },
-    {
-        path: "/auth/discord/redirect",
-        beforeEnter(to, from, next) {
-            console.log("ZOOM DISCORD TIME");
-            localStorage.setItem("auth_next", from.fullPath);
-            const params = {
-                client_id: process.env.VUE_APP_DISCORD_CLIENT_ID,
-                redirect_uri: `${window.location.origin}/auth/discord/return`,
-                response_type: "code",
-                scope: ["identify"].join(" ")
-            };
-
-            const stringParams = Object.entries(params)
-                .map(parts => parts.map(part => encodeURIComponent(part)).join("="))
-                .join("&");
-
-            window.location.replace("https://discord.com/api/oauth2/authorize?" + stringParams);
-        }
-    },
-    {
         path: "/broadcast/:broadcastCode",
         component: BroadcastApp,
         props: route => ({
@@ -110,15 +87,11 @@ export default [
             bodyClass: route.query.class || route.query.bodyClass
         }),
         children: BroadcastRoutes
-    },
+    }
     // {
     //     path: "/redirect",
     //     beforeEnter: (to, from, next) => {
     //         window.location.href = to.query.url;
     //     }
     // },
-    {
-        path: "/*",
-        component: NotFoundPage
-    }
 ];

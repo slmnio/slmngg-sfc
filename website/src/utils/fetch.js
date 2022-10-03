@@ -149,11 +149,11 @@ export function getMainDomain(subdomain) {
         if (subdomain) {
             return window.location.origin.replace(`${subdomain}.`, "");
         } else {
-            if (process.env.NODE_ENV === "development") return "http://localhost:8080";
-            if (process.env.VUE_APP_DEPLOY_MODE === "local") return "http://localhost:8080";
-            if (process.env.VUE_APP_DEPLOY_MODE === "staging") return "https://dev.slmn.gg";
-            if (process.env.NODE_ENV === "production") return "https://slmn.gg";
             if (process.env.VUE_APP_DEPLOY_MODE === "production") return "https://slmn.gg";
+            if (process.env.VUE_APP_DEPLOY_MODE === "staging") return "https://dev.slmn.gg";
+            if (process.env.VUE_APP_DEPLOY_MODE === "local") return "http://localhost:8080";
+            if (process.env.NODE_ENV === "production") return "https://slmn.gg";
+            if (process.env.NODE_ENV === "development") return "http://localhost:8080";
             return "https://dev.slmn.gg";
         }
     } catch (e) {
@@ -167,11 +167,11 @@ export function getMainCookieDomain(subdomain) {
         if (subdomain) {
             return window.location.hostname.replace(`${subdomain}.`, "");
         } else {
-            if (process.env.NODE_ENV === "development") return "localhost";
-            if (process.env.VUE_APP_DEPLOY_MODE === "local") return "localhost";
-            if (process.env.VUE_APP_DEPLOY_MODE === "staging") return "dev.slmn.gg";
-            if (process.env.NODE_ENV === "production") return "slmn.gg";
             if (process.env.VUE_APP_DEPLOY_MODE === "production") return "slmn.gg";
+            if (process.env.VUE_APP_DEPLOY_MODE === "staging") return "dev.slmn.gg";
+            if (process.env.VUE_APP_DEPLOY_MODE === "local") return "localhost";
+            if (process.env.NODE_ENV === "production") return "slmn.gg";
+            if (process.env.NODE_ENV === "development") return "localhost";
             return "dev.slmn.gg";
         }
     } catch (e) {

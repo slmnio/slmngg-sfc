@@ -39,7 +39,7 @@ export function isOnMainDomain() {
 export function setAuthNext(app, path) {
     const url = path.startsWith("http") ? path : ((window.location.origin === getMainDomain() ? "" : window.location.origin) + path);
 
-    console.log("auth_next", url, "->", getMainDomain());
+    console.log("[auth] auth_next", url, "->", getMainDomain());
     localStorage.setItem("auth_next", url);
 
     if (app) {
@@ -50,7 +50,7 @@ export function setAuthNext(app, path) {
 
 export function getAuthNext(app) {
     const next = localStorage.getItem("auth_next") || app.$cookies.get("auth_next");
-    console.log("auth_next", next);
+    console.log("[auth] auth_next", next);
 
     app.$cookies.remove("auth_next");
     localStorage.removeItem("auth_next");

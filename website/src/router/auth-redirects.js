@@ -7,13 +7,13 @@ export default (app, mainDomain) => ([
         path: "/login",
         redirect: to => ({
             path: "/auth/discord/redirect",
-            query: { return: to.params.return }
+            query: { return: to.query.return }
         })
     },
     {
         path: "/auth/discord/redirect",
         beforeEnter(to, from, next) {
-            console.log("ZOOM DISCORD TIME", mainDomain, from.fullPath);
+            console.log("ZOOM DISCORD TIME", mainDomain, from.fullPath, to.query.return);
 
             if (!isOnMainDomain()) {
                 console.log("[auth] Redirecting through main domain for next");

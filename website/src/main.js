@@ -20,6 +20,7 @@ import SharedRoutes from "@/router/shared-routes";
 import AuthRoutes from "@/router/auth-redirects";
 import { ReactiveRoot } from "@/utils/reactive";
 import { authenticateWithToken, setAuthNext } from "@/utils/auth";
+import NotFoundContent from "@/views/sub-views/NotFoundContent";
 
 // eslint-disable-next-line prefer-const
 let app;
@@ -95,7 +96,8 @@ if (subdomain) {
                         };
                     }
                 },
-                ...SharedRoutes
+                ...SharedRoutes,
+                { path: "*", component: NotFoundContent }
             ]
         },
         ...AuthRoutes(app, mainDomain)

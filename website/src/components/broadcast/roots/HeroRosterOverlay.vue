@@ -73,6 +73,16 @@ export default {
             if (!heroName || !(this.heroes || []).length) return null;
             return this.heroes.find(h => h.name && h.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() === heroName.toLowerCase());
         }
+    },
+    watch: {
+        team: {
+            deep: true,
+            handler(team) {
+                // console.log("team change", this.$parent);
+                this.$parent.updateTheme(team.theme);
+                // this.$emit("stinger_theme_change", team.theme);
+            }
+        }
     }
 };
 </script>

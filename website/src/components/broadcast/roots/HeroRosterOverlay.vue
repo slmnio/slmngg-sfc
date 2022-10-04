@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay class="hero-roster-overlay" :title="title || (team && team.name) || 'Roster'" :title-style="titleStyle">
+    <GenericOverlay class="hero-roster-overlay" :title="title || (team && team.name) || 'Roster'" :title-style="titleStyle" :custom-theme="team && team.theme" :accent-color="team && team.theme && team.theme.color_theme">
         <div class="players h-100 d-flex flex-center">
             <div class="player h-100" v-for="player in players" :key="player.id">
                 <RecoloredHero class="h-100" :hero="player.favourite_hero" :theme="team.theme"></RecoloredHero>
@@ -41,6 +41,16 @@ export default {
             if ([2, "2", "right", "alt"].includes(this.teamNum)) {
                 return this.match?.teams?.[1];
             }
+            if ([3, "3", "highlight", "highlighted"].includes(this.teamNum)) {
+                return ReactiveRoot(this.broadcast.id, {
+                    highlight_team: ReactiveThing("highlight_team", {
+                        theme: ReactiveThing("theme"),
+                        players: ReactiveArray("players", {
+                            favourite_hero: ReactiveThing("favourite_hero")
+                        })
+                    })
+                })?.highlight_team;
+            }
             return this.match?.teams?.[0];
         },
         players() {
@@ -51,7 +61,8 @@ export default {
                     player.favourite_hero = this.getFavouriteHero(player.favourite_hero);
                 });
             }
-            return (players || []).slice(0, 6 || this.playerCount);
+            if (this.playerCount) return (players || []).slice(0, this.playerCount);
+            return (players || []);
         },
         titleStyle() {
             return themeBackground1(this.team);
@@ -59,7 +70,7 @@ export default {
     },
     methods: {
         getFavouriteHero(heroName) {
-            if (!heroName || !this.heroes.length) return null;
+            if (!heroName || !(this.heroes || []).length) return null;
             return this.heroes.find(h => h.name && h.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() === heroName.toLowerCase());
         }
     }
@@ -69,7 +80,7 @@ export default {
 <style scoped>
     .player >>> .color-holder {
         height: 100%;
-        --over: 250%;
+        --over: 350%;
         width: calc(100% + var(--over));
         margin-left: calc(-0.5 * var(--over));
     }
@@ -103,5 +114,10 @@ export default {
         flex-grow: 0;
         height: 3em;
         font-size: 2em;
+    }
+
+    .hero-roster-overlay >>> .g-body {
+        overflow: hidden;
+        color: white;
     }
 </style>

@@ -7,6 +7,9 @@
             </div>
         </theme-transition>
         <slot></slot>
+        <div class="preload">
+            <theme-logo v-if="theme" class="w-100 h-100" :theme="theme" logo-size="h-1080" border-width="0" icon-padding="200px" />
+        </div>
     </div>
 </template>
 
@@ -76,5 +79,12 @@ export default {
     @keyframes zoom {
         0% { transform: scale(0.9); }
         100% { transform: scale(1); }
+    }
+
+    .preload {
+        opacity: 0;
+        max-width: 0;
+        max-height: 0;
+        overflow: hidden;
     }
 </style>

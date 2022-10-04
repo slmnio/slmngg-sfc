@@ -29,7 +29,7 @@ import ThemeTransition from "@/components/broadcast/ThemeTransition";
 export default {
     name: "GenericOverlay",
     components: { ThemeTransition, TourneyBar },
-    props: ["title", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "titleStyle"],
+    props: ["title", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "titleStyle", "customTheme"],
     methods: {
         nbr(text) {
             if (!text) return "";
@@ -38,7 +38,7 @@ export default {
     },
     computed: {
         theme() {
-            return this.$root?.broadcast?.event?.theme;
+            return this.customTheme || this.$root?.broadcast?.event?.theme;
         },
         _accentColor() {
             return this.accentColor || this.$root?.broadcast?.event?.theme?.color_theme;

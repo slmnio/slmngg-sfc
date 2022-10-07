@@ -31,13 +31,14 @@ import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { Howl } from "howler";
 
 class Track {
-    constructor(trackData) {
+    constructor(trackData, loopSongs) {
         this.title = trackData?.title;
         this.artist = trackData?.artist;
         this.id = trackData?.id;
         this.loaded = false;
         this.audio = new Howl({
-            src: [trackData?.file?.[0]?.url]
+            src: [trackData?.file?.[0]?.url],
+            loop: loopSongs
         });
         this.currentTime = 0;
         this.duration = this.audio.duration();
@@ -68,7 +69,7 @@ class Track {
 
 export default {
     name: "MusicOverlay",
-    props: ["broadcast", "role", "showTitle", "volume", "crossfadeDuration", "active"],
+    props: ["broadcast", "role", "showTitle", "volume", "crossfadeDuration", "active", "loopSongs"],
     data: () => ({
         started: false,
         mainPlayer: null,
@@ -100,7 +101,7 @@ export default {
             });
         },
         trackList() {
-            return this.tracksData?.track_group_roles
+            return (this.tracksData?.track_group_roles || [])
                 ?.filter(trackGroupRole => trackGroupRole?.role?.toLowerCase() === this.role?.toLowerCase())
                 ?.map(trackGroupRole => trackGroupRole.track_groups.map(trackGroup => trackGroup.tracks)).flat(2) || [];
         },
@@ -118,13 +119,14 @@ export default {
         mainPlayer: {
             deep: true,
             handler(p) {
+                if (this.loopSongs) return;
                 if (p.duration - p.currentTime < this.crossfadeDuration && p.loaded) {
                     this.startCrossfade();
                 }
             }
         },
         trackList(list) {
-            if (!list.length) return console.log("list empty");
+            if (!list?.length) return console.log("list empty");
             if (list.some(t => !t || t.__loading)) return console.log("some loading");
             this.loadedTrackList = list;
         },
@@ -189,7 +191,7 @@ export default {
             if (!next) return;
 
             this.started = true;
-            this.mainPlayer = new Track(next);
+            this.mainPlayer = new Track(next, this.loopSongs);
             this.mainPlayer.play(this.volume);
         },
         startCrossfade() {
@@ -198,7 +200,7 @@ export default {
             this.crossfading = true;
             const next = this.getNextTrack();
 
-            this.crossfadePlayer = new Track(next);
+            this.crossfadePlayer = new Track(next, this.loopSongs);
             this.crossfadePlayer.play(0);
 
             this.mainPlayer.rampVolume(this.volume, 0, this.crossfadeDuration);

@@ -162,7 +162,8 @@ export default [
             role: route.query.group || route.query.role,
             showTitle: ["showTitle", "showText", "text", "title", "song"].some(t => route.query[t]),
             volume: parseFloat(route.query.volume) || 0.2,
-            crossfadeDuration: parseFloat(route.query.crossfade || route.query.fade) || 10
+            crossfadeDuration: parseFloat(route.query.crossfade || route.query.fade) || 10,
+            loopSongs: !!route.query.loop
         })
     },
     { path: "tester", component: ThemeTransitionTester },

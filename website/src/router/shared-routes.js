@@ -23,6 +23,7 @@ import PlayerBrands from "@/views/sub-views/PlayerBrands";
 import MatchEditor from "@/components/website/dashboard/MatchEditor";
 import PlayerParticipation from "@/views/sub-views/PlayerParticipation";
 import Me from "@/views/Me";
+import PlayerCamRedirect from "@/views/sub-views/PlayerCamRedirect";
 
 export default [
     {
@@ -58,7 +59,8 @@ export default [
             { path: "matches", component: PlayerMatches },
             { path: "played-matches", component: PlayerPlayedMatches },
             { path: "brands", component: PlayerBrands },
-            { path: "participation", component: PlayerParticipation }
+            { path: "participation", component: PlayerParticipation },
+            { path: "cam", component: PlayerCamRedirect, meta: { requiresAuth: true } }
         ]
     },
     {

@@ -31,29 +31,19 @@
             </li>
         </ul>
         <h3>Cam links</h3>
-        <PlayerCamLink v-for="player in playersWithCams.players" :player="player" :key="player.id"/>
+        <div class="d-flex flex-column">
+            <router-link v-for="player in team.players" :to="`/player/${player.id}/cam`" :key="player.id">{{player.name}}</router-link>
+
+        </div>
 
     </div>
 </template>
 
 <script>
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import PlayerCamLink from "@/components/website/PlayerCamLink";
 
 export default {
     name: "TeamCams",
-    components: { PlayerCamLink },
-    props: ["team"],
-    computed: {
-        playersWithCams() {
-            return ReactiveRoot(this.team.id, {
-                players: ReactiveArray("players", {
-                    live_guests: ReactiveThing("live_guests")
-                })
-            });
-        }
-    }
-
+    props: ["team"]
 };
 </script>
 

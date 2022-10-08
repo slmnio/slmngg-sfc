@@ -16,7 +16,8 @@ module.exports = {
             console.log(currentLiveGuest);
             let response = await updateRecord("Live Guests", currentLiveGuest, {
                 "Discord ID": user.discord.id,
-                "Avatar": `https://cdn.discordapp.com/avatars/${user.discord.id}/${user.discord.avatar}.webp?size=512`
+                "Avatar": `https://cdn.discordapp.com/avatars/${user.discord.id}/${user.discord.avatar}.webp?size=512`,
+                "Use Cam": true
             });
             return response?.error ? error("Airtable error", 500) : success();
         } else {
@@ -24,7 +25,8 @@ module.exports = {
                 "Discord ID": user.discord.id,
                 "Avatar": `https://cdn.discordapp.com/avatars/${user.discord.id}/${user.discord.avatar}.webp?size=512`,
                 "Name": user.discord.username,
-                "Player": [user.airtable.id]
+                "Player": [user.airtable.id],
+                "Use Cam": true
             });
             return response?.error ? error("Airtable error", 500) : success();
         }

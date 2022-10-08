@@ -163,7 +163,7 @@ const Auction = {
         console.log("[auction]", "getting players...");
         let players = await Auction.getPlayers(true);
         console.log("[auction]", "getting teams...");
-        let teams = await Auction.getTeams(true);
+        let teams = await Auction.getTeams();
         let teamIDs = teams.map(t => t.id);
 
         let eligiblePlayers = players.filter(t => {
@@ -212,8 +212,6 @@ const Auction = {
         if (!Auction.channel) return console.error("No auction channel setup");
         Auction.activePlayer = player;
 
-        console.log("[auction]", "setting active player...");
-        await Auction.setActivePlayer(player);
 
         Auction.Timer.initial();
         let embed = new Discord.MessageEmbed();
@@ -242,7 +240,9 @@ const Auction = {
             embed.setFooter(`Auction will close in ${Auction.wait.afterBid} seconds if there are no further bids.`);
         }
         console.log("[auction]", "sending first message");
-        Auction.channel.send({ embeds: [embed] });
+        await Auction.channel.send({ embeds: [embed] });
+        console.log("[auction]", "setting active player...");
+        await Auction.setActivePlayer(player);
     },
     sign: async function (player, team, bid) {
 
@@ -372,8 +372,8 @@ client.on("messageCreate", async message => {
 
                 console.log("[auction]", "finding player...");
                 let player = await Auction.findPlayer(args[0]);
-                console.log("[auction]", "found player", player.get("Name"));
                 if (!player) return message.reply(red({title: "idk who that is LOL"}));
+                console.log("[auction]", "found player", player.get("Name"));
                 await Auction.start(player, (Auction.autobid ? team : null));
 
             }

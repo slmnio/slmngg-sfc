@@ -380,12 +380,12 @@ export default {
             this.signedPlayer = player;
             setTimeout(() => {
                 // TODO: uncomment
-                // if (this.justSigned) {
-                //     this.socketPlayer = null;
-                //     this.justSigned = null;
-                //     this.signedPlayer = null;
-                //     this.bids = [];
-                // }
+                if (this.justSigned) {
+                    this.socketPlayer = null;
+                    this.justSigned = null;
+                    this.signedPlayer = null;
+                    this.bids = [];
+                }
             }, 20 * 1000);
         },
         auction_stats(stats) {

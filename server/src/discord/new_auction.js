@@ -160,7 +160,9 @@ const Auction = {
     },
     findPlayer: async function(prompt) {
         if (!prompt) return null;
+        console.log("[auction]", "getting players...");
         let players = await Auction.getPlayers(true);
+        console.log("[auction]", "getting teams...");
         let teams = await Auction.getTeams(true);
         let teamIDs = teams.map(t => t.id);
 
@@ -202,7 +204,7 @@ const Auction = {
     },
     getTeam: async function(discordMember, bust) {
         let teams = await Auction.getTeams(bust);
-        let team = teams.find(t => (t.get("Controller IDs") || "").split(",").some(tag => tag === discordMember.tag));
+        let team = teams.find(t => (t.get("Controller IDs") || "").split(",").some(id => id === discordMember.id));
         return team;
     },
     start: async function(player, startingTeam) {
@@ -210,6 +212,7 @@ const Auction = {
         if (!Auction.channel) return console.error("No auction channel setup");
         Auction.activePlayer = player;
 
+        console.log("[auction]", "setting active player...");
         await Auction.setActivePlayer(player);
 
         Auction.Timer.initial();
@@ -226,11 +229,19 @@ const Auction = {
             embed.setDescription(`Started by ${startingTeam.get("Name")} at $1k.\nIf there are no further bids, ${player.get("Name")} will be signed to to ${startingTeam.get("Name")}`);
             embed.setThumbnail(getImage(startingTeam));
 
+            if (player.get("Draft Data")) {
+                embed.setFields([{
+                    name: "Draft info",
+                    value: player.get("Draft Data").slice(0, 1000)
+                }]);
+            }
+
             if (startingTeam.get("Theme Color")) {
                 embed.setColor(getHex(startingTeam));
             }
             embed.setFooter(`Auction will close in ${Auction.wait.afterBid} seconds if there are no further bids.`);
         }
+        console.log("[auction]", "sending first message");
         Auction.channel.send({ embeds: [embed] });
     },
     sign: async function (player, team, bid) {
@@ -352,12 +363,16 @@ client.on("messageCreate", async message => {
 
                 if (!args[0]) return message.reply(red({title: "usage: `.start <name>` eg `.start joshen`"}));
                 await Auction.channel.sendTyping();
+                console.log("[auction]", "getting teams...");
                 await Auction.getTeams(true);
+                console.log("[auction]", "getting message author team...");
                 let team = await Auction.getTeam(message.author, true);
                 if (!team) return message.reply(red({title: "Can't find the team you represent"}));
                 if ((team.get("Players") || []).length >= getAuctionMax()) return message.reply(red({title: "You're at your maximum player count."}));
 
+                console.log("[auction]", "finding player...");
                 let player = await Auction.findPlayer(args[0]);
+                console.log("[auction]", "found player", player.get("Name"));
                 if (!player) return message.reply(red({title: "idk who that is LOL"}));
                 await Auction.start(player, (Auction.autobid ? team : null));
 

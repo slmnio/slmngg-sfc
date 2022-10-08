@@ -182,7 +182,7 @@ export default {
             // console.log(imageData);
 
 
-            layers.forEach(layer => {
+            for (const layer of layers) {
                 let element = this.$refs[`${layer.id}-color-${number}`];
                 if (!element.id && element?.[0]) element = element?.[0];
                 if (!element) return console.warn("No canvas element", layer.id, number);
@@ -193,7 +193,7 @@ export default {
                 if (layer.processing) {
                     layer.processing(element);
                 }
-            });
+            }
         },
         async colorImageTheme() {
             const colors = this.themeColors;
@@ -203,13 +203,17 @@ export default {
                 images: [this.mainImage?.backgroundImage, ...this.layers]
             };
             // muffling stops some colours mix down properly on changes, not sure why
-            // if (JSON.stringify(payload) === JSON.stringify(this.lastRecolor)) return console.warn("[muffle]", "Same payload requested", payload);
+            if (JSON.stringify(payload) === JSON.stringify(this.lastRecolor)) return console.warn("[muffle]", "Same payload requested", payload, this.lastRecolor);
             this.lastRecolor = payload;
 
-            this.layers.forEach((layer, i) => {
-                // console.log(layer, i, colors, colors[i]);
-                this.recolor(layer, colors[i], i + 1);
-            });
+            console.log("[recolor]", "starting");
+            this.$emit("recolor_starting");
+            for (let i = 0; i < this.layers.length; i++) {
+                const layer = this.layers[i];
+                await this.recolor(layer, colors[i], i + 1);
+            }
+            console.log("[recolor]", "complete");
+            this.$emit("recolor_complete");
         }
     }
 };

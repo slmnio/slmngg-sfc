@@ -6,8 +6,8 @@
                     <div class="logo-inner bg-center" :style="eventLogo"></div>
                 </div>
                 <div class="event-name flex-grow-1 flex-center d-flex flex-column">
-                    <div class="industry-align">{{ _broadcast.event ? (_broadcast.event.short || _broadcast.event.name): '' }}</div>
-                    <div class="industry-align">{{ title || 'Player Auction' }}</div>
+                    <div class="industry-align text-center">{{ _broadcast.event ? (_broadcast.event.short || _broadcast.event.name): '' }}</div>
+                    <div class="industry-align text-center">{{ title || 'Player Auction' }}</div>
                 </div>
                 <div class="event-stats flex-center d-flex flex-column">
                     <div v-if="stats && stats.allPlayers">{{ stats.remainingEligiblePlayers }} / {{ stats.allPlayers }} player{{ stats.remainingEligiblePlayers === 1 ? '' : 's' }} remaining</div>
@@ -21,11 +21,17 @@
                         <AuctionCountdown v-if="player && bids.length" />
                     </transition>
                     <transition name="fade-right">
-                        <div v-if="player">
+                        <RecoloredHero v-if="player && player.favourite_hero" :theme="heroColor" :hero="player.favourite_hero"></RecoloredHero>
+                    </transition>
+                    <transition name="fade-right">
+                        <div class="player-info" v-if="player">
                             <div class="player-name">{{ player.name }}</div>
                             <div class="accolades" v-if="accolades.length">
                                 <ContentThing :thing="accolade" type="event" :link-to="accolade.event" :theme="accolade.event && accolade.event.theme" v-for="accolade in accolades"
                                               v-bind:key="accolade.id" :show-logo="true" :text="accolade.player_text" />
+                            </div>
+                            <div class="player-captain-info" v-if="showCaptainInfo">
+                                {{ player.draft_data }}
                             </div>
                             <div class="player-teams d-flex flex-wrap flex-center" v-for="group in groupedTeams"
                                  :key="group.group" :class="`group-${group.group}`">
@@ -95,11 +101,12 @@ import BiddingWar from "@/components/broadcast/auction/BiddingWar";
 import { resizedImage } from "@/utils/images";
 import AuctionCountdown from "@/components/broadcast/auction/AuctionCountdown";
 import ContentThing from "@/components/website/ContentThing";
+import RecoloredHero from "@/components/broadcast/RecoloredHero";
 
 export default {
     name: "AuctionOverlay",
-    props: ["broadcast", "category", "title"],
-    components: { TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar, AuctionCountdown, ContentThing },
+    props: ["broadcast", "category", "title", "showCaptainInfo"],
+    components: { RecoloredHero, TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar, AuctionCountdown, ContentThing },
     data: () => ({
         tick: 0,
         socketPlayer: null,
@@ -153,7 +160,8 @@ export default {
                     event: ReactiveThing("event", {
                         theme: ReactiveThing("theme")
                     })
-                })
+                }),
+                favourite_hero: ReactiveThing("favourite_hero")
             });
         },
         accolades() {
@@ -187,6 +195,7 @@ export default {
             }).sort((a, b) => sortEvents(a.event, b.event));
         },
         groupedTeams() {
+            if (this.showCaptainInfo) return [];
             if (!this.broadcast?.event?.game) return [{ teams: this.playerTeams, group: "all" }];
             const sameGame = [];
             const diffGame = [];
@@ -306,6 +315,9 @@ export default {
                 players: ReactiveArray("players")
             });
         },
+        heroColor() {
+            return this.signedTeam?.theme || this.broadcast?.event?.theme;
+        },
         leadingBid() {
             if (!this.bids) return null;
             return this.bids[this.bids.length - 1];
@@ -368,12 +380,12 @@ export default {
             this.signedPlayer = player;
             setTimeout(() => {
                 // TODO: uncomment
-                if (this.justSigned) {
-                    this.socketPlayer = null;
-                    this.justSigned = null;
-                    this.signedPlayer = null;
-                    this.bids = [];
-                }
+                // if (this.justSigned) {
+                //     this.socketPlayer = null;
+                //     this.justSigned = null;
+                //     this.signedPlayer = null;
+                //     this.bids = [];
+                // }
             }, 20 * 1000);
         },
         auction_stats(stats) {
@@ -415,8 +427,11 @@ export default {
         width: 600px;
         background-color: rgba(24,24,24);
     }
-    .event-logo-holder, .event-stats {
+    .event-logo-holder  {
         width: 300px;
+    }
+    .event-stats {
+        width: 350px;
     }
     .logo-inner {
         width: 90%; height: 90%;
@@ -629,5 +644,10 @@ export default {
         flex-wrap: wrap;
         margin-bottom: 32px;
         padding: 0 24px;
+    }
+    .player-captain-info {
+        text-align: center;
+        font-size: 32px;
+        white-space: pre-wrap;
     }
 </style>

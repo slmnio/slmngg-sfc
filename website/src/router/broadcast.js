@@ -147,7 +147,7 @@ export default [
     { path: "sponsors", component: SponsorOverlay },
     { path: "maps", component: MapsOverlay, props: route => ({ autoTitle: route.query.auto }) },
     { path: "branding", component: BrandingOverlay },
-    { path: "auction", component: AuctionOverlay, props: route => ({ category: route.query.category }) },
+    { path: "auction", component: AuctionOverlay, props: route => ({ category: route.query.category, showCaptainInfo: !!route.query.captain }) },
     { path: "ad-read", component: AdReadOverlay, props: route => ({ extraDelay: route.query.delay }) },
     { path: "logos", component: LogoAdOverlay },
     { path: "staff", component: StaffOverlay },

@@ -106,12 +106,12 @@ export function getMatchContext(match) {
 
 export function getRoleSVG(name) {
     if (name === "Tank") {
-        return `<svg id="role_tank" viewBox="0 0 64 64" width="100%" height="100%">
+        return `<svg id="role_tank" style="fill:currentColor" viewBox="0 0 64 64" width="100%" height="100%">
 <path d="M51.4,24.1c0,3.1,0,6.2,0,9.3a4.7,4.7,0,0,1-.6,2.4A57.2,57.2,0,0,1,33.2,55.5a1.8,1.8,0,0,1-2.4,0A57.4,57.4,0,0,1,13.2,36a5.5,5.5,0,0,1-.7-2.8c0-5.8.1-11.7,0-17.5-.1-4.2,3.2-4.9,6.1-5.6A59.4,59.4,0,0,1,32.9,8C37.5,8,44.5,9.6,47,10.4s4.1,1.4,4.3,3.3.1,3.2.1,4.9,0,3.7,0,5.5Z"/>
 </svg>`;
     }
     if (name === "DPS") {
-        return `<svg id="role_offense" viewBox="0 0 64 64" width="100%" height="100%">
+        return `<svg id="role_offense" style="fill:currentColor" viewBox="0 0 64 64" width="100%" height="100%">
 <rect class="cls-1" x="12" y="49.3" width="10.2" height="5.61"/>
 <path class="cls-1" d="M22.2,19.1a10.2,10.2,0,0,0,0-1c-.8-6.9-5.1-9-5.1-9s-4.3,2.1-5.1,9c0,.3,0,1,0,1V45.4H22.2Z"/>
 <rect class="cls-1" x="26.9" y="49.3" width="10.2" height="5.61"/>
@@ -121,21 +121,21 @@ export function getRoleSVG(name) {
 </svg>`;
     }
     if (name === "Flex") {
-        return `<svg id="role_flex" viewBox="0 0 64 64" width="100%" height="100%">
+        return `<svg id="role_flex" style="fill:currentColor" viewBox="0 0 64 64" width="100%" height="100%">
 <path d="M18.55,32.89h0a13.17,13.17,0,0,1,1.77-5.17c.13-.23.5-.6.11-1a15.68,15.68,0,0,1-2.11-4.19.5.5,0,0,0-.89-.19A18.41,18.41,0,0,0,13,34.17h0a9.9,9.9,0,1,0,5.59-1.28Z"/>
 <path d="M27,26.85a9.89,9.89,0,0,0,13.16-3h0A13.17,13.17,0,0,1,43.75,28c.13.23.27.73.81.6a15.68,15.68,0,0,1,4.68.28.5.5,0,0,0,.61-.67,18.41,18.41,0,0,0-8-9.82h0A9.9,9.9,0,1,0,27,26.85Z"/>
 <path d="M54.73,37.87a9.89,9.89,0,0,0-17.52,9.18h0a13.17,13.17,0,0,1-5.37,1c-.27,0-.76-.14-.92.4a15.67,15.67,0,0,1-2.6,3.9.5.5,0,0,0,.27.87,18.41,18.41,0,0,0,12.51-2h0A9.9,9.9,0,0,0,54.73,37.87Z"/>
 </svg>`;
     }
     if (name === "Support") {
-        return `<svg id="role_support" viewBox="0 0 64 64" width="100%" height="100%">
+        return `<svg id="role_support" style="fill:currentColor" viewBox="0 0 64 64" width="100%" height="100%">
 <path d="M51.9,23.2H40.8V12.1A4.1,4.1,0,0,0,36.7,8H27.3a4.1,4.1,0,0,0-4.1,4.1V23.2H12.1A4.1,4.1,0,0,0,8,27.3v9.4a4.1,4.1,0,0,0,4.1,4.1H23.2V51.9A4.1,4.1,0,0,0,27.3,56h9.4a4.1,4.1,0,0,0,4.1-4.1V40.8H51.9A4.1,4.1,0,0,0,56,36.7V27.3A4.1,4.1,0,0,0,51.9,23.2Z"/>
 </svg>`;
     }
-    if (name === "Staff") return "<i class=\"fas fa-user-tie fa-fw\"></i>";
+    if (name === "Staff") return "<i style'color:currentColor' class=\"fas fa-user-tie fa-fw\"></i>";
     if (name === "Staff") {
         return `<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
- viewBox="0 0 25.916 25.916" style="enable-background:new 0 0 25.916 25.916;" xml:space="preserve">
+ viewBox="0 0 25.916 25.916" style="fill:currentColor;enable-background:new 0 0 25.916 25.916;" xml:space="preserve">
 <g>
 <g>
 <path d="M7.938,8.13c0.09,0.414,0.228,0.682,0.389,0.849c0.383,2.666,2.776,4.938,4.698,4.843
@@ -154,9 +154,9 @@ C13.888,14.756,13.487,14.83,13.065,14.847z"/>
 </g>
 </g></svg>`;
     }
-    if (name === "Captain") return "<i class=\"fas fa-user-crown fa-fw\"></i>";
-    if (name === "Manager") return "<i class=\"fas fa-clipboard-list fa-fw\"></i>";
-    if (name === "Coach") return "<i class=\"fas fa-whistle fa-fw\"></i>";
+    if (name === "Captain") return "<i style'color:currentColor' class=\"fas fa-user-crown fa-fw\"></i>";
+    if (name === "Manager") return "<i style'color:currentColor' class=\"fas fa-clipboard-list fa-fw\"></i>";
+    if (name === "Coach") return "<i style'color:currentColor' class=\"fas fa-whistle fa-fw\"></i>";
 
     return "";
 }

@@ -13,7 +13,7 @@
             <MoneyBar :team="team"  :auction-settings="auctionSettings"  />
             <div class="player" v-bind:class="{empty: player.empty}" v-for="player in players" v-bind:key="player.id" :style="teamIsDone ? teamBG : {}">
                 <div class="player-internal" v-if="!player.empty" >
-                    <span class="player-name">{{ player.name }}</span>
+                    <span class="player-name">{{ player.name || "•" }}</span>
                     <span class="player-money" v-if="player.auction_price">{{ money(player.auction_price) }}</span>
                 </div>
                 <div v-else style="opacity: 0;">...</div>

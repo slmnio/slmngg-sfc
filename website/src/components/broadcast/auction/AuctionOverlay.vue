@@ -21,7 +21,7 @@
                         <AuctionCountdown v-if="player && bids.length" />
                     </transition>
                     <transition name="fade-right">
-                        <RecoloredHero v-if="player && player.favourite_hero" :theme="heroColor" :hero="player.favourite_hero"></RecoloredHero>
+                        <RecoloredHero v-if="!showCaptainInfo && player && player.favourite_hero" :theme="heroColor" :hero="player.favourite_hero"></RecoloredHero>
                     </transition>
                     <transition name="fade-right">
                         <div class="player-info" v-if="player">

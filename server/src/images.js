@@ -265,6 +265,19 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
 
             let filePath = await fullGetURL(logoURL, "orig", null);
 
+            let filename =  theme.modified.replace(/[.:\\/]/g, "_") + "_" + getFilename(logoURL);
+            let sizeText = `theme-${size}-${padding}`;
+            let resizedFilePath = getPath(filename, sizeText);
+            // console.log({ filePath, filename, sizeText, resizedFilePath });
+            await ensureFolder(sizeText);
+
+            let heldImage = await getImage(filename, sizeText);
+            if (heldImage) {
+                console.log("[image|theme]", `theme using saved @${size} in ${Date.now() - t}ms`);
+                return res.sendFile(heldImage);
+            }
+
+
             let resizedImage = await sharp(filePath).resize({
                 width: size - padding,
                 height: size - padding,
@@ -274,23 +287,23 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
 
             res.header("Content-Type", "image/png");
 
-            return sharp({
+            let composite = sharp({
                 create: {
                     width: size,
                     height: size,
                     channels: 3,
                     background: themeColor
                 }
-            })
-                .composite([
-                    { input: resizedImage }
-                ])
-                .png()
-                .toBuffer()
+            }).composite([{ input: resizedImage }]);
+
+
+            composite.clone().png().toBuffer()
                 .then(data => {
+                    console.log("[image|theme]", `theme processed @${size} in ${Date.now() - t}ms`);
                     res.end(data);
-                    console.log("[image]", `theme processed @${size} in ${Date.now() - t}ms`);
                 });
+
+            return await composite.clone().toFile(resizedFilePath);
 
         } catch (e) {
             console.error("Theme image error", e);

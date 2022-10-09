@@ -67,6 +67,7 @@ const Auction = {
     stats: {},
     timeouts: {},
     bids: [],
+    lastStartedTeam: null,
     bid: function(bid) {
         Auction.bids.push(bid);
         io.emit("auction_bids", Auction.bids.map(b => ({
@@ -243,6 +244,7 @@ const Auction = {
         await Auction.setActivePlayer(player);
         console.log("[auction]", "sending first message");
         await Auction.channel.send({ embeds: [embed] });
+        Auction.lastStartedTeam = startingTeam;
     },
     sign: async function (player, team, bid) {
 
@@ -284,10 +286,10 @@ const Auction = {
         Auction.stats.remainingPlaces--;
         Auction.updateStats();
 
-        if (team.get("Draft Order")) {
+        if (Auction.lastStartedTeam.get("Draft Order")) {
             // see who's up next
             let teams = await Auction.getTeams();
-            let nextTeam = teams.find(t => t.get("Draft Order") === team.get("Draft Order") + 1) || teams.find(t => t.get("Draft Order") === 1);
+            let nextTeam = teams.find(t => t.get("Draft Order") === Auction.lastStartedTeam.get("Draft Order") + 1) || teams.find(t => t.get("Draft Order") === 1);
 
             if (!nextTeam) return;
 
@@ -299,7 +301,7 @@ const Auction = {
 
             let infoEmbed = new Discord.MessageEmbed();
             infoEmbed.setTitle("Team information");
-            infoEmbed.setDescription(teams.map(t => `**${t.get("Name")}** - ${money(t.get("Name") === team.get("Name") ? newTeamBalance : t.get("Balance"))} - ${t.get("Name") === team.get("Name") ? team.get("Players").length + 1 : (t.get("Players") || []).length} / ${getAuctionMax()} signed`).join("\n"));
+            infoEmbed.setDescription(teams.map(t => `**${t.get("Name")}** - ${money(t.get("Name") === Auction.lastStartedTeam.get("Name") ? newTeamBalance : t.get("Balance"))} - ${t.get("Name") === Auction.lastStartedTeam.get("Name") ? Auction.lastStartedTeam.get("Players").length + 1 : (t.get("Players") || []).length} / ${getAuctionMax()} signed`).join("\n"));
 
             setTimeout(() => {
                 Auction.channel.send({ embeds: [embed, infoEmbed] });

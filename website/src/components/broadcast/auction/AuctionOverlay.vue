@@ -233,9 +233,10 @@ export default {
             // return "bid-focus";
             // // eslint-disable-next-line no-unreachable
             if (this.justSigned) return "sign-focus";
-            if (this.biddingWar) return "bidding-war";
+            if (this.biddingWar && !this.showCaptainInfo) return "bidding-war";
             if (this.highlightedTeam) return "team-focus";
             if (this.bids && this.biddingActive) {
+                if (this.showCaptainInfo) return "bid-focus";
                 if (this.bids.length >= 12) return "bid-focus";
                 if (this.leadingBid && this.leadingBid.amount >= Math.min(this.average || 0, 200)) return "bid-focus";
             }

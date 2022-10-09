@@ -105,3 +105,7 @@
  * @param {object} changes - New data to change
  * @returns {Promise<UpdateRecordResponse>}
  */
+
+/**
+ * @typedef {'create'|'lock'|'resolve'|'cancel'} PredictionAction
+ */

@@ -36,6 +36,14 @@ export async function updateMatchData(auth, match, updatedData) {
     });
 }
 
+export async function managePred(auth, client, predictionAction) {
+    if (!auth?.user) return { error: true, errorMessage: "Not authenticated" };
+    return await authenticatedRequest(auth, "actions/manage-prediction", {
+        client: client.id || client,
+        predictionAction
+    });
+}
+
 export async function updateMapData(auth, match, mapData) {
     if (!auth?.user) return { error: true, errorMessage: "Not authenticated" };
     return await authenticatedRequest(auth, "actions/update-map-data", {

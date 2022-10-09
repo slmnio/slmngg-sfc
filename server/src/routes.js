@@ -1,3 +1,9 @@
+const fetch = require("node-fetch");
+const { updateRecord,
+    createRecord
+} = require("./action-utils");
+const { getTokenInfo } = require("@twurple/auth");
+
 function cleanID(id) {
     if (!id) return null;
     if (typeof id !== "string") return id.id || null; // no real id oops
@@ -281,4 +287,75 @@ module.exports = ({ app, cors, Cache, io }) => {
             return res.status(500).send(e.message);
         }
     });
+
+    let states = {};
+
+    function createState() {
+        // return a uuid without a library
+        let uuid = "";
+        for (let i = 0; i < 32; i++) {
+            uuid += Math.floor(Math.random() * 16).toString(16);
+        }
+        return uuid;
+    }
+
+    app.get("/twitch_auth/:scopes", (req, res) => {
+        let state = createState();
+        states[state] = req.params.scopes;
+        res.redirect(`https://id.twitch.tv/oauth2/authorize?client_id=${process.env.TWITCH_CLIENT_ID}&redirect_uri=${process.env.TWITCH_REDIRECT_URI}&response_type=code&scope=${req.params.scopes}&force_verify=true`);
+    });
+
+
+    app.get("/twitch_callback", async(req, res) => {
+        try {
+            const response = await fetch("https://id.twitch.tv/oauth2/token", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: `client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&grant_type=authorization_code&code=${req.query.code}&redirect_uri=${process.env.TWITCH_REDIRECT_URI}`
+            });
+            const data = await response.json();
+
+            // get user data
+            const tokenInfo = await getTokenInfo(data.access_token, process.env.TWITCH_CLIENT_ID);
+
+            let scopes = states[req.query.state];
+            if (scopes) delete states[req.query.state];
+
+
+            // get or create channel in table
+            const channelIDs = (await Cache.get("Channels"))?.ids || [];
+            const channels = await Promise.all(channelIDs.map(id => Cache.get(id)));
+            console.log(channels);
+            const existingChannel = channels.find(c => c.channel_id === tokenInfo.userId);
+
+            let airtableResponse;
+            // store into channels table with tokens + scopes
+
+            if (existingChannel) {
+                airtableResponse = await updateRecord(Cache, "Channels", existingChannel.id, {
+                    "Twitch Refresh Token": data.refresh_token,
+                    "Twitch Scopes": tokenInfo.scopes.join(" "),
+                    "Channel ID": tokenInfo.userId,
+                    "Name": tokenInfo.userName
+                });
+            } else {
+                airtableResponse = await createRecord(Cache, "Channels", [{
+                    "Twitch Refresh Token": data.refresh_token,
+                    "Twitch Scopes": tokenInfo.scopes.join(" "),
+                    "Channel ID": tokenInfo.userId,
+                    "Name": tokenInfo.userName
+                }]);
+            }
+
+            console.log(airtableResponse);
+
+
+            return res.send("okay thanks");
+        } catch (e) {
+            console.error("[Twitch Auth] error", e);
+        }
+    });
+
 };

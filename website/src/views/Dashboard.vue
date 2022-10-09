@@ -12,6 +12,7 @@
         <div class="broadcast-match-editor" v-if="liveMatch">
             <MatchEditor :match="liveMatch"></MatchEditor>
         </div>
+        <Predictions v-if="liveMatch" :client="client"/>
     </div>
 </template>
 
@@ -23,10 +24,11 @@ import MatchThumbnail from "@/components/website/match/MatchThumbnail";
 import MatchEditor from "@/components/website/dashboard/MatchEditor";
 import { BFormCheckbox } from "bootstrap-vue";
 import { togglePlayerCams } from "@/utils/dashboard";
+import Predictions from "@/components/website/dashboard/Predictions";
 
 export default {
     name: "Dashboard",
-    components: { MatchEditor, MatchThumbnail, BroadcastSwitcher, BFormCheckbox },
+    components: { Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BFormCheckbox },
     computed: {
         user() {
             if (!this.$root.auth.user?.airtableID) return {};

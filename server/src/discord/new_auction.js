@@ -299,7 +299,7 @@ const Auction = {
 
             let infoEmbed = new Discord.MessageEmbed();
             infoEmbed.setTitle("Team information");
-            infoEmbed.setDescription(teams.map(t => `**${t.get("Name")}\n**${money(t.get("Name") === team.get("Name") ? newTeamBalance : t.get("Balance"))} - ${t.get("Name") === team.get("Name") ? team.get("Players").length + 1 : (t.get("Players") || []).length} / ${getAuctionMax()} signed`).join("\n"));
+            infoEmbed.setDescription(teams.map(t => `**${t.get("Name")}** - ${money(t.get("Name") === team.get("Name") ? newTeamBalance : t.get("Balance"))} - ${t.get("Name") === team.get("Name") ? team.get("Players").length + 1 : (t.get("Players") || []).length} / ${getAuctionMax()} signed`).join("\n"));
 
             setTimeout(() => {
                 Auction.channel.send({ embeds: [embed, infoEmbed] });
@@ -424,7 +424,7 @@ client.on("messageCreate", async message => {
                 // TODO: say how much a team has in their balance
                 embed.setColor(getHex(team));
                 embed.setThumbnail(getImage(team));
-                embed.setDescription(`${team.get("Name")} has ${money(team.get("Balance"))}\\n${(team.get("Players") || []).length} / ${getAuctionMax()} players signed\``);
+                embed.setDescription(`${team.get("Name")} has ${money(team.get("Balance"))}\n${(team.get("Players") || []).length} / ${getAuctionMax()} players signed`);
 
                 Auction.channel.send({embeds: [embed]});
 

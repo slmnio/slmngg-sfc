@@ -289,16 +289,23 @@ const Auction = {
         if (Auction.lastStartedTeam.get("Draft Order")) {
             // see who's up next
             let teams = await Auction.getTeams();
-            let nextTeams = teams.filter(t => {
+            let teamsInOrder = teams.filter(t => {
                 if ((t.get("Players") || []).length >= getAuctionMax()) return false; // full
-                if (t.get("Draft Order") < Auction.lastStartedTeam.get("Draft Order")) return false; // earlier in the draft
                 return true;
             }).sort((a,b) => a.get("Draft Order") - b.get("Draft Order"));
-            // console.log(nextTeams);
-            if (!nextTeams.length) nextTeams = [teams.find(t => t.get("Draft Order") === 1)];
-            let nextTeam = nextTeams[0];
 
-            //.find(t => t.get("Draft Order") === Auction.lastStartedTeam.get("Draft Order") + 1) || teams.find(t => t.get("Draft Order") === 1);
+            let nextTeams = teamsInOrder.filter(t => {
+                if (t.get("Draft Order") <= Auction.lastStartedTeam.get("Draft Order")) return false; // earlier in the draft
+                return true;
+            });
+
+            let nextTeam;
+
+            if (nextTeams.length) {
+                nextTeam = nextTeams[0];
+            } else if (teamsInOrder.length) {
+                nextTeam = teamsInOrder[0];
+            }
 
             if (!nextTeam) return;
 
@@ -310,7 +317,7 @@ const Auction = {
 
             let infoEmbed = new Discord.MessageEmbed();
             infoEmbed.setTitle("Team information");
-            infoEmbed.setDescription(teams.map(t => `${t.get("Name") === team.get("Name") ? "🔹 " : ""}**${t.get("Name")}** - ${money(t.get("Name") === team.get("Name") ? newTeamBalance : t.get("Balance"))} - ${t.get("Name") === team.get("Name") ? count + 1 : (t.get("Players") || []).length} / ${getAuctionMax()} signed`).join("\n"));
+            infoEmbed.setDescription(teams.map(t => `${t.get("Name") === team.get("Name") ? "💰 " : ""}${nextTeam && t.get("Name") === nextTeam.get("Name") ? "▶️ " : ""}**${t.get("Name")}** - ${money(t.get("Name") === team.get("Name") ? newTeamBalance : t.get("Balance"))} - ${t.get("Name") === team.get("Name") ? count + 1 : (t.get("Players") || []).length} / ${getAuctionMax()} signed`).join("\n"));
 
             // .sort((a,b) => {
             //         let [aBalance, bBalance] = [a,b].map(x => x.get("Name") === team.get("Name") ? newTeamBalance : team.get("Balance"));

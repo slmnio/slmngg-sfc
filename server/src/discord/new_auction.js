@@ -221,6 +221,8 @@ const Auction = {
         embed.setFooter(`Auction will close in ${Auction.wait.afterInitial} seconds if there are no further bids.`);
 
 
+        console.log("[auction]", "setting active player...");
+        await Auction.setActivePlayer(player);
         Auction.bids = [];
         if (startingTeam) {
             Auction.bid(new AuctionBid(startingTeam, 1));
@@ -240,10 +242,8 @@ const Auction = {
             }
             embed.setFooter(`Auction will close in ${Auction.wait.afterBid} seconds if there are no further bids.`);
         }
-        console.log("[auction]", "setting active player...");
-        await Auction.setActivePlayer(player);
         console.log("[auction]", "sending first message");
-        await Auction.channel.send({ embeds: [embed] });
+        Auction.channel.send({ embeds: [embed] });
         Auction.lastStartedTeam = startingTeam;
     },
     sign: async function (player, team, bid) {

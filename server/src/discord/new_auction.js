@@ -243,8 +243,8 @@ const Auction = {
             embed.setFooter(`Auction will close in ${Auction.wait.afterBid} seconds if there are no further bids.`);
         }
         console.log("[auction]", "sending first message");
+        await Auction.channel.send({ embeds: [embed] });
         Auction.Timer.initial();
-        Auction.channel.send({ embeds: [embed] });
         Auction.lastStartedTeam = startingTeam;
     },
     sign: async function (player, team, bid) {

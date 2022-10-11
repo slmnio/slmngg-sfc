@@ -41,7 +41,8 @@ const Borpa = "https://cdn.discordapp.com/emojis/827000769253343242.gif";
 function getImage(team) {
     if (!team) return Borpa;
     try {
-        return team.get("Icon")[0].url;
+        let themeID = team.get("Theme")[0];
+        return `https://data.slmn.gg/theme.png?id=${themeID}&size=500&padding=20`;
     } catch (e) {
         return Borpa;
     }

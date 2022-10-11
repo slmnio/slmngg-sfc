@@ -215,7 +215,6 @@ const Auction = {
         Auction.activePlayer = player;
 
 
-        Auction.Timer.initial();
         let embed = new Discord.MessageEmbed();
         embed.setTitle(`Auction started: ${player.get("Name")}`);
         embed.setColor(0x44D582);
@@ -244,6 +243,7 @@ const Auction = {
             embed.setFooter(`Auction will close in ${Auction.wait.afterBid} seconds if there are no further bids.`);
         }
         console.log("[auction]", "sending first message");
+        Auction.Timer.initial();
         Auction.channel.send({ embeds: [embed] });
         Auction.lastStartedTeam = startingTeam;
     },

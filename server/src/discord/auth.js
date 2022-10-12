@@ -5,6 +5,14 @@ function discordEnvSet() {
     return ["DISCORD_CLIENT_ID", "DISCORD_CLIENT_SECRET", "DISCORD_REDIRECT_URI"].every(key => !!process.env[key]);
 }
 
+function getRequestingDomain(origin) {
+    // check it against our list
+    let domains = (process.env.DISCORD_REDIRECT_DOMAINS || "").split(",");
+
+    if (domains.includes(origin)) return origin;
+    return "https://dev.slmn.gg";
+}
+
 module.exports = ({ app, router, cors, Cache, io }) => {
     if (!discordEnvSet()) return console.warn("Discord authentication on the server is disabled. Set DISCORD_ keys in server/.env to enable it.");
 
@@ -18,7 +26,7 @@ module.exports = ({ app, router, cors, Cache, io }) => {
         const code = req.body?.code;
         if (!code) return res.status(400).send({ error: true, message: "No code sent to SLMN.GG server for Discord auth" });
 
-        let tokens = await getToken(code);
+        let tokens = await getToken(code, getRequestingDomain(req.headers?.origin));
 
         if (tokens.error) {
             return res.send({
@@ -84,13 +92,13 @@ module.exports = ({ app, router, cors, Cache, io }) => {
 
     app.use("/auth", authApp);
 
-    async function getToken(code) {
+    async function getToken(code, origin) {
 
         // console.log("ZOOM DISCORD TIME");
         const data = {
             client_id: process.env.DISCORD_CLIENT_ID,
             client_secret: process.env.DISCORD_CLIENT_SECRET,
-            redirect_uri: process.env.DISCORD_REDIRECT_URI, // TODO: use request data to use request domain
+            redirect_uri: process.env.DISCORD_REDIRECT_URI || `${origin}/auth/discord/return`,
             grant_type: "authorization_code",
             code: code,
             scope: "identify"

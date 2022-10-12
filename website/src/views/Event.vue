@@ -68,6 +68,7 @@ export default {
                 player_relationships: ReactiveArray("player_relationships", {
                     player: ReactiveThing("player")
                 }),
+                brand_designers: ReactiveArray("brand_designers"),
                 casters: ReactiveArray("casters"),
                 news_items: ReactiveArray("news_items", {
                     team: ReactiveThing("team", {

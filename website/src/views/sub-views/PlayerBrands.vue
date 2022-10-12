@@ -1,7 +1,7 @@
 <template>
     <div class="container player-brands">
         <div class="row">
-            <router-link :to="`/team/${brand.id}/theme`" class="brand no-link-style ct-passive text-center col-xl-2 col-md-3 col-sm-6 mb-3" v-for="brand in brandsDesigned" :key="brand.id">
+            <router-link :to="`/${brand.__tableName === 'Events' ? 'event' : 'team'}/${brand.id}/theme`" class="brand no-link-style ct-passive text-center col-xl-2 col-md-3 col-sm-6 mb-3" v-for="brand in brandsDesigned" :key="brand.id">
                 <ThemeLogo class="brand-logo" :theme="brand.theme" logo-size="w-200" border-width="6"/>
                 <div class="theme-title py-1">{{ brand.name }}</div>
             </router-link>
@@ -20,8 +20,19 @@ export default {
     computed: {
         brandsDesigned() {
             if (!this.player?.brands_designed) return null;
-            const teams = this.player.brands_designed;
-            return teams.sort(sortTeams);
+            const teams = this.player.brands_designed || [];
+            const events = this.player.event_brands_designed || [];
+            return [...teams, ...events].sort((a, b) => {
+                const [aDate, bDate] = [a, b].map(x => x.start_date || x.event_date?.[0]);
+
+                if (aDate && bDate) {
+                    return new Date(aDate) - new Date(bDate);
+                }
+
+                if (aDate) return -1;
+                if (bDate) return 1;
+                return 0;
+            });
         }
     }
 };

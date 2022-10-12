@@ -2,7 +2,8 @@
     <div class="thing-theme container">
 
         <ContentRow v-if="thing.brand_designers" :title="thing.brand_designers.length === 1 ? 'Brand designer' : 'Brand designers'">
-            <ContentThing type="player" :text="designer.name" :thing="designer" :theme="thing.theme" v-for="designer in thing.brand_designers" v-bind:key="designer.id"></ContentThing>
+            <ContentThing type="player" :text="designer.name" :thing="designer" :theme="thing.theme" v-for="designer in thing.brand_designers"
+                          v-bind:key="designer.id" :link-options="{ 'subPage': 'brands' }"></ContentThing>
         </ContentRow>
 
         <h3>Themes</h3>

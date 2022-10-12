@@ -300,6 +300,10 @@ export default {
                 group.forEach((team, i) => {
                     team.standings.rank = display;
                     team.standings.tie_show_number = i === 0;
+
+                    if (standings.length === 1) {
+                        team.standings.tie_show_number = false;
+                    }
                     rank++;
                 });
                 display = rank;

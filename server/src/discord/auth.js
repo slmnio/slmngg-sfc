@@ -2,7 +2,8 @@ const bodyParser = require("body-parser");
 const fetch = require("node-fetch");
 
 function discordEnvSet() {
-    return ["DISCORD_CLIENT_ID", "DISCORD_CLIENT_SECRET", "DISCORD_REDIRECT_URI"].every(key => !!process.env[key]);
+    return ["DISCORD_CLIENT_ID", "DISCORD_CLIENT_SECRET"].every(key => !!process.env[key])
+        && ["DISCORD_REDIRECT_DOMAINS", "DISCORD_REDIRECT_URI"].some(key => !!process.env[key]);
 }
 
 function getRequestingDomain(origin) {
@@ -14,7 +15,14 @@ function getRequestingDomain(origin) {
 }
 
 module.exports = ({ app, router, cors, Cache, io }) => {
-    if (!discordEnvSet()) return console.warn("Discord authentication on the server is disabled. Set DISCORD_ keys in server/.env to enable it.");
+    if (!discordEnvSet()) {
+        const tempAuthApp = router;
+        tempAuthApp.options("/*", cors());
+        tempAuthApp.post("/*", cors(), (req, res) => res.status(503).send({ error: true, message: "Discord authentication is disabled" }));
+        app.use("/auth", tempAuthApp);
+
+        return console.warn("Discord authentication on the server is disabled. Set DISCORD_ keys in server/.env to enable it.");
+    }
 
     const authApp = router;
     authApp.use(bodyParser.json());

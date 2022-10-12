@@ -27,7 +27,6 @@ export default {
         shouldShow() {
             if (!this.match?.id) return false;
             if (!this.match?.event?.id) return false;
-            if (!this.match.event.short) return false;
             return true;
             // return this.match.live;
         }

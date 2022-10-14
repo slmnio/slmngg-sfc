@@ -85,10 +85,10 @@ export default {
 <style scoped>
     .hero-container {
         position: absolute;
-        width: 42vw;
-        height: 120vh;
-        right: 0;
-        top: -5vh;
+        width: 50vw;
+        height: 130vh;
+        right: -5vw;
+        top: -12vh;
     }
     .text-container {
         position: absolute;

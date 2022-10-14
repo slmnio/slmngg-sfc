@@ -54,7 +54,7 @@ async function updateRecord(Cache, tableName, item, data) {
         await slmngg(tableName).update(item.id, data);
     } catch (e) {
         console.error("Airtable update failed", e);
-        return { error: true};
+        return { error: true };
     }
 }
 
@@ -70,14 +70,15 @@ async function createRecord(Cache, tableName, records) {
     // TODO: think about how eager update would work
 
     try {
-        let newRecords = await slmngg(tableName).create(records);
+        let newRecords = await slmngg(tableName).create(records.map(recordData => ({ fields: recordData })));
         newRecords.forEach(record => {
             Cache.set(cleanID(record.id), deAirtable(record.fields), { eager: true });
         });
         console.log(newRecords.length);
         console.log(newRecords);
     } catch (e) {
-        return { error: true };
+        console.error("Airtable create failed", e);
+        return { error: true, errorMessage: e.message };
     }
 }
 

@@ -114,7 +114,7 @@ module.exports = {
                 if (map.score_1) fieldData["Score 1"] = map.score_1;
                 if (map.score_2) fieldData["Score 2"] = map.score_2;
 
-                return { fields: fieldData };
+                return fieldData;
             });
 
         if (recordCreations.length) {

@@ -12,6 +12,10 @@
         <div class="broadcast-match-editor" v-if="liveMatch">
             <MatchEditor :match="liveMatch"></MatchEditor>
         </div>
+        <Predictions v-if="liveMatch" :client="client"/>
+        <b-button class="mt-2" variant="secondary" @click="updateTitle">
+            <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title
+        </b-button>
     </div>
 </template>
 
@@ -21,12 +25,13 @@ import { url } from "@/utils/content-utils";
 import BroadcastSwitcher from "@/components/website/dashboard/BroadcastSwitcher";
 import MatchThumbnail from "@/components/website/match/MatchThumbnail";
 import MatchEditor from "@/components/website/dashboard/MatchEditor";
-import { BFormCheckbox } from "bootstrap-vue";
-import { togglePlayerCams } from "@/utils/dashboard";
+import { BButton, BFormCheckbox } from "bootstrap-vue";
+import { togglePlayerCams, updateAutomaticTitle } from "@/utils/dashboard";
+import Predictions from "@/components/website/dashboard/Predictions";
 
 export default {
     name: "Dashboard",
-    components: { MatchEditor, MatchThumbnail, BroadcastSwitcher, BFormCheckbox },
+    components: { Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BFormCheckbox, BButton },
     computed: {
         user() {
             if (!this.$root.auth.user?.airtableID) return {};
@@ -67,7 +72,12 @@ export default {
         }
     },
     methods: {
-        url, togglePlayerCams
+        url,
+        togglePlayerCams,
+
+        async updateTitle() {
+            await updateAutomaticTitle(this.$root.auth, "self", "create");
+        }
     }
 };
 </script>

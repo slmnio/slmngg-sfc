@@ -40,7 +40,15 @@ export async function managePred(auth, client, predictionAction) {
     if (!auth?.user) return { error: true, errorMessage: "Not authenticated" };
     return await authenticatedRequest(auth, "actions/manage-prediction", {
         client: client.id || client,
-        predictionAction
+        predictionAction//,
+        // autoLockAfter: 60
+    });
+}
+
+export async function updateAutomaticTitle(auth, client) {
+    if (!auth?.user) return { error: true, errorMessage: "Not authenticated" };
+    return await authenticatedRequest(auth, "actions/set-title", {
+        client: client.id || client
     });
 }
 

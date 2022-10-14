@@ -83,6 +83,7 @@ async function load(expressApp, cors, Cache, io) {
                         updateRecord: (tableName, item, data) => updateRecord(Cache, tableName, item, data),
                         get: Cache.get,
                         createRecord: (tableName, data) => createRecord(Cache, tableName, data),
+                        auth: Cache.auth
                     }
                 );
             } catch (e) {
@@ -137,6 +138,7 @@ async function load(expressApp, cors, Cache, io) {
                             updateRecord: (tableName, item, data) => updateRecord(Cache, tableName, item, data),
                             get: Cache.get,
                             createRecord: (tableName, data) => createRecord(Cache, tableName, data),
+                            auth: Cache.auth
                         }
                     );
                 } catch (e) {

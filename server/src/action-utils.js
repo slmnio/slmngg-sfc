@@ -78,7 +78,7 @@ async function createRecord(Cache, tableName, records) {
         console.log(newRecords);
     } catch (e) {
         console.error("Airtable create failed", e);
-        return { error: true };
+        return { error: true, errorMessage: e.message };
     }
 }
 

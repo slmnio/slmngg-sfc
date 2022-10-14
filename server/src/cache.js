@@ -1,5 +1,7 @@
 const crypto = require("crypto");
-
+const { accessTokenIsExpired,
+    refreshUserToken
+} = require("@twurple/auth");
 /*
     - Get and set data
     - Store data
@@ -190,6 +192,11 @@ async function set(id, data, options) {
         // });
     }
 
+    if (data?.__tableName === "Channels") {
+        auth.set(`channel_${id}`, data);
+        return; // not setting it on global requestble store
+    }
+
     if (data?.__tableName === "Events") {
         // update antileak
         if (!data.antileak?.length) {
@@ -304,12 +311,33 @@ async function getPlayer(discordID) {
     return players.get(discordID);
 }
 
+async function getChannel(airtableID) {
+    return auth.get(`channel_${cleanID(airtableID)}`);
+}
+
+async function getTwitchAccessToken(channel) {
+    // get stored access token, check if it's valid
+    // otherwise / or if no token, get from refresh token
+    let storedToken = auth.get(`twitch_access_token_${channel.channel_id}`);
+
+    if (!storedToken || accessTokenIsExpired(storedToken)) {
+        // refresh token
+        let token = await refreshUserToken(process.env.TWITCH_CLIENT_ID, process.env.TWITCH_CLIENT_SECRET, channel.twitch_refresh_token);
+        auth.set(`twitch_access_token_${channel.channel_id}`, token);
+        return token;
+
+    }
+    return storedToken;
+}
+
 
 module.exports = {
     set, get, setup, onUpdate,
     auth: {
         start: authStart,
         getData: getAuthenticatedData,
-        getPlayer
+        getPlayer,
+        getChannel,
+        getTwitchAccessToken
     }
 };

@@ -32,7 +32,7 @@ module.exports = {
     key: "manage-prediction",
     auth: ["client"],
     requiredParams: ["predictionAction"],
-    optionalParams: ["autoLockAfter"], // TODO: this wont work yet
+    optionalParams: ["autoLockAfter"],
     /***
      * @param {ActionSuccessCallback} success
      * @param {ActionErrorCallback} error
@@ -40,11 +40,12 @@ module.exports = {
      * @param {number?} autoLockAfter
      * @param {ClientData} client
      * @param {CacheGetFunction} get
+     * @param {CacheAuthFunctions} auth
      * @param {SimpleUpdateRecord} updateRecord
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern
-    async handler(success, error, { predictionAction, autoLockAfter = 120 }, { client }, { get }) {
+    async handler(success, error, { predictionAction, autoLockAfter = 120 }, { client }, { get, auth }) {
         if (!(["create", "lock", "resolve", "cancel"].includes(predictionAction))) return error("Invalid action");
         console.log(predictionAction);
 
@@ -52,14 +53,19 @@ module.exports = {
         if (!broadcast) return error("No broadcast associated");
         if (!broadcast.channel) return error("No channel associated with broadcast");
 
-        const channel = await get(broadcast?.channel?.[0]);
+        const channel = await auth.getChannel(broadcast?.channel?.[0]);
         if (!channel.twitch_refresh_token) return error("No twitch auth token associated with channel");
         if (!channel.channel_id || !channel.name || !channel.twitch_scopes) return error("Invalid channel data");
-        // TODO: store this in Cache.auth somewhere
-        const { accessToken } = await refreshUserToken(process.env.TWITCH_CLIENT_ID, process.env.TWITCH_CLIENT_SECRET, channel.twitch_refresh_token);
+        let scopes = channel.twitch_scopes.split(" ");
+        if (!["channel:manage:predictions", "channel:read:predictions"].every(scope => scopes.includes(scope))) return error("Token doesn't have the required scopes");
+
+        console.log(channel);
+        const accessToken = await auth.getTwitchAccessToken(channel);
 
         const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, accessToken);
         const api = new ApiClient({authProvider});
+
+        // TODO: move cancel action to here
 
         const match = await get(broadcast?.live_match?.[0]);
         if (!match) return error("No match associated");
@@ -100,10 +106,16 @@ module.exports = {
                 if (targetPrediction) return error("Prediction already exists");
                 const predictionTitle = generatePredictionTitle(currentMap);
 
+                let outcomes = [team1.name, team2.name];
+
+                if (!(currentMap && currentMap.map.type === "Control")) {
+                    outcomes.push("Draw");
+                }
+
                 const responsePrediction = await api.predictions.createPrediction(channel.channel_id, {
                     title: predictionTitle,
-                    outcomes: [team1.name, team2.name, "Draw"],
-                    autoLockAfter: 120
+                    outcomes: outcomes,
+                    autoLockAfter: autoLockAfter || 120
                 });
                 console.log(responsePrediction);
                 return success(); // TODO: check responsePrediction for errors

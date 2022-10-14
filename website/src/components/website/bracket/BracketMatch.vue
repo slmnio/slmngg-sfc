@@ -59,10 +59,10 @@ export default {
             const connections = this?.match?._bracket_data?.connections;
             if (!connections) return;
 
-            const cons = [
-                { id: connections.winner.id, text: "Winner advances here", side: connections.winner.side, number: connections.winner?.match_number },
-                { id: connections.loser.id, text: "Loser drops to here", side: connections.loser.side, number: connections.loser?.match_number }
-            ];
+            // const cons = [
+            //     { id: connections.winner.id, text: "Winner advances here", side: connections.winner.side, number: connections.winner?.match_number },
+            //     { id: connections.loser.id, text: "Loser drops to here", side: connections.loser.side, number: connections.loser?.match_number }
+            // ];
 
             // connections.feederMatches.map(f => {
             //     cons.push({

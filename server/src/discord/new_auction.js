@@ -41,7 +41,8 @@ const Borpa = "https://cdn.discordapp.com/emojis/827000769253343242.gif";
 function getImage(team) {
     if (!team) return Borpa;
     try {
-        return team.get("Icon")[0].url;
+        let themeID = team.get("Theme")[0];
+        return `https://data.slmn.gg/theme.png?id=${themeID}&size=500&padding=20`;
     } catch (e) {
         return Borpa;
     }
@@ -67,6 +68,7 @@ const Auction = {
     stats: {},
     timeouts: {},
     bids: [],
+    lastStartedTeam: null,
     bid: function(bid) {
         Auction.bids.push(bid);
         io.emit("auction_bids", Auction.bids.map(b => ({
@@ -213,13 +215,14 @@ const Auction = {
         Auction.activePlayer = player;
 
 
-        Auction.Timer.initial();
         let embed = new Discord.MessageEmbed();
         embed.setTitle(`Auction started: ${player.get("Name")}`);
         embed.setColor(0x44D582);
         embed.setFooter(`Auction will close in ${Auction.wait.afterInitial} seconds if there are no further bids.`);
 
 
+        console.log("[auction]", "setting active player...");
+        await Auction.setActivePlayer(player);
         Auction.bids = [];
         if (startingTeam) {
             Auction.bid(new AuctionBid(startingTeam, 1));
@@ -241,8 +244,8 @@ const Auction = {
         }
         console.log("[auction]", "sending first message");
         await Auction.channel.send({ embeds: [embed] });
-        console.log("[auction]", "setting active player...");
-        await Auction.setActivePlayer(player);
+        Auction.Timer.initial();
+        Auction.lastStartedTeam = startingTeam;
     },
     sign: async function (player, team, bid) {
 
@@ -273,8 +276,9 @@ const Auction = {
             "Auction Price": bid.amount
         });
 
+        let newTeamBalance = (parseInt(team.get("Balance")) - bid.amount) + (remaining ? 10 : 0);
         await update("Teams", team.id, {
-            "Balance": (parseInt(team.get("Balance")) - bid.amount) + (remaining ? 10 : 0)
+            "Balance": newTeamBalance
         });
 
 
@@ -282,6 +286,49 @@ const Auction = {
         Auction.stats.signedPlayers++;
         Auction.stats.remainingPlaces--;
         Auction.updateStats();
+
+        if (Auction.lastStartedTeam.get("Draft Order")) {
+            // see who's up next
+            let teams = await Auction.getTeams();
+            let teamsInOrder = teams.filter(t => {
+                if ((t.get("Players") || []).length >= getAuctionMax()) return false; // full
+                return true;
+            }).sort((a,b) => a.get("Draft Order") - b.get("Draft Order"));
+
+            let nextTeams = teamsInOrder.filter(t => {
+                if (t.get("Draft Order") <= Auction.lastStartedTeam.get("Draft Order")) return false; // earlier in the draft
+                return true;
+            });
+
+            let nextTeam;
+
+            if (nextTeams.length) {
+                nextTeam = nextTeams[0];
+            } else if (teamsInOrder.length) {
+                nextTeam = teamsInOrder[0];
+            }
+
+            if (!nextTeam) return;
+
+            let embed = new Discord.MessageEmbed();
+            embed.setTitle(`Up next: ${nextTeam.get("Name")}`);
+            embed.setColor(getHex(nextTeam));
+            embed.setThumbnail(getImage(nextTeam));
+            embed.setDescription(`Remaining: ${money(nextTeam.get("Balance"))}\n${(nextTeam.get("Players") || []).length} / ${getAuctionMax()} players signed`);
+
+            let infoEmbed = new Discord.MessageEmbed();
+            infoEmbed.setTitle("Team information");
+            infoEmbed.setDescription(teams.map(t => `${t.get("Name") === team.get("Name") ? "💰 " : ""}${nextTeam && t.get("Name") === nextTeam.get("Name") ? "▶️ " : ""}**${t.get("Name")}** - ${money(t.get("Name") === team.get("Name") ? newTeamBalance : t.get("Balance"))} - ${t.get("Name") === team.get("Name") ? count + 1 : (t.get("Players") || []).length} / ${getAuctionMax()} signed`).join("\n"));
+
+            // .sort((a,b) => {
+            //         let [aBalance, bBalance] = [a,b].map(x => x.get("Name") === team.get("Name") ? newTeamBalance : team.get("Balance"));
+            //         return (aBalance - bBalance);
+            //     })
+
+            setTimeout(() => {
+                Auction.channel.send({ embeds: [embed, infoEmbed] });
+            }, 2000);
+        }
     },
     checkAfterBid() {
         console.log("check after");
@@ -351,7 +398,7 @@ client.on("messageCreate", async message => {
                 embed.setTitle(`Your team: ${team.get("Name")}`);
                 embed.setColor(getHex(team));
                 embed.setThumbnail(getImage(team));
-                embed.setDescription(`Remaining: ${money(team.get("Balance"))}`);
+                embed.setDescription(`Remaining: ${money(team.get("Balance"))}\n${(team.get("Players") || []).length} / ${getAuctionMax()} players signed`);
                 message.reply({ embeds: [embed] });
             }
         },
@@ -401,7 +448,7 @@ client.on("messageCreate", async message => {
                 // TODO: say how much a team has in their balance
                 embed.setColor(getHex(team));
                 embed.setThumbnail(getImage(team));
-                embed.setDescription(`${team.get("Name")} has ${money(team.get("Balance"))}`);
+                embed.setDescription(`${team.get("Name")} has ${money(team.get("Balance"))}\n${(team.get("Players") || []).length} / ${getAuctionMax()} players signed`);
 
                 Auction.channel.send({embeds: [embed]});
 

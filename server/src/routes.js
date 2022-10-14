@@ -237,6 +237,7 @@ module.exports = ({ app, cors, Cache, io }) => {
     }
 
     function getCalCol(hex) {
+        if (!hex) return null;
         hex = hex.replace("#", "");
         return [
             hex.slice(0,2),

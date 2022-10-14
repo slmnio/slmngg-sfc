@@ -31,6 +31,8 @@
                                               v-bind:key="accolade.id" :show-logo="true" :text="accolade.player_text" />
                             </div>
                             <div class="player-captain-info" v-if="showCaptainInfo">
+                                {{ player.pronouns }}
+                                    <br>
                                 {{ player.draft_data }}
                             </div>
                             <div class="player-teams d-flex flex-wrap flex-center" v-for="group in groupedTeams"

@@ -4,10 +4,10 @@
             <div class="hero-image-base" :style="mainImage || fallbackImage" :class="{ 'fallback-image': !mainImage && fallbackImage }"></div>
 
             <div :class="`color color-${i+1}`" v-for="(layer, i) in layers" :key="layer.id">
-                <canvas :style="{ opacity: $root.colorControls[themeColors[i]] && $root.colorControls[themeColors[i]]['hue'] }" :class="`adjustment-layer hue-layer target-color-${i+1}`" :ref="`hue-color-${i+1}`"></canvas>
-                <canvas :style="{ opacity: $root.colorControls[themeColors[i]] && $root.colorControls[themeColors[i]]['overlay'] }" :class="`adjustment-layer overlay-layer target-color-${i+1}`" :ref="`overlay-color-${i+1}`"></canvas>
-                <canvas :style="{ opacity: $root.colorControls[themeColors[i]] && $root.colorControls[themeColors[i]]['multiply'] }" :class="`adjustment-layer multiply-layer target-color-${i+1}`" :ref="`multiply-color-${i+1}`"></canvas>
-                <canvas :style="{ opacity: $root.colorControls[themeColors[i]] && $root.colorControls[themeColors[i]]['saturation'] }" :class="`adjustment-layer saturation-layer target-color-${i+1}`" :ref="`saturation-color-${i+1}`"></canvas>
+                <canvas :class="`adjustment-layer hue-layer target-color-${i+1}`" :ref="`hue-color-${i+1}`"></canvas>
+                <canvas :class="`adjustment-layer overlay-layer target-color-${i+1}`" :ref="`overlay-color-${i+1}`"></canvas>
+                <canvas :style="{ opacity: getOpacityAdjustment(themeColors[i], false, 1, -0.5, 0, 0.5) }" :class="`adjustment-layer multiply-layer target-color-${i+1}`" :ref="`multiply-color-${i+1}`"></canvas>
+                <canvas :class="`adjustment-layer saturation-layer target-color-${i+1}`" :ref="`saturation-color-${i+1}`"></canvas>
             </div>
 
         </div>
@@ -145,6 +145,7 @@ export default {
         }
     },
     methods: {
+        getOpacityAdjustment,
         async recolor(imageURL, color, number) {
             // console.log("recolor", { imageURL, color, number });
             if (!imageURL || !color) return;
@@ -235,7 +236,7 @@ export default {
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
-        object-fit: cover;
+        object-fit: contain;
     }
 
     .alter-overlay {
@@ -245,7 +246,7 @@ export default {
 
     /*.hero-image-base { background-image: url(https://cdn.discordapp.com/attachments/782502500765794376/1012474572932657262/3.png) }*/
     .hero-image-base {
-        background-size: cover !important;
+        background-size: contain !important;
     }
 
     /*.color-2 { background-image: url() } !* #ec008c *!*/

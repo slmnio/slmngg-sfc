@@ -46,7 +46,8 @@ export default {
                 }),
                 other_broadcasts: ReactiveArray("other_broadcasts"),
                 headlines: ReactiveArray("headlines"),
-                highlight_media: ReactiveThing("highlight_media")
+                highlight_media: ReactiveThing("highlight_media"),
+                highlight_hero: ReactiveThing("highlight_hero")
             });
         },
         haltAnimations() {

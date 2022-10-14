@@ -1,3 +1,5 @@
+import MVPOverlay from "@/components/broadcast/roots/MVPOverlay";
+
 const IngameOverlay = () => import("@/components/broadcast/roots/IngameOverlay");
 const BreakOverlay = () => import("@/components/broadcast/break/BreakOverlay");
 const BracketOverlay = () => import("@/components/broadcast/roots/BracketOverlay");
@@ -170,5 +172,6 @@ export default [
     { path: "desk-graphics", component: DeskGraphicsOverlay },
     { path: "stinger", component: EmptyStingerOverlay },
     { path: "empty", redirect: "stinger" },
-    { path: "broadcasts", component: OtherBroadcastsOverlay }
+    { path: "broadcasts", component: OtherBroadcastsOverlay },
+    { path: "mvp", component: MVPOverlay }
 ];

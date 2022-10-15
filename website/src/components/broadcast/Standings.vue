@@ -1,9 +1,9 @@
 <template>
     <div class="standings" v-if="standings && standings.standings && standings.standings.length">
 <!--        <div>{{ event.name }} / {{ stage }} / {{ allMatches.length }} -> {{ stageMatches.length }} ({{ teams.length }} teams)</div>-->
-        <h3 class="top-standings-name text-center d-md-none">{{ title || stage || 'Team' }}</h3>
+        <h3 class="top-standings-name text-center d-md-none">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</h3>
         <div class="standings-header d-flex align-items-center">
-            <div class="team-name flex-grow-1 text-left d-none d-md-flex">{{ title || stage || 'Team' }}</div>
+            <div class="team-name flex-grow-1 text-left d-none d-md-flex">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</div>
             <div class="team-name team-code flex-grow-1 text-left d-md-none"></div>
             <div class="team-stats d-flex">
                 <div class="team-stat text-center" v-for="col in showColumns" v-bind:key="col" v-b-tooltip="getColumnText(col).title">
@@ -19,7 +19,7 @@
         <div class="teams">
             <div class="team-group" v-for="(group, i) in standings.standings" v-bind:key="i">
                 <div class="team" v-for="team in group" v-bind:key="team.id">
-                    <StandingsTeam :team="team" :tie-text="tieText" :showColumns="showColumns" />
+                    <StandingsTeam :team="team" :tie-text="tieText" :showColumns="showColumns" icon-size="w-60" />
                 </div>
             </div>
         </div>
@@ -299,6 +299,7 @@ export default {
             standings.forEach(group => {
                 group.forEach((team, i) => {
                     team.standings.rank = display;
+                    console.log("tie show", i, team);
                     team.standings.tie_show_number = i === 0;
 
                     if (standings.length === 1) {

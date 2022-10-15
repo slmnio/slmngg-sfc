@@ -299,7 +299,6 @@ export default {
             standings.forEach(group => {
                 group.forEach((team, i) => {
                     team.standings.rank = display;
-                    console.log("tie show", i, team);
                     team.standings.tie_show_number = i === 0;
 
                     if (standings.length === 1) {

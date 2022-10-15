@@ -62,12 +62,12 @@ export default {
             };
         },
         directions() {
-            console.log("directions", this.start, this.end, this.left);
+            // console.log("directions", this.start, this.end, this.left);
             let start = this.start || "right";
             let end = this.end || "left";
             if (this.left && !this.start) start = "left";
             if (this.left && !this.end) end = "right";
-            console.log({ start, end });
+            // console.log({ start, end });
 
             return { start, end };
         },

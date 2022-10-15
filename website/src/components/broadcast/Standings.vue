@@ -19,7 +19,7 @@
         <div class="teams">
             <div class="team-group" v-for="(group, i) in standings.standings" v-bind:key="i">
                 <div class="team" v-for="team in group" v-bind:key="team.id">
-                    <StandingsTeam :team="team" :tie-text="tieText" :showColumns="showColumns" icon-size="w-60" />
+                    <StandingsTeam :team="team" :tie-text="tieText" :showColumns="showColumns" icon-size="w-60" :use-codes="useCodes" />
                 </div>
             </div>
         </div>
@@ -50,7 +50,9 @@ export default {
         stage: String,
         title: String,
         tieText: String,
-        showMapDiff: Boolean
+        showMapDiff: Boolean,
+        useCodes: Boolean,
+        overrideShowColumns: Array
     },
     components: { StandingsTeam },
     methods: {
@@ -119,7 +121,7 @@ export default {
             return (this.blocks?.standings || []).find(s => s.group === this.stage);
         },
         showColumns() {
-            return this.standingsSettings?.show || [
+            return this.overrideShowColumns || this.standingsSettings?.show || [
                 "Matches", "Maps", "MapDiff"
             ];
         },
@@ -350,6 +352,7 @@ export default {
     .standings-header, .top-standings-name {
         font-weight: bold;
         text-transform: uppercase;
+        line-height: 1;
     }
     .team-name {
         margin-left: 2em;

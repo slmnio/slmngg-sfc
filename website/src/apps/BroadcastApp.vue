@@ -3,7 +3,7 @@
         <div class="broadcast-app" :class="broadcastClass">
             <!--        <div style="font-size: 5em; color: black">{{ $root.activeScene }}</div>-->
             <router-view id="overlay" :class="bodyClass" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active"
-                         :animation-active="animationActive"/>
+                         :animation-active="animationActive" :full="full"/>
             <v-style v-if="broadcast && broadcast.event">
                 {{ broadcast.event.broadcast_css }}
 
@@ -21,7 +21,7 @@ import StingerWrap from "@/components/broadcast/StingerWrap";
 
 export default {
     name: "BroadcastApp",
-    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass"],
+    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass", "full"],
     components: {
         StingerWrap
     },

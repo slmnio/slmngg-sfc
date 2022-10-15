@@ -39,7 +39,7 @@ export default {
             return (this.blocks?.standings || []).find(s => s.group === this._stage);
         },
         stageTitle() {
-            return this.standingsSettings?.title || this._stage;
+            return this.standingsSettings?.short || this.standingsSettings?.title || this._stage;
         }
     },
     metaInfo() {

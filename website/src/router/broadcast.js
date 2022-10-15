@@ -1,4 +1,5 @@
-import MVPOverlay from "@/components/broadcast/roots/MVPOverlay";
+const MVPOverlay = () => import("@/components/broadcast/roots/MVPOverlay");
+const MultiStandingsOverlay = () => import("@/components/broadcast/roots/MultiStandingsOverlay");
 
 const IngameOverlay = () => import("@/components/broadcast/roots/IngameOverlay");
 const BreakOverlay = () => import("@/components/broadcast/break/BreakOverlay");
@@ -96,6 +97,16 @@ export default [
     { path: "schedule", component: ScheduleOverlay, props: route => ({ secondary: !!route.query.secondary }) },
     { path: "iframe", component: IframeOverlay, props: route => ({ url: route.query.url }) },
     { path: "standings", component: StandingsOverlay, props: route => ({ stage: route.query.stage || route.query.group }) },
+    {
+        path: "multi-standings",
+        component: MultiStandingsOverlay,
+        props: route => ({
+            stageCodes: (route.query.stage || route.query.group || route.query.stages || route.query.groups || "").split(",").filter(t => t),
+            useCodes: !!route.query.codes,
+            showColumns: (route.query.columns || route.query.show || "").split(",").filter(t => t)
+        })
+    },
+    { path: "multistandings", redirect: "multi-standings" },
     { path: "roster", redirect: "rosters" },
     {
         path: "rosters",

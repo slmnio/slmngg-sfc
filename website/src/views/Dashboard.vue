@@ -13,6 +13,7 @@
             <MatchEditor :match="liveMatch"></MatchEditor>
         </div>
         <Predictions v-if="liveMatch" :client="client"/>
+        <Commercials :client="client" />
         <b-button class="mt-2" variant="secondary" @click="updateTitle">
             <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title
         </b-button>
@@ -28,10 +29,11 @@ import MatchEditor from "@/components/website/dashboard/MatchEditor";
 import { BButton, BFormCheckbox } from "bootstrap-vue";
 import { togglePlayerCams, updateAutomaticTitle } from "@/utils/dashboard";
 import Predictions from "@/components/website/dashboard/Predictions";
+import Commercials from "@/components/website/dashboard/Commercials";
 
 export default {
     name: "Dashboard",
-    components: { Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BFormCheckbox, BButton },
+    components: { Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BFormCheckbox, BButton },
     computed: {
         user() {
             if (!this.$root.auth.user?.airtableID) return {};

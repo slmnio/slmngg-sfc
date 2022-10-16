@@ -308,7 +308,7 @@ module.exports = ({ app, cors, Cache, io }) => {
         if (!TwitchEnvSet) return res.status(503).send({ error: true, message: "Twitch authentication is disabled on the server." });
         let state = createState();
         states[state] = req.params.scopes;
-        res.redirect(`https://id.twitch.tv/oauth2/authorize?client_id=${process.env.TWITCH_CLIENT_ID}&redirect_uri=${process.env.TWITCH_REDIRECT_URI}&response_type=code&scope=${req.params.scopes}&force_verify=true`);
+        res.redirect(`https://id.twitch.tv/oauth2/authorize?client_id=${process.env.TWITCH_CLIENT_ID}&redirect_uri=${process.env.TWITCH_REDIRECT_URI}&response_type=code&scope=${req.params.scopes}&force_verify=true&state=${state}`);
     });
 
 
@@ -332,14 +332,15 @@ module.exports = ({ app, cors, Cache, io }) => {
             if (existingChannel) {
                 airtableResponse = await updateRecord(Cache, "Channels", existingChannel.id, {
                     "Twitch Refresh Token": tokenInfo.accessToken,
-                    "Twitch Scopes": tokenInfo.scopes.join(" "),
+                    "Twitch Scopes": tokenInfo.scope.join(" "),
                     "Channel ID": tokenInfo.userId,
                     "Name": tokenInfo.userName
                 });
+
             } else {
                 airtableResponse = await createRecord(Cache, "Channels", [{
                     "Twitch Refresh Token": tokenInfo.accessToken,
-                    "Twitch Scopes": tokenInfo.scopes.join(" "),
+                    "Twitch Scopes": tokenInfo.scope.join(" "),
                     "Channel ID": tokenInfo.userId,
                     "Name": tokenInfo.userName
                 }]);
@@ -347,10 +348,13 @@ module.exports = ({ app, cors, Cache, io }) => {
 
             // console.log(airtableResponse);
 
-            return res.send("okay thanks");
+            if (airtableResponse.error) {
+                return res.status(400).send({ error: true, errorMessage: airtableResponse.errorMessage });
+            }
+            return res.send("poggers thanks");
         } catch (e) {
             console.error("[Twitch Auth] error", e);
-            res.status(400).send({ error: true, errorMessage: e.message});
+            res.status(400).send({ error: true, errorMessage: e.message });
         }
     });
 

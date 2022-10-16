@@ -62,7 +62,7 @@ export default [
                 component: Authenticator
             },
             {
-                path: "/twitch-scopes",
+                path: "/twitch-auth",
                 component: TwitchAuthScopeSelector
             }
         ]

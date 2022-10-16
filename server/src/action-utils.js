@@ -74,8 +74,8 @@ async function createRecord(Cache, tableName, records) {
         newRecords.forEach(record => {
             Cache.set(cleanID(record.id), deAirtable(record.fields), { eager: true });
         });
-        console.log(newRecords.length);
-        console.log(newRecords);
+        // console.log(newRecords.length);
+        // console.log(newRecords);
     } catch (e) {
         console.error("Airtable create failed", e);
         return { error: true, errorMessage: e.message };

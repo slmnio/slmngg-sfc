@@ -32,7 +32,7 @@ export default {
                 value: "channel:manage:predictions channel:read:predictions"
             },
             {
-                text: "Title (channel:manage:broadcast)",
+                text: "Title/Game (channel:manage:broadcast)",
                 value: "channel:manage:broadcast"
             },
             {

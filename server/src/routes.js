@@ -327,14 +327,14 @@ module.exports = ({ app, cors, Cache, io }) => {
 
             const existingChannel = await Cache.auth.getChannelByID(tokenInfo.userId);
 
-            console.log(existingChannel);
+            // console.log(existingChannel);
 
             let airtableResponse;
             // store into channels table with tokens + scopes
 
             if (existingChannel) {
                 airtableResponse = await updateRecord(Cache, "Channels", existingChannel, {
-                    "Twitch Refresh Token": tokenInfo.accessToken,
+                    "Twitch Refresh Token": token.refreshToken,
                     "Twitch Scopes": tokenInfo.scopes.join(" "),
                     "Channel ID": tokenInfo.userId,
                     "Name": tokenInfo.userName
@@ -342,7 +342,7 @@ module.exports = ({ app, cors, Cache, io }) => {
 
             } else {
                 airtableResponse = await createRecord(Cache, "Channels", [{
-                    "Twitch Refresh Token": tokenInfo.accessToken,
+                    "Twitch Refresh Token": token.refreshToken,
                     "Twitch Scopes": tokenInfo.scopes.join(" "),
                     "Channel ID": tokenInfo.userId,
                     "Name": tokenInfo.userName

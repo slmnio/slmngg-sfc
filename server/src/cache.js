@@ -315,14 +315,10 @@ async function getChannel(airtableID) {
     return auth.get(`channel_${cleanID(airtableID)}`);
 }
 async function getChannelByID(channelID) {
-    let c = (await getChannels()).find(channel => channel.channel_id === channelID);
-    console.log(c);
-    return c;
+    return (await getChannels()).find(channel => channel.channel_id === channelID);
 }
 async function getChannels() {
-    let c = await Promise.all(((await get("Channels"))?.ids || []).map(id => getChannel(id)));
-    console.log(c);
-    return c;
+    return await Promise.all(((await get("Channels"))?.ids || []).map(id => getChannel(id)));
 }
 
 async function getTwitchAccessToken(channel) {

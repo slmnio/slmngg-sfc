@@ -314,6 +314,16 @@ async function getPlayer(discordID) {
 async function getChannel(airtableID) {
     return auth.get(`channel_${cleanID(airtableID)}`);
 }
+async function getChannelByID(channelID) {
+    let c = (await getChannels()).find(channel => channel.channel_id === channelID);
+    console.log(c);
+    return c;
+}
+async function getChannels() {
+    let c = await Promise.all(((await get("Channels"))?.ids || []).map(id => getChannel(id)));
+    console.log(c);
+    return c;
+}
 
 async function getTwitchAccessToken(channel) {
     // get stored access token, check if it's valid
@@ -338,6 +348,7 @@ module.exports = {
         getData: getAuthenticatedData,
         getPlayer,
         getChannel,
+        getChannelByID,
         getTwitchAccessToken
     }
 };

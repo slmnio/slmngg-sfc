@@ -33,6 +33,14 @@ function dirtyID(id) {
     return id;
 }
 
+/**
+ * @param {Cache} Cache - Cache object
+ * @param {string} tableName - Airtable table name this record belongs to
+ * @param {object} item - Full item as requested from Cache
+ * @param {AnyAirtableID} item.id - Item must have its Airtable ID
+ * @param {*?} item.* -  Item can have any other data
+ * @param {*} data - Data to update (can be partial)
+ */
 async function updateRecord(Cache, tableName, item, data) {
     // see: airtable-interface.js customUpdater
     console.log(`[update record] updating table=${tableName} id=${item.id}`, data);
@@ -51,7 +59,7 @@ async function updateRecord(Cache, tableName, item, data) {
     if (tableName === "News" && item.slug) Cache.set(`news-${item.slug}`, slmnggData, { eager: true });
 
     try {
-        await slmngg(tableName).update(item.id, data);
+        return await slmngg(tableName).update(item.id, data);
     } catch (e) {
         console.error("Airtable update failed", e);
         return { error: true };
@@ -76,6 +84,7 @@ async function createRecord(Cache, tableName, records) {
         });
         // console.log(newRecords.length);
         // console.log(newRecords);
+        return newRecords;
     } catch (e) {
         console.error("Airtable create failed", e);
         return { error: true, errorMessage: e.message };

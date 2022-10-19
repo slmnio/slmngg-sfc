@@ -54,7 +54,7 @@ export default {
     computed: {
         defaultScheduleNum() {
             const filtered = this.pagedMatches.filter(page => {
-                const allMatchesComplete = page.matches.every(m => [m.score_1, m.score_2].includes(m.first_to));
+                const allMatchesComplete = page.matches.every(m => m.special_event || [m.score_1, m.score_2].includes(m.first_to));
                 if (allMatchesComplete) return false; // don't show a page if all of the matches are complete by default
 
                 const anyMatchHasTeams = page.matches.some(m => m.teams);

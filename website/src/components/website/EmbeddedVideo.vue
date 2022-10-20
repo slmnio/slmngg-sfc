@@ -93,7 +93,7 @@ export default {
 
 <style scoped>
     .embed.embed--pdf, .embed.embed--iframe {
-        min-height: calc(100vh - 430px) !important;
+        min-height: max(600px, calc(100vh - 500px)) !important;
     }
     .embed.embed--pdf:before, .embed.embed--iframe:before {
         display: none;

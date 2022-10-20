@@ -48,6 +48,7 @@ function matchWide(id, size = 500) {
 }
 
 function stripMarkdown(md) {
+    if (!md) return "";
     try {
         return md.replace(/\[([^\]]*)\]\(([^)]*)\)/g, "$1") // replace links [$1]($2) with $1
             .replace(/\*\*([^\*]*)\*\*/g, "$1"); // replace bold **$1** with $1

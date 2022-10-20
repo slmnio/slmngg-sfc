@@ -62,7 +62,7 @@ export default [
                 path: "pov",
                 component: CamOverlay,
                 props: route => ({
-                    number: route.query.number || route.query.player,
+                    number: route.query.number || route.query.num || route.query.player,
                     full: !!route.query.full || !!route.query.relay,
                     alwaysShow: !!route.query.alwaysShow || !!route.query.relay,
                     relay: !!route.query.relay

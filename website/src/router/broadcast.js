@@ -48,7 +48,7 @@ const HeroRosterOverlay = () => import("@/components/broadcast/roots/HeroRosterO
 
 export default [
     {
-        path: "overview",
+        path: "admin",
         component: ClientOverview
     },
     {

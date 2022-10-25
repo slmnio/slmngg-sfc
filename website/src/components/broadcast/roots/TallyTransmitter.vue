@@ -7,7 +7,10 @@ export default {
     data: () => ({
         active: false,
         visible: false,
-        scene: ""
+        scene: "",
+        prodData: {
+            minor: true
+        }
     }),
     computed: {
         state() {

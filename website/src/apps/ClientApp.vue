@@ -1,6 +1,6 @@
 <template>
     <BroadcastApp v-if="broadcastID" :id="broadcastID" :title="title" :client="_client" :no-animation="noAnimation"
-        :no-stinger="noStinger" :body-class="bodyClass" :full="full" />
+        :no-stinger="noStinger" :body-class="bodyClass" :full="full" :clientName="client" />
 </template>
 
 <script>

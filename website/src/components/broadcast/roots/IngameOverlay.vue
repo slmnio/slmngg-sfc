@@ -143,6 +143,11 @@ export default {
         },
         useCodes() {
             return this.codes || (this.broadcast?.broadcast_settings || []).includes("Use team codes");
+        },
+        prodData() {
+            return {
+                match: this.match?.name || this.broadcast?.code || this.broadcast?.name
+            };
         }
     },
     watch: {

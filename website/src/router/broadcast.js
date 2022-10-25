@@ -1,5 +1,6 @@
 const MVPOverlay = () => import("@/components/broadcast/roots/MVPOverlay");
 const MultiStandingsOverlay = () => import("@/components/broadcast/roots/MultiStandingsOverlay");
+const ClientOverview = () => import("@/components/broadcast/roots/ClientOverview");
 
 const IngameOverlay = () => import("@/components/broadcast/roots/IngameOverlay");
 const BreakOverlay = () => import("@/components/broadcast/break/BreakOverlay");
@@ -46,6 +47,10 @@ const OtherBroadcastsOverlay = () => import("@/components/broadcast/roots/OtherB
 const HeroRosterOverlay = () => import("@/components/broadcast/roots/HeroRosterOverlay");
 
 export default [
+    {
+        path: "overview",
+        component: ClientOverview
+    },
     {
         path: "ingame",
         component: IngameOverlay,

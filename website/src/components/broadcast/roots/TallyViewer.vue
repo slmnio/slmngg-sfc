@@ -5,6 +5,7 @@
                 {{ state.toLocaleUpperCase() }}
             </div>
             <div class="metadata d-flex flex-column align-items-center">
+                <div class="scene-name d-none">{{ sceneName }}</div>
                 <div>
                     <span v-if="number">{{ number }} &middot; </span>
                     <span>{{ client.name }}</span>
@@ -49,7 +50,8 @@ export default {
         state: "disconnected",
         sceneName: "N/A",
         number: null,
-        wakeLock: null
+        wakeLock: null,
+        noBroadcastStyle: true
     }),
     metaInfo() {
         return {

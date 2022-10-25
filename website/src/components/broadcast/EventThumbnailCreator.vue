@@ -25,6 +25,9 @@ import { resizedImage } from "@/utils/images";
 export default {
     name: "EventThumbnailCreator",
     props: ["broadcast", "title"],
+    data: () => ({
+        noStinger: true
+    }),
     computed: {
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;

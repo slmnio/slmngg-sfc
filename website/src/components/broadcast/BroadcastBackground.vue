@@ -11,6 +11,9 @@
 export default {
     name: "BroadcastBackground",
     props: ["broadcast", "index"],
+    data: () => ({
+        noStinger: true
+    }),
     computed: {
         background() {
             if (!this.broadcast?.background) return null;

@@ -25,7 +25,8 @@ export default {
         prodData: {
             forHumans: true
         },
-        noBroadcastStyle: true
+        noBroadcastStyle: true,
+        noStinger: true
     }),
     methods: {
         sendToOverlay(socketID, event, data) {

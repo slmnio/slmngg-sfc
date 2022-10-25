@@ -10,7 +10,8 @@ export default {
         scene: "",
         prodData: {
             minor: true
-        }
+        },
+        noStinger: true
     }),
     computed: {
         state() {

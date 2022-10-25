@@ -51,7 +51,8 @@ export default {
         sceneName: "N/A",
         number: null,
         wakeLock: null,
-        noBroadcastStyle: true
+        noBroadcastStyle: true,
+        noStinger: true
     }),
     metaInfo() {
         return {

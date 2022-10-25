@@ -67,7 +67,7 @@ export default {
         },
         useBuiltInStingers() {
             // console.log("use", this.noStinger, this.broadcast?.broadcast_settings);
-            if (this.noStinger) return false;
+            if (this.noStinger || this.$refs.overlay?.noStinger) return false;
             return (this.broadcast?.broadcast_settings || []).includes("Use built-in stingers");
         },
         noBroadcastStyle() {

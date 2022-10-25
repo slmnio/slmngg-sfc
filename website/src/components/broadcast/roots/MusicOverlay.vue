@@ -78,7 +78,8 @@ export default {
         playedTrackIds: [],
         loadedTrackList: [],
         visible: true,
-        lastTrack: null
+        lastTrack: null,
+        noStinger: true
     }),
     computed: {
         tracksData() {

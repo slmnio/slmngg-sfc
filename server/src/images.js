@@ -148,7 +148,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
             const originalFileType = dots[dots.length - 1]; // last . (now works with .svg.png)
             const filename = parts[4] + "." + originalFileType;
 
-            if (!["dl.airtable.com", "media.slmn.io"].some(domain => domain === parts[2])) {
+            if (!["dl.airtable.com", "media.slmn.io", "v5.airtableusercontent.com"].some(domain => domain === parts[2])) {
                 return res.status(400).send("Domain not whitelisted");
             }
 

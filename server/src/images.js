@@ -194,7 +194,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                 };
             }
 
-            if (["svg", "gif"].includes(originalFileType)) {
+            if (!size /*["svg", "gif"].includes(originalFileType)*/) { // TODO: load image first then detect filetype
                 // just do orig if svg
                 size = "orig";
             }
@@ -205,7 +205,11 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
 
             let imagePath = await getImage(filename, size);
 
-            if (imagePath) return res.sendFile(imagePath);
+            if (imagePath) {
+                // let metaFileType = (await sharp(imagePath).metadata())?.format;
+                // console.log({metaFileType});
+                return res.sendFile(imagePath);
+            }
             console.log("[image]", `no file for ${originalFilename} @ ${size}`);
             // no image
 
@@ -221,6 +225,9 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                 orig = await getImage(filename, "orig");
                 if (size === "orig") return res.sendFile(orig);
             }
+
+            // let metaFileType = (await sharp(orig).metadata())?.format;
+            // console.log({metaFileType});
 
             // resize time!
             // console.log("[image]", `resizing ${originalFilename} @ ${size}`);

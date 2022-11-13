@@ -5,13 +5,18 @@ export function bg(url) {
     return { backgroundImage: `url(${url})` };
 }
 
+function getFileEnding(url) {
+    const splits = url.split(".");
+    return splits[splits.length - 1];
+}
+
 export function getImageURL(airtableURL, size) {
     if (!size) {
         console.warn("[Image Utils]", `No size set for ${airtableURL}`);
         size = "orig";
     }
     const dataServer = getDataServerAddress();
-    return `${dataServer}/image?size=${size}&url=${airtableURL}`;
+    return `${dataServer}/image.${getFileEnding(airtableURL) || "png"}?size=${size}&url=${airtableURL.replace("?", "&")}`;
 }
 
 export function getAirtableURL(attachment) {

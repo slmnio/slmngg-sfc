@@ -130,6 +130,7 @@ async function fullGetURL(url, sizeText, sizeData) {
 
 module.exports = ({ app, cors, Cache, corsHandle }) => {
 
+    ensureFolder("").then(r => console.log("[images] images folder ensured"));
     ensureFolder("orig").then(r => console.log("[images] orig folder ensured"));
 
     async function handleImageRequests(req, res) {
@@ -141,12 +142,12 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
 
             const url = req.query.url;
             let parts = url.split("/");
-            let originalFilename = parts[parts.length - 1];
+            let originalFilename = req.query.filename || parts[parts.length - 1];
             let [strippedName, args] = originalFilename.split("?");
             originalFilename = strippedName;
             const dots = strippedName.split(".");
             const originalFileType = dots[dots.length - 1]; // last . (now works with .svg.png)
-            const filename = parts[4] + "." + originalFileType;
+            const filename = parts[parts.length - 2] + "." + originalFileType;
 
             if (!["dl.airtable.com", "media.slmn.io", "v5.airtableusercontent.com"].some(domain => domain === parts[2])) {
                 return res.status(400).send("Domain not whitelisted");
@@ -273,6 +274,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
             let filePath = await fullGetURL(logoURL, "orig", null);
 
             let filename =  theme.modified.replace(/[.:\\/]/g, "_") + "_" + getFilename(logoURL);
+            if (!filename.endsWith(".png")) filename += ".png";
             let sizeText = `theme-${size}-${padding}`;
             let resizedFilePath = getPath(filename, sizeText);
             // console.log({ filePath, filename, sizeText, resizedFilePath });

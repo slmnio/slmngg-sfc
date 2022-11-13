@@ -116,9 +116,13 @@ const slmnggAttachments = {
     "Teams": ["icon"]
 };
 
-function stripValidation(str) {
+function generateAttachmentURL(str, filename) {
     let idx = str.indexOf("ts=");
-    if (idx !== -1) return str.slice(0, idx -1);
+    if (idx !== -1) str = str.slice(0, idx -1);
+
+    if (filename && !str.split("/").pop().includes(".")) {
+        str += `?filename=${filename}`;
+    }
     return str;
 }
 
@@ -130,10 +134,10 @@ async function removeAttachmentTimestamps(data) {
         tableData.forEach(key => {
             if (data[key]) {
                 data[key].forEach(attachment => {
-                    attachment.url = stripValidation(attachment.url);
+                    attachment.url = generateAttachmentURL(attachment.url, attachment.filename);
                     for (let size in attachment.thumbnails) {
                         size = attachment.thumbnails[size];
-                        size.url = stripValidation(size.url);
+                        size.url = generateAttachmentURL(size.url, attachment.filename);
                     }
                 });
             }

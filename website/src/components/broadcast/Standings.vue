@@ -353,6 +353,7 @@ export default {
         font-weight: bold;
         text-transform: uppercase;
         line-height: 1;
+        margin-bottom: .2em;
     }
     .team-name {
         margin-left: 2em;

@@ -89,10 +89,10 @@ async function dataUpdate(id, data, options) {
     if (JSON.stringify(store.get(id)) !== JSON.stringify(data)) {
         // console.log(`Data update on [${id}]`);
         recents.sent++;
-        if (!(options && options.custom)) updateFunction(id, { oldData: store.get(id), newData: data });
         if (data) data = await removeAntiLeak(id, data);
         // if (options?.eager) console.log("Sending");
         await broadcast(id, "data_update", id, data);
+        if (!(options && options.custom)) updateFunction(id, { oldData: store.get(id), newData: data });
     }
 }
 
@@ -198,7 +198,13 @@ async function set(id, data, options) {
 
     if (data?.__tableName === "Channels") {
         auth.set(`channel_${id}`, data);
-        return; // not setting it on global requestble store
+        return; // not setting it on global requestable store
+    }
+
+    if (data?.__tableName === "Discord Bots") {
+        auth.set(`bot_${cleanID(id)}`, data);
+
+        return; // not setting it on global requestable store
     }
 
     if (data?.__tableName === "Events") {
@@ -266,6 +272,7 @@ async function set(id, data, options) {
 
     await dataUpdate(id, data, options);
     store.set(id, data);
+
 }
 function cleanID(id) {
     if (!id) return null;
@@ -318,11 +325,17 @@ async function getPlayer(discordID) {
 async function getChannel(airtableID) {
     return auth.get(`channel_${cleanID(airtableID)}`);
 }
+async function getBot(airtableID) {
+    return auth.get(`bot_${cleanID(airtableID)}`);
+}
 async function getChannelByID(channelID) {
     return (await getChannels()).find(channel => channel.channel_id === channelID);
 }
 async function getChannels() {
     return await Promise.all(((await get("Channels"))?.ids || []).map(id => getChannel(id)));
+}
+async function getBots() {
+    return await Promise.all(((await get("Discord Bots"))?.ids || []).map(id => getBot(id)));
 }
 
 async function getTwitchAccessToken(channel) {
@@ -349,6 +362,7 @@ module.exports = {
         getPlayer,
         getChannel,
         getChannelByID,
-        getTwitchAccessToken
+        getTwitchAccessToken,
+        getBots
     }
 };

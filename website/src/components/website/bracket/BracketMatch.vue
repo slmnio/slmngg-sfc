@@ -4,6 +4,7 @@
                  @mouseover.native="matchHover" @mouseleave.native="matchEmpty">
         <div class="match-name d-none">{{ match && match.name }}</div>
         <div class="match-number" v-bind:class="{'lowlight': lowlight}" v-if="matchNumber">{{ matchNumber }}</div>
+        <div class="match-time" v-bind:class="{'lowlight': lowlight}" v-if="showTimes && friendlyStartTime">{{ friendlyStartTime }}</div>
         <div class="match-teams">
             <BracketTeam v-for="(team, i) in teams"
                          :team="team.id && team"
@@ -43,11 +44,12 @@
 import BracketTeam from "@/components/website/bracket/BracketTeam";
 import { url } from "@/utils/content-utils";
 import store from "@/thing-store";
+import spacetime from "spacetime";
 
 export default {
     name: "BracketMatch",
     components: { BracketTeam },
-    props: ["match"],
+    props: ["match", "showTimes"],
     data: () => ({
         hover: false
     }),
@@ -176,6 +178,28 @@ export default {
         },
         lowlight() {
             return !!store.state.highlighted_team;
+        },
+        friendlyStartTime() {
+            if (!this.match.start) return null;
+            const utc = spacetime(this.match.start);
+            const time = utc.goto(this.activeTimezone);
+            const diffFromNow = new Date(this.match.start) - new Date();
+
+            if (diffFromNow <= 0) return null; // don't show on past matches (could be disabled)
+
+            const clarifyDate = diffFromNow <= 0 || diffFromNow >= 1000 * 60 * 60 * 24 * 7;
+
+            // eslint-disable-next-line no-unreachable
+            const format = "{day-short}[D] {hour}[M]{ampm}"
+                .replace("[M]", time.minute() === 0 ? "" : ":{minute-pad}")
+                .replace("[D]", clarifyDate ? " {date-ordinal} {month-short}" : "");
+
+            return time.format(format);
+        },
+        activeTimezone() {
+            const stz = store.state.timezone;
+            if (!stz || stz === "local") return spacetime.now().timezone().name;
+            return stz;
         }
     }
 };
@@ -228,9 +252,8 @@ export default {
         margin-top: .15em;
     }
 
-    .match-number {
+    .match-number, .match-time {
         position: absolute;
-        left: 0;
         background: #333;
         text-align: center;
         bottom: 100%;
@@ -244,11 +267,20 @@ export default {
         transition: opacity 150ms, border-color 150ms;
     }
 
+    .match-number {
+        left: 0;
+    }
+    .match-time {
+        right: 0;
+    }
+
     .bracket-match.hover,
-    .bracket-match.hover .match-number {
+    .bracket-match.hover .match-number,
+    .bracket-match.hover .match-time {
         border-color:  rgba(255, 255, 255, 0.5);
     }
-    .bracket-match:not(:hover) .match-number.lowlight {
+    .bracket-match:not(:hover) .match-number.lowlight,
+    .bracket-match:not(:hover) .match-time.lowlight {
         opacity: 0.2;
     }
 </style>

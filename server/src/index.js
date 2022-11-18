@@ -9,7 +9,6 @@ const meta = require("./meta.js");
 const routes = require("./routes.js");
 const images = require("./images.js");
 const discordAuth = require("./discord/auth.js");
-const botController = require("./discord/bot-controller.js");
 
 /* The staff module should only run on the server, probably not your local machine. */
 let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEGORY_ID", "STAFFAPPS_APPLICATION_CHANNEL_ID", "IS_SLMNGG_MAIN_SERVER"];
@@ -52,6 +51,7 @@ const auction = require("./discord/new_auction.js")({
 
 const Cache = (require("./cache.js")).setup(io);
 (require("./airtable-interface.js")).setup(io);
+(require("./discord/bot-controller.js")).setup(io);
 
 const actions = require("./action-manager.js");
 actions.load(app, localCors, Cache, io);

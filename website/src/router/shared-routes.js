@@ -4,7 +4,7 @@ import TeamMain from "@/views/sub-views/TeamMain";
 import TeamSchedule from "@/views/sub-views/TeamSchedule";
 import TeamTheme from "@/views/sub-views/ThingTheme";
 import TeamDetails from "@/views/sub-views/TeamDetails";
-import TeamCams from "@/views/sub-views/TeamCams";
+import Cams from "@/views/sub-views/Cams";
 import Event from "@/views/Event";
 import EventRoutes from "@/router/event";
 import Player from "@/views/Player";
@@ -23,7 +23,6 @@ import PlayerBrands from "@/views/sub-views/PlayerBrands";
 import MatchEditor from "@/components/website/dashboard/MatchEditor";
 import PlayerParticipation from "@/views/sub-views/PlayerParticipation";
 import Me from "@/views/Me";
-import PlayerCamRedirect from "@/views/sub-views/PlayerCamRedirect";
 
 export default [
     {
@@ -36,8 +35,7 @@ export default [
             { path: "matches", component: TeamSchedule },
             { path: "theme", component: TeamTheme },
             { path: "details", component: TeamDetails },
-            { path: "composition", component: TeamComposition },
-            { path: "cams", component: TeamCams }
+            { path: "composition", component: TeamComposition }
         ]
     },
     {
@@ -59,8 +57,7 @@ export default [
             { path: "matches", component: PlayerMatches },
             { path: "played-matches", component: PlayerPlayedMatches },
             { path: "brands", component: PlayerBrands },
-            { path: "participation", component: PlayerParticipation },
-            { path: "cam", component: PlayerCamRedirect, meta: { requiresAuth: true } }
+            { path: "participation", component: PlayerParticipation }
         ]
     },
     {
@@ -78,6 +75,7 @@ export default [
             requiresAuth: true
         }
     },
+    { path: "cams", component: Cams },
     {
         path: "/match/:id",
         component: Match,

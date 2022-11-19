@@ -2,7 +2,7 @@
     <tr class="match-map-history" v-bind:class="{ 'scheduled': isScheduled }">
         <td class="map-name" style="width: 200px">
             {{ map.name }}
-            <i class="fa fa-fw fa-check" v-if="isScheduled"></i>
+            <i class="fa fa-fw fa-check" v-b-tooltip.top="'Scheduled for this match'" v-if="isScheduled"></i>
         </td>
         <TeamMapStats class="map-team-stats" v-for="(data, ti) in data.stats"
                       v-bind:key="ti" :data="data"/>
@@ -11,9 +11,13 @@
 
 <script>
 import TeamMapStats from "@/components/website/match/TeamMapStats";
+import { VBTooltip } from "bootstrap-vue";
 
 export default {
     name: "MatchMapHistory",
+    directives: {
+        VBTooltip
+    },
     components: { TeamMapStats },
     props: ["data", "map"],
     computed: {

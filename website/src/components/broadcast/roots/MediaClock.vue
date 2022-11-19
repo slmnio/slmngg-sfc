@@ -31,7 +31,10 @@ export default {
             duration: null
         },
         lastSecondsHighlight: 10,
-        now: new Date()
+        now: new Date(),
+        prodData: {
+            forHumans: true
+        }
     }),
     computed: {
         timeNow() {

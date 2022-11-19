@@ -1,5 +1,5 @@
 <template>
-    <div class="generic-overlay flex-center flex-column">
+    <div class="generic-overlay flex-center flex-column" :class="{'full': full}">
         <TourneyBar class="st4-top" v-if="top === 'st4'" :broadcast="broadcast" left="Schedule" :right="title"/>
         <div class="g-title-wrapper">
             <theme-transition :theme="theme" :active="$root.animationActive" end="middle"  :duration="500" :inner-delay="150" one-color="true">
@@ -29,7 +29,7 @@ import ThemeTransition from "@/components/broadcast/ThemeTransition";
 export default {
     name: "GenericOverlay",
     components: { ThemeTransition, TourneyBar },
-    props: ["title", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "titleStyle"],
+    props: ["title", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "titleStyle", "customTheme", "full"],
     methods: {
         nbr(text) {
             if (!text) return "";
@@ -38,7 +38,7 @@ export default {
     },
     computed: {
         theme() {
-            return this.$root?.broadcast?.event?.theme;
+            return this.customTheme || this.$root?.broadcast?.event?.theme;
         },
         _accentColor() {
             return this.accentColor || this.$root?.broadcast?.event?.theme?.color_theme;
@@ -74,6 +74,9 @@ export default {
     padding: 60px 320px;
 }
 
+.generic-overlay.full {
+    padding: 60px 120px;
+}
 
 .schedule-overlay .generic-overlay-body {
     padding: 0;

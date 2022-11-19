@@ -27,6 +27,22 @@
  * @property {DirtyAirtableID} id
  */
 
+/**
+ * @typedef {Object} CacheAuthFunctions
+ * @property {CacheGetAuthFunction} getChannel - Get Twitch channel data from Airtable
+ * @property {function} getTwitchAccessToken - Get refreshed access token from Twitch
+ */
+
+/**
+ * @typedef CacheGetAuthFunction
+ * @param {AnyAirtableID} airtableID - ID from Channels table
+ */
+/**
+ * @typedef TwitchGetOrRefreshToken
+ * @param {object} channel - Channels table object
+ * @param {string} object.channel_id - Twitch channel ID
+ * @param {string} object.twitch_refresh_token - Twitch refresh token
+ */
 
 /**
  * @typedef {Object} DiscordUserData
@@ -104,4 +120,8 @@
  * @param {object} item - Original item data
  * @param {object} changes - New data to change
  * @returns {Promise<UpdateRecordResponse>}
+ */
+
+/**
+ * @typedef {'create'|'lock'|'resolve'|'cancel'} PredictionAction
  */

@@ -1,12 +1,15 @@
 <template>
     <div class="stinger-wrap" :class="{'s-active': active, 's-show': showStinger}">
-        <theme-transition class="stinger-transition" name="stinger-out" start="left" end="left" :active="active && shouldUse" :theme="theme" :start-inner-full="true" :trigger="true"
+        <theme-transition class="stinger-transition" name="stinger-out" start="left" end="left" :active="active && shouldUse" :theme="useTheme" :start-inner-full="true" :trigger="true"
                           :starting-inner-delay="150" :trigger-duration="800" :duration="300" :inner-delay="200">
             <div class="stinger flex-center" :style="bg" :class="{'stinging': active || showStinger}">
-                <theme-logo class="w-100 h-100" :theme="theme" logo-size="h-1080" border-width="0" icon-padding="200px" />
+                <theme-logo class="w-100 h-100" :theme="useTheme" logo-size="h-1080" border-width="0" icon-padding="200px" />
             </div>
         </theme-transition>
         <slot></slot>
+        <div class="preload">
+            <theme-logo v-if="useTheme" class="w-100 h-100" :theme="useTheme" logo-size="h-1080" border-width="0" icon-padding="200px" />
+        </div>
     </div>
 </template>
 
@@ -19,7 +22,8 @@ export default {
     props: ["theme", "active", "waitBeforeAnimOut", "shouldUse"],
     components: { ThemeLogo, ThemeTransition },
     data: () => ({
-        showStinger: null
+        showStinger: null,
+        customTheme: null
     }),
     watch: {
         active(isActive) {
@@ -32,8 +36,17 @@ export default {
         }
     },
     computed: {
+        useTheme() {
+            return this.customTheme || this.theme;
+        },
         bg() {
-            return logoBackground(this.theme);
+            return logoBackground(this.useTheme);
+        }
+    },
+    methods: {
+        updateTheme(theme) {
+            this.customTheme = theme;
+            console.log("custom stinger theme", theme);
         }
     }
 };
@@ -76,5 +89,12 @@ export default {
     @keyframes zoom {
         0% { transform: scale(0.9); }
         100% { transform: scale(1); }
+    }
+
+    .preload {
+        opacity: 0;
+        max-width: 0;
+        max-height: 0;
+        overflow: hidden;
     }
 </style>

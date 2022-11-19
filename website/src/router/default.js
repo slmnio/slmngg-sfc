@@ -2,7 +2,6 @@ import Home from "@/views/Home";
 import Events from "@/views/lists/Events";
 import Teams from "@/views/lists/Teams";
 import Players from "@/views/lists/Players";
-import NotFoundPage from "@/views/NotFoundPage";
 
 import WebsiteApp from "@/apps/WebsiteApp";
 import BroadcastApp from "@/apps/BroadcastApp";
@@ -13,6 +12,7 @@ import SharedRoutes from "@/router/shared-routes";
 import Authenticator from "@/views/Authenticator";
 import Dashboard from "@/views/Dashboard";
 import ProfilePage from "@/views/ProfilePage";
+import TwitchAuthScopeSelector from "@/components/website/TwitchAuthScopeSelector";
 
 export default [
     {
@@ -60,31 +60,12 @@ export default [
                 path: "/auth/discord/return",
                 props: route => ({ code: route.query.code }),
                 component: Authenticator
+            },
+            {
+                path: "/twitch-auth",
+                component: TwitchAuthScopeSelector
             }
         ]
-    },
-    {
-        path: "/login",
-        redirect: "/auth/discord/redirect"
-    },
-    {
-        path: "/auth/discord/redirect",
-        beforeEnter(to, from, next) {
-            console.log("ZOOM DISCORD TIME");
-            localStorage.setItem("auth_next", from.fullPath);
-            const params = {
-                client_id: process.env.VUE_APP_DISCORD_CLIENT_ID,
-                redirect_uri: `${window.location.origin}/auth/discord/return`,
-                response_type: "code",
-                scope: ["identify"].join(" ")
-            };
-
-            const stringParams = Object.entries(params)
-                .map(parts => parts.map(part => encodeURIComponent(part)).join("="))
-                .join("&");
-
-            window.location.replace("https://discord.com/api/oauth2/authorize?" + stringParams);
-        }
     },
     {
         path: "/broadcast/:broadcastCode",
@@ -95,7 +76,8 @@ export default [
             top: route.query.top,
             noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation),
             noStinger: (route.query.noStinger || route.query.stinger === "false"),
-            bodyClass: route.query.class || route.query.bodyClass
+            bodyClass: route.query.class || route.query.bodyClass,
+            full: !!route.query.full
         }),
         children: BroadcastRoutes
     },
@@ -107,18 +89,15 @@ export default [
             title: route.query.title,
             noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation),
             noStinger: (route.query.noStinger || route.query.stinger === "false"),
-            bodyClass: route.query.class || route.query.bodyClass
+            bodyClass: route.query.class || route.query.bodyClass,
+            full: !!route.query.full
         }),
         children: BroadcastRoutes
-    },
+    }
     // {
     //     path: "/redirect",
     //     beforeEnter: (to, from, next) => {
     //         window.location.href = to.query.url;
     //     }
     // },
-    {
-        path: "/*",
-        component: NotFoundPage
-    }
 ];

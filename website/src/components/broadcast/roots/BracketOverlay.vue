@@ -1,10 +1,10 @@
 <template>
     <GenericOverlay class="bracket-overlay" v-if="!extended" :title="title || 'Bracket'">
-        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :small="small"
-                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" :scale="scale" />
+        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :scale="scale" :small="small"
+                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" />
     </GenericOverlay>
     <div class="bracket-overlay bracket-extended" :style="zoom" v-else>
-        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :small="small"
+        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :scale="scale" :small="small"
                  :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" :extended="extended" />
     </div>
 </template>

@@ -82,7 +82,7 @@ function setRebuilding(isRebuilding) {
 // Starting with syncing Matches
 
 // const tables = ["Matches", "Teams", "Themes", "Events", "Players", "Player Relationships"];
-const tables = ["Broadcasts", "Clients", "Players", "Events", "Event Series", "Teams", "Ad Reads", "Ad Read Groups", "News", "Matches",  "Themes",  "Socials", "Accolades", "Player Relationships", "Brackets", "Live Guests", "Headlines", "Maps", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles"];
+const tables = ["Broadcasts", "Clients", "Channels", "Discord Bots", "Players", "Events", "Event Series", "Teams", "Ad Reads", "Ad Read Groups", "News", "Matches",  "Themes",  "Socials", "Accolades", "Player Relationships", "Brackets", "Live Guests", "Headlines", "Maps", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles"];
 const staticTables = ["Redirects"];
 
 function deAirtable(obj) {
@@ -120,7 +120,7 @@ async function getAllTableData(tableName, options = {}) {
                 // Airtable down
                 return console.error("Airtable 503");
             }
-            console.error("Airtable error", e);
+            console.error(`[Airtable error] getting all table data on ${tableName}`, e);
         }
     }
 }
@@ -192,7 +192,7 @@ function registerUpdater(tableName, options) {
                     // Airtable down
                     return console.error("Airtable 503");
                 }
-                console.error("Airtable error", e);
+                console.error(`[Airtable error] getting updates from ${tableName}`, e);
             }
         }
     }, pollRate);

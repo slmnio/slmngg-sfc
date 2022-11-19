@@ -14,11 +14,11 @@
                 --b-width: {{ connectionWidth }}px !important;
             }
         </v-style>
-        <div class="internal-bracket d-flex" v-for="(bracket, i) in brackets" v-bind:key="i">
-            <div class="column" v-for="(column, ci) in bracket.columns" v-bind:key="ci">
+        <div class="internal-bracket d-flex" v-for="(_bracket, i) in brackets" v-bind:key="i">
+            <div class="column" v-for="(column, ci) in _bracket.columns" v-bind:key="ci">
                 <div class="header text-center mb-3" :style="logoBackground1(event)" v-if="showHeaders && column.header">{{ column.header }}</div>
                 <div class="column-matches flex-grow-1">
-                    <BracketMatch :ref="`match-${matchNum}`" v-for="matchNum in column.games" :match="getMatch(matchNum)" v-bind:key="matchNum"/>
+                    <BracketMatch :ref="`match-${matchNum}`" :show-times="bracket.show_times" v-for="matchNum in column.games" :match="getMatch(matchNum)" v-bind:key="matchNum"/>
                 </div>
             </div>
         </div>

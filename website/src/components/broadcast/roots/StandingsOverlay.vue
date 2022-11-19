@@ -1,6 +1,6 @@
 <template>
-    <GenericOverlay :title="title || (_stage ? `Standings: ${_stage}` : 'Standings')">
-        <Standings class="standings" :event="event" :stage="_stage" />
+    <GenericOverlay :title="title || (stageTitle ? `Standings: ${stageTitle}` : 'Standings')">
+        <Standings class="standings" :event="event" :stage="_stage" :tie-text="standingsSettings && standingsSettings.tieText" />
     </GenericOverlay>
 </template>
 
@@ -25,6 +25,21 @@ export default {
         },
         _stage() {
             return this.stage || this.broadcast?.current_stage;
+        },
+        blocks() {
+            if (!this.event || !this.event.blocks) return null;
+            try {
+                const blocks = JSON.parse(this.event.blocks);
+                return blocks || null;
+            } catch (e) {
+                return null;
+            }
+        },
+        standingsSettings() {
+            return (this.blocks?.standings || []).find(s => s.group === this._stage);
+        },
+        stageTitle() {
+            return this.standingsSettings?.short || this.standingsSettings?.title || this._stage;
         }
     },
     metaInfo() {

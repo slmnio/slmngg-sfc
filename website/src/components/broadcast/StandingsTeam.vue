@@ -1,9 +1,10 @@
 <template>
     <div class="standings-team d-flex">
         <div class="team-rank flex-shrink-0">{{ tieText && !teamStats["tie_show_number"] ? tieText : teamStats["rank"] }}</div>
-        <ThemeLogo class="team-logo flex-shrink-0" :theme="team.theme" icon-padding="0.2em" border-width="0.15em" logo-size="w-30" />
-        <router-link :to="url('team', team)" class="team-name ct-passive flex-grow-1 text-left d-none d-md-flex">{{ team.name }}</router-link>
-        <router-link :to="url('team', team)" class="team-name team-code ct-passive flex-grow-1 text-left d-md-none">{{ team.code }}</router-link>
+        <ThemeLogo class="team-logo flex-shrink-0" :theme="team.theme" icon-padding="0.2em" border-width="0.15em" :logo-size="iconSize || 'w-30'" />
+        <router-link v-if="!useCodes" :to="url('team', team)" class="team-name ct-passive flex-grow-1 text-left d-none d-md-flex">{{ team.name }}</router-link>
+        <router-link v-if="!useCodes" :to="url('team', team)" class="team-name team-code ct-passive flex-grow-1 text-left d-md-none">{{ team.code }}</router-link>
+        <router-link v-if="useCodes" :to="url('team', team)" class="team-name team-code ct-passive flex-grow-1 text-left">{{ team.code }}</router-link>
         <div class="team-stats d-flex">
             <div class="team-stat text-center" v-for="(stat, i) in stats" v-bind:key="stat + i" v-bind:class="{'d-none d-md-block': ['omw'].includes(stat) }">
                 {{ teamStats[stat] }}
@@ -25,7 +26,7 @@ function diffString(val) {
 export default {
     name: "StandingsTeam",
     components: { ThemeLogo },
-    props: ["team", "tieText", "showColumns"],
+    props: ["team", "tieText", "showColumns", "iconSize", "useCodes"],
     data: () => ({
         // stats: ["diff", "map_diff"/*, "points" */]
 

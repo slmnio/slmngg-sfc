@@ -90,6 +90,9 @@ export default {
                     event: ReactiveThing("event"),
                     theme: ReactiveThing("theme")
                 }),
+                event_brands_designed: ReactiveArray("event_brands_designed", {
+                    theme: ReactiveThing("theme")
+                }),
                 socials: ReactiveArray("socials"),
                 player_relationships: ReactiveArray("player_relationships", {
                     events: ReactiveArray("events", {

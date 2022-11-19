@@ -3,8 +3,8 @@
         <div class="broadcast-app" :class="broadcastClass">
             <!--        <div style="font-size: 5em; color: black">{{ $root.activeScene }}</div>-->
             <router-view id="overlay" :class="bodyClass" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active"
-                         :animation-active="animationActive"/>
-            <v-style v-if="broadcast && broadcast.event">
+                         :animation-active="animationActive" :full="full" @prodUpdate="(x) => prodUpdate(x)" ref="overlay"/>
+            <v-style v-if="broadcast && broadcast.event && !noBroadcastStyle">
                 {{ broadcast.event.broadcast_css }}
 
                 :root {
@@ -19,16 +19,28 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import StingerWrap from "@/components/broadcast/StingerWrap";
 
+function getComponentName(route) {
+    try {
+        return route.matched[route.matched.length - 1]?.components?.default?.name;
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
+
 export default {
     name: "BroadcastApp",
-    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass"],
+    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass", "full", "clientName"],
     components: {
         StingerWrap
     },
     data: () => ({
         active: false,
         animationActive: true,
-        obs: null
+        obs: null,
+        lastProdData: null,
+        isActive: null,
+        isVisible: null
     }),
     computed: {
         broadcastClass() {
@@ -46,7 +58,8 @@ export default {
                 }),
                 other_broadcasts: ReactiveArray("other_broadcasts"),
                 headlines: ReactiveArray("headlines"),
-                highlight_media: ReactiveThing("highlight_media")
+                highlight_media: ReactiveThing("highlight_media"),
+                highlight_hero: ReactiveThing("highlight_hero")
             });
         },
         haltAnimations() {
@@ -54,12 +67,39 @@ export default {
         },
         useBuiltInStingers() {
             // console.log("use", this.noStinger, this.broadcast?.broadcast_settings);
-            if (this.noStinger) return false;
+            if (this.noStinger || this.$refs.overlay?.noStinger) return false;
             return (this.broadcast?.broadcast_settings || []).includes("Use built-in stingers");
+        },
+        noBroadcastStyle() {
+            return this.$refs.overlay?.noBroadcastStyle;
+        },
+        sendingProdData() {
+            const componentName = getComponentName(this.$router.currentRoute);
+            return {
+                clientName: this.clientName,
+                component: componentName,
+                path: this.$router.currentRoute.path,
+                fullPath: this.$router.currentRoute.fullPath,
+                active: this.isActive,
+                visible: this.isVisible,
+                data: {
+                    ...this.$refs.overlay?.prodData,
+                    ...this.lastProdData
+                }
+            };
+        }
+    },
+    methods: {
+        prodUpdate(data) {
+            if (this.$socket?.client) {
+                this.lastProdData = data;
+                this.$socket.client.emit("prod-update", this.sendingProdData);
+            }
         }
     },
     mounted () {
         console.log("overlay app mounted", this.id);
+        this.prodUpdate();
 
         if (this.haltAnimations) {
             this.active = true;
@@ -75,6 +115,14 @@ export default {
             console.log("loading with broadcast client");
             this.$socket.client.emit("prod-join", `broadcast--${this.code}`);
         }
+
+
+        window.addEventListener("obsSourceActiveChanged", (e) => {
+            this.isActive = e.detail.active;
+        });
+        window.addEventListener("obsSourceVisibleChanged", (e) => {
+            this.isVisible = e.detail.visible;
+        });
     },
     watch: {
         active(isActive) {
@@ -98,10 +146,24 @@ export default {
         },
         broadcast() {
             this.$root.broadcast = this.broadcast;
+        },
+        sendingProdData: {
+            deep: true,
+            handler() {
+                this.prodUpdate();
+            }
         }
     },
     beforeCreate () {
         document.body.className = "overlay";
+    },
+    sockets: {
+        send_prod_update() {
+            if (!this.lastProdData) this.prodUpdate();
+        },
+        prod_button_reload() {
+            document.location.reload();
+        }
     }
 };
 </script>
@@ -109,6 +171,7 @@ export default {
 <style>
     .broadcast-app, #overlay, body.overlay {
         overflow: hidden;
+        font-family: "SLMN-Industry", "Industry", sans-serif;
     }
     body.overlay #slmngg-app {
         padding-bottom: 0 !important;

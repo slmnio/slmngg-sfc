@@ -1,9 +1,9 @@
 <template>
     <div class="standings" v-if="standings && standings.standings && standings.standings.length">
 <!--        <div>{{ event.name }} / {{ stage }} / {{ allMatches.length }} -> {{ stageMatches.length }} ({{ teams.length }} teams)</div>-->
-        <h3 class="top-standings-name text-center d-md-none">{{ title || stage || 'Team' }}</h3>
+        <h3 class="top-standings-name text-center d-md-none">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</h3>
         <div class="standings-header d-flex align-items-center">
-            <div class="team-name flex-grow-1 text-left d-none d-md-flex">{{ title || stage || 'Team' }}</div>
+            <div class="team-name flex-grow-1 text-left d-none d-md-flex">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</div>
             <div class="team-name team-code flex-grow-1 text-left d-md-none"></div>
             <div class="team-stats d-flex">
                 <div class="team-stat text-center" v-for="col in showColumns" v-bind:key="col" v-b-tooltip="getColumnText(col).title">
@@ -19,7 +19,7 @@
         <div class="teams">
             <div class="team-group" v-for="(group, i) in standings.standings" v-bind:key="i">
                 <div class="team" v-for="team in group" v-bind:key="team.id">
-                    <StandingsTeam :team="team" :tie-text="tieText" :showColumns="showColumns" />
+                    <StandingsTeam :team="team" :tie-text="tieText" :showColumns="showColumns" icon-size="w-60" :use-codes="useCodes" />
                 </div>
             </div>
         </div>
@@ -50,7 +50,9 @@ export default {
         stage: String,
         title: String,
         tieText: String,
-        showMapDiff: Boolean
+        showMapDiff: Boolean,
+        useCodes: Boolean,
+        overrideShowColumns: Array
     },
     components: { StandingsTeam },
     methods: {
@@ -119,7 +121,7 @@ export default {
             return (this.blocks?.standings || []).find(s => s.group === this.stage);
         },
         showColumns() {
-            return this.standingsSettings?.show || [
+            return this.overrideShowColumns || this.standingsSettings?.show || [
                 "Matches", "Maps", "MapDiff"
             ];
         },
@@ -300,6 +302,10 @@ export default {
                 group.forEach((team, i) => {
                     team.standings.rank = display;
                     team.standings.tie_show_number = i === 0;
+
+                    if (standings.length === 1) {
+                        team.standings.tie_show_number = false;
+                    }
                     rank++;
                 });
                 display = rank;
@@ -346,6 +352,8 @@ export default {
     .standings-header, .top-standings-name {
         font-weight: bold;
         text-transform: uppercase;
+        line-height: 1;
+        margin-bottom: .2em;
     }
     .team-name {
         margin-left: 2em;

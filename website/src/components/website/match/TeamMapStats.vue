@@ -4,7 +4,7 @@
             <!--        <div class="stat team">{{ team.code }}</div>-->
             <ThemeLogo logo-size="w-50" class="team-icon" :theme="team.theme" border-width="4" icon-padding="4" />
             <div class="stat scoreline">{{ scoreline }}</div>
-            <div class="stat recent"><i v-if="stats.played_recently" class="far fa-clock fa-fw" title="Played in their last match"></i></div>
+            <div class="stat recent"><i v-if="stats.played_recently" class="far fa-clock fa-fw" v-b-tooltip.top="'Played in their last match'"></i></div>
             <!--        <div class="stat played">{{ stats.played }}</div>-->
 
         </div>
@@ -13,10 +13,14 @@
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
+import { VBTooltip } from "bootstrap-vue";
 export default {
     name: "TeamMapStats",
     components: { ThemeLogo },
     props: ["data"],
+    directives: {
+        VBTooltip
+    },
     computed: {
         stats() {
             return this.data.stats;

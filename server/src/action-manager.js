@@ -56,6 +56,11 @@ async function load(expressApp, cors, Cache, io) {
                 if (!authObjects.client) return res.status(403).send({ error: true, errorMessage: "No client data associated with this token" });
             }
 
+            if (action.optionalParams) {
+                (action.optionalParams || []).forEach(key => {
+                    params[key] = req.body[key] || null;
+                });
+            }
             if (action.requiredParams) {
                 (action.requiredParams || []).forEach(key => {
                     params[key] = req.body[key];
@@ -65,16 +70,20 @@ async function load(expressApp, cors, Cache, io) {
             try {
                 await action.handler(
                     async (data) => res.send({ error: false, ...data }),
-                    async (errorMessage, errorCode) => res.status(errorCode || 400).send({
-                        error: true,
-                        errorMessage
-                    }),
+                    async (errorMessage, errorCode) => {
+                        console.warn(`Error in action [${action.key}] ${errorCode} ${errorMessage}`);
+                        res.status(errorCode || 400).send({
+                            error: true,
+                            errorMessage
+                        });
+                    },
                     params,
                     authObjects,
                     {
                         updateRecord: (tableName, item, data) => updateRecord(Cache, tableName, item, data),
                         get: Cache.get,
                         createRecord: (tableName, data) => createRecord(Cache, tableName, data),
+                        auth: Cache.auth
                     }
                 );
             } catch (e) {
@@ -129,6 +138,7 @@ async function load(expressApp, cors, Cache, io) {
                             updateRecord: (tableName, item, data) => updateRecord(Cache, tableName, item, data),
                             get: Cache.get,
                             createRecord: (tableName, data) => createRecord(Cache, tableName, data),
+                            auth: Cache.auth
                         }
                     );
                 } catch (e) {

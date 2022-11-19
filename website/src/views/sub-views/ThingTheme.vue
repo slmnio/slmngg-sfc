@@ -2,7 +2,8 @@
     <div class="thing-theme container">
 
         <ContentRow v-if="thing.brand_designers" :title="thing.brand_designers.length === 1 ? 'Brand designer' : 'Brand designers'">
-            <ContentThing type="player" :text="designer.name" :thing="designer" :theme="thing.theme" v-for="designer in thing.brand_designers" v-bind:key="designer.id"></ContentThing>
+            <ContentThing type="player" :text="designer.name" :thing="designer" :theme="thing.theme" v-for="designer in thing.brand_designers"
+                          v-bind:key="designer.id" :link-options="{ 'subPage': 'brands' }"></ContentThing>
         </ContentRow>
 
         <h3>Themes</h3>
@@ -20,7 +21,7 @@
         <div v-if="colors.length" class="color-list mb-3">
             <div class="color" v-for="color in colors" v-bind:key="color.name">
                 <div class="color-swatch" :style="{backgroundColor: color.value}"></div>
-                <div class="color-name">{{ color.name }}: <code>{{ color.value }}</code></div>
+                <div class="color-name">{{ color.name }}: <CopyTextButton><code>{{ color.value }}</code></CopyTextButton> </div>
             </div>
         </div>
 
@@ -79,6 +80,7 @@ import ContentThing from "@/components/website/ContentThing";
 import StandingsTeam from "@/components/broadcast/StandingsTeam";
 import { resizedImageNoWrap } from "@/utils/images";
 import { getDataServerAddress } from "@/utils/fetch";
+import CopyTextButton from "@/components/website/CopyTextButton";
 // import RecoloredHero from "@/components/broadcast/RecoloredHero";
 // import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 // import HeroColorControls from "@/components/broadcast/HeroColorControls";
@@ -89,7 +91,7 @@ function cleanKey(key) {
 
 export default {
     name: "ThingTheme",
-    components: { /* HeroColorControls, RecoloredHero, */ BracketTeam, IngameTeam, ContentRow, ContentThing, StandingsTeam },
+    components: { CopyTextButton, /* HeroColorControls, RecoloredHero, */ BracketTeam, IngameTeam, ContentRow, ContentThing, StandingsTeam },
     props: ["team", "event"],
     computed: {
         // heroes() {

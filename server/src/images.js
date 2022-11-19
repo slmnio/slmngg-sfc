@@ -130,6 +130,7 @@ async function fullGetURL(url, sizeText, sizeData) {
 
 module.exports = ({ app, cors, Cache, corsHandle }) => {
 
+    ensureFolder("").then(r => console.log("[images] images folder ensured"));
     ensureFolder("orig").then(r => console.log("[images] orig folder ensured"));
 
     async function handleImageRequests(req, res) {
@@ -141,14 +142,14 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
 
             const url = req.query.url;
             let parts = url.split("/");
-            let originalFilename = parts[parts.length - 1];
+            let originalFilename = req.query.filename || parts[parts.length - 1];
             let [strippedName, args] = originalFilename.split("?");
             originalFilename = strippedName;
             const dots = strippedName.split(".");
             const originalFileType = dots[dots.length - 1]; // last . (now works with .svg.png)
-            const filename = parts[4] + "." + originalFileType;
+            const filename = parts[parts.length - 2] + "." + originalFileType;
 
-            if (!["dl.airtable.com", "media.slmn.io"].some(domain => domain === parts[2])) {
+            if (!["dl.airtable.com", "media.slmn.io", "v5.airtableusercontent.com"].some(domain => domain === parts[2])) {
                 return res.status(400).send("Domain not whitelisted");
             }
 
@@ -194,7 +195,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                 };
             }
 
-            if (["svg", "gif"].includes(originalFileType)) {
+            if (!size /*["svg", "gif"].includes(originalFileType)*/) { // TODO: load image first then detect filetype
                 // just do orig if svg
                 size = "orig";
             }
@@ -205,7 +206,11 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
 
             let imagePath = await getImage(filename, size);
 
-            if (imagePath) return res.sendFile(imagePath);
+            if (imagePath) {
+                // let metaFileType = (await sharp(imagePath).metadata())?.format;
+                // console.log({metaFileType});
+                return res.sendFile(imagePath);
+            }
             console.log("[image]", `no file for ${originalFilename} @ ${size}`);
             // no image
 
@@ -221,6 +226,9 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                 orig = await getImage(filename, "orig");
                 if (size === "orig") return res.sendFile(orig);
             }
+
+            // let metaFileType = (await sharp(orig).metadata())?.format;
+            // console.log({metaFileType});
 
             // resize time!
             // console.log("[image]", `resizing ${originalFilename} @ ${size}`);
@@ -265,6 +273,20 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
 
             let filePath = await fullGetURL(logoURL, "orig", null);
 
+            let filename =  theme.modified.replace(/[.:\\/]/g, "_") + "_" + getFilename(logoURL);
+            if (!filename.endsWith(".png")) filename += ".png";
+            let sizeText = `theme-${size}-${padding}`;
+            let resizedFilePath = getPath(filename, sizeText);
+            // console.log({ filePath, filename, sizeText, resizedFilePath });
+            await ensureFolder(sizeText);
+
+            let heldImage = await getImage(filename, sizeText);
+            if (heldImage) {
+                console.log("[image|theme]", `theme using saved @${size} in ${Date.now() - t}ms`);
+                return res.sendFile(heldImage);
+            }
+
+
             let resizedImage = await sharp(filePath).resize({
                 width: size - padding,
                 height: size - padding,
@@ -274,23 +296,23 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
 
             res.header("Content-Type", "image/png");
 
-            return sharp({
+            let composite = sharp({
                 create: {
                     width: size,
                     height: size,
                     channels: 3,
                     background: themeColor
                 }
-            })
-                .composite([
-                    { input: resizedImage }
-                ])
-                .png()
-                .toBuffer()
+            }).composite([{ input: resizedImage }]);
+
+
+            composite.clone().png().toBuffer()
                 .then(data => {
+                    console.log("[image|theme]", `theme processed @${size} in ${Date.now() - t}ms`);
                     res.end(data);
-                    console.log("[image]", `theme processed @${size} in ${Date.now() - t}ms`);
                 });
+
+            return await composite.clone().toFile(resizedFilePath);
 
         } catch (e) {
             console.error("Theme image error", e);

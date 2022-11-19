@@ -7,20 +7,24 @@ import VueRouter from "vue-router";
 import VueSocketIOExt from "vue-socket.io-extended";
 import { io } from "socket.io-client";
 import { VBTooltip } from "bootstrap-vue";
+import "bootstrap-vue/dist/bootstrap-vue.css";
 import VueYoutubeEmbed from "vue-youtube-embed";
 import VueCookies from "vue-cookies";
 
 import defaultRoutes from "@/router/default";
-import { getDataServerAddress, fetchThings } from "@/utils/fetch";
+import { getDataServerAddress, fetchThings, getMainDomain } from "@/utils/fetch";
 import EventRoutes from "@/router/event";
 
 import Event from "@/views/Event";
 import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp";
-import NotFoundPage from "@/views/NotFoundPage";
 import SharedRoutes from "@/router/shared-routes";
+import AuthRoutes from "@/router/auth-redirects";
 import { ReactiveRoot } from "@/utils/reactive";
-import { authenticateWithToken } from "@/utils/auth";
+import { authenticateWithToken, setAuthNext } from "@/utils/auth";
+import NotFoundContent from "@/views/sub-views/NotFoundContent";
 
+// eslint-disable-next-line prefer-const
+let app;
 
 Vue.use(Vuex);
 Vue.use(VueMeta);
@@ -49,14 +53,17 @@ Vue.component("v-style", {
     }
 });
 
-
 const host = window.location.hostname;
-const domains = ["slmn.gg", "localslmn", "localhost"].map(d => new RegExp(`(?:^|(.*)\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
+const domains = ["slmn.gg", "localslmn", "localhost"].map(d => ({
+    main: d,
+    r: new RegExp(`(?:^|(.*)\\.)${d.replace(".", "\\.")}(?:$|\\n)`)
+}));
 let subdomain = null;
+const mainDomain = getMainDomain(subdomain);
 let routes = [];
 let subID;
 
-domains.forEach(r => {
+domains.forEach(({ main, r }) => {
     const result = host.match(r);
     if (result && result[1] && !["dev", "live"].includes(result[1])) {
         if (result[1].endsWith(".dev")) {
@@ -90,15 +97,19 @@ if (subdomain) {
                         };
                     }
                 },
-                ...SharedRoutes
+                ...SharedRoutes,
+                { path: "*", component: NotFoundContent }
             ]
         },
-        { path: "/*", component: NotFoundPage }
+        ...AuthRoutes(app, mainDomain)
     ];
 } else {
     // default slmn.gg
     console.log("[subdomain]", "default routes applied");
-    routes = defaultRoutes;
+    routes = [
+        ...defaultRoutes,
+        ...AuthRoutes(app, mainDomain)
+    ];
 }
 
 const router = new VueRouter({
@@ -116,7 +127,7 @@ router.beforeEach((to, from, next) => {
         if (to.meta.requiresAuth) {
             // authenticating!
 
-            localStorage.setItem("auth_next", to.fullPath);
+            setAuthNext(app?.$root, to.fullPath);
 
             if (app && !app.auth.user) {
                 return next({ path: "/login" });
@@ -137,7 +148,7 @@ router.beforeEach((to, from, next) => {
 });
 
 
-const app = new Vue({
+app = new Vue({
     router,
     render: h => h(GlobalApp),
     store,

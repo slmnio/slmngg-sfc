@@ -72,11 +72,6 @@ export default {
             return this.$root.auth.user;
         }
     },
-    async mounted() {
-        this.liveGuestInterval = setInterval(async () => {
-            await this.createLiveGuest();
-        }, 1000);
-    },
     methods: {
         async createLiveGuest() {
             if (this.$root.auth?.user && !this.hasCreatedLiveGuest) {

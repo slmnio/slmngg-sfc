@@ -16,41 +16,47 @@ import { cleanID } from "@/utils/content-utils";
 
 export default {
     name: "PlayerAudio",
-    props: ["broadcast", "taskKey"],
+    props: ["broadcast", "taskKey", "buffer"],
     sockets: {
         async audio(room, { data, user }) {
             if (room !== this.roomKey) return;
-            if (this.muted) return;
-            this.lastPacketTime[user] = Date.now();
+            setTimeout(async () => {
+                if (this.muted) return;
+                this.lastPacketTime[user] = Date.now();
 
-            if (!this.players[user]) {
-                this.players[user] = new PCMPlayer({
-                    encoding: "32bitFloat",
-                    channels: 2,
-                    sampleRate: 48000,
-                    flushingTime: 1000
-                });
-            }
+                if (!this.players[user]) {
+                    this.players[user] = new PCMPlayer({
+                        encoding: "32bitFloat",
+                        channels: 2,
+                        sampleRate: 48000,
+                        flushingTime: 1000
+                    });
+                }
 
-            if (!this.decoders[user]) {
-                this.decoders[user] = new OpusDecoderWebWorker({ channels: 2 });
-            }
+                if (!this.decoders[user]) {
+                    this.decoders[user] = new OpusDecoderWebWorker({ channels: 2 });
+                }
 
-            await this.decoders[user].ready;
+                await this.decoders[user].ready;
 
-            const { channelData, samplesDecoded } = await this.decoders[user].decodeFrame(data);
-            if (channelData) {
-                this.players[user].feed({ channelData, length: samplesDecoded });
-            }
+                const { channelData, samplesDecoded } = await this.decoders[user].decodeFrame(data);
+                if (channelData) {
+                    this.players[user].feed({ channelData, length: samplesDecoded });
+                }
+            }, this.buffer || 0);
         },
         audio_member_list(room, memberList) {
             if (room !== this.roomKey) return;
-            this.memberList = memberList;
+            setTimeout(() => {
+                this.memberList = memberList;
+            }, this.buffer || 0);
         },
         audio_job_status(room, status) {
             if (room !== this.roomKey) return;
-            console.log("status", this.taskKey, status);
-            this.status = status;
+            setTimeout(() => {
+                console.log("status", this.taskKey, status);
+                this.status = status;
+            }, this.buffer || 0);
         }
     },
     data: () => ({

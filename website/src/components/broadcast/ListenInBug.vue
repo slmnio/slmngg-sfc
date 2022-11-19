@@ -26,7 +26,6 @@ export default {
         display: flex;
         font-size: 32px;
         border-bottom: 4px solid transparent;
-        padding-top: 2px;
     }
     .listen-in .team-logo {
         height: 100%;
@@ -34,6 +33,7 @@ export default {
     }
     .listen-in .text {
         padding: 2px 8px;
+        padding-top: 4px;
         text-transform: uppercase;
     }
 </style>

@@ -203,7 +203,8 @@ export default [
         path: "ingame-comms",
         component: IngameCommsOverlay,
         props: route => ({
-            listenInText: route.query.text
+            listenInText: route.query.text,
+            buffer: parseInt(route.query.buffer)
         })
     }
 ];

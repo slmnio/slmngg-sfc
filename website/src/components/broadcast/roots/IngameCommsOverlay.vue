@@ -1,14 +1,15 @@
 <template>
     <div class="overlay ingame-comms-overlay" v-if="match && match.teams">
+        <div class="btn">{{ match.flip_teams }}</div>
         <div class="teams" :class="{'flip': match.flip_teams}" :style="{ marginTop: topOffset }">
-            <div class="team" v-for="(team, i) in match.teams" :key="team.id" :style="{ width: teamWidth }" :class="{'left': i === 0 || (i === 1 && match.flip_teams)}">
+            <div class="team" v-for="(team, i) in match.teams" :key="team.id" :style="{ width: teamWidth }" :class="{'left': match.flip_teams ? i === 1 : i === 0}">
                 <ThemeTransition class="listen-in-holder" :duration="250" :theme="team.theme"
                                  :active="activeTeamIndex === i"
-                                 :start="i === 0 || (i === 1 && match.flip_teams) ? 'left' : 'right'"
-                                 :end="i === 0 || (i === 1 && match.flip_teams) ? 'right' : 'left'">
+                                 :start="match.flip_teams ? i === 1 : i === 0 ? 'left' : 'right'"
+                                 :end="match.flip_teams ? i === 1 : i === 0 ? 'right' : 'left'">
                     <ListenInBug :text="listenInText" :team="team" />
                 </ThemeTransition>
-                <PlayerAudio :team="team" :broadcast="broadcast" :task-key="`team${i+1}`" :ref="`team${i+1}`" />
+                <PlayerAudio :team="team" :broadcast="broadcast" :task-key="`team${i+1}`" :ref="`team${i+1}`" :buffer="buffer" />
             </div>
         </div>
     </div>
@@ -22,7 +23,7 @@ import ThemeTransition from "@/components/broadcast/ThemeTransition";
 
 export default {
     name: "IngameCommsOverlay",
-    props: ["broadcast", "listenInText"],
+    props: ["broadcast", "listenInText", "buffer"],
     components: { ListenInBug, PlayerAudio, ThemeTransition },
     data: () => ({
         activeTeamIndex: null,
@@ -95,5 +96,8 @@ export default {
     }
     .listen-in-holder {
         margin-top: 8px;
+    }
+    .teams.flip {
+        flex-direction: row-reverse;
     }
 </style>

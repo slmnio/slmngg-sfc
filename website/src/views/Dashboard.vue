@@ -78,6 +78,14 @@ export default {
         async updateTitle() {
             await updateAutomaticTitle(this.$root.auth, "self", "create");
         }
+    },
+    watch: {
+        client(oldClient, newClient) {
+            if (!this.client?.key) return;
+            if (oldClient?.key === newClient?.key) return;
+            console.log("prod-join", this.client?.key);
+            this.$socket.client.emit("prod-join", this.client?.key);
+        }
     }
 };
 </script>

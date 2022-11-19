@@ -1,3 +1,5 @@
+const IngameCommsOverlay = () => import("@/components/broadcast/roots/IngameCommsOverlay");
+const PlayerAudio = () => import("@/components/broadcast/PlayerAudio");
 const MVPOverlay = () => import("@/components/broadcast/roots/MVPOverlay");
 const MultiStandingsOverlay = () => import("@/components/broadcast/roots/MultiStandingsOverlay");
 const ClientOverview = () => import("@/components/broadcast/roots/ClientOverview");
@@ -189,5 +191,20 @@ export default [
     { path: "stinger", component: EmptyStingerOverlay },
     { path: "empty", redirect: "stinger" },
     { path: "broadcasts", component: OtherBroadcastsOverlay },
-    { path: "mvp", component: MVPOverlay }
+    { path: "mvp", component: MVPOverlay },
+    {
+        path: "audio",
+        component: PlayerAudio,
+        props: route => ({
+            taskKey: route.query.key
+        })
+    },
+    {
+        path: "ingame-comms",
+        component: IngameCommsOverlay,
+        props: route => ({
+            listenInText: route.query.text,
+            buffer: parseInt(route.query.buffer)
+        })
+    }
 ];

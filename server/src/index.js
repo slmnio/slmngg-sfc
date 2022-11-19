@@ -51,6 +51,7 @@ const auction = require("./discord/new_auction.js")({
 
 const Cache = (require("./cache.js")).setup(io);
 (require("./airtable-interface.js")).setup(io);
+(require("./discord/bot-controller.js")).setup(io);
 
 const actions = require("./action-manager.js");
 actions.load(app, localCors, Cache, io);
@@ -136,7 +137,7 @@ io.on("connection", (socket) => {
         console.log("get and subscribe out:", id);
     });
     socket.on("prod-join", (clientName) => {
-        console.log("[prod] join ", clientName);
+        console.log("[prod] join", clientName);
         socket._clientName = clientName;
         socket.join(`prod:client-${clientName}`);
     });

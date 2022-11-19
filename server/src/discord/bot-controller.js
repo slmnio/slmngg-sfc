@@ -133,6 +133,37 @@ onUpdate(async(id, { newData, oldData }) => {
  * @param client {DiscordBot}
  */
 
+class Job {
+    constructor({ channelID, broadcastKey, taskKey, team}) {
+        this.channelID = channelID;
+        this.broadcastKey = broadcastKey;
+        this.taskKey = taskKey;
+        this.team = team;
+        this.teamName = team?.name;
+
+        this.client = null;
+        this.status = "unfulfilled";
+    }
+
+    sync(customSocket) {
+        if (!io) return;
+        let audioRoom = `${this.broadcastKey}/${this.taskKey}`;
+        let destination = customSocket || io.to(audioRoom);
+        destination.emit("audio_job_status", audioRoom, this.serialize());
+    }
+
+    serialize() {
+        return ({
+            status: this.status,
+            channelID: this.channelID,
+            broadcastKey: this.broadcastKey,
+            taskKey: this.taskKey,
+            teamID: this.team?.id
+        });
+    }
+}
+
+
 /***
  * @property jobs {Job[]}
  * @property clients {DiscordBot[]}
@@ -160,17 +191,15 @@ class BotManager {
 
     createJob(channelID, broadcastKey, taskKey, team) {
         console.log(`[BotManager] New job [${broadcastKey}/${taskKey}] created for channel ${channelID}`);
-        let job = {
-            status: "unfulfilled",
-            client: null,
+        let job = new Job({
             channelID,
             broadcastKey,
             taskKey,
-            team,
-            teamName: team?.name
-        };
+            team
+        });
         this.jobs.push(job);
         this.assignJobs();
+        job.sync();
         return job;
     }
 
@@ -192,6 +221,9 @@ class BotManager {
 
     getClient(taskKey, broadcastKey) {
         return this.clients.find(client => client?.job?.broadcastKey === broadcastKey && client?.job?.taskKey === taskKey);
+    }
+    getJob(taskKey, broadcastKey) {
+        return this.jobs.find(job => job?.broadcastKey === broadcastKey && job?.taskKey === taskKey);
     }
 
     printStatus() {
@@ -222,6 +254,7 @@ class BotManager {
             client.setJob(job);
             job.status = "attempting";
             job.client = client;
+            job.sync();
             // this.printStatus();
         });
     }
@@ -230,11 +263,13 @@ class BotManager {
         let job = this.jobs.find(job => job.client.token === worker.token);
         if (!job) return console.warn(`[BotManager] No job for this worker ${worker.id}`);
         job.status = status;
+        job.sync();
         // this.printStatus();
     }
 
     deleteWorkerJob(worker) {
         let job = this.jobs.find(job => job.client.token === worker.token);
+        // job.prepareForDeletion();
         if (!job) return console.error("Tried to delete a worker's job but couldn't find it");
         this.jobs = this.jobs.filter(job => !(job.client.token === worker.token));
     }
@@ -408,7 +443,7 @@ class DiscordBot {
             // TODO: checks before transmitting data
             // TODO: How do we manage sockets
             // console.log("emitting", this.socketRoom, member.user.id);
-            io.to(this.socketRoom).emit("audio", {data, user: member.user.id});
+            io.to(this.socketRoom).emit("audio", this.socketRoom, {data, user: member.user.id});
         });
 
         ["close", "end", "error", "pause"].forEach(eventType => {
@@ -465,7 +500,7 @@ class MemberList {
     async sync(customSocket) {
         let destination = customSocket || io.to(this.bot.socketRoom);
         // this.bot.log("updating member list");
-        destination.emit("audio_member_list", await this.getList());
+        destination.emit("audio_member_list", this.bot.socketRoom, await this.getList());
     }
 }
 
@@ -476,13 +511,21 @@ module.exports = {
         io.on("connect", socket => {
             socket.on("audio_subscribe", ({ taskKey, broadcastKey }) => {
                 console.log("[audio] sub", taskKey, broadcastKey);
-                if (socket._audioRoom) socket.leave(socket._audioRoom);
-                socket._audioRoom = `${broadcastKey}/${taskKey}`;
-                socket.join(socket._audioRoom);
+                let audioRoom = `${broadcastKey}/${taskKey}`;
+                // if (socket._audioRoom) socket.leave(socket._audioRoom);
+                // socket._audioRoom = `${broadcastKey}/${taskKey}`;
+                socket.join(audioRoom);
 
                 let client = manager.getClient(taskKey, broadcastKey);
-                if (!client) return;
-                client.memberList.sync(socket);
+                if (client) {
+                    client.memberList.sync(socket);
+                }
+                let job = manager.getJob(taskKey, broadcastKey);
+                if (job) {
+                    job.sync(socket);
+                } else {
+                    socket.emit("audio_job_status", audioRoom, null);
+                }
             });
         });
     }

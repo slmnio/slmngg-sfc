@@ -137,7 +137,7 @@ io.on("connection", (socket) => {
         console.log("get and subscribe out:", id);
     });
     socket.on("prod-join", (clientName) => {
-        console.log("[prod] join ", clientName);
+        console.log("[prod] join", clientName);
         socket._clientName = clientName;
         socket.join(`prod:client-${clientName}`);
     });

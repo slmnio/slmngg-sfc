@@ -1,10 +1,6 @@
 <template>
     <div class="player-audio" @click="muted = !muted">
-        {{ broadcastKey }} {{ taskKey }}
-
-        {{ muted ? 'muted' : '' }}
-
-        <div class="member-list">
+        <div class="member-list" v-if="showMemberList">
             <div class="member" v-for="member in decoratedMemberList" :key="member.id" :class="{'speaking': member.speaking}">
                 {{ member.airtable && member.airtable.name }} {{ member.name }} {{ member.id }} {{ member.speaking }}
             </div>
@@ -22,7 +18,8 @@ export default {
     name: "PlayerAudio",
     props: ["broadcast", "taskKey"],
     sockets: {
-        async audio({ data, user }) {
+        async audio(room, { data, user }) {
+            if (room !== this.roomKey) return;
             if (this.muted) return;
             this.lastPacketTime[user] = Date.now();
 
@@ -46,8 +43,14 @@ export default {
                 this.players[user].feed({ channelData, length: samplesDecoded });
             }
         },
-        audio_member_list(memberList) {
+        audio_member_list(room, memberList) {
+            if (room !== this.roomKey) return;
             this.memberList = memberList;
+        },
+        audio_job_status(room, status) {
+            if (room !== this.roomKey) return;
+            console.log("status", this.taskKey, status);
+            this.status = status;
         }
     },
     data: () => ({
@@ -56,7 +59,9 @@ export default {
         decoders: {},
         lastPacketTime: {},
         memberList: [],
-        muted: false
+        muted: true,
+        status: null,
+        showMemberList: false
     }),
     computed: {
         broadcastKey() {
@@ -71,6 +76,9 @@ export default {
                 ...member,
                 airtable: airtableData.find(m => cleanID(m.id) === cleanID(member.airtableID))
             }));
+        },
+        roomKey() {
+            return `${this.broadcastKey}/${this.taskKey}`;
         }
     },
     methods: {
@@ -92,6 +100,12 @@ export default {
                 taskKey: key || this.taskKey,
                 broadcastKey: this.broadcastKey
             });
+        },
+        enable() {
+            this.muted = false;
+        },
+        disable() {
+            this.muted = true;
         }
     },
     watch: {

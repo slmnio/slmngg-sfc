@@ -1,3 +1,4 @@
+const IngameCommsOverlay = () => import("@/components/broadcast/roots/IngameCommsOverlay");
 const PlayerAudio = () => import("@/components/broadcast/PlayerAudio");
 const MVPOverlay = () => import("@/components/broadcast/roots/MVPOverlay");
 const MultiStandingsOverlay = () => import("@/components/broadcast/roots/MultiStandingsOverlay");
@@ -196,6 +197,13 @@ export default [
         component: PlayerAudio,
         props: route => ({
             taskKey: route.query.key
+        })
+    },
+    {
+        path: "ingame-comms",
+        component: IngameCommsOverlay,
+        props: route => ({
+            listenInText: route.query.text
         })
     }
 ];

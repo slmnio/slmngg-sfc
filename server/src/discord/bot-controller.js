@@ -260,7 +260,7 @@ class BotManager {
     }
 
     setWorkerJobStatus(worker, status) {
-        let job = this.jobs.find(job => job.client.token === worker.token);
+        let job = this.jobs.find(job => job.client?.token === worker.token);
         if (!job) return console.warn(`[BotManager] No job for this worker ${worker.id}`);
         job.status = status;
         job.sync();
@@ -268,7 +268,7 @@ class BotManager {
     }
 
     deleteWorkerJob(worker) {
-        let job = this.jobs.find(job => job.client.token === worker.token);
+        let job = this.jobs.find(job => job.client?.token === worker.token);
         // job.prepareForDeletion();
         if (!job) return console.error("Tried to delete a worker's job but couldn't find it");
         this.jobs = this.jobs.filter(job => !(job.client.token === worker.token));

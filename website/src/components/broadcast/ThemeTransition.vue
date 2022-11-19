@@ -113,9 +113,9 @@ export default {
 
 <style scoped>
 .theme-transition, .theme-transition-outer, .theme-transition-inner {
-    /*width: 100%;*/
-    /*height: 100%;*/
-    display: inline-flex;
+    width: 100%;
+    height: 100%;
+    /*display: inline-flex;*/
 }
 
 .theme-transition.border-left .theme-transition-inner { border-left: var(--tt-border-width) solid transparent; }

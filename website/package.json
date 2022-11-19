@@ -9,7 +9,7 @@
     "build-stage": "vue-cli-service build --mode staging"
   },
   "dependencies": {
-    "bootstrap-vue": "^2.21.2",
+    "bootstrap-vue": "^2.23.1",
     "core-js": "^3.6.5",
     "howler": "^2.2.3",
     "jimp": "^0.16.1",

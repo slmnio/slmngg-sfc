@@ -28,8 +28,12 @@
                                     <div :is="player.limited ? 'div' : 'router-link'" class="ct-active" :to="url('player', player)">{{ player.name }} </div>
                                     <span v-if="showCastingInfo && player.pronouns" class="player-pronouns ml-1 badge rounded-pill bg-light text-dark" :data-pronoun="player.pronouns">{{ player.pronouns }}</span></div>
                                 <div class="player-info player-pronounce" v-if="showCastingInfo"><i class="fas fa-w fa-lips player-icon-holder"></i> {{ player.pronunciation }}</div>
-                                <div class="player-info player-dtag" v-if="showPlayerInfo"><i class="fab fa-fw fa-discord player-icon-holder"></i> {{ player.discord_tag }}</div>
-                                <div class="player-info player-btag" v-if="showPlayerInfo"><i class="fab fa-fw fa-battle-net player-icon-holder"></i> {{ player.battletag }}</div>
+                                <div class="player-info player-dtag" v-if="showPlayerInfo">
+                                    <i class="fab fa-fw fa-discord player-icon-holder"></i> <CopyTextButton>{{player.discord_tag}}</CopyTextButton>
+                                </div>
+                                <div class="player-info player-btag" v-if="showPlayerInfo">
+                                    <i class="fab fa-fw fa-battle-net player-icon-holder"></i> <CopyTextButton>{{player.battletag}}</CopyTextButton>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -159,10 +163,11 @@ import PreviousMatch from "@/components/website/match/PreviousMatch";
 import DetailedMatchStat from "@/components/website/match/DetailedMatchStat";
 import Markdown from "@/components/website/Markdown";
 import { resizedImage, resizedImageNoWrap } from "@/utils/images";
+import CopyTextButton from "@/components/website/CopyTextButton";
 
 export default {
     name: "DetailedMatch",
-    components: { Markdown, PreviousMatch, ThemeLogo, MapDisplay, stat: DetailedMatchStat },
+    components: { CopyTextButton, Markdown, PreviousMatch, ThemeLogo, MapDisplay, stat: DetailedMatchStat },
     props: ["id"],
     data: () => ({
         showPlayerInfo: false,

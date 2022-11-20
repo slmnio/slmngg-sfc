@@ -92,7 +92,7 @@ export default {
 </script>
 
 <style scoped>
-    .maps {
-        gap: 3em
+    .map-stats-segment + .map-stats-segment {
+        margin-left: 3em;
     }
 </style>

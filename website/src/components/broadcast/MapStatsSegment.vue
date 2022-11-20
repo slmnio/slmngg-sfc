@@ -8,7 +8,7 @@
                 <div class="team-stats flex-center w-100">
                     <div :style="{ order: i * 2 }" class="team-stat flex-center" v-for="(teamStats, i) in mapStats(map).stats" :key="teamStats.team.id" :class="{'right': i === 1}">
                         <ThemeLogo logo-size="h-50" class="team-logo" :theme="teamStats.team.theme" border-width="0px"></ThemeLogo>
-                        <div class="team-stats-box" :class="{'opacity-50': teamStats.stats.played === 0}" :style="teamStats.stats.score_winner ? logoBackground1(teamStats.team) : {}">
+                        <div class="team-stats-box" :class="{'opacity-50': teamStats.stats.played === 0}" :style="(teamStats.stats.score_winner && teamStats.stats.played) ? logoBackground1(teamStats.team) : {}">
                             {{ teamStats.stats | wld }}
                         </div>
                     </div>

@@ -1,3 +1,4 @@
+const MapStatsOverlay = () => import("@/components/broadcast/roots/MapStatsOverlay");
 const IngameCommsOverlay = () => import("@/components/broadcast/roots/IngameCommsOverlay");
 const PlayerAudio = () => import("@/components/broadcast/PlayerAudio");
 const MVPOverlay = () => import("@/components/broadcast/roots/MVPOverlay");
@@ -206,5 +207,6 @@ export default [
             listenInText: route.query.text,
             buffer: parseInt(route.query.buffer)
         })
-    }
+    },
+    { path: "map-stats", component: MapStatsOverlay }
 ];

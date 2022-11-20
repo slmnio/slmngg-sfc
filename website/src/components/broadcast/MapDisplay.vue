@@ -14,6 +14,7 @@
 <script>
 import MapSegment from "@/components/broadcast/MapSegment";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { DefaultMapImages, likelyNeededMaps } from "@/utils/content-utils";
 
 export default {
     name: "MapDisplay",
@@ -52,24 +53,10 @@ export default {
             return this.broadcast.map_set.split(",");
         },
         maps() {
-            const images = {
-                Assault: "https://cdn.discordapp.com/attachments/855517740914573342/868231135224819743/44684849494984.png",
-                Escort: "https://cdn.discordapp.com/attachments/855517740914573342/868231132444000276/484444884949494949494948421651615641.png",
-                Hybrid: "https://cdn.discordapp.com/attachments/855517740914573342/868231133765201950/448489494949849494949494949494949.png",
-                Control: "https://cdn.discordapp.com/attachments/855517740914573342/868230457622396928/63541654456789487695.png",
-                Push: "https://cdn.discordapp.com/attachments/855517740914573342/969692510249177098/puuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuush.png",
-                Spike: "https://cdn.discordapp.com/attachments/880305022716481639/883811894463447110/newspikeplant.png",
-                SpikeRush: "https://cdn.discordapp.com/attachments/880305022716481639/883809271198924840/spikerush_default.png",
-                ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png",
-                Slayer: "https://media.discordapp.net/attachments/855517740914573342/913747752729595904/slayer.png",
-                Strongholds: "https://media.discordapp.net/attachments/855517740914573342/913747753086107668/strongholds.png",
-                CTF: "https://media.discordapp.net/attachments/855517740914573342/913747753392304158/ctf.png",
-                Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png"
-            };
             // if (!this.match?.maps) {
             //     const maps = [];
             //     for (let i = 0; i < this.mapCount; i++) {
-            //         maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[i]], image: [{ url: images[this.mapTypes[i]] }] } : {}) });
+            //         maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[i]], image: [{ url: DefaultMapImages[this.mapTypes[i]] }] } : {}) });
             //     }
             //     return maps;
             // }
@@ -101,36 +88,13 @@ export default {
             if (dummyMapCount > 0) {
                 for (let i = 0; i < dummyMapCount; i++) {
                     const num = initialMapCount + i;
-                    if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[num]], image: [{ url: images[this.mapTypes[num]] }] } : {}) });
+                    if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[num]], image: [{ url: DefaultMapImages[this.mapTypes[num]] }] } : {}) });
                 }
             }
             return maps;
         },
         likelyNeededMaps() {
-            const scores = [this.match.score_1, this.match.score_2].map(s => s || 0);
-
-            // how many maps have a winner marked
-            const playedMaps = (this.match.maps || []).filter(m => m.winner).length;
-
-            // how many maps each team needs to win to complete
-            const toWin = scores.map(s => this.match.first_to - s);
-
-            // how many maps could be played with no draws
-            const withoutDraws = (this.match.first_to * 2) - 1;
-
-            const draws = (this.match?.maps || []).filter(m => m.draw).length;
-
-            // if match is over (scores.some s == match.first_to)
-
-            // minimum (first to x2) -1
-
-            // currently played + 1 (tiebreakers, draws etc)
-
-            console.log({ playedMaps, toWin, withoutDraws, draws });
-
-            return withoutDraws + draws;
-
-            // return 0;
+            return likelyNeededMaps(this.match);
         },
         mapCount() {
             if (!this.match) return 0;

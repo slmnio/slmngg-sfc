@@ -5,7 +5,7 @@
         <div class="map-records" v-if="mapGroup">
             <div class="record-map" v-for="map in mapGroup.maps" :key="map.id">
                 <div class="map-name">{{ map.name }}</div>
-                <div class="team-stats flex-center w-100">
+                <div class="team-stats flex-center w-100" v-if="mapStats(map)">
                     <div :style="{ order: i * 2 }" class="team-stat flex-center" v-for="(teamStats, i) in mapStats(map).stats" :key="teamStats.team.id" :class="{'right': i === 1}">
                         <ThemeLogo logo-size="h-50" class="team-logo" :theme="teamStats.team.theme" border-width="0px"></ThemeLogo>
                         <div class="team-stats-box" :class="{'opacity-50': teamStats.stats.played === 0}" :style="(teamStats.stats.score_winner && teamStats.stats.played) ? logoBackground1(teamStats.team) : {}">
@@ -50,6 +50,7 @@ export default {
         mapGroup() {
             if (!this.map || !this.mapGroups.length) return null;
             const group = this.mapGroups.find(group => group.name === this.map.type?.[0]);
+            if (!group) return null;
             if (!this.map.dummy) {
                 group.maps = group.maps.sort((a, b) => a.name === this.map.name?.[0] ? -1 : (b.name === this.map.name?.[0] ? 1 : 0));
                 group.thisMap = true;

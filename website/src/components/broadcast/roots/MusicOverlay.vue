@@ -141,7 +141,7 @@ export default {
             }
         },
         active(isActive) {
-            this.startNewSong();
+            this.startNewSong(isActive);
         }
     },
     beforeDestroy() {

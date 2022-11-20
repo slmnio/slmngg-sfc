@@ -85,11 +85,11 @@ export default {
         },
         generateDummies(dummy, match) {
             const feederMatches = match?._bracket_data?.connections?.feederMatches;
-            console.log("cons", match?._bracket_data?.num, match?._bracket_data?.connections);
+            // console.log("cons", match?._bracket_data?.num, match?._bracket_data?.connections);
             if (!feederMatches || (!feederMatches["1"] && !feederMatches["2"])) return [dummy, dummy];
             const dummies = [dummy, dummy];
             if (feederMatches["1"]) {
-                console.log("f1", feederMatches["1"]);
+                // console.log("f1", feederMatches["1"]);
                 dummies[0] = {
                     ...dummy,
                     text: `${feederMatches["1"]._m} M${feederMatches["1"].side}`
@@ -97,14 +97,14 @@ export default {
             }
 
             if (feederMatches["2"]) {
-                console.log("f2", feederMatches["2"]);
+                // console.log("f2", feederMatches["2"]);
                 dummies[1] = {
                     ...dummy,
                     text: `${feederMatches["2"]._m} M${feederMatches["2"].side}`
                 };
             }
 
-            console.log("dummies", match._bracket_data.num, dummies);
+            // console.log("dummies", match._bracket_data.num, dummies);
 
             return dummies;
         }
@@ -135,7 +135,7 @@ export default {
             const dummy = { text: "TBD", dummy: true, id: null };
             const dummies = this.generateDummies(dummy, this.match);
             if (!this.match) return [{ ...dummies[0], _empty: true }, { ...dummies[1], _empty: true }];
-            console.log("dummies", this.match._bracket_data.num, dummies);
+            // console.log("dummies", this.match._bracket_data.num, dummies);
 
             let text = (this.match.placeholder_teams || "").trim().split("|").filter(t => t !== "");
             let extraText = [null, null];

@@ -214,7 +214,7 @@ export default {
                     feederMatches[connection.lose.split(".").pop()] = { ...this.getConnectionMatch(_n), _m: "Loser" };
                 }
             });
-            console.log(`feeder matches n=${num}`, feederMatches);
+            // console.log(`feeder matches n=${num}`, feederMatches);
             if (feederMatches) cons.feederMatches = feederMatches;
 
             return {
@@ -349,20 +349,20 @@ export default {
             deep: true,
             handler() {
                 console.log("[layout data update]");
-                this.createConnections();
+                this.$nextTick(() => this.createConnections());
             }
         },
         bracket: {
             deep: true,
             handler() {
                 console.log("[bracket data update]");
-                this.createConnections();
+                this.$nextTick(() => this.createConnections());
             }
         }
     },
     mounted() {
         console.log("[bracket mounted]");
-        this.createConnections();
+        this.$nextTick(() => this.createConnections());
     }
 };
 </script>

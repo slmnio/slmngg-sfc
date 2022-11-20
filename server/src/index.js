@@ -182,6 +182,7 @@ io.on("connection", (socket) => {
     });
     socket.on("prod_trigger", (event, ...args) => {
         if (!socket._clientName) return console.warn(`Socket connection tried to ${event} without client`);
+        console.log("[Prod Trigger]", socket._clientName, event);
         io.to(`prod:client-${socket._clientName}`).emit(event, args);
     });
 });

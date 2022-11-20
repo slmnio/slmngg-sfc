@@ -83,6 +83,11 @@ export default {
                 // this.$emit("stinger_theme_change", team.theme);
             }
         }
+    },
+    metaInfo() {
+        return {
+            title: `Hero Roster #${this.teamNum || 1} | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

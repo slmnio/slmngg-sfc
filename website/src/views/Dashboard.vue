@@ -88,7 +88,10 @@ export default {
             console.log("prod-join", this.client?.key);
             this.$socket.client.emit("prod-join", this.client?.key);
         }
-    }
+    },
+    metaInfo: () => ({
+        title: "Dashboard"
+    })
 };
 </script>
 

@@ -19,8 +19,8 @@ module.exports = {
      */
     // eslint-disable-next-line no-empty-pattern
     async handler(success, error, { commercialDuration }, { client }, { get, auth }) {
-        const { channel } = getTwitchChannel(client, ["channel:edit:commercial"], { get, auth }, { success, error });
-        const api = getTwitchAPIClient(channel, auth);
+        const { channel } = getTwitchChannel(client, ["channel:edit:commercial"], { success, error });
+        const api = getTwitchAPIClient(channel);
 
         try {
             await api.channels.startChannelCommercial(channel.channel_id, commercialDuration);

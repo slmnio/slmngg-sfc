@@ -19,13 +19,13 @@ module.exports = {
      */
     // eslint-disable-next-line no-empty-pattern
     async handler(success, error, { }, { client }, { get, auth }) {
-        const { broadcast, channel } = getTwitchChannel(client, ["channel:manage:broadcast"], { get, auth }, { success, error });
+        const { broadcast, channel } = getTwitchChannel(client, ["channel:manage:broadcast"], { success, error });
 
         const event = await get(broadcast.event?.[0]);
         if (!event) return error("No event associated with broadcast");
 
         const api = await getTwitchAPIClient(channel, auth);
-        const { match, team1, team2 } = await getMatchData(broadcast, true, { get }, { success, error });
+        const { match, team1, team2 } = await getMatchData(broadcast, true,  { success, error });
 
         const formatOptions = {
             "event": event.name,

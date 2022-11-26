@@ -55,10 +55,10 @@ module.exports = {
 
         // TODO: move cancel action to here
 
-        const { broadcast, channel } = getTwitchChannel(client, ["channel:manage:predictions", "channel:read:predictions"], { get, auth }, { success, error });
+        const { broadcast, channel } = getTwitchChannel(client, ["channel:manage:predictions", "channel:read:predictions"], { success, error });
         // console.log(channel);
-        const api = await getTwitchAPIClient(channel, auth);
-        const { match, team1, team2 } = await getMatchData(broadcast, true, { get }, { success, error });
+        const api = await getTwitchAPIClient(channel);
+        const { match, team1, team2 } = await getMatchData(broadcast, true, { success, error });
 
         const maps = await Promise.all((match.maps || []).map(async m => {
             let map = await get(m);

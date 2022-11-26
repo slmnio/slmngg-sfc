@@ -2,6 +2,7 @@ const Airtable = require("airtable");
 const Cache = require("./cache");
 const { StaticAuthProvider } = require("@twurple/auth");
 const { ApiClient } = require("@twurple/api");
+const { get, auth } = require("./cache");
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
 const slmngg = airtable.base(process.env.AIRTABLE_APP);
 
@@ -102,7 +103,7 @@ async function getValidHeroes() {
     return heroes.filter(h => h.game === "Overwatch");
 }
 
-async function getTwitchChannel(client, requestedScopes, { get, auth }, { success, error }) {
+async function getTwitchChannel(client, requestedScopes, { success, error }) {
     const broadcast = await get(client?.broadcast?.[0]);
     if (!broadcast) return error("No broadcast associated");
     if (!broadcast.channel) return error("No channel associated with broadcast");
@@ -119,7 +120,7 @@ async function getTwitchChannel(client, requestedScopes, { get, auth }, { succes
     };
 }
 
-async function getMatchData(broadcast, requireAll, { get }, { success, error }) {
+async function getMatchData(broadcast, requireAll, { success, error }) {
     const match = await get(broadcast?.live_match?.[0]);
     if (!match) return error("No match associated");
 
@@ -134,7 +135,7 @@ async function getMatchData(broadcast, requireAll, { get }, { success, error }) 
     };
 }
 
-async function getTwitchAPI(channel, auth) {
+async function getTwitchAPIClient(channel) {
     const accessToken = await auth.getTwitchAccessToken(channel);
     const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, accessToken);
     return new ApiClient({authProvider});
@@ -142,5 +143,5 @@ async function getTwitchAPI(channel, auth) {
 
 
 module.exports = {
-    getSelfClient, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord, getTwitchChannel, getMatchData, getTwitchAPIClient: getTwitchAPI
+    getSelfClient, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord, getTwitchChannel, getMatchData, getTwitchAPIClient
 };

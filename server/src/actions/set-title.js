@@ -1,5 +1,3 @@
-const { ApiClient } = require("@twurple/api");
-const { StaticAuthProvider } = require("@twurple/auth");
 const { getTwitchChannel,
     getMatchData,
     getTwitchAPIClient

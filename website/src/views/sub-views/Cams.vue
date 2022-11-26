@@ -20,7 +20,7 @@
                 The links may ask for audio, but we won't use it.
                 We may however use team audio through our bot system while you are in your team's voice channel and during interviews.
             </li>
-
+            <li>We set up the video streams to use the minimum quality and bandwidth to reduce the effects on your PC.</li>
             <li>
                 Video streaming is complicated, and sometimes uses more resources than it should. If you are worried
                 about frame drops, or don't have a particularly powerful PC, you can use these links on a phone or other
@@ -33,12 +33,12 @@
         <h3>Cam Link</h3>
         <div v-if="this.$root.auth.user">
             <p v-if="this.camId">
-                <a :href="camLink">Open Cam</a> Cam ID: {{this.camId}}
+                <b-button variant="success" class="link-text" :href="camLink">Open Cam <i class="fas fa-fw fa-external-link"></i></b-button>
             </p>
             <p v-else><LoadingIcon/> Finding your camera</p>
         </div>
         <p v-else>
-           <button @click="login">Login to see your cam link</button>
+           <b-button variant="secondary" @click="login"><i class="fas fa-fw fa-lock"></i> Login to see your cam link</b-button>
         </p>
 
     </div>
@@ -49,10 +49,11 @@
 import { authenticatedRequest } from "@/utils/dashboard";
 import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import LoadingIcon from "@/components/website/LoadingIcon";
+import { BButton } from "bootstrap-vue";
 
 export default {
     name: "TeamCams",
-    components: { LoadingIcon },
+    components: { LoadingIcon, BButton },
     data: () => ({
         hasCreatedLiveGuest: false
     }),
@@ -89,6 +90,11 @@ export default {
         isAuthed() {
             this.createLiveGuest();
         }
+    },
+    metaInfo() {
+        return {
+            title: "Player Cams"
+        };
     }
 };
 </script>

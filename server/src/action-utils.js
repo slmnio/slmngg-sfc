@@ -1,5 +1,8 @@
 const Airtable = require("airtable");
 const Cache = require("./cache");
+const { StaticAuthProvider } = require("@twurple/auth");
+const { ApiClient } = require("@twurple/api");
+const { get, auth } = require("./cache");
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
 const slmngg = airtable.base(process.env.AIRTABLE_APP);
 
@@ -109,6 +112,45 @@ async function getValidHeroes() {
     return heroes.filter(h => h.game === "Overwatch");
 }
 
+async function getTwitchChannel(client, requestedScopes, { success, error }) {
+    const broadcast = await get(client?.broadcast?.[0]);
+    if (!broadcast) return error("No broadcast associated");
+    if (!broadcast.channel) return error("No channel associated with broadcast");
+
+    const channel = await auth.getChannel(broadcast?.channel?.[0]);
+    if (!channel.twitch_refresh_token) return error("No twitch auth token associated with channel");
+    if (!channel.channel_id || !channel.name || !channel.twitch_scopes) return error("Invalid channel data");
+    let scopes = channel.twitch_scopes.split(" ");
+    if (!requestedScopes.every(scope => scopes.includes(scope))) return error("Token doesn't have the required scopes");
+    return {
+        broadcast,
+        channel,
+        scopes
+    };
+}
+
+async function getMatchData(broadcast, requireAll, { success, error }) {
+    const match = await get(broadcast?.live_match?.[0]);
+    if (!match) return error("No match associated");
+
+    const team1 = await get(match?.teams?.[0]);
+    const team2 = await get(match?.teams?.[1]);
+    if (requireAll && (!team1 || !team2)) return error("Did not find two teams!");
+
+    return {
+        match,
+        team1,
+        team2
+    };
+}
+
+async function getTwitchAPIClient(channel) {
+    const accessToken = await auth.getTwitchAccessToken(channel);
+    const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, accessToken);
+    return new ApiClient({authProvider});
+}
+
+
 module.exports = {
-    getSelfClient, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord
+    getSelfClient, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord, getTwitchChannel, getMatchData, getTwitchAPIClient
 };

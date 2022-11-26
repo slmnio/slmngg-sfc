@@ -13,7 +13,6 @@ module.exports = {
     async handler(success, error, {  }, { user }, { updateRecord, get, createRecord }) {
         if (user.airtable?.live_guests?.length > 0) {
             const currentLiveGuest = await get(user.airtable?.live_guests[0]);
-            console.log(currentLiveGuest);
             let response = await updateRecord("Live Guests", currentLiveGuest, {
                 "Discord ID": user.discord.id,
                 "Avatar": `https://cdn.discordapp.com/avatars/${user.discord.id}/${user.discord.avatar}.webp?size=512`,

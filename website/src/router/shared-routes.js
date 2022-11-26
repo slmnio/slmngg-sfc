@@ -1,5 +1,6 @@
 import EventRoutes from "@/router/event";
 const Team = () => import("@/views/Team");
+const Cams = () => import("@/views/sub-views/Cams");
 const TeamMain = () => import("@/views/sub-views/TeamMain");
 const TeamSchedule = () => import("@/views/sub-views/TeamSchedule");
 const TeamTheme = () => import("@/views/sub-views/ThingTheme");
@@ -73,6 +74,7 @@ export default [
             requiresAuth: true
         }
     },
+    { path: "cams", component: Cams },
     {
         path: "/match/:id",
         component: Match,

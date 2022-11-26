@@ -1,5 +1,9 @@
 const { ApiClient } = require("@twurple/api");
 const { StaticAuthProvider } = require("@twurple/auth");
+const { getTwitchChannel,
+    getMatchData,
+    getTwitchAPIClient
+} = require("../action-utils");
 module.exports = {
     key: "set-title",
     auth: ["client"],
@@ -15,32 +19,13 @@ module.exports = {
      */
     // eslint-disable-next-line no-empty-pattern
     async handler(success, error, { }, { client }, { get, auth }) {
-        const broadcast = await get(client?.broadcast?.[0]);
-        if (!broadcast) return error("No broadcast associated");
-        if (!broadcast.channel) return error("No channel associated with broadcast");
+        const { broadcast, channel } = getTwitchChannel(client, ["channel:manage:broadcast"], { get, auth }, { success, error });
 
         const event = await get(broadcast.event?.[0]);
         if (!event) return error("No event associated with broadcast");
 
-
-        const channel = await auth.getChannel(broadcast?.channel?.[0]);
-        if (!channel.twitch_refresh_token) return error("No twitch auth token associated with channel");
-        if (!channel.channel_id || !channel.name || !channel.twitch_scopes) return error("Invalid channel data");
-        let scopes = channel.twitch_scopes.split(" ");
-        if (!["channel:manage:broadcast"].every(scope => scopes.includes(scope))) return error("Token doesn't have the required scopes");
-
-        const accessToken = await auth.getTwitchAccessToken(channel);
-
-        const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, accessToken);
-        const api = new ApiClient({authProvider});
-
-
-        const match = await get(broadcast?.live_match?.[0]);
-        if (!match) return error("No match associated");
-
-        const team1 = await get(match?.teams?.[0]);
-        const team2 = await get(match?.teams?.[1]);
-        if (!team1 || !team2) return error("Did not find two teams!");
+        const api = await getTwitchAPIClient(channel, auth);
+        const { match, team1, team2 } = await getMatchData(broadcast, true, { get }, { success, error });
 
         const formatOptions = {
             "event": event.name,

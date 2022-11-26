@@ -1,5 +1,9 @@
 const { ApiClient } = require("@twurple/api");
 const { StaticAuthProvider, refreshUserToken } = require("@twurple/auth");
+const { getTwitchChannel,
+    getTwitchAPIClient,
+    getMatchData
+} = require("../action-utils");
 
 const automaticPredictionTitleStartCharacter = "⬥";
 
@@ -49,30 +53,12 @@ module.exports = {
         if (!(["create", "lock", "resolve", "cancel"].includes(predictionAction))) return error("Invalid action");
         console.log(predictionAction);
 
-        const broadcast = await get(client?.broadcast?.[0]);
-        if (!broadcast) return error("No broadcast associated");
-        if (!broadcast.channel) return error("No channel associated with broadcast");
-
-        const channel = await auth.getChannel(broadcast?.channel?.[0]);
-        if (!channel.twitch_refresh_token) return error("No twitch auth token associated with channel");
-        if (!channel.channel_id || !channel.name || !channel.twitch_scopes) return error("Invalid channel data");
-        let scopes = channel.twitch_scopes.split(" ");
-        if (!["channel:manage:predictions", "channel:read:predictions"].every(scope => scopes.includes(scope))) return error("Token doesn't have the required scopes");
-
-        console.log(channel);
-        const accessToken = await auth.getTwitchAccessToken(channel);
-
-        const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, accessToken);
-        const api = new ApiClient({authProvider});
-
         // TODO: move cancel action to here
 
-        const match = await get(broadcast?.live_match?.[0]);
-        if (!match) return error("No match associated");
-
-        const team1 = await get(match?.teams?.[0]);
-        const team2 = await get(match?.teams?.[1]);
-        if (!team1 || !team2) return error("Did not find two teams!");
+        const { broadcast, channel } = getTwitchChannel(client, ["channel:manage:predictions", "channel:read:predictions"], { get, auth }, { success, error });
+        // console.log(channel);
+        const api = await getTwitchAPIClient(channel, auth);
+        const { match, team1, team2 } = await getMatchData(broadcast, true, { get }, { success, error });
 
         const maps = await Promise.all((match.maps || []).map(async m => {
             let map = await get(m);

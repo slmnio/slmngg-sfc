@@ -1,8 +1,9 @@
 <template>
     <div class="cam-overlay">
-        <div class="guest" v-bind:class="{ full }" v-if="shouldShowCam" :style="theme">
+        <div class="guest" v-bind:class="{ full }" v-if="shouldShowCam" v-show="alwaysShowBox || childCameraIsOn" :style="theme">
             <CasterCam class="team-cam" :guest="activeGuest" :extra-params="camParams" :disable-video="false"
-                       :event="broadcast && broadcast.event" :relay-prefix="relayPrefix" :team="activeTeam" />
+                       :event="broadcast && broadcast.event" :relay-prefix="relayPrefix" :team="activeTeam"
+             @cam_visible="(isVisible) => childCameraIsOn = isVisible"/>
         </div>
         <div class="guest-name-holder" v-if="shouldShowName">
             <div class="team-logo-holder" v-if="activeTeam">
@@ -29,8 +30,11 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 
 export default {
     name: "CamOverlay",
-    props: ["broadcast", "params", "number", "full", "alwaysShow", "relay", "client"],
+    props: ["broadcast", "params", "number", "full", "alwaysShow", "relay", "client", "alwaysShowBox"],
     components: { CasterCam, ThemeLogo },
+    data: () => ({
+        childCameraIsOn: false
+    }),
     computed: {
         broadcastSettings() {
             return this.broadcast?.broadcast_settings || [];

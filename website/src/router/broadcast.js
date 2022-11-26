@@ -73,6 +73,7 @@ export default [
                     number: route.query.number || route.query.num || route.query.player,
                     full: !!route.query.full || !!route.query.relay,
                     alwaysShow: !!route.query.alwaysShow || !!route.query.relay,
+                    alwaysShowBox: !!route.query.alwaysShowBox || !!route.query.box,
                     relay: !!route.query.relay
                 })
             },

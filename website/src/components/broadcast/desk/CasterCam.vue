@@ -17,7 +17,7 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "CasterCam",
-    props: ["guest", "disableVideo", "color", "extraParams", "fallbackAvatar", "event", "relayPrefix", "team"],
+    props: ["guest", "disableVideo", "color", "extraParams", "fallbackAvatar", "event", "relayPrefix", "team", "hideIfNoCam"],
     data: () => ({
         iframe: null,
         apiVisible: false,
@@ -74,6 +74,10 @@ export default {
             } else {
                 this.slowDisableCam();
             }
+        },
+        cameraIsOn(isVisible) {
+            this.$emit("cam_visible", isVisible);
+            console.log("cam_visible", isVisible);
         }
     },
     methods: {
@@ -86,6 +90,7 @@ export default {
     },
     mounted() {
         window.addEventListener("message", (e) => {
+            if (e.data?.source?.startsWith("vue-")) return;
             console.log("[global iframe]", e.data);
             const data = e.data;
 

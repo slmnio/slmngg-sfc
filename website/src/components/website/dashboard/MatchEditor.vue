@@ -4,7 +4,7 @@
 
         <b-form v-if="match" @submit="(e) => e.preventDefault()">
             <b-alert variant="danger" :show="!!errorMessage" dismissible @dismissed="() => this.errorMessage = null"><i class="fas fa-exclamation-circle fa-fw"></i> <b>Error</b>: {{ errorMessage }}</b-alert>
-            <div class="top d-flex align-items-center">
+            <div class="top d-flex align-items-center" v-if="!hideMatchExtras">
                 <b-form-checkbox :class="{'low-opacity': processing['special_event']}" class="opacity-changes flex-shrink-0 mr-5"
                                  v-model="matchData.special_event" name="special-event-checkbox" @change="(checked) => sendMatchDataChange('special_event', checked)">
                     Special Event
@@ -31,6 +31,7 @@
                     <b-button size="sm" @click="() => extraMaps++">
                         <i class="fas fa-fw fa-plus"></i> Add map
                     </b-button>
+                    <b-button v-if="hideMatchExtras" class="ml-2 top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save all</b-button>
                 </div>
             </div>
             <table class="teams-maps table table-bordered table-sm table-dark mt-2 opacity-changes"  :class="{'low-opacity': processing['map']}">
@@ -70,6 +71,14 @@
                 </tr>
             </table>
         </b-form>
+
+        {{ matchData }}
+        <br>
+        {{ editedMapData }}
+        <br>
+        {{ previousAutoData }}
+        <br>
+        <br>
     </div>
 </template>
 
@@ -85,7 +94,7 @@ import MapScoreEditor from "@/components/website/dashboard/MapScoreEditor";
 
 export default {
     name: "MatchEditor",
-    props: ["match"],
+    props: ["match", "hideMatchExtras"],
     // eslint-disable-next-line vue/no-unused-components
     components: { MapScoreEditor, TeamPicker, ContentThing, ThemeLogo, BForm, BFormGroup, BFormCheckbox, BFormInput, BButton, BFormSelect, BAlert },
     computed: {
@@ -204,7 +213,8 @@ export default {
         mapNumbers: [],
         existingMapIDs: [],
         extraMaps: 0,
-        errorMessage: null
+        errorMessage: null,
+        previousAutoData: null
     }),
     methods: {
         async setScore(scoreNum, number) {
@@ -214,6 +224,11 @@ export default {
             });
 
             await this.sendMatchDataChange(scoreNum, parseInt(number));
+        },
+        setIfNew(key, index, value) {
+            if (this.previousAutoData?.[key]?.[index] === value) return; // console.log(`Not updating ${key}[${index}] because ${value} is the same as last set`);
+            console.log(`Updating ${key}[${index}] to`, value);
+            this.$set(this[key], index, value);
         },
         updateMatchData(data) {
             console.log("match data update", data);
@@ -226,20 +241,32 @@ export default {
             if (data.maps) {
                 data.maps.forEach((map, i) => {
                     const mapChoice = cleanID(map.map?.id || map.map?.[0]);
-                    if (mapChoice) this.$set(this.mapChoices, i, mapChoice);
+                    this.setIfNew("mapChoices", i, mapChoice || null);
                     console.log("Map set", !!mapChoice, mapChoice, this.mapChoices[i], map);
-                    this.$set(this.draws, i, map.draw);
-                    this.$set(this.existingMapIDs, i, map.id);
-                    this.$set(this.winners, i, map.winner?.id || map.winner?.[0]);
-                    this.$set(this.pickers, i, map.picker?.id || map.picker?.[0]);
-                    this.$set(this.banners, i, map.banner?.id || map.banner?.[0]);
-                    this.$set(this.score_1s, i, map.score_1);
-                    this.$set(this.score_2s, i, map.score_2);
-                    this.$set(this.mapNumbers, i, map.number);
+                    this.setIfNew("draws", i, map.draw);
+                    this.setIfNew("existingMapIDs", i, map.id);
+                    this.setIfNew("winners", i, map.winner?.id || map.winner?.[0]);
+                    this.setIfNew("pickers", i, map.picker?.id || map.picker?.[0]);
+                    this.setIfNew("banners", i, map.banner?.id || map.banner?.[0]);
+                    this.setIfNew("score_1s", i, map.score_1);
+                    this.setIfNew("score_2s", i, map.score_2);
+                    this.setIfNew("mapNumbers", i, map.number);
                 });
             }
 
             this.matchData.scores = this.scores;
+
+            this.previousAutoData = {
+                draws: Object.assign([], this.draws),
+                existingMapIDs: Object.assign([], this.existingMapIDs),
+                winners: Object.assign([], this.winners),
+                pickers: Object.assign([], this.pickers),
+                banners: Object.assign([], this.banners),
+                score_1s: Object.assign([], this.score_1s),
+                score_2s: Object.assign([], this.score_2s),
+                mapNumbers: Object.assign([], this.mapNumbers),
+                mapChoices: Object.assign([], this.mapChoices)
+            };
         },
         async sendMatchDataChange(key, val) {
             this.$set(this.processing, key, true); // set it processing while we work

@@ -10,7 +10,7 @@
             <div class="m-2 d-none"><b-form-checkbox v-model="broadcast.show_cams" @change="() => togglePlayerCams($root.auth)">Show Cams</b-form-checkbox></div>
         </div>
         <div class="broadcast-match-editor" v-if="liveMatch">
-            <MatchEditor :match="liveMatch"></MatchEditor>
+            <MatchEditor :hide-match-extras="true" :match="liveMatch"></MatchEditor>
         </div>
         <Predictions v-if="liveMatch" :client="client"/>
         <Commercials v-if="hasPermission('Full broadcast permissions')" :client="client" />

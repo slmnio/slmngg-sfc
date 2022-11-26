@@ -1,13 +1,6 @@
-import Team from "@/views/Team";
-import TeamMain from "@/views/sub-views/TeamMain";
-// import TeamMatches from "@/views/sub-views/TeamMatches";
-import TeamSchedule from "@/views/sub-views/TeamSchedule";
-import TeamTheme from "@/views/sub-views/ThingTheme";
-import TeamDetails from "@/views/sub-views/TeamDetails";
-import Cams from "@/views/sub-views/Cams";
-import Event from "@/views/Event";
 import EventRoutes from "@/router/event";
 const Team = () => import("@/views/Team");
+const Cams = () => import("@/views/sub-views/Cams");
 const TeamMain = () => import("@/views/sub-views/TeamMain");
 const TeamSchedule = () => import("@/views/sub-views/TeamSchedule");
 const TeamTheme = () => import("@/views/sub-views/ThingTheme");

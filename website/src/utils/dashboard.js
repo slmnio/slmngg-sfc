@@ -45,6 +45,14 @@ export async function managePred(auth, client, predictionAction) {
     });
 }
 
+export async function startCommercial(auth, client, commercialDuration) {
+    if (!auth?.user) return { error: true, errorMessage: "Not authenticated" };
+    return await authenticatedRequest(auth, "actions/start-commercial", {
+        client: client.id || client,
+        commercialDuration
+    });
+}
+
 export async function updateAutomaticTitle(auth, client) {
     if (!auth?.user) return { error: true, errorMessage: "Not authenticated" };
     return await authenticatedRequest(auth, "actions/set-title", {

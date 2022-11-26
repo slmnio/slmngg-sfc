@@ -6,7 +6,6 @@ module.exports = {
     /***
      * @param {ActionSuccessCallback} success
      * @param {ActionErrorCallback} error
-     * @param {PredictionAction} predictionAction
      * @param {number?} autoLockAfter
      * @param {ClientData} client
      * @param {CacheGetFunction} get
@@ -15,8 +14,7 @@ module.exports = {
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern
-    async handler(success, error, { predictionAction, autoLockAfter = 120 }, { client }, { get, auth }) {
-
+    async handler(success, error, { }, { client }, { get, auth }) {
         const broadcast = await get(client?.broadcast?.[0]);
         if (!broadcast) return error("No broadcast associated");
         if (!broadcast.channel) return error("No channel associated with broadcast");

@@ -13,7 +13,7 @@
             <MatchEditor :match="liveMatch"></MatchEditor>
         </div>
         <Predictions v-if="liveMatch" :client="client"/>
-        <Commercials :client="client" />
+        <Commercials v-if="hasPermission('Full broadcast permissions')" :client="client" />
         <b-button class="mt-2" variant="secondary" @click="updateTitle">
             <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title
         </b-button>
@@ -76,9 +76,11 @@ export default {
     methods: {
         url,
         togglePlayerCams,
-
         async updateTitle() {
             await updateAutomaticTitle(this.$root.auth, "self", "create");
+        },
+        hasPermission(permission) {
+            return (this.user.website_settings || []).includes(permission);
         }
     }
 };

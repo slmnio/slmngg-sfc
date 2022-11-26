@@ -15,7 +15,9 @@ module.exports = {
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern
-    async handler(success, error, { commercialDuration }, { client }, { get, auth }) {
+    async handler(success, error, { commercialDuration }, { client, user }, { get, auth }) {
+        if (!user.airtable?.website_settings?.includes("Full broadcast permissions")) return error("You don't have permission to start a commercial", 403);
+
         const broadcast = await get(client?.broadcast?.[0]);
         if (!broadcast) return error("No broadcast associated");
         if (!broadcast.channel) return error("No channel associated with broadcast");

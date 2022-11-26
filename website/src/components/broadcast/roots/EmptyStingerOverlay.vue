@@ -5,6 +5,11 @@
 <script>
 export default {
     name: "EmptyStingerOverlay",
+    data: () => ({
+        prodData: {
+            minor: true
+        }
+    }),
     metaInfo() {
         return {
             title: `Empty Stinger | ${this.broadcast?.code || this.broadcast?.name || ""}`

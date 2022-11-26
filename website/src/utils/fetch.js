@@ -149,6 +149,7 @@ export function getMainDomain(subdomain) {
         if (subdomain) {
             return window.location.origin.replace(`${subdomain}.`, "");
         } else {
+            if (process.env.VUE_APP_MAIN_DOMAIN) return process.env.VUE_APP_MAIN_DOMAIN;
             if (process.env.VUE_APP_DEPLOY_MODE === "production") return "https://slmn.gg";
             if (process.env.VUE_APP_DEPLOY_MODE === "staging") return "https://dev.slmn.gg";
             if (process.env.VUE_APP_DEPLOY_MODE === "local") return "http://localhost:8080";
@@ -167,6 +168,7 @@ export function getMainCookieDomain(subdomain) {
         if (subdomain) {
             return window.location.hostname.replace(`${subdomain}.`, "");
         } else {
+            if (process.env.VUE_APP_MAIN_COOKIE_DOMAIN) return process.env.VUE_APP_MAIN_COOKIE_DOMAIN;
             if (process.env.VUE_APP_DEPLOY_MODE === "production") return "slmn.gg";
             if (process.env.VUE_APP_DEPLOY_MODE === "staging") return "dev.slmn.gg";
             if (process.env.VUE_APP_DEPLOY_MODE === "local") return "localhost";

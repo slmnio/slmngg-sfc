@@ -4,6 +4,7 @@
                  @mouseover.native="matchHover" @mouseleave.native="matchEmpty">
         <div class="match-name d-none">{{ match && match.name }}</div>
         <div class="match-number" v-bind:class="{'lowlight': lowlight}" v-if="matchNumber">{{ matchNumber }}</div>
+        <div class="match-time" v-bind:class="{'lowlight': lowlight}" v-if="showTimes && friendlyStartTime">{{ friendlyStartTime }}</div>
         <div class="match-teams">
             <BracketTeam v-for="(team, i) in teams"
                          :team="team.id && team"
@@ -43,11 +44,12 @@
 import BracketTeam from "@/components/website/bracket/BracketTeam";
 import { url } from "@/utils/content-utils";
 import store from "@/thing-store";
+import spacetime from "spacetime";
 
 export default {
     name: "BracketMatch",
     components: { BracketTeam },
-    props: ["match"],
+    props: ["match", "showTimes"],
     data: () => ({
         hover: false
     }),
@@ -83,11 +85,11 @@ export default {
         },
         generateDummies(dummy, match) {
             const feederMatches = match?._bracket_data?.connections?.feederMatches;
-            console.log("cons", match?._bracket_data?.num, match?._bracket_data?.connections);
+            // console.log("cons", match?._bracket_data?.num, match?._bracket_data?.connections);
             if (!feederMatches || (!feederMatches["1"] && !feederMatches["2"])) return [dummy, dummy];
             const dummies = [dummy, dummy];
             if (feederMatches["1"]) {
-                console.log("f1", feederMatches["1"]);
+                // console.log("f1", feederMatches["1"]);
                 dummies[0] = {
                     ...dummy,
                     text: `${feederMatches["1"]._m} M${feederMatches["1"].side}`
@@ -95,14 +97,14 @@ export default {
             }
 
             if (feederMatches["2"]) {
-                console.log("f2", feederMatches["2"]);
+                // console.log("f2", feederMatches["2"]);
                 dummies[1] = {
                     ...dummy,
                     text: `${feederMatches["2"]._m} M${feederMatches["2"].side}`
                 };
             }
 
-            console.log("dummies", match._bracket_data.num, dummies);
+            // console.log("dummies", match._bracket_data.num, dummies);
 
             return dummies;
         }
@@ -133,7 +135,7 @@ export default {
             const dummy = { text: "TBD", dummy: true, id: null };
             const dummies = this.generateDummies(dummy, this.match);
             if (!this.match) return [{ ...dummies[0], _empty: true }, { ...dummies[1], _empty: true }];
-            console.log("dummies", this.match._bracket_data.num, dummies);
+            // console.log("dummies", this.match._bracket_data.num, dummies);
 
             let text = (this.match.placeholder_teams || "").trim().split("|").filter(t => t !== "");
             let extraText = [null, null];
@@ -176,6 +178,28 @@ export default {
         },
         lowlight() {
             return !!store.state.highlighted_team;
+        },
+        friendlyStartTime() {
+            if (!this.match.start) return null;
+            const utc = spacetime(this.match.start);
+            const time = utc.goto(this.activeTimezone);
+            const diffFromNow = new Date(this.match.start) - new Date();
+
+            if (diffFromNow <= 0) return null; // don't show on past matches (could be disabled)
+
+            const clarifyDate = diffFromNow <= 0 || diffFromNow >= 1000 * 60 * 60 * 24 * 7;
+
+            // eslint-disable-next-line no-unreachable
+            const format = "{day-short}[D] {hour}[M]{ampm}"
+                .replace("[M]", time.minute() === 0 ? "" : ":{minute-pad}")
+                .replace("[D]", clarifyDate ? " {date-ordinal} {month-short}" : "");
+
+            return time.format(format);
+        },
+        activeTimezone() {
+            const stz = store.state.timezone;
+            if (!stz || stz === "local") return spacetime.now().timezone().name;
+            return stz;
         }
     }
 };
@@ -228,9 +252,8 @@ export default {
         margin-top: .15em;
     }
 
-    .match-number {
+    .match-number, .match-time {
         position: absolute;
-        left: 0;
         background: #333;
         text-align: center;
         bottom: 100%;
@@ -244,11 +267,20 @@ export default {
         transition: opacity 150ms, border-color 150ms;
     }
 
+    .match-number {
+        left: 0;
+    }
+    .match-time {
+        right: 0;
+    }
+
     .bracket-match.hover,
-    .bracket-match.hover .match-number {
+    .bracket-match.hover .match-number,
+    .bracket-match.hover .match-time {
         border-color:  rgba(255, 255, 255, 0.5);
     }
-    .bracket-match:not(:hover) .match-number.lowlight {
+    .bracket-match:not(:hover) .match-number.lowlight,
+    .bracket-match:not(:hover) .match-time.lowlight {
         opacity: 0.2;
     }
 </style>

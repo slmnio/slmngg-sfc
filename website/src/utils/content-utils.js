@@ -186,3 +186,118 @@ export function textSort(a, b) {
     if (a > b) return 1;
     return 0;
 }
+
+export function likelyNeededMaps(match) {
+    const scores = [match.score_1, match.score_2].map(s => s || 0);
+
+    // how many maps have a winner marked
+    const playedMaps = (match.maps || []).filter(m => m.winner).length;
+
+    // how many maps each team needs to win to complete
+    const toWin = scores.map(s => match.first_to - s);
+
+    // how many maps could be played with no draws
+    const withoutDraws = (match.first_to * 2) - 1;
+
+    const draws = (match?.maps || []).filter(m => m.draw).length;
+
+    // if match is over (scores.some s == match.first_to)
+
+    // minimum (first to x2) -1
+
+    // currently played + 1 (tiebreakers, draws etc)
+
+    console.log({ playedMaps, toWin, withoutDraws, draws });
+
+    return withoutDraws + draws;
+}
+
+export const DefaultMapImages = {
+    Assault: "https://cdn.discordapp.com/attachments/855517740914573342/868231135224819743/44684849494984.png",
+    Escort: "https://cdn.discordapp.com/attachments/855517740914573342/868231132444000276/484444884949494949494948421651615641.png",
+    Hybrid: "https://cdn.discordapp.com/attachments/855517740914573342/868231133765201950/448489494949849494949494949494949.png",
+    Control: "https://cdn.discordapp.com/attachments/855517740914573342/868230457622396928/63541654456789487695.png",
+    Push: "https://cdn.discordapp.com/attachments/855517740914573342/969692510249177098/puuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuush.png",
+    Spike: "https://cdn.discordapp.com/attachments/880305022716481639/883811894463447110/newspikeplant.png",
+    SpikeRush: "https://cdn.discordapp.com/attachments/880305022716481639/883809271198924840/spikerush_default.png",
+    ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png",
+    Slayer: "https://media.discordapp.net/attachments/855517740914573342/913747752729595904/slayer.png",
+    Strongholds: "https://media.discordapp.net/attachments/855517740914573342/913747753086107668/strongholds.png",
+    CTF: "https://media.discordapp.net/attachments/855517740914573342/913747753392304158/ctf.png",
+    Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png"
+};
+
+export function getTeamsMapStats(teams, requestMatch, requestMap) {
+    console.log(requestMatch);
+    if (!teams) return null;
+    const stats = teams.map(team => {
+        const stat = {
+            played: 0,
+            wins: 0,
+            losses: 0,
+            draws: 0
+        };
+
+        const prevMatches = (team.matches || [])
+            .filter(m => new Date(m.start) < new Date(requestMatch.start) && m.id !== requestMatch.id)
+            .sort((a, b) => new Date(b.start) - new Date(a.start));
+
+        const latestMatch = prevMatches.length ? prevMatches[0] : null;
+
+
+        (team.matches || []).forEach(match => {
+            (match.maps || []).forEach(matchMap => {
+                if (!matchMap.map) return; // no proper map data
+                if (requestMap.id !== cleanID(matchMap.map[0])) return; // isn't this map
+
+                if (requestMatch?.maps?.length) {
+                    const scheduledMap = requestMatch.maps.find(m => m.name?.length && matchMap.name?.length && (m.name[0] === matchMap.name[0]));
+                    console.log(matchMap.name, { scheduledMap, matchMap });
+                    if (scheduledMap) stat.scheduled_for_match = true;
+                }
+
+                if (!(matchMap.draw || matchMap.winner)) return; // wasn't played fully
+
+                // woo right map
+
+                stat.played++;
+                if (matchMap.draw) {
+                    stat.draws++;
+                } else {
+                    // determine winner
+                    if (cleanID(matchMap.winner[0]) === team.id) {
+                        stat.wins++;
+                    } else {
+                        stat.losses++;
+                    }
+                }
+
+
+                if (latestMatch?.maps) {
+                    // Check to see if the last played match played this map
+                    const playedMap = latestMatch.maps.find(m => m.winner?.length && m.name?.length && matchMap.name?.length && (m.name[0] === matchMap.name[0]));
+                    if (playedMap) stat.played_recently = true;
+                }
+            });
+        });
+
+        stat.score = stat.wins + (stat.losses * -0.25);
+        return { stats: stat, team };
+    });
+
+    if (stats?.[0]?.stats?.score > stats?.[1]?.stats?.score) {
+        stats[0].stats.score_winner = true;
+    } else if (stats?.[0]?.stats?.score < stats?.[1]?.stats?.score) {
+        stats[1].stats.score_winner = true;
+    }
+
+    console.log(stats);
+
+    return {
+        stats,
+        meta: {
+            eitherTeamPlayed: stats.some(t => t.stats?.played > 0),
+            scheduledForMatch: stats.some(t => t.stats?.scheduled_for_match)
+        }
+    };
+}

@@ -1,6 +1,6 @@
 import { getDataServerAddress } from "@/utils/fetch";
 
-async function authenticatedRequest(auth, url, data) {
+export async function authenticatedRequest(auth, url, data) {
     const token = auth?.token;
     if (!token) return { error: true, errorMessage: "No token" };
     return await fetch(`${getDataServerAddress()}/${url}`, {

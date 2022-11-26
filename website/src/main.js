@@ -7,6 +7,7 @@ import VueRouter from "vue-router";
 import VueSocketIOExt from "vue-socket.io-extended";
 import { io } from "socket.io-client";
 import { VBTooltip } from "bootstrap-vue";
+import "bootstrap-vue/dist/bootstrap-vue.css";
 import VueYoutubeEmbed from "vue-youtube-embed";
 import VueCookies from "vue-cookies";
 

@@ -18,10 +18,10 @@ function sizePadding(val, defaultVal) {
 
 export default {
     name: "ThemeLogo",
-    props: ["theme", "iconPadding", "borderWidth", "logoSize"],
+    props: ["theme", "iconPadding", "borderWidth", "logoSize", "small"],
     computed: {
         image() {
-            if (this.logoSize && parseInt(this.logoSize) <= 100) {
+            if (this.small || (this.logoSize && parseInt(this.logoSize) <= 100)) {
                 // use smalls if possible
                 return resizedImage(this.theme, ["small_logo", "default_logo"], this.logoSize);
             }

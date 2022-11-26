@@ -17,9 +17,9 @@ module.exports = {
      */
     // eslint-disable-next-line no-empty-pattern
     async handler(success, error, { commercialDuration }, { client }, { get, auth }) {
+        if (!user.airtable?.website_settings?.includes("Full broadcast permissions")) return error("You don't have permission to start a commercial", 403);
         const { channel } = getTwitchChannel(client, ["channel:edit:commercial"], { success, error });
         const api = getTwitchAPIClient(channel);
-
         try {
             await api.channels.startChannelCommercial(channel.channel_id, commercialDuration);
         } catch (e) {

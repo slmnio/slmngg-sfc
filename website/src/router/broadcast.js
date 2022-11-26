@@ -1,5 +1,9 @@
+const MapStatsOverlay = () => import("@/components/broadcast/roots/MapStatsOverlay");
+const IngameCommsOverlay = () => import("@/components/broadcast/roots/IngameCommsOverlay");
+const PlayerAudio = () => import("@/components/broadcast/PlayerAudio");
 const MVPOverlay = () => import("@/components/broadcast/roots/MVPOverlay");
 const MultiStandingsOverlay = () => import("@/components/broadcast/roots/MultiStandingsOverlay");
+const ClientOverview = () => import("@/components/broadcast/roots/ClientOverview");
 
 const IngameOverlay = () => import("@/components/broadcast/roots/IngameOverlay");
 const BreakOverlay = () => import("@/components/broadcast/break/BreakOverlay");
@@ -47,6 +51,10 @@ const HeroRosterOverlay = () => import("@/components/broadcast/roots/HeroRosterO
 
 export default [
     {
+        path: "admin",
+        component: ClientOverview
+    },
+    {
         path: "ingame",
         component: IngameOverlay,
         props: route => ({ codes: route.query.codes, sponsorFadeSpeed: (route.query.sponsorSpeed || route.query.sponsorFadeSpeed) })
@@ -62,7 +70,7 @@ export default [
                 path: "pov",
                 component: CamOverlay,
                 props: route => ({
-                    number: route.query.number || route.query.player,
+                    number: route.query.number || route.query.num || route.query.player,
                     full: !!route.query.full || !!route.query.relay,
                     alwaysShow: !!route.query.alwaysShow || !!route.query.relay,
                     relay: !!route.query.relay
@@ -184,5 +192,21 @@ export default [
     { path: "stinger", component: EmptyStingerOverlay },
     { path: "empty", redirect: "stinger" },
     { path: "broadcasts", component: OtherBroadcastsOverlay },
-    { path: "mvp", component: MVPOverlay }
+    { path: "mvp", component: MVPOverlay },
+    {
+        path: "audio",
+        component: PlayerAudio,
+        props: route => ({
+            taskKey: route.query.key
+        })
+    },
+    {
+        path: "ingame-comms",
+        component: IngameCommsOverlay,
+        props: route => ({
+            listenInText: route.query.text,
+            buffer: parseInt(route.query.buffer)
+        })
+    },
+    { path: "map-stats", component: MapStatsOverlay }
 ];

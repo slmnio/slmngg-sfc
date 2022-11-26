@@ -78,7 +78,8 @@ export default {
         playedTrackIds: [],
         loadedTrackList: [],
         visible: true,
-        lastTrack: null
+        lastTrack: null,
+        noStinger: true
     }),
     computed: {
         tracksData() {
@@ -140,17 +141,7 @@ export default {
             }
         },
         active(isActive) {
-            if (this.crossfading) return; // already crossfading, dw about it
-            if (isActive) {
-                this.mainPlayer?.stop();
-                this.mainPlayer = null;
-                this.start();
-                setTimeout(() => {
-                    this.visible = true;
-                }, this.broadcast?.transition_offset + 500 || 500);
-            } else {
-                this.visible = false;
-            }
+            this.startNewSong(isActive);
         }
     },
     beforeDestroy() {
@@ -217,12 +208,33 @@ export default {
                 this.crossfadePlayer.stop();
                 this.crossfadePlayer = null;
             }, this.crossfadeDuration * 1000);
+        },
+        startNewSong(isActive) {
+            if (this.crossfading) return; // already crossfading, dw about it
+            if (isActive) {
+                this.mainPlayer?.stop();
+                this.mainPlayer = null;
+                this.start();
+                setTimeout(() => {
+                    this.visible = true;
+                }, this.broadcast?.transition_offset + 500 || 500);
+            } else {
+                this.visible = false;
+            }
         }
     },
     metaInfo() {
         return {
             title: `Music (${this.role || ""}) | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
+    },
+    sockets: {
+        skip_song([group]) {
+            console.log(group, this.role);
+            if (group === this.role) {
+                this.startNewSong(true);
+            }
+        }
     }
 };
 

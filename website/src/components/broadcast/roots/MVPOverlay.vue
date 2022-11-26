@@ -78,6 +78,11 @@ export default {
                 }
             }
         }
+    },
+    metaInfo() {
+        return {
+            title: `MVP | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

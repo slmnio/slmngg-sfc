@@ -12,6 +12,7 @@ import SharedRoutes from "@/router/shared-routes";
 import Authenticator from "@/views/Authenticator";
 import Dashboard from "@/views/Dashboard";
 import ProfilePage from "@/views/ProfilePage";
+import TwitchAuthScopeSelector from "@/components/website/TwitchAuthScopeSelector";
 
 export default [
     {
@@ -59,6 +60,10 @@ export default [
                 path: "/auth/discord/return",
                 props: route => ({ code: route.query.code }),
                 component: Authenticator
+            },
+            {
+                path: "/twitch-auth",
+                component: TwitchAuthScopeSelector
             }
         ]
     },

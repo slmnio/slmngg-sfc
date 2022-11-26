@@ -51,6 +51,7 @@ const auction = require("./discord/new_auction.js")({
 
 const Cache = (require("./cache.js")).setup(io);
 (require("./airtable-interface.js")).setup(io);
+(require("./discord/bot-controller.js")).setup(io);
 
 const actions = require("./action-manager.js");
 actions.load(app, localCors, Cache, io);
@@ -123,6 +124,8 @@ io.on("connection", (socket) => {
         });
     });
     socket.on("disconnect", () => {
+        if (socket._clientName)
+            io.sockets.to(`prod:client-${socket._clientName}-overview`).emit("prod_disconnect", socket.id);
         connected--;
     });
 
@@ -134,13 +137,42 @@ io.on("connection", (socket) => {
         console.log("get and subscribe out:", id);
     });
     socket.on("prod-join", (clientName) => {
-        console.log("prod-join", clientName);
+        console.log("[prod] join", clientName);
         socket._clientName = clientName;
         socket.join(`prod:client-${clientName}`);
     });
+    socket.on("prod-overview-join", (clientName) => {
+        console.log("[prod-overview] join ", clientName);
+        socket._clientName = clientName;
+        socket.join(`prod:client-${clientName}-overview`);
+        io.sockets.to(`prod:client-${clientName}`).emit("send_prod_update");
+    });
+
+    socket.on("prod-send", ({ socketID, event, data }) => {
+        let overlaySocket = io.sockets.sockets.get(socketID);
+        if (overlaySocket) {
+            console.log(socketID, event, data);
+            overlaySocket.emit(`prod_button_${event}`, data);
+        } else {
+            console.warn(`[prod send] error ${socketID} doesn't exist anymore`);
+        }
+    });
+
+    socket.on("prod-update", (data) => {
+        if (data.clientName) {
+            socket._clientName = data.clientName;
+        }
+        if (!socket._clientName) return console.warn("prod update without client name", data);
+        data = {
+            ...data,
+            socket: socket.id
+        };
+        // console.log("[prod] update", data);
+        io.sockets.to(`prod:client-${socket._clientName}-overview`).emit("prod_update", data);
+    });
 
     socket.on("tally_change", ({ clientName, state, number, sceneName, data }) => {
-        // console.log("[tally]", clientName, state, number, data);
+        console.log("[tally]", clientName, state, number, data);
         socket.to(`prod:client-${clientName}`).emit("tally_change", { state, number, sceneName });
     });
 
@@ -150,6 +182,7 @@ io.on("connection", (socket) => {
     });
     socket.on("prod_trigger", (event, ...args) => {
         if (!socket._clientName) return console.warn(`Socket connection tried to ${event} without client`);
+        console.log("[Prod Trigger]", socket._clientName, event);
         io.to(`prod:client-${socket._clientName}`).emit(event, args);
     });
 });

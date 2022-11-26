@@ -7,7 +7,11 @@ export default {
     data: () => ({
         active: false,
         visible: false,
-        scene: ""
+        scene: "",
+        prodData: {
+            minor: true
+        },
+        noStinger: true
     }),
     computed: {
         state() {

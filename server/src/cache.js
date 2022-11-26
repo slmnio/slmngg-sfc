@@ -89,10 +89,10 @@ async function dataUpdate(id, data, options) {
     if (JSON.stringify(store.get(id)) !== JSON.stringify(data)) {
         // console.log(`Data update on [${id}]`);
         recents.sent++;
-        if (!(options && options.custom)) updateFunction(id, { oldData: store.get(id), newData: data });
         if (data) data = await removeAntiLeak(id, data);
         // if (options?.eager) console.log("Sending");
         await broadcast(id, "data_update", id, data);
+        if (!(options && options.custom)) updateFunction(id, { oldData: store.get(id), newData: data });
     }
 }
 
@@ -116,9 +116,13 @@ const slmnggAttachments = {
     "Teams": ["icon"]
 };
 
-function stripValidation(str) {
+function generateAttachmentURL(str, filename) {
     let idx = str.indexOf("ts=");
-    if (idx !== -1) return str.slice(0, idx -1);
+    if (idx !== -1) str = str.slice(0, idx -1);
+
+    if (filename && !str.split("/").pop().includes(".")) {
+        str += `?filename=${filename}`;
+    }
     return str;
 }
 
@@ -130,10 +134,10 @@ async function removeAttachmentTimestamps(data) {
         tableData.forEach(key => {
             if (data[key]) {
                 data[key].forEach(attachment => {
-                    attachment.url = stripValidation(attachment.url);
+                    attachment.url = generateAttachmentURL(attachment.url, attachment.filename);
                     for (let size in attachment.thumbnails) {
                         size = attachment.thumbnails[size];
-                        size.url = stripValidation(size.url);
+                        size.url = generateAttachmentURL(size.url, attachment.filename);
                     }
                 });
             }
@@ -194,7 +198,13 @@ async function set(id, data, options) {
 
     if (data?.__tableName === "Channels") {
         auth.set(`channel_${id}`, data);
-        return; // not setting it on global requestble store
+        return; // not setting it on global requestable store
+    }
+
+    if (data?.__tableName === "Discord Bots") {
+        auth.set(`bot_${cleanID(id)}`, data);
+
+        return; // not setting it on global requestable store
     }
 
     if (data?.__tableName === "Events") {
@@ -262,6 +272,7 @@ async function set(id, data, options) {
 
     await dataUpdate(id, data, options);
     store.set(id, data);
+
 }
 function cleanID(id) {
     if (!id) return null;
@@ -314,6 +325,18 @@ async function getPlayer(discordID) {
 async function getChannel(airtableID) {
     return auth.get(`channel_${cleanID(airtableID)}`);
 }
+async function getBot(airtableID) {
+    return auth.get(`bot_${cleanID(airtableID)}`);
+}
+async function getChannelByID(channelID) {
+    return (await getChannels()).find(channel => channel.channel_id === channelID);
+}
+async function getChannels() {
+    return await Promise.all(((await get("Channels"))?.ids || []).map(id => getChannel(id)));
+}
+async function getBots() {
+    return await Promise.all(((await get("Discord Bots"))?.ids || []).map(id => getBot(id)));
+}
 
 async function getTwitchAccessToken(channel) {
     // get stored access token, check if it's valid
@@ -338,6 +361,8 @@ module.exports = {
         getData: getAuthenticatedData,
         getPlayer,
         getChannel,
-        getTwitchAccessToken
+        getChannelByID,
+        getTwitchAccessToken,
+        getBots
     }
 };

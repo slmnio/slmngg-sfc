@@ -1,13 +1,16 @@
 <template>
     <div class="container">
         <h1>SLMN.GG Dashboard</h1>
-        <div class="client-broadcasts d-flex" v-if="client && client.broadcast">
+        <div class="client-broadcasts d-flex mb-2" v-if="client && client.broadcast">
             <BroadcastSwitcher :broadcasts="client.broadcast" />
             <router-link v-if="liveMatch" :to="url('match', liveMatch, { subPage: 'editor' })">
                 <MatchThumbnail class="mini-thumbnail" :match="liveMatch" stripe-height="2px"/>
             </router-link>
             <div class="match-thumbnail-ghost default-thing mini-thumbnail" v-if="!liveMatch"></div>
             <div class="m-2 d-none"><b-form-checkbox v-model="broadcast.show_cams" @change="() => togglePlayerCams($root.auth)">Show Cams</b-form-checkbox></div>
+        </div>
+        <div class="broadcast-editor mb-2" v-if="client && client.broadcast">
+            <BroadcastEditor :client="client"/>
         </div>
         <div class="broadcast-match-editor" v-if="liveMatch">
             <MatchEditor :hide-match-extras="true" :match="liveMatch"></MatchEditor>
@@ -32,10 +35,11 @@ import { togglePlayerCams, updateAutomaticTitle } from "@/utils/dashboard";
 import Predictions from "@/components/website/dashboard/Predictions";
 import CommsControl from "@/components/website/dashboard/CommsControls";
 import Commercials from "@/components/website/dashboard/Commercials";
+import BroadcastEditor from "@/components/website/dashboard/BroadcastEditor";
 
 export default {
     name: "Dashboard",
-    components: { CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BFormCheckbox, BButton },
+    components: { BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BFormCheckbox, BButton },
     computed: {
         user() {
             if (!this.$root.auth.user?.airtableID) return {};

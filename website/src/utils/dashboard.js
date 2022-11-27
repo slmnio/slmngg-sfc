@@ -68,8 +68,15 @@ export async function updateMapData(auth, match, mapData) {
     });
 }
 export async function togglePlayerCams(auth) {
-    console.log(auth);
     if (!auth?.user) return { error: true, errorMessage: "Not authenticated" };
-    console.log(auth);
     return await authenticatedRequest(auth, "actions/toggle-player-cams");
+}
+export async function toggleFlipTeams(auth) {
+    if (!auth?.user) return { error: true, errorMessage: "Not authenticated" };
+    return await authenticatedRequest(auth, "actions/toggle-flip-teams");
+}
+
+export async function setMapAttack(auth, side) {
+    if (!auth?.user) return { error: true, errorMessage: "Not authenticated" };
+    return await authenticatedRequest(auth, "actions/set-map-attack", { side });
 }

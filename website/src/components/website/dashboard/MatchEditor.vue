@@ -71,14 +71,6 @@
                 </tr>
             </table>
         </b-form>
-
-        {{ matchData }}
-        <br>
-        {{ editedMapData }}
-        <br>
-        {{ previousAutoData }}
-        <br>
-        <br>
     </div>
 </template>
 

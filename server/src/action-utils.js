@@ -36,6 +36,8 @@ function dirtyID(id) {
     return id;
 }
 
+const TimeOffset = 3 * 1000;
+
 /**
  * @param {Cache} Cache - Cache object
  * @param {string} tableName - Airtable table name this record belongs to
@@ -50,7 +52,7 @@ async function updateRecord(Cache, tableName, item, data) {
 
     let slmnggData = {
         ...deAirtable({ ...item, ...data }),
-        modified: new Date().toString()
+        modified: (new Date((new Date()).getTime() + TimeOffset)).toString()
     };
     // Eager update
     Cache.set(cleanID(item.id), slmnggData, { eager: true });

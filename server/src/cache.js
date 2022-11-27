@@ -59,7 +59,7 @@ async function removeAntiLeak(id, data) {
     }
 
     Object.entries(data).forEach(([key, val]) => {
-        if (typeof val === "object" && val.length) {
+        if (typeof val === "object" && val?.length) {
             data[key] = val.filter(id => !antiLeakIDs.includes(cleanID(id)));
             if (data[key].length === 0) delete data[key];
         }

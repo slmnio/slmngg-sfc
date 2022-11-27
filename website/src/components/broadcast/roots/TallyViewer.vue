@@ -5,7 +5,6 @@
                 {{ state.toLocaleUpperCase() }}
             </div>
             <div class="metadata d-flex flex-column align-items-center">
-                <div class="scene-name d-none">{{ sceneName }}</div>
                 <div>
                     <span v-if="number">{{ number }} &middot; </span>
                     <span>{{ client.name }}</span>
@@ -20,10 +19,9 @@ export default {
     name: "TallyViewer",
     props: ["client"],
     sockets: {
-        tally_change({ state, number, sceneName }) {
+        tally_change({ state, number }) {
             this.state = state;
             this.number = number;
-            this.sceneName = sceneName;
         }
     },
     methods: {
@@ -48,7 +46,6 @@ export default {
     },
     data: () => ({
         state: "disconnected",
-        sceneName: "N/A",
         number: null,
         wakeLock: null,
         noBroadcastStyle: true,

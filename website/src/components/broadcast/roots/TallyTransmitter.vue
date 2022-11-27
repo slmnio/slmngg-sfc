@@ -1,28 +1,23 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import OBSWebSocket from "obs-websocket-js";
 
 export default {
     name: "TallyTransmitter",
-    props: ["client", "number"],
+    props: ["client", "number", "useWs", "wsUrl", "wsPassword", "wsSceneNameOverride"],
     data: () => ({
-        active: false,
-        visible: false,
-        scene: "",
+        browserActive: false,
+        browserVisible: false,
+        obsWs: null,
+        wsIsConnected: false,
+        wsPreview: false,
+        wsProgram: false,
         prodData: {
             minor: true
         },
         noStinger: true
     }),
     computed: {
-        state() {
-            if (this.active) {
-                return "active";
-            } else if (this.visible) {
-                return "preview";
-            } else {
-                return "inactive";
-            }
-        },
         observers() {
             return ReactiveRoot(this.client.id, {
                 broadcast: ReactiveThing("broadcast", {
@@ -44,6 +39,22 @@ export default {
             } else {
                 return this.client.key;
             }
+        },
+        state() {
+            if (this.wsIsConnected) {
+                return this.wsProgram ? "active" : this.wsPreview ? "preview" : "inactive";
+            } else {
+                return this.browserActive ? "active" : this.browserVisible ? "preview" : "inactive";
+            }
+        },
+        wsSceneName() {
+            if (this.wsSceneNameOverride) {
+                return this.wsSceneNameOverride;
+            } else if (this.number) {
+                return `Ingame ${this.number}`;
+            } else {
+                return undefined;
+            }
         }
     },
 
@@ -52,33 +63,74 @@ export default {
             this.$socket.client.emit("tally_change", {
                 clientName: this.observer,
                 state: this.state,
-                sceneName: this.scene,
                 number: this.number
             });
         },
-        transmitState() {
-            if (window.obsstudio) {
-                window.obsstudio.getCurrentScene((scene) => {
-                    this.scene = scene?.name;
-                    this.transmit();
-                });
-            } else {
+        async connectWs() {
+            if (this.wsIsConnected || !this.useWs) return;
+            try {
+                await this.obsWs.connect(this.wsUrl, this.wsPassword);
+                await this.updateWsSceneData();
+                this.wsIsConnected = true;
                 this.transmit();
+                console.log("Connected to OBS Websocket");
+            } catch (e) {
+                console.error("Failed to connect to OBS WebSocket");
+                console.error(e);
             }
+        },
+        async updateWsSceneData() {
+            const [programSceneResponse, previewSceneResponse] = await this.obsWs.callBatch([
+                {
+                    requestType: "GetCurrentProgramScene"
+                },
+                {
+                    requestType: "GetCurrentPreviewScene"
+                }
+            ]);
+            const programScene = programSceneResponse?.responseData?.currentProgramSceneName;
+            const previewScene = previewSceneResponse?.responseData?.currentPreviewSceneName;
+            this.wsProgram = programScene === this.wsSceneName;
+            this.wsPreview = previewScene === this.wsSceneName;
+            console.log(`OBS Websocket: Program Scene: ${programScene}, Preview Scene: ${previewScene}`);
         }
     },
-    mounted() {
+    async mounted() {
+        this.obsWs = new OBSWebSocket();
+
+        this.obsWs.on("ConnectionOpened", () => {
+            this.wsIsConnected = true;
+        });
+
+        this.obsWs.on("ConnectionClosed", () => {
+            this.wsIsConnected = false;
+        });
+
+        this.obsWs.on("CurrentProgramSceneChanged", async () => {
+            await this.updateWsSceneData();
+            this.transmit();
+        });
+        this.obsWs.on("CurrentPreviewSceneChanged", async () => {
+            await this.updateWsSceneData();
+            this.transmit();
+        });
+
+
         window.addEventListener("obsSourceActiveChanged", (e) => {
             if (!this.observer) return;
-            this.active = e.detail.active;
-            this.transmitState();
+            this.browserActive = e.detail.active;
+            this.transmit();
         });
 
         window.addEventListener("obsSourceVisibleChanged", (e) => {
             if (!this.observer) return;
-            this.visible = e.detail.visible;
-            this.transmitState();
+            this.browserVisible = e.detail.visible;
+            this.transmit();
         });
+
+        setInterval(() => {
+            this.connectWs();
+        }, 1000);
     },
     metaInfo() {
         return {

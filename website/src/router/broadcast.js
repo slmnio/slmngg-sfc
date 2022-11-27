@@ -90,7 +90,17 @@ export default [
     },
     { path: "break", component: BreakOverlay, props: route => ({ secondary: !!route.query.secondary }) },
     { path: "syncer", component: SyncerOverlay },
-    { path: "tally-transmitter", component: TallyTransmitter, props: route => ({ number: route.query.num || route.query.number }) },
+    {
+        path: "tally-transmitter",
+        component: TallyTransmitter,
+        props: route => ({
+            number: route.query.num || route.query.number,
+            useWs: route.query.useWs || route.query.ws,
+            wsUrl: route.query.wsUrl || route.query.wsurl || route.query.wsURL || "ws://127.0.0.1:4455",
+            wsPassword: route.query.wsPassword || route.query.password || route.query.pw,
+            wsSceneNameOverride: route.query.sceneName || route.query.scene
+        })
+    },
     { path: "tally-viewer", component: TallyViewer },
     { path: "break-bar", component: BreakBarOverlay },
     {

@@ -171,9 +171,9 @@ io.on("connection", (socket) => {
         io.sockets.to(`prod:client-${socket._clientName}-overview`).emit("prod_update", data);
     });
 
-    socket.on("tally_change", ({ clientName, state, number, sceneName, data }) => {
+    socket.on("tally_change", ({ clientName, state, number, data }) => {
         console.log("[tally]", clientName, state, number, data);
-        socket.to(`prod:client-${clientName}`).emit("tally_change", { state, number, sceneName });
+        socket.to(`prod:client-${clientName}`).emit("tally_change", { state, number });
     });
 
     socket.on("media_update", (status, value) => {

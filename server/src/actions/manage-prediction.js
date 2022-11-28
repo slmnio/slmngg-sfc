@@ -5,9 +5,11 @@ const { getTwitchChannel,
 
 const automaticPredictionTitleStartCharacter = "⬥";
 
-function generatePredictionTitle(map) {
+function generatePredictionTitle(map, predictionType) {
     let title;
-    if (map.number) {
+    if (predictionType === "match") {
+        title = "Who will win the match?";
+    } else if (map.number) {
         if (map.name) {
             title = `Who will win map ${map.number} - ${map.name}?`;
         } else {
@@ -30,6 +32,14 @@ function getTargetPrediction(predictions, teams) {
     );
 }
 
+
+function getMatchWinner(match, team1, team2) {
+    if (match.score1 >= match.first_to) return team1;
+    if (match.score2 >= match.first_to) return team2;
+    return null;
+}
+
+
 module.exports = {
     key: "manage-prediction",
     auth: ["client"],
@@ -51,6 +61,7 @@ module.exports = {
         const { broadcast, channel } = getTwitchChannel(client, ["channel:manage:predictions", "channel:read:predictions"]);
         // console.log(channel);
         const api = await getTwitchAPIClient(channel);
+        const predictionType = broadcast.broadcast_settings.includes("Predict every map") ? "map" : "match";
         const { match, team1, team2 } = await getMatchData(broadcast, true);
 
         const maps = await Promise.all((match.maps || []).map(async m => {
@@ -66,26 +77,28 @@ module.exports = {
 
             return map;
         }));
-        if (maps.length === 0) throw ("No maps associated with match");
+
+        const matchWinner = getMatchWinner(match, team1, team2);
+
+        if (maps.length === 0 && predictionType === "map") throw ("No maps associated with match");
 
         const { data: predictions } = await api.predictions.getPredictions(channel.channel_id);
 
 
         if (["create", "lock"].includes(predictionAction)) {
             const currentMap = maps.filter(m => !m.dummy && !m.winner && !m.draw && !m.banner)[0];
-            if (!currentMap) throw ("No valid map to start a prediction for");
-
+            if (!currentMap && predictionType === "map") throw ("No valid map to start a prediction for");
 
             const targetPrediction = getTargetPrediction(predictions, [team1, team2]);
             console.log(targetPrediction);
 
             if (predictionAction === "create") {
                 if (targetPrediction) throw ("Prediction already exists");
-                const predictionTitle = generatePredictionTitle(currentMap);
+                const predictionTitle = generatePredictionTitle(currentMap, predictionType);
 
                 let outcomes = [team1.name, team2.name];
 
-                if (!(currentMap && currentMap.map.type === "Control")) {
+                if (predictionType === "map" && !(currentMap && currentMap.map.type === "Control")) {
                     outcomes.push("Draw");
                 }
 
@@ -109,9 +122,14 @@ module.exports = {
         } else if (["resolve"].includes(predictionAction)) {
             const lastMap = maps.filter(m => !m.dummy && !m.banner && (m.winner || m.draw)).pop();
             const targetPrediction = getTargetPrediction(predictions, [team1, team2]);
+            if (!targetPrediction) throw ("Prediction does not exist");
             console.log(targetPrediction);
 
-            if (lastMap.draw) {
+            if (predictionType === "match") {
+                if (!matchWinner) throw ("Match has not been won yet");
+                const responsePrediction = await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === matchWinner.name).id);
+                console.log(responsePrediction);
+            } else if (lastMap.draw) {
                 const responsePrediction = await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === "Draw").id);
                 console.log(responsePrediction);
             } else {

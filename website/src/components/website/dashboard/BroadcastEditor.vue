@@ -19,12 +19,20 @@
                 </b-button-group>
             </div>
         </div>
+        <div class="spacer flex-grow-1"></div>
+        <div class="group text-right">
+            <div class="group-top">Advertise</div>
+            <div class="group-bottom">
+                <b-form-checkbox :checked="broadcast.advertise" @change="(state) => advertiseBroadcast(state)"
+                                 button size="sm" :button-variant="broadcast.advertise ? 'primary' : ''">{{ broadcast.advertise ? 'Advertising' : 'Advertise' }}</b-form-checkbox>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 import { BButton, BButtonGroup, BFormCheckbox } from "bootstrap-vue";
-import { setMapAttack, toggleFlipTeams } from "@/utils/dashboard";
+import { setBroadcastAdvertise, setMapAttack, toggleFlipTeams } from "@/utils/dashboard";
 
 export default {
     name: "BroadcastEditor",
@@ -43,6 +51,9 @@ export default {
     methods: {
         async toggleFlipTeams(state) {
             await toggleFlipTeams(this.$root.auth);
+        },
+        async advertiseBroadcast(state) {
+            await setBroadcastAdvertise(this.$root.auth, state);
         },
         async setAttack(side) {
             const set = side === this.broadcast.map_attack ? null : side;

@@ -17,7 +17,6 @@ module.exports = {
         if (!user.airtable?.website_settings?.includes("Full broadcast permissions")) throw { errorCode: 403, errorMessage: "You don't have permission to start a commercial" };
         const { channel } = await getTwitchChannel(client, ["channel:edit:commercial"]);
         const api = await getTwitchAPIClient(channel);
-        console.log(this);
         try {
             await api.channels.startChannelCommercial(channel.channel_id, commercialDuration);
         } catch (e) {

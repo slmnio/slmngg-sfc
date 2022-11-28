@@ -36,58 +36,51 @@ module.exports = {
     requiredParams: ["predictionAction"],
     optionalParams: ["autoLockAfter"],
     /***
-     * @param {ActionSuccessCallback} success
-     * @param {ActionErrorCallback} error
      * @param {PredictionAction} predictionAction
      * @param {number?} autoLockAfter
      * @param {ClientData} client
-     * @param {CacheGetFunction} get
-     * @param {CacheAuthFunctions} auth
-     * @param {SimpleUpdateRecord} updateRecord
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern
-    async handler(success, error, { predictionAction, autoLockAfter = 120 }, { client }, { get, auth }) {
-        if (!(["create", "lock", "resolve", "cancel"].includes(predictionAction))) return error("Invalid action");
+    async handler({ predictionAction, autoLockAfter = 120 }, { client }) {
+        if (!(["create", "lock", "resolve", "cancel"].includes(predictionAction))) throw ("Invalid action");
         console.log(predictionAction);
 
         // TODO: move cancel action to here
 
-        const { broadcast, channel } = getTwitchChannel(client, ["channel:manage:predictions", "channel:read:predictions"], { success, error });
+        const { broadcast, channel } = getTwitchChannel(client, ["channel:manage:predictions", "channel:read:predictions"]);
         // console.log(channel);
         const api = await getTwitchAPIClient(channel);
-        const { match, team1, team2 } = await getMatchData(broadcast, true, { success, error });
+        const { match, team1, team2 } = await getMatchData(broadcast, true);
 
         const maps = await Promise.all((match.maps || []).map(async m => {
-            let map = await get(m);
+            let map = await this.helpers.get(m);
 
             if (map?.map?.[0]) {
-                let mapData = await get(map?.map?.[0]);
-                map.map = mapData;
+                map.map = await this.helpers.get(map?.map?.[0]);
             }
 
             if (map?.winner?.[0]) {
-                let winner = await get(map?.winner?.[0]);
-                map.winner = winner;
+                map.winner = await this.helpers.get(map?.winner?.[0]);
             }
 
             return map;
         }));
-        if (maps.length === 0) return error("No maps associated with match");
+        if (maps.length === 0) throw ("No maps associated with match");
 
         const { data: predictions } = await api.predictions.getPredictions(channel.channel_id);
 
 
         if (["create", "lock"].includes(predictionAction)) {
             const currentMap = maps.filter(m => !m.dummy && !m.winner && !m.draw && !m.banner)[0];
-            if (!currentMap) return error("No valid map to start a prediction for");
+            if (!currentMap) throw ("No valid map to start a prediction for");
 
 
             const targetPrediction = getTargetPrediction(predictions, [team1, team2]);
             console.log(targetPrediction);
 
             if (predictionAction === "create") {
-                if (targetPrediction) return error("Prediction already exists");
+                if (targetPrediction) throw ("Prediction already exists");
                 const predictionTitle = generatePredictionTitle(currentMap);
 
                 let outcomes = [team1.name, team2.name];
@@ -102,10 +95,11 @@ module.exports = {
                     autoLockAfter: autoLockAfter || 120
                 });
                 console.log(responsePrediction);
-                return success(); // TODO: check responsePrediction for errors
+                // TODO: check responsePrediction for errors
+                return;
             }
 
-            if (!targetPrediction) return error("Prediction does not exist");
+            if (!targetPrediction) throw ("Prediction does not exist");
 
             if (predictionAction === "lock") {
                 const responsePrediction = await api.predictions.lockPrediction(channel.channel_id, targetPrediction.id);
@@ -132,7 +126,5 @@ module.exports = {
                 console.log(responsePrediction);
             }
         }
-
-        return success();
     }
 };

@@ -341,6 +341,7 @@ async function getBots() {
 async function getTwitchAccessToken(channel) {
     // get stored access token, check if it's valid
     // otherwise / or if no token, get from refresh token
+    if (!channel) return null;
     let storedToken = auth.get(`twitch_access_token_${channel.channel_id}`);
 
     if (!storedToken || accessTokenIsExpired(storedToken)) {

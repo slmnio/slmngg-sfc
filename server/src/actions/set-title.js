@@ -6,24 +6,20 @@ module.exports = {
     key: "set-title",
     auth: ["client"],
     /***
-     * @param {ActionSuccessCallback} success
-     * @param {ActionErrorCallback} error
-     * @param {number?} autoLockAfter
+     * @param {Object?} params
      * @param {ClientData} client
      * @param {CacheGetFunction} get
-     * @param {CacheAuthFunctions} auth
-     * @param {SimpleUpdateRecord} updateRecord
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern
-    async handler(success, error, { }, { client }, { get, auth }) {
+    async handler(params, { client }) {
         const { broadcast, channel } = getTwitchChannel(client, ["channel:manage:broadcast"], { success, error });
 
-        const event = await get(broadcast.event?.[0]);
-        if (!event) return error("No event associated with broadcast");
+        const event = await this.helpers.get(broadcast.event?.[0]);
+        if (!event) throw ("No event associated with broadcast");
 
-        const api = await getTwitchAPIClient(channel, auth);
-        const { match, team1, team2 } = await getMatchData(broadcast, true,  { success, error });
+        const api = await getTwitchAPIClient(channel);
+        const { match, team1, team2 } = await getMatchData(broadcast, true);
 
         const formatOptions = {
             "event": event.name,
@@ -64,7 +60,6 @@ module.exports = {
             console.log(channelInfo);
         }
 
-        return success();
         // return response?.error ? error("Airtable error", 500) : success();
     }
 };

@@ -114,16 +114,17 @@ async function getValidHeroes() {
     return heroes.filter(h => h.game === "Overwatch");
 }
 
-async function getTwitchChannel(client, requestedScopes, { success, error }) {
+async function getTwitchChannel(client, requestedScopes) {
     const broadcast = await get(client?.broadcast?.[0]);
-    if (!broadcast) return error("No broadcast associated");
-    if (!broadcast.channel) return error("No channel associated with broadcast");
+    if (!broadcast) throw "No broadcast associated";
+    if (!broadcast.channel) throw "No channel associated with broadcast";
 
     const channel = await auth.getChannel(broadcast?.channel?.[0]);
-    if (!channel.twitch_refresh_token) return error("No twitch auth token associated with channel");
-    if (!channel.channel_id || !channel.name || !channel.twitch_scopes) return error("Invalid channel data");
+    if (!channel.twitch_refresh_token) throw "No twitch auth token associated with channel";
+    if (!channel.channel_id || !channel.name || !channel.twitch_scopes) throw "Invalid channel data";
     let scopes = channel.twitch_scopes.split(" ");
-    if (!requestedScopes.every(scope => scopes.includes(scope))) return error("Token doesn't have the required scopes");
+    if (!requestedScopes.every(scope => scopes.includes(scope))) throw "Token doesn't have the required scopes";
+
     return {
         broadcast,
         channel,
@@ -131,13 +132,13 @@ async function getTwitchChannel(client, requestedScopes, { success, error }) {
     };
 }
 
-async function getMatchData(broadcast, requireAll, { success, error }) {
+async function getMatchData(broadcast, requireAll) {
     const match = await get(broadcast?.live_match?.[0]);
-    if (!match) return error("No match associated");
+    if (!match) throw("No match associated");
 
     const team1 = await get(match?.teams?.[0]);
     const team2 = await get(match?.teams?.[1]);
-    if (requireAll && (!team1 || !team2)) return error("Did not find two teams!");
+    if (requireAll && (!team1 || !team2)) throw("Did not find two teams!");
 
     return {
         match,
@@ -147,12 +148,26 @@ async function getMatchData(broadcast, requireAll, { success, error }) {
 }
 
 async function getTwitchAPIClient(channel) {
+    if (!channel) throw("Internal error connecting to Twitch");
     const accessToken = await auth.getTwitchAccessToken(channel);
     const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, accessToken);
     return new ApiClient({authProvider});
 }
 
+function getTwitchAPIError(error) {
+    let libError = (error?.message || "").split("\n").shift() || null;
+    try {
+        if (!error?.body) return libError || null;
+        let message = JSON.parse(error?._body)?.message;
+        return message || libError;
+    } catch (e) {
+        console.warn("Error decoding Twitch API error", e);
+        return libError || null;
+    }
+}
+
 
 module.exports = {
-    getSelfClient, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord, getTwitchChannel, getMatchData, getTwitchAPIClient
+    getSelfClient, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord,
+    getTwitchChannel, getMatchData, getTwitchAPIClient, getTwitchAPIError
 };

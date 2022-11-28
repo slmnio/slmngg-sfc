@@ -3,31 +3,34 @@ module.exports = {
     requiredParams: [],
     auth: ["user"],
     /***
-     * @param {ActionSuccessCallback} success
-     * @param {ActionErrorCallback} error
-     * @param {object}
+     * @param {Object?} params
      * @param {UserData} user
-     * @param {SimpleUpdateRecord} updateRecord
      * @returns {Promise<void>}
      */
-    async handler(success, error, {  }, { user }, { updateRecord, get, createRecord }) {
+    async handler(params, { user }) {
         if (user.airtable?.live_guests?.length > 0) {
-            const currentLiveGuest = await get(user.airtable?.live_guests[0]);
-            let response = await updateRecord("Live Guests", currentLiveGuest, {
+            const currentLiveGuest = await this.helpers.get(user.airtable?.live_guests[0]);
+            let response = await this.helpers.updateRecord("Live Guests", currentLiveGuest, {
                 "Discord ID": user.discord.id,
                 "Avatar": `https://cdn.discordapp.com/avatars/${user.discord.id}/${user.discord.avatar}.webp?size=512`,
                 "Use Cam": true
             });
-            return response?.error ? error("Airtable error", 500) : success();
+            if (response?.error) {
+                console.error("Airtable error", response.error);
+                throw "Airtable error";
+            }
         } else {
-            let response = await createRecord("Live Guests", {
+            let response = await this.helpers.createRecord("Live Guests", {
                 "Discord ID": user.discord.id,
                 "Avatar": `https://cdn.discordapp.com/avatars/${user.discord.id}/${user.discord.avatar}.webp?size=512`,
                 "Name": user.discord.username,
                 "Player": [user.airtable.id],
                 "Use Cam": true
             });
-            return response?.error ? error("Airtable error", 500) : success();
+            if (response?.error) {
+                console.error("Airtable error", response.error);
+                throw "Airtable error";
+            }
         }
     }
 };

@@ -4,14 +4,11 @@ module.exports = {
     requiredParams: ["profileData"],
     auth: ["user"],
     /***
-     * @param {ActionSuccessCallback} success
-     * @param {ActionErrorCallback} error
      * @param {object} profileData
      * @param {UserData} user
-     * @param {SimpleUpdateRecord} updateRecord
      * @returns {Promise<void>}
      */
-    async handler(success, error, { profileData }, { user }, { updateRecord }) {
+    async handler({ profileData }, { user }) {
         let validatedData = {};
 
         if (profileData.pronouns) {
@@ -25,7 +22,7 @@ module.exports = {
         }
 
         if (profileData.pronunciation) {
-            if (profileData.pronunciation.length > 100) return error("Pronunciation is too long. Please keep it under 100 characters.");
+            if (profileData.pronunciation.length > 100) throw ("Pronunciation is too long. Please keep it under 100 characters.");
             validatedData["Pronunciation"] = profileData.pronunciation;
         }
 
@@ -37,9 +34,13 @@ module.exports = {
         }
 
         console.log("[profile]", user.airtable.name, user.airtable.id, "is setting", validatedData);
-        let response = await updateRecord("Players", user.airtable, {
+        let response = await this.helpers.updateRecord("Players", user.airtable, {
             ...validatedData
         });
-        return response?.error ? error("Airtable error", 500) : success();
+
+        if (response?.error) {
+            console.error("Airtable error", response.error);
+            throw "Airtable error";
+        }
     }
 };

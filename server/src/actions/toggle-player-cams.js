@@ -2,22 +2,21 @@ module.exports = {
     key: "toggle-player-cams",
     auth: ["client"],
     /***
-     * @param {ActionSuccessCallback} success
-     * @param {ActionErrorCallback} error
+     * @param {Object?} params
      * @param {ClientData} client
-     * @param {CacheGetFunction} get
-     * @param {SimpleUpdateRecord} updateRecord
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern
-    async handler(success, error, {  }, { client }, { get, updateRecord }) {
-        let broadcast = await get(client?.broadcast?.[0]);
-        if (!broadcast) error("No broadcast associated");
+    async handler(params, { client }) {
+        let broadcast = await this.helpers.get(client?.broadcast?.[0]);
+        if (!broadcast) throw "No broadcast associated";
 
-        let response = await updateRecord("Broadcasts", broadcast, {
+        let response = await this.helpers.updateRecord("Broadcasts", broadcast, {
             "Show Cams": !broadcast.show_cams
         });
-
-        return response?.error ? error("Airtable error", 500) : success();
+        if (response?.error) {
+            console.error("Airtable error", response.error);
+            throw "Airtable error";
+        }
     }
 };

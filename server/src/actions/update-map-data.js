@@ -4,8 +4,6 @@ module.exports = {
     requiredParams: ["matchID", "mapData"],
     auth: ["user"],
     /***
-     * @param {ActionSuccessCallback} success
-     * @param {ActionErrorCallback} error
      * @param {AnyAirtableID} matchID
      *
      * @param {object[]} mapData
@@ -19,18 +17,16 @@ module.exports = {
      * @param {boolean?} mapData.draw
      *
      * @param {UserData} user
-     * @param {SimpleUpdateRecord} updateRecord
-     * @param {CacheGetFunction} get - Cache.get
      * @returns {Promise<void>}
      */
-    async handler(success, error, { matchID, mapData }, { user }, { updateRecord, get, createRecord }) {
+    async handler({ matchID, mapData }, { user }) {
         // TODO: expand permissions system to allow for event moderators/admins/staff --something to edit matches on an event-by-event basis
-        if (!user.airtable?.website_settings?.includes("Can edit any match")) return error("You don't have permission to edit this item", 403);
+        if (!user.airtable?.website_settings?.includes("Can edit any match")) throw { errorMessage: "You don't have permission to edit this item", errorCode: 403 };
 
-        let match = await get(matchID);
-        if (!match) return error("Couldn't load match data");
+        let match = await this.helpers.get(matchID);
+        if (!match) throw "Couldn't load match data";
 
-        let existingMaps = await Promise.all((match.maps || []).map(m => get(m)));
+        let existingMaps = await Promise.all((match.maps || []).map(m => this.helpers.get(m)));
         let matchTeamIDs = [...match.teams, null];
         let recordUpdates = {};
         let recordCreations = [];
@@ -92,10 +88,10 @@ module.exports = {
         console.log({ recordUpdates });
 
         let responses = await Promise.all(Object.entries(recordUpdates).map(async([recordID, updates]) => {
-            let localData = await get(recordID);
-            return updateRecord("Maps", localData, updates);
+            let localData = await this.helpers.get(recordID);
+            return this.helpers.updateRecord("Maps", localData, updates);
         }));
-        if (responses.some(r => r?.error)) error("Airtable error", 500);
+        if (responses.some(r => r?.error)) throw "Airtable error";
 
         recordCreations = recordCreations
             .filter(rec => rec.map || rec.winner || rec.banner || rec.picker)
@@ -120,9 +116,8 @@ module.exports = {
         if (recordCreations.length) {
             console.log({ recordCreations });
 
-            let createResponses = await createRecord("Maps", recordCreations);
-            if ((createResponses || []).some(r => r?.error)) return error("Airtable error", 500);
+            let createResponses = await this.helpers.createRecord("Maps", recordCreations);
+            if ((createResponses || []).some(r => r?.error)) throw "Airtable error";
         }
-        success();
     }
 };

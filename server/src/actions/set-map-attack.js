@@ -11,18 +11,20 @@ module.exports = {
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern
-    async handler(success, error, { side }, { client }, { get, updateRecord }) {
-        let broadcast = await get(client?.broadcast?.[0]);
-        if (!broadcast) error("No broadcast associated");
+    async handler({ side }, { client }) {
+        let broadcast = await this.helpers.get(client?.broadcast?.[0]);
+        if (!broadcast) throw ("No broadcast associated");
 
         let eligibleSides = [null, "Left", "Right", "Both"];
-        if (!eligibleSides.includes(side)) return error("Invalid side");
+        if (!eligibleSides.includes(side)) throw ("Invalid side");
 
-
-        let response = await updateRecord("Broadcasts", broadcast, {
+        let response = await this.helpers.updateRecord("Broadcasts", broadcast, {
             "Map Attack": side
         });
 
-        return response?.error ? error("Airtable error", 500) : success();
+        if (response?.error) {
+            console.error("Airtable error", response.error);
+            throw "Airtable error";
+        }
     }
 };

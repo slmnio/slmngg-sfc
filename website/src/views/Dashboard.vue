@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container" v-if="user && user.name">
         <h1>SLMN.GG Dashboard</h1>
         <div class="client-broadcasts d-flex mb-2" v-if="client && client.broadcast">
             <BroadcastSwitcher :broadcasts="client.broadcast" />

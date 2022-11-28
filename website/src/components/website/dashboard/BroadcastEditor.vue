@@ -46,7 +46,12 @@ export default {
         },
         async setAttack(side) {
             const set = side === this.broadcast.map_attack ? null : side;
-            await setMapAttack(this.$root.auth, set);
+            const response = await setMapAttack(this.$root.auth, set);
+            if (response.error) {
+                this.$notyf.error({
+                    message: response.errorMessage
+                });
+            }
         }
     }
 };

@@ -1,16 +1,31 @@
 import { getDataServerAddress } from "@/utils/fetch";
 
+import { Notyf } from "notyf";
+const notyf = new Notyf({ duration: 5000, position: { x: "right", y: "top" }, dismissible: true });
+
 export async function authenticatedRequest(auth, url, data) {
     const token = auth?.token;
     if (!token) return { error: true, errorMessage: "No token" };
-    return await fetch(`${getDataServerAddress()}/${url}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authentication: `Bearer ${token}`
-        },
-        body: JSON.stringify(data)
-    }).then(res => res.json());
+    try {
+        const request = await fetch(`${getDataServerAddress()}/${url}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authentication: `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        }).then(res => res.json());
+        console.log(request.error, notyf);
+        if (request.error) {
+            notyf.error({
+                message: request.errorMessage
+            });
+        }
+        return request;
+    } catch (e) {
+        console.error(e);
+        return { error: true, errorMessage: e.errorMessage };
+    }
 }
 
 export async function setActiveBroadcast(auth, client, broadcast) {

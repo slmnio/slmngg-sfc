@@ -106,13 +106,7 @@ export async function updateMapData(auth, match, mapData) {
         mapData
     });
 }
-export async function togglePlayerCams(auth) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
-    return await authenticatedRequest(auth, "actions/toggle-player-cams");
-}
+
 export async function toggleFlipTeams(auth) {
     if (!auth?.user) {
         notyf.error("Not authenticated");
@@ -121,18 +115,22 @@ export async function toggleFlipTeams(auth) {
     return await authenticatedRequest(auth, "actions/toggle-flip-teams");
 }
 
-export async function setMapAttack(auth, side) {
+export async function updateBroadcastData(auth, data) {
     if (!auth?.user) {
         notyf.error("Not authenticated");
         return { error: true, errorMessage: "Not authenticated" };
     }
-    return await authenticatedRequest(auth, "actions/set-map-attack", { side });
+    return await authenticatedRequest(auth, "actions/update-broadcast", data);
 }
 
-export async function setBroadcastAdvertise(auth, advertise) {
+export async function setMatchOverlayState(auth, matchID, overlayType, state) {
     if (!auth?.user) {
         notyf.error("Not authenticated");
         return { error: true, errorMessage: "Not authenticated" };
     }
-    return await authenticatedRequest(auth, "actions/set-broadcast-advertise", { advertise });
+    return await authenticatedRequest(auth, "actions/set-match-overlays", {
+        match: matchID,
+        overlayType,
+        state
+    });
 }

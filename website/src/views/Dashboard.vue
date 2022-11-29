@@ -3,24 +3,31 @@
         <h1>SLMN.GG Dashboard</h1>
         <div class="client-broadcasts d-flex mb-2" v-if="client && client.broadcast">
             <BroadcastSwitcher :broadcasts="client.broadcast" />
-            <router-link v-if="liveMatch" :to="url('match', liveMatch, { subPage: 'editor' })">
+            <router-link v-if="liveMatch" :to="url('detailed', liveMatch)">
                 <MatchThumbnail class="mini-thumbnail" :match="liveMatch" stripe-height="2px"/>
             </router-link>
             <div class="match-thumbnail-ghost default-thing mini-thumbnail" v-if="!liveMatch"></div>
-            <div class="m-2 d-none"><b-form-checkbox v-model="broadcast.show_cams" @change="() => togglePlayerCams($root.auth)">Show Cams</b-form-checkbox></div>
+            <div class="spacer flex-grow-1"></div>
+            <div class="clocks d-flex">
+                <DashboardClock title="Local" />
+                <DashboardClock title="Broadcast" :timezone="broadcast.timezone || 'America/New_York'" />
+            </div>
         </div>
         <div class="broadcast-editor mb-2" v-if="client && client.broadcast">
             <BroadcastEditor :client="client"/>
         </div>
-        <div class="broadcast-match-editor" v-if="liveMatch">
+        <div class="broadcast-match-editor mb-3" v-if="liveMatch">
             <MatchEditor :hide-match-extras="true" :match="liveMatch"></MatchEditor>
+        </div>
+        <div class="broadcast-schedule-editor mb-3">
+            <ScheduleEditor :broadcast="broadcast"></ScheduleEditor>
         </div>
         <Predictions v-if="liveMatch" :client="client"/>
         <Commercials v-if="hasPermission('Full broadcast permissions')" :client="client" />
         <b-button class="mt-2" variant="secondary" @click="updateTitle">
             <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title
         </b-button>
-        <CommsControl :match="liveMatch"/>
+        <CommsControl v-if="useTeamComms" :match="liveMatch"/>
     </div>
 </template>
 
@@ -30,16 +37,18 @@ import { url } from "@/utils/content-utils";
 import BroadcastSwitcher from "@/components/website/dashboard/BroadcastSwitcher";
 import MatchThumbnail from "@/components/website/match/MatchThumbnail";
 import MatchEditor from "@/components/website/dashboard/MatchEditor";
-import { BButton, BFormCheckbox } from "bootstrap-vue";
-import { togglePlayerCams, updateAutomaticTitle } from "@/utils/dashboard";
+import { BButton } from "bootstrap-vue";
+import { updateAutomaticTitle } from "@/utils/dashboard";
 import Predictions from "@/components/website/dashboard/Predictions";
 import CommsControl from "@/components/website/dashboard/CommsControls";
 import Commercials from "@/components/website/dashboard/Commercials";
 import BroadcastEditor from "@/components/website/dashboard/BroadcastEditor";
+import ScheduleEditor from "@/components/website/dashboard/ScheduleEditor";
+import DashboardClock from "@/components/website/dashboard/DashboardClock";
 
 export default {
     name: "Dashboard",
-    components: { BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BFormCheckbox, BButton },
+    components: { DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
     computed: {
         user() {
             if (!this.$root.auth.user?.airtableID) return {};
@@ -77,11 +86,13 @@ export default {
         },
         liveMatch() {
             return this.broadcast?.live_match;
+        },
+        useTeamComms() {
+            return (this.broadcast?.broadcast_settings || []).includes("Connect for team comms");
         }
     },
     methods: {
         url,
-        togglePlayerCams,
         async updateTitle() {
             await updateAutomaticTitle(this.$root.auth, "self", "create");
         },
@@ -105,13 +116,17 @@ export default {
 
 <style scoped>
     .mini-thumbnail {
-        height: 38px;
-        width: 80px;
+        height: 46px;
+        width: 90px;
         margin-left: 10px;
     }
     .match-thumbnail-ghost {
-        height: 40px;
+        height: 48px;
         border-bottom-width: 2px;
         border-bottom-style: solid;
+    }
+
+    .dashboard-clock + .dashboard-clock {
+        margin-left: 1em;
     }
 </style>

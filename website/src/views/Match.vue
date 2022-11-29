@@ -63,7 +63,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import MatchHero from "@/components/website/match/MatchHero";
 import MatchScore from "@/components/website/match/MatchScore";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
-import { getMatchContext, url } from "@/utils/content-utils";
+import { formatTime, getMatchContext, url } from "@/utils/content-utils";
 import { resizedImageNoWrap } from "@/utils/images";
 import { isAuthenticated } from "@/utils/auth";
 
@@ -139,34 +139,7 @@ export default {
             return Object.values(groups);
         },
         date() {
-            const date = new Date(this.match.start);
-
-            let time = "";
-
-            if (date.getHours() >= 12) {
-                // pm
-                if (date.getHours() % 12 === 0) { time += 12; } else { time += (date.getHours() % 12); }
-                time += ":";
-                time += date.getMinutes().toString().padStart(2, "0");
-                time += "pm";
-            } else {
-                if (date.getHours() === 0) { time += 12; } else { time += (date.getHours() % 12); }
-                time += ":";
-                time += date.getMinutes().toString().padStart(2, "0");
-                time += "am";
-            }
-
-
-            function z(n) {
-                n = n.toString();
-                if (["11", "12", "13"].includes(n.slice(-2))) return "th";
-                if (n.slice(-1) === "1") return "st";
-                if (n.slice(-1) === "2") return "nd";
-                if (n.slice(-1) === "3") return "rd";
-                return "th";
-            }
-
-            return `${date.getDate()}${z(date.getDate())} ${("Jan.Feb.Mar.Apr.May.Jun.Jul.Aug.Sep.Oct.Nov.Dec".split("."))[date.getMonth()]} ${date.getFullYear()} ${time}`;
+            return formatTime(this.match.start, this.$store.state.timezone);
         },
         theme() {
             return this.match?.event?.theme;

@@ -71,7 +71,7 @@
             </div>
             <div class="right-holder col-3">
                 <router-link :to="url('event', match.event)">
-                    <ThemeLogo class="top-right-logo mb-3" :theme="_theme" border-width="8"/>
+                    <ThemeLogo class="top-right-logo mb-3" logo-size="w-200" :theme="_theme" border-width="8"/>
                 </router-link>
                 <div class="info-block">
 

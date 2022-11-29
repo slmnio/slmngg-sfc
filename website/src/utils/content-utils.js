@@ -1,3 +1,6 @@
+import spacetime from "spacetime";
+import informal from "spacetime-informal";
+
 export function getImage (i) {
     // console.log(i);
     if (!i) return null;
@@ -300,4 +303,16 @@ export function getTeamsMapStats(teams, requestMatch, requestMap) {
             scheduledForMatch: stats.some(t => t.stats?.scheduled_for_match)
         }
     };
+}
+
+function getAbbrev(timezone, time) {
+    const display = informal.display(timezone);
+    return time.isDST() ? display.daylight.abbrev : display.standard.abbrev;
+}
+
+export function formatTime(timeString, stateTimezone, format) {
+    const timezone = stateTimezone === "local" ? spacetime.now().timezone().name : stateTimezone;
+    const time = spacetime(timeString).goto(timezone);
+    const abbrev = getAbbrev(timezone, time);
+    return time.format((format || "{date-ordinal} {month-short} {year} {time} {tz}").replace("{tz}", abbrev));
 }

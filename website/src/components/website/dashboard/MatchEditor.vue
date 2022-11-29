@@ -1,6 +1,6 @@
 <template>
     <div class="match-editor">
-        <h2>Match Editor</h2>
+<!--        <h2>Match Editor</h2>-->
 
         <b-form v-if="match" @submit="(e) => e.preventDefault()">
 <!--            <b-alert variant="danger" :show="!!errorMessage" dismissible @dismissed="() => this.errorMessage = null"><i class="fas fa-exclamation-circle fa-fw"></i> <b>Error</b>: {{ errorMessage }}</b-alert>-->

@@ -58,7 +58,7 @@ async function load(expressApp, cors, Cache, io) {
 
                 if (requireAuth && !token) return error(401, "Unauthorized");
 
-                if (action.requiredParams && !action.requiredParams.every(key => args[key])) {
+                if (action.requiredParams && !action.requiredParams.every(key => args[key] !== undefined)) {
                     return error(400, "Missing required parameter");
                 }
 
@@ -73,7 +73,7 @@ async function load(expressApp, cors, Cache, io) {
 
                 if (action.optionalParams) {
                     (action.optionalParams || []).forEach(key => {
-                        params[key] = args[key] || null;
+                        params[key] = args[key];
                     });
                 }
                 if (action.requiredParams) {

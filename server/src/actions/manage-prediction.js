@@ -61,7 +61,7 @@ module.exports = {
         const { broadcast, channel } = getTwitchChannel(client, ["channel:manage:predictions", "channel:read:predictions"]);
         // console.log(channel);
         const api = await getTwitchAPIClient(channel);
-        const predictionType = broadcast.broadcast_settings.includes("Predict every map") ? "map" : "match";
+        const predictionType = (broadcast.broadcast_settings || []).includes("Predict every map") ? "map" : "match";
         const { match, team1, team2 } = await getMatchData(broadcast, true);
 
         const maps = await Promise.all((match.maps || []).map(async m => {
@@ -80,14 +80,14 @@ module.exports = {
 
         const matchWinner = getMatchWinner(match, team1, team2);
 
-        if (maps.length === 0 && predictionType === "map") throw ("No maps associated with match");
+        if (predictionType === "map" && maps.length === 0) throw ("No maps associated with match");
 
         const { data: predictions } = await api.predictions.getPredictions(channel.channel_id);
 
 
         if (["create", "lock"].includes(predictionAction)) {
             const currentMap = maps.filter(m => !m.dummy && !m.winner && !m.draw && !m.banner)[0];
-            if (!currentMap && predictionType === "map") throw ("No valid map to start a prediction for");
+            if (predictionType === "map" && !currentMap) throw ("No valid map to start a prediction for");
 
             const targetPrediction = getTargetPrediction(predictions, [team1, team2]);
             console.log(targetPrediction);
@@ -98,7 +98,9 @@ module.exports = {
 
                 let outcomes = [team1.name, team2.name];
 
-                if (predictionType === "map" && !(currentMap && currentMap.map.type === "Control")) {
+                if (predictionType === "map" &&
+                    !(currentMap && currentMap.map.type === "Control") &&
+                    (broadcast.broadcast_settings || []).includes("Allow draw predictions")) {
                     outcomes.push("Draw");
                 }
 
@@ -129,12 +131,14 @@ module.exports = {
                 if (!matchWinner) throw ("Match has not been won yet");
                 const responsePrediction = await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === matchWinner.name).id);
                 console.log(responsePrediction);
-            } else if (lastMap.draw) {
-                const responsePrediction = await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === "Draw").id);
-                console.log(responsePrediction);
             } else {
-                const responsePrediction = await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === lastMap.winner.name).id);
-                console.log(responsePrediction);
+                if (lastMap.draw) {
+                    const responsePrediction = await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === "Draw").id);
+                    console.log(responsePrediction);
+                } else {
+                    const responsePrediction = await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === lastMap.winner.name).id);
+                    console.log(responsePrediction);
+                }
             }
 
         } else if (["cancel"].includes(predictionAction)) {

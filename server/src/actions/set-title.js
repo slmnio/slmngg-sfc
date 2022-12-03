@@ -13,7 +13,7 @@ module.exports = {
      */
     // eslint-disable-next-line no-empty-pattern
     async handler(params, { client }) {
-        const { broadcast, channel } = getTwitchChannel(client, ["channel:manage:broadcast"], { success, error });
+        const { broadcast, channel } = getTwitchChannel(client, ["channel:manage:broadcast"]);
 
         const event = await this.helpers.get(broadcast.event?.[0]);
         if (!event) throw ("No event associated with broadcast");
@@ -59,7 +59,5 @@ module.exports = {
             });
             console.log(channelInfo);
         }
-
-        // return response?.error ? error("Airtable error", 500) : success();
     }
 };

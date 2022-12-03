@@ -117,11 +117,11 @@ async function getValidHeroes() {
 async function getTwitchChannel(client, requestedScopes) {
     const broadcast = await get(client?.broadcast?.[0]);
     if (!broadcast) throw "No broadcast associated";
-    if (!broadcast.channel) throw "No channel associated with broadcast";
+    if (!broadcast.channel?.[0]) throw "No channel associated with broadcast";
 
     const channel = await auth.getChannel(broadcast?.channel?.[0]);
-    if (!channel.twitch_refresh_token) throw "No twitch auth token associated with channel";
-    if (!channel.channel_id || !channel.name || !channel.twitch_scopes) throw "Invalid channel data";
+    if (!channel?.twitch_refresh_token) throw "No twitch auth token associated with channel";
+    if (!channel?.channel_id || !channel?.name || !channel.twitch_scopes) throw "Invalid channel data";
     let scopes = channel.twitch_scopes.split(" ");
     if (!requestedScopes.every(scope => scopes.includes(scope))) throw "Token doesn't have the required scopes";
 

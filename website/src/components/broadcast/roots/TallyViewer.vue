@@ -7,8 +7,9 @@
             </div>
             <div class="metadata d-flex flex-column align-items-center">
                 <div>
-                    <span v-if="number || selfObserverNumber">{{ number || selfObserverNumber }} &middot; </span>
-                    <span>{{ client.name }}</span>
+                    <span v-if="number || selfObserverNumber">{{ number || selfObserverNumber }} </span>
+                    <span v-else><i class="fas fa-exclamation-circle"></i> Not assigned </span>
+                    <span>&middot; {{ client.name }}</span>
                 </div>
                 <div class="prod-info flex-center" v-if="producer && showProducerInfo">
                     <div class="prod-name">Producer: {{ producer.name }}</div>

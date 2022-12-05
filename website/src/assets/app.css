@@ -274,3 +274,8 @@ input.no-arrows::-webkit-inner-spin-button {
 input.no-arrows[type=number] {
     -moz-appearance:textfield;
 }
+
+.notyf__ripple {
+    width: 500px;
+    height: 500px;
+}

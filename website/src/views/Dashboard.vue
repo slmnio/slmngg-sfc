@@ -94,7 +94,12 @@ export default {
     methods: {
         url,
         async updateTitle() {
-            await updateAutomaticTitle(this.$root.auth, "self", "create");
+            const response = await updateAutomaticTitle(this.$root.auth, "self", "create");
+            if (response.error) return; // handled by internal
+            this.$notyf.success({
+                message: response.data,
+                duration: 20000
+            });
         },
         hasPermission(permission) {
             return (this.user.website_settings || []).includes(permission);

@@ -57,5 +57,6 @@ module.exports = {
                 title: newTitle
             });
         }
+        return `Updated ${channel.name}'s title to "${newTitle}"`;
     }
 };

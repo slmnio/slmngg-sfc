@@ -58,7 +58,7 @@ module.exports = {
 
         // TODO: move cancel action to here
 
-        const { broadcast, channel } = getTwitchChannel(client, ["channel:manage:predictions", "channel:read:predictions"]);
+        const { broadcast, channel } = await getTwitchChannel(client, ["channel:manage:predictions", "channel:read:predictions"]);
         // console.log(channel);
         const api = await getTwitchAPIClient(channel);
         const predictionType = (broadcast.broadcast_settings || []).includes("Predict every map") ? "map" : "match";

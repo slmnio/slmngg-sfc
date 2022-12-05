@@ -9,11 +9,11 @@ module.exports = {
      * @param {Object?} params
      * @param {ClientData} client
      * @param {CacheGetFunction} get
-     * @returns {Promise<void>}
+     * @returns {Promise<string>}
      */
     // eslint-disable-next-line no-empty-pattern
     async handler(params, { client }) {
-        const { broadcast, channel } = getTwitchChannel(client, ["channel:manage:broadcast"]);
+        const { broadcast, channel } = await getTwitchChannel(client, ["channel:manage:broadcast"]);
 
         const event = await this.helpers.get(broadcast.event?.[0]);
         if (!event) throw ("No event associated with broadcast");
@@ -48,16 +48,14 @@ module.exports = {
 
         if (event.game && gameMap[event.game]) {
             const game = await api.games.getGameByName(gameMap[event.game]);
-            const channelInfo = api.channels.updateChannelInfo(channel.channel_id, {
+            await api.channels.updateChannelInfo(channel.channel_id, {
                 title: newTitle,
                 gameId: game.id
             });
-            console.log(channelInfo);
         } else {
-            const channelInfo = api.channels.updateChannelInfo(channel.channel_id, {
+            await api.channels.updateChannelInfo(channel.channel_id, {
                 title: newTitle
             });
-            console.log(channelInfo);
         }
     }
 };

@@ -1,3 +1,4 @@
+const TeamAudio = () => import("@/components/broadcast/TeamAudio");
 const MapStatsOverlay = () => import("@/components/broadcast/roots/MapStatsOverlay");
 const IngameCommsOverlay = () => import("@/components/broadcast/roots/IngameCommsOverlay");
 const MVPOverlay = () => import("@/components/broadcast/roots/MVPOverlay");
@@ -202,5 +203,13 @@ export default [
             forceTeam: route.query.team ? parseInt(route.query.team) : null
         })
     },
-    { path: "map-stats", component: MapStatsOverlay }
+    { path: "map-stats", component: MapStatsOverlay },
+    {
+        path: "audio",
+        component: TeamAudio,
+        props: route => ({
+            taskKey: route.query.key,
+            buffer: parseInt(route.query.buffer)
+        })
+    }
 ];

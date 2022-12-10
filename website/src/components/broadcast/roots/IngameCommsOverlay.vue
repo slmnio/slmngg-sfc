@@ -9,7 +9,7 @@
                                  :end="match.flip_teams ? i === 1 : i === 0 ? 'right' : 'left'">
                     <ListenInBug :text="listenInText" :team="team" />
                 </ThemeTransition>
-                <PlayerAudio :team="team" :broadcast="broadcast" :task-key="`team${i+1}`" :ref="`team${i+1}`" :buffer="buffer" />
+                <TeamAudio :team="team" :broadcast="broadcast" :task-key="`team${i+1}`" :ref="`team${i+1}`" :buffer="buffer" />
             </div>
         </div>
     </div>
@@ -17,14 +17,14 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import PlayerAudio from "@/components/broadcast/PlayerAudio";
+import TeamAudio from "@/components/broadcast/TeamAudio.vue";
 import ListenInBug from "@/components/broadcast/ListenInBug";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
 
 export default {
     name: "IngameCommsOverlay",
     props: ["broadcast", "listenInText", "buffer"],
-    components: { ListenInBug, PlayerAudio, ThemeTransition },
+    components: { ListenInBug, TeamAudio, ThemeTransition },
     data: () => ({
         activeTeamIndex: null,
         noStinger: true

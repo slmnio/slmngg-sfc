@@ -1,6 +1,6 @@
 const MapStatsOverlay = () => import("@/components/broadcast/roots/MapStatsOverlay");
 const IngameCommsOverlay = () => import("@/components/broadcast/roots/IngameCommsOverlay");
-const PlayerAudio = () => import("@/components/broadcast/PlayerAudio");
+const TeamAudio = () => import("@/components/broadcast/TeamAudio.vue");
 const MVPOverlay = () => import("@/components/broadcast/roots/MVPOverlay");
 const MultiStandingsOverlay = () => import("@/components/broadcast/roots/MultiStandingsOverlay");
 const ClientOverview = () => import("@/components/broadcast/roots/ClientOverview");
@@ -196,7 +196,7 @@ export default [
     { path: "mvp", component: MVPOverlay },
     {
         path: "audio",
-        component: PlayerAudio,
+        component: TeamAudio,
         props: route => ({
             taskKey: route.query.key
         })

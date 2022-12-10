@@ -15,7 +15,7 @@ import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { cleanID } from "@/utils/content-utils";
 
 export default {
-    name: "PlayerAudio",
+    name: "TeamAudio",
     props: ["broadcast", "taskKey", "buffer"],
     sockets: {
         async audio(room, { data, user }) {

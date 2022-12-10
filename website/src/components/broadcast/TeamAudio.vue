@@ -1,5 +1,5 @@
 <template>
-    <div class="player-audio" @click="muted = !muted">
+    <div class="player-audio" @click="_muted = !_muted">
         <div class="member-list" v-if="showMemberList">
             <div class="member" v-for="member in decoratedMemberList" :key="member.id" :class="{'speaking': member.speaking}">
                 {{ member.airtable && member.airtable.name }} {{ member.name }} {{ member.id }} {{ member.speaking }}
@@ -16,7 +16,7 @@ import { cleanID } from "@/utils/content-utils";
 
 export default {
     name: "TeamAudio",
-    props: ["broadcast", "taskKey", "buffer"],
+    props: ["broadcast", "taskKey", "buffer", "alwaysUnmuted"],
     sockets: {
         async audio(room, { data, user }) {
             if (room !== this.roomKey) return;
@@ -65,11 +65,14 @@ export default {
         decoders: {},
         lastPacketTime: {},
         memberList: [],
-        muted: true,
+        _muted: true,
         status: null,
         showMemberList: false
     }),
     computed: {
+        muted() {
+            return this.alwaysUnmuted ? false : this._muted;
+        },
         broadcastKey() {
             return this.broadcast.key;
         },
@@ -108,10 +111,10 @@ export default {
             });
         },
         enable() {
-            this.muted = false;
+            this._muted = false;
         },
         disable() {
-            this.muted = true;
+            this._muted = true;
         }
     },
     watch: {

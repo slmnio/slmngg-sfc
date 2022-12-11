@@ -45,7 +45,7 @@ export default {
         },
         teamLogo() {
             if (!this.team) return {};
-            return resizedImage(this.team?.theme, ["small_logo", "default_logo"], "s-40");
+            return resizedImage(this.team?.theme, ["small_logo", "default_logo"], "s-80");
         }
     }
 };

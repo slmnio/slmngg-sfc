@@ -9,22 +9,27 @@
             for some of the best moments we've captured.
         </p>
         <h3>How does it work?</h3>
-        <p> We're using a skinned version of obs.ninja for low latency video streaming. Below is a list of links that
-            each player can use to share their webcam/phone camera. We'll match this up with the 6 players in the lobby
+        <p> We're using a skinned version of vdo.ninja for low latency video streaming. Below is a link that
+            you can use to share your webcam/phone camera. We'll match it up with the 6 players in the lobby
             and show your camera when we're spectating you, or between maps with both teams showing.
         </p>
         <h3>Things to note</h3>
         <ul>
             <li>This is completely optional.</li>
             <li>
+                You <strong>don't have to show your face</strong> if you don't want to. We've had players share their
+                keyboard/mouse cam, their pets, and their plushies instead.
+            </li>
+            <li>
                 The links may ask for audio, but we won't use it.
-                We may however use team audio through our bot system while you are in your team's voice channel and during interviews.
+                We may however use team audio while you are in your team's voice channel and during interviews.
+                Watch out for any BPL-marked account in your voice channel to see if your audio is being used.
             </li>
             <li>We set up the video streams to use the minimum quality and bandwidth to reduce the effects on your PC.</li>
             <li>
                 Video streaming is complicated, and sometimes uses more resources than it should. If you are worried
-                about frame drops, or don't have a particularly powerful PC, you can use these links on a phone or other
-                device and it will still work!
+                about frame drops, or don't have a particularly powerful PC, <strong>you can use these links on a phone or other
+                device</strong> and it will still work!
             </li>
             <li>
                 You <strong>must be 16+</strong> to use a webcam on a broadcast.

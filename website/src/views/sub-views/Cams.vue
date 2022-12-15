@@ -10,7 +10,7 @@
         </p>
         <h3>How does it work?</h3>
         <p> We're using a skinned version of vdo.ninja for low latency video streaming. Below is a link that
-            you can use to share your webcam/phone camera. We'll match it up with the 6 players in the lobby
+            you can use to share your webcam/phone camera. We'll match it up with the 5 players in the lobby
             and show your camera when we're spectating you, or between maps with both teams showing.
         </p>
         <h3>Things to note</h3>

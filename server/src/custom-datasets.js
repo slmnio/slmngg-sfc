@@ -20,6 +20,16 @@ async function matchUpdate(Cache) {
 
     let allLiveMatchIDs = (await Cache.get("special:live-matches")).matches;
 
+    const eventCache = {};
+
+    await Promise.all(allMatchData.map(async(match) => {
+        if (!match.event) return;
+        let eventID = match.event?.[0];
+        if (eventCache[eventID]) return;
+
+        eventCache[eventID] = await Cache.get(eventID);
+    }));
+
     let upcomingMatches = allMatchData.filter(match => {
         // need matches that are:
         // - live right now (.live)
@@ -29,6 +39,10 @@ async function matchUpdate(Cache) {
         if (match.first_to && (match.score_1 === match.first_to || match.score_2 === match.first_to)) return false; // remove completed matches
 
         if (!match.start) return false;
+
+        if (!match.event?.[0]) return false;
+        if (!eventCache[match.event[0]]?.show_in_events) return false;
+
         if (allLiveMatchIDs.includes(match.id)) return true;
 
         let start = new Date(match.start).getTime();

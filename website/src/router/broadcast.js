@@ -134,7 +134,9 @@ export default [
         component: HeroRosterOverlay,
         props: route => ({
             teamNum: route.query.team || route.query.teamNum,
-            playerCount: route.query.players || route.query.playerCount
+            playerCount: route.query.players || route.query.playerCount,
+            showRoles: !!route.query.roles || !!route.query.icons,
+            showPronouns: !!route.query.pronouns
         })
     },
     { path: "history", component: HistoryOverlay, props: route => ({ max: route.query.max || 5 }) },

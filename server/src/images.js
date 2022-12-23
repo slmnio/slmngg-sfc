@@ -195,7 +195,9 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                 };
             }
 
-            if (!size /*["svg", "gif"].includes(originalFileType)*/) { // TODO: load image first then detect filetype
+            if (["svg", "gif"].includes(originalFileType)) {
+                // TODO: We get file types from Airtable legacy URLs, but we won't in future
+                // We need to load the image first then detect the filetype
                 // just do orig if svg
                 size = "orig";
             }

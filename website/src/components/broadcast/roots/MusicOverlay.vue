@@ -96,7 +96,7 @@ export default {
             return (this.tracksData?.track_group_roles || [])
                 ?.filter(trackGroupRole => trackGroupRole?.role?.toLowerCase() === this.role?.toLowerCase())
                 ?.map(trackGroupRole => trackGroupRole.track_groups.map(trackGroup => trackGroup.tracks)).flat(2)
-                ?.filter(t => t?.file?.length >= 1) || [];
+                ?.filter(t => t?.file?.length) || [];
         },
         unplayedTracks() {
             return this.loadedTrackList?.filter(t => t && !this.playedTrackIds.includes(t?.id));

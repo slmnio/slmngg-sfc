@@ -2,7 +2,7 @@
     <div class="container">
         <div class="my-2 mx-3 top">
             <h2>Staff</h2>
-            <div class="btn btn-light" @click="table = !table">{{ table ? 'List' : 'Table' }} view</div>
+            <div class="btn btn-light" v-if="showTableButton" @click="table = !table">{{ table ? 'List' : 'Table' }} view</div>
         </div>
         <div v-if="!table">
             <ContentRow title="Staff" v-if="event.staff && event.staff.length">
@@ -35,6 +35,9 @@ export default {
         ContentThing, ContentRow, EventStaffing
     },
     computed: {
+        showTableButton() {
+            return this.event?.player_relationships || this.event?.casters;
+        },
         playerRelationshipGroups() {
             if (!this.event?.player_relationships?.length) return [];
             const groups = {};

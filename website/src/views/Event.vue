@@ -96,7 +96,11 @@ export default {
             return this.settings?.draft?.use || false;
         },
         showStaff() {
-            return this.settings?.extendedStaffPage || this.event?.player_relationships || this.event?.staff || this.event?.matches;
+            return this.settings?.extendedStaffPage ||
+                this.event?.player_relationships ||
+                this.event?.staff ||
+                this.event?.matches ||
+                this.event?.casters;
         },
         subdomain() {
             return this.event?.subdomain || this.event?.partial_subdomain;

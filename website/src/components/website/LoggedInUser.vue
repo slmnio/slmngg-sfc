@@ -6,7 +6,7 @@
         </template>
         <b-dropdown-item variant="dark" :to="url('player', { id: playerID })" active-class="active">Player page</b-dropdown-item>
         <b-dropdown-item variant="dark" :href="rootLinkExternal('/profile')" :to="rootLinkRouter('/profile')" active-class="active">Edit profile</b-dropdown-item>
-        <b-dropdown-item v-if="isProduction" variant="dark" to="/dashboard" active-class="active">Dashboard</b-dropdown-item>
+        <b-dropdown-item v-if="isProduction" variant="dark" :href="rootLinkExternal('/dashboard')" :to="rootLinkRouter('/dashboard')" active-class="active">Dashboard</b-dropdown-item>
     </b-nav-item-dropdown>
 </template>
 

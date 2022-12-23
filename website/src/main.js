@@ -94,6 +94,7 @@ if (subdomain) {
     // verify event from subdomain
     console.log("[subdomain]", subdomain);
     routes = [
+        ...AuthRoutes(app, mainDomain),
         {
             path: "/",
             component: MinisiteWrapperApp,
@@ -112,8 +113,7 @@ if (subdomain) {
                 ...SharedRoutes,
                 { path: "*", component: NotFoundContent }
             ]
-        },
-        ...AuthRoutes(app, mainDomain)
+        }
     ];
 } else {
     // default slmn.gg

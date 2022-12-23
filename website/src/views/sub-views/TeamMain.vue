@@ -21,7 +21,7 @@
             <ContentRow v-if="showLimitedPlayers" title="Players">
                 <ContentThing type="player" :thing="player" no-link="true" :text="player.name" :theme="team.theme" v-for="player in team.limited_players" v-bind:key="player.name"></ContentThing>
             </ContentRow>
-            <ContentRow v-if="team.sister_teams" title="Sister teams">
+            <ContentRow v-if="team.sister_teams" :title="`Sister team${team.sister_teams.length === 1 ? '' : 's'}`">
                 <ContentThing type="team" :show-logo="true" :text="item.name" :thing="item" :theme="item.theme" v-for="item in team.sister_teams" v-bind:key="item.id"></ContentThing>
             </ContentRow>
             <ContentRow v-if="team.team_in_other_tournaments" title="Team in other tournaments">

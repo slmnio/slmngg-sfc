@@ -6,9 +6,19 @@ function tableUpdated(tableName, Cache) {
     if (tableName === "Matches") matchUpdate(Cache);
     if (tableName === "Broadcasts") broadcastUpdate(Cache);
     if (tableName === "Players") playerList(Cache);
+    if (tableName === "Events") publicEvents(Cache);
     // TODO: maybe add discord bots here?
 }
 module.exports = tableUpdated;
+
+async function publicEvents(Cache) {
+    let allEvents = await Cache.get("Events");
+    if (!allEvents?.ids) return;
+
+    let allEventData = (await Promise.all(allEvents.ids.map(id => (Cache.get(id.slice(3))))));
+    let liveEvents = allEventData.filter(event => event.show_in_events && event.teams && event.teams.length !== 0);
+    Cache.set("special:public-events", { events: liveEvents.map(m => m.id) });
+}
 
 async function matchUpdate(Cache) {
     let allMatches = await Cache.get("Matches");

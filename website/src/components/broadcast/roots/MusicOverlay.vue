@@ -83,28 +83,20 @@ export default {
     }),
     computed: {
         tracksData() {
-            if (!this.broadcast?.id) {
-                return {
-                    caster_tracks: [],
-                    break_tracks: []
-                };
-            }
+            if (!this.broadcast?.id) return;
             return ReactiveRoot(this.broadcast.id, {
                 track_group_roles: ReactiveArray("track_group_roles", {
                     track_groups: ReactiveArray("track_groups", {
                         tracks: ReactiveArray("tracks")
-
                     })
-                }),
-                break_tracks: ReactiveArray("break_tracks", {
-                    tracks: ReactiveArray("tracks")
                 })
             });
         },
         trackList() {
             return (this.tracksData?.track_group_roles || [])
                 ?.filter(trackGroupRole => trackGroupRole?.role?.toLowerCase() === this.role?.toLowerCase())
-                ?.map(trackGroupRole => trackGroupRole.track_groups.map(trackGroup => trackGroup.tracks)).flat(2) || [];
+                ?.map(trackGroupRole => trackGroupRole.track_groups.map(trackGroup => trackGroup.tracks)).flat(2)
+                ?.filter(t => t?.file?.length) || [];
         },
         unplayedTracks() {
             return this.loadedTrackList?.filter(t => t && !this.playedTrackIds.includes(t?.id));

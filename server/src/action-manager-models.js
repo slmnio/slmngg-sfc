@@ -40,7 +40,8 @@ class Action {
     get helpers() {
         return {
             get: (...args) => Cache.get(...args),
-            createRecord: (tableName, data) => createRecord(Cache, tableName, data),
+            createRecord: (tableName, data) => createRecord(Cache, tableName, [data]),
+            createRecords: (tableName, items) => createRecord(Cache, tableName, items),
             updateRecord: (tableName, item, data) => updateRecord(Cache, tableName, item, data),
             auth: Cache.auth
         };

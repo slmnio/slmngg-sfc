@@ -116,7 +116,7 @@ module.exports = {
         if (recordCreations.length) {
             console.log({ recordCreations });
 
-            let createResponses = await this.helpers.createRecord("Maps", recordCreations);
+            let createResponses = await this.helpers.createRecords("Maps", recordCreations);
             if ((createResponses || []).some(r => r?.error)) throw "Airtable error";
         }
     }

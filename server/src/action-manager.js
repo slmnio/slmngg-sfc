@@ -3,10 +3,7 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 
-const { getSelfClient,
-    updateRecord,
-    createRecord
-} = require("./action-utils");
+const { getSelfClient } = require("./action-utils");
 
 const {
     HTTPActionManager,

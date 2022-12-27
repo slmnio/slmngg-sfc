@@ -13,6 +13,7 @@ function getFileEnding(url, mimeType) {
 }
 
 export function getImageURL(airtableURL, size, mimeType) {
+    mimeType = mimeType && mimeType.split("+")?.[0];
     if (!size) {
         console.warn("[Image Utils]", `No size set for ${airtableURL}`);
         size = "orig";

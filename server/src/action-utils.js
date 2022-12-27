@@ -114,11 +114,19 @@ async function getValidHeroes() {
     return heroes.filter(h => h.game === "Overwatch");
 }
 
-async function getTwitchChannel(client, requestedScopes) {
+async function getBroadcast(client) {
+    if (!client?.broadcast?.[0]) throw "No broadcast associated with this client";
     const broadcast = await get(client?.broadcast?.[0]);
     if (!broadcast) throw "No broadcast associated";
-    if (!broadcast.channel?.[0]) throw "No channel associated with broadcast";
+    return broadcast;
+}
 
+async function getMaps(match) {
+    return await Promise.all((match.maps || []).map(m => get(m)));
+}
+
+async function getTwitchChannel(client, requestedScopes) {
+    let broadcast = await getBroadcast(client);
     const channel = await auth.getChannel(broadcast?.channel?.[0]);
     if (!channel?.twitch_refresh_token) throw "No twitch auth token associated with channel";
     if (!channel?.channel_id || !channel?.name || !channel.twitch_scopes) throw "Invalid channel data";
@@ -169,5 +177,5 @@ function getTwitchAPIError(error) {
 
 module.exports = {
     getSelfClient, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord,
-    getTwitchChannel, getMatchData, getTwitchAPIClient, getTwitchAPIError
+    getTwitchChannel, getMatchData, getTwitchAPIClient, getTwitchAPIError, getBroadcast, getMaps
 };

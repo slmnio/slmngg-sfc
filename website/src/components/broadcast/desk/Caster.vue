@@ -9,6 +9,8 @@
                 <div class="caster-name flex-center">
                     <div class="c-name industry-align">{{ name }}</div>
                     <div class="c-twitter industry-align" v-if="twitter">{{ twitter }}</div>
+                    <div class="c-pronouns industry-align" v-if="player && player.pronouns && showPronouns && !pronounsOnNewline">{{ player.pronouns }}</div>
+                    <div class="c-pronouns industry-align" v-if="player && player.pronouns && showPronouns && pronounsOnNewline" v-html="breakUp(player.pronouns)"></div>
                 </div>
             </div>
         </transition>
@@ -20,7 +22,7 @@ import CasterCam from "@/components/broadcast/desk/CasterCam";
 
 export default {
     name: "Caster",
-    props: ["caster", "guest", "color", "disableVideo", "event"],
+    props: ["caster", "guest", "color", "disableVideo", "event", "showPronouns", "pronounsOnNewline"],
     components: { CasterCam },
     computed: {
         align() {
@@ -72,6 +74,12 @@ export default {
         lowerType() {
             if ((this.$root.broadcast?.broadcast_settings || []).includes("Cams lower: traditional")) return "traditional";
             return "normal";
+        }
+    },
+    methods: {
+        breakUp(text) {
+            if (!text) return null;
+            return text.split("/").join("<br>");
         }
     }
 };
@@ -128,6 +136,11 @@ export default {
         margin-bottom: .15em;
     }
 
+    .c-pronouns {
+        font-size: 0.8em;
+        margin-bottom: .15em;
+    }
+
     .caster-cam-box {
         position: relative;
     }
@@ -158,9 +171,14 @@ export default {
 
 
     .caster-lower.cl-traditional .c-name,
-    .caster-lower.cl-traditional .c-twitter {
+    .caster-lower.cl-traditional .c-twitter,
+    .caster-lower.cl-traditional .c-pronouns {
         text-align: center;
         margin: 0 20px;
+    }
+
+    .caster-lower.cl-traditional .c-pronouns {
+        order: -1;
     }
 
     /*.caster-lower.cl-traditional .c-name { text-align: left; }*/

@@ -5,7 +5,8 @@
         </div>
         <transition-group class="casters flex-center" name="anim-talent">
             <Caster v-for="(caster, i) in casters" v-bind:key="caster.id" :guest="caster" :color="getColor(i)"
-                    :event="event" :disable-video="shouldDisableCasterVideo" :class="{'wide-feed': caster.wide_feed}" />
+                    :event="event" :disable-video="shouldDisableCasterVideo" :class="{'wide-feed': caster.wide_feed}"
+                    :show-pronouns="showPronouns" :pronouns-on-newline="pronounsOnNewline" />
         </transition-group>
         <div class="lower-holder flex-center">
             <transition mode="out-in" name="break-content">
@@ -80,7 +81,14 @@ export default {
         deskColors() {
             if (!this.broadcast?.event?.theme?.desk_colors) return [];
             return this.broadcast.event.theme.desk_colors.trim().split(/[\n,]/g).map(e => e.trim());
+        },
+        showPronouns() {
+            return (this.broadcast?.broadcast_settings || []).includes("Show pronouns on desk");
+        },
+        pronounsOnNewline() {
+            return (this.broadcast?.broadcast_settings || []).includes("Show desk pronouns on new lines");
         }
+
     },
     metaInfo() {
         return {

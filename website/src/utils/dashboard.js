@@ -70,8 +70,8 @@ export async function managePred(auth, client, predictionAction) {
     }
     return await authenticatedRequest(auth, "actions/manage-prediction", {
         client: client.id || client,
-        predictionAction//,
-        // autoLockAfter: 60
+        predictionAction,
+        autoLockAfter: 300
     });
 }
 
@@ -132,5 +132,15 @@ export async function setMatchOverlayState(auth, matchID, overlayType, state) {
         match: matchID,
         overlayType,
         state
+    });
+}
+
+export async function resolveEntireBracket(auth, bracketID) {
+    if (!auth?.user) {
+        notyf.error("Not authenticated");
+        return { error: true, errorMessage: "Not authenticated" };
+    }
+    return await authenticatedRequest(auth, "actions/resolve-entire-bracket", {
+        bracketID
     });
 }

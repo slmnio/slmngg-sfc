@@ -75,14 +75,15 @@ module.exports = {
                 team._position = connection.position;
                 correctTeams[parseInt(connection.position) - 1] = team;
             });
-            console.log("correct teams", correctTeams);
+            console.log("correct teams", correctTeams.map(t => t?.code || t));
 
             correctTeams = correctTeams.filter(c => c);
 
             if (correctTeams.length === 0) {
                 // no updates
             } else if (correctTeams.length === 1) {
-                let placeholderRight = correctTeams[0]._position === 1; // (not 2)
+                let placeholderRight = parseInt(correctTeams[0]._position) === 1; // (not 2)
+                console.log(matchNum, correctTeams[0]._position, placeholderRight);
 
                 let response = await this.helpers.updateRecord("Matches", match, {
                     "Teams": [correctTeams[0].id],

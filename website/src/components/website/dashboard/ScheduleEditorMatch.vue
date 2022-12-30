@@ -1,6 +1,8 @@
 <template>
     <tr class="schedule-editor-match">
-        <td>{{ match.name }}</td>
+        <td>
+            <router-link :to="url('detailed', match)">{{ match.name }}</router-link>
+        </td>
         <td>{{ prettyDate }}</td>
         <td>
             <div class="btn-group">
@@ -20,7 +22,7 @@
 </template>
 
 <script>
-import { formatTime } from "@/utils/content-utils";
+import { formatTime, url } from "@/utils/content-utils";
 import { BFormCheckbox } from "bootstrap-vue";
 import { setMatchOverlayState, updateBroadcastData } from "@/utils/dashboard";
 
@@ -37,6 +39,7 @@ export default {
         }
     },
     methods: {
+        url,
         async setLiveMatch(state) {
             await updateBroadcastData(this.$root.auth, {
                 match: state ? this.match.id : null

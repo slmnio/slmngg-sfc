@@ -11,6 +11,11 @@
                 {{ imp.special.toUpperCase() }}
             </div>
         </div>
+        <div v-if="imp.otherMatch" class="other-match">
+            advances to <router-link :to="url(linkToDetailedMatch ? 'detailed' : 'match', imp.otherMatch)">
+            <span v-if="imp.otherMatch.round">{{ imp.otherMatch.round }}</span> <span v-if="imp.otherMatch.match_number">(M{{ imp.otherMatch.match_number }})</span>
+        </router-link>
+        </div>
         <div v-if="imp.facingTeam" class="other-team flex-center flex-column">
             <router-link v-if="imp.facingTeam" :to="url('team', imp.facingTeam)" class="box" :style="facingTeamTheme"></router-link>
             <div class="box-text">faces <router-link :to="url('team', imp.facingTeam)">{{ imp.facingTeam.name }}</router-link></div>
@@ -24,11 +29,6 @@
             <div class="box-text">
                 Faces {{ imp.feederMatch.feederTake.toLowerCase() }} of <router-link :to="url(linkToDetailedMatch ? 'detailed' : 'match', imp.feederMatch)">{{ imp.feederMatch.name }}</router-link>
             </div>
-        </div>
-        <div v-if="imp.otherMatch" class="other-match">
-            in <router-link :to="url(linkToDetailedMatch ? 'detailed' : 'match', imp.otherMatch)">
-                <span v-if="imp.otherMatch.round">{{ imp.otherMatch.round }}</span> <span v-if="imp.otherMatch.match_number">(M{{ imp.otherMatch.match_number }})</span>
-            </router-link>
         </div>
     </div>
 <!--    <div class="bracket-implication-match">-->

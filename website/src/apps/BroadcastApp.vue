@@ -87,6 +87,9 @@ export default {
                     ...this.lastProdData
                 }
             };
+        },
+        broadcastKey() {
+            return this.code || this.broadcast?.key;
         }
     },
     methods: {
@@ -111,9 +114,9 @@ export default {
                 this.active = !this.active;
             });
         }
-        if (!this.client) {
-            console.log("loading with broadcast client");
-            this.$socket.client.emit("prod-join", `broadcast--${this.code}`);
+        if (this.broadcastKey) {
+            console.log("loading with broadcastKey");
+            this.$socket.client.emit("prod-broadcast-join", this.broadcastKey);
         }
 
 
@@ -152,6 +155,10 @@ export default {
             handler() {
                 this.prodUpdate();
             }
+        },
+        broadcastKey(newCode) {
+            console.log(newCode);
+            this.$socket.client.emit("prod-broadcast-join", newCode);
         }
     },
     beforeCreate () {

@@ -35,6 +35,7 @@ const CamsWrapper = () => import("@/components/broadcast/cams/CamsWrapper");
 const SeasonHistoryOverlay = () => import("@/components/broadcast/roots/SeasonHistoryOverlay");
 const IframeOverlay = () => import("@/components/broadcast/roots/IframeOverlay");
 const TallyTransmitter = () => import("@/components/broadcast/roots/TallyTransmitter");
+const WebsocketTransmitter = () => import("@/components/broadcast/roots/WebsocketTransmitter");
 const TallyViewer = () => import("@/components/broadcast/roots/TallyViewer");
 const PlayerHistory = () => import("@/components/broadcast/PlayerHistory");
 const OverviewOverlay = () => import("@/components/broadcast/roots/OverviewOverlay");
@@ -90,7 +91,21 @@ export default [
     },
     { path: "break", component: BreakOverlay, props: route => ({ secondary: !!route.query.secondary }) },
     { path: "syncer", component: SyncerOverlay },
-    { path: "tally-transmitter", component: TallyTransmitter, props: route => ({ number: route.query.num || route.query.number }) },
+    {
+        path: "tally-transmitter",
+        component: TallyTransmitter,
+        props: route => ({
+            number: route.query.num || route.query.number
+        })
+    }, {
+        path: "websocket-transmitter",
+        component: WebsocketTransmitter,
+        props: route => ({
+            wsUrl: route.query.url || route.query.wsUrl || route.query.wsurl || route.query.wsURL || "ws://127.0.0.1:4455",
+            wsPassword: route.query.wsPassword || route.query.password || route.query.pw,
+            wsSceneNameOverride: route.query.sceneName || route.query.scene
+        })
+    },
     { path: "tally-viewer", component: TallyViewer },
     { path: "break-bar", component: BreakBarOverlay },
     {

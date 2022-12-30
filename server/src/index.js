@@ -137,15 +137,26 @@ io.on("connection", (socket) => {
         // console.log("get and subscribe out:", id);
     });
     socket.on("prod-join", (clientName) => {
-        console.log("[prod] join", clientName);
+        console.log("[prod:client] join", `prod:client-${clientName}`);
         socket._clientName = clientName;
         socket.join(`prod:client-${clientName}`);
     });
+
     socket.on("prod-overview-join", (clientName) => {
         console.log("[prod-overview] join ", clientName);
         socket._clientName = clientName;
         socket.join(`prod:client-${clientName}-overview`);
         io.sockets.to(`prod:client-${clientName}`).emit("send_prod_update");
+    });
+
+    socket.on("prod-broadcast-join", (broadcastKey) => {
+        if (socket._broadcastKey) {
+            console.log("[prod:broadcast] leaving", `prod:broadcast-${socket._broadcastKey}`);
+            socket.leave(`prod:broadcast-${socket._broadcastKey}`);
+        }
+        socket._broadcastKey = broadcastKey;
+        socket.join(`prod:broadcast-${socket._broadcastKey}`);
+        console.log("[prod:broadcast] joining", `prod:broadcast-${socket._broadcastKey}`);
     });
 
     socket.on("prod-send", ({ socketID, event, data }) => {
@@ -171,9 +182,22 @@ io.on("connection", (socket) => {
         io.sockets.to(`prod:client-${socket._clientName}-overview`).emit("prod_update", data);
     });
 
-    socket.on("tally_change", ({ clientName, state, number, sceneName, data }) => {
+    socket.on("obs_data_change", async ({ clientName, previewScene, programScene }) => {
+        let client = await Cache.get(`client-${clientName}`);
+        console.log("obs_data_change", { clientName, previewScene, programScene });
+
+        if (clientName && client) {
+            io.sockets.to(`prod:client-${clientName}`).emit("prod_preview_program_change", { previewScene, programScene, emitSource: "client", clientSource: clientName });
+        }
+        let broadcast = await Cache.get(client.broadcast?.[0]);
+        if (broadcast && broadcast.key) {
+            io.sockets.to(`prod:broadcast-${broadcast.key}`).emit("prod_preview_program_change", { previewScene, programScene, emitSource: "broadcast", clientSource: clientName });
+        }
+    });
+
+    socket.on("tally_change", ({ clientName, state, number, data }) => {
         console.log("[tally]", clientName, state, number, data);
-        socket.to(`prod:client-${clientName}`).emit("tally_change", { state, number, sceneName });
+        socket.to(`prod:client-${clientName}`).emit("tally_change", { state, number });
     });
 
     socket.on("media_update", (status, value) => {

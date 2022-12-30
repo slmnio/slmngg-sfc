@@ -18,7 +18,11 @@ async function log(text) {
     if (!client) return;
     let channel = await getChannel();
     if (!channel) return;
-    return channel.send(text);
+    try {
+        return channel.send(text);
+    } catch (e) {
+        console.error("[Log:failed]", e);
+    }
 }
 
 module.exports = {

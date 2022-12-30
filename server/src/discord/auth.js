@@ -55,6 +55,7 @@ module.exports = ({ app, router, cors, Cache, io }) => {
             });
         }
         if (!user.airtable) {
+            console.log(`[Auth] No SLMN.GG profile for ${user.discord.id} ${user.discord.username}#${user.discord.discriminator}`);
             return res.send({
                 error: true,
                 message: "No SLMN.GG profile found",

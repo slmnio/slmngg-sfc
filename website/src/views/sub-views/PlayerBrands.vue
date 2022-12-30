@@ -10,7 +10,6 @@
 </template>
 
 <script>
-import { sortTeams } from "@/utils/sorts";
 import ThemeLogo from "@/components/website/ThemeLogo";
 
 export default {

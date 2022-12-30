@@ -1,8 +1,15 @@
 <template>
     <div class="tally-dot">
         <div class="d-flex">
-            <div class="dot" v-bind:class="{ preview: state === 'preview', active: state === 'active', 'unassigned': !observer }">{{ number }}</div>
-            <div class="text">{{ observer || '' }}</div>
+            <div class="dot" v-bind:class="{ preview: state === 'preview', active: state === 'active', 'unassigned': !observer }">
+                <span class="industry-align">{{ number }}</span>
+            </div>
+            <div class="text">
+                <span class="name">{{ observerName || '' }}</span>
+                <span class="team-cams">
+                    <span class="team" v-for="team in teamCams" :key="team">{{ team.slice(-1) }}</span>
+                </span>
+            </div>
         </div>
     </div>
 </template>
@@ -50,16 +57,24 @@ export default {
             return (this.liveMatch?.player_relationships || []).filter(rel => rel.singular_name === "Observer");
         },
         observer() {
-            return this.observers[this.number - 1]?.player?.name;
+            return this.observers[this.number - 1];
+        },
+        observerName() {
+            return this.observer?.player?.name;
         },
         liveMatch() {
             const matchID = this.client?.broadcast?.live_match?.[0];
             if (!matchID) return null;
             return ReactiveRoot(matchID, {
                 player_relationships: ReactiveArray("player_relationships", {
-                    player: ReactiveThing("player")
+                    player: ReactiveThing("player", {
+                        clients: ReactiveThing("clients")
+                    })
                 })
             });
+        },
+        teamCams() {
+            return this.observer.player.clients.cams;
         }
     },
     data: () => ({
@@ -87,7 +102,7 @@ export default {
     position: absolute;
     bottom: 0;
     left: 0;
-    margin: .2em;
+    padding: .2em;
     font-size: 120px;
     justify-content: flex-start;
     align-items: flex-end;
@@ -99,17 +114,24 @@ export default {
     border-radius: 50%;
     text-align: center;
     font-weight: bold;
+
+    line-height: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 6px solid #222;
 }
 
 .text {
     font-weight: bold;
     margin-left: .2em;
-    text-shadow: 4px 4px black, 0 0 4px black;
+    text-shadow: 8px 8px black, 0 0 8px black;
 }
 
 .dot {
     background-color: black;
     color: white;
+    font-size: 1.25em;
 }
 .dot.unassigned {
     color: rgba(255,255,255,0.5);
@@ -123,6 +145,18 @@ export default {
 .dot.active,
 .dot.program {
     background-color: #ff0000;
+}
+
+.team-cams .team {
+    background-color: black;
+    font-size: 0.4em;
+    padding:  0 0.25em;
+    margin-left: 0.1em;
+    line-height: 1;
+}
+
+.team-cams {
+    margin-left: .1em;
 }
 
 </style>

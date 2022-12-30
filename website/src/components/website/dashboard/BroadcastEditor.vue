@@ -42,10 +42,7 @@
 <script>
 import { BButton, BButtonGroup, BFormCheckbox } from "bootstrap-vue";
 import {
-    setBroadcastAdvertise,
-    setMapAttack,
     toggleFlipTeams,
-    togglePlayerCams,
     updateBroadcastData
 } from "@/utils/dashboard";
 

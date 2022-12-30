@@ -15,6 +15,7 @@ export default {
     props: ["client"],
     components: { TallyDot },
     data: () => ({
+        noBroadcastStyle: true,
         noStinger: true
     })
 };

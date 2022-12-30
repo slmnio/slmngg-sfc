@@ -37,6 +37,8 @@ const IframeOverlay = () => import("@/components/broadcast/roots/IframeOverlay")
 const TallyTransmitter = () => import("@/components/broadcast/roots/TallyTransmitter");
 const WebsocketTransmitter = () => import("@/components/broadcast/roots/WebsocketTransmitter");
 const TallyViewer = () => import("@/components/broadcast/roots/TallyViewer");
+const TallyDot = () => import("@/components/broadcast/roots/TallyDot");
+const QuadTallyDot = () => import("@/components/broadcast/roots/QuadTallyDot");
 const PlayerHistory = () => import("@/components/broadcast/PlayerHistory");
 const OverviewOverlay = () => import("@/components/broadcast/roots/OverviewOverlay");
 const MediaOverlay = () => import("@/components/broadcast/roots/MediaOverlay");
@@ -107,6 +109,8 @@ export default [
         })
     },
     { path: "tally-viewer", component: TallyViewer },
+    { path: "tally-dot", component: TallyDot, props: route => ({ number: parseInt(route.query.number) }) },
+    { path: "quad", component: QuadTallyDot },
     { path: "break-bar", component: BreakBarOverlay },
     {
         path: "bracket",

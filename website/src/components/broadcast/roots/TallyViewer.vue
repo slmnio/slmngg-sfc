@@ -40,10 +40,10 @@ export default {
             this.producerPreviewScene = data.previewScene;
             this.producerProgramScene = data.programScene;
 
-            if (this.targetsMe(this.producerPreviewScene)) {
-                this.state = "preview";
-            } else if (this.targetsMe(this.producerProgramScene)) {
+            if (this.targetsMe(this.producerProgramScene)) {
                 this.state = "active";
+            } else if (this.targetsMe(this.producerPreviewScene)) {
+                this.state = "preview";
             } else {
                 this.state = "inactive";
             }

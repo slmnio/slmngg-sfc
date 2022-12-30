@@ -150,9 +150,8 @@ export default {
         },
         showEditor() {
             if (!isAuthenticated(this.$root)) return false;
-            console.log("match editor show", this.$root.auth?.user?.website_settings?.includes("Can edit any match"));
             // TODO: Make sure user is an admin or has perms here
-            return true;
+            return this.$root.auth?.user?.website_settings?.includes("Can edit any match");
         },
         sidebarItems() {
             const items = ["vod"];

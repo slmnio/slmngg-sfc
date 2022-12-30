@@ -31,6 +31,7 @@ class Action {
                 success(data);
             },
             e => {
+                console.trace(e);
                 let errorCode = e?.errorCode || 500;
                 let errorMessage = e?.errorMessage || e?.message || e;
                 error(errorCode, errorMessage);

@@ -121,8 +121,11 @@ async function getBroadcast(client) {
     return broadcast;
 }
 
+async function getAll(ids) {
+    return await Promise.all((ids || []).map(m => get(m)));
+}
 async function getMaps(match) {
-    return await Promise.all((match.maps || []).map(m => get(m)));
+    return getAll(match.maps);
 }
 
 async function getTwitchChannel(client, requestedScopes) {
@@ -176,6 +179,6 @@ function getTwitchAPIError(error) {
 
 
 module.exports = {
-    getSelfClient, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord,
-    getTwitchChannel, getMatchData, getTwitchAPIClient, getTwitchAPIError, getBroadcast, getMaps
+    getSelfClient, cleanID, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord,
+    getTwitchChannel, getMatchData, getTwitchAPIClient, getTwitchAPIError, getBroadcast, getMaps, getAll
 };

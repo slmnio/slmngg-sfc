@@ -1,19 +1,21 @@
 <template>
     <div class="event-brackets container-fluid">
-         <div class="event-bracket-container mb-4" v-for="bracket in brackets" v-bind:key="bracket.id">
-                 <h1 class="bracket-name mb-3">{{ bracket.name }}</h1>
-                 <Bracket class="event-bracket" :bracket="bracket" :event="event" />
-         </div>
+        <div class="event-bracket-container mb-4" v-for="bracket in brackets" v-bind:key="bracket.id">
+            <h1 class="bracket-name mb-3">{{ bracket.name }}</h1>
+            <BracketResolveButton class="resolve-button" :bracket="bracket" />
+            <Bracket class="event-bracket" :bracket="bracket" :event="event" />
+        </div>
     </div>
 </template>
 
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import Bracket from "@/components/website/bracket/Bracket";
+import BracketResolveButton from "@/components/website/bracket/BracketResolveButton.vue";
 
 export default {
     name: "EventBrackets",
-    components: { Bracket },
+    components: { BracketResolveButton, Bracket },
     props: ["event"],
     computed: {
         brackets() {
@@ -38,6 +40,7 @@ export default {
         display: flex;
         flex-direction: column;
         align-items: center;
+        position: relative;
     }
     .event-bracket {
         max-width: 100%;
@@ -77,5 +80,11 @@ export default {
         .bracket {
             zoom: 0.8;
         }
+    }
+
+    .resolve-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
     }
 </style>

@@ -6,6 +6,9 @@
 <!--                <div class="bracket-details">{{ imps.bracket.description }}</div>-->
                 <BracketImplicationMatch class="flex-grow-1" :imp="imps.win" relation="Winner" :team="matchWinner" :link-to-detailed-match="linkToDetailedMatch"></BracketImplicationMatch>
                 <BracketImplicationMatch class="flex-grow-1" :imp="imps.lose" relation="Loser" :team="matchLoser" :link-to-detailed-match="linkToDetailedMatch"></BracketImplicationMatch>
+                <div class="button-holder" v-if="showResolveButton">
+                    <BracketResolveButton :bracket="imps.bracket" vertical-button />
+                </div>
             </div>
         </div>
     </div>
@@ -15,13 +18,15 @@
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { url } from "@/utils/content-utils";
 import BracketImplicationMatch from "@/components/website/dashboard/BracketImplicationMatch.vue";
+import BracketResolveButton from "@/components/website/bracket/BracketResolveButton.vue";
 
 export default {
     name: "BracketImplications",
-    components: { BracketImplicationMatch },
+    components: { BracketResolveButton, BracketImplicationMatch },
     props: {
         match: Object,
-        linkToDetailedMatch: Boolean
+        linkToDetailedMatch: Boolean,
+        showResolveButton: Boolean
     },
     computed: {
         bracketsIncludingMatch() {

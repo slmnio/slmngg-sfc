@@ -1,9 +1,9 @@
 <template>
     <div class="container" v-if="player && player.name">
         <h1>Profile Page</h1>
-        <b-alert v-model="showAlert" dismissible variant="danger">
-            {{ errorMessage }}
-        </b-alert>
+<!--        <b-alert v-model="showAlert" dismissible variant="danger">-->
+<!--            {{ errorMessage }}-->
+<!--        </b-alert>-->
 
         <b-form class="mt-4 opacity-changes" @submit="onSubmit" :class="{'low-opacity': submitting || isRestricted }">
 
@@ -37,14 +37,14 @@
 </template>
 
 <script>
-import { BAlert, BButton, BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BFormSelect } from "bootstrap-vue";
+import { BButton, BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BFormSelect } from "bootstrap-vue";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { updateProfileData } from "@/utils/dashboard";
 import { resizedImage } from "@/utils/images";
 
 export default {
     name: "ProfilePage",
-    components: { BForm, BFormGroup, BFormSelect, BButton, BFormInput, BAlert, BFormInvalidFeedback },
+    components: { BForm, BFormGroup, BFormSelect, BButton, BFormInput, BFormInvalidFeedback },
     computed: {
         player() {
             if (!this.$root.auth.user?.airtableID) return {};

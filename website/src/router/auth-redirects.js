@@ -1,4 +1,3 @@
-import NotFoundPage from "@/views/NotFoundPage";
 import { isOnMainDomain, setAuthNext } from "@/utils/auth";
 import { getMainDomain } from "@/utils/fetch";
 
@@ -35,9 +34,5 @@ export default (app, mainDomain) => ([
 
             window.location.replace("https://discord.com/api/oauth2/authorize?" + stringParams);
         }
-    },
-    {
-        path: "/*",
-        component: NotFoundPage
     }
 ]);

@@ -19,16 +19,43 @@
                 </b-button-group>
             </div>
         </div>
+        <div class="group">
+            <div class="group-top">Player Cams</div>
+            <div class="group-bottom">
+                <b-form-checkbox :checked="broadcast.show_cams" @change="(state) => togglePlayerCams(state)"
+                                 button size="sm" :button-variant="broadcast.show_cams ? 'primary' : ''">
+                    Show Cams
+                </b-form-checkbox>
+            </div>
+        </div>
+        <div class="spacer flex-grow-1"></div>
+        <div class="group text-right">
+            <div class="group-top">Advertise</div>
+            <div class="group-bottom">
+                <b-form-checkbox :checked="broadcast.advertise" @change="(state) => advertiseBroadcast(state)"
+                                 button size="sm" :button-variant="broadcast.advertise ? 'primary' : ''">{{ broadcast.advertise ? 'Advertising' : 'Advertise' }}</b-form-checkbox>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 import { BButton, BButtonGroup, BFormCheckbox } from "bootstrap-vue";
-import { setMapAttack, toggleFlipTeams } from "@/utils/dashboard";
+import {
+    setBroadcastAdvertise,
+    setMapAttack,
+    toggleFlipTeams,
+    togglePlayerCams,
+    updateBroadcastData
+} from "@/utils/dashboard";
 
 export default {
     name: "BroadcastEditor",
     props: ["client"],
+    data: () => ({
+        updateData: { },
+        broadcastUpdateTimeout: null
+    }),
     components: {
         BFormCheckbox, BButtonGroup, BButton
     },
@@ -44,10 +71,28 @@ export default {
         async toggleFlipTeams(state) {
             await toggleFlipTeams(this.$root.auth);
         },
+        async advertiseBroadcast(state) {
+            this.updateData.advertise = state;
+            return this.updateBroadcast();
+        },
+        async togglePlayerCams(state) {
+            this.updateData.playerCams = state;
+            return this.updateBroadcast();
+        },
         async setAttack(side) {
             const set = side === this.broadcast.map_attack ? null : side;
-            await setMapAttack(this.$root.auth, set);
+            this.updateData.mapAttack = set;
+            return this.updateBroadcast();
+        },
+        async updateBroadcast() {
+            if (this.broadcastUpdateTimeout) clearTimeout(this.broadcastUpdateTimeout);
+
+            // this.broadcastUpdateTimeout = setTimeout(async () => {
+            updateBroadcastData(this.$root.auth, this.updateData);
+            this.updateData = {};
+            // }, 500);
         }
+
     }
 };
 </script>

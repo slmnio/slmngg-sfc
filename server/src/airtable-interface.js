@@ -28,6 +28,7 @@ const reqLog = {
     trigger(key) {
         this.counts[key]++;
         setTimeout(() => this.counts[key]--, this.period * 1000);
+        this.setHighRate(this.counts.started > 20 && this.counts.failed / this.counts.started > 0.2);
     },
     start() {
         this.trigger("started");
@@ -40,12 +41,16 @@ const reqLog = {
     },
     output() {
         console.log(`[Request log] last ${this.period}s: ${this.counts.started} started, ${this.counts.succeeded} succeeded (${Math.floor((this.counts.succeeded / this.counts.started) * 100)}% success), ${this.counts.failed} failed (${Math.floor((this.counts.failed / this.counts.started) * 100)}% start-fails)`);
-        this.setHighRate(this.counts.started > 20 && this.counts.failed / this.counts.started > 0.5);
     },
     setHighRate(newRate) {
         if (this.highErrorRate !== newRate) {
-            console.log("high_error_rate", this.highErrorRate);
-            io.emit("high_error_rate", this.highErrorRate);
+            console.log("high_error_rate", newRate);
+            if (newRate) {
+                log(`**High error rate**: ${Math.floor((this.counts.failed / this.counts.started) * 100)}% requests failed in the last ${this.period}s.`);
+            } else {
+                log(`**High error rate** (Resolved): ${Math.floor((this.counts.failed / this.counts.started) * 100)}% requests failed in the last ${this.period}s.`);
+            }
+            io.emit("high_error_rate", newRate);
         }
         this.highErrorRate = newRate;
     }

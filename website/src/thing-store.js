@@ -16,7 +16,8 @@ export default new Vuex.Store({
         match_highlights: [],
         timezone: localStorage.getItem("timezone") || "local",
         draft_notes: [],
-        last_event_match_pages: []
+        last_event_match_pages: [],
+        dashboard_modules_active: []
     },
     mutations: {
         push(_store, { id, data }) {
@@ -100,6 +101,18 @@ export default new Vuex.Store({
             const index = state.last_event_match_pages.findIndex(x => x.eventID === eventID);
             if (index === -1) return state.last_event_match_pages.push(item);
             state.last_event_match_pages.splice(index, 1, item);
+        },
+        setDashboardModuleVisibility(state, { visible, moduleName }) {
+            if (!moduleName) return;
+            const index = state.dashboard_modules_active.indexOf(moduleName);
+
+            if (index === -1) {
+                // not set
+                if (visible) state.dashboard_modules_active.push(moduleName);
+            } else {
+                // set
+                if (!visible) state.last_event_match_pages.splice(index, 1);
+            }
         }
     },
     getters: {
@@ -110,7 +123,8 @@ export default new Vuex.Store({
         getNotes: state => (playerID) => state.draft_notes.find(notes => notes.player_id === playerID),
         getLastMatchPage: state => (eventID) => state.last_event_match_pages.find(x => x.eventID === eventID),
         // highlightedMatch: (state, getters) => () => getters.thing(state.highlighted_match)
-        highlightedMatch: state => () => state.highlighted_match
+        highlightedMatch: state => () => state.highlighted_match,
+        dashboardModuleIsVisible: state => (moduleName) => state.dashboard_modules_active.includes(moduleName)
     },
     actions: {
         subscribe: (state, data) => state.commit("subscribe", data),

@@ -130,11 +130,11 @@ io.on("connection", (socket) => {
     });
 
     socket.on("get_and_subscribe", async (id) => {
-        console.log("get and subscribe in:", id);
+        // console.log("get and subscribe in:", id);
         id = cleanID(id);
         socket.join(id);
         socket.emit("data_update", id, await Cache.get(id));
-        console.log("get and subscribe out:", id);
+        // console.log("get and subscribe out:", id);
     });
     socket.on("prod-join", (clientName) => {
         console.log("[prod:client] join", `prod:client-${clientName}`);

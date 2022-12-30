@@ -146,7 +146,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
             let [strippedName, args] = originalFilename.split("?");
             originalFilename = strippedName;
             const dots = strippedName.split(".");
-            const originalFileType = dots[dots.length - 1]; // last . (now works with .svg.png)
+            const originalFileType = req.query.type ? req.query.type.split("/").pop().split("+")?.[0] : dots[dots.length - 1]; // last . (now works with .svg.png)
             const filename = parts[parts.length - 2] + "." + originalFileType;
 
             if (!["dl.airtable.com", "media.slmn.io", "v5.airtableusercontent.com"].some(domain => domain === parts[2])) {
@@ -195,7 +195,9 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                 };
             }
 
-            if (!size /*["svg", "gif"].includes(originalFileType)*/) { // TODO: load image first then detect filetype
+            if (["svg", "gif"].includes(originalFileType)) {
+                // TODO: We get file types from Airtable legacy URLs, but we won't in future
+                // We need to load the image first then detect the filetype
                 // just do orig if svg
                 size = "orig";
             }

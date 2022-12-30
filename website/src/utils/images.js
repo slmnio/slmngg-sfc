@@ -5,18 +5,21 @@ export function bg(url) {
     return { backgroundImage: `url(${url})` };
 }
 
-function getFileEnding(url) {
-    const splits = url.split(".");
-    return splits[splits.length - 1];
+function getFileEnding(url, mimeType) {
+    if (mimeType) {
+        return mimeType.split("/").pop();
+    }
+    return url.split("/").pop().split(".").pop();
 }
 
-export function getImageURL(airtableURL, size) {
+export function getImageURL(airtableURL, size, mimeType) {
+    mimeType = mimeType && mimeType.split("+")?.[0];
     if (!size) {
         console.warn("[Image Utils]", `No size set for ${airtableURL}`);
         size = "orig";
     }
     const dataServer = getDataServerAddress();
-    return `${dataServer}/image.${getFileEnding(airtableURL) || "png"}?size=${size}&url=${airtableURL.replace("?", "&")}`;
+    return `${dataServer}/image.${getFileEnding(airtableURL, mimeType)}?size=${size}${mimeType ? `&type=${mimeType}` : ""}&url=${airtableURL.replace("?", "&")}`;
 }
 
 export function getAirtableURL(attachment) {
@@ -24,17 +27,17 @@ export function getAirtableURL(attachment) {
     return attachment?.[0]?.url || null;
 }
 
-function keyedImage(theme, keys) {
-    const urls = keys.map(key => getAirtableURL(theme[key])).filter(s => s);
+function keyedImageAttachments(theme, keys) {
+    const urls = keys.map(key => theme[key]?.[0]).filter(s => s?.url);
     if (urls.length) return urls[0];
     return null;
 }
 
 export function resizedImageNoWrap(theme, keys, size) {
     if (!theme) return null;
-    const imageURL = keyedImage(theme, keys);
-    if (!imageURL) return null;
-    return getImageURL(imageURL, size);
+    const imageAttachment = keyedImageAttachments(theme, keys);
+    if (!imageAttachment) return null;
+    return getImageURL(getAirtableURL(imageAttachment), size, imageAttachment.type);
 }
 
 export function resizedImage(theme, keys, size) {
@@ -42,5 +45,5 @@ export function resizedImage(theme, keys, size) {
 }
 
 export function resizedAttachment(attachment, size) {
-    return getImageURL(getAirtableURL(attachment), size || "orig");
+    return getImageURL(getAirtableURL(attachment), size || "orig", attachment.type);
 }

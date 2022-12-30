@@ -2,25 +2,25 @@ module.exports = {
     key: "toggle-flip-teams",
     auth: ["client"],
     /***
-     * @param {ActionSuccessCallback} success
-     * @param {ActionErrorCallback} error
+     * @param {Object?} params
      * @param {ClientData} client
-     * @param {CacheGetFunction} get
-     * @param {SimpleUpdateRecord} updateRecord
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern
-    async handler(success, error, {  }, { client }, { get, updateRecord }) {
-        let broadcast = await get(client?.broadcast?.[0]);
-        if (!broadcast) error("No broadcast associated");
+    async handler(params, { client }) {
+        let broadcast = await this.helpers.get(client?.broadcast?.[0]);
+        if (!broadcast) throw "No broadcast associated";
 
-        let match = await get(broadcast?.live_match?.[0]);
-        if (!match) error("No match associated");
+        let match = await this.helpers.get(broadcast?.live_match?.[0]);
+        if (!match) throw "No match associated";
 
-        let response = await updateRecord("Matches", match, {
+        let response = await this.helpers.updateRecord("Matches", match, {
             "Flip Teams": !match.flip_teams
         });
 
-        return response?.error ? error("Airtable error", 500) : success();
+        if (response?.error) {
+            console.error("Airtable error", response.error);
+            throw "Airtable error";
+        }
     }
 };

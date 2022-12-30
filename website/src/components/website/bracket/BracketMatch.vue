@@ -84,6 +84,9 @@ export default {
             store.commit("setHighlightedMatch", null);
         },
         generateDummies(dummy, match) {
+            // "1" and "2" come from the dot notation (eg "winner": "7.2")
+            // so 1 is top/left, 2 is bottom/right
+
             const feederMatches = match?._bracket_data?.connections?.feederMatches;
             // console.log("cons", match?._bracket_data?.num, match?._bracket_data?.connections);
             if (!feederMatches || (!feederMatches["1"] && !feederMatches["2"])) return [dummy, dummy];
@@ -92,7 +95,7 @@ export default {
                 // console.log("f1", feederMatches["1"]);
                 dummies[0] = {
                     ...dummy,
-                    text: `${feederMatches["1"]._m} M${feederMatches["1"].side}`
+                    text: this.generateDummyText(feederMatches["1"])
                 };
             }
 
@@ -100,13 +103,20 @@ export default {
                 // console.log("f2", feederMatches["2"]);
                 dummies[1] = {
                     ...dummy,
-                    text: `${feederMatches["2"]._m} M${feederMatches["2"].side}`
+                    text: this.generateDummyText(feederMatches["2"])
                 };
             }
 
             // console.log("dummies", match._bracket_data.num, dummies);
 
             return dummies;
+        },
+        generateDummyText(match) {
+            console.log("dummy text", match);
+            if (match?.teams?.length === 2 && match.teams.every(team => team.code)) {
+                return `${match._m} of ${match.teams.map(team => team.code).join(" vs ")}`;
+            }
+            return `${match._m} M${match.side}`;
         }
     },
     computed: {

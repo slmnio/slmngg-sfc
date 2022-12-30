@@ -11,6 +11,9 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 import VueYoutubeEmbed from "vue-youtube-embed";
 import VueCookies from "vue-cookies";
 
+import { Notyf } from "notyf";
+import "notyf/notyf.min.css";
+
 import defaultRoutes from "@/router/default";
 import { getDataServerAddress, fetchThings, getMainDomain } from "@/utils/fetch";
 import EventRoutes from "@/router/event";
@@ -31,6 +34,15 @@ Vue.use(VueMeta);
 Vue.use(VueRouter);
 Vue.use(VueYoutubeEmbed, { global: false });
 Vue.use(VueCookies);
+
+Vue.prototype.$notyf = new Notyf({
+    duration: 5000,
+    position: {
+        x: "right",
+        y: "top"
+    },
+    dismissible: true
+});
 
 store.subscribe((mutation, state) => {
     if (mutation.type === "setPlayerDraftNotes") {
@@ -82,6 +94,7 @@ if (subdomain) {
     // verify event from subdomain
     console.log("[subdomain]", subdomain);
     routes = [
+        ...AuthRoutes(app, mainDomain),
         {
             path: "/",
             component: MinisiteWrapperApp,
@@ -100,8 +113,7 @@ if (subdomain) {
                 ...SharedRoutes,
                 { path: "*", component: NotFoundContent }
             ]
-        },
-        ...AuthRoutes(app, mainDomain)
+        }
     ];
 } else {
     // default slmn.gg

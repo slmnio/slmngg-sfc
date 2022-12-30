@@ -260,8 +260,11 @@ async function set(id, data, options) {
     if (oldData && (data.modified !== oldData.modified)) {
         let [oldDate, newDate] = [oldData.modified, data.modified].map(x => new Date(x));
         if (newDate.getTime() < oldDate.getTime()) {
-            console.log(`[old] id=${id} \n     old=${oldDate.toLocaleString()} \n     new=${newDate.toLocaleString()}`);
-            console.warn("     old data is newer, keeping it!");
+            if (oldDate.getTime() - newDate.getTime() > 3000) {
+                // only send a log if it's over 3 seconds
+                console.log(`[old] id=${id} \n     old=${oldDate.toLocaleString()} \n     new=${newDate.toLocaleString()}`);
+                console.warn("     old data is newer, keeping it!");
+            }
             // console.log("old data:");
             // console.log(oldData);
             // console.log("new data:");
@@ -341,6 +344,7 @@ async function getBots() {
 async function getTwitchAccessToken(channel) {
     // get stored access token, check if it's valid
     // otherwise / or if no token, get from refresh token
+    if (!channel) return null;
     let storedToken = auth.get(`twitch_access_token_${channel.channel_id}`);
 
     if (!storedToken || accessTokenIsExpired(storedToken)) {

@@ -83,6 +83,11 @@
             <p>Change your timezone for dates and times across SLMN.GG:</p>
             <TimezoneSwapper align="left" />
         </b-modal>
+        <v-style>
+            .notyf {
+                margin-top: {{ height }}px !important;
+            }
+        </v-style>
     </div>
 </template>
 
@@ -120,7 +125,9 @@ export default {
     },
     props: ["minisite"],
     data: () => ({
-        pageNoLongerNew: false
+        pageNoLongerNew: false,
+        resizeObserver: null,
+        height: 0
     }),
     computed: {
         liveMatches() {
@@ -195,12 +202,20 @@ export default {
             // ignore if the socket is disconnected for the first 3 seconds of loading
             this.pageNoLongerNew = true;
         }, 3000);
+        this.resizeObserver = new ResizeObserver(this.onResize);
+        this.resizeObserver.observe(this.$el);
     },
     methods: {
         isAuthenticated,
         slmnggURL(page) {
             return `${this.slmnggDomain}/${page}`;
+        },
+        onResize() {
+            this.height = this.$el.offsetHeight;
         }
+    },
+    beforeDestroy () {
+        this.resizeObserver.unobserve(this.$el);
     }
 };
 </script>

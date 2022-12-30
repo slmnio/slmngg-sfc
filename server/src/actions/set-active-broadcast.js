@@ -5,16 +5,13 @@ module.exports = {
     requiredParams: ["client", "broadcast"],
     auth: ["user", "client"],
     /***
-     * @param {ActionSuccessCallback} success
-     * @param {ActionErrorCallback} error
      * @param {DirtyAirtableID} broadcastID
      * @param {DirtyAirtableID} clientID
      * @param {UserData} user
      * @param {ClientData} client
-     * @param {SimpleUpdateRecord} updateRecord
      * @returns {Promise<void>}
      */
-    async handler(success, error, { broadcast: broadcastID }, { client }, { updateRecord }) {
+    async handler({ broadcast: broadcastID }, { client }) {
         broadcastID = dirtyID(broadcastID);
 
         // client.broadcast = array of broadcasts, but first one is the "active" one -> [0] to make it active
@@ -24,10 +21,13 @@ module.exports = {
             return 0;
         });
 
-        let response = await updateRecord("Clients", client, {
+        let response = await this.helpers.updateRecord("Clients", client, {
             "Broadcast": broadcasts
         });
 
-        return response?.error ? error("Airtable error", 500) : success();
+        if (response?.error) {
+            console.error("Airtable error", response.error);
+            throw "Airtable error";
+        }
     }
 };

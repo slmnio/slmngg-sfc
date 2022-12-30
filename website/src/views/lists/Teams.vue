@@ -2,7 +2,7 @@
     <div class="container">
         <h1 class="big mb-3">Teams</h1>
         <input type="text" class="form-control mb-3" placeholder="Start typing to filter" v-model="search">
-        <h1><LoadingIcon v-if="!sortedEvents.length"></LoadingIcon></h1>
+        <h1><LoadingIcon v-if="!search && !sortedEvents.length"></LoadingIcon></h1>
         <div v-for="event in sortedEvents" v-bind:key="event.id" class="event mb-4">
             <EventDisplay class="team-display" :event="event"/>
             <div class="event-teams d-flex row">
@@ -11,27 +11,32 @@
                 </div>
             </div>
         </div>
+        <b-pagination v-if="!searchEvents" v-model="page" :per-page="eventsPerPage" :total-rows="events.length" align="center"></b-pagination>
     </div>
 </template>
 
 <script>
-import { ReactiveArray, ReactiveList, ReactiveThing } from "@/utils/reactive";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { searchInCollection } from "@/utils/search";
 import TeamDisplay from "@/views/lists/TeamDisplay";
 import EventDisplay from "@/views/lists/EventDisplay";
 import { sortEvents } from "@/utils/sorts";
 import LoadingIcon from "@/components/website/LoadingIcon";
+import { BPagination } from "bootstrap-vue";
 
 export default {
     name: "Teams",
     components: {
         LoadingIcon,
         TeamDisplay,
-        EventDisplay
+        EventDisplay,
+        BPagination
     },
     data: function() {
         return {
-            search: null
+            search: null,
+            page: 1,
+            eventsPerPage: 10
         };
     },
     computed: {
@@ -43,15 +48,25 @@ export default {
         //     });
         // },
         events() {
-            return ReactiveList("Events", {
-                theme: ReactiveThing("theme"),
-                teams: ReactiveArray("teams", {
-                    theme: ReactiveThing("theme")
+            const events = ReactiveRoot("special:public-events", {
+                events: ReactiveArray("events", {
+                    theme: ReactiveThing("theme"),
+                    teams: ReactiveArray("teams", {
+                        theme: ReactiveThing("theme")
+                    })
                 })
-            }).sort((a, b) => sortEvents(a, b))
-                .reverse();
+            })?.events;
+            if (!events) return [];
+            return events.sort((a, b) => sortEvents(a, b)).reverse();
+        },
+        searchEvents() {
+            return (this.search && this.search.length > 2);
         },
         sortedEvents() {
+            if (!this.searchEvents) {
+                // group and paginate
+                return this.events.slice(this.eventsPerPage * (this.page - 1), this.eventsPerPage * this.page);
+            }
             return this.events
                 .map(e => {
                     if (this.search && this.search.length > 2 && e.teams) {
@@ -61,8 +76,7 @@ export default {
                         };
                     }
                     return e;
-                })
-                .filter(e => e.show_in_events && e.teams && e.teams.length !== 0);
+                }).filter(e => e.show_in_events && e.teams && e.teams.length !== 0);
         }
         // groupedTeams() {
         //     const groups = new Map();
@@ -95,5 +109,8 @@ export default {
 }
 .event-teams.row {
   margin: 0 -6px;
+}
+.pagination {
+    user-select: none;
 }
 </style>

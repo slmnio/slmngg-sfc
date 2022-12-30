@@ -1,9 +1,9 @@
 <template>
     <div class="match-editor">
-        <h2>Match Editor</h2>
+<!--        <h2>Match Editor</h2>-->
 
         <b-form v-if="match" @submit="(e) => e.preventDefault()">
-            <b-alert variant="danger" :show="!!errorMessage" dismissible @dismissed="() => this.errorMessage = null"><i class="fas fa-exclamation-circle fa-fw"></i> <b>Error</b>: {{ errorMessage }}</b-alert>
+<!--            <b-alert variant="danger" :show="!!errorMessage" dismissible @dismissed="() => this.errorMessage = null"><i class="fas fa-exclamation-circle fa-fw"></i> <b>Error</b>: {{ errorMessage }}</b-alert>-->
             <div class="top d-flex align-items-center" v-if="!hideMatchExtras">
                 <b-form-checkbox :class="{'low-opacity': processing['special_event']}" class="opacity-changes flex-shrink-0 mr-5"
                                  v-model="matchData.special_event" name="special-event-checkbox" @change="(checked) => sendMatchDataChange('special_event', checked)">
@@ -17,7 +17,7 @@
                 </b-form-input>
                 <b-button class="ml-5 top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save all</b-button>
                 </div>
-            <div class="teams-scores mt-2">
+            <div class="teams-scores pt-2 px-2">
                 <div class="spacer" style="order:0"></div>
                 <div class="team" v-for="(team, i) in teams" :key="team.id" :class="{'end': i === 1}">
                     <ContentThing v-if="!team.empty" :thing="team" :theme="team.theme" show-logo="true" type="team" text="" />
@@ -25,7 +25,7 @@
                 </div>
                 <b-form-input v-for="(score, i) in scores" :key="i" v-model.number="matchData.scores[i]"
                               @change="(number) => setScore(`score_${i+1}`, number)"
-                              type="number" :min="0" :max="match.first_to" debounce="500" class="opacity-changes score-input" />
+                              type="number" :min="0" :max="match.first_to" class="opacity-changes score-input" />
                 <div class="spacer" style="order:10"></div>
                 <div class="right-buttons" style="order:11">
                     <b-button size="sm" @click="() => extraMaps++">
@@ -34,7 +34,7 @@
                     <b-button v-if="hideMatchExtras" class="ml-2 top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save all</b-button>
                 </div>
             </div>
-            <table class="teams-maps table table-bordered table-sm table-dark mt-2 opacity-changes"  :class="{'low-opacity': processing['map']}">
+            <table class="teams-maps table table-bordered table-sm table-dark mt-2 mb-0 opacity-changes"  :class="{'low-opacity': processing['map']}">
                 <tr class="map" v-for="(map, i) in maps" :key="i" :class="{'banned': banners[i], 'very-low-opacity': !map.dummy && !map._original_data_id}">
                     <td class="form-stack number">
                         <div class="form-top">#</div>
@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import { BAlert, BButton, BForm, BFormCheckbox, BFormGroup, BFormInput, BFormSelect } from "bootstrap-vue";
+import { BButton, BForm, BFormCheckbox, BFormGroup, BFormInput, BFormSelect } from "bootstrap-vue";
 import { updateMapData, updateMatchData } from "@/utils/dashboard";
 import ThemeLogo from "@/components/website/ThemeLogo";
 import ContentThing from "@/components/website/ContentThing";
@@ -83,12 +83,13 @@ import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { cleanID, textSort } from "@/utils/content-utils";
 import TeamPicker from "@/components/website/dashboard/TeamPicker";
 import MapScoreEditor from "@/components/website/dashboard/MapScoreEditor";
+import DashboardModule from "@/components/website/dashboard/DashboardModule.vue";
 
 export default {
     name: "MatchEditor",
     props: ["match", "hideMatchExtras"],
     // eslint-disable-next-line vue/no-unused-components
-    components: { MapScoreEditor, TeamPicker, ContentThing, ThemeLogo, BForm, BFormGroup, BFormCheckbox, BFormInput, BButton, BFormSelect, BAlert },
+    components: { DashboardModule, MapScoreEditor, TeamPicker, ContentThing, ThemeLogo, BForm, BFormGroup, BFormCheckbox, BFormInput, BButton, BFormSelect },
     computed: {
         teams() {
             const dummy = { dummy: true };
@@ -206,16 +207,28 @@ export default {
         existingMapIDs: [],
         extraMaps: 0,
         errorMessage: null,
-        previousAutoData: null
+        previousAutoData: null,
+        scoreDebounceTimeouts: []
     }),
     methods: {
         async setScore(scoreNum, number) {
-            console.log({
-                scoreNum,
-                number
-            });
+            if (this.scoreDebounceTimeouts[scoreNum]) clearTimeout(this.scoreDebounceTimeouts[scoreNum]);
+            this.scoreDebounceTimeouts[scoreNum] = setTimeout(async () => {
+                console.log({
+                    scoreNum,
+                    number
+                });
 
-            await this.sendMatchDataChange(scoreNum, parseInt(number));
+                const response = await this.sendMatchDataChange(scoreNum, parseInt(number));
+                if (!response.error) {
+                    const updatedScore = [...this.scores];
+                    updatedScore[scoreNum] = number;
+                    this.$notyf.success({
+                        message: `Score set to ${updatedScore.join("-")}`,
+                        duration: 3000
+                    });
+                }
+            }, 500);
         },
         setIfNew(key, index, value) {
             if (this.previousAutoData?.[key]?.[index] === value) return; // console.log(`Not updating ${key}[${index}] because ${value} is the same as last set`);
@@ -267,19 +280,28 @@ export default {
             obj[key] = val;
 
             const response = await updateMatchData(this.$root.auth, this.match, obj);
-            if (response.error) this.errorMessage = response.errorMessage;
+            // if (response.error) this.errorMessage = response.errorMessage;
             console.log(response);
             this.$set(this.processing, key, false);
             console.log("[processing]", key, "off");
+            return response;
         },
         async sendMapDataChange() {
             console.log("map processing");
             this.$set(this.processing, "map", true);
 
             const response = await updateMapData(this.$root.auth, this.match, this.editedMapData);
-            if (response.error) this.errorMessage = response.errorMessage;
+            // if (response.error) this.errorMessage = response.errorMessage;
             console.log(response);
             this.$set(this.processing, "map", false);
+
+            if (!response.error) {
+                this.$notyf.success({
+                    message: "Map data saved",
+                    duration: 3000
+                });
+            }
+            return response;
         }
     },
     mounted() {

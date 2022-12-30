@@ -1,6 +1,6 @@
+const TeamAudio = () => import("@/components/broadcast/TeamAudio");
 const MapStatsOverlay = () => import("@/components/broadcast/roots/MapStatsOverlay");
 const IngameCommsOverlay = () => import("@/components/broadcast/roots/IngameCommsOverlay");
-const PlayerAudio = () => import("@/components/broadcast/PlayerAudio");
 const MVPOverlay = () => import("@/components/broadcast/roots/MVPOverlay");
 const MultiStandingsOverlay = () => import("@/components/broadcast/roots/MultiStandingsOverlay");
 const ClientOverview = () => import("@/components/broadcast/roots/ClientOverview");
@@ -149,7 +149,9 @@ export default [
         component: HeroRosterOverlay,
         props: route => ({
             teamNum: route.query.team || route.query.teamNum,
-            playerCount: route.query.players || route.query.playerCount
+            playerCount: route.query.players || route.query.playerCount,
+            showRoles: !!route.query.roles || !!route.query.icons,
+            showPronouns: !!route.query.pronouns
         })
     },
     { path: "history", component: HistoryOverlay, props: route => ({ max: route.query.max || 5 }) },
@@ -210,19 +212,21 @@ export default [
     { path: "broadcasts", component: OtherBroadcastsOverlay },
     { path: "mvp", component: MVPOverlay },
     {
-        path: "audio",
-        component: PlayerAudio,
-        props: route => ({
-            taskKey: route.query.key
-        })
-    },
-    {
         path: "ingame-comms",
         component: IngameCommsOverlay,
         props: route => ({
             listenInText: route.query.text,
-            buffer: parseInt(route.query.buffer)
+            buffer: parseInt(route.query.buffer),
+            forceTeam: route.query.team ? parseInt(route.query.team) : null
         })
     },
-    { path: "map-stats", component: MapStatsOverlay }
+    { path: "map-stats", component: MapStatsOverlay },
+    {
+        path: "audio",
+        component: TeamAudio,
+        props: route => ({
+            taskKey: route.query.key,
+            buffer: parseInt(route.query.buffer)
+        })
+    }
 ];

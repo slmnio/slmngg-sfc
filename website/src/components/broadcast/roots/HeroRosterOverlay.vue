@@ -1,9 +1,13 @@
 <template>
     <GenericOverlay class="hero-roster-overlay" :title="title || (team && team.name) || 'Roster'" :title-style="titleStyle" :custom-theme="team && team.theme" :accent-color="team && team.theme && team.theme.color_theme">
         <div class="players h-100 d-flex flex-center">
-            <div class="player h-100" v-for="player in players" :key="player.id">
+            <div class="player h-100" v-for="player in players" :key="player.id" :class="{'has-role-icon': showRoles}">
                 <RecoloredHero class="h-100" :hero="player.favourite_hero" :theme="team.theme"></RecoloredHero>
-                <div class="player-name flex-center text-center">{{ player.name }}</div>
+                <div class="player-name flex-center text-center">
+                    <span class="player-name-internal">{{ player.name }}</span>
+                    <span v-if="showRoles" class="player-role" v-html="getRoleSVG(player.role)"></span>
+                    <span :style="themeBackground1(team)" v-if="showPronouns" class="player-pronouns">{{ player.pronouns }}</span>
+                </div>
             </div>
         </div>
     </GenericOverlay>
@@ -14,10 +18,11 @@ import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import { themeBackground1 } from "@/utils/theme-styles";
+import { getRoleSVG } from "@/utils/content-utils";
 
 export default {
     name: "HeroRosterOverlay",
-    props: ["broadcast", "title", "playerCount", "teamNum"],
+    props: ["broadcast", "title", "playerCount", "teamNum", "showRoles", "showPronouns"],
     components: { RecoloredHero, GenericOverlay },
     computed: {
         match() {
@@ -72,7 +77,9 @@ export default {
         getFavouriteHero(heroName) {
             if (!heroName || !(this.heroes || []).length) return null;
             return this.heroes.find(h => h.name && h.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() === heroName.toLowerCase());
-        }
+        },
+        themeBackground1,
+        getRoleSVG
     },
     watch: {
         team: {
@@ -134,5 +141,24 @@ export default {
     .hero-roster-overlay >>> .g-body {
         overflow: hidden;
         color: white;
+    }
+
+    .player-name {
+        flex-direction: column;
+    }
+    .player-role {
+        width: 2em;
+    }
+    .player.has-role-icon .player-name {
+        height: 4.25em;
+    }
+    .player.has-role-icon .recolored-hero {
+        height: calc(100% - 6em) !important;
+    }
+    .player-pronouns {
+        padding: 0.25em 0.5em;
+        font-size: 0.6em;
+        line-height: 1;
+        margin-top: .2em;
     }
 </style>

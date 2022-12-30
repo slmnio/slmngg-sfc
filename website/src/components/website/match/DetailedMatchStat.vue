@@ -2,7 +2,7 @@
     <div class="stat mb-2" v-if="shouldShow">
         <div class="stat-a"><slot></slot></div>
         <div class="stat-b" v-if="raw" v-html="formattedTargetData"></div>
-        <div class="stat-b" v-else-if="time">{{ prettyDate(targetData) }} local time</div>
+        <div class="stat-b" v-else-if="time">{{ prettyDate(targetData) }}</div>
         <div class="stat-b" v-else-if="players">
             <LinkedPlayers :players="targetData" :show-tally="showTally" />
         </div>
@@ -15,7 +15,7 @@
 
 <script>
 import LinkedPlayers from "@/components/website/LinkedPlayers";
-import spacetime from "spacetime";
+import { formatTime } from "@/utils/content-utils";
 
 export default {
     name: "DetailedMatchStat",
@@ -23,7 +23,7 @@ export default {
     components: { LinkedPlayers },
     methods: {
         prettyDate(timeString) {
-            return spacetime(timeString).goto(null).format("{date} {month-short} {time}");
+            return formatTime(timeString, this.$store.state.timezone);
         }
     },
     computed: {

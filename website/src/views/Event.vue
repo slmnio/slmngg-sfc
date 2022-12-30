@@ -10,7 +10,7 @@
             <li class="nav-item ct-passive" v-if="showStandings"><router-link class="nav-link" :to="subLink('standings')">Standings</router-link></li>
             <li class="nav-item ct-passive" v-if="showFoldy"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
             <li class="nav-item ct-passive" v-if="showDraft"><router-link class="nav-link" :to="subLink('draft')">Draft</router-link></li>
-            <li class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('staff')">Staff</router-link></li>
+            <li class="nav-item ct-passive" v-if="showStaff"><router-link class="nav-link" :to="subLink('staff')">Staff</router-link></li>
             <li class="nav-item ct-passive" v-if="event.theme"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
             <li class="nav-item ct-passive" v-if="event.about"><router-link class="nav-link" :to="subLink('about')">About</router-link></li>
 <!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
@@ -95,8 +95,12 @@ export default {
         showDraft() {
             return this.settings?.draft?.use || false;
         },
-        useStaffPage() {
-            return this.settings?.extendedStaffPage || false;
+        showStaff() {
+            return this.settings?.extendedStaffPage ||
+                this.event?.player_relationships ||
+                this.event?.staff ||
+                this.event?.matches ||
+                this.event?.casters;
         },
         subdomain() {
             return this.event?.subdomain || this.event?.partial_subdomain;

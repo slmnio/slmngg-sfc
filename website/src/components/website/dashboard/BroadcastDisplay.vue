@@ -47,7 +47,7 @@ export default {
         justify-content: flex-start;
         align-items: center;
         background-color: #555;
-        min-height: 2.5em;
+        min-height: 3em;
     }
     .broadcast-display[disabled] {
         pointer-events: none;
@@ -55,9 +55,9 @@ export default {
     }
 
     .event-logo {
-        height: 2em;
-        width: 2em;
-        margin-right: .5em;
+        height: 2.5em;
+        width: 2.5em;
+        margin-right: .75em;
     }
     .event-logo-inner {
         width: 100%;

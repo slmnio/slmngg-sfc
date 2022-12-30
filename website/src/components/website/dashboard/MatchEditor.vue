@@ -17,7 +17,7 @@
                 </b-form-input>
                 <b-button class="ml-5 top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save all</b-button>
                 </div>
-            <div class="teams-scores mt-2">
+            <div class="teams-scores pt-2 px-2">
                 <div class="spacer" style="order:0"></div>
                 <div class="team" v-for="(team, i) in teams" :key="team.id" :class="{'end': i === 1}">
                     <ContentThing v-if="!team.empty" :thing="team" :theme="team.theme" show-logo="true" type="team" text="" />
@@ -34,7 +34,7 @@
                     <b-button v-if="hideMatchExtras" class="ml-2 top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save all</b-button>
                 </div>
             </div>
-            <table class="teams-maps table table-bordered table-sm table-dark mt-2 opacity-changes"  :class="{'low-opacity': processing['map']}">
+            <table class="teams-maps table table-bordered table-sm table-dark mt-2 mb-0 opacity-changes"  :class="{'low-opacity': processing['map']}">
                 <tr class="map" v-for="(map, i) in maps" :key="i" :class="{'banned': banners[i], 'very-low-opacity': !map.dummy && !map._original_data_id}">
                     <td class="form-stack number">
                         <div class="form-top">#</div>
@@ -83,12 +83,13 @@ import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { cleanID, textSort } from "@/utils/content-utils";
 import TeamPicker from "@/components/website/dashboard/TeamPicker";
 import MapScoreEditor from "@/components/website/dashboard/MapScoreEditor";
+import DashboardModule from "@/components/website/dashboard/DashboardModule.vue";
 
 export default {
     name: "MatchEditor",
     props: ["match", "hideMatchExtras"],
     // eslint-disable-next-line vue/no-unused-components
-    components: { MapScoreEditor, TeamPicker, ContentThing, ThemeLogo, BForm, BFormGroup, BFormCheckbox, BFormInput, BButton, BFormSelect },
+    components: { DashboardModule, MapScoreEditor, TeamPicker, ContentThing, ThemeLogo, BForm, BFormGroup, BFormCheckbox, BFormInput, BButton, BFormSelect },
     computed: {
         teams() {
             const dummy = { dummy: true };

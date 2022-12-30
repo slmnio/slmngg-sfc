@@ -64,6 +64,10 @@
                         <PreviousMatch v-for="match in teamMatches(team)" :match="match" :team="team" v-bind:key="match.id" />
                     </div>
                 </div>
+
+                <bracket-implications class="bracket-implications mt-3" :match="match" link-to-detailed-match
+                                      v-if="showImplications && match.brackets"></bracket-implications>
+
                 <div class="show-notes mt-3" v-if="showShowNotes && match.show_notes">
                     <h2>Show notes</h2>
                     <Markdown :markdown="match.show_notes"/>
@@ -101,6 +105,9 @@
                     </div>
                     <div v-if="match.maps" :class="`btn btn-block btn-${showMatchMaps ? 'light' : 'secondary'} mb-2`" v-on:click="showMatchMaps = !showMatchMaps">
                         <i class="fa-fw fas fa-map"></i> Match maps
+                    </div>
+                    <div v-if="match.brackets" :class="`btn btn-block btn-${showImplications ? 'light' : 'secondary'}`" v-on:click="showImplications = !showImplications">
+                        <i class="fa-fw fas fa-sitemap"></i> Bracket implications
                     </div>
                     <div v-if="match.maps && showMatchMaps" :class="`btn btn-block btn-${showMapBans ? 'light' : 'secondary'} mb-2`" v-on:click="showMapBans = !showMapBans">
                         <i class="fa-fw fas fa-ban"></i> Show map bans
@@ -164,10 +171,11 @@ import DetailedMatchStat from "@/components/website/match/DetailedMatchStat";
 import Markdown from "@/components/website/Markdown";
 import { resizedImage, resizedImageNoWrap } from "@/utils/images";
 import CopyTextButton from "@/components/website/CopyTextButton";
+import BracketImplications from "@/components/website/dashboard/BracketImplications.vue";
 
 export default {
     name: "DetailedMatch",
-    components: { CopyTextButton, Markdown, PreviousMatch, ThemeLogo, MapDisplay, stat: DetailedMatchStat },
+    components: { BracketImplications, CopyTextButton, Markdown, PreviousMatch, ThemeLogo, MapDisplay, stat: DetailedMatchStat },
     props: ["id"],
     data: () => ({
         showPlayerInfo: false,
@@ -180,7 +188,8 @@ export default {
         showMapBans: true,
         showVod: false,
 
-        showManagers: false
+        showManagers: false,
+        showImplications: true
     }),
     methods: {
         url,
@@ -402,5 +411,9 @@ export default {
 
     a.btn-primary.text-dark-low:focus, a.btn-primary.text-dark-low:hover {
         color: #121416
+    }
+
+    .bracket-implications {
+        border: 1px solid #454d55;
     }
 </style>

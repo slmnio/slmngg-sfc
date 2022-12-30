@@ -13,20 +13,24 @@
                 <DashboardClock title="Broadcast" :timezone="broadcast.timezone || 'America/New_York'" />
             </div>
         </div>
-        <div class="broadcast-editor mb-2" v-if="client && client.broadcast">
+        <div class="broadcast-editor mb-3" v-if="client && client.broadcast">
             <BroadcastEditor :client="client"/>
         </div>
-        <div class="broadcast-match-editor mb-3" v-if="liveMatch">
+        <DashboardModule title="Match Editor" icon-class="fas fa-pennant" class="broadcast-match-editor mb-2" v-if="liveMatch" start-opened>
             <MatchEditor :hide-match-extras="true" :match="liveMatch"></MatchEditor>
-        </div>
-        <div class="broadcast-schedule-editor mb-3">
-            <ScheduleEditor :broadcast="broadcast"></ScheduleEditor>
-        </div>
-        <Predictions v-if="liveMatch" :client="client"/>
-        <Commercials v-if="hasPermission('Full broadcast permissions')" :client="client" />
-        <b-button class="mt-2" variant="secondary" @click="updateTitle">
-            <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title
-        </b-button>
+        </DashboardModule>
+        <DashboardModule title="Bracket Implications" icon-class="fas fa-sitemap" class="broadcast-bracket-editor mb-2" v-if="hasBrackets">
+            <BracketImplications :match="liveMatch" link-to-detailed-match />
+        </DashboardModule>
+        <ScheduleEditor class="broadcast-schedule-editor mb-2" :broadcast="broadcast"></ScheduleEditor>
+        <DashboardModule title="Twitch Controls" icon-class="fas fa-wrench" content-class="p-2" v-if="broadcast">
+            <template v-slot:header v-if="broadcast.stream_link">{{ broadcast.stream_link }}</template>
+            <Predictions v-if="liveMatch" :client="client"/>
+            <Commercials v-if="hasPermission('Full broadcast permissions')" :client="client" />
+            <b-button class="mt-2" variant="secondary" @click="updateTitle" :disabled="!liveMatch">
+                <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title
+            </b-button>
+        </DashboardModule>
         <CommsControl v-if="useTeamComms" :match="liveMatch"/>
     </div>
 </template>
@@ -45,10 +49,12 @@ import Commercials from "@/components/website/dashboard/Commercials";
 import BroadcastEditor from "@/components/website/dashboard/BroadcastEditor";
 import ScheduleEditor from "@/components/website/dashboard/ScheduleEditor";
 import DashboardClock from "@/components/website/dashboard/DashboardClock";
+import DashboardModule from "@/components/website/dashboard/DashboardModule.vue";
+import BracketImplications from "@/components/website/dashboard/BracketImplications.vue";
 
 export default {
     name: "Dashboard",
-    components: { DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
+    components: { BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
     computed: {
         user() {
             if (!this.$root.auth.user?.airtableID) return {};
@@ -89,6 +95,9 @@ export default {
         },
         useTeamComms() {
             return (this.broadcast?.broadcast_settings || []).includes("Connect for team comms");
+        },
+        hasBrackets() {
+            return this.liveMatch?.brackets?.length;
         }
     },
     methods: {

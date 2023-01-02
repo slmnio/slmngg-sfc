@@ -67,9 +67,10 @@ export default {
             }
         },
         name() {
-            if (!this.map?.name) return null;
+            if (!(this.map?.map?.name || this.map?.name)) return null;
             if (this.useShorterNames && this.map?.map?.shorter_name) return this.map.map.shorter_name;
-            return this.map.name[0];
+            const topLevelName = typeof this.map?.name === "object" ? this.map?.name?.[0] : this.map?.name;
+            return this.map?.map?.name || topLevelName;
         },
         showMapScores() {
             return (this.broadcast?.broadcast_settings || [])?.includes("Show map scores");

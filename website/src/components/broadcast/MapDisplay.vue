@@ -89,7 +89,7 @@ export default {
             if (dummyMapCount > 0) {
                 for (let i = 0; i < dummyMapCount; i++) {
                     const num = initialMapCount + i;
-                    if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[num]], image: [{ url: DefaultMapImages[this.mapTypes[num]] }] } : {}) });
+                    if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: this.mapTypes && this.mapTypes[num], image: [{ url: DefaultMapImages[this.mapTypes[num]] }] } : {}) });
                 }
             }
             return maps;

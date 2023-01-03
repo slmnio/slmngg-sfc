@@ -30,6 +30,12 @@
         </div>
         <div class="spacer flex-grow-1"></div>
         <div class="group text-right">
+            <div class="group-top">Observer Settings</div>
+            <div class="group-bottom">
+                <ObserverSettingsModal :broadcast="broadcast" />
+            </div>
+        </div>
+        <div class="group text-right">
             <div class="group-top">Advertise</div>
             <div class="group-bottom">
                 <b-form-checkbox :checked="broadcast.advertise" @change="(state) => advertiseBroadcast(state)"
@@ -45,6 +51,7 @@ import {
     toggleFlipTeams,
     updateBroadcastData
 } from "@/utils/dashboard";
+import ObserverSettingsModal from "@/components/website/dashboard/ObserverSettingsModal.vue";
 
 export default {
     name: "BroadcastEditor",
@@ -54,7 +61,10 @@ export default {
         broadcastUpdateTimeout: null
     }),
     components: {
-        BFormCheckbox, BButtonGroup, BButton
+        ObserverSettingsModal,
+        BFormCheckbox,
+        BButtonGroup,
+        BButton
     },
     computed: {
         broadcast() {

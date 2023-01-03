@@ -144,3 +144,13 @@ export async function resolveEntireBracket(auth, bracketID) {
         bracketID
     });
 }
+
+export async function setObserverSetting(auth, setting, value) {
+    if (!auth?.user) {
+        notyf.error("Not authenticated");
+        return { error: true, errorMessage: "Not authenticated" };
+    }
+    return await authenticatedRequest(auth, "actions/set-observer-setting", {
+        setting, value
+    });
+}

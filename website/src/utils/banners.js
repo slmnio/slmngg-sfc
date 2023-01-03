@@ -102,8 +102,8 @@ class Banner {
     drawImage(canvas) {
         return new Promise(resolve => {
             const svg64 = btoa(this.getSource());
-            const b64Start = "data:image/svg+xml;base64,";
-            const image64 = b64Start + svg64;
+            const b64Start = "data:image/svg+xml;base64;charset=utf-8,";
+            const image64 = b64Start + svg64.replaceAll("#", "%23");
 
             const img = new Image();
             img.onload = async () => {
@@ -122,7 +122,7 @@ class Banner {
 const BannerBases = {
     "Basic Glow": `<?xml version="1.0" encoding="utf-8"?>
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-\t viewBox="0 0 1500 500" style="enable-background:new 0 0 1500 500;" xml:space="preserve">
+\t viewBox="0 0 1500 500" width="1500" height="500" style="enable-background:new 0 0 1500 500;" xml:space="preserve">
 <style type="text/css">
 \t.st0{fill:--background--;}
 \t.st1{fill:--accent--;}

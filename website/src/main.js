@@ -23,7 +23,7 @@ import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp";
 import SharedRoutes from "@/router/shared-routes";
 import AuthRoutes from "@/router/auth-redirects";
 import { ReactiveRoot } from "@/utils/reactive";
-import { authenticateWithToken, setAuthNext } from "@/utils/auth";
+import { authenticateWithToken, getAuthNext, setAuthNext } from "@/utils/auth";
 import NotFoundContent from "@/views/sub-views/NotFoundContent";
 
 // eslint-disable-next-line prefer-const
@@ -139,10 +139,12 @@ router.beforeEach((to, from, next) => {
         if (to.meta.requiresAuth) {
             // authenticating!
 
+            getAuthNext(app); // empty auth
+
             setAuthNext(app?.$root, to.fullPath);
 
             if (app && !app.auth.user) {
-                return next({ path: "/login" });
+                return router.push({ path: "/login", query: { return: to.fullPath } });
                 // TODO: to.fullPath can be used for return (set in localstorage or something  /redirect?to=)
             } else {
                 console.warn("Need to check if authenticated, but the app hasn't loaded yet.");
@@ -151,12 +153,11 @@ router.beforeEach((to, from, next) => {
                 // return next({ path: "/login" });
             }
         }
-
-        next();
     } catch (e) {
         console.error("Vue navigation error", e);
-        next();
     }
+
+    next();
 });
 
 

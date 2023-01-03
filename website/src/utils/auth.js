@@ -40,11 +40,12 @@ export function setAuthNext(app, path) {
     const url = path.startsWith("http") ? path : ((window.location.origin === getMainDomain() ? "" : window.location.origin) + path);
 
     console.log("[auth] auth_next", url, "->", getMainDomain());
+    if (localStorage.getItem("auth_next")) return console.warn("[auth] Not re-setting auth next since it's already present as", localStorage.getItem("auth_next"));
     localStorage.setItem("auth_next", url);
 
     if (app) {
-        app.$cookies.set("auth_next", url, "3d", null, getMainDomain());
-        app.$cookies.set("auth_next", url, "3d", null, "." + getMainDomain());
+        app.$cookies.set("auth_next", url, "1d", null, getMainDomain());
+        app.$cookies.set("auth_next", url, "1d", null, "." + getMainDomain());
     }
 }
 
@@ -52,7 +53,7 @@ export function getAuthNext(app) {
     const next = localStorage.getItem("auth_next") || app.$cookies.get("auth_next");
     console.log("[auth] auth_next", next);
 
-    app.$cookies.remove("auth_next");
+    app?.$cookies.remove("auth_next");
     localStorage.removeItem("auth_next");
 
     return next;

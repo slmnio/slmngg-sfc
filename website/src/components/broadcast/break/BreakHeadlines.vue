@@ -14,14 +14,14 @@
 <script>
 export default {
     name: "BreakHeadlines",
-    props: ["headlines", "title", "borderCSS"],
+    props: ["headlines", "title", "borderCSS", "interval"],
     data: () => ({
         headlineIndex: 0,
         nextInterval: 4000
     }),
     mounted() {
         // this.nextHeadline();
-        setInterval(this.nextHeadline, 6000);
+        setInterval(this.nextHeadline, this.interval || 6000);
     },
     computed: {
         headline() {

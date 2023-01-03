@@ -91,7 +91,7 @@ export default [
             }
         ]
     },
-    { path: "break", component: BreakOverlay, props: route => ({ secondary: !!route.query.secondary }) },
+    { path: "break", component: BreakOverlay, props: route => ({ secondary: !!route.query.secondary, interval: route.query.interval || route.query.headlineInterval }) },
     { path: "syncer", component: SyncerOverlay },
     {
         path: "tally-transmitter",

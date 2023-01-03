@@ -257,11 +257,11 @@ export default {
         transform: scale(1);
         transition: all 800ms ease;
         width: 100%;
-        border: 1px solid red;
+        /*border: 1px solid red;*/
     }
     .map-display >>> .map.next-map .map-lower-name {
         width: 39.8%;
-        border: 1px solid lime;
+        /*border: 1px solid lime;*/
     }
     .map-display:not(.show-next-map) >>> .map .map-lower-name {
         width: 76.8%;

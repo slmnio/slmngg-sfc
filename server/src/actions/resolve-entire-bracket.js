@@ -106,7 +106,7 @@ module.exports = {
         let error = responses.filter(response => response.error).length;
         let output = [];
         if (success) output.push(`${success} match${success === 1 ? "" : "es"} updated`);
-        if (error) output.push(`${error} match${error === 1 ? "" : "es"} updated`);
+        if (error) output.push(`${error} match${error === 1 ? "" : "es"} errored`);
         if (!output.length) output.push("No matches updated");
 
         return {

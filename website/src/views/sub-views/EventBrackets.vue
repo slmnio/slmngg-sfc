@@ -1,9 +1,13 @@
 <template>
     <div class="event-brackets container-fluid">
-        <div class="event-bracket-container mb-4" v-for="bracket in brackets" v-bind:key="bracket.id">
-            <h1 class="bracket-name mb-3">{{ bracket.name }}</h1>
-            <BracketResolveButton class="resolve-button" :bracket="bracket" />
-            <Bracket class="event-bracket" :bracket="bracket" :event="event" />
+        <div class="bracket-wrapper" v-for="bracket in brackets" v-bind:key="bracket.id">
+            <div class="container position-relative">
+                <h1 class="bracket-name mb-3">{{ bracket.name }}</h1>
+                <BracketResolveButton class="resolve-button" :bracket="bracket" />
+            </div>
+            <div class="event-bracket-container mb-4">
+                <Bracket class="event-bracket" :bracket="bracket" :event="event" />
+            </div>
         </div>
     </div>
 </template>
@@ -40,7 +44,6 @@ export default {
         display: flex;
         flex-direction: column;
         align-items: center;
-        position: relative;
     }
     .event-bracket {
         max-width: 100%;
@@ -84,7 +87,7 @@ export default {
 
     .resolve-button {
         position: absolute;
-        top: 10px;
-        right: 10px;
+        top: 7px;
+        right: 15px;
     }
 </style>

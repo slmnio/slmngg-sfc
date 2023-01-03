@@ -9,13 +9,19 @@ class Banner {
             customized: false
         };
         this.text = {
-            player: "Player"
+            player: "Player",
+            subtitle: null
         };
         this.logo = null;
+
+        this.lastOptions = null;
     }
 
     customize(options) {
         console.log("customizing", options);
+        if (this.lastOptions) {
+            if (JSON.stringify(options) === this.lastOptions) return console.warn("Muffle - last request is the same");
+        }
         this.source.current = this.source.original.slice();
 
         if (options.background) this.source.current = this.source.current.replaceAll("--background--", options.background);
@@ -30,13 +36,15 @@ class Banner {
         if (options.theme) console.warn("options.theme is deprecated. use background or accent");
 
         if (options.text) this.text.player = options.text;
+        this.text.subtitle = options.subtitle || null;
 
+        this.lastOptions = JSON.stringify(options);
         return this;
     }
 
     getSource() {
         if (!this.source.customized) this.customize({ accent: "#66D9FF", background: "#111111" });
-        console.log(this.source.current);
+        // console.log(this.source.current);
         return this.source.current;
     }
 
@@ -48,8 +56,16 @@ class Banner {
             ctx.font = `900 ${p.fontSize}px SLMN-Industry`;
             ctx.fillStyle = this.textColor || p.color;
             ctx.textAlign = "center";
-            console.log(p, p.position);
+            // console.log(p, p.position);
             ctx.fillText(this.text.player.toUpperCase(), ...p.position);
+        }
+        if (this.text.subtitle && this.options.text.subtitle) {
+            const p = this.options.text.subtitle;
+            ctx.font = `900 ${p.fontSize}px SLMN-Industry`;
+            ctx.fillStyle = this.textColor || p.color;
+            ctx.textAlign = "center";
+            console.log(p, p.position);
+            ctx.fillText(this.text.subtitle.toUpperCase(), ...p.position);
         }
     }
 
@@ -61,7 +77,7 @@ class Banner {
                 const logo = new Image();
                 logo.crossOrigin = "anonymous";
                 logo.onload = () => {
-                    console.log(logo.width, logo.height);
+                    // console.log(logo.width, logo.height);
                     if (this.options.logo.autoHeightFromWidth) {
                         let [left, top] = this.options.logo.position;
 
@@ -69,11 +85,11 @@ class Banner {
                         const height = (logo.height / logo.width) * width;
 
 
-                        console.log({
-                            width,
-                            height,
-                            offset: (width - height)
-                        });
+                        // console.log({
+                        //     width,
+                        //     height,
+                        //     offset: (width - height)
+                        // });
 
                         top += (width - height) / 2;
 
@@ -107,7 +123,7 @@ class Banner {
 
             const img = new Image();
             img.onload = async () => {
-                console.log(img);
+                // console.log(img);
                 canvas.getContext("2d").drawImage(img, 0, 0);
                 this.drawText(canvas);
                 await this.drawLogo(canvas);
@@ -121,22 +137,40 @@ class Banner {
 
 const BannerBases = {
     "Basic Glow": `<?xml version="1.0" encoding="utf-8"?>
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-\t viewBox="0 0 1500 500" width="1500" height="500" style="enable-background:new 0 0 1500 500;" xml:space="preserve">
-<style type="text/css">
-\t.st0{fill:--background--;}
-\t.st1{fill:--accent--;}
-\t.st2{fill:url(#SVGID_1_);}
-</style>
-<g id="Background">
-\t<rect class="st0" width="1500" height="500"/>
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+     y="0px"
+     viewBox="0 0 1500 500" width="1500" height="500" style="enable-background:new 0 0 1500 500;" xml:space="preserve">
+    <style type="text/css">
+        .st0{fill:--background--;}
+        .st1{fill:--accent--;}
+        .st2{fill:url(#SVGID_1_);}
+    </style>
+        
+    <g id="Background">
+        <rect class="st0" width="1500" height="500"/>
+    </g>
+    <rect id="Stripe" y="480" class="st1" width="1500" height="20"/>
+    
+    <linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="750" y1="488" x2="750" y2="192">
+        <stop offset="0" style="stop-color:--accent--;stop-opacity:0.5"/>
+        <stop offset="1" style="stop-color:--accent--;stop-opacity:0"/>
+    </linearGradient>
+    <rect id="Fade" y="192" class="st2" width="1500" height="296"/>
+        
+    <g id="layer1" transform="matrix(2.5,0,0,2.5,1469,447)" class="st1" style="fill-opacity:1">    
+       <path style="stroke-width:0;stroke-dasharray:none"
+             d="M 5,0 H 0 V 3 H 4 V 4 H 0 V 5 H 5 V 2 H 1 V 1 h 4 z"
+             id="path1255" />
+       <path style="stroke-width:0;stroke-dasharray:none"
+             d="M 6,0 V 5 H 9 V 4 H 7 V 0 Z"
+             id="path1257" />
+       <path style="stroke-width:0;stroke-dasharray:none"
+             d="m 0,6 v 4 H 1 V 7 h 1 v 3 H 3 V 7 h 1 v 3 H 5 V 6 Z"
+             id="path1259" />
+       <path style="stroke-width:0;stroke-dasharray:none"
+             d="m 6,6 v 4 H 7 V 7 h 1 v 3 H 9 V 6 Z"
+             id="path1261" />
 </g>
-<rect id="Stripe" y="480" class="st1" width="1500" height="20"/>
-<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="750" y1="488" x2="750" y2="192">
-\t<stop  offset="0" style="stop-color:--accent--;stop-opacity:0.5"/>
-\t<stop  offset="1" style="stop-color:--accent--;stop-opacity:0"/>
-</linearGradient>
-<rect y="192" class="st2" width="1500" height="296"/>
 </svg>`
 };
 
@@ -146,14 +180,16 @@ export const AllBanners = [
         svg: BannerBases["Basic Glow"],
         name: "Basic Glow (no logos)",
         text: {
-            player: { color: "#ffffff", fontSize: 180, position: [750, 310, 1400] }
+            player: { color: "#ffffff", fontSize: 180, position: [750, 310, 1400] },
+            subtitle: { color: "#ffffff", fontSize: 30, position: [750, 130, 1400] }
         }
     }),
     new Banner({
         svg: BannerBases["Basic Glow"],
         name: "Basic Glow (with logos)",
         text: {
-            player: { color: "#ffffff", fontSize: 180, position: [750, 250, 1400] }
+            player: { color: "#ffffff", fontSize: 180, position: [750, 250, 1400] },
+            subtitle: { color: "#ffffff", fontSize: 30, position: [750, 70, 1400] }
         },
         logo: {
             position: [675, 290],
@@ -162,6 +198,8 @@ export const AllBanners = [
     })
 ];
 
+
+console.log(AllBanners);
 
 function expected() {
     const banners = [];

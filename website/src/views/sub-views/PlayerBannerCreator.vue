@@ -61,7 +61,8 @@ export default {
             ];
             let events = [
                 ...this.player.event_staff || [],
-                ...this.player.event_brands_designed || []
+                ...this.player.event_brands_designed || [],
+                ...this.player.casted_events || []
             ];
 
             (this.player.player_relationships || []).forEach(rel => {
@@ -142,6 +143,9 @@ export default {
                 }
                 if ((this.player.event_brands_designed || []).find(e => e.id === this.customTheme.id)) {
                     options.push("Event Brand Designer");
+                }
+                if ((this.player.casted_events || []).find(e => e.id === this.customTheme.id)) {
+                    options.push("Caster");
                 }
 
                 const rels = (this.player.player_relationships || []).filter(rel => (rel.events || []).find(e => e.id === this.customTheme.id));

@@ -53,7 +53,8 @@ export default {
                 ...this.player.member_of || [],
                 ...this.player.captain_of || [],
                 ...this.player.team_staff || [],
-                ...this.player.brands_designed || []
+                ...this.player.brands_designed || [],
+                ...this.player.owned_teams || []
             ];
             let events = [
                 ...this.player.event_staff || [],

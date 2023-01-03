@@ -45,7 +45,7 @@ class Banner {
 
         if (this.text.player && this.options.text.player) {
             const p = this.options.text.player;
-            ctx.font = `900 ${p.fontSize}px Industry`;
+            ctx.font = `900 ${p.fontSize}px SLMN-Industry`;
             ctx.fillStyle = this.textColor || p.color;
             ctx.textAlign = "center";
             console.log(p, p.position);

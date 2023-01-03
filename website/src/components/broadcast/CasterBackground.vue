@@ -54,7 +54,7 @@ export default {
             // if (!req) req = this.allMaps.find(map => map.name === "King's Row");
             if (!req) {
                 // get a random one
-                const maps = this.allMaps.filter(map => map.type && map.type.indexOf("(") === -1 && map.map_video);
+                const maps = this.allMaps.filter(map => map.type && map.type.indexOf("(") === -1 && map.video);
                 req = maps[Math.floor(Math.random() * maps.length)];
             }
             return req;
@@ -67,11 +67,11 @@ export default {
         mapImage(map) {
             console.log(map);
             return {
-                backgroundImage: `url(${(map.map_big_image || map.map_image)?.[0].url})`
+                backgroundImage: `url(${(map.big_image || map.image)?.[0].url})`
             };
         },
         mapVideo(map) {
-            const video = map?.map_video?.[0];
+            const video = map?.video?.[0];
             if (!video) return null;
             return video.url;
         }

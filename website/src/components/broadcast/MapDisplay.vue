@@ -1,11 +1,11 @@
 <template>
     <transition v-if="useTransitions" mode="out-in" name="break-content" class="map-anim-holder">
-        <div :key="autoKey" class="map-display d-flex w-100 h-100" v-bind:class="{'show-next-map': showNextMap && nextMap}">
+        <div :key="autoKey" class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" v-bind:class="{'show-next-map': showNextMap && nextMap}">
             <MapSegment class="map" v-bind:class="{ 'map-dummy' : map.dummy }" v-for="map in maps" v-bind:key="map.id"
                 :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
         </div>
     </transition>
-    <div v-else class="map-display d-flex w-100 h-100" v-bind:class="{'show-next-map': showNextMap && nextMap}">
+    <div v-else class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" v-bind:class="{'show-next-map': showNextMap && nextMap}">
         <MapSegment class="map" v-bind:class="{ 'map-dummy' : map.dummy }" v-for="map in maps" v-bind:key="map.id"
                     :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
     </div>
@@ -82,6 +82,7 @@ export default {
             const initialMapCount = maps.length;
 
             const next = maps.find(m => !m.winner && !m.draw && !m.banner);
+            console.log({ next, maps });
             if (next) next._next = true;
 
             if (!this.match?.first_to) return maps;
@@ -146,11 +147,11 @@ export default {
     },
     methods: {
         playAudio() {
-            if (this.nextMap?.map?.map_audio) {
+            if (this.nextMap?.map?.audio) {
                 try {
                     this.runAudio({
-                        audio: this.nextMap.map.map_audio,
-                        volume: this.nextMap.map.map_audio_volume || 100
+                        audio: this.nextMap.map.audio,
+                        volume: this.nextMap.map.audio_volume || 100
                     });
                 } catch (e) {
                     this.activeAudio.stop();
@@ -256,11 +257,18 @@ export default {
         transform: scale(1);
         transition: all 800ms ease;
         width: 100%;
+        border: 1px solid red;
     }
-    .map-display.show-next-map >>> .map.next-map .map-lower-name {
-        width: 40%;
+    .map-display >>> .map.next-map .map-lower-name {
+        width: 39.8%;
+        border: 1px solid lime;
+    }
+    .map-display:not(.show-next-map) >>> .map .map-lower-name {
+        width: 76.8%;
+        /*transform: scale(0.75);*/
     }
     .map-display.show-next-map >>> .map:not(.next-map) .map-lower-name {
+        width: 100%;
         transform: scale(0.75);
     }
     .break-content-enter-active, .break-content-leave-active { transition: all .35s ease; overflow: hidden }

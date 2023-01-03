@@ -99,7 +99,7 @@ export default {
                 ?.filter(t => t?.file?.length) || [];
         },
         unplayedTracks() {
-            return this.loadedTrackList?.filter(t => t && !this.playedTrackIds.includes(t?.id));
+            return this.loadedTrackList?.filter(t => t && !this.playedTrackIds.includes(t?.id) && t.file);
         }
         // loaded() {
         //     if (!this.trackList) return false;

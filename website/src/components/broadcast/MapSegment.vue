@@ -27,7 +27,7 @@
                 </div>
             </div>
             <div class="map-lower flex-center flex-column" :style="accent">
-                <div class="map-lower-name"><span class="industry-align">{{ name }}</span></div>
+                <div class="map-lower-name flex-center"><span class="industry-align">{{ name }}</span></div>
                 <div class="map-lower-type" v-if="type"><span class="industry-align">{{ type }}</span></div>
             </div>
         </div>
@@ -56,11 +56,13 @@ export default {
             };
         },
         mapBackground() {
-            if (!(this.map?.big_image || this.map?.image)) return {};
+            console.log("background", this.map.name, { submap_big: this.map?.map?.big_image, submap_image: this.map?.map?.image, parent_big: this.map?.big_image, parent_image: this.map?.image });
+            const image = this.map?.map?.big_image || this.map?.map?.image || this.map?.big_image || this.map?.image;
+            if (!(image)) return {};
 
             try {
                 return {
-                    backgroundImage: `url(${(this.map.big_image || this.map.image)[0].url}`
+                    backgroundImage: `url(${(image)[0].url}`
                 };
             } catch (e) {
                 return {};
@@ -103,8 +105,8 @@ export default {
         },
         mapVideo() {
             if (!this.showMapVideo) return null;
-            if (!this.map?.map?.map_video?.length) return null;
-            return this.map.map.map_video[0].url;
+            if (!this.map?.map?.video?.length) return null;
+            return this.map.map.video[0].url;
         }
     }
 };
@@ -132,7 +134,7 @@ export default {
         text-align: center;
         padding: 10px 5px;
         line-height: 1;
-        min-height: 100px;
+        min-height: 120px;
 
         /* default */
         background-color: #333333;

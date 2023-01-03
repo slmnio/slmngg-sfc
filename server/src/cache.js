@@ -107,7 +107,7 @@ const slmnggAttachments = {
     "Themes": ["default_logo", "default_wordmark", "small_logo", "other_images", "logo_on_dark", "logo_on_light", "logo_on_theme", "wordmark_on_dark", "wordmark_on_light", "wordmark_on_theme"],
     "Broadcasts": ["break_image", "background"],
     "News": ["header", "thumbnail"],
-    "Map Data": ["map_image", "map_big_image", "map_video", "map_audio"],
+    "Map Data": ["image", "big_image", "video", "audio"],
     "Maps": ["image", "big_image"],
     "Log Files": ["log_file"],
     "Heroes": ["main_image"],

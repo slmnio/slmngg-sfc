@@ -53,61 +53,74 @@ class Banner {
         }
     }
 
-    drawLogo(canvas) {
-        const ctx = canvas.getContext("2d");
+    async drawLogo(canvas) {
+        return new Promise((resolve) => {
+            const ctx = canvas.getContext("2d");
 
-        if (this.options.logo && this.logo) {
-            const logo = new Image();
-            logo.onload = () => {
-                console.log(logo.width, logo.height);
-                if (this.options.logo.autoHeightFromWidth) {
-                    let [left, top] = this.options.logo.position;
+            if (this.options.logo && this.logo) {
+                const logo = new Image();
+                logo.crossOrigin = "anonymous";
+                logo.onload = () => {
+                    console.log(logo.width, logo.height);
+                    if (this.options.logo.autoHeightFromWidth) {
+                        let [left, top] = this.options.logo.position;
 
-                    const width = this.options.logo.autoHeightFromWidth;
-                    const height = (logo.height / logo.width) * width;
+                        const width = this.options.logo.autoHeightFromWidth;
+                        const height = (logo.height / logo.width) * width;
 
 
-                    console.log({ width, height, offset: (width - height) });
+                        console.log({
+                            width,
+                            height,
+                            offset: (width - height)
+                        });
 
-                    top += (width - height) / 2;
+                        top += (width - height) / 2;
 
-                    ctx.drawImage(logo, left, top, width, height);
-                } else if (this.options.logo.autoHeight_centered) {
-                    // | <---> logo <---> |
+                        ctx.drawImage(logo, left, top, width, height);
+                    } else if (this.options.logo.autoHeight_centered) {
+                        // | <---> logo <---> |
 
-                    let [left, top] = this.options.logo.position;
-                    const height = this.options.logo.autoHeight_centered;
-                    const width = (logo.width / logo.height) * height;
+                        let [left, top] = this.options.logo.position;
+                        const height = this.options.logo.autoHeight_centered;
+                        const width = (logo.width / logo.height) * height;
 
-                    left = (1500 - width) / 2;
-                    ctx.drawImage(logo, left, top, width, height);
-                } else {
-                    ctx.drawImage(logo, ...this.options.logo.position);
-                }
-            };
-            logo.src = this.logo;
-        }
+                        left = (1500 - width) / 2;
+                        ctx.drawImage(logo, left, top, width, height);
+                    } else {
+                        ctx.drawImage(logo, ...this.options.logo.position);
+                    }
+                    resolve();
+                };
+                logo.src = this.logo;
+            } else {
+                resolve();
+            }
+        });
     }
 
     drawImage(canvas) {
-        const svg64 = btoa(this.getSource());
-        const b64Start = "data:image/svg+xml;base64,";
-        const image64 = b64Start + svg64;
+        return new Promise(resolve => {
+            const svg64 = btoa(this.getSource());
+            const b64Start = "data:image/svg+xml;base64,";
+            const image64 = b64Start + svg64;
 
-        const img = new Image();
-        img.onload = () => {
-            console.log(img);
-            canvas.getContext("2d").drawImage(img, 0, 0);
-            this.drawText(canvas);
-            this.drawLogo(canvas);
-        };
-        img.src = image64;
+            const img = new Image();
+            img.onload = async () => {
+                console.log(img);
+                canvas.getContext("2d").drawImage(img, 0, 0);
+                this.drawText(canvas);
+                await this.drawLogo(canvas);
+                resolve(canvas.toDataURL("image/png"));
+            };
+            img.src = image64;
+        });
     }
 }
 
 
 const BannerBases = {
-    "Ribbon Glow": `<?xml version="1.0" encoding="utf-8"?>
+    "Basic Glow": `<?xml version="1.0" encoding="utf-8"?>
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 \t viewBox="0 0 1500 500" style="enable-background:new 0 0 1500 500;" xml:space="preserve">
 <style type="text/css">
@@ -130,15 +143,15 @@ const BannerBases = {
 
 export const AllBanners = [
     new Banner({
-        svg: BannerBases["Ribbon Glow"],
-        name: "Ribbon Glow (no logos)",
+        svg: BannerBases["Basic Glow"],
+        name: "Basic Glow (no logos)",
         text: {
             player: { color: "#ffffff", fontSize: 180, position: [750, 310, 1400] }
         }
     }),
     new Banner({
-        svg: BannerBases["Ribbon Glow"],
-        name: "Ribbon Glow (with logos)",
+        svg: BannerBases["Basic Glow"],
+        name: "Basic Glow (with logos)",
         text: {
             player: { color: "#ffffff", fontSize: 180, position: [750, 250, 1400] }
         },

@@ -249,8 +249,8 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
         }
         res.status(400).send("An error occurred");
     }
-    app.get("/image", cors({ origin: corsHandle}), handleImageRequests);
-    app.get("/image.:fileFormat", cors({ origin: corsHandle}), handleImageRequests); // ignoring requested file format here
+    app.get("/image", cors(), handleImageRequests);
+    app.get("/image.:fileFormat", cors(), handleImageRequests); // ignoring requested file format here
 
     async function handleThemeRequests(req, res) {
         try {

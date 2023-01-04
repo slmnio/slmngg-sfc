@@ -1,9 +1,10 @@
 <template>
     <div class="bracket row flex-column" :style="winVars" v-bind:class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
         <div class="connections" ref="connections-holder">
-            <div class="connection" v-for="bug in connectionBugs" :key="bug.key" :class="connectionBugClass(bug)" :style="bug.style"
+            <div class="connection" v-for="bug in connectionBugs" :key="bug.key" :data-key="bug.key" :class="connectionBugClass(bug)" :style="bug.style"
                 :data-column-num="bug.column">
-                <div class="c-top"></div><div class="c-middle"></div><div class="c-bottom"></div>
+                <div class="c-top" v-if="bug.type === 'normal'"></div><div class="c-middle"></div><div class="c-bottom"></div>
+                <div class="c-text" :title="bug.title" v-if="bug.type === 'loser-drops'">{{ bug.text }}</div>
             </div>
         </div>
         <v-style>
@@ -156,7 +157,7 @@ export default {
 
             if (this.connectionsToHighlight?.matches) {
                 // console.log("bug highlight", bug, this.connectionsToHighlight);
-                const bugMatches = bug.key.split("->");
+                const bugMatches = bug.key.split("->").map(e => e.split(".").shift());
 
                 // TODO: make sure the connection (11 -> 14.1) is what the team did
                 //  (ie upper finals -> lower finals -> grand finals shouldn't highlight upper -> grands connection)
@@ -248,10 +249,10 @@ export default {
                     const [otherMatchNum, destNum] = connectionData.win.toString().split(".");
                     this.createConnectionBetweenRefs(matchRef, this.getMatchRef(otherMatchNum), matchNum, otherMatchNum, parseInt(destNum || "0"));
                 }
-                // if (connectionData.lose) {
-                //     const [otherMatchNum, destNum] = connectionData.lose.toString().split(".");
-                //     this.createConnectionBetweenRefs(matchRef, this.getMatchRef(otherMatchNum), matchNum, parseInt(destNum || "0"));
-                // }
+                if (connectionData.lose) {
+                    const [otherMatchNum, destNum] = connectionData.lose.toString().split(".");
+                    this.createLoserDropsConnection(this.getMatchRef(otherMatchNum), matchNum, otherMatchNum, parseInt(destNum || "0"));
+                }
             });
         },
         getMatchRef(matchNum) {
@@ -321,6 +322,7 @@ export default {
 
 
             this.connectionBugs.push({
+                type: "normal",
                 key: `${sourceNum}->${destNum}`,
                 column: Math.max(this.getMatchColumnNum(sourceNum), this.getMatchColumnNum(destNum)),
                 direction: coord.direction,
@@ -334,6 +336,61 @@ export default {
 
             // container.appendChild(connection);
             this.connectionElements.push(connection);
+        },
+        createLoserDropsConnection(dest, sourceNum, destNum, destSide) {
+            if (!dest || !destSide) return; // console.log("No destination for loser drops from", sourceNum, "to", destSide);
+            // console.log(dest, sourceNum, destSide);
+
+            const destBox = dest?.[0].$el.getBoundingClientRect();
+            const container = this.$refs["connections-holder"];
+
+            const coord = {};
+            coord.leftSide = destBox.left;
+            coord.rightSide = destBox.left;
+
+            const sourcePoint = (destBox.bottom - (destBox.height / 2));
+            let destPoint = (destBox.bottom - (destBox.height / 2));
+
+
+            const quarterHeight = destBox.height / 4;
+            if (destSide) {
+                if (destSide === 1) {
+                    destPoint -= quarterHeight * 2;
+                } else if (destSide === 2) {
+                    destPoint += quarterHeight;
+                }
+            }
+
+            const alignmentDiff = container.getBoundingClientRect();
+
+
+            coord.topSide = Math.min(sourcePoint, destPoint);
+            coord.bottomSide = Math.max(sourcePoint, destPoint);
+
+            coord.direction = sourcePoint > destPoint ? "up" : "down";
+
+            const HalfLine = 1;
+            if (coord.direction === "up") {
+                coord.topSide -= (HalfLine * 2);
+                coord.bottomSide += HalfLine;
+            } else {
+                coord.topSide -= HalfLine;
+                coord.bottomSide += HalfLine * 2;
+            }
+
+            this.connectionBugs.push({
+                type: "loser-drops",
+                direction: "loser-drops",
+                key: `${sourceNum}->${destNum}.${destSide}`,
+                text: this.getMatch(sourceNum)?.match_number || sourceNum,
+                title: `Loser of match ${sourceNum}`,
+                style: {
+                    left: `${coord.leftSide - alignmentDiff.left - (quarterHeight)}px`,
+                    top: `${coord.topSide - alignmentDiff.bottom}px`,
+                    height: `${quarterHeight}px`,
+                    width: `${(quarterHeight)}px`
+                }
+            });
         }
     },
     beforeDestroy() {
@@ -396,6 +453,9 @@ export default {
         display: none;
     }
     .bracket.small >>> .match-number {
+        display: none
+    }
+    .bracket.small >>> .c-text {
         display: none
     }
     .bracket >>> .connection {
@@ -468,6 +528,21 @@ export default {
         border: none;
         border-bottom: var(--b-width) solid var(--b-color);
         border-right: var(--b-width) solid var(--b-color);
+    }
+
+    .bracket >>> .connection.dir-loser-drops .c-bottom {
+        margin-left: 0;
+        width: 100%;
+        border-bottom-left-radius: var(--b-curve);
+    }
+    .bracket >>> .c-text {
+        position: absolute;
+        font-size: 0.8em;
+        width: 100%;
+        text-align: center;
+        margin-bottom: .2em;
+        margin-left: var(--b-width);
+        color: var(--b-color);
     }
 
 </style>

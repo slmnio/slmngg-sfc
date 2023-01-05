@@ -102,7 +102,7 @@ function deAirtable(obj) {
         data[key.replace(/ +/g, "_").replace(/[:()]/g, "_").replace(/_+/g,"_").toLowerCase()] = val;
     });
     Object.entries(data).forEach(([key, val]) => {
-        if (typeof val === "object" && val.length === 0) {
+        if (typeof val === "object" && val?.length === 0) {
             console.log("[Action deAirtable] Skipping", key, val);
             delete data[key];
         }

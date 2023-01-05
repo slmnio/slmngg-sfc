@@ -384,6 +384,7 @@ export default {
                 key: `${sourceNum}->${destNum}.${destSide}`,
                 text: this.getMatch(sourceNum)?.match_number || sourceNum,
                 title: `Loser of match ${sourceNum}`,
+                column: this.getMatchColumnNum(destNum),
                 style: {
                     left: `${coord.leftSide - alignmentDiff.left - (quarterHeight)}px`,
                     top: `${coord.topSide - alignmentDiff.bottom}px`,

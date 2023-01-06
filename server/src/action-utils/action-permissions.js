@@ -10,7 +10,6 @@ const { getAll,
  * @returns {Promise<boolean>}
  */
 async function canEditMatch(user, { match, event }) {
-    console.log(user);
     if ((user.airtable?.website_settings || []).includes("Can edit any match")) return true;
 
     if (match) {

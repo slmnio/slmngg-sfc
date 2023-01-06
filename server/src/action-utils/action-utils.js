@@ -137,7 +137,7 @@ async function getMaps(match) {
 async function getTwitchChannel(client, requestedScopes) {
     let broadcast = await getBroadcast(client);
     const channel = await Cache.auth.getChannel(broadcast?.channel?.[0]);
-    if (!channel?.twitch_refresh_token) throw "No twitch auth token associated with channel";
+    if (!channel?.twitch_refresh_token) throw "No Twitch auth token associated with channel";
     if (!channel?.channel_id || !channel?.name || !channel.twitch_scopes) throw "Invalid channel data";
     let scopes = channel.twitch_scopes.split(" ");
     if (!requestedScopes.every(scope => scopes.includes(scope))) throw "Token doesn't have the required scopes";

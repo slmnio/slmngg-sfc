@@ -191,7 +191,7 @@ io.on("connection", (socket) => {
         }
         let broadcast = await Cache.get(client.broadcast?.[0]);
         if (broadcast && broadcast.key) {
-            io.sockets.to(`prod:broadcast-${broadcast.key}`).emit("prod_preview_program_change", { previewScene, programScene, emitSource: "broadcast", clientSource: clientName });
+            io.sockets.to(`prod:broadcast-${broadcast.key}`).emit("prod_preview_program_change", { previewScene, programScene, emitSource: "broadcast", clientSource: clientName, broadcastKey: broadcast.key });
         }
     });
 

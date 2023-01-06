@@ -8,6 +8,7 @@
             </router-link>
             <div class="match-thumbnail-ghost default-thing mini-thumbnail" v-if="!liveMatch"></div>
             <div class="spacer flex-grow-1"></div>
+            <PreviewProgramDisplay :broadcast="broadcast" />
             <div class="clocks d-flex">
                 <DashboardClock title="Local" />
                 <DashboardClock title="Broadcast" :timezone="broadcast.timezone || 'America/New_York'" />
@@ -51,10 +52,11 @@ import ScheduleEditor from "@/components/website/dashboard/ScheduleEditor";
 import DashboardClock from "@/components/website/dashboard/DashboardClock";
 import DashboardModule from "@/components/website/dashboard/DashboardModule.vue";
 import BracketImplications from "@/components/website/dashboard/BracketImplications.vue";
+import PreviewProgramDisplay from "@/components/website/dashboard/PreviewProgramDisplay.vue";
 
 export default {
     name: "Dashboard",
-    components: { BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
+    components: { PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
     computed: {
         user() {
             if (!this.$root.auth.user?.airtableID) return {};
@@ -138,9 +140,5 @@ export default {
         height: 48px;
         border-bottom-width: 2px;
         border-bottom-style: solid;
-    }
-
-    .dashboard-clock + .dashboard-clock {
-        margin-left: 1em;
     }
 </style>

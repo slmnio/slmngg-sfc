@@ -1,5 +1,5 @@
 <template>
-    <div class="dashboard-clock bg-dark px-2" @click="() => use12hr = !use12hr">
+    <div class="dashboard-clock bg-dark px-2 mx-1" @click="() => use12hr = !use12hr">
         <div class="title">{{ title }}</div>
         <div class="clock">{{  text  }}</div>
     </div>

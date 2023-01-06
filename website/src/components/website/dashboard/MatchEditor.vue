@@ -60,9 +60,15 @@
                             <MapScoreEditor class="map-editor" v-model="score_2s[i]" :team="teams[1]" :reverse="true"></MapScoreEditor>
                         </div>
                     </td>
-                    <td>
-                        <div class="map-draw">
-                            <b-form-checkbox v-model="draws[i]">Draw</b-form-checkbox>
+                    <td class="form-stack">
+                        <div class="form-top text-center">
+                            Draw
+                        </div>
+                        <div class="form-bottom d-flex">
+                            <b-form-checkbox button :button-variant="draws[i] ? 'primary' : 'light'" class="draw-checkbox" v-model="draws[i]">
+                                <i v-if="draws[i]" class="fas fa-check fa-fw"></i>
+                                <i v-else class="fas fa-fw fa-check hoverable"></i>
+                            </b-form-checkbox>
                         </div>
                     </td>
                     <td><TeamPicker title="Banned by" :teams="teams" v-model="banners[i]"></TeamPicker></td>
@@ -366,5 +372,11 @@ export default {
     .map-number {
         min-width: 2.5em;
         text-align: center;
+    }
+    .draw-checkbox i.hoverable {
+        opacity: 0.1;
+    }
+    .draw-checkbox:hover i.hoverable {
+        opacity: 0.5;
     }
 </style>

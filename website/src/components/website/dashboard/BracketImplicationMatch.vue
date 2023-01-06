@@ -12,7 +12,7 @@
             </div>
         </div>
         <div v-if="imp.otherMatch" class="other-match">
-            advances to <router-link :to="url(linkToDetailedMatch ? 'detailed' : 'match', imp.otherMatch)">
+            {{ relation === "Winner" ? 'advances' : 'drops' }} to <router-link :to="url(linkToDetailedMatch ? 'detailed' : 'match', imp.otherMatch)">
             <span v-if="imp.otherMatch.round">{{ imp.otherMatch.round }}</span> <span v-if="imp.otherMatch.match_number">(M{{ imp.otherMatch.match_number }})</span>
         </router-link>
         </div>

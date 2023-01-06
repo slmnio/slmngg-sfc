@@ -15,6 +15,8 @@ module.exports = {
     async handler(params, { client }) {
         const { broadcast, channel } = await getTwitchChannel(client, ["channel:manage:broadcast"]);
 
+        if (!broadcast.title_format) throw "The broadcast has no title format";
+
         const event = await this.helpers.get(broadcast.event?.[0]);
         if (!event) throw ("No event associated with broadcast");
 

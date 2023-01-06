@@ -441,6 +441,10 @@ export default {
         justify-content: center;
     }
 
+    .internal-bracket {
+        padding: 0 6px;
+    }
+
     .internal-bracket + .internal-bracket {
         margin-top: 1.5em;
     }

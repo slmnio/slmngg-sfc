@@ -19,8 +19,8 @@ module.exports = {
 
         for (const i in matches) {
             const match = matches[i];
-            if (match.teams?.[0]) match.teams[0] = await this.helpers.get(match.teams[0]);
-            if (match.teams?.[1]) match.teams[1] = await this.helpers.get(match.teams[1]);
+            if (match.teams?.[0]) match.teams[0] = await this.helpers.get(cleanID(match.teams[0]));
+            if (match.teams?.[1]) match.teams[1] = await this.helpers.get(cleanID(match.teams[1]));
             matches[i] = match;
         }
 
@@ -73,7 +73,11 @@ module.exports = {
                 if (connection.loser) teamIndex = +!teamIndex;
                 let team = connectionMatch.teams[teamIndex];
                 team._position = connection.position;
-                correctTeams[parseInt(connection.position) - 1] = team;
+                if (team) {
+                    correctTeams[parseInt(connection.position) - 1] = team;
+                } else {
+                    console.warn("No team available", connection, team);
+                }
             });
             console.log("correct teams", correctTeams.map(t => t?.code || t));
 
@@ -83,7 +87,7 @@ module.exports = {
                 // no updates
             } else if (correctTeams.length === 1) {
                 let placeholderRight = parseInt(correctTeams[0]._position) === 1; // (not 2)
-                console.log(matchNum, correctTeams[0]._position, placeholderRight);
+                // console.log(matchNum, correctTeams[0]._position, placeholderRight);
 
                 let response = await this.helpers.updateRecord("Matches", match, {
                     "Teams": [correctTeams[0].id],

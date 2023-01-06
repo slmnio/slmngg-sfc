@@ -17,13 +17,19 @@
         </router-link>
         </div>
         <div v-if="imp.facingTeam" class="other-team flex-center flex-column">
-            <router-link v-if="imp.facingTeam" :to="url('team', imp.facingTeam)" class="box" :style="facingTeamTheme"></router-link>
+            <router-link v-if="imp.facingTeam" :to="url('team', imp.facingTeam)" class="box" :style="facingTeamTheme" v-b-tooltip="imp.facingTeam.name"></router-link>
             <div class="box-text">faces <router-link :to="url('team', imp.facingTeam)">{{ imp.facingTeam.name }}</router-link></div>
         </div>
         <div v-if="imp.feederMatch" class="other-team-feeder">
             <div class="boxes d-flex flex-center">
-                <router-link v-if="imp.feederMatch.teams && imp.feederMatch.teams[0]" :to="url('team', imp.feederMatch.teams[0])" class="box" :style="getTheme(imp.feederMatch.teams[0])"></router-link>
-                <router-link v-if="imp.feederMatch.teams && imp.feederMatch.teams[1]" :to="url('team', imp.feederMatch.teams[1])" class="box" :style="getTheme(imp.feederMatch.teams[1])"></router-link>
+                <router-link v-if="imp.feederMatch.teams && imp.feederMatch.teams[0]" :to="url('team', imp.feederMatch.teams[0])" v-b-tooltip="imp.feederMatch.teams[0].name" class="box" :style="getTheme(imp.feederMatch.teams[0])"></router-link>
+                <div v-if="imp.feederMatch.teams && !imp.feederMatch.teams[0]" class="box" v-b-tooltip="'Team to be decided'">
+                    <i class="fas fa-question"></i>
+                </div>
+                <router-link v-if="imp.feederMatch.teams && imp.feederMatch.teams[1]" :to="url('team', imp.feederMatch.teams[1])" v-b-tooltip="imp.feederMatch.teams[1].name" class="box" :style="getTheme(imp.feederMatch.teams[1])"></router-link>
+                <div v-if="imp.feederMatch.teams && !imp.feederMatch.teams[1]" class="box" v-b-tooltip="'Team to be decided'">
+                    <i class="fas fa-question"></i>
+                </div>
                 <div class="box" v-if="!imp.feederMatch.teams"><i class="fas fa-question"></i></div>
             </div>
             <div class="box-text">

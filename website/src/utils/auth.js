@@ -50,7 +50,7 @@ export function setAuthNext(app, path) {
 }
 
 export function getAuthNext(app) {
-    const next = localStorage.getItem("auth_next") || app.$cookies.get("auth_next");
+    const next = localStorage.getItem("auth_next") || (app?.$cookies.get("auth_next"));
     console.log("[auth] auth_next", next);
 
     app?.$cookies.remove("auth_next");

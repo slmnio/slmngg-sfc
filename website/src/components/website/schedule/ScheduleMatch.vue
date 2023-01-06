@@ -57,7 +57,7 @@ export default {
         },
         loaded() {
             if (this.match?.__loading) return false;
-            return !!this.match && !!this.match.name;
+            return !!this.match && !!this.match._original_data_id;
         },
         scores() {
             if (!this.match) return [null, null];

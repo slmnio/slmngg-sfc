@@ -36,7 +36,7 @@ export default {
     mounted() {
         setInterval(() => {
             this.now = this.ts.now();
-        }, 1000);
+        }, 50);
     }
 };
 </script>

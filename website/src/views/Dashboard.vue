@@ -20,8 +20,11 @@
         <DashboardModule title="Match Editor" icon-class="fas fa-pennant" class="broadcast-match-editor mb-2" v-if="liveMatch" start-opened>
             <MatchEditor :hide-match-extras="true" :match="liveMatch"></MatchEditor>
         </DashboardModule>
-        <DashboardModule title="Bracket Implications" icon-class="fas fa-sitemap" class="broadcast-bracket-editor mb-2" v-if="hasBrackets">
+        <DashboardModule title="Bracket Implications" icon-class="fas fa-sitemap" class="broadcast-bracket-editor mb-2" v-if="bracketCount">
             <BracketImplications :match="liveMatch" link-to-detailed-match show-resolve-button />
+        </DashboardModule>
+        <DashboardModule class="bracket-viewer mb-2" icon-class="fas fa-sitemap"  :title="bracketCount === 1 ? 'Bracket' : 'Brackets'" v-if="bracketCount">
+            <Bracket scale="0.75" v-for="bracket in bracketData" :event="liveMatch.event" :bracket="bracket" :key="bracket.id"></Bracket>
         </DashboardModule>
         <ScheduleEditor class="broadcast-schedule-editor mb-2" :broadcast="broadcast"></ScheduleEditor>
         <DashboardModule title="Twitch Controls" icon-class="fas fa-wrench" content-class="p-2" v-if="broadcast">
@@ -53,10 +56,11 @@ import DashboardClock from "@/components/website/dashboard/DashboardClock";
 import DashboardModule from "@/components/website/dashboard/DashboardModule.vue";
 import BracketImplications from "@/components/website/dashboard/BracketImplications.vue";
 import PreviewProgramDisplay from "@/components/website/dashboard/PreviewProgramDisplay.vue";
+import Bracket from "@/components/website/bracket/Bracket.vue";
 
 export default {
     name: "Dashboard",
-    components: { PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
+    components: { Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
     computed: {
         user() {
             if (!this.$root.auth.user?.airtableID) return {};
@@ -98,8 +102,20 @@ export default {
         useTeamComms() {
             return (this.broadcast?.broadcast_settings || []).includes("Connect for team comms");
         },
-        hasBrackets() {
+        bracketCount() {
             return this.liveMatch?.brackets?.length;
+        },
+        bracketData() {
+            return ReactiveArray("brackets", {
+                event: ReactiveThing("event", {
+                    theme: ReactiveThing("theme")
+                }),
+                ordered_matches: ReactiveArray("ordered_matches", {
+                    teams: ReactiveArray("teams", {
+                        theme: ReactiveThing("theme")
+                    })
+                })
+            })(this.liveMatch);
         }
     },
     methods: {
@@ -140,5 +156,35 @@ export default {
         height: 48px;
         border-bottom-width: 2px;
         border-bottom-style: solid;
+    }
+    .bracket-viewer >>> .module-content .bracket {
+        padding: 10px 20px 0px 20px;
+    }
+    .bracket-viewer >>> .module-content {
+        overflow-x: scroll;
+    }
+
+
+    .bracket-viewer >>> .module-content::-webkit-scrollbar-track {
+        border-radius: 4px;
+        background-color: transparent;
+    }
+
+    .bracket-viewer >>> .module-content::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+        background-color: transparent;
+    }
+
+    .bracket-viewer >>> .module-content::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+        background-color: #222;
+        transition: background-color 300ms ease;
+    }
+
+    .bracket-viewer >>> .module-content:hover::-webkit-scrollbar-thumb,
+    .bracket-viewer >>> .module-content:active::-webkit-scrollbar-thumb {
+        background-color: #333;
     }
 </style>

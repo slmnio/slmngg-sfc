@@ -9,10 +9,8 @@ module.exports = {
      * @returns {Promise<void>}
      */
     async handler({ matchID, updatedData }, { user }) {
-        // TODO: expand permissions system to allow for event moderators/admins/staff --something to edit matches on an event-by-event basis
-        if (!user.airtable?.website_settings?.includes("Can edit any match")) throw { errorMessage: "You don't have permission to edit this item", errorCode: 403 };
-
         let match = await this.helpers.get(matchID);
+        if (!(await this.helpers.permissions.canEditMatch(user, { match }))) throw { errorMessage: "You don't have permission to edit this item", errorCode: 403 };
         if (!match) throw "Couldn't load match data";
 
         let validKeysMap = {

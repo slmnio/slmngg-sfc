@@ -3,7 +3,7 @@ const {
     getBroadcast,
     getMaps,
     dirtyID
-} = require("../action-utils");
+} = require("../action-utils/action-utils");
 
 module.exports = {
     key: "multi-map-win",

@@ -1,8 +1,7 @@
 const Airtable = require("airtable");
-const Cache = require("./cache");
+const Cache = require("../cache");
 const { StaticAuthProvider } = require("@twurple/auth");
 const { ApiClient } = require("@twurple/api");
-const { get, auth } = require("./cache");
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
 const slmngg = airtable.base(process.env.AIRTABLE_APP);
 
@@ -123,13 +122,13 @@ async function getValidHeroes() {
 
 async function getBroadcast(client) {
     if (!client?.broadcast?.[0]) throw "No broadcast associated with this client";
-    const broadcast = await get(client?.broadcast?.[0]);
+    const broadcast = await Cache.get(client?.broadcast?.[0]);
     if (!broadcast) throw "No broadcast associated";
     return broadcast;
 }
 
 async function getAll(ids) {
-    return await Promise.all((ids || []).map(m => get(m)));
+    return await Promise.all((ids || []).map(m => Cache.get(m)));
 }
 async function getMaps(match) {
     return getAll(match.maps);
@@ -137,7 +136,7 @@ async function getMaps(match) {
 
 async function getTwitchChannel(client, requestedScopes) {
     let broadcast = await getBroadcast(client);
-    const channel = await auth.getChannel(broadcast?.channel?.[0]);
+    const channel = await Cache.auth.getChannel(broadcast?.channel?.[0]);
     if (!channel?.twitch_refresh_token) throw "No twitch auth token associated with channel";
     if (!channel?.channel_id || !channel?.name || !channel.twitch_scopes) throw "Invalid channel data";
     let scopes = channel.twitch_scopes.split(" ");
@@ -151,11 +150,11 @@ async function getTwitchChannel(client, requestedScopes) {
 }
 
 async function getMatchData(broadcast, requireAll) {
-    const match = await get(broadcast?.live_match?.[0]);
+    const match = await Cache.get(broadcast?.live_match?.[0]);
     if (!match) throw("No match associated");
 
-    const team1 = await get(match?.teams?.[0]);
-    const team2 = await get(match?.teams?.[1]);
+    const team1 = await Cache.get(match?.teams?.[0]);
+    const team2 = await Cache.get(match?.teams?.[1]);
     if (requireAll && (!team1 || !team2)) throw("Did not find two teams!");
 
     return {
@@ -167,7 +166,7 @@ async function getMatchData(broadcast, requireAll) {
 
 async function getTwitchAPIClient(channel) {
     if (!channel) throw("Internal error connecting to Twitch");
-    const accessToken = await auth.getTwitchAccessToken(channel);
+    const accessToken = await Cache.auth.getTwitchAccessToken(channel);
     const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, accessToken);
     return new ApiClient({authProvider});
 }

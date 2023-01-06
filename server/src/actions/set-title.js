@@ -1,7 +1,7 @@
 const { getTwitchChannel,
     getMatchData,
     getTwitchAPIClient
-} = require("../action-utils");
+} = require("../action-utils/action-utils");
 module.exports = {
     key: "set-title",
     auth: ["client"],

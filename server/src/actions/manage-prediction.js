@@ -1,7 +1,7 @@
 const { getTwitchChannel,
     getTwitchAPIClient,
     getMatchData
-} = require("../action-utils");
+} = require("../action-utils/action-utils");
 
 const automaticPredictionTitleStartCharacter = "⬥";
 

@@ -5,7 +5,8 @@ const {
     createRecord
 } = require("./action-utils");
 
-const Cache = require("./cache.js");
+const Cache = require("../cache.js");
+const permissions = require("./action-permissions");
 
 class Action {
     /**
@@ -44,7 +45,8 @@ class Action {
             createRecord: (tableName, data) => createRecord(Cache, tableName, [data]),
             createRecords: (tableName, items) => createRecord(Cache, tableName, items),
             updateRecord: (tableName, item, data) => updateRecord(Cache, tableName, item, data),
-            auth: Cache.auth
+            auth: Cache.auth,
+            permissions
         };
     }
 }

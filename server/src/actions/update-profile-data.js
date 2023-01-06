@@ -1,4 +1,4 @@
-const { getValidHeroes } = require("../action-utils");
+const { getValidHeroes } = require("../action-utils/action-utils");
 module.exports = {
     key: "update-profile-data",
     requiredParams: ["profileData"],

@@ -29,7 +29,7 @@ async function load(expressApp, cors, Cache, io) {
     const actionApp = express.Router();
     actionApp.use(bodyParser.json());
     actionApp.options("/*", cors());
-    actions = (await loadActions(path.join(__dirname, "actions"))) || [];
+    actions = (await loadActions(path.join(__dirname, "..", "actions"))) || [];
 
     let ioFunctions = [];
 

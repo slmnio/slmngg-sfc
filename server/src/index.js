@@ -53,7 +53,7 @@ const Cache = (require("./cache.js")).setup(io);
 (require("./airtable-interface.js")).setup(io);
 (require("./discord/bot-controller.js")).setup(io);
 
-const actions = require("./action-manager.js");
+const actions = require("./action-utils/action-manager.js");
 actions.load(app, localCors, Cache, io);
 
 app.use(bodyParser.urlencoded({ extended: true }));

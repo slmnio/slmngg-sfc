@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 const { updateRecord,
     createRecord
-} = require("./action-utils");
+} = require("./action-utils/action-utils");
 const { exchangeCode,
     getTokenInfo
 } = require("@twurple/auth");

@@ -1,7 +1,7 @@
 const { getTwitchChannel,
     getTwitchAPIClient,
     getTwitchAPIError
-} = require("../action-utils");
+} = require("../action-utils/action-utils");
 module.exports = {
     key: "start-commercial",
     auth: ["user", "client"],

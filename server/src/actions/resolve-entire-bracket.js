@@ -1,4 +1,4 @@
-const { getAll, cleanID } = require("../action-utils");
+const { getAll, cleanID } = require("../action-utils/action-utils");
 
 module.exports = {
     key: "resolve-entire-bracket",

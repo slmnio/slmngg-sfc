@@ -154,6 +154,13 @@
                         {{ relGroup.items.length === 1 ? relGroup.meta.singular_name : relGroup.meta.plural_name }}
                     </stat>
                     <stat :match="match" data="replay_codes" :raw="true" :format="(t) => t[0].replace(/\n/g, '<br>')">Replay codes</stat>
+                    <stat :match="match">
+                        Match Thumbnails
+                        <template v-slot:content class="d-inline">
+                            <a :href="matchThumbnailURL(match, 720)"  rel="nofollow" target="_blank">720p</a>,
+                            <a :href="matchThumbnailURL(match, 1080)"  rel="nofollow" target="_blank">1080p</a>
+                        </template>
+                    </stat>
                 </div>
             </div>
         </div>
@@ -172,6 +179,7 @@ import Markdown from "@/components/website/Markdown";
 import { resizedImage, resizedImageNoWrap } from "@/utils/images";
 import CopyTextButton from "@/components/website/CopyTextButton";
 import BracketImplications from "@/components/website/dashboard/BracketImplications.vue";
+import { getDataServerAddress } from "@/utils/fetch";
 
 export default {
     name: "DetailedMatch",
@@ -230,6 +238,10 @@ export default {
         },
         showLimitedPlayers(team) {
             return ((team.players || [])?.length === 0) && (team.limited_players || []).length !== 0;
+        },
+        matchThumbnailURL(match, size) {
+            const dataServerURL = getDataServerAddress();
+            return `${dataServerURL}/match.png?id=${match.id}&size=${size || "720"}&padding=30`;
         }
     },
     computed: {

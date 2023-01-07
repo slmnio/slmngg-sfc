@@ -83,24 +83,15 @@ export default {
             }
             const [otherMatchNum, position] = pointedMatch.split(".").map(e => parseInt(e));
             const otherMatch = matches[otherMatchNum - 1];
+            const otherMatchOtherTeams = (otherMatch.teams || []).filter(oTeam => !(this.match.teams || []).some(mTeam => mTeam.code === oTeam.code));
 
-            if (otherMatch?.teams?.length === 1) {
+            if (otherMatchOtherTeams?.length === 1) {
                 return {
                     otherMatch,
                     position,
-                    facingTeam: otherMatch.teams[0]
+                    facingTeam: otherMatchOtherTeams[0]
                 };
-            } else if (otherMatch?.teams?.length === 2) {
-                const otherMatchOtherTeams = otherMatch.teams.filter(oTeam => !this.match.teams.some(mTeam => mTeam.code === oTeam.code));
-
-                if (otherMatchOtherTeams.length === 1) {
-                    return {
-                        otherMatch,
-                        position,
-                        facingTeam: otherMatchOtherTeams[0]
-                    };
-                }
-
+            } else if (otherMatchOtherTeams?.length === 2) {
                 return {
                     text: `Match already has the teams ${otherMatch.teams.map(team => team.name).join(" vs ")}`
                 };

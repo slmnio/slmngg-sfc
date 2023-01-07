@@ -50,10 +50,10 @@
                                     <router-link class="ct-active" :to="url('player', player)">{{ player.name }} <i class="fas fa-badge-check fa-fw" title="REAL" v-if="player.verified"></i></router-link>
                                 </div>
                                 <div class="player-info player-dtag" v-if="showPlayerInfo && player.discord_tag">
-                                    <i class="fab fa-fw fa-discord player-icon-holder"></i> {{ player.discord_tag }}
+                                    <i class="fab fa-fw fa-discord player-icon-holder"></i> <CopyTextButton>{{player.discord_tag}}</CopyTextButton>
                                 </div>
                                 <div class="player-info player-btag" v-if="showPlayerInfo && player.battletag">
-                                    <i class="fab fa-fw fa-battle-net player-icon-holder"></i> {{ player.battletag }}
+                                    <i class="fab fa-fw fa-battle-net player-icon-holder"></i> <CopyTextButton>{{player.battletag}}</CopyTextButton>
                                 </div>
                             </div>
                         </div>

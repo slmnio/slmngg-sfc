@@ -157,8 +157,8 @@
                     <stat :match="match">
                         Match Thumbnails
                         <template v-slot:content class="d-inline">
-                            <a :href="matchThumbnailURL(match, 720)"  rel="nofollow" target="_blank">720p</a>,
-                            <a :href="matchThumbnailURL(match, 1080)"  rel="nofollow" target="_blank">1080p</a>
+                            <a class="ct-active" :href="matchThumbnailURL(match, 720)"  rel="nofollow" target="_blank">720p</a>,
+                            <a class="ct-active" :href="matchThumbnailURL(match, 1080)"  rel="nofollow" target="_blank">1080p</a>
                         </template>
                     </stat>
                 </div>

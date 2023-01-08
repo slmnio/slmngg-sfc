@@ -1,5 +1,5 @@
 <template>
-    <div class="tally-dot">
+    <div class="tally-dot" v-bind:class="{ preview: state === 'preview', active: state === 'active', 'unassigned': !observer }">
         <div class="d-flex">
             <div class="dot" v-bind:class="{ preview: state === 'preview', active: state === 'active', 'unassigned': !observer }">
                 <span class="industry-align">{{ number }}</span>
@@ -102,10 +102,17 @@ export default {
     position: absolute;
     bottom: 0;
     left: 0;
+    border: .2em solid transparent;
     padding: .2em;
     font-size: 120px;
     justify-content: flex-start;
     align-items: flex-end;
+}
+.tally-dot.active {
+    border-color: rgba(255,0,0,0.5);
+}
+.tally-dot.preview {
+    border-color: rgba(0,255,0,0.5);
 }
 
 .dot {

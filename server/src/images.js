@@ -375,11 +375,38 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                         .composite([{ input: resizedLogo }]).png().toBuffer();
                 }));
 
-                thumb.composite(logos.map((shp, i) => ({
-                    input: shp,
-                    left: i * halfWidth,
-                    top: 0
-                })));
+                let eventLogo;
+
+                if (match.event) {
+                    try {
+                        let event = await Cache.get(match?.event?.[0]);
+                        let eventTheme = event?.theme?.length ? await Cache.get(event?.theme?.[0]) : null;
+                        let eventLogoFilePath = await fullGetURL(eventTheme?.default_logo[0].url, "orig", null);
+                        eventLogo = await sharp(eventLogoFilePath).resize({
+                            height: Math.floor(size * 0.20),
+                            width: Math.floor(size * 0.25),
+                            fit: "contain",
+                            background: { r: 0, g: 0, b: 0, alpha: 0 }
+                        }).png().toBuffer();
+                    } catch (e) {
+                        eventLogo = null;
+                    }
+                }
+
+                thumb.composite([
+                    ...logos.map((shp, i) => ({
+                        input: shp,
+                        left: i * halfWidth,
+                        top: 0
+                    })),
+                    eventLogo ?
+                        {
+                            input: eventLogo,
+                            top: Math.floor(size * 0.77),
+                            left: Math.floor(halfWidth - (Math.floor(size * 0.25) / 2)),
+                            background: { r: 0, g: 0, b: 0, alpha: 0 }
+                        } : {}
+                ]);
 
                 let thumbBuffer = await thumb.png().toBuffer();
                 return res.header("Content-Type", "image/png").send(thumbBuffer);

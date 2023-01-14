@@ -115,7 +115,7 @@ export default {
             // return this.settings?.useOMW && this.stageMatches.every(m => [m.score_1, m.score_2].some(s => s === m.first_to));
         },
         standingsSort() {
-            return this.standingsSettings?.sort;
+            return this.standingsSettings?.sort || [];
         },
         standingsSettings() {
             return (this.blocks?.standings || []).find(s => s.group === this.stage);
@@ -179,7 +179,7 @@ export default {
                 // }
 
 
-                if (this.settings && this.settings.points) team.standings.points = team.extra_points || 0;
+                if (this.settings && this.settings.points) team.standings.points = 0;
                 // get matches here
                 this.stageMatches.forEach(match => {
                     if (!match.teams) return;

@@ -126,6 +126,14 @@ export function sortByOMapWinrate(a, b) {
     return 0;
 }
 
+export function sortByExtraPoints(a, b) {
+    const [aPoints, bPoints] = [a, b].map(x => (x.extra_points));
+    if (aPoints !== bPoints) {
+        if (aPoints > bPoints) return -1;
+        if (aPoints < bPoints) return 1;
+    }
+    return 0;
+}
 export function sortByMapDiff(a, b) {
     // if (a.map_wins > b.map_wins) return -1;
     // if (a.map_wins < b.map_wins) return 1;
@@ -376,6 +384,7 @@ function getSortMethod(stringMethod) {
     if (stringMethod === "MiniLeagueMaps") return { prep: miniLeaguePrep, method: miniLeagueMapDiff, max: null };
     if (stringMethod === "MapRoundsDiff") return { method: mapRoundsDiff, max: null };
     if (stringMethod === "MapRoundWins") return { method: mapRoundWins, max: null };
+    if (stringMethod === "Points") return { method: sortByExtraPoints, max: null };
     return null;
 }
 

@@ -216,6 +216,7 @@ export default {
 
     span.industry-align {
         transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
+        --translate-y: -0.0925em;
     }
 
     .lower-bar {

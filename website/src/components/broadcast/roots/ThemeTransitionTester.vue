@@ -16,16 +16,27 @@
                 <div class="lower-third-text">Middle split!</div>
             </ThemeTransition></div>
 
+            <div class="box">
+                <div>squeeze:</div>
+                <Squeezable>
+                    <div class="box-text">hiii it's inner text</div>
+                </Squeezable>
+            </div>
+
         </div>
     </div>
 </template>
 
 <script>
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
+import Squeezable from "@/components/broadcast/Squeezable.vue";
 export default {
     name: "ThemeTransitionTester",
-    components: { ThemeTransition },
+    components: { Squeezable, ThemeTransition },
     props: ["broadcast", "active"],
+    data: () => ({
+        noStinger: true
+    }),
     computed: {
         theme() {
             return this.broadcast?.event?.theme;
@@ -50,4 +61,12 @@ export default {
     .lower-third-area div {
         width: fit-content;
     }
+
+    .box {
+        display: flex;
+        border: 1px solid;
+        width: 10em !important;
+        font-size: 2em;
+    }
+
 </style>

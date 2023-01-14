@@ -2,13 +2,13 @@
     <div class="break-overlay">
         <div class="break-center">
             <ThemeTransition class="break-transition-top" :theme="event && event.theme" :one-color="true" :active="animationActive" start="middle" end="middle">
-                <div class="break-top event-theme-border flex-center overlay--bg" :style="eventBorder">
+                <Squeezable align="middle" :disabled="(overlayTitle).includes('\\n')" class="break-top event-theme-border flex-center overlay--bg" :style="eventBorder">
                     <transition name="fade" mode="out-in">
                         <span class="industry-align" v-bind:class="{'has-br': (overlayTitle).includes('\\n') }"
                               :key="overlayTitle" v-html="nbr(overlayTitle)"></span>
                     </transition>
                     <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News" :borderCSS="eventBorder" />
-                </div>
+                </Squeezable>
             </ThemeTransition>
             <ThemeTransition class="break-transition-main" :theme="event && event.theme" :one-color="true" :active="animationActive" start="middle" end="middle" :starting-delay="100">
                 <div class="break-main event-theme-border overlay--bg" :style="eventBorder">
@@ -98,13 +98,14 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 import { resizedImage, resizedImageNoWrap } from "@/utils/images";
 import OtherBroadcasts from "@/components/broadcast/OtherBroadcasts";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
+import Squeezable from "@/components/broadcast/Squeezable.vue";
 
 const tickTime = 25;
 
 export default {
     name: "BreakOverlay",
     props: ["broadcast", "title", "animationActive", "secondary", "headlineInterval"],
-    components: { OtherBroadcasts, ThemeLogo, BreakMatchup, BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown, ThemeTransition },
+    components: { Squeezable, OtherBroadcasts, ThemeLogo, BreakMatchup, BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown, ThemeTransition },
     data: () => ({
         tick: 0,
         lastCountdownTick: 0
@@ -303,6 +304,7 @@ export default {
 
     span.industry-align {
         transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
+        --translate-y: -0.0925em;
     }
 
     .break-center {

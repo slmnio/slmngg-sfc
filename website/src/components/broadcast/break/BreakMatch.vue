@@ -240,7 +240,7 @@ export default {
     }
     span.industry-align {
         transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
-        display: inline-flex;
+        --translate-y: -0.0925em;
     }
 
     .match-details {
@@ -335,6 +335,7 @@ export default {
         line-height: 1;
         font-size: calc(1.1em);
         transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
+        --translate-y: -0.0925em;
     }
     .match-special-event-name {
         flex-grow: 1;

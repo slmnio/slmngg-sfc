@@ -84,7 +84,8 @@ export default {
                     theme: ReactiveThing("theme")
                 }),
                 event: ReactiveThing("event", {
-                    theme: ReactiveThing("theme")
+                    theme: ReactiveThing("theme"),
+                    player_relationships: ReactiveArray("player_relationships")
                 }),
                 casters: ReactiveArray("casters"),
                 player_relationships: ReactiveArray("player_relationships", {
@@ -149,9 +150,16 @@ export default {
             return this.match?.event?.map_pool;
         },
         showEditor() {
+            console.log("m->e->s", this.match?.event?.staff, this.$root.auth?.user);
+            console.log("m->e->pr", (this.match?.event?.player_relationships || []));
             if (!isAuthenticated(this.$root)) return false;
             // TODO: Make sure user is an admin or has perms here
-            return this.$root.auth?.user?.website_settings?.includes("Can edit any match");
+            return (
+                this.$root.auth?.user?.website_settings?.includes("Can edit any match") ||
+                (this.match?.event?.staff || []).includes(`rec${this.$root.auth?.user?.airtableID}`) ||
+                (this.match?.event?.player_relationships || []).some(rel => rel.player?.[0] === `rec${this.$root.auth?.user?.airtableID}` && (rel.permissions || []).includes("Match Editor")) ||
+                (this.match?.player_relationships || []).some(rel => rel.player?.[0] === `rec${this.$root.auth?.user?.airtableID}` && (rel.permissions || []).includes("Match Editor"))
+            );
         },
         sidebarItems() {
             const items = ["vod"];

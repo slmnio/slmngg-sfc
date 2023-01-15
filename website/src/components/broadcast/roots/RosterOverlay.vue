@@ -123,7 +123,7 @@ export default {
         sortedTeamPlayers(team) {
             if (!team?.showablePlayers) return [];
             try {
-                const order = ["DPS", "Tank", "Support", "Flex"];
+                const order = ["Tank", "DPS", "Support", "Flex"];
                 const players = [...team.showablePlayers];
 
                 return players.sort((a, b) => {

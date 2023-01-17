@@ -40,7 +40,7 @@ const reqLog = {
         this.trigger("failed");
     },
     output() {
-        console.log(`[Request log] last ${this.period}s: ${this.counts.started} started, ${this.counts.succeeded} succeeded (${Math.floor((this.counts.succeeded / this.counts.started) * 100)}% success), ${this.counts.failed} failed (${Math.floor((this.counts.failed / this.counts.started) * 100)}% start-fails)`);
+        console.log(`[Request log] last ${this.period}s: ${this.counts.started} started (${(this.counts.started / this.period).toFixed(1)}/s, ${(((this.counts.started / this.period) / 5) * 100).toFixed(1)}% of limit), ${this.counts.succeeded} succeeded (${Math.floor((this.counts.succeeded / this.counts.started) * 100)}% success), ${this.counts.failed} failed (${Math.floor((this.counts.failed / this.counts.started) * 100)}% start-fails)`);
     },
     setHighRate(newRate) {
         if (this.highErrorRate !== newRate) {
@@ -163,7 +163,7 @@ const customTableUpdate = require("./custom-datasets");
 const { log } = require("./discord/slmngg-log");
 
 function registerUpdater(tableName, options) {
-    let pollRate = 3000;
+    let pollRate = 5000;
     setInterval(async function() {
         let date = (new Date(new Date().getTime() - pollRate)).toISOString().slice(0, 19);
         try {
@@ -218,7 +218,7 @@ let firstRun = true;
 async function sync() {
     for (let table of staticTables) {
         await processTableData(table, await getAllTableData(table), true);
-        setInterval(async () => processTableData(table, await getAllTableData(table), true), 5 * 1000);
+        setInterval(async () => processTableData(table, await getAllTableData(table), true), 8 * 1000);
         if (firstRun) console.log(`[rebuild] static table ${table} complete`);
     }
     for (let table of tables) {

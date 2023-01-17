@@ -16,7 +16,7 @@
 
 <script>
 import Jimp from "jimp/es";
-import { heroRecolorColors, logoBackground } from "@/utils/theme-styles";
+import { heroRecolorColors } from "@/utils/theme-styles";
 import { bg, resizedAttachment } from "@/utils/images";
 
 function deHex(hexString) {
@@ -32,7 +32,7 @@ async function recolorImage(imageURL, toColor, fromColor) {
         url: imageURL
     });
 
-    // console.log({ image, from, to });
+    // console.log("image width", image.bitmap.width);
     const frame = image.bitmap.data;
 
     const outputFrame = new Uint8Array(frame);// (new Uint8Array(frame)).slice(0, image.bitmap.width * image.bitmap.height * 4);
@@ -52,8 +52,11 @@ async function recolorImage(imageURL, toColor, fromColor) {
     // console.log("output should be", (image.bitmap.width * image.bitmap.height * 4));
     // console.log("output is", frame.length, outputFrame.length);
     return {
-        ...image.bitmap,
-        data: outputFrame
+        pixels: {
+            ...image.bitmap,
+            data: outputFrame
+        },
+        width: image.bitmap.width
     };
 }
 
@@ -149,7 +152,9 @@ export default {
         async recolor(imageURL, color, number) {
             // console.log("recolor", { imageURL, color, number });
             if (!imageURL || !color) return;
-            const pixels = await recolorImage(imageURL, color);
+            const { pixels, width } = await recolorImage(imageURL, color);
+
+            this.$emit("recolor_width", width);
 
             let hue = (this.$refs[`hue-color-${number}`]);
             if (!hue.id && hue?.[0]) hue = hue?.[0];

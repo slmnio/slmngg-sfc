@@ -153,8 +153,8 @@ export default [
         component: HeroRosterOverlay,
         props: route => ({
             teamNum: route.query.team || route.query.teamNum,
-            playerCount: route.query.players || route.query.playerCount,
-            showRoles: !!route.query.roles || !!route.query.icons,
+            playerCount: route.query.count || route.query.players || route.query.playerCount,
+            showRoles: !!route.query.role || !!route.query.roles || !!route.query.icons,
             showPronouns: !!route.query.pronouns
         })
     },

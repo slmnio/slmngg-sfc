@@ -75,7 +75,8 @@ export default {
                         theme: ReactiveThing("theme")
                     })
                 }),
-                socials: ReactiveArray("socials")
+                socials: ReactiveArray("socials"),
+                matches: ReactiveArray("matches")
             });
         },
         settings() {

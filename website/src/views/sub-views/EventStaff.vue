@@ -36,7 +36,7 @@ export default {
     },
     computed: {
         showTableButton() {
-            return this.event?.player_relationships || this.event?.casters;
+            return this.event?.player_relationships || this.event?.casters || (this.event?.matches || []).some(match => match.player_relationships?.length);
         },
         playerRelationshipGroups() {
             if (!this.event?.player_relationships?.length) return [];

@@ -88,18 +88,15 @@ export default {
         },
         pagedMatches() {
             const groups = {};
-            console.table(this.matches);
             this.matches.forEach(match => {
                 if (!match._original_data_id) return null;
                 let flatWeek = Math.floor(match.week);
                 if (isNaN(flatWeek)) {
-                    // console.log(flatWeek, match.week, match);
                     flatWeek = 1;
                 }
                 if (!groups[flatWeek]) groups[flatWeek] = { num: flatWeek, text: match.week_text || `Week ${flatWeek}`, matches: [] };
                 groups[flatWeek].matches.push(match);
             });
-            console.log(groups);
             return Object.values(groups).sort((a, b) => a.num - b.num);
         },
         activeScheduleGroup() {

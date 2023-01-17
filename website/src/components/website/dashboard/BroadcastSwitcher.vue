@@ -5,7 +5,6 @@
         </div>
 
         <b-modal ref="broadcast-switcher" id="broadcast-switcher" title="Broadcast Switcher" hide-footer>
-            <div class="error text-danger mb-2" v-if="error"><i class="fas fa-exclamation-circle fa-fw"></i> Error: {{ error }}</div>
             <div class="broadcasts flex-center flex-column">
                 <BroadcastDisplay class="broadcast" :disabled="bi === 0 || setting" v-for="(broadcast, bi) in broadcasts" :broadcast="broadcast" :key="broadcast.id" :set-method="switchBroadcast" />
             </div>
@@ -26,8 +25,7 @@ export default {
     props: ["broadcasts"],
     data: () => ({
         setting: false,
-        attemptedFirst: null,
-        error: null
+        attemptedFirst: null
     }),
     computed: {
         activeBroadcast() {
@@ -38,10 +36,8 @@ export default {
         async switchBroadcast(broadcast) {
             this.setting = true;
             this.attemptedFirst = broadcast;
-            this.error = null;
 
-            const request = await setActiveBroadcast(this.$root.auth, "self", broadcast);
-            if (request.error) this.error = request.errorMessage;
+            await setActiveBroadcast(this.$root.auth, "self", broadcast);
             // this.setting = false;
         }
     },

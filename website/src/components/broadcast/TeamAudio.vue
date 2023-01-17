@@ -1,5 +1,5 @@
 <template>
-    <div class="player-audio" @click="_muted = !_muted">
+    <div class="player-audio" @click="isMuted = !isMuted">
         <div class="member-list" v-if="showMemberList">
             <div class="member" v-for="member in decoratedMemberList" :key="member.id" :class="{'speaking': member.speaking}">
                 {{ member.airtable && member.airtable.name }} {{ member.name }} {{ member.id }} {{ member.speaking }}
@@ -65,13 +65,13 @@ export default {
         decoders: {},
         lastPacketTime: {},
         memberList: [],
-        _muted: true,
+        isMuted: true,
         status: null,
         showMemberList: false
     }),
     computed: {
         muted() {
-            return this.alwaysUnmuted ? false : this._muted;
+            return this.alwaysUnmuted ? false : this.isMuted;
         },
         broadcastKey() {
             return this.broadcast.key;
@@ -111,10 +111,10 @@ export default {
             });
         },
         enable() {
-            this._muted = false;
+            this.isMuted = false;
         },
         disable() {
-            this._muted = true;
+            this.isMuted = true;
         }
     },
     watch: {

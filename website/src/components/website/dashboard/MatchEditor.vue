@@ -4,7 +4,7 @@
 
         <b-form v-if="match" @submit="(e) => e.preventDefault()">
 <!--            <b-alert variant="danger" :show="!!errorMessage" dismissible @dismissed="() => this.errorMessage = null"><i class="fas fa-exclamation-circle fa-fw"></i> <b>Error</b>: {{ errorMessage }}</b-alert>-->
-            <div class="top d-flex align-items-center" v-if="!hideMatchExtras">
+            <div class="top px-2 d-flex align-items-center" v-if="!hideMatchExtras">
                 <b-form-checkbox :class="{'low-opacity': processing['special_event']}" class="opacity-changes flex-shrink-0 mr-5"
                                  v-model="matchData.special_event" name="special-event-checkbox" @change="(checked) => sendMatchDataChange('special_event', checked)">
                     Special Event
@@ -18,6 +18,7 @@
                 <b-button class="ml-5 top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save all</b-button>
                 </div>
             <div class="teams-scores pt-2 px-2">
+                <b-form-checkbox v-if="hasMapPool" class="mr-2" v-model="restrictToMapPool" id="map-pool-checkbox">Restrict to map pool</b-form-checkbox>
                 <div class="spacer" style="order:0"></div>
                 <div class="team" v-for="(team, i) in teams" :key="team.id" :class="{'end': i === 1}">
                     <ContentThing v-if="!team.empty" :thing="team" :theme="team.theme" show-logo="true" type="team" text="" />
@@ -56,8 +57,8 @@
                             Map Score
                         </div>
                         <div class="form-bottom map-editors d-flex">
-                            <MapScoreEditor class="map-editor" v-model="score_1s[i]" :team="teams[0]"></MapScoreEditor>
-                            <MapScoreEditor class="map-editor" v-model="score_2s[i]" :team="teams[1]" :reverse="true"></MapScoreEditor>
+                            <MapScoreEditor class="map-editor" v-model="score_1s[i]" @input="(val) => checkAutoWinner(i, val)" :team="teams[0]"></MapScoreEditor>
+                            <MapScoreEditor class="map-editor" v-model="score_2s[i]" @input="(val) => checkAutoWinner(i, val)" :team="teams[1]" :reverse="true"></MapScoreEditor>
                         </div>
                     </td>
                     <td class="form-stack">
@@ -107,13 +108,41 @@ export default {
         scores() {
             return [this.match.score_1 || 0, this.match.score_2 || 0];
         },
+        mapWinnerScore() {
+            if (!this.teams?.length) return [0, 0];
+            return [
+                this.winners.filter(id => id === this.teams[0].id).length,
+                this.winners.filter(id => id === this.teams[1].id).length
+            ];
+        },
         minMaps() {
-            return Math.max(
-                this.scores[0] + this.scores[1],
+            /*
+                Number of maps to be editable
+                Minimum: match.first_to
+                Should automatically increase based on whatever would be needed to complete the match
+             */
+
+            let mapCount = Math.max(
+                this.scores[0] + this.scores[1], // match score on record
+                (this.matchData.scores?.[0] || 0) + (this.matchData.scores?.[1] || 0), // match score as staged data
+                this.winners.length,
                 this.match.first_to || 0,
-                (this.match.maps?.filter(m => !m.banner && !m.draw))?.length || 0,
-                (this.matchData.scores?.[0] || 0) + (this.matchData.scores?.[1] || 0)
-            ) + this.draws.filter(d => d).length + this.banners.filter(d => d).length + this.extraMaps;
+                (this.match.maps?.filter(m => !m.banner && !m.draw))?.length || 0
+            );
+
+            mapCount += this.draws.filter(d => d).length + this.banners.filter(d => d).length; // draws and bans need to +1
+            mapCount += this.extraMaps; // manual adding
+
+            // check if match is complete with current amount
+            if (this.match.first_to &&
+                this.mapWinnerScore.reduce((a, val) => a + val, 0) === mapCount &&
+                this.mapWinnerScore.every(score => this.match.first_to !== score)) {
+                // match is not complete
+                mapCount++;
+            }
+
+
+            return mapCount;
         },
         maps() {
             const min = this.minMaps;
@@ -130,11 +159,19 @@ export default {
 
             return maps;
         },
+        hasMapPool() {
+            return this.match?.event?.map_pool?.length;
+        },
         availableMaps() {
             return (ReactiveRoot("Map Data", {
                 ids: ReactiveArray("ids")
             }))?.ids?.filter(map => {
                 if (!map) return;
+
+                if (this.restrictToMapPool && this.hasMapPool) {
+                    return (this.match?.event?.map_pool || []).some(_m => _m === "rec" + map?.id || _m?.id === "rec" + map?.id);
+                }
+
                 if (!this.match?.event?.game) return true;
                 return map && map.game === this.match?.event?.game;
             }).sort((a, b) => {
@@ -193,6 +230,18 @@ export default {
         mapOptions: {
             deep: true,
             handler: (c) => console.log(c)
+        },
+        score_1s: {
+            deep: true,
+            handler() {
+                // this.checkAuto
+            }
+        },
+        score_2s: {
+            deep: true,
+            handler() {
+
+            }
         }
     },
     data: () => ({
@@ -214,7 +263,8 @@ export default {
         extraMaps: 0,
         errorMessage: null,
         previousAutoData: null,
-        scoreDebounceTimeouts: []
+        scoreDebounceTimeouts: [],
+        restrictToMapPool: true
     }),
     methods: {
         async setScore(scoreNum, number) {
@@ -308,6 +358,23 @@ export default {
                 });
             }
             return response;
+        },
+        checkAutoWinner(i, val) {
+            console.log("checkAutoWinner", { val, i }, this.score_1s[i], this.score_2s[i]);
+
+            if (this.teams?.length !== 2) return;
+
+            if (this.score_1s[i] !== undefined && this.score_2s[i] !== undefined) {
+                if (this.score_1s[i] > this.score_2s[i]) {
+                    // set left winner
+
+                    this.$set(this.winners, i, this.teams[0].id);
+                } else if (this.score_1s[i] < this.score_2s[i]) {
+                    // set right winner
+
+                    this.$set(this.winners, i, this.teams[1].id);
+                }
+            }
         }
     },
     mounted() {
@@ -378,5 +445,9 @@ export default {
     }
     .draw-checkbox:hover i.hoverable {
         opacity: 0.5;
+    }
+
+    .teams-scores >>> .custom-checkbox {
+        font-size: 16px !important;
     }
 </style>

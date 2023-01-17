@@ -108,8 +108,8 @@ module.exports = {
                 if (map.picker) fieldData.Picker = [map.picker];
                 if (map.number) fieldData.Number = map.number;
                 if (map.draw) fieldData.Draw = map.draw;
-                if (map.score_1) fieldData["Score 1"] = map.score_1;
-                if (map.score_2) fieldData["Score 2"] = map.score_2;
+                if (map.score_1 != null) fieldData["Score 1"] = map.score_1;
+                if (map.score_2 != null) fieldData["Score 2"] = map.score_2;
                 if (map.replay_code) fieldData["Replay Code"] = map.replay_code;
 
                 return fieldData;

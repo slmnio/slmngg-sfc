@@ -24,16 +24,27 @@
             <BracketImplications :match="liveMatch" link-to-detailed-match show-resolve-button />
         </DashboardModule>
         <DashboardModule class="bracket-viewer mb-2" icon-class="fas fa-sitemap"  :title="bracketCount === 1 ? 'Bracket' : 'Brackets'" v-if="bracketCount">
-            <Bracket scale="0.75" v-for="bracket in bracketData" :event="liveMatch.event" :bracket="bracket" :key="bracket.id"></Bracket>
+            <Bracket :scale="0.75" v-for="bracket in bracketData" :event="liveMatch.event" :bracket="bracket" :key="bracket.id"></Bracket>
         </DashboardModule>
         <ScheduleEditor class="broadcast-schedule-editor mb-2" :broadcast="broadcast"></ScheduleEditor>
-        <DashboardModule title="Twitch Controls" icon-class="fas fa-wrench" content-class="p-2" v-if="broadcast">
-            <template v-slot:header v-if="broadcast.stream_link">{{ broadcast.stream_link }}</template>
+        <DashboardModule title="Twitch Controls" icon-class="fas fa-wrench" content-class="p-2" v-if="broadcast && broadcast.channel">
+            <template v-slot:header v-if="streamLink">{{ streamLink }}</template>
             <Predictions v-if="liveMatch" :client="client"/>
             <Commercials v-if="hasPermission('Full broadcast permissions')" :client="client" />
-            <b-button class="mt-2" variant="secondary" @click="updateTitle" :disabled="!liveMatch">
-                <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title
-            </b-button>
+            <div class="mt-2">
+                <b-button variant="secondary" @click="updateTitle" :disabled="!liveMatch">
+                    <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title
+                </b-button>
+                <b-button class="ml-2 no-link-style d-inline-block" variant="outline-secondary" v-if="streamLink" :href="`https://${streamLink}`" target="_blank">
+                    Stream <i class="fas fa-fw fa-external-link"></i>
+                </b-button>
+                <b-button class="ml-2 no-link-style d-inline-block" variant="outline-secondary" v-if="streamLink" :href="`https://${streamLink}/chat`" target="_blank">
+                    <i class="fab mr-1 fa-twitch"></i> Chat <i class="fas fa-fw fa-external-link"></i>
+                </b-button>
+                <b-button class="ml-2 no-link-style d-inline-block" variant="outline-secondary" v-if="twitchChannelName" :href="`https://dashboard.twitch.tv/u/${twitchChannelName}`" target="_blank">
+                    <i class="fab mr-1 fa-twitch"></i> Dashboard <i class="fas fa-fw fa-external-link"></i>
+                </b-button>
+            </div>
         </DashboardModule>
         <CommsControl v-if="useTeamComms" :match="liveMatch"/>
     </div>
@@ -95,6 +106,12 @@ export default {
         },
         broadcast() {
             return this.client?.broadcast?.[0];
+        },
+        streamLink() {
+            return this.broadcast?.stream_link || (this.broadcast?.channel_username?.[0] ? `twitch.tv/${this.broadcast?.channel_username?.[0]}` : null);
+        },
+        twitchChannelName() {
+            return this.broadcast?.channel_username?.[0] || (this.broadcast?.stream_link ? this.broadcast?.stream_link.split("/").pop() : null);
         },
         liveMatch() {
             return this.broadcast?.live_match;

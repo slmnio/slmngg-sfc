@@ -46,9 +46,9 @@
                                 <td>MVP</td>
                                 <td><LinkedPlayers :players="[match.mvp]" /></td>
                             </tr>
-                            <tr v-if="match.log_files && match.log_files.replay_codes">
+                            <tr v-if="replayCodes">
                                 <td>Replay codes</td>
-                                <td>{{ match.log_files.replay_codes }}</td>
+                                <td>{{ replayCodes }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -150,8 +150,6 @@ export default {
             return this.match?.event?.map_pool;
         },
         showEditor() {
-            console.log("m->e->s", this.match?.event?.staff, this.$root.auth?.user);
-            console.log("m->e->pr", (this.match?.event?.player_relationships || []));
             if (!isAuthenticated(this.$root)) return false;
             // TODO: Make sure user is an admin or has perms here
             return (
@@ -168,6 +166,11 @@ export default {
             if (this.showEditor) items.push("editor");
 
             return items;
+        },
+        replayCodes() {
+            if (this.match?.log_files?.replay_codes) return this.match.log_files.replay_codes;
+            if (!this.match?.maps.some(map => map.replay_code)) return null;
+            return this.match.maps.map(map => `${map.name?.[0]}: ${map.replay_code}`).join(", \n");
         }
     },
     metaInfo() {

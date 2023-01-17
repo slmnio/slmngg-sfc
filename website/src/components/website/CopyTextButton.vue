@@ -1,6 +1,6 @@
 <template>
     <span class="parent" @click="copyText">
-        <span ref="copy"><slot></slot></span> <i :class="`fas ${recentlyCopied ? 'fa-clipboard-check' : 'fa-clipboard'}`"></i>
+        <span ref="copy"><slot></slot></span> <i :class="`fas fa-fw ${recentlyCopied ? 'fa-clipboard-check' : 'fa-copy'}`"></i>
     </span>
 </template>
 
@@ -26,11 +26,16 @@ export default {
 <style scoped>
 .parent {
     cursor: pointer;
+    position: relative;
 }
 
 i {
     opacity: 0;
     transition: opacity .1s ease-in-out;
+    position: absolute;
+    margin-left: .5em;
+    line-height: 100%;
+    top: 0.2em;
 }
 .parent:hover > i {
     opacity: 100%;

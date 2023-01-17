@@ -13,9 +13,12 @@
             <div class="map-insert-text" v-if="!complete && !condensed && !winner && mapClass === 'tiebreaker'">TIEBREAKER</div>
             <div class="map-insert-text" v-if="!complete && !condensed && !winner && mapClass === 'extra'">IF REQUIRED</div>
         </div>
-        <div class="map-name">{{ name || '--' }}</div>
-        <div class="map-scores" v-if="scores">{{ scores }}</div>
-        <div class="map-pick" v-if="banText || pickText">{{ banText || pickText  || ''}}</div>
+        <div class="map-lower-text map-name">{{ name || '--' }}</div>
+        <div class="map-lower-text map-scores" v-if="scores">{{ scores }}</div>
+        <div class="map-lower-text map-pick" v-if="!condensed && banText || pickText">{{ banText || pickText  || '' }}</div>
+        <div class="map-lower-text map-replay-code" v-if="!condensed && map.replay_code">
+             <i class="fas fa-history fa-fw" v-b-tooltip="'Replay Code'"></i> <CopyTextButton>{{ map.replay_code }}</CopyTextButton>
+        </div>
     </div>
 </template>
 
@@ -23,9 +26,11 @@
 import { cleanID } from "@/utils/content-utils";
 import { logoBackground1, themeBackground } from "@/utils/theme-styles";
 import { resizedImage } from "@/utils/images";
+import CopyTextButton from "@/components/website/CopyTextButton.vue";
 
 export default {
     name: "MapDisplay",
+    components: { CopyTextButton },
     props: ["map", "theme", "match", "i", "condensed", "showBannedMaps"],
     computed: {
         mapClass() {
@@ -141,30 +146,35 @@ export default {
         font-size: 18px;
         filter: drop-shadow(0px 0px 3px black);
     }
-    .map-name {
-        line-height: 1;
-        text-align: center;
-        margin-top: 6px;
-    }
-    .map.condensed .map-name {
-        font-size: 0.6em;
-        margin-top: 3px;
-    }
     .map-score {
         line-height: 1;
         text-align: center;
         margin-top: 6px;
     }
 
-    .map-scores, .map-pick {
+    .map-lower-text {
         line-height: 1;
         font-size: 0.85em;
         text-align: center;
         margin-top: 4px;
     }
-    .map.condensed .map-scores,
-    .map.condensed .map-pick {
+    .map.condensed .map-lower-text {
         font-size: 0.6em;
         margin-top: 1px;
+    }
+
+    .map-replay-code {
+        margin-top: 5px;
+    }
+
+    .map-name {
+        line-height: 1;
+        text-align: center;
+        margin-top: 6px;
+        font-size: 1em;
+    }
+    .map.condensed .map-name {
+        font-size: 0.6em;
+        margin-top: 3px;
     }
 </style>

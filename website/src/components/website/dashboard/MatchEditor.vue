@@ -72,6 +72,12 @@
                             </b-form-checkbox>
                         </div>
                     </td>
+                    <td class="form-stack number" v-if="!hideMatchExtras">
+                        <div class="form-top">Replay Code</div>
+                        <div class="form-button">
+                            <b-form-input type="text" v-model="replayCodes[i]"></b-form-input>
+                        </div>
+                    </td>
                     <td><TeamPicker title="Banned by" :teams="teams" v-model="banners[i]"></TeamPicker></td>
                     <td><TeamPicker title="Picked by" :class="{ 'very-low-opacity': banners[i] }" :teams="teams" v-model="pickers[i]"></TeamPicker></td>
                     <td><TeamPicker title="Winner" :class="{ 'very-low-opacity': banners[i] }" :teams="teams" v-model="winners[i]"></TeamPicker></td>
@@ -203,7 +209,8 @@ export default {
                     picker: this.pickers[i],
                     score_1: this.score_1s[i],
                     score_2: this.score_2s[i],
-                    number: this.mapNumbers[i]
+                    number: this.mapNumbers[i],
+                    replay_code: this.replayCodes[i]
                 });
             }
             return data;
@@ -260,6 +267,7 @@ export default {
         score_2s: [],
         mapNumbers: [],
         existingMapIDs: [],
+        replayCodes: [],
         extraMaps: 0,
         errorMessage: null,
         previousAutoData: null,
@@ -311,6 +319,7 @@ export default {
                     this.setIfNew("banners", i, map.banner?.id || map.banner?.[0]);
                     this.setIfNew("score_1s", i, map.score_1);
                     this.setIfNew("score_2s", i, map.score_2);
+                    this.setIfNew("replayCodes", i, map.replay_code);
                     this.setIfNew("mapNumbers", i, map.number);
                 });
             }
@@ -326,7 +335,8 @@ export default {
                 score_1s: Object.assign([], this.score_1s),
                 score_2s: Object.assign([], this.score_2s),
                 mapNumbers: Object.assign([], this.mapNumbers),
-                mapChoices: Object.assign([], this.mapChoices)
+                mapChoices: Object.assign([], this.mapChoices),
+                replayCodes: Object.assign([], this.replayCodes)
             };
         },
         async sendMatchDataChange(key, val) {
@@ -435,6 +445,7 @@ export default {
     }
     .form-top {
         margin-bottom: 0.25em;
+        white-space: nowrap;
     }
     .map-number {
         min-width: 2.5em;

@@ -34,6 +34,7 @@
         ],
         "no-multiple-empty-lines": ["warn", { "max": 2 }],
         "no-trailing-spaces": ["warn"],
-        "space-before-function-paren": "off"
+        "space-before-function-paren": "off",
+        "no-throw-literal": "off"
     }
 }

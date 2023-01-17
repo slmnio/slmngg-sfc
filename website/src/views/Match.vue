@@ -169,7 +169,7 @@ export default {
         },
         replayCodes() {
             if (this.match?.log_files?.replay_codes) return this.match.log_files.replay_codes;
-            if (!this.match?.maps.some(map => map.replay_code)) return null;
+            if (!this.match?.maps?.some(map => map.replay_code)) return null;
             return this.match.maps.map(map => `${map.name?.[0]}: ${map.replay_code}`).join(", \n");
         }
     },

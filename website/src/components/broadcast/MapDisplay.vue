@@ -135,13 +135,18 @@ export default {
         },
         useShorterMapNames() {
             return this.broadcast?.broadcast_settings?.includes("Use shorter map names");
+        },
+        isInMapsScene() {
+            return this.$root?.activeScene?.name?.toLowerCase().includes("maps");
         }
     },
     sockets: {
         map_music() {
+            console.log("Map Music trigger");
             this.playAudio();
         },
         fade_map_music() {
+            console.log("Fade Map Music trigger");
             this.fadeOutAudio(0, 5);
         }
     },
@@ -161,6 +166,7 @@ export default {
         },
         async runAudio(read) {
             if (this.audioStatus === "playing") {
+                console.log("Audio is playing. Fading out...");
                 return this.fadeOutAudio(0, 5);
             } else if (this.audioStatus === "fading out") {
                 return console.log("Not doing anything since music is already fading out");
@@ -170,6 +176,10 @@ export default {
             const url = read.audio[0].url;
             const audio = new Audio(url);
             audio.volume = (read.volume || 100) / 100;
+            audio.onended = () => {
+                this.activeAudio = null;
+                this.audioStatus = "not playing";
+            };
             this.activeAudio = audio;
             this.audioStatus = "playing";
             await audio.play();
@@ -189,6 +199,8 @@ export default {
             console.log(`Climbing to ${targetVolume} at ${climbAmount}p`);
 
             const interval = setInterval(() => {
+                if (!this.activeAudio) return;
+
                 if (this.activeAudio.volume + climbAmount >= 1) {
                     this.activeAudio.volume = 1;
                 } else if (this.activeAudio.volume + climbAmount <= 0) {
@@ -220,18 +232,31 @@ export default {
                 if (targetVolume === 0) this.activeAudio = null;
                 this.audioStatus = "not playing";
             }, (duration + 1) * 1000);
+        },
+        stopAudio() {
+            if (this.activeAudio) {
+                this.activeAudio.pause();
+                this.activeAudio = null;
+                this.audioStatus = "not playing";
+            }
         }
     },
     watch: {
         animationActive(isActive) {
             this.showNextMap = false;
 
+            console.log("animation active", isActive, this.isInMapsScene);
+
             if (isActive && this.nextMap?.map) {
                 console.log("Animation trigger");
-                if ((this.$root?.activeScene?.name?.toLowerCase().includes("maps"))) this.playAudio();
+                if (this.isInMapsScene) this.playAudio();
                 setTimeout(() => {
                     this.showNextMap = true;
                 }, 3000);
+            }
+            if (!isActive && this.activeAudio) {
+                console.log("Animation reset - stopping audio");
+                this.stopAudio();
             }
         },
         audioStatus(is, was) {

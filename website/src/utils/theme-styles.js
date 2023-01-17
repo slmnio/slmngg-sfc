@@ -31,3 +31,9 @@ export function themeBackground1(item) {
     if (!item || !item.theme) return {};
     return themeBackground(item.theme);
 }
+export function heroRecolorColors(theme) {
+    return {
+        primary: theme.color_hero_recolor_primary || logoBackground(theme).backgroundColor,
+        secondary: theme.color_hero_recolor_secondary || logoBackground(theme).borderColor || logoBackground(theme).color
+    };
+}

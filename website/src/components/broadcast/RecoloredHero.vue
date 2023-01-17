@@ -16,7 +16,7 @@
 
 <script>
 import Jimp from "jimp/es";
-import { logoBackground } from "@/utils/theme-styles";
+import { heroRecolorColors, logoBackground } from "@/utils/theme-styles";
 import { bg, resizedAttachment } from "@/utils/images";
 
 function deHex(hexString) {
@@ -120,10 +120,10 @@ export default {
             return this.hero.recolor_layers.map(layer => resizedAttachment(layer, "orig"));
         },
         themeColors() {
-            const style = logoBackground(this.theme);
+            const style = heroRecolorColors(this.theme);
             return [
-                style.backgroundColor,
-                style.borderColor || style.color
+                style.primary,
+                style.secondary
             ];
         }
     },

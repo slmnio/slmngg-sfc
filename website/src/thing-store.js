@@ -13,6 +13,7 @@ export default new Vuex.Store({
 
         highlighted_team: null,
         highlighted_match: null,
+        edit_in_site_timezone: false,
         match_highlights: [],
         timezone: localStorage.getItem("timezone") || "local",
         draft_notes: [],
@@ -113,6 +114,9 @@ export default new Vuex.Store({
                 // set
                 if (!visible) state.last_event_match_pages.splice(index, 1);
             }
+        },
+        setTimeEditTimezone(state, editInSiteTimezone) {
+            state.edit_in_site_timezone = editInSiteTimezone;
         }
     },
     getters: {
@@ -124,7 +128,8 @@ export default new Vuex.Store({
         getLastMatchPage: state => (eventID) => state.last_event_match_pages.find(x => x.eventID === eventID),
         // highlightedMatch: (state, getters) => () => getters.thing(state.highlighted_match)
         highlightedMatch: state => () => state.highlighted_match,
-        dashboardModuleIsVisible: state => (moduleName) => state.dashboard_modules_active.includes(moduleName)
+        dashboardModuleIsVisible: state => (moduleName) => state.dashboard_modules_active.includes(moduleName),
+        editTimeInSiteTimezone: state => state.edit_in_site_timezone
     },
     actions: {
         subscribe: (state, data) => state.commit("subscribe", data),

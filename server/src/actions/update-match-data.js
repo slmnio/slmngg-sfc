@@ -17,7 +17,8 @@ module.exports = {
             "special_event": "Special Event",
             "custom_name": "Custom Name",
             "score_1": "Score 1",
-            "score_2": "Score 2"
+            "score_2": "Score 2",
+            "start": "Start"
         };
         let validatedData = {};
 

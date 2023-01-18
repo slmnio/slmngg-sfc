@@ -5,10 +5,11 @@
         <b-form v-if="match" @submit="(e) => e.preventDefault()">
 <!--            <b-alert variant="danger" :show="!!errorMessage" dismissible @dismissed="() => this.errorMessage = null"><i class="fas fa-exclamation-circle fa-fw"></i> <b>Error</b>: {{ errorMessage }}</b-alert>-->
             <div class="top px-2 d-flex align-items-center" v-if="!hideMatchExtras">
-                <b-form-checkbox :class="{'low-opacity': processing['special_event']}" class="opacity-changes flex-shrink-0 mr-5"
+                <b-form-checkbox :class="{'low-opacity': processing['special_event']}" class="opacity-changes flex-shrink-0 mr-3"
                                  v-model="matchData.special_event" name="special-event-checkbox" @change="(checked) => sendMatchDataChange('special_event', checked)">
                     Special Event
                 </b-form-checkbox>
+                <AdvancedDateEditor class="mr-3" :saved-time="match.start" :is-processing="processing['start']" @submit="(timeString) => setMatchStart(timeString)"></AdvancedDateEditor>
                 <div class="mid-label mr-3 text-nowrap">
                     Custom Name
                 </div>
@@ -93,16 +94,17 @@ import { updateMapData, updateMatchData } from "@/utils/dashboard";
 import ThemeLogo from "@/components/website/ThemeLogo";
 import ContentThing from "@/components/website/ContentThing";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
-import { cleanID, textSort } from "@/utils/content-utils";
+import { cleanID, formatTime, textSort } from "@/utils/content-utils";
 import TeamPicker from "@/components/website/dashboard/TeamPicker";
 import MapScoreEditor from "@/components/website/dashboard/MapScoreEditor";
 import DashboardModule from "@/components/website/dashboard/DashboardModule.vue";
+import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";
 
 export default {
     name: "MatchEditor",
     props: ["match", "hideMatchExtras"],
     // eslint-disable-next-line vue/no-unused-components
-    components: { DashboardModule, MapScoreEditor, TeamPicker, ContentThing, ThemeLogo, BForm, BFormGroup, BFormCheckbox, BFormInput, BButton, BFormSelect },
+    components: { AdvancedDateEditor, DashboardModule, MapScoreEditor, TeamPicker, ContentThing, ThemeLogo, BForm, BFormGroup, BFormCheckbox, BFormInput, BButton, BFormSelect },
     computed: {
         teams() {
             const dummy = { dummy: true };
@@ -293,6 +295,12 @@ export default {
                     });
                 }
             }, 500);
+        },
+        async setMatchStart(timeString) {
+            const response = await this.sendMatchDataChange("start", timeString);
+            if (!response.error) {
+                this.$notyf.success(`Set match start to: ${formatTime(timeString, this.$store.state.timezone)}`);
+            }
         },
         setIfNew(key, index, value) {
             if (this.previousAutoData?.[key]?.[index] === value) return; // console.log(`Not updating ${key}[${index}] because ${value} is the same as last set`);

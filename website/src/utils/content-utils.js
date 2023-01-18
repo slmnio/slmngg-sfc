@@ -305,14 +305,37 @@ export function getTeamsMapStats(teams, requestMatch, requestMap) {
     };
 }
 
-function getAbbrev(timezone, time) {
+/**
+ * @param {string?} stateTimezone - timezone from state
+ * @returns {string} - proper timezone name
+ */
+export function getTimezone(stateTimezone) {
+    return (stateTimezone === "local" || !stateTimezone) ? spacetime.now().timezone().name : stateTimezone;
+}
+
+
+/**
+ * @param {string} timezone
+ * @param {Spacetime} time
+ * @returns {string} abbreviation
+ */
+export function getAbbrev(timezone, time) {
+    timezone = getTimezone(timezone);
     const display = informal.display(timezone);
     return time.isDST() ? display.daylight.abbrev : display.standard.abbrev;
 }
 
+
+/**
+ *
+ * @param {ParsableDate | Date | number | Array<number> | string} timeString - spacetime parsable date/time string
+ * @param {string?} stateTimezone - site timezone from store
+ * @param {string?} format - override for format
+ * @returns {string}
+ */
 export function formatTime(timeString, stateTimezone, format) {
-    const timezone = stateTimezone === "local" ? spacetime.now().timezone().name : stateTimezone;
+    const timezone = getTimezone(stateTimezone);
     const time = spacetime(timeString).goto(timezone);
     const abbrev = getAbbrev(timezone, time);
-    return time.format((format || "{date-ordinal} {month-short} {year} {time} {tz}").replace("{tz}", abbrev));
+    return time.format((format || "{day-short} {date-ordinal} {month-short} {year} {time} {tz}").replace("{tz}", abbrev));
 }

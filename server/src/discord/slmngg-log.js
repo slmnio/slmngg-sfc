@@ -14,6 +14,9 @@ async function getChannel() {
 }
 
 async function log(text) {
+    if (process.env.IS_SLMNGG_MAIN_SERVER) {
+        text = "[Main] " + text;
+    }
     console.log("[Log]", text);
     if (!client) return;
     let channel = await getChannel();

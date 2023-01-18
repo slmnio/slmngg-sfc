@@ -19,6 +19,7 @@ let _rebuildStart = null;
 
 const reqLog = {
     highErrorRate: false,
+    errorRate: 0,
     counts: {
         started: 0,
         succeeded: 0,
@@ -28,7 +29,7 @@ const reqLog = {
     trigger(key) {
         this.counts[key]++;
         setTimeout(() => this.counts[key]--, this.period * 1000);
-        this.setHighRate(this.counts.started > 20 && this.counts.failed / this.counts.started > 0.2);
+        if (this.counts.started > 20) this.setHighRate(this.counts.failed / this.counts.started);
     },
     start() {
         this.trigger("started");
@@ -43,16 +44,18 @@ const reqLog = {
         console.log(`[Request log] last ${this.period}s: ${this.counts.started} started (${(this.counts.started / this.period).toFixed(1)}/s, ${(((this.counts.started / this.period) / 5) * 100).toFixed(1)}% of limit), ${this.counts.succeeded} succeeded (${Math.floor((this.counts.succeeded / this.counts.started) * 100)}% success), ${this.counts.failed} failed (${Math.floor((this.counts.failed / this.counts.started) * 100)}% start-fails)`);
     },
     setHighRate(newRate) {
-        if (this.highErrorRate !== newRate) {
+        if (!this.highErrorRate && newRate >= 0.2) { // not alerted and should be
             console.log("high_error_rate", newRate);
-            if (newRate) {
-                log(`**High error rate**: ${Math.floor((this.counts.failed / this.counts.started) * 100)}% requests failed in the last ${this.period}s.`);
-            } else {
-                log(`**High error rate** (Resolved): ${Math.floor((this.counts.failed / this.counts.started) * 100)}% requests failed in the last ${this.period}s.`);
-            }
-            io.emit("high_error_rate", newRate);
+            log(`**High error rate**: ${Math.floor((this.counts.failed / this.counts.started) * 100)}% requests failed in the last ${this.period}s.`);
+            io.emit("high_error_rate", true);
+            this.highErrorRate = true;
+
+        } else if (this.highErrorRate && newRate <= 0.05) { // alerted and should not be
+            io.emit("high_error_rate", false);
+            log(`**High error rate** (Resolved): ${Math.floor((this.counts.failed / this.counts.started) * 100)}% requests failed in the last ${this.period}s.`);
+            this.highErrorRate = false;
         }
-        this.highErrorRate = newRate;
+        this.errorRate = newRate;
     }
 };
 setInterval(() => {

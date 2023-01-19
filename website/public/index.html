@@ -1,29 +1,24 @@
 <!DOCTYPE html>
-<html style="scroll-behavior: smooth;" lang="">
-  <head>
+<html style="scroll-behavior: smooth;" lang="en">
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-      <link rel="stylesheet" href="<%= BASE_URL %>assets/initial.css">
-<!--      <script>-->
-<!--          try {-->
-<!--              if (window.obsstudio || ["client", "broadcast"].includes(window.location.pathname.split('/')[1])) {-->
-<!--                  // stay transparent pls-->
-<!--              } else {-->
-<!--                  document.head.insertAdjacentHTML('beforeend', '<link rel="stylesheet" href="/assets/initial.css">')-->
-<!--              }-->
-<!--          } catch (e) { console.error(e); }-->
-<!--      </script>-->
+    <script defer data-domain="all-sites.slmn.gg" id="science"></script>
+    <script>
+        document.getElementById("science").dataset.domain += "," + window.location.hostname;
+        document.getElementById("science").src = "https://science.slmn.io/science.js";
+    </script>
+    <link rel="stylesheet" href="<%= BASE_URL %>assets/initial.css">
     <link rel="stylesheet" href="<%= BASE_URL %>assets/fa-all.css">
     <link rel="icon" href="/favicon.ico">
     <title><%= htmlWebpackPlugin.options.title %></title>
-  </head>
-  <body>
+</head>
+<body>
     <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+        <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled.
+            Please enable it to continue.</strong>
     </noscript>
     <div id="app"></div>
-    <!-- built files will be auto injected -->
-<!--    <script src="https://3j02ybrwvyv9.statuspage.io/embed/script.js"></script>-->
-  </body>
+</body>
 </html>

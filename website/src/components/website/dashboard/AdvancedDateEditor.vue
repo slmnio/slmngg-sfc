@@ -104,11 +104,12 @@ export default {
 };
 </script>
 
-<style scoped>
-    #date-editor-modal >>> .modal-dialog {
+<style>
+    #date-editor-modal .modal-dialog {
         max-width: min(100vw, 600px);
     }
-
+</style>
+<style scoped>
     .timezones {
         justify-content: space-evenly;
     }

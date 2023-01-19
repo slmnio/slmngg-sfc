@@ -14,6 +14,10 @@ module.exports = {
 
         let newObserverSettings = broadcast.observer_settings || [];
 
+        if (observerSettingValue === "toggle") {
+            observerSettingValue = !newObserverSettings.includes(observerSetting);
+        }
+
         if (observerSettingValue) {
             // add to array
             if (!newObserverSettings.includes(observerSetting)) newObserverSettings.push(observerSetting);

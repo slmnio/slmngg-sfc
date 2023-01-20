@@ -3,68 +3,14 @@
 </template>
 
 <script>
+import { getEmbedData } from "@/utils/content-utils";
+
 export default {
     name: "EmbeddedVideo",
     props: ["src"],
     computed: {
         embed() {
-            const vodURL = new URL(this.src);
-
-            if (vodURL.host === "www.youtube.com") {
-                let ts = 0;
-                if (vodURL.searchParams.get("t")) {
-                    let timestamp = vodURL.searchParams.get("t");
-                    if (["h", "m", "s"].some(t => timestamp.includes(t))) {
-                        // has a hms in it
-                        timestamp = timestamp.match(/\d+[hms]/g);
-                        timestamp.forEach(t => {
-                            const time = t.slice(0, -1);
-                            const hms = t.slice(-1);
-                            const mult = {
-                                s: 1,
-                                m: 60,
-                                h: 60 * 60
-                            };
-                            ts += parseInt(time) * mult[hms];
-                        });
-                    } else {
-                        ts = timestamp;
-                    }
-                }
-
-                console.log(ts);
-
-                return { service: "youtube", key: vodURL.searchParams.get("v"), timestamp: ts || null };
-            }
-            if (vodURL.host === "youtu.be") {
-                return { service: "youtube", key: vodURL.pathname.slice(1), timestamp: vodURL.searchParams.get("t") || null };
-            }
-            if (["www.twitch.tv", "twitch.tv"].includes(vodURL.host)) {
-                const embed = {
-                    service: (vodURL.pathname.split("/").length === 3 ? "twitch" : "twitch-live"),
-                    key: vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1)
-                };
-                if (embed.service === "twitch") {
-                    embed.timestamp = vodURL.searchParams.get("t") || null;
-                }
-                return embed;
-            }
-
-            if (this.src.endsWith(".pdf")) {
-                return {
-                    service: "pdf",
-                    url: this.src
-                };
-            }
-
-            if (["mp4", "webm"].some(file => this.src.endsWith("." + file))) {
-                return {
-                    service: "unknown-video",
-                    url: this.src
-                };
-            }
-
-            return { service: "unknown", url: this.src };
+            return getEmbedData(this.src);
         },
         renderEmbed() {
             if (this.embed.service === "youtube") {
@@ -93,7 +39,7 @@ export default {
 
 <style scoped>
     .embed.embed--pdf, .embed.embed--iframe {
-        min-height: max(600px, calc(100vh - 500px)) !important;
+        min-height: max(720px, calc(100vh - 300px)) !important;
     }
     .embed.embed--pdf:before, .embed.embed--iframe:before {
         display: none;

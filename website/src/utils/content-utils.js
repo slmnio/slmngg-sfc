@@ -339,3 +339,64 @@ export function formatTime(timeString, stateTimezone, format) {
     const abbrev = getAbbrev(timezone, time);
     return time.format((format || "{day-short} {date-ordinal} {month-short} {year} {time} {tz}").replace("{tz}", abbrev));
 }
+
+
+export function getEmbedData(url) {
+    const vodURL = new URL(url);
+
+    if (vodURL.host === "www.youtube.com") {
+        let ts = 0;
+        if (vodURL.searchParams.get("t")) {
+            let timestamp = vodURL.searchParams.get("t");
+            if (["h", "m", "s"].some(t => timestamp.includes(t))) {
+                // has a hms in it
+                timestamp = timestamp.match(/\d+[hms]/g);
+                timestamp.forEach(t => {
+                    const time = t.slice(0, -1);
+                    const hms = t.slice(-1);
+                    const mult = {
+                        s: 1,
+                        m: 60,
+                        h: 60 * 60
+                    };
+                    ts += parseInt(time) * mult[hms];
+                });
+            } else {
+                ts = timestamp;
+            }
+        }
+
+        console.log(ts);
+
+        return { service: "youtube", key: vodURL.searchParams.get("v"), timestamp: ts || null };
+    }
+    if (vodURL.host === "youtu.be") {
+        return { service: "youtube", key: vodURL.pathname.slice(1), timestamp: vodURL.searchParams.get("t") || null };
+    }
+    if (["www.twitch.tv", "twitch.tv"].includes(vodURL.host)) {
+        const embed = {
+            service: (vodURL.pathname.split("/").length === 3 ? "twitch" : "twitch-live"),
+            key: vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1)
+        };
+        if (embed.service === "twitch") {
+            embed.timestamp = vodURL.searchParams.get("t") || null;
+        }
+        return embed;
+    }
+
+    if (url.endsWith(".pdf")) {
+        return {
+            service: "pdf",
+            url: url
+        };
+    }
+
+    if (["mp4", "webm"].some(file => url.endsWith("." + file))) {
+        return {
+            service: "unknown-video",
+            url: url
+        };
+    }
+
+    return { service: "unknown", url: url };
+}

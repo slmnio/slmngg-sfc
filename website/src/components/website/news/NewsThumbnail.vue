@@ -1,5 +1,8 @@
 <template>
     <div class="news-thumbnail default-thing" :style="border">
+        <div class="icons">
+            <i class="fa-fw fas fa-external-link" v-if="item.redirect_url"></i>
+        </div>
         <div class="news-custom-thumbnail w-100 bg-center" v-if="customThumbnail" :style="customThumbnail"></div>
         <div class="news-generated-thumbnail w-100 flex-center" v-else :style="{ backgroundColor: generatedThumbnail.backgroundColor }">
             <div class="news-generated-thumbnail-logo bg-center" :style="{backgroundImage: generatedThumbnail.backgroundImage}"></div>
@@ -75,5 +78,20 @@ export default {
     .news-generated-thumbnail-logo {
         width: calc(100% - 16px);
         height: calc(100% - 24px);
+    }
+
+    .icons {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: .5em .25em;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .icons i {
+        color: white;
+        text-shadow: 0 0 5px black;
     }
 </style>

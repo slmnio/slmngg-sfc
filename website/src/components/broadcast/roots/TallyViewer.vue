@@ -119,27 +119,17 @@ export default {
   color: #ffffff;
   display: grid;
   place-items: center;
-  font-size: 5em;
+  font-size: clamp(10px, 8vw, 25vh);
   transition: background-color 0.2s ease;
   font-family: "SLMN-Industry", "Industry", sans-serif;
 }
 
 .state {
-  font-size: .75em;
+  font-size: 1.25em;
 }
 
 .metadata {
-  font-size: .3em;
-}
-
-@media (min-width: 700px) {
-  .state {
-    font-size: 1.25em;
-  }
-
-  .metadata {
-    font-size: .75em;
-  }
+  font-size: .75em;
 }
 
 

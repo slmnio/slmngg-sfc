@@ -1,11 +1,11 @@
 <template>
     <GenericOverlay class="bracket-overlay" v-if="!extended" :title="title || 'Bracket'">
         <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :scale="scale" :small="small"
-                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" />
+                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" :custom-timezone="broadcastTimezone" />
     </GenericOverlay>
     <div class="bracket-overlay bracket-extended" :style="zoom" v-else>
         <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :scale="scale" :small="small"
-                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" :extended="extended" />
+                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" :extended="extended" :custom-timezone="broadcastTimezone" />
     </div>
 </template>
 
@@ -63,6 +63,9 @@ export default {
                 return this.broadcast?.highlight_team || null;
             }
             return null;
+        },
+        broadcastTimezone() {
+            return this.broadcast?.timezone || "America/New_York";
         }
     },
     watch: {

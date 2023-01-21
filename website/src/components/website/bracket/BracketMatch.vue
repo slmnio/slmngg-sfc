@@ -49,7 +49,7 @@ import spacetime from "spacetime";
 export default {
     name: "BracketMatch",
     components: { BracketTeam },
-    props: ["match", "showTimes"],
+    props: ["match", "showTimes", "customTimezone"],
     data: () => ({
         hover: false
     }),
@@ -207,7 +207,7 @@ export default {
             return time.format(format);
         },
         activeTimezone() {
-            const stz = store.state.timezone;
+            const stz = this.customTimezone || store.state.timezone;
             if (!stz || stz === "local") return spacetime.now().timezone().name;
             return stz;
         }

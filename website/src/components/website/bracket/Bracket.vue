@@ -19,7 +19,8 @@
             <div class="column" v-for="(column, ci) in _bracket.columns" v-bind:key="ci">
                 <div class="header text-center mb-3" :style="logoBackground1(event)" v-if="showHeaders && column.header">{{ column.header }}</div>
                 <div class="column-matches flex-grow-1">
-                    <BracketMatch :ref="`match-${matchNum}`" :show-times="bracket.show_times" v-for="matchNum in column.games" :match="getMatch(matchNum)" v-bind:key="matchNum"/>
+                    <BracketMatch v-for="matchNum in column.games" :key="matchNum" :ref="`match-${matchNum}`" :custom-timezone="customTimezone"
+                                  :show-times="bracket.show_times" :match="getMatch(matchNum)"/>
                 </div>
             </div>
         </div>
@@ -42,7 +43,8 @@ export default {
         scale: Number,
         extended: Boolean,
         broadcastHighlightMatch: {},
-        broadcastHighlightTeam: {}
+        broadcastHighlightTeam: {},
+        customTimezone: String
     },
     data: () => ({
         connectionElements: [],
@@ -454,13 +456,9 @@ export default {
         display: initial;
         font-size: 1.75em;
     }
-    .bracket.small >>> .inner .text {
-        display: none;
-    }
-    .bracket.small >>> .match-number {
-        display: none
-    }
-    .bracket.small >>> .c-text {
+    .bracket.small >>> .inner .text,
+    .bracket.small >>> .match-number,
+    .bracket.small >>> .match-extra-info {
         display: none
     }
     .bracket >>> .connection {

@@ -1,10 +1,10 @@
 <template>
     <div class="team-focus p-3" v-if="team">
-        <ThemeLogo v-bind:class="{'leading': isLeading }" class="top-logo w-100" :theme="team.theme"/>
+        <ThemeLogo :class="{'leading': isLeading }" class="top-logo w-100" :theme="team.theme"/>
         <div class="title pt-3 font-weight-bold text-center">{{ team.name }}</div>
 
         <div class="player-list">
-            <div class="player" v-bind:class="{empty: player.empty, latest: player.latest}" v-for="player in players" v-bind:key="player.id"  :style="(player.latest ? teamBG : {})">
+            <div class="player" :class="{empty: player.empty, latest: player.latest}" v-for="player in players" :key="player.id"  :style="(player.latest ? teamBG : {})">
                 <div class="player-internal" v-if="!player.empty" >
                     <span class="player-name">{{ player.name }}</span>
                     <span class="player-money" v-if="player.auction_price">{{ money(player.auction_price) }}</span>

@@ -1,7 +1,7 @@
 <template>
-    <div class="match my-2" v-if="loaded" v-bind:class="{ 'bg-danger' : !loaded, 'special-event': match.special_event }">
+    <div class="match my-2" v-if="loaded" :class="{ 'bg-danger' : !loaded, 'special-event': match.special_event }">
         <div class="match-left match-details flex-center flex-column text-center">
-            <div class="match-detail" v-for="detail in details" v-bind:key="detail.sort" v-b-tooltip="detail.long">{{ detail.short }}</div>
+            <div class="match-detail" v-for="detail in details" :key="detail.sort" v-b-tooltip="detail.long">{{ detail.short }}</div>
         </div>
 
         <router-link :to="url('match', this.match)" v-if="match.special_event"
@@ -10,9 +10,9 @@
         </router-link>
 
         <div v-for="(team, i) in swappedTeams"
-             v-bind:key="team.id" :style="{order: i*2}"
+             :key="team.id" :style="{order: i*2}"
              class="match-team flex-grow-1 d-flex align-items-center justify-content-end"
-             v-bind:class="{'right': i === 1}">
+             :class="{'right': i === 1}">
 
             <div v-if="team.dummy" class="team-name team-name--spacer d-none d-lg-flex">{{ team.text }}</div>
             <router-link v-else-if="!team.dummy" :to="url('team', team)" class="team-name d-none d-lg-flex ct-passive">{{ team.name }}</router-link>

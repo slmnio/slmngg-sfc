@@ -38,7 +38,7 @@
                                 <td>{{ match.casters.length === 1 ? 'Caster' : 'Casters' }}</td>
                                 <td><LinkedPlayers :players="match.casters" /></td>
                             </tr>
-                            <tr v-for="group in playerRelationshipGroups" v-bind:key="group.meta.singular_name">
+                            <tr v-for="group in playerRelationshipGroups" :key="group.meta.singular_name">
                                 <td>{{ group.items.length === 1 ? group.meta.singular_name : group.meta.plural_name }}</td>
                                 <td><LinkedPlayers :players="group.items"/></td>
                             </tr>

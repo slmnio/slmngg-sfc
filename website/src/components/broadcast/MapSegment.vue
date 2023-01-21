@@ -1,9 +1,9 @@
 <template>
-    <div class="map d-flex position-relative" v-bind:class="{'next-map': map._next }">
-        <div v-if="mapVideo" class="map-bg map-video w-100 h-100 bg-center" v-bind:class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground">
+    <div class="map d-flex position-relative" :class="{'next-map': map._next }">
+        <div v-if="mapVideo" class="map-bg map-video w-100 h-100 bg-center" :class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground">
             <video :src="mapVideo" autoplay muted loop></video>
         </div>
-        <div v-else class="map-bg w-100 h-100 bg-center" v-bind:class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground"></div>
+        <div v-else class="map-bg w-100 h-100 bg-center" :class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground"></div>
         <div class="map-gel w-100 h-100 position-absolute" :style="winnerBG"></div>
         <div class="map-gel w-100 h-100 position-absolute draw-gel" v-if="map && map.draw"></div>
         <div class="map-gel w-100 h-100 position-absolute ban-gel flex-center" v-if="map && map.banner"></div>

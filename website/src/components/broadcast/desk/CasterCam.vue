@@ -4,7 +4,7 @@
         <transition name="mid-split">
 <!--            <slot v-if="useCam ? !apiVisible : true">-->
                 <div v-if="useCam ? !cameraIsOn : true" class="caster-bg flex-center" :style="{backgroundColor: color}">
-                    <div v-if="avatar" class="caster-avatar" v-bind:class="{'event-fallback': avatar.eventFallback}" :style="avatar"></div>
+                    <div v-if="avatar" class="caster-avatar" :class="{'event-fallback': avatar.eventFallback}" :style="avatar"></div>
                 </div>
 <!--            </slot>-->
         </transition>

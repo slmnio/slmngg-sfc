@@ -1,5 +1,5 @@
 <template>
-    <div class="bid-focus-team d-flex" :style="canBid ? teamBG : {...dark, opacity: 0.25 }" v-bind:class="{ leading: isLeading }">
+    <div class="bid-focus-team d-flex" :style="canBid ? teamBG : {...dark, opacity: 0.25 }" :class="{ leading: isLeading }">
         <div class="team-logo flex-center">
             <div class="logo-inner bg-center" :style="teamLogo"></div>
         </div>

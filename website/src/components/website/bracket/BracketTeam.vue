@@ -1,5 +1,5 @@
 <template>
-    <div class="bracket-team default-thing" v-bind:class="{'text': !!text, 'empty': empty, 'highlighted': highlighted, 'lowlighted': lowlighted}"
+    <div class="bracket-team default-thing" :class="{'text': !!text, 'empty': empty, 'highlighted': highlighted, 'lowlighted': lowlighted}"
          @mouseover="highlight" @mouseout="unHighlight"
          :style="background">
         <div class="inner" v-if="!empty">
@@ -12,7 +12,7 @@
                 <div class="team-name">{{ team.name }}</div>
                 <div class="team-code">{{ team.code }}</div>
             </div>
-            <div class="team-score flex-center" v-bind:class="{ 'win': win }" v-if="team && score !== null">{{ score }}</div>
+            <div class="team-score flex-center" :class="{ 'win': win }" v-if="team && score !== null">{{ score }}</div>
         </div>
     </div>
 </template>

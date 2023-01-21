@@ -4,7 +4,7 @@
             <div class="industry-align">{{ team.name }}</div>
         </div>
         <div class="team-history w-100 d-flex">
-            <SeasonHistoryMatch class="match" v-for="match in matches" v-bind:key="match.id"
+            <SeasonHistoryMatch class="match" v-for="match in matches" :key="match.id"
                                 :match="match" :home-team="team" :live-match="liveMatch" :timezone="timezone" />
         </div>
     </div>

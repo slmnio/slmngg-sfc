@@ -30,12 +30,12 @@
                     <div class="industry-align">Designed by: {{ designers }}</div>
                 </div>
                 <div class="logos flex-grow-1 d-flex flex-column mb-3">
-                    <div class="logo-holder w-100 flex-grow-1 my-2 flex-center" v-for="logo in logos" v-bind:key="logo.key" :style="teamBG">
+                    <div class="logo-holder w-100 flex-grow-1 my-2 flex-center" v-for="logo in logos" :key="logo.key" :style="teamBG">
                         <div class="logo-inner bg-center" :style="{'backgroundImage': `url(${logo.item})`}"></div>
                     </div>
                 </div>
                 <div class="colors d-flex">
-                    <div class="swatch flex-grow-1 h-100 mx-2" v-for="color in colors" v-bind:key="color.value" :style="{ backgroundColor: color.value }"></div>
+                    <div class="swatch flex-grow-1 h-100 mx-2" v-for="color in colors" :key="color.value" :style="{ backgroundColor: color.value }"></div>
                 </div>
             </div>
         </div>

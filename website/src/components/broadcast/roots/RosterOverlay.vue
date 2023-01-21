@@ -1,6 +1,6 @@
 <template>
     <GenericOverlay class="roster-overlay" :title="title || 'Rosters'" body-color="transparent !important" no-bottom="true" no-bottom-animate="true">
-        <div class="team" v-for="(team, i) in teams" v-bind:key="team.id">
+        <div class="team" v-for="(team, i) in teams" :key="team.id">
             <ThemeTransition :border-width="0" :theme="team.theme" :active="animationActive" :left="i === 0"
             :startingDelay="200" :inner-delay="200" :duration="600" :one-color="true">
                 <div class="team-inner" :style="{ borderColor: accentColor }">
@@ -13,7 +13,7 @@
                     <div class="team-roster-holder flex-center flex-column overlay--bg w-100" :style="{ fontSize: rosterFontSize(team) }">
                         <div class="team-roster flex-center flex-column">
                             <div class="player" v-for="player in teamPlayerGroups(team)[0]"
-                                 v-bind:key="player.id">
+                                 :key="player.id">
                                 <div class="player-role flex-center" v-if="showRoles && player.role"
                                      v-html="getRoleSVG(player.role)"></div>
                                 <span class="player-name">{{ player.name }}</span>
@@ -24,7 +24,7 @@
                         </div>
                         <div class="team-roster team-sub-roster flex-center flex-column" v-if="teamPlayerGroups(team)[1] && teamPlayerGroups(team)[1].length">
                             <div class="player" v-for="player in teamPlayerGroups(team)[1]"
-                                 v-bind:key="player.id">
+                                 :key="player.id">
                                 <div class="player-role flex-center" v-if="showRoles && player.role"
                                      v-html="getRoleSVG(player.role)"></div>
                                 <span class="player-name">{{ player.name }}</span>
@@ -36,7 +36,7 @@
                         <div class="team-roster team-staff-roster flex-center flex-column" v-if="showStaff">
                             <div class="staff-text d-none">Staff</div>
                             <div class="player" v-for="player in getTeamStaff(team)"
-                                 v-bind:key="player.id">
+                                 :key="player.id">
                                 <div class="player-role flex-center" v-if="player.staff_role || player.role" v-html="getRoleSVG(player.staff_role || player.role)"></div>
                                 <span class="player-name">{{ player.name }}</span>
                                 <div class="player-badge" v-if="showBadges && getHighlightEventTeam(player)">

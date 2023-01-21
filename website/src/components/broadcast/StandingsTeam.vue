@@ -6,7 +6,7 @@
         <router-link v-if="!useCodes" :to="url('team', team)" class="team-name team-code ct-passive flex-grow-1 text-left d-md-none">{{ team.code }}</router-link>
         <router-link v-if="useCodes" :to="url('team', team)" class="team-name team-code ct-passive flex-grow-1 text-left">{{ team.code }}</router-link>
         <div class="team-stats d-flex">
-            <div class="team-stat text-center" v-for="(stat, i) in stats" v-bind:key="stat + i" v-bind:class="{'d-none d-md-block': ['omw'].includes(stat) }">
+            <div class="team-stat text-center" v-for="(stat, i) in stats" :key="stat + i" :class="{'d-none d-md-block': ['omw'].includes(stat) }">
                 {{ teamStats[stat] }}
             </div>
         </div>

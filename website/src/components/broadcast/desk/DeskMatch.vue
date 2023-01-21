@@ -1,7 +1,7 @@
 <template>
         <div class="desk-match" v-if="match">
             <div class="teams d-flex" v-if="!match.special_event">
-                <DeskTeam class="team" v-for="(team, i) in match.teams" v-bind:key="team.id" :team="team" :style="{order: i * 2}" />
+                <DeskTeam class="team" v-for="(team, i) in match.teams" :key="team.id" :team="team" :style="{order: i * 2}" />
 
                 <div class="match-middle flex-center w-100">
                     <transition name="break-content" mode="out-in">
@@ -10,9 +10,9 @@
 
                             <div class="match-center flex-center" v-if="!splitMatchScore">
                                 <div class="match-score flex-center" v-if="show.score">
-                                    <div class="score flex-center" v-bind:class="{'win': match.score_1 === match.first_to}"><span class="industry-align">{{ match.score_1 }}</span></div>
+                                    <div class="score flex-center" :class="{'win': match.score_1 === match.first_to}"><span class="industry-align">{{ match.score_1 }}</span></div>
                                     <div class="dash">-</div>
-                                    <div class="score flex-center" v-bind:class="{'win': match.score_2 === match.first_to}"><span class="industry-align">{{ match.score_2 }}</span></div>
+                                    <div class="score flex-center" :class="{'win': match.score_2 === match.first_to}"><span class="industry-align">{{ match.score_2 }}</span></div>
                                 </div>
                                 <div class="match-vs flex-center" :style="centerBorder" v-if="show.vs">
                                     <span class="industry-align">{{ scoreText }}</span>

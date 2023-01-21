@@ -3,7 +3,7 @@
 
         <ContentRow v-if="thing.brand_designers" :title="thing.brand_designers.length === 1 ? 'Brand designer' : 'Brand designers'">
             <ContentThing type="player" :text="designer.name" :thing="designer" :theme="thing.theme" v-for="designer in thing.brand_designers"
-                          v-bind:key="designer.id" :link-options="{ 'subPage': 'brands' }"></ContentThing>
+                          :key="designer.id" :link-options="{ 'subPage': 'brands' }"></ContentThing>
         </ContentRow>
 
         <h3>Themes</h3>
@@ -19,7 +19,7 @@
 
         <h3 v-if="colors.length">Colors</h3>
         <div v-if="colors.length" class="color-list mb-3">
-            <div class="color" v-for="color in colors" v-bind:key="color.name">
+            <div class="color" v-for="color in colors" :key="color.name">
                 <div class="color-swatch" :style="{backgroundColor: color.value}"></div>
                 <div class="color-name">{{ color.name }}: <CopyTextButton><code>{{ color.value }}</code></CopyTextButton> </div>
             </div>
@@ -32,7 +32,7 @@
 <!--        <HeroColorControls :theme="theme"></HeroColorControls>-->
         <h3 v-if="logos.length">Logos</h3>
         <div v-if="logos.length" class="logo-list mb-3">
-            <div class="logo-holder flex-center" v-for="logo in logos" v-bind:key="logo.key" :style="logoBackground">
+            <div class="logo-holder flex-center" v-for="logo in logos" :key="logo.key" :style="logoBackground">
                 <a :href="logo.image" target="_blank" class="bg-center logo" :style="{backgroundImage: `url(${logo.image})`}"></a>
                 <div class="logo-name">{{ logo.key }}</div>
             </div>

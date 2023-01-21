@@ -2,7 +2,7 @@
     <div class="match-thumbnail" :style="eventBackground">
 
         <div class="match-thumbnail-half flex-center"
-             v-for="team in teams" v-bind:key="team.id"
+             v-for="team in teams" :key="team.id"
              :style="teamBackground(team)">
 <!--            <div class="match-loading-code" v-if="isLoading">LOADING: {{ team.code }}</div>-->
             <div class="match-thumbnail-logo bg-center" :style="logo(team)"></div>

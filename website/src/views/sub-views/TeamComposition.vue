@@ -18,7 +18,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="player in players" v-bind:key="player.id">
+            <tr v-for="player in players" :key="player.id">
                 <td v-if="hasFeederEvents" v-b-tooltip="player.feederEligible ? 'Played in feeder events' : 'Did not play in feeder events'">
                     <i class="fas fa-star" v-if="player.feederEligible"></i>
                 </td>

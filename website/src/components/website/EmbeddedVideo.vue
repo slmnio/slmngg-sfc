@@ -1,5 +1,5 @@
 <template>
-    <div class="embed embed-responsive embed-responsive-16by9" v-bind:class="{'embed--pdf': embed.service === 'pdf', 'embed--iframe': embed.service === 'unknown'}" v-html="renderEmbed"></div>
+    <div class="embed embed-responsive embed-responsive-16by9" :class="{'embed--pdf': embed.service === 'pdf', 'embed--iframe': embed.service === 'unknown'}" v-html="renderEmbed"></div>
 </template>
 
 <script>

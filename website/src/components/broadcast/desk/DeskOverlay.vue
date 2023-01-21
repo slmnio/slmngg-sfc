@@ -4,7 +4,7 @@
             <TourneyBar :left="broadcast.event && broadcast.event.short" :right="broadcast.subtitle" :event="broadcast.event" />
         </div>
         <transition-group class="casters flex-center" name="anim-talent">
-            <Caster v-for="(caster, i) in casters" v-bind:key="caster.id" :guest="caster" :color="getColor(i)"
+            <Caster v-for="(caster, i) in casters" :key="caster.id" :guest="caster" :color="getColor(i)"
                     :event="event" :disable-video="shouldDisableCasterVideo" :class="{'wide-feed': caster.wide_feed}"
                     :show-pronouns="showPronouns" :pronouns-on-newline="pronounsOnNewline" />
         </transition-group>

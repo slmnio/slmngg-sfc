@@ -1,6 +1,6 @@
 <template>
     <router-link :to="url('match', this.match)" class="bracket-match no-link-style" v-if="!!match"
-                 v-bind:class="{'hover': hover, 'forfeit': match && match.forfeit }"
+                 :class="{'hover': hover, 'forfeit': match && match.forfeit }"
                  @mouseover.native="matchHover" @mouseleave.native="matchEmpty">
         <div class="match-name d-none">{{ match && match.name }}</div>
         <div class="match-number" v-bind:class="{'lowlight': lowlight}" v-if="matchNumber">{{ matchNumber }}</div>
@@ -11,13 +11,13 @@
                          :text="team.dummy && team.text"
                          :short="team.dummy && team.short"
                          :empty="team._empty"
-                         v-bind:key="team.id"
+                         :key="team.id"
                          :score="displayScores[i]" :win="scores[i] === match.first_to"
             />
         </div>
         <transition name="fade">
             <div class="match-highlight-text" v-if="matchHighlight"
-                 :data-side="matchHighlight.side" v-bind:class="{ 'feeder': matchHighlight.feeder }">
+                 :data-side="matchHighlight.side" :class="{ 'feeder': matchHighlight.feeder }">
                 {{ matchHighlight.text }}
                 <i class="fas fa-chevron-down" v-if="matchHighlight.feeder && matchHighlight.text === 'Loser'"></i>
                 <i class="fas fa-chevron-right" v-if="matchHighlight.feeder && matchHighlight.text !== 'Loser'"></i>
@@ -33,7 +33,7 @@
                          :text="team.dummy && team.text"
                          :short="team.dummy && team.short"
                          :empty="team._empty"
-                         v-bind:key="team.id"
+                         :key="team.id"
                          :score="displayScores[i]"
             />
         </div>

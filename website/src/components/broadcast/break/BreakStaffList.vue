@@ -1,9 +1,9 @@
 <template>
     <div class="break-staff-list">
-        <div class="staff-group" v-for="group in staffGroups" v-bind:key="group.singular_name">
+        <div class="staff-group" v-for="group in staffGroups" :key="group.singular_name">
             <div class="group-name">{{ group.people.length === 1 ? group.singular_name : group.plural_name }}</div>
             <div class="people d-flex flex-wrap">
-                <div class="person" v-for="(person, i) in group.people" v-bind:key="i">{{ person }}</div>
+                <div class="person" v-for="(person, i) in group.people" :key="i">{{ person }}</div>
             </div>
         </div>
     </div>

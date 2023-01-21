@@ -1,8 +1,8 @@
 <template>
     <div class="container event-rosters">
 
-        <ContentRow :title="team.name" v-for="team in teams" v-bind:key="team.id">
-            <ContentThing :thing="player" type="player" :theme="team.theme" v-for="player in (team.showLimitedPlayers ? team.limited_players : team.players)" v-bind:key="player.id" :no-link="team.showLimitedPlayers"></ContentThing>
+        <ContentRow :title="team.name" v-for="team in teams" :key="team.id">
+            <ContentThing :thing="player" type="player" :theme="team.theme" v-for="player in (team.showLimitedPlayers ? team.limited_players : team.players)" :key="player.id" :no-link="team.showLimitedPlayers"></ContentThing>
         </ContentRow>
     </div>
 </template>

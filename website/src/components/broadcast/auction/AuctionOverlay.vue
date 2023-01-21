@@ -28,7 +28,7 @@
                             <div class="player-name">{{ player.name }}</div>
                             <div class="accolades" v-if="accolades.length">
                                 <ContentThing :thing="accolade" type="event" :link-to="accolade.event" :theme="accolade.event && accolade.event.theme" v-for="accolade in accolades"
-                                              v-bind:key="accolade.id" :show-logo="true" :text="accolade.player_text" />
+                                              :key="accolade.id" :show-logo="true" :text="accolade.player_text" />
                             </div>
                             <div class="player-captain-info" v-if="showCaptainInfo">
                                 {{ player.pronouns }}
@@ -37,14 +37,14 @@
                             </div>
                             <div class="player-teams d-flex flex-wrap flex-center" v-for="group in groupedTeams"
                                  :key="group.group" :class="`group-${group.group}`">
-                                <PlayerTeamDisplay :team="team" v-for="team in group.teams" v-bind:key="team.id"/>
+                                <PlayerTeamDisplay :team="team" v-for="team in group.teams" :key="team.id"/>
                             </div>
                         </div>
                     </transition>
                 </div>
                 <div class="bids flex-column-reverse d-flex justify-content-end" :class="{ 'has-bids': (player || bids.length) }">
                     <transition-group name="fade-down">
-                        <div class="bid d-flex align-content-center" v-for="(bid, i) in bids" v-bind:key="i"
+                        <div class="bid d-flex align-content-center" v-for="(bid, i) in bids" :key="i"
                              :style="getTheme(bid.team.id)">
                             <div class="team-logo flex-center">
                                 <div class="logo-inner bg-center" :style="getLogo(bid.team.id)"></div>
@@ -63,7 +63,7 @@
 <!--                </transition-group>-->
 <!--            </div>-->
 <!--            <div class="team-lists" v-if="['teams', 'teams-1', 'teams-2'].includes(rightDisplay)">-->
-<!--                <TeamPlayerList v-for="team in displayTeams" :team="team" v-bind:key="team.id" :leading="leadingBid" :auction-settings="auctionSettings" />-->
+<!--                <TeamPlayerList v-for="team in displayTeams" :team="team" :key="team.id" :leading="leadingBid" :auction-settings="auctionSettings" />-->
 <!--            </div>-->
             <transition name="fade-left" mode="out-in">
                 <transition-group  :style="background" tag="div" v-if="['teams-1', 'teams-2', 'teams'].includes(rightDisplay)" name="move" class="team-rows-holder">

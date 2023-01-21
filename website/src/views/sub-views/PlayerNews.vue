@@ -2,7 +2,7 @@
     <div class="div">
         <div class="container">
             <div class="row">
-                <News class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3" v-for="item in news" :item="item" v-bind:key="item.id" />
+                <News class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3" v-for="item in news" :item="item" :key="item.id" />
             </div>
         </div>
     </div>

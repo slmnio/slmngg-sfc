@@ -11,7 +11,7 @@
 
         <div class="player-list">
             <div class="search-helper default-thing" v-if="search && search.length < minCharacters">Use {{ minCharacters }} or more characters to search</div>
-            <ContentThing v-for="player in filteredPlayers" v-bind:key="player.id"
+            <ContentThing v-for="player in filteredPlayers" :key="player.id"
                           :text="player.name" :thing="player" type="player" />
         </div>
     </div>

@@ -35,23 +35,23 @@
         <div class="n-nav mb-3" v-if="matchGroups">
             <select name="match-group-selector" id="match-group-selector" v-model="activeMatchGroup">
                 <option selected disabled value="null">Select a group</option>
-                <option v-for="group in matchGroups" :value="group" v-bind:key="group">{{ group }}</option>
+                <option v-for="group in matchGroups" :value="group" :key="group">{{ group }}</option>
             </select>
         </div>
 
         <table class="table-bordered text-light mb-3" v-if="counts && counts[0] && counts[0].positions">
             <tr v-if="counts" class="font-weight-bold">
                 <th class="p-2 border-dark text-right" style="min-width: 8.5em">{{ showCountsAsPercentages ? `% of ${currentScenarioView.length} scenarios` : `/${currentScenarioView.length} scenarios`}}</th>
-                <th class="p-2 border-dark" v-for="(x, i) in (counts[0].positions).slice(0, -1)" v-bind:key="i">
+                <th class="p-2 border-dark" v-for="(x, i) in (counts[0].positions).slice(0, -1)" :key="i">
                     #{{ i + 1 }}
                 </th>
                 <th class="p-2 border-dark" v-b-tooltip:top="'Standings haven\'t converged into separate groups'">Incomplete</th>
             </tr>
-            <tr v-for="team in counts" v-bind:key="team.code">
+            <tr v-for="team in counts" :key="team.code">
                 <td class="p-2 border-dark text-right font-weight-bold">{{ team.code }}</td>
-                <td class="p-2 border-dark cell-num" v-for="(pos, posi) in team.positions" v-bind:key="posi"
+                <td class="p-2 border-dark cell-num" v-for="(pos, posi) in team.positions" :key="posi"
                     @click="() => showWhen(team.code, posi)"
-                    v-bind:class="{ 'bg-info': manualScenarioFilters.find((f) => f.team === team.code && f.position === posi ) }"
+                    :class="{ 'bg-info': manualScenarioFilters.find((f) => f.team === team.code && f.position === posi ) }"
                 >
                     <span v-if="showCountsAsPercentages">{{ (pos / currentScenarioView.length) | perc }}</span>
                     <span v-else>{{ pos }}</span>
@@ -62,20 +62,20 @@
         <table class="table text-white" v-if="scenarios">
             <tr class="sticky-top bg-dark">
                 <td>#</td>
-                <td class="text-center" v-for="match in matchesForScenarios" v-bind:key="match.id">
+                <td class="text-center" v-for="match in matchesForScenarios" :key="match.id">
                     {{ match.teams.map(t => t.code).join(' vs ') }}
                 </td>
                 <td class="text-center">Standings</td>
             </tr>
-            <tr v-for="(scenario, i) in currentScenarioView" v-bind:key="i">
+            <tr v-for="(scenario, i) in currentScenarioView" :key="i">
                 <td>{{ scenario.i + 1 }}</td>
-                <td v-for="(match, mi) in scenario.outcomes" v-bind:key="mi">
+                <td v-for="(match, mi) in scenario.outcomes" :key="mi">
                     {{ match.scoreFirstWinner && match.scoreFirstWinner.join('-') }} {{ match.winner && match.winner.code }}
                 </td>
 <!--                <td>-->
 <!--                    not sorted-->
 <!--                    <ul>-->
-<!--                        <li class="text-nowrap" v-for="team in scenario.teams" v-bind:key="team.id">-->
+<!--                        <li class="text-nowrap" v-for="team in scenario.teams" :key="team.id">-->
 <!--                            {{ team.code }} ({{ team.wins }}-{{ team.losses }}) m({{ team.map_wins }}-{{ team.map_losses }})-->
 <!--                        </li>-->
 <!--                    </ul>-->
@@ -83,8 +83,8 @@
                 <td class="text-nowrap">
 <!--                    first round of sorting (match wins)-->
                     <ol class="mb-0 small">
-                        <li v-for="(g, gi) in scenario.standings" v-bind:key="gi">
-                            <div v-for="(team,ei) in g" v-bind:key="ei">{{ team.code }} ({{ team.standings.wins }}-{{ team.standings.losses }}) (m{{ team.standings.map_wins }}-{{ team.standings.map_losses }})</div>
+                        <li v-for="(g, gi) in scenario.standings" :key="gi">
+                            <div v-for="(team,ei) in g" :key="ei">{{ team.code }} ({{ team.standings.wins }}-{{ team.standings.losses }}) (m{{ team.standings.map_wins }}-{{ team.standings.map_losses }})</div>
                         </li>
                     </ol>
                 </td>

@@ -1,5 +1,5 @@
 <template>
-    <div class="tally-block" v-bind:class="{ preview: state === 'preview', active: state === 'active' }"
+    <div class="tally-block" :class="{ preview: state === 'preview', active: state === 'active' }"
          @click="showProducerInfo = !showProducerInfo">
         <div class="d-flex flex-column align-items-center">
             <div class="state">

@@ -18,7 +18,7 @@
 
             <ul class="socials d-flex" v-if="event.socials">
                 <li class="nav-item">
-                    <Social class="ct-active" :social="social" v-for="social in event.socials" v-bind:key="social.id"/>
+                    <Social class="ct-active" :social="social" v-for="social in event.socials" :key="social.id"/>
                 </li>
             </ul>
 

@@ -1,6 +1,6 @@
 <template>
 <!--    <transition name="ingame-team-anim">-->
-        <div class="ingame-team-holder" v-if="loaded" v-bind:class="{'right': right, 'left': !right}">
+        <div class="ingame-team-holder" v-if="loaded" :class="{'right': right, 'left': !right}">
             <div class="ingame-team default-thing" :style="style" :key="team.id" :class="{ 'extend-map-icon': extendIcons && mapAttack }">
                 <div class="texture-holder position-absolute w-100 h-100" v-if="texture">
                     <div class="ingame-texture">

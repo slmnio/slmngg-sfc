@@ -1,5 +1,5 @@
 <template>
-    <td class="team-map-stats" v-bind:class="{'has-played': stats.played > 0}">
+    <td class="team-map-stats" :class="{'has-played': stats.played > 0}">
         <div class="d-flex flex-grow-1 w-100">
             <!--        <div class="stat team">{{ team.code }}</div>-->
             <ThemeLogo logo-size="w-50" class="team-icon" :theme="team.theme" border-width="4" icon-padding="4" />

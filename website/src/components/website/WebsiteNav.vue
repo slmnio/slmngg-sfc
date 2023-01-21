@@ -46,7 +46,7 @@
                     <router-link active-class="active" v-if="minisiteSettings && minisiteSettings.standings" class="nav-link" to="/standings">Standings</router-link>
                     <div class="nav-divider" v-if="navbarEvents.length"></div>
 
-                    <router-link v-for="event in navbarEvents" v-bind:key="event.id"
+                    <router-link v-for="event in navbarEvents" :key="event.id"
                                  active-class="active"
                                  class="nav-link" :to="event._link" :exact="event.__id === minisite.__id">
                         {{ event.navbar_short || event.short || event.series_subtitle || event.name }}</router-link>
@@ -76,7 +76,7 @@
 
         <div class="live-matches flex-wrap flex-center" v-if="liveMatches.length">
             <div class="live-matches-text">🔴 LIVE</div>
-            <NavLiveMatch v-for="match in liveMatches" :match="match" v-bind:key="match.id" />
+            <NavLiveMatch v-for="match in liveMatches" :match="match" :key="match.id" />
         </div>
 
         <b-modal ref="timezone-swapper-modal" id="timezone-swapper-modal" title="Timezone swapper" hide-footer>

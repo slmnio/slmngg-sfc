@@ -2,7 +2,7 @@
     <div class="timezone-swapper" :class="{'align-left': align === 'left'}">
         <select id="timezone" v-model="siteTimezone">
             <option value="local">Your local time ({{ localTimezoneCode }})</option>
-            <option v-for="tz in availableTimezones" :value="tz.value" v-bind:key="tz.value">{{ tz.text }}</option>
+            <option v-for="tz in availableTimezones" :value="tz.value" :key="tz.value">{{ tz.text }}</option>
         </select>
     </div>
 </template>

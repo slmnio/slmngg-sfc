@@ -5,7 +5,7 @@
             <theme-transition :theme="theme" :active="$root.animationActive" end="middle"  :duration="500" :inner-delay="150">
                 <div class="generic-overlay-title g-title overlay--bg flex-center" :style="{borderColor: _accentColor, ...(titleStyle || {})}">
                     <transition name="fade" mode="out-in">
-                        <span class="industry-align" :key="title" v-bind:class="{'has-br': title.includes('\\n') }" v-html="nbr(title)"></span>
+                        <span class="industry-align" :key="title" :class="{'has-br': title.includes('\\n') }" v-html="nbr(title)"></span>
                     </transition>
                 </div>
             </theme-transition>

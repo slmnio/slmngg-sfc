@@ -4,7 +4,7 @@
             <ThemeTransition class="break-transition-top" :theme="event && event.theme" :one-color="true" :active="animationActive" start="middle" end="middle">
                 <Squeezable align="middle" :disabled="(overlayTitle).includes('\\n')" class="break-top event-theme-border flex-center overlay--bg" :style="eventBorder">
                     <transition name="fade" mode="out-in">
-                        <span class="industry-align" v-bind:class="{'has-br': (overlayTitle).includes('\\n') }"
+                        <span class="industry-align" :class="{'has-br': (overlayTitle).includes('\\n') }"
                               :key="overlayTitle" v-html="nbr(overlayTitle)"></span>
                     </transition>
                     <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News" :borderCSS="eventBorder" />
@@ -30,7 +30,7 @@
                         <transition-group class="break-col break-schedule" name="a--match"
                                           v-if="automatedShow === 'Schedule'" key="Schedule">
                             <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match"
-                                        :expanded="true" v-bind:key="match.id" :theme-color="themeColor"/>
+                                        :expanded="true" :key="match.id" :theme-color="themeColor"/>
                         </transition-group>
                         <div class="break-col break-standings" v-if="automatedShow === 'Standings'"
                              :key="`Standings-${broadcast.current_stage || ''}`">
@@ -55,7 +55,7 @@
                                 {{ broadcasts.length === 1 ? broadcasts[0].name : "Other broadcasts" }}
                             </div>
                             <div class="broadcast-previews">
-                                <BroadcastPreview v-for="other in broadcasts" v-bind:key="other.id" :broadcast="other"/>
+                                <BroadcastPreview v-for="other in broadcasts" :key="other.id" :broadcast="other"/>
                             </div>
                         </div>
                         <div class="break-col break-others-info" v-if="automatedShow === 'Other Info'" key="Other-Info">
@@ -70,7 +70,7 @@
             </ThemeTransition>
         </div>
         <div class="break-preload">
-            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
+            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />
             <Standings :event="event" :stage="broadcast.current_stage" />
             <div class="break-image-inner" :style="breakImage"></div>
             <Bracket class="break-col break-bracket" :event="event" :bracket="bracket" use-overlay-scale />

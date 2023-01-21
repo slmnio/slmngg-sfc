@@ -2,13 +2,13 @@
     <div class="match-history">
         <h1>Map Head To Head</h1>
         <div class="text-light">
-            <div class="map-type" v-for="(mapType, i) in mapGroups" v-bind:key="i">
+            <div class="map-type" v-for="(mapType, i) in mapGroups" :key="i">
                 <div class="title">
                     <h3>{{ mapType.name }}</h3>
                 </div>
                 <div>
                     <table class="w-100">
-                        <MatchMapHistory v-for="map in mapType.maps" v-bind:key="map.id" :data="_getTeamMapStats(map)" :map="map" />
+                        <MatchMapHistory v-for="map in mapType.maps" :key="map.id" :data="_getTeamMapStats(map)" :map="map" />
                     </table>
                 </div>
             </div>
@@ -16,7 +16,7 @@
 
         <h2 class="text-center mt-4">This match</h2>
         <div class="this-match-maps d-flex flex-center align-items-start">
-            <MapDisplay v-for="map in match.maps" :map="map" v-bind:key="map.id" :match="match"/>
+            <MapDisplay v-for="map in match.maps" :map="map" :key="map.id" :match="match"/>
         </div>
 
 

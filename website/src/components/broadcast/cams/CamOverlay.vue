@@ -1,6 +1,6 @@
 <template>
     <div class="cam-overlay">
-        <div class="guest" v-bind:class="{ full }" v-if="shouldShowCam" v-show="alwaysShowBox || childCameraIsOn" :style="theme">
+        <div class="guest" :class="{ full }" v-if="shouldShowCam" v-show="alwaysShowBox || childCameraIsOn" :style="theme">
             <CasterCam class="team-cam" :guest="activeGuest" :extra-params="camParams" :disable-video="false"
                        :event="broadcast && broadcast.event" :relay-prefix="relayPrefix" :team="activeTeam"
              @cam_visible="(isVisible) => childCameraIsOn = isVisible"/>

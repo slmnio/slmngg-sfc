@@ -1,8 +1,8 @@
 <template>
     <div class="match-scoreline" v-if="match.first_to">
         <div class="match-score flex-center default-thing" v-for="(score, i) in scores"
-             v-bind:class="{'match-score-win': score === match.first_to }"
-             v-bind:key="i"
+             :class="{'match-score-win': score === match.first_to }"
+             :key="i"
              :style="{order: i*2, ...(score === match.first_to ? {... pointColor} : {})}">{{ displayScores[i] }}</div>
         <div class="match-score-center">-</div>
     </div>

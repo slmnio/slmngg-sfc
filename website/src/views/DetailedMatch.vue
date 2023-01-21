@@ -3,7 +3,7 @@
         <div class="main-content row">
             <div class="center-holder col-9">
                 <div class="maps-holder mt-1" v-if="match.maps && showMatchMaps">
-                    <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="_theme" v-bind:key="map.id" :show-banned-maps="showMapBans"/>
+                    <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="_theme" :key="map.id" :show-banned-maps="showMapBans"/>
                 </div>
 
                 <div class="special-event-notice" v-if="match.special_event">
@@ -12,7 +12,7 @@
                 </div>
 
                 <div class="team-holder f-row mb-2">
-                    <div class="team f-col w-50 mt-2" v-for="team in match.teams" v-bind:key="team.id">
+                    <div class="team f-col w-50 mt-2" v-for="team in match.teams" :key="team.id">
                         <div :style="theme(team)" class="team-header flex-center f-col default-thing">
                             <div class="team-code">{{ team.code }}</div>
                             <div class="team-overlay-text">{{ team.small_overlay_text }}</div>
@@ -20,7 +20,7 @@
                             <router-link :to="url('team', team, match.event)" class="team-name">{{ team.name }}</router-link>
                         </div>
                         <div class="team-players f-col p-1" v-if="showRosters">
-                            <div class="team-player" v-for="player in showLimitedPlayers(team) ? team.limited_players : team.players" v-bind:key="player.id">
+                            <div class="team-player" v-for="player in showLimitedPlayers(team) ? team.limited_players : team.players" :key="player.id">
                                 <div class="player-info player-name flex-center">
                                     <div class="player-role-holder player-icon-holder flex-center" v-if="player.role">
                                         <div class="player-role" v-html="getRoleSVG(player.role)"></div>
@@ -39,12 +39,12 @@
                     </div>
                 </div>
                 <div class="team-holder f-row mb-2" v-if="showManagers">
-                    <div class="team f-col w-50" v-for="team in match.teams" v-bind:key="team.id">
+                    <div class="team f-col w-50" v-for="team in match.teams" :key="team.id">
                         <div class="team-players team-managers f-col p-1">
-                            <div class="team-player" v-for="player in getTeamStaff(team)" v-bind:key="player.id">
+                            <div class="team-player" v-for="player in getTeamStaff(team)" :key="player.id">
                                 <div class="player-info player-name flex-center">
                                     <div class="player-role-holder player-icon-holder">
-                                        <div v-for="role in player.is" v-bind:key="role" class="player-role" v-html="getRoleSVG(role)" v-b-tooltip="role"></div>
+                                        <div v-for="role in player.is" :key="role" class="player-role" v-html="getRoleSVG(role)" v-b-tooltip="role"></div>
                                         <div v-if="!player.is.length" class="player-role" v-html="getRoleSVG('Staff')" v-b-tooltip="'Team staff'"></div>
                                     </div>
                                     <router-link class="ct-active" :to="url('player', player)">{{ player.name }} <i class="fas fa-badge-check fa-fw" title="REAL" v-if="player.verified"></i></router-link>
@@ -60,8 +60,8 @@
                     </div>
                 </div>
                 <div class="prev-matches-holder d-flex mt-2" v-if="showMatchHistory">
-                    <div class="team-prev-wrapper w-50" v-for="team in match.teams" v-bind:key="team.id">
-                        <PreviousMatch v-for="match in teamMatches(team)" :match="match" :team="team" v-bind:key="match.id" />
+                    <div class="team-prev-wrapper w-50" v-for="team in match.teams" :key="team.id">
+                        <PreviousMatch v-for="match in teamMatches(team)" :match="match" :team="team" :key="match.id" />
                     </div>
                 </div>
 
@@ -150,7 +150,7 @@
                     <stat :match="match" data="vod" :external-link="true">VOD Link</stat>
                     <stat :match="match" data="clean_feed" :external-link="true">Clean Feed</stat>
                     <stat :match="match" data="first_to">First to</stat>
-                    <stat :override="relGroup.items" v-for="relGroup in playerRelationshipGroups" v-bind:key="relGroup.meta.singular_name" :players="true" :show-tally="relGroup.meta.singular_name === 'Observer'">
+                    <stat :override="relGroup.items" v-for="relGroup in playerRelationshipGroups" :key="relGroup.meta.singular_name" :players="true" :show-tally="relGroup.meta.singular_name === 'Observer'">
                         {{ relGroup.items.length === 1 ? relGroup.meta.singular_name : relGroup.meta.plural_name }}
                     </stat>
                     <stat :match="match" data="replay_codes" :raw="true" :format="(t) => t[0].replace(/\n/g, '<br>')">Replay codes</stat>

@@ -5,7 +5,7 @@
             :event="event" />
         </div>
         <transition name="fade">
-            <div class="caster-lower flex-center" :key="`${name}-${twitter}-${lowerType}`" v-bind:class="{'cl-traditional': lowerType === 'traditional'}">
+            <div class="caster-lower flex-center" :key="`${name}-${twitter}-${lowerType}`" :class="{'cl-traditional': lowerType === 'traditional'}">
                 <div class="caster-name flex-center">
                     <div class="c-name industry-align">{{ name }}</div>
                     <div class="c-twitter industry-align" v-if="twitter">{{ twitter }}</div>

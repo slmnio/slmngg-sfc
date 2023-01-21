@@ -1,7 +1,7 @@
 <template>
-    <div class="tally-dot" v-bind:class="{ preview: state === 'preview', active: state === 'active', 'unassigned': !observer }">
+    <div class="tally-dot" :class="{ preview: state === 'preview', active: state === 'active', 'unassigned': !observer }">
         <div class="d-flex">
-            <div class="dot" v-bind:class="{ preview: state === 'preview', active: state === 'active', 'unassigned': !observer }">
+            <div class="dot" :class="{ preview: state === 'preview', active: state === 'active', 'unassigned': !observer }">
                 <span class="industry-align">{{ number }}</span>
             </div>
             <div class="text">

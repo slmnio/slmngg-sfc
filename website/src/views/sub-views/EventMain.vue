@@ -1,16 +1,16 @@
 <template>
     <div class="container">
-        <ContentRow :title="group.name" v-for="group in groupedTeams" v-bind:key="group.name">
-            <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in group.teams" v-bind:key="team.id" :show-logo="true"></ContentThing>
+        <ContentRow :title="group.name" v-for="group in groupedTeams" :key="group.name">
+            <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in group.teams" :key="team.id" :show-logo="true"></ContentThing>
         </ContentRow>
         <ContentRow title="Teams" v-if="event.teams && event.teams.length && !groupedTeams">
-            <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in event.teams" v-bind:key="team.id" :show-logo="true"></ContentThing>
+            <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in event.teams" :key="team.id" :show-logo="true"></ContentThing>
         </ContentRow>
         <div class="news mt-3">
-            <div class="news-category" v-for="([categoryName, category]) in Object.entries(newsCategories)" v-bind:key="categoryName">
+            <div class="news-category" v-for="([categoryName, category]) in Object.entries(newsCategories)" :key="categoryName">
                 <h2>{{ categoryName }}</h2>
                 <div class="row">
-                    <News class="ct-passive col-6 col-md-4 col-lg-3 mb-3" v-for="item in category" :item="item" v-bind:key="item.id" />
+                    <News class="ct-passive col-6 col-md-4 col-lg-3 mb-3" v-for="item in category" :item="item" :key="item.id" />
                 </div>
             </div>
         </div>

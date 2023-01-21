@@ -6,7 +6,7 @@
             <div class="team-name flex-grow-1 text-left d-none d-md-flex">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</div>
             <div class="team-name team-code flex-grow-1 text-left d-md-none"></div>
             <div class="team-stats d-flex">
-                <div class="team-stat text-center" v-for="col in showColumns" v-bind:key="col" v-b-tooltip="getColumnText(col).title">
+                <div class="team-stat text-center" v-for="col in showColumns" :key="col" v-b-tooltip="getColumnText(col).title">
                     {{ getColumnText(col).header }}
                 </div>
 <!--                <div class="team-stat text-center">Matches</div>-->
@@ -17,14 +17,14 @@
             </div>
         </div>
         <div class="teams">
-            <div class="team-group" v-for="(group, i) in standings.standings" v-bind:key="i">
-                <div class="team" v-for="team in group" v-bind:key="team.id">
+            <div class="team-group" v-for="(group, i) in standings.standings" :key="i">
+                <div class="team" v-for="team in group" :key="team.id">
                     <StandingsTeam :team="team" :tie-text="tieText" :showColumns="showColumns" icon-size="w-60" :use-codes="useCodes" />
                 </div>
             </div>
         </div>
         <div class="warnings flex-center flex-column mt-2 mx-2" v-if="standings && standings.warnings.length">
-            <div class="warning bg-warning text-dark p-1 px-2 mb-1" v-for="warn in standings.warnings" v-bind:key="warn">{{ warn }}</div>
+            <div class="warning bg-warning text-dark p-1 px-2 mb-1" v-for="warn in standings.warnings" :key="warn">{{ warn }}</div>
         </div>
     </div>
 </template>

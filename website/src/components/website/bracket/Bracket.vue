@@ -1,5 +1,5 @@
 <template>
-    <div class="bracket row flex-column" :style="winVars" v-bind:class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
+    <div class="bracket row flex-column" :style="winVars" :class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
         <div class="connections" ref="connections-holder">
             <div class="connection" v-for="bug in connectionBugs" :key="bug.key" :data-key="bug.key" :class="connectionBugClass(bug)" :style="bug.style"
                 :data-column-num="bug.column">
@@ -15,8 +15,8 @@
                 --b-width: {{ connectionWidth }}px !important;
             }
         </v-style>
-        <div class="internal-bracket d-flex" v-for="(_bracket, i) in brackets" v-bind:key="i">
-            <div class="column" v-for="(column, ci) in _bracket.columns" v-bind:key="ci">
+        <div class="internal-bracket d-flex" v-for="(_bracket, i) in brackets" :key="i">
+            <div class="column" v-for="(column, ci) in _bracket.columns" :key="ci">
                 <div class="header text-center mb-3" :style="logoBackground1(event)" v-if="showHeaders && column.header">{{ column.header }}</div>
                 <div class="column-matches flex-grow-1">
                     <BracketMatch v-for="matchNum in column.games" :key="matchNum" :ref="`match-${matchNum}`" :custom-timezone="customTimezone"

@@ -17,7 +17,7 @@
                 <b-form-checkbox v-model="showBannedMaps" switch> Show banned maps</b-form-checkbox>
             </div>
             <div class="maps-holder flex-center w-100">
-                <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="theme" v-bind:key="map.id" :show-banned-maps="showBannedMaps"/>
+                <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="theme" :key="map.id" :show-banned-maps="showBannedMaps"/>
             </div>
         </div>
     </div>

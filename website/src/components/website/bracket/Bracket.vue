@@ -20,7 +20,7 @@
                 <div class="header text-center mb-3" :style="logoBackground1(event)" v-if="showHeaders && column.header">{{ column.header }}</div>
                 <div class="column-matches flex-grow-1">
                     <BracketMatch v-for="matchNum in column.games" :key="matchNum" :ref="`match-${matchNum}`" :custom-timezone="customTimezone"
-                                  :show-times="bracket.show_times" :match="getMatch(matchNum)"/>
+                                  :show-times="bracket.show_times" :show-broadcasts="bracket.show_broadcasts" :match="getMatch(matchNum)"/>
                 </div>
             </div>
         </div>
@@ -477,6 +477,14 @@ export default {
         top: 0;
         left: 0;
         width: 100%;
+    }
+
+
+    .bracket {
+        z-index: 2;
+    }
+    .connections {
+        z-index: 1;
     }
 
     .bracket >>> .connections {

@@ -92,6 +92,7 @@ export default {
                                 theme: ReactiveThing("theme")
                             }),
                             event: ReactiveThing("event", {
+                                broadcasts: ReactiveThing("broadcasts"),
                                 theme: ReactiveThing("theme")
                             })
                         })

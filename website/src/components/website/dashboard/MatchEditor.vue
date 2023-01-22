@@ -49,8 +49,8 @@
                             Map
                         </div>
                         <div class="form-bottom">
-                            <b-form-select :options="mapOptions" v-if="mapChoices[i]" v-model="mapChoices[i]" />
-                            <b-form-select :options="mapOptions" v-else v-model="mapChoices[i]" />
+                            <b-form-select :options="getMapOptions(i)" v-if="mapChoices[i]" v-model="mapChoices[i]" />
+                            <b-form-select :options="getMapOptions(i)" v-else v-model="mapChoices[i]" />
                         </div>
                     </td>
                     <td class="form-stack">
@@ -187,18 +187,7 @@ export default {
                 return l !== 0 ? l : textSort(a.name, b.name);
             });
         },
-        mapOptions() {
-            if (!this.availableMaps?.length) return [];
-            const groups = {};
-            this.availableMaps.forEach(m => {
-                if (!groups[m.type]) groups[m.type] = [];
-                groups[m.type].push({ id: m.id, name: m.name });
-            });
-            return [
-                { id: null, label: "Select a map", text: "Select a map", value: null },
-                ...Object.entries(groups).map(([groupName, maps]) => ({ label: groupName, options: maps.map(m => ({ value: m.id, text: m.name })) }))
-            ];
-        },
+
         editedMapData() {
             const data = [];
             for (let i = 0; i < this.minMaps; i++) {
@@ -216,6 +205,9 @@ export default {
                 });
             }
             return data;
+        },
+        broadcastData() {
+            return this.broadcast || this.match?.event?.broadcasts;
         }
     },
     watch: {
@@ -235,10 +227,6 @@ export default {
                     console.log("score up", newMatch.scores[1]);
                 }
             }
-        },
-        mapOptions: {
-            deep: true,
-            handler: (c) => console.log(c)
         },
         score_1s: {
             deep: true,
@@ -277,6 +265,28 @@ export default {
         restrictToMapPool: true
     }),
     methods: {
+        getMapOptions(mapIndex) {
+            if (!this.availableMaps?.length) return [];
+            const groups = {};
+            let mapType = null;
+
+            console.log(this.broadcastData);
+            if (this.broadcastData?.map_set) {
+                const maps = this.broadcastData?.map_set.split(",");
+                mapType = maps[mapIndex];
+            }
+
+            this.availableMaps.forEach(m => {
+                if (this.restrictToMapPool && mapType && mapType !== m.type) return;
+
+                if (!groups[m.type]) groups[m.type] = [];
+                groups[m.type].push({ id: m.id, name: m.name });
+            });
+            return [
+                { id: null, label: "Select a map", text: "Select a map", value: null },
+                ...Object.entries(groups).map(([groupName, maps]) => ({ label: groupName, options: maps.map(m => ({ value: m.id, text: m.name })) }))
+            ];
+        },
         async setScore(scoreNum, number) {
             if (this.scoreDebounceTimeouts[scoreNum]) clearTimeout(this.scoreDebounceTimeouts[scoreNum]);
             this.scoreDebounceTimeouts[scoreNum] = setTimeout(async () => {

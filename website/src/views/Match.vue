@@ -85,7 +85,8 @@ export default {
                 }),
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme"),
-                    player_relationships: ReactiveArray("player_relationships")
+                    player_relationships: ReactiveArray("player_relationships"),
+                    broadcasts: ReactiveThing("broadcasts")
                 }),
                 casters: ReactiveArray("casters"),
                 player_relationships: ReactiveArray("player_relationships", {

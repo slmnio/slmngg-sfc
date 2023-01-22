@@ -1,20 +1,34 @@
 <template>
     <div class="websocket-transmitter">
-        <ul>
-            <li>wsUrl: {{ wsUrl }}</li>
-            <li>wsPassword: {{ wsPassword }}</li>
-            <li>isConnected: {{ isConnected }}</li>
-            <li>wsPreview: {{ wsPreview }}</li>
-            <li>wsProgram: {{ wsProgram }}</li>
-        </ul>
+        <h1>Tally Transmitter</h1>
+        <code>
+            URL: {{ wsUrl }}<br>
+            Password: {{ wsPassword }}
+        </code>
+
+        <div v-if="isConnected">
+            <i class="fas fa-check-circle"></i> Connected
+        </div>
+        <div v-else>
+            <LoadingIcon/>
+            Not Connected
+        </div>
+
+
+        <div class="prod-scenes">
+            <div v-if="wsPreview" class="prod-preview">{{ wsPreview }}</div>
+            <div v-if="wsProgram" class="prod-program">{{ wsProgram }}</div>
+        </div>
     </div>
 </template>
 <script>
 import OBSWebSocket from "obs-websocket-js";
+import LoadingIcon from "@/components/website/LoadingIcon";
 
 export default {
     name: "WebsocketTransmitter",
-    props: ["client", "wsUrl", "wsPassword", "wsSceneNameOverride"],
+    components: { LoadingIcon },
+    props: ["client", "wsUrl", "wsPassword"],
     data: () => ({
         obsWs: null,
         isConnected: false,
@@ -32,13 +46,6 @@ export default {
                 return this.wsProgram ? "active" : this.wsPreview ? "preview" : "inactive";
             } else {
                 return "inactive";
-            }
-        },
-        wsSceneName() {
-            if (this.wsSceneNameOverride) {
-                return this.wsSceneNameOverride;
-            } else {
-                return undefined;
             }
         }
     },
@@ -112,7 +119,54 @@ export default {
 };
 </script>
 <style scoped>
-    .websocket-transmitter {
-        font-size: 3em;
-    }
+h1 {
+    font-size: 5rem;
+}
+
+.websocket-transmitter {
+    height: 100vh;
+    width: 100vw;
+    background-color: #000000;
+    color: #ffffff;
+    display: grid;
+    place-items: center;
+    font-size: 4rem;
+    font-family: "SLMN-Industry", "Industry", sans-serif;
+}
+
+.prod-scenes {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    flex-grow: 1;
+    font-weight: bold;
+    width: 80vw;
+}
+
+.prod-scenes div {
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    padding: 0.5em .25em;
+    margin: 0 0.25em;
+    background-color: black;
+    width: 100%;
+    line-height: 1.2;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.prod-scenes .prod-preview {
+    color: lime;
+    border-color: lime;
+    border-radius: .1em;
+}
+
+.prod-scenes .prod-program {
+    color: #ff4646;
+    border-color: #ff0000;
+    border-radius: .1em;
+}
 </style>

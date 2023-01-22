@@ -13,6 +13,7 @@ import Authenticator from "@/views/Authenticator";
 import Dashboard from "@/views/Dashboard";
 import ProfilePage from "@/views/ProfilePage";
 import TwitchAuthScopeSelector from "@/components/website/TwitchAuthScopeSelector";
+import SLMNGGTokenCopy from "@/components/website/SLMNGGTokenCopy.vue";
 
 export default [
     {
@@ -64,6 +65,11 @@ export default [
             {
                 path: "/twitch-auth",
                 component: TwitchAuthScopeSelector
+            },
+            {
+                path: "/api-token",
+                meta: { requiresAuth: true },
+                component: SLMNGGTokenCopy
             }
         ]
     },

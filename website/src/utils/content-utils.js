@@ -329,15 +329,21 @@ export function getAbbrev(timezone, time) {
 /**
  *
  * @param {ParsableDate | Date | number | Array<number> | string} timeString - spacetime parsable date/time string
- * @param {string?} stateTimezone - site timezone from store
+ * @param {string?} tz - site timezone from store
  * @param {string?} format - override for format
+ * @param {boolean?} use24HourTime - use 24 hour time
  * @returns {string}
  */
-export function formatTime(timeString, stateTimezone, format) {
-    const timezone = getTimezone(stateTimezone);
+export function formatTime(timeString, { tz, use24HourTime = false, format = "{day-short} {date-ordinal} {month-short} {year} {time} {tz}" }) {
+    const timezone = getTimezone(tz);
     const time = spacetime(timeString).goto(timezone);
     const abbrev = getAbbrev(timezone, time);
-    return time.format((format || "{day-short} {date-ordinal} {month-short} {year} {time} {tz}").replace("{tz}", abbrev));
+    return time.format(
+        (format || "")
+            .replace("{tz}", abbrev)
+            .replace("{time}", use24HourTime ? "{time-24}" : "{time}")
+            .replace("{year-short-prev-only}", time.year() === spacetime.now().year() ? "" : "{year-short}")
+    );
 }
 
 

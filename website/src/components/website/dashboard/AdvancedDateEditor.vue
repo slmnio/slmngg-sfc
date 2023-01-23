@@ -11,9 +11,6 @@
             <template v-slot:modal-title>Time editor</template>
 
             <div class="d-flex mb-3 flex-center">
-                <div class="spacer  text-right mr-2">
-                    Site timezone
-                </div>
                 <TimezoneSwapper align="left"></TimezoneSwapper>
             </div>
 
@@ -25,12 +22,12 @@
                 <div class="group">
                     <div class="top font-weight-bold" :class="{'text-muted': useSiteTimezone}">Local timezone</div>
                     <div class="bottom">{{ localTimezone }}</div>
-                    <div class="bottom">{{ formatTime(spaceTimeRef.toLocalDate(), localTimezone) }}</div>
+                    <div class="bottom">{{ formatTime(spaceTimeRef.toLocalDate(), { tz: localTimezone, use24HourTime: $store.state.use24HourTime }) }}</div>
                 </div>
                 <div class="group ml-3">
                     <div class="top font-weight-bold" :class="{'text-muted': !useSiteTimezone}">Site timezone</div>
                     <div class="bottom">{{ siteTimezone }}</div>
-                    <div class="bottom">{{ formatTime(spaceTimeRef.toLocalDate(), siteTimezone) }}</div>
+                    <div class="bottom">{{ formatTime(spaceTimeRef.toLocalDate(), { tz: siteTimezone, use24HourTime: $store.state.use24HourTime }) }}</div>
                 </div>
             </div>
         </b-modal>

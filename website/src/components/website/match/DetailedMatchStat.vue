@@ -26,7 +26,7 @@ export default {
     components: { LinkedPlayers },
     methods: {
         prettyDate(timeString) {
-            return formatTime(timeString, this.$store.state.timezone);
+            return formatTime(timeString, { tz: this.$store.state.timezone, use24HourTime: this.$store.state.use24HourTime });
         }
     },
     computed: {

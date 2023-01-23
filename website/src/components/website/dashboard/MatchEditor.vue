@@ -309,7 +309,7 @@ export default {
         async setMatchStart(timeString) {
             const response = await this.sendMatchDataChange("start", timeString);
             if (!response.error) {
-                this.$notyf.success(`Set match start to: ${formatTime(timeString, this.$store.state.timezone)}`);
+                this.$notyf.success(`Set match start to: ${formatTime(timeString, { tz: this.$store.state.timezone, use24HourTime: this.$store.state.use24HourTime })}`);
             }
         },
         setIfNew(key, index, value) {

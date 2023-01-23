@@ -49,7 +49,7 @@ export default {
     computed: {
         prettyDate() {
             if (!this.match.start) return;
-            return formatTime(this.match.start, this.timezone || this.$store.state.timezone, "{day-short} {date-ordinal} {month-short} - {time} {tz}");
+            return formatTime(this.match.start, { format: "{day-short} {date-ordinal} {month-short} - {time} {tz}", tz: this.timezone || this.$store.state.timezone, use24HourTime: this.$store.state.use24HourTime });
         },
         teams() {
             return this.match?.teams || [];

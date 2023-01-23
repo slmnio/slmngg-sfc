@@ -9,9 +9,13 @@
         <div v-if="isConnected">
             <i class="fas fa-check-circle"></i> Connected
         </div>
-        <div v-else>
-            <LoadingIcon/>
-            Not Connected
+        <div class="text-center" v-else>
+            <div>
+                <i class="fas fa-wifi-slash"></i> Not Connected
+            </div>
+            <code v-if="obsError" class="error">
+                Error: {{ obsError }}
+            </code>
         </div>
 
 
@@ -23,15 +27,14 @@
 </template>
 <script>
 import OBSWebSocket from "obs-websocket-js";
-import LoadingIcon from "@/components/website/LoadingIcon";
 
 export default {
     name: "WebsocketTransmitter",
-    components: { LoadingIcon },
     props: ["client", "wsUrl", "wsPassword"],
     data: () => ({
         obsWs: null,
         isConnected: false,
+        obsError: "",
         wsPreview: false,
         wsProgram: false,
 
@@ -67,6 +70,7 @@ export default {
                 this.transmit();
                 console.log("Connected to OBS Websocket");
             } catch (e) {
+                this.obsError = e.message;
                 console.error("Failed to connect to OBS WebSocket");
                 console.error(e);
             }
@@ -90,11 +94,12 @@ export default {
     async mounted() {
         this.obsWs = new OBSWebSocket();
 
-        this.obsWs.on("ConnectionOpened", () => {
+        this.obsWs.on("Identified", () => {
             this.isConnected = true;
         });
 
-        this.obsWs.on("ConnectionClosed", () => {
+        this.obsWs.on("ConnectionClosed", (error) => {
+            this.obsError = error.message;
             this.isConnected = false;
         });
 
@@ -168,5 +173,9 @@ h1 {
     color: #ff4646;
     border-color: #ff0000;
     border-radius: .1em;
+}
+
+.error {
+    font-size: 2.5rem;
 }
 </style>

@@ -104,8 +104,7 @@ export default [
         component: WebsocketTransmitter,
         props: route => ({
             wsUrl: route.query.url || route.query.wsUrl || route.query.wsurl || route.query.wsURL || "ws://127.0.0.1:4455",
-            wsPassword: route.query.wsPassword || route.query.password || route.query.pw,
-            wsSceneNameOverride: route.query.sceneName || route.query.scene
+            wsPassword: route.query.wsPassword || route.query.password || route.query.pw
         })
     },
     { path: "tally-viewer", component: TallyViewer },

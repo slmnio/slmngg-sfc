@@ -1,7 +1,7 @@
 <template>
     <div class="break-automation-modal">
         <div v-b-modal.break-automation>
-            <b-button size="sm">Automation</b-button>
+            <b-button size="sm"><DashboardModalIcon/> Automation</b-button>
         </div>
 
         <b-modal id="break-automation" ref="modal" title="Break Automation" @show="resetOptions(activeOptions)"
@@ -36,10 +36,12 @@
 <script>
 import { BButton, BFormCheckbox, BFormGroup, BModal, VBModal } from "bootstrap-vue";
 import { updateBreakAutomation } from "@/utils/dashboard";
+import DashboardModalIcon from "@/components/website/dashboard/DashboardModalIcon.vue";
 
 export default {
     name: "BreakAutomationModal",
     components: {
+        DashboardModalIcon,
         BFormCheckbox,
         BFormGroup,
         BModal,

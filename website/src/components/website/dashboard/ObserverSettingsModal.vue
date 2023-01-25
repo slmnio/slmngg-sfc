@@ -1,7 +1,7 @@
 <template>
     <div class="observer-settings-modal">
         <div v-b-modal.observer-settings >
-            <b-button size="sm" :variant="hasSettingOn ? 'primary' : 'secondary'" :class="{'active': hasSettingOn}">{{ autoText }}</b-button>
+            <b-button size="sm" :variant="hasSettingOn ? 'primary' : 'secondary'" :class="{'active': hasSettingOn}"><DashboardModalIcon/> {{ autoText }}</b-button>
         </div>
 
         <b-modal ref="observer-settings" id="observer-settings" title="Observer Settings">
@@ -19,6 +19,7 @@
 <script>
 import { BButton, BModal, VBModal } from "bootstrap-vue";
 import ObserverSettingsButton from "@/components/website/dashboard/ObserverSettingsButton.vue";
+import DashboardModalIcon from "@/components/website/dashboard/DashboardModalIcon.vue";
 
 export default {
     name: "ObserverSettingsModal",
@@ -26,6 +27,7 @@ export default {
         broadcast: Object
     },
     components: {
+        DashboardModalIcon,
         ObserverSettingsButton,
         BModal,
         BButton

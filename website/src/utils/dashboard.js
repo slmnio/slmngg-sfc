@@ -155,7 +155,6 @@ export async function setObserverSetting(auth, setting, value) {
     });
 }
 
-
 export async function updateBreakAutomation(auth, options) {
     if (!auth?.user) {
         notyf.error("Not authenticated");
@@ -163,5 +162,15 @@ export async function updateBreakAutomation(auth, options) {
     }
     return await authenticatedRequest(auth, "actions/update-break-automation", {
         options
+    });
+}
+
+export async function updateBreakDisplay(auth, option) {
+    if (!auth?.user) {
+        notyf.error("Not authenticated");
+        return { error: true, errorMessage: "Not authenticated" };
+    }
+    return await authenticatedRequest(auth, "actions/update-break-display", {
+        option
     });
 }

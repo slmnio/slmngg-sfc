@@ -1,7 +1,9 @@
 <template>
     <div class="break-automation-modal">
         <div v-b-modal.break-automation>
-            <b-button size="sm"><DashboardModalIcon/> Automation</b-button>
+            <b-button size="sm" :class="{ active: automationIsActive }" :variant="automationIsActive ? 'primary' : ''">
+                <DashboardModalIcon/> Automation<span v-if="activeRotationOptions"> ({{ activeRotationOptions.length }})</span>
+            </b-button>
         </div>
 
         <b-modal id="break-automation" ref="modal" title="Break Automation" @show="resetOptions(activeOptions)"
@@ -58,10 +60,10 @@ export default {
         rotationOptions: [
             { text: "Schedule", value: "use: Schedule" },
             { text: "Standings", value: "use: Standings" },
-            { text: "Image", value: "use: Image" },
-            { text: "Event Staff", value: "use: Staff" },
             { text: "Bracket", value: "use: Bracket" },
             { text: "Matchup", value: "use: Matchup" },
+            { text: "Image", value: "use: Image" },
+            { text: "Event Staff", value: "use: Staff" },
             { text: "Title", value: "use: Title" },
             { text: "Other Broadcast Matches", value: "use: Other Info" }
         ],
@@ -93,6 +95,9 @@ export default {
                 return "live match isn't showing";
             }
             return null;
+        },
+        activeRotationOptions() {
+            return this.activeOptions.filter(option => this.rotationOptions.find(ro => ro.value === option));
         }
     },
     watch: {
@@ -109,7 +114,7 @@ export default {
         }
     },
     methods: {
-        async saveOptions(event) {
+        async saveOptions() {
             this.processing = true;
             try {
                 const response = await updateBreakAutomation(this.$root.auth, this.chosenOptions);

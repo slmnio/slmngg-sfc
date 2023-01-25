@@ -30,9 +30,12 @@
         </div>
         <div class="spacer flex-grow-1"></div>
         <div class="group text-right">
-            <div class="group-top">Break Automation</div>
+            <div class="group-top">Break Display</div>
             <div class="group-bottom">
-                <BreakAutomationModal :broadcast="broadcast" />
+                <div class="fake-btn-group">
+                    <BreakDisplayModal :broadcast="broadcast" />
+                    <BreakAutomationModal :broadcast="broadcast" />
+                </div>
             </div>
         </div>
         <div class="group text-right">
@@ -59,6 +62,7 @@ import {
 } from "@/utils/dashboard";
 import ObserverSettingsModal from "@/components/website/dashboard/ObserverSettingsModal.vue";
 import BreakAutomationModal from "@/components/website/dashboard/BreakAutomationModal.vue";
+import BreakDisplayModal from "@/components/website/dashboard/BreakDisplayModal.vue";
 
 export default {
     name: "BroadcastEditor",
@@ -68,6 +72,7 @@ export default {
         broadcastUpdateTimeout: null
     }),
     components: {
+        BreakDisplayModal,
         BreakAutomationModal,
         ObserverSettingsModal,
         BFormCheckbox,
@@ -126,4 +131,19 @@ export default {
         outline: none !important;
         box-shadow: none !important;
     }
+
+    .fake-btn-group {
+        position: relative;
+        display: inline-flex;
+        vertical-align: middle;
+    }
+    .fake-btn-group div:not(:first-child) >>> .btn {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    .fake-btn-group div:not(:last-child) >>> .btn {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
 </style>

@@ -1,7 +1,5 @@
 <template>
-    <div class="setting mb-2">
-        <b-button @click="() => setObserverSetting(setting, !isOn)" :class="{'active': isOn}" :variant="isOn ? 'primary' : 'secondary'">{{ setting }}</b-button>
-    </div>
+    <b-button @click="() => setObserverSetting(setting, !isOn)" :class="{'active': isOn}" :variant="isOn ? 'primary' : 'secondary'">{{ setting }}</b-button>
 </template>
 
 <script>

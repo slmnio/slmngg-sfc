@@ -5,7 +5,12 @@
         </div>
 
         <b-modal ref="observer-settings" id="observer-settings" title="Observer Settings">
-            <ObserverSettingsButton  v-for="setting in settings" :key="setting" :setting="setting" :is-on="settingIsOn(setting)" />
+            <div class="w-100 flex-center">
+                <div class="d-inline-flex flex-column">
+                    <ObserverSettingsButton class="mb-2" v-for="setting in settings" :key="setting" :setting="setting"
+                                            :is-on="settingIsOn(setting)"/>
+                </div>
+            </div>
             <template v-slot:modal-footer>
                 <div class="w-100 flex-center text-center">
                     These settings will change instantly once you click them.<br>

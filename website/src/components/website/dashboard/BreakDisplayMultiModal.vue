@@ -1,7 +1,7 @@
 <template>
     <div class="break-display-modal">
         <div v-b-modal.break-display>
-            <b-button size="sm" :class="{ active: broadcast && broadcast.break_display }" :variant="broadcast && broadcast.break_display ? 'primary' : ''">
+            <b-button size="sm" :class="{ active: automationIsActive }" :variant="automationIsActive ? 'primary' : ''">
                 <DashboardModalIcon/> {{ autoText }}
             </b-button>
         </div>
@@ -12,8 +12,7 @@
 
             <template v-slot:modal-footer>
                 <div v-if="selectedTab === 'Display'" class="w-100 flex-center text-center">
-                    These settings will change the break scene's display instantly.<br>
-                    Make sure that your show is ready for these graphics to appear.
+                    These buttons will change the break scene's display instantly.
                 </div>
             </template>
         </b-modal>
@@ -43,6 +42,9 @@ export default {
     computed: {
         autoText() {
             return this.broadcast?.break_display ? `Display: ${this.broadcast.break_display}` : "Display";
+        },
+        automationIsActive() {
+            return this.broadcast?.break_display === "Automated";
         }
     }
 };

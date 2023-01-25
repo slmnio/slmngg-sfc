@@ -1,10 +1,10 @@
 <template>
     <div class="timezone-swapper" :class="{'align-left': align === 'left'}">
-        <b-form>
-            <b-form-group label-size="sm" label="Timezone">
-                <b-form-select :options="availableTimezones" v-model="siteTimezone" size="sm" />
+        <b-form :inline="inline">
+            <b-form-group label-size="sm" label="Timezone" :label-cols-sm="inline ? 3 : 12">
+                <b-form-select id="available-timezone-select" :options="availableTimezones" v-model="siteTimezone" size="sm" />
             </b-form-group>
-            <b-form-checkbox size="sm" switch v-model="use24HourTime">
+            <b-form-checkbox :class="{'ml-3': inline}" size="sm" switch v-model="use24HourTime">
                 Use 24-hour time
             </b-form-checkbox>
         </b-form>
@@ -31,7 +31,7 @@ function getOffset(timezone) {
 
 export default {
     name: "TimezoneSwapper",
-    props: ["align"],
+    props: ["align", "inline"],
     components: {
         BForm,
         BFormGroup,

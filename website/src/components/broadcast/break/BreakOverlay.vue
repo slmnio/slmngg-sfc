@@ -220,7 +220,7 @@ export default {
         automatedShow() {
             if (this.broadcast?.break_automation?.length && this.lastCountdownTick <= 30 && this.broadcast.countdown_end) {
                 if (this.broadcast.break_automation.includes("setting: Always do 30s Schedule")) return "Schedule";
-                if (this.broadcast.break_automation.includes("setting: Always do 30s Matchup")) return "Matchup";
+                if (this.broadcast.break_automation.includes("setting: Always do 30s Matchup") && this.nextMatch) return "Matchup";
             }
             if (this.broadcast.break_display && this.broadcast.break_display !== "Automated") {
                 // do what it says

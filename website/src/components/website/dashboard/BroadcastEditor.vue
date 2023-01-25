@@ -30,7 +30,13 @@
         </div>
         <div class="spacer flex-grow-1"></div>
         <div class="group text-right">
-            <div class="group-top">Observer Settings</div>
+            <div class="group-top">Break Automation</div>
+            <div class="group-bottom">
+                <BreakAutomationModal :broadcast="broadcast" />
+            </div>
+        </div>
+        <div class="group text-right">
+            <div class="group-top">Observers</div>
             <div class="group-bottom">
                 <ObserverSettingsModal :broadcast="broadcast" />
             </div>
@@ -52,6 +58,7 @@ import {
     updateBroadcastData
 } from "@/utils/dashboard";
 import ObserverSettingsModal from "@/components/website/dashboard/ObserverSettingsModal.vue";
+import BreakAutomationModal from "@/components/website/dashboard/BreakAutomationModal.vue";
 
 export default {
     name: "BroadcastEditor",
@@ -61,6 +68,7 @@ export default {
         broadcastUpdateTimeout: null
     }),
     components: {
+        BreakAutomationModal,
         ObserverSettingsModal,
         BFormCheckbox,
         BButtonGroup,

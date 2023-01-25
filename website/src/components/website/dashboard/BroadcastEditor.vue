@@ -33,8 +33,7 @@
             <div class="group-top">Break Display</div>
             <div class="group-bottom">
                 <div class="fake-btn-group">
-                    <BreakDisplayModal :broadcast="broadcast" />
-                    <BreakAutomationModal :broadcast="broadcast" />
+                    <BreakDisplayMultiModal :broadcast="broadcast" />
                 </div>
             </div>
         </div>
@@ -61,8 +60,7 @@ import {
     updateBroadcastData
 } from "@/utils/dashboard";
 import ObserverSettingsModal from "@/components/website/dashboard/ObserverSettingsModal.vue";
-import BreakAutomationModal from "@/components/website/dashboard/BreakAutomationModal.vue";
-import BreakDisplayModal from "@/components/website/dashboard/BreakDisplayModal.vue";
+import BreakDisplayMultiModal from "@/components/website/dashboard/BreakDisplayMultiModal.vue";
 
 export default {
     name: "BroadcastEditor",
@@ -72,8 +70,7 @@ export default {
         broadcastUpdateTimeout: null
     }),
     components: {
-        BreakDisplayModal,
-        BreakAutomationModal,
+        BreakDisplayMultiModal,
         ObserverSettingsModal,
         BFormCheckbox,
         BButtonGroup,

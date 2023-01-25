@@ -1,53 +1,45 @@
 <template>
-    <div class="break-automation-modal">
-        <div v-b-modal.break-automation>
-            <b-button size="sm" :class="{ active: automationIsActive }" :variant="automationIsActive ? 'primary' : ''">
-                <DashboardModalIcon/> Automation<span v-if="activeRotationOptions"> ({{ activeRotationOptions.length }})</span>
-            </b-button>
+    <div class="break-automation-tab">
+        <div class="mb-3">
+            <p class="mb-0">Automation is currently <b :class="automationIsActive ? 'text-success' : 'text-danger'">{{ automationIsActive ? 'active' : 'inactive' }}</b>.</p>
+            <p class="mb-0" v-if="!automationIsActive && broadcastBreakDisplay">Break display is currently <b>{{ broadcastBreakDisplay }}</b>.</p>
         </div>
 
-        <b-modal id="break-automation" ref="modal" title="Break Automation" @show="resetOptions(activeOptions)"
-                 ok-only ok-title="Save" ok-variant="success" :ok-disabled="processing" @ok.prevent="saveOptions">
-            <div class="mb-3">
-                <p class="mb-0">Automation is currently <b :class="automationIsActive ? 'text-success' : 'text-danger'">{{ automationIsActive ? 'active' : 'inactive' }}</b>.</p>
-                <p class="mb-0" v-if="!automationIsActive && broadcastBreakDisplay">Break display is currently <b>{{ broadcastBreakDisplay }}</b>.</p>
-            </div>
-
-            <b-form-group label="Break display rotation options" label-class="font-weight-bold">
-                <b-form-checkbox v-for="option in rotationOptions" :key="option.value" :value="option.value" v-model="selectedRotationOptions">
+        <b-form-group label="Break display rotation options" label-class="font-weight-bold">
+            <b-form-checkbox v-for="option in rotationOptions" :key="option.value" :value="option.value" v-model="selectedRotationOptions">
                     <span v-if="option.text === 'Matchup' && matchupText" class="text-muted">
                         {{ option.text }} (Won't show, {{ matchupText }})
                     </span>
-                    <span v-else>{{ option.text }}</span>
-                </b-form-checkbox>
-            </b-form-group>
+                <span v-else>{{ option.text }}</span>
+            </b-form-checkbox>
+        </b-form-group>
 
-            <b-form-group label="Ending break display (countdown 30 seconds or lower)" label-class="font-weight-bold">
-                <b-form-checkbox v-for="option in endingOptions" :key="option.value" :value="option.value" v-model="selectedEndingOptions">
+        <b-form-group label="Ending break display (countdown 30 seconds or lower)" label-class="font-weight-bold">
+            <b-form-checkbox v-for="option in endingOptions" :key="option.value" :value="option.value" v-model="selectedEndingOptions">
                     <span v-if="option.text === 'Matchup' && matchupText" class="text-muted">
                         {{ option.text }} (Won't show, {{ matchupText }})
                     </span>
-                    <span v-else>{{ option.text }}</span>
-                </b-form-checkbox>
-            </b-form-group>
-        </b-modal>
+                <span v-else>{{ option.text }}</span>
+            </b-form-checkbox>
+        </b-form-group>
 
+        <div class="d-flex">
+            <div class="w-100"></div>
+            <b-button variant="success" :disabled="processing" @click="saveOptions">Save</b-button>
+        </div>
     </div>
 </template>
 
 <script>
-import { BButton, BFormCheckbox, BFormGroup, BModal, VBModal } from "bootstrap-vue";
+import { BButton, BFormCheckbox, BFormGroup, VBModal } from "bootstrap-vue";
 import { updateBreakAutomation } from "@/utils/dashboard";
-import DashboardModalIcon from "@/components/website/dashboard/DashboardModalIcon.vue";
 
 export default {
-    name: "BreakAutomationModal",
+    name: "BreakAutomationTab",
     components: {
-        DashboardModalIcon,
+        BButton,
         BFormCheckbox,
-        BFormGroup,
-        BModal,
-        BButton
+        BFormGroup
     },
     directives: {
         BModal: VBModal
@@ -95,9 +87,6 @@ export default {
                 return "live match isn't showing";
             }
             return null;
-        },
-        activeRotationOptions() {
-            return this.activeOptions.filter(option => this.rotationOptions.find(ro => ro.value === option));
         }
     },
     watch: {

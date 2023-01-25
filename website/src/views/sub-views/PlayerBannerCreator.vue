@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <h2>Banner Creator (beta)</h2>
         <b-form-select class="my-1" name="banner" id="" v-model="bannerID" :options="bannerTemplateOptions" />
         <b-form-select class="my-1" name="customTheme" id="" v-model="customThemeID" :options="playerThings" />
         <b-form-select class="my-1" name="customText" id="" v-model="customText" :options="textOptions" />
@@ -11,13 +12,18 @@
         <b-button v-if="customTheme && png" class="no-link-style d-inline-block" :download="filename" target="_blank" :href="png" variant="success">
             <i class="fa-fw fas fa-save"></i> Save
         </b-button>
+
+        <b-alert class="mt-4" variant="info" show>
+            This is a beta feature. It is known to <b>not work</b> with iOS browsers. Desktop Chrome and Firefox should work.<br>
+            Send bugs and feature requests to <b>#slmngg-requests</b>.
+        </b-alert>
     </div>
 </template>
 
 <script>
 import { AllBanners } from "@/utils/banners";
 import { resizedImageNoWrap } from "@/utils/images";
-import { BButton, BFormSelect } from "bootstrap-vue";
+import { BAlert, BButton, BFormSelect } from "bootstrap-vue";
 import { sortEvents, sortTeams } from "@/utils/sorts";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
@@ -25,7 +31,7 @@ export default {
     name: "PlayerBannerCreator",
     props: ["player"],
     components: {
-        BButton, BFormSelect
+        BButton, BFormSelect, BAlert
     },
     data: () => ({
         bannerID: 1,

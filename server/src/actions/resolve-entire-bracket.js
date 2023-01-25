@@ -50,11 +50,11 @@ module.exports = {
         for (const [matchNum, connects] of Object.entries(connections)) {
             let match = matches[parseInt(matchNum) - 1];
 
-            if (match.teams?.length === 2) continue; // ignore if it's already got 2 teams
+            if (match?.teams?.length === 2) continue; // ignore if it's already got 2 teams
 
             let correctTeams = [null, null];
 
-            if (match.teams?.length === 1) {
+            if (match?.teams?.length === 1) {
                 correctTeams[match.placeholder_right ? 0 : 1] = match.teams[0];
             }
 

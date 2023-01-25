@@ -339,10 +339,11 @@ export function formatTime(timeString, { tz, use24HourTime = false, format = "{d
     const time = spacetime(timeString).goto(timezone);
     const abbrev = getAbbrev(timezone, time);
     return time.format(
-        (format || "")
+        format
             .replace("{tz}", abbrev)
             .replace("{time}", use24HourTime ? "{time-24}" : "{time}")
             .replace("{year-short-prev-only}", time.year() === spacetime.now().year() ? "" : "{year-short}")
+            .trim()
     );
 }
 

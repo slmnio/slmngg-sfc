@@ -33,6 +33,7 @@
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import StandingsTeam from "@/components/broadcast/StandingsTeam";
 import { sortTeamsIntoStandings } from "@/utils/scenarios";
+import { cleanID } from "@/utils/content-utils";
 
 
 function avg(arr) {
@@ -287,6 +288,10 @@ export default {
                 if (a.standings.map_losses > b.standings.map_losses) return 1;
                 if (a.standings.map_losses < b.standings.map_losses) return -1;
             };
+
+            if (this.standingsSettings?.hide?.length) {
+                teams = teams.filter(team => !this.standingsSettings.hide.find(id => cleanID(id) === cleanID(team.id)));
+            }
 
             teams = teams.sort(sortFunction);
 

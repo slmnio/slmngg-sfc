@@ -23,7 +23,7 @@ export default {
                 format: "{date} {month-short} {year-short-prev-only}",
                 tz: this.$store.state.timezone,
                 use24HourTime: this.$store.state.use24HourTime
-            }).trim();
+            });
         },
         bottom() {
             return !this.noTimes && formatTime(this.time, {

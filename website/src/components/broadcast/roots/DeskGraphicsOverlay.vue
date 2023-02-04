@@ -1,5 +1,5 @@
 <template>
-    <div class="desk-graphics-overlay">
+    <div class="desk-graphics-overlay" @click="fullscreenToggle()">
         <BroadcastBackground class="pos-overlay bg" :broadcast="broadcast" />
         <ThemeTransition :duration="400" :inner-delay="150" class="pos-overlay stinger-transition" :active="stingerActive" :theme="theme" :border-width="0" start="right" end="right">
             <div class="stinger w-100 h-100">
@@ -75,6 +75,13 @@ export default {
     methods: {
         sting(shouldSting) {
             this.stingerActive = shouldSting;
+        },
+        fullscreenToggle() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
         }
     },
     metaInfo() {

@@ -34,8 +34,8 @@ function getTargetPrediction(predictions, teams) {
 
 
 function getMatchWinner(match, team1, team2) {
-    if (match.score1 >= match.first_to) return team1;
-    if (match.score2 >= match.first_to) return team2;
+    if (match.score_1 >= match.first_to) return team1;
+    if (match.score_2 >= match.first_to) return team2;
     return null;
 }
 
@@ -124,8 +124,10 @@ module.exports = {
         } else if (["resolve"].includes(predictionAction)) {
             const lastMap = maps.filter(m => !m.dummy && !m.banner && (m.winner || m.draw)).pop();
             const targetPrediction = getTargetPrediction(predictions, [team1, team2]);
-            if (!targetPrediction) throw ("Prediction does not exist");
-            console.log(targetPrediction);
+            if (!targetPrediction) {
+                console.log(targetPrediction, Object.entries(predictions), [team1, team2]);
+                throw ("Prediction does not exist");
+            }
 
             if (predictionType === "match") {
                 if (!matchWinner) throw ("Match has not been won yet");

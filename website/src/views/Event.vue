@@ -132,9 +132,9 @@ export default {
             if (!this.event) return null;
 
             try {
-                if ([process.env.VUE_APP_DEPLOY_MODE, process.env.NODE_ENV].includes("staging")) return `https://${this.subdomain}.dev.slmn.gg`;
-                if (process.env.NODE_ENV === "development" || process.env.VUE_APP_DEPLOY_MODE === "local") return `http://${this.subdomain}.localhost:8080`;
-                if ([process.env.VUE_APP_DEPLOY_MODE, process.env.NODE_ENV].includes("production")) return `https://${this.subdomain}.slmn.gg`;
+                if ([import.meta.env.VITE_DEPLOY_MODE, import.meta.env.NODE_ENV].includes("staging")) return `https://${this.subdomain}.dev.slmn.gg`;
+                if (import.meta.env.NODE_ENV === "development" || import.meta.env.VITE_DEPLOY_MODE === "local") return `http://${this.subdomain}.localhost:8080`;
+                if ([import.meta.env.VITE_DEPLOY_MODE, import.meta.env.NODE_ENV].includes("production")) return `https://${this.subdomain}.slmn.gg`;
                 return null;
             } catch (e) {
                 return null;

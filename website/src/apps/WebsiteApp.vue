@@ -7,6 +7,8 @@
 
 <script>
 import WebsiteNav from "@/components/website/WebsiteNav";
+import "@/assets/bootstrap.css";
+import "@/assets/app.css";
 
 export default {
     name: "WebsiteApp",
@@ -20,9 +22,6 @@ export default {
 </script>
 
 <style scoped>
-@import "~@/assets/bootstrap.css";
-@import "~@/assets/app.css";
-
 .nav-link-match {
     color: rgba(255,255,255,0.8) !important;
 }

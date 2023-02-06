@@ -43,7 +43,7 @@ export default {
     }),
     computed: {
         twitchAuthURL() {
-            return `${process.env.VUE_APP_DATA_SERVER}/twitch_auth/${this.selected.join(" ")}`;
+            return `${import.meta.env.VITE_DATA_SERVER}/twitch_auth/${this.selected.join(" ")}`;
         }
     }
 };

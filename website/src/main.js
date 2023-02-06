@@ -126,7 +126,7 @@ if (subdomain) {
 
 const router = new VueRouter({
     mode: "history",
-    base: process.env.BASE_URL,
+    base: import.meta.env.BASE_URL,
     routes
 });
 
@@ -254,7 +254,7 @@ app = new Vue({
             return this.$store.getters.thing(`subdomain-${subdomain}`);
         },
         version() {
-            return process.env?.VUE_APP_SLMNGG_VERSION;
+            return import.meta.env?.VITE_SLMNGG_VERSION;
         },
         authUser() {
             if (!this.auth.user?.airtableID) return null;

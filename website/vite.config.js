@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue2";
-import path from "path";
+import { fileURLToPath, URL } from "url";
 import dns from "dns";
 
 // make sure we use localhost instead of 127.0.0.1
@@ -11,7 +11,7 @@ export default defineConfig({
     plugins: [vue()],
     resolve: {
         alias: {
-            "@": path.resolve(__dirname, "./src")
+            "@": fileURLToPath(new URL("./src", import.meta.url))
         },
         extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json", ".vue"]
     }

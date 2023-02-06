@@ -119,7 +119,7 @@ export default {
             return this.standingsSettings?.sort || [];
         },
         standingsSettings() {
-            return (this.blocks?.standings || []).find(s => s.group === this.stage);
+            return (this.blocks?.standings || []).find(s => s.group.toLowerCase() === this.stage.toLowerCase() || s.key.toLowerCase() === this.stage.toLowerCase());
         },
         showColumns() {
             return this.overrideShowColumns || this.standingsSettings?.show || [

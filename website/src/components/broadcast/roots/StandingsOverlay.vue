@@ -16,7 +16,7 @@ export default {
     computed: {
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;
-            return ReactiveRoot(this.broadcast.event.id, {
+            return ReactiveRoot(this.broadcast?.event?.id, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -24,7 +24,7 @@ export default {
             });
         },
         _stage() {
-            return this.stage || this.broadcast?.current_stage;
+            return (this.stage || this.broadcast?.current_stage || "").toLowerCase();
         },
         blocks() {
             if (!this.event || !this.event.blocks) return null;
@@ -36,7 +36,7 @@ export default {
             }
         },
         standingsSettings() {
-            return (this.blocks?.standings || []).find(s => s.group === this._stage);
+            return (this.blocks?.standings || []).find(s => s.group.toLowerCase() === this._stage || s.key.toLowerCase() === this._stage);
         },
         stageTitle() {
             return this.standingsSettings?.short || this.standingsSettings?.title || this._stage;

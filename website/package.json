@@ -7,7 +7,8 @@
     "build": "vite build",
     "serve": "vite preview --port 8080",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
-    "build-stage": "vite build --mode staging"
+    "build-stage": "vite build --mode staging",
+    "serve-website": "yarn dev"
   },
   "dependencies": {
     "bootstrap-vue": "^2.23.1",

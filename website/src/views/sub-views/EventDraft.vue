@@ -56,7 +56,7 @@ import PlayerDraftRow from "@/components/website/draft/PlayerDraftRow";
 import store from "@/thing-store";
 import EventDraftHeaders from "@/components/website/draft/EventDraftHeaders";
 import { BFormCheckbox, BFormSelect } from "bootstrap-vue";
-const { url } = require("@/utils/content-utils");
+import { url } from "@/utils/content-utils";
 
 
 function getRoleString(sr) {

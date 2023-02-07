@@ -59,6 +59,8 @@ Vue.use(VueSocketIOExt, socket, { store });
 
 Vue.config.productionTip = false;
 
+Vue.config.devtools = ["local", "staging"].includes(import.meta.env.VITE_DEPLOY_MODE);
+
 Vue.component("v-style", {
     render: function (createElement) {
         return createElement("style", this.$slots.default);

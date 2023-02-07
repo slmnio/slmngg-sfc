@@ -11,7 +11,8 @@ export default defineConfig({
     plugins: [vue()],
     resolve: {
         alias: {
-            "@": fileURLToPath(new URL("./src", import.meta.url))
+            "@": fileURLToPath(new URL("./src", import.meta.url)),
+            fs: require.resolve("rollup-plugin-node-builtins")
         },
         extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json", ".vue"]
     }

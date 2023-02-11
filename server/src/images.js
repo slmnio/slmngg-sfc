@@ -100,7 +100,7 @@ function getFilename(url) {
     originalFilename = strippedName;
     const dots = originalFilename.split(".");
     const originalFileType = dots[dots.length - 1]; // last . (now works with .svg.png)
-    return parts[4] + "." + originalFileType; // specific to airtable urls
+    return parts[4].substring(0, 45) + "." + originalFileType; // specific to airtable urls, shorten to 45 chars TODO: This is a temporary fix, we should do it properly
 }
 
 /***
@@ -147,7 +147,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
             originalFilename = strippedName;
             const dots = strippedName.split(".");
             const originalFileType = req.query.type ? req.query.type.split("/").pop().split("+")?.[0] : dots[dots.length - 1]; // last . (now works with .svg.png)
-            const filename = parts[parts.length - 2] + "." + originalFileType;
+            const filename = parts[parts.length - 2].substring(0, 45) + "." + originalFileType; // shorten to 45 chars TODO: This is a temporary fix, we should do it properly
 
             if (!["dl.airtable.com", "media.slmn.io", "v5.airtableusercontent.com"].some(domain => domain === parts[2])) {
                 return res.status(400).send("Domain not whitelisted");

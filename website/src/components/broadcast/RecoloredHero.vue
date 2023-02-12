@@ -110,6 +110,7 @@ export default {
     computed: {
         mainImage() {
             const img = this.hero?.recolor_base;
+            console.log(img, this.hero);
             if (!img) return null;
             return bg(resizedAttachment(img, "orig"));
         },

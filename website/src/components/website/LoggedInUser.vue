@@ -15,6 +15,7 @@ import { url } from "@/utils/content-utils.js";
 import { BDropdownItem, BNavItemDropdown } from "bootstrap-vue";
 import { isAuthenticated, isOnMainDomain } from "@/utils/auth";
 import { getMainDomain } from "@/utils/fetch";
+import { bg } from "@/utils/images";
 
 export default {
     name: "LoggedInUser",
@@ -29,9 +30,7 @@ export default {
             return this.user?.airtableID;
         },
         avatar() {
-            return {
-                backgroundImage: `url(${this.user.avatar})`
-            };
+            return bg(this.user.avatar);
         },
         isProduction() {
             if (!isAuthenticated(this.$root)) return false;

@@ -1,6 +1,6 @@
 <template>
     <div class="background" v-if="background">
-        <div class="image-background full" v-if="type === 'image'" :style="{ backgroundImage: `url(${background.url})` }"></div>
+        <div class="image-background full" v-if="type === 'image'" :style="bg(background.url)"></div>
         <div class="video-background full flex-center" v-if="type === 'video'">
             <video :src="background.url" loop autoplay muted />
         </div>
@@ -8,6 +8,8 @@
 </template>
 
 <script>
+import { bg } from "@/utils/images";
+
 export default {
     name: "BroadcastBackground",
     props: ["broadcast", "index"],
@@ -30,6 +32,9 @@ export default {
         return {
             title: `Background${this.index ? ` #${this.index}` : ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
+    },
+    methods: {
+        bg
     }
 };
 </script>

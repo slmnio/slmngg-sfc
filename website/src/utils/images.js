@@ -2,7 +2,7 @@ import { getDataServerAddress } from "@/utils/fetch";
 
 export function bg(url) {
     if (!url) return {};
-    return { backgroundImage: `url(${url})` };
+    return { backgroundImage: `url(${url.replaceAll("(", "%28").replaceAll(")", "%29")})` };
 }
 
 function getFileEnding(url, mimeType) {

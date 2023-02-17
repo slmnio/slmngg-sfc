@@ -109,13 +109,12 @@ export default {
     }),
     computed: {
         mainImage() {
-            const img = this.hero?.recolor_base;
-            console.log(img, this.hero);
+            const img = this.hero?.recolor_base?.[0];
             if (!img) return null;
             return bg(resizedAttachment(img, "orig"));
         },
         fallbackImage() {
-            const img = this.hero?.main_image;
+            const img = this.hero?.main_image?.[0];
             if (!img) return null;
             return bg(resizedAttachment(img, "orig"));
         },

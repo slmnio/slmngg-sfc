@@ -12,6 +12,7 @@ const store = new Map();
 const hiddenEvents = new Map();
 const auth = new Map();
 const players = new Map();
+const attachments = new Map();
 
 function getAntiLeakIDs() {
     if (process.env.DISABLE_ANTILEAK === "true") return []; // don't hide anything on local
@@ -116,14 +117,38 @@ const slmnggAttachments = {
     "Teams": ["icon"]
 };
 
-function generateAttachmentURL(str, filename) {
+function generateAttachmentURL(str, attachment) {
     let idx = str.indexOf("ts=");
     if (idx !== -1) str = str.slice(0, idx -1);
 
+    let filename = attachment.filename;
+
     if (filename && !str.split("/").pop().includes(".")) {
-        str += `?filename=${encodeURIComponent(filename.replaceAll("(", "%28").replaceAll(")", "%29"))}`;
+        str += `?filename=${encodeURIComponent(filename.replaceAll("(", "%28").replaceAll(")", "%29"))}&id=${attachment.id}`;
     }
     return str;
+}
+
+/**
+ * Generate a filename from its mimetype and record ID
+ */
+function getAutoFilename(attachment) {
+    let ending = (attachment.type || "").split("/").pop();
+
+    // specific overrides where the "group/[type]" doesn't match the extension
+    if (attachment.type === "audio/mpeg") ending = "mp3";
+    if (attachment.type === "text/plain") ending = "txt";
+    if (attachment.type === "image/svg+xml") ending = "svg";
+
+    if (!ending) return {
+        ending,
+        filename: attachment.id
+    };
+
+    return {
+        ending,
+        filename: `${attachment.id}.${ending}`
+    };
 }
 
 async function removeAttachmentTimestamps(data) {
@@ -134,10 +159,16 @@ async function removeAttachmentTimestamps(data) {
         tableData.forEach(key => {
             if (data[key]) {
                 data[key].forEach(attachment => {
-                    attachment.url = generateAttachmentURL(attachment.url, attachment.filename);
+                    let { ending, filename } = getAutoFilename(attachment);
+                    attachment._autoFilename = filename;
+                    attachment.fileExtension = ending;
+                    attachments.set(attachment.id, attachment);
+
+                    attachment.url = generateAttachmentURL(attachment.url, attachment);
+
                     for (let size in attachment.thumbnails) {
                         size = attachment.thumbnails[size];
-                        size.url = generateAttachmentURL(size.url, attachment.filename);
+                        size.url = generateAttachmentURL(size.url, attachment);
                     }
                 });
             }
@@ -368,5 +399,6 @@ module.exports = {
         getChannelByID,
         getTwitchAccessToken,
         getBots
-    }
+    },
+    getAttachment: (id) => attachments.get(id)
 };

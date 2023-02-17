@@ -14,7 +14,7 @@
                         </span>
                     </transition>
                 </div>
-                <Squeezable class="flex-center team-name">
+                <Squeezable class="flex-center team-name" :align="right ? 'left' : 'right'">
                     <span class="industry-align team-sub-name" v-if="!codes">{{ team.name }}</span>
                     <span class="industry-align team-sub-subtitle" v-if="!codes && team.subtitle">{{ team.subtitle }}</span>
                     <span class="industry-align team-sub-code" v-if="codes">{{ team.code }}</span>

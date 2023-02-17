@@ -6,23 +6,20 @@
             </b-button>
         </div>
         <b-modal hide-footer ref="modal" id="token" title="SLMN.gg Token">
-            <p>
-                This token can be used for our Companion module or while using the API in another way.<br>
-            </p>
+            <p>Your <b>SLMN.GG token</b> is used to identify you and perform requests on the site.</p>
+            <p>You can use the token in our Companion module to make full use of the buttons.</p>
 
-            <p>
-                The token gives <strong>full access to SLMN.gg</strong> so you <strong>must keep it safe</strong>.
-            </p>
+            <p><b>Please note:</b> Your token gives anyone who has it <b class="text-danger">full access to your account</b> on SLMN.GG, including any permissions you have to edit matches or broadcasts.</p>
+            <p>You shouldn't share it with a third party. Only use it in programs you are running yourself.</p>
 
             <b-form-checkbox v-model="hasAccepted">
                 I will keep my token safe
             </b-form-checkbox>
 
-            <b-button v-if="token" class="mt-2" @click="copyToken" :disabled="!hasAccepted">
+            <b-button v-if="token" class="mt-3" @click="copyToken" :disabled="!hasAccepted">
                 <i :class="`fas fa-fw ${recentlyCopied ? 'fa-clipboard-check' : 'fa-copy'}`"></i> Copy token
             </b-button>
-
-            <p class="mt-2" v-else>
+            <p class="mt-3" v-else>
                 <i class="fas fa-exclamation-triangle mr-2"></i> You are not logged in.
             </p>
 

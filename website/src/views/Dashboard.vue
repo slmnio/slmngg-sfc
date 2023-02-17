@@ -47,7 +47,6 @@
             </div>
         </DashboardModule>
         <CommsControl v-if="useTeamComms" :match="liveMatch"/>
-        <TokenModal/>
     </div>
 </template>
 
@@ -69,11 +68,10 @@ import DashboardModule from "@/components/website/dashboard/DashboardModule.vue"
 import BracketImplications from "@/components/website/dashboard/BracketImplications.vue";
 import PreviewProgramDisplay from "@/components/website/dashboard/PreviewProgramDisplay.vue";
 import Bracket from "@/components/website/bracket/Bracket.vue";
-import TokenModal from "@/components/website/dashboard/TokenModal.vue";
 
 export default {
     name: "Dashboard",
-    components: { TokenModal, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
+    components: { Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
     computed: {
         user() {
             if (!this.$root.auth.user?.airtableID) return {};

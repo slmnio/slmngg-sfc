@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { resizedImage } from "@/utils/images";
+import { bg, resizedImage } from "@/utils/images";
 
 export default {
     name: "NewsThumbnail",
@@ -29,10 +29,10 @@ export default {
                 if (this.item.embed && this.item.use_embed_thumbnail) {
                     const vodURL = new URL(this.item.embed);
                     if (["www.youtube.com", "youtube.com"].includes(vodURL.host)) {
-                        return { backgroundImage: `url(https://i.ytimg.com/vi/${vodURL.searchParams.get("v")}/maxresdefault.jpg)` };
+                        return bg(`https://i.ytimg.com/vi/${vodURL.searchParams.get("v")}/maxresdefault.jpg`);
                     }
                     if (["youtu.be"].includes(vodURL.host)) {
-                        return { backgroundImage: `url(https://i.ytimg.com/vi/${vodURL.pathname.slice(1)}/maxresdefault.jpg)` };
+                        return bg(`https://i.ytimg.com/vi/${vodURL.pathname.slice(1)}/maxresdefault.jpg`);
                     }
                 }
                 return null;

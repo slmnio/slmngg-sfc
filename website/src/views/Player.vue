@@ -4,7 +4,7 @@
             <div class="top">
                 <div class="player-top d-flex">
                     <div class="player-icon bg-center default-thing" v-if="player.overwatch_icon"
-                         :style="{backgroundImage: `url(${player.overwatch_icon})`}"></div>
+                         :style="bg(player.overwatch_icon)"></div>
                     <div class="player-name">
                         {{ player.name }}
                         <i class="fas fa-badge-check mr-3" v-if="player.verified"></i>
@@ -38,6 +38,7 @@ import Social from "@/components/website/Social";
 import SubPageNav from "@/components/website/SubPageNav";
 import { pronounsFilter } from "@/utils/content-utils";
 import { sortEvents } from "@/utils/sorts";
+import { bg } from "@/utils/images";
 
 export default {
     name: "Player",
@@ -46,6 +47,7 @@ export default {
         Social, SubPageNav
     },
     methods: {
+        bg,
         subLink(page) {
             return `/player/${this.player.id}/${page}`;
         }

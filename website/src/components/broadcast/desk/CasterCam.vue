@@ -13,7 +13,7 @@
 
 <script>
 import { logoBackground, logoBackground1 } from "@/utils/theme-styles";
-import { resizedImage } from "@/utils/images";
+import { bg, resizedImage } from "@/utils/images";
 
 export default {
     name: "CasterCam",
@@ -63,7 +63,7 @@ export default {
                     eventFallback: true
                 };
             }
-            return { backgroundImage: `url(${this.guest.avatar})` };
+            return bg(this.guest.avatar);
         }
     },
     watch: {

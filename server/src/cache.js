@@ -110,7 +110,7 @@ const slmnggAttachments = {
     "Map Data": ["image", "big_image", "video", "audio"],
     "Maps": ["image", "big_image"],
     "Log Files": ["log_file"],
-    "Heroes": ["main_image"],
+    "Heroes": ["main_image", "recolor_base", "recolor_layers"],
     "Ad Reads": ["audio", "image"],
     "Tracks": ["file"],
     "Teams": ["icon"]
@@ -121,7 +121,7 @@ function generateAttachmentURL(str, filename) {
     if (idx !== -1) str = str.slice(0, idx -1);
 
     if (filename && !str.split("/").pop().includes(".")) {
-        str += `?filename=${filename}`;
+        str += `?filename=${encodeURIComponent(filename.replaceAll("(", "%28").replaceAll(")", "%29"))}`;
     }
     return str;
 }

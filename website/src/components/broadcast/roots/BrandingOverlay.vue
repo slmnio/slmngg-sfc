@@ -48,7 +48,7 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { logoBackground1 } from "@/utils/theme-styles";
-import { resizedImage } from "@/utils/images";
+import { bg, resizedImage } from "@/utils/images";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");
@@ -115,9 +115,7 @@ export default {
             return this.highlightTeam.brand_designers.map(p => p.name).join(", ");
         },
         focusedLogoCSS() {
-            return {
-                backgroundImage: `url(${this.bigLogos[this.logoI]?.item})`
-            };
+            return bg(this.bigLogos[this.logoI]?.item);
         }
     },
     mounted() {

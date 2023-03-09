@@ -146,8 +146,7 @@ export default {
             return getMainDomain(this.minisite?.subdomain);
         },
         siteMode() {
-            // console.log("env", process.env);
-            return process.env.VUE_APP_DEPLOY_MODE || process.env.NODE_ENV;
+            return import.meta.env.VITE_DEPLOY_MODE || import.meta.env.NODE_ENV;
         },
         navbarEvents() {
             if (!this.minisite?.id) return [];

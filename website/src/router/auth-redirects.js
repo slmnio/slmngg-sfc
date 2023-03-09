@@ -26,7 +26,7 @@ export default (app, mainDomain) => ([
             setAuthNext(app?.$root, to.query.return || from.fullPath);
 
             const params = {
-                client_id: process.env.VUE_APP_DISCORD_CLIENT_ID,
+                client_id: import.meta.env.VITE_DISCORD_CLIENT_ID,
                 redirect_uri: `${mainDomain}/auth/discord/return`,
                 response_type: "code",
                 scope: ["identify"].join(" ")

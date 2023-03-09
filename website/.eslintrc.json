@@ -9,8 +9,7 @@
     ],
     "parserOptions": {
         "ecmaVersion": 12,
-        "sourceType": "module",
-        "parser": "babel-eslint"
+        "sourceType": "module"
     },
     "rules": {
         "indent": [

@@ -6,10 +6,16 @@
 
         <b-modal ref="broadcast-switcher" id="broadcast-switcher" title="Broadcast Switcher" hide-footer>
             <div class="broadcasts flex-center flex-column">
-                <BroadcastDisplay class="broadcast" :disabled="bi === 0 || setting" v-for="(broadcast, bi) in broadcastGroups.active" :broadcast="broadcast" :key="broadcast.id" :set-method="switchBroadcast" />
-                <div class="broadcasts-text inactive" v-if="broadcastGroups.inactive.length">Inactive broadcasts</div>
-                <BroadcastDisplay class="broadcast inactive" :disabled="bi === 0 || setting" v-for="(broadcast, bi) in broadcastGroups.inactive" :broadcast="broadcast" :key="broadcast.id" :set-method="switchBroadcast" />
-
+                <BroadcastDisplay class="broadcast" :class="{'active-broadcast': activeBroadcast.id === broadcast.id}" :disabled="activeBroadcast.id === broadcast.id || setting" v-for="broadcast in broadcastGroups.active" :broadcast="broadcast" :key="broadcast.id" :set-method="switchBroadcast" />
+                <b-button class="broadcasts-text inactive" v-if="broadcastGroups.inactive.length"
+                          :variant="showInactive ? 'primary' : 'secondary'" :class="{'active': showInactive}"
+                          @click="showInactive = !showInactive">Show inactive broadcasts ({{ broadcastGroups.inactive.length }})</b-button>
+                <div class="inactive-broadcasts" v-if="showInactive">
+                    <BroadcastDisplay class="broadcast"
+                                      :disabled="activeBroadcast.id === broadcast.id || setting"
+                                      v-for="broadcast in broadcastGroups.inactive" :broadcast="broadcast"
+                                      :key="broadcast.id" :set-method="switchBroadcast"/>
+                </div>
             </div>
 
             <template v-slot:modal-footer>
@@ -24,18 +30,19 @@
 
 <script>
 import BroadcastDisplay from "@/components/website/dashboard/BroadcastDisplay";
-import { BModal, VBModal } from "bootstrap-vue";
+import { BButton, BModal, VBModal } from "bootstrap-vue";
 import { setActiveBroadcast } from "@/utils/dashboard";
 export default {
     name: "BroadcastSwitcher",
-    components: { BroadcastDisplay, BModal },
+    components: { BroadcastDisplay, BModal, BButton },
     directives: {
         BModal: VBModal
     },
     props: ["broadcasts"],
     data: () => ({
         setting: false,
-        attemptedFirst: null
+        attemptedFirst: null,
+        showInactive: false
     }),
     computed: {
         activeBroadcast() {
@@ -48,7 +55,7 @@ export default {
             };
 
             (this.broadcasts || []).forEach(broadcast => {
-                if (broadcast?.active) {
+                if (broadcast.id === this.activeBroadcast.id || broadcast?.active) {
                     groups.active.push(broadcast);
                 } else {
                     groups.inactive.push(broadcast);
@@ -89,8 +96,7 @@ export default {
         cursor: pointer;
     }
 
-    .broadcast.inactive {
-        opacity: 0.8;
+    .inactive-broadcasts .broadcast {
         font-size: 12px;
         width: 18.75em;
     }

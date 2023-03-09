@@ -213,6 +213,8 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
             // not already cached
             console.log("[image]", `no file for ${filename} (${att.filename}) @ ${size}`);
 
+            if (!airtableURL) return res.status(404).send("No URL available for this image");
+
             // first download or retrieve to orig/
             let orig = await getOrWaitForDownload(airtableURL, filename, "orig");
 

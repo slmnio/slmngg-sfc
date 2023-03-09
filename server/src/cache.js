@@ -154,6 +154,8 @@ function getAutoFilename(attachment) {
 async function removeAttachmentTimestamps(data) {
     if (!data?.__tableName) return data;
 
+    data = JSON.parse(JSON.stringify(data));
+
     let tableData = slmnggAttachments[data.__tableName];
     if (tableData) {
         tableData.forEach(key => {
@@ -162,7 +164,8 @@ async function removeAttachmentTimestamps(data) {
                     let { ending, filename } = getAutoFilename(attachment);
                     attachment._autoFilename = filename;
                     attachment.fileExtension = ending;
-                    attachments.set(attachment.id, {...attachment});
+                    attachments.set(attachment.id, JSON.parse(JSON.stringify(attachment)));
+                    // console.log("att set", attachment, attachments.get(attachment.id));
 
                     // we don't want the URLs to appear in requests anymore
                     // the data server just uses the attachment IDs
@@ -173,6 +176,7 @@ async function removeAttachmentTimestamps(data) {
                         size = attachment.thumbnails[size];
                         size.url = null; // generateAttachmentURL(size.url, attachment);
                     }
+
                 });
             }
         });

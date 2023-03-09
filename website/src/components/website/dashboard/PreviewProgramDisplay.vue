@@ -1,5 +1,5 @@
 <template>
-    <div class="preview-program-display flex-center" v-if="producerPreviewScene">
+    <div class="preview-program-display flex-center mb-2" v-if="producerPreviewScene">
         <div class="display preview bg-dark px-2 mx-1">
             <div class="title">Preview</div>
             <div class="scene">{{ producerPreviewScene }}</div>

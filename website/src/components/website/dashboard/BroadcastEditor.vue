@@ -1,53 +1,59 @@
 <template>
-    <div class="broadcast-editor d-flex">
-        <div class="group">
-            <div class="group-top">Flip Teams</div>
-            <div class="group-bottom">
-                <b-form-checkbox :checked="match.flip_teams" @change="(state) => toggleFlipTeams(state)"
-                                 button size="sm" :button-variant="match.flip_teams ? 'primary' : ''">
-                    Flip Teams
-                </b-form-checkbox>
+    <div class="broadcast-editor d-flex flex-wrap align-items-center justify-content-center">
+        <div class="area left-area">
+            <div class="group">
+                <div class="group-top">Flip Teams</div>
+                <div class="group-bottom">
+                    <b-form-checkbox :checked="match.flip_teams" @change="(state) => toggleFlipTeams(state)"
+                                     button size="sm" :button-variant="match.flip_teams ? 'primary' : ''">
+                        Flip Teams
+                    </b-form-checkbox>
+                </div>
             </div>
-        </div>
-        <div class="group map-attack">
-            <div class="group-top">Attacker Side</div>
-            <div class="group-bottom">
-                <b-button-group>
-                    <b-button size="sm" v-for="side in ['Left', 'Right', 'Both']" :key="side"
-                              :variant="broadcast.map_attack === side ? 'danger' : 'secondary'"
-                              @click="() => setAttack(side)">{{ side }}</b-button>
-                </b-button-group>
+            <div class="group map-attack">
+                <div class="group-top">Attacker Side</div>
+                <div class="group-bottom">
+                    <b-button-group>
+                        <b-button size="sm" v-for="side in ['Left', 'Right', 'Both']" :key="side"
+                                  :variant="broadcast.map_attack === side ? 'danger' : 'secondary'"
+                                  @click="() => setAttack(side)">{{ side }}</b-button>
+                    </b-button-group>
+                </div>
             </div>
-        </div>
-        <div class="group">
-            <div class="group-top">Player Cams</div>
-            <div class="group-bottom">
-                <b-form-checkbox :checked="broadcast.show_cams" @change="(state) => togglePlayerCams(state)"
-                                 button size="sm" :button-variant="broadcast.show_cams ? 'primary' : ''">
-                    Show Cams
-                </b-form-checkbox>
-            </div>
-        </div>
-        <div class="spacer flex-grow-1"></div>
-        <div class="group text-right">
-            <div class="group-top">Break Display</div>
-            <div class="group-bottom">
-                <div class="fake-btn-group">
-                    <BreakDisplayMultiModal :broadcast="broadcast" />
+            <div class="group">
+                <div class="group-top">Player Cams</div>
+                <div class="group-bottom">
+                    <b-form-checkbox :checked="broadcast.show_cams" @change="(state) => togglePlayerCams(state)"
+                                     button size="sm" :button-variant="broadcast.show_cams ? 'primary' : ''">
+                        Show Cams
+                    </b-form-checkbox>
                 </div>
             </div>
         </div>
-        <div class="group text-right">
-            <div class="group-top">Observers</div>
-            <div class="group-bottom">
-                <ObserverSettingsModal :broadcast="broadcast" />
+        <div class="spacer flex-grow-1"></div>
+        <div class="area right-area">
+            <div class="group text-right">
+                <div class="group-top">Break Display</div>
+                <div class="group-bottom">
+                    <div class="fake-btn-group">
+                        <BreakDisplayMultiModal :broadcast="broadcast"/>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="group text-right">
-            <div class="group-top">Advertise</div>
-            <div class="group-bottom">
-                <b-form-checkbox :checked="broadcast.advertise" @change="(state) => advertiseBroadcast(state)"
-                                 button size="sm" :button-variant="broadcast.advertise ? 'primary' : ''">{{ broadcast.advertise ? 'Advertising' : 'Advertise' }}</b-form-checkbox>
+            <div class="group text-right">
+                <div class="group-top">Observers</div>
+                <div class="group-bottom">
+                    <ObserverSettingsModal :broadcast="broadcast"/>
+                </div>
+            </div>
+            <div class="group text-right">
+                <div class="group-top">Advertise</div>
+                <div class="group-bottom">
+                    <b-form-checkbox :checked="broadcast.advertise" @change="(state) => advertiseBroadcast(state)"
+                                     button size="sm" :button-variant="broadcast.advertise ? 'primary' : ''">
+                        {{ broadcast.advertise ? "Advertising" : "Advertise" }}
+                    </b-form-checkbox>
+                </div>
             </div>
         </div>
     </div>
@@ -115,8 +121,13 @@ export default {
 </script>
 
 <style scoped>
-    .broadcast-editor {
+    .area {
+        display: flex;
         gap: 1em;
+        margin-bottom: .5rem;
+    }
+    .right-area {
+        margin-left: auto;
     }
     .group-top {
         font-size: 0.9em;

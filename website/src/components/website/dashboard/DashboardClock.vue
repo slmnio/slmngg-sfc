@@ -1,5 +1,5 @@
 <template>
-    <div class="dashboard-clock bg-dark px-2 mx-1" @click="() => use12hr = !use12hr">
+    <div class="dashboard-clock bg-dark px-2" @click="() => use12hr = !use12hr">
         <div class="title">{{ title }}</div>
         <div class="clock">{{ text }}</div>
     </div>
@@ -51,6 +51,7 @@ export default {
 
         padding: 4px;
         height: 48px;
+        margin: 0.25rem;
     }
     .title {
         font-size: 0.9em;

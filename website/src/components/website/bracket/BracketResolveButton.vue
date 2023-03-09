@@ -16,7 +16,8 @@ export default {
     name: "BracketResolveButton",
     props: {
         bracket: Object,
-        verticalButton: Boolean
+        verticalButton: Boolean,
+        showButton: Boolean
     },
     components: { BButton },
     data: () => ({
@@ -25,7 +26,7 @@ export default {
     computed: {
         showResolveButton() {
             if (!isAuthenticated(this.$root)) return false;
-            return this.$root.auth?.user?.website_settings?.includes("Can edit any match");
+            return this.showButton || this.$root.auth?.user?.website_settings?.includes("Can edit any match");
         }
     },
     methods: {

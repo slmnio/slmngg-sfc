@@ -7,7 +7,7 @@
                 <BracketImplicationMatch class="flex-grow-1" :imp="imps.win" relation="Winner" :team="matchWinner" :link-to-detailed-match="linkToDetailedMatch"></BracketImplicationMatch>
                 <BracketImplicationMatch class="flex-grow-1" :imp="imps.lose" relation="Loser" :team="matchLoser" :link-to-detailed-match="linkToDetailedMatch"></BracketImplicationMatch>
                 <div class="button-holder" v-if="showResolveButton">
-                    <BracketResolveButton :bracket="imps.bracket" vertical-button />
+                    <BracketResolveButton :show-button="showResolveButton" :bracket="imps.bracket" vertical-button />
                 </div>
             </div>
         </div>

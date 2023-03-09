@@ -36,54 +36,79 @@
                     <b-button v-if="hideMatchExtras" class="ml-2 top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save all</b-button>
                 </div>
             </div>
-            <table class="teams-maps table table-bordered table-sm table-dark mt-2 mb-0 opacity-changes"  :class="{'low-opacity': processing['map']}">
-                <tr class="map" v-for="(map, i) in maps" :key="i" :class="{'banned': banners[i], 'very-low-opacity': !map.dummy && !map._original_data_id}">
-                    <td class="form-stack number">
-                        <div class="form-top">#</div>
-                        <div class="form-button">
-                            <b-form-input type="number" class="map-number no-arrows" :min="1" :max="minMaps" v-model.number="mapNumbers[i]"></b-form-input>
-                        </div>
-                    </td>
-                    <td class="map form-stack" style="width: 100%;">
-                        <div class="form-top">
-                            Map
-                        </div>
-                        <div class="form-bottom">
-                            <b-form-select :options="getMapOptions(i)" v-if="mapChoices[i]" v-model="mapChoices[i]" />
-                            <b-form-select :options="getMapOptions(i)" v-else v-model="mapChoices[i]" />
-                        </div>
-                    </td>
-                    <td class="form-stack">
-                        <div class="form-top text-center">
-                            Map Score
-                        </div>
-                        <div class="form-bottom map-editors d-flex">
-                            <MapScoreEditor class="map-editor" v-model="score_1s[i]" @input="(val) => checkAutoWinner(i, val)" :team="teams[0]"></MapScoreEditor>
-                            <MapScoreEditor class="map-editor" v-model="score_2s[i]" @input="(val) => checkAutoWinner(i, val)" :team="teams[1]" :reverse="true"></MapScoreEditor>
-                        </div>
-                    </td>
-                    <td class="form-stack">
-                        <div class="form-top text-center">
-                            Draw
-                        </div>
-                        <div class="form-bottom d-flex">
-                            <b-form-checkbox button :button-variant="draws[i] ? 'primary' : 'light'" class="draw-checkbox" v-model="draws[i]">
-                                <i v-if="draws[i]" class="fas fa-check fa-fw"></i>
-                                <i v-else class="fas fa-fw fa-check hoverable"></i>
-                            </b-form-checkbox>
-                        </div>
-                    </td>
-                    <td class="form-stack number" v-if="!hideMatchExtras">
-                        <div class="form-top">Replay Code</div>
-                        <div class="form-button">
-                            <b-form-input type="text" v-model="replayCodes[i]"></b-form-input>
-                        </div>
-                    </td>
-                    <td><TeamPicker title="Banned by" :teams="teams" v-model="banners[i]"></TeamPicker></td>
-                    <td><TeamPicker title="Picked by" :class="{ 'very-low-opacity': banners[i] }" :teams="teams" v-model="pickers[i]"></TeamPicker></td>
-                    <td><TeamPicker title="Winner" :class="{ 'very-low-opacity': banners[i] }" :teams="teams" v-model="winners[i]"></TeamPicker></td>
-                </tr>
-            </table>
+            <div class="maps-table-wrapper">
+                <table class="teams-maps table table-bordered table-sm table-dark mt-2 mb-0 opacity-changes"
+                       :class="{'low-opacity': processing['map']}">
+                    <tr class="map" v-for="(map, i) in maps" :key="i"
+                        :class="{'banned': banners[i], 'very-low-opacity': !map.dummy && !map._original_data_id}">
+                        <td class="form-stack number">
+                            <div class="form-top d-flex">
+                                <div>#</div>
+                                <div class="flex-grow-1 text-right">
+                                    <i class="fas fa-pen" v-b-tooltip="'Edits an existing map record'" v-if="existingMapIDs[i]"></i>
+                                    <i class="fas fa-plus" v-b-tooltip="'Creates a new map record'" v-if="!existingMapIDs[i]"></i>
+                                </div>
+                            </div>
+                            <div class="form-button">
+                                <b-form-input type="number" class="map-number no-arrows" :min="1" :max="minMaps"
+                                              v-model.number="mapNumbers[i]"></b-form-input>
+                            </div>
+                        </td>
+                        <td class="map form-stack" style="width: 100%;">
+                            <div class="form-top">
+                                Map
+                            </div>
+                            <div class="form-bottom">
+                                <b-form-select :options="getMapOptions(i)" v-if="mapChoices[i]"
+                                               v-model="mapChoices[i]"/>
+                                <b-form-select :options="getMapOptions(i)" v-else v-model="mapChoices[i]"/>
+                            </div>
+                        </td>
+                        <td class="form-stack">
+                            <div class="form-top text-center">
+                                Map Score
+                            </div>
+                            <div class="form-bottom map-editors d-flex">
+                                <MapScoreEditor class="map-editor" v-model="score_1s[i]"
+                                                @input="(val) => checkAutoWinner(i, val)"
+                                                :team="teams[0]"></MapScoreEditor>
+                                <MapScoreEditor class="map-editor" v-model="score_2s[i]"
+                                                @input="(val) => checkAutoWinner(i, val)" :team="teams[1]"
+                                                :reverse="true"></MapScoreEditor>
+                            </div>
+                        </td>
+                        <td class="form-stack">
+                            <div class="form-top text-center">
+                                Draw
+                            </div>
+                            <div class="form-bottom d-flex">
+                                <b-form-checkbox button :button-variant="draws[i] ? 'primary' : 'light'"
+                                                 class="draw-checkbox" v-model="draws[i]">
+                                    <i v-if="draws[i]" class="fas fa-check fa-fw"></i>
+                                    <i v-else class="fas fa-fw fa-check hoverable"></i>
+                                </b-form-checkbox>
+                            </div>
+                        </td>
+                        <td class="form-stack number" v-if="!hideMatchExtras">
+                            <div class="form-top">Replay Code</div>
+                            <div class="form-button">
+                                <b-form-input type="text" v-model="replayCodes[i]"></b-form-input>
+                            </div>
+                        </td>
+                        <td>
+                            <TeamPicker title="Banned by" :teams="teams" v-model="banners[i]"></TeamPicker>
+                        </td>
+                        <td>
+                            <TeamPicker title="Picked by" :class="{ 'very-low-opacity': banners[i] }" :teams="teams"
+                                        v-model="pickers[i]"></TeamPicker>
+                        </td>
+                        <td>
+                            <TeamPicker title="Winner" :class="{ 'very-low-opacity': banners[i] }" :teams="teams"
+                                        v-model="winners[i]"></TeamPicker>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </b-form>
     </div>
 </template>
@@ -270,7 +295,7 @@ export default {
             const groups = {};
             let mapType = null;
 
-            console.log(this.broadcastData);
+            // console.log(this.broadcastData);
             if (this.broadcastData?.map_set) {
                 const maps = this.broadcastData?.map_set.split(",");
                 mapType = maps[mapIndex];
@@ -313,7 +338,7 @@ export default {
             }
         },
         setIfNew(key, index, value) {
-            if (this.previousAutoData?.[key]?.[index] === value) return; // console.log(`Not updating ${key}[${index}] because ${value} is the same as last set`);
+            if (this.previousAutoData?.[key]?.[index] === value) return console.log(`Not updating ${key}[${index}] because ${value} is the same as last set`);
             console.log(`Updating ${key}[${index}] to`, value);
             this.$set(this[key], index, value);
         },
@@ -328,8 +353,8 @@ export default {
             if (data.maps) {
                 data.maps.forEach((map, i) => {
                     const mapChoice = cleanID(map.map?.id || map.map?.[0]);
-                    this.setIfNew("mapChoices", i, mapChoice || null);
                     console.log("Map set", !!mapChoice, mapChoice, this.mapChoices[i], map);
+                    this.setIfNew("mapChoices", i, mapChoice || null);
                     this.setIfNew("draws", i, map.draw);
                     this.setIfNew("existingMapIDs", i, map.id);
                     this.setIfNew("winners", i, map.winner?.id || map.winner?.[0]);
@@ -412,6 +437,9 @@ export default {
 </script>
 
 <style scoped>
+    .maps-table-wrapper {
+        overflow-x: auto;
+    }
     .opacity-changes {
         opacity: 1;
         transition: opacity .3s ease;
@@ -453,6 +481,9 @@ export default {
     tr.map.banned {
         border-left-color: var(--danger)
     }
+    td.map {
+        min-width: 10em;
+    }
 
     .spacer {
         flex-grow: 1;
@@ -478,5 +509,9 @@ export default {
 
     .teams-scores >>> .custom-checkbox {
         font-size: 16px !important;
+    }
+
+    .map .number .fas {
+        font-size: 0.8em;
     }
 </style>

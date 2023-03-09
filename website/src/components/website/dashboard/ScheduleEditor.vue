@@ -4,7 +4,7 @@
 
         <table class="table table-bordered table-sm table-dark mb-0">
             <tr>
-                <th>Match</th>
+                <th colspan="2">Match</th>
                 <th>Start time</th>
                 <th>Show on overlays</th>
                 <th>Live Match</th>

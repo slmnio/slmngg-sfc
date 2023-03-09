@@ -1,20 +1,26 @@
 <template>
     <div class="container" v-if="user && user.name">
-        <h1>SLMN.GG Dashboard</h1>
-        <div class="client-broadcasts d-flex mb-2" v-if="client && client.broadcast">
-            <BroadcastSwitcher :broadcasts="client.broadcast" />
-            <router-link v-if="liveMatch" :to="url('detailed', liveMatch)">
-                <MatchThumbnail class="mini-thumbnail" :match="liveMatch" stripe-height="2px"/>
-            </router-link>
-            <div class="match-thumbnail-ghost default-thing mini-thumbnail" v-if="!liveMatch"></div>
+        <h1 class="text-md-left text-center">SLMN.GG Dashboard</h1>
+        <div class="client-broadcasts d-flex flex-wrap flex-column flex-md-row align-items-center" v-if="client && client.broadcast">
+            <div class="wrapper mb-2">
+                <BroadcastSwitcher :broadcasts="client.broadcast" />
+                <router-link v-if="liveMatch" :to="url('detailed', liveMatch)">
+                    <MatchThumbnail class="mini-thumbnail" :match="liveMatch" stripe-height="2px"/>
+                </router-link>
+                <div class="match-thumbnail-ghost default-thing mini-thumbnail" v-if="!liveMatch"></div>
+            </div>
             <div class="spacer flex-grow-1"></div>
-            <PreviewProgramDisplay :broadcast="broadcast" />
-            <div class="clocks d-flex">
-                <DashboardClock title="Local" />
-                <DashboardClock title="Broadcast" :timezone="broadcast.timezone || 'America/New_York'" />
+            <div class="wrapper">
+                <PreviewProgramDisplay :broadcast="broadcast"/>
+            </div>
+            <div class="wrapper mb-2">
+                <div class="clocks d-flex">
+                    <DashboardClock title="Local"/>
+                    <DashboardClock title="Broadcast" :timezone="broadcast.timezone || 'America/New_York'"/>
+                </div>
             </div>
         </div>
-        <div class="broadcast-editor mb-3" v-if="client && client.broadcast">
+        <div class="broadcast-editor mb-2" v-if="client && client.broadcast">
             <BroadcastEditor :client="client"/>
         </div>
         <DashboardModule title="Match Editor" icon-class="fas fa-pennant" class="broadcast-match-editor mb-2" v-if="liveMatch" start-opened>
@@ -204,5 +210,17 @@ export default {
     .bracket-viewer >>> .module-content:hover::-webkit-scrollbar-thumb,
     .bracket-viewer >>> .module-content:active::-webkit-scrollbar-thumb {
         background-color: #333;
+    }
+
+
+    .clocks .dashboard-clock:first-child {
+        margin-left: 0;
+    }
+    .clocks .dashboard-clock:last-child {
+        margin-right: 0;
+    }
+
+    .wrapper {
+        display: flex;
     }
 </style>

@@ -17,18 +17,14 @@ export function getNewURL(attachment, size) {
     return `${dataServer}/image.${attachment.fileExtension}?id=${attachment.id}&size=${size}`;
 }
 
-export function getAirtableURL(attachment) {
-    if (attachment?.url) return attachment.url;
-    return attachment?.[0]?.url || null;
-}
-
 function keyedImageAttachments(theme, keys) {
-    const urls = keys.map(key => theme[key]?.[0]).filter(s => s?.url);
-    if (urls.length) return urls[0];
+    const attachments = keys.map(key => theme[key]?.[0]).filter(s => s?.id);
+    if (attachments.length) return attachments[0];
     return null;
 }
 
 export function resizedImageNoWrap(theme, keys, size) {
+    // console.log("resized image", { theme, keys, size });
     if (!theme) return null;
     const imageAttachment = keyedImageAttachments(theme, keys);
     if (!imageAttachment) return null;

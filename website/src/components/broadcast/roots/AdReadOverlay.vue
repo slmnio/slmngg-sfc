@@ -13,7 +13,7 @@
 
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
-import { bg, getAirtableURL } from "@/utils/images";
+import { bg, getNewURL } from "@/utils/images";
 
 async function wait(ms) {
     return new Promise((resolve, reject) => {
@@ -43,7 +43,7 @@ export default {
         readImage() {
             if (!this.activeRead) return {};
             try {
-                return bg(getAirtableURL(this.activeRead.image));
+                return bg(getNewURL(this.activeRead.image, "orig"));
             } catch (e) {
                 return {};
             }

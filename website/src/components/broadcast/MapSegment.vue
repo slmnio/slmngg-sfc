@@ -36,7 +36,7 @@
 
 <script>
 import { logoBackground } from "@/utils/theme-styles";
-import { bg, getAirtableURL, resizedImage } from "@/utils/images";
+import { bg, getNewURL, resizedImage } from "@/utils/images";
 import ThemeLogo from "@/components/website/ThemeLogo";
 
 
@@ -61,7 +61,7 @@ export default {
             if (!(image)) return {};
 
             try {
-                return bg(getAirtableURL(image));
+                return bg(getNewURL(image, "orig"));
             } catch (e) {
                 return {};
             }

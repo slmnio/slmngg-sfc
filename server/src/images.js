@@ -51,7 +51,13 @@ async function downloadImage(url, filename, size) {
             file.on("finish", () => file.close(resolve));
         }).on("error", err => {
             console.error(`[image] file error for ${filename} ${err.code} ${err.message}`);
-            fs.unlink(pathName);
+            fs.unlink(pathName, function(err) {
+                if (err) {
+                    console.error(`[image] file error for ${filename} unlink FAILED`, err);
+                } else {
+                    console.error(`[image] file error for ${filename} unlinked`);
+                }
+            });
             reject(err);
         });
     }));

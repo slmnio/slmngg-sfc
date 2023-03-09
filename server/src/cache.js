@@ -162,13 +162,16 @@ async function removeAttachmentTimestamps(data) {
                     let { ending, filename } = getAutoFilename(attachment);
                     attachment._autoFilename = filename;
                     attachment.fileExtension = ending;
-                    attachments.set(attachment.id, attachment);
+                    attachments.set(attachment.id, {...attachment});
 
-                    attachment.url = generateAttachmentURL(attachment.url, attachment);
+                    // we don't want the URLs to appear in requests anymore
+                    // the data server just uses the attachment IDs
+
+                    attachment.url = null; // generateAttachmentURL(attachment.url, attachment);
 
                     for (let size in attachment.thumbnails) {
                         size = attachment.thumbnails[size];
-                        size.url = generateAttachmentURL(size.url, attachment);
+                        size.url = null; // generateAttachmentURL(size.url, attachment);
                     }
                 });
             }

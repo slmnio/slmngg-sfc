@@ -52,7 +52,8 @@ module.exports = {
         const gameMap = {
             "Overwatch": "Overwatch 2",
             "Valorant": "VALORANT",
-            "League of Legends": "League of Legends"
+            "League of Legends": "League of Legends",
+            "F1": "F1 22"
         };
 
         if (event.game && gameMap[event.game]) {

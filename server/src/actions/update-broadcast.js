@@ -1,19 +1,20 @@
+const { safeInput } = require("../action-utils/action-utils");
 
 module.exports = {
     key: "update-broadcast",
     auth: ["client"],
-    optionalParams: ["match", "advertise", "playerCams", "mapAttack"],
+    optionalParams: ["match", "advertise", "playerCams", "mapAttack", "title"],
     /***
      * @param {AnyAirtableID} match
      * @param {ClientData} client
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern
-    async handler({ match: matchID, advertise, playerCams, mapAttack }, { client }) {
+    async handler({ match: matchID, advertise, playerCams, mapAttack, title }, { client }) {
         let broadcast = await this.helpers.get(client?.broadcast?.[0]);
         if (!broadcast) throw ("No broadcast associated");
 
-        console.log({ matchID, advertise, playerCams, mapAttack });
+        console.log({ matchID, advertise, playerCams, mapAttack, title });
         let validatedData = {};
 
         if (matchID !== undefined) {
@@ -35,6 +36,9 @@ module.exports = {
         }
         if (playerCams !== undefined) {
             validatedData["Show Cams"] = !!playerCams;
+        }
+        if (title !== undefined) {
+            validatedData["Title"] = safeInput(title);
         }
 
         console.log(validatedData);

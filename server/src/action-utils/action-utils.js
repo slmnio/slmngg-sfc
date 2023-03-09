@@ -183,8 +183,17 @@ function getTwitchAPIError(error) {
     }
 }
 
+function safeInput(string) {
+    return string
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 
 module.exports = {
-    getSelfClient, cleanID, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord,
+    getSelfClient, cleanID, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord, safeInput,
     getTwitchChannel, getMatchData, getTwitchAPIClient, getTwitchAPIError, getBroadcast, getMaps, getAll
 };

@@ -400,3 +400,13 @@ export function getEmbedData(url) {
 
     return { service: "unknown", url: url };
 }
+
+
+export function unescapeText(text) {
+    return text
+        .replaceAll("&amp;", "&")
+        .replaceAll("&lt;", "<")
+        .replaceAll("&gt;", ">")
+        .replaceAll("&quot;", "\"")
+        .replaceAll("&#039;", "'");
+}

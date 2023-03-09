@@ -33,7 +33,7 @@
         <div class="spacer flex-grow-1"></div>
         <div class="area right-area">
             <div class="group text-right">
-                <div class="group-top">Break Display</div>
+                <div class="group-top">Break Settings</div>
                 <div class="group-bottom">
                     <div class="fake-btn-group">
                         <BreakDisplayMultiModal :broadcast="broadcast"/>

@@ -338,7 +338,7 @@ export default {
             }
         },
         setIfNew(key, index, value) {
-            if (this.previousAutoData?.[key]?.[index] === value) return console.log(`Not updating ${key}[${index}] because ${value} is the same as last set`);
+            if (this.previousAutoData?.[key]?.[index] === value) return; // console.log(`Not updating ${key}[${index}] because ${value} is the same as last set`);
             console.log(`Updating ${key}[${index}] to`, value);
             this.$set(this[key], index, value);
         },

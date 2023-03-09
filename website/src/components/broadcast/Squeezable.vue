@@ -35,14 +35,14 @@ export default {
             const small = this.$slots.default?.[0]?.elm;
             console.log({ big, small });
 
-            if (!big || !small) return;
+            if (!big?.getBoundingClientRect || !small?.getBoundingClientRect) return;
 
             const boxSize = big.getBoundingClientRect().width;
             const contentSize = small.getBoundingClientRect().width;
             const contentScale = boxSize / contentSize;
             console.log(contentScale, this.contentScale);
             this.contentScale = contentScale * this.contentScale;
-            if (isNaN(this.contentScale)) {
+            if (isNaN(this.contentScale) || this.contentScale === Infinity) {
                 this.contentScale = 1;
             }
 

@@ -1,16 +1,19 @@
 <template>
     <div class="break-overlay">
         <div class="break-center">
-            <ThemeTransition class="break-transition-top" :theme="event && event.theme" :one-color="true" :active="animationActive" start="middle" end="middle">
-                <Squeezable align="middle" :disabled="(overlayTitle).includes('\\n')" class="break-top event-theme-border flex-center overlay--bg" :style="eventBorder">
-                    <transition name="fade" mode="out-in">
-                        <span class="industry-align" :class="{'has-br': (overlayTitle).includes('\\n') }"
-                              :key="overlayTitle" v-html="nbr(overlayTitle)"></span>
-                    </transition>
-                    <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News" :borderCSS="eventBorder" />
-                </Squeezable>
+            <ThemeTransition class="break-transition-top" :theme="event && event.theme" :active="animationActive" start="middle" end="middle">
+                <div class="break-top event-theme-border flex-center overlay--bg px-4" :style="eventBorder">
+                    <Squeezable align="middle" :disabled="(overlayTitle).includes('\\n')" class="w-100 flex-center">
+                        <transition name="fade" mode="out-in">
+                            <span class="industry-align" :class="{'has-br': (overlayTitle).includes('\\n') }"
+                                  :key="overlayTitle" v-html="nbr(overlayTitle)"></span>
+                        </transition>
+                        <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News"
+                                        :borderCSS="eventBorder"/>
+                    </Squeezable>
+                </div>
             </ThemeTransition>
-            <ThemeTransition class="break-transition-main" :theme="event && event.theme" :one-color="true" :active="animationActive" start="middle" end="middle" :starting-delay="100">
+            <ThemeTransition class="break-transition-main" :theme="event && event.theme" :active="animationActive" start="middle" end="middle" :starting-delay="100">
                 <div class="break-main event-theme-border overlay--bg" :style="eventBorder">
                     <div class="break-col break-left-col">
                         <transition name="anim-break-next">

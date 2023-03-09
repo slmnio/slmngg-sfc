@@ -163,7 +163,7 @@ export default {
             return resizedImage(this._theme, ["small_logo", "default_logo"], "h-80");
         },
         teamWidth() {
-            return this.width || 690;
+            return this.width || 567;
         },
         teamWidthCSS() {
             if (!this.teamWidth) return {};

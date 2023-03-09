@@ -64,7 +64,7 @@ export default {
         overflow: hidden;
     }
     .team-guests .guest {
-        width: calc((100% / 6) - 4px);
+        width: calc((100% / 5) - 4px);
         margin: 0 2px;
         --caster-width: 375px;
     }

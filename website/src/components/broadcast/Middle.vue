@@ -9,10 +9,7 @@
 <script>
 export default {
     name: "Middle",
-    props: ["text"],
-    mounted() {
-        console.log("midd");
-    }
+    props: ["text"]
 };
 </script>
 
@@ -22,7 +19,7 @@ export default {
     width: 100%;
     display: flex;
     justify-content: center;
-    top: 8px;
+    top: -10px;
     pointer-events: none;
 }
 

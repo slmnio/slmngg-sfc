@@ -18,15 +18,12 @@ function getImageURL(attachment, size = "orig") {
 }
 
 
-function aImg(airtableImage, size) {
-    // console.log(airtableImage);
-    if (!airtableImage || !airtableImage.length) return null;
-    let i = airtableImage[0];
+function aImg(attachment, size) {
     return {
-        width: i.width,
-        height: i.height,
-        type: i.type,
-        url: getImageURL(i.url, size)
+        width: attachment.width,
+        height: attachment.height,
+        type: attachment.type,
+        url: getImageURL(attachment, size)
     };
 }
 function themeSquare(id, size = 500) {
@@ -243,6 +240,11 @@ module.exports = ({ app, Cache }) => {
                 let event = thing?.event && await Cache.get(thing.event[0]);
                 let theme = event?.theme && await Cache.get(event.theme[0]);
 
+                let thumbnail = thing?.thumbnail?.[0] && Cache.getAttachment(thing.thumbnail[0].id);
+                let header = !thumbnail && thing?.header?.[0] && Cache.getAttachment(thing.header[0].id);
+
+                console.log({ thing, thumbnail, header });
+
 
                 /*
                 need to get:
@@ -260,7 +262,7 @@ module.exports = ({ app, Cache }) => {
                     /* solo_description removes slmn.gg footer */
                     solo_description: text.slice(0, cutoff) + (text.length > cutoff ? "..." : ""),
                     color: theme?.color_theme,
-                    image: aImg(thing?.thumbnail, "w-1000") || aImg(thing?.header, "w-1000") || themeSquare(theme?.id),
+                    image: aImg(thumbnail || header, "w-1000") || themeSquare(theme?.id),
                     card_type: (thing?.thumbnail || thing?.header) ? "summary_large_image" : null
                 };
 

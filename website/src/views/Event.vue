@@ -117,7 +117,7 @@ export default {
             return "on-foreign-subdomain";
         },
         shouldShowMinisitePrompt() {
-            return ["no-root-minisite", "on-foreign-subdomain"].includes(this.ownMinisiteStatus);
+            return this.minisiteDomain && ["no-root-minisite", "on-foreign-subdomain"].includes(this.ownMinisiteStatus);
         },
         minisiteLink() {
             if (!this.event?.id || !this.minisiteDomain) return null;

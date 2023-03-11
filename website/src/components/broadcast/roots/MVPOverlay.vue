@@ -50,10 +50,21 @@ export default {
                 })
             });
         },
+        broadcastData() {
+            return ReactiveRoot(this.broadcast?.id, {
+                highlight_player: ReactiveThing("highlight_player"),
+                highlight_team: ReactiveThing("highlight_team", {
+                    theme: ReactiveThing("theme")
+                })
+            });
+        },
         mvp() {
-            return this.match?.mvp;
+            return this.match?.mvp || this.broadcastData?.highlight_player;
         },
         mvpTeam() {
+            return this.relatedMvpTeam || this.broadcastData?.highlight_team;
+        },
+        relatedMvpTeam() {
             if (!this.mvp) return null;
             return (this.mvp.member_of || []).find(team => (this.match?.teams || []).some(t => t.id === team.id));
         },

@@ -1,14 +1,14 @@
 <template>
     <div class="background" v-if="background">
-        <div class="image-background full" v-if="type === 'image'" :style="bg(background.url)"></div>
+        <div class="image-background full" v-if="type === 'image'" :style="bg(backgroundURL)"></div>
         <div class="video-background full flex-center" v-if="type === 'video'">
-            <video :src="background.url" loop autoplay muted />
+            <video :src="backgroundURL" loop autoplay muted />
         </div>
     </div>
 </template>
 
 <script>
-import { bg } from "@/utils/images";
+import { bg, getNewURL } from "@/utils/images";
 
 export default {
     name: "BroadcastBackground",
@@ -17,6 +17,9 @@ export default {
         noStinger: true
     }),
     computed: {
+        backgroundURL() {
+            return getNewURL(this.background, "orig");
+        },
         background() {
             if (!this.broadcast?.background) return null;
             if (this.index && this.broadcast.background[this.index]) return this.broadcast.background[this.index];

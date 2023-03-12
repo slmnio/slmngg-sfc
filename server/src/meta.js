@@ -19,6 +19,7 @@ function getImageURL(attachment, size = "orig") {
 
 
 function aImg(attachment, size) {
+    if (!attachment) return null;
     return {
         width: attachment.width,
         height: attachment.height,

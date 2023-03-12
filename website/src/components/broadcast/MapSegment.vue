@@ -57,11 +57,11 @@ export default {
         },
         mapBackground() {
             console.log("background", this.map.name, { submap_big: this.map?.map?.big_image, submap_image: this.map?.map?.image, parent_big: this.map?.big_image, parent_image: this.map?.image });
-            const image = this.map?.map?.big_image || this.map?.map?.image || this.map?.big_image || this.map?.image;
+            const image = (this.map?.map?.big_image || this.map?.map?.image || this.map?.big_image || this.map?.image)?.[0];
             if (!(image)) return {};
 
             try {
-                return bg(getNewURL(image, "orig"));
+                return bg(image?.url || getNewURL(image, "orig"));
             } catch (e) {
                 return {};
             }
@@ -104,7 +104,7 @@ export default {
         mapVideo() {
             if (!this.showMapVideo) return null;
             if (!this.map?.map?.video?.length) return null;
-            return this.map.map.video[0].url;
+            return getNewURL(this.map.map.video?.[0], "orig");
         }
     }
 };

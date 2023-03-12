@@ -15,6 +15,7 @@
 import MapSegment from "@/components/broadcast/MapSegment";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { DefaultMapImages, likelyNeededMaps } from "@/utils/content-utils";
+import { getNewURL } from "@/utils/images";
 
 export default {
     name: "MapDisplay",
@@ -172,8 +173,10 @@ export default {
                 return console.log("Not doing anything since music is already fading out");
             }
             console.log("running audio", read);
-            if (!read?.audio?.length || !read?.audio[0]?.url) return console.warn("no valid data", read);
-            const url = read.audio[0].url;
+
+            const audioURL = getNewURL(read.audio?.[0], "orig");
+            if (!audioURL) return console.warn("no valid data", read);
+            const url = audioURL;
             const audio = new Audio(url);
             audio.volume = (read.volume || 100) / 100;
             audio.onended = () => {

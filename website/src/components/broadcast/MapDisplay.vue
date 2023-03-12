@@ -176,8 +176,7 @@ export default {
 
             const audioURL = getNewURL(read.audio?.[0], "orig");
             if (!audioURL) return console.warn("no valid data", read);
-            const url = audioURL;
-            const audio = new Audio(url);
+            const audio = new Audio(audioURL);
             audio.volume = (read.volume || 100) / 100;
             audio.onended = () => {
                 this.activeAudio = null;

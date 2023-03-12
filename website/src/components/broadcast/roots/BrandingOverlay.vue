@@ -31,7 +31,7 @@
                 </div>
                 <div class="logos flex-grow-1 d-flex flex-column mb-3">
                     <div class="logo-holder w-100 flex-grow-1 my-2 flex-center" v-for="logo in logos" :key="logo.key" :style="teamBG">
-                        <div class="logo-inner bg-center" :style="{'backgroundImage': `url(${logo.item})`}"></div>
+                        <div class="logo-inner bg-center" :style="bg(resizedAttachment(logo.item, 'orig'))"></div>
                     </div>
                 </div>
                 <div class="colors d-flex">
@@ -48,16 +48,16 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { logoBackground1 } from "@/utils/theme-styles";
-import { bg, resizedImage } from "@/utils/images";
+import { bg, resizedAttachment, resizedImage } from "@/utils/images";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");
 }
 
 export default {
-    name: "InfoOverlay",
+    name: "BrandingOverlay",
     props: ["broadcast"],
-    methods: { logoBackground1, resizedImage },
+    methods: { resizedAttachment, logoBackground1, resizedImage, bg },
     data: () => ({
         logoI: 0
     }),
@@ -83,7 +83,7 @@ export default {
             if (!this.highlightTeam?.theme) return [];
             const theme = this.highlightTeam.theme;
             return ["small_logo", "default_logo", "default_wordmark"].map(key => ({ key, item: theme[key] }))
-                .filter(s => s.item).map(s => ({ ...s, item: s.item[0].url }));
+                .filter(s => s.item).map(s => ({ ...s, item: s.item[0] }));
         },
         bigLogos() {
             return this.logos.filter(logo => logo.key !== "small_logo");
@@ -115,7 +115,7 @@ export default {
             return this.highlightTeam.brand_designers.map(p => p.name).join(", ");
         },
         focusedLogoCSS() {
-            return bg(this.bigLogos[this.logoI]?.item);
+            return bg(resizedAttachment(this.bigLogos[this.logoI]?.item));
         }
     },
     mounted() {

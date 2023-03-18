@@ -72,7 +72,13 @@ export default {
             })(this.broadcast);
         },
         casters() {
-            return this.guests;/* .filter(g => g.show); */
+            if (!this.guests.length) {
+                return (this.liveMatch?.casters || []).map(caster => ({
+                    ...caster.live_guests,
+                    player: caster
+                }));
+            }
+            return this.guests;
         },
         themeColor() {
             if (!this.broadcast?.event?.theme) return {};

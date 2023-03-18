@@ -1,5 +1,5 @@
 <template>
-    <div class="bracket-implications bg-dark p-2 d-flex ">
+    <div class="bracket-implications bg-dark p-2 d-flex" v-if="bracketImplications.length">
         <div class="bracket-i-b w-100" v-for="imps in bracketImplications" :key="imps.bracket.id">
             <div class="mb-1 text-center"><b><i class="fas fa-sitemap fa-fw mr-2"></i><router-link :to="url('event', match.event, { subPage: 'bracket' })">{{ imps.bracket.name }}</router-link></b></div>
             <div class="bracket-row">

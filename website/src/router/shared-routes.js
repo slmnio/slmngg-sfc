@@ -61,7 +61,7 @@ export default [
         children: [
             { path: "", component: () => import("@/views/sub-views/MatchVOD.vue") },
             { path: "history", component: () => import("@/views/sub-views/MatchHistory.vue") },
-            { path: "editor", component: () => import("@/components/website/dashboard/MatchEditor.vue"), meta: { requiresAuth: true } }
+            { path: "editor", component: () => import("@/views/sub-views/EventMatchEditor.vue"), meta: { requiresAuth: true } }
         ]
     },
     { path: "/detailed/:id", component: () => import("@/views/DetailedMatch.vue"), props: route => ({ id: route.params.id }) },

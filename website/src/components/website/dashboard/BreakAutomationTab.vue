@@ -112,7 +112,7 @@ export default {
                 }
             } finally {
                 this.processing = false;
-                this.$refs.modal.hide();
+                // this.$refs.modal.hide();
             }
         },
         resetOptions(options) {

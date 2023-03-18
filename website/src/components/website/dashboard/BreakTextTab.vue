@@ -1,7 +1,7 @@
 <template>
     <div class="break-text-tab">
         <b-form-group label="Break title" label-for="input-1" description="Use {auto} for dynamic starting/BRB/thanks text">
-            <b-form-input id="input-1" v-model="breakTitle"></b-form-input>
+            <b-form-input id="input-1" v-model="breakTitle" @keydown.ctrl.enter="saveOptions"></b-form-input>
         </b-form-group>
 
 

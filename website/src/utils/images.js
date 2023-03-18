@@ -24,7 +24,7 @@ function keyedImageAttachments(theme, keys) {
 }
 
 export function resizedImageNoWrap(theme, keys, size) {
-    console.log("resized image", { theme, keys, size });
+    // console.log("resized image", { theme, keys, size });
     if (!theme) return null;
     const imageAttachment = keyedImageAttachments(theme, keys);
     if (!imageAttachment) return null;

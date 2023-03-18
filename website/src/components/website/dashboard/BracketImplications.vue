@@ -40,7 +40,7 @@ export default {
             })(this.match);
         },
         bracketImplications() {
-            return this.bracketsIncludingMatch.map(bracket => {
+            return this.bracketsIncludingMatch.filter(bracket => !bracket.hide_implications).map(bracket => {
                 try {
                     const { connections } = JSON.parse(bracket.bracket_layout);
                     const thisMatchNumber = bracket.ordered_matches.findIndex(match => match.id === this.match.id);

@@ -1,5 +1,5 @@
 <template>
-    <b-modal hide-footer id="token-modal" title="SLMN.gg Token">
+    <b-modal hide-footer id="token-modal" title="SLMN.gg Token" ref="modal" @show="reset()">
         <p>Your <b>SLMN.GG token</b> is used to identify you and perform requests on the site.</p>
         <p>You can use the token in our Companion module to make full use of the buttons.</p>
 
@@ -42,12 +42,16 @@ export default {
         }
     },
     methods: {
+        reset() {
+            this.hasAccepted = false;
+            this.recentlyCopied = false;
+        },
         copyToken() {
             navigator.clipboard.writeText(this.token);
             this.recentlyCopied = true;
             setTimeout(() => {
-                this.recentlyCopied = false;
-            }, 1500);
+                this.$refs.modal?.hide();
+            }, 500);
         }
     }
 };

@@ -197,14 +197,3 @@ export const AllBanners = [
         }
     })
 ];
-
-
-console.log(AllBanners);
-
-function expected() {
-    const banners = [];
-
-    const userChoice = 0;
-    const banner = banners[userChoice];
-    banner.customise({ color: "red" });
-}

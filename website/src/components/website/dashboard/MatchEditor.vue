@@ -16,7 +16,7 @@
                 <b-form-input :class="{'low-opacity': processing['custom_name']}" class="opacity-changes"
                               v-model="matchData.custom_name" @change="sendMatchDataChange('custom_name', matchData.custom_name)">
                 </b-form-input>
-                <b-button class="ml-5 top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save all</b-button>
+                <b-button class="ml-5 top-button flex-shrink-0" variant="success" @click="() => saveMapAndScores()"><i class="fas fa-save fa-fw"></i> Save all</b-button>
                 </div>
             <div class="teams-scores pt-2 px-2">
                 <b-form-checkbox v-if="hasMapPool" class="mr-2" v-model="restrictToMapPool" id="map-pool-checkbox">Restrict to map pool</b-form-checkbox>
@@ -26,7 +26,6 @@
                     <div class="team-dummy" v-else>Dummy</div>
                 </div>
                 <b-form-input v-for="(score, i) in scores" :key="i" v-model.number="matchData.scores[i]"
-                              @change="(number) => setScore(`score_${i+1}`, number)"
                               type="number" :min="0" :max="match.first_to" class="opacity-changes score-input" />
                 <div class="spacer" style="order:10"></div>
                 <div class="right-buttons" style="order:11">
@@ -395,9 +394,40 @@ export default {
             console.log("[processing]", key, "off");
             return response;
         },
+        async saveMapAndScores() {
+            const responses = await Promise.all([
+                this.sendScoresIfDifferent(),
+                this.sendMapDataChange()
+            ]);
+        },
+        async sendScoresIfDifferent() {
+            const newScores = this.matchData?.scores;
+            const oldScores = [this.match.score_1, this.match.score_2];
+            if (!(newScores.length === 2 && oldScores.length === 2)) {
+                return console.warn("Not sending scores, they're weird", { oldScores, newScores });
+            }
+
+            if ((newScores[0] !== oldScores[0]) || (newScores[1] !== oldScores[1])) {
+                // scores are different
+
+                const response = await updateMatchData(this.$root.auth, this.match, {
+                    score_1: newScores[0],
+                    score_2: newScores[1]
+                });
+
+                if (!response.error) {
+                    this.$notyf.success({
+                        message: `Score set to ${newScores.join("-")}`,
+                        duration: 3000
+                    });
+                }
+            }
+        },
         async sendMapDataChange() {
             console.log("map processing");
             this.$set(this.processing, "map", true);
+
+            await this.sendScoresIfDifferent();
 
             const response = await updateMapData(this.$root.auth, this.match, this.editedMapData);
             // if (response.error) this.errorMessage = response.errorMessage;

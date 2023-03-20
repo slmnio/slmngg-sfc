@@ -49,7 +49,7 @@ export default {
         dummy: false
     }),
     methods: {
-        insertDummies(players) {
+        insertDummies(players = []) {
             if (!this.eachTeam) return players;
             const dummyRecord = { dummy: true };
             const dummiedPlayers = [];

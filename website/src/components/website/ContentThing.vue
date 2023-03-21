@@ -61,7 +61,7 @@ export default {
         },
         logo () {
             if (!this.theme || !this.theme.default_logo) return null;
-            return resizedImage(this.theme, ["small_logo", "default_logo"], "h-120");
+            return resizedImage(this.theme, ["small_logo", "default_logo"], "s-120");
         },
         headshot () {
             if (!this.thing) return null;

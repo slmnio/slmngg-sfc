@@ -13,7 +13,7 @@ import informal from "spacetime-informal";
 
 function getAbbrev(timezone) {
     const display = informal.display(timezone);
-    return spacetime.now().isDST() ? display.daylight.abbrev : display.standard.abbrev;
+    return spacetime.now(timezone).isDST() ? display.daylight.abbrev : display.standard.abbrev;
 }
 function getLocation(timezone) {
     return timezone.split("/")[1].replace(/_/g, " ");

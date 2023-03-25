@@ -2511,10 +2511,10 @@ spacetime-informal@^0.6.1:
   dependencies:
     efrt-unpack "2.2.0"
 
-spacetime@^6.16.0:
-  version "6.16.0"
-  resolved "https://registry.yarnpkg.com/spacetime/-/spacetime-6.16.0.tgz#f213963392eafc380716c3857b23251de87db97f"
-  integrity sha512-mkuniNOp6ssfPyJidj81tb54zKxK4vEKPTmcUsC/NEGIF8S07ppoSotdg6numT1/26rthQYmdxMY/M5a9WeJVQ==
+spacetime@^7.4.1:
+  version "7.4.1"
+  resolved "https://registry.yarnpkg.com/spacetime/-/spacetime-7.4.1.tgz#2be4064ee26accfaf4ccfe16787a7c45c14f3faf"
+  integrity sha512-khQpvLNMhHFzfFJslMfunqqsjOxdmoDDYX5Wh4qYb8N6f8vBPI6HvbT7Wb2wcMa+oP1Xh1HpEcwfPFrj8UfvHQ==
 
 spdx-correct@^3.0.0:
   version "3.1.1"

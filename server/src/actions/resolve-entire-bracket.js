@@ -1,13 +1,34 @@
 const { getAll, cleanID } = require("../action-utils/action-utils");
+const { canEditMatch } = require("../action-utils/action-permissions");
 
 module.exports = {
     key: "resolve-entire-bracket",
     auth: ["user"],
     requiredParams: ["bracketID"],
     async handler({ bracketID }, { user }) {
-        if (!user.airtable?.website_settings?.includes("Can edit any match")) throw { errorMessage: "You don't have permission to resolve brackets", errorCode: 403 };
 
         let bracket = await this.helpers.get(bracketID);
+
+        if (bracket.event) {
+            // Bracket attached to event, use event permissions
+            let event = await this.helpers.get(bracket.events?.[0]);
+            if (!await canEditMatch(user, { event })) {
+                throw {
+                    errorMessage: "You don't have permission to resolve brackets",
+                    errorCode: 403
+                };
+            }
+
+        } else {
+            // Bracket is not attached to an event, use global permissions
+            if (!user.airtable?.website_settings?.includes("Can edit any match")) {
+                throw {
+                    errorMessage: "You don't have permission to resolve brackets",
+                    errorCode: 403
+                };
+            }
+        }
+
         if (!bracket?.bracket_layout) throw { errorMessage: "Unknown or unusable bracket" };
 
         let layout;

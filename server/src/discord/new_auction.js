@@ -225,7 +225,7 @@ const Auction = {
         await Auction.setActivePlayer(player);
         Auction.bids = [];
         if (startingTeam) {
-            Auction.bid(new AuctionBid(startingTeam, 1));
+            Auction.bid(new AuctionBid(startingTeam, 10));
 
             embed.setDescription(`Started by ${startingTeam.get("Name")} at $1k.\nIf there are no further bids, ${player.get("Name")} will be signed to to ${startingTeam.get("Name")}`);
             embed.setThumbnail(getImage(startingTeam));
@@ -364,8 +364,8 @@ const blue = (items) => {
 };
 
 client.on("messageCreate", async message => {
-    if (!message.guild || message.guild.id !== "646065580000149514") return;
-    if (!["746461094654247003", "648311334907281408"].includes(message.channel.id)) return;
+    if (!["646065580000149514", "1083249916933058571"].includes(message.guild?.id)) return;
+    if (!["746461094654247003", "648311334907281408", "1089657638855393330"].includes(message.channel.id)) return;
     // console.log("[auction] message", message.content);
 
     let args = message.content.split(/ +/);

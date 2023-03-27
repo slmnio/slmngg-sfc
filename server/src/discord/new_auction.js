@@ -380,6 +380,13 @@ client.on("messageCreate", async message => {
             }
         },
         {
+            aliases: [".setup"],
+            execute: async (args, message) => {
+                Auction.channel = message.channel;
+                Auction.channel.send("Set auction channel to this channel :)");
+            }
+        },
+        {
             aliases: [".restart"],
             execute: async (args, message) => {
                 Auction.startingAllowed = true;

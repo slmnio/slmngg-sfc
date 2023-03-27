@@ -9,7 +9,7 @@ function money(num) {
     return `$${num || 0}k`;
 }
 function getAuctionMax() {
-    return 7;
+    return 8;
 }
 
 function deAirtable(obj) {

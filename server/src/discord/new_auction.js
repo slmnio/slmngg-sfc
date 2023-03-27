@@ -225,9 +225,10 @@ const Auction = {
         await Auction.setActivePlayer(player);
         Auction.bids = [];
         if (startingTeam) {
-            Auction.bid(new AuctionBid(startingTeam, 10));
+            let startAmount = 10;
+            Auction.bid(new AuctionBid(startingTeam, startAmount));
 
-            embed.setDescription(`Started by ${startingTeam.get("Name")} at $1k.\nIf there are no further bids, ${player.get("Name")} will be signed to to ${startingTeam.get("Name")}`);
+            embed.setDescription(`Started by ${startingTeam.get("Name")} at $${startAmount}k.\nIf there are no further bids, ${player.get("Name")} will be signed to to ${startingTeam.get("Name")}`);
             embed.setThumbnail(getImage(startingTeam));
 
             if (player.get("Draft Data")) {

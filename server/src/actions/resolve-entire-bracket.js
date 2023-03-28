@@ -108,7 +108,15 @@ module.exports = {
                 // no updates
             } else if (correctTeams.length === 1) {
                 let placeholderRight = parseInt(correctTeams[0]._position) === 1; // (not 2)
-                // console.log(matchNum, correctTeams[0]._position, placeholderRight);
+                // console.log(matchNum, correctTeams[0]._position, placeholderRight, feeders.length);
+
+                if (!correctTeams[0]?._position && feeders.length === 1) {
+                    // team here doesn't know where it should be, and there's one feeder
+                    // therefore put the only team in the opposite to the feeder
+                    let feeder = feeders[0];
+                    placeholderRight = feeder.position === "2";
+                    // feeder position 2 = right/bottom, so placeholder there
+                }
 
                 let response = await this.helpers.updateRecord("Matches", match, {
                     "Teams": [correctTeams[0].id],

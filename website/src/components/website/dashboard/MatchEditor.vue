@@ -238,6 +238,9 @@ export default {
         match: {
             deep: true,
             handler(newMatch, oldMatch) {
+                if (newMatch?.id !== oldMatch?.id) {
+                    this.emptyData(newMatch?.id);
+                }
                 this.updateMatchData(newMatch);
             }
         },
@@ -341,18 +344,37 @@ export default {
             console.log(`Updating ${key}[${index}] to`, value);
             this.$set(this[key], index, value);
         },
+        emptyData(newID) {
+            console.log("New match, emptying data", newID);
+            this.$set(this.processing, "map", true);
+            this.draws = [];
+            this.mapChoices = [];
+            this.winners = [];
+            this.pickers = [];
+            this.banners = [];
+            this.score_1s = [];
+            this.score_2s = [];
+            this.mapNumbers = [];
+            this.existingMapIDs = [];
+            this.replayCodes = [];
+            this.extraMaps = 0;
+            this.errorMessage = null;
+            this.restrictToMapPool = true;
+        },
         updateMatchData(data) {
             console.log("match data update", data);
+
             Object.entries(this.matchData).forEach(([key]) => {
                 if (data[key] !== this.matchData[key]) {
                     this.matchData[key] = data[key] || null;
                 }
             });
 
+
             if (data.maps) {
                 data.maps.forEach((map, i) => {
                     const mapChoice = cleanID(map.map?.id || map.map?.[0]);
-                    console.log("Map set", !!mapChoice, mapChoice, this.mapChoices[i], map);
+                    // console.log("Map set", !!mapChoice, mapChoice, this.mapChoices[i], map);
                     this.setIfNew("mapChoices", i, mapChoice || null);
                     this.setIfNew("draws", i, map.draw);
                     this.setIfNew("existingMapIDs", i, map.id);
@@ -364,6 +386,9 @@ export default {
                     this.setIfNew("replayCodes", i, map.replay_code);
                     this.setIfNew("mapNumbers", i, map.number);
                 });
+                this.$set(this.processing, "map", false);
+            } else {
+                this.$set(this.processing, "map", false);
             }
 
             this.matchData.scores = this.scores;

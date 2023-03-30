@@ -237,7 +237,7 @@ export default {
         },
         logoBackground1,
         createConnections() {
-            console.log("creating connections");
+            // console.log("creating connections");
             this.connectionElements.forEach(el => el.remove());
             this.connectionBugs = [];
 
@@ -408,20 +408,20 @@ export default {
         layout: {
             deep: true,
             handler() {
-                console.log("[layout data update]");
+                // console.log("[layout data update]");
                 this.$nextTick(() => this.createConnections());
             }
         },
         bracket: {
             deep: true,
             handler() {
-                console.log("[bracket data update]");
+                // console.log("[bracket data update]");
                 this.$nextTick(() => this.createConnections());
             }
         }
     },
     mounted() {
-        console.log("[bracket mounted]");
+        // console.log("[bracket mounted]");
         this.$nextTick(() => this.createConnections());
     }
 };

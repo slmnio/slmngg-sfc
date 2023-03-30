@@ -469,6 +469,7 @@ export default {
         justify-content: center;
         align-items: center;
         transition: opacity 150ms ease, border-color 150ms ease, background-color 150ms ease;
+        overflow: hidden;
     }
     /*.bracket >>> .connection.dir-up { background-color: rgba(255,255,0,0.25); }*/
     /*.bracket >>> .connection.dir-down { background-color: rgba(0, 255,255,0.25); }*/

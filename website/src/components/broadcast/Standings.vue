@@ -208,7 +208,7 @@ export default {
                     if (match.maps?.length) {
                         match.maps.forEach(map => {
                             if (!map.id) return;
-                            if (map.score_1 === undefined || map.score_2 === undefined) return;
+                            if (map.score_1 == null || map.score_2 == null) return;
                             const mapScores = [map.score_1, map.score_2];
                             team.standings.map_round_wins += mapScores[teamIndex];
                             team.standings.map_round_losses += mapScores[+!teamIndex];

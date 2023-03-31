@@ -63,9 +63,8 @@ export default {
             if (!this.match) return [null, null];
             if (!this.match.teams || this.match.teams.length !== 2) return [null, null];
 
-            // console.log(this.match);
-            if (this.match.first_to === 1 && this.match.maps?.length === 1) {
-                const map = this.match.maps[0];
+            if (this.match.first_to === 1 && this.match.maps?.filter(m => !(m.banner)).length === 1) {
+                const map = this.match.maps.find(m => !(m.banner));
                 if (map.id && (map.score_1 !== undefined && map.score_2 !== undefined)) {
                     console.log("show map score!", this.match, map);
                     if (this.shouldSwapTeams) return [map.score_2, map.score_1];

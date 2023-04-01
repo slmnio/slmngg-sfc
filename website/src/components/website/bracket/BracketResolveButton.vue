@@ -37,7 +37,7 @@ export default {
     },
     methods: {
         async clickResolveButton(bracket) {
-            if (!this.$root.auth?.user?.website_settings?.includes("Can edit any match")) {
+            if (!canEditMatch(this.$root?.auth?.user, { event: this.hydratedEvent })) {
                 return this.$notyf.error("You don't have permission to resolve brackets");
             }
             this.isResolving = true;

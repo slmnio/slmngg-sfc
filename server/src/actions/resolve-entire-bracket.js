@@ -9,7 +9,7 @@ module.exports = {
 
         let bracket = await this.helpers.get(bracketID);
 
-        if (bracket.event) {
+        if (bracket.events) {
             // Bracket attached to event, use event permissions
             let event = await this.helpers.get(bracket.events?.[0]);
             if (!await canEditMatch(user, { event })) {

@@ -16,7 +16,7 @@
                 <b-form-input :class="{'low-opacity': processing['custom_name']}" class="opacity-changes"
                               v-model="matchData.custom_name" @change="sendMatchDataChange('custom_name', matchData.custom_name)">
                 </b-form-input>
-                <b-button class="ml-5 top-button flex-shrink-0" variant="success" @click="() => saveMapAndScores()"><i class="fas fa-save fa-fw"></i> Save all</b-button>
+                <b-button :disabled="processing['map']" class="ml-5 top-button flex-shrink-0" variant="success" @click="() => saveMapAndScores()"><i class="fas fa-save fa-fw"></i> Save all</b-button>
                 </div>
             <div class="teams-scores pt-2 px-2">
                 <b-form-checkbox v-if="hasMapPool" class="mr-2" v-model="restrictToMapPool" id="map-pool-checkbox">Restrict to map pool</b-form-checkbox>
@@ -195,18 +195,28 @@ export default {
             return this.match?.event?.map_pool?.length;
         },
         availableMaps() {
-            return (ReactiveRoot("Map Data", {
+            const mapData = (ReactiveRoot("Map Data", {
                 ids: ReactiveArray("ids")
-            }))?.ids?.filter(map => {
-                if (!map) return;
+            }))?.ids?.filter(Boolean);
+            if (!mapData?.length) return [];
 
+            let maps = mapData.filter(map => {
                 if (this.restrictToMapPool && this.hasMapPool) {
                     return (this.match?.event?.map_pool || []).some(_m => _m === "rec" + map?.id || _m?.id === "rec" + map?.id);
                 }
-
                 if (!this.match?.event?.game) return true;
                 return map && map.game === this.match?.event?.game;
-            }).sort((a, b) => {
+            });
+
+            if (maps.length === 0) {
+                maps = mapData.filter(map => {
+                    if (this.restrictToMapPool && this.hasMapPool) {
+                        return (this.match?.event?.map_pool || []).some(_m => _m === "rec" + map?.id || _m?.id === "rec" + map?.id);
+                    }
+                });
+            }
+
+            return maps.sort((a, b) => {
                 const l = textSort(a.type, b.type);
                 return l !== 0 ? l : textSort(a.name, b.name);
             });
@@ -314,25 +324,25 @@ export default {
                 ...Object.entries(groups).map(([groupName, maps]) => ({ label: groupName, options: maps.map(m => ({ value: m.id, text: m.name })) }))
             ];
         },
-        async setScore(scoreNum, number) {
-            if (this.scoreDebounceTimeouts[scoreNum]) clearTimeout(this.scoreDebounceTimeouts[scoreNum]);
-            this.scoreDebounceTimeouts[scoreNum] = setTimeout(async () => {
-                console.log({
-                    scoreNum,
-                    number
-                });
-
-                const response = await this.sendMatchDataChange(scoreNum, parseInt(number));
-                if (!response.error) {
-                    const updatedScore = [...this.scores];
-                    updatedScore[scoreNum] = number;
-                    this.$notyf.success({
-                        message: `Score set to ${updatedScore.join("-")}`,
-                        duration: 3000
-                    });
-                }
-            }, 500);
-        },
+        // async setScore(scoreNum, number) {
+        //     if (this.scoreDebounceTimeouts[scoreNum]) clearTimeout(this.scoreDebounceTimeouts[scoreNum]);
+        //     this.scoreDebounceTimeouts[scoreNum] = setTimeout(async () => {
+        //         console.log({
+        //             scoreNum,
+        //             number
+        //         });
+        //
+        //         const response = await this.sendMatchDataChange(scoreNum, parseInt(number));
+        //         if (!response.error) {
+        //             const updatedScore = [...this.scores];
+        //             updatedScore[scoreNum] = number;
+        //             this.$notyf.success({
+        //                 message: `Score set to ${updatedScore.join("-")}`,
+        //                 duration: 3000
+        //             });
+        //         }
+        //     }, 500);
+        // },
         async setMatchStart(timeString) {
             const response = await this.sendMatchDataChange("start", timeString);
             if (!response.error) {
@@ -420,10 +430,7 @@ export default {
             return response;
         },
         async saveMapAndScores() {
-            const responses = await Promise.all([
-                this.sendScoresIfDifferent(),
-                this.sendMapDataChange()
-            ]);
+            return this.sendMapDataChange(); // function changes scores if different
         },
         async sendScoresIfDifferent() {
             const newScores = this.matchData?.scores;

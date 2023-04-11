@@ -10,6 +10,7 @@
                     <div class="industry-align text-center">{{ title || 'Player Auction' }}</div>
                 </div>
                 <div class="event-stats flex-center d-flex flex-column">
+                    <div>{{ auctionState }}</div>
                     <div v-if="stats && stats.allPlayers">{{ stats.remainingEligiblePlayers }} / {{ stats.allPlayers }} player{{ stats.remainingEligiblePlayers === 1 ? '' : 's' }} remaining</div>
                     <div v-if="stats && stats.remainingPlaces">{{ stats.remainingPlaces }} spot{{ stats.remainingPlaces === 1 ? '' : 's' }} remaining</div>
                     <div v-if="stats && stats.signedPlayers">{{ stats.signedPlayers }} player{{ stats.signedPlayers === 1 ? '' : 's' }} signed</div>
@@ -17,9 +18,7 @@
             </div>
             <div class="player-middle d-flex flex-grow-1">
                 <div class="player-info w-100 flex-center flex-column position-relative">
-                    <transition name="fade-down">
-                        <AuctionCountdown v-if="player && bids.length" />
-                    </transition>
+                    <AuctionCountdown v-if="player" />
                     <transition name="fade-right">
                         <RecoloredHero v-if="!showCaptainInfo && player && player.favourite_hero" :theme="heroColor" :hero="player.favourite_hero"></RecoloredHero>
                     </transition>
@@ -45,9 +44,9 @@
                 <div class="bids flex-column-reverse d-flex justify-content-end" :class="{ 'has-bids': (player || bids.length) }">
                     <transition-group name="fade-down">
                         <div class="bid d-flex align-content-center" v-for="(bid, i) in bids" :key="i"
-                             :style="getTheme(bid.team.id)">
+                             :style="getTheme(bid.teamID)">
                             <div class="team-logo flex-center">
-                                <div class="logo-inner bg-center" :style="getLogo(bid.team.id)"></div>
+                                <div class="logo-inner bg-center" :style="getLogo(bid.teamID)"></div>
                             </div>
                             <div class="team-text flex-center ml-2">{{ money(bid.amount) }}</div>
                         </div>
@@ -112,12 +111,15 @@ export default {
     data: () => ({
         tick: 0,
         socketPlayer: null,
+        socketPlayerID: null,
         bids: [],
         justSigned: null,
         signedPlayer: null,
         signAmount: null,
         biddingActive: false,
-        stats: null
+        stats: null,
+        auctionServerConnected: true,
+        auctionState: "NOT_CONNECTED"
     }),
     computed: {
         background() {
@@ -140,6 +142,7 @@ export default {
         },
         playerID() {
             // if (!this.biddingActive && !this.justSigned) return null;
+            if (this.socketPlayerID) return this.socketPlayerID;
             if (this.socketPlayer) return this.socketPlayer.id;
             if (!this.broadcast?.highlight_player) return null;
             return this.broadcast?.highlight_player[0];
@@ -332,10 +335,13 @@ export default {
             if (latestBids.length !== count) return false;
             const teams = [];
             latestBids.forEach((bid) => {
-                if (teams.indexOf(bid.team.id) === -1) teams.push(bid.team.id);
+                if (teams.indexOf(bid.teamID) === -1) teams.push(this.teams.find(t => t.id === bid.teamID));
             });
             if (teams.length === 2) return teams;
             return null;
+        },
+        eventID() {
+            return cleanID(this._broadcast?.event?._original_data_id);
         }
     },
     watch: {
@@ -343,6 +349,15 @@ export default {
             if (!this.socketPlayer) return;
             if (this.broadcastPlayerID !== null && this.broadcastPlayerID === this.socketPlayer.id) {
                 this.socketPlayer = null;
+            }
+        },
+        eventID: {
+            immediate: true,
+            handler(eventID) {
+                console.log("eventID", eventID, this._broadcast);
+                if (!eventID) return;
+                console.log("Socket client subscribing", `auction:${eventID}`);
+                this.sendToAuctionServer("auction:subscribe");
             }
         }
     },
@@ -352,7 +367,15 @@ export default {
             return resizedImage(this.teams.find(t => t.id === cleanID(teamID))?.theme, ["small_logo", "default_logo"], "h-100");
         },
         getTheme(teamID) {
+            console.log(teamID, this.teams.find(t => t.id === cleanID(teamID)));
             return logoBackground1(this.teams.find(t => t.id === cleanID(teamID)));
+        },
+        sendToAuctionServer(event, data) {
+            console.log("[socket]", "sending", event, data);
+            this.$socket.client.emit(event, {
+                auctionID: this.eventID,
+                ...data
+            });
         }
     },
     mounted() {
@@ -364,12 +387,35 @@ export default {
         }, 8000);
     },
     sockets: {
-        auction_start(player) {
-            console.log("auction_start", player);
-            this.socketPlayer = player;
+        auction_welcome({ auctionID, ready, state, activePlayerID }) {
+            if (auctionID !== this.eventID) return console.warn("Auction welcome from unknown source", auctionID);
+            this.auctionServerConnected = true;
+            this.auctionState = state;
+            if (state === "IN_ACTION" && activePlayerID) {
+                this.socketPlayerID = activePlayerID;
+            }
+            console.log("auction welcome", { auctionID, ready, state });
+        },
+        auction_state({ state, oldState }) {
+            this.auctionState = state;
+        },
+        auction_error(error) {
+            console.warn("Auction error", error);
+        },
+
+
+        auction_start({ activePlayerID }) {
+            console.log("auction_start", activePlayerID);
+            this.state = "IN_ACTION";
+            this.socketPlayerID = activePlayerID;
             this.justSigned = null;
-            this.bids = [];
             this.biddingActive = true;
+        },
+        auction_pre_auction({ activePlayerID }) {
+            this.state = "PRE_AUCTION";
+            this.socketPlayerID = activePlayerID;
+            this.justSigned = null;
+            this.biddingActive = false;
         },
         auction_bids(bids) {
             console.log("auction_bids", bids);
@@ -381,15 +427,15 @@ export default {
             this.signAmount = amount;
             this.biddingActive = false;
             this.signedPlayer = player;
-            setTimeout(() => {
-                // TODO: uncomment
-                if (this.justSigned) {
-                    this.socketPlayer = null;
-                    this.justSigned = null;
-                    this.signedPlayer = null;
-                    this.bids = [];
-                }
-            }, 20 * 1000);
+            // setTimeout(() => {
+            //     // TODO: uncomment
+            //     if (this.justSigned) {
+            //         this.socketPlayer = null;
+            //         this.justSigned = null;
+            //         this.signedPlayer = null;
+            //         this.bids = [];
+            //     }
+            // }, 20 * 1000);
         },
         auction_stats(stats) {
             console.log(stats);
@@ -606,6 +652,10 @@ export default {
         transform: translate(0, -100%);
         opacity: 0;
     }
+    .fade-down-leave, .fade-down-enter-to {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
 
     .bids {
         transition: background-color 500ms ease;
@@ -652,5 +702,45 @@ export default {
         text-align: center;
         font-size: 32px;
         white-space: pre-wrap;
+    }
+
+
+    .auction-overlay .recolored-hero {
+        position: absolute;
+        left: -5vw !important;
+        height: 100vh !important;
+        bottom: -15vh !important;
+        width: 58vw !important;
+        z-index: 0;
+        opacity: 0.7;
+    }
+
+
+    .auction-overlay .color-holder {
+        width: 100% !important;
+    }
+    .auction-overlay .hero-image-base {
+        background-size: contain !important;
+    }
+    .auction-overlay .color-holder,
+    .auction-overlay .color-holder canvas {
+        object-fit: contain !important;
+    }
+
+    .auction-overlay .player-info,
+    .auction-overlay .countdown-holder {
+        z-index: 2;
+    }
+
+    .auction-overlay .event-stats {
+        display: none;
+    }
+
+    .auction-overlay .player-middle .player-name {
+        text-shadow: 0 0 8px #222222, 0 0 2px #222222;
+    }
+
+    .team-row .player-list .player {
+        font-size: 16px !important;
     }
 </style>

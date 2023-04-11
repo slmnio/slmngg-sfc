@@ -10,6 +10,7 @@
             <li class="nav-item ct-passive" v-if="showStandings"><router-link class="nav-link" :to="subLink('standings')">Standings</router-link></li>
             <li class="nav-item ct-passive" v-if="showFoldy"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
             <li class="nav-item ct-passive" v-if="showDraft"><router-link class="nav-link" :to="subLink('draft')">Draft</router-link></li>
+            <li class="nav-item ct-passive" v-if="showAuction"><router-link class="nav-link" :to="subLink('auction')">Auction</router-link></li>
             <li class="nav-item ct-passive" v-if="showStaff"><router-link class="nav-link" :to="subLink('staff')">Staff</router-link></li>
             <li class="nav-item ct-passive" v-if="event.theme"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
             <li class="nav-item ct-passive" v-if="event.about"><router-link class="nav-link" :to="subLink('about')">About</router-link></li>
@@ -95,6 +96,9 @@ export default {
         },
         showDraft() {
             return this.settings?.draft?.use || false;
+        },
+        showAuction() {
+            return this.settings?.auction?.public || false;
         },
         showStaff() {
             return this.settings?.extendedStaffPage ||

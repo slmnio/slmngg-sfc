@@ -23,3 +23,9 @@ export function sortEvents(a, b) {
     if (a.start_date) return -1;
     if (b.start_date) return 1;
 }
+
+export function sortAlpha(a, b, key) {
+    if (a[key]?.toLowerCase() > b[key]?.toLowerCase()) return 1;
+    if (a[key]?.toLowerCase() < b[key]?.toLowerCase()) return -1;
+    return 0;
+}

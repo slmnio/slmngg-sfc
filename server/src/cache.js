@@ -348,6 +348,11 @@ async function authStart(storedData) {
     return token;
 }
 
+/**
+ *
+ * @param token
+ * @returns {Promise<UserData | null>}
+ */
 async function getAuthenticatedData(token) {
     let data = auth.get(token);
 

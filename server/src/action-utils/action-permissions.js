@@ -51,6 +51,30 @@ async function canEditMatch(user, { match, event }) {
     return false;
 }
 
+async function isEventStaffOrHasRole(user, event, role, websiteRoles) {
+    if ([...websiteRoles, role].some(websiteRole => (user.airtable?.website_settings || []).includes(websiteRole))) return true;
+    if (event) {
+        if (typeof event === "string") {
+            event = await Cache.get(event);
+        }
+        if ((event.staff || []).includes(user.airtable.id)) return true;
+    }
+
+    // player.player_relationships with event OR
+    // player.player_relationships with match
+    // and the relationship has "{role}" permission
+    // have access
+
+    let playerRelationships = await getAll(user.airtable.player_relationships || []);
+
+    let eventPlayerRelationships = playerRelationships.some(rel =>
+        (rel.permissions || []).includes(role) &&
+        (rel.events || []).some(eventID => eventID === dirtyID(event.id))
+    );
+    if (eventPlayerRelationships) return true;
+    return false;
+}
+
 module.exports = {
-    canEditMatch
+    canEditMatch, isEventStaffOrHasRole
 };

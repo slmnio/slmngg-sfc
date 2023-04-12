@@ -175,7 +175,7 @@ export function money(num) {
 }
 
 export function getAuctionMax() {
-    return 8;
+    return 7;
 }
 
 export function clarifyTeam(team) {

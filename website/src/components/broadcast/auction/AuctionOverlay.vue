@@ -24,6 +24,7 @@
                     <transition name="fade-right">
                         <div class="player-info" v-if="player">
                             <div class="player-name">{{ player.name }}</div>
+                            <div class="player-role" v-if="player.role" v-html="getRoleSVG(player.role)"></div>
                             <div class="accolades" v-if="accolades.length">
                                 <ContentThing :thing="accolade" type="event" :link-to="accolade.event" :theme="accolade.event && accolade.event.theme" v-for="accolade in accolades"
                                               :key="accolade.id" :show-logo="true" :text="accolade.player_text" />
@@ -71,7 +72,7 @@
                     </div>
                 </transition-group>
                 <div :style="background" class="team-focus h-100" v-if="rightDisplay === 'sign-focus'" key="signed-focus">
-                    <SignedTeamList :team="signedTeam" :amount="signAmount" :signedPlayer="signedPlayer" :auction-settings="auctionSettings" />
+                    <SignedTeamList :team="signedTeam" :amount="signAmount" :signedPlayer="socketPlayerID" :auction-settings="auctionSettings" />
                 </div>
                 <div :style="background" class="bid-focus flex-center h-100 w-100" v-if="rightDisplay === 'bid-focus'" key="bid-focus">
                     <BidFocus :teams="teams" :bids="bids"/>
@@ -90,7 +91,7 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import TeamPlayerList from "./TeamPlayerList";
-import { cleanID, money } from "@/utils/content-utils";
+import { cleanID, getRoleSVG, money } from "@/utils/content-utils";
 import PlayerTeamDisplay from "./PlayerTeamDisplay";
 import { sortEvents } from "@/utils/sorts";
 import SignedTeamList from "@/components/broadcast/auction/SignedTeamList";
@@ -112,7 +113,7 @@ export default {
         socketPlayer: null,
         socketPlayerID: null,
         bids: [],
-        justSignedID: null,
+        justSignedTeamID: null,
         signedPlayer: null,
         signAmount: null,
         biddingActive: false,
@@ -121,6 +122,14 @@ export default {
         auctionState: "NOT_CONNECTED"
     }),
     computed: {
+        // playersRemaining() {
+        //     let num = 0;
+        //     this.teams.forEach(team => {
+        //         if (team.players.length >= 7) return;
+        //         num += (7 - team.players.length);
+        //     });
+        //     return num;
+        // },
         background() {
             return logoBackground1(this.broadcast?.event);
         },
@@ -260,7 +269,7 @@ export default {
             let teams = this._broadcast.event.teams;// .filter(t => t.players?.length);
             if (this.category) teams = teams.filter(t => (t.team_category?.includes(";") ? t.team_category.split(";")[1] : t.team_category) === this.category);
 
-            return teams.sort((a, b) => a.draft_order - b.draft_order);
+            return teams.sort((a, b) => a.draft_order - b.draft_order);// .filter(t => t.players.length !== 7);
         },
         displayTeams() {
             if (!this.teams?.length) return [];
@@ -314,8 +323,8 @@ export default {
             // if (this.rightDisplay === "teams-2") teams = teams.slice(8, 16);
         },
         signedTeam() {
-            if (!this.justSignedID) return null;
-            return ReactiveRoot(this.justSignedID, {
+            if (!this.justSignedTeamID) return null;
+            return ReactiveRoot(this.justSignedTeamID, {
                 theme: ReactiveThing("theme"),
                 players: ReactiveArray("players")
             });
@@ -343,8 +352,8 @@ export default {
             return cleanID(this._broadcast?.event?._original_data_id);
         },
         justSigned() {
-            if (!this.justSignedID) return null;
-            return this.teams.find(t => t.id === this.justSignedID);
+            if (!this.justSignedTeamID) return null;
+            return this.teams.find(t => t.id === this.justSignedTeamID);
         }
     },
     watch: {
@@ -366,6 +375,7 @@ export default {
     },
     methods: {
         money,
+        getRoleSVG,
         getLogo(teamID) {
             return resizedImage(this.teams.find(t => t.id === cleanID(teamID))?.theme, ["small_logo", "default_logo"], "h-100");
         },
@@ -403,7 +413,7 @@ export default {
             this.auctionState = state;
             if (["RESTRICTED", "READY"].includes(state)) {
                 this.socketPlayerID = null;
-                this.justSignedID = null;
+                this.justSignedTeamID = null;
                 this.signAmount = null;
                 this.bids = [];
             }
@@ -417,18 +427,18 @@ export default {
             console.log("auction_start", activePlayerID);
             this.state = "IN_ACTION";
             this.socketPlayerID = activePlayerID;
-            this.justSignedID = null;
+            this.justSignedTeamID = null;
             this.biddingActive = true;
         },
         auction_pre_auction({ activePlayerID }) {
             this.state = "PRE_AUCTION";
             this.socketPlayerID = activePlayerID;
-            this.justSignedID = null;
+            this.justSignedTeamID = null;
             this.biddingActive = false;
         },
         auction_post_auction({ activePlayerID }) {
             this.state = "POST_AUCTION";
-            this.justSignedID = this.leadingBid?.teamID;
+            this.justSignedTeamID = this.leadingBid?.teamID;
             this.signAmount = this.leadingBid?.amount;
             console.log("POST AUCTION SIGNED", this.leadingBid);
         },
@@ -441,7 +451,7 @@ export default {
             this.signAmount = amount;
             this.biddingActive = false;
             this.signedPlayer = player;
-            this.justSignedID = team;
+            this.justSignedTeamID = team;
             // setTimeout(() => {
             //     // TODO: uncomment
             //     if (this.justSigned) {
@@ -757,5 +767,9 @@ export default {
 
     .team-row .player-list .player {
         font-size: 16px !important;
+    }
+    .player-info .player-role {
+        height: 60px;
+        margin-bottom: 20px;
     }
 </style>

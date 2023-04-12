@@ -31,7 +31,7 @@ export default {
             return cleanID(this.leading.teamID) === this.team.id;
         },
         canBid() {
-            if (this.auctionSettings?.each_team <= this.team?.players?.length) return false;
+            if ((this.auctionSettings?.each_team || 7) <= this.team?.players?.length) return false;
             // TODO: add something about the amount of players they have
             if (!this.leading?.teamID) return true;
             if (cleanID(this.leading.teamID) === this.team.id && this.leading.amount === this.team.balance) return true;

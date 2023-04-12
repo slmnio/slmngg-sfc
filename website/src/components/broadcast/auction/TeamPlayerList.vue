@@ -9,10 +9,11 @@
 <!--                <div class="amount">{{ (money(team.balance).slice(-4)) }}</div>-->
             </div>
         </div>
-        <div class="player-list">
+        <div class="player-list" :class="{'done': teamIsDone}">
             <MoneyBar :team="team"  :auction-settings="auctionSettings"  />
             <div class="player" :class="{empty: player.empty}" v-for="player in players" :key="player.id" :style="teamIsDone ? teamBG : {}">
                 <div class="player-internal" v-if="!player.empty" >
+                    <span class="player-role" v-html="getRoleSVG(player.role)"></span>
                     <span class="player-name">{{ player.name || "•" }}</span>
                     <span class="player-money" v-if="player.auction_price">{{ money(player.auction_price) }}</span>
                 </div>
@@ -24,7 +25,7 @@
 
 <script>
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cleanID, getAuctionMax, money } from "@/utils/content-utils";
+import { cleanID, getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
 import { resizedImage } from "@/utils/images";
 import MoneyBar from "@/components/broadcast/auction/MoneyBar";
 
@@ -32,7 +33,7 @@ export default {
     name: "TeamPlayerList",
     components: { MoneyBar },
     props: ["team", "leading", "auctionSettings"],
-    methods: { money },
+    methods: { money, getRoleSVG },
     computed: {
         teamBG() {
             return logoBackground1(this.team);
@@ -50,8 +51,9 @@ export default {
             ];
         },
         teamIsDone() {
+            return false;
             if (!this.team?.players?.length) return false;
-            const max = (this.auctionSettings?.each_team || getAuctionMax());
+            const max = 7; //  (this.auctionSettings?.each_team || getAuctionMax());
             // console.log(this.team.players.length, max);
             return this.team.players.length >= max;
         },
@@ -135,5 +137,12 @@ export default {
 
     .player-internal {
         display: flex;
+    }
+
+    .player-role {
+        width: 24px;
+        height: 24px;
+        margin-right: 2px;
+        transform: translate(-2px, -2px);
     }
 </style>

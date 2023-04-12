@@ -20,7 +20,7 @@ module.exports = class Auction {
             afterSubsequentBids: auctionData?.time?.afterSubsequentBids ?? 15,
             afterSaleNextAutoPlayer: auctionData?.time?.afterSaleNextAutoPlayer ?? 10,
             preAuction: auctionData?.time?.preAuction ?? 5,
-            postAuction: auctionData?.time?.preAuction ?? 10,
+            postAuction: auctionData?.time?.postAuction ?? 10,
         };
 
         this.money = {

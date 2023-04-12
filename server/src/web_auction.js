@@ -38,7 +38,7 @@ module.exports = async ({ app, io }) => {
             if (id.startsWith("subdomain-")) return;
             console.log(id, data?.name);
 
-            if (!Auctions[id]) {
+            if (!Auctions.has(id)) {
                 Auctions.set(id, new Auction(data, io, getAuctionData(data)));
             }
             Auctions.get(id).update(data, getAuctionData(data));

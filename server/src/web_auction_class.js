@@ -322,7 +322,7 @@ module.exports = class Auction {
         if (!player) return this.log("No player", playerID);
         let amount = bid.amount;
 
-        const teamHasMoreSpots = (this.playerNumbers.eachTeam - ((team.players?.length || 0) + 1)) >= 0;
+        const remainingSpots = (this.playerNumbers.maximumPlayerCount - ((team.players?.length || 0) + 1));
 
         await Promise.all([
             updateRecord(Cache, "Teams", team, {
@@ -330,7 +330,7 @@ module.exports = class Auction {
                     ...((team.players || []).map(id => dirtyID(id))),
                     dirtyID(playerID)
                 ],
-                "Balance": ((team.balance || 0) - amount) + (teamHasMoreSpots ? this.money.unlockAfterSigning : 0)
+                "Balance": ((team.balance || 0) - amount) + (remainingSpots > 0 ? this.money.unlockAfterSigning : 0)
             }),
             updateRecord(Cache, "Players", player, {
                 "Member Of": [

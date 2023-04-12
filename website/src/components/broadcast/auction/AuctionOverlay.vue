@@ -401,6 +401,12 @@ export default {
         },
         auction_state({ state, oldState }) {
             this.auctionState = state;
+            if (["RESTRICTED", "READY"].includes(state)) {
+                this.socketPlayerID = null;
+                this.justSignedID = null;
+                this.signAmount = null;
+                this.bids = [];
+            }
         },
         auction_error(error) {
             console.warn("Auction error", error);

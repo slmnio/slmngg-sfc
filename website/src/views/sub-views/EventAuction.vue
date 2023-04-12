@@ -376,6 +376,7 @@ export default {
         auction_post_auction({ activePlayerID }) {
             this.state = "POST_AUCTION";
             this.activePlayerID = activePlayerID;
+            this.customBidAmount = 0;
         },
         auction_error(error) {
             console.warn("auction_error", error);

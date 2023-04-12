@@ -322,7 +322,7 @@ module.exports = class Auction {
         if (!player) return this.log("No player", playerID);
         let amount = bid.amount;
 
-        const teamHasMoreSpots = (this.playerNumbers.eachTeam - ((team.players?.length || 0) + 1)) <= 0;
+        const teamHasMoreSpots = (this.playerNumbers.eachTeam - ((team.players?.length || 0) + 1)) >= 0;
 
         await Promise.all([
             updateRecord(Cache, "Teams", team, {

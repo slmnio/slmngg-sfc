@@ -44,6 +44,7 @@ export default {
     background-color: #222;
     text-align: center;
     font-weight: bold;
+    color: white;
 }
 .auction-bid .team-row {
     padding: 4px;

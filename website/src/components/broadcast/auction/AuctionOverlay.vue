@@ -10,7 +10,6 @@
                     <div class="industry-align text-center">{{ title || 'Player Auction' }}</div>
                 </div>
                 <div class="event-stats flex-center d-flex flex-column">
-                    <div>{{ auctionState }}</div>
                     <div v-if="stats && stats.allPlayers">{{ stats.remainingEligiblePlayers }} / {{ stats.allPlayers }} player{{ stats.remainingEligiblePlayers === 1 ? '' : 's' }} remaining</div>
                     <div v-if="stats && stats.remainingPlaces">{{ stats.remainingPlaces }} spot{{ stats.remainingPlaces === 1 ? '' : 's' }} remaining</div>
                     <div v-if="stats && stats.signedPlayers">{{ stats.signedPlayers }} player{{ stats.signedPlayers === 1 ? '' : 's' }} signed</div>
@@ -113,7 +112,7 @@ export default {
         socketPlayer: null,
         socketPlayerID: null,
         bids: [],
-        justSigned: null,
+        justSignedID: null,
         signedPlayer: null,
         signAmount: null,
         biddingActive: false,
@@ -315,8 +314,8 @@ export default {
             // if (this.rightDisplay === "teams-2") teams = teams.slice(8, 16);
         },
         signedTeam() {
-            if (!this.justSigned?.id) return null;
-            return ReactiveRoot(this.justSigned.id, {
+            if (!this.justSignedID) return null;
+            return ReactiveRoot(this.justSignedID, {
                 theme: ReactiveThing("theme"),
                 players: ReactiveArray("players")
             });
@@ -342,6 +341,10 @@ export default {
         },
         eventID() {
             return cleanID(this._broadcast?.event?._original_data_id);
+        },
+        justSigned() {
+            if (!this.justSignedID) return null;
+            return this.teams.find(t => t.id === this.justSignedID);
         }
     },
     watch: {
@@ -408,14 +411,20 @@ export default {
             console.log("auction_start", activePlayerID);
             this.state = "IN_ACTION";
             this.socketPlayerID = activePlayerID;
-            this.justSigned = null;
+            this.justSignedID = null;
             this.biddingActive = true;
         },
         auction_pre_auction({ activePlayerID }) {
             this.state = "PRE_AUCTION";
             this.socketPlayerID = activePlayerID;
-            this.justSigned = null;
+            this.justSignedID = null;
             this.biddingActive = false;
+        },
+        auction_post_auction({ activePlayerID }) {
+            this.state = "POST_AUCTION";
+            this.justSignedID = this.leadingBid?.teamID;
+            this.signAmount = this.leadingBid?.amount;
+            console.log("POST AUCTION SIGNED", this.leadingBid);
         },
         auction_bids(bids) {
             console.log("auction_bids", bids);
@@ -423,10 +432,10 @@ export default {
         },
         auction_signed({ player, team, amount }) {
             console.log("signed", { player, team, amount });
-            this.justSigned = team;
             this.signAmount = amount;
             this.biddingActive = false;
             this.signedPlayer = player;
+            this.justSignedID = team;
             // setTimeout(() => {
             //     // TODO: uncomment
             //     if (this.justSigned) {

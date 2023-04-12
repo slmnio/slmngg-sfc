@@ -28,13 +28,13 @@ export default {
         },
         isLeading() {
             if (!this.leading) return false;
-            return cleanID(this.leading.team.id) === this.team.id;
+            return cleanID(this.leading.teamID) === this.team.id;
         },
         canBid() {
             if (this.auctionSettings?.each_team <= this.team?.players?.length) return false;
             // TODO: add something about the amount of players they have
-            if (!this.leading?.team) return true;
-            if (cleanID(this.leading.team.id) === this.team.id && this.leading.amount === this.team.balance) return true;
+            if (!this.leading?.teamID) return true;
+            if (cleanID(this.leading.teamID) === this.team.id && this.leading.amount === this.team.balance) return true;
             return (this.leading.amount + 1) <= this.team.balance;
         },
         dark() {

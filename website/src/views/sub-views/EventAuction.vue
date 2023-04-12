@@ -276,7 +276,7 @@ export default {
             if (!draftingTeamIDs?.length) return [];
             return this.allPlayers.filter(player => {
                 return !(player?.member_of || []).some(teamID => draftingTeamIDs.includes(dirtyID(teamID)));
-            }).sort((a, b) => sortAlpha(a, b, "name"));
+            }).sort((a, b) => b.manual_sr - a.manual_sr);
         },
         eventID() {
             return cleanID(this.event?._original_data_id);

@@ -34,6 +34,7 @@ module.exports = async ({ app, io }) => {
 
 
     onUpdate((id, { oldData, newData: data }) => {{
+        if (!data?.__tableName) return;
         if (data.__tableName === "Events") {
             if (id.startsWith("subdomain-")) return;
             console.log(id, data?.name);

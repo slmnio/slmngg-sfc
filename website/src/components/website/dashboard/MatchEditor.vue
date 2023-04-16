@@ -192,7 +192,7 @@ export default {
             return maps;
         },
         hasMapPool() {
-            return this.match?.event?.map_pool?.length;
+            return this.match?.event?.map_pool?.length || this.broadcastData?.map_set;
         },
         availableMaps() {
             const mapData = (ReactiveRoot("Map Data", {

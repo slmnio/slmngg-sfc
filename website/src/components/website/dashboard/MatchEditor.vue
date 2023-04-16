@@ -19,7 +19,7 @@
                 <b-button :disabled="processing['map']" class="ml-5 top-button flex-shrink-0" variant="success" @click="() => saveMapAndScores()"><i class="fas fa-save fa-fw"></i> Save all</b-button>
                 </div>
             <div class="teams-scores pt-2 px-2">
-                <b-form-checkbox v-if="hasMapPool" class="mr-2" v-model="restrictToMapPool" id="map-pool-checkbox">Restrict to map pool</b-form-checkbox>
+                <b-form-checkbox v-if="showRestrictCheckbox" class="mr-2" v-model="restrictToMapPool" id="map-pool-checkbox">Restrict to map pool</b-form-checkbox>
                 <div class="spacer" style="order:0"></div>
                 <div class="team" v-for="(team, i) in teams" :key="team.id" :class="{'end': i === 1}">
                     <ContentThing v-if="!team.empty" :thing="team" :theme="team.theme" show-logo="true" type="team" text="" />
@@ -192,7 +192,10 @@ export default {
             return maps;
         },
         hasMapPool() {
-            return this.match?.event?.map_pool?.length || this.broadcastData?.map_set;
+            return this.match?.event?.map_pool?.length;
+        },
+        showRestrictCheckbox() {
+            return this.hasMapPool || this.broadcastData?.map_set;
         },
         availableMaps() {
             const mapData = (ReactiveRoot("Map Data", {

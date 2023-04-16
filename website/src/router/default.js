@@ -69,7 +69,8 @@ export default [
             noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation),
             noStinger: (route.query.noStinger || route.query.stinger === "false"),
             bodyClass: route.query.class || route.query.bodyClass,
-            full: !!route.query.full
+            full: !!route.query.full,
+            backgroundIndex: route.query.background && parseInt(route.query.background)
         }),
         children: BroadcastRoutes
     },
@@ -82,7 +83,8 @@ export default [
             noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation),
             noStinger: (route.query.noStinger || route.query.stinger === "false"),
             bodyClass: route.query.class || route.query.bodyClass,
-            full: !!route.query.full
+            full: !!route.query.full,
+            backgroundIndex: route.query.background && parseInt(route.query.background)
         }),
         children: BroadcastRoutes
     }

@@ -20,9 +20,15 @@ export default {
         backgroundURL() {
             return getNewURL(this.background, "orig");
         },
+        processedIndex() {
+            if (this.index == null) return null;
+            if (this.index === 0) return 0;
+            // make it 1-based unless a 0 is passed
+            return parseInt(this.index) - 1;
+        },
         background() {
             if (!this.broadcast?.background) return null;
-            if (this.index && this.broadcast.background[this.index]) return this.broadcast.background[this.index];
+            if (this.processedIndex && this.broadcast.background[this.processedIndex]) return this.broadcast.background[this.processedIndex];
             return this.broadcast.background[0];
         },
         type() {

@@ -4,6 +4,9 @@
             <!--        <div style="font-size: 5em; color: black">{{ $root.activeScene }}</div>-->
             <router-view id="overlay" :class="bodyClass" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active"
                          :animation-active="animationActive" :full="full" @prodUpdate="(x) => prodUpdate(x)" ref="overlay"/>
+
+            <BroadcastBackground class="force-background" v-if="backgroundIndex" :broadcast="broadcast" :index="backgroundIndex" />
+
             <v-style v-if="broadcast && broadcast.event && !noBroadcastStyle">
                 {{ broadcast.event.broadcast_css }}
 
@@ -18,6 +21,7 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import StingerWrap from "@/components/broadcast/StingerWrap";
+import BroadcastBackground from "@/components/broadcast/BroadcastBackground.vue";
 
 function getComponentName(route) {
     try {
@@ -30,8 +34,9 @@ function getComponentName(route) {
 
 export default {
     name: "BroadcastApp",
-    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass", "full", "clientName"],
+    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass", "full", "clientName", "backgroundIndex"],
     components: {
+        BroadcastBackground,
         StingerWrap
     },
     data: () => ({
@@ -185,5 +190,13 @@ export default {
     }
     body.overlay {
         --overlay-line-height-adjust: translate(0, -0.0925em);
+    }
+</style>
+<style scoped>
+    .force-background {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
     }
 </style>

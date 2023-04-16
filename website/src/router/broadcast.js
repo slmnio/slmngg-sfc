@@ -1,9 +1,5 @@
 export default [
     {
-        path: "admin",
-        component: () => import("@/components/broadcast/roots/ClientOverview.vue")
-    },
-    {
         path: "ingame",
         component: () => import("@/components/broadcast/roots/IngameOverlay.vue"),
         props: route => ({ codes: route.query.codes, sponsorFadeSpeed: (route.query.sponsorSpeed || route.query.sponsorFadeSpeed) })
@@ -37,25 +33,14 @@ export default [
             }
         ]
     },
-    { path: "break", component: () => import("@/components/broadcast/break/BreakOverlay.vue"), props: route => ({ secondary: !!route.query.secondary, interval: route.query.interval || route.query.headlineInterval }) },
-    { path: "syncer", component: () => import("@/components/broadcast/roots/SyncerOverlay.vue") },
     {
-        path: "tally-transmitter",
-        component: () => import("@/components/broadcast/roots/TallyTransmitter.vue"),
+        path: "break",
+        component: () => import("@/components/broadcast/break/BreakOverlay.vue"),
         props: route => ({
-            number: route.query.num || route.query.number
-        })
-    }, {
-        path: "websocket-transmitter",
-        component: () => import("@/components/broadcast/roots/WebsocketTransmitter.vue"),
-        props: route => ({
-            wsUrl: route.query.url || route.query.wsUrl || route.query.wsurl || route.query.wsURL || "ws://127.0.0.1:4455",
-            wsPassword: route.query.wsPassword || route.query.password || route.query.pw
+            secondary: !!route.query.secondary,
+            interval: route.query.interval || route.query.headlineInterval
         })
     },
-    { path: "tally-viewer", component: () => import("@/components/broadcast/roots/TallyViewer.vue") },
-    { path: "tally-dot", component: () => import("@/components/broadcast/roots/TallyDot.vue"), props: route => ({ number: parseInt(route.query.number) }) },
-    { path: "quad", component: () => import("@/components/broadcast/roots/QuadTallyDot.vue") },
     { path: "break-bar", component: () => import("@/components/broadcast/break/BreakBarOverlay.vue") },
     {
         path: "bracket",
@@ -142,7 +127,6 @@ export default [
     { path: "player-history", component: () => import("@/components/broadcast/PlayerHistory.vue"), props: route => ({ showMinor: route.query.minor }) },
     { path: "overview", component: () => import("@/components/broadcast/roots/OverviewOverlay.vue") },
     { path: "media", component: () => import("@/components/broadcast/roots/MediaOverlay.vue") },
-    { path: "clock", component: () => import("@/components/broadcast/roots/MediaClock.vue") },
     {
         path: "music",
         component: () => import("@/components/broadcast/roots/MusicOverlay.vue"),
@@ -154,7 +138,6 @@ export default [
             loopSongs: !!route.query.loop
         })
     },
-    { path: "tester", component: () => import("@/components/broadcast/roots/ThemeTransitionTester.vue") },
     { path: "desk-graphics", component: () => import("@/components/broadcast/roots/DeskGraphicsOverlay.vue") },
     { path: "stinger", component: () => import("@/components/broadcast/roots/EmptyStingerOverlay.vue") },
     { path: "empty", redirect: "stinger" },
@@ -176,6 +159,34 @@ export default [
         props: route => ({
             taskKey: route.query.key,
             buffer: parseInt(route.query.buffer)
+        })
+    },
+
+    /* Production staff stuff */
+    { path: "clock", component: () => import("@/components/broadcast/roots/MediaClock.vue") },
+    { path: "tester", component: () => import("@/components/broadcast/roots/ThemeTransitionTester.vue") },
+    { path: "admin", component: () => import("@/components/broadcast/roots/ClientOverview.vue") },
+    { path: "syncer", component: () => import("@/components/broadcast/roots/SyncerOverlay.vue") },
+    { path: "tally-viewer", component: () => import("@/components/broadcast/roots/TallyViewer.vue") },
+    {
+        path: "tally-dot",
+        component: () => import("@/components/broadcast/roots/TallyDot.vue"),
+        props: route => ({ number: parseInt(route.query.number || route.query.number) })
+    },
+    { path: "quad", component: () => import("@/components/broadcast/roots/QuadTallyDot.vue") },
+    {
+        path: "tally-transmitter",
+        component: () => import("@/components/broadcast/roots/TallyTransmitter.vue"),
+        props: route => ({
+            number: route.query.num || route.query.number
+        })
+    },
+    {
+        path: "websocket-transmitter",
+        component: () => import("@/components/broadcast/roots/WebsocketTransmitter.vue"),
+        props: route => ({
+            wsUrl: route.query.url || route.query.wsUrl || route.query.wsurl || route.query.wsURL || "ws://127.0.0.1:4455",
+            wsPassword: route.query.wsPassword || route.query.password || route.query.pw
         })
     }
 ];

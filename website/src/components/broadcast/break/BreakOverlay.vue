@@ -8,7 +8,7 @@
                             <span class="industry-align" :class="{'has-br': (overlayTitle).includes('\\n') }"
                                   :key="overlayTitle" v-html="nbr(overlayTitle)"></span>
                         </transition>
-                        <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News"
+                        <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News" :interval="headlineInterval"
                                         :borderCSS="eventBorder"/>
                     </Squeezable>
                 </div>

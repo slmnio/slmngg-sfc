@@ -6,6 +6,7 @@
                 <th>Team</th>
                 <th>Next match</th>
                 <th v-for="code in distinctStreamCodes" :key="code">{{ code }}</th>
+                <th class="bg-primary text-white">On</th>
                 <th class="bg-danger text-white">Off</th>
                 <th class="bg-secondary text-white">Total</th>
             </tr>
@@ -22,6 +23,7 @@
                     </span>
                 </td>
                 <td class="count" v-for="code in distinctStreamCodes" :key="code" :class="{'low-opacity': !counts[code]}">{{ counts[code] || 0 }}</td>
+                <td class="count" :class="{'low-opacity': !counts.Streamed }">{{ counts.Streamed || 0 }}</td>
                 <td class="count" :class="{'low-opacity': !counts.Off, 'bg-danger': counts.Off === counts.Total && counts.Off > 0}">{{ counts.Off || 0 }}</td>
                 <td class="count" :class="{'low-opacity': !counts.Total}">{{ counts.Total || 0 }}</td>
             </tr>
@@ -30,7 +32,7 @@
 </template>
 
 <script>
-import { cleanID, formatTime, url } from "@/utils/content-utils";
+import { formatTime, url } from "@/utils/content-utils";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
@@ -50,7 +52,7 @@ export default {
                     codes.add(match.stream_code);
                 }
             });
-            return [...codes.values()].sort();
+            return [...codes.values()].filter(code => !["Off", "Total"].includes(code)).sort();
         },
         teams() {
             return ReactiveArray("teams", {
@@ -66,7 +68,8 @@ export default {
             return (this.teams || []).filter(team => team.matches).map(team => {
                 const counts = {
                     Off: 0,
-                    Total: 0
+                    Total: 0,
+                    Streamed: 0
                 };
                 team.matches.forEach(match => {
                     if (!match) return;
@@ -79,8 +82,12 @@ export default {
                     }
                 });
 
-                const nextMatch = team.matches.filter(m => (![m.score_1, m.score_2].includes(m.first_to))).sort(sortMatches)?.[0];
-                nextMatch.opponent = nextMatch.teams.find(t => t.id !== team.id);
+                const nextMatch = team.matches.filter(m => (![m.score_1, m.score_2].includes(m.first_to)) && (m?.teams?.length === 2)).sort(sortMatches)?.[0];
+                if (nextMatch) {
+                    nextMatch.opponent = nextMatch.teams.find(t => t.id !== team.id);
+                }
+
+                if (counts.Total) counts.Streamed = counts.Total - counts.Off;
 
                 return {
                     team,
@@ -88,14 +95,14 @@ export default {
                     nextMatch
                 };
             }).sort((a, b) => {
-                if (a.counts.Off > b.counts.Off) return -1;
-                if (a.counts.Off < b.counts.Off) return 1;
-
-                if ((a.counts.B || 0) > (b.counts.B || 0)) return -1;
-                if ((a.counts.B || 0) < (b.counts.B || 0)) return 1;
-
+                if ((a.counts.Streamed || 0) > (b.counts.Streamed || 0)) return -1;
+                if ((a.counts.Streamed || 0) < (b.counts.Streamed || 0)) return 1;
+                // if (a.counts.Off > b.counts.Off) return -1;
+                // if (a.counts.Off < b.counts.Off) return 1;
                 if ((a.counts.A || 0) > (b.counts.A || 0)) return -1;
                 if ((a.counts.A || 0) < (b.counts.A || 0)) return 1;
+                if ((a.counts.B || 0) > (b.counts.B || 0)) return -1;
+                if ((a.counts.B || 0) < (b.counts.B || 0)) return 1;
             });
         }
     }

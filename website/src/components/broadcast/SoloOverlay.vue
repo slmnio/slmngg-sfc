@@ -195,7 +195,9 @@ export default {
         scores: [0, 0],
         breakEnd: null,
         maps: [],
-        showGuides: false
+        showGuides: false,
+
+        noStinger: true
     }),
     methods: {
         flipTeams() {

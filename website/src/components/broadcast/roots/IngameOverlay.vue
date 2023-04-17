@@ -8,9 +8,8 @@
           </transition-group>
 
           <transition name="mid" mode="out-in">
-              <Middle v-if="shouldShowMiddle" :text="middleText" :key="middleText" />
+              <Middle v-if="shouldShowMiddle" :text="middleText" :key="middleText" :tiny="broadcast.margin === 0" />
           </transition>
-
       </div>
       <transition name="fade" mode="out-in">
           {{ fadeSponsors }}
@@ -206,6 +205,16 @@ export default {
     /* Margin: 0.5 4v4 */
     /*background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/841443615557287956/ScreenShot_21-05-10_23-36-13-000.jpg");*/
     /*background-image: url(https://cdn.discordapp.com/attachments/485493459357007876/974757857188794378/unknown.png);*/
+
+    /* Overwatch 2 */
+    /* Margin: 0.0 */
+    /* background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/1097643734834872471/escort-0-active.jpg"); */
+
+    /* Margin: 0.5 */
+    /* background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/1097641564580368414/escort-pre-countdown.jpg"); */
+    /* background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/1097641565381480479/escort-active.jpg"); */
+    /* background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/1097641565100453978/control-pre-countdown.jpg"); */
+    /* background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/1097641564852994169/control-capped.jpg"); */
     background-size: contain;
     position: absolute;
     width: 100%;

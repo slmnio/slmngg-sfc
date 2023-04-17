@@ -1,15 +1,17 @@
 <template>
-        <div class="centerer">
-            <div class="middle-holder flex-center">
-                <div class="middle">{{ text }}</div>
+    <div class="centerer" :class="{'tiny': tiny}">
+        <div class="middle-holder flex-center">
+            <div class="middle">
+                <div class="industry-align">{{ text }}</div>
             </div>
         </div>
+    </div>
 </template>
 
 <script>
 export default {
     name: "Middle",
-    props: ["text"]
+    props: ["text", "tiny"]
 };
 </script>
 
@@ -19,8 +21,9 @@ export default {
     width: 100%;
     display: flex;
     justify-content: center;
-    top: -10px;
+    top: -12px;
     pointer-events: none;
+    transition: all .2s ease-in-out;
 }
 
 .middle-holder {
@@ -34,7 +37,10 @@ export default {
     color: white;
     padding: .0em .5em;
     font-size: 24px;
+    text-transform: uppercase;
     display: inline-flex;
+    border-radius: 4px;
+    transition: all .2s ease-in-out;
 }
 
 .mid-leave-active,
@@ -45,4 +51,15 @@ export default {
 
 .mid-enter-to .middle-holder, .mid-leave .middle-holder { width: 450px; }
 .mid-enter .middle-holder, .mid-leave-to .middle-holder { width: 0; }
+
+
+.centerer.tiny {
+    top: 3px;
+}
+.centerer.tiny .middle {
+    font-size: 20px;
+    padding: 0 .5em;
+    line-height: 1.2em;
+}
+
 </style>

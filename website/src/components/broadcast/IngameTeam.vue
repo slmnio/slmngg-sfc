@@ -338,13 +338,13 @@ export default {
         margin: 0 12px 0 0;
     }
     .team-name {
-        margin: 0 12px 0 20px;
+        margin: 0 12px 0 24px;
     }
     .ingame-team-holder.right .team-logo-holder {
         margin: 0 0 0 12px;
     }
     .ingame-team-holder.right .team-name {
-        margin: 0 20px 0 12px;
+        margin: 0 24px 0 12px;
     }
 
     .team-logo {

@@ -1,8 +1,8 @@
 <template>
     <div class="logo-overlay h-100 w-100">
         <div class="logo-container h-100 w-100">
-            <div class="logo h-100 flex-center" v-for="sponsor in sponsors" v-bind:key="sponsor.id">
-                <div class="logo-inner bg-center" :style="cssImage('backgroundImage', sponsor, ['default_wordmark', 'default_logo'], null, false)"></div>
+            <div class="logo h-100 flex-center" v-for="sponsor in sponsors" :key="sponsor.id">
+                <div class="logo-inner bg-center" :style="resizedImage(sponsor, ['default_wordmark', 'default_logo'], 'orig')"></div>
             </div>
         </div>
     </div>
@@ -10,7 +10,7 @@
 
 <script>
 import { ReactiveArray } from "@/utils/reactive";
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "LogoAdOverlay",
@@ -28,7 +28,12 @@ export default {
         }
     },
     methods: {
-        cssImage
+        resizedImage
+    },
+    metaInfo() {
+        return {
+            title: `Logos | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

@@ -1,5 +1,5 @@
 <template>
-    <div class="bracket-team default-thing" v-bind:class="{'text': !!text, 'empty': empty, 'highlighted': highlighted, 'lowlighted': lowlighted}"
+    <div class="bracket-team default-thing" :class="{'text': !!text, 'empty': empty, 'highlighted': highlighted, 'lowlighted': lowlighted}"
          @mouseover="highlight" @mouseout="unHighlight"
          :style="background">
         <div class="inner" v-if="!empty">
@@ -12,15 +12,15 @@
                 <div class="team-name">{{ team.name }}</div>
                 <div class="team-code">{{ team.code }}</div>
             </div>
-            <div class="team-score flex-center" v-bind:class="{ 'win': win }" v-if="team && score !== null">{{ score }}</div>
+            <div class="team-score flex-center" :class="{ 'win': win }" v-if="team && score !== null">{{ score }}</div>
         </div>
     </div>
 </template>
 
 <script>
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cssImage } from "@/utils/content-utils";
 import Store from "@/thing-store";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "BracketTeam",
@@ -45,7 +45,7 @@ export default {
         },
         teamLogo() {
             if (!this.team) return {};
-            return cssImage("backgroundImage", this.team?.theme, ["small_logo", "default_logo"], 36);
+            return resizedImage(this.team?.theme, ["small_logo", "default_logo"], "s-80");
         }
     }
 };
@@ -61,7 +61,7 @@ export default {
 
     .bracket-team {
         width: 100%;
-        --match-height: 2.3em;
+        --match-height: 2.25em;
         height: var(--match-height);
         /*background-color: #282828;*/
     }
@@ -92,8 +92,10 @@ export default {
         overflow: hidden;
     }
     .team-name {
-        line-height: 1;
-        transform: translate(0, -0.0925em); /* industry-align */
+        line-height: 0.92;
+        transform: translate(0, -0.05em);
+        /*line-height: 1;*/
+        /* transform: var(--overlay-line-height-adjust, translate(0, -0.0925em)); !* industry-align *!*/
 
         font-size: 1.1em;
         padding: 0.15em 0;
@@ -120,7 +122,7 @@ export default {
     }
 
     .bracket-team {
-        transition: opacity 150ms;
+        transition: opacity 150ms ease;
     }
     .bracket-team.lowlighted {
         opacity: 0.2;
@@ -129,7 +131,7 @@ export default {
     .team-code {
         display: none;
         font-size: 2em;
-        transform: translate(0, -0.0925em); /* industry-align */
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));/* industry-align */
     }
 
     .bracket.small .team-code {

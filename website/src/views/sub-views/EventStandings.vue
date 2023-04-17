@@ -1,6 +1,6 @@
 <template>
     <div class="container event-standings align-items-center d-flex flex-column">
-        <Standings class="standings my-2" v-for="standing in standings" v-bind:key="standing.title"
+        <Standings class="standings my-2" v-for="standing in standings" :key="standing.title"
                    :event="event" :stage="standing.group" :title="standing.title" :tie-text="standing.tieText" show-map-diff />
     </div>
 </template>

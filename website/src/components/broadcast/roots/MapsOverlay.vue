@@ -1,6 +1,6 @@
 <template>
     <GenericOverlay class="maps-overlay" v-if="match" :title="customTitle">
-        <MapDisplay :broadcast="broadcast" :animation-active="animationActive" />
+        <MapDisplay :broadcast="broadcast" :animation-active="animationActive" :use-transitions="useTransitions" />
     </GenericOverlay>
 </template>
 
@@ -12,7 +12,7 @@ import MapDisplay from "@/components/broadcast/MapDisplay";
 export default {
     name: "MapsOverlay",
     components: { GenericOverlay, MapDisplay },
-    props: ["broadcast", "title", "animationActive"],
+    props: ["broadcast", "title", "animationActive", "useTransitions"],
     computed: {
         match() {
             if (!this.broadcast?.live_match) return null;
@@ -26,6 +26,12 @@ export default {
                     }),
                     map: ReactiveThing("map", {
                         map: ReactiveThing("map")
+                    }),
+                    picker: ReactiveThing("picker", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    banner: ReactiveThing("banner", {
+                        theme: ReactiveThing("theme")
                     })
                 })
             });
@@ -43,6 +49,11 @@ export default {
             }
             return "Map Set";
         }
+    },
+    metaInfo() {
+        return {
+            title: `Maps | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

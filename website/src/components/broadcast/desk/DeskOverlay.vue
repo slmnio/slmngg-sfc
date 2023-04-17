@@ -4,18 +4,20 @@
             <TourneyBar :left="broadcast.event && broadcast.event.short" :right="broadcast.subtitle" :event="broadcast.event" />
         </div>
         <transition-group class="casters flex-center" name="anim-talent">
-            <Caster v-for="(caster, i) in casters" v-bind:key="caster.id" :guest="caster" :color="getColor(i)"
-                    :event="event" :disable-video="shouldDisableCasterVideo" />
+            <Caster v-for="(caster, i) in casters" :key="caster.id" :guest="caster" :color="getColor(i)"
+                    :event="event" :disable-video="shouldDisableCasterVideo" :class="{'wide-feed': caster.wide_feed}"
+                    :show-pronouns="showPronouns" :pronouns-on-newline="pronounsOnNewline" />
         </transition-group>
         <div class="lower-holder flex-center">
-            <DeskMatch class="w-100" :_match="liveMatch" :theme-color="themeColor" />
+            <transition mode="out-in" name="break-content">
+                <DeskMatch :broadcast="broadcast" class="w-100" :_match="liveMatch" :theme-color="themeColor" :guests="guests" v-if="liveMatch" />
+            </transition>
         </div>
     </div>
 </template>
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cssImage } from "@/utils/content-utils";
 import TourneyBar from "@/components/broadcast/TourneyBar";
 import Caster from "@/components/broadcast/desk/Caster";
 import DeskMatch from "@/components/broadcast/desk/DeskMatch";
@@ -26,7 +28,6 @@ export default {
     components: { DeskMatch, Caster, TourneyBar },
     props: ["broadcast", "group"],
     methods: {
-        cssImage,
         getColor(index) {
             if (!this.deskColors?.length) return this.broadcast?.event?.theme?.color_logo_background || this.broadcast?.event?.theme?.color_theme;
             return this.deskColors[index % this.deskColors.length];
@@ -64,11 +65,20 @@ export default {
                 player: ReactiveThing("player", {
                     socials: ReactiveArray("socials")
                 }),
-                theme: ReactiveThing("theme")
+                theme: ReactiveThing("theme"),
+                prediction_team: ReactiveThing("prediction_team", {
+                    theme: ReactiveThing("theme")
+                })
             })(this.broadcast);
         },
         casters() {
-            return this.guests;/* .filter(g => g.show); */
+            if (!this.guests.length) {
+                return (this.liveMatch?.casters || []).map(caster => ({
+                    ...caster.live_guests,
+                    player: caster
+                }));
+            }
+            return this.guests;
         },
         themeColor() {
             if (!this.broadcast?.event?.theme) return {};
@@ -77,14 +87,26 @@ export default {
         deskColors() {
             if (!this.broadcast?.event?.theme?.desk_colors) return [];
             return this.broadcast.event.theme.desk_colors.trim().split(/[\n,]/g).map(e => e.trim());
+        },
+        showPronouns() {
+            return (this.broadcast?.broadcast_settings || []).includes("Show pronouns on desk");
+        },
+        pronounsOnNewline() {
+            return (this.broadcast?.broadcast_settings || []).includes("Show desk pronouns on new lines");
         }
+
+    },
+    metaInfo() {
+        return {
+            title: `Desk | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>
 
 <style scoped>
     .desk-overlay {
-        font-family: "Industry", "SLMN-Industry", sans-serif;
+        font-family: "SLMN-Industry", "Industry", sans-serif;
         overflow: hidden;
     }
     .top-holder {
@@ -116,6 +138,7 @@ export default {
     .anim-talent-enter, .anim-talent-leave-to {
         /* hide */
         max-width: 0;
+        min-width: 0 !important;
         opacity: 0;
         padding: 0 0;
     }
@@ -142,7 +165,7 @@ export default {
     }
 
     .desk-overlay {
-        padding: 2vh 10vw;
+        padding: 2vh 8vw;
         height: 100vh !important;
         box-sizing: border-box;
     }
@@ -169,4 +192,11 @@ export default {
 
     /*.casters .caster:last-child .caster-lower { right: 0 !important; }*/
     /*.casters .caster:last-child .caster-name { align-items: flex-end !important;}*/
+
+    .caster.wide-feed {
+        min-width: var(--caster-width)
+    }
+    .caster.wide-feed >>> .caster-frame {
+        --oversize: 1% !important;
+    }
 </style>

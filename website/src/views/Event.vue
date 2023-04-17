@@ -1,6 +1,6 @@
 <template>
     <div v-if="event">
-        <ThingTop :thing="event" type="event"></ThingTop>
+        <ThingTop :thing="event" type="event" :themeURL="subLink('theme')"></ThingTop>
 
         <SubPageNav class="my-2">
             <li class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
@@ -10,14 +10,16 @@
             <li class="nav-item ct-passive" v-if="showStandings"><router-link class="nav-link" :to="subLink('standings')">Standings</router-link></li>
             <li class="nav-item ct-passive" v-if="showFoldy"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
             <li class="nav-item ct-passive" v-if="showDraft"><router-link class="nav-link" :to="subLink('draft')">Draft</router-link></li>
-            <li class="nav-item ct-passive" v-if="useStaffPage"><router-link class="nav-link" :to="subLink('staff')">Staff</router-link></li>
+            <li class="nav-item ct-passive" v-if="showAuction"><router-link class="nav-link" :to="subLink('auction')">Auction</router-link></li>
+            <li class="nav-item ct-passive" v-if="showStaff"><router-link class="nav-link" :to="subLink('staff')">Staff</router-link></li>
+            <li class="nav-item ct-passive" v-if="event.theme"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
             <li class="nav-item ct-passive" v-if="event.about"><router-link class="nav-link" :to="subLink('about')">About</router-link></li>
 <!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
 
 
             <ul class="socials d-flex" v-if="event.socials">
                 <li class="nav-item">
-                    <Social class="ct-active" :social="social" v-for="social in event.socials" v-bind:key="social.id"/>
+                    <Social class="ct-active" :social="social" v-for="social in event.socials" :key="social.id"/>
                 </li>
             </ul>
 
@@ -34,10 +36,10 @@
 
 import ThingTop from "@/components/website/ThingTop";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { multiImage } from "@/utils/content-utils";
 import SubPageNav from "@/components/website/SubPageNav";
 import Social from "@/components/website/Social";
 import { themeBackground1 } from "@/utils/theme-styles";
+import { resizedImageNoWrap } from "@/utils/images";
 
 export default {
     name: "Event",
@@ -53,7 +55,7 @@ export default {
                 { name: "og:description", content: "test description" },
                 { name: "og:title", content: this.event.name }
             ],
-            link: [{ rel: "icon", href: multiImage(this.event.theme, ["small_logo", "default_logo"]) }]
+            link: [{ rel: "icon", href: resizedImageNoWrap(this.event.theme, ["small_logo", "default_logo"], "s-128") }]
         };
     },
     computed: {
@@ -67,13 +69,15 @@ export default {
                 player_relationships: ReactiveArray("player_relationships", {
                     player: ReactiveThing("player")
                 }),
+                brand_designers: ReactiveArray("brand_designers"),
                 casters: ReactiveArray("casters"),
                 news_items: ReactiveArray("news_items", {
                     team: ReactiveThing("team", {
                         theme: ReactiveThing("theme")
                     })
                 }),
-                socials: ReactiveArray("socials")
+                socials: ReactiveArray("socials"),
+                matches: ReactiveArray("matches")
             });
         },
         settings() {
@@ -93,8 +97,15 @@ export default {
         showDraft() {
             return this.settings?.draft?.use || false;
         },
-        useStaffPage() {
-            return this.settings?.extendedStaffPage || false;
+        showAuction() {
+            return this.settings?.auction?.public || false;
+        },
+        showStaff() {
+            return this.settings?.extendedStaffPage ||
+                this.event?.player_relationships ||
+                this.event?.staff ||
+                this.event?.matches ||
+                this.event?.casters;
         },
         subdomain() {
             return this.event?.subdomain || this.event?.partial_subdomain;
@@ -110,7 +121,7 @@ export default {
             return "on-foreign-subdomain";
         },
         shouldShowMinisitePrompt() {
-            return ["no-root-minisite", "on-foreign-subdomain"].includes(this.ownMinisiteStatus);
+            return this.minisiteDomain && ["no-root-minisite", "on-foreign-subdomain"].includes(this.ownMinisiteStatus);
         },
         minisiteLink() {
             if (!this.event?.id || !this.minisiteDomain) return null;
@@ -125,9 +136,9 @@ export default {
             if (!this.event) return null;
 
             try {
-                if ([process.env.VUE_APP_DEPLOY_MODE, process.env.NODE_ENV].includes("staging")) return `https://${this.subdomain}.dev.slmn.gg`;
-                if (process.env.NODE_ENV === "development" || process.env.VUE_APP_DEPLOY_MODE === "local") return `http://${this.subdomain}.localhost:8080`;
-                if ([process.env.VUE_APP_DEPLOY_MODE, process.env.NODE_ENV].includes("production")) return `https://${this.subdomain}.slmn.gg`;
+                if ([import.meta.env.VITE_DEPLOY_MODE, import.meta.env.NODE_ENV].includes("staging")) return `https://${this.subdomain}.dev.slmn.gg`;
+                if (import.meta.env.NODE_ENV === "development" || import.meta.env.VITE_DEPLOY_MODE === "local") return `http://${this.subdomain}.localhost:8080`;
+                if ([import.meta.env.VITE_DEPLOY_MODE, import.meta.env.NODE_ENV].includes("production")) return `https://${this.subdomain}.slmn.gg`;
                 return null;
             } catch (e) {
                 return null;

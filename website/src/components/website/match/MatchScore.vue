@@ -1,8 +1,8 @@
 <template>
     <div class="match-scoreline" v-if="match.first_to">
         <div class="match-score flex-center default-thing" v-for="(score, i) in scores"
-             v-bind:class="{'match-score-win': score === match.first_to }"
-             v-bind:key="i"
+             :class="{'match-score-win': score === match.first_to }"
+             :key="i"
              :style="{order: i*2, ...(score === match.first_to ? {... pointColor} : {})}">{{ displayScores[i] }}</div>
         <div class="match-score-center">-</div>
     </div>
@@ -27,6 +27,12 @@ export default {
                             left: frag.slice(0, 1) === "l"
                         })).forEach(e => e.left ? score[0]++ : score[1]++);
                     return score;
+                }
+            }
+            if (this.match.first_to === 1 && this.match.maps?.filter(m => !(m.banner)).length === 1) {
+                const map = this.match.maps.find(m => !(m.banner));
+                if (map.id && (map.score_1 !== undefined && map.score_2 !== undefined)) {
+                    return [map.score_1, map.score_2];
                 }
             }
             return this.scores;

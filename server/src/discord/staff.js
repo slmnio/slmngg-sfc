@@ -338,11 +338,11 @@ async function emptyEmptyRoles(event) {
     // Load members into cache
     await guild.members.list({ limit: 1000 });
 
-    let checkRoles = guild.roles.cache.filter(r => r.name !== "@everyone" && r.members.size !== 0);
+    let checkRoles = (guild.roles?.cache || []).filter(r => r.name !== "@everyone" && r.members.size !== 0);
 
     if (checkRoles.length === 0) return console.warn("Didn't want to empty roles - all roles appear to be empty");
 
-    let eligibleRoles = guild.roles.cache.filter(r => r.name.startsWith(event.prefix) && r.members.size === 0);
+    let eligibleRoles = (guild.roles?.cache || []).filter(r => r.name.startsWith(event.prefix) && r.members.size === 0);
 
     log(`Requested empty role deletion for **${event.name}**. The roles were:\n\`\`\`${eligibleRoles.map(r => `${r.id} - ${r.name}`)}\`\`\``);
 
@@ -369,7 +369,7 @@ async function findMember(guild, discordTag) {
     let [username, discriminator] = discordTag.split("#");
     let checkFunction = (m) => m.user && m.user.username.toLowerCase() === username.toLowerCase() && m.user.discriminator === discriminator;
 
-    let member = guild.members.cache.find(checkFunction);
+    let member = guild.members?.cache?.find(checkFunction);
     if (member) return member;
 
     let results = await guild.members.search({ query: username });
@@ -410,8 +410,8 @@ async function sendApplicationMessage(application) {
     }
     embed.setDescription(description.join("\n"));
 
-    if (application.background_and_experience) embed.addField("Background and experience", application.background_and_experience);
-    if (application.technical_details) embed.addField("Technical details", application.technical_details);
+    if (application.background_and_experience) embed.addField("Background and experience", application.background_and_experience.slice(0, 750) + (application.background_and_experience.length > 750 ? "..." : ""));
+    if (application.technical_details) embed.addField("Technical details", application.technical_details.slice(0, 250) + (application.technical_details.length > 250 ? "..." : ""));
 
     embed.addField("Discord tag", application.discord_tag, true);
     if (application.battletag) embed.addField("Battletag", application.battletag, true);

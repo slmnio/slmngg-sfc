@@ -1,24 +1,38 @@
 <template>
-    <div class="draft-player" :style="background">
-        <div class="player-name">{{ player.name }}</div>
+    <div class="draft-player" v-if="player && !player.dummy" :style="background" :data-player-id="player && player.id || 'empty'">
+        <Squeezable class="player-name">
+            <div>{{ player.name }}</div>
+        </Squeezable>
         <div class="player-role flex-center" v-if="showIcon" v-html="getSVG(player.role)"></div>
+        <div class="player-badge" v-if="badge">
+            <ThemeLogo class="badge-logo" :theme="badge && badge.theme" icon-padding="0.2em" logo-size="w-50" />
+        </div>
+    </div>
+    <div class="draft-player dummy" v-else :style="background">
+        <div class="player-name">dummy</div>
     </div>
 </template>
 
 <script>
 import { logoBackground } from "@/utils/theme-styles";
 import { getRoleSVG } from "@/utils/content-utils";
+import ThemeLogo from "@/components/website/ThemeLogo";
+import Squeezable from "@/components/broadcast/Squeezable.vue";
 
 export default {
     name: "DraftPlayer",
+    components: { Squeezable, ThemeLogo },
     props: {
         player: {},
         theme: {},
         asStaff: Boolean,
-        showIcon: Boolean
+        showIcon: Boolean,
+        badge: { }
     },
     computed: {
-        background() { return logoBackground(this.theme); }
+        background() {
+            return logoBackground(this.theme);
+        }
     },
     methods: {
         getSVG: getRoleSVG
@@ -44,6 +58,17 @@ export default {
         --size: 1.25em;
         height: var(--size);
         width: var(--size);
+    }
+    .draft-player.dummy {
+        opacity: 0.6;
+    }
+    .draft-player.dummy .player-name {
+        opacity: 0;
+    }
+    .player-badge .badge-logo {
+        width: 1.6em;
+        height: 1.4em;
+        border-bottom-width: .15em !important;
     }
 </style>
 

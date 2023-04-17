@@ -1,5 +1,5 @@
 <template>
-    <router-link :to="overrideURL || url(type, linkTo || thing)" class="link content-thing default-thing" :style="bgStyle" v-bind:class="{ 'has-headshot' : showHeadshot && headshot }">
+    <component :is="noLink ? 'div' : 'router-link'" :to="noLink ? null : this.overrideURL || url(this.type, this.linkTo || this.thing, this.linkOptions || {})" class="link content-thing default-thing" :style="bgStyle" :class="{ 'has-headshot' : showHeadshot && headshot }">
       <span class="link-headshot" v-if="showHeadshot">
         <span class="headshot" :style="headshot"></span>
       </span>
@@ -9,7 +9,7 @@
               :style="logo"
               v-if="shouldShowLogo && !logoRight"></span>
 
-        <span class="name">{{ text || thing.name }}</span>
+        <span class="name" v-if="text !== ''">{{ text || thing.name }}</span>
 
         <i class="fas fa-badge-check fa-fw" title="REAL" v-if="thing.verified"></i>
 
@@ -19,16 +19,17 @@
             class="icon-internal bg-center icon-internal-right"
             :style="logo"
             v-if="shouldShowLogo && logoRight"></span>
-        </span></router-link>
+        </span></component>
 </template>
 
 <script>
-import { resizedImage, url, cssImage } from "@/utils/content-utils";
+import { url } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 import LoadingIcon from "@/components/website/LoadingIcon";
 
 export default {
     name: "ContentThing",
-    props: ["theme", "thing", "showLogo", "type", "text", "logoRight", "linkTo", "showHeadshot", "overrideURL"],
+    props: ["theme", "thing", "showLogo", "type", "text", "logoRight", "linkTo", "showHeadshot", "overrideURL", "noLink", "linkOptions"],
     components: { LoadingIcon },
     methods: {
         url
@@ -55,11 +56,12 @@ export default {
             return false;
         },
         loading() {
+            if (this.thing?.limited) return false;
             return this.thing.__loading || !this.thing || !this.thing.id;
         },
         logo () {
             if (!this.theme || !this.theme.default_logo) return null;
-            return cssImage("backgroundImage", this.theme, ["small_logo", "default_logo"], 30);
+            return resizedImage(this.theme, ["small_logo", "default_logo"], "s-120");
         },
         headshot () {
             if (!this.thing) return null;
@@ -98,8 +100,8 @@ export default {
         height: 1.5em;
         width: 1.5em;
     }
-    .icon-internal.icon-internal-left { margin-right: .3em }
-    .icon-internal.icon-internal-right { margin-left: .3em }
+    .icon-internal.icon-internal-left + .name { margin-left: .3em }
+    .icon-internal.icon-internal-right + .name { margin-right: .3em }
     .content-thing i {
       margin: 5px 0;
     }

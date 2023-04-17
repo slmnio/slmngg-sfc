@@ -19,7 +19,7 @@
             <div class="right w-25 px-2 d-flex flex-column">
                 <div class="sister mb-3 text-uppercase d-flex align-items-center" v-if="sister" :style="logoBackground1(sister)">
                     <div class="sister-logo flex-center mx-2">
-                        <div class="logo-inner bg-center" :style="cssImage('backgroundImage', sister.theme, ['default_logo', 'default_wordmark', 'small_logo'], 100)"></div>
+                        <div class="logo-inner bg-center" :style="resizedImage(sister.theme, ['default_logo', 'default_wordmark', 'small_logo'], 'h-100')"></div>
                     </div>
                     <div class="sister-text ml-1">
                         <div class="industry-align">Sister team</div>
@@ -30,17 +30,17 @@
                     <div class="industry-align">Designed by: {{ designers }}</div>
                 </div>
                 <div class="logos flex-grow-1 d-flex flex-column mb-3">
-                    <div class="logo-holder w-100 flex-grow-1 my-2 flex-center" v-for="logo in logos" v-bind:key="logo.key" :style="teamBG">
-                        <div class="logo-inner bg-center" :style="{'backgroundImage': `url(${logo.item})`}"></div>
+                    <div class="logo-holder w-100 flex-grow-1 my-2 flex-center" v-for="logo in logos" :key="logo.key" :style="teamBG">
+                        <div class="logo-inner bg-center" :style="bg(resizedAttachment(logo.item, 'orig'))"></div>
                     </div>
                 </div>
                 <div class="colors d-flex">
-                    <div class="swatch flex-grow-1 h-100 mx-2" v-for="color in colors" v-bind:key="color.value" :style="{ backgroundColor: color.value }"></div>
+                    <div class="swatch flex-grow-1 h-100 mx-2" v-for="color in colors" :key="color.value" :style="{ backgroundColor: color.value }"></div>
                 </div>
             </div>
         </div>
         <div class="event-logo-holder position-absolute d-none flex-center" v-if="broadcast.event && broadcast.event.theme">
-            <div class="logo-inner bg-center w-100 h-100" :style="cssImage('backgroundImage', broadcast.event.theme, ['default_logo'], 0, false)"></div>
+            <div class="logo-inner bg-center w-100 h-100" :style="resizedImage(broadcast.event.theme, ['default_logo'], 'orig')"></div>
         </div>
     </div>
 </template>
@@ -48,16 +48,16 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cssImage } from "@/utils/content-utils";
+import { bg, resizedAttachment, resizedImage } from "@/utils/images";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");
 }
 
 export default {
-    name: "InfoOverlay",
+    name: "BrandingOverlay",
     props: ["broadcast"],
-    methods: { logoBackground1, cssImage },
+    methods: { resizedAttachment, logoBackground1, resizedImage, bg },
     data: () => ({
         logoI: 0
     }),
@@ -83,14 +83,14 @@ export default {
             if (!this.highlightTeam?.theme) return [];
             const theme = this.highlightTeam.theme;
             return ["small_logo", "default_logo", "default_wordmark"].map(key => ({ key, item: theme[key] }))
-                .filter(s => s.item).map(s => ({ ...s, item: s.item[0].url }));
+                .filter(s => s.item).map(s => ({ ...s, item: s.item[0] }));
         },
         bigLogos() {
             return this.logos.filter(logo => logo.key !== "small_logo");
         },
         eventLogo() {
             if (!this.broadcast?.event?.theme) return {};
-            return cssImage("backgroundImage", this.broadcast.event.theme, ["default_logo"], 200);
+            return resizedImage(this.broadcast.event.theme, ["default_logo"], "h-200");
         },
         colors() {
             if (!this.highlightTeam?.theme) return [];
@@ -115,9 +115,7 @@ export default {
             return this.highlightTeam.brand_designers.map(p => p.name).join(", ");
         },
         focusedLogoCSS() {
-            return {
-                backgroundImage: `url(${this.bigLogos[this.logoI]?.item})`
-            };
+            return bg(resizedAttachment(this.bigLogos[this.logoI]?.item));
         }
     },
     mounted() {
@@ -125,14 +123,18 @@ export default {
             this.logoI++;
             if (this.logoI >= this.bigLogos.length) this.logoI = 0;
         }, 8000);
+    },
+    metaInfo() {
+        return {
+            title: `Branding | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>
 
 <style scoped>
     .branding-overlay {
-        background-color: #222;
-        font-family: "Industry", "SLMN-Industry", sans-serif;
+        font-family: "SLMN-Industry", "Industry", sans-serif;
         color: white;
         display: flex;
         flex-direction: column;

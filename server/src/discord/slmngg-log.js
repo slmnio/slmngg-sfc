@@ -14,11 +14,18 @@ async function getChannel() {
 }
 
 async function log(text) {
+    if (process.env.IS_SLMNGG_MAIN_SERVER) {
+        text = "[Main] " + text;
+    }
     console.log("[Log]", text);
     if (!client) return;
     let channel = await getChannel();
     if (!channel) return;
-    return channel.send(text);
+    try {
+        return channel.send(text);
+    } catch (e) {
+        console.error("[Log:failed]", e);
+    }
 }
 
 module.exports = {

@@ -1,5 +1,5 @@
 <template>
-    <div class="tourney-bar" :style="gradient" v-bind:class="{'small-bar': !(left && right) }">
+    <div class="tourney-bar" :style="gradient" :class="{'small-bar': !(left && right) }">
         <div class="bar-text flex-center bar-text-left">
             <transition name="fade" mode="out-in">
                 <span :key="left" v-if="left && right">{{ left }}</span>
@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "TourneyBar",
@@ -41,7 +41,7 @@ export default {
         },
         logo() {
             if (!this._theme) return {};
-            return cssImage("backgroundImage", this._theme, ["default_wordmark", "default_logo"], null, false);
+            return resizedImage(this._theme, ["default_wordmark", "default_logo"], "h-500");
         }
     }
 };
@@ -62,7 +62,8 @@ export default {
         border-radius: 0;
     }
     .tourney-bar.small-bar .bar-logo {
-        height: 220px;
+        width: 75%;
+        height: 200px;
     }
     .bar-text {
         text-transform: uppercase;
@@ -73,7 +74,11 @@ export default {
         transform: translate(0, -0.08em)
     }
 
-    .bar-logo {width: 300px;height: 300px;margin: -100px 0;}
+    .bar-logo {
+        width: 300px;
+        height: 300px;
+        margin: -90px 0;
+    }
 
     .bar-logo-holder {}
 </style>

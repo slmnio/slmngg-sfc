@@ -10,9 +10,10 @@
                     <router-view :match="match" />
                 </div>
                 <div class="col-12 col-md-3">
-                    <ul class="match-sub-nav list-group mb-2" v-if="showHeadToHead"> <!-- only because it'd be the only one -->
-                        <router-link class="list-group-item ct-passive" exact active-class="active ct-active" :to="subLink('')">VOD</router-link>
-                        <router-link v-if="showHeadToHead" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('history')">Head to head</router-link>
+                    <ul class="match-sub-nav list-group mb-2" v-if="sidebarItems.length > 1"> <!-- only because it'd be the only one -->
+                        <router-link v-if="sidebarItems.includes('vod')" class="list-group-item ct-passive" exact active-class="active ct-active" :to="subLink('')">VOD</router-link>
+                        <router-link v-if="sidebarItems.includes('head-to-head')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('history')">Head to head</router-link>
+                        <router-link v-if="sidebarItems.includes('editor')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('editor')">Match editor</router-link>
                     </ul>
 
                     <table class="match-details table-sm">
@@ -28,7 +29,7 @@
                             <tr v-if="match.event && match.event.name"><td colspan="2" class="default-thing" :style="eventStyle">
                                 <b><router-link :to="url('event', match.event)" class="match-event-link">{{ match.event.name }}</router-link></b>
                             </td></tr>
-                            <tr v-if="match.forfeit"><td colspan="2"><i>Match was forfeited</i></td></tr>
+                            <tr v-if="match.forfeit"><td colspan="2"><b><i>Match was forfeited</i></b><span v-if="match.forfeit_reason"><br>{{ match.forfeit_reason }}</span></td></tr>
                             <tr v-if="lowerText"><td colspan="2">{{ lowerText }}</td></tr>
                             <tr v-if="match.first_to">
                                 <td>First to</td><td>{{ match.first_to }}</td>
@@ -37,7 +38,7 @@
                                 <td>{{ match.casters.length === 1 ? 'Caster' : 'Casters' }}</td>
                                 <td><LinkedPlayers :players="match.casters" /></td>
                             </tr>
-                            <tr v-for="group in playerRelationshipGroups" v-bind:key="group.meta.singular_name">
+                            <tr v-for="group in playerRelationshipGroups" :key="group.meta.singular_name">
                                 <td>{{ group.items.length === 1 ? group.meta.singular_name : group.meta.plural_name }}</td>
                                 <td><LinkedPlayers :players="group.items"/></td>
                             </tr>
@@ -45,9 +46,9 @@
                                 <td>MVP</td>
                                 <td><LinkedPlayers :players="[match.mvp]" /></td>
                             </tr>
-                            <tr v-if="match.log_files && match.log_files.replay_codes">
+                            <tr v-if="replayCodes">
                                 <td>Replay codes</td>
-                                <td>{{ match.log_files.replay_codes }}</td>
+                                <td>{{ replayCodes }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -62,7 +63,9 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import MatchHero from "@/components/website/match/MatchHero";
 import MatchScore from "@/components/website/match/MatchScore";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
-import { getMatchContext, multiImage, url } from "@/utils/content-utils";
+import { formatTime, getMatchContext, url } from "@/utils/content-utils";
+import { resizedImageNoWrap } from "@/utils/images";
+import { isAuthenticated } from "@/utils/auth";
 
 export default {
     name: "Match",
@@ -81,7 +84,9 @@ export default {
                     theme: ReactiveThing("theme")
                 }),
                 event: ReactiveThing("event", {
-                    theme: ReactiveThing("theme")
+                    theme: ReactiveThing("theme"),
+                    player_relationships: ReactiveArray("player_relationships"),
+                    broadcasts: ReactiveThing("broadcasts")
                 }),
                 casters: ReactiveArray("casters"),
                 player_relationships: ReactiveArray("player_relationships", {
@@ -89,7 +94,14 @@ export default {
                 }),
                 mvp: ReactiveThing("mvp"),
                 maps: ReactiveArray("maps", {
+                    map: ReactiveThing("map"),
                     winner: ReactiveThing("winner", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    picker: ReactiveThing("picker", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    banner: ReactiveThing("banner", {
                         theme: ReactiveThing("theme")
                     })
                 }),
@@ -129,34 +141,7 @@ export default {
             return Object.values(groups);
         },
         date() {
-            const date = new Date(this.match.start);
-
-            let time = "";
-
-            if (date.getHours() >= 12) {
-                // pm
-                if (date.getHours() % 12 === 0) { time += 12; } else { time += (date.getHours() % 12); }
-                time += ":";
-                time += date.getMinutes().toString().padStart(2, "0");
-                time += "pm";
-            } else {
-                if (date.getHours() === 0) { time += 12; } else { time += (date.getHours() % 12); }
-                time += ":";
-                time += date.getMinutes().toString().padStart(2, "0");
-                time += "am";
-            }
-
-
-            function z(n) {
-                n = n.toString();
-                if (["11", "12", "13"].includes(n.slice(-2))) return "th";
-                if (n.slice(-1) === "1") return "st";
-                if (n.slice(-1) === "2") return "nd";
-                if (n.slice(-1) === "3") return "rd";
-                return "th";
-            }
-
-            return `${date.getDate()}${z(date.getDate())} ${("Jan.Feb.Mar.Apr.May.Jun.Jul.Aug.Sep.Oct.Nov.Dec".split("."))[date.getMonth()]} ${date.getFullYear()} ${time}`;
+            return formatTime(this.match.start, this.$store.state.timezone);
         },
         theme() {
             return this.match?.event?.theme;
@@ -164,12 +149,35 @@ export default {
         showHeadToHead() {
             if (this.match?.special_event) return false;
             return this.match?.event?.map_pool;
+        },
+        showEditor() {
+            if (!isAuthenticated(this.$root)) return false;
+            // TODO: Make sure user is an admin or has perms here
+            return (
+                this.$root.auth?.user?.website_settings?.includes("Can edit any match") ||
+                (this.match?.event?.staff || []).includes(`rec${this.$root.auth?.user?.airtableID}`) ||
+                (this.match?.event?.player_relationships || []).some(rel => rel.player?.[0] === `rec${this.$root.auth?.user?.airtableID}` && (rel.permissions || []).includes("Match Editor")) ||
+                (this.match?.player_relationships || []).some(rel => rel.player?.[0] === `rec${this.$root.auth?.user?.airtableID}` && (rel.permissions || []).includes("Match Editor"))
+            );
+        },
+        sidebarItems() {
+            const items = ["vod"];
+
+            if (this.showHeadToHead) items.push("head-to-head");
+            if (this.showEditor) items.push("editor");
+
+            return items;
+        },
+        replayCodes() {
+            if (this.match?.log_files?.replay_codes) return this.match.log_files.replay_codes;
+            if (!this.match?.maps?.some(map => map.replay_code)) return null;
+            return this.match.maps.map(map => `${map.name?.[0]}: ${map.replay_code}`).join(", \n");
         }
     },
     metaInfo() {
         return {
             title: this.match.name,
-            link: [{ rel: "icon", href: multiImage(this.match?.event?.theme, ["small_logo", "default_logo"]) }]
+            link: [{ rel: "icon", href: resizedImageNoWrap(this.match?.event?.theme, ["small_logo", "default_logo"], "s-128") }]
         };
     }
 };

@@ -1,11 +1,11 @@
 <template>
-    <div class="match-hero" v-bind:class="{'special-event': match.special_event}">
+    <div class="match-hero" :class="{'special-event': match.special_event}">
         <div class="match-hero-event flex-center default-thing-border-bg" v-if="match.event && !$root.minisiteEvent && !match.special_event" :style="eventStyle"></div>
         <div class="match-hero-teams" v-if="!match.special_event">
-            <MatchHeroTeam class="team" v-for="team in match.teams" v-bind:key="team.id" :team="team" />
+            <MatchHeroTeam class="team" v-for="team in match.teams" :key="team.id" :team="team" />
             <div class="match-hero-event-logo" v-if="match.event" :style="eventLogo"></div>
         </div>
-        <div class="match-hero-text flex-grow-1 flex-center" v-if="match.special_event" :style="eventStyle">
+        <div class="match-hero-text flex-grow-1 flex-center text-center" v-if="match.special_event" :style="eventStyle">
             {{ match.custom_name }}
         </div>
     </div>
@@ -69,6 +69,7 @@ export default {
         font-size: 4em;
         font-weight: bold;
         border-bottom: 8px solid transparent;
+        line-height: 1;
     }
 
     .match-hero.special-event {

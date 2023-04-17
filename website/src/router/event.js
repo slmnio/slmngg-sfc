@@ -1,25 +1,20 @@
-import EventMain from "@/views/sub-views/EventMain";
-import EventRosters from "@/views/sub-views/EventRosters";
-import EventBrackets from "@/views/sub-views/EventBrackets";
-import EventSchedule from "@/views/sub-views/EventSchedule";
-// import EventScenarios from "@/views/sub-views/EventScenarios";
-import EventDraft from "@/views/sub-views/EventDraft";
-import EventStaff from "@/views/sub-views/EventStaff";
-import EventAbout from "@/views/sub-views/EventAbout";
-import EventScenarios2 from "@/views/sub-views/EventScenarios2";
-import EventStandings from "@/views/sub-views/EventStandings";
-
 export default [
-    { path: "", component: EventMain },
-    { path: "rosters", component: EventRosters },
-    { path: "bracket", component: EventBrackets },
+    { path: "", component: () => import("@/views/sub-views/EventMain.vue") },
+    { path: "rosters", component: () => import("@/views/sub-views/EventRosters.vue") },
+    { path: "bracket", component: () => import("@/views/sub-views/EventBrackets.vue") },
     { path: "brackets", redirect: "bracket" },
-    { path: "schedule", component: EventSchedule },
+    { path: "schedule", component: () => import("@/views/sub-views/EventSchedule.vue") },
     { path: "matches", redirect: "schedule" },
     // { path: "scenarios", component: EventScenarios },
-    { path: "scenarios", component: EventScenarios2 },
-    { path: "draft", component: EventDraft },
-    { path: "staff", component: EventStaff },
-    { path: "about", component: EventAbout },
-    { path: "standings", component: EventStandings }
+    { path: "scenarios", component: () => import("@/views/sub-views/EventScenarios2.vue") },
+    { path: "draft", component: () => import("@/views/sub-views/EventDraft.vue") },
+    { path: "staff", component: () => import("@/views/sub-views/EventStaff.vue") },
+    { path: "about", component: () => import("@/views/sub-views/EventAbout.vue") },
+    { path: "standings", component: () => import("@/views/sub-views/EventStandings.vue") },
+    { path: "theme", component: () => import("@/views/sub-views/ThingTheme.vue") },
+    { path: "brands", component: () => import("@/views/sub-views/EventBrands.vue") },
+    { path: "auction", component: () => import("@/views/sub-views/EventAuction.vue") },
+    { path: "stream", redirect: "streams" },
+    { path: "stream-details", redirect: "streams" },
+    { path: "streams", component: () => import("@/views/sub-views/EventStreamDetails.vue") }
 ];

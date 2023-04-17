@@ -10,7 +10,8 @@
         <h1><LoadingIcon v-if="!players.length"></LoadingIcon></h1>
 
         <div class="player-list">
-            <ContentThing v-for="player in filteredPlayers" v-bind:key="player.id"
+            <div class="search-helper default-thing" v-if="search && search.length < minCharacters">Use {{ minCharacters }} or more characters to search</div>
+            <ContentThing v-for="player in filteredPlayers" :key="player.id"
                           :text="player.name" :thing="player" type="player" />
         </div>
     </div>
@@ -18,13 +19,17 @@
 
 <script>
 import { ReactiveRoot } from "@/utils/reactive";
+import { searchInCollection } from "@/utils/search";
 import ContentThing from "@/components/website/ContentThing";
 import LoadingIcon from "@/components/website/LoadingIcon";
 
 export default {
     name: "Players",
     components: { ContentThing, LoadingIcon },
-    data: () => ({ search: null }),
+    data: () => ({
+        search: null,
+        minCharacters: 3
+    }),
     computed: {
         players() {
             const data = ReactiveRoot("special:players")?.players;
@@ -39,20 +44,9 @@ export default {
             });
         },
         filteredPlayers() {
-            if (!this.search) return this.players;
-            const unleetSearch = this.unleet(this.search);
-            return this.players.filter(p =>
-                p.name && (p.name.toLowerCase().includes(this.search.toLowerCase()) ||
-                this.unleet(p.name).includes(unleetSearch))
-            );
-        }
-    },
-    methods: {
-        unleet(text) {
-            return text.toLowerCase().replace(/0/g, "o")
-                .replace(/4/g, "a")
-                .replace(/3/g, "e")
-                .replace(/2/g, "a");
+            if (!this.search || this.search.length === 0) return this.players;
+            if (this.search.length < this.minCharacters) return [];
+            return searchInCollection(this.players, this.search, "name");
         }
     },
     metaInfo() {
@@ -71,5 +65,13 @@ export default {
     }
     .player-list .content-thing {
         color: #eee;
+    }
+
+    .search-helper {
+        padding: 0.25em 1em;
+        margin: 0.25em 0.25em;
+        border-bottom: 0.2em solid transparent;
+        background-color: rgba(255, 255, 255, 0.05);
+        color: rgba(255,255,255,0.8);
     }
 </style>

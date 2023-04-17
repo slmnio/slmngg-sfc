@@ -1,7 +1,7 @@
 <template>
     <GenericOverlay :title="title || 'Schedule'" class="schedule-overlay" :top="top" :broadcast="broadcast">
         <transition-group class="break-col break-schedule" name="a--match">
-            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
+            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />
         </transition-group>
     </GenericOverlay>
 </template>
@@ -9,7 +9,7 @@
 <script>
 import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import BreakMatch from "@/components/broadcast/break/BreakMatch";
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
 import { themeBackground1 } from "@/utils/theme-styles";
 
@@ -32,6 +32,11 @@ export default {
             if (!this.broadcast?.event?.theme) return {};
             return themeBackground1(this.broadcast.event);
         }
+    },
+    metaInfo() {
+        return {
+            title: `Schedule${this.secondary ? " (Secondary)" : ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

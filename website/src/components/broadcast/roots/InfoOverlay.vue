@@ -4,7 +4,7 @@
             <div class="team-text" :style="teamBG">
                 <transition mode="out-in" name="fade">
                     <div class="industry-align" :key="title || broadcast.title" v-html="nbr( title || broadcast.title)"
-                         v-bind:class="{'has-br': (title || broadcast.title || '').includes('\\n') }"></div>
+                         :class="{'has-br': (title || broadcast.title || '').includes('\\n') }"></div>
                 </transition>
             </div>
             <div class="event-logo bg-center" :style="eventLogo"></div>
@@ -15,7 +15,7 @@
 <script>
 import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "InfoOverlay",
@@ -37,7 +37,7 @@ export default {
         },
         eventLogo() {
             if (!this.broadcast?.event?.theme) return {};
-            return cssImage("backgroundImage", this.broadcast.event.theme, ["default_logo"], 200);
+            return resizedImage(this.broadcast.event.theme, ["default_logo"], "h-200");
         }
     },
     methods: {
@@ -45,6 +45,11 @@ export default {
             if (!text) return "";
             return text.replace(/\\n/g, "<br>");
         }
+    },
+    metaInfo() {
+        return {
+            title: `Info "${this.title}" | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>
@@ -88,5 +93,8 @@ export default {
         align-items: center;
     }
 
-    .industry-align { transform: translate(0, -0.075em); }
+    .industry-align {
+        /* this was slightly less than normal: -0.0075em */
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
+    }
 </style>

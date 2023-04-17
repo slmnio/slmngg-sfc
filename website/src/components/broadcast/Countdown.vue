@@ -14,7 +14,8 @@ export default {
         setInterval(this.tick, 1000);
     },
     data: () => ({
-        now: new Date()
+        now: new Date(),
+        startingCountdown: null
     }),
     computed: {
         diff() {
@@ -24,8 +25,9 @@ export default {
             return diff;
         },
         text() {
-            if (!this.to) {
+            if (!this.to || !this.startingCountdown) {
                 // return current date if no time set
+                //        or if the "to" starts the countdown at 0
                 const utc = spacetime(this.now);
                 const local = utc.goto(this.timezone || "America/New_York");
                 return local.format("{hour}:{minute-pad}") + `<span class="ampm">${local.format("ampm")}</span>`;
@@ -51,6 +53,9 @@ export default {
     watch: {
         diff(v) {
             if (this.update) this.update(v);
+        },
+        to(newTo) {
+            this.startingCountdown = this.diff;
         }
     }
 };
@@ -58,7 +63,7 @@ export default {
 
 <style scoped>
     span.industry-align {
-        transform: translate(0, -.0925em);
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
     }
     .countdown {
         font-variant-numeric: tabular-nums;

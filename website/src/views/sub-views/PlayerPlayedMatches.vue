@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="row">
-            <Match v-for="match in matches" :hydrated-match="match" v-bind:key="match.id" class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3" />
+            <Match v-for="match in matches" :hydrated-match="match" :key="match.id" class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3" />
         </div>
     </div>
 </template>
@@ -38,7 +38,12 @@ export default {
                 console.log(team.matches);
                 if (team.matches) matches = matches.concat(team.matches);
             });
-            return matches.sort(sortMatches);
+
+            const sortIndex = {};
+            matches.forEach((match, i) => {
+                sortIndex[match.id] = i;
+            });
+            return matches.filter((val, i) => sortIndex[val.id] === i).sort(sortMatches);
         }
     }
 };

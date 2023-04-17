@@ -1,9 +1,9 @@
 <template>
     <div class="draft-team-top default-thing" :style="background">
-        <div class="team-logo-holder flex-center">
+        <div class="team-logo-holder flex-center" v-if="showLogo">
             <div class="team-logo bg-center" :style="logo"></div>
         </div>
-        <div class="team-name-holder">
+        <div class="team-name-holder" :class="{'no-top': !showLogo }">
             <div class="team-name">{{ team.name }}</div>
         </div>
     </div>
@@ -11,16 +11,15 @@
 
 <script>
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "DraftTeam",
-    props: ["team"],
+    props: ["team", "showLogo"],
     computed: {
         background() { return logoBackground1(this.team); },
         logo() {
-            return cssImage("backgroundImage", this.team.theme,
-                ["default_wormark", "default_logo", "small_logo"], 200);
+            return resizedImage(this.team.theme, ["default_wordmark", "default_logo", "small_logo"], "w-200");
         }
     }
 };
@@ -46,6 +45,10 @@ export default {
     .team-logo-holder {
         height: 180px;
         padding-top: 10px;
+    }
+    .team-name-holder.no-top {
+        margin-top: 0;
+        padding-bottom: 0;
     }
     .team-logo {
         width: calc(100% - 20px);

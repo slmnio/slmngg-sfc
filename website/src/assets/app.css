@@ -181,7 +181,7 @@ a.link-text {
 .f-col { display: flex; flex-direction: column; }
 .f-row { display: flex; flex-direction: row; }
 
-.navbar-nav .nav-item>*, .navbar-nav>* {
+.navbar-nav .nav-item, .navbar-nav div {
     line-height: 1;
     text-align: center;
     display: flex;
@@ -209,7 +209,7 @@ body.overlay {
     background-color: transparent;
 }
 .industry-align {
-    transform: translate(0, -0.09em);
+    transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
 }
 
 h1.big {
@@ -258,4 +258,24 @@ a.ct-passive:hover,
 .ct-passive a:hover,
 .ct-passive:hover a {
     color: var(--theme-active, #66d9ff);
+}
+
+.modal-content {
+    color: #222;
+}
+
+/* hide arrows on input[type=number] https://stackoverflow.com/a/4298216 */
+
+input.no-arrows::-webkit-outer-spin-button,
+input.no-arrows::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input.no-arrows[type=number] {
+    -moz-appearance:textfield;
+}
+
+.notyf__ripple {
+    width: 500px;
+    height: 500px;
 }

@@ -3,7 +3,7 @@
         <div class="prev-match-date" v-if="match.round || match.sub_event">{{ match.round || match.sub_event }}</div>
         <div class="prev-match-date" v-else-if="match.start">{{ goodDate }}</div>
         <div class="prev-match-result">{{ resultLetter }}</div>
-        <router-link :to="url('detailed', match)" class="prev-match-vs">vs</router-link>
+        <router-link :to="url('detailed', match)" class="prev-match-vs ct-active">vs</router-link>
         <div class="prev-match-opponent default-thing flex-center flex-shrink-0" :style="teamTheme(opponent)"><div class="prev-match-opponent-logo bg-center" :style="largeIcon(opponent)"></div></div>
         <div class="prev-match-maps"><MapDisplay class="map"
                 v-for="map in (match.maps || []).filter(map => map.number <= match.first_to || map.winner)"
@@ -13,9 +13,10 @@
 </template>
 
 <script>
-import { cssImage, url } from "@/utils/content-utils";
+import { url } from "@/utils/content-utils";
 import MapDisplay from "@/components/website/match/MapDisplay";
 import { logoBackground1 } from "@/utils/theme-styles";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "PreviousMatch",
@@ -60,7 +61,7 @@ export default {
     },
     methods: {
         teamTheme: (team) => logoBackground1(team),
-        largeIcon: (team) => cssImage("backgroundImage", team?.theme, ["default_logo", "small_logo"], 50),
+        largeIcon: (team) => resizedImage(team?.theme, ["default_logo", "small_logo"], "h-50"),
         url
     }
 };
@@ -71,7 +72,7 @@ export default {
         display: flex;
         align-items: center;
         position: relative;
-        min-height: 70px;
+        min-height: 74px;
     }
     .prev-match-maps {
         display: flex;

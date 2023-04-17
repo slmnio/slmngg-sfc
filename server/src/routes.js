@@ -1,3 +1,11 @@
+const fetch = require("node-fetch");
+const { updateRecord,
+    createRecord
+} = require("./action-utils/action-utils");
+const { exchangeCode,
+    getTokenInfo
+} = require("@twurple/auth");
+
 function cleanID(id) {
     if (!id) return null;
     if (typeof id !== "string") return id.id || null; // no real id oops
@@ -21,6 +29,7 @@ module.exports = ({ app, cors, Cache, io }) => {
             let subdomain = req.query.subdomain || null;
             let path = req.query.path;
             if (!path.startsWith("/")) path = "/" + path;
+            path = path.trim().toLowerCase();
 
 
             if (!redirects) return res.send({ redirect: null, warn: "no redirects loaded" });
@@ -28,14 +37,14 @@ module.exports = ({ app, cors, Cache, io }) => {
             let redirect = redirects.find(r => {
                 if (!r.active) return false;
                 // check subdomain & urls match
-                return (r.subdomain || null) === subdomain && r.incoming_url === path;
+                return (r.subdomain || null) === subdomain && r.incoming_url.trim().toLowerCase() === path;
             });
 
             if (!redirect) redirect = redirects.find(r => {
                 if (!r.active) return false;
                 // if we can't find anything on the specific subdomain, use a global one
                 if (r.subdomain) return false;
-                return (r.incoming_url === path);
+                return (r.incoming_url.trim().toLowerCase() === path);
             });
 
             if (!redirect) {
@@ -82,8 +91,8 @@ module.exports = ({ app, cors, Cache, io }) => {
             live_match = live_match.data;
 
             if (!live_match.casters || live_match.casters.length === 0) return res.send("No casters are linked to this match.");
-            let casters = (await Promise.all(live_match.casters.map(id => Cache.get(cleanID(id))))).map(caster => caster.name);
-            return res.send(`Your casters for this match are ${niceJoin(casters)}!`);
+            let casters = (await Promise.all(live_match.casters.map(id => Cache.get(cleanID(id))))).map(caster => caster.name + (caster.twitter_link?.length ? ": " + caster.twitter_link[0].replace("https://", "").toLowerCase() + " ": ""));
+            return res.send(`Your casters for this match are ${niceJoin(casters)}`);
 
         } catch (e) {
             console.error(e);
@@ -164,4 +173,192 @@ module.exports = ({ app, cors, Cache, io }) => {
         io.to(`prod:client-${req.query.client}`).emit(req.query.event, "go");
         return res.send(":) ok bet");
     });
+
+    function getdtz(time) {
+        return [
+            time.getUTCFullYear().toString().padStart(4, "0"),
+            (time.getUTCMonth() + 1).toString().padStart(2, "0"),
+            time.getUTCDate().toString().padStart(2, "0"),
+            "T",
+            time.getUTCHours().toString().padStart(2, "0"),
+            time.getUTCMinutes().toString().padStart(2, "0"),
+            time.getUTCSeconds().toString().padStart(2, "0"),
+            "Z"
+        ].join("");
+    }
+
+    function addHours(date = new Date(), num) {
+        // console.log(date, "+", num, date.getTime(), (num * 60 * 60 * 1000), date.getTime() + (num * 60 * 60 * 1000), new Date(date.getTime() + (num * 60 * 60 * 1000)));
+        return new Date(date.getTime() + (num * 60 * 60 * 1000));
+    }
+    function addMins(date = new Date(), num) {
+        // console.log(date, "+m", num, date.getTime(), (num * 60 * 1000), date.getTime() + (num * 60 * 1000), new Date(date.getTime() + (num * 60 * 1000)));
+        return new Date(date.getTime() + (num * 60 * 1000));
+    }
+
+    function getMatchCal(match, event) {
+        let start = new Date(match.start);
+        let end = new Date(match.start);
+
+        if (match.duration) {
+            end = addMins(start, match.duration);
+        } else {
+            if (match.first_to === 2) {
+                end = addHours(start, 1);
+            }
+            if (match.first_to === 3) {
+                end = addHours(start, 2);
+            }
+        }
+
+        if (start.getTime() === end.getTime()) {
+            end = addHours(start, 1);
+        }
+
+        let matchDesc = [];
+        if (event && event.name) { matchDesc.push("Event: " + event.name); }
+        if (match.vod) { matchDesc.push("Stream: " + match.vod); }
+        let subdomain = event.subdomain || event.partial_subdomain;
+        matchDesc.push(`Match details: https://${subdomain ? `${subdomain}.` : ""}slmn.gg/match/${match.id.slice(3)}`);
+
+        matchDesc.push("");
+        matchDesc.push("Synced from SLMN.GG");
+        if (match.modified) matchDesc.push(`Last updated: ${new Date(match.modified).toUTCString()}.`);
+        matchDesc.push(`Last synced: ${new Date().toUTCString()}.`);
+
+        return [
+            "BEGIN:VEVENT",
+            `UID:evt-${match.id}@slmn.gg`,
+            `DTSTAMP:${getdtz(new Date(match.created))}`,
+            `DTSTART:${getdtz(start)}`,
+            `DTEND:${getdtz(end)}`,
+            `SUMMARY:${match.name}`,
+            `DESCRIPTION:${matchDesc.join("\\n")}`,
+            "END:VEVENT"
+        ];
+    }
+
+    function getCalCol(hex) {
+        if (!hex) return null;
+        hex = hex.replace("#", "");
+        return [
+            hex.slice(0,2),
+            hex.slice(2,4),
+            hex.slice(4,6)
+        ].map(hex => parseInt(hex, 16)).join(":");
+    }
+
+    async function generateCal(event) {
+        let theme = (event.theme ? await Cache.get(event.theme[0]) : null);
+        let matches = await Promise.all((event.matches || []).map(id => Cache.get(id)));
+        matches = matches.filter(m => m?.start).map(m => getMatchCal(m, event));
+        if (!matches.length) return null;
+        let cal = [
+            "BEGIN:VCALENDAR",
+            "VERSION:2.0",
+            "PRODID:-//2022//SLMN.GG//EN",
+            "METHOD:PUBLISH",
+            "CALSCALE:GREGORIAN",
+            `NAME:${event.name} (SLMN.GG)`,
+            `X-WR-CALNAME:${event.name} (SLMN.GG)`,
+            `COLOR:${theme ? getCalCol(theme.color_theme) : "64:64:64"}`,
+            "REFRESH-INTERVAL;VALUE=DURATION:PT10M",
+            "X-PUBLISHED-TTL:PT10M"
+        ];
+        matches.forEach(matchCal => {
+            cal = [
+                ...cal,
+                ...matchCal,
+            ];
+        });
+        cal.push("END:VCALENDAR");
+        return cal.join("\n");
+    }
+
+    app.get("/ical", async (req, res) => {
+        try {
+            if (!req.query.event) return res.status(400).send("The 'event' query is required");
+            let event = await Cache.get(req.query.event);
+            if (!event || event.__tableName !== "Events") return res.status(400).send("Unknown event");
+
+            let ical = await generateCal(event);
+            if (!ical) return res.status(400).send("No matches scheduled");
+
+            return res.header("Content-Type", "text/calendar").send(ical);
+        } catch (e) {
+            console.error(e);
+            return res.status(500).send(e.message);
+        }
+    });
+
+    let states = {};
+
+    function createState() {
+        // return a uuid without a library
+        let uuid = "";
+        for (let i = 0; i < 32; i++) {
+            uuid += Math.floor(Math.random() * 16).toString(16);
+        }
+        return uuid;
+    }
+    const TwitchEnvSet = ["TWITCH_REDIRECT_URI", "TWITCH_CLIENT_ID", "TWITCH_CLIENT_SECRET"].every(key => !!process.env[key]);
+    if (!TwitchEnvSet) {
+        console.error("Twitch authentication on the server is disabled. Set TWITCH_ keys in server/.env to enable it.");
+    }
+
+    app.get("/twitch_auth/:scopes", (req, res) => {
+        if (!TwitchEnvSet) return res.status(503).send({ error: true, message: "Twitch authentication is disabled on the server." });
+        let state = createState();
+        states[state] = req.params.scopes;
+        res.redirect(`https://id.twitch.tv/oauth2/authorize?client_id=${process.env.TWITCH_CLIENT_ID}&redirect_uri=${process.env.TWITCH_REDIRECT_URI}&response_type=code&scope=${req.params.scopes}&force_verify=true&state=${state}`);
+    });
+
+
+    app.get("/twitch_callback", async(req, res) => {
+        if (!TwitchEnvSet) return res.status(503).send({ error: true, message: "Twitch authentication is disabled on the server." });
+        try {
+            const token = await exchangeCode(process.env.TWITCH_CLIENT_ID, process.env.TWITCH_CLIENT_SECRET, req.query.code, process.env.TWITCH_REDIRECT_URI);
+            const tokenInfo = await getTokenInfo(token.accessToken, process.env.TWITCH_CLIENT_ID);
+
+            // let scopes = states[req.query.state];
+            // if (scopes) delete states[req.query.state];
+
+            // get or create channel in table
+
+            const existingChannel = await Cache.auth.getChannelByID(tokenInfo.userId);
+
+            // console.log(existingChannel);
+
+            let airtableResponse;
+            // store into channels table with tokens + scopes
+
+            if (existingChannel) {
+                airtableResponse = await updateRecord(Cache, "Channels", existingChannel, {
+                    "Twitch Refresh Token": token.refreshToken,
+                    "Twitch Scopes": tokenInfo.scopes.join(" "),
+                    "Channel ID": tokenInfo.userId,
+                    "Name": tokenInfo.userName
+                });
+
+            } else {
+                airtableResponse = await createRecord(Cache, "Channels", [{
+                    "Twitch Refresh Token": token.refreshToken,
+                    "Twitch Scopes": tokenInfo.scopes.join(" "),
+                    "Channel ID": tokenInfo.userId,
+                    "Name": tokenInfo.userName
+                }]);
+            }
+
+            // console.log(airtableResponse);
+
+            if (airtableResponse.error) {
+                return res.status(400).send({ error: true, errorMessage: airtableResponse.errorMessage });
+            }
+            return res.send("poggers thanks");
+        } catch (e) {
+            console.error("[Twitch Auth] error", e);
+            res.status(400).send({ error: true, errorMessage: e.message });
+        }
+    });
+
 };

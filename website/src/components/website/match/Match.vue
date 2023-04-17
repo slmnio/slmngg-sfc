@@ -30,6 +30,10 @@ export default {
             });
         },
         lowerText() {
+            if (this.match?.special_event && this.match?.custom_name) {
+                const start = (this.match?.event?.short || this.match?.event?.name || "");
+                return start ? `${start}: ${this.match.custom_name}` : this.match.custom_name;
+            }
             return getMatchContext(this.match);
         }
     }

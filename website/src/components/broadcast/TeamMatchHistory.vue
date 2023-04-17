@@ -1,6 +1,6 @@
 <template>
     <div class="team-match-history">
-        <MatchHistory class="match" v-for="match in matches" v-bind:key="match.id" :match="match" :this-team="team" />
+        <MatchHistory class="match" v-for="match in matches" :key="match.id" :match="match" :this-team="team" />
     </div>
 </template>
 

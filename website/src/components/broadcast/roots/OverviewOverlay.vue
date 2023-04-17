@@ -22,6 +22,11 @@ export default {
             if (!this.broadcast?.live_match) return null;
             return this.broadcast.live_match[0];
         }
+    },
+    metaInfo() {
+        return {
+            title: `Overview | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>
@@ -37,9 +42,9 @@ export default {
     height: 100%;
     width: 100%;
     color: white;
-    font-family: "Industry", "SLMN-Industry", sans-serif;
+    font-family: "SLMN-Industry", "Industry", sans-serif;
 
-    padding: 60px;
+    padding: 60px 100px;
 
     display: flex;
     flex-direction: column;
@@ -53,8 +58,7 @@ export default {
 .desk-match >>> .team-logo-holder {
     height: 120px !important;
 }
-
-.overview-overlay >>> .map-lower {
+.part-map-display >>> .map-lower {
     padding: 10px;
 }
 </style>

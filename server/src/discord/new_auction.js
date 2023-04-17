@@ -41,7 +41,8 @@ const Borpa = "https://cdn.discordapp.com/emojis/827000769253343242.gif";
 function getImage(team) {
     if (!team) return Borpa;
     try {
-        return team.get("Icon")[0].url;
+        let themeID = team.get("Theme")[0];
+        return `https://data.slmn.gg/theme.png?id=${themeID}&size=500&padding=20`;
     } catch (e) {
         return Borpa;
     }
@@ -62,11 +63,12 @@ const Auction = {
     activePlayer: null,
     wait: {
         afterInitial: 20,
-        afterBid: 12
+        afterBid: 15
     },
     stats: {},
     timeouts: {},
     bids: [],
+    lastStartedTeam: null,
     bid: function(bid) {
         Auction.bids.push(bid);
         io.emit("auction_bids", Auction.bids.map(b => ({
@@ -81,10 +83,18 @@ const Auction = {
         },
         initial() {
             Auction.Timer.clear();
+            io.emit("auction_timer", {
+                name: "after_initial",
+                duration: Auction.wait.afterInitial * 1000
+            });
             Auction.Timer.timeout = setTimeout(Auction.checkAfterBid, Auction.wait.afterInitial * 1000);
         },
         proc() {
             Auction.Timer.clear();
+            io.emit("auction_timer", {
+                name: "after_bid",
+                duration: Auction.wait.afterBid * 1000
+            });
             Auction.Timer.timeout = setTimeout(Auction.checkAfterBid, Auction.wait.afterBid * 1000);
         }
     },
@@ -152,8 +162,10 @@ const Auction = {
     },
     findPlayer: async function(prompt) {
         if (!prompt) return null;
+        console.log("[auction]", "getting players...");
         let players = await Auction.getPlayers(true);
-        let teams = await Auction.getTeams(true);
+        console.log("[auction]", "getting teams...");
+        let teams = await Auction.getTeams();
         let teamIDs = teams.map(t => t.id);
 
         let eligiblePlayers = players.filter(t => {
@@ -172,7 +184,7 @@ const Auction = {
     getBroadcast: async function() {
         try {
             return await select("Broadcasts", {
-                filterByFormula: "{Key} = \"bpl3\""
+                filterByFormula: "{Key} = \"vvl\""
             });
         } catch (e) {
             console.error(e);
@@ -194,7 +206,7 @@ const Auction = {
     },
     getTeam: async function(discordMember, bust) {
         let teams = await Auction.getTeams(bust);
-        let team = teams.find(t => (t.get("Controller IDs") || "").split(",").some(tag => tag === discordMember.tag));
+        let team = teams.find(t => (t.get("Controller IDs") || "").split(",").some(id => id === discordMember.id));
         return team;
     },
     start: async function(player, startingTeam) {
@@ -202,28 +214,39 @@ const Auction = {
         if (!Auction.channel) return console.error("No auction channel setup");
         Auction.activePlayer = player;
 
-        await Auction.setActivePlayer(player);
 
-        Auction.Timer.initial();
         let embed = new Discord.MessageEmbed();
         embed.setTitle(`Auction started: ${player.get("Name")}`);
         embed.setColor(0x44D582);
         embed.setFooter(`Auction will close in ${Auction.wait.afterInitial} seconds if there are no further bids.`);
 
 
+        console.log("[auction]", "setting active player...");
+        await Auction.setActivePlayer(player);
         Auction.bids = [];
         if (startingTeam) {
-            Auction.bid(new AuctionBid(startingTeam, 1));
+            let startAmount = 10;
+            Auction.bid(new AuctionBid(startingTeam, startAmount));
 
-            embed.setDescription(`Started by ${startingTeam.get("Name")} at $1k.\nIf there are no further bids, ${player.get("Name")} will be signed to to ${startingTeam.get("Name")}`);
+            embed.setDescription(`Started by ${startingTeam.get("Name")} at $${startAmount}k.\nIf there are no further bids, ${player.get("Name")} will be signed to to ${startingTeam.get("Name")}`);
             embed.setThumbnail(getImage(startingTeam));
+
+            if (player.get("Draft Data")) {
+                embed.setFields([{
+                    name: "Draft info",
+                    value: player.get("Draft Data").slice(0, 1000)
+                }]);
+            }
 
             if (startingTeam.get("Theme Color")) {
                 embed.setColor(getHex(startingTeam));
             }
             embed.setFooter(`Auction will close in ${Auction.wait.afterBid} seconds if there are no further bids.`);
         }
-        Auction.channel.send({ embeds: [embed] });
+        console.log("[auction]", "sending first message");
+        await Auction.channel.send({ embeds: [embed] });
+        Auction.Timer.initial();
+        Auction.lastStartedTeam = startingTeam;
     },
     sign: async function (player, team, bid) {
 
@@ -250,11 +273,13 @@ const Auction = {
             "Member Of": [
                 ...(player.get("Member Of") || []),
                 team.id
-            ]
+            ],
+            "Auction Price": bid.amount
         });
 
+        let newTeamBalance = (parseInt(team.get("Balance")) - bid.amount) + (remaining ? 10 : 0);
         await update("Teams", team.id, {
-            "Balance": (parseInt(team.get("Balance")) - bid.amount) + (remaining - 1 ? 10 : 0)
+            "Balance": newTeamBalance
         });
 
 
@@ -262,6 +287,49 @@ const Auction = {
         Auction.stats.signedPlayers++;
         Auction.stats.remainingPlaces--;
         Auction.updateStats();
+
+        if (Auction.lastStartedTeam.get("Draft Order")) {
+            // see who's up next
+            let teams = await Auction.getTeams();
+            let teamsInOrder = teams.filter(t => {
+                if ((t.get("Players") || []).length >= getAuctionMax()) return false; // full
+                return true;
+            }).sort((a,b) => a.get("Draft Order") - b.get("Draft Order"));
+
+            let nextTeams = teamsInOrder.filter(t => {
+                if (t.get("Draft Order") <= Auction.lastStartedTeam.get("Draft Order")) return false; // earlier in the draft
+                return true;
+            });
+
+            let nextTeam;
+
+            if (nextTeams.length) {
+                nextTeam = nextTeams[0];
+            } else if (teamsInOrder.length) {
+                nextTeam = teamsInOrder[0];
+            }
+
+            if (!nextTeam) return;
+
+            let embed = new Discord.MessageEmbed();
+            embed.setTitle(`Up next: ${nextTeam.get("Name")}`);
+            embed.setColor(getHex(nextTeam));
+            embed.setThumbnail(getImage(nextTeam));
+            embed.setDescription(`Remaining: ${money(nextTeam.get("Balance"))}\n${(nextTeam.get("Players") || []).length} / ${getAuctionMax()} players signed`);
+
+            let infoEmbed = new Discord.MessageEmbed();
+            infoEmbed.setTitle("Team information");
+            infoEmbed.setDescription(teams.map(t => `${t.get("Name") === team.get("Name") ? "💰 " : ""}${nextTeam && t.get("Name") === nextTeam.get("Name") ? "▶️ " : ""}**${t.get("Name")}** - ${money(t.get("Name") === team.get("Name") ? newTeamBalance : t.get("Balance"))} - ${t.get("Name") === team.get("Name") ? count + 1 : (t.get("Players") || []).length} / ${getAuctionMax()} signed`).join("\n"));
+
+            // .sort((a,b) => {
+            //         let [aBalance, bBalance] = [a,b].map(x => x.get("Name") === team.get("Name") ? newTeamBalance : team.get("Balance"));
+            //         return (aBalance - bBalance);
+            //     })
+
+            setTimeout(() => {
+                Auction.channel.send({ embeds: [embed, infoEmbed] });
+            }, 2000);
+        }
     },
     checkAfterBid() {
         console.log("check after");
@@ -297,8 +365,8 @@ const blue = (items) => {
 };
 
 client.on("messageCreate", async message => {
-    if (!message.guild || message.guild.id !== "646065580000149514") return;
-    if (!["746461094654247003", "648311334907281408"].includes(message.channel.id)) return;
+    if (!["646065580000149514", "1083249916933058571"].includes(message.guild?.id)) return;
+    if (!["746461094654247003", "648311334907281408", "1089657638855393330"].includes(message.channel.id)) return;
     // console.log("[auction] message", message.content);
 
     let args = message.content.split(/ +/);
@@ -310,6 +378,13 @@ client.on("messageCreate", async message => {
             execute: async (args, message) => {
                 Auction.startingAllowed = false;
                 Auction.activePlayer = null;
+            }
+        },
+        {
+            aliases: [".setup"],
+            execute: async (args, message) => {
+                Auction.channel = message.channel;
+                Auction.channel.send("Set auction channel to this channel :)");
             }
         },
         {
@@ -331,7 +406,7 @@ client.on("messageCreate", async message => {
                 embed.setTitle(`Your team: ${team.get("Name")}`);
                 embed.setColor(getHex(team));
                 embed.setThumbnail(getImage(team));
-                embed.setDescription(`Remaining: ${money(team.get("Balance"))}`);
+                embed.setDescription(`Remaining: ${money(team.get("Balance"))}\n${(team.get("Players") || []).length} / ${getAuctionMax()} players signed`);
                 message.reply({ embeds: [embed] });
             }
         },
@@ -343,13 +418,17 @@ client.on("messageCreate", async message => {
 
                 if (!args[0]) return message.reply(red({title: "usage: `.start <name>` eg `.start joshen`"}));
                 await Auction.channel.sendTyping();
+                console.log("[auction]", "getting teams...");
                 await Auction.getTeams(true);
+                console.log("[auction]", "getting message author team...");
                 let team = await Auction.getTeam(message.author, true);
                 if (!team) return message.reply(red({title: "Can't find the team you represent"}));
                 if ((team.get("Players") || []).length >= getAuctionMax()) return message.reply(red({title: "You're at your maximum player count."}));
 
+                console.log("[auction]", "finding player...");
                 let player = await Auction.findPlayer(args[0]);
                 if (!player) return message.reply(red({title: "idk who that is LOL"}));
+                console.log("[auction]", "found player", player.get("Name"));
                 await Auction.start(player, (Auction.autobid ? team : null));
 
             }
@@ -360,6 +439,7 @@ client.on("messageCreate", async message => {
                 if (!Auction.activePlayer) { try { await message.delete(); } catch (e) { } return; }
                 let team = await Auction.getTeam(message.author);
                 if (!team) return;
+                if ((team.get("Players") || []).length >= getAuctionMax()) return message.reply(red({title: "You're at your maximum player count."}));
 
                 let leadingBid = Auction.getLeadingBid();
                 if (leadingBid && leadingBid.team.id === team.id) return message.reply(red({title: "You're already the leading bid"}));
@@ -376,7 +456,7 @@ client.on("messageCreate", async message => {
                 // TODO: say how much a team has in their balance
                 embed.setColor(getHex(team));
                 embed.setThumbnail(getImage(team));
-                embed.setDescription(`${team.get("Name")} has ${money(team.get("Balance"))}`);
+                embed.setDescription(`${team.get("Name")} has ${money(team.get("Balance"))}\n${(team.get("Players") || []).length} / ${getAuctionMax()} players signed`);
 
                 Auction.channel.send({embeds: [embed]});
 

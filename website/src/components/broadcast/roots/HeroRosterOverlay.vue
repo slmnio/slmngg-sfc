@@ -1,0 +1,182 @@
+<template>
+    <GenericOverlay class="hero-roster-overlay" :title="title || (team && team.name) || 'Roster'" :title-style="titleStyle" :custom-theme="team && team.theme" :accent-color="team && team.theme && team.theme.color_theme">
+        <div class="flex-center h-100 w-100 flex-column">
+            <div class="players h-100 d-flex flex-center">
+                <div class="player h-100" v-for="(player, i) in players" :key="player.id" :class="{'has-role-icon': showRoles}" :data-image-width="widths[i]" :style="{flexGrow: widths[i], zIndex: animationActive ? Math.max(...widths) - widths[i] : 1}">
+                    <RecoloredHero @recolor_width="(w) => handleWidth(i, w)" class="h-100" :hero="player.favourite_hero" :theme="team.theme"></RecoloredHero>
+                </div>
+            </div>
+            <div class="player-names flex-center w-100 mt-4 justify-content-around" :class="{'has-role-icon': showRoles}">
+                <div class="player-name-holder" v-for="player in players" :key="player.id">
+                    <div class="player-name flex-center text-center">
+                        <span class="player-name-internal">{{ player.name }}</span>
+                        <span v-if="showRoles" class="player-role" v-html="getRoleSVG(player.role)"></span>
+                        <span :style="themeBackground1(team)" v-if="showPronouns" class="player-pronouns">{{ player.pronouns }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </GenericOverlay>
+</template>
+
+<script>
+import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import RecoloredHero from "@/components/broadcast/RecoloredHero";
+import { themeBackground1 } from "@/utils/theme-styles";
+import { getRoleSVG } from "@/utils/content-utils";
+
+export default {
+    name: "HeroRosterOverlay",
+    props: ["broadcast", "title", "playerCount", "teamNum", "showRoles", "showPronouns", "active", "animationActive"],
+    components: { RecoloredHero, GenericOverlay },
+    data: () => ({
+        widths: []
+    }),
+    computed: {
+        match() {
+            if (!this.broadcast || !this.broadcast.live_match) return null;
+            return ReactiveRoot(this.broadcast.live_match[0], {
+                teams: ReactiveArray("teams", {
+                    theme: ReactiveThing("theme"),
+                    players: ReactiveArray("players", {
+                        favourite_hero: ReactiveThing("favourite_hero")
+                    }),
+                    staff: ReactiveArray("staff")
+                })
+            });
+        },
+        heroes() {
+            return ReactiveRoot("Heroes", {
+                ids: ReactiveArray("ids")
+            })?.ids;
+        },
+        team() {
+            if ([2, "2", "right", "alt"].includes(this.teamNum)) {
+                return this.match?.teams?.[1];
+            }
+            if ([3, "3", "highlight", "highlighted"].includes(this.teamNum)) {
+                return ReactiveRoot(this.broadcast.id, {
+                    highlight_team: ReactiveThing("highlight_team", {
+                        theme: ReactiveThing("theme"),
+                        players: ReactiveArray("players", {
+                            favourite_hero: ReactiveThing("favourite_hero")
+                        })
+                    })
+                })?.highlight_team;
+            }
+            return this.match?.teams?.[0];
+        },
+        players() {
+            const players = this.team?.players || this.team?.limited_players;
+            if (!this.team?.players && this.team?.limited_players) {
+                players.forEach(player => {
+                    // set hero from lookup
+                    player.favourite_hero = this.getFavouriteHero(player.favourite_hero);
+                });
+            }
+            if (this.playerCount) return (players || []).slice(0, this.playerCount);
+            return (players || []);
+        },
+        titleStyle() {
+            return themeBackground1(this.team);
+        }
+    },
+    methods: {
+        getFavouriteHero(heroName) {
+            if (!heroName || !(this.heroes || []).length) return null;
+            return this.heroes.find(h => h.name && h.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() === heroName.toLowerCase());
+        },
+        handleWidth(i, w) {
+            // console.log("width of index", i, w);
+            this.$set(this.widths, i, w);
+        },
+        themeBackground1,
+        getRoleSVG
+    },
+    watch: {
+        team: {
+            deep: true,
+            handler(team) {
+                console.log("team change", this.$parent);
+                this.$parent.updateTheme(team?.theme);
+                // this.$emit("stinger_theme_change", team.theme);
+            }
+        },
+        active(a) {
+            console.log("active", a);
+        },
+        animationActive(a) {
+            console.log("animation active", a);
+        }
+    },
+    metaInfo() {
+        return {
+            title: `Hero Roster #${this.teamNum || 1} | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
+    }
+};
+</script>
+
+<style scoped>
+    .player >>> .color-holder {
+        height: 100%;
+        --over: 350%;
+        width: calc(100% + var(--over));
+        margin-left: calc(-0.5 * var(--over));
+    }
+
+    .player {
+        /*width: 100%;*/
+        flex-grow: 1;
+    }
+
+    .players {
+        width: 100%;
+    }
+
+    .player >>> .color-holder div,
+    .player >>> .color-holder canvas {
+        object-fit: contain !important;
+    }
+
+    .player >>> .hero-image-base {
+        background-size: contain !important;
+    }
+
+    .recolored-hero {
+        /*height: calc(100% - 2em) !important;*/
+    }
+
+    .player-name {
+        z-index: 2;
+        display: flex; justify-content: center; align-items: center;
+        flex-shrink: 0;
+        flex-grow: 0;
+        font-size: 2em;
+    }
+
+    .hero-roster-overlay >>> .g-body {
+        overflow: hidden;
+        color: white;
+    }
+
+    .player-name {
+        flex-direction: column;
+    }
+    .player-role {
+        width: 2em;
+    }
+    .player.has-role-icon .player-name {
+        height: 4.25em;
+    }
+    .player.has-role-icon .recolored-hero {
+        /*height: calc(100% - 6em) !important;*/
+    }
+    .player-pronouns {
+        padding: 0.25em 0.5em;
+        font-size: 0.6em;
+        line-height: 1;
+        margin-top: .2em;
+    }
+</style>

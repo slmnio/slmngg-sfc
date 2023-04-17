@@ -1,6 +1,7 @@
 <template>
     <div class="bidding-war d-flex">
-        <TeamFocus class="team-focus" v-for="team in _teams" :team="team" v-bind:key="team.id" :leading="leading" />
+        <div class="bidding-war-text">BIDDING WAR</div>
+        <TeamFocus class="team-focus" v-for="team in _teams" :team="team" :key="team.id" :leading="leading" />
     </div>
 </template>
 
@@ -50,5 +51,21 @@ export default {
     .bidding-war >>> .top-logo.leading {
         box-shadow: 0 0 0px 4px white;
         transform: scale(1);
+    }
+
+    .bidding-war-text {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 64px;
+        height: 1.3em;
+        position: absolute;
+        top: -35px;
+    }
+
+    .bidding-war {
+        position: relative;
+        padding-top: 55px;
     }
 </style>

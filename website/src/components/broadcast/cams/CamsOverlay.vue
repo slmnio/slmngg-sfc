@@ -2,7 +2,7 @@
     <div class="cams-overlay">
         <transition name="slide-in">
             <div class="team-cams" v-show="showCams">
-                <TeamCamsGroup :style="{ order: match.flip_teams ? +!ti : ti }" v-for="(team, ti) in teams" v-bind:key="team.id"
+                <TeamCamsGroup :style="{ order: match.flip_teams ? +!ti : ti }" v-for="(team, ti) in teams" :key="team.id"
                                :team="team" :guests="guests[ti]" :params="camParams" :event="broadcast && broadcast.event"
                                :relay-prefix="relayPrefix" :ti="match.flip_teams ? +!ti : ti" :disable-cams="disable" />
             </div>
@@ -54,7 +54,7 @@ export default {
             return _teams;
         },
         camParams() {
-            return `&cover&na${this.params}`;
+            return `&${this.$root.defaults.camParams || "_"}&${this.params}`;
         },
         broadcastShowCams() {
             return this.broadcast?.show_cams;
@@ -71,6 +71,11 @@ export default {
                 this.showCams = show;
             }
         }
+    },
+    metaInfo() {
+        return {
+            title: `Ingame Cams | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>
@@ -80,7 +85,7 @@ export default {
         /* Margin: 0.5 */
         height: 100vh;
         /*background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/841070258440896602/ScreenShot_21-05-09_22-46-01-000.jpg");*/
-        font-family: "Industry", "SLMN-Industry", sans-serif;
+        font-family: "SLMN-Industry", "Industry", sans-serif;
         overflow: hidden;
     }
     .team-cams {

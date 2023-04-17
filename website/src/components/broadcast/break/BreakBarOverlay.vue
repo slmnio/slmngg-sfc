@@ -1,21 +1,21 @@
 <template>
     <div class="break-bar-overlay" :style="eventCSS">
 
-        <div class="upper-bar">
-            <transition name="seg" mode="out-in">
-                <div class="segment-wrapper" v-if="showBigSegment('Bracket')" :key="'Bracket'">
-                    <div class="overlay--bg bar-segment segment-bracket">
-                        <Bracket class="segment-bracket-inner" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.6" />
-                    </div>
-                </div>
+<!--        <div class="upper-bar">-->
+<!--            <transition name="seg" mode="out-in">-->
+<!--                <div class="segment-wrapper" v-if="showBigSegment('Bracket')" :key="'Bracket'">-->
+<!--                    <div class="overlay&#45;&#45;bg bar-segment segment-bracket">-->
+<!--                        <Bracket class="segment-bracket-inner" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.6" />-->
+<!--                    </div>-->
+<!--                </div>-->
 
-                <div class="segment-wrapper" v-if="showBigSegment('Schedule')" :key="'Schedule'">
-                    <div class="overlay--bg bar-segment segment-schedule flex-column">
-                        <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
-                    </div>
-                </div>
-            </transition>
-        </div>
+<!--                <div class="segment-wrapper" v-if="showBigSegment('Schedule')" :key="'Schedule'">-->
+<!--                    <div class="overlay&#45;&#45;bg bar-segment segment-schedule flex-column">-->
+<!--                        <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </transition>-->
+<!--        </div>-->
 
 
         <div class="lower-bar">
@@ -34,7 +34,7 @@
                 <div class="segment-wrapper" v-if="showSegment('Title') && (title || (broadcast && broadcast.title))" :key="'Title-' + (title || broadcast.title)">
                     <div class="overlay--bg bar-segment segment-title">
                         <span class="segment-text" v-html="nbr(title || broadcast.title)"
-                        v-bind:class="{'has-br': (title || broadcast.title || '').includes('\\n')}"></span>
+                        :class="{'has-br': (title || broadcast.title || '').includes('\\n')}"></span>
                     </div>
                 </div>
             </transition>
@@ -63,7 +63,7 @@
             <transition name="seg">
                 <div class="segment-wrapper" v-if="showSegment('Event logo') && event && event.theme" :key="'Event logo'">
                     <div class="overlay--bg bar-segment segment-event-logo p-2" :style="eventLogoBackground">
-                        <div :style="cssImage('backgroundImage', event.theme, ['default_logo'], 200)"
+                        <div :style="resizedImage(event.theme, ['default_logo'], 'h-200')"
                              class="segment-image bg-center w-100 h-100"></div>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
 
         <div class="break-preload">
             <Bracket class="segment-bracket-inner" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.6" />
-            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
+            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />
         </div>
 
     </div>
@@ -82,12 +82,12 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import Countdown from "@/components/broadcast/Countdown";
-import { cssImage } from "@/utils/content-utils";
 import BreakMatch from "@/components/broadcast/break/BreakMatch";
 import { themeBackground1 } from "@/utils/theme-styles";
 import Sponsors from "@/components/broadcast/Sponsors";
 import Bracket from "@/components/website/bracket/Bracket";
 import { sortMatches } from "@/utils/sorts";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "BreakBarOverlay",
@@ -181,11 +181,16 @@ export default {
         showBigSegment(segmentName) {
             return (this.broadcast.break_display === segmentName);
         },
-        cssImage,
+        resizedImage,
         nbr(text) {
             if (!text) return "";
             return text.replace(/\\n/g, "<br>");
         }
+    },
+    metaInfo() {
+        return {
+            title: `Break Bar | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>
@@ -199,7 +204,7 @@ export default {
         width: 100%;
         color: white;
 
-        font-family: "Industry", "SLMN-Industry", sans-serif;
+        font-family: "SLMN-Industry", "Industry", sans-serif;
 
         /*background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/881082194095902730/unknown.png");*/
 
@@ -210,7 +215,8 @@ export default {
     }
 
     span.industry-align {
-        transform: translate(0, -.0925em);
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
+        --translate-y: -0.0925em;
     }
 
     .lower-bar {

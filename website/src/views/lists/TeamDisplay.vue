@@ -8,7 +8,9 @@
 </template>
 
 <script>
-import { resizedImage, url } from "@/utils/content-utils";
+import { url } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
+import { logoBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "TeamDisplay",
@@ -19,18 +21,11 @@ export default {
     computed: {
         teamTheme() {
             if (!this.team || !this.team.theme) return {};
-            const theme = this.team.theme;
-            return {
-                backgroundColor: theme.color_logo_background || theme.color_theme,
-                color: theme.color_text_on_logo_background || theme.color_text_on_theme,
-                borderColor: theme.color_logo_accent || theme.color_alt || theme.color_accent
-            };
+            return logoBackground1(this.team);
         },
         logo() {
             if (!this.team || !this.team.theme) return {};
-            return {
-                backgroundImage: `url(${resizedImage(this.team.theme, "small_logo", 50) || resizedImage(this.team.theme, "default_logo", 50)})`
-            };
+            return resizedImage(this.team.theme, ["small_logo", "default_logo"], "h-50");
         }
     }
 };

@@ -14,7 +14,7 @@
 
                 <div class="title d-flex flex-column text-center mb-2">Team History</div>
                 <div class="player-teams d-flex flex-wrap flex-center">
-                    <PlayerTeamDisplay :team="team" v-for="team in playerTeams" v-bind:key="team.id" :showName="true"/>
+                    <PlayerTeamDisplay :team="team" v-for="team in playerTeams" :key="team.id" :showName="true"/>
                 </div>
             </div>
         </div>
@@ -72,7 +72,11 @@ export default {
                 .sort(sortEvents);
             return events[0];
         }
-        // TODO: Get a list of all events a player has participated in, sort by date, and display the start date of the earliest event as "Player Since"
+    },
+    metaInfo() {
+        return {
+            title: `Player History | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>
@@ -87,7 +91,7 @@ export default {
 }
 .hero-segment {
     overflow: hidden;
-    height: 740px;
+    height: 100%;
     width: 296px;
     flex-shrink: 0;
     background-color: rgba(0, 0, 0, .2);

@@ -6,12 +6,16 @@
         <div class="signed-amount pt-1 font-weight-bold text-center">for {{ money(amount) }}</div>
 
         <div class="player-list">
-            <div class="player" v-bind:class="{empty: player.empty, latest: player.latest}" v-for="player in players" v-bind:key="player.id"  :style="(player.latest ? teamBG : {})">
-                <div v-if="!player.empty">{{ player.name }}</div>
+            <div class="player" :class="{empty: player.empty, latest: player.latest}" v-for="player in players" :key="player.id"  :style="(player.latest ? teamBG : {})">
+                <div class="player-internal" v-if="!player.empty">
+                    <span class="player-name">{{ player.name }}</span>
+                    <span class="player-money" v-if="player.auction_price">{{ money(player.auction_price) }}</span>
+                </div>
                 <div v-else style="opacity: 0;">...</div>
             </div>
         </div>
-        <div class="remaining font-weight-bold text-center">Remaining: {{ money(team.balance) }}</div>
+        <MoneyBar class="team-focus-bar" :team="team" :auction-settings="auctionSettings"></MoneyBar>
+<!--        <div class="remaining font-weight-bold text-center">Remaining: {{ money(team.balance) }}</div>-->
     </div>
 </template>
 
@@ -19,11 +23,12 @@
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { logoBackground1 } from "@/utils/theme-styles";
 import { cleanID, getAuctionMax, money } from "@/utils/content-utils";
+import MoneyBar from "@/components/broadcast/auction/MoneyBar";
 
 export default {
     name: "SignedTeamList",
-    components: { ThemeLogo },
-    props: ["team", "amount", "signedPlayer"],
+    components: { ThemeLogo, MoneyBar },
+    props: ["team", "amount", "signedPlayer", "auctionSettings"],
     methods: {
         money
     },
@@ -32,7 +37,7 @@ export default {
             return logoBackground1(this.team);
         },
         players() {
-            const max = getAuctionMax();
+            const max = (this.auctionSettings?.each_team || getAuctionMax());
             let fill = max - (this.team?.players?.length || 0);
             if (fill < 0) fill = 0;
 
@@ -45,7 +50,7 @@ export default {
             if (this.signedPlayer) {
                 return arr.map((p, i) => ({
                     ...p,
-                    latest: cleanID(this.signedPlayer.id) === p.id
+                    latest: this.signedPlayer === p.id
                 }));
             }
             return arr;
@@ -55,6 +60,13 @@ export default {
 </script>
 
 <style scoped>
+    .player-name {
+        flex-grow: 1;
+    }
+
+    .player-internal {
+        display: flex;
+    }
     .top-logo {
         height: 300px;
     }
@@ -87,5 +99,10 @@ export default {
     }
     .remaining {
         font-size: 30px;
+    }
+
+    .money-bar.team-focus-bar {
+        font-size: 36px;
+        margin-top: 4px;
     }
 </style>

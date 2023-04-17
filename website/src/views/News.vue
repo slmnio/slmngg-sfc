@@ -1,10 +1,10 @@
 <template>
     <div class="container news-item">
         <OptionalLink :condition="!!connection" :url="connection">
-            <NewsHeader class="news-header" :url="headerImage" :theme="theme" />
+            <NewsHeader class="news-header" :header-image="headerImage" :theme="theme" />
         </OptionalLink>
         <h1 class="news-headline">{{ news.headline }}</h1>
-        <div class="content">
+        <div class="content" :class="{'pdf-embedded': embedData.service === 'pdf' }">
             <div class="news-line">
             <span v-if="newsLine && newsLine.author">
                 {{  newsLine.ahead }} <router-link :to="url('player', news.author)">{{ news.author.name }}<i class="fas fa-badge-check fa-fw" style="margin-left: .5ex" title="REAL" v-if="news.author.verified"></i></router-link>{{ newsLine.after ? ", " + newsLine.after : "" }}
@@ -27,12 +27,13 @@
 
 <script>
 import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { getImage, multiImage, url } from "@/utils/content-utils";
+import { getEmbedData, url } from "@/utils/content-utils";
 import NewsHeader from "@/components/website/news/NewsHeader";
 import Markdown from "@/components/website/Markdown";
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 import { themeBackground } from "@/utils/theme-styles";
 import OptionalLink from "@/components/website/OptionalLink";
+import { resizedImage, resizedImageNoWrap } from "@/utils/images";
 
 export default {
     name: "News",
@@ -62,7 +63,7 @@ export default {
         },
         headerImage() {
             if (!this.news?.header) return null;
-            return getImage(this.news.header);
+            return resizedImage(this.news, ["header"], "w-1200");
         },
         theme() {
             if (this.news?.event?.theme && this.news?.prefer_event) return this.news.event.theme;
@@ -115,12 +116,15 @@ export default {
                 text: str.slice(0, 2).join(", ")
             };
             // }
+        },
+        embedData() {
+            return this.news?.embed ? getEmbedData(this.news.embed) : {};
         }
     },
     metaInfo() {
         return {
             title: [this.news?.headline, this.connection?.name].filter(t => t).join(" | "),
-            link: [{ rel: "icon", href: multiImage(this.theme, ["small_logo", "default_logo"]) }]
+            link: [{ rel: "icon", href: resizedImageNoWrap(this.theme, ["small_logo", "default_logo"], "s-128") }]
         };
     }
 };
@@ -144,13 +148,17 @@ export default {
         margin: 0 auto;
     }
 
+    .content.pdf-embedded {
+        max-width: 100%;
+    }
+
     .news-content {
         margin: 12px 0;
         padding: 16px;
         background-color: #252525;
     }
 
-    .news-content >>> p:first-child {
+    .news-content >>> .markdown > p:first-child {
         font-size: 1.15em !important;
     }
     .news-content >>> img {

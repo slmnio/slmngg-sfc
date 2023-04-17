@@ -1,27 +1,31 @@
 <template>
     <transition v-if="useTransitions" mode="out-in" name="break-content" class="map-anim-holder">
-        <div :key="autoKey" class="map-display d-flex w-100 h-100" v-bind:class="{'show-next-map': showNextMap && nextMap}">
-            <MapSegment class="map" v-bind:class="{ 'map-dummy' : map.dummy }" v-for="map in maps" v-bind:key="map.id"
-                :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to"></MapSegment>
+        <div :key="autoKey" class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" :class="{'show-next-map': showNextMap && nextMap}">
+            <MapSegment class="map" :class="{ 'map-dummy' : map.dummy }" v-for="map in maps" :key="map.id"
+                :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
         </div>
     </transition>
-    <div v-else class="map-display d-flex w-100 h-100" v-bind:class="{'show-next-map': showNextMap && nextMap}">
-        <MapSegment class="map" v-bind:class="{ 'map-dummy' : map.dummy }" v-for="map in maps" v-bind:key="map.id"
-                    :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to"></MapSegment>
+    <div v-else class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" :class="{'show-next-map': showNextMap && nextMap}">
+        <MapSegment class="map" :class="{ 'map-dummy' : map.dummy }" v-for="map in maps" :key="map.id"
+                    :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
     </div>
 </template>
 
 <script>
 import MapSegment from "@/components/broadcast/MapSegment";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { DefaultMapImages, likelyNeededMaps } from "@/utils/content-utils";
+import { getNewURL } from "@/utils/images";
 
 export default {
     name: "MapDisplay",
     components: { MapSegment },
-    props: ["broadcast", "animationActive", "useTransitions", "virtualMatch"],
+    props: ["broadcast", "animationActive", "useTransitions", "virtualMatch", "noMapVideos"],
     data: () => ({
         activeAudio: null,
-        showNextMap: false
+        showNextMap: false,
+        showBannedMaps: true,
+        audioStatus: "not playing"
     }),
     computed: {
         match() {
@@ -35,6 +39,12 @@ export default {
                     winner: ReactiveThing("winner", {
                         theme: ReactiveThing("theme")
                     }),
+                    banner: ReactiveThing("banner", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    picker: ReactiveThing("picker", {
+                        theme: ReactiveThing("theme")
+                    }),
                     map: ReactiveThing("map", {
                         map: ReactiveThing("map")
                     })
@@ -46,35 +56,35 @@ export default {
             return this.broadcast.map_set.split(",");
         },
         maps() {
-            const images = {
-                Assault: "https://cdn.discordapp.com/attachments/855517740914573342/868231135224819743/44684849494984.png",
-                Escort: "https://cdn.discordapp.com/attachments/855517740914573342/868231132444000276/484444884949494949494948421651615641.png",
-                Hybrid: "https://cdn.discordapp.com/attachments/855517740914573342/868231133765201950/448489494949849494949494949494949.png",
-                Control: "https://cdn.discordapp.com/attachments/855517740914573342/868230457622396928/63541654456789487695.png",
-                Spike: "https://cdn.discordapp.com/attachments/880305022716481639/883811894463447110/newspikeplant.png",
-                SpikeRush: "https://cdn.discordapp.com/attachments/880305022716481639/883809271198924840/spikerush_default.png",
-                ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png",
-                Slayer: "https://media.discordapp.net/attachments/855517740914573342/913747752729595904/slayer.png",
-                Strongholds: "https://media.discordapp.net/attachments/855517740914573342/913747753086107668/strongholds.png",
-                CTF: "https://media.discordapp.net/attachments/855517740914573342/913747753392304158/ctf.png",
-                Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png"
-            };
             // if (!this.match?.maps) {
             //     const maps = [];
             //     for (let i = 0; i < this.mapCount; i++) {
-            //         maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[i]], image: [{ url: images[this.mapTypes[i]] }] } : {}) });
+            //         maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[i]], image: [{ url: DefaultMapImages[this.mapTypes[i]] }] } : {}) });
             //     }
             //     return maps;
             // }
 
             if (!this.match?.first_to) return this.match?.maps;
 
-            const maps = this.match?.first_to ? [...(this.match?.maps || [])].filter(m => m.map).slice(0, this.likelyNeededMaps) : [...(this.match.maps || [])];
+            let maps = [...(this.match?.maps || [])].filter(m => m.map);
+
+            console.log("maps 75", maps);
+            if (this.showBannedMaps) {
+            } else {
+                maps = maps.filter(m => !(m.banner || m.banned));
+
+                if (this.match?.first_to) {
+                    maps = maps.slice(0, this.likelyNeededMaps);
+                }
+            }
+
+
             const dummyMapCount = this.likelyNeededMaps - maps.length;
             console.log("extra maps", this.mapCount, dummyMapCount);
             const initialMapCount = maps.length;
 
-            const next = maps.find(m => !m.winner && !m.draw);
+            const next = maps.find(m => !m.winner && !m.draw && !m.banner);
+            console.log({ next, maps });
             if (next) next._next = true;
 
             if (!this.match?.first_to) return maps;
@@ -82,36 +92,13 @@ export default {
             if (dummyMapCount > 0) {
                 for (let i = 0; i < dummyMapCount; i++) {
                     const num = initialMapCount + i;
-                    if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[num]], image: [{ url: images[this.mapTypes[num]] }] } : {}) });
+                    if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: this.mapTypes && this.mapTypes[num], image: [{ url: DefaultMapImages[this.mapTypes[num]] }] } : {}) });
                 }
             }
             return maps;
         },
         likelyNeededMaps() {
-            const scores = [this.match.score_1, this.match.score_2].map(s => s || 0);
-
-            // how many maps have a winner marked
-            const playedMaps = (this.match.maps || []).filter(m => m.winner).length;
-
-            // how many maps each team needs to win to complete
-            const toWin = scores.map(s => this.match.first_to - s);
-
-            // how many maps could be played with no draws
-            const withoutDraws = (this.match.first_to * 2) - 1;
-
-            const draws = (this.match?.maps || []).filter(m => m.draw).length;
-
-            // if match is over (scores.some s == match.first_to)
-
-            // minimum (first to x2) -1
-
-            // currently played + 1 (tiebreakers, draws etc)
-
-            console.log({ playedMaps, toWin, withoutDraws, draws });
-
-            return withoutDraws + draws;
-
-            // return 0;
+            return likelyNeededMaps(this.match);
         },
         mapCount() {
             if (!this.match) return 0;
@@ -134,32 +121,44 @@ export default {
             return (scores[0] + scores[1]) + Math.min(...toWin);
         },
         showMapVideos() {
+            if (this.noMapVideos) return false;
             if (!this.broadcast?.broadcast_settings?.length) return false;
             return this.broadcast.broadcast_settings.includes("Use map videos");
         },
         nextMap() {
-            const unplayedMaps = this.maps.filter(m => !m.dummy && !m.winner && !m.draw);
-            return unplayedMaps[0];
+            const unplayedMaps = (this.maps || []).filter(m => !m.dummy && !m.winner && !m.draw);
+            return unplayedMaps?.[0];
         },
         autoKey() {
             return [
                 this.match?.id,
                 ...(this.maps || []).map(m => [m.name, m.winner?.id || "live", m.draw].join("-"))
             ].join("_");
+        },
+        useShorterMapNames() {
+            return this.broadcast?.broadcast_settings?.includes("Use shorter map names");
+        },
+        isInMapsScene() {
+            return this.$root?.activeScene?.name?.toLowerCase().includes("maps");
         }
     },
     sockets: {
-        map_music(e) {
+        map_music() {
+            console.log("Map Music trigger");
             this.playAudio();
+        },
+        fade_map_music() {
+            console.log("Fade Map Music trigger");
+            this.fadeOutAudio(0, 5);
         }
     },
     methods: {
         playAudio() {
-            if (this.nextMap?.map?.map_audio) {
+            if (this.nextMap?.map?.audio) {
                 try {
                     this.runAudio({
-                        audio: this.nextMap.map.map_audio,
-                        volume: this.nextMap.map.map_audio_volume || 100
+                        audio: this.nextMap.map.audio,
+                        volume: this.nextMap.map.audio_volume || 100
                     });
                 } catch (e) {
                     this.activeAudio.stop();
@@ -168,13 +167,24 @@ export default {
             }
         },
         async runAudio(read) {
-            if (this.activeAudio) return this.fadeOutAudio(0, 5);
+            if (this.audioStatus === "playing") {
+                console.log("Audio is playing. Fading out...");
+                return this.fadeOutAudio(0, 5);
+            } else if (this.audioStatus === "fading out") {
+                return console.log("Not doing anything since music is already fading out");
+            }
             console.log("running audio", read);
-            if (!read?.audio?.length || !read?.audio[0]?.url) return console.warn("no valid data", read);
-            const url = read.audio[0].url;
-            const audio = new Audio(url);
+
+            const audioURL = getNewURL(read.audio?.[0], "orig");
+            if (!audioURL) return console.warn("no valid data", read);
+            const audio = new Audio(audioURL);
             audio.volume = (read.volume || 100) / 100;
+            audio.onended = () => {
+                this.activeAudio = null;
+                this.audioStatus = "not playing";
+            };
             this.activeAudio = audio;
+            this.audioStatus = "playing";
             await audio.play();
             return await new Promise((resolve, reject) => {
                 audio.addEventListener("ended", async () => {
@@ -184,12 +194,16 @@ export default {
             });
         },
         async fadeOutAudio(targetVolume, duration) {
+            if (this.audioStatus !== "playing") return;
             if (!this.activeAudio) return;
             const climbAmount = (targetVolume - this.activeAudio.volume) / (duration * 10);
+            this.audioStatus = "fading out";
 
             console.log(`Climbing to ${targetVolume} at ${climbAmount}p`);
 
             const interval = setInterval(() => {
+                if (!this.activeAudio) return;
+
                 if (this.activeAudio.volume + climbAmount >= 1) {
                     this.activeAudio.volume = 1;
                 } else if (this.activeAudio.volume + climbAmount <= 0) {
@@ -219,20 +233,37 @@ export default {
                 clearInterval(interval);
                 console.log("climbed");
                 if (targetVolume === 0) this.activeAudio = null;
+                this.audioStatus = "not playing";
             }, (duration + 1) * 1000);
+        },
+        stopAudio() {
+            if (this.activeAudio) {
+                this.activeAudio.pause();
+                this.activeAudio = null;
+                this.audioStatus = "not playing";
+            }
         }
     },
     watch: {
         animationActive(isActive) {
             this.showNextMap = false;
 
+            console.log("animation active", isActive, this.isInMapsScene);
+
             if (isActive && this.nextMap?.map) {
                 console.log("Animation trigger");
-                if (!this.activeAudio && (this.$root?.activeScene?.name?.toLowerCase().includes("maps"))) this.playAudio();
+                if (this.isInMapsScene) this.playAudio();
                 setTimeout(() => {
                     this.showNextMap = true;
                 }, 3000);
             }
+            if (!isActive && this.activeAudio) {
+                console.log("Animation reset - stopping audio");
+                this.stopAudio();
+            }
+        },
+        audioStatus(is, was) {
+            console.log({ was, is });
         }
     }
 };
@@ -254,11 +285,18 @@ export default {
         transform: scale(1);
         transition: all 800ms ease;
         width: 100%;
+        /*border: 1px solid red;*/
     }
-    .map-display.show-next-map >>> .map.next-map .map-lower-name {
-        width: 40%;
+    .map-display >>> .map.next-map .map-lower-name {
+        width: 39.8%;
+        /*border: 1px solid lime;*/
+    }
+    .map-display:not(.show-next-map) >>> .map .map-lower-name {
+        width: 76.8%;
+        /*transform: scale(0.75);*/
     }
     .map-display.show-next-map >>> .map:not(.next-map) .map-lower-name {
+        width: 100%;
         transform: scale(0.75);
     }
     .break-content-enter-active, .break-content-leave-active { transition: all .35s ease; overflow: hidden }

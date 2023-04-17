@@ -1,6 +1,6 @@
 <template>
     <div v-if="team">
-        <ThingTop :thing="team" type="team"></ThingTop>
+        <ThingTop :thing="team" type="team" :themeURL="subLink('theme')"></ThingTop>
         <SubPageNav class="my-2">
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
             <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
@@ -10,7 +10,7 @@
 
             <ul class="socials d-flex" v-if="team.socials">
                 <li class="nav-item">
-                    <Social class="ct-active" :social="social" v-for="social in team.socials" v-bind:key="social.id"/>
+                    <Social class="ct-active" :social="social" v-for="social in team.socials" :key="social.id"/>
                 </li>
             </ul>
 
@@ -23,8 +23,8 @@
 import ThingTop from "@/components/website/ThingTop";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import SubPageNav from "@/components/website/SubPageNav";
-import { multiImage } from "@/utils/content-utils";
 import Social from "@/components/website/Social";
+import { resizedImageNoWrap } from "@/utils/images";
 
 export default {
     name: "Team",
@@ -40,7 +40,7 @@ export default {
                 { name: "og:description", content: "test description" },
                 { name: "og:title", content: this.team.name }
             ],
-            link: [{ rel: "icon", href: multiImage(this.team.theme, ["small_logo", "default_logo"]) }]
+            link: [{ rel: "icon", href: resizedImageNoWrap(this.team.theme, ["small_logo", "default_logo"], "s-128") }]
         };
     },
     methods: {
@@ -55,6 +55,8 @@ export default {
                 captains: ReactiveArray("captains"),
                 players: ReactiveArray("players"),
                 theme: ReactiveThing("theme"),
+                red_theme: ReactiveThing("red_theme"),
+                blue_theme: ReactiveThing("blue_theme"),
                 brand_designers: ReactiveArray("brand_designers"),
                 sister_teams: ReactiveArray("sister_teams", {
                     theme: ReactiveThing("theme")

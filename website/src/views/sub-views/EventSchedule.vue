@@ -8,30 +8,30 @@
         <div class="schedule-top mb-2">
             <h2 class="text-center">Schedule</h2>
             <ul class="schedule-group-holder nav justify-content-center" v-if="pagedMatches.length > 1">
-                <li class="nav-item schedule-group" v-for="(pm) in pagedMatches" v-bind:key="pm.num"
-                    v-bind:class="{ 'active': activeScheduleGroup.num === pm.num, 'ct-active': activeScheduleGroup.num === pm.num, 'ct-passive': activeScheduleGroup.num !== pm.num }">
+                <li class="nav-item schedule-group" v-for="(pm) in pagedMatches" :key="pm.num"
+                    :class="{ 'active': activeScheduleGroup.num === pm.num, 'ct-active': activeScheduleGroup.num === pm.num, 'ct-passive': activeScheduleGroup.num !== pm.num }">
                     <a @click="activeScheduleNum = pm.num" class="nav-link no-link-style">{{ pm.text }}</a>
                 </li>
 
                 <li class="nav-item schedule-group nav-link no-link-style" @click="showAll = true"
-                    v-bind:class="{'active ct-active': showAll === true, 'ct-passive': showAll !== true }">
+                    :class="{'active ct-active': showAll === true, 'ct-passive': showAll !== true }">
                     <b>All matches</b>
                 </li>
             </ul>
         </div>
 
         <div class="schedule-filter flex-center text-center mb-2" v-if="showAll">
-            <div class="btn btn-sm mx-2" @click="hideCompleted = !hideCompleted" v-bind:class="{'btn-light': hideCompleted, 'btn-dark': !hideCompleted}">
+            <div class="btn btn-sm mx-2" @click="hideCompleted = !hideCompleted" :class="{'btn-light': hideCompleted, 'btn-dark': !hideCompleted}">
                 Hide completed matches
             </div>
-            <div class="btn btn-sm mx-2" @click="hideNoVods = !hideNoVods" v-bind:class="{'btn-light': hideNoVods, 'btn-dark': !hideNoVods}">
+            <div class="btn btn-sm mx-2" @click="hideNoVods = !hideNoVods" :class="{'btn-light': hideNoVods, 'btn-dark': !hideNoVods}">
                 Hide matches without VODs
             </div>
         </div>
 
         <div class="schedule-matches mt-3" v-if="activeScheduleGroup">
-            <ScheduleMatch v-for="(match, i) in groupMatches" v-bind:key="match.id" :match="match"
-                           v-bind:class="i > 0 && getMatchClass(match, groupMatches[i-1])" :custom-text="showAll && match.match_group ? match.match_group : null"
+            <ScheduleMatch v-for="(match, i) in groupMatches" :key="match.id" :match="match"
+                           :class="i > 0 && getMatchClass(match, groupMatches[i-1])" :custom-text="showAll && match.match_group ? match.match_group : null"
             />
         </div>
     </div>
@@ -54,7 +54,7 @@ export default {
     computed: {
         defaultScheduleNum() {
             const filtered = this.pagedMatches.filter(page => {
-                const allMatchesComplete = page.matches.every(m => [m.score_1, m.score_2].includes(m.first_to));
+                const allMatchesComplete = page.matches.every(m => m.special_event || [m.score_1, m.score_2].includes(m.first_to));
                 if (allMatchesComplete) return false; // don't show a page if all of the matches are complete by default
 
                 const anyMatchHasTeams = page.matches.some(m => m.teams);
@@ -82,13 +82,18 @@ export default {
             return ReactiveArray("matches", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
-                })
+                }),
+                maps: ReactiveArray("maps")
             })(this.event);
         },
         pagedMatches() {
             const groups = {};
             this.matches.forEach(match => {
-                const flatWeek = Math.floor(match.week);
+                if (!match._original_data_id) return null;
+                let flatWeek = Math.floor(match.week);
+                if (isNaN(flatWeek)) {
+                    flatWeek = 1;
+                }
                 if (!groups[flatWeek]) groups[flatWeek] = { num: flatWeek, text: match.week_text || `Week ${flatWeek}`, matches: [] };
                 groups[flatWeek].matches.push(match);
             });

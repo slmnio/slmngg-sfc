@@ -1,14 +1,16 @@
 <template>
     <div class="caster flex-center flex-column" :style="themeColor">
-        <div class="caster-cam-box flex-center" :style="{borderColor}">
+        <div class="caster-cam-box flex-center" :style="{borderColor}" :class="align">
             <CasterCam class="caster-cam-wrapper" :guest="liveGuestData" :disableVideo="disableVideo" :color="color"
             :event="event" />
         </div>
-        <transition mode="out-in" name="fade">
-            <div class="caster-lower flex-center" :key="`${name}-${twitter}-${lowerType}`" v-bind:class="{'cl-traditional': lowerType === 'traditional'}">
+        <transition name="fade">
+            <div class="caster-lower flex-center" :key="`${name}-${twitter}-${lowerType}`" :class="{'cl-traditional': lowerType === 'traditional'}">
                 <div class="caster-name flex-center">
-                    <div class="c-name">{{ name }}</div>
-                    <div class="c-twitter" v-if="twitter">{{ twitter }}</div>
+                    <div class="c-name industry-align">{{ name }}</div>
+                    <div class="c-twitter industry-align" v-if="twitter">{{ twitter }}</div>
+                    <div class="c-pronouns industry-align" v-if="player && player.pronouns && showPronouns && !pronounsOnNewline">{{ player.pronouns }}</div>
+                    <div class="c-pronouns industry-align" v-if="player && player.pronouns && showPronouns && pronounsOnNewline" v-html="breakUp(player.pronouns)"></div>
                 </div>
             </div>
         </transition>
@@ -20,9 +22,16 @@ import CasterCam from "@/components/broadcast/desk/CasterCam";
 
 export default {
     name: "Caster",
-    props: ["caster", "guest", "color", "disableVideo", "event"],
+    props: ["caster", "guest", "color", "disableVideo", "event", "showPronouns", "pronounsOnNewline"],
     components: { CasterCam },
     computed: {
+        align() {
+            const alignSettings = (this.guest.align || []);
+            const aligns = [];
+            if (alignSettings.indexOf("Right") !== -1) aligns.push("align-right");
+            if (alignSettings.indexOf("Left") !== -1) aligns.push("align-left");
+            return aligns;
+        },
         borderColor() {
             const theme = this.event?.theme;
             if (!theme) return;
@@ -66,6 +75,12 @@ export default {
             if ((this.$root.broadcast?.broadcast_settings || []).includes("Cams lower: traditional")) return "traditional";
             return "normal";
         }
+    },
+    methods: {
+        breakUp(text) {
+            if (!text) return null;
+            return text.split("/").join("<br>");
+        }
     }
 };
 </script>
@@ -77,10 +92,10 @@ export default {
         --theme-color: #2F2F30;
         position: relative;
 
-        --caster-width: 800px;
+        --caster-width: 810px;
         --caster-height: 570px;
         max-width: var(--caster-width);
-        transition: max-width .4s ease;
+        transition: max-width .4s ease, min-width .4s ease;
     }
 
     .caster-cam-box {
@@ -120,8 +135,10 @@ export default {
         font-size: 0.8em;
         margin-bottom: .15em;
     }
-    .c-name {
-        transform: translate(0, -.0925em);
+
+    .c-pronouns {
+        font-size: 0.8em;
+        margin-bottom: .15em;
     }
 
     .caster-cam-box {
@@ -149,15 +166,24 @@ export default {
         padding: 10px 15px;
         flex-direction: row;
         flex-wrap: wrap;
-        justify-content: space-between;
+        justify-content: center;
     }
 
 
     .caster-lower.cl-traditional .c-name,
-    .caster-lower.cl-traditional .c-twitter {
+    .caster-lower.cl-traditional .c-twitter,
+    .caster-lower.cl-traditional .c-pronouns {
         text-align: center;
+        margin: 0 20px;
+    }
+
+    .caster-lower.cl-traditional .c-pronouns {
+        order: -1;
     }
 
     /*.caster-lower.cl-traditional .c-name { text-align: left; }*/
     /*.caster-lower.cl-traditional .c-twitter { text-align: right; }*/
+
+    .caster-cam-box.align-right { justify-content: flex-end; }
+    .caster-cam-box.align-left { justify-content: flex-start; }
 </style>

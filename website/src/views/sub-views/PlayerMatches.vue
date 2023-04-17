@@ -2,14 +2,14 @@
     <div>
         <div class="container">
             <div>
-                <h6 class="d-flex matches-bar">Games: <a v-for="rel in mainPlayerRelationships" v-bind:key="rel.meta.singular_name" :href="'#' + convertToSlug(rel.meta.singular_name)">{{ rel.items.length }} as {{ rel.meta.singular_name }}</a></h6>
+                <h6 class="d-flex flex-wrap matches-bar">Games: <a v-for="rel in mainPlayerRelationships" :key="rel.meta.singular_name" :href="'#' + convertToSlug(rel.meta.singular_name)">{{ rel.items.length }} as {{ rel.meta.singular_name }}</a></h6>
             </div>
-            <div class="role-group" v-for="rel in mainPlayerRelationships" v-bind:key="rel.meta.singular_name">
+            <div class="role-group" v-for="rel in mainPlayerRelationships" :key="rel.meta.singular_name">
                 <h1 :id="convertToSlug(rel.meta.singular_name)">as {{ rel.meta.singular_name }} ({{ rel.items.length }})</h1>
                 <div class="row">
                     <Match class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3"
                            v-for="item in rel.items"
-                           v-bind:key="item.item.id"
+                           :key="item.item.id"
                            :hydrated-match="item.item"
                     />
                 </div>
@@ -71,7 +71,7 @@ export default {
                 if (val.items.length === 0) {
                     delete groups[key];
                 }
-                if (groups[key] && groups[key].matches) groups[key].matches = groups[key].matches.sort(sortMatches);
+                if (groups[key] && groups[key].items) groups[key].items = groups[key].items.sort((a, b) => sortMatches(a.item, b.item));
             });
             return groups;
         }
@@ -86,6 +86,6 @@ export default {
 
 <style scoped>
     .matches-bar {
-        gap: 2rem;
+        gap: .5rem 1.5rem;
     }
 </style>

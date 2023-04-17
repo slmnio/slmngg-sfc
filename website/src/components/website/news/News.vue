@@ -1,5 +1,5 @@
 <template>
-    <a v-if="news && news.redirect_url" :href="news.redirect_url" target="_blank">
+    <a v-if="news && news.redirect_url" :href="news.redirect_url" target="_blank" class="no-link-style">
         <NewsThumbnail :item="news"/>
         <div class="news-headline">{{ news.headline }}</div>
     </a>

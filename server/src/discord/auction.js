@@ -300,7 +300,8 @@ let Auction = {
         console.log(`!! Signing ${player.name} to ${team.name} for ${amount}`);
         console.log(player.member_of, team.id);
         await airtable.slmngg("Players").update(player.id, {
-            "Member Of": [...(player.member_of || []), team.id]
+            "Member Of": [...(player.member_of || []), team.id],
+            "Auction Price": amount
         });
         balances[team.id] = team.balance - amount;
 

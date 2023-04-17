@@ -6,7 +6,7 @@
         <div class="n-nav mb-2" v-if="_matchGroups">
             <select name="match-group-selector" id="match-group-selector" v-model="activeMatchGroup">
                 <option selected disabled value="null">Select a group</option>
-                <option v-for="group in _matchGroups" :value="group" v-bind:key="group">{{ group }}</option>
+                <option v-for="group in _matchGroups" :value="group" :key="group">{{ group }}</option>
             </select>
         </div>
 
@@ -25,7 +25,7 @@
         <div class="btn btn-dark mb-3" v-if="!showAll" @click="showAll = true">Show all scenarios</div>
 
         <div class="d-flex">
-            <table class="table table-dark table-sm w-auto mr-3" v-for="calc in calculations" v-bind:key="calc.title">
+            <table class="table table-dark table-sm w-auto mr-3" v-for="calc in calculations" :key="calc.title">
                 <tr>
                     <th colspan="3" class="text-center">{{ calc.title }}</th>
                 </tr>
@@ -33,7 +33,7 @@
                     <th>Team</th>
                     <th colspan="2">Scenarios (/{{ scenarios.length }})</th>
                 </tr>
-                <tr v-for="team in calc.counts" v-bind:key="team.code">
+                <tr v-for="team in calc.counts" :key="team.code">
                     <td>{{ team.code }}</td>
                     <td>{{ team.num }}</td>
                     <td>{{ team.perc | perc}}</td>
@@ -52,11 +52,11 @@
                 </tr>
                 <tr>
                     <td class="text-center">#</td>
-                    <td v-for="(match, i) in scenarioMatches" v-bind:key="`m-${i}`" v-bind:class="{ 'locked': match.completed }"
+                    <td v-for="(match, i) in scenarioMatches" :key="`m-${i}`" :class="{ 'locked': match.completed }"
                         @click="setOverride(i, null)">
                         {{ match.teams.map((t, ti) => overrides[i] === ti ? `[${t}]` : t).join(" vs ") }}
                     </td>
-                    <td v-for="(team, ti) in scenarioTeams" v-bind:key="`t2-${ti}`" class="text-center">
+                    <td v-for="(team, ti) in scenarioTeams" :key="`t2-${ti}`" class="text-center">
                         #{{ ti+1 }}
                     </td>
                     <td class="text-center">Info</td>
@@ -64,14 +64,14 @@
                 </thead>
 
                 <tbody>
-                <tr v-for="(scenario, i) in scenarios" v-bind:key="`scenario-${i}`" v-bind:class="{'impossible': scenario.impossible, 'tie-l': scenario.flags.includes('3-WAY-LAST'), 'tie-f': scenario.flags.includes('3-WAY-FIRST')}">
+                <tr v-for="(scenario, i) in scenarios" :key="`scenario-${i}`" :class="{'impossible': scenario.impossible, 'tie-l': scenario.flags.includes('3-WAY-LAST'), 'tie-f': scenario.flags.includes('3-WAY-FIRST')}">
                     <td class="text-center">{{ scenario.i + 1 }}</td>
-                    <td v-for="(winner, wi) in scenario.winners" v-bind:key="`w-${wi}`"
-                        v-bind:class="{ 'locked': scenarioMatches[wi].completed && !scenario.impossible, 'overridden': overrides[wi] === scenario.bits[wi] }"
+                    <td v-for="(winner, wi) in scenario.winners" :key="`w-${wi}`"
+                        :class="{ 'locked': scenarioMatches[wi].completed && !scenario.impossible, 'overridden': overrides[wi] === scenario.bits[wi] }"
                         @click="setOverride(wi, scenario.bits[wi])">
                         {{ winner }}
                     </td>
-                    <td v-for="(team, ti) in scenario.standings" v-bind:key="`t-${ti}`" class="no-wrap">
+                    <td v-for="(team, ti) in scenario.standings" :key="`t-${ti}`" class="no-wrap">
                         {{ team.code }}
 
                         <span class="badge badge-pill bg-info">{{ team.wins }}-{{ team.losses }}</span>

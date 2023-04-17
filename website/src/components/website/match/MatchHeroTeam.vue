@@ -6,7 +6,8 @@
 </template>
 
 <script>
-import { getImage, url } from "@/utils/content-utils";
+import { url } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "MatchHeroTeam",
@@ -15,9 +16,7 @@ export default {
     computed: {
         teamLogo() {
             if (!this.team || !this.team.theme) return {};
-            return {
-                backgroundImage: `url(${getImage(this.team.theme.default_wordmark) || getImage(this.team.theme.default_logo)})`
-            };
+            return resizedImage(this.team.theme, ["default_wordmark", "default_logo"], "w-1000");
         },
         teamBG() {
             if (!this.team || !this.team.theme) return {};

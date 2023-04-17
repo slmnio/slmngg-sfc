@@ -4,6 +4,9 @@
         <WebsiteNavBanner class="bg-danger" v-if="showDisconnectedMessage">
             <i class="fas fa-wifi-slash fa-fw mr-1"></i> <b>No connection to the data server.</b> Don't refresh, we're trying to reconnect...
         </WebsiteNavBanner>
+        <WebsiteNavBanner class="bg-warning text-dark" v-if="showHighErrorRateMessage">
+            <i class="fas fa-exclamation-triangle fa-fw mr-1"></i> <b>Data server errors.</b> We are having some errors requesting data from our upstream provider. Some data maybe inaccurate, incomplete or inaccessible.
+        </WebsiteNavBanner>
         <WebsiteNavBanner class="bg-warning text-dark" v-if="showRebuildingMessage">
             <i class="fas fa-spinner fa-pulse fa-fw mr-1"></i> <b>Server rebuilding</b>: The server is rebuilding its data store. Some pages might not be accessible.</WebsiteNavBanner>
 
@@ -33,6 +36,8 @@
                     <router-link active-class="active" class="nav-link" to="/events">Events</router-link>
                     <router-link active-class="active" class="nav-link" to="/teams">Teams</router-link>
                     <router-link active-class="active" class="nav-link" to="/players">Players</router-link>
+                    <router-link v-if="isAuthenticated" active-class="active" class="nav-link" to="/profile">Profile</router-link>
+                    <router-link v-if="isProduction" active-class="active" class="nav-link" to="/dashboard">Dashboard</router-link>
 <!--                    <router-link active-class="active" class="nav-link" to="/news">News</router-link>-->
                 </b-navbar-nav>
                 <b-navbar-nav v-if="minisite" class="flex-wrap">
@@ -41,55 +46,88 @@
                     <router-link active-class="active" v-if="minisiteSettings && minisiteSettings.standings" class="nav-link" to="/standings">Standings</router-link>
                     <div class="nav-divider" v-if="navbarEvents.length"></div>
 
-                    <router-link v-for="event in navbarEvents" v-bind:key="event.id"
+                    <router-link v-for="event in navbarEvents" :key="event.id"
                                  active-class="active"
                                  class="nav-link" :to="event._link" :exact="event.__id === minisite.__id">
                         {{ event.navbar_short || event.short || event.series_subtitle || event.name }}</router-link>
 <!--                    <router-link :to="'/'" v-if="minisite.navbar_short" active-class="active" exact class="nav-link">{{ minisite.navbar_short }}</router-link>-->
                 </b-navbar-nav>
                 <b-navbar-nav class="flex-grow-1"></b-navbar-nav>
+
+                <b-navbar-nav>
+                    <div class="nav-link" v-b-modal.timezone-swapper-modal>Timezone</div>
+                    <a target="_blank" class="nav-link" href="https://slmn.statuspage.io/?utm_source=slmngg_nav">Status</a>
+                </b-navbar-nav>
+
                 <b-navbar-nav v-if="minisite">
                     <a :href="slmnggURL('')" class="nav-link">SLMN.GG</a>
                 </b-navbar-nav>
                 <b-navbar-nav v-else>
                     <a v-if="$root.version" class="nav-link" target="_blank" href="https://github.com/slmnio/slmngg-sfc">SLMN.GG {{ $root.version }}</a>
-                    <a target="_blank" class="nav-link" href="https://slmn.statuspage.io/?utm_source=slmngg_nav">Status</a>
                 </b-navbar-nav>
+
+                <b-navbar-nav>
+                    <router-link class="nav-link" to="/login" v-if="!$root.auth.user && !$root.isRebuilding">Login</router-link>
+                    <LoggedInUser v-if="$root.auth.user"/>
+                </b-navbar-nav>
+
             </b-collapse>
         </b-navbar>
 
         <div class="live-matches flex-wrap flex-center" v-if="liveMatches.length">
             <div class="live-matches-text">🔴 LIVE</div>
-            <NavLiveMatch v-for="match in liveMatches" :match="match" v-bind:key="match.id" />
+            <NavLiveMatch v-for="match in liveMatches" :match="match" :key="match.id" />
         </div>
+
+        <b-modal ref="timezone-swapper-modal" id="timezone-swapper-modal" title="Timezone swapper" hide-footer>
+            <p>Change your timezone for dates and times across SLMN.GG:</p>
+            <TimezoneSwapper align="left" />
+        </b-modal>
+        <v-style>
+            .notyf {
+                margin-top: {{ height }}px !important;
+            }
+        </v-style>
     </div>
 </template>
 
 <script>
 import {
-    BCollapse,
+    BCollapse, BModal,
     BNavbar,
     BNavbarNav,
-    BNavbarToggle
+    BNavbarToggle, VBModal
 } from "bootstrap-vue";
 import NavLiveMatch from "@/components/website/NavLiveMatch";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { getImage } from "@/utils/content-utils";
 import WebsiteNavBanner from "@/components/website/WebsiteNavBanner";
+import { resizedImageNoWrap } from "@/utils/images";
+import LoggedInUser from "@/components/website/LoggedInUser";
+import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
+import { isAuthenticated } from "@/utils/auth";
+import { getMainDomain } from "@/utils/fetch";
 
 export default {
     name: "WebsiteNav",
     components: {
+        TimezoneSwapper,
+        LoggedInUser,
         WebsiteNavBanner,
         BNavbar,
         BNavbarToggle,
         BCollapse,
         BNavbarNav,
-        NavLiveMatch
+        NavLiveMatch,
+        BModal
+    },
+    directives: {
+        BModal: VBModal
     },
     props: ["minisite"],
     data: () => ({
-        pageNoLongerNew: false
+        pageNoLongerNew: false,
+        resizeObserver: null,
+        height: 0
     }),
     computed: {
         liveMatches() {
@@ -105,27 +143,10 @@ export default {
             }).matches || [];
         },
         slmnggDomain() {
-            try {
-                // console.log("[minisite]", this.minisite);
-
-                if (!this.minisite?.subdomain) {
-                    // basically just defaults if we can't automatically go back up to the parent
-                    if (process.env.NODE_ENV === "development") return "http://localhost:8080";
-                    if (process.env.VUE_APP_DEPLOY_MODE === "local") return "http://localhost:8080";
-                    if (process.env.VUE_APP_DEPLOY_MODE === "staging") return "https://dev.slmn.gg";
-                    if (process.env.NODE_ENV === "production") return "https://slmn.gg";
-                    if (process.env.VUE_APP_DEPLOY_MODE === "production") return "http://slmn.gg";
-                    return "http://dev.slmn.gg";
-                } else {
-                    return window.location.origin.replace(`${this.minisite.subdomain}.`, "");
-                }
-            } catch (e) {
-                return "https://dev.slmn.gg";
-            }
+            return getMainDomain(this.minisite?.subdomain);
         },
         siteMode() {
-            // console.log("env", process.env);
-            return process.env.VUE_APP_DEPLOY_MODE || process.env.NODE_ENV;
+            return import.meta.env.VITE_DEPLOY_MODE || import.meta.env.NODE_ENV;
         },
         navbarEvents() {
             if (!this.minisite?.id) return [];
@@ -149,7 +170,7 @@ export default {
             const theme = ReactiveRoot(this.minisite.id, { theme: ReactiveThing("theme") })?.theme;
             // console.log("[theme]", theme);
             if (!theme) return null;
-            return getImage(theme.small_logo) || getImage(theme.default_logo);
+            return resizedImageNoWrap(theme, ["small_logo", "default_logo"], "h-40");
         },
         showDisconnectedMessage() {
             return this.pageNoLongerNew && this.$socket.disconnected;
@@ -158,6 +179,10 @@ export default {
             if (this.showDisconnectedMessage) return false;
             return this.$root.isRebuilding;
         },
+        showHighErrorRateMessage() {
+            if (this.showDisconnectedMessage || this.showRebuildingMessage) return false;
+            return this.$root.highErrorRate;
+        },
         minisiteSettings() {
             if (!this.minisite?.blocks) return null;
             try {
@@ -165,6 +190,10 @@ export default {
             } catch {
                 return null;
             }
+        },
+        isProduction() {
+            if (!isAuthenticated(this.$root)) return false;
+            return this.$root.authUser?.clients?.length;
         }
     },
     mounted() {
@@ -172,11 +201,20 @@ export default {
             // ignore if the socket is disconnected for the first 3 seconds of loading
             this.pageNoLongerNew = true;
         }, 3000);
+        this.resizeObserver = new ResizeObserver(this.onResize);
+        this.resizeObserver.observe(this.$el);
     },
     methods: {
+        isAuthenticated,
         slmnggURL(page) {
             return `${this.slmnggDomain}/${page}`;
+        },
+        onResize() {
+            this.height = this.$el.offsetHeight;
         }
+    },
+    beforeDestroy () {
+        this.resizeObserver.unobserve(this.$el);
     }
 };
 </script>
@@ -210,5 +248,8 @@ export default {
 }
 .live-matches-text {
     font-size: 1.5em;
+}
+.website-nav >>> .dropdown-item {
+    padding: 0.5rem 1.5rem;
 }
 </style>

@@ -1,3 +1,4 @@
+require("dotenv").config();
 function cleanID(id) {
     if (!id) return null;
     if (typeof id !== "string") return id.id || null; // no real id oops
@@ -5,19 +6,48 @@ function cleanID(id) {
     return id;
 }
 
-function aImg(airtableImage) {
-    // console.log(airtableImage);
-    if (!airtableImage.length) return null;
-    let i = airtableImage[0];
+function getFileEnding(url) {
+    let splits = url.split(".");
+    return splits[splits.length - 1];
+}
+
+const dataServer = process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg";
+
+function getImageURL(attachment, size = "orig") {
+    return `${dataServer}/image.${attachment.fileExtension}?id=${attachment.id}&size=${size}`;
+}
+
+
+function aImg(attachment, size) {
+    if (!attachment) return null;
     return {
-        url: i.url,
-        width: i.width,
-        height: i.height,
-        type: i.type
+        width: attachment.width,
+        height: attachment.height,
+        type: attachment.type,
+        url: getImageURL(attachment, size)
+    };
+}
+function themeSquare(id, size = 500) {
+    if (!id) return null;
+    return {
+        width: size,
+        height: size,
+        type: "image/png",
+        url: `${dataServer}/theme.png?id=${id}&size=${size}&padding=20`
+    };
+}
+function matchWide(id, size = 500) {
+    if (!id) return null;
+    return {
+        width: size * 2,
+        height: size,
+        type: "image/png",
+        url: `${dataServer}/match.png?id=${id}&size=${size}&padding=30`
     };
 }
 
 function stripMarkdown(md) {
+    if (!md) return "";
     try {
         return md.replace(/\[([^\]]*)\]\(([^)]*)\)/g, "$1") // replace links [$1]($2) with $1
             .replace(/\*\*([^\*]*)\*\*/g, "$1"); // replace bold **$1** with $1
@@ -35,8 +65,13 @@ function niceJoin(array) {
     return array[0];
 }
 
-module.exports = ({ app, cors, Cache }) => {
+module.exports = ({ app, Cache }) => {
 
+    async function subArrayNames(ids) {
+        if (!ids?.length) return [];
+        let things = await Promise.all((ids || []).map(id => Cache.get(id)));
+        return things.filter(p => p.name).map(p => p.name);
+    }
 
     //     $meta = (object)[
     //         "title" => " | SLMN.GG",
@@ -62,19 +97,23 @@ module.exports = ({ app, cors, Cache }) => {
             card_type: "summary"
         };
 
+        // remove any keys that don't have a value so that they can be overridden by the default
+        // this allows using optional chaining for values as one does not need to check that the result exists
+        let cleanData = Object.fromEntries(Object.entries(data || {}).filter(([_, v]) => v != null));
+
         let response = {
             ...defaultResponse,
-            ...data,
+            ...cleanData,
         };
 
-        if (data.title) response.title = `${data.title} | SLMN.GG`;
-        if (data.name) response.title = `${data.name} | SLMN.GG`;
-        if (data.image) response.image = data.image;
-        if (data.imageURL) response.image = { url: data.image };
-        if (data.description) response.description = data.description + "\n" + defaultResponse.description;
-        if (data.solo_description) response.description = data.solo_description;
+        if (cleanData.title) response.title = `${cleanData.title} | SLMN.GG`;
+        if (cleanData.name) response.title = `${cleanData.name} | SLMN.GG`;
+        if (cleanData.image) response.image = cleanData.image;
+        if (cleanData.imageURL) response.image = { url: cleanData.image };
+        if (cleanData.description) response.description = cleanData.description + "\n" + defaultResponse.description;
+        if (cleanData.solo_description) response.description = cleanData.solo_description;
 
-        if (data.card_type) response.card_type = data.card_type;
+        if (cleanData.card_type) response.card_type = cleanData.card_type;
 
         return response;
     }
@@ -82,7 +121,7 @@ module.exports = ({ app, cors, Cache }) => {
     const routes = [
         {
             url: "player",
-            async handle({ path, parts }) {
+            async handle({ parts }) {
                 let thing = await Cache.get(cleanID(parts[1]));
 
                 if (!thing.name) {
@@ -101,7 +140,7 @@ module.exports = ({ app, cors, Cache }) => {
         },
         {
             url: "event",
-            async handle({ path, parts }) {
+            async handle({ parts }) {
                 let thing = await Cache.get(cleanID(parts[1]));
 
                 if (!thing.name) {
@@ -109,39 +148,85 @@ module.exports = ({ app, cors, Cache }) => {
                 }
                 let theme = thing?.theme && await Cache.get(thing.theme[0]);
 
-                let data = {
-                    title: thing.name
-                };
-                if (theme) {
-                    data.color = theme.color_theme;
+                return meta({
+                    title: thing.name,
+                    color: theme?.color_theme,
+                    image: themeSquare(theme?.id)
+                });
+            }
+        },
+        {
+            url: "team",
+            async handle({ parts }) {
+                let thing = await Cache.get(cleanID(parts[1]));
+                if (!thing.name) {
+                    return null;
                 }
-                if (!data.image && theme?.default_wordmark) data.image = aImg(theme.default_wordmark);
-                if (!data.image && theme?.default_logo) data.image = aImg(theme.default_logo);
-                return meta(data);
+
+                let theme = thing?.theme && await Cache.get(thing.theme[0]);
+                let event = thing?.event && await Cache.get(thing.event[0]);
+                let captains = await subArrayNames(thing?.captains);
+                let owners = await subArrayNames(thing?.owners);
+                let players = await subArrayNames(thing?.players);
+                let staff = await subArrayNames(thing?.staff);
+
+                console.log(captains);
+
+                let description = [];
+                if (event?.name) description.push(`${thing.name} from ${event.name}.\n`);
+                if (captains.length) description.push(`Captained by ${niceJoin(captains)}.`);
+                if (owners.length) description.push(`Owned by ${niceJoin(owners)}.`);
+
+                if (staff.length && players.length) {
+                    // staff AND players
+                    description.push(`The roster is ${niceJoin(players)}, and they're supported by their staff of ${niceJoin(staff)}.`);
+                } else if (staff.length) {
+                    // staff only
+                    description.push(`The team staff are ${niceJoin(staff)}.`);
+                } else if (players.length) {
+                    // players only
+                    description.push(`The roster is ${niceJoin(players)}.`);
+                }
+
+                return meta({
+                    title: thing.name,
+                    color: theme?.color_theme,
+                    image: themeSquare(theme?.id),
+                    description: description.join(" ")
+                });
             }
         },
         {
             url: ["match", "detailed"],
-            async handle({ path, parts }) {
+            async handle({ parts }) {
                 let thing = await Cache.get(cleanID(parts[1]));
                 let data = {};
+                let teams = await Promise.all((thing.teams || []).map(tID => Cache.get(tID)));
 
                 if (thing.special_event) {
                     data.title = thing.custom_name;
+                    if (teams.length === 2) data.description = teams.map(t => t.name).join(" vs ");
+                } else if (thing.custom_name) {
+                    // has custom name
+                    data.title = thing.custom_name;
+                    if (teams.length === 2) data.description = teams.map(t => t.name).join(" vs ");
                 } else {
                     // standard match
-                    let teams = await Promise.all((thing.teams || []).map(tID => Cache.get(tID)));
-                    data.title = thing.custom_name || teams.map(t => t.name).join(" vs ");
+                    if (teams.length === 2) {
+                        data.title = teams.map(t => t.name).join(" vs ");
+                    } else {
+                        data.title = thing.name;
+                    }
                 }
 
                 let event = await Cache.get(thing.event?.[0]);
                 if (event) {
                     if (event?.name) data.title += ` | ${event.name}`;
                     let theme = await Cache.get(event.theme?.[0]);
-
-                    if (!data.image && theme?.default_wordmark) data.image = aImg(theme.default_wordmark);
-                    if (!data.image && theme?.default_logo) data.image = aImg(theme.default_logo);
-                    if (theme.color_theme) data.color = theme.color_theme;
+                    if (thing.teams?.length === 2 || theme.id) {
+                        data.image = matchWide(thing.id);
+                    }
+                    data.color = theme?.color_theme;
                 }
 
                 return meta(data);
@@ -149,12 +234,17 @@ module.exports = ({ app, cors, Cache }) => {
         },
         {
             url: "news",
-            async handle({ path, parts }) {
+            async handle({ parts }) {
                 let thing = await Cache.get(`news-${parts[1]}`);
                 if (!thing.headline) return;
 
-                let event = thing.event && await Cache.get(thing.event[0]);
+                let event = thing?.event && await Cache.get(thing.event[0]);
                 let theme = event?.theme && await Cache.get(event.theme[0]);
+
+                let thumbnail = thing?.thumbnail?.[0] && Cache.getAttachment(thing.thumbnail[0].id);
+                let header = !thumbnail && thing?.header?.[0] && Cache.getAttachment(thing.header[0].id);
+
+                console.log({ thing, thumbnail, header });
 
 
                 /*
@@ -171,37 +261,26 @@ module.exports = ({ app, cors, Cache }) => {
                 let data = {
                     title: thing.headline,
                     /* solo_description removes slmn.gg footer */
-                    solo_description: text.slice(0, 300) + (text.length > 300 ? "..." : "")
+                    solo_description: text.slice(0, cutoff) + (text.length > cutoff ? "..." : ""),
+                    color: theme?.color_theme,
+                    image: aImg(thumbnail || header, "w-1000") || themeSquare(theme?.id),
+                    card_type: (thing?.thumbnail || thing?.header) ? "summary_large_image" : null
                 };
-                if (theme) {
-                    data.color = theme.color_theme;
-                }
-                if (thing.thumbnail) {
-                    data.image = aImg(thing.thumbnail);
-                    data.card_type = "summary_large_image";
-                }
-                if (!data.image && thing.header) {
-                    data.image = aImg(thing.header);
-                    data.card_type = "summary_large_image";
-                }
-                if (!data.image && theme?.default_wordmark) data.image = aImg(theme.default_wordmark);
-                if (!data.image && theme?.default_logo) data.image = aImg(theme.default_logo);
 
                 return meta(data);
             }
         }
     ];
 
-    const basicEventRoute = async ({ event, path, parts }) => {
+    const basicEventRoute = async ({ event }) => {
+        let theme = event?.theme && await Cache.get(event.theme[0]);
+
         let data = {
-            title: event.name
+            title: event.name,
+            color: theme?.color_theme,
+            image: themeSquare(theme?.id)
         };
 
-        let theme = event?.theme && await Cache.get(event.theme[0]);
-        // console.log(event);
-        if (theme) data.color = theme.color_theme;
-        if (!data.image && theme?.default_wordmark) data.image = aImg(theme.default_wordmark);
-        if (!data.image && theme?.default_logo) data.image = aImg(theme.default_logo);
 
         let things = [];
         if (event.teams?.length) things.push("team" + (event.teams.length === 1 ? "" : "s"));
@@ -268,6 +347,29 @@ module.exports = ({ app, cors, Cache }) => {
         ].includes(domain.toLowerCase());
     }
 
+    async function getRedirect(path = "", subdomain) {
+        // get all redirects
+        // see if any match path/subdomain combo
+        // if it does, send back data for indexer
+
+        let redirects = (await Cache.get("Redirects"))?.items;
+        if (!path.startsWith("/")) path = "/" + path;
+        path = path.trim().toLowerCase();
+        if (!redirects?.length) return null;
+
+        let redirect = redirects.find(r => {
+            if (!r.active) return false;
+            return (r.subdomain || undefined) === subdomain && r.incoming_url.trim().toLowerCase() === path;
+        });
+
+        if (!redirect) return null;
+        return {
+            error: false,
+            redirect: true,
+            url: redirect.outgoing_url
+        };
+    }
+
     app.get("/meta/:path?", async (req, res) => {
 
         /*
@@ -281,10 +383,14 @@ module.exports = ({ app, cors, Cache }) => {
             }
 
             let domain = req.query.domain;
+            if (["slmn.gg", "dev.slmn.gg", "localhost"].includes(domain)) domain = null;
 
             if (domain) {
             // domain = SUBDOMAIN.SLMN.GG
                 let subdomain = domain.split(".")[0];
+
+                let redirect = await getRedirect(req.params.path, subdomain);
+                if (redirect) return res.send(redirect);
 
                 let event = await Cache.get(`subdomain-${subdomain}`);
 
@@ -296,6 +402,7 @@ module.exports = ({ app, cors, Cache }) => {
                     let parts = path.split("/");
 
                     let route = eventRoutes.find(r => (typeof r.url === "object" ? r.url.includes(parts[0]) : r.url === parts[0]));
+                    if (!route) route = routes.find(r => (typeof r.url === "object" ? r.url.includes(parts[0]) : r.url === parts[0]));
 
                     if (route) {
                         let data = await route.handle({ event, path, parts });
@@ -311,8 +418,10 @@ module.exports = ({ app, cors, Cache }) => {
 
             // standard slmn.gg/event
 
+            let redirect = await getRedirect(req.params.path);
+            if (redirect) return res.send(redirect);
 
-            const path = req.params.path;
+            const path = req.params.path || "";
             let parts = path.split("/");
 
             const route = routes.find(r => (typeof r.url === "object" ? r.url.includes(parts[0]) : r.url === parts[0]));

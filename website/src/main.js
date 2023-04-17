@@ -7,20 +7,42 @@ import VueRouter from "vue-router";
 import VueSocketIOExt from "vue-socket.io-extended";
 import { io } from "socket.io-client";
 import { VBTooltip } from "bootstrap-vue";
+import "bootstrap-vue/dist/bootstrap-vue.css";
+import VueYoutubeEmbed from "vue-youtube-embed";
+import VueCookies from "vue-cookies";
+
+import { Notyf } from "notyf";
+import "notyf/notyf.min.css";
 
 import defaultRoutes from "@/router/default";
-import { getDataServerAddress, fetchThings } from "@/utils/fetch";
+import { getDataServerAddress, fetchThings, getMainDomain } from "@/utils/fetch";
 import EventRoutes from "@/router/event";
 
 import Event from "@/views/Event";
 import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp";
-import NotFoundPage from "@/views/NotFoundPage";
 import SharedRoutes from "@/router/shared-routes";
+import AuthRoutes from "@/router/auth-redirects";
+import { ReactiveRoot } from "@/utils/reactive";
+import { authenticateWithToken, getAuthNext, setAuthNext } from "@/utils/auth";
+import NotFoundContent from "@/views/sub-views/NotFoundContent";
 
+// eslint-disable-next-line prefer-const
+let app;
 
 Vue.use(Vuex);
 Vue.use(VueMeta);
 Vue.use(VueRouter);
+Vue.use(VueYoutubeEmbed, { global: false });
+Vue.use(VueCookies);
+
+Vue.prototype.$notyf = new Notyf({
+    duration: 5000,
+    position: {
+        x: "right",
+        y: "top"
+    },
+    dismissible: true
+});
 
 store.subscribe((mutation, state) => {
     if (mutation.type === "setPlayerDraftNotes") {
@@ -37,20 +59,25 @@ Vue.use(VueSocketIOExt, socket, { store });
 
 Vue.config.productionTip = false;
 
+Vue.config.devtools = ["local", "staging"].includes(import.meta.env.VITE_DEPLOY_MODE);
+
 Vue.component("v-style", {
     render: function (createElement) {
         return createElement("style", this.$slots.default);
     }
 });
 
-
 const host = window.location.hostname;
-const domains = ["slmn.gg", "localslmn", "localhost"].map(d => new RegExp(`(?:^|(.*)\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
+const domains = ["slmn.gg", "localslmn", "localhost"].map(d => ({
+    main: d,
+    r: new RegExp(`(?:^|(.*)\\.)${d.replace(".", "\\.")}(?:$|\\n)`)
+}));
 let subdomain = null;
+const mainDomain = getMainDomain(subdomain);
 let routes = [];
 let subID;
 
-domains.forEach(r => {
+domains.forEach(({ main, r }) => {
     const result = host.match(r);
     if (result && result[1] && !["dev", "live"].includes(result[1])) {
         if (result[1].endsWith(".dev")) {
@@ -69,6 +96,7 @@ if (subdomain) {
     // verify event from subdomain
     console.log("[subdomain]", subdomain);
     routes = [
+        ...AuthRoutes(app, mainDomain),
         {
             path: "/",
             component: MinisiteWrapperApp,
@@ -84,23 +112,60 @@ if (subdomain) {
                         };
                     }
                 },
-                ...SharedRoutes
+                ...SharedRoutes,
+                { path: "*", component: NotFoundContent }
             ]
-        },
-        { path: "/*", component: NotFoundPage }
+        }
     ];
 } else {
     // default slmn.gg
     console.log("[subdomain]", "default routes applied");
-    routes = defaultRoutes;
+    routes = [
+        ...defaultRoutes,
+        ...AuthRoutes(app, mainDomain)
+    ];
 }
 
-const app = new Vue({
-    router: new VueRouter({
-        mode: "history",
-        base: process.env.BASE_URL,
-        routes
-    }),
+const router = new VueRouter({
+    mode: "history",
+    base: import.meta.env.BASE_URL,
+    routes
+});
+
+let preloadAuthCheckRequired = false;
+let preloadAuthReturn = null;
+
+// TODO: this doesn't really work very well nor work on the first run
+router.beforeEach((to, from, next) => {
+    try {
+        // console.log("routerResolve", to, this, app);
+        if (to.meta.requiresAuth) {
+            // authenticating!
+
+            getAuthNext(app); // empty auth
+
+            if (app && !app.auth.user) {
+                setAuthNext(app?.$root, to.fullPath);
+                return router.push({ path: "/login", query: { return: to.fullPath } });
+                // TODO: to.fullPath can be used for return (set in localstorage or something  /redirect?to=)
+            } else {
+                console.warn("Need to check if authenticated, but the app hasn't loaded yet.");
+                preloadAuthCheckRequired = true;
+                preloadAuthReturn = to.fullPath;
+                // console.log(document.cookie);
+                // return next({ path: "/login" });
+            }
+        }
+    } catch (e) {
+        console.error("Vue navigation error", e);
+    }
+
+    next();
+});
+
+
+app = new Vue({
+    router,
     render: h => h(GlobalApp),
     store,
     sockets: {
@@ -115,14 +180,18 @@ const app = new Vue({
         server_rebuilding(x) {
             console.log("rebuilding", x);
             this.isRebuilding = x;
+        },
+        high_error_rate(x) {
+            console.log("high error rate", x);
+            this.highErrorRate = x;
         }
     },
     metaInfo: {
         // title: "SLMN.GG",
-        titleTemplate: (chunk) => chunk ? `${chunk} | SLMN.GG` : "SLMN.GG",
-        link: [
-            { rel: "icon", href: "https://slmn.io/slmn-new.png" }
-        ]
+        titleTemplate: (chunk) => chunk ? `${chunk} | SLMN.GG` : "SLMN.GG"
+        // link: [
+        //     { rel: "icon", href: "https://slmn.io/slmn-new.png" }
+        // ]
     },
     data: () => ({
         interval: null,
@@ -130,10 +199,24 @@ const app = new Vue({
         isRebuilding: false,
         animationActive: true,
         activeScene: null,
-        broadcast: null
+        broadcast: null,
+        defaults: {
+            camParams: (["cover", "na", "animate=0"]).join("&")
+        },
+        auth: {
+            token: null,
+            user: null
+        },
+        // this is mainly for development, probably won't stay
+        colorControls: {
+            schema: {
+                hue: 0, saturation: 0, overlay: 0, multiply: 0
+            }
+        }
     }),
-    mounted() {
+    async mounted() {
         console.log("[app]", "subdomain", subdomain);
+        console.log("[app]", "data server", getDataServerAddress());
         if (subdomain) {
             this.loadMinisite(subdomain);
         }
@@ -146,13 +229,38 @@ const app = new Vue({
                 this.$store.state.draft_notes = notes;
             }
         } catch (e) { console.error("Draft notes local storage error", e); }
+
+        if (!this.auth.user) {
+            const token = this.$cookies.get("token");
+            if (token) {
+                // authenticate
+                await authenticateWithToken(this, token);
+            }
+        }
+
+        if (!this.auth.user && preloadAuthCheckRequired) {
+            console.warn("App loaded, recognising preload check is required and we're not authenticated. Sending to login");
+            preloadAuthCheckRequired = false;
+            if (preloadAuthReturn) setAuthNext(app, preloadAuthReturn);
+
+            this.$router.push({
+                path: "/login",
+                query: {
+                    return: getAuthNext(app, true)
+                }
+            });
+        }
     },
     computed: {
         minisiteEvent() {
             return this.$store.getters.thing(`subdomain-${subdomain}`);
         },
         version() {
-            return process.env?.VUE_APP_SLMNGG_VERSION;
+            return import.meta.env?.VITE_SLMNGG_VERSION;
+        },
+        authUser() {
+            if (!this.auth.user?.airtableID) return null;
+            return ReactiveRoot(this.auth.user.airtableID);
         }
     },
     methods: {

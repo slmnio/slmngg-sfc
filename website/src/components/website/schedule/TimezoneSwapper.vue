@@ -1,8 +1,8 @@
 <template>
-    <div class="timezone-swapper">
+    <div class="timezone-swapper" :class="{'align-left': align === 'left'}">
         <select id="timezone" v-model="siteTimezone">
-            <option value="local">Your local time</option>
-            <option v-for="tz in availableTimezones" :value="tz.value" v-bind:key="tz.value">{{ tz.text }}</option>
+            <option value="local">Your local time ({{ localTimezoneCode }})</option>
+            <option v-for="tz in availableTimezones" :value="tz.value" :key="tz.value">{{ tz.text }}</option>
         </select>
     </div>
 </template>
@@ -13,7 +13,7 @@ import informal from "spacetime-informal";
 
 function getAbbrev(timezone) {
     const display = informal.display(timezone);
-    return spacetime.now().isDST() ? display.daylight.abbrev : display.standard.abbrev;
+    return spacetime.now(timezone).isDST() ? display.daylight.abbrev : display.standard.abbrev;
 }
 function getLocation(timezone) {
     return timezone.split("/")[1].replace(/_/g, " ");
@@ -24,13 +24,14 @@ function getOffset(timezone) {
 
 export default {
     name: "TimezoneSwapper",
+    props: ["align"],
     computed: {
         siteTimezone: {
             set(tz) {
                 this.$store.commit("setTimezone", tz);
             },
             get() {
-                return this.$store.state.timezone;
+                return this.$store.state.timezone || "local";
             }
         },
         availableTimezones() {
@@ -41,16 +42,20 @@ export default {
                 value: tz,
                 offset: getOffset(tz)
             })).sort((a, b) => a.offset - b.offset);
+        },
+        localTimezoneCode() {
+            return getAbbrev(spacetime.now().timezone().name);
+            // return getAbbrev();
         }
     }
 };
 </script>
 
 <style scoped>
-    select {
+    .timezone-swapper:not(.align-left) select {
         text-align-last: right;
     }
-    option {
+    .timezone-swapper:not(.align-left) option {
         direction: rtl;
     }
 </style>

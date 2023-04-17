@@ -1,5 +1,6 @@
 <template>
     <div class="container event-rosters">
+        <h2>Team details</h2>
         <table class="table table-bordered table-dark table-sm">
             <thead>
             <tr>
@@ -12,8 +13,11 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="player in people" v-bind:key="player.id">
-                <td class="wide">{{ player.name }}</td>
+            <tr v-for="player in people" :key="player.id">
+                <td class="wide">
+                    <span v-for="role in player.is" :key="role" v-b-tooltip="role" v-html="getRoleSVG(role)" class="mr-1"></span>
+                    <LinkedPlayers :players="[player]"/>
+                </td>
                 <td class="wide">{{ player.pronouns }}</td>
                 <td>{{ player.pronunciation }}</td>
                 <td class="wide"><TwitterLink :thing="player" /></td>
@@ -28,11 +32,13 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import TwitterLink from "@/components/website/TwitterLink";
+import LinkedPlayers from "@/components/website/LinkedPlayers";
+import { getRoleSVG } from "@/utils/content-utils";
 
 export default {
     name: "TeamDetails",
     props: ["team"],
-    components: { TwitterLink },
+    components: { LinkedPlayers, TwitterLink },
     computed: {
         _team() {
             if (!this.team) return [];
@@ -51,8 +57,28 @@ export default {
                 ...this._team?.players || []
             ].filter((player, index, array) => {
                 return array.findIndex(p => p.id === player.id) === index;
+            }).map(person => {
+                const roles = [];
+
+                if ((this._team.owners || []).find(x => x.id === person.id)) roles.push("Owner");
+                if ((this._team.captains || []).find(x => x.id === person.id)) roles.push("Captain");
+                if ((this._team.staff || []).find(x => x.id === person.id)) {
+                    if (person.staff_role) {
+                        roles.push(person.staff_role);
+                    } else {
+                        roles.push("Staff");
+                    }
+                }
+
+                return {
+                    ...person,
+                    is: roles
+                };
             });
         }
+    },
+    methods: {
+        getRoleSVG
     }
 };
 </script>

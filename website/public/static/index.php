@@ -37,6 +37,10 @@ $meta = (object)[
     "color" => "#111111",
     "card_type" => "summary"
 ];
+if ($__meta->redirect) {
+    header("Location: " . $__meta->url);
+    die();
+}
 
 if (!$__meta->error) {
     $meta = $__meta;

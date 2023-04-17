@@ -3,47 +3,31 @@
         <div class="team-logo-holder flex-shrink-0 flex-center" :style="bg">
             <div class="team-logo bg-center" :style="logo"></div>
         </div>
-        <div class="team-name flex-center w-100" :style="bg">
-            <span class="industry-align">{{ team.name }}</span>
-        </div>
     </div>
 </template>
 
 <script>
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cssImage } from "@/utils/content-utils";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "DeskTeam",
     props: ["team"],
     computed: {
-        bg() {
-            if (!this.team?.theme) {
-                return {
-                    backgroundColor: "#373737",
-                    color: "white",
-                    borderColor: "#5F5F5F"
-                };
-            }
-            return logoBackground1(this.team);
-        },
-        logo() {
-            if (!this.team?.theme) return {};
-            return cssImage("backgroundImage", this.team.theme, ["default_wordmark", "default_logo"], null, false);
-        }
+        bg() { return logoBackground1(this.team); },
+        logo() { return resizedImage(this.team.theme, ["default_wordmark", "default_logo"], "h-200"); }
     }
 };
 </script>
 
 <style scoped>
     .team {
-        width: 100%;
-        flex-grow: 1;
     }
     .team-logo-holder {
         width:  160px;
         height: 150px;
         /*border-radius: 20px;*/
+        background-color: #373737; /* basic, overriden by bg() */
     }
     .team-logo {
         --size: 90%;

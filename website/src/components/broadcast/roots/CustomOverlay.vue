@@ -8,7 +8,12 @@ import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 export default {
     name: "StandingsOverlay",
     components: { GenericOverlay },
-    props: ["broadcast", "title"]
+    props: ["broadcast", "title"],
+    metaInfo() {
+        return {
+            title: `Custom "${this.title}" | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
+    }
 };
 </script>
 

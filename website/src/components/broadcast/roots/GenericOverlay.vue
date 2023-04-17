@@ -1,27 +1,35 @@
 <template>
-    <div class="generic-overlay flex-center flex-column">
+    <div class="generic-overlay flex-center flex-column" :class="{'full': full}">
         <TourneyBar class="st4-top" v-if="top === 'st4'" :broadcast="broadcast" left="Schedule" :right="title"/>
-        <transition name="broadcast-mid-split">
-            <div v-if="top !== 'st4'" class="generic-overlay-title overlay--bg flex-center" :style="{borderColor: _accentColor}" v-show="$root.animationActive">
-                <transition name="fade" mode="out-in">
-                    <span class="industry-align" :key="title" v-bind:class="{'has-br': title.includes('\\n') }" v-html="nbr(title)"></span>
-                </transition>
-            </div>
-        </transition>
-        <transition name="broadcast-mid-split">
-            <div class="generic-overlay-body overlay--bg flex-center" :style="{backgroundColor: bodyColor, borderColor: noBottom ? 'transparent' : _accentColor}" v-show="$root.animationActive">
-                <slot></slot>
-            </div>
-        </transition>
+        <div class="g-title-wrapper">
+            <theme-transition :theme="theme" :active="$root.animationActive" end="middle"  :duration="500" :inner-delay="150">
+                <div class="generic-overlay-title g-title overlay--bg flex-center" :style="{borderColor: _accentColor, ...(titleStyle || {})}">
+                    <transition name="fade" mode="out-in">
+                        <span class="industry-align" :key="title" :class="{'has-br': title.includes('\\n') }" v-html="nbr(title)"></span>
+                    </transition>
+                </div>
+            </theme-transition>
+        </div>
+        <div class="g-body-wrapper">
+                <div v-if="noBottomAnimate" class="generic-overlay-body g-body overlay--bg flex-center" :style="bodyStyle">
+                    <slot></slot>
+                </div>
+            <theme-transition v-else :active="$root.animationActive" :theme="theme" :starting-delay="100" end="middle" :duration="500" :inner-delay="150">
+                <div class="generic-overlay-body g-body overlay--bg flex-center" :style="bodyStyle">
+                    <slot></slot>
+                </div>
+            </theme-transition>
+        </div>
     </div>
 </template>
 
 <script>
 import TourneyBar from "@/components/broadcast/TourneyBar";
+import ThemeTransition from "@/components/broadcast/ThemeTransition";
 export default {
     name: "GenericOverlay",
-    components: { TourneyBar },
-    props: ["title", "accentColor", "bodyColor", "top", "broadcast", "noBottom"],
+    components: { ThemeTransition, TourneyBar },
+    props: ["title", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "titleStyle", "customTheme", "full"],
     methods: {
         nbr(text) {
             if (!text) return "";
@@ -29,8 +37,22 @@ export default {
         }
     },
     computed: {
+        theme() {
+            return this.customTheme || this.$root?.broadcast?.event?.theme;
+        },
         _accentColor() {
             return this.accentColor || this.$root?.broadcast?.event?.theme?.color_theme;
+        },
+        bodyStyle() {
+            const css = {
+                backgroundColor: this.bodyColor,
+                borderColor: this._accentColor
+            };
+            if (this.noBottom) {
+                css.borderColor = "transparent";
+                css.borderBottomWidth = "0";
+            }
+            return css;
         }
     }
 };
@@ -47,11 +69,14 @@ export default {
     height: 100%;
     width: 100%;
     color: white;
-    font-family: "Industry", "SLMN-Industry", sans-serif;
+    font-family: "SLMN-Industry", "Industry", sans-serif;
 
     padding: 60px 320px;
 }
 
+.generic-overlay.full {
+    padding: 60px 120px;
+}
 
 .schedule-overlay .generic-overlay-body {
     padding: 0;
@@ -62,8 +87,6 @@ export default {
     border-bottom: 8px solid transparent;
 }
 .generic-overlay-title {
-    height: 160px;
-    width: 100%;
     background-color: #222;
     font-size: 96px;
     font-weight: bold;
@@ -71,17 +94,28 @@ export default {
     flex-shrink: 0;
     line-height: 1;
     text-align: center;
+    height: 100%;
+}
+.g-title-wrapper {
+    width: 100%;
+    height: 160px;
+    flex-shrink: 0;
 }
 .generic-overlay-body {
-    margin-top: 60px;
     flex-grow: 1;
-    height: 0;
     width: 100%;
     padding: 40px;
+    height: 100%;
+}
+.g-body-wrapper {
+    margin-top: 60px;
+    width: 100%;
+    flex-grow: 1;
+    overflow: hidden;
 }
 
 span.industry-align {
-    transform: translate(0, -.0925em);
+    transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
 }
 .st4-top {
     margin: 20px 0;
@@ -103,7 +137,7 @@ span.industry-align {
 .broadcast-mid-split-enter {
     /*clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);*/
     /*clip-path: polygon(0% 0%, 0% 100%, 0% 100%, 0% 0, 100% 0, 100% 100%, 100% 100%, 100% 0%);*/
-    clip-path: polygon(50% 0, 50% 100%, 50% 100%, 50% 1%, 50% 0%, 50% 100%, 50% 100%, 50% 0);
+    clip-path: polygon(50% 0, 50% 100%, 50% 100%, 50% 0%, 50% 0%, 50% 100%, 50% 100%, 50% 0);
 }
 .broadcast-mid-split-enter-to {
     /*clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);*/

@@ -1,8 +1,8 @@
 <template>
     <div class="podcast-overlay">
-        <div class="podcast-row" v-for="(row, i) in rowsOfGuests(rows || 2)" v-bind:key="i">
+        <div class="podcast-row" v-for="(row, i) in rowsOfGuests(rows || 2)" :key="i">
             <transition-group class="casters flex-center" name="anim-talent">
-                <Caster v-for="caster in row" v-bind:key="caster.id" :guest="caster" :disable-video="shouldDisablePodcastVideo" />
+                <Caster v-for="caster in row" :key="caster.id" :guest="caster" :disable-video="shouldDisablePodcastVideo" />
             </transition-group>
         </div>
         <v-style>{{ autoWidth }}</v-style>
@@ -56,13 +56,18 @@ export default {
 
             return rows;
         }
+    },
+    metaInfo() {
+        return {
+            title: `Podcast | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>
 
 <style scoped>
     .podcast-overlay {
-        font-family: "Industry", "SLMN-Industry", sans-serif;
+        font-family: "SLMN-Industry", "Industry", sans-serif;
         overflow: hidden;
         display: flex;
         flex-direction: column;

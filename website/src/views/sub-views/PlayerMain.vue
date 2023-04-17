@@ -3,40 +3,36 @@
         <div class="container">
             <ContentRow v-if="accolades">
                 <ContentThing :thing="accolade" type="event" :link-to="accolade.event" :theme="accolade.event && accolade.event.theme" v-for="accolade in accolades"
-                              v-bind:key="accolade.id" :show-logo="true" :text="accolade.player_text" />
+                              :key="accolade.id" :show-logo="true" :text="accolade.player_text" />
             </ContentRow>
             <ContentRow title="Owner of" v-if="ownedTeams">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in ownedTeams"
-                              v-bind:key="team.id" :show-logo="true" />
+                              :text="clarifyTeam(team)" :key="team.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Captain of" v-if="captainedTeams">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in captainedTeams"
-                              v-bind:key="team.id" :show-logo="true" />
+                              :text="clarifyTeam(team)" :key="team.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Team staff for" v-if="teamStaff">
               <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teamStaff"
-                            v-bind:key="team.id" :show-logo="true" />
-            </ContentRow>
-            <ContentRow title="Brand designer for" v-if="brandsDesigned">
-              <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in brandsDesigned"
-                            v-bind:key="team.id" :show-logo="true" :overrideURL="`/team/${team.id}/theme`" />
+                            :text="clarifyTeam(team)" :key="team.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Player for" v-if="teams">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teams"
-                              v-bind:key="team.id" :show-logo="true" />
+                              :text="clarifyTeam(team)" :key="team.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Event staff for" v-if="eventStaff">
                 <ContentThing :thing="event" type="event" :theme="event.theme" v-for="event in eventStaff"
-                              v-bind:key="event.id" :show-logo="true" />
+                              :key="event.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Caster for" v-if="castedEvents">
                 <ContentThing :thing="event" type="event" :theme="event.theme" v-for="event in castedEvents"
-                              v-bind:key="event.id" :show-logo="true" />
+                              :key="event.id" :show-logo="true" />
             </ContentRow>
-            <ContentRow :title="group.meta.player_text" v-for="group in mainPlayerRelationships" v-bind:key="group.meta.singular_name">
+            <ContentRow :title="group.meta.player_text" v-for="group in mainPlayerRelationships" :key="group.meta.singular_name">
                 <ContentThing
                     v-for="item in group.items"
-                    v-bind:key="item.item.id"
+                    :key="item.item.id"
                     :thing="item.item"
                     :type="item.type"
                     :theme="item.item.theme"
@@ -50,6 +46,7 @@
 import ContentRow from "@/components/website/ContentRow";
 import ContentThing from "@/components/website/ContentThing";
 import { sortTeams, sortEvents } from "@/utils/sorts";
+import { clarifyTeam } from "@/utils/content-utils";
 
 export default {
     props: ["player"],
@@ -64,7 +61,7 @@ export default {
 
             return [
                 // team things
-                ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => e.accolades).filter(e => !!e)) : []),
+                ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => (e.accolades || []).filter(a => a?.show_for_players)).filter(Boolean)) : []),
                 ...(this.player.accolades ? this.player.accolades : [])
             ];
         },
@@ -130,11 +127,16 @@ export default {
             Object.entries(groups).forEach(([key, val]) => {
                 if (val.items.length === 0) {
                     delete groups[key];
+                } else {
+                    val.items.sort((a, b) => sortEvents(a.item, b.item));
                 }
             });
 
             return groups;
         }
+    },
+    methods: {
+        clarifyTeam
     }
 };
 </script>

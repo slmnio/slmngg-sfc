@@ -1,7 +1,9 @@
 <template>
     <div class="container">
         <div class="top d-flex">
-            <ThemeLogo class="top-theme-logo" :theme="thing.theme"></ThemeLogo>
+            <router-link :to="themeURL">
+                <ThemeLogo class="top-theme-logo" :theme="thing.theme" logo-size="w-200"/>
+            </router-link>
             <div class="thing-names">
                 <div class="thing-name d-flex flex-column">
                     <h3 class="subtitle m-0" v-if="type === 'team' && thing.subtitle">{{ thing.subtitle }}</h3>
@@ -32,7 +34,7 @@ import { url } from "@/utils/content-utils";
 
 export default {
     name: "ThingTop",
-    props: ["thing", "type"],
+    props: ["thing", "type", "themeURL"],
     components: {
         ThemeLogo
     },

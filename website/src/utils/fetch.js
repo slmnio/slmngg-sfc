@@ -5,11 +5,11 @@ async function addToBuffer(id) {
     return store.commit("addToRequestBuffer", id);
 }
 export function getDataServerAddress() {
-    console.log("[data server address]", window.location.hostname, process.env.VUE_APP_DATA_SERVER);
+    // console.log("[data server address]", window.location.hostname, process.env.VITE_DATA_SERVER);
     // can override this with .env.development etc
-    if (process.env.VUE_APP_DATA_SERVER) return process.env.VUE_APP_DATA_SERVER;
+    if (import.meta.env.VITE_DATA_SERVER) return import.meta.env.VITE_DATA_SERVER;
 
-    if (process.env.VUE_APP_DEPLOY_MODE === "local") {
+    if (import.meta.env.VITE_DEPLOY_MODE === "local") {
         return `//${window.location.hostname}:8901`;
     }
     return "https://data.slmn.gg";
@@ -82,7 +82,7 @@ export async function fetchThings (ids) {
                 data: item
             });
             if (cleanID(item.id) !== item.__id) {
-                console.log("[custom update]", item.__id, item.id);
+                // console.log("[custom update]", item.__id, item.id);
                 store.commit("push", {
                     id: item.__id,
                     data: item
@@ -119,7 +119,7 @@ export async function getThing(id) {
     id = cleanID(id);
     if (!id) return null;
     // TODO: some sort of queue system so it doesn't try to XHR things that are currently pending
-    const findIndex = store.state.things.findIndex(t => t.id === id);
+    const findIndex = store.state.thing_map[id] || -1;
     if (findIndex !== -1) {
         return store.state.things[findIndex];
     }
@@ -142,4 +142,41 @@ export async function getThings(ids) {
 
 export async function getAndWait(id) {
 
+}
+
+export function getMainDomain(subdomain) {
+    try {
+        if (subdomain) {
+            return window.location.origin.replace(`${subdomain}.`, "");
+        } else {
+            if (import.meta.env.VITE_MAIN_DOMAIN) return import.meta.env.VITE_MAIN_DOMAIN;
+            if (import.meta.env.VITE_DEPLOY_MODE === "production") return "https://slmn.gg";
+            if (import.meta.env.VITE_DEPLOY_MODE === "staging") return "https://dev.slmn.gg";
+            if (import.meta.env.VITE_DEPLOY_MODE === "local") return "http://localhost:8080";
+            if (import.meta.env.NODE_ENV === "production") return "https://slmn.gg";
+            if (import.meta.env.NODE_ENV === "development") return "http://localhost:8080";
+            return "https://dev.slmn.gg";
+        }
+    } catch (e) {
+        return "https://dev.slmn.gg";
+    }
+}
+
+export function getMainCookieDomain(subdomain) {
+    // cookies don't care about origins, only hostnames (no ports, no protocols)
+    try {
+        if (subdomain) {
+            return window.location.hostname.replace(`${subdomain}.`, "");
+        } else {
+            if (import.meta.env.VITE_MAIN_COOKIE_DOMAIN) return import.meta.env.VITE_MAIN_COOKIE_DOMAIN;
+            if (import.meta.env.VITE_DEPLOY_MODE === "production") return "slmn.gg";
+            if (import.meta.env.VITE_DEPLOY_MODE === "staging") return "dev.slmn.gg";
+            if (import.meta.env.VITE_DEPLOY_MODE === "local") return "localhost";
+            if (import.meta.env.NODE_ENV === "production") return "slmn.gg";
+            if (import.meta.env.NODE_ENV === "development") return "localhost";
+            return "dev.slmn.gg";
+        }
+    } catch (e) {
+        return "dev.slmn.gg";
+    }
 }

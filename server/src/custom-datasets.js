@@ -6,14 +6,82 @@ function tableUpdated(tableName, Cache) {
     if (tableName === "Matches") matchUpdate(Cache);
     if (tableName === "Broadcasts") broadcastUpdate(Cache);
     if (tableName === "Players") playerList(Cache);
+    if (tableName === "Events") publicEvents(Cache);
+    // TODO: maybe add discord bots here?
 }
 module.exports = tableUpdated;
+
+async function publicEvents(Cache) {
+    let allEvents = await Cache.get("Events");
+    if (!allEvents?.ids) return;
+
+    let allEventData = (await Promise.all(allEvents.ids.map(id => (Cache.get(id.slice(3))))));
+    let liveEvents = allEventData.filter(event => event.show_in_events && event.teams && event.teams.length !== 0)
+        .sort(function (a, b) {
+            if (!a || !b) return 0;
+            if (!a) return 1;
+            if (!b) return -1;
+
+            if (a.start_date && b.start_date) {
+                return (new Date(a.start_date) - new Date(b.start_date));
+            }
+            if (a.start_date) return -1;
+            if (b.start_date) return 1;
+        });
+
+    Cache.set("special:public-events", { events: liveEvents.map(m => m.id) });
+}
 
 async function matchUpdate(Cache) {
     let allMatches = await Cache.get("Matches");
     if (!allMatches.ids) return;
-    let liveMatches = (await Promise.all(allMatches.ids.map(id => (Cache.get(id.slice(3)))))).filter(match => match.live);
+
+    let allMatchData = (await Promise.all(allMatches.ids.map(id => (Cache.get(id.slice(3))))));
+    let liveMatches = allMatchData.filter(match => match.live);
     Cache.set("internal:live-matches", { matches: liveMatches.map(m => m.id) });
+
+    let allLiveMatchIDs = (await Cache.get("special:live-matches")).matches;
+
+    const eventCache = {};
+
+    await Promise.all(allMatchData.map(async(match) => {
+        if (!match.event) return;
+        let eventID = match.event?.[0];
+        if (eventCache[eventID]) return;
+
+        eventCache[eventID] = await Cache.get(eventID);
+    }));
+
+    let upcomingMatches = allMatchData.filter(match => {
+        // need matches that are:
+        // - live right now (.live)
+        // - scheduled to be live soon
+        // - scheduled to be live recently but it should in its duration (ie it's 5:30pm on a 5:00pm match with 60m duration)
+
+        if (match.first_to && (match.score_1 === match.first_to || match.score_2 === match.first_to)) return false; // remove completed matches
+
+        if (!match.start) return false;
+
+        if (!match.event?.[0]) return false;
+        if (!eventCache[match.event[0]]?.show_in_events) return false;
+
+        if (allLiveMatchIDs.includes(match.id)) return true;
+
+        let start = new Date(match.start).getTime();
+        let diff = new Date() - start;
+
+        // between now and 8 days from now
+        if (diff < 0 && Math.abs(diff) > (8 * 24 * 60 * 60 * 1000)) return true;
+
+
+        let scheduledInProgress = diff <= (match.duration || 60) * 60 * 1000;
+        if (scheduledInProgress) return true;
+
+
+        return false;
+    }).sort((a,b) => new Date(a.start) - new Date(b.start));
+
+    Cache.set("special:upcoming-matches", { matches: upcomingMatches.map(m => m.id) });
 }
 
 async function broadcastUpdate(Cache) {

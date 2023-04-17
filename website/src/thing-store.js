@@ -7,27 +7,32 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         things: [],
+        thing_map: {},
         subscribed_ids: [],
         request_buffer: [],
 
         highlighted_team: null,
+        highlighted_match: null,
+        edit_in_site_timezone: false,
         match_highlights: [],
-        timezone: "local",
+        timezone: localStorage.getItem("timezone") || "local",
         draft_notes: [],
-        last_event_match_pages: []
+        last_event_match_pages: [],
+        dashboard_modules_active: []
     },
     mutations: {
         push(_store, { id, data }) {
             data = JSON.parse(JSON.stringify({ ...data, id: cleanID(id), _original_data_id: cleanID(data.id), __stored: true }));
             // if ()
 
-            const index = this.state.things.findIndex(t => t.id === id);
+            const index = this.state.thing_map[id] || -1;
             // console.log(">update", id, this.state.things, index);
             if (index !== -1) {
                 this.state.things.splice(index, 1, data);
                 return this.state.things[index];
             } else {
                 this.state.things.push(data);
+                this.state.thing_map[id] = this.state.things.length - 1;
                 return this.state.things[this.state.things.length - 1];
             }
 
@@ -38,10 +43,10 @@ export default new Vuex.Store({
             state.request_buffer.push(id);
         },
         clearRequestBuffer(state) {
-            state.request_buffer = [];
+            state.request_buffer = state.request_buffer.slice(100);
         },
         executeRequestBuffer(state) {
-            const ids = state.request_buffer;
+            const ids = state.request_buffer.slice(0, 100);
             if (!ids.length) return;
             this.commit("clearRequestBuffer");
             return fetchThings(ids);
@@ -68,7 +73,11 @@ export default new Vuex.Store({
         setHighlightedTeam(state, teamID) {
             state.highlighted_team = teamID;
         },
+        setHighlightedMatch(state, matchID) {
+            state.highlighted_match = matchID;
+        },
         setTimezone(state, timezone) {
+            localStorage.setItem("timezone", timezone);
             state.timezone = timezone;
         },
         setHighlights(state, matchHighlights) {
@@ -93,15 +102,34 @@ export default new Vuex.Store({
             const index = state.last_event_match_pages.findIndex(x => x.eventID === eventID);
             if (index === -1) return state.last_event_match_pages.push(item);
             state.last_event_match_pages.splice(index, 1, item);
+        },
+        setDashboardModuleVisibility(state, { visible, moduleName }) {
+            if (!moduleName) return;
+            const index = state.dashboard_modules_active.indexOf(moduleName);
+
+            if (index === -1) {
+                // not set
+                if (visible) state.dashboard_modules_active.push(moduleName);
+            } else {
+                // set
+                if (!visible) state.last_event_match_pages.splice(index, 1);
+            }
+        },
+        setTimeEditTimezone(state, editInSiteTimezone) {
+            state.edit_in_site_timezone = editInSiteTimezone;
         }
     },
     getters: {
         things: state => state.things,
-        thing: (state) => (id) => state.things.find(item => item.id === id),
+        thing: (state) => (id) => state.things[state.thing_map[id]],
         isHighlighted: state => (id) => state.highlighted_team === id,
         getHighlight: state => (matchID) => state.match_highlights.find(match => match.id === matchID),
         getNotes: state => (playerID) => state.draft_notes.find(notes => notes.player_id === playerID),
-        getLastMatchPage: state => (eventID) => state.last_event_match_pages.find(x => x.eventID === eventID)
+        getLastMatchPage: state => (eventID) => state.last_event_match_pages.find(x => x.eventID === eventID),
+        // highlightedMatch: (state, getters) => () => getters.thing(state.highlighted_match)
+        highlightedMatch: state => () => state.highlighted_match,
+        dashboardModuleIsVisible: state => (moduleName) => state.dashboard_modules_active.includes(moduleName),
+        editTimeInSiteTimezone: state => state.edit_in_site_timezone
     },
     actions: {
         subscribe: (state, data) => state.commit("subscribe", data),

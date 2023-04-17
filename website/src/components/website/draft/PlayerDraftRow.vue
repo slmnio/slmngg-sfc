@@ -1,18 +1,20 @@
 <template>
-    <tr v-bind:key="player.id">
+    <tr :key="player.id">
         <td class="draft--name"><router-link :to="url('player', player)">{{ player.name }} <i class="fas fa-badge-check" v-if="player.verified"></i></router-link></td>
-        <td class="draft--sr" v-if="player.rating" v-b-tooltip.top="player.rating.note">{{ player.rating.level }}</td>
-        <td v-else></td>
-        <td class="draft--role" v-b-tooltip.top="extendedRole">
+        <td class="draft--highest-rank" v-if="game === 'Valorant'">{{ player._draftData && player._draftData.highest_rank }}</td>
+        <td class="draft--current-rank" v-if="game === 'Valorant'">{{ player._draftData && player._draftData.current_rank }}</td>
+        <td class="draft--sr" v-if="game === 'Overwatch' && player.rating" v-b-tooltip.top="player.rating.note">{{ player.rating.level }}</td>
+        <td v-else-if="game === 'Overwatch'"></td>
+        <td class="draft--role" v-if="game === 'Overwatch'" v-b-tooltip.top="extendedRole">
             <div class="player-role flex-center" v-html="getSVG(player.role)"></div>
         </td>
         <td class="draft--heroes" v-if="hasDraftData && settings.heroes">
             <div class="player-heroes" v-if="player.heroes" v-b-tooltip.hover.top="player.heroes && player.heroes.join(', ')">
-                <HeroIcon v-for="hero in player.heroes" :hero="hero" v-bind:key="hero" />
+                <HeroIcon v-for="hero in player.heroes" :hero="hero" :key="hero" />
             </div>
         </td>
         <td v-if="settings.slmn_events">
-            <PlayerDraftTeamInfo v-for="team in teams" :team="team" v-bind:key="team.id"/>
+            <PlayerDraftTeamInfo v-for="team in teams" :team="team" :key="team.id"/>
         </td>
         <td v-if="hasDraftData && settings.info_for_captains" class="info-for-captains">{{  player.info_for_captains }}</td>
         <td v-if="settings.custom_notes">
@@ -41,7 +43,7 @@ import { sortEvents } from "@/utils/sorts";
 
 export default {
     name: "PlayerDraftRow",
-    props: ["player", "hasDraftData", "settings"],
+    props: ["player", "hasDraftData", "settings", "game"],
     components: { PlayerDraftTeamInfo, HeroIcon, BButton, BButtonGroup },
     data: () => ({
         customNote: ""
@@ -83,7 +85,7 @@ export default {
         },
         teams() {
             if (!this._player?.member_of) return [];
-            return this._player.member_of.slice().sort(sortEvents);
+            return this._player.member_of.slice().filter(event => event.game === this.game).sort(sortEvents);
         },
         extendedRole() {
             if (!this.player?.draft_data) return null;
@@ -142,6 +144,7 @@ a { font-weight: bold; }
 .draft--sr { width: 3.5em; text-align: center; }
 .draft--role { width: 3.5em; text-align: center; }
 .draft--controls { width: 5em; text-align: center; }
+.draft--highest-rank, .draft--current-rank { width: 6em; text-align: center; }
 </style>
 
 <style>

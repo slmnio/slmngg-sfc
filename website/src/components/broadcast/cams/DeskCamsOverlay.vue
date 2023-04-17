@@ -1,7 +1,7 @@
 <template>
     <GenericOverlay class="desk-cams-overlay" :title="title || 'Player Cams'">
         <div class="team-cams flex-center w-100 flex-column">
-            <TeamCamsGroup v-for="(team, ti) in teams" v-bind:key="team.id"
+            <TeamCamsGroup v-for="(team, ti) in teams" :key="team.id"
                            :team="team" :guests="guests[ti]" :params="camParams" :event="broadcast && broadcast.event"
             :relay-prefix="relayPrefix" :ti="ti" :disable-cams="disable"/>
         </div>
@@ -53,8 +53,13 @@ export default {
             return _teams;
         },
         camParams() {
-            return `&cover&na${this.params}`;
+            return `&${this.$root.defaults.camParams || "_"}&${this.params}`;
         }
+    },
+    metaInfo() {
+        return {
+            title: `Desk Cams | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

@@ -2,21 +2,21 @@
     <div class="match-history">
         <h1>Map Head To Head</h1>
         <div class="text-light">
-            <div class="map-type" v-for="(mapType, i) in mapGroups" v-bind:key="i">
+            <div class="map-type" v-for="(mapType, i) in mapGroups" :key="i">
                 <div class="title">
                     <h3>{{ mapType.name }}</h3>
                 </div>
                 <div>
                     <table class="w-100">
-                        <MatchMapHistory v-for="map in mapType.maps" v-bind:key="map.id" :data="getTeamMapStats(map)" :map="map" />
+                        <MatchMapHistory v-for="map in mapType.maps" :key="map.id" :data="_getTeamMapStats(map)" :map="map" />
                     </table>
                 </div>
             </div>
         </div>
 
         <h2 class="text-center mt-4">This match</h2>
-        <div class="this-match-maps d-flex flex-center">
-            <MapDisplay v-for="map in match.maps" :map="map" v-bind:key="map.id" :match="match"/>
+        <div class="this-match-maps d-flex flex-center align-items-start">
+            <MapDisplay v-for="map in match.maps" :map="map" :key="map.id" :match="match"/>
         </div>
 
 
@@ -25,7 +25,7 @@
 
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
-import { cleanID } from "@/utils/content-utils";
+import { getTeamsMapStats } from "@/utils/content-utils";
 import MatchMapHistory from "@/components/website/match/MatchMapHistory";
 import MapDisplay from "@/components/website/match/MapDisplay";
 
@@ -61,68 +61,8 @@ export default {
         }
     },
     methods: {
-        getTeamMapStats(requestMap) {
-            if (!this.teams) return null;
-            const stats = this.teams.map(team => {
-                const stat = {
-                    played: 0,
-                    wins: 0,
-                    losses: 0,
-                    draws: 0
-                };
-
-                const prevMatches = (team.matches || [])
-                    .filter(m => new Date(m.start) < new Date(this.match.start) && m.id !== this.match.id)
-                    .sort((a, b) => new Date(b.start) - new Date(a.start));
-
-                const latestMatch = prevMatches.length ? prevMatches[0] : null;
-
-
-                (team.matches || []).forEach(match => {
-                    (match.maps || []).forEach(matchMap => {
-                        if (!matchMap.map) return; // no proper map data
-                        if (requestMap.id !== cleanID(matchMap.map[0])) return; // isn't this map
-
-                        if (this.match?.maps?.length) {
-                            const scheduledMap = this.match.maps.find(m => m.name?.length && matchMap.name?.length && (m.name[0] === matchMap.name[0]));
-                            console.log(matchMap.name, { scheduledMap, matchMap });
-                            if (scheduledMap) stat.scheduled_for_match = true;
-                        }
-
-                        if (!(matchMap.draw || matchMap.winner)) return; // wasn't played fully
-
-                        // woo right map
-
-                        stat.played++;
-                        if (matchMap.draw) {
-                            stat.draws++;
-                        } else {
-                            // determine winner
-                            if (cleanID(matchMap.winner[0]) === team.id) {
-                                stat.wins++;
-                            } else {
-                                stat.losses++;
-                            }
-                        }
-
-
-                        if (latestMatch?.maps) {
-                            // Check to see if the last played match played this map
-                            const playedMap = latestMatch.maps.find(m => m.winner?.length && m.name?.length && matchMap.name?.length && (m.name[0] === matchMap.name[0]));
-                            if (playedMap) stat.played_recently = true;
-                        }
-                    });
-                });
-                return { stats: stat, team };
-            });
-
-            return {
-                stats,
-                meta: {
-                    eitherTeamPlayed: stats.some(t => t.stats?.played > 0),
-                    scheduledForMatch: stats.some(t => t.stats?.scheduled_for_match)
-                }
-            };
+        _getTeamMapStats(requestMap) {
+            return getTeamsMapStats(this.teams, this.match, requestMap);
         }
     }
 };

@@ -93,6 +93,47 @@ export function sortByHeadToHead(a, b) {
     return a.h2h[b.id] || 0;
 }
 
+export function sortByOMatchWinrate(a, b) {
+    const [aDiff, bDiff] = [a, b].map(x => x.standings.opponent_winrate);
+    if (aDiff !== bDiff) {
+        if (aDiff > bDiff) return -1;
+        if (aDiff < bDiff) return 1;
+    }
+    return 0;
+}
+export function sortByMapWinrate(a, b) {
+    const [aDiff, bDiff] = [a, b].map(x => x.standings.map_winrate);
+    if (aDiff !== bDiff) {
+        if (aDiff > bDiff) return -1;
+        if (aDiff < bDiff) return 1;
+    }
+    return 0;
+}
+export function sortByMatchWinrate(a, b) {
+    const [aDiff, bDiff] = [a, b].map(x => x.standings.winrate);
+    if (aDiff !== bDiff) {
+        if (aDiff > bDiff) return -1;
+        if (aDiff < bDiff) return 1;
+    }
+    return 0;
+}
+export function sortByOMapWinrate(a, b) {
+    const [aDiff, bDiff] = [a, b].map(x => x.standings.opponent_map_winrate);
+    if (aDiff !== bDiff) {
+        if (aDiff > bDiff) return -1;
+        if (aDiff < bDiff) return 1;
+    }
+    return 0;
+}
+
+export function sortByExtraPoints(a, b) {
+    const [aPoints, bPoints] = [a, b].map(x => (x.extra_points));
+    if (aPoints !== bPoints) {
+        if (aPoints > bPoints) return -1;
+        if (aPoints < bPoints) return 1;
+    }
+    return 0;
+}
 export function sortByMapDiff(a, b) {
     // if (a.map_wins > b.map_wins) return -1;
     // if (a.map_wins < b.map_wins) return 1;
@@ -139,6 +180,15 @@ export function sortByOMW(a, b) {
     if (aa > ab) return -1;
 
     return 0;
+}
+
+export function mapRoundsDiff(a, b) {
+    const [aDiff, bDiff] = [a, b].map(x => x.standings.map_round_wins - x.standings.map_round_losses);
+    return bDiff - aDiff;
+}
+export function mapRoundWins(a, b) {
+    const [aWins, bWins] = [a, b].map(x => x.standings.map_round_wins);
+    return bWins - aWins;
 }
 
 export function sortMatches(i, sortFunction, teams, standings) {
@@ -323,11 +373,18 @@ function miniLeaguePrep(standings) {
 function getSortMethod(stringMethod) {
     if (stringMethod === "MatchDiff") return { method: sortByMatchDiff, max: null };
     if (stringMethod === "MapDiff") return { method: sortByMapDiff, max: null };
+    if (stringMethod === "MatchWinrate") return { method: sortByMatchWinrate, max: null };
+    if (stringMethod === "MapWinrate") return { method: sortByMapWinrate, max: null };
     if (stringMethod === "HeadToHead") return { method: sortByHeadToHead, max: 2 };
     if (stringMethod === "MapWins") return { method: sortByMapWins, max: null };
     if (stringMethod === "OMW") return { method: sortByOMW, max: null };
+    if (stringMethod === "OMapWinrate") return { method: sortByOMapWinrate, max: null };
+    if (stringMethod === "OMatchWinrate") return { method: sortByOMatchWinrate, max: null };
     if (stringMethod === "MiniLeague") return { prep: miniLeaguePrep, method: miniLeagueMatchDiff, max: null };
     if (stringMethod === "MiniLeagueMaps") return { prep: miniLeaguePrep, method: miniLeagueMapDiff, max: null };
+    if (stringMethod === "MapRoundsDiff") return { method: mapRoundsDiff, max: null };
+    if (stringMethod === "MapRoundWins") return { method: mapRoundWins, max: null };
+    if (stringMethod === "Points") return { method: sortByExtraPoints, max: null };
     return null;
 }
 

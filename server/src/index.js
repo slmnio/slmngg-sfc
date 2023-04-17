@@ -1,11 +1,15 @@
 require("dotenv").config();
-const app = require("express")();
+const express = require("express");
+const app = express();
 const bodyParser = require("body-parser");
 const port = 8901;
 const http = require("http").Server(app);
 const cors = require("cors");
 const meta = require("./meta.js");
 const routes = require("./routes.js");
+const images = require("./images.js");
+const discordAuth = require("./discord/auth.js");
+const webAuction = require("./web_auction");
 
 /* The staff module should only run on the server, probably not your local machine. */
 let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEGORY_ID", "STAFFAPPS_APPLICATION_CHANNEL_ID", "IS_SLMNGG_MAIN_SERVER"];
@@ -34,18 +38,24 @@ function corsHandle(origin, callback) {
     }
 }
 
+const localCors =  () => cors({ origin: corsHandle });
+
 const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials: true}, allowEIO3: true});
 
-// const auction = require("./discord/new_auction.js")({
-//     to: (...a) => io.to(...a),
-//     emit: (...a) => io.emit(...a),
-//     on: (...a) => io.on(...a),
-//     test: ["hi"]
-// });
+const auction = require("./discord/new_auction.js")({
+    to: (...a) => io.to(...a),
+    emit: (...a) => io.emit(...a),
+    on: (...a) => io.on(...a),
+    test: ["hi"]
+});
 
 
 const Cache = (require("./cache.js")).setup(io);
 (require("./airtable-interface.js")).setup(io);
+(require("./discord/bot-controller.js")).setup(io);
+
+const actions = require("./action-utils/action-manager.js");
+actions.load(app, localCors, Cache, io);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -80,7 +90,13 @@ app.get("/things/:ids", cors({ origin: corsHandle}), async (req, res) => {
 });
 
 routes({ app, cors, Cache, io });
+
+discordAuth({ app, router: express.Router(), cors, Cache, io });
+
 meta({ app, cors, Cache });
+images({ app, cors, Cache, corsHandle });
+
+webAuction({ app, io });
 
 function cleanID(id) {
     if (!id) return null;
@@ -105,22 +121,96 @@ io.on("connection", (socket) => {
         socket.leave(id);
     });
     socket.on("subscribe-multiple", (ids) => {
-        // console.log(`[multiple] client rejoining ${ids.length} rooms`);
+        console.log(`[multiple] client rejoining ${ids.length} rooms`);
         ids.map(id => cleanID(id)).forEach(id => {
             socket.join(id);
         });
     });
     socket.on("disconnect", () => {
+        if (socket._clientName)
+            io.sockets.to(`prod:client-${socket._clientName}-overview`).emit("prod_disconnect", socket.id);
         connected--;
     });
 
+    socket.on("get_and_subscribe", async (id) => {
+        // console.log("get and subscribe in:", id);
+        id = cleanID(id);
+        socket.join(id);
+        socket.emit("data_update", id, await Cache.get(id));
+        // console.log("get and subscribe out:", id);
+    });
     socket.on("prod-join", (clientName) => {
-        console.log("prod-join", clientName);
+        console.log("[prod:client] join", `prod:client-${clientName}`);
+        socket._clientName = clientName;
         socket.join(`prod:client-${clientName}`);
     });
 
-    socket.on("tally_change", ({ clientName, state, sceneName }) => {
-        socket.to(`prod:client-${clientName}`).emit("tally_change", { state, sceneName });
+    socket.on("prod-overview-join", (clientName) => {
+        console.log("[prod-overview] join ", clientName);
+        socket._clientName = clientName;
+        socket.join(`prod:client-${clientName}-overview`);
+        io.sockets.to(`prod:client-${clientName}`).emit("send_prod_update");
+    });
+
+    socket.on("prod-broadcast-join", (broadcastKey) => {
+        if (socket._broadcastKey) {
+            console.log("[prod:broadcast] leaving", `prod:broadcast-${socket._broadcastKey}`);
+            socket.leave(`prod:broadcast-${socket._broadcastKey}`);
+        }
+        socket._broadcastKey = broadcastKey;
+        socket.join(`prod:broadcast-${socket._broadcastKey}`);
+        console.log("[prod:broadcast] joining", `prod:broadcast-${socket._broadcastKey}`);
+    });
+
+    socket.on("prod-send", ({ socketID, event, data }) => {
+        let overlaySocket = io.sockets.sockets.get(socketID);
+        if (overlaySocket) {
+            console.log(socketID, event, data);
+            overlaySocket.emit(`prod_button_${event}`, data);
+        } else {
+            console.warn(`[prod send] error ${socketID} doesn't exist anymore`);
+        }
+    });
+
+    socket.on("prod-update", (data) => {
+        if (data.clientName) {
+            socket._clientName = data.clientName;
+        }
+        if (!socket._clientName) return console.warn("prod update without client name", data);
+        data = {
+            ...data,
+            socket: socket.id
+        };
+        // console.log("[prod] update", data);
+        io.sockets.to(`prod:client-${socket._clientName}-overview`).emit("prod_update", data);
+    });
+
+    socket.on("obs_data_change", async ({ clientName, previewScene, programScene }) => {
+        let client = await Cache.get(`client-${clientName}`);
+        console.log("obs_data_change", { clientName, previewScene, programScene });
+
+        if (clientName && client) {
+            io.sockets.to(`prod:client-${clientName}`).emit("prod_preview_program_change", { previewScene, programScene, emitSource: "client", clientSource: clientName });
+        }
+        let broadcast = await Cache.get(client.broadcast?.[0]);
+        if (broadcast && broadcast.key) {
+            io.sockets.to(`prod:broadcast-${broadcast.key}`).emit("prod_preview_program_change", { previewScene, programScene, emitSource: "broadcast", clientSource: clientName, broadcastKey: broadcast.key });
+        }
+    });
+
+    socket.on("tally_change", ({ clientName, state, number, data }) => {
+        console.log("[tally]", clientName, state, number, data);
+        socket.to(`prod:client-${clientName}`).emit("tally_change", { state, number });
+    });
+
+    socket.on("media_update", (status, value) => {
+        if (!socket._clientName) return;
+        socket.to(`prod:client-${socket._clientName}`).emit(`media_update_${status}`, value);
+    });
+    socket.on("prod_trigger", (event, ...args) => {
+        if (!socket._clientName) return console.warn(`Socket connection tried to ${event} without client`);
+        console.log("[Prod Trigger]", socket._clientName, event);
+        io.to(`prod:client-${socket._clientName}`).emit(event, args);
     });
 });
 

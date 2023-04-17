@@ -1,6 +1,6 @@
 <template>
     <GenericOverlay class="history-overlay" :broadcast="broadcast" :title="title || 'Match History'" body-color="transparent !important">
-        <div class="team" v-for="team in teams" v-bind:key="team.id">
+        <div class="team overlay--bg" v-for="team in teams" :key="team.id">
             <div class="team-top flex-center" :style="themeColor(team)">
                 <div class="team-name flex-center">{{ team.name }}</div>
                 <div class="team-icon-holder flex-center">
@@ -15,8 +15,8 @@
 <script>
 import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cssImage } from "@/utils/content-utils";
 import TeamMatchHistory from "@/components/broadcast/TeamMatchHistory";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "HistoryOverlay",
@@ -59,8 +59,13 @@ export default {
         },
         icon(team) {
             if (!team.theme) return {};
-            return cssImage("backgroundImage", team.theme, ["default_logo", "default_wordmark"], 250);
+            return resizedImage(team.theme, ["default_logo", "default_wordmark"], "h-250");
         }
+    },
+    metaInfo() {
+        return {
+            title: `History | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>
@@ -77,6 +82,7 @@ export default {
     align-items: center;
     background: #222;
     margin: -40px;
+    border-bottom: 8px solid transparent;
 }
 
 .team:first-child {
@@ -131,5 +137,8 @@ export default {
 
 .team-top {
     position: relative;
+}
+.history-overlay >>> .generic-overlay-body.overlay--bg {
+    border-bottom: none !important;
 }
 </style>

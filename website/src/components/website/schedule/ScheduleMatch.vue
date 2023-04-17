@@ -1,7 +1,7 @@
 <template>
-    <div class="match my-2" v-if="loaded" v-bind:class="{ 'bg-danger' : !loaded, 'special-event': match.special_event }">
+    <div class="match my-2" v-if="loaded" :class="{ 'bg-danger' : !loaded, 'special-event': match.special_event }">
         <div class="match-left match-details flex-center flex-column text-center">
-            <div class="match-detail" v-for="detail in details" v-bind:key="detail">{{ detail }}</div>
+            <div class="match-detail" v-for="detail in details" :key="detail.sort" v-b-tooltip="detail.long">{{ detail.short }}</div>
         </div>
 
         <router-link :to="url('match', this.match)" v-if="match.special_event"
@@ -9,10 +9,10 @@
             {{ match.custom_name }}
         </router-link>
 
-        <div v-for="(team, i) in teams"
-             v-bind:key="team.id" :style="{order: i*2}"
+        <div v-for="(team, i) in swappedTeams"
+             :key="team.id" :style="{order: i*2}"
              class="match-team flex-grow-1 d-flex align-items-center justify-content-end"
-             v-bind:class="{'right': i === 1}">
+             :class="{'right': i === 1}">
 
             <div v-if="team.dummy" class="team-name team-name--spacer d-none d-lg-flex">{{ team.text }}</div>
             <router-link v-else-if="!team.dummy" :to="url('team', team)" class="team-name d-none d-lg-flex ct-passive">{{ team.name }}</router-link>
@@ -22,13 +22,13 @@
             <router-link v-else-if="!team.dummy" :to="url('team', team)" class="team-code d-lg-none ct-passive">{{ team.code }}</router-link>
 
 
-            <ThemeLogo v-if="team && !team.dummy" :theme="team.theme" border-width="4" class="team-logo" icon-padding="4"/>
+            <ThemeLogo v-if="team && !team.dummy" :theme="team.theme" border-width="4" class="team-logo" icon-padding="4" logo-size="w-60"/>
             <div class="team-logo team-logo--spacer" v-else></div>
         </div>
 
         <router-link :to="url('match', this.match)" class="match-center match-vs flex-center text-center ct-passive" v-if="!match.special_event">
             <div class="scores-wrap" v-if="scores.some(s => s)">
-                <div class="scores">{{ match.score_1 }} - {{ match.score_2 }}</div>
+                <div class="scores">{{ scores[0] }} - {{ scores[1] }}</div>
                 <div class="scores-forfeit" v-if="match.forfeit">Forfeit</div>
             </div>
             <div class="vs ct-passive" v-else>vs</div>
@@ -48,16 +48,36 @@ export default {
     name: "ScheduleMatch",
     components: { ScheduleTime, ThemeLogo },
     methods: { url },
-    props: ["match", "customText"],
+    props: ["match", "customText", "leftTeam"],
     computed: {
+        shouldSwapTeams() {
+            if (!this.leftTeam?.id) return false;
+            if (this.teams?.length !== 2) return false;
+            return this.teams[1].id === this.leftTeam.id;
+        },
         loaded() {
             if (this.match?.__loading) return false;
-            return !!this.match && !!this.match.name;
+            return !!this.match && !!this.match._original_data_id;
         },
         scores() {
             if (!this.match) return [null, null];
             if (!this.match.teams || this.match.teams.length !== 2) return [null, null];
+
+            if (this.match.first_to === 1 && this.match.maps?.filter(m => !(m.banner)).length === 1) {
+                const map = this.match.maps.find(m => !(m.banner));
+                if (map.id && (map.score_1 !== undefined && map.score_2 !== undefined)) {
+                    console.log("show map score!", this.match, map);
+                    if (this.shouldSwapTeams) return [map.score_2, map.score_1];
+                    return [map.score_1, map.score_2];
+                }
+            }
+
+            if (this.shouldSwapTeams) return [this.match.score_2, this.match.score_1];
             return [this.match.score_1, this.match.score_2];
+        },
+        swappedTeams() {
+            if (this.shouldSwapTeams) return [this.teams[1], this.teams[0]];
+            return this.teams;
         },
         teams() {
             if (this.match?.special_event) return [];
@@ -104,9 +124,9 @@ export default {
             if (!this.match) return "";
             const details = [];
 
-            if (this.match.match_number) details.push(`M${this.match.match_number}`);
-            if (this.match.stream_code) details.push(`${this.match.stream_code} stream`);
-            if (this.match.first_to) details.push(`FT${this.match.first_to}`);
+            if (this.match.match_number) details.push({ short: `M${this.match.match_number}`, long: `Match number ${this.match.match_number}` });
+            if (this.match.stream_code) details.push({ short: `${this.match.stream_code} stream`, long: `Broadcast on the ${this.match.stream_code} stream` });
+            if (this.match.first_to) details.push({ short: `FT${this.match.first_to}`, long: `First to ${this.match.first_to} maps` });
 
             return details.slice(0, 2);
         },

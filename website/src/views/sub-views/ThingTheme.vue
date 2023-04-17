@@ -1,8 +1,9 @@
 <template>
-    <div class="team-theme container">
+    <div class="thing-theme container">
 
-        <ContentRow v-if="team.brand_designers" :title="team.brand_designers.length === 1 ? 'Brand designer' : 'Brand designers'">
-            <ContentThing type="player" :text="designer.name" :thing="designer" :theme="team.theme" v-for="designer in team.brand_designers" v-bind:key="designer.id"></ContentThing>
+        <ContentRow v-if="thing.brand_designers" :title="thing.brand_designers.length === 1 ? 'Brand designer' : 'Brand designers'">
+            <ContentThing type="player" :text="designer.name" :thing="designer" :theme="thing.theme" v-for="designer in thing.brand_designers"
+                          :key="designer.id" :link-options="{ 'subPage': 'brands' }"></ContentThing>
         </ContentRow>
 
         <h3>Themes</h3>
@@ -18,35 +19,53 @@
 
         <h3 v-if="colors.length">Colors</h3>
         <div v-if="colors.length" class="color-list mb-3">
-            <div class="color" v-for="color in colors" v-bind:key="color.name">
+            <div class="color" v-for="color in colors" :key="color.name">
                 <div class="color-swatch" :style="{backgroundColor: color.value}"></div>
-                <div class="color-name">{{ color.name }}: <code>{{ color.value }}</code></div>
+                <div class="color-name">{{ color.name }}: <CopyTextButton><code>{{ color.value }}</code></CopyTextButton> </div>
             </div>
         </div>
 
+<!--        <h3>Hero</h3>-->
+<!--        <div class="heroes d-flex">-->
+<!--            <RecoloredHero :show-controls="true" class="recolored-hero" v-for="hero in heroes" :theme="theme" :hero="hero" :key="hero.id"></RecoloredHero>-->
+<!--        </div>-->
+<!--        <HeroColorControls :theme="theme"></HeroColorControls>-->
         <h3 v-if="logos.length">Logos</h3>
         <div v-if="logos.length" class="logo-list mb-3">
-            <div class="logo-holder flex-center" v-for="logo in logos" v-bind:key="logo.key" :style="logoBackground">
-                <a :href="logo.image" target="_blank" class="bg-center logo" :style="{backgroundImage: `url(${logo.image})`}"></a>
+            <div class="logo-holder flex-center" v-for="logo in logos" :key="logo.key" :style="logoBackground">
+                <a :href="logo.image" target="_blank" class="bg-center logo" :style="bg(logo.image)"></a>
                 <div class="logo-name">{{ logo.key }}</div>
             </div>
         </div>
 
-        <h3>Ingame overlay</h3>
-        <div class="overlay-area ingame-overlay mb-3">
-            <IngameTeam :team="team" :event="team.event" />
-        </div>
-
-        <h3>Bracket</h3>
-        <div class="overlay-area mb-3">
-            <div class="bracket-match">
-                <BracketTeam :team="team" score="0"/>
+        <h3 v-if="theme && theme.id">Generated images</h3>
+        <div v-if="theme && theme.id" class="logo-list mb-3">
+            <div class="logo-holder square-logo-holder flex-center" :style="logoBackground">
+                <a :href="dataServerURL(`theme.png?id=${theme.id}&size=500&padding=20`)" target="_blank" class="bg-center square-logo logo" :style="bg(dataServerURL(`theme.png?id=${theme.id}&size=500&padding=20`))"></a>
+            </div>
+            <div class="logo-holder circle-logo-holder flex-center" :style="logoBackground">
+                <a :href="dataServerURL(`theme.png?id=${theme.id}&size=500&padding=30`)" target="_blank" class="bg-center square-logo logo" :style="bg(dataServerURL(`theme.png?id=${theme.id}&size=500&padding=30`))"></a>
             </div>
         </div>
 
-        <h3>Standings</h3>
-        <div class="standings mb-3">
-            <StandingsTeam :team="standingsData" />
+
+        <div class="team-specific" v-if="team">
+            <h3>Ingame overlay</h3>
+            <div class="overlay-area ingame-overlay mb-3">
+                <IngameTeam :team="team" :event="team.event" />
+            </div>
+
+            <h3>Bracket</h3>
+            <div class="overlay-area mb-3">
+                <div class="bracket-match">
+                    <BracketTeam :team="team" score="0"/>
+                </div>
+            </div>
+
+            <h3>Standings</h3>
+            <div class="standings mb-3">
+                <StandingsTeam :team="standingsData" />
+            </div>
         </div>
 
     </div>
@@ -55,21 +74,34 @@
 <script>
 import IngameTeam from "@/components/broadcast/IngameTeam";
 import BracketTeam from "@/components/website/bracket/BracketTeam";
-import { getImage } from "@/utils/content-utils";
 import { logoBackground } from "@/utils/theme-styles";
 import ContentRow from "@/components/website/ContentRow";
 import ContentThing from "@/components/website/ContentThing";
 import StandingsTeam from "@/components/broadcast/StandingsTeam";
+import { bg, resizedImageNoWrap } from "@/utils/images";
+import { getDataServerAddress } from "@/utils/fetch";
+import CopyTextButton from "@/components/website/CopyTextButton";
+// import RecoloredHero from "@/components/broadcast/RecoloredHero";
+// import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
+// import HeroColorControls from "@/components/broadcast/HeroColorControls";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");
 }
 
 export default {
-    name: "TeamTheme.vue",
-    components: { BracketTeam, IngameTeam, ContentRow, ContentThing, StandingsTeam },
-    props: ["team"],
+    name: "ThingTheme",
+    components: { CopyTextButton, /* HeroColorControls, RecoloredHero, */ BracketTeam, IngameTeam, ContentRow, ContentThing, StandingsTeam },
+    props: ["team", "event"],
     computed: {
+        // heroes() {
+        //     return (ReactiveRoot("Heroes", {
+        //         ids: ReactiveArray("ids")
+        //     })?.ids || []).filter(h => h.recolor_base);
+        // },
+        thing() {
+            return this.team || this.event;
+        },
         standingsData() {
             return {
                 ...this.team,
@@ -79,8 +111,8 @@ export default {
             };
         },
         theme() {
-            if (!this.team || this.team.has_theme === 0 || !this.team.theme?.id) return null;
-            return this.team.theme;
+            if (!this.thing || this.thing.has_theme === 0 || !this.thing.theme?.id) return null;
+            return this.thing.theme;
         },
         mainTheme() {
             if (!this.theme) return {};
@@ -100,6 +132,7 @@ export default {
 
             attrs.forEach(([key, val]) => {
                 if (!key.startsWith("color_")) return;
+                if (val) val = val.toUpperCase();
                 const u = colors.find(c => c.value === val);
                 key = cleanKey(key.replace("color_", ""));
                 if (u) {
@@ -116,8 +149,14 @@ export default {
             const keys = ["small_logo", "default_logo", "default_wordmark"];
             return keys.map(k => ({
                 key: cleanKey(k),
-                image: getImage(this.theme[k])
+                image: resizedImageNoWrap(this.theme, [k], "orig")
             })).filter(i => i.image);
+        }
+    },
+    methods: {
+        bg,
+        dataServerURL(path) {
+            return `${getDataServerAddress()}/${path}`;
         }
     }
 };
@@ -214,4 +253,26 @@ export default {
         margin-right: 32px;
         min-width: 250px;
     }
+
+    .square-logo-holder,
+    .circle-logo-holder {
+        width: 160px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .circle-logo-holder {
+        border-radius: 50%;
+    }
+
+    .square-logo-holder a,
+    .circle-logo-holder a {
+        width: 100%;
+        height: 100%;
+    }
+    /*.recolored-hero {*/
+    /*    width: 200px;*/
+    /*}*/
+    /*.recolored-hero >>> .color-holder {*/
+    /*    height: 500px;*/
+    /*}*/
 </style>

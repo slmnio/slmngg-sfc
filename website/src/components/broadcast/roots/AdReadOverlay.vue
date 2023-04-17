@@ -8,11 +8,16 @@
             </div>
         </transition>
         <div class="d-none">{{ groups }}</div>
+
+        <div class="preload">
+            <img v-for="url in activeGroupImages" :key="url" :src="url">
+        </div>
     </div>
 </template>
 
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
+import { bg, getNewURL } from "@/utils/images";
 
 async function wait(ms) {
     return new Promise((resolve, reject) => {
@@ -26,7 +31,8 @@ export default {
     data: () => ({
         activeRead: null,
         activeAudio: null,
-        localData: null
+        localData: null,
+        activeGroup: null
     }),
     computed: {
         groups() {
@@ -40,14 +46,26 @@ export default {
             })(this.broadcast);
         },
         readImage() {
-            if (!this.activeRead) return {};
+            if (!this.activeRead?.image) return {};
             try {
-                return {
-                    backgroundImage: `url(${this.activeRead.image[0].url})`
-                };
+                return bg(getNewURL(this.activeRead.image?.[0], "orig"));
             } catch (e) {
                 return {};
             }
+        },
+        activeGroupImages() {
+            if (!this.activeGroup) return [];
+
+            const images = [];
+            if (this.activeGroup.opening_read?.image) {
+                images.push(getNewURL(this.activeGroup.opening_read.image?.[0], "orig"));
+            }
+
+            (this.activeGroup.ad_reads || []).forEach(read => {
+                images.push(getNewURL(read.image?.[0], "orig"));
+            });
+
+            return images;
         }
     },
     mounted() {
@@ -87,9 +105,9 @@ export default {
         async runAudio(read) {
             if (this.activeAudio) return;
             console.log("running audio", read);
-            if (!read?.audio?.length || !read?.audio[0]?.url) return console.warn("no valid data", read);
+            if (!read?.audio?.length || !read?.audio[0]?.id) return console.warn("no valid data", read);
             this.activeRead = read;
-            const url = read.audio[0].url;
+            const url = getNewURL(read.audio[0], "orig");
             const audio = new Audio(url);
             audio.volume = (read.volume || 100) / 100;
             this.activeAudio = audio;
@@ -112,6 +130,7 @@ export default {
         async runGroup(group) {
             if (this.activeRead || this.activeAudio) return console.warn("already running", { read: this.activeRead, audio: this.activeAudio });
             console.log("running", group);
+            this.activeGroup = group;
 
 
             if (group.opening_read) {
@@ -141,12 +160,18 @@ export default {
             localStorage.setItem("ad-reads-latest", group.id);
 
             this.activeRead = null;
+            this.activeGroup = null;
         }
     },
     sockets: {
         ad_read_start() {
             this.runGroup(this.getActiveGroup());
         }
+    },
+    metaInfo() {
+        return {
+            title: `Ad Read | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>
@@ -169,5 +194,12 @@ export default {
     .active-read-img-inner {
         width: 95%;
         height: 95%;
+    }
+
+    .preload {
+        opacity: 0;
+        max-width: 0;
+        max-height: 0;
+        overflow: hidden;
     }
 </style>

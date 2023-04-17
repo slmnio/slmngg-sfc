@@ -1,5 +1,5 @@
 <template>
-    <div class="break-match flex-center" v-bind:class="{'expanded': expanded}" :data-center="centerShow">
+    <div class="break-match flex-center" :class="{'expanded': expanded}" :data-center="centerShow">
         <div class="match-next-details" v-if="!expanded">
             <transition name="fade" mode="out-in">
                 <span :key="match ? match.round : 'empty'">{{ hasFinished ? 'FINAL SCORE:' : 'UP NEXT:'}} {{ match && match.round }}</span>
@@ -19,7 +19,7 @@
                 {{ match.custom_name }}
             </div>
 
-                <div class="match-team" v-for="(team, i) in teams" v-bind:key="team ? `${team.id}-${team.name}-${team.code}-${i}` : i" :style="{ order: i*2 }">
+                <div class="match-team" v-for="(team, i) in teams" :key="team ? `${team.id}-${team.name}-${team.code}-${i}` : i" :style="{ order: i*2 }">
                     <div :class="expanded ? 'match-team-name' : 'match-team-code'" v-if="team && expanded" :data-code="team.code">
                         <span class="industry-align" v-if="team.dummy">{{ team.text }}</span>
                         <span class="industry-align" v-else-if="expanded && team.split_name" v-html="nbr(team.split_name)"></span>
@@ -32,9 +32,9 @@
                 </div>
             <div class="match-team-center" v-if="match">
                 <div v-if="centerShow === 'scores'" class="center-scores flex-center">
-                    <div class="center-score" :style="winCSS(0)" v-bind:class="{'win': scores[0] === match.first_to}"><span class="industry-align">{{ scores[0] }}</span></div>
+                    <div class="center-score" :style="winCSS(0)" :class="{'win': scores[0] === match.first_to}"><span class="industry-align">{{ scores[0] }}</span></div>
                     <div class="center-dash">-</div>
-                    <div class="center-score" :style="winCSS(1)" v-bind:class="{'win': scores[1] === match.first_to}"><span class="industry-align">{{ scores[1] }}</span></div>
+                    <div class="center-score" :style="winCSS(1)" :class="{'win': scores[1] === match.first_to}"><span class="industry-align">{{ scores[1] }}</span></div>
                 </div>
                 <div v-if="centerShow === 'time'" class="center-time">{{ start }}</div>
                 <div v-if="centerShow === 'vs'" class="center-vs">vs</div>
@@ -52,9 +52,9 @@
 </template>
 
 <script>
-import { cssImage } from "@/utils/content-utils";
 import spacetime from "spacetime";
 import { logoBackground1 } from "@/utils/theme-styles";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "BreakMatch",
@@ -113,7 +113,8 @@ export default {
             return this.scores.some(t => !!t);
         },
         hasFinished() {
-            if (!this.scores) return false;
+            if (!this.scores?.length) return false;
+            if (!this.match.first_to) return false;
             return this.scores.some(s => s === this.match.first_to);
         },
         scores() {
@@ -147,7 +148,7 @@ export default {
         teamLogo(team) {
             if (!team || !team.theme) return {};
             return {
-                ...cssImage("backgroundImage", team.theme, ["small_logo", "default_logo"], 40, true)
+                ...resizedImage(team.theme, ["small_logo", "default_logo"], "h-100")
             };
         },
         teamTheme(team) {
@@ -188,6 +189,7 @@ export default {
         margin-bottom: -0.1em;
         /*margin-bottom: 0;*/
         /*margin-top: -0.1em;*/
+        text-align: center;
     }
 
     .match-teams {
@@ -242,8 +244,8 @@ export default {
         height: 100%;
     }
     span.industry-align {
-        transform: translate(0, -.0925em);
-        display: inline-flex;
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
+        --translate-y: -0.0925em;
     }
 
     .match-details {
@@ -337,7 +339,8 @@ export default {
         margin: 0 .2em;
         line-height: 1;
         font-size: calc(1.1em);
-        transform: translate(0, -0.0925em);
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
+        --translate-y: -0.0925em;
     }
     .match-special-event-name {
         flex-grow: 1;

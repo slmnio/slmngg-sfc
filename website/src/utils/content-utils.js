@@ -1,3 +1,6 @@
+import spacetime from "spacetime";
+import informal from "spacetime-informal";
+
 export function getImage (i) {
     // console.log(i);
     if (!i) return null;
@@ -10,7 +13,7 @@ export function url (page, record, options = {}) {
     if (this.$root.minisiteEvent &&
         this.$root.minisiteEvent._original_data_id === record.id &&
         page === "event") {
-        return "/";
+        return `${(options && options.subPage) ? `/${options.subPage}` : "/"}`;
     }
 
     let domain = "";
@@ -22,7 +25,7 @@ export function url (page, record, options = {}) {
 
     if (page === "event" && subdomain) {
         const pageURL = window.location.origin.split("://");
-        domain = `${pageURL[0]}://${subdomain}.${pageURL[1]}`;
+        domain = `${pageURL[0]}://${subdomain}.${pageURL[1]}${(options && options.subPage) ? `/${options.subPage}` : ""}`;
     }
 
     if (domain) {
@@ -30,15 +33,15 @@ export function url (page, record, options = {}) {
         let url;
         if (options.partial_subdomain) {
             // use /event/x
-            url = `${domain}/${page}/${record.id}`;
+            url = `${domain}/${page}/${record.id}${(options && options.subPage) ? `/${options.subPage}` : ""}`;
         } else if (options.subdomain && page === "event") {
             // just use /
-            url = `${domain}/`;
+            url = `${domain}/${(options && options.subPage) || ""}`;
         }
         // return `/redirect?url=${url}`;
         return url;
     }
-    return `/${page}/${record.id}`;
+    return `/${page}/${record.id}${(options && options.subPage) ? `/${options.subPage}` : ""}`;
 }
 
 export function image (theme, key) {
@@ -57,10 +60,17 @@ export function resizedImage(theme, key, minSize = 30) {
 }
 
 export function cleanID (id) {
+    if (id?.id) return id.id;
     // console.log(">id", id);
     if (!id) return null;
     if (typeof id !== "string") return null;
     if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
+    return id;
+}
+export function dirtyID(id) {
+    // add rec
+    if (!id) return id;
+    if (id.length === 14) return "rec" + id;
     return id;
 }
 
@@ -105,12 +115,12 @@ export function getMatchContext(match) {
 
 export function getRoleSVG(name) {
     if (name === "Tank") {
-        return `<svg id="role_tank" viewBox="0 0 64 64" width="100%" height="100%">
+        return `<svg id="role_tank" style="fill:currentColor" viewBox="0 0 64 64" width="100%" height="100%">
 <path d="M51.4,24.1c0,3.1,0,6.2,0,9.3a4.7,4.7,0,0,1-.6,2.4A57.2,57.2,0,0,1,33.2,55.5a1.8,1.8,0,0,1-2.4,0A57.4,57.4,0,0,1,13.2,36a5.5,5.5,0,0,1-.7-2.8c0-5.8.1-11.7,0-17.5-.1-4.2,3.2-4.9,6.1-5.6A59.4,59.4,0,0,1,32.9,8C37.5,8,44.5,9.6,47,10.4s4.1,1.4,4.3,3.3.1,3.2.1,4.9,0,3.7,0,5.5Z"/>
 </svg>`;
     }
     if (name === "DPS") {
-        return `<svg id="role_offense" viewBox="0 0 64 64" width="100%" height="100%">
+        return `<svg id="role_offense" style="fill:currentColor" viewBox="0 0 64 64" width="100%" height="100%">
 <rect class="cls-1" x="12" y="49.3" width="10.2" height="5.61"/>
 <path class="cls-1" d="M22.2,19.1a10.2,10.2,0,0,0,0-1c-.8-6.9-5.1-9-5.1-9s-4.3,2.1-5.1,9c0,.3,0,1,0,1V45.4H22.2Z"/>
 <rect class="cls-1" x="26.9" y="49.3" width="10.2" height="5.61"/>
@@ -120,21 +130,21 @@ export function getRoleSVG(name) {
 </svg>`;
     }
     if (name === "Flex") {
-        return `<svg id="role_flex" viewBox="0 0 64 64" width="100%" height="100%">
+        return `<svg id="role_flex" style="fill:currentColor" viewBox="0 0 64 64" width="100%" height="100%">
 <path d="M18.55,32.89h0a13.17,13.17,0,0,1,1.77-5.17c.13-.23.5-.6.11-1a15.68,15.68,0,0,1-2.11-4.19.5.5,0,0,0-.89-.19A18.41,18.41,0,0,0,13,34.17h0a9.9,9.9,0,1,0,5.59-1.28Z"/>
 <path d="M27,26.85a9.89,9.89,0,0,0,13.16-3h0A13.17,13.17,0,0,1,43.75,28c.13.23.27.73.81.6a15.68,15.68,0,0,1,4.68.28.5.5,0,0,0,.61-.67,18.41,18.41,0,0,0-8-9.82h0A9.9,9.9,0,1,0,27,26.85Z"/>
 <path d="M54.73,37.87a9.89,9.89,0,0,0-17.52,9.18h0a13.17,13.17,0,0,1-5.37,1c-.27,0-.76-.14-.92.4a15.67,15.67,0,0,1-2.6,3.9.5.5,0,0,0,.27.87,18.41,18.41,0,0,0,12.51-2h0A9.9,9.9,0,0,0,54.73,37.87Z"/>
 </svg>`;
     }
     if (name === "Support") {
-        return `<svg id="role_support" viewBox="0 0 64 64" width="100%" height="100%">
+        return `<svg id="role_support" style="fill:currentColor" viewBox="0 0 64 64" width="100%" height="100%">
 <path d="M51.9,23.2H40.8V12.1A4.1,4.1,0,0,0,36.7,8H27.3a4.1,4.1,0,0,0-4.1,4.1V23.2H12.1A4.1,4.1,0,0,0,8,27.3v9.4a4.1,4.1,0,0,0,4.1,4.1H23.2V51.9A4.1,4.1,0,0,0,27.3,56h9.4a4.1,4.1,0,0,0,4.1-4.1V40.8H51.9A4.1,4.1,0,0,0,56,36.7V27.3A4.1,4.1,0,0,0,51.9,23.2Z"/>
 </svg>`;
     }
-    if (name === "Staff") return "<i class=\"fas fa-user-tie fa-fw\"></i>";
+    if (name === "Staff") return "<i style'color:currentColor' class=\"fas fa-user-tie fa-fw\"></i>";
     if (name === "Staff") {
         return `<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
- viewBox="0 0 25.916 25.916" style="enable-background:new 0 0 25.916 25.916;" xml:space="preserve">
+ viewBox="0 0 25.916 25.916" style="fill:currentColor;enable-background:new 0 0 25.916 25.916;" xml:space="preserve">
 <g>
 <g>
 <path d="M7.938,8.13c0.09,0.414,0.228,0.682,0.389,0.849c0.383,2.666,2.776,4.938,4.698,4.843
@@ -153,9 +163,9 @@ C13.888,14.756,13.487,14.83,13.065,14.847z"/>
 </g>
 </g></svg>`;
     }
-    if (name === "Captain") return "<i class=\"fas fa-user-crown fa-fw\"></i>";
-    if (name === "Manager") return "<i class=\"fas fa-clipboard-list fa-fw\"></i>";
-    if (name === "Coach") return "<i class=\"fas fa-whistle fa-fw\"></i>";
+    if (name === "Captain") return "<i style'color:currentColor' class=\"fas fa-user-crown fa-fw\"></i>";
+    if (name === "Manager") return "<i style'color:currentColor' class=\"fas fa-clipboard-list fa-fw\"></i>";
+    if (name === "Coach") return "<i style'color:currentColor' class=\"fas fa-whistle fa-fw\"></i>";
 
     return "";
 }
@@ -165,5 +175,244 @@ export function money(num) {
 }
 
 export function getAuctionMax() {
-    return 8;
+    return 7;
+}
+
+export function clarifyTeam(team) {
+    if (team.event && team.event.clarify_teams && team.event.short) {
+        return `${team.name} (${team.event.short})`;
+    }
+    return team.name;
+}
+
+export function pronounsFilter(pronouns) {
+    if (pronouns === "any") return "any pronouns";
+    return pronouns;
+}
+
+export function textSort(a, b) {
+    if (a < b) return -1;
+    if (a > b) return 1;
+    return 0;
+}
+
+export function likelyNeededMaps(match) {
+    const scores = [match.score_1, match.score_2].map(s => s || 0);
+
+    // how many maps have a winner marked
+    const playedMaps = (match.maps || []).filter(m => m.winner).length;
+
+    // how many maps each team needs to win to complete
+    const toWin = scores.map(s => match.first_to - s);
+
+    // how many maps could be played with no draws
+    const withoutDraws = (match.first_to * 2) - 1;
+
+    const draws = (match?.maps || []).filter(m => m.draw).length;
+
+    // if match is over (scores.some s == match.first_to)
+
+    // minimum (first to x2) -1
+
+    // currently played + 1 (tiebreakers, draws etc)
+
+    console.log({ playedMaps, toWin, withoutDraws, draws });
+
+    return withoutDraws + draws;
+}
+
+export const DefaultMapImages = {
+    Assault: "https://cdn.discordapp.com/attachments/855517740914573342/868231135224819743/44684849494984.png",
+    Escort: "https://cdn.discordapp.com/attachments/855517740914573342/868231132444000276/484444884949494949494948421651615641.png",
+    Hybrid: "https://cdn.discordapp.com/attachments/855517740914573342/868231133765201950/448489494949849494949494949494949.png",
+    Control: "https://cdn.discordapp.com/attachments/855517740914573342/868230457622396928/63541654456789487695.png",
+    Push: "https://cdn.discordapp.com/attachments/855517740914573342/969692510249177098/puuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuush.png",
+    Spike: "https://cdn.discordapp.com/attachments/880305022716481639/883811894463447110/newspikeplant.png",
+    SpikeRush: "https://cdn.discordapp.com/attachments/880305022716481639/883809271198924840/spikerush_default.png",
+    ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png",
+    Slayer: "https://media.discordapp.net/attachments/855517740914573342/913747752729595904/slayer.png",
+    Strongholds: "https://media.discordapp.net/attachments/855517740914573342/913747753086107668/strongholds.png",
+    CTF: "https://media.discordapp.net/attachments/855517740914573342/913747753392304158/ctf.png",
+    Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png"
+};
+
+export function getTeamsMapStats(teams, requestMatch, requestMap) {
+    console.log(requestMatch);
+    if (!teams) return null;
+    const stats = teams.map(team => {
+        const stat = {
+            played: 0,
+            wins: 0,
+            losses: 0,
+            draws: 0
+        };
+
+        const prevMatches = (team.matches || [])
+            .filter(m => new Date(m.start) < new Date(requestMatch.start) && m.id !== requestMatch.id)
+            .sort((a, b) => new Date(b.start) - new Date(a.start));
+
+        const latestMatch = prevMatches.length ? prevMatches[0] : null;
+
+
+        (team.matches || []).forEach(match => {
+            (match.maps || []).forEach(matchMap => {
+                if (!matchMap.map) return; // no proper map data
+                if (requestMap.id !== cleanID(matchMap.map[0])) return; // isn't this map
+
+                if (requestMatch?.maps?.length) {
+                    const scheduledMap = requestMatch.maps.find(m => m.name?.length && matchMap.name?.length && (m.name[0] === matchMap.name[0]));
+                    console.log(matchMap.name, { scheduledMap, matchMap });
+                    if (scheduledMap) stat.scheduled_for_match = true;
+                }
+
+                if (!(matchMap.draw || matchMap.winner)) return; // wasn't played fully
+
+                // woo right map
+
+                stat.played++;
+                if (matchMap.draw) {
+                    stat.draws++;
+                } else {
+                    // determine winner
+                    if (cleanID(matchMap.winner[0]) === team.id) {
+                        stat.wins++;
+                    } else {
+                        stat.losses++;
+                    }
+                }
+
+
+                if (latestMatch?.maps) {
+                    // Check to see if the last played match played this map
+                    const playedMap = latestMatch.maps.find(m => m.winner?.length && m.name?.length && matchMap.name?.length && (m.name[0] === matchMap.name[0]));
+                    if (playedMap) stat.played_recently = true;
+                }
+            });
+        });
+
+        stat.score = stat.wins + (stat.losses * -0.25);
+        return { stats: stat, team };
+    });
+
+    if (stats?.[0]?.stats?.score > stats?.[1]?.stats?.score) {
+        stats[0].stats.score_winner = true;
+    } else if (stats?.[0]?.stats?.score < stats?.[1]?.stats?.score) {
+        stats[1].stats.score_winner = true;
+    }
+
+    console.log(stats);
+
+    return {
+        stats,
+        meta: {
+            eitherTeamPlayed: stats.some(t => t.stats?.played > 0),
+            scheduledForMatch: stats.some(t => t.stats?.scheduled_for_match)
+        }
+    };
+}
+
+/**
+ * @param {string?} stateTimezone - timezone from state
+ * @returns {string} - proper timezone name
+ */
+export function getTimezone(stateTimezone) {
+    return (stateTimezone === "local" || !stateTimezone) ? spacetime.now().timezone().name : stateTimezone;
+}
+
+
+/**
+ * @param {string} timezone
+ * @param {Spacetime} time
+ * @returns {string} abbreviation
+ */
+export function getAbbrev(timezone, time) {
+    timezone = getTimezone(timezone);
+    const display = informal.display(timezone);
+    return time.isDST() ? display.daylight.abbrev : display.standard.abbrev;
+}
+
+
+/**
+ *
+ * @param {ParsableDate | Date | number | Array<number> | string} timeString - spacetime parsable date/time string
+ * @param {string?} stateTimezone - site timezone from store
+ * @param {string?} format - override for format
+ * @returns {string}
+ */
+export function formatTime(timeString, stateTimezone, format) {
+    const timezone = getTimezone(stateTimezone);
+    const time = spacetime(timeString).goto(timezone);
+    const abbrev = getAbbrev(timezone, time);
+    return time.format((format || "{day-short} {date-ordinal} {month-short} {year} {time} {tz}").replace("{tz}", abbrev));
+}
+
+
+export function getEmbedData(url) {
+    const vodURL = new URL(url);
+
+    if (vodURL.host === "www.youtube.com") {
+        let ts = 0;
+        if (vodURL.searchParams.get("t")) {
+            let timestamp = vodURL.searchParams.get("t");
+            if (["h", "m", "s"].some(t => timestamp.includes(t))) {
+                // has a hms in it
+                timestamp = timestamp.match(/\d+[hms]/g);
+                timestamp.forEach(t => {
+                    const time = t.slice(0, -1);
+                    const hms = t.slice(-1);
+                    const mult = {
+                        s: 1,
+                        m: 60,
+                        h: 60 * 60
+                    };
+                    ts += parseInt(time) * mult[hms];
+                });
+            } else {
+                ts = timestamp;
+            }
+        }
+
+        console.log(ts);
+
+        return { service: "youtube", key: vodURL.searchParams.get("v"), timestamp: ts || null };
+    }
+    if (vodURL.host === "youtu.be") {
+        return { service: "youtube", key: vodURL.pathname.slice(1), timestamp: vodURL.searchParams.get("t") || null };
+    }
+    if (["www.twitch.tv", "twitch.tv"].includes(vodURL.host)) {
+        const embed = {
+            service: (vodURL.pathname.split("/").length === 3 ? "twitch" : "twitch-live"),
+            key: vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1)
+        };
+        if (embed.service === "twitch") {
+            embed.timestamp = vodURL.searchParams.get("t") || null;
+        }
+        return embed;
+    }
+
+    if (url.endsWith(".pdf")) {
+        return {
+            service: "pdf",
+            url: url
+        };
+    }
+
+    if (["mp4", "webm"].some(file => url.endsWith("." + file))) {
+        return {
+            service: "unknown-video",
+            url: url
+        };
+    }
+
+    return { service: "unknown", url: url };
+}
+
+
+export function unescapeText(text) {
+    return text
+        .replaceAll("&amp;", "&")
+        .replaceAll("&lt;", "<")
+        .replaceAll("&gt;", ">")
+        .replaceAll("&quot;", "\"")
+        .replaceAll("&#039;", "'");
 }

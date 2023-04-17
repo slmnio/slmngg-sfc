@@ -1,6 +1,6 @@
 <template>
     <SoloControlButton :click="() => click()" :style="css">
-        <ThemeLogo class="solo-team-logo" :theme="team.theme" border-width="0" />
+        <ThemeLogo class="solo-team-logo" logo-size="w-150" :theme="team.theme" border-width="0" />
         <div class="solo-team-code">{{ team.code || "---" }}</div>
     </SoloControlButton>
 </template>

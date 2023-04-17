@@ -1,6 +1,7 @@
 <template>
-    <div class="solo-overlay flex-center">
+    <div class="solo-overlay flex-center" :class="{'show-guides': showGuides}">
         <div class="solo-part solo--ingame">
+            <div class="solo-pixel-info">200px</div>
             <transition-group name="fade" mode="out-in">
                 <IngameTeam :key="`${team.name}-${i}`" v-for="(team, i) in teams"
                             :team="team" :right="i === 1" :score="scores[i]"/>
@@ -15,6 +16,8 @@
 
 
         <div class="solo-part solo--controls">
+            <div class="solo-pixel-info">200px</div>
+<!--            <div class="solo-pixel-info d-flex">{{ controlMode }}</div>-->
             <div class="control-group" v-if="controlMode === 'default'">
                 <SoloControlButton noclick left rotate>SLMN.GG</SoloControlButton>
                 <SoloControlButton icon="fas fa-exchange" color="#f22cf2" :click="() => flipTeams()">Flip teams</SoloControlButton>
@@ -28,6 +31,7 @@
 
                 <div class="spacer"></div>
 <!--                <SoloControlButton icon="fas fa-wrench" color="#f22cf2" :click="() => controlMode = 'set-options'">Match Options</SoloControlButton>-->
+                <SoloControlButton icon="fas fa-border-outer" :color="showGuides ? '' : '#2cd1f2'" :click="() => showGuides = !showGuides" style="font-size: 2.75em">{{ showGuides ? 'Hide' : 'Show' }} guides</SoloControlButton>
                 <SoloControlButton icon="fas fa-desktop" noclick style="font-size: 2.75em">Overlay height: {{ pageHeight }}<small>px</small></SoloControlButton>
                 <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
             </div>
@@ -85,7 +89,7 @@
             <div class="control-group" v-if="controlMode === 'set-maps'">
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
 
-                <SoloControlButton v-for="num in mapNums" :key="num" :click="() => controlMap(num)">Map {{ num + 1}}</SoloControlButton>
+                <SoloMapButton v-for="num in mapNums" :key="num" :click="() => chooseMap(num)" :noclick="num !== 0 && !maps[Math.max(0,num - 1)]?.name" :map="maps[num]" :top-text="`Map ${num + 1}`"></SoloMapButton>
 
                 <div class="spacer"></div>
                 <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
@@ -93,7 +97,7 @@
             <div class="control-group" v-if="controlMode === 'set-map'">
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
 
-                <SoloControlButton noclick>Map {{ controllingMapNum + 1}}</SoloControlButton>
+                <SoloControlButton noclick>Map {{ controllingMapNum + 1 }} <small>{{ maps[controllingMapNum]._type || maps[controllingMapNum].type || '' }}</small></SoloControlButton>
                 <SoloMapButton :map="maps[controllingMapNum].map" :click="() => chooseMap()">Click to change</SoloMapButton>
 
                 <div class="spacer"></div>
@@ -101,8 +105,8 @@
             </div>
 
             <div class="control-group" v-if="controlMode === 'choose-map'">
-                <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
-                <SoloControlButton noclick>Map {{ controllingMapNum + 1 }} <small>{{ maps[controllingMapNum]._type || '' }}</small></SoloControlButton>
+                <SoloControlButton left rotate :click="() => controlMode = 'set-maps'" color="#f0802c">Maps</SoloControlButton>
+                <SoloControlButton noclick>Map {{ controllingMapNum + 1 }} <small>{{ maps[controllingMapNum]._type || maps[controllingMapNum].type || '' }}</small></SoloControlButton>
 
                 <SoloMapButton v-for="map in currentMapChunk" v-bind:key="map.id" :map="map"
                                        :click="() => setMap(controllingMapNum, map)"/>
@@ -128,17 +132,22 @@
 
 
         <div class="solo-part solo--desk flex-center" v-if="showModule('desk')">
+            <div class="solo-pixel-info">200px</div>
             <DeskMatch class="w-100" :_match="virtualMatch" />
         </div>
 
         <div class="solo-part solo--rosters" v-if="showModule('rosters')">
-            <RosterOverlay :virtual-match="virtualMatch" :broadcast="broadcast" :client="client" :title="title" />
+            <div class="solo-pixel-info">1080px</div>
+            <RosterOverlay :virtual-match="virtualMatch" :broadcast="broadcast" :client="client" :title="title" :animation-active="true"
+                           :show-roles="rosterOptions.includes('roles')" :sort="rosterOptions.includes('sort')" :show-badges="rosterOptions.includes('badges')" />
         </div>
         <div class="solo-part solo--break" v-if="showModule('break')">
+            <div class="solo-pixel-info">1080px</div>
             <BreakOverlay :virtual-match="virtualMatch" :broadcast="broadcast" :client="client" :title="title" :animation-active="true" />
         </div>
         <div class="solo-part solo--overview" v-if="showModule('overview')">
-            <OverviewOverlay :broadcast="broadcast" :virtual-match="virtualMatch" />
+            <div class="solo-pixel-info">1080px</div>
+            <OverviewOverlay :broadcast="broadcast" :virtual-match="virtualMatch" :no-map-videos="!showMapVideos" />
         </div>
         <div class="solo-loader d-none">
             {{ event && event.name }}
@@ -149,7 +158,7 @@
 <script>
 import IngameTeam from "@/components/broadcast/IngameTeam";
 import SoloControlButton from "@/components/broadcast/SoloControlButton";
-import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import SoloTeamControlButton from "@/components/broadcast/SoloTeamControlButton";
 import DeskMatch from "@/components/broadcast/desk/DeskMatch";
 import Middle from "@/components/broadcast/Middle";
@@ -160,7 +169,7 @@ import SoloMapButton from "@/components/broadcast/SoloMapButton";
 
 export default {
     name: "SoloOverlay",
-    props: ["broadcast", "client", "title", "modules"],
+    props: ["broadcast", "client", "title", "modules", "rosterOptions", "showMapVideos"],
     components: {
         SoloMapButton,
         OverviewOverlay,
@@ -185,7 +194,8 @@ export default {
         ],
         scores: [0, 0],
         breakEnd: null,
-        maps: []
+        maps: [],
+        showGuides: false
     }),
     methods: {
         flipTeams() {
@@ -205,10 +215,11 @@ export default {
             this.$set(this.maps, index, {
                 ...map,
                 map: map,
-                big_image: map.map_big_image,
-                image: map.map_image,
+                big_image: map.big_image,
+                image: map.image,
                 name: [map.name] // this emulates the lookup from Airtable
             });
+            console.log("setting map", map, this.maps[index]);
             this.controlMode = "set-maps"; // TODO: change to "set-map" so other things can be done with it
         },
         setScore(index, score) {
@@ -229,9 +240,10 @@ export default {
             }
             this.controlMode = "default";
         },
-        controlMap(num) {
+        chooseMap(num) {
             this.controllingMapNum = num;
-            console.log(this.allMaps, this.maps);
+            this.controlPage = 0;
+            this.controlMode = "choose-map";
             if (!this.maps[num]) {
                 this.maps[num] = {
                     map: null,
@@ -239,11 +251,6 @@ export default {
                     _type: this.mapTypes[num]
                 };
             }
-            this.controlMode = "set-map";
-        },
-        chooseMap() {
-            this.controlPage = 0;
-            this.controlMode = "choose-map";
             console.log(this.chunkedMaps, this.currentMapChunk);
         }
     },
@@ -279,7 +286,13 @@ export default {
             })(this.broadcast);
         },
         allMaps() {
-            return this.event.map_pool;
+            console.log("all maps", this.event);
+            if (this.event?.map_pool) return this.event.map_pool;
+            const allMaps = ReactiveRoot("Map Data", {
+                ids: ReactiveArray("ids")
+            })?.ids;
+            if (!allMaps?.length) return [];
+            return allMaps.filter(map => map.game === this.event.game);
         },
         chunkedTeams() {
             if (!this.event?.teams) return [];
@@ -365,12 +378,39 @@ export default {
         font-family: "Industry", "SLMN-Industry", sans-serif;
         color: black;
     }
+    .solo-overlay.show-guides .solo-part {
+        border: 1px solid red;
+        background-color: rgba(255,0,0,0.2);
+    }
+    .solo-overlay.show-guides .solo-part:nth-child(2n+1) {
+        border: 1px solid blue;
+        background-color: rgba(0,0,255,0.2);
+    }
+    .solo-pixel-info {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 100;
+        font-weight: bold;
+        font-size: 2em;
+        background-color: rgba(255,255,255,0.9);
+        padding: 0.25em .5em;
+        line-height: 1;
+        margin: .25em;
+        border: 2px solid red;
+    }
+
+    .solo-overlay.show-guides .solo-part:nth-child(2n+1) .solo-pixel-info {
+        border: 2px solid blue;
+    }
+    .solo-overlay:not(.show-guides) .solo-pixel-info {
+        display: none;
+    }
     .solo-part {
         height: 200px;
         width: 100%;
         overflow: hidden;
         position: relative;
-        /* TODO: remove dev */ border: 2px solid red;
     }
     .solo-part.solo--rosters,
     .solo-part.solo--overview,

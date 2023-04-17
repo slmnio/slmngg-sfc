@@ -189,5 +189,13 @@ export default [
             wsPassword: route.query.wsPassword || route.query.password || route.query.pw
         })
     },
-    { path: "solo", component: import("@/components/broadcast/SoloOverlay.vue"), props: route => ({ modules: route.query.modules?.split(",") }) }
+    {
+        path: "solo",
+        component: () => import("@/components/broadcast/SoloOverlay.vue"),
+        props: route => ({
+            modules: route.query.modules?.split(","),
+            rosterOptions: (route.query.rosterOptions || route.query.roster)?.split(","),
+            showMapVideos: !!(route.query.mapVideos || route.query.videos)
+        })
+    }
 ];

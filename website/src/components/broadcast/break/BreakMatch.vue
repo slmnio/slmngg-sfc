@@ -13,7 +13,7 @@
 <!--        <transition-group name="fade" mode="out-in" class="match-teams flex-center">-->
 
 
-        <div class="match-teams flex-center">
+        <div class="match-teams flex-center" v-if="match">
 
             <div class="match-special-event-name" v-if="match.special_event">
                 {{ match.custom_name }}

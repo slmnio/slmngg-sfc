@@ -4,7 +4,7 @@
             <DeskMatch class="desk-match" :matchID="matchID" :_match="virtualMatch"/>
         </div>
         <div class="part part-map-display flex-grow-1">
-            <MapDisplay :broadcast="broadcast" use-transitions="true" :virtual-match="virtualMatch" />
+            <MapDisplay :broadcast="broadcast" use-transitions="true" :virtual-match="virtualMatch" :no-map-videos="noMapVideos" />
         </div>
     </div>
 </template>
@@ -15,7 +15,7 @@ import DeskMatch from "@/components/broadcast/desk/DeskMatch";
 export default {
     name: "OverviewOverlay",
     components: { DeskMatch, MapDisplay },
-    props: ["broadcast", "virtualMatch"],
+    props: ["broadcast", "virtualMatch", "noMapVideos"],
     computed: {
         matchID() {
             if (this.virtualMatch) return null;

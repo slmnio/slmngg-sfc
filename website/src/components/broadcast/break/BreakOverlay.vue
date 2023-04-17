@@ -107,7 +107,7 @@ const tickTime = 25;
 
 export default {
     name: "BreakOverlay",
-    props: ["broadcast", "title", "animationActive", "secondary", "headlineInterval", "virtualMatch"],
+    props: ["broadcast", "title", "animationActive", "secondary", "headlineInterval", "virtualMatch", "customBreakAutomation"],
     components: { Squeezable, OtherBroadcasts, ThemeLogo, BreakMatchup, BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown, ThemeTransition },
     data: () => ({
         tick: 0,
@@ -210,10 +210,13 @@ export default {
         themeColor() {
             return themeBackground1(this.event);
         },
+        breakAutomation() {
+            return this.customBreakAutomation || this.broadcast?.break_automation || [];
+        },
         suggestedShow() {
-            if (!this.broadcast?.break_automation?.length) return null;
+            if (!this.breakAutomation?.length) return null;
 
-            let slides = this.broadcast.break_automation.filter(s => s.startsWith("use:")).map(s => s.replace("use: ", ""));
+            let slides = this.breakAutomation.filter(s => s.startsWith("use:")).map(s => s.replace("use: ", ""));
             console.log(slides);
             if (!this.nextMatch) slides = slides.filter(s => s !== "Matchup");
             if (!this.currentStage) slides = slides.filter(s => s !== "Standings");
@@ -231,10 +234,12 @@ export default {
             return slides[(this.tick % slides.length)];
         },
         automatedShow() {
-            if (this.broadcast?.break_automation?.length && this.lastCountdownTick <= 30 && this.countdownEnd) {
-                if (this.broadcast.break_automation.includes("setting: Always do 30s Schedule")) return "Schedule";
-                if (this.broadcast.break_automation.includes("setting: Always do 30s Matchup") && this.nextMatch) return "Matchup";
+            if (this.breakAutomation?.length && this.lastCountdownTick <= 30 && this.countdownEnd) {
+                if (this.breakAutomation.includes("setting: Always do 30s Schedule")) return "Schedule";
+                if (this.breakAutomation.includes("setting: Always do 30s Matchup") && this.nextMatch) return "Matchup";
             }
+            if (this.customBreakAutomation) return this.suggestedShow;
+
             if (this.broadcast.break_display && this.broadcast.break_display !== "Automated") {
                 // do what it says
                 return this.broadcast.break_display;

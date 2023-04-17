@@ -31,7 +31,7 @@
 
                 <div class="spacer"></div>
 <!--                <SoloControlButton icon="fas fa-wrench" color="#f22cf2" :click="() => controlMode = 'set-options'">Match Options</SoloControlButton>-->
-                <SoloControlButton icon="fas fa-border-outer" :color="showGuides ? '' : '#2cd1f2'" :click="() => showGuides = !showGuides" style="font-size: 2.75em">{{ showGuides ? 'Hide' : 'Show' }} guides</SoloControlButton>
+                <SoloControlButton icon="fas fa-border-outer" :color="showGuides ? '#2cd1f2' : ''" :click="() => showGuides = !showGuides" style="font-size: 2.75em">{{ showGuides ? 'Hide' : 'Show' }} guides</SoloControlButton>
                 <SoloControlButton icon="fas fa-desktop" noclick style="font-size: 2.75em">Overlay height: {{ pageHeight }}<small>px</small></SoloControlButton>
                 <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
             </div>
@@ -143,7 +143,8 @@
         </div>
         <div class="solo-part solo--break" v-if="showModule('break')">
             <div class="solo-pixel-info">1080px</div>
-            <BreakOverlay :virtual-match="virtualMatch" :broadcast="broadcast" :client="client" :title="title" :animation-active="true" />
+            <BreakOverlay :virtual-match="virtualMatch" :broadcast="broadcast" :client="client" :title="title" :animation-active="true"
+                          :custom-break-automation="breakAutomation"/>
         </div>
         <div class="solo-part solo--overview" v-if="showModule('overview')">
             <div class="solo-pixel-info">1080px</div>
@@ -369,6 +370,14 @@ export default {
                 return data[data.length - 1];
             }
             return null;
+        },
+        breakAutomation() {
+            return [
+                "use: Schedule",
+                "use: Matchup",
+                "use: Bracket",
+                "setting: Always do 30s Matchup"
+            ];
         }
     }
 };

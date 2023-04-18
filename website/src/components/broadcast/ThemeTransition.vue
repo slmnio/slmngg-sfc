@@ -2,7 +2,7 @@
     <transition name="tt" mode="out-in" :duration="calculatedDuration"
         @after-enter="() => entered = true" @before-leave="() => entered = false" @before-enter="() => entered = false">
         <div v-show="isActive" :key="transitionKey || 'transition'" :data-key="transitionKey ?? 'transition'" class="theme-transition" :style="animDurations"
-             :class="{ ...directionClasses, ...borderClasses, 'start-inner-full': startInnerFull, 'active': isActive, 'entered': entered, 'clear-after-entered': clearStyleAfterEntered, 'use-fit-content': useFitContent }">
+             :class="{ ...directionClasses, ...borderClasses, 'start-inner-full': startInnerFull, 'active': isActive, 'entered': entered, 'clear-after-entered': clearStyleAfterEntered, 'use-fit-content': useFitContent, 'clip-slot': clipSlot }">
             <div class="theme-transition-outer" :style="outerStyle">
                 <div class="theme-transition-inner" :style="innerStyle" :class="innerClass">
                     <slot></slot>
@@ -29,12 +29,14 @@ export default {
         leavingDelay: Number,
         innerDelay: Number,
         startingInnerDelay: Number,
+        clipDelay: Number,
 
         autoStart: Boolean,
         clearStyleAfterEntered: Boolean,
         useFitContent: Boolean,
         oneColor: Boolean,
         startInnerFull: Boolean,
+        clipSlot: Boolean,
 
         start: String,
         end: String,
@@ -51,7 +53,7 @@ export default {
     }),
     computed: {
         calculatedDuration() {
-            return (this.startingDelay || 0) + (this.duration || 750) + (this.innerDelay || 250);
+            return (this.startingDelay || 0) + (this.duration || 750) + (this.innerDelay || 250) + (this.clipSlot ? (this.clipDelay || 250) : 0);
         },
         isActive() {
             if (this.trigger) return this.manuallyActive;
@@ -86,6 +88,7 @@ export default {
             return {
                 "--tt-starting-delay": `${this.startingDelay === undefined ? 0 : this.startingDelay}ms`,
                 "--tt-leaving-delay": `${this.leavingDelay === undefined ? (this.startingDelay === undefined ? 0 : this.startingDelay) : this.leavingDelay}ms`,
+                "--tt-clip-delay": `${this.clipDelay === undefined ? (this.startingDelay === undefined ? 0 : this.startingDelay) : this.clipDelay}ms`,
                 "--tt-duration": `${this.duration === undefined ? 750 : this.duration}ms`,
                 "--tt-inner-delay": `${this.innerDelay === undefined ? 250 : this.innerDelay}ms`,
                 "--tt-border-width": `${this.borderWidth === undefined ? 6 : this.borderWidth}px`,
@@ -175,6 +178,13 @@ export default {
 
 }
 
+.tt-enter-active.clip-slot >>> .clip-target,
+.tt-leave-active.clip-slot >>> .clip-target {
+    transition: clip-path var(--tt-duration, .75s) ease;
+    transition-delay: var(--tt-clip-delay);
+}
+
+
 .tt-enter-active.start-inner-full .theme-transition-outer {
     transition-duration: 0s;
 }
@@ -183,6 +193,8 @@ export default {
     transition-delay: var(--tt-starting-inner-delay, 300ms) !important;
 }
 
+.tt-enter-to.clip-slot >>> .clip-target,
+.tt-leave.clip-slot >>> .clip-target,
 .tt-enter-to .theme-transition-outer,
 .tt-enter-to .theme-transition-inner,
 .tt-leave .theme-transition-outer,
@@ -190,14 +202,19 @@ export default {
     /* full open */
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
 }
-.theme-transition.start-right.tt-enter .theme-transition-outer,
+
+.theme-transition.start-right.tt-enter.clip-slot >>> .clip-target,
+.theme-transition.start-right.tt-leave-to.clip-slot >>> .clip-target,
 .theme-transition.start-right.tt-enter .theme-transition-inner,
+.theme-transition.start-right.tt-enter .theme-transition-outer,
 .theme-transition.end-left.tt-leave-to .theme-transition-outer,
 .theme-transition.end-left.tt-leave-to .theme-transition-inner {
     /* closed left */
     clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
 }
 
+.theme-transition.start-left.tt-enter.clip-slot >>> .clip-target,
+.theme-transition.start-left.tt-leave-to.clip-slot >>> .clip-target,
 .theme-transition.start-left.tt-enter .theme-transition-outer,
 .theme-transition.start-left.tt-enter .theme-transition-inner,
 .theme-transition.end-right.tt-leave-to .theme-transition-outer,
@@ -206,6 +223,8 @@ export default {
     clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%)
 }
 
+.theme-transition.end-middle.tt-enter-to.clip-slot >>> .clip-target,
+.theme-transition.end-middle.tt-leave.clip-slot >>> .clip-target,
 .theme-transition.end-middle.tt-enter-to .theme-transition-outer,
 .theme-transition.end-middle.tt-enter-to .theme-transition-inner,
 .theme-transition.start-middle.tt-leave .theme-transition-outer,
@@ -214,6 +233,8 @@ export default {
     clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 100% 100%, 100% 0%);
 }
 
+.theme-transition.end-middle.tt-enter.clip-slot >>> .clip-target,
+.theme-transition.end-middle.tt-leave-to.clip-slot >>> .clip-target,
 .theme-transition.end-middle.tt-enter .theme-transition-outer,
 .theme-transition.end-middle.tt-enter .theme-transition-inner,
 .theme-transition.start-middle.tt-leave-to .theme-transition-outer,

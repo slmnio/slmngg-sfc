@@ -2,8 +2,8 @@
 <!--    <transition name="ingame-team-anim">-->
         <ThemeTransition class="ingame-team-holder" v-if="loaded" :class="{'right': right, 'left': !right}" :duration="500"
                          :key="`${team.id}-${right ? '1':'0'}`" :transitionKey="`${team.id}-${right ? '1':'0'}`" :use-fit-content="true"
-                         :active="active" :theme="_theme" :start="right ? 'left' : 'right'" :end="right ? 'right' : 'left'">
-            <div class="ingame-team default-thing" :style="style" :key="team.id" :class="{ 'extend-map-icon': extendIcons && mapAttack }">
+                         :active="active" :theme="_theme" :start="right ? 'left' : 'right'" :end="right ? 'right' : 'left'" clip-slot :clip-delay="500">
+            <div class="ingame-team default-thing clip-target" :style="style" :key="team.id" :class="{ 'extend-map-icon': extendIcons && mapAttack }">
                 <div class="texture-holder position-absolute w-100 h-100" v-if="texture">
                     <div class="ingame-texture">
                         <img :src="texture" alt="">

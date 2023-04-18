@@ -1,17 +1,24 @@
 <template>
-    <div class="centerer" :class="{'tiny': tiny}">
-        <div class="middle-holder flex-center">
+    <div class="centerer" :class="{'tiny': tiny}" >
+        <ThemeTransition :one-color="true" start="middle" end="middle" :theme="theme" :active="!!active"
+                         :duration="400" :starting-delay="500" :inner-delay="300" :leaving-delay="0"
+                         class="middle-holder flex-center" :use-fit-content="true" :clear-style-after-entered="true">
             <div class="middle">
-                <div class="industry-align">{{ text }}</div>
+                <transition name="fade" mode="out-in">
+                    <div class="industry-align" :key="text">{{ text }}</div>
+                </transition>
             </div>
-        </div>
+        </ThemeTransition>
     </div>
 </template>
 
 <script>
+import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
+
 export default {
     name: "Middle",
-    props: ["text", "tiny"]
+    components: { ThemeTransition },
+    props: ["text", "tiny", "active", "theme"]
 };
 </script>
 
@@ -30,10 +37,11 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     width: 450px;
+    border-radius: 4px;
 }
 
 .middle {
-    background-color: rgba(0, 0, 0, 0.75);
+    background-color: rgba(0, 0, 0, 0.65);
     color: white;
     padding: .0em .5em;
     font-size: 24px;
@@ -62,4 +70,14 @@ export default {
     line-height: 1.2em;
 }
 
+.centerer >>> .theme-transition-outer {
+    border-radius: 4px !important;
+    overflow: hidden;
+}
+.centerer >>> .theme-transition.end-middle.tt-enter-to .theme-transition-inner,
+.centerer >>> .theme-transition.end-middle.tt-enter-to .theme-transition-outer {
+    clip-path: polygon(0% 0%, 0% 110%, 50% 110%, 50% 0, 50% 0, 50% 110%, 100% 110%, 100% 0%) !important;
+    /* this is a hack to avoid a subpixel issue at the bottom of the box */
+    /* could be to do with 0.5 margins having a .5px adjustment */
+}
 </style>

@@ -1,15 +1,11 @@
 <template>
   <div class="ingame-overlay">
       <div class="top-overlay" :style="broadcastMargin">
-          <transition-group name="itah" mode="out-in">
-              <IngameTeam :key="`${team.id}-${i}`" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
-                          :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores" :extend-icons="extendIcons"
-                          :width="teamWidth" :codes="useCodes" :event="broadcast.event" :auto-small="autoSmall" :map-attack="attacks[i]" :use-dots="useDots" :first-to="match && match.first_to"/>
-          </transition-group>
+          <IngameTeam :key="team.id" v-for="(team, i) in teams" :theme="getAltTheme(team, i)" :active="animationActive && !flippingTeams"
+                      :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores" :extend-icons="extendIcons"
+                      :width="teamWidth" :codes="useCodes" :event="broadcast.event" :auto-small="autoSmall" :map-attack="attacks[i]" :use-dots="useDots" :first-to="match && match.first_to"/>
 
-          <transition name="mid" mode="out-in">
-              <Middle v-if="shouldShowMiddle" :text="middleText" :key="middleText" :tiny="broadcast.margin === 0" />
-          </transition>
+          <Middle :active="shouldShowMiddle" :theme="broadcast?.event?.theme" :text="middleText" :tiny="broadcast.margin === 0" />
       </div>
       <transition name="fade" mode="out-in">
           {{ fadeSponsors }}
@@ -28,6 +24,9 @@ export default {
     name: "IngameOverlay",
     props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed"],
     components: { IngameTeam, Middle, Sponsors },
+    data: () => ({
+        flippingTeams: false
+    }),
     computed: {
         match() {
             if (!this.broadcast || !this.broadcast.live_match) return null;
@@ -48,7 +47,17 @@ export default {
                 if (t.theme === undefined && t.has_theme === 0) return true;
                 return t.theme && !t.theme.__loading && t.theme.id;
             })) return [];
-            if (!this.animationActive) return [];
+            // if (!this.animationActive) return [];
+
+            if (this.flippingTeams) {
+                // hold old ones for a second
+                if (this.match.flip_teams) {
+                    // do invert
+                    return [this.match.teams[0], this.match.teams[1]];
+                } else {
+                    return [this.match.teams[1], this.match.teams[0]];
+                }
+            }
             if (this.match.flip_teams && this.match.teams.length === 2) return [this.match.teams[1], this.match.teams[0]];
             if (this.match.teams.length !== 2) return [];
             return this.match.teams;
@@ -62,6 +71,15 @@ export default {
         scores() {
             if (!this.teams) return [];
             const scores = [this.match.score_1, this.match.score_2];
+            if (this.flippingTeams) {
+                // hold old ones for a second
+                if (this.match.flip_teams) {
+                    // do invert
+                    return [scores[0], scores[1]];
+                } else {
+                    return [scores[1], scores[0]];
+                }
+            }
             if (this.match.flip_teams && this.match.teams.length === 2) return [scores[1], scores[0]];
             return scores;
         },
@@ -147,12 +165,24 @@ export default {
             return {
                 match: this.match?.name || this.broadcast?.code || this.broadcast?.name
             };
+        },
+        flipTeams() {
+            return this.match?.flip_teams || false;
         }
     },
     watch: {
         broadcast() {
             if (this.broadcast) {
                 document.body.dataset.broadcast = this.broadcast.key;
+            }
+        },
+        flipTeams: {
+            handler(newValue) {
+                console.log("flip teams now", newValue);
+                this.flippingTeams = true;
+                setTimeout(() => {
+                    this.flippingTeams = false;
+                }, 1000);
             }
         }
     },

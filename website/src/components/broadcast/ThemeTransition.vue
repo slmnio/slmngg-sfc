@@ -1,6 +1,8 @@
 <template>
-    <transition name="tt" mode="out-in" :duration="calculatedDuration">
-        <div v-show="isActive" :key="_key || 'transition'" class="theme-transition" :style="animDurations" :class="{ ...directionClasses, ...borderClasses, 'start-inner-full': startInnerFull }">
+    <transition name="tt" mode="out-in" :duration="calculatedDuration"
+        @after-enter="() => entered = true" @before-leave="() => entered = false" @before-enter="() => entered = false">
+        <div v-show="isActive" :key="transitionKey || 'transition'" :data-key="transitionKey ?? 'transition'" class="theme-transition" :style="animDurations"
+             :class="{ ...directionClasses, ...borderClasses, 'start-inner-full': startInnerFull, 'active': isActive, 'entered': entered, 'clear-after-entered': clearStyleAfterEntered, 'use-fit-content': useFitContent }">
             <div class="theme-transition-outer" :style="outerStyle">
                 <div class="theme-transition-inner" :style="innerStyle" :class="innerClass">
                     <slot></slot>
@@ -15,9 +17,37 @@ import { logoBackground } from "@/utils/theme-styles";
 
 export default {
     name: "ThemeTransition",
-    props: ["theme", "active", "borderWidth", "_key", "autoStart", "duration", "startingDelay", "innerDelay", "left", "oneColor", "start", "end", "border", "startInnerFull", "trigger", "triggerDuration", "startingInnerDelay", "innerClass"],
+    props: {
+        theme: Object,
+        active: Boolean,
+
+        borderWidth: Number,
+        transitionKey: String,
+
+        duration: Number,
+        startingDelay: Number,
+        leavingDelay: Number,
+        innerDelay: Number,
+        startingInnerDelay: Number,
+
+        autoStart: Boolean,
+        clearStyleAfterEntered: Boolean,
+        useFitContent: Boolean,
+        oneColor: Boolean,
+        startInnerFull: Boolean,
+
+        start: String,
+        end: String,
+        left: Boolean,
+        border: String,
+
+        trigger: Boolean,
+        triggerDuration: Number,
+        innerClass: String
+    },
     data: () => ({
-        manuallyActive: false
+        manuallyActive: false,
+        entered: false
     }),
     computed: {
         calculatedDuration() {
@@ -55,6 +85,7 @@ export default {
         animDurations() {
             return {
                 "--tt-starting-delay": `${this.startingDelay === undefined ? 0 : this.startingDelay}ms`,
+                "--tt-leaving-delay": `${this.leavingDelay === undefined ? (this.startingDelay === undefined ? 0 : this.startingDelay) : this.leavingDelay}ms`,
                 "--tt-duration": `${this.duration === undefined ? 750 : this.duration}ms`,
                 "--tt-inner-delay": `${this.innerDelay === undefined ? 250 : this.innerDelay}ms`,
                 "--tt-border-width": `${this.borderWidth === undefined ? 6 : this.borderWidth}px`,
@@ -97,6 +128,7 @@ export default {
     },
     watch: {
         active(isActive) {
+            console.log("theme watching active", isActive);
             if (!isActive) {
                 this.manuallyActive = false;
             }
@@ -115,7 +147,12 @@ export default {
 .theme-transition, .theme-transition-outer, .theme-transition-inner {
     width: 100%;
     height: 100%;
-    /*display: inline-flex;*/
+}
+.theme-transition.use-fit-content,
+.theme-transition.use-fit-content .theme-transition-outer,
+.theme-transition.use-fit-content .theme-transition-inner {
+    width: fit-content;
+    height: fit-content;
 }
 
 .theme-transition.border-left .theme-transition-inner { border-left: var(--tt-border-width) solid transparent; }
@@ -125,12 +162,16 @@ export default {
 
 .tt-enter-active,
 .tt-enter-active .theme-transition-inner,
-.tt-enter-active .theme-transition-outer,
+.tt-enter-active .theme-transition-outer {
+    transition: clip-path var(--tt-duration, .75s) ease;
+    transition-delay: var(--tt-starting-delay);
+
+}
 .tt-leave-active,
 .tt-leave-active .theme-transition-inner,
 .tt-leave-active .theme-transition-outer {
-    transition: all var(--tt-duration, .75s) ease;
-    transition-delay: var(--tt-starting-delay);
+    transition: clip-path var(--tt-duration, .75s) ease;
+    transition-delay: var(--tt-leaving-delay);
 
 }
 
@@ -187,6 +228,17 @@ export default {
 /*}*/
 
 .tt-enter-active .theme-transition-inner { transition-delay: calc(var(--tt-starting-delay) + var(--tt-inner-delay)); }
-.tt-leave-active .theme-transition-outer { transition-delay: calc(var(--tt-starting-delay) + var(--tt-inner-delay)); }
+.tt-leave-active .theme-transition-outer { transition-delay: calc(var(--tt-leaving-delay) + var(--tt-inner-delay)); }
 
+
+.theme-transition.clear-after-entered.entered:not(.tt-enter-active) .theme-transition-outer,
+.theme-transition.clear-after-entered.entered:not(.tt-enter-active) .theme-transition-inner {
+    transition: background-color .5s ease .5s, border-color .5s ease .5s, color .5s ease .5s;
+}
+.theme-transition.clear-after-entered.entered .theme-transition-outer,
+.theme-transition.clear-after-entered.entered .theme-transition-inner {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    color: transparent !important;
+}
 </style>

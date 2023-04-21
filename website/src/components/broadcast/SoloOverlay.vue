@@ -10,7 +10,7 @@
                         :width="teamWidth" :codes="codes" -->
 
             <transition name="mid" mode="out-in">
-                <Middle v-if="middle" :text="middle" :key="middle" />
+                <Middle v-if="autoMiddle" :text="autoMiddle" :key="autoMiddle" />
             </transition>
         </div>
 
@@ -59,10 +59,25 @@
                                    :click="() => setScore(0, score)">{{ score }}</SoloControlButton>
 
 
-                <SoloTeamControlButton noclick v-for="team in teams" v-bind:key="team.id" :team="team"/>
+                <SoloTeamControlButton noclick :team="teams[0]"/>
+                <SoloControlButton icon="fas fa-trophy" color="#f22cf2" :click="() => controlMode = 'set-first-to'">First<br>To {{ firstTo }}</SoloControlButton>
+                <SoloTeamControlButton noclick :team="teams[1]"/>
 
                 <SoloControlButton v-bind:class="{'is-score': scores[1] === score}" class="score" v-for="score in scoreArray" v-bind:key="'team-2-' + score"
                                    :click="() => setScore(1, score)">{{ score }}</SoloControlButton>
+
+                <div class="spacer"></div>
+                <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
+            </div>
+
+            <div class="control-group" v-if="controlMode === 'set-first-to'">
+                <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
+                <SoloControlButton icon="fas fa-trophy" color="#f22cf2" noclick>First<br>To</SoloControlButton>
+
+
+                <SoloControlButton v-bind:class="{'is-score': firstTo === num}" class="score" v-for="num in [1,2,3,4,5]" v-bind:key="'first-to' + num"
+                                   :click="() => setFirstTo(num)">{{ num }}</SoloControlButton>
+
 
                 <div class="spacer"></div>
                 <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
@@ -72,7 +87,7 @@
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
 
                 <div class="solo-input-wrapper flex-center w-100">
-                    <input type="text" v-model="tempMiddle" class="solo-text-input">
+                    <input type="text" v-model="tempMiddle" class="solo-text-input" @keydown.enter="() => setMiddle()">
                 </div>
                 <SoloControlButton color="#f22cf2" :click="() => setMiddle()">Set</SoloControlButton>
                 <div class="spacer"></div>
@@ -197,6 +212,7 @@ export default {
         breakEnd: null,
         maps: [],
         showGuides: false,
+        firstTo: 3,
 
         noStinger: true
     }),
@@ -255,6 +271,10 @@ export default {
                 };
             }
             console.log(this.chunkedMaps, this.currentMapChunk);
+        },
+        setFirstTo(num) {
+            this.firstTo = num;
+            this.controlMode = "set-scores";
         }
     },
     watch: {
@@ -263,6 +283,13 @@ export default {
         }
     },
     computed: {
+        autoMiddle() {
+            if (!this.middle && !this.firstTo) return null;
+            const parts = [];
+            if (this.middle) parts.push(this.middle);
+            if (this.firstTo) parts.push(`First to ${this.firstTo}`);
+            return parts.join(" - ");
+        },
         mapTypes() {
             if (!this.broadcast?.map_set) return [];
             return this.broadcast.map_set.split(",");
@@ -342,12 +369,16 @@ export default {
                 id: "virtual",
                 _virtual_match_category: this.matchCategory,
                 _virtual_break_end: this.breakEnd,
-                first_to: 3,
+                first_to: this.firstTo,
                 maps: this.maps
             };
         },
         scoreArray() {
-            return [0, 1, 2, 3];
+            const arr = [];
+            for (let i = 0; i <= this.firstTo; i++) {
+                arr.push(i);
+            }
+            return arr;
         },
         pageHeight() {
             let height = 0;

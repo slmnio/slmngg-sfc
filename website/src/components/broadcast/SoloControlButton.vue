@@ -1,5 +1,5 @@
 <template>
-    <div class="control-button d-flex flex-column" v-bind:class="elClass" @click="() => click()" :style="css">
+    <div class="control-button d-flex flex-column" v-bind:class="elClass" @click="() => click && click()" :style="css">
         <span class="icon" v-if="icon"><i :class="icon"></i></span>
         <span class="slot"><slot></slot></span>
     </div>

@@ -88,7 +88,14 @@ export default [
             showPronouns: !!route.query.pronouns
         })
     },
-    { path: "history", component: () => import("@/components/broadcast/roots/HistoryOverlay.vue"), props: route => ({ max: route.query.max || 5 }) },
+    {
+        path: "history",
+        component: () => import("@/components/broadcast/roots/HistoryOverlay.vue"),
+        props: route => ({
+            max: route.query.max || 5,
+            reverse: route.query.reverse !== "false"
+        })
+    },
     { path: "season-history", component: () => import("@/components/broadcast/roots/SeasonHistoryOverlay.vue") },
     { path: "thumbnail", component: () => import("@/components/broadcast/EventThumbnailCreator.vue") },
     {

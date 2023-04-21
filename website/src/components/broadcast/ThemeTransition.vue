@@ -78,7 +78,7 @@ export default {
             if (this.theme?.color_logo_accent && this.theme?.color_logo_accent !== otherColor) altColor = this.theme?.color_logo_accent;
             if (this.theme?.color_alt && this.theme?.color_alt !== otherColor) altColor = this.theme?.color_alt;
             if (this.theme?.color_accent && this.theme?.color_accent !== otherColor) altColor = this.theme?.color_accent;
-            console.log("other", otherColor, altColor, this.theme);
+            // console.log("other", otherColor, altColor, this.theme);
 
             return {
                 backgroundColor: altColor

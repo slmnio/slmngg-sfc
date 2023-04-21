@@ -171,13 +171,11 @@ export default {
 .team {
     width: 100%;
     height: 100%;
-    height: calc(100% + 80px);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     /*background: #222;*/
-    margin: -40px;
 }
 
 .team:first-child {

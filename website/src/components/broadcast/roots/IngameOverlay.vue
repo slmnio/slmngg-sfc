@@ -1,11 +1,21 @@
 <template>
   <div class="ingame-overlay">
       <div class="top-overlay" :style="broadcastMargin">
-          <IngameTeam :key="team.id" v-for="(team, i) in teams" :theme="getAltTheme(team, i)" :active="animationActive && !flippingTeams"
-                      :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores" :extend-icons="extendIcons"
-                      :width="teamWidth" :codes="useCodes" :event="broadcast.event" :auto-small="autoSmall" :map-attack="attacks[i]" :use-dots="useDots" :first-to="match && match.first_to"/>
+          <div class="teams">
+              <IngameTeam :key="team.id" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
+                          :team="team"  :right="i === 1"
+                          :active="shouldShowTeams" :score="scores[i]" :hideScores="broadcast.hide_scores"
+                          :extend-icons="extendIcons"
+                          :width="teamWidth" :codes="useCodes" :event="broadcast.event" :auto-small="autoSmall"
+                          :map-attack="attacks[i]" :use-dots="useDots" :first-to="match && match.first_to"
+              />
+              <!--   -->
+          </div>
 
-          <Middle :active="shouldShowMiddle" :theme="broadcast?.event?.theme" :text="middleText" :tiny="broadcast.margin === 0" />
+          <div class="middle">
+              <Middle :active="shouldShowMiddle" :theme="broadcast?.event?.theme" :text="middleText"
+                      :tiny="broadcast.margin === 0"/>
+          </div>
       </div>
       <transition name="fade" mode="out-in">
           {{ fadeSponsors }}
@@ -43,21 +53,30 @@ export default {
             });
         },
         teams() {
+            console.warn("Teams", this.match?.teams);
             if (!this.match || !this.match.teams || !this.match.teams.every(t => {
                 if (t.theme === undefined && t.has_theme === 0) return true;
                 return t.theme && !t.theme.__loading && t.theme.id;
-            })) return [];
+            })) {
+                console.warn("No teams, not loaded", this.match?.teams);
+                return [];
+            }
             // if (!this.animationActive) return [];
 
+            console.log("teams - flipping teams", this.flippingTeams);
             if (this.flippingTeams) {
                 // hold old ones for a second
+                const teams = [...this.match.teams];
                 if (this.match.flip_teams) {
                     // do invert
-                    return [this.match.teams[0], this.match.teams[1]];
+                    console.log("holding 0,1", teams[0]);
+                    return [teams[0], teams[1]];
                 } else {
-                    return [this.match.teams[1], this.match.teams[0]];
+                    console.log("holding 1,0", teams[0]);
+                    return [teams[1], teams[0]];
                 }
             }
+            console.log("default view", this.match.teams, this.match.teams.length);
             if (this.match.flip_teams && this.match.teams.length === 2) return [this.match.teams[1], this.match.teams[0]];
             if (this.match.teams.length !== 2) return [];
             return this.match.teams;
@@ -168,6 +187,9 @@ export default {
         },
         flipTeams() {
             return this.match?.flip_teams || false;
+        },
+        shouldShowTeams() {
+            return this.animationActive && !this.flippingTeams;
         }
     },
     watch: {
@@ -182,7 +204,13 @@ export default {
                 this.flippingTeams = true;
                 setTimeout(() => {
                     this.flippingTeams = false;
-                }, 1000);
+                    console.log("flip teams now", this.flippingTeams);
+                }, 1500);
+            }
+        },
+        shouldShowTeams: {
+            handler(val) {
+                console.log("should show teams", val);
             }
         }
     },

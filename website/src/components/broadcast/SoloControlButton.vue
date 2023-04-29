@@ -1,5 +1,5 @@
 <template>
-    <div class="control-button d-flex flex-column" v-bind:class="elClass" @click="() => click && click()" :style="css">
+    <div class="control-button d-flex flex-column" v-bind:class="elClass" @click="() => click && !noclick && click()" :style="css">
         <span class="icon" v-if="icon"><i :class="icon"></i></span>
         <span class="slot"><slot></slot></span>
     </div>
@@ -75,7 +75,8 @@ export default {
         background-color: white;
     }
     .control-button:not(.noclick):hover {
-        opacity: 1;
+        /* this fixes a bug for some reason */
+        opacity: 0.99;
     }
 
     .control-button.control-slice {

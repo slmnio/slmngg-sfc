@@ -16,18 +16,18 @@
 
 
         <div class="solo-part solo--controls">
-            <div class="solo-pixel-info">200px</div>
+            <div class="solo-pixel-info">200px / {{ controlMode }}</div>
 <!--            <div class="solo-pixel-info d-flex">{{ controlMode }}</div>-->
             <div class="control-group" v-if="controlMode === 'default'">
                 <SoloControlButton noclick left rotate>SLMN.GG</SoloControlButton>
                 <SoloControlButton icon="fas fa-exchange" color="#f22cf2" :click="() => flipTeams()">Flip teams</SoloControlButton>
                 <SoloControlButton icon="fas fa-users" :color="teams[0] && teams[0].id ? '#2cd1f2' : ''" :click="() => controlMode = 'set-team-1'">Set Team 1</SoloControlButton>
                 <SoloControlButton icon="far fa-users" :color="teams[1] && teams[1].id ? '#2cd1f2' : ''" :click="() => controlMode = 'set-team-2'">Set Team 2</SoloControlButton>
-                <SoloControlButton icon="fas fa-medal" color="#f22cf2" :click="() => controlMode = 'set-scores'">Set Scores</SoloControlButton>
-                <SoloControlButton icon="fas fa-align-center" :color="middle ? '#2cd1f2' : ''" :click="() => controlMode = 'set-middle'">Set Middle</SoloControlButton>
-                <SoloControlButton v-if="showModule('break')" icon="far fa-snooze" :click="() => controlMode = 'set-break'">Break</SoloControlButton>
+                <SoloControlButton icon="fas fa-align-center" :color="middle ? '#2cd1f2' : ''" :click="() => controlMode = 'set-middle'">Middle</SoloControlButton>
+                <SoloControlButton icon="fas fa-medal" color="#f22cf2" :click="() => controlMode = 'set-scores'">Scores</SoloControlButton>
+                <SoloControlButton icon="fas fa-map-marked-alt" color="#f22cf2" :click="() => controlMode = 'set-maps'" v-if="showModule('overview')">Maps & Winners</SoloControlButton>
+                <SoloControlButton v-if="showModule('break')" :color="!breakEnd ? '#f22cf2' : '#2cd1f2'" icon="far fa-snooze" :click="() => controlMode = 'set-break'">Break</SoloControlButton>
 
-                <SoloControlButton icon="fas fa-map-marked-alt" color="#f22cf2" :click="() => controlMode = 'set-maps'" v-if="showModule('overview')">Set Maps</SoloControlButton>
 
                 <div class="spacer"></div>
 <!--                <SoloControlButton icon="fas fa-wrench" color="#f22cf2" :click="() => controlMode = 'set-options'">Match Options</SoloControlButton>-->
@@ -104,9 +104,23 @@
             <div class="control-group" v-if="controlMode === 'set-maps'">
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
 
-                <SoloMapButton v-for="num in mapNums" :key="num" :click="() => chooseMap(num)" :noclick="num !== 0 && !maps[Math.max(0,num - 1)]?.name" :map="maps[num]" :top-text="`Map ${num + 1}`"></SoloMapButton>
+                <SoloMapButton v-for="num in mapNums" :key="num" :click="() => chooseMap(num)" :noclick="num !== 0 && !maps[Math.max(0,num - 1)]?.name"
+                               :map="maps[num]" :top-text="`Map ${num + 1}`" :team-gel="mapWinners[num] === 'team-1' ? teams[0]?.theme : (mapWinners[num] === 'team-2'? teams[1]?.theme : null)"></SoloMapButton>
 
                 <div class="spacer"></div>
+                <SoloControlButton icon="fas fa-trophy" style="font-size: 2.5em" color="#f17a2c" :click="() => controlMode = 'set-map-winners'">Set Winners</SoloControlButton>
+                <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
+            </div>
+            <div class="control-group" v-if="controlMode === 'set-map-winners'">
+                <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
+
+                <SoloMapToggleButton v-for="num in mapNums" :key="num" :click="() => toggleMapWinner(num)"
+                                     :teams="teams" :map="maps[num]" :noclick="num !== 0 && !maps[Math.max(0,num - 1)]?.name"
+                                     :top-text="maps[num]?.short_name || `Map ${num + 1}`" :current="mapWinners[num]">
+                </SoloMapToggleButton>
+
+                <div class="spacer"></div>
+                <SoloControlButton icon="fas fa-map-marked-alt" style="font-size: 2.5em" :click="() => controlMode = 'set-maps'">Set<br>Maps</SoloControlButton>
                 <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
             </div>
             <div class="control-group" v-if="controlMode === 'set-map'">
@@ -120,7 +134,7 @@
             </div>
 
             <div class="control-group" v-if="controlMode === 'choose-map'">
-                <SoloControlButton left rotate :click="() => controlMode = 'set-maps'" color="#f0802c">Maps</SoloControlButton>
+                <SoloControlButton left rotate :click="() => controlMode = 'set-maps'" color="#f0a02c">Maps</SoloControlButton>
                 <SoloControlButton noclick>Map {{ controllingMapNum + 1 }} <small>{{ maps[controllingMapNum]._type || maps[controllingMapNum].type || '' }}</small></SoloControlButton>
 
                 <SoloMapButton v-for="map in currentMapChunk" v-bind:key="map.id" :map="map"
@@ -182,11 +196,13 @@ import RosterOverlay from "@/components/broadcast/roots/RosterOverlay";
 import BreakOverlay from "@/components/broadcast/break/BreakOverlay";
 import OverviewOverlay from "@/components/broadcast/roots/OverviewOverlay";
 import SoloMapButton from "@/components/broadcast/SoloMapButton";
+import SoloMapToggleButton from "@/components/broadcast/SoloMapToggleButton.vue";
 
 export default {
     name: "SoloOverlay",
     props: ["broadcast", "client", "title", "modules", "rosterOptions", "showMapVideos"],
     components: {
+        SoloMapToggleButton,
         SoloMapButton,
         OverviewOverlay,
         RosterOverlay,
@@ -205,12 +221,13 @@ export default {
         controllingMapNum: null,
 
         teams: [
-            { name: "Team 1", has_theme: 0 },
-            { name: "Team 2", has_theme: 0 }
+            { name: "Team 1", code: "T1", has_theme: 0 },
+            { name: "Team 2", code: "T2", has_theme: 0 }
         ],
         scores: [0, 0],
         breakEnd: null,
         maps: [],
+        mapWinners: [],
         showGuides: false,
         firstTo: 3,
 
@@ -275,6 +292,28 @@ export default {
         setFirstTo(num) {
             this.firstTo = num;
             this.controlMode = "set-scores";
+        },
+        toggleMapWinner(num) {
+            console.log("toggle winner", num);
+            const rotation = [null, "team-1", "team-2", "draw"];
+            let current = this.mapWinners[num];
+            if (current === undefined) {
+                this.$set(this.mapWinners, num, null);
+                current = null;
+            }
+
+            const index = rotation.indexOf(current);
+            if (index === -1) {
+                console.warn("Unsure what map winner to toggle to", { num, current });
+                this.$set(this.mapWinners, num, null);
+                return;
+            }
+            if (index >= rotation.length - 1) {
+                this.$set(this.mapWinners, num, rotation[0]);
+            } else {
+                this.$set(this.mapWinners, num, rotation[index + 1]);
+            }
+            console.log(this.mapWinners[num]);
         }
     },
     watch: {
@@ -360,6 +399,22 @@ export default {
             if (!this.chunkedMaps?.[this.controlPage]) return [];
             return this.chunkedMaps[this.controlPage];
         },
+        mapsWithWinners() {
+            return this.maps.map((_map, i) => {
+                const map = { ..._map };
+                const mapWinData = this.mapWinners[i];
+                if (mapWinData) {
+                    if (mapWinData === "draw") {
+                        map.draw = true;
+                    } else if (mapWinData === "team-1") {
+                        map.winner = this.teams[0];
+                    } else if (mapWinData === "team-2") {
+                        map.winner = this.teams[1];
+                    }
+                }
+                return map;
+            });
+        },
         virtualMatch() {
             return {
                 teams: this.teams,
@@ -370,7 +425,7 @@ export default {
                 _virtual_match_category: this.matchCategory,
                 _virtual_break_end: this.breakEnd,
                 first_to: this.firstTo,
-                maps: this.maps
+                maps: this.mapsWithWinners
             };
         },
         scoreArray() {

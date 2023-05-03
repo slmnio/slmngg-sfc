@@ -13,6 +13,7 @@ import Authenticator from "@/views/Authenticator";
 import Dashboard from "@/views/Dashboard";
 import ProfilePage from "@/views/ProfilePage";
 import TwitchAuthScopeSelector from "@/components/website/TwitchAuthScopeSelector";
+import BracketCreator from "@/views/BracketCreator.vue";
 
 export default [
     {
@@ -56,6 +57,10 @@ export default [
             {
                 path: "/twitch-auth",
                 component: TwitchAuthScopeSelector
+            },
+            {
+                path: "/bracket-creator",
+                component: BracketCreator
             }
         ]
     },

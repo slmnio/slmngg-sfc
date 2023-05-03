@@ -1,21 +1,16 @@
 <template>
   <div class="ingame-overlay">
       <div class="top-overlay" :style="broadcastMargin">
-          <div class="teams">
-              <IngameTeam :key="team.id" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
-                          :team="team"  :right="i === 1"
-                          :active="shouldShowTeams" :score="scores[i]" :hideScores="broadcast.hide_scores"
-                          :extend-icons="extendIcons"
-                          :width="teamWidth" :codes="useCodes" :event="broadcast.event" :auto-small="autoSmall"
-                          :map-attack="attacks[i]" :use-dots="useDots" :first-to="match && match.first_to"
-              />
-              <!--   -->
-          </div>
-
-          <div class="middle">
-              <Middle :active="shouldShowMiddle" :theme="broadcast?.event?.theme" :text="middleText"
-                      :tiny="broadcast.margin === 0"/>
-          </div>
+          <IngameTeam :key="team.id" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
+                      :team="team"  :right="i === 1"
+                      :active="noAnimation || shouldShowTeams" :score="scores[i]" :hideScores="broadcast.hide_scores"
+                      :extend-icons="extendIcons"
+                      :width="teamWidth" :codes="useCodes" :event="broadcast.event" :auto-small="autoSmall"
+                      :map-attack="attacks[i]" :use-dots="useDots" :first-to="match && match.first_to"
+          />
+          <!--   -->
+          <Middle :active="shouldShowMiddle" :theme="broadcast?.event?.theme" :text="middleText"
+                  :tiny="broadcast.margin === 0"/>
       </div>
       <transition name="fade" mode="out-in">
           {{ fadeSponsors }}
@@ -32,7 +27,7 @@ import Sponsors from "@/components/broadcast/Sponsors";
 
 export default {
     name: "IngameOverlay",
-    props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed"],
+    props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed", "noAnimation"],
     components: { IngameTeam, Middle, Sponsors },
     data: () => ({
         flippingTeams: false

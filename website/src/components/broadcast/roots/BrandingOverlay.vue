@@ -31,7 +31,7 @@
                 </div>
                 <div class="logos flex-grow-1 d-flex flex-column mb-3">
                     <div class="logo-holder w-100 flex-grow-1 my-2 flex-center" v-for="logo in logos" :key="logo.key" :style="teamBG">
-                        <div class="logo-inner bg-center" :style="bg(resizedAttachment(logo.item, 'orig'))"></div>
+                        <div class="logo-inner bg-center" :style="bg(resizedAttachment(logo?.item, 'orig'))"></div>
                     </div>
                 </div>
                 <div class="colors d-flex">
@@ -39,7 +39,7 @@
                 </div>
             </div>
         </div>
-        <div class="event-logo-holder position-absolute d-none flex-center" v-if="broadcast.event && broadcast.event.theme">
+        <div class="event-logo-holder position-absolute d-none flex-center" v-if="broadcast.event && broadcast.event?.theme">
             <div class="logo-inner bg-center w-100 h-100" :style="resizedImage(broadcast.event.theme, ['default_logo'], 'orig')"></div>
         </div>
     </div>

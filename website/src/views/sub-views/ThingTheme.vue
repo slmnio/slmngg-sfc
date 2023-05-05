@@ -52,7 +52,7 @@
         <div class="team-specific" v-if="team">
             <h3>Ingame overlay</h3>
             <div class="overlay-area ingame-overlay mb-3">
-                <IngameTeam :team="team" :event="team.event" />
+                <IngameTeam :team="team" :event="team.event" :active="true" />
             </div>
 
             <h3>Bracket</h3>

@@ -7,7 +7,7 @@
                 <button class="btn btn-warning mr-1" @click="sendToAuctionServer('auction:admin_set_state', {'state': 'RESTRICTED'})">Set state: RESTRICTED</button>
                 <div class="btn-text text-right flex-grow-1">{{ auctionState }}</div>
             </div>
-            <AuctionCountdown class="auction-countdown mb-2" web />
+            <AuctionCountdown class="auction-countdown mb-2" web :style="themeBackground1(event)" />
 
             <div class="row">
                 <div class="active-player col-7 mb-5">
@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div class="row mt-2">
-                <div class="col-7 d-flex justify-content-end align-items-center control-box">
+                <div class="col-12 col-lg-6 d-flex justify-content-end align-items-center control-box">
                     <div class="active-team-select">
                         <select v-model="actingTeamID">
                             <option :value="null" disabled>Choose a team to control</option>
@@ -30,19 +30,36 @@
                     </div>
                     <div class="active-team-balance">{{ money(balance) }}</div>
                 </div>
-                <div class="col-5 text-center bid-buttons">
+                <div class="col-12 col-lg-6 text-center bid-buttons">
                     <div class="status-bar mb-1">
                         {{ biddingStatus }}
                     </div>
                     <div class="d-flex buttons">
-                        <button class="btn btn-success btn-lg" @click="sendBid((leadingBid?.amount ?? 0) + autoSettings.money.minimumBidIncrement)" :disabled="!canBid">+ {{ money(autoSettings.money.minimumBidIncrement) }}</button>
-                        <div class="button-group bid-input-group">
-                            <input type="number" class="bid-amount-input" v-model.number="customBidAmount"
-                                   :min="leadingBid ? leadingBid?.amount + autoSettings.money.minimumBidIncrement : 1"
-                                   :max="leadingBid ? leadingBid?.amount + autoSettings.money.maximumBidIncrement : 200"
-                                   @keydown.enter="sendBid(customBidAmount)"
-                            />
-                            <button class="btn btn-success btn-lg" @click="sendBid(customBidAmount)" :disabled="customBidError || !canBid" :data-tooltip="customBidError">Bid</button>
+                        <div class="d-flex buttons">
+                            <button class="btn btn-success btn-lg text-nowrap"
+                                    @click="sendBid((leadingBid?.amount ?? 0) + autoSettings.money.minimumBidIncrement)"
+                                    :disabled="!canBid">+ {{ money(autoSettings.money.minimumBidIncrement) }}
+                            </button>
+                            <button class="btn btn-success btn-lg text-nowrap" v-if="autoSettings.money.minimumBidIncrement < 5"
+                                    @click="sendBid((leadingBid?.amount ?? 0) + 5)" :disabled="!canBid">+ {{ money(5) }}
+                            </button>
+                            <button class="btn btn-success btn-lg text-nowrap" v-if="autoSettings.money.minimumBidIncrement < 10"
+                                    @click="sendBid((leadingBid?.amount ?? 0) + 10)" :disabled="!canBid">+ {{
+                                    money(10)
+                                }}
+                            </button>
+                        </div>
+                        <div class="flex-center">
+                            <div class="button-group bid-input-group">
+                                <input type="number" class="bid-amount-input" v-model.number="customBidAmount"
+                                       :min="leadingBid ? leadingBid?.amount + autoSettings.money.minimumBidIncrement : 1"
+                                       :max="leadingBid ? leadingBid?.amount + autoSettings.money.maximumBidIncrement : 200"
+                                       @keydown.enter="sendBid(customBidAmount)"
+                                />
+                                <button class="btn btn-success btn-lg" @click="sendBid(customBidAmount)"
+                                        :disabled="customBidError || !canBid" :data-tooltip="customBidError">Bid
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -119,6 +136,7 @@ import AuctionCountdown from "@/components/broadcast/auction/AuctionCountdown.vu
 import AuctionBid from "@/components/website/AuctionBid.vue";
 import { VBTooltip } from "bootstrap-vue";
 import ContentThing from "@/components/website/ContentThing.vue";
+import { themeBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "EventAuction",
@@ -289,6 +307,7 @@ export default {
         }
     },
     methods: {
+        themeBackground1,
         isAuthenticated,
         money,
         getRoleSVG,
@@ -412,7 +431,7 @@ export default {
     }
 
     .buttons {
-        gap: 1em;
+        gap: 0.75em;
         justify-content: center;
     }
 

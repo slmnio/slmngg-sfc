@@ -53,7 +53,7 @@ export default {
         teamIsDone() {
             // return false;
             if (!this.team?.players?.length) return false;
-            const max = 7; //  (this.auctionSettings?.each_team || getAuctionMax());
+            const max = (this.auctionSettings?.each_team || getAuctionMax());
             // console.log(this.team.players.length, max);
             return this.team.players.length >= max;
         },

@@ -61,7 +61,7 @@ module.exports = class Auction {
         this.wait.afterSubsequentBids = auctionData?.time?.afterSubsequentBids ?? 15;
         this.wait.afterSaleNextAutoPlayer = auctionData?.time?.afterSaleNextAutoPlayer ?? 10;
         this.wait.preAuction = auctionData?.time?.preAuction ?? 5;
-        this.wait.postAuction = auctionData?.time?.preAuction ?? 10;
+        this.wait.postAuction = auctionData?.time?.postAuction ?? 10;
 
         this.money.defaultStartingBid = auctionData?.money?.defaultStartingBid ?? 1;
         this.money.minimumBidIncrement = auctionData?.money?.minimumBidIncrement ?? 1;

@@ -11,7 +11,11 @@
 
             <div class="row">
                 <div class="active-player col-7 mb-5">
-                    <div class="player-name">{{ activePlayer?.name || '&nbsp;' }}</div>
+                    <div class="player-name" v-if="activePlayer">
+                        <router-link class="no-link-style" :to="url('player', activePlayer)" target="_blank">{{ activePlayer?.name || '&nbsp;' }}</router-link>
+                        <div class="player-role" v-if="activePlayer?.role" v-html="getRoleSVG(activePlayer.role)"></div>
+                    </div>
+<!--                    <h3 class="player-signed">SIGNED TO</h3>-->
                     <div class="player-info">{{ activePlayer?.draft_data }}</div>
                 </div>
                 <div class="bids col-5">
@@ -67,16 +71,30 @@
         </div>
         <div class="row mt-5">
             <div class="col-4 teams-section">
-                <h3 class="text-center">Teams</h3>
-
-                <div class="team-group" v-for="team in teams" :key="team.id">
+                <h3 class="text-center" v-if="groupedTeams.active.length">Active teams</h3>
+                <div class="team-group" v-for="team in groupedTeams.active" :key="team.id">
                     <div class="d-flex">
                         <ContentThing class="team-display d-inline-flex" type="team" :text="team.name" :theme="team.theme" :show-logo="true" :thing="team" />
-                        <div class="money">{{ money(team.balance) }}</div>
+                        <div class="text money">{{ money(team.balance) }}</div>
+                        <div class="text player-count ml-2">({{ auctionSettings.each_team - (team.players?.length || 0) }} to draft)</div>
                     </div>
                     <ul>
                         <li v-for="player in team.players" :key="player.id">
-                            <router-link :to="url('player', player)">{{ player?.name }}</router-link>
+                            <router-link :to="url('player', player)" target="_blank">{{ player?.name }}</router-link>
+                            {{ money(player?.auction_price) }}
+                        </li>
+                    </ul>
+                </div>
+                <h3 class="text-center" v-if="groupedTeams.finished.length">Completed Teams</h3>
+                <div class="team-group" v-for="team in groupedTeams.finished" :key="team.id">
+                    <div class="d-flex">
+                        <ContentThing class="team-display d-inline-flex" type="team" :text="team.name" :theme="team.theme" :show-logo="true" :thing="team" />
+                        <div class="text money">{{ money(team.balance) }} left over</div>
+                    </div>
+                    <ul>
+                        <li v-for="player in team.players" :key="player.id">
+                            <router-link :to="url('player', player)" target="_blank">{{ player?.name }}</router-link>
+                            • {{ money(player?.auction_price) }}
                         </li>
                     </ul>
                 </div>
@@ -88,6 +106,15 @@
                     </tr>
                     <tr>
                         <td>Maximum increment: <b>{{ money(this.autoSettings.money.maximumBidIncrement) }}</b></td>
+                    </tr>
+                    <tr v-if="auctionSettings?.time?.beforeFirstBids">
+                        <td>Pre-auction timer: <b>{{ auctionSettings?.time?.beforeFirstBids }} seconds</b></td>
+                    </tr>
+                    <tr v-if="auctionSettings?.time?.afterInitialBid">
+                        <td>Auction timer after first bid: <b>{{ auctionSettings?.time?.afterInitialBid }} seconds</b></td>
+                    </tr>
+                    <tr v-if="auctionSettings?.time?.afterSubsequentBids">
+                        <td>Auction timer after other bids: <b>{{ auctionSettings?.time?.afterSubsequentBids }} seconds</b></td>
                     </tr>
                 </table>
             </div>
@@ -104,15 +131,13 @@
 
                 <table class="table table-bordered table-dark table-sm w-100">
                     <tr class="player" v-for="(player, i) in undraftedPlayers" :key="player.id" :class="{'striped': i % 2 === 1, 'bg-primary': activePlayer?.id === player.id}">
-                        <td class="player-name w-100">
+                        <td class="player-name">
                             <div class="player-info-box d-flex align-items-center">
                                 <div v-if="player.role" class="player-role" v-html="getRoleSVG(player.role)"></div>
                                 <router-link :to="url('player', player)">{{ player.name }}</router-link>
                             </div>
                         </td>
-                        <td>
-                            {{ player.draft_data }}
-                        </td>
+                        <td class="draft-data">{{ player.draft_data }}</td>
                         <td class="player-buttons-cell">
                             <div class="buttons d-flex">
                                 <button class="btn btn-info btn-sm" v-if="isAdmin" :disabled="!adminTeamID" @click="() => askStarting(player)">force</button>
@@ -247,6 +272,22 @@ export default {
                 players: ReactiveArray("players")
             })(this.event).filter(team => team?.draft_order).sort((a, b) => a.draft_order - b.draft_order);
         },
+        groupedTeams() {
+            const groups = {
+                active: [],
+                finished: []
+            };
+            if (!this.teams?.length) return groups;
+            this.teams.forEach(team => {
+                if (team.players.length === this.auctionSettings?.each_team ?? 7) {
+                    // Finished
+                    groups.finished.push(team);
+                } else {
+                    groups.active.push(team);
+                }
+            });
+            return groups;
+        },
         actingTeam() {
             return (this.teams || []).find(t => t.id === this.actingTeamID);
         },
@@ -366,7 +407,7 @@ export default {
             handler(latestBid) {
                 if (!latestBid?.amount) return;
                 console.log("latest team bid", latestBid);
-                this.customBidAmount = latestBid.amount + (this.autoSettings.money.minimumBidIncrement * 2);
+                // this.customBidAmount = latestBid.amount + (this.autoSettings.money.minimumBidIncrement * 2);
             }
         }
     },
@@ -467,14 +508,24 @@ export default {
         font-size: 3em;
         font-weight: bold;
         text-shadow:  0 0 8px rgba(255,255,255,0.4);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .active-player .player-role {
+        height: 1.25em;
+        width: 1.25em;
     }
     .player-info {
         white-space: pre-wrap;
     }
-    .team-group .money {
+    .team-group .text {
         line-height: 40px;
         margin-left: 4px;
         font-size: 18px;
+    }
+    .draft-data {
+        white-space: pre-wrap;;
     }
 </style>
 

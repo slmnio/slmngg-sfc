@@ -10,6 +10,10 @@
                     <div class="industry-align text-center">{{ title || 'Player Auction' }}</div>
                 </div>
                 <div class="event-stats flex-center d-flex flex-column">
+                    <div>{{ autoSettings?.drafted }} / {{ autoSettings?.totalSlots }} {{ autoSettings?.drafted === 1 ? 'player' : 'players' }} signed</div>
+                    <div>{{ autoSettings?.slotsRemaining }} {{ autoSettings?.slotsRemaining === 1 ? 'slot' : 'slots' }} remaining</div>
+                    <div>{{ autoSettings?.undraftedPlayerCount }} {{ autoSettings?.undraftedPlayerCount === 1 ? 'player' : 'players' }} in the pool</div>
+                    <div class="small">({{ (autoSettings?.totalDraftablePlayerCount - autoSettings?.totalSlots) }} {{ autoSettings?.totalDraftablePlayerCount - autoSettings?.totalSlots === 1 ? 'player' : 'players' }} won't be drafted)</div>
                     <div v-if="stats && stats.allPlayers">{{ stats.remainingEligiblePlayers }} / {{ stats.allPlayers }} player{{ stats.remainingEligiblePlayers === 1 ? '' : 's' }} remaining</div>
                     <div v-if="stats && stats.remainingPlaces">{{ stats.remainingPlaces }} spot{{ stats.remainingPlaces === 1 ? '' : 's' }} remaining</div>
                     <div v-if="stats && stats.signedPlayers">{{ stats.signedPlayers }} player{{ stats.signedPlayers === 1 ? '' : 's' }} signed</div>
@@ -122,6 +126,44 @@ export default {
         auctionState: "NOT_CONNECTED"
     }),
     computed: {
+        autoSettings() {
+            let totalSlots = 0;
+            let drafted = 0;
+            let slotsRemaining = 0;
+            const playersEachTeam = this.auctionSettings.each_team ?? 7;
+
+            (this.teams || []).forEach(team => {
+                totalSlots += playersEachTeam;
+                const playerCount = (team.players || []).length ?? 0;
+                drafted += playerCount;
+                slotsRemaining += (playersEachTeam - playerCount);
+            });
+
+            const draftablePlayerIDs = this.broadcast?.event?.draftable_players || [];
+            const draftedPlayerIDs = [];
+            const undraftedPlayerIDs = [];
+
+            draftablePlayerIDs.forEach(id => {
+                if (this.teams.some(team => team.players.some(p => cleanID(p.id) === cleanID(id)))) {
+                    draftedPlayerIDs.push(id);
+                } else {
+                    undraftedPlayerIDs.push(id);
+                }
+            });
+
+            console.log("player IDs", {
+                draftedPlayerIDs,
+                undraftedPlayerIDs
+            });
+
+            return {
+                totalSlots,
+                drafted,
+                slotsRemaining,
+                totalDraftablePlayerCount: draftablePlayerIDs.length,
+                undraftedPlayerCount: undraftedPlayerIDs.length
+            };
+        },
         // playersRemaining() {
         //     let num = 0;
         //     this.teams.forEach(team => {
@@ -342,9 +384,11 @@ export default {
             const latestBids = this.bids.slice(Math.max(this.bids.length - count, 0));
             if (latestBids.length !== count) return false;
             const teams = [];
+            console.log(latestBids);
             latestBids.forEach((bid) => {
-                if (teams.indexOf(bid.teamID) === -1) teams.push(this.teams.find(t => t.id === bid.teamID));
+                if (teams.indexOf(bid.teamID) === -1) teams.push(this.teams.find(t => cleanID(t.id) === cleanID(bid.teamID)));
             });
+            console.log(teams);
             if (teams.length === 2) return teams;
             return null;
         },
@@ -380,7 +424,7 @@ export default {
             return resizedImage(this.teams.find(t => t.id === cleanID(teamID))?.theme, ["small_logo", "default_logo"], "h-100");
         },
         getTheme(teamID) {
-            console.log(teamID, this.teams.find(t => t.id === cleanID(teamID)));
+            // console.log(teamID, this.teams.find(t => t.id === cleanID(teamID)));
             return logoBackground1(this.teams.find(t => t.id === cleanID(teamID)));
         },
         sendToAuctionServer(event, data) {

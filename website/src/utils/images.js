@@ -18,7 +18,7 @@ export function getNewURL(attachment, size) {
         size = "orig";
     }
     const dataServer = getDataServerAddress();
-    console.log(attachment);
+    // console.log(attachment);
     return `${dataServer}/image.${attachment.fileExtension}?id=${attachment.id}&size=${size}`;
 }
 

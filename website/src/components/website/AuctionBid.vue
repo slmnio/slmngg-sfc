@@ -63,4 +63,11 @@ export default {
     font-weight: bold;
     line-height: 1em;
 }
+.team-row {
+    animation: jump .5s forwards;
+}
+@keyframes jump {
+    0%, 100% { transform: scale(1) }
+    50% { transform: scale(1.1) }
+}
 </style>

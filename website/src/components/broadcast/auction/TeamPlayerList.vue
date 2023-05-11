@@ -143,6 +143,6 @@ export default {
         width: 24px;
         height: 24px;
         margin-right: 2px;
-        transform: translate(-2px, -2px);
+        transform: translate(-2px, -1px);
     }
 </style>

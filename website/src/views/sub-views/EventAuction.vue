@@ -278,8 +278,8 @@ export default {
                 finished: []
             };
             if (!this.teams?.length) return groups;
-            this.teams.forEach(team => {
-                if (team.players.length === this.auctionSettings?.each_team ?? 7) {
+            (this.teams || []).forEach(team => {
+                if (team.players?.length === this.auctionSettings?.each_team ?? 7) {
                     // Finished
                     groups.finished.push(team);
                 } else {

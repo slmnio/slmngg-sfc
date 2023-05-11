@@ -43,7 +43,7 @@ export default {
         },
         isLeading() {
             if (!this.leading) return false;
-            return cleanID(this.leading.team.id) === this.team.id;
+            return cleanID(this.leading.teamID) === this.team?.id;
         }
     }
 };

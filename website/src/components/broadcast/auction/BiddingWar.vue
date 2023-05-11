@@ -1,7 +1,7 @@
 <template>
     <div class="bidding-war d-flex">
         <div class="bidding-war-text">BIDDING WAR</div>
-        <TeamFocus class="team-focus" v-for="team in _teams" :team="team" :key="team.id" :leading="leading" />
+        <TeamFocus class="team-focus" v-for="team in filledTeams" :team="team" :key="team.id" :leading="leading" :auction-settings="auctionSettings" />
     </div>
 </template>
 
@@ -12,9 +12,9 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "BiddingWar",
     components: { TeamFocus },
-    props: ["teams", "leading"],
+    props: ["teams", "leading", "auctionSettings"],
     computed: {
-        _teams() {
+        filledTeams() {
             if (!this.teams) return [];
             return this.teams.map(t => ReactiveRoot(t, {
                 theme: ReactiveThing("theme"),
@@ -33,9 +33,9 @@ export default {
         height: 250px;
     }
     .team-focus {
-        margin: 0;
         width: 50% !important;
         flex-shrink: 0;
+        margin-top: 25px;
     }
     .bidding-war >>> .title {
         font-size: 40px;
@@ -52,7 +52,15 @@ export default {
         box-shadow: 0 0 0px 4px white;
         transform: scale(1);
     }
-
+    .bidding-war >>> .player {
+        font-size: 23px !important;
+    }
+    .bidding-war >>> .player .player-role {
+        width: 30px;
+        height: 20px;
+        transform: translate(-8px, -2px);
+        margin-right: -7px;
+    }
     .bidding-war-text {
         width: 100%;
         display: flex;
@@ -61,7 +69,8 @@ export default {
         font-size: 64px;
         height: 1.3em;
         position: absolute;
-        top: -35px;
+        top: 0;
+        font-weight: bold;
     }
 
     .bidding-war {

@@ -20,27 +20,34 @@
                 </div>
             </div>
             <div class="player-middle d-flex flex-grow-1">
-                <div class="player-info w-100 flex-center flex-column position-relative">
+                <div class="player-info-holder w-100 flex-center flex-column position-relative">
                     <AuctionCountdown v-if="player" />
+                    <transition name="color-block-fade">
+                        <div class="color-block" v-if="blockColorCSS" :style="blockColorCSS"></div>
+                    </transition>
                     <transition name="fade-right">
                         <RecoloredHero v-if="!showCaptainInfo && player && player.favourite_hero" :theme="heroColor" :hero="player.favourite_hero"></RecoloredHero>
                     </transition>
                     <transition name="fade-right">
                         <div class="player-info" v-if="player">
                             <div class="player-name">{{ player.name }}</div>
-                            <div class="player-role" v-if="player.role" v-html="getRoleSVG(player.role)"></div>
-                            <div class="accolades" v-if="accolades.length">
-                                <ContentThing :thing="accolade" type="event" :link-to="accolade.event" :theme="accolade.event && accolade.event.theme" v-for="accolade in accolades"
-                                              :key="accolade.id" :show-logo="true" :text="accolade.player_text" />
-                            </div>
-                            <div class="player-captain-info" v-if="showCaptainInfo">
-                                {{ player.pronouns }}
+                            <div class="player-extras">
+                                <div class="player-role" v-if="player.role" v-html="getRoleSVG(player.role)"></div>
+                                <div class="accolades" v-if="accolades.length">
+                                    <ContentThing :thing="accolade" type="event" :link-to="accolade.event"
+                                                  :theme="accolade.event && accolade.event.theme"
+                                                  v-for="accolade in accolades"
+                                                  :key="accolade.id" :show-logo="true" :text="accolade.player_text"/>
+                                </div>
+                                <div class="player-captain-info" v-if="showCaptainInfo">
+                                    {{ player.pronouns }}
                                     <br>
-                                {{ player.draft_data }}
-                            </div>
-                            <div class="player-teams d-flex flex-wrap flex-center" v-for="group in groupedTeams"
-                                 :key="group.group" :class="`group-${group.group}`">
-                                <PlayerTeamDisplay :team="team" v-for="team in group.teams" :key="team.id"/>
+                                    {{ player.draft_data }}
+                                </div>
+                                <div class="player-teams d-flex flex-wrap flex-center" v-for="group in groupedTeams"
+                                     :key="group.group" :class="`group-${group.group}`">
+                                    <PlayerTeamDisplay :team="team" v-for="team in group.teams" :key="team.id"/>
+                                </div>
                             </div>
                         </div>
                     </transition>
@@ -79,13 +86,13 @@
                     <SignedTeamList :team="signedTeam" :amount="signAmount" :signedPlayer="socketPlayerID" :auction-settings="auctionSettings" />
                 </div>
                 <div :style="background" class="bid-focus flex-center h-100 w-100" v-if="rightDisplay === 'bid-focus'" key="bid-focus">
-                    <BidFocus :teams="teams" :bids="bids"/>
+                    <BidFocus :teams="teams" :bids="bids" :auction-settings="auctionSettings" />
                 </div>
                 <div :style="background" class="team-focus" v-if="rightDisplay === 'team-focus'" key="team-focus">
                     <TeamFocus :team="highlightedTeam" :auction-settings="auctionSettings" />
                 </div>
                 <div :style="background" class="bidding-war" v-if="rightDisplay === 'bidding-war'" key="bidding-war">
-                    <BiddingWar :teams="biddingWar" :leading="leadingBid"/>
+                    <BiddingWar :teams="biddingWar" :leading="leadingBid" :auction-settings="auctionSettings"/>
                 </div>
             </transition>
         </div>
@@ -99,7 +106,7 @@ import { cleanID, getRoleSVG, money } from "@/utils/content-utils";
 import PlayerTeamDisplay from "./PlayerTeamDisplay";
 import { sortEvents } from "@/utils/sorts";
 import SignedTeamList from "@/components/broadcast/auction/SignedTeamList";
-import { logoBackground1 } from "@/utils/theme-styles";
+import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import BidFocus from "./BidFocus";
 import TeamFocus from "@/components/broadcast/auction/TeamFocus";
 import BiddingWar from "@/components/broadcast/auction/BiddingWar";
@@ -222,9 +229,10 @@ export default {
         accolades() {
             if (!this.player) return [];
 
+            console.log("accolades", this.players?.member_of);
             return [
                 // team things
-                ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => e.accolades).filter(e => !!e)) : []),
+                ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => e.accolades).filter(e => e?.show_for_players)) : []),
                 ...(this.player.accolades ? this.player.accolades : [])
             ];
         },
@@ -285,8 +293,6 @@ export default {
             });
         },
         rightDisplay() {
-            // return "bid-focus";
-            // // eslint-disable-next-line no-unreachable
             if (this.justSigned) return "sign-focus";
             if (this.biddingWar && !this.showCaptainInfo) return "bidding-war";
             if (this.highlightedTeam) return "team-focus";
@@ -374,21 +380,29 @@ export default {
         heroColor() {
             return this.signedTeam?.theme || this.broadcast?.event?.theme;
         },
+        blockColorCSS() {
+            if (!this.signedTeam?.theme?.color_theme) return null;
+            return {
+                backgroundImage: `linear-gradient(to top, ${this.signedTeam?.theme?.color_theme}, transparent)`
+            };
+        },
         leadingBid() {
             if (!this.bids) return null;
             return this.bids[this.bids.length - 1];
         },
         biddingWar() {
             // if (!this.biddingActive) return false;
-            const count = 5;
+            const count = 6;
             const latestBids = this.bids.slice(Math.max(this.bids.length - count, 0));
             if (latestBids.length !== count) return false;
             const teams = [];
-            console.log(latestBids);
+            console.log("latest bids", latestBids);
             latestBids.forEach((bid) => {
-                if (teams.indexOf(bid.teamID) === -1) teams.push(this.teams.find(t => cleanID(t.id) === cleanID(bid.teamID)));
+                if (!teams.find(t => cleanID(t?.id) === cleanID(bid.teamID))) {
+                    teams.push(this.teams.find(t => cleanID(t.id) === cleanID(bid.teamID)));
+                }
             });
-            console.log(teams);
+            console.log("bidding war teams", teams);
             if (teams.length === 2) return teams;
             return null;
         },
@@ -418,6 +432,7 @@ export default {
         }
     },
     methods: {
+        themeBackground1,
         money,
         getRoleSVG,
         getLogo(teamID) {
@@ -619,6 +634,7 @@ export default {
         transform: translate(0,0)
     }
 
+
     .fade-scroll-enter-active, .fade-scroll-leave-active {
         transition: all 500ms ease;
     }
@@ -815,5 +831,23 @@ export default {
     .player-info .player-role {
         height: 60px;
         margin-bottom: 20px;
+    }
+    .color-block {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0.5;
+    }
+    .color-block-fade-enter-active, .color-block-fade-leave-active { transition: opacity 750ms ease; }
+    .color-block-fade-enter, .color-block-fade-leave-to { opacity: 0; }
+    .color-block-fade-enter-to, .color-block-fade-leave { opacity: 0.5; }
+
+
+    .player-extras {
+        max-height: 670px;
+    }
+
+    .player-info-holder {
+        padding-top: 48px;
     }
 </style>

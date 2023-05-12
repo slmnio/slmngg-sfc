@@ -4,13 +4,13 @@
             <div class="solo-pixel-info">200px</div>
             <transition-group name="fade" mode="out-in">
                 <IngameTeam :key="`${team.name}-${i}`" v-for="(team, i) in teams"
-                            :team="team" :right="i === 1" :score="scores[i]"/>
+                            :team="team" :right="i === 1" :score="scores[i]" :active="true"/>
             </transition-group>
             <!--  :score="scores[i]" :hideScores="broadcast.hide_scores"
                         :width="teamWidth" :codes="codes" -->
 
             <transition name="mid" mode="out-in">
-                <Middle v-if="autoMiddle" :text="autoMiddle" :key="autoMiddle" />
+                <Middle v-if="autoMiddle" :text="autoMiddle" :key="autoMiddle" :active="true" :tiny="true" />
             </transition>
         </div>
 

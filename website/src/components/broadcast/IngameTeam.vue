@@ -243,7 +243,7 @@ export default {
 <style scoped>
     .ingame-team {
         --team-expand: 0px;
-        width: calc(690px + var(--team-expand));
+        width: calc(567px + var(--team-expand));
         height: 48px;
 
         display: flex;

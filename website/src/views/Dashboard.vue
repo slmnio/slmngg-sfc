@@ -26,6 +26,9 @@
         <DashboardModule title="Match Editor" icon-class="fas fa-pennant" class="broadcast-match-editor mb-2" v-if="liveMatch" start-opened>
             <MatchEditor :hide-match-extras="true" :match="liveMatch"></MatchEditor>
         </DashboardModule>
+        <DashboardModule title="Desk" icon-class="fas fa-users" class="desk-editor mb-2" start-opened>
+            <DeskEditor :broadcast="broadcast" />
+        </DashboardModule>
         <DashboardModule title="Bracket Implications" icon-class="fas fa-sitemap" class="broadcast-bracket-editor mb-2" v-if="bracketCount">
             <BracketImplications :match="liveMatch" link-to-detailed-match show-resolve-button />
         </DashboardModule>
@@ -74,10 +77,11 @@ import DashboardModule from "@/components/website/dashboard/DashboardModule.vue"
 import BracketImplications from "@/components/website/dashboard/BracketImplications.vue";
 import PreviewProgramDisplay from "@/components/website/dashboard/PreviewProgramDisplay.vue";
 import Bracket from "@/components/website/bracket/Bracket.vue";
+import DeskEditor from "@/components/website/dashboard/DeskEditor.vue";
 
 export default {
     name: "Dashboard",
-    components: { Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
+    components: { DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
     computed: {
         user() {
             if (!this.$root.auth.user?.airtableID) return {};

@@ -115,9 +115,9 @@ export default {
             window.addEventListener("obsSourceActiveChanged", (e) => {
                 this.active = e.detail.active;
             });
-            document.body.addEventListener("click", () => {
-                this.active = !this.active;
-            });
+            // document.body.addEventListener("click", () => {
+            //     this.active = !this.active;
+            // });
         }
         if (this.broadcastKey) {
             console.log("loading with broadcastKey");

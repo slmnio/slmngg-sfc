@@ -20,7 +20,7 @@ import { getNewURL } from "@/utils/images";
 export default {
     name: "MapDisplay",
     components: { MapSegment },
-    props: ["broadcast", "animationActive", "useTransitions", "noMapVideos"],
+    props: ["broadcast", "animationActive", "useTransitions", "virtualMatch", "noMapVideos"],
     data: () => ({
         activeAudio: null,
         showNextMap: false,
@@ -29,6 +29,7 @@ export default {
     }),
     computed: {
         match() {
+            if (this.virtualMatch) return this.virtualMatch;
             if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {

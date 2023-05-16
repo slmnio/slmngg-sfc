@@ -149,10 +149,10 @@ export default {
         deskGuestSource() {
             if (this.broadcast?.guests) {
                 return "Broadcast › Guests";
-            } else if (this.liveMatch?.casters) {
-                return "Broadcast › Live Match › Casters";
             } else if (this.broadcast?.manual_guests) {
                 return "Broadcast › Manual Guests";
+            } else if (this.liveMatch?.casters) {
+                return "Broadcast › Live Match › Casters";
             }
             return null;
         }

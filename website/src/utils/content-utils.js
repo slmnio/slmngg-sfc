@@ -416,3 +416,33 @@ export function unescapeText(text) {
         .replaceAll("&quot;", "\"")
         .replaceAll("&#039;", "'");
 }
+
+
+export function createGuestObject(str) {
+    const guest = {
+        manual: true
+    };
+
+    str.split(/[,|]/).forEach(part => {
+        if (!part) return;
+        part = part.trim();
+
+        if (part.startsWith("@")) {
+            guest.twitter = part;
+        } else if (part.includes("view=")) {
+            guest.webcam = part;
+        } else if (part.startsWith("http")) {
+            guest.avatar = part;
+        } else if (part.includes("/")) {
+            guest.pronouns = part;
+        } else {
+            guest.name = part;
+        }
+    });
+    return guest;
+}
+
+export function getGuestString(guest) {
+    delete guest.manual;
+    return Object.values(guest).join("|");
+}

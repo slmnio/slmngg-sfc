@@ -9,8 +9,8 @@
                 <div class="caster-name flex-center">
                     <div class="c-name industry-align">{{ name }}</div>
                     <div class="c-twitter industry-align" v-if="twitter">{{ twitter }}</div>
-                    <div class="c-pronouns industry-align" v-if="player && player.pronouns && showPronouns && !pronounsOnNewline">{{ player.pronouns }}</div>
-                    <div class="c-pronouns industry-align" v-if="player && player.pronouns && showPronouns && pronounsOnNewline" v-html="breakUp(player.pronouns)"></div>
+                    <div class="c-pronouns industry-align" v-if="pronouns && showPronouns && !pronounsOnNewline">{{ pronouns }}</div>
+                    <div class="c-pronouns industry-align" v-if="pronouns && showPronouns && pronounsOnNewline" v-html="breakUp(pronouns)"></div>
                 </div>
             </div>
         </transition>
@@ -47,7 +47,11 @@ export default {
         player() {
             return this.caster || this.guest.player;
         },
+        pronouns() {
+            return this.player?.pronouns || this.guest?.pronouns;
+        },
         twitter() {
+            if (this.guest?.manual && this.guest?.twitter) return this.guest?.twitter;
             if (!this.player?.socials) return "";
             const twitter = this.player.socials.find(s => s.type === "Twitter");
             if (!twitter) return "";

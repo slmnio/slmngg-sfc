@@ -280,3 +280,16 @@ input.no-arrows[type=number] {
 .table.border-no-top tr:first-child th {
     border-top: none;
 }
+
+.gap-1 {
+    gap: .25rem;
+}
+.gap-2 {
+    gap: .5rem;
+}
+.gap-3 {
+    gap: 1rem;
+}
+.gap-4 {
+    gap: 1.5rem;
+}

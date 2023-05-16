@@ -31,6 +31,9 @@
             <template v-slot:header v-if="deskGuestSource">Desk guests pulled from: {{ deskGuestSource }}</template>
             <DeskEditor :broadcast="broadcast" />
         </DashboardModule>
+        <DashboardModule class="mb-2" title="Desk Display" icon-class="far fa-comment-alt-dots">
+            <DeskTextEditor :broadcast="broadcast" />
+        </DashboardModule>
         <DashboardModule title="Bracket Implications" icon-class="fas fa-sitemap" class="broadcast-bracket-editor mb-2" v-if="bracketCount">
             <BracketImplications :match="liveMatch" link-to-detailed-match show-resolve-button />
         </DashboardModule>
@@ -80,10 +83,11 @@ import BracketImplications from "@/components/website/dashboard/BracketImplicati
 import PreviewProgramDisplay from "@/components/website/dashboard/PreviewProgramDisplay.vue";
 import Bracket from "@/components/website/bracket/Bracket.vue";
 import DeskEditor from "@/components/website/dashboard/DeskEditor.vue";
+import DeskTextEditor from "@/components/website/dashboard/DeskTextEditor.vue";
 
 export default {
     name: "Dashboard",
-    components: { DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
+    components: { DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
     computed: {
         user() {
             if (!this.$root.auth.user?.airtableID) return {};

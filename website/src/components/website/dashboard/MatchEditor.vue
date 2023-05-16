@@ -19,7 +19,10 @@
                 <b-button :disabled="processing['map']" class="ml-5 top-button flex-shrink-0" variant="success" @click="() => saveMapAndScores()"><i class="fas fa-save fa-fw"></i> Save all</b-button>
                 </div>
             <div class="teams-scores pt-2 px-2">
-                <b-form-checkbox v-if="showRestrictCheckbox" class="mr-2" v-model="restrictToMapPool" id="map-pool-checkbox">Restrict to map pool</b-form-checkbox>
+                <div class="checkboxes">
+                    <b-form-checkbox v-if="showRestrictCheckbox" class="mr-2" v-model="restrictToMapPool" id="map-pool-checkbox">Restrict to map pool</b-form-checkbox>
+                    <b-form-checkbox class="mr-2" v-model="showMapBanButtons" id="map-ban-checkbox">Show map bans</b-form-checkbox>
+                </div>
                 <div class="spacer" style="order:0"></div>
                 <div class="team" v-for="(team, i) in teams" :key="team.id" :class="{'end': i === 1}">
                     <ContentThing v-if="!team.empty" :thing="team" :theme="team.theme" show-logo="true" type="team" text="" />
@@ -94,7 +97,7 @@
                                 <b-form-input type="text" v-model="replayCodes[i]"></b-form-input>
                             </div>
                         </td>
-                        <td>
+                        <td v-if="showMapBanButtons">
                             <TeamPicker title="Banned by" :teams="teams" v-model="banners[i]"></TeamPicker>
                         </td>
                         <td>
@@ -302,7 +305,8 @@ export default {
         errorMessage: null,
         previousAutoData: null,
         scoreDebounceTimeouts: [],
-        restrictToMapPool: true
+        restrictToMapPool: true,
+        showMapBanButtons: false
     }),
     methods: {
         getMapOptions(mapIndex) {

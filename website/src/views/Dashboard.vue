@@ -8,6 +8,7 @@
                     <MatchThumbnail class="mini-thumbnail" :match="liveMatch" stripe-height="2px"/>
                 </router-link>
                 <div class="match-thumbnail-ghost default-thing mini-thumbnail" v-if="!liveMatch"></div>
+                <router-link class="text-white flex-center d-flex ml-2 no-link-style" :to="`/match/${liveMatch?.id}/editor`"><i class="fas fa-pencil"></i></router-link>
             </div>
             <div class="spacer flex-grow-1"></div>
             <div class="wrapper">
@@ -26,7 +27,7 @@
         <DashboardModule title="Match Editor" icon-class="fas fa-pennant" class="broadcast-match-editor mb-2" v-if="liveMatch" start-opened>
             <MatchEditor :hide-match-extras="true" :match="liveMatch"></MatchEditor>
         </DashboardModule>
-        <DashboardModule title="Desk Guests" icon-class="fas fa-users" class="desk-editor mb-2" start-opened>
+        <DashboardModule title="Desk Guests" icon-class="fas fa-users" class="desk-editor mb-2">
             <template v-slot:header v-if="deskGuestSource">Desk guests pulled from: {{ deskGuestSource }}</template>
             <DeskEditor :broadcast="broadcast" />
         </DashboardModule>

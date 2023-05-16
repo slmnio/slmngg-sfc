@@ -66,6 +66,7 @@ import LinkedPlayers from "@/components/website/LinkedPlayers";
 import { formatTime, getMatchContext, url } from "@/utils/content-utils";
 import { resizedImageNoWrap } from "@/utils/images";
 import { isAuthenticated } from "@/utils/auth";
+import { canEditMatch } from "@/utils/client-action-permissions";
 
 export default {
     name: "Match",
@@ -153,12 +154,7 @@ export default {
         showEditor() {
             if (!isAuthenticated(this.$root)) return false;
             // TODO: Make sure user is an admin or has perms here
-            return (
-                this.$root.auth?.user?.website_settings?.includes("Can edit any match") ||
-                (this.match?.event?.staff || []).includes(`rec${this.$root.auth?.user?.airtableID}`) ||
-                (this.match?.event?.player_relationships || []).some(rel => rel.player?.[0] === `rec${this.$root.auth?.user?.airtableID}` && (rel.permissions || []).includes("Match Editor")) ||
-                (this.match?.player_relationships || []).some(rel => rel.player?.[0] === `rec${this.$root.auth?.user?.airtableID}` && (rel.permissions || []).includes("Match Editor"))
-            );
+            return canEditMatch(this.$root.auth?.user, { event: this.match?.event, match: this.match });
         },
         sidebarItems() {
             const items = ["vod"];

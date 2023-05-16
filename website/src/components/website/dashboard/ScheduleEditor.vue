@@ -1,5 +1,5 @@
 <template>
-    <DashboardModule class="schedule-editor" title="Schedule" icon-class="fas fa-calendar-alt" no-content-border>
+    <DashboardModule class="schedule-editor" title="Schedule" icon-class="fas fa-calendar-alt">
         <template v-slot:header>{{ status }}</template>
 
         <table class="table table-bordered table-sm table-dark mb-0">
@@ -87,5 +87,7 @@ export default {
 </script>
 
 <style scoped>
-
+    table tr.schedule-editor-match:last-child >>> td {
+        border-bottom: none;
+    }
 </style>

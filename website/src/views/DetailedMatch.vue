@@ -84,6 +84,11 @@
                         <i class="fa-fw fas fa-external-link"></i>
                         See match page
                     </router-link>
+                    <router-link :to="`/match/${match.id}/editor`" v-if="matchEditable" class="btn btn-block border-transparent btn-primary text-dark-low"
+                    :style="theme(match.event)">
+                        <i class="fa-fw fas fa-pencil"></i>
+                        Match editor
+                    </router-link>
 
                     <div :class="`mt-3 btn btn-block btn-${showRosters ? 'light' : 'secondary'} mb-2`" v-on:click="showRosters = !showRosters">
                         <i class="fa-fw fas fa-users"></i> Rosters
@@ -180,6 +185,8 @@ import { resizedImage, resizedImageNoWrap } from "@/utils/images";
 import CopyTextButton from "@/components/website/CopyTextButton";
 import BracketImplications from "@/components/website/dashboard/BracketImplications.vue";
 import { getDataServerAddress } from "@/utils/fetch";
+import { canEditMatch } from "@/utils/client-action-permissions";
+import { isAuthenticated } from "@/utils/auth";
 
 export default {
     name: "DetailedMatch",
@@ -317,6 +324,10 @@ export default {
             if (groups[undefined]) return [];
 
             return Object.values(groups);
+        },
+        matchEditable() {
+            if (!isAuthenticated(this.$root)) return false;
+            return canEditMatch(this.$root.auth?.user, { event: this.match?.event, match: this.match });
         }
     },
     metaInfo() {

@@ -429,6 +429,8 @@ export function createGuestObject(str) {
 
         if (part.startsWith("@")) {
             guest.twitter = part;
+        } else if (part.includes("view=")) {
+            guest.webcam = part;
         } else if (part.startsWith("http")) {
             guest.avatar = part;
         } else if (part.includes("/")) {
@@ -438,4 +440,9 @@ export function createGuestObject(str) {
         }
     });
     return guest;
+}
+
+export function getGuestString(guest) {
+    delete guest.manual;
+    return Object.values(guest).join("|");
 }

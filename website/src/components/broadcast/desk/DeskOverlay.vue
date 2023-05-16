@@ -67,8 +67,7 @@ export default {
             return manualGuests;
         },
         guests: function() {
-            if (!this.broadcast?.guests) return [];
-            const guests = ReactiveArray("guests", {
+            const guests = (!this.broadcast?.guests) ? [] : ReactiveArray("guests", {
                 player: ReactiveThing("player", {
                     socials: ReactiveArray("socials")
                 }),

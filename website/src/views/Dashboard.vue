@@ -26,7 +26,8 @@
         <DashboardModule title="Match Editor" icon-class="fas fa-pennant" class="broadcast-match-editor mb-2" v-if="liveMatch" start-opened>
             <MatchEditor :hide-match-extras="true" :match="liveMatch"></MatchEditor>
         </DashboardModule>
-        <DashboardModule title="Desk" icon-class="fas fa-users" class="desk-editor mb-2" start-opened>
+        <DashboardModule title="Desk Guests" icon-class="fas fa-users" class="desk-editor mb-2" start-opened>
+            <template v-slot:header v-if="deskGuestSource">Desk guests pulled from: {{ deskGuestSource }}</template>
             <DeskEditor :broadcast="broadcast" />
         </DashboardModule>
         <DashboardModule title="Bracket Implications" icon-class="fas fa-sitemap" class="broadcast-bracket-editor mb-2" v-if="bracketCount">
@@ -144,6 +145,16 @@ export default {
                     })
                 })
             })(this.liveMatch);
+        },
+        deskGuestSource() {
+            if (this.broadcast?.guests) {
+                return "Broadcast › Guests";
+            } else if (this.liveMatch?.casters) {
+                return "Broadcast › Live Match › Casters";
+            } else if (this.broadcast?.manual_guests) {
+                return "Broadcast › Manual Guests";
+            }
+            return null;
         }
     },
     methods: {

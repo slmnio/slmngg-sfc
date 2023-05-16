@@ -103,8 +103,10 @@ export default {
             return tempGuest[key]?.trim() === guest[key]?.trim();
         },
         confirmRemoveGuest(i) {
-            const okay = window.confirm(`Remove guest "${this.manualGuests?.[i]?.name}"?`) === true;
-            if (!okay) return;
+            if (this.manualGuests?.[i]?.name) {
+                const okay = window.confirm(`Remove guest "${this.manualGuests?.[i]?.name}"?`) === true;
+                if (!okay) return;
+            }
             this.manualGuests.splice(i, 1);
         },
         async saveGuests() {

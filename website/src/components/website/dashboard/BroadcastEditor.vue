@@ -16,6 +16,7 @@
                     <b-button-group>
                         <b-button size="sm" v-for="side in ['Left', 'Right', 'Both']" :key="side"
                                   :variant="broadcast.map_attack === side ? 'danger' : 'secondary'"
+                                  :disabled="updateData?.mapAttack !== undefined"
                                   @click="() => setAttack(side)">{{ side }}</b-button>
                     </b-button-group>
                 </div>
@@ -24,6 +25,7 @@
                 <div class="group-top">Player Cams</div>
                 <div class="group-bottom">
                     <b-form-checkbox :checked="broadcast.show_cams" @change="(state) => togglePlayerCams(state)"
+                                     :disabled="updateData?.playerCams !== undefined"
                                      button size="sm" :button-variant="broadcast.show_cams ? 'primary' : ''">
                         Show Cams
                     </b-form-checkbox>
@@ -32,6 +34,14 @@
         </div>
         <div class="spacer flex-grow-1"></div>
         <div class="area right-area">
+            <div class="group text-right">
+                <div class="group-top">Break match</div>
+                <div class="group-bottom">
+                    <b-button size="sm" :variant="broadcast.show_live_match ? 'primary' : 'secondary'" :pressed="broadcast.show_live_match"
+                              :disabled="updateData?.showLiveMatch !== undefined"
+                              @click="() => setLiveMatchVisibility(!broadcast.show_live_match)">Show live match</b-button>
+                </div>
+            </div>
             <div class="group text-right">
                 <div class="group-top">Break Settings</div>
                 <div class="group-bottom">
@@ -50,6 +60,7 @@
                 <div class="group-top">Advertise</div>
                 <div class="group-bottom">
                     <b-form-checkbox :checked="broadcast.advertise" @change="(state) => advertiseBroadcast(state)"
+                                     :disabled="updateData?.advertise !== undefined"
                                      button size="sm" :button-variant="broadcast.advertise ? 'primary' : ''">
                         {{ broadcast.advertise ? "Advertising" : "Advertise" }}
                     </b-form-checkbox>
@@ -107,11 +118,15 @@ export default {
             this.updateData.mapAttack = set;
             return this.updateBroadcast();
         },
+        async setLiveMatchVisibility(visible) {
+            this.updateData.showLiveMatch = visible;
+            return this.updateBroadcast();
+        },
         async updateBroadcast() {
             if (this.broadcastUpdateTimeout) clearTimeout(this.broadcastUpdateTimeout);
 
             // this.broadcastUpdateTimeout = setTimeout(async () => {
-            updateBroadcastData(this.$root.auth, this.updateData);
+            await updateBroadcastData(this.$root.auth, this.updateData);
             this.updateData = {};
             // }, 500);
         }

@@ -8,8 +8,8 @@
                           @keydown.ctrl.enter="saveData({mode: 'show'})"
                           type="text" v-model="deskText" placeholder="Desk text"/>
             <b-form-select class="w-auto" :options="displayOptions" v-model="chosenDisplayOption"></b-form-select>
-            <b-button @click="saveData({ mode: 'show'})" class="flex-shrink-0" :disabled="processing" :variant="dataDeskMode ? 'primary' : 'secondary'"><i class="fas fa-fw fa-eye"></i> Show</b-button>
-            <b-button @click="saveData({ mode: 'hide'})" class="flex-shrink-0" :disabled="processing" :variant="dataDeskMode ? 'secondary' : 'primary'"><i class="fas fa-eye-slash"></i> Hide</b-button>
+            <b-button @click="saveData({ mode: 'show'})" class="flex-shrink-0" :disabled="processing" :variant="!dataDeskMode ? 'primary' : 'secondary'"><i class="fas fa-fw fa-eye"></i> Show</b-button>
+            <b-button @click="saveData({ mode: 'hide'})" class="flex-shrink-0" :disabled="processing" :variant="!dataDeskMode ? 'secondary' : 'primary'"><i class="fas fa-eye-slash"></i> Hide</b-button>
         </div>
     </div>
 </template>

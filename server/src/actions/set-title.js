@@ -39,6 +39,10 @@ module.exports = {
             "match_group": match.match_group,
             "match_round": match.round,
             "match_number": match.match_number,
+            "match_week_text": match.week_text,
+            "match_week_number": match.week,
+            "match_day": match.day,
+            "match_first_to": match.first_to
         };
 
         let newTitle = broadcast.title_format;

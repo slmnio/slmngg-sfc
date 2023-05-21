@@ -14,7 +14,7 @@
 <!--                        </router-link>-->
                     </div>
                 </div>
-                <div class="player-socials" v-if="player.socials" :style="{ marginLeft: player.overwatch_icon ? '84px' : '16px'}">
+                <div class="player-socials" v-if="player.socials" :style="{ marginLeft: profilePictureTheme?.backgroundImage ? '84px' : '16px'}">
                     <Social class="ct-active" :social="social" v-for="social in player.socials" :key="social.id"/>
                 </div>
             </div>

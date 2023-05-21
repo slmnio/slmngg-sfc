@@ -26,7 +26,16 @@
                 <b-form-select :options="heroes" v-model="profile.favourite_hero" :disabled="heroes.length === 0" />
             </b-form-group>
             <hr>
-            <b-form-group label="Profile Picture" label-cols-lg="2" label-cols-sm="3" label-cols="12" class="image-form-group">
+            <b-form-group label-cols-lg="2" label-cols-sm="3" label-cols="12" class="image-form-group">
+                <template v-slot:label>
+                    <b>Profile Picture</b>
+                    <span class="badge badge-pill badge-info ml-2">NEW <i class="fas fa-sparkles"></i>
+                </span>
+                </template>
+                <template v-slot:description>
+                    <span class="text-info"><b>New!</b> You can set your profile picture to a team or event you were a part of!<br>Once you've saved, you can check your player page <router-link
+                            :to="url('player', { id: player?.id })">here</router-link>.</span>
+                </template>
                 <div class="hero-image profile-theme mr-2" :style="profileTheme"></div>
                 <b-form-select :options="themesForProfile" v-model="profile.profile_picture_theme"></b-form-select>
             </b-form-group>
@@ -46,7 +55,7 @@ import { BButton, BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BFormSele
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { updateProfileData } from "@/utils/dashboard";
 import { resizedImage } from "@/utils/images";
-import { cleanID, getAssociatedThemeOptions } from "@/utils/content-utils";
+import { cleanID, getAssociatedThemeOptions, url } from "@/utils/content-utils";
 import { logoBackground } from "@/utils/theme-styles";
 
 export default {
@@ -204,6 +213,7 @@ export default {
         }
     },
     methods: {
+        url,
         async onSubmit(e) {
             this.submitting = true;
             e.preventDefault();
@@ -286,11 +296,18 @@ export default {
         background-position: center;
         width: 38px;
     }
-    .image-form-group >>> .col {
-        display: flex;
-    }
     hr {
         border-color: rgba(255,255,255,0.1);
     }
-
+    .image-form-group >>> .col {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .image-form-group >>> .custom-select {
+        width: auto;
+        flex-grow: 1;
+    }
+    .image-form-group >>> small {
+        width: 100%;
+    }
 </style>

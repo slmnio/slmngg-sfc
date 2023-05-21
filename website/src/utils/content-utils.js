@@ -49,7 +49,7 @@ export function image (theme, key) {
     return `url(${getImage(theme[key])})`;
 }
 
-export function resizedImage(theme, key, minSize = 30) {
+function resizedImage(theme, key, minSize = 30) {
     if (!theme || !theme[key] || !theme[key][0]) return "";
     const image = theme[key][0];
     if (!image.thumbnails) return image.url;

@@ -1,6 +1,7 @@
 import { getDataServerAddress } from "@/utils/fetch";
 
 import { Notyf } from "notyf";
+
 const notyf = new Notyf({ duration: 5000, position: { x: "right", y: "top" }, dismissible: true });
 
 export async function authenticatedRequest(auth, url, data) {
@@ -63,7 +64,7 @@ export async function updateMatchData(auth, match, updatedData) {
     });
 }
 
-export async function managePred(auth, client, predictionAction) {
+export async function managePred(auth, client, predictionAction, predictionType) {
     if (!auth?.user) {
         notyf.error("Not authenticated");
         return { error: true, errorMessage: "Not authenticated" };
@@ -71,7 +72,8 @@ export async function managePred(auth, client, predictionAction) {
     return await authenticatedRequest(auth, "actions/manage-prediction", {
         client: client.id || client,
         predictionAction,
-        autoLockAfter: 300
+        predictionType,
+        autoLockAfter: predictionType === "map" ? 180 : 300
     });
 }
 

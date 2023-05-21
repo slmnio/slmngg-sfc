@@ -123,6 +123,3 @@
  * @returns {Promise<UpdateRecordResponse>}
  */
 
-/**
- * @typedef {'create'|'lock'|'resolve'|'cancel'} PredictionAction
- */

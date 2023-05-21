@@ -3,7 +3,7 @@
       <div class="top-overlay" :style="broadcastMargin">
           <IngameTeam :key="team.id" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
                       :team="team"  :right="i === 1"
-                      :active="noAnimation || shouldShowTeams" :score="scores[i]" :hideScores="broadcast.hide_scores"
+                      :active="noAnimation || shouldShowTeams" :score="scores[i]" :hide-scores="broadcast.hide_scores"
                       :extend-icons="extendIcons"
                       :width="teamWidth" :codes="useCodes" :event="broadcast.event" :auto-small="autoSmall"
                       :map-attack="attacks[i]" :use-dots="useDots" :first-to="match && match.first_to"
@@ -80,7 +80,7 @@ export default {
             return this.broadcast?.broadcast_settings?.includes("Use dots instead of numbers for score");
         },
         autoSmall() {
-            return this.broadcast?.broadcast_settings?.includes("Show match records ingame") ? { show: "record", stage: this.broadcast?.current_stage } : null;
+            return this.broadcast?.broadcast_settings?.includes("Show match records ingame") ? { show: "record", stage: this.broadcast?.current_stage || this.match?.match_group } : null;
         },
         scores() {
             if (!this.teams) return [];

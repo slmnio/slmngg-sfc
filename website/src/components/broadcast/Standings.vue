@@ -1,5 +1,5 @@
 <template>
-    <div class="standings" v-if="standings && standings.standings && standings.standings.length">
+    <div class="standings" v-if="standings && standings.standings && standings.standings.length" :style="useAutoFontSize ? { 'fontSize': autoFontSize} : {}">
 <!--        <div>{{ event.name }} / {{ stage }} / {{ allMatches.length }} -> {{ stageMatches.length }} ({{ teams.length }} teams)</div>-->
         <h3 class="top-standings-name text-center d-md-none">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</h3>
         <div class="standings-header d-flex align-items-center">
@@ -53,7 +53,8 @@ export default {
         tieText: String,
         showMapDiff: Boolean,
         useCodes: Boolean,
-        overrideShowColumns: Array
+        overrideShowColumns: Array,
+        useAutoFontSize: Boolean
     },
     components: { StandingsTeam },
     methods: {
@@ -84,6 +85,15 @@ export default {
         }
     },
     computed: {
+        autoFontSize() {
+            const teams = this.standings?.standings;
+            if (!teams) return "";
+
+            function clamp(number, min, max) {
+                return Math.max(min, Math.min(number, max));
+            }
+            return clamp(380 / ((teams?.length || 0) + 1.2), 16, 46) + "px";
+        },
         allMatches() {
             if (!this.event || !this.event.matches) return [];
             return ReactiveArray("matches", {

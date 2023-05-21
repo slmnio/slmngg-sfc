@@ -1,6 +1,6 @@
 <template>
     <GenericOverlay :title="title || (stageTitle ? `Standings: ${stageTitle}` : 'Standings')">
-        <Standings class="standings" :event="event" :stage="_stage" :tie-text="standingsSettings && standingsSettings.tieText" />
+        <Standings class="standings" :event="event" :stage="_stage" :tie-text="standingsSettings && standingsSettings.tieText" use-auto-font-size />
     </GenericOverlay>
 </template>
 
@@ -23,8 +23,14 @@ export default {
                 })
             });
         },
+        liveMatch() {
+            if (!this.broadcast?.live_match) return null;
+            return ReactiveRoot(this.broadcast?.live_match?.[0], {
+                teams: ReactiveArray("teams")
+            });
+        },
         _stage() {
-            return (this.stage || this.broadcast?.current_stage || "").toLowerCase();
+            return (this.stage || this.broadcast?.current_stage || this.liveMatch?.match_group || "").toLowerCase();
         },
         blocks() {
             if (!this.event || !this.event.blocks) return null;

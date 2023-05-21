@@ -190,7 +190,15 @@ export default {
             return this.broadcast.break_display;
         },
         bracketKey() {
-            return this.broadcast?.bracket_key;
+            const key = this.broadcast?.bracket_key;
+            if (key) return key;
+            // find bracket this match is in
+            if (this.nextMatch) {
+                const bracket = this.event.brackets.find(b => b.key && b?.ordered_matches?.some(m => m.id === this.nextMatch?.id));
+                console.log(this.event.brackets, bracket);
+                return bracket?.key;
+            }
+            return null;
         },
         bracket() {
             if (!this.event?.brackets) return null;
@@ -249,7 +257,7 @@ export default {
             }
         },
         currentStage() {
-            return this.virtualMatch?._virtual_match_category || this.broadcast?.current_stage;
+            return this.virtualMatch?._virtual_match_category || this.broadcast?.current_stage || this.nextMatch?.match_group;
         },
         countdownEnd() {
             return this.virtualMatch?._virtual_break_end || this.broadcast?.countdown_end;

@@ -21,9 +21,14 @@
             <b-form-group label="Overwatch Role" label-cols-lg="2" label-cols-sm="3" label-cols="12">
                 <b-form-select :options="roles" v-model="profile.role"/>
             </b-form-group>
-            <b-form-group label="Favourite Hero" label-cols-lg="2" label-cols-sm="3" label-cols="12" class="hero-form-group">
+            <b-form-group label="Favourite Hero" label-cols-lg="2" label-cols-sm="3" label-cols="12" class="image-form-group">
                 <div class="hero-image mr-2" :style="heroImage"></div>
                 <b-form-select :options="heroes" v-model="profile.favourite_hero" :disabled="heroes.length === 0" />
+            </b-form-group>
+            <hr>
+            <b-form-group label="Profile Picture" label-cols-lg="2" label-cols-sm="3" label-cols="12" class="image-form-group">
+                <div class="hero-image profile-theme mr-2" :style="profileTheme"></div>
+                <b-form-select :options="themesForProfile" v-model="profile.profile_picture_theme"></b-form-select>
             </b-form-group>
             <div>
                 <b-button type="submit" variant="success">
@@ -38,9 +43,11 @@
 
 <script>
 import { BButton, BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BFormSelect } from "bootstrap-vue";
-import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { updateProfileData } from "@/utils/dashboard";
 import { resizedImage } from "@/utils/images";
+import { cleanID, getAssociatedThemeOptions } from "@/utils/content-utils";
+import { logoBackground } from "@/utils/theme-styles";
 
 export default {
     name: "ProfilePage",
@@ -49,8 +56,42 @@ export default {
         player() {
             if (!this.$root.auth.user?.airtableID) return {};
             return ReactiveRoot(this.$root.auth.user.airtableID, {
-
+                member_of: ReactiveArray("member_of", {
+                    theme: ReactiveThing("theme")
+                }),
+                captain_of: ReactiveArray("captain_of", {
+                    theme: ReactiveThing("theme")
+                }),
+                team_staff: ReactiveArray("team_staff", {
+                    theme: ReactiveThing("theme")
+                }),
+                brands_designed: ReactiveArray("brands_designed", {
+                    theme: ReactiveThing("theme")
+                }),
+                owned_teams: ReactiveArray("owned_teams", {
+                    theme: ReactiveThing("theme")
+                }),
+                event_staff: ReactiveArray("event_staff", {
+                    theme: ReactiveThing("theme")
+                }),
+                event_brands_designed: ReactiveArray("event_brands_designed", {
+                    theme: ReactiveThing("theme")
+                }),
+                casted_events: ReactiveArray("casted_events", {
+                    theme: ReactiveThing("theme")
+                })
             });
+        },
+        themesForProfile() {
+            return getAssociatedThemeOptions(this.player, (item) => item.theme?.id);
+        },
+        profileTheme() {
+            if (!this.profile?.profile_picture_theme) return {};
+            const theme = ReactiveRoot(this.profile.profile_picture_theme);
+            return {
+                ...logoBackground(theme),
+                ...resizedImage(theme, ["default_logo", "small_logo", "default_wordmark"], "s-100")
+            };
         },
         isRestricted() {
             return this.player?.website_settings?.includes("No profile editing");
@@ -85,14 +126,14 @@ export default {
             return Object.entries(groups).map(([groupName, group]) => ({
                 label: groupName,
                 options: group.map(hero => ({
-                    value: `rec${hero.id}`,
+                    value: hero.id,
                     text: hero.name
                 }))
             }));
         },
         activeFavouriteHero() {
             if (this.profile.favourite_hero) {
-                return this._heroes.find(hero => `rec${hero.id}` === this.profile.favourite_hero);
+                return this._heroes.find(hero => hero.id === this.profile.favourite_hero);
             }
             return null;
         },
@@ -120,7 +161,8 @@ export default {
             pronouns: null,
             pronunciation: null,
             role: null,
-            favourite_hero: null
+            favourite_hero: null,
+            profile_picture_theme: null
         },
         submitting: false,
         errorMessage: null,
@@ -187,7 +229,9 @@ export default {
         },
         updateProfile(data) {
             Object.entries(this.profile).forEach(([key]) => {
-                if (key === "favourite_hero" && data[key]?.[0]) data[key] = data[key][0];
+                if (["favourite_hero", "profile_picture_theme"].includes(key) && data[key]?.[0] && data[key]?.[0]?.startsWith("rec")) {
+                    data[key] = cleanID(data[key][0]);
+                }
                 if (data[key] !== this.profile[key]) {
                     this.profile[key] = data[key] || null;
                 }
@@ -237,7 +281,12 @@ export default {
         background-color: rgba(255,255,255,0.1);
         background-size: 100%;
     }
-    .hero-form-group >>> .col {
+    .profile-theme {
+        background-size: 70%;
+        background-position: center;
+        width: 38px;
+    }
+    .image-form-group >>> .col {
         display: flex;
     }
     hr {

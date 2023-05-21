@@ -1,5 +1,6 @@
 import spacetime from "spacetime";
 import informal from "spacetime-informal";
+import { sortEvents, sortTeams } from "@/utils/sorts";
 
 export function getImage (i) {
     // console.log(i);
@@ -445,4 +446,34 @@ export function createGuestObject(str) {
 export function getGuestString(guest) {
     delete guest.manual;
     return Object.values(guest).join("|");
+}
+
+export function getAssociatedThemeOptions(player, valueFn) {
+    let teams = [
+        ...player.member_of || [],
+        ...player.captain_of || [],
+        ...player.team_staff || [],
+        ...player.brands_designed || [],
+        ...player.owned_teams || []
+    ];
+    let events = [
+        ...player.event_staff || [],
+        ...player.event_brands_designed || [],
+        ...player.casted_events || []
+    ];
+
+    (player.player_relationships || []).forEach(rel => {
+        if (rel.teams) {
+            teams = [...teams, ...rel.teams];
+        }
+        if (rel.events) {
+            events = [...events, ...rel.events];
+        }
+    });
+
+    return [
+        { value: null, disabled: true, text: "Choose a theme" },
+        { label: "Teams", options: teams.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortTeams).map((t) => ({ ...t, text: t.name, value: valueFn ? valueFn(t) : t.id })) },
+        { label: "Events", options: events.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortEvents).map((e) => ({ ...e, text: e.name, value: valueFn ? valueFn(e) : e.id })) }
+    ];
 }

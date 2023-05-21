@@ -24,8 +24,8 @@
 import { AllBanners } from "@/utils/banners";
 import { resizedImageNoWrap } from "@/utils/images";
 import { BAlert, BButton, BFormSelect } from "bootstrap-vue";
-import { sortEvents, sortTeams } from "@/utils/sorts";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { getAssociatedThemeOptions } from "@/utils/content-utils";
 
 export default {
     name: "PlayerBannerCreator",
@@ -58,33 +58,7 @@ export default {
             ];
         },
         playerThings() {
-            let teams = [
-                ...this.player.member_of || [],
-                ...this.player.captain_of || [],
-                ...this.player.team_staff || [],
-                ...this.player.brands_designed || [],
-                ...this.player.owned_teams || []
-            ];
-            let events = [
-                ...this.player.event_staff || [],
-                ...this.player.event_brands_designed || [],
-                ...this.player.casted_events || []
-            ];
-
-            (this.player.player_relationships || []).forEach(rel => {
-                if (rel.teams) {
-                    teams = [...teams, ...rel.teams];
-                }
-                if (rel.events) {
-                    events = [...events, ...rel.events];
-                }
-            });
-
-            return [
-                { value: null, disabled: true, text: "Choose a theme" },
-                { label: "Teams", options: teams.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortTeams).map((t) => ({ ...t, text: t.name, value: t.id })) },
-                { label: "Events", options: events.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortEvents).map((e) => ({ ...e, text: e.name, value: e.id })) }
-            ];
+            return getAssociatedThemeOptions(this.player);
         },
         customThemeAccolades: function () {
             if (!this.customTheme) return [];

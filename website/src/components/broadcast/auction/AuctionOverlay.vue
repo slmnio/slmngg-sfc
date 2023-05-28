@@ -147,11 +147,14 @@ export default {
             });
 
             const draftablePlayerIDs = this.broadcast?.event?.draftable_players || [];
+            const preDraftedPlayerIDs = [];
             const draftedPlayerIDs = [];
             const undraftedPlayerIDs = [];
 
             draftablePlayerIDs.forEach(id => {
-                if (this.teams.some(team => team.players.some(p => cleanID(p.id) === cleanID(id)))) {
+                if ((this.preDraftedTeams).some(team => team?.players?.some(p => cleanID(p.id) === cleanID(id)))) {
+                    preDraftedPlayerIDs.push(id);
+                } else if (this.teams.some(team => team?.players?.some(p => cleanID(p.id) === cleanID(id)))) {
                     draftedPlayerIDs.push(id);
                 } else {
                     undraftedPlayerIDs.push(id);
@@ -159,6 +162,7 @@ export default {
             });
 
             console.log("player IDs", {
+                preDraftedPlayerIDs,
                 draftedPlayerIDs,
                 undraftedPlayerIDs
             });
@@ -167,7 +171,8 @@ export default {
                 totalSlots,
                 drafted,
                 slotsRemaining,
-                totalDraftablePlayerCount: draftablePlayerIDs.length,
+                totalPreDraftedPlayerCount: preDraftedPlayerIDs.length,
+                totalDraftablePlayerCount: draftablePlayerIDs.length - preDraftedPlayerIDs.length,
                 undraftedPlayerCount: undraftedPlayerIDs.length
             };
         },
@@ -311,6 +316,12 @@ export default {
             const sum = balances.reduce((a, b) => a + b, 0);
             const avg = (sum / balances.length) || 0;
             return avg;
+        },
+        preDraftedTeams() {
+            if (!this._broadcast?.event?.teams?.length) return [];
+            let teams = this._broadcast.event.teams;
+            if (this.category) teams = teams.filter(t => !this.category || (t.team_category?.includes(";") ? t.team_category.split(";")[1] : t.team_category) !== this.category);
+            return teams;
         },
         teams() {
             if (!this._broadcast?.event?.teams?.length) return null;

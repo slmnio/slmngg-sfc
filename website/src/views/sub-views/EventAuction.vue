@@ -11,6 +11,12 @@
 
             <div class="row">
                 <div class="active-player col-7 mb-5">
+                    <div class="last-started" v-if="lastStartedTeam && ['PRE_AUCTION', 'IN_ACTION'].includes(auctionState)">
+                        <div class="badge badge-pill badge-secondary">Started by</div> <ThemeLogo :theme="lastStartedTeam?.theme" border-width="3px" icon-padding="4px" /> <router-link class="no-link-style" :to="url('team', lastStartedTeam)" target="_blank">{{ lastStartedTeam?.name || '&nbsp;' }}</router-link>
+                    </div>
+                    <div class="last-started" v-if="nextTeamToStart && ['READY', 'POST_AUCTION', 'RESTRICTED'].includes(auctionState)">
+                        <div class="badge badge-pill badge-primary">Next to start</div> <ThemeLogo :theme="nextTeamToStart?.theme" border-width="3px" icon-padding="4px" /> <router-link class="no-link-style" :to="url('team', nextTeamToStart)" target="_blank">{{ nextTeamToStart?.name || ' ' }}</router-link>
+                    </div>
                     <div class="player-name" v-if="activePlayer">
                         <router-link class="no-link-style" :to="url('player', activePlayer)" target="_blank">{{ activePlayer?.name || '&nbsp;' }}</router-link>
                         <div class="player-role" v-if="activePlayer?.role" v-html="getRoleSVG(activePlayer.role)"></div>
@@ -78,6 +84,8 @@
                         <div class="text money">{{ money(team.balance) }}</div>
                         <div class="text player-count ml-2">({{ auctionSettings.each_team - (team.players?.length || 0) }} to draft)</div>
                     </div>
+                    <div class="ml-2 badge badge-pill badge-secondary" v-if="lastStartedTeam?.id === team?.id">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>
+                    <div class="ml-2 badge badge-pill badge-primary" v-if="nextTeamToStart?.id === team?.id">Next to start</div>
                     <ul>
                         <li v-for="player in team.players" :key="player.id">
                             <router-link :to="url('player', player)" target="_blank">{{ player?.name }}</router-link>
@@ -162,10 +170,11 @@ import AuctionBid from "@/components/website/AuctionBid.vue";
 import { VBTooltip } from "bootstrap-vue";
 import ContentThing from "@/components/website/ContentThing.vue";
 import { themeBackground1 } from "@/utils/theme-styles";
+import ThemeLogo from "@/components/website/ThemeLogo.vue";
 
 export default {
     name: "EventAuction",
-    components: { ContentThing, AuctionBid, AuctionCountdown },
+    components: { ThemeLogo, ContentThing, AuctionBid, AuctionCountdown },
     directives: { BTooltip: VBTooltip },
     props: {
         event: {}
@@ -178,7 +187,8 @@ export default {
         actingTeamID: null,
         bids: [],
         customBidAmount: 0,
-        adminTeamID: null
+        adminTeamID: null,
+        lastStartedTeamID: null
     }),
     computed: {
         activePlayer() {
@@ -202,6 +212,21 @@ export default {
                 }),
                 favourite_hero: ReactiveThing("favourite_hero")
             });
+        },
+        lastStartedTeam() {
+            if (!this.lastStartedTeamID) return null;
+            return this.teams.find(t => cleanID(t.id) === cleanID(this.lastStartedTeamID));
+        },
+        nextTeamToStart() {
+            // || !["POST_AUCTION", "READY", "IN_ACTION"].includes(this.auctionState)
+            if (!this.lastStartedTeamID) return null;
+            const lastTeamIndex = this.groupedTeams.active.findIndex(t => cleanID(t.id) === cleanID(this.lastStartedTeamID));
+            if (lastTeamIndex === -1) return null;
+            let nextTeamIndex = lastTeamIndex + 1;
+            if (lastTeamIndex >= this.groupedTeams.active?.length - 1) {
+                nextTeamIndex = 0;
+            }
+            return this.groupedTeams.active[nextTeamIndex];
         },
         eventSettings() {
             if (!this.event?.blocks) return null;
@@ -267,10 +292,14 @@ export default {
         },
         teams() {
             if (!this.event?.teams?.length) return [];
+            return this.allEventTeams.filter(team => team?.draft_order).sort((a, b) => a.draft_order - b.draft_order);
+        },
+        allEventTeams() {
+            if (!this.event?.teams?.length) return [];
             return ReactiveArray("teams", {
                 theme: ReactiveThing("theme"),
                 players: ReactiveArray("players")
-            })(this.event).filter(team => team?.draft_order).sort((a, b) => a.draft_order - b.draft_order);
+            })(this.event);
         },
         groupedTeams() {
             const groups = {
@@ -331,7 +360,7 @@ export default {
             })(this.event);
         },
         undraftedPlayers() {
-            const draftingTeamIDs = this.teams.map(team => team?.id).filter(Boolean).map(id => dirtyID(id));
+            const draftingTeamIDs = this.allEventTeams.map(team => team?.id).filter(Boolean).map(id => dirtyID(id));
             if (!draftingTeamIDs?.length) return [];
             return this.allPlayers.filter(player => {
                 return !(player?.member_of || []).some(teamID => draftingTeamIDs.includes(dirtyID(teamID)));
@@ -412,31 +441,36 @@ export default {
         }
     },
     sockets: {
-        auction_welcome({ auctionID, ready, state, activePlayerID }) {
+        auction_welcome({ auctionID, ready, state, activePlayerID, lastStartedTeamID }) {
             if (auctionID !== this.eventID) return console.warn("Auction welcome from unknown source", auctionID);
             this.auctionServerConnected = true;
             this.auctionState = state;
             if (state === "IN_ACTION" && activePlayerID) {
                 this.activePlayerID = activePlayerID;
             }
+            this.lastStartedTeamID = lastStartedTeamID;
             console.log("auction welcome", { auctionID, ready });
         },
-        auction_state({ state, oldState, activePlayerID }) {
+        auction_state({ state, oldState, activePlayerID, lastStartedTeamID }) {
             this.auctionState = state;
             this.activePlayerID = activePlayerID;
+            this.lastStartedTeamID = lastStartedTeamID;
         },
-        auction_start({ activePlayerID }) {
+        auction_start({ activePlayerID, startingTeamID }) {
             this.state = "IN_ACTION";
             this.activePlayerID = activePlayerID;
+            this.lastStartedTeamID = startingTeamID;
         },
-        auction_pre_auction({ activePlayerID }) {
+        auction_pre_auction({ activePlayerID, startingTeamID }) {
             this.state = "PRE_AUCTION";
             this.activePlayerID = activePlayerID;
+            this.lastStartedTeamID = startingTeamID;
         },
-        auction_post_auction({ activePlayerID }) {
+        auction_post_auction({ activePlayerID, startingTeamID }) {
             this.state = "POST_AUCTION";
             this.activePlayerID = activePlayerID;
             this.customBidAmount = 0;
+            this.lastStartedTeamID = startingTeamID;
         },
         auction_error(error) {
             console.warn("auction_error", error);
@@ -526,6 +560,18 @@ export default {
     }
     .draft-data {
         white-space: pre-wrap;;
+    }
+    .last-started {
+        display: flex;
+        gap: .5em;
+        align-items: center;
+    }
+    .last-started .icon-holder {
+        height: 2em;
+        width: 2em;
+    }
+    .last-started .badge {
+        font-size: 1em;
     }
 </style>
 

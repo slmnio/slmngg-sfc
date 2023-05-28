@@ -13,6 +13,7 @@ module.exports = class Auction {
         this.isRestricted = true;
 
         this.activePlayerID = null;
+        this.lastStartedTeamID = null;
 
         this.wait = {
             beforeFirstBids: auctionData?.time?.beforeFirstBids ?? 5,
@@ -48,7 +49,8 @@ module.exports = class Auction {
             auctionID: this.id,
             ready: true,
             state: this.state,
-            activePlayerID: this.state === "IN_ACTION" && this.activePlayerID
+            activePlayerID: this.state === "IN_ACTION" && this.activePlayerID,
+            lastStartedTeamID: this.lastStartedTeamID
         });
         this.io.to(socketID).emit("auction_bids", this.bidData);
     }
@@ -86,7 +88,8 @@ module.exports = class Auction {
             auctionID: this.id,
             state,
             oldState: this.state,
-            activePlayerID: state === "IN_ACTION" && this.activePlayerID
+            activePlayerID: state === "IN_ACTION" && this.activePlayerID,
+            lastStartedTeamID: this.lastStartedTeamID
         });
         this.handleStateChange(this.state, state);
         this.state = state;
@@ -278,11 +281,12 @@ module.exports = class Auction {
         this.log("start", playerID, startingBid);
 
         this.activePlayerID = playerID;
+        this.lastStartedTeamID = startingBid?.teamID;
         this.bids.push(startingBid);
 
         if (this.wait.preAuction) {
             this.setState("PRE_AUCTION");
-            this.broadcastData("auction_pre_auction", { activePlayerID: playerID });
+            this.broadcastData("auction_pre_auction", { activePlayerID: playerID, startingTeamID: startingBid?.teamID });
             this.timer.start();
         } else {
             this.startAuction();
@@ -291,7 +295,7 @@ module.exports = class Auction {
 
     startAuction() {
         this.setState("IN_ACTION");
-        this.broadcastData("auction_start", { activePlayerID: this.activePlayerID });
+        this.broadcastData("auction_start", { activePlayerID: this.activePlayerID, startingTeamID: this.lastStartedTeamID });
         this.timer.start();
     }
 
@@ -303,7 +307,7 @@ module.exports = class Auction {
 
         if (this.wait.postAuction) {
             this.setState("POST_AUCTION");
-            this.broadcastData("auction_post_auction", { activePlayerID: this.activePlayerID });
+            this.broadcastData("auction_post_auction", { activePlayerID: this.activePlayerID, startingTeamID: this.lastStartedTeamID });
             this.timer.start();
         } else {
             this.closeAuction();

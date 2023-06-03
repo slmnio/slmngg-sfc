@@ -1,4 +1,4 @@
-const { safeInput } = require("../action-utils/action-utils");
+const { safeInput, safeInputNoQuotes } = require("../action-utils/action-utils");
 
 module.exports = {
     key: "update-broadcast",
@@ -52,7 +52,7 @@ module.exports = {
             validatedData["Desk Display"] = deskDisplayMode;
         }
         if (deskDisplayText !== undefined) {
-            validatedData["Notice Text"] = safeInput(deskDisplayText);
+            validatedData["Notice Text"] = safeInputNoQuotes(deskDisplayText);
         }
 
         console.log(validatedData);

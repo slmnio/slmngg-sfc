@@ -191,9 +191,15 @@ function safeInput(string) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+function safeInputNoQuotes(string) {
+    return string
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
 
 
 module.exports = {
-    getSelfClient, cleanID, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord, safeInput,
+    getSelfClient, cleanID, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord, safeInput, safeInputNoQuotes,
     getTwitchChannel, getMatchData, getTwitchAPIClient, getTwitchAPIError, getBroadcast, getMaps, getAll
 };

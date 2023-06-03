@@ -114,7 +114,8 @@ const slmnggAttachments = {
     "Heroes": ["main_image", "recolor_base", "recolor_layers"],
     "Ad Reads": ["audio", "image"],
     "Tracks": ["file"],
-    "Teams": ["icon"]
+    "Teams": ["icon"],
+    "GFX": ["image"]
 };
 
 function generateAttachmentURL(str, attachment) {

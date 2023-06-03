@@ -176,3 +176,13 @@ export async function updateBreakDisplay(auth, option) {
         option
     });
 }
+
+export async function updateGfxIndex(auth, gfxID, index) {
+    if (!auth?.user) {
+        notyf.error("Not authenticated");
+        return { error: true, errorMessage: "Not authenticated" };
+    }
+    return await authenticatedRequest(auth, "actions/update-gfx-index", {
+        gfxID, index
+    });
+}

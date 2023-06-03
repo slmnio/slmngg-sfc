@@ -168,6 +168,13 @@ export default [
             buffer: parseInt(route.query.buffer)
         })
     },
+    {
+        path: "gfx/:index",
+        component: () => import("@/components/broadcast/roots/GFXRoot.vue"),
+        props: route => ({
+            index: parseInt(route.params.index) || parseInt(route.query.index ?? route.query.number) || 1
+        })
+    },
 
     /* Production staff stuff */
     { path: "clock", component: () => import("@/components/broadcast/roots/MediaClock.vue") },

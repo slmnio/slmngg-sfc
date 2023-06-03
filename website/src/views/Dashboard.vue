@@ -37,6 +37,9 @@
         <DashboardModule class="mb-2" title="Desk Display" icon-class="far fa-comment-alt-dots">
             <DeskTextEditor :broadcast="broadcast" />
         </DashboardModule>
+        <DashboardModule class="mb-2" title="GFX" icon-class="fas fa-palette">
+            <GFXController :broadcast="broadcast" :client="client"/>
+        </DashboardModule>
         <DashboardModule title="Bracket Implications" icon-class="fas fa-sitemap" class="broadcast-bracket-editor mb-2" v-if="bracketCount">
             <BracketImplications :match="liveMatch" link-to-detailed-match show-resolve-button />
         </DashboardModule>
@@ -88,10 +91,11 @@ import Bracket from "@/components/website/bracket/Bracket.vue";
 import DeskEditor from "@/components/website/dashboard/DeskEditor.vue";
 import DeskTextEditor from "@/components/website/dashboard/DeskTextEditor.vue";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
+import GFXController from "@/views/GFXController.vue";
 
 export default {
     name: "Dashboard",
-    components: { ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
+    components: { GFXController, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
     data: () => ({
         titleProcessing: false
     }),
@@ -118,7 +122,8 @@ export default {
                                 broadcasts: ReactiveThing("broadcasts"),
                                 theme: ReactiveThing("theme")
                             })
-                        })
+                        }),
+                        gfx: ReactiveArray("gfx")
                     })
                 }) // TODO: make this just client
             });

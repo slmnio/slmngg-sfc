@@ -61,6 +61,7 @@ export default {
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")
                 }),
+                gfx: ReactiveArray("gfx"),
                 other_broadcasts: ReactiveArray("other_broadcasts"),
                 headlines: ReactiveArray("headlines"),
                 highlight_media: ReactiveThing("highlight_media"),

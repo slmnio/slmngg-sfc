@@ -130,10 +130,15 @@ module.exports = ({ app, Cache }) => {
 
                 return meta({
                     title: thing.name,
-                    ...(thing.overwatch_icon ? {
-                        image: { url: thing.overwatch_icon,
-                            width: 128, height: 128 }
-                    } : {}),
+                    ...(thing.profile_picture_theme ?
+                        {
+                            image: {
+                                url: themeSquare(cleanID(thing.profile_picture_theme?.[0])),
+                                width: 500,
+                                height: 500
+                            }
+                        } : {}
+                    ),
                     description: `${thing.name}'s player profile.`
                 });
             }

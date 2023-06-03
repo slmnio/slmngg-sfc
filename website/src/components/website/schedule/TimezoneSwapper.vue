@@ -4,7 +4,7 @@
             <b-form-group label-size="sm" label="Timezone" :label-cols-sm="inline ? 3 : 12">
                 <b-form-select id="available-timezone-select" :options="availableTimezones" v-model="siteTimezone" size="sm" />
             </b-form-group>
-            <b-form-checkbox :class="{'ml-3': inline}" size="sm" switch v-model="use24HourTime">
+            <b-form-checkbox v-if="!inline" size="sm" switch v-model="use24HourTime">
                 Use 24-hour time
             </b-form-checkbox>
         </b-form>

@@ -4,6 +4,9 @@
         <BracketOverlay v-if="gfx?.type === 'Bracket'" v-bind="overlayProps" />
         <ImageOverlay v-if="gfx?.type === 'Image'" v-bind="overlayProps" />
         <IframeOverlay v-if="gfx?.type === 'Iframe'" v-bind="overlayProps" />
+        <v-style>
+            {{ gfx?.custom_css }}
+        </v-style>
     </div>
 </template>
 

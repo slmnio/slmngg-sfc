@@ -1,16 +1,19 @@
 <template>
     <div class="break-overlay">
         <div class="break-center">
-            <ThemeTransition class="break-transition-top" :theme="event && event.theme" :one-color="true" :active="animationActive" start="middle" end="middle">
-                <Squeezable align="middle" :disabled="(overlayTitle).includes('\\n')" class="break-top event-theme-border flex-center overlay--bg" :style="eventBorder">
-                    <transition name="fade" mode="out-in">
-                        <span class="industry-align" :class="{'has-br': (overlayTitle).includes('\\n') }"
-                              :key="overlayTitle" v-html="nbr(overlayTitle)"></span>
-                    </transition>
-                    <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News" :borderCSS="eventBorder" />
-                </Squeezable>
+            <ThemeTransition class="break-transition-top w-100 h-100" :theme="event && event.theme" :active="animationActive" start="middle" end="middle">
+                <div class="break-top event-theme-border flex-center overlay--bg px-4" :style="eventBorder">
+                    <Squeezable align="middle" :disabled="(overlayTitle).includes('\\n')" class="w-100 flex-center">
+                        <transition name="fade" mode="out-in">
+                            <span class="industry-align" :class="{'has-br': (overlayTitle).includes('\\n') }"
+                                  :key="overlayTitle" v-html="nbr(overlayTitle)"></span>
+                        </transition>
+                        <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News" :interval="headlineInterval"
+                                        :borderCSS="eventBorder"/>
+                    </Squeezable>
+                </div>
             </ThemeTransition>
-            <ThemeTransition class="break-transition-main" :theme="event && event.theme" :one-color="true" :active="animationActive" start="middle" end="middle" :starting-delay="100">
+            <ThemeTransition class="break-transition-main w-100 h-100" :theme="event && event.theme" :active="animationActive" start="middle" end="middle" :starting-delay="100">
                 <div class="break-main event-theme-border overlay--bg" :style="eventBorder">
                     <div class="break-col break-left-col">
                         <transition name="anim-break-next">
@@ -20,9 +23,9 @@
                         </transition>
                         <transition name="anim-break-next">
                             <!-- TODO: make this mirror the actual countdown, handling the not-starting-on-zero thing -->
-                            <div class="countdown-text" v-if="!broadcast.countdown_end && !nextMatch">Current time</div>
+                            <div class="countdown-text" v-if="!countdownEnd && !nextMatch">Current time</div>
                         </transition>
-                        <Countdown class="break-countdown" :to="broadcast.countdown_end" :timezone="broadcast.timezone"
+                        <Countdown class="break-countdown" :to="countdownEnd" :timezone="broadcast.timezone"
                                    :update="(e) => countdownTick(e)"/>
                         <Sponsors class="break-sponsors" :sponsors="sponsorThemes"/>
                     </div>
@@ -33,8 +36,8 @@
                                         :expanded="true" :key="match.id" :theme-color="themeColor"/>
                         </transition-group>
                         <div class="break-col break-standings" v-if="automatedShow === 'Standings'"
-                             :key="`Standings-${broadcast.current_stage || ''}`">
-                            <Standings :event="event" :stage="broadcast.current_stage"/>
+                             :key="`Standings-${currentStage || ''}`">
+                            <Standings :event="event" :stage="currentStage"/>
                         </div>
                         <div class="break-col break-image" v-if="automatedShow === 'Image'"
                              :key="`image-${breakImageURL}`">
@@ -71,7 +74,7 @@
         </div>
         <div class="break-preload">
             <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />
-            <Standings :event="event" :stage="broadcast.current_stage" />
+            <Standings :event="event" :stage="currentStage" />
             <div class="break-image-inner" :style="breakImage"></div>
             <Bracket class="break-col break-bracket" :event="event" :bracket="bracket" use-overlay-scale />
             <BreakMatchup class="break-col break-matchup" :match="nextMatch" />
@@ -104,7 +107,7 @@ const tickTime = 25;
 
 export default {
     name: "BreakOverlay",
-    props: ["broadcast", "title", "animationActive", "secondary", "headlineInterval"],
+    props: ["broadcast", "title", "animationActive", "secondary", "headlineInterval", "virtualMatch", "customBreakAutomation"],
     components: { Squeezable, OtherBroadcasts, ThemeLogo, BreakMatchup, BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown, ThemeTransition },
     data: () => ({
         tick: 0,
@@ -131,6 +134,7 @@ export default {
             return resizedImageNoWrap(this.broadcast, ["break_image"], "h-1080");
         },
         nextMatch() {
+            if (this.virtualMatch) return this.virtualMatch;
             if (!this.broadcast || !this.broadcast.live_match || !this.broadcast.show_live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
@@ -139,6 +143,7 @@ export default {
             });
         },
         fullSchedule() {
+            if (this.virtualMatch) return [this.virtualMatch];
             if (!this.broadcast || !this.broadcast.schedule) return null;
             return ReactiveArray("schedule", {
                 teams: ReactiveArray("teams", {
@@ -185,13 +190,27 @@ export default {
             return this.broadcast.break_display;
         },
         bracketKey() {
-            return this.broadcast?.bracket_key;
+            const key = this.broadcast?.bracket_key;
+            if (key) return key;
+            // find bracket this match is in
+            if (this.nextMatch) {
+                const bracket = this.event.brackets.find(b => b.key && b?.ordered_matches?.some(m => m.id === this.nextMatch?.id));
+                console.log(this.event.brackets, bracket);
+                return bracket?.key;
+            }
+            return null;
         },
         bracket() {
             if (!this.event?.brackets) return null;
-            if (!this.bracketKey) return this.event.brackets[0];
-            const bracket = this.event.brackets.find(b => b && b.key === this.bracketKey);
-            return bracket || this.event.brackets[0];
+            if (this.virtualMatch?._virtual_match_category) {
+                const bracket = this.event.brackets.find(b => b && b.associated_match_group === this.virtualMatch._virtual_match_category);
+                if (bracket) return bracket;
+            }
+            if (this.bracketKey) {
+                const bracket = this.event.brackets.find(b => b && b.key === this.bracketKey);
+                if (bracket) return bracket;
+            }
+            return this.event.brackets[0];
         },
         headlines() {
             return (this.broadcast?.headlines || []).filter(b => b.ready);
@@ -199,29 +218,36 @@ export default {
         themeColor() {
             return themeBackground1(this.event);
         },
+        breakAutomation() {
+            return this.customBreakAutomation || this.broadcast?.break_automation || [];
+        },
         suggestedShow() {
-            if (!this.broadcast?.break_automation?.length) return null;
+            if (!this.breakAutomation?.length) return null;
 
-            let slides = this.broadcast.break_automation.filter(s => s.startsWith("use:")).map(s => s.replace("use: ", ""));
+            let slides = this.breakAutomation.filter(s => s.startsWith("use:")).map(s => s.replace("use: ", ""));
             console.log(slides);
             if (!this.nextMatch) slides = slides.filter(s => s !== "Matchup");
-
-            console.log(slides, this.nextMatch);
+            if (!this.currentStage) slides = slides.filter(s => s !== "Standings");
+            if (!this.bracket) slides = slides.filter(s => s !== "Bracket");
+            if (!this.virtualMatch) slides = slides.filter(s => s !== "Schedule"); // Only going to be 1 match atm so matchup will be fine
+            console.log(slides);
 
             // TODO: add stuff here that changes based on the countdown remaining
 
 
-            if (slides?.includes("Schedule") && this.broadcast.countdown_end && this.lastCountdownTick <= 30) {
+            if (slides?.includes("Schedule") && this.countdownEnd && this.lastCountdownTick <= 30) {
                 return "Schedule";
             }
 
             return slides[(this.tick % slides.length)];
         },
         automatedShow() {
-            if (this.broadcast?.break_automation?.length && this.lastCountdownTick <= 30 && this.broadcast.countdown_end) {
-                if (this.broadcast.break_automation.includes("setting: Always do 30s Schedule")) return "Schedule";
-                if (this.broadcast.break_automation.includes("setting: Always do 30s Matchup")) return "Matchup";
+            if (this.breakAutomation?.length && this.lastCountdownTick <= 30 && this.countdownEnd) {
+                if (this.breakAutomation.includes("setting: Always do 30s Schedule")) return "Schedule";
+                if (this.breakAutomation.includes("setting: Always do 30s Matchup") && this.nextMatch) return "Matchup";
             }
+            if (this.customBreakAutomation) return this.suggestedShow;
+
             if (this.broadcast.break_display && this.broadcast.break_display !== "Automated") {
                 // do what it says
                 return this.broadcast.break_display;
@@ -230,9 +256,18 @@ export default {
                 return this.suggestedShow;
             }
         },
+        currentStage() {
+            return this.virtualMatch?._virtual_match_category || this.broadcast?.current_stage || this.nextMatch?.match_group;
+        },
+        countdownEnd() {
+            return this.virtualMatch?._virtual_break_end || this.broadcast?.countdown_end;
+        },
         matchIsLast() {
             if (!this.schedule?.length) return true; // no schedule - assume last
             if (!this.nextMatch?.first_to) return false; // no match - assume others??
+
+            // TODO: this logic doesn't make much sense. it should check if any match has completed, rather than the order in the schedule
+
             const index = this.schedule.findIndex(match => match.id === this.nextMatch.id);
             if (index === -1) return true; // not in schedule - assume it's a schedule for tomorrow
             if (index === (this.schedule.length - 1)) return true; // last of the day!
@@ -248,6 +283,7 @@ export default {
         },
         overlayTitle() {
             const title = this.title || this.broadcast?.title || this.broadcast?.name || "";
+            if (this.virtualMatch) return this.autoTitle || this.broadcast?.event?.name;
             const titleWithAuto = title.replace("{auto}", this.autoTitle);
             if (!titleWithAuto || titleWithAuto.trim().length === 0) return title; // make sure we have something here
             return titleWithAuto;

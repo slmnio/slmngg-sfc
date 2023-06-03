@@ -1,5 +1,6 @@
 import spacetime from "spacetime";
 import informal from "spacetime-informal";
+import { sortEvents, sortTeams } from "@/utils/sorts";
 
 export function getImage (i) {
     // console.log(i);
@@ -48,7 +49,7 @@ export function image (theme, key) {
     return `url(${getImage(theme[key])})`;
 }
 
-export function resizedImage(theme, key, minSize = 30) {
+function resizedImage(theme, key, minSize = 30) {
     if (!theme || !theme[key] || !theme[key][0]) return "";
     const image = theme[key][0];
     if (!image.thumbnails) return image.url;
@@ -65,6 +66,12 @@ export function cleanID (id) {
     if (!id) return null;
     if (typeof id !== "string") return null;
     if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
+    return id;
+}
+export function dirtyID(id) {
+    // add rec
+    if (!id) return id;
+    if (id.length === 14) return "rec" + id;
     return id;
 }
 
@@ -169,7 +176,7 @@ export function money(num) {
 }
 
 export function getAuctionMax() {
-    return 8;
+    return 7;
 }
 
 export function clarifyTeam(team) {
@@ -406,4 +413,74 @@ export function getEmbedData(url) {
     }
 
     return { service: "unknown", url: url };
+}
+
+
+export function unescapeText(text) {
+    return text
+        .replaceAll("&amp;", "&")
+        .replaceAll("&lt;", "<")
+        .replaceAll("&gt;", ">")
+        .replaceAll("&quot;", "\"")
+        .replaceAll("&#039;", "'");
+}
+
+
+export function createGuestObject(str) {
+    const guest = {
+        manual: true
+    };
+
+    str.split(/[,|]/).forEach(part => {
+        if (!part) return;
+        part = part.trim();
+
+        if (part.startsWith("@")) {
+            guest.twitter = part;
+        } else if (part.includes("view=")) {
+            guest.webcam = part;
+        } else if (part.startsWith("http")) {
+            guest.avatar = part;
+        } else if (part.includes("/")) {
+            guest.pronouns = part;
+        } else {
+            guest.name = part;
+        }
+    });
+    return guest;
+}
+
+export function getGuestString(guest) {
+    delete guest.manual;
+    return Object.values(guest).join("|");
+}
+
+export function getAssociatedThemeOptions(player, valueFn) {
+    let teams = [
+        ...player.member_of || [],
+        ...player.captain_of || [],
+        ...player.team_staff || [],
+        ...player.brands_designed || [],
+        ...player.owned_teams || []
+    ];
+    let events = [
+        ...player.event_staff || [],
+        ...player.event_brands_designed || [],
+        ...player.casted_events || []
+    ];
+
+    (player.player_relationships || []).forEach(rel => {
+        if (rel.teams) {
+            teams = [...teams, ...rel.teams];
+        }
+        if (rel.events) {
+            events = [...events, ...rel.events];
+        }
+    });
+
+    return [
+        { value: null, disabled: true, text: "Choose a theme" },
+        { label: "Teams", options: teams.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortTeams).map((t) => ({ ...t, text: t.name, value: valueFn ? valueFn(t) : t.id })) },
+        { label: "Events", options: events.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortEvents).map((e) => ({ ...e, text: e.name, value: valueFn ? valueFn(e) : e.id })) }
+    ];
 }

@@ -8,29 +8,36 @@
 </template>
 
 <script>
-import { isAuthenticated } from "@/utils/auth";
 import { resolveEntireBracket } from "@/utils/dashboard";
 import { BButton } from "bootstrap-vue";
+import { canEditMatch } from "@/utils/client-action-permissions";
+import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 
 export default {
     name: "BracketResolveButton",
     props: {
         bracket: Object,
-        verticalButton: Boolean
+        verticalButton: Boolean,
+        showButton: Boolean
     },
     components: { BButton },
     data: () => ({
         isResolving: false
     }),
     computed: {
+        hydratedEvent() {
+            if (!this.bracket?.events?.[0]) return null;
+            return ReactiveRoot(this.bracket.events?.[0], {
+                player_relationships: ReactiveArray("player_relationships")
+            });
+        },
         showResolveButton() {
-            if (!isAuthenticated(this.$root)) return false;
-            return this.$root.auth?.user?.website_settings?.includes("Can edit any match");
+            return canEditMatch(this.$root?.auth?.user, { event: this.hydratedEvent });
         }
     },
     methods: {
         async clickResolveButton(bracket) {
-            if (!this.$root.auth?.user?.website_settings?.includes("Can edit any match")) {
+            if (!canEditMatch(this.$root?.auth?.user, { event: this.hydratedEvent })) {
                 return this.$notyf.error("You don't have permission to resolve brackets");
             }
             this.isResolving = true;

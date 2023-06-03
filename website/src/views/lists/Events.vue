@@ -53,6 +53,8 @@ export default {
             }).sort((a, b) => a.order - b.order);
         },
         otherEvents() {
+            if (!this.eventSeries.some(e => e._original_data_id)) return [];
+
             return this.events.filter(event => {
                 return !this.eventSeries.some(es => es.events?.some(e => e.id === event.id));
             }).sort(sortEvents);

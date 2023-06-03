@@ -16,7 +16,19 @@ async function publicEvents(Cache) {
     if (!allEvents?.ids) return;
 
     let allEventData = (await Promise.all(allEvents.ids.map(id => (Cache.get(id.slice(3))))));
-    let liveEvents = allEventData.filter(event => event.show_in_events && event.teams && event.teams.length !== 0);
+    let liveEvents = allEventData.filter(event => event.show_in_events && event.teams && event.teams.length !== 0)
+        .sort(function (a, b) {
+            if (!a || !b) return 0;
+            if (!a) return 1;
+            if (!b) return -1;
+
+            if (a.start_date && b.start_date) {
+                return (new Date(a.start_date) - new Date(b.start_date));
+            }
+            if (a.start_date) return -1;
+            if (b.start_date) return 1;
+        });
+
     Cache.set("special:public-events", { events: liveEvents.map(m => m.id) });
 }
 

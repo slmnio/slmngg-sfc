@@ -17,7 +17,7 @@ import { cleanID } from "@/utils/content-utils";
 export default {
     name: "BracketOverlay",
     components: { Bracket, GenericOverlay },
-    props: ["broadcast", "title", "bracketKey", "extended", "scale", "small"],
+    props: ["broadcast", "title", "bracketKey", "extended", "scale", "small", "forceBracket"],
     computed: {
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;
@@ -33,6 +33,9 @@ export default {
             });
         },
         bracket() {
+            if (this.forceBracket) {
+                return this.forceBracket;
+            }
             if (!this.event?.brackets) return null;
             let key;
             if (this.broadcast?.bracket_key) key = this.broadcast.bracket_key;

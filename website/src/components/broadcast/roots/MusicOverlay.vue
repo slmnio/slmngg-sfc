@@ -29,6 +29,7 @@
 <script>
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { Howl } from "howler";
+import { getNewURL } from "@/utils/images";
 
 class Track {
     constructor(trackData, loopSongs) {
@@ -37,7 +38,7 @@ class Track {
         this.id = trackData?.id;
         this.loaded = false;
         this.audio = new Howl({
-            src: [trackData?.file?.[0]?.url],
+            src: [getNewURL(trackData?.file?.[0], "orig")],
             loop: loopSongs
         });
         this.currentTime = 0;

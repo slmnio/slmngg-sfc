@@ -7,7 +7,7 @@
 
         <div class="player-list">
             <div class="player" :class="{empty: player.empty, latest: player.latest}" v-for="player in players" :key="player.id"  :style="(player.latest ? teamBG : {})">
-                <div class="player-internal" v-if="!player.empty" >
+                <div class="player-internal" v-if="!player.empty">
                     <span class="player-name">{{ player.name }}</span>
                     <span class="player-money" v-if="player.auction_price">{{ money(player.auction_price) }}</span>
                 </div>
@@ -50,7 +50,7 @@ export default {
             if (this.signedPlayer) {
                 return arr.map((p, i) => ({
                     ...p,
-                    latest: cleanID(this.signedPlayer.id) === p.id
+                    latest: this.signedPlayer === p.id
                 }));
             }
             return arr;

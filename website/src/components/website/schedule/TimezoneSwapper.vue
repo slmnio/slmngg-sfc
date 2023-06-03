@@ -18,7 +18,7 @@ import { BForm, BFormGroup, BFormSelect, BFormCheckbox } from "bootstrap-vue";
 
 function getAbbrev(timezone) {
     const display = informal.display(timezone);
-    return spacetime.now().isDST() ? display.daylight.abbrev : display.standard.abbrev;
+    return spacetime.now(timezone).isDST() ? display.daylight.abbrev : display.standard.abbrev;
 }
 
 function getLocation(timezone) {

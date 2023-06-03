@@ -1,5 +1,5 @@
 <template>
-    <div class="standings" v-if="standings && standings.standings && standings.standings.length">
+    <div class="standings" v-if="standings && standings.standings && standings.standings.length" :style="useAutoFontSize ? { 'fontSize': autoFontSize} : {}">
 <!--        <div>{{ event.name }} / {{ stage }} / {{ allMatches.length }} -> {{ stageMatches.length }} ({{ teams.length }} teams)</div>-->
         <h3 class="top-standings-name text-center d-md-none">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</h3>
         <div class="standings-header d-flex align-items-center">
@@ -33,6 +33,7 @@
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import StandingsTeam from "@/components/broadcast/StandingsTeam";
 import { sortTeamsIntoStandings } from "@/utils/scenarios";
+import { cleanID } from "@/utils/content-utils";
 
 
 function avg(arr) {
@@ -52,7 +53,8 @@ export default {
         tieText: String,
         showMapDiff: Boolean,
         useCodes: Boolean,
-        overrideShowColumns: Array
+        overrideShowColumns: Array,
+        useAutoFontSize: Boolean
     },
     components: { StandingsTeam },
     methods: {
@@ -83,6 +85,15 @@ export default {
         }
     },
     computed: {
+        autoFontSize() {
+            const teams = this.standings?.standings;
+            if (!teams) return "";
+
+            function clamp(number, min, max) {
+                return Math.max(min, Math.min(number, max));
+            }
+            return clamp(380 / ((teams?.length || 0) + 1.2), 16, 46) + "px";
+        },
         allMatches() {
             if (!this.event || !this.event.matches) return [];
             return ReactiveArray("matches", {
@@ -118,7 +129,7 @@ export default {
             return this.standingsSettings?.sort || [];
         },
         standingsSettings() {
-            return (this.blocks?.standings || []).find(s => s.group === this.stage);
+            return (this.blocks?.standings || []).find(s => s.group?.toLowerCase() === this.stage.toLowerCase() || s.key?.toLowerCase() === this.stage.toLowerCase());
         },
         showColumns() {
             return this.overrideShowColumns || this.standingsSettings?.show || [
@@ -207,7 +218,7 @@ export default {
                     if (match.maps?.length) {
                         match.maps.forEach(map => {
                             if (!map.id) return;
-                            if (map.score_1 === undefined || map.score_2 === undefined) return;
+                            if (map.score_1 == null || map.score_2 == null) return;
                             const mapScores = [map.score_1, map.score_2];
                             team.standings.map_round_wins += mapScores[teamIndex];
                             team.standings.map_round_losses += mapScores[+!teamIndex];
@@ -287,6 +298,10 @@ export default {
                 if (a.standings.map_losses > b.standings.map_losses) return 1;
                 if (a.standings.map_losses < b.standings.map_losses) return -1;
             };
+
+            if (this.standingsSettings?.hide?.length) {
+                teams = teams.filter(team => !this.standingsSettings.hide.find(id => cleanID(id) === cleanID(team.id)));
+            }
 
             teams = teams.sort(sortFunction);
 

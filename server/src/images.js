@@ -51,7 +51,13 @@ async function downloadImage(url, filename, size) {
             file.on("finish", () => file.close(resolve));
         }).on("error", err => {
             console.error(`[image] file error for ${filename} ${err.code} ${err.message}`);
-            fs.unlink(pathName);
+            fs.unlink(pathName, function(err) {
+                if (err) {
+                    console.error(`[image] file error for ${filename} unlink FAILED`, err);
+                } else {
+                    console.error(`[image] file error for ${filename} unlinked`);
+                }
+            });
             reject(err);
         });
     }));
@@ -100,15 +106,16 @@ function getFilename(url) {
     originalFilename = strippedName;
     const dots = originalFilename.split(".");
     const originalFileType = dots[dots.length - 1]; // last . (now works with .svg.png)
-    return parts[4] + "." + originalFileType; // specific to airtable urls
+    return parts[4].substring(0, 45) + "." + originalFileType; // specific to airtable urls, shorten to 45 chars TODO: This is a temporary fix, we should do it properly
 }
 
 /***
  *
  * @returns {Promise<string>} localFilePath - local file path to a stored image
  */
-async function fullGetURL(url, sizeText, sizeData) {
-    let filename = getFilename(url);
+async function fullGetURL(attachment, sizeText, sizeData) {
+    let { _autoFilename: filename, url } = attachment;
+
     let previouslyStoredImage = await getImage(filename, sizeText);
     if (previouslyStoredImage) return previouslyStoredImage;
     console.log("[image|fg] no stored image, creating it");
@@ -121,6 +128,7 @@ async function fullGetURL(url, sizeText, sizeData) {
         storedOrig = await getImage(filename, "orig");
         console.log("[image|fg] downloaded orig copy");
     }
+
     if (sizeText === "orig") return storedOrig;
     // resize if needed
     await resizeImage(filename, sizeText, sizeData);
@@ -136,23 +144,17 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
     async function handleImageRequests(req, res) {
 
         try {
-            if (!req.query.url) {
-                return res.status(404).send("No URL requested");
+            if (req.query.url && !req.query.id) {
+                return res.status(400).send("Requests must now send their attachment ID to receive a response");
+            } else if (!req.query.id) {
+                return res.status(400).send("Required parameter 'id' is missing");
             }
 
-            const url = req.query.url;
-            let parts = url.split("/");
-            let originalFilename = req.query.filename || parts[parts.length - 1];
-            let [strippedName, args] = originalFilename.split("?");
-            originalFilename = strippedName;
-            const dots = strippedName.split(".");
-            const originalFileType = req.query.type ? req.query.type.split("/").pop().split("+")?.[0] : dots[dots.length - 1]; // last . (now works with .svg.png)
-            const filename = parts[parts.length - 2] + "." + originalFileType;
+            let att = Cache.getAttachment(req.query.id);
+            if (!att) return res.status(404).send("Could not find attachment data");
 
-            if (!["dl.airtable.com", "media.slmn.io", "v5.airtableusercontent.com"].some(domain => domain === parts[2])) {
-                return res.status(400).send("Domain not whitelisted");
-            }
-
+            let airtableURL = att.url;
+            let filename = att._autoFilename;
 
             let size = "orig";
             let sizeData = {};
@@ -195,42 +197,36 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                 };
             }
 
-            if (["svg", "gif"].includes(originalFileType)) {
-                // TODO: We get file types from Airtable legacy URLs, but we won't in future
-                // We need to load the image first then detect the filetype
-                // just do orig if svg
+            if (["image/svg+xml", "image/gif"].includes(att.type)) {
+                // Don't attempt to rescale these images
                 size = "orig";
             }
-            /* else if (!["png", "jpeg", "webp"].includes(originalFileType)) {
-                return res.status(400).send("Unsupported image type");
-            }*/
 
 
             let imagePath = await getImage(filename, size);
 
             if (imagePath) {
-                // let metaFileType = (await sharp(imagePath).metadata())?.format;
-                // console.log({metaFileType});
+                // already cached
                 return res.sendFile(imagePath);
             }
-            console.log("[image]", `no file for ${originalFilename} @ ${size}`);
-            // no image
+
+            // not already cached
+            console.log("[image]", `no file for ${filename} (${att.filename}) @ ${size}`);
+
+            if (!airtableURL) return res.status(404).send("No URL available for this image");
 
             // first download or retrieve to orig/
-            let orig = await getOrWaitForDownload(url, filename, "orig");
-            // let orig = await getImage(filename, "orig");
-            // console.log("[image]", "orig", orig);
+            let orig = await getOrWaitForDownload(airtableURL, filename, "orig");
+
             if (!orig) {
+                // original version isn't cached, download that first
                 const t = Date.now();
-                console.log("[image]", `downloading ${originalFilename} @ orig...`);
-                await downloadImage(url, filename, "orig");
-                console.log("[image]", `downloaded ${originalFilename} @ orig in ${Date.now() - t}ms`);
+                console.log("[image]", `downloading ${filename} (${att.filename}) @ orig...`);
+                await downloadImage(airtableURL, filename, "orig");
+                console.log("[image]", `downloaded ${filename} (${att.filename}) @ orig in ${Date.now() - t}ms`);
                 orig = await getImage(filename, "orig");
                 if (size === "orig") return res.sendFile(orig);
             }
-
-            // let metaFileType = (await sharp(orig).metadata())?.format;
-            // console.log({metaFileType});
 
             // resize time!
             // console.log("[image]", `resizing ${originalFilename} @ ${size}`);
@@ -239,7 +235,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
             await resizeImage(filename, size, sizeData);
             let resizedImagePath = await getImage(filename, size);
 
-            console.log("[image]", `resized ${originalFilename} @ ${size} in ${Date.now() - t}ms`);
+            console.log("[image]", `resized ${filename} (${att.filename}) @ ${size} in ${Date.now() - t}ms`);
 
             if (resizedImagePath) return res.sendFile(resizedImagePath);
 
@@ -265,18 +261,18 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
 
 
             let theme = await Cache.get(req.query.id);
-            if (!theme.default_logo?.[0]?.url) return res.status(400).send("No logo to use");
-            let logoURL = theme.default_logo?.[0]?.url;
+            let logo = theme.default_logo?.[0];
+
+            if (!logo) return res.status(400).send("No logo to use");
             let themeColor = theme.color_logo_background || theme.color_theme || "#222222";
 
             // background: logo background
             // centered logo
             // with ?padding around it
 
-            let filePath = await fullGetURL(logoURL, "orig", null);
+            let filePath = await fullGetURL(logo, "orig", null);
 
-            let filename =  theme.modified.replace(/[.:\\/]/g, "_") + "_" + getFilename(logoURL);
-            if (!filename.endsWith(".png")) filename += ".png";
+            let filename = themeColor.replace("#", "") + "_" + logo._autoFilename;
             let sizeText = `theme-${size}-${padding}`;
             let resizedFilePath = getPath(filename, sizeText);
             // console.log({ filePath, filename, sizeText, resizedFilePath });
@@ -288,8 +284,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                 return res.sendFile(heldImage);
             }
 
-
-            let resizedImage = await sharp(filePath).resize({
+            let resizedLogo = await sharp(filePath).resize({
                 width: size - padding,
                 height: size - padding,
                 fit: "contain",
@@ -298,23 +293,23 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
 
             res.header("Content-Type", "image/png");
 
-            let composite = sharp({
+            let compositeThemeImage = sharp({
                 create: {
                     width: size,
                     height: size,
                     channels: 3,
                     background: themeColor
                 }
-            }).composite([{ input: resizedImage }]);
+            }).composite([{ input: resizedLogo }]);
 
 
-            composite.clone().png().toBuffer()
+            compositeThemeImage.clone().png().toBuffer()
                 .then(data => {
                     console.log("[image|theme]", `theme processed @${size} in ${Date.now() - t}ms`);
                     res.end(data);
                 });
 
-            return await composite.clone().toFile(resizedFilePath);
+            return await compositeThemeImage.clone().toFile(resizedFilePath);
 
         } catch (e) {
             console.error("Theme image error", e);
@@ -361,7 +356,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                 }});
 
                 let logos = await Promise.all(teams.map(async team => {
-                    let filePath = await fullGetURL(team.theme.default_logo[0].url, "orig", null);
+                    let filePath = await fullGetURL(team.theme.default_logo[0], "orig", null);
                     let themeColor = team.theme.color_logo_background || team.theme.color_theme || "#222222";
 
                     let resizedLogo = await sharp(filePath).resize({
@@ -381,7 +376,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                     try {
                         let event = await Cache.get(match?.event?.[0]);
                         let eventTheme = event?.theme?.length ? await Cache.get(event?.theme?.[0]) : null;
-                        let eventLogoFilePath = await fullGetURL(eventTheme?.default_logo[0].url, "orig", null);
+                        let eventLogoFilePath = await fullGetURL(eventTheme?.default_logo[0], "orig", null);
                         eventLogo = await sharp(eventLogoFilePath).resize({
                             height: Math.floor(size * 0.20),
                             width: Math.floor(size * 0.25),
@@ -420,7 +415,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                 if (!event.theme?.id) return res.status(400).send("No event theme data");
                 let themeColor = event.theme.color_logo_background || event.theme.color_theme || "#222222";
 
-                let filePath = await fullGetURL(event.theme.default_logo[0].url, "orig", null);
+                let filePath = await fullGetURL(event.theme.default_logo[0], "orig", null);
 
                 let resizedLogo = await sharp(filePath).resize({
                     width: width - padding,

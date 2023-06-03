@@ -33,7 +33,7 @@
         <h3 v-if="logos.length">Logos</h3>
         <div v-if="logos.length" class="logo-list mb-3">
             <div class="logo-holder flex-center" v-for="logo in logos" :key="logo.key" :style="logoBackground">
-                <a :href="logo.image" target="_blank" class="bg-center logo" :style="{backgroundImage: `url(${logo.image})`}"></a>
+                <a :href="logo.image" target="_blank" class="bg-center logo" :style="bg(logo.image)"></a>
                 <div class="logo-name">{{ logo.key }}</div>
             </div>
         </div>
@@ -41,10 +41,10 @@
         <h3 v-if="theme && theme.id">Generated images</h3>
         <div v-if="theme && theme.id" class="logo-list mb-3">
             <div class="logo-holder square-logo-holder flex-center" :style="logoBackground">
-                <a :href="dataServerURL(`theme.png?id=${theme.id}&size=500&padding=20`)" target="_blank" class="bg-center square-logo logo" :style="{backgroundImage: `url(${dataServerURL(`theme.png?id=${theme.id}&size=500&padding=20`)})`}"></a>
+                <a :href="dataServerURL(`theme.png?id=${theme.id}&size=500&padding=20`)" target="_blank" class="bg-center square-logo logo" :style="bg(dataServerURL(`theme.png?id=${theme.id}&size=500&padding=20`))"></a>
             </div>
             <div class="logo-holder circle-logo-holder flex-center" :style="logoBackground">
-                <a :href="dataServerURL(`theme.png?id=${theme.id}&size=500&padding=30`)" target="_blank" class="bg-center square-logo logo" :style="{backgroundImage: `url(${dataServerURL(`theme.png?id=${theme.id}&size=500&padding=30`)})`}"></a>
+                <a :href="dataServerURL(`theme.png?id=${theme.id}&size=500&padding=30`)" target="_blank" class="bg-center square-logo logo" :style="bg(dataServerURL(`theme.png?id=${theme.id}&size=500&padding=30`))"></a>
             </div>
         </div>
 
@@ -52,7 +52,7 @@
         <div class="team-specific" v-if="team">
             <h3>Ingame overlay</h3>
             <div class="overlay-area ingame-overlay mb-3">
-                <IngameTeam :team="team" :event="team.event" />
+                <IngameTeam :team="team" :event="team.event" :active="true" />
             </div>
 
             <h3>Bracket</h3>
@@ -78,7 +78,7 @@ import { logoBackground } from "@/utils/theme-styles";
 import ContentRow from "@/components/website/ContentRow";
 import ContentThing from "@/components/website/ContentThing";
 import StandingsTeam from "@/components/broadcast/StandingsTeam";
-import { resizedImageNoWrap } from "@/utils/images";
+import { bg, resizedImageNoWrap } from "@/utils/images";
 import { getDataServerAddress } from "@/utils/fetch";
 import CopyTextButton from "@/components/website/CopyTextButton";
 // import RecoloredHero from "@/components/broadcast/RecoloredHero";
@@ -154,6 +154,7 @@ export default {
         }
     },
     methods: {
+        bg,
         dataServerURL(path) {
             return `${getDataServerAddress()}/${path}`;
         }

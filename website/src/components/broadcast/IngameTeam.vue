@@ -1,7 +1,9 @@
 <template>
 <!--    <transition name="ingame-team-anim">-->
-        <div class="ingame-team-holder" v-if="loaded" :class="{'right': right, 'left': !right}">
-            <div class="ingame-team default-thing" :style="style" :key="team.id" :class="{ 'extend-map-icon': extendIcons && mapAttack }">
+        <ThemeTransition class="ingame-team-holder" v-if="loaded" :class="{'right': right, 'left': !right}" :duration="500"
+                         :key="`${team.id}-${right ? '1':'0'}`" :transitionKey="`${team.id}-${right ? '1':'0'}`" :use-fit-content="true"
+                         :active="active" :theme="_theme" :start="right ? 'left' : 'right'" :end="right ? 'right' : 'left'" clip-slot :clip-delay="500">
+            <div class="ingame-team default-thing clip-target" :style="style" :key="team.id" :class="{ 'extend-map-icon': extendIcons && mapAttack }">
                 <div class="texture-holder position-absolute w-100 h-100" v-if="texture">
                     <div class="ingame-texture">
                         <img :src="texture" alt="">
@@ -14,7 +16,7 @@
                         </span>
                     </transition>
                 </div>
-                <Squeezable class="flex-center team-name">
+                <Squeezable class="flex-center team-name" :align="right ? 'left' : 'right'">
                     <span class="industry-align team-sub-name" v-if="!codes">{{ team.name }}</span>
                     <span class="industry-align team-sub-subtitle" v-if="!codes && team.subtitle">{{ team.subtitle }}</span>
                     <span class="industry-align team-sub-code" v-if="codes">{{ team.code }}</span>
@@ -24,7 +26,9 @@
                 </div>
                 <transition name="score">
                     <div class="flex-center team-score" v-if="!hideScores && !useDots">
-                        <span class="industry-align">{{ score || '0' }}</span>
+                        <transition name="fade" mode="out-in">
+                            <span class="industry-align" :key="score || '0'">{{ score || '0' }}</span>
+                        </transition>
                     </div>
                 </transition>
                 <transition name="score">
@@ -32,6 +36,7 @@
                         <div class="dot" v-for="(dot, i) in dots" :class="{'active': dot.active}" :key="i" :style="dot.active ? teamSlice : {}"></div>
                     </div>
                 </transition>
+                <div class="team-alt-slice" :style="teamSlice"></div>
                 <transition name="slide" mode="out-in">
                     <div class="attack-holder" v-if="mapAttack">
                         <transition name="attack" mode="out-in">
@@ -39,20 +44,20 @@
                         </transition>
                     </div>
                 </transition>
-                <div class="team-alt-slice" :style="teamSlice"></div>
             </div>
-        </div>
+        </ThemeTransition>
 <!--    </transition>-->
 </template>
 
 <script>
 import { resizedImage } from "@/utils/images";
 import Squeezable from "@/components/broadcast/Squeezable.vue";
+import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
 
 export default {
     name: "IngameTeam",
-    components: { Squeezable },
-    props: ["team", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo"],
+    components: { Squeezable, ThemeTransition },
+    props: ["team", "active", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo"],
     data: () => ({
         textureData: {
             url: null,
@@ -163,7 +168,7 @@ export default {
             return resizedImage(this._theme, ["small_logo", "default_logo"], "h-80");
         },
         teamWidth() {
-            return this.width || 690;
+            return this.width || 567;
         },
         teamWidthCSS() {
             if (!this.teamWidth) return {};
@@ -238,7 +243,7 @@ export default {
 <style scoped>
     .ingame-team {
         --team-expand: 0px;
-        width: calc(690px + var(--team-expand));
+        width: calc(567px + var(--team-expand));
         height: 48px;
 
         display: flex;
@@ -338,13 +343,13 @@ export default {
         margin: 0 12px 0 0;
     }
     .team-name {
-        margin: 0 12px 0 20px;
+        margin: 0 12px 0 24px;
     }
     .ingame-team-holder.right .team-logo-holder {
         margin: 0 0 0 12px;
     }
     .ingame-team-holder.right .team-name {
-        margin: 0 20px 0 12px;
+        margin: 0 24px 0 12px;
     }
 
     .team-logo {

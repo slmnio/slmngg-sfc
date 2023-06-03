@@ -88,6 +88,15 @@ export default {
         border: none;
     }
 
+    .module-content >>> .table tr th:last-child,
+    .module-content >>> .table tr td:last-child {
+        border-right: none;
+    }
+    .module-content >>> .table tr th:first-child,
+    .module-content >>> .table tr td:first-child {
+        border-left: none;
+    }
+
     .clip-swipe-down-enter-active,
     .clip-swipe-down-leave-active {
         transition: clip-path 200ms ease, max-height 200ms ease;

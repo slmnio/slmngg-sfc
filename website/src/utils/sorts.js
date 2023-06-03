@@ -17,9 +17,18 @@ export function sortTeams(a, b) {
 }
 
 export function sortEvents(a, b) {
+    if (a && !b) return -1;
+    if (!a && b) return 1;
+    if (!a && !b) return 0;
     if (a.start_date && b.start_date) {
         return (new Date(a.start_date) - new Date(b.start_date));
     }
     if (a.start_date) return -1;
     if (b.start_date) return 1;
+}
+
+export function sortAlpha(a, b, key) {
+    if (a[key]?.toLowerCase() > b[key]?.toLowerCase()) return 1;
+    if (a[key]?.toLowerCase() < b[key]?.toLowerCase()) return -1;
+    return 0;
 }

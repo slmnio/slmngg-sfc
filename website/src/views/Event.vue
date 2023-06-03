@@ -10,6 +10,7 @@
             <li class="nav-item ct-passive" v-if="showStandings"><router-link class="nav-link" :to="subLink('standings')">Standings</router-link></li>
             <li class="nav-item ct-passive" v-if="showFoldy"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
             <li class="nav-item ct-passive" v-if="showDraft"><router-link class="nav-link" :to="subLink('draft')">Draft</router-link></li>
+            <li class="nav-item ct-passive" v-if="showAuction"><router-link class="nav-link" :to="subLink('auction')">Auction</router-link></li>
             <li class="nav-item ct-passive" v-if="showStaff"><router-link class="nav-link" :to="subLink('staff')">Staff</router-link></li>
             <li class="nav-item ct-passive" v-if="event.theme"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
             <li class="nav-item ct-passive" v-if="event.about"><router-link class="nav-link" :to="subLink('about')">About</router-link></li>
@@ -96,6 +97,9 @@ export default {
         showDraft() {
             return this.settings?.draft?.use || false;
         },
+        showAuction() {
+            return this.settings?.auction?.public || false;
+        },
         showStaff() {
             return this.settings?.extendedStaffPage ||
                 this.event?.player_relationships ||
@@ -117,7 +121,7 @@ export default {
             return "on-foreign-subdomain";
         },
         shouldShowMinisitePrompt() {
-            return ["no-root-minisite", "on-foreign-subdomain"].includes(this.ownMinisiteStatus);
+            return this.minisiteDomain && ["no-root-minisite", "on-foreign-subdomain"].includes(this.ownMinisiteStatus);
         },
         minisiteLink() {
             if (!this.event?.id || !this.minisiteDomain) return null;
@@ -132,9 +136,9 @@ export default {
             if (!this.event) return null;
 
             try {
-                if ([process.env.VUE_APP_DEPLOY_MODE, process.env.NODE_ENV].includes("staging")) return `https://${this.subdomain}.dev.slmn.gg`;
-                if (process.env.NODE_ENV === "development" || process.env.VUE_APP_DEPLOY_MODE === "local") return `http://${this.subdomain}.localhost:8080`;
-                if ([process.env.VUE_APP_DEPLOY_MODE, process.env.NODE_ENV].includes("production")) return `https://${this.subdomain}.slmn.gg`;
+                if ([import.meta.env.VITE_DEPLOY_MODE, import.meta.env.NODE_ENV].includes("staging")) return `https://${this.subdomain}.dev.slmn.gg`;
+                if (import.meta.env.NODE_ENV === "development" || import.meta.env.VITE_DEPLOY_MODE === "local") return `http://${this.subdomain}.localhost:8080`;
+                if ([import.meta.env.VITE_DEPLOY_MODE, import.meta.env.NODE_ENV].includes("production")) return `https://${this.subdomain}.slmn.gg`;
                 return null;
             } catch (e) {
                 return null;

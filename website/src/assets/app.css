@@ -83,10 +83,6 @@ a:not(.link-text), a:not(.link-text):hover {
     background-color: var(--theme);
 }
 
-.btn-primary {
-    background-color: var(--brand-theme);
-    border-color: var(--brand-theme);
-}
 /*.btn:hover:not(:disabled), .btn.hover:not(:disabled) {*/
 /*    background-color: #00a367 !important;*/
 /*    border-color: #00a367 !important;*/
@@ -278,4 +274,22 @@ input.no-arrows[type=number] {
 .notyf__ripple {
     width: 500px;
     height: 500px;
+}
+
+.table.border-no-top tr:first-child td,
+.table.border-no-top tr:first-child th {
+    border-top: none;
+}
+
+.gap-1 {
+    gap: .25rem;
+}
+.gap-2 {
+    gap: .5rem;
+}
+.gap-3 {
+    gap: 1rem;
+}
+.gap-4 {
+    gap: 1.5rem;
 }

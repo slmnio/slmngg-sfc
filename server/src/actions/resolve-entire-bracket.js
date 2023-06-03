@@ -1,13 +1,34 @@
 const { getAll, cleanID } = require("../action-utils/action-utils");
+const { canEditMatch } = require("../action-utils/action-permissions");
 
 module.exports = {
     key: "resolve-entire-bracket",
     auth: ["user"],
     requiredParams: ["bracketID"],
     async handler({ bracketID }, { user }) {
-        if (!user.airtable?.website_settings?.includes("Can edit any match")) throw { errorMessage: "You don't have permission to resolve brackets", errorCode: 403 };
 
         let bracket = await this.helpers.get(bracketID);
+
+        if (bracket.events) {
+            // Bracket attached to event, use event permissions
+            let event = await this.helpers.get(bracket.events?.[0]);
+            if (!await canEditMatch(user, { event })) {
+                throw {
+                    errorMessage: "You don't have permission to resolve brackets",
+                    errorCode: 403
+                };
+            }
+
+        } else {
+            // Bracket is not attached to an event, use global permissions
+            if (!user.airtable?.website_settings?.includes("Can edit any match")) {
+                throw {
+                    errorMessage: "You don't have permission to resolve brackets",
+                    errorCode: 403
+                };
+            }
+        }
+
         if (!bracket?.bracket_layout) throw { errorMessage: "Unknown or unusable bracket" };
 
         let layout;
@@ -50,11 +71,11 @@ module.exports = {
         for (const [matchNum, connects] of Object.entries(connections)) {
             let match = matches[parseInt(matchNum) - 1];
 
-            if (match.teams?.length === 2) continue; // ignore if it's already got 2 teams
+            if (match?.teams?.length === 2) continue; // ignore if it's already got 2 teams
 
             let correctTeams = [null, null];
 
-            if (match.teams?.length === 1) {
+            if (match?.teams?.length === 1) {
                 correctTeams[match.placeholder_right ? 0 : 1] = match.teams[0];
             }
 
@@ -87,7 +108,15 @@ module.exports = {
                 // no updates
             } else if (correctTeams.length === 1) {
                 let placeholderRight = parseInt(correctTeams[0]._position) === 1; // (not 2)
-                // console.log(matchNum, correctTeams[0]._position, placeholderRight);
+                // console.log(matchNum, correctTeams[0]._position, placeholderRight, feeders.length);
+
+                if (!correctTeams[0]?._position && feeders.length === 1) {
+                    // team here doesn't know where it should be, and there's one feeder
+                    // therefore put the only team in the opposite to the feeder
+                    let feeder = feeders[0];
+                    placeholderRight = feeder.position === "2";
+                    // feeder position 2 = right/bottom, so placeholder there
+                }
 
                 let response = await this.helpers.updateRecord("Matches", match, {
                     "Teams": [correctTeams[0].id],

@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <h2>Banner Creator (beta)</h2>
         <b-form-select class="my-1" name="banner" id="" v-model="bannerID" :options="bannerTemplateOptions" />
         <b-form-select class="my-1" name="customTheme" id="" v-model="customThemeID" :options="playerThings" />
         <b-form-select class="my-1" name="customText" id="" v-model="customText" :options="textOptions" />
@@ -11,21 +12,26 @@
         <b-button v-if="customTheme && png" class="no-link-style d-inline-block" :download="filename" target="_blank" :href="png" variant="success">
             <i class="fa-fw fas fa-save"></i> Save
         </b-button>
+
+        <b-alert class="mt-4" variant="info" show>
+            This is a beta feature. It is known to <b>not work</b> with iOS browsers. Desktop Chrome and Firefox should work.<br>
+            Send bugs and feature requests to <b>#slmngg-requests</b>.
+        </b-alert>
     </div>
 </template>
 
 <script>
 import { AllBanners } from "@/utils/banners";
 import { resizedImageNoWrap } from "@/utils/images";
-import { BButton, BFormSelect } from "bootstrap-vue";
-import { sortEvents, sortTeams } from "@/utils/sorts";
+import { BAlert, BButton, BFormSelect } from "bootstrap-vue";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { getAssociatedThemeOptions } from "@/utils/content-utils";
 
 export default {
     name: "PlayerBannerCreator",
     props: ["player"],
     components: {
-        BButton, BFormSelect
+        BButton, BFormSelect, BAlert
     },
     data: () => ({
         bannerID: 1,
@@ -52,33 +58,7 @@ export default {
             ];
         },
         playerThings() {
-            let teams = [
-                ...this.player.member_of || [],
-                ...this.player.captain_of || [],
-                ...this.player.team_staff || [],
-                ...this.player.brands_designed || [],
-                ...this.player.owned_teams || []
-            ];
-            let events = [
-                ...this.player.event_staff || [],
-                ...this.player.event_brands_designed || [],
-                ...this.player.casted_events || []
-            ];
-
-            (this.player.player_relationships || []).forEach(rel => {
-                if (rel.teams) {
-                    teams = [...teams, ...rel.teams];
-                }
-                if (rel.events) {
-                    events = [...events, ...rel.events];
-                }
-            });
-
-            return [
-                { value: null, disabled: true, text: "Choose a theme" },
-                { label: "Teams", options: teams.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortTeams).map((t) => ({ ...t, text: t.name, value: t.id })) },
-                { label: "Events", options: events.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortEvents).map((e) => ({ ...e, text: e.name, value: e.id })) }
-            ];
+            return getAssociatedThemeOptions(this.player);
         },
         customThemeAccolades: function () {
             if (!this.customTheme) return [];

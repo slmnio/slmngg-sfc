@@ -343,22 +343,34 @@ function miniLeaguePrep(standings) {
             team.standings.minileague = {
                 wins: 0,
                 losses: 0,
-                map_diff: 0
+                map_diff: 0,
+                matches: 0
             };
             groupIDs.forEach(opponentID => {
                 const diff = team.standings.h2h[opponentID];
-                if (diff === 1) team.standings.minileague.wins++;
-                if (diff === -1) team.standings.minileague.losses++;
-
-                if (team.standings.h2h_maps) {
-                    const mapDiff = team.standings.h2h_maps[opponentID];
-                    if (!isNaN(mapDiff)) team.standings.minileague.map_diff += mapDiff;
+                if (diff) {
+                    team.standings.minileague.matches++;
+                    if (diff === 1) team.standings.minileague.wins++;
+                    if (diff === -1) team.standings.minileague.losses++;
+                    if (team.standings.h2h_maps) {
+                        const mapDiff = team.standings.h2h_maps[opponentID];
+                        if (!isNaN(mapDiff)) team.standings.minileague.map_diff += mapDiff;
+                    }
                 }
             });
         });
 
+
+        console.log(group.sort(miniLeagueMatchDiff).map(t => `|${t.code.padStart(6, " ")} ${t.standings.minileague.wins}-${t.standings.minileague.losses} (${t.standings.minileague.map_diff}) [${t.standings.minileague.matches}]`).join("\n"));
+
+        if (group.some(team => team.standings?.minileague?.matches === 0)) {
+            console.warn("team has no matches in this minileague");
+            group.forEach(team => {
+                team.standings.minileague = {};
+            });
+        }
+
         // console.log(group);
-        // console.log(group.sort(miniLeagueMatchDiff).map(t => `|${t.code.padStart(6, " ")} ${t.standings.minileague.wins}-${t.standings.minileague.losses} (${t.standings.minileague.map_diff})`).join("\n"));
 
         // if (group.length === 2) console.log("minileague h2h", standings);
         /*
@@ -389,7 +401,7 @@ function getSortMethod(stringMethod) {
 }
 
 export function sortTeamsIntoStandings(teams, settings = {}) {
-    const log = false;
+    const log = true;
     if (log) console.log("[standings]", "starting sort", teams, settings);
     let warnings = [];
 

@@ -74,7 +74,7 @@ export default {
             });
         },
         teamCams() {
-            return this.observer.player.clients.cams;
+            return this.observer?.player?.clients?.cams || [];
         }
     },
     data: () => ({

@@ -1,16 +1,16 @@
 <template>
   <div class="ingame-overlay">
       <div class="top-overlay" :style="broadcastMargin">
-          <transition-group name="itah" mode="out-in">
-              <IngameTeam :key="`${team.id}-${i}`" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
-                          :team="team" :right="i === 1" :score="scores[i]" :hideScores="broadcast.hide_scores" :extend-icons="extendIcons"
-                          :width="teamWidth" :codes="useCodes" :event="broadcast.event" :auto-small="autoSmall" :map-attack="attacks[i]" :use-dots="useDots" :first-to="match && match.first_to"/>
-          </transition-group>
-
-          <transition name="mid" mode="out-in">
-              <Middle v-if="shouldShowMiddle" :text="middleText" :key="middleText" />
-          </transition>
-
+          <IngameTeam :key="team.id" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
+                      :team="team"  :right="i === 1"
+                      :active="noAnimation || shouldShowTeams" :score="scores[i]" :hide-scores="broadcast.hide_scores"
+                      :extend-icons="extendIcons"
+                      :width="teamWidth" :codes="useCodes" :event="broadcast.event" :auto-small="autoSmall"
+                      :map-attack="attacks[i]" :use-dots="useDots" :first-to="match && match.first_to"
+          />
+          <!--   -->
+          <Middle :active="shouldShowMiddle" :theme="broadcast?.event?.theme" :text="middleText"
+                  :tiny="broadcast.margin === 0"/>
       </div>
       <transition name="fade" mode="out-in">
           {{ fadeSponsors }}
@@ -27,8 +27,11 @@ import Sponsors from "@/components/broadcast/Sponsors";
 
 export default {
     name: "IngameOverlay",
-    props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed"],
+    props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed", "noAnimation"],
     components: { IngameTeam, Middle, Sponsors },
+    data: () => ({
+        flippingTeams: false
+    }),
     computed: {
         match() {
             if (!this.broadcast || !this.broadcast.live_match) return null;
@@ -45,11 +48,30 @@ export default {
             });
         },
         teams() {
+            console.warn("Teams", this.match?.teams);
             if (!this.match || !this.match.teams || !this.match.teams.every(t => {
                 if (t.theme === undefined && t.has_theme === 0) return true;
                 return t.theme && !t.theme.__loading && t.theme.id;
-            })) return [];
-            if (!this.animationActive) return [];
+            })) {
+                console.warn("No teams, not loaded", this.match?.teams);
+                return [];
+            }
+            // if (!this.animationActive) return [];
+
+            console.log("teams - flipping teams", this.flippingTeams);
+            if (this.flippingTeams) {
+                // hold old ones for a second
+                const teams = [...this.match.teams];
+                if (this.match.flip_teams) {
+                    // do invert
+                    console.log("holding 0,1", teams[0]);
+                    return [teams[0], teams[1]];
+                } else {
+                    console.log("holding 1,0", teams[0]);
+                    return [teams[1], teams[0]];
+                }
+            }
+            console.log("default view", this.match.teams, this.match.teams.length);
             if (this.match.flip_teams && this.match.teams.length === 2) return [this.match.teams[1], this.match.teams[0]];
             if (this.match.teams.length !== 2) return [];
             return this.match.teams;
@@ -58,11 +80,20 @@ export default {
             return this.broadcast?.broadcast_settings?.includes("Use dots instead of numbers for score");
         },
         autoSmall() {
-            return this.broadcast?.broadcast_settings?.includes("Show match records ingame") ? { show: "record", stage: this.broadcast?.current_stage } : null;
+            return this.broadcast?.broadcast_settings?.includes("Show match records ingame") ? { show: "record", stage: this.broadcast?.current_stage || this.match?.match_group } : null;
         },
         scores() {
             if (!this.teams) return [];
             const scores = [this.match.score_1, this.match.score_2];
+            if (this.flippingTeams) {
+                // hold old ones for a second
+                if (this.match.flip_teams) {
+                    // do invert
+                    return [scores[0], scores[1]];
+                } else {
+                    return [scores[1], scores[0]];
+                }
+            }
             if (this.match.flip_teams && this.match.teams.length === 2) return [scores[1], scores[0]];
             return scores;
         },
@@ -148,12 +179,33 @@ export default {
             return {
                 match: this.match?.name || this.broadcast?.code || this.broadcast?.name
             };
+        },
+        flipTeams() {
+            return this.match?.flip_teams || false;
+        },
+        shouldShowTeams() {
+            return this.animationActive && !this.flippingTeams;
         }
     },
     watch: {
         broadcast() {
             if (this.broadcast) {
                 document.body.dataset.broadcast = this.broadcast.key;
+            }
+        },
+        flipTeams: {
+            handler(newValue) {
+                console.log("flip teams now", newValue);
+                this.flippingTeams = true;
+                setTimeout(() => {
+                    this.flippingTeams = false;
+                    console.log("flip teams now", this.flippingTeams);
+                }, 1500);
+            }
+        },
+        shouldShowTeams: {
+            handler(val) {
+                console.log("should show teams", val);
             }
         }
     },
@@ -206,6 +258,16 @@ export default {
     /* Margin: 0.5 4v4 */
     /*background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/841443615557287956/ScreenShot_21-05-10_23-36-13-000.jpg");*/
     /*background-image: url(https://cdn.discordapp.com/attachments/485493459357007876/974757857188794378/unknown.png);*/
+
+    /* Overwatch 2 */
+    /* Margin: 0.0 */
+    /* background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/1097643734834872471/escort-0-active.jpg"); */
+
+    /* Margin: 0.5 */
+    /* background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/1097641564580368414/escort-pre-countdown.jpg"); */
+    /* background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/1097641565381480479/escort-active.jpg"); */
+    /* background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/1097641565100453978/control-pre-countdown.jpg"); */
+    /* background-image: url("https://cdn.discordapp.com/attachments/485493459357007876/1097641564852994169/control-capped.jpg"); */
     background-size: contain;
     position: absolute;
     width: 100%;

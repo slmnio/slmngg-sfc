@@ -13,6 +13,7 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { bg } from "@/utils/images";
 
 function mapCheck(map, search) {
     if (!map.name) return false;
@@ -66,9 +67,7 @@ export default {
     methods: {
         mapImage(map) {
             console.log(map);
-            return {
-                backgroundImage: `url(${(map.big_image || map.image)?.[0].url})`
-            };
+            return bg((map.big_image || map.image)?.[0].url);
         },
         mapVideo(map) {
             const video = map?.video?.[0];

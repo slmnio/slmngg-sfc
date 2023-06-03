@@ -27,7 +27,7 @@ export default {
             return this.settings.includes("Show overlay");
         },
         syncerURL() {
-            let base = "https://syncer.live/?embed&noCenter";
+            let base = "https://syncer.live/?embed&split&noCenter&hideOffset";
             if (this.client?.name) base += `&label=${this.client.name}`;
             return base;
         }

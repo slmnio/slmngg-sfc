@@ -9,6 +9,7 @@ const meta = require("./meta.js");
 const routes = require("./routes.js");
 const images = require("./images.js");
 const discordAuth = require("./discord/auth.js");
+const webAuction = require("./web_auction");
 
 /* The staff module should only run on the server, probably not your local machine. */
 let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEGORY_ID", "STAFFAPPS_APPLICATION_CHANNEL_ID", "IS_SLMNGG_MAIN_SERVER"];
@@ -94,6 +95,8 @@ discordAuth({ app, router: express.Router(), cors, Cache, io });
 
 meta({ app, cors, Cache });
 images({ app, cors, Cache, corsHandle });
+
+webAuction({ app, io });
 
 function cleanID(id) {
     if (!id) return null;

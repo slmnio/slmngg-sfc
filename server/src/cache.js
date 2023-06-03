@@ -12,6 +12,7 @@ const store = new Map();
 const hiddenEvents = new Map();
 const auth = new Map();
 const players = new Map();
+const attachments = new Map();
 
 function getAntiLeakIDs() {
     if (process.env.DISABLE_ANTILEAK === "true") return []; // don't hide anything on local
@@ -110,35 +111,73 @@ const slmnggAttachments = {
     "Map Data": ["image", "big_image", "video", "audio"],
     "Maps": ["image", "big_image"],
     "Log Files": ["log_file"],
-    "Heroes": ["main_image"],
+    "Heroes": ["main_image", "recolor_base", "recolor_layers"],
     "Ad Reads": ["audio", "image"],
     "Tracks": ["file"],
-    "Teams": ["icon"]
+    "Teams": ["icon"],
+    "GFX": ["image"]
 };
 
-function generateAttachmentURL(str, filename) {
+function generateAttachmentURL(str, attachment) {
     let idx = str.indexOf("ts=");
     if (idx !== -1) str = str.slice(0, idx -1);
 
+    let filename = attachment.filename;
+
     if (filename && !str.split("/").pop().includes(".")) {
-        str += `?filename=${filename}`;
+        str += `?filename=${encodeURIComponent(filename.replaceAll("(", "%28").replaceAll(")", "%29"))}&id=${attachment.id}`;
     }
     return str;
 }
 
+/**
+ * Generate a filename from its mimetype and record ID
+ */
+function getAutoFilename(attachment) {
+    let ending = (attachment.type || "").split("/").pop();
+
+    // specific overrides where the "group/[type]" doesn't match the extension
+    if (attachment.type === "audio/mpeg") ending = "mp3";
+    if (attachment.type === "text/plain") ending = "txt";
+    if (attachment.type === "image/svg+xml") ending = "svg";
+
+    if (!ending) return {
+        ending,
+        filename: attachment.id
+    };
+
+    return {
+        ending,
+        filename: `${attachment.id}.${ending}`
+    };
+}
+
 async function removeAttachmentTimestamps(data) {
     if (!data?.__tableName) return data;
+
+    data = JSON.parse(JSON.stringify(data));
 
     let tableData = slmnggAttachments[data.__tableName];
     if (tableData) {
         tableData.forEach(key => {
             if (data[key]) {
                 data[key].forEach(attachment => {
-                    attachment.url = generateAttachmentURL(attachment.url, attachment.filename);
+                    let { ending, filename } = getAutoFilename(attachment);
+                    attachment._autoFilename = filename;
+                    attachment.fileExtension = ending;
+                    attachments.set(attachment.id, JSON.parse(JSON.stringify(attachment)));
+                    // console.log("att set", attachment, attachments.get(attachment.id));
+
+                    // we don't want the URLs to appear in requests anymore
+                    // the data server just uses the attachment IDs
+
+                    attachment.url = null; // generateAttachmentURL(attachment.url, attachment);
+
                     for (let size in attachment.thumbnails) {
                         size = attachment.thumbnails[size];
-                        size.url = generateAttachmentURL(size.url, attachment.filename);
+                        size.url = null; // generateAttachmentURL(size.url, attachment);
                     }
+
                 });
             }
         });
@@ -310,6 +349,11 @@ async function authStart(storedData) {
     return token;
 }
 
+/**
+ *
+ * @param token
+ * @returns {Promise<UserData | null>}
+ */
 async function getAuthenticatedData(token) {
     let data = auth.get(token);
 
@@ -368,5 +412,6 @@ module.exports = {
         getChannelByID,
         getTwitchAccessToken,
         getBots
-    }
+    },
+    getAttachment: (id) => attachments.get(id)
 };

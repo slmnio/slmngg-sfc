@@ -250,8 +250,8 @@ module.exports = ({ app, cors, Cache, io }) => {
 
     async function generateCal(event) {
         let theme = (event.theme ? await Cache.get(event.theme[0]) : null);
-        let matches = await Promise.all(event.matches.map(id => Cache.get(id)));
-        matches = matches.filter(m => m.start).map(m => getMatchCal(m, event));
+        let matches = await Promise.all((event.matches || []).map(id => Cache.get(id)));
+        matches = matches.filter(m => m?.start).map(m => getMatchCal(m, event));
         if (!matches.length) return null;
         let cal = [
             "BEGIN:VCALENDAR",

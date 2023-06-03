@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="container">
-            <ContentRow v-if="accolades">
+            <ContentRow v-if="accolades" class="accolades">
                 <ContentThing :thing="accolade" type="event" :link-to="accolade.event" :theme="accolade.event && accolade.event.theme" v-for="accolade in accolades"
                               :key="accolade.id" :show-logo="true" :text="accolade.player_text" />
             </ContentRow>
@@ -61,9 +61,9 @@ export default {
 
             return [
                 // team things
-                ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => e.accolades).filter(e => !!e)) : []),
+                ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => (e.accolades || []).filter(a => a?.show_for_players)).filter(Boolean)) : []),
                 ...(this.player.accolades ? this.player.accolades : [])
-            ];
+            ].filter(accolade => !accolade.trophy_tier).sort((a, b) => sortEvents(a?.event, b?.event));
         },
         teams() {
             if (!this.player?.member_of) return null;
@@ -142,5 +142,7 @@ export default {
 </script>
 
 <style scoped>
-
+    .content-row.accolades {
+        font-size: 1.1em;
+    }
 </style>

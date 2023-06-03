@@ -1,13 +1,15 @@
 <template>
     <div class="background" v-if="background">
-        <div class="image-background full" v-if="type === 'image'" :style="{ backgroundImage: `url(${background.url})` }"></div>
+        <div class="image-background full" v-if="type === 'image'" :style="bg(backgroundURL)"></div>
         <div class="video-background full flex-center" v-if="type === 'video'">
-            <video :src="background.url" loop autoplay muted />
+            <video :src="backgroundURL" loop autoplay muted />
         </div>
     </div>
 </template>
 
 <script>
+import { bg, getNewURL } from "@/utils/images";
+
 export default {
     name: "BroadcastBackground",
     props: ["broadcast", "index"],
@@ -15,9 +17,18 @@ export default {
         noStinger: true
     }),
     computed: {
+        backgroundURL() {
+            return getNewURL(this.background, "orig");
+        },
+        processedIndex() {
+            if (this.index == null) return null;
+            if (this.index === 0) return 0;
+            // make it 1-based unless a 0 is passed
+            return parseInt(this.index) - 1;
+        },
         background() {
             if (!this.broadcast?.background) return null;
-            if (this.index && this.broadcast.background[this.index]) return this.broadcast.background[this.index];
+            if (this.processedIndex && this.broadcast.background[this.processedIndex]) return this.broadcast.background[this.processedIndex];
             return this.broadcast.background[0];
         },
         type() {
@@ -30,6 +41,9 @@ export default {
         return {
             title: `Background${this.index ? ` #${this.index}` : ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
+    },
+    methods: {
+        bg
     }
 };
 </script>

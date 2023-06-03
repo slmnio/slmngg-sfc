@@ -90,15 +90,21 @@ function setRebuilding(isRebuilding) {
 // Starting with syncing Matches
 
 // const tables = ["Matches", "Teams", "Themes", "Events", "Players", "Player Relationships"];
-const tables = ["Broadcasts", "Clients", "Channels", "Discord Bots", "Players", "Events", "Event Series", "Teams", "Ad Reads", "Ad Read Groups", "News", "Matches",  "Themes",  "Socials", "Accolades", "Player Relationships", "Brackets", "Live Guests", "Headlines", "Maps", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles"];
+const tables = ["Broadcasts", "Clients", "Channels", "Discord Bots", "Players", "Events", "GFX", "Event Series", "Teams", "Ad Reads", "Ad Read Groups", "News", "Matches",  "Themes",  "Socials", "Accolades", "Player Relationships", "Brackets", "Live Guests", "Headlines", "Maps", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles"];
 const staticTables = ["Redirects"];
+
+function sortKeys([aKey], [bKey]) {
+    if (aKey > bKey) return 1;
+    if (aKey < bKey) return -1;
+    return 0;
+}
 
 function deAirtable(obj) {
     const data = {};
     if (!obj.fields) {
         console.error(obj);
     }
-    Object.entries(obj.fields).forEach(([key, val]) => {
+    Object.entries(obj.fields).sort(sortKeys).forEach(([key, val]) => {
         data[key.replace(/ +/g, "_").replace(/[:()]/g, "_").replace(/_+/g,"_").toLowerCase()] = val;
     });
     data.id = obj.id;

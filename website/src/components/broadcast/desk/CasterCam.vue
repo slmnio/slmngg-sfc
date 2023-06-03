@@ -13,7 +13,7 @@
 
 <script>
 import { logoBackground, logoBackground1 } from "@/utils/theme-styles";
-import { resizedImage } from "@/utils/images";
+import { bg, resizedImage } from "@/utils/images";
 
 export default {
     name: "CasterCam",
@@ -33,10 +33,12 @@ export default {
             return this.manualCamera ? true : this.apiVisible;
         },
         useCam() {
+            if (this.guest?.webcam?.includes("view=")) return true;
             if (this.disableVideo) return null;
             return this.guest?.use_cam || false;
         },
         streamID() {
+            if (this.guest?.webcam) return this.guest.webcam;
             if (this.relayPrefix) return this.relayPrefix;
             return this.guest?.cam_code || "";
         },
@@ -63,7 +65,7 @@ export default {
                     eventFallback: true
                 };
             }
-            return { backgroundImage: `url(${this.guest.avatar})` };
+            return bg(this.guest.avatar);
         }
     },
     watch: {
@@ -175,6 +177,7 @@ export default {
         border-radius: 50%;
         box-shadow: 0 0 8px 0 black;
         background-size: cover;
+        background-position: center;
         transform: translate(0, -10%);
         transition: all .4s ease;
     }

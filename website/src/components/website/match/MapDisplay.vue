@@ -75,7 +75,7 @@ export default {
             } catch (e) { return ""; }
         },
         scores() {
-            if (this.map.score_1 === undefined || this.map.score_2 === undefined) return null;
+            if (this.map.score_1 == null || this.map.score_2 == null) return null;
             return [this.map.score_1, this.map.score_2].join(" - ");
         },
         pickText() {

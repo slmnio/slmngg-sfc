@@ -33,23 +33,23 @@ export default {
         updateWidth(isAfterTick) {
             const big = this.$refs.big;
             const small = this.$slots.default?.[0]?.elm;
-            console.log({ big, small });
+            // console.log({ big, small });
 
-            if (!big || !small) return;
+            if (!big?.getBoundingClientRect || !small?.getBoundingClientRect) return;
 
             const boxSize = big.getBoundingClientRect().width;
             const contentSize = small.getBoundingClientRect().width;
             const contentScale = boxSize / contentSize;
-            console.log(contentScale, this.contentScale);
+            // console.log(contentScale, this.contentScale);
             this.contentScale = contentScale * this.contentScale;
-            if (isNaN(this.contentScale)) {
+            if (isNaN(this.contentScale) || this.contentScale === Infinity) {
                 this.contentScale = 1;
             }
 
             if (!isAfterTick) this.$nextTick(() => this.updateWidth(true));
         },
         observerUpdate(...a) {
-            console.log(a);
+            // console.log(a);
             this.updateWidth();
         }
     },

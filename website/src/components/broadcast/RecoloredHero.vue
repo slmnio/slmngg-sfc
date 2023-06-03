@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import Jimp from "jimp/es";
+import { Image } from "image-js";
 import { heroRecolorColors } from "@/utils/theme-styles";
 import { bg, resizedAttachment } from "@/utils/images";
 
@@ -28,12 +28,9 @@ function deHex(hexString) {
 
 async function recolorImage(imageURL, toColor, fromColor) {
     const [from, to] = [fromColor, toColor].map(deHex);
-    const image = await Jimp.read({
-        url: imageURL
-    });
-
+    const image = await Image.load(imageURL);
     // console.log("image width", image.bitmap.width);
-    const frame = image.bitmap.data;
+    const frame = image.data;
 
     const outputFrame = new Uint8Array(frame);// (new Uint8Array(frame)).slice(0, image.bitmap.width * image.bitmap.height * 4);
 
@@ -53,10 +50,10 @@ async function recolorImage(imageURL, toColor, fromColor) {
     // console.log("output is", frame.length, outputFrame.length);
     return {
         pixels: {
-            ...image.bitmap,
+            ...image,
             data: outputFrame
         },
-        width: image.bitmap.width
+        width: image.width
     };
 }
 
@@ -109,12 +106,12 @@ export default {
     }),
     computed: {
         mainImage() {
-            const img = this.hero?.recolor_base;
+            const img = this.hero?.recolor_base?.[0];
             if (!img) return null;
             return bg(resizedAttachment(img, "orig"));
         },
         fallbackImage() {
-            const img = this.hero?.main_image;
+            const img = this.hero?.main_image?.[0];
             if (!img) return null;
             return bg(resizedAttachment(img, "orig"));
         },

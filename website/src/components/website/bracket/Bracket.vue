@@ -20,7 +20,7 @@
                 <div class="header text-center mb-3" :style="logoBackground1(event)" v-if="showHeaders && column.header">{{ column.header }}</div>
                 <div class="column-matches flex-grow-1">
                     <BracketMatch v-for="matchNum in column.games" :key="matchNum" :ref="`match-${matchNum}`" :custom-timezone="customTimezone"
-                                  :show-times="bracket.show_times" :match="getMatch(matchNum)"/>
+                                  :show-times="bracket.show_times" :show-broadcasts="bracket.show_broadcasts" :match="getMatch(matchNum)"/>
                 </div>
             </div>
         </div>
@@ -237,7 +237,7 @@ export default {
         },
         logoBackground1,
         createConnections() {
-            console.log("creating connections");
+            // console.log("creating connections");
             this.connectionElements.forEach(el => el.remove());
             this.connectionBugs = [];
 
@@ -408,20 +408,20 @@ export default {
         layout: {
             deep: true,
             handler() {
-                console.log("[layout data update]");
+                // console.log("[layout data update]");
                 this.$nextTick(() => this.createConnections());
             }
         },
         bracket: {
             deep: true,
             handler() {
-                console.log("[bracket data update]");
+                // console.log("[bracket data update]");
                 this.$nextTick(() => this.createConnections());
             }
         }
     },
     mounted() {
-        console.log("[bracket mounted]");
+        // console.log("[bracket mounted]");
         this.$nextTick(() => this.createConnections());
     }
 };
@@ -469,6 +469,7 @@ export default {
         justify-content: center;
         align-items: center;
         transition: opacity 150ms ease, border-color 150ms ease, background-color 150ms ease;
+        overflow: hidden;
     }
     /*.bracket >>> .connection.dir-up { background-color: rgba(255,255,0,0.25); }*/
     /*.bracket >>> .connection.dir-down { background-color: rgba(0, 255,255,0.25); }*/
@@ -477,6 +478,14 @@ export default {
         top: 0;
         left: 0;
         width: 100%;
+    }
+
+
+    .bracket {
+        z-index: 2;
+    }
+    .connections {
+        z-index: 1;
     }
 
     .bracket >>> .connections {

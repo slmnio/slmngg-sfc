@@ -59,6 +59,8 @@ Vue.use(VueSocketIOExt, socket, { store });
 
 Vue.config.productionTip = false;
 
+Vue.config.devtools = ["local", "staging"].includes(import.meta.env.VITE_DEPLOY_MODE);
+
 Vue.component("v-style", {
     render: function (createElement) {
         return createElement("style", this.$slots.default);
@@ -126,11 +128,12 @@ if (subdomain) {
 
 const router = new VueRouter({
     mode: "history",
-    base: process.env.BASE_URL,
+    base: import.meta.env.BASE_URL,
     routes
 });
 
 let preloadAuthCheckRequired = false;
+let preloadAuthReturn = null;
 
 // TODO: this doesn't really work very well nor work on the first run
 router.beforeEach((to, from, next) => {
@@ -141,14 +144,14 @@ router.beforeEach((to, from, next) => {
 
             getAuthNext(app); // empty auth
 
-            setAuthNext(app?.$root, to.fullPath);
-
             if (app && !app.auth.user) {
+                setAuthNext(app?.$root, to.fullPath);
                 return router.push({ path: "/login", query: { return: to.fullPath } });
                 // TODO: to.fullPath can be used for return (set in localstorage or something  /redirect?to=)
             } else {
                 console.warn("Need to check if authenticated, but the app hasn't loaded yet.");
                 preloadAuthCheckRequired = true;
+                preloadAuthReturn = to.fullPath;
                 // console.log(document.cookie);
                 // return next({ path: "/login" });
             }
@@ -238,7 +241,14 @@ app = new Vue({
         if (!this.auth.user && preloadAuthCheckRequired) {
             console.warn("App loaded, recognising preload check is required and we're not authenticated. Sending to login");
             preloadAuthCheckRequired = false;
-            this.$router.push("/login");
+            if (preloadAuthReturn) setAuthNext(app, preloadAuthReturn);
+
+            this.$router.push({
+                path: "/login",
+                query: {
+                    return: getAuthNext(app, true)
+                }
+            });
         }
     },
     computed: {
@@ -246,7 +256,7 @@ app = new Vue({
             return this.$store.getters.thing(`subdomain-${subdomain}`);
         },
         version() {
-            return process.env?.VUE_APP_SLMNGG_VERSION;
+            return import.meta.env?.VITE_SLMNGG_VERSION;
         },
         authUser() {
             if (!this.auth.user?.airtableID) return null;

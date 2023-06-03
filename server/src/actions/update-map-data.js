@@ -43,7 +43,10 @@ module.exports = {
             const existingMap = existingMaps[i];
 
             if (!newMap.existingID) {
-                return recordCreations.push(newMap);
+                return recordCreations.push({
+                    ...newMap,
+                    index: i
+                });
             } else if (newMap.existingID !== existingMap.id) {
                 return console.warn(`[map editor] Map ID mismatch: existing=${existingMap.id} new=${newMap.existingID}`);
             }
@@ -112,14 +115,30 @@ module.exports = {
                 if (map.score_2 != null) fieldData["Score 2"] = map.score_2;
                 if (map.replay_code) fieldData["Replay Code"] = map.replay_code;
 
-                return fieldData;
+                return {
+                    index: map.index,
+                    fields: fieldData
+                };
             });
 
         if (recordCreations.length) {
             console.log({ recordCreations });
 
-            const createResponses = await this.helpers.createRecords("Maps", recordCreations);
+            const createResponses = await this.helpers.createRecords("Maps", recordCreations.map(item => item.fields));
             if ((createResponses || []).some(r => r?.error)) throw "Airtable error";
+
+            let mapIDs = existingMaps.map(m => m.id);
+            createResponses.forEach((response, i) => {
+                let index = recordCreations[i]?.index;
+                if (index == null) return;
+                mapIDs[index] = response.id;
+            });
+
+            console.log("Match's map IDs:", mapIDs);
+
+            await this.helpers.updateRecord("Matches", match, {
+                "Maps": mapIDs.filter(Boolean)
+            });
         }
     }
 };

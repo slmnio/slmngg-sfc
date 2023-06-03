@@ -15,11 +15,12 @@
 import MapSegment from "@/components/broadcast/MapSegment";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { DefaultMapImages, likelyNeededMaps } from "@/utils/content-utils";
+import { getNewURL } from "@/utils/images";
 
 export default {
     name: "MapDisplay",
     components: { MapSegment },
-    props: ["broadcast", "animationActive", "useTransitions", "noMapVideos"],
+    props: ["broadcast", "animationActive", "useTransitions", "virtualMatch", "noMapVideos"],
     data: () => ({
         activeAudio: null,
         showNextMap: false,
@@ -28,6 +29,7 @@ export default {
     }),
     computed: {
         match() {
+            if (this.virtualMatch) return this.virtualMatch;
             if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
@@ -172,9 +174,10 @@ export default {
                 return console.log("Not doing anything since music is already fading out");
             }
             console.log("running audio", read);
-            if (!read?.audio?.length || !read?.audio[0]?.url) return console.warn("no valid data", read);
-            const url = read.audio[0].url;
-            const audio = new Audio(url);
+
+            const audioURL = getNewURL(read.audio?.[0], "orig");
+            if (!audioURL) return console.warn("no valid data", read);
+            const audio = new Audio(audioURL);
             audio.volume = (read.volume || 100) / 100;
             audio.onended = () => {
                 this.activeAudio = null;

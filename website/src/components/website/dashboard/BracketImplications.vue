@@ -1,5 +1,5 @@
 <template>
-    <div class="bracket-implications bg-dark p-2 d-flex ">
+    <div class="bracket-implications bg-dark p-2 d-flex" v-if="bracketImplications.length">
         <div class="bracket-i-b w-100" v-for="imps in bracketImplications" :key="imps.bracket.id">
             <div class="mb-1 text-center"><b><i class="fas fa-sitemap fa-fw mr-2"></i><router-link :to="url('event', match.event, { subPage: 'bracket' })">{{ imps.bracket.name }}</router-link></b></div>
             <div class="bracket-row">
@@ -7,7 +7,7 @@
                 <BracketImplicationMatch class="flex-grow-1" :imp="imps.win" relation="Winner" :team="matchWinner" :link-to-detailed-match="linkToDetailedMatch"></BracketImplicationMatch>
                 <BracketImplicationMatch class="flex-grow-1" :imp="imps.lose" relation="Loser" :team="matchLoser" :link-to-detailed-match="linkToDetailedMatch"></BracketImplicationMatch>
                 <div class="button-holder" v-if="showResolveButton">
-                    <BracketResolveButton :bracket="imps.bracket" vertical-button />
+                    <BracketResolveButton :show-button="showResolveButton" :bracket="imps.bracket" vertical-button />
                 </div>
             </div>
         </div>
@@ -40,7 +40,7 @@ export default {
             })(this.match);
         },
         bracketImplications() {
-            return this.bracketsIncludingMatch.map(bracket => {
+            return this.bracketsIncludingMatch.filter(bracket => !bracket.hide_implications).map(bracket => {
                 try {
                     const { connections } = JSON.parse(bracket.bracket_layout);
                     const thisMatchNumber = bracket.ordered_matches.findIndex(match => match.id === this.match.id);

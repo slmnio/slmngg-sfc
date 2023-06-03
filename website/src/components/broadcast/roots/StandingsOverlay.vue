@@ -42,7 +42,7 @@ export default {
             }
         },
         standingsSettings() {
-            return (this.blocks?.standings || []).find(s => s.group.toLowerCase() === this._stage || s.key.toLowerCase() === this._stage);
+            return (this.blocks?.standings || []).find(s => s.group?.toLowerCase() === this._stage || s.key?.toLowerCase() === this._stage);
         },
         stageTitle() {
             return this.standingsSettings?.short || this.standingsSettings?.title || this._stage;

@@ -70,7 +70,13 @@ export default {
         },
         teams() {
             if (this.noTeams) return [];
-            return this.match?.teams || [];
+            if (this.match?.teams?.length === 1) {
+                return [
+                    ...this.match.teams,
+                    this.match?.event
+                ];
+            }
+            return this.match?.teams?.slice(0, 2) || [];
         }
     },
     methods: {

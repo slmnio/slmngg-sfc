@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { resizedImage } from "@/utils/images";
+import { getNewURL, resizedImage } from "@/utils/images";
 import Squeezable from "@/components/broadcast/Squeezable.vue";
 import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
 
@@ -62,11 +62,13 @@ export default {
         textureData: {
             url: null,
             svg: null,
-            loading: true
-        }
+            loading: false
+        },
+        show: true
     }),
     methods: {
         async loadSVG(url) {
+            console.log("Load SVG", url);
             this.textureData.loading = true;
             this.textureData.url = url;
             const data = await fetch(url).then(res => res.text());
@@ -126,10 +128,12 @@ export default {
         texture() {
             const texture = this.event?.broadcast_texture?.[0];
             if (!texture) return null;
-            if (this.textureData.loading && this.textureData.url === texture.url) return null;
+            console.log("texture data", texture);
+            if (this.textureData.loading) return null;
+            const textureURL = getNewURL(texture, "orig");
 
-            if (this.textureData.url !== texture.url) {
-                return this.loadSVG(texture.url);
+            if (this.textureData.url !== textureURL) {
+                return this.loadSVG(textureURL);
             }
             // console.log(texture);
             return "data:image/svg+xml;base64," + btoa(this.textureData.svg.replace(/#696969/g, this.svgColor).trim());
@@ -174,7 +178,7 @@ export default {
             if (!this.teamWidth) return {};
             return { width: `calc(${this.teamWidth}px + var(--team-expand))` };
         }
-    }//,
+    }, //,
     // watch: {
     //     style() {
     //         if (this.$el && this.$el.querySelector) {
@@ -191,14 +195,11 @@ export default {
     //         }
     //     }
     // },
-    // mounted() {
-    //     this.$nextTick(() => {
-    //         if (this.$el && this.$el.querySelector) {
-    //             // console.log("mount - tick");
-    //             updateWidth(this.$el, this.teamWidth);
-    //         }
-    //     });
-    // }
+    mounted() {
+        setInterval(() => {
+            // this.show = !this.show;
+        }, 2500);
+    }
 };
 
 // function updateWidth(vueEl, fullWidth) {
@@ -391,7 +392,7 @@ export default {
         right: 0;
     }
     .ingame-texture img {
-        min-height: 121px;
+        height: 100%;
     }
 
     .attack-holder {

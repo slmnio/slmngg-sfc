@@ -43,6 +43,7 @@ async function getOrWaitForDownload(url, filename, size) {
 }
 
 async function downloadImage(url, filename, size) {
+    console.log("[image|downloading]", url, filename, size);
     return await heldPromise(["download", url, size, filename], new Promise((resolve, reject) => {
         const pathName = getPath(filename, size);
         const file = fs.createWriteStream(pathName);
@@ -261,7 +262,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
 
 
             let theme = await Cache.get(req.query.id);
-            let logo = theme.default_logo?.[0];
+            let logo = await Cache.getAttachment(theme.default_logo?.[0]?.id);
 
             if (!logo) return res.status(400).send("No logo to use");
             let themeColor = theme.color_logo_background || theme.color_theme || "#222222";
@@ -348,6 +349,11 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                     return data;
                 }));
 
+                if (!teams.every(t => t.theme?.default_logo)) {
+                    console.log(teams);
+                    return res.status(500).send("Not all teams have theme data");
+                }
+
                 let thumb = await sharp({ create: {
                     width: width,
                     height: size,
@@ -356,7 +362,9 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                 }});
 
                 let logos = await Promise.all(teams.map(async team => {
-                    let filePath = await fullGetURL(team.theme.default_logo[0], "orig", null);
+                    const logo = await Cache.getAttachment(team.theme?.default_logo?.[0]?.id);
+                    if (!logo) return null;
+                    let filePath = await fullGetURL(logo, "orig", null);
                     let themeColor = team.theme.color_logo_background || team.theme.color_theme || "#222222";
 
                     let resizedLogo = await sharp(filePath).resize({
@@ -370,13 +378,19 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                         .composite([{ input: resizedLogo }]).png().toBuffer();
                 }));
 
+                if (logos.filter(Boolean).length < 2) {
+                    return res.status(500).send("Team theme error");
+                }
+
                 let eventLogo;
 
                 if (match.event) {
                     try {
                         let event = await Cache.get(match?.event?.[0]);
                         let eventTheme = event?.theme?.length ? await Cache.get(event?.theme?.[0]) : null;
-                        let eventLogoFilePath = await fullGetURL(eventTheme?.default_logo[0], "orig", null);
+                        const logo = await Cache.getAttachment(eventTheme?.default_logo?.[0]?.id);
+                        if (!logo) return null;
+                        let eventLogoFilePath = await fullGetURL(logo, "orig", null);
                         eventLogo = await sharp(eventLogoFilePath).resize({
                             height: Math.floor(size * 0.20),
                             width: Math.floor(size * 0.25),

@@ -350,7 +350,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                 }));
 
                 if (!teams.every(t => t.theme?.default_logo)) {
-                    console.log(teams);
+                    console.log(match, teams);
                     return res.status(500).send("Not all teams have theme data");
                 }
 

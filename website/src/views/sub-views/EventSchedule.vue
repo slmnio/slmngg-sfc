@@ -225,10 +225,10 @@ export default {
         text-decoration: underline;
     }
 
-    .match.day-diff {
+    .match-wrapper.day-diff {
         margin-top: 1.5em !important;
     }
-    .match.week-diff {
+    .match-wrapper.week-diff {
         margin-top: 2.5em !important;
     }
 

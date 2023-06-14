@@ -140,7 +140,7 @@ export default {
                         theme: ReactiveThing("theme")
                     })
                 })
-            }).matches || [];
+            })?.matches || [];
         },
         slmnggDomain() {
             return getMainDomain(this.minisite?.subdomain);

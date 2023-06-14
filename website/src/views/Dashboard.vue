@@ -27,7 +27,7 @@
         <div class="broadcast-editor mb-2" v-if="client && client.broadcast">
             <BroadcastEditor :client="client"/>
         </div>
-        <DashboardModule title="Match Editor" icon-class="fas fa-pennant" class="broadcast-match-editor mb-2" v-if="liveMatch" start-opened>
+        <DashboardModule title="Match Editor" icon-class="fas fa-pennant" class="broadcast-match-editor mb-2" v-if="liveMatch?.id" start-opened>
             <MatchEditor :hide-match-extras="true" :match="liveMatch"></MatchEditor>
         </DashboardModule>
         <DashboardModule title="Desk Guests" icon-class="fas fa-users" class="desk-editor mb-2">

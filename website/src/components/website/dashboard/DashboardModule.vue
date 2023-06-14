@@ -11,8 +11,8 @@
             <i class="fa fa-fw fa-chevron-left" :class="{ 'rotate': showDropdown }"></i>
         </div>
         <transition name="clip-swipe-down">
-            <div class="module-content bg-dark" :class="contentClass + (noContentBorder ? ' no-border' : '')" :style="moduleContentCSS" v-show="showDropdown" ref="content">
-                <slot></slot>
+            <div class="module-content bg-dark" :class="(contentClass || '') + (noContentBorder ? ' no-border' : '')" :style="moduleContentCSS" v-show="showDropdown" ref="content">
+                <slot v-if="loadDropdown"></slot>
             </div>
         </transition>
     </div>
@@ -30,6 +30,7 @@ export default {
     },
     data: () => ({
         showDropdown: false,
+        loadDropdown: false,
         contentHeight: 0
     }),
     computed: {
@@ -47,15 +48,17 @@ export default {
             if (height > 50) this.contentHeight = height;
         }
     },
-    mounted() {
+    created() {
         const storeData = this.$store.getters.dashboardModuleIsVisible(this.title);
         if (storeData !== undefined) this.showDropdown = storeData;
 
         if (this.startOpened) this.showDropdown = true;
+        this.loadDropdown = this.showDropdown;
     },
     watch: {
         showDropdown(isVisible) {
             this.$store.commit("setDashboardModuleVisibility", { moduleName: this.title, visible: isVisible });
+            this.loadDropdown = true;
 
             this.$nextTick(() => {
                 this.setHeight();

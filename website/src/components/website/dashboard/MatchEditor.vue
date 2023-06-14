@@ -249,6 +249,23 @@ export default {
         broadcastData() {
             return this.broadcast || this.match?.event?.broadcasts;
         }
+        // loadedFully() {
+        //     const test = [
+        //         this.match.__loading,
+        //         this.match.maps?.[0]?.__loading,
+        //         this.match.maps?.[0]?.map?.__loading,
+        //         this.match.maps?.[0]?.winner?.__loading,
+        //         this.teams?.[0]?.__loading,
+        //         this.teams?.[0]?.theme?.__loading,
+        //         this.availableMaps?.[0]?.__loading,
+        //         this.broadcastData?.__loading,
+        //         this.updatingData
+        //     ];
+        //
+        //     console.log("[Match Load Test]", test);
+        //
+        //     return test.every(b => !b);
+        // }
     },
     watch: {
         match: {
@@ -256,6 +273,10 @@ export default {
             handler(newMatch, oldMatch) {
                 if (newMatch?.id !== oldMatch?.id) {
                     this.emptyData(newMatch?.id);
+                }
+                if (JSON.stringify(newMatch) === JSON.stringify(oldMatch)) {
+                    console.log("No change in data", newMatch);
+                    return;
                 }
                 this.updateMatchData(newMatch);
             }
@@ -283,6 +304,15 @@ export default {
 
             }
         }
+        // loadedFully: {
+        //     immediate: true,
+        //     handler(isLoaded) {
+        //         if (isLoaded) {
+        //             console.log("Data fully loaded");
+        //             this.dataLoaded = true;
+        //         }
+        //     }
+        // }
     },
     data: () => ({
         processing: {},
@@ -358,7 +388,7 @@ export default {
         },
         setIfNew(key, index, value) {
             if (this.previousAutoData?.[key]?.[index] === value) return; // console.log(`Not updating ${key}[${index}] because ${value} is the same as last set`);
-            console.log(`Updating ${key}[${index}] to`, value);
+            // console.log(`Updating ${key}[${index}] to`, value);
             this.$set(this[key], index, value);
         },
         emptyData(newID) {

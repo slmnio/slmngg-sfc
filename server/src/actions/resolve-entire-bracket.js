@@ -118,17 +118,26 @@ module.exports = {
                     // feeder position 2 = right/bottom, so placeholder there
                 }
 
-                let response = await this.helpers.updateRecord("Matches", match, {
-                    "Teams": [correctTeams[0].id],
-                    "Placeholder Right": placeholderRight
-                });
-                responses.push(response);
+                const matchAlreadySet = JSON.stringify(correctTeams.map(t => t.id)) === JSON.stringify((match.teams || []).map(t => t.id)) && placeholderRight === match.placeholder_right;
+
+                if (!matchAlreadySet) {
+                    let response = await this.helpers.updateRecord("Matches", match, {
+                        "Teams": [correctTeams[0].id],
+                        "Placeholder Right": placeholderRight
+                    });
+                    responses.push(response);
+                }
             } else if (correctTeams.length === 2) {
-                let response = await this.helpers.updateRecord("Matches", match, {
-                    "Teams": correctTeams.map(team => team.id),
-                    "Placeholder Right": false
-                });
-                responses.push(response);
+
+                const matchAlreadySet = JSON.stringify(correctTeams.map(t => t.id)) === JSON.stringify((match.teams || []).map(t => t.id)) && match.placeholder_right === false;
+
+                if (!matchAlreadySet) {
+                    let response = await this.helpers.updateRecord("Matches", match, {
+                        "Teams": correctTeams.map(team => team.id),
+                        "Placeholder Right": false
+                    });
+                    responses.push(response);
+                }
             }
 
             matches[parseInt(matchNum) - 1].teams = correctTeams;

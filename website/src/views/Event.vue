@@ -40,6 +40,7 @@ import SubPageNav from "@/components/website/SubPageNav";
 import Social from "@/components/website/Social";
 import { themeBackground1 } from "@/utils/theme-styles";
 import { resizedImageNoWrap } from "@/utils/images";
+import { cleanID } from "@/utils/content-utils";
 
 export default {
     name: "Event",
@@ -148,6 +149,15 @@ export default {
     mounted() {
         console.log("[event mount]", this.id, this.event, this.$root.minisiteEvent);
     },
+    watch: {
+        id: {
+            handler(id) {
+                console.log("id change", cleanID(id));
+                this.$emit("id_change", cleanID(id));
+            },
+            immediate: true
+        }
+    },
     methods: {
         subLink(page) {
             if (this.isMinisite) {
@@ -156,6 +166,10 @@ export default {
             return `/event/${this.event.id}/${page}`;
         },
         themeBackground1
+    },
+    beforeRouteLeave(to, from, next) {
+        this.$emit("id_change", null);
+        next();
     }
 };
 

@@ -25,6 +25,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import SubPageNav from "@/components/website/SubPageNav";
 import Social from "@/components/website/Social";
 import { resizedImageNoWrap } from "@/utils/images";
+import { cleanID } from "@/utils/content-utils";
 
 export default {
     name: "Team",
@@ -86,6 +87,9 @@ export default {
                 })
             });
         },
+        eventID() {
+            return this.team?.event?.id;
+        },
         eventSettings() {
             if (!this.team?.event?.blocks) return null;
             try {
@@ -97,6 +101,19 @@ export default {
         useTeamCompositions() {
             return this.eventSettings?.composition?.use && (this.team?.players || []).some(p => p.composition_tank_sr || p.composition_dps_sr || p.composition_support_sr);
         }
+    },
+    watch: {
+        eventID: {
+            handler(id) {
+                console.log("team's event id change", cleanID(id));
+                this.$emit("id_change", cleanID(id));
+            },
+            immediate: true
+        }
+    },
+    beforeRouteLeave(to, from, next) {
+        this.$emit("id_change", null);
+        next();
     }
 };
 

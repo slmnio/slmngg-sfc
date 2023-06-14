@@ -47,7 +47,7 @@
                     <div class="nav-divider" v-if="navbarEvents.length"></div>
 
                     <router-link v-for="event in navbarEvents" :key="event.id"
-                                 active-class="active"
+                                 active-class="active" :class="{'active': event._original_data_id === activeEventID }"
                                  class="nav-link" :to="event._link" :exact="event.__id === minisite.__id">
                         {{ event.navbar_short || event.short || event.series_subtitle || event.name }}</router-link>
 <!--                    <router-link :to="'/'" v-if="minisite.navbar_short" active-class="active" exact class="nav-link">{{ minisite.navbar_short }}</router-link>-->
@@ -123,7 +123,7 @@ export default {
     directives: {
         BModal: VBModal
     },
-    props: ["minisite"],
+    props: ["minisite", "activeEventID"],
     data: () => ({
         pageNoLongerNew: false,
         resizeObserver: null,

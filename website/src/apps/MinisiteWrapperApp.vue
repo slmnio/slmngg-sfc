@@ -1,7 +1,7 @@
 <template>
     <div class="minisite-wrapper-app">
         <div id="app" v-if="event && (event._original_data_id || event.__loading)">
-            <WebsiteNav :minisite="event"/>
+            <WebsiteNav :minisite="event" :activeEventID="activeEventID" />
             <v-style id="minisite-css">
                 body.minisite {
                     background-color: {{ theme.color_body }};
@@ -34,7 +34,7 @@
                 body.minisite .website-nav .nav-link:hover { color: {{ nav_color }}bf !important; }
                 body.minisite .website-nav .nav-link.active { color: {{ nav_color }}ff !important; }
             </v-style>
-            <router-view class="my-3 slmngg-page"/>
+            <router-view @id_change="(id) => activeEventID = id" class="my-3 slmngg-page"/>
         </div>
         <NotFoundPage v-else/>
     </div>
@@ -48,6 +48,9 @@ import "@/assets/bootstrap.css";
 import "@/assets/app.css";
 export default {
     name: "MinisiteWrapperApp",
+    data: () => ({
+        activeEventID: null
+    }),
     components: {
         NotFoundPage,
         // Event,

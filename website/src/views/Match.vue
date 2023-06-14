@@ -63,7 +63,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import MatchHero from "@/components/website/match/MatchHero";
 import MatchScore from "@/components/website/match/MatchScore";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
-import { formatTime, getMatchContext, url } from "@/utils/content-utils";
+import { cleanID, formatTime, getMatchContext, url } from "@/utils/content-utils";
 import { resizedImageNoWrap } from "@/utils/images";
 import { isAuthenticated } from "@/utils/auth";
 import { canEditMatch } from "@/utils/client-action-permissions";
@@ -168,7 +168,23 @@ export default {
             if (this.match?.log_files?.replay_codes) return this.match.log_files.replay_codes;
             if (!this.match?.maps?.some(map => map.replay_code)) return null;
             return this.match.maps.map(map => `${map.name?.[0]}: ${map.replay_code}`).join(", \n");
+        },
+        eventID() {
+            return this.match?.event?.id;
         }
+    },
+    watch: {
+        eventID: {
+            handler(id) {
+                console.log("match's event id change", cleanID(id));
+                this.$emit("id_change", cleanID(id));
+            },
+            immediate: true
+        }
+    },
+    beforeRouteLeave(to, from, next) {
+        this.$emit("id_change", null);
+        next();
     },
     metaInfo() {
         return {

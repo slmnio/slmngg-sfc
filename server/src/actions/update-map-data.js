@@ -25,7 +25,7 @@ module.exports = {
         if (!match) throw "Couldn't load match data";
 
         const existingMaps = await Promise.all((match.maps || []).map(m => this.helpers.get(m)));
-        const matchTeamIDs = [...match.teams, null];
+        const matchTeamIDs = [...(match.teams || []), null];
         const recordUpdates = {};
         let recordCreations = [];
 

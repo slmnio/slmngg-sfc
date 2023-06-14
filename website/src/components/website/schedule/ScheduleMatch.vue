@@ -1,40 +1,58 @@
 <template>
-    <div class="match my-2" v-if="loaded" :class="{ 'bg-danger' : !loaded, 'special-event': match.special_event }">
-        <div class="match-left match-details flex-center flex-column text-center">
-            <div class="match-detail" v-for="detail in details" :key="detail.sort" v-b-tooltip="detail.long">{{ detail.short }}</div>
-        </div>
-
-        <router-link :to="url('match', this.match)" v-if="match.special_event"
-                     class="match-special-event-name flex-center text-center ct-passive link-text">
-            {{ match.custom_name }}
-        </router-link>
-
-        <div v-for="(team, i) in swappedTeams"
-             :key="team.id" :style="{order: i*2}"
-             class="match-team flex-grow-1 d-flex align-items-center justify-content-end"
-             :class="{'right': i === 1}">
-
-            <div v-if="team.dummy" class="team-name team-name--spacer d-none d-lg-flex">{{ team.text }}</div>
-            <router-link v-else-if="!team.dummy" :to="url('team', team)" class="team-name d-none d-lg-flex ct-passive">{{ team.name }}</router-link>
-
-
-            <div v-if="team.dummy" class="team-code d-lg-none">{{ team.code || team.text || 'TBD' }}</div>
-            <router-link v-else-if="!team.dummy" :to="url('team', team)" class="team-code d-lg-none ct-passive">{{ team.code }}</router-link>
-
-
-            <ThemeLogo v-if="team && !team.dummy" :theme="team.theme" border-width="4" class="team-logo" icon-padding="4" logo-size="w-60"/>
-            <div class="team-logo team-logo--spacer" v-else></div>
-        </div>
-
-        <router-link :to="url('match', this.match)" class="match-center match-vs flex-center text-center ct-passive" v-if="!match.special_event">
-            <div class="scores-wrap" v-if="scores.some(s => s)">
-                <div class="scores">{{ scores[0] }} - {{ scores[1] }}</div>
-                <div class="scores-forfeit" v-if="match.forfeit">Forfeit</div>
+    <div class="match-wrapper my-2" v-if="loaded" :class="{ 'bg-danger' : !loaded }">
+        <div class="match" :class="{'special-event': match.special_event}">
+            <div class="match-left match-details flex-center flex-column text-center">
+                <div class="match-detail" v-for="detail in details" :key="detail.sort" v-b-tooltip="detail.long">
+                    {{ detail.short }}
+                </div>
             </div>
-            <div class="vs ct-passive" v-else>vs</div>
-        </router-link>
-        <div class="match-right match-time flex-center">
-            <ScheduleTime :time="match.start" :custom-text="timeCustomText"/>
+
+            <router-link :to="url('match', this.match)" v-if="match.special_event"
+                         class="match-special-event-name flex-center text-center ct-passive link-text">
+                {{ match.custom_name }}
+            </router-link>
+
+            <div v-for="(team, i) in swappedTeams"
+                 :key="team.id" :style="{order: i*2}"
+                 class="match-team flex-grow-1 d-flex align-items-center justify-content-end"
+                 :class="{'right': i === 1}">
+
+                <div v-if="team.dummy" class="team-name team-name--spacer d-none d-lg-flex">{{ team.text }}</div>
+                <router-link v-else-if="!team.dummy" :to="url('team', team)"
+                             class="team-name d-none d-lg-flex ct-passive">{{ team.name }}
+                </router-link>
+
+
+                <div v-if="team.dummy" class="team-code d-lg-none">{{ team.code || team.text || "TBD" }}</div>
+                <router-link v-else-if="!team.dummy" :to="url('team', team)" class="team-code d-lg-none ct-passive">
+                    {{ team.code }}
+                </router-link>
+
+
+                <ThemeLogo v-if="team && !team.dummy" :theme="team.theme" border-width="4" class="team-logo"
+                           icon-padding="4" logo-size="w-60"/>
+                <div class="team-logo team-logo--spacer" v-else></div>
+            </div>
+
+            <router-link :to="url('match', this.match)" class="match-center match-vs flex-center text-center ct-passive"
+                         v-if="!match.special_event">
+                <div class="scores-wrap" v-if="scores.some(s => s)">
+                    <div class="scores">{{ scores[0] }} - {{ scores[1] }}</div>
+                    <div class="scores-forfeit" v-if="match.forfeit">Forfeit</div>
+                </div>
+                <div class="vs ct-passive" v-else>vs</div>
+            </router-link>
+            <div class="match-right match-time flex-center">
+                <ScheduleTime :time="match.start" :custom-text="timeCustomText"/>
+            </div>
+        </div>
+
+        <div class="buttons flex-center ml-2 gap-1" v-if="showEditorButton || eventBroadcasts?.length">
+            <b-button-group v-if="showEditorButton">
+                <b-button class="text-white" size="sm" :to="url('match', this.match, { subPage: 'editor' })">
+                    <i class="fas fa-pencil"></i>
+                </b-button>
+            </b-button-group>
         </div>
     </div>
 </template>
@@ -43,12 +61,13 @@
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { url } from "@/utils/content-utils";
 import ScheduleTime from "@/components/website/schedule/ScheduleTime";
+import { BButton, BButtonGroup } from "bootstrap-vue";
 
 export default {
     name: "ScheduleMatch",
-    components: { ScheduleTime, ThemeLogo },
+    components: { BButtonGroup, BButton, ScheduleTime, ThemeLogo },
     methods: { url },
-    props: ["match", "customText", "leftTeam"],
+    props: ["match", "customText", "leftTeam", "showEditorButton"],
     computed: {
         shouldSwapTeams() {
             if (!this.leftTeam?.id) return false;
@@ -160,12 +179,18 @@ export default {
         text-align: left;
     }
 
+    .match-wrapper {
+        display: flex;
+        width: 100%;
+    }
+
     .match {
         display: grid;
         grid-template-columns: 0.75fr 2fr 0.25fr 2fr 0.75fr;
         grid-template-rows: 1fr;
         gap: 0px 0px;
         min-height: 3em;
+        width: 100%;
     }
     .match.special-event {
         grid-template-columns: 0.75fr 4.25fr 0.75fr;
@@ -229,5 +254,8 @@ export default {
 
     .team-logo--spacer {
         display: none;
+    }
+    .buttons {
+        order: 3;
     }
 </style>

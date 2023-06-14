@@ -154,12 +154,12 @@ io.on("connection", (socket) => {
 
     socket.on("prod-broadcast-join", (broadcastKey) => {
         if (socket._broadcastKey) {
-            console.log("[prod:broadcast] leaving", `prod:broadcast-${socket._broadcastKey}`);
+            // console.log("[prod:broadcast] leaving", `prod:broadcast-${socket._broadcastKey}`);
             socket.leave(`prod:broadcast-${socket._broadcastKey}`);
         }
         socket._broadcastKey = broadcastKey;
         socket.join(`prod:broadcast-${socket._broadcastKey}`);
-        console.log("[prod:broadcast] joining", `prod:broadcast-${socket._broadcastKey}`);
+        // console.log("[prod:broadcast] joining", `prod:broadcast-${socket._broadcastKey}`);
     });
 
     socket.on("prod-send", ({ socketID, event, data }) => {

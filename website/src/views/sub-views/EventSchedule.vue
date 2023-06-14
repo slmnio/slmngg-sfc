@@ -32,7 +32,7 @@
         <div class="schedule-matches mt-3" v-if="activeScheduleGroup">
             <ScheduleMatch v-for="(match, i) in groupMatches" :key="match.id" :match="match"
                            :class="i > 0 && getMatchClass(match, groupMatches[i-1])" :custom-text="showAll && match.match_group ? match.match_group : null"
-            />
+                           :show-editor-button="showEditorButton" />
         </div>
     </div>
 </template>
@@ -41,6 +41,7 @@
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
+import { canEditMatch } from "@/utils/client-action-permissions";
 
 export default {
     name: "EventSchedule",
@@ -176,6 +177,9 @@ export default {
                 // if (lastPage.matchPage > this.pagedMatches.length) return this.defaultScheduleNum;
                 return lastPage.matchPage;
             }
+        },
+        showEditorButton() {
+            return canEditMatch(this.$root?.auth?.user, { event: this.event });
         }
     },
     methods: {

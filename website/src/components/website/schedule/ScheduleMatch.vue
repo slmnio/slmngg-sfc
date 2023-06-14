@@ -47,7 +47,7 @@
             </div>
         </div>
 
-        <div class="buttons flex-center ml-2 gap-1" v-if="showEditorButton || eventBroadcasts?.length">
+        <div class="buttons flex-center ml-2 gap-1" v-if="showEditorButton">
             <b-button-group v-if="showEditorButton">
                 <b-button class="text-white" size="sm" :to="url('match', this.match, { subPage: 'editor' })">
                     <i class="fas fa-pencil"></i>

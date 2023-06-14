@@ -16,11 +16,12 @@
                 </div>
                 <TimezoneSwapper align="left"></TimezoneSwapper>
             </div>
-
-            <b-form-checkbox class="mb-2" switch v-model="useSiteTimezone" name="use-site-timezone">
-                Edit time in {{ useSiteTimezone ? 'the site' : 'your local' }} timezone ({{ timezoneName }})
+            <b-form-checkbox class="mb-3" switch v-model="useSiteTimezone" name="use-site-timezone">
+                Use site timezone to edit?
             </b-form-checkbox>
             <b-form-input class="mb-2" name="datetime-editor" type="datetime-local" :value="temporaryTime || safeSavedTime" @change="(val) => temporaryTime = val"></b-form-input>
+
+            <div class="text-center mb-2">Editing in <b>{{ useSiteTimezone ? 'the site' : 'your local' }} timezone</b> ({{ timezoneName }})</div>
             <div class="flex-center text-center timezones">
                 <div class="group">
                     <div class="top font-weight-bold" :class="{'text-muted': useSiteTimezone}">Local timezone</div>

@@ -9,6 +9,7 @@
         <b-dropdown-divider v-if="isProduction"></b-dropdown-divider>
         <b-dropdown-item v-if="isProduction" variant="dark" :href="rootLinkExternal('/dashboard')" :to="rootLinkRouter('/dashboard')" active-class="active">Dashboard</b-dropdown-item>
         <b-dropdown-item v-if="isProduction" variant="dark" v-b-modal.token-modal>Token</b-dropdown-item>
+        <b-dropdown-item v-if="isProduction" variant="dark" to="/login">Re-auth</b-dropdown-item>
         <TokenModal />
     </b-nav-item-dropdown>
 </template>

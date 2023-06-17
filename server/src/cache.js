@@ -210,6 +210,8 @@ function generateLimitedPlayers(longText) {
             if (key === "pronouns") {
                 val = val.toLowerCase();
             }
+            if (val === "true") val = true;
+            if (val === "false") val = false;
             player[key] = val;
         });
 

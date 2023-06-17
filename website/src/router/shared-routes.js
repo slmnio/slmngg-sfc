@@ -7,7 +7,7 @@ export default [
         component: () => import("@/views/Team"),
         props: route => ({ id: route.params.id }),
         children: [
-            { path: "", component: () => import("@/views/sub-views/TeamMain.vue") },
+            { path: "", component: () => import("@/views/sub-views/TeamMainPage.vue") },
             { path: "matches", component: () => import("@/views/sub-views/TeamSchedule.vue") },
             { path: "theme", component: () => import("@/views/sub-views/ThingTheme.vue") },
             { path: "details", component: () => import("@/views/sub-views/TeamDetails.vue") },

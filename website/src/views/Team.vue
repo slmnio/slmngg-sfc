@@ -2,7 +2,7 @@
     <div v-if="team">
         <ThingTop :thing="team" type="team" :themeURL="subLink('theme')"></ThingTop>
         <SubPageNav class="my-2">
-            <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
+            <li class="nav-item"><router-link class="nav-link" :to="subLink('')">{{ showPublicTeamDetails === true ? 'Details' : 'Overview' }}</router-link></li>
             <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
             <li class="nav-item" v-if="useTeamCompositions"><router-link class="nav-link" :to="subLink('composition')">Composition</router-link></li>
             <li class="nav-item" v-if="team.theme"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
@@ -86,6 +86,13 @@ export default {
                     })
                 })
             });
+        },
+        showPublicTeamDetails() {
+            if (this.team.__loading || !this.team?.id) return null;
+            if (this.team.event === undefined) return false;
+            if (this.team.event?.__loading || !this.team.event?.id) return null;
+
+            return this.team.event?.show_public_team_details || false;
         },
         eventID() {
             return this.team?.event?.id;

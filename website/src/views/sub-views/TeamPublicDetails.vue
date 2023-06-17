@@ -43,7 +43,7 @@ export default {
     },
     computed: {
         players() {
-            let players = this.team?.players;
+            let players = (this.team?.players || []).filter(p => !p.__loading && p.id);
             if (!players?.length && this.team.limited_players?.length) {
                 players = this.team.limited_players.filter(p => p.name && p.role !== "Staff").map(p => ({ ...p, limited: true, is_captain: p.captain || p.is_captain }));
             }

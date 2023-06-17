@@ -10,7 +10,8 @@
             <tr v-for="player in players" :key="player.id">
                 <td class="role" :title="player.role" v-b-tooltip><RoleIcon :role="player.role" /></td>
                 <td>
-                    <i v-if="player.is_captain" class="fas fa-fw fa-user-crown mr-1 text-warning" title="Captain" v-b-tooltip></i>
+                    <i v-if="player.is_captain" class="fas fa-fw fa-user-crown mr-1 text-warning" :title="'Captain' + (player.highlight_role ? ', ' + player.highlight_role : '')" v-b-tooltip></i>
+                    <i v-else-if="player.highlight_role" class="fas fa-fw fa-star mr-1 text-warning" :title="player.highlight_role" v-b-tooltip></i>
                     <router-link v-if="player.id" :to="url('player', player)">{{ player?.name }}</router-link>
                     <span v-else>{{ player?.name }}</span>
                 </td>
@@ -54,9 +55,13 @@ export default {
                 ...player,
                 is_captain: player.is_captain || this.isCaptain(player)
             })).sort((a, b) => {
-                if (a.is_captain === b.is_captain) return 0;
-                if (a.is_captain) return -1;
-                if (b.is_captain) return 1;
+                console.log(a.highlight_role, b.highlight_role);
+                if (a.is_captain && !b.is_captain) return -1;
+                if (b.is_captain && !a.is_captain) return 1;
+
+                // return 1;
+                if (a.highlight_role && !b.highlight_role) return -1;
+                if (b.highlight_role && !a.highlight_role) return 1;
             });
         },
         staff() {

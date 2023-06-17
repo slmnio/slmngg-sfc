@@ -10,19 +10,22 @@
             <tr v-for="player in players" :key="player.id">
                 <td class="role" :title="player.role" v-b-tooltip><RoleIcon :role="player.role" /></td>
                 <td>
-                    <i v-if="player.is_captain" class="fas fa-user-crown mr-2 text-warning" title="Captain" v-b-tooltip></i>
+                    <i v-if="player.is_captain" class="fas fa-fw fa-user-crown mr-1 text-warning" title="Captain" v-b-tooltip></i>
                     <router-link v-if="player.id" :to="url('player', player)">{{ player?.name }}</router-link>
                     <span v-else>{{ player?.name }}</span>
                 </td>
                 <td><CopyTextButton v-if="player?.discord_tag">{{ player?.discord_tag }}</CopyTextButton></td>
                 <td><CopyTextButton v-if="player?.battletag">{{ player?.battletag }}</CopyTextButton></td>
             </tr>
-            <tr class="spacer" v-if="team?.staff?.length">
+            <tr class="spacer" v-if="staff?.length">
                 <td colspan="4"></td>
             </tr>
-            <tr v-for="staff in team.staff" :key="staff.id">
+            <tr v-for="staff in staff" :key="staff.id">
                 <td class="role" :title="staff.staff_role || 'Staff'" v-b-tooltip><RoleIcon :role="staff.staff_role || 'Staff'" /></td>
-                <td>{{ staff?.name }}</td>
+                <td>
+                    <i v-if="staff.highlight_role" class="fas fa-fw fa-star mr-1 text-warning" :title="staff.highlight_role" v-b-tooltip></i>
+                    {{ staff?.name }}
+                </td>
                 <td><CopyTextButton v-if="staff?.discord_tag">{{ staff?.discord_tag }}</CopyTextButton></td>
                 <td><CopyTextButton v-if="staff?.battletag">{{ staff?.battletag }}</CopyTextButton></td>
             </tr>
@@ -57,8 +60,13 @@ export default {
             });
         },
         staff() {
-            if (this.team?.staff?.length) return this.team.staff;
-            return this.team.limited_players.filter(p => p.name && p.role === "Staff").map(p => ({ ...p, limited: true }));
+            let staff = this.team.staff;
+            if (!staff?.length) staff = (this.team.limited_players || []).filter(p => p.name && p.role === "Staff").map(p => ({ ...p, limited: true }));
+            return (staff || []).sort((a, b) => {
+                if ((a.is_captain || a.highlight_role) === (b.is_captain || b.highlight_role)) return 0;
+                if ((a.is_captain || a.highlight_role)) return -1;
+                if ((b.is_captain || b.highlight_role)) return 1;
+            });
         }
     },
     methods: {

@@ -3,6 +3,7 @@ const fp = require("fs/promises");
 const fs = require("fs");
 const path = require("path");
 const https = require("https");
+const { cleanID } = require("./action-utils/action-utils");
 
 const heldPromises = [];
 function getHeldPromise(parts) {
@@ -342,7 +343,8 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
 
             if ((match.teams || []).length === 2) {
                 // do 2 teams side by side
-                let teams = await Promise.all(match.teams.map(async tID => {
+                const teamIDs = match.teams.map(tID => cleanID(tID));
+                let teams = await Promise.all(teamIDs.map(async tID => {
                     let data = await Cache.get(tID);
                     if (data?.theme?.[0]) data.theme = await Cache.get(data.theme[0]);
                     // console.log(data, data.theme);

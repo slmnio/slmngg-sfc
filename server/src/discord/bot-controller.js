@@ -1,4 +1,5 @@
-const {Client, Intents} = require("discord.js");
+const { Client, GatewayIntentBits } = require("discord.js");
+
 const {joinVoiceChannel, EndBehaviorType} = require("@discordjs/voice");
 
 const { onUpdate, auth: { getBots, getPlayer }, get } = require("../cache.js");
@@ -299,8 +300,8 @@ class DiscordBot {
 
         this.client = new Client({
             intents: [
-                Intents.FLAGS.GUILDS,
-                Intents.FLAGS.GUILD_VOICE_STATES
+                GatewayIntentBits.Guilds,
+                GatewayIntentBits.GuildVoiceStates
             ]
         });
 

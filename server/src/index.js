@@ -49,6 +49,8 @@ const auction = require("./discord/new_auction.js")({
     test: ["hi"]
 });
 
+const test = require("./discord/slash-commands.js");
+
 
 const Cache = (require("./cache.js")).setup(io);
 (require("./airtable-interface.js")).setup(io);

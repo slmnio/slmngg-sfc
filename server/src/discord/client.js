@@ -1,11 +1,13 @@
-const { Client, Intents, Permissions } = require("discord.js");
+const {Client, GatewayIntentBits, Partials} = require("discord.js");
 
-let client = null;
+
+/* @type {Client} */
+let client;
 
 if (process.env.DISCORD_TOKEN) {
     client = new Client({
-        intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
-        partials: ["MESSAGE", "REACTION"]
+        intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions],
+        partials: [Partials.Message, Partials.Reaction]
     });
     client.login(process.env.DISCORD_TOKEN);
     client.once("ready", () => console.log(`[discord] Logged in as ${client.user.tag}`));

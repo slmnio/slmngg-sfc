@@ -3,7 +3,7 @@
         <h1 class="big mb-3">Teams</h1>
         <input type="text" class="form-control mb-3" placeholder="Start typing to filter" v-model="search">
         <h1><LoadingIcon v-if="!search && !sortedEvents.length"></LoadingIcon></h1>
-        <EventTeamsDisplay class="mb-4" v-for="eventID in sortedEvents" :key="eventID" :event-i-d="eventID"></EventTeamsDisplay>
+        <EventTeamsDisplay class="mb-4" v-for="eventID in sortedEvents" :key="eventID" :event-i-d="eventID" :search-text="searchEvents ? search : null"></EventTeamsDisplay>
         <b-pagination @page-click="scrollToTop()" v-if="!searchEvents" v-model="page" :per-page="eventsPerPage" :total-rows="events.length" align="center"></b-pagination>
     </div>
 </template>
@@ -43,16 +43,46 @@ export default {
                 // group and paginate
                 return this.events.slice(this.eventsPerPage * (this.page - 1), this.eventsPerPage * this.page);
             }
-            return this.events
-                .map(e => {
-                    if (this.search && this.search.length > 2 && e.teams) {
-                        return {
-                            ...e,
-                            teams: searchInCollection(e.teams, this.search, "name")
-                        };
-                    }
-                    return e;
-                }).filter(e => e.show_in_events && e.teams && e.teams.length !== 0);
+
+            // console.log(this.search, this.teamData);
+            if (!this.teamData?.length) return [];
+
+            const teamSearchResults = searchInCollection(this.teamData, this.search, "name");
+            const events = [];
+
+            teamSearchResults.forEach(team => {
+                if (!team.event) return;
+                let existing = events.find(e => e.eventID === team.event);
+                if (!existing) {
+                    existing = events[events.push({
+                        eventID: team.event,
+                        eventStart: team.eventStart,
+                        teams: []
+                    }) - 1];
+                }
+                existing.teams.push(team);
+            });
+            return events.sort((a, b) => {
+                if (a.eventStart && b.eventStart) {
+                    return (new Date(a.eventStart) - new Date(b.eventStart));
+                }
+                if (a.eventStart) return -1;
+                if (b.eventStart) return 1;
+            }).reverse()?.map(e => e.eventID);
+
+            // return this.events
+            //     .map(e => {
+            //         if (this.search && this.search.length > 2 && e.teams) {
+            //             return {
+            //                 ...e,
+            //                 teams: searchInCollection(e.teams, this.search, "name")
+            //             };
+            //         }
+            //         return e;
+            //     }).filter(e => e.show_in_events && e.teams && e.teams.length !== 0);
+        },
+        teamData() {
+            return ReactiveRoot("special:teams")?.teams;
         }
     },
     metaInfo() {

@@ -4,6 +4,7 @@
         <BracketOverlay v-if="gfx?.type === 'Bracket'" v-bind="overlayProps" />
         <ImageOverlay v-if="gfx?.type === 'Image'" v-bind="overlayProps" />
         <IframeOverlay v-if="gfx?.type === 'Iframe'" v-bind="overlayProps" />
+        <StandingsOverlay v-if="gfx?.type === 'Standings'" v-bind="overlayProps" />
         <v-style>
             {{ gfx?.custom_css }}
         </v-style>
@@ -16,10 +17,11 @@ import ScheduleOverlay from "@/components/broadcast/roots/ScheduleOverlay.vue";
 import BracketOverlay from "@/components/broadcast/roots/BracketOverlay.vue";
 import ImageOverlay from "@/components/broadcast/roots/ImageOverlay.vue";
 import IframeOverlay from "@/components/broadcast/roots/IframeOverlay.vue";
+import StandingsOverlay from "@/components/broadcast/roots/StandingsOverlay.vue";
 
 export default {
     name: "GFXRoot",
-    components: { IframeOverlay, ImageOverlay, BracketOverlay, ScheduleOverlay },
+    components: { StandingsOverlay, IframeOverlay, ImageOverlay, BracketOverlay, ScheduleOverlay },
     props: {
         index: Number,
         broadcast: Object,
@@ -35,7 +37,8 @@ export default {
                 extended: this.gfx?.extended,
                 forceBracket: this.gfx?.bracket,
                 image: this.gfx?.image?.[0],
-                url: this.gfx?.url
+                url: this.gfx?.url,
+                key: this.gfx?.key
             };
         },
         gfx() {

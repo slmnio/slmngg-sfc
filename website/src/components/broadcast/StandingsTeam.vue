@@ -116,7 +116,7 @@ export default {
     }
     .standings-team {
         align-items: flex-start;
-        padding: 8px 0px;
+        padding: 0.25em 0;
     }
     .team-name, .team-rank, .team-stat {
         line-height: 1;

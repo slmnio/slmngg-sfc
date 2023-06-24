@@ -1,12 +1,12 @@
 <template>
     <transition v-if="useTransitions" mode="out-in" name="break-content" class="map-anim-holder">
         <div :key="autoKey" class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" :class="{'show-next-map': showNextMap && nextMap}">
-            <MapSegment class="map" :class="{ 'map-dummy' : map.dummy }" v-for="map in maps" :key="map.id"
+            <MapSegment class="map" v-for="map in maps" :key="map.id"
                 :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
         </div>
     </transition>
     <div v-else class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" :class="{'show-next-map': showNextMap && nextMap}">
-        <MapSegment class="map" :class="{ 'map-dummy' : map.dummy }" v-for="map in maps" :key="map.id"
+        <MapSegment class="map" v-for="map in maps" :key="map.id"
                     :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
     </div>
 </template>

@@ -159,7 +159,14 @@ export default [
             forceTeam: route.query.team ? parseInt(route.query.team) : null
         })
     },
-    { path: "map-stats", component: () => import("@/components/broadcast/roots/MapStatsOverlay.vue") },
+    {
+        path: "map-stats",
+        component: () => import("@/components/broadcast/roots/MapStatsOverlay.vue"),
+        props: route => ({
+            number: parseInt(route.query.number || route.query.maps || route.query.count),
+            hideCompletedRecords: route.query.hideCompleted || route.query.hide
+        })
+    },
     {
         path: "audio",
         component: () => import("@/components/broadcast/TeamAudio.vue"),

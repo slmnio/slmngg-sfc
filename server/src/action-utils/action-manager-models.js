@@ -8,6 +8,25 @@ const {
 const Cache = require("../cache.js");
 const permissions = require("./action-permissions");
 
+function cleanID(id) {
+    // console.log(">id", id);
+    if (!id) return null;
+    if (typeof id !== "string") return null;
+    if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
+    return id;
+}
+function cleanUser(user) {
+    // console.log("clean user", user);
+    return ({
+        discordID: user.discord?.id,
+        airtableID: cleanID(user.airtable?.id),
+        name: user.airtable.name,
+        avatar: `https://cdn.discordapp.com/avatars/${user.discord.id}/${user.discord.avatar}.png`,
+        website_settings: user.airtable.website_settings || []
+    });
+}
+
+
 class Action {
     /**
      * @param {string} key
@@ -156,6 +175,18 @@ class SocketActionManager extends ActionManager {
 
     finalSetup(io) {
         io.on("connection", socket => {
+            if (socket.handshake?.query?.token) {
+                // auth check
+                (async () => {
+                    let userData = await Cache.auth.getData(socket.handshake.query.token);
+                    if (!userData?.user) {
+                        socket.emit("auth_status", { error: true, message: "Unknown token" });
+                    } else {
+                        socket.emit("auth_status", { error: false, user: cleanUser(userData.user)});
+                    }
+                })();
+            }
+
             for (let [key, action] of this.actions) {
                 if (!(action instanceof Action)) action = new Action(action);
 

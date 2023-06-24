@@ -115,11 +115,10 @@ export default {
             return dummies;
         },
         generateDummyText(match) {
-            // console.log("dummy text", match);
             if (match?.teams?.length === 2 && match.teams.every(team => team.code)) {
                 return `${match._m} of ${match.teams.map(team => team.code).join(" vs ")}`;
             }
-            return `${match._m} M${match.side}`;
+            return `${match._m} M${(match.match_number || match.side)}`;
         }
     },
     computed: {

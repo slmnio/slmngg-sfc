@@ -1,7 +1,7 @@
 <template>
     <div class="syncer-overlay">
         <transition name="fade">
-            <IngameOverlay id="overlay" :broadcast="broadcast" v-if="showOverlay" :animation-active="true" />
+            <IngameOverlay id="overlay" :broadcast="broadcast" v-if="showOverlay" :animation-active="true" :basic-mode="useBasicOverlay" />
         </transition>
         <transition name="fade">
             <iframe class="w-100 h-100 position-absolute border-0" :src="syncerURL" v-show="showSyncer"/>
@@ -25,6 +25,9 @@ export default {
         },
         showOverlay() {
             return this.settings.includes("Show overlay");
+        },
+        useBasicOverlay() {
+            return this.settings.includes("Use basic overlay");
         },
         syncerURL() {
             let base = "https://syncer.live/?embed&split&noCenter&hideOffset";

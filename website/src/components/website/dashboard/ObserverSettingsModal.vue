@@ -43,7 +43,8 @@ export default {
     data: () => ({
         settings: [
             "Show syncer",
-            "Show overlay"
+            "Show overlay",
+            "Use basic overlay"
         ]
     }),
     computed: {

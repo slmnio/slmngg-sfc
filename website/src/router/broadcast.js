@@ -2,7 +2,11 @@ export default [
     {
         path: "ingame",
         component: () => import("@/components/broadcast/roots/IngameOverlay.vue"),
-        props: route => ({ codes: route.query.codes, sponsorFadeSpeed: (route.query.sponsorSpeed || route.query.sponsorFadeSpeed) })
+        props: route => ({
+            codes: route.query.codes,
+            sponsorFadeSpeed: (route.query.sponsorSpeed || route.query.sponsorFadeSpeed),
+            basicMode: !!route.query.basic
+        })
     },
     {
         path: "cams",

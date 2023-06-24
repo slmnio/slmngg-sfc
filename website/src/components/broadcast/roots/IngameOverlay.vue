@@ -1,5 +1,5 @@
 <template>
-  <div class="ingame-overlay">
+  <div class="ingame-overlay" :class="{'basic': basicMode}">
       <div class="top-overlay" :style="broadcastMargin">
           <IngameTeam :key="team.id" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
                       :team="team"  :right="i === 1"
@@ -9,12 +9,11 @@
                       :map-attack="attacks[i]" :use-dots="useDots" :first-to="match && match.first_to"
           />
           <!--   -->
-          <Middle :active="shouldShowMiddle" :theme="broadcast?.event?.theme" :text="middleText"
+          <Middle v-if="!basicMode" :active="shouldShowMiddle" :theme="broadcast?.event?.theme" :text="middleText"
                   :tiny="broadcast.margin === 0"/>
       </div>
       <transition name="fade" mode="out-in">
-          {{ fadeSponsors }}
-          <Sponsors v-if="showFadeSponsors" class="ingame-fade-sponsors" :sponsors="fadeSponsors" mode="out-in" :speed="sponsorFadeSpeed" />
+          <Sponsors v-if="showFadeSponsors && !basicMode" class="ingame-fade-sponsors" :sponsors="fadeSponsors" mode="out-in" :speed="sponsorFadeSpeed" />
       </transition>
   </div>
 </template>
@@ -27,7 +26,7 @@ import Sponsors from "@/components/broadcast/Sponsors";
 
 export default {
     name: "IngameOverlay",
-    props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed", "noAnimation"],
+    props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed", "noAnimation", "basicMode"],
     components: { IngameTeam, Middle, Sponsors },
     data: () => ({
         flippingTeams: false
@@ -317,5 +316,12 @@ export default {
 
 .ingame-fade-sponsors >>> .break-sponsor-logo {
     height: calc(100% - 1.5em) !important;
+}
+.ingame-overlay.basic >>> .team-score,
+.ingame-overlay.basic >>> .attack-holder {
+    display: none !important;
+}
+.ingame-overlay.basic >>> .ingame-team {
+    --team-expand: 0px !important;
 }
 </style>

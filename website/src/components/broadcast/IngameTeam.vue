@@ -82,7 +82,7 @@ export default {
             const _dots = [];
             for (let i = 1; i <= (this.firstTo || 2); i++) {
                 console.log(this.score, i);
-                if (this.score === i) {
+                if (this.score >= i) {
                     _dots.push({ active: true });
                 } else {
                     _dots.push({ active: false });

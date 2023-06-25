@@ -163,7 +163,7 @@ export default {
             if (!this._theme) return {};
             let color = this._theme.color_accent;
             if (!color || color.toLowerCase() === "#ffffff") color = this._theme.color_logo_accent;
-            if (!color || color.toLowerCase() === "#ffffff") color = this._theme.color_logo_theme;
+            if (!color || color.toLowerCase() === "#ffffff") color = this._theme.color_theme;
             return {
                 backgroundColor: color
             };
@@ -442,5 +442,8 @@ export default {
         width: 1.5em;
         height: .8em;
         margin: 0 2px;
+    }
+    .dot.active {
+        background-color: white;
     }
 </style>

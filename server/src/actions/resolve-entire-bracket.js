@@ -36,7 +36,7 @@ module.exports = {
         if (!layout.connections) throw "Bracket has no connections";
         let { connections } = layout;
 
-        let matches = await getAll(bracket.ordered_matches);
+        let matches = JSON.parse(JSON.stringify(await getAll(bracket.ordered_matches)));
 
         for (const i in matches) {
             const match = matches[i];
@@ -141,7 +141,9 @@ module.exports = {
                 }
             }
 
-            matches[parseInt(matchNum) - 1].teams = correctTeams;
+            if (matchNum && matches[parseInt(matchNum) - 1]) {
+                matches[parseInt(matchNum) - 1].teams = correctTeams;
+            }
         }
 
         // console.log("responses", responses);

@@ -46,6 +46,7 @@ module.exports = {
         }
 
         function splitDot(dot) {
+            if (!dot) return {};
             if (!dot.includes(".")) return { special: dot };
             return {
                 matchNum: dot.split(".")[0],

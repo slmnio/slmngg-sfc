@@ -257,7 +257,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                 return res.status(404).send("No theme ID requested");
             }
             let size = parseInt(req.query.size) || 500;
-            let padding = size * ((req.query.padding || 5) / 100);
+            let padding = Math.floor(size * ((req.query.padding || 5) / 100));
 
             if (size > 3000) return res.status(400).send("Requested image too large");
 
@@ -336,7 +336,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
             if (size > 3000) return res.status(400).send("Requested image too large");
             let width = Math.floor(size * (16 / 9));
             let halfWidth = Math.floor(width / 2);
-            let padding = size * ((req.query.padding || 5) / 100);
+            let padding = Math.floor(size * ((req.query.padding || 5) / 100));
 
             let match = await Cache.get(id);
             if (!match?.id) return res.status(400).send("No valid match data");

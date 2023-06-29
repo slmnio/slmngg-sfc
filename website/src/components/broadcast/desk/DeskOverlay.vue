@@ -27,7 +27,7 @@ import { createGuestObject } from "@/utils/content-utils";
 export default {
     name: "DeskOverlay",
     components: { DeskMatch, Caster, TourneyBar },
-    props: ["broadcast", "group"],
+    props: ["broadcast", "group", "disableCasters"],
     methods: {
         getColor(index) {
             if (!this.deskColors?.length) return this.broadcast?.event?.theme?.color_logo_background || this.broadcast?.event?.theme?.color_theme;
@@ -39,6 +39,7 @@ export default {
             return this.broadcast?.event;
         },
         shouldDisableCasterVideo() {
+            if (this.disableCasters) return true;
             if (!this.broadcast?.broadcast_settings) return false;
             return this.broadcast.broadcast_settings.includes("Disable casters");
         },

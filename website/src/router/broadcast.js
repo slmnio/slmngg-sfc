@@ -123,7 +123,14 @@ export default [
             useVideo: (route.query.video !== "false")
         })
     },
-    { path: "desk", component: () => import("@/components/broadcast/desk/DeskOverlay.vue"), props: route => ({ group: "casters" }) },
+    {
+        path: "desk",
+        component: () => import("@/components/broadcast/desk/DeskOverlay.vue"),
+        props: route => ({
+            group: "casters",
+            disableCasters: route.query.disable || route.query.casters === "false"
+        })
+    },
     { path: "podcast", component: () => import("@/components/broadcast/roots/PodcastOverlay.vue"), props: route => ({ rows: route.query.rows }) },
     { path: "custom", component: () => import("@/components/broadcast/roots/CustomOverlay.vue") },
     { path: "info", component: () => import("@/components/broadcast/roots/InfoOverlay.vue") },

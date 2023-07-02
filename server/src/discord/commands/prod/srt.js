@@ -38,12 +38,7 @@ module.exports = {
 
         let feedId = interaction.options.getString("feed")?.toLocaleLowerCase();
         if (!feedId) {
-            const playerIds = (await Cache.get("Players"))?.ids;
-            const players = await Promise.all(playerIds.map(id => Cache.get(id)));
-            let targetPlayer = players.filter(player => {
-                return player.discord_id === interaction.user.id;
-            })?.[0];
-
+            let targetPlayer = await Cache.auth.getPlayer(interaction.user.id);
             let playerClient = await Cache.get(targetPlayer?.clients?.[0]);
             if (!playerClient || !playerClient?.key) {
                 return interaction.followUp("Couldn't find a feed");

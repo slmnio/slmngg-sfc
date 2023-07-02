@@ -344,6 +344,7 @@ async function createToken() {
     });
 }
 async function getOrCreateToken() {
+    // TODO: lookup existing tokens
     return createToken();
 }
 

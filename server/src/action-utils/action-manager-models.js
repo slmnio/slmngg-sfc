@@ -250,19 +250,7 @@ class InternalActionManager extends ActionManager {
         let action = this.actions.get(actionKey);
         if (!(action instanceof Action)) action = new Action(action);
         if (!action) return console.error(`Oh god no action ${actionKey}`);
-
-        // check auth here
-        // if (auth.includes("user")) {
-        //     auth = {
-        //         ...auth,
-        //         user: (await Cache.auth.getData(auth.user))
-        //     };
-        // }
-
-        // console.log(action);
-
         return new Promise((resolve, reject) => {
-            //  ({ token, args, error, execute })
             action.registerFunction({
                 token,
                 args,

@@ -343,6 +343,9 @@ async function createToken() {
         });
     });
 }
+async function getOrCreateToken() {
+    return createToken();
+}
 
 async function authStart(storedData) {
     const token = await createToken();
@@ -403,12 +406,37 @@ async function getTwitchAccessToken(channel) {
     return storedToken;
 }
 
+async function startRawDiscordAuth(discordUser) {
+    /*
+    - get or create a token using the discord ID (trusted)
+    - get player/user objects that will work directly with the auth system
+     */
+    const player = await getPlayer(discordUser.id);
+    if (!player) {
+        console.error(`No player for ID ${discordUser.id}`);
+        return {};
+    }
+    const userData = {
+        discordID: discordUser.id,
+        airtableID: player.id,
+        user: {
+            discord: discordUser,
+            airtable: player
+        }
+    };
+    const token = await authStart(userData);
+
+    return {
+        token, player, user: userData
+    };
+}
 
 module.exports = {
     set, get, setup, onUpdate,
     auth: {
         start: authStart,
         getData: getAuthenticatedData,
+        startRawDiscordAuth,
         getPlayer,
         getChannel,
         getChannelByID,

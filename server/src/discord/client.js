@@ -1,7 +1,7 @@
 const {Client, GatewayIntentBits, Partials} = require("discord.js");
 
 
-/* @type {Client} */
+/** @type {Client} */
 let client;
 
 if (process.env.DISCORD_TOKEN) {

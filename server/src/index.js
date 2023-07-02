@@ -42,12 +42,12 @@ const localCors =  () => cors({ origin: corsHandle });
 
 const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials: true}, allowEIO3: true});
 
-const auction = require("./discord/new_auction.js")({
-    to: (...a) => io.to(...a),
-    emit: (...a) => io.emit(...a),
-    on: (...a) => io.on(...a),
-    test: ["hi"]
-});
+// const auction = require("./discord/new_auction.js")({
+//     to: (...a) => io.to(...a),
+//     emit: (...a) => io.emit(...a),
+//     on: (...a) => io.on(...a),
+//     test: ["hi"]
+// });
 
 const test = require("./discord/slash-commands.js");
 

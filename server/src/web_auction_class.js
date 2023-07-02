@@ -105,7 +105,9 @@ module.exports = class Auction {
     }
 
     get socketIdentifier() { return `auction:${this.id}`; }
-    log(...data) { console.log(`[Auction] [${this.socketIdentifier}]`, ...data); }
+    log(...data) {
+        // console.log(`[Auction] [${this.socketIdentifier}]`, ...data);
+    }
 
     /**
      * @param {Socket} socket

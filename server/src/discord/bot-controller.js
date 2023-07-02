@@ -1,4 +1,5 @@
-const {Client, Intents} = require("discord.js");
+const { Client, GatewayIntentBits } = require("discord.js");
+
 const {joinVoiceChannel, EndBehaviorType} = require("@discordjs/voice");
 
 const { onUpdate, auth: { getBots, getPlayer }, get } = require("../cache.js");
@@ -55,9 +56,9 @@ async function checkBroadcast(id, broadcast) {
 
     if (broadcast.broadcast_settings.includes("Connect for caster voice")) {
         let taskKey = "casters";
-        if (!broadcast.voice_channels) return console.warn(`[Voice] Couldn't connect for caster voice because ${broadcast.name} has no voice_channels set.`);
-        let channelIDs = new MapObject(broadcast.voice_channels);
-        if (!channelIDs.get("live")) return console.warn(`[Voice] Couldn't connect for caster voice because ${broadcast.name} has no voice_channels.live set.`);
+        if (!broadcast.discord_control) return console.warn(`[Voice] Couldn't connect for caster voice because ${broadcast.name} has no discord_control set.`);
+        let channelIDs = new MapObject(broadcast.discord_control);
+        if (!channelIDs.get("live")) return console.warn(`[Voice] Couldn't connect for caster voice because ${broadcast.name} has no discord_control.live set.`);
         console.log("Creating a new caster job", broadcastKey, channelIDs.get("live"));
         manager.getOrCreateJob(channelIDs.get("live"), broadcastKey, taskKey);
     } else {
@@ -299,8 +300,8 @@ class DiscordBot {
 
         this.client = new Client({
             intents: [
-                Intents.FLAGS.GUILDS,
-                Intents.FLAGS.GUILD_VOICE_STATES
+                GatewayIntentBits.Guilds,
+                GatewayIntentBits.GuildVoiceStates
             ]
         });
 

@@ -31,7 +31,7 @@ for (const folder of commandFolders) {
 const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
 // and deploy your commands!
-(async () => {
+const registerCommands = (async () => {
     try {
         console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
@@ -46,4 +46,9 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN);
         // And of course, make sure you catch and log any errors!
         console.error(error);
     }
-})();
+});
+
+registerCommands().finally(() => {
+    console.log("Command registration complete");
+    process.exit();
+});

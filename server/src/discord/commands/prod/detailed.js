@@ -47,8 +47,19 @@ module.exports = {
             return interaction.followUp("Couldn't find a broadcast");
         }
 
-        if (!targetBroadcast?.["live_match"]) return interaction.followUp(`Couldn't find live match on broadcast ${targetBroadcast?.name}!`);
+        if (!targetBroadcast.live_match) return interaction.followUp(`Couldn't find live match on broadcast ${targetBroadcast?.name}!`);
+        const match = await Cache.get(targetBroadcast?.live_match?.[0]);
+        if (!match?.id) return interaction.followUp(`Couldn't find live match on broadcast ${targetBroadcast?.name}!`);
 
-        return interaction.followUp(`https://dev.slmn.gg/detailed/${targetBroadcast.live_match?.[0]}`);
+        let subdomain = "";
+
+        if (match?.event?.length) {
+            const event = await Cache.get(match?.event?.[0]);
+            if (event?.subdomain || event?.partial_subdomain) {
+                subdomain = (event.subdomain || event.partial_subdomain || "") + ".";
+            }
+        }
+
+        return interaction.followUp(`https://${subdomain}slmn.gg/detailed/${match.id}`);
     },
 };

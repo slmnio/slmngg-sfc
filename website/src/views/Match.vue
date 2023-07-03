@@ -142,7 +142,10 @@ export default {
             return Object.values(groups);
         },
         date() {
-            return formatTime(this.match.start, this.$store.state.timezone);
+            return formatTime(this.match.start, {
+                tz: this.$store.state.timezone,
+                use24HourTime: this.$store.state.use24HourTime
+            });
         },
         theme() {
             return this.match?.event?.theme;

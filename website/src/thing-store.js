@@ -16,6 +16,7 @@ export default new Vuex.Store({
         edit_in_site_timezone: false,
         match_highlights: [],
         timezone: localStorage.getItem("timezone") || "local",
+        use24HourTime: localStorage.getItem("use24HourTime") === "true" || false,
         draft_notes: [],
         last_event_match_pages: [],
         dashboard_modules_active: []
@@ -79,6 +80,10 @@ export default new Vuex.Store({
         setTimezone(state, timezone) {
             localStorage.setItem("timezone", timezone);
             state.timezone = timezone;
+        },
+        setUse24HourTime(state, use24HourTime) {
+            localStorage.setItem("use24HourTime", use24HourTime);
+            state.use24HourTime = use24HourTime;
         },
         setHighlights(state, matchHighlights) {
             state.match_highlights = matchHighlights;

@@ -10,7 +10,7 @@
         </transition-group>
         <transition tag="div" class="lower-holder flex-center" mode="out-in" name="break-content">
             <DeskMatch :broadcast="broadcast" class="w-100" :_match="liveMatch" :theme-color="themeColor" :guests="guests" v-if="liveMatch && !useScoreboard" key="desk-match" />
-            <MatchScoreboard :active="animationActive" class="scoreboard" v-if="liveMatch && useScoreboard" :match="liveMatch" :broadcast="broadcast" key="scoreboard" />
+            <MatchScoreboard :active="animationActive" class="scoreboard" v-if="liveMatch && useScoreboard" :match="liveMatch" :broadcast="broadcast" key="scoreboard" :animate-on-mount="true" />
         </transition>
     </div>
 </template>

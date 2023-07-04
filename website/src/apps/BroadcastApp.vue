@@ -9,6 +9,7 @@
 
             <v-style v-if="broadcast && broadcast.event && !noBroadcastStyle">
                 {{ broadcast.event.broadcast_css }}
+                {{ broadcast.broadcast_css }}
 
                 :root {
                 --broadcast-transition-offset: {{ broadcast.transition_offset || 0 }}ms;

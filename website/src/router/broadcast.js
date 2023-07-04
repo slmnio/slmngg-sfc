@@ -47,6 +47,10 @@ export default [
     },
     { path: "break-bar", component: () => import("@/components/broadcast/break/BreakBarOverlay.vue") },
     {
+        path: "break-text",
+        component: () => import("@/components/broadcast/break/BreakTextOverlay.vue")
+    },
+    {
         path: "bracket",
         component: () => import("@/components/broadcast/roots/BracketOverlay.vue"),
         props: route => ({

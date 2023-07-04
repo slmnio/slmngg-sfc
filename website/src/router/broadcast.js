@@ -97,6 +97,15 @@ export default [
         })
     },
     {
+        path: "team-image",
+        component: () => import("@/components/broadcast/roots/TeamImageOverlay.vue"),
+        props: route => ({
+            teamNum: parseInt(route.query.team || route.query.teamNum || "1"),
+            imageNum: parseInt(route.query.index || route.query.image || route.query.imageNum || "1"),
+            overrideURL: route.query.overrideURL || route.query.override
+        })
+    },
+    {
         path: "history",
         component: () => import("@/components/broadcast/roots/HistoryOverlay.vue"),
         props: route => ({

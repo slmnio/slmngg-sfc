@@ -47,7 +47,7 @@ module.exports = {
             validatedData["Manual Guests"] = safeInput(manualGuests);
         }
         if (deskDisplayMode !== undefined) {
-            let eligibleModes = [null, "Match", "Predictions", "Maps", "Notice (Team 1)", "Notice (Team 2)", "Notice (Event)"];
+            let eligibleModes = [null, "Match", "Predictions", "Maps", "Notice (Team 1)", "Notice (Team 2)", "Notice (Event)", "Scoreboard"];
             if (!eligibleModes.includes(deskDisplayMode)) throw ("Invalid display mode");
             validatedData["Desk Display"] = deskDisplayMode;
         }

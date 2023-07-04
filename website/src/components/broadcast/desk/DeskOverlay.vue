@@ -8,11 +8,10 @@
                     :event="event" :disable-video="shouldDisableCasterVideo" :class="{'wide-feed': caster.wide_feed}"
                     :show-pronouns="showPronouns" :pronouns-on-newline="pronounsOnNewline" />
         </transition-group>
-        <div class="lower-holder flex-center">
-            <transition mode="out-in" name="break-content">
-                <DeskMatch :broadcast="broadcast" class="w-100" :_match="liveMatch" :theme-color="themeColor" :guests="guests" v-if="liveMatch" />
-            </transition>
-        </div>
+        <transition tag="div" class="lower-holder flex-center" mode="out-in" name="break-content">
+            <DeskMatch :broadcast="broadcast" class="w-100" :_match="liveMatch" :theme-color="themeColor" :guests="guests" v-if="liveMatch && !useScoreboard" key="desk-match" />
+            <MatchScoreboard :active="animationActive" class="scoreboard" v-if="liveMatch && useScoreboard" :match="liveMatch" :broadcast="broadcast" key="scoreboard" />
+        </transition>
     </div>
 </template>
 
@@ -23,11 +22,12 @@ import Caster from "@/components/broadcast/desk/Caster";
 import DeskMatch from "@/components/broadcast/desk/DeskMatch";
 import { themeBackground1 } from "@/utils/theme-styles";
 import { createGuestObject } from "@/utils/content-utils";
+import MatchScoreboard from "@/components/broadcast/MatchScoreboard.vue";
 
 export default {
     name: "DeskOverlay",
-    components: { DeskMatch, Caster, TourneyBar },
-    props: ["broadcast", "group", "disableCasters"],
+    components: { MatchScoreboard, DeskMatch, Caster, TourneyBar },
+    props: ["broadcast", "group", "disableCasters", "animationActive"],
     methods: {
         getColor(index) {
             if (!this.deskColors?.length) return this.broadcast?.event?.theme?.color_logo_background || this.broadcast?.event?.theme?.color_theme;
@@ -105,6 +105,9 @@ export default {
         },
         pronounsOnNewline() {
             return (this.broadcast?.broadcast_settings || []).includes("Show desk pronouns on new lines");
+        },
+        useScoreboard() {
+            return (this.broadcast?.desk_display) === "Scoreboard";
         }
 
     },

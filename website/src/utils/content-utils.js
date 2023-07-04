@@ -237,6 +237,14 @@ export const DefaultMapImages = {
     Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png"
 };
 
+export const MapTypeIcons = {
+    Hybrid: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907303867088896/180.png",
+    Escort: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907343893336097/180.png",
+    Control: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907374708903946/180.png",
+    Push: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908279537717392/Push.png",
+    Assault: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908385250934904/assault.png"
+};
+
 export function getTeamsMapStats(teams, requestMatch, requestMap) {
     console.log(requestMatch);
     if (!teams) return null;

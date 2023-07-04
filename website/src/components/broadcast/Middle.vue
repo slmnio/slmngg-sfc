@@ -3,7 +3,7 @@
         <ThemeTransition :one-color="true" start="middle" end="middle" :theme="theme" :active="!!active"
                          :duration="400" :starting-delay="500" :inner-delay="300" :leaving-delay="0"
                          class="middle-holder flex-center" :use-fit-content="true" :clear-style-after-entered="true">
-            <div class="middle">
+            <div class="middle" :style="middleBorderStyle">
                 <transition name="fade" mode="out-in">
                     <div class="industry-align" :key="text">{{ text }}</div>
                 </transition>
@@ -18,7 +18,19 @@ import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
 export default {
     name: "Middle",
     components: { ThemeTransition },
-    props: ["text", "tiny", "active", "theme"]
+    props: ["text", "tiny", "active", "theme", "borders"],
+    computed: {
+        middleBorderStyle() {
+            if (!this.borders?.length) return {};
+            return {
+                borderWidth: "0 6px",
+                borderStyle: "solid",
+                borderColor: "transparent",
+                borderLeftColor: this.borders?.[0]?.backgroundColor,
+                borderRightColor: this.borders?.[1]?.backgroundColor
+            };
+        }
+    }
 };
 </script>
 

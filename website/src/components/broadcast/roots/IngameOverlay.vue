@@ -10,7 +10,7 @@
           />
           <!--   -->
           <Middle v-if="!basicMode" :active="shouldShowMiddle" :theme="broadcast?.event?.theme" :text="middleText"
-                  :tiny="broadcast.margin === 0"/>
+                  :tiny="broadcast.margin === 0" :borders="middleBorders" />
       </div>
       <transition name="fade" mode="out-in">
           <Sponsors v-if="showFadeSponsors && !basicMode" class="ingame-fade-sponsors" :sponsors="fadeSponsors" mode="out-in" :speed="sponsorFadeSpeed" />
@@ -23,6 +23,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import IngameTeam from "@/components/broadcast/IngameTeam";
 import Middle from "@/components/broadcast/Middle";
 import Sponsors from "@/components/broadcast/Sponsors";
+import { themeBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "IngameOverlay",
@@ -184,6 +185,10 @@ export default {
         },
         shouldShowTeams() {
             return this.animationActive && !this.flippingTeams;
+        },
+        middleBorders() {
+            if (!(this.broadcast?.broadcast_settings || []).includes("Show borders on middle")) return null;
+            return this.teams.map(t => themeBackground1(t));
         }
     },
     watch: {

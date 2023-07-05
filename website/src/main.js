@@ -15,7 +15,7 @@ import { Notyf } from "notyf";
 import "notyf/notyf.min.css";
 
 import defaultRoutes from "@/router/default";
-import { getDataServerAddress, fetchThings, getMainDomain } from "@/utils/fetch";
+import { fetchThings, getDataServerAddress, getMainDomain } from "@/utils/fetch";
 import EventRoutes from "@/router/event";
 
 import Event from "@/views/Event";
@@ -177,13 +177,10 @@ app = new Vue({
             // handled by vuex
             console.log("[socket]", "data_update", d);
         },
-        server_rebuilding(x) {
-            console.log("rebuilding", x);
-            this.isRebuilding = x;
-        },
-        high_error_rate(x) {
-            console.log("high error rate", x);
-            this.highErrorRate = x;
+        website_flags(flags) {
+            console.log("website_flags", flags);
+            this.isRebuilding = flags.includes("server_rebuilding");
+            this.highErrorRate = flags.includes("high_error_rate");
         }
     },
     metaInfo: {
@@ -222,6 +219,7 @@ app = new Vue({
         }
 
         setInterval(() => app.$store.commit("executeRequestBuffer"), 100);
+        setInterval(() => app.$store.commit("executeUpdateBuffer"), 50);
 
         try {
             if (localStorage.getItem("draft-notes")) {

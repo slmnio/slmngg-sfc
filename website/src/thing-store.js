@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import { cleanID } from "@/utils/content-utils";
 import { fetchThings } from "@/utils/fetch";
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -19,7 +20,9 @@ export default new Vuex.Store({
         use24HourTime: localStorage.getItem("use24HourTime") === "true" || false,
         draft_notes: [],
         last_event_match_pages: [],
-        dashboard_modules_active: []
+        dashboard_modules_active: [],
+
+        data_update_buffer: []
     },
     mutations: {
         push(_store, { id, data }) {
@@ -53,8 +56,17 @@ export default new Vuex.Store({
             return fetchThings(ids);
         },
         SOCKET_DATA_UPDATE(state, [id, data]) {
-            console.log("[store] [data_update]", data);
-            this.commit("push", { id, data });
+            // console.log("[store] [data_update]", data);
+            // this.commit("push", { id, data });
+            state.data_update_buffer.push({ id, data });
+        },
+        executeUpdateBuffer(state) {
+            if (!state.data_update_buffer.length) return;
+            console.log("[store] [data_update]", state.data_update_buffer.length);
+            state.data_update_buffer.forEach(({ id, data }) => {
+                this.commit("push", { id, data });
+            });
+            state.data_update_buffer = [];
         },
         subscribe(state, id) {
             if (!id) return;

@@ -312,11 +312,12 @@ export default {
             });
             // console.log("[new standings]", standings);
 
-            let rank = 1; let display = 1;
+            let rank = 1; let display = 1; let teamNum = 1;
             standings.forEach(group => {
                 group.forEach((team, i) => {
                     team.standings.rank = display;
                     team.standings.tie_show_number = i === 0;
+                    team.standings.teamNum = teamNum++;
 
                     if (standings.length === 1) {
                         team.standings.tie_show_number = false;

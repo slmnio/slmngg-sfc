@@ -20,7 +20,7 @@
                {{ map[`score_${ti + 1}`]  || '-' }}
            </div>
            <div class="match-score flex-center"
-                :style="match[`score_${ti+1}`] > match[`score_${(+!ti)+1}`] ? themeBackground1(team) : {}">
+                :style="match[`score_${ti+1}`] === match.first_to ? themeBackground1(team) : {}">
                {{ match[`score_${ti + 1}`] || 0 }}
            </div>
        </div>

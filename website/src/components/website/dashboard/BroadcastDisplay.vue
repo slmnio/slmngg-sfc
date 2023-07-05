@@ -63,4 +63,7 @@ export default {
         width: 100%;
         height: 100%;
     }
+    .broadcast-name {
+        line-height: 1;
+    }
 </style>

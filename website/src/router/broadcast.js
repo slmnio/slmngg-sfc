@@ -113,7 +113,15 @@ export default [
             reverse: route.query.reverse !== "false"
         })
     },
-    { path: "season-history", component: () => import("@/components/broadcast/roots/SeasonHistoryOverlay.vue") },
+    {
+        path: "season-history",
+        component: () => import("@/components/broadcast/roots/SeasonHistoryOverlay.vue"),
+        props: route => ({
+            showHeaders: route.query.headers,
+            matchCount: route.query.matches || route.query.match || route.query.max,
+            stage: route.query.stage || route.query.group
+        })
+    },
     { path: "thumbnail", component: () => import("@/components/broadcast/EventThumbnailCreator.vue") },
     {
         path: "draft",

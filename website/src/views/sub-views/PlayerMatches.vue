@@ -27,7 +27,7 @@
                     <tr v-for="partner in partners" :key="partner.player.id">
                         <td><router-link :to="`/player/${partner.player.id}/matches`">{{ partner.player.name }}</router-link></td>
                         <td>{{ partner.matches }}</td>
-                        <td>{{ formatTime(partner.lastMatch.start, null, "{day} {date-ordinal} {month} {year}") }} -
+                        <td>{{ formatTime(partner.lastMatch.start, {format: "{day} {date-ordinal} {month} {year}", tz: $store.state.timezone, use24HourTime: $store.state.use24HourTime}) }} -
                             <span v-if="partner.lastMatch?.event"><router-link :to="url('event', partner.lastMatch?.event)">{{ partner.lastMatch?.event?.name }}</router-link> - </span>
                             <router-link :to="url('match', partner.lastMatch)">{{ partner.lastMatch?.name}}</router-link></td>
                     </tr>

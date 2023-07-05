@@ -19,7 +19,13 @@
                     <span class="d-flex" v-if="nextMatch">
                         <ThemeLogo :theme="nextMatch.opponent.theme" logo-size="w-50" class="team-logo" border-width="3px" icon-padding="4px" />
                         <router-link :to="url('detailed', nextMatch)">vs {{ nextMatch.opponent.name }}</router-link>
-                        <span class="d-inline-flex ml-auto">{{ formatTime(nextMatch.start, $store.state.timezone, "{day-short} {date-ordinal} {month-short} {time}") }}</span>
+                        <span class="d-inline-flex ml-auto">{{
+                                formatTime(nextMatch.start, {
+                                    format: "{day-short} {date-ordinal} {month-short} {time}",
+                                    tz: $store.state.timezone,
+                                    use24HourTime: $store.state.use24HourTime
+                                })
+                          }}</span>
                     </span>
                 </td>
                 <td class="count" v-for="code in distinctStreamCodes" :key="code" :class="{'low-opacity': !counts[code]}">{{ counts[code] || 0 }}</td>

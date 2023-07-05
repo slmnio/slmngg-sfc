@@ -119,7 +119,7 @@ onUpdate(async(id, { newData, oldData }) => {
 
         if (id === "Discord Bots") {
             let botData = await getBots(); // update manager?
-            manager.setTokens(botData.map(d => d.token).filter(d => d));
+            manager.setTokens(botData.filter(d => d?.token).map(d => d.token));
 
             // manager.createJob("996236081819303936", "bpl4", "assistance");
         }

@@ -246,12 +246,12 @@ async function sync() {
 sync();
 // setInterval(sync, 5 * 1000);
 
-module.exports = {
-    async update(table, id, data) {
-        return await slmngg(table).update(id, data);
-    },
-    async select(table, filter) {
-        return await slmngg(table).select(filter).all();
-    },
-    setup
-};
+// module.exports = {
+//     async update(table, id, data) {
+//         return await slmngg(table).update(id, data);
+//     },
+//     async select(table, filter) {
+//         return await slmngg(table).select(filter).all();
+//     },
+//     setup
+// };

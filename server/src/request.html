@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>data.slmn.gg status</title>
+    <style>
+        #app {
+            font-family: sans-serif;
+        }
+        table, th, td {
+            border: 1px solid rgba(0,0,0,0.4);
+            border-collapse: collapse;
+        }
+        th,td {
+            padding: .25em .5em
+        }
+
+        .active {
+            background-color: #1e8d58;
+            color: white;
+        }
+        .active-time {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <table>
+        <tr>
+            <th>Table</th>
+            <th>Last request</th>
+            <th>Status</th>
+            <th>Req type</th>
+            <th>Time</th>
+            <th>Items</th>
+            <th title="Airtable request count">#</th>
+        </tr>
+        <tr v-for="table in requests">
+            <th style="text-align: left">{{ table.tableName }}</th>
+            <td :class="{'active-time': table.request?.status === 'active'}" style="font-family: monospace">{{ time(Math.floor((now - new Date(table.lastRequest)) / 1000)) }}</td>
+            <td :class="{'active': table.request?.status === 'active'}">{{ table.request?.status }}</td>
+            <td>{{ table.request?.type }}</td>
+            <td :class="{'active-time': table.request?.status === 'active'}" style="font-family: monospace">{{ table.request?.duration ? (table.request.duration / 1000).toFixed(1) + 's' : null}}</td>
+            <td>{{ table.request?.itemCount != null ? `${table.request.itemCount} item${table.request.itemCount === 1 ? '' : 's'}` : null}}</td>
+            <td style="font-family: monospace">{{ table.airtableRequestCount }}</td>
+            <td style="font-family: monospace" v-if="table.request?.type === 'all' && table.request?.status === 'finished'">
+                <span>{{ ((table.request.duration / 1000) / table.airtableRequestCount).toFixed(2) }} s/r</span>
+            </td>
+        </tr>
+    </table>
+</div>
+<script src="https://unpkg.com/vue@3.2.47/dist/vue.global.js"></script>
+<script>
+    const { createApp } = Vue;
+    const app = createApp({
+        data: () => ({
+            now: new Date(),
+            requests: []
+        }),
+        methods: {
+            async getRequestData() {
+                this.now = new Date();
+                this.requests = (await fetch("/api/requests").then(res => res.json())).map(table => ({
+                    ...table,
+                    request: table.request && ({
+                        ...table.request,
+                        ...(table.request.status === 'active' ? {duration: (new Date() - new Date(table.request.start))} : {})
+                    })
+                }))
+            },
+            time(secs) {
+                if (isNaN(secs)) return "";
+                if (secs >= 60) {
+                    return `${Math.floor(secs / 60)}m ${secs % 60}s`
+                }
+                return `${secs % 60}s`
+            }
+        },
+        mounted() {
+            this.getRequestData();
+            setInterval(() => this.getRequestData(), 200);
+        }
+    }).mount("#app")
+</script>
+</body>
+</html>

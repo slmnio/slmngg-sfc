@@ -53,7 +53,7 @@ const test = require("./discord/slash-commands.js");
 
 
 const Cache = (require("./cache.js")).setup(io);
-(require("./airtable-interface.js")).setup(io);
+(require("./airtable-v2.js")).setup({ web: app, io });
 (require("./discord/bot-controller.js")).setup(io);
 
 const actions = require("./action-utils/action-manager.js");

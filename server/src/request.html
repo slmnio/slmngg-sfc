@@ -22,6 +22,10 @@
             background-color: #1e8d58;
             color: white;
         }
+        .errored {
+            background-color: #8d1e1e;
+            color: white;
+        }
         .active-time {
             font-weight: bold;
         }
@@ -42,7 +46,7 @@
         <tr v-for="table in requests">
             <th style="text-align: left">{{ table.tableName }}</th>
             <td :class="{'active-time': table.request?.status === 'active'}" style="font-family: monospace">{{ time(Math.floor((now - new Date(table.lastRequest)) / 1000)) }}</td>
-            <td :class="{'active': table.request?.status === 'active'}">{{ table.request?.status }}</td>
+            <td :class="table.request?.status">{{ table.request?.status }}</td>
             <td>{{ table.request?.type }}</td>
             <td :class="{'active-time': table.request?.status === 'active'}" style="font-family: monospace">{{ table.request?.duration ? (table.request.duration / 1000).toFixed(1) + 's' : null}}</td>
             <td>{{ table.request?.itemCount != null ? `${table.request.itemCount} item${table.request.itemCount === 1 ? '' : 's'}` : null}}</td>
@@ -50,6 +54,11 @@
             <td style="font-family: monospace" v-if="table.request?.type === 'all' && table.request?.status === 'finished'">
                 <span>{{ ((table.request.duration / 1000) / table.airtableRequestCount).toFixed(2) }} s/r</span>
             </td>
+            <td><span v-if="table.lastError">
+                {{ time(Math.floor((now - new Date(table.lastError?.date)) / 1000)) }}
+                {{ table.lastError
+                 }}
+            </span></td>
         </tr>
     </table>
 </div>

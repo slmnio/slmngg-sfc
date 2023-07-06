@@ -49,6 +49,7 @@ class TableManager {
         this.tableName = tableName;
         this.timerStart = null;
         this.request = null;
+        this.lastError = null;
         this.airtableRequestCount = 0;
     }
 
@@ -59,18 +60,44 @@ class TableManager {
             start: this.startTimer(),
         };
         this.lastRequest = this.request.start;
-        const data = await slmngg(this.tableName).select().all();
-        this.request.status = "finished";
-        this.request.duration = this.endTimer();
-        this.request.itemCount = data.length;
 
-        await this.processData(data);
+        try {
+            const data = await slmngg(this.tableName).select().all();
 
-        await Cache.set(this.tableName, {
-            id: this.tableName,
-            ids: data.map(d => d.id)
-        });
-        customTableUpdate(this.tableName, Cache);
+            this.request.status = "finished";
+            this.request.duration = this.endTimer();
+            this.request.itemCount = data.length;
+
+            await this.processData(data);
+
+
+            await Cache.set(this.tableName, {
+                id: this.tableName,
+                ids: data.map(d => d.id)
+            });
+            customTableUpdate(this.tableName, Cache);
+
+        } catch (e) {
+            this.request.status = "errored";
+            this.request.duration = this.endTimer();
+            this.request.error = e;
+            if (this.lastError?.timeout) clearTimeout(this.lastError.timeout);
+            this.lastError = {
+                ...e,
+                date: new Date(),
+                timeout: setTimeout(() => { this.lastError = null; }, 10 * 60 * 1000)
+            };
+
+            console.error("Airtable error", e.statusCode || e.code);
+            if (e.code === "ETIMEDOUT") {
+                console.warn("Airtable timed out");
+            } else if (e.statusCode === 503) {
+                console.warn("Airtable 503");
+            } else {
+                console.error(`[Airtable error] getting updates from ${this.tableName}`, e);
+            }
+            await wait(2000);
+        }
     }
 
     async getTableUpdates() {
@@ -79,17 +106,39 @@ class TableManager {
             status: "active",
             start: this.startTimer(),
         };
-        const data = await slmngg(this.tableName).select({
-            filterByFormula: `{Modified} > "${this.lastRequest.toISOString().slice(0, 19)}"`
-        }).all();
+        try {
+            const data = await slmngg(this.tableName).select({
+                filterByFormula: `{Modified} > "${this.lastRequest.toISOString().slice(0, 19)}"`
+            }).all();
 
-        this.lastRequest = this.request.start;
+            this.lastRequest = this.request.start;
 
-        this.request.status = "finished";
-        this.request.duration = this.endTimer();
-        this.request.itemCount = data.length;
+            this.request.status = "finished";
+            this.request.duration = this.endTimer();
+            this.request.itemCount = data.length;
 
-        return this.processData(data);
+            return this.processData(data);
+        } catch (e) {
+            this.request.status = "errored";
+            this.request.duration = this.endTimer();
+            this.request.error = e;
+            if (this.lastError?.timeout) clearTimeout(this.lastError.timeout);
+            this.lastError = {
+                ...e,
+                date: new Date(),
+                timeout: setTimeout(() => { this.lastError = null; }, 10 * 60 * 1000)
+            };
+
+            console.error("Airtable error", e.statusCode || e.code);
+            if (e.code === "ETIMEDOUT") {
+                console.warn("Airtable timed out");
+            } else if (e.statusCode === 503) {
+                console.warn("Airtable 503");
+            } else {
+                console.error(`[Airtable error] getting updates from ${this.tableName}`, e);
+            }
+            await wait(2000);
+        }
     }
 
     async processData(data) {
@@ -201,7 +250,8 @@ class AirtableManager {
             tableName: table.tableName,
             lastRequest: table.lastRequest,
             request: table.request,
-            airtableRequestCount: table.airtableRequestCount
+            airtableRequestCount: table.airtableRequestCount,
+            lastError: table.lastError
         }));
     }
 }

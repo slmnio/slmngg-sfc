@@ -43,6 +43,7 @@ async function checkExtraRecord(tableName, item) {
 }
 
 const customTableUpdate = require("./custom-datasets");
+const { log } = require("./discord/slmngg-log");
 
 class TableManager {
     constructor(tableName) {
@@ -162,6 +163,14 @@ class TableManager {
     }
 }
 
+function time(secs) {
+    if (isNaN(secs)) return "";
+    if (secs >= 60) {
+        return `${Math.floor(secs / 60)}m ${secs % 60}s`;
+    }
+    return `${secs % 60}s`;
+}
+
 class AirtableManager {
     constructor() {
         this.tableNames = ["Redirects", "Broadcasts", "Clients", "Channels", "Discord Bots", "Players", "Live Guests", "Events", "GFX", "Event Series", "Teams", "Ad Reads", "Ad Read Groups", "News", "Matches",  "Themes",  "Socials", "Accolades", "Player Relationships", "Brackets", "Headlines", "Maps", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles"];
@@ -186,6 +195,8 @@ class AirtableManager {
 
         const fullLoadStart = new Date();
 
+        if (process.env.IS_SLMNGG_MAIN_SERVER) log(`SLMN.GG has started. Rebuilding ${this.tables.length} tables.`);
+
         const iterator = this.tables.values();
         await Promise.allSettled(Array(this.availableRequests).fill(iterator).map(async iterator => {
             for (const table of iterator) {
@@ -196,7 +207,7 @@ class AirtableManager {
         }));
 
         this.removeWebsiteFlag("server_rebuilding");
-        console.log(`[Load] -> Full load finished in ${Math.floor((new Date() - new Date(fullLoadStart)) / 1000)}s`);
+        if (process.env.IS_SLMNGG_MAIN_SERVER) log(`SLMN.GG has finished rebuilding in ${time(Math.floor((new Date() - new Date(fullLoadStart)) / 1000))}.`);
 
         for (let i = 0; i < this.availableRequests; i++) {
             this.startNextOldestTable();

@@ -108,6 +108,7 @@ export default {
                         event: ReactiveThing("event", {
                             theme: ReactiveThing("theme")
                         }),
+                        theme_override: ReactiveThing("theme_override"),
                         live_match: ReactiveThing("live_match", {
                             maps: ReactiveArray("maps", {
                                 map: ReactiveThing("map"),

@@ -58,16 +58,27 @@ export default {
             return classes.join(" ");
         },
         broadcast() {
-            return ReactiveRoot(this.id || `broadcast-${this.code}`, {
+            const broadcast = ReactiveRoot(this.id || `broadcast-${this.code}`, {
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")
                 }),
+                theme_override: ReactiveThing("theme_override"),
                 gfx: ReactiveArray("gfx"),
                 other_broadcasts: ReactiveArray("other_broadcasts"),
                 headlines: ReactiveArray("headlines"),
                 highlight_media: ReactiveThing("highlight_media"),
                 highlight_hero: ReactiveThing("highlight_hero")
             });
+            if (broadcast?.event?.id && broadcast?.theme_override?.id) {
+                return {
+                    ...broadcast,
+                    event: {
+                        ...broadcast.event,
+                        theme: broadcast.theme_override
+                    }
+                };
+            }
+            return broadcast;
         },
         haltAnimations() {
             return this.noAnimation || (this.broadcast?.broadcast_settings || []).includes("No animations");

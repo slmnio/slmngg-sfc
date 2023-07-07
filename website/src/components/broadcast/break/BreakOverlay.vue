@@ -1,7 +1,7 @@
 <template>
     <div class="break-overlay">
         <div class="break-center">
-            <ThemeTransition class="break-transition-top w-100 h-100" :theme="event && event.theme" :active="animationActive" start="middle" end="middle">
+            <ThemeTransition class="break-transition-top w-100 h-100" :theme="event && event.theme" :active="animationActive" one-color start="middle" end="middle">
                 <div class="break-top event-theme-border flex-center overlay--bg px-4" :style="eventBorder">
                     <Squeezable align="middle" :disabled="(overlayTitle).includes('\\n')" class="w-100 flex-center">
                         <transition name="fade" mode="out-in">
@@ -13,7 +13,7 @@
                     </Squeezable>
                 </div>
             </ThemeTransition>
-            <ThemeTransition class="break-transition-main w-100 h-100" :theme="event && event.theme" :active="animationActive" start="middle" end="middle" :starting-delay="100">
+            <ThemeTransition class="break-transition-main w-100 h-100" :theme="event && event.theme" :active="animationActive" one-color start="middle" end="middle" :starting-delay="100">
                 <div class="break-main event-theme-border overlay--bg" :style="eventBorder">
                     <div class="break-col break-left-col">
                         <transition name="anim-break-next">
@@ -159,7 +159,7 @@ export default {
         },
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;
-            return ReactiveRoot(this.broadcast.event.id, {
+            const event = ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -172,6 +172,14 @@ export default {
                     })
                 })
             });
+
+            if (this.broadcast?.theme_override?.id) {
+                return {
+                    ...event,
+                    theme: this.broadcast.theme_override
+                };
+            }
+            return event;
         },
         sponsorThemes() {
             if (!this.broadcast || !this.broadcast.sponsors) return null;

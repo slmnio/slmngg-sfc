@@ -122,6 +122,9 @@ export default {
         line-height: 1;
         transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
     }
+    .team-name {
+        color: inherit;
+    }
     .team-logo {
         width: 1.25em;
         height: 1.1em;

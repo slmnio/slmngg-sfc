@@ -42,6 +42,13 @@ export default {
                 }
             },
             {
+                text: "Scoreboard",
+                value: {
+                    hasText: false,
+                    text: "Scoreboard"
+                }
+            },
+            {
                 text: "Predictions",
                 value: {
                     hasText: false,

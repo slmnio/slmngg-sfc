@@ -48,10 +48,8 @@ async function downloadImage(url, filename, size) {
     return await heldPromise(["download", url, size, filename], new Promise((resolve, reject) => {
         const pathName = getPath(filename, size);
         const file = fs.createWriteStream(pathName);
-        https.get(url, res => {
-            res.pipe(file);
-            file.on("finish", () => file.close(resolve));
-        }).on("error", err => {
+
+        function error(err) {
             console.error(`[image] file error for ${filename} ${err.code} ${err.message}`);
             fs.unlink(pathName, function(err) {
                 if (err) {
@@ -61,7 +59,15 @@ async function downloadImage(url, filename, size) {
                 }
             });
             reject(err);
-        });
+        }
+
+        https.get(url, res => {
+            if (![200].includes(res.statusCode)) return error({ code: res.statusCode, message: res.statusMessage });
+            res.pipe(file);
+            file.on("finish", () => {
+                file.close(resolve);
+            });
+        }).on("error", err => error(err));
     }));
 }
 

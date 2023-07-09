@@ -11,17 +11,17 @@
                 <div class="scoreboard-team" :style="logoBackground1(team)">
                     <ThemeLogo class="team-logo" :theme="team?.theme" border-width="0px" logo-size=""/>
                     <Squeezable class="team-name flex-center" align="center">
-                        <div>{{ team.name }}</div>
+                        <div class="industry-align">{{ team.name }}</div>
                     </Squeezable>
                 </div>
                 <!-- :style="cleanID(map.winner?.[0]) === team.id ? themeBackground1(team) : {}" -->
                 <div class="map flex-center map-score" v-for="map in maps" :key="map.id"
                 :class="{'map-won': cleanID(map.winner?.[0]) === team.id}">
-               {{ map[`score_${ti + 1}`]  || '-' }}
+                    <div class="industry-align">{{ map[`score_${ti + 1}`] || "-" }}</div>
            </div>
            <div class="match-score flex-center"
                 :style="match[`score_${ti+1}`] === match.first_to ? themeBackground1(team) : {}">
-               {{ match[`score_${ti + 1}`] || 0 }}
+               <div class="industry-align">{{ match[`score_${ti + 1}`] || 0 }}</div>
            </div>
        </div>
    </ThemeTransition>
@@ -191,7 +191,7 @@ export default {
 .map {
    position: relative;
 }
-.map ~ .map:before {
+.team-row .map ~ .map:before {
    content: "";
    position: absolute;
    background-color: rgba(0,0,0,0.1);
@@ -200,6 +200,3 @@ export default {
    height: 60%;
 }
 </style>
-
-<script setup>
-</script>

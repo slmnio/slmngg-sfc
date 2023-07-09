@@ -2,8 +2,8 @@
     <transition name="fade-down">
         <div class="countdown-holder" v-show="countdownLeft || web" :class="{'web': web}">
             <div class="countdown">
-                <div class="countdown-bar-text" style="font-variant-numeric: tabular-nums">{{ humanText }} {{ countdownLeft ? (countdownLeft / 1000).toFixed(1) : ''}}</div>
-                <div class="countdown-bar" :style="{ width: `${barWidth}%` }"></div>
+                <div class="countdown-bar-text" style="font-variant-numeric: tabular-nums">{{ humanText }} {{ (showTime && countdownLeft) ? (countdownLeft / 1000).toFixed(1) : ''}}</div>
+                <div class="countdown-bar" :style="{ width: `${this.barWidth}%` }"></div>
             </div>
         </div>
     </transition>
@@ -13,7 +13,8 @@
 export default {
     name: "AuctionCountdown",
     props: {
-        web: Boolean
+        web: Boolean,
+        showTime: Boolean
     },
     data: () => ({
         countdownLeft: 0,

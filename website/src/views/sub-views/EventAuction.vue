@@ -9,7 +9,7 @@
             </div>
             <AuctionCountdown class="auction-countdown mb-2" web :style="themeBackground1(event)" show-time />
 
-            <div class="action-row row mb-3">
+            <div class="action-row d-flex mb-3">
                 <div class="active-player col-7">
                     <div class="last-started" v-if="lastStartedTeam && ['PRE_AUCTION', 'IN_ACTION'].includes(auctionState)">
                         <div class="badge badge-pill badge-secondary">Started by</div> <ThemeLogo :theme="lastStartedTeam?.theme" border-width="3px" icon-padding="4px" /> <router-link class="no-link-style" :to="url('team', lastStartedTeam)" target="_blank">{{ lastStartedTeam?.name || '&nbsp;' }}</router-link>
@@ -94,6 +94,7 @@
                     </div>
                     <div class="ml-2 badge badge-pill badge-secondary" v-if="lastStartedTeam?.id === team?.id">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>
                     <div class="ml-2 badge badge-pill badge-primary" v-if="nextTeamToStart?.id === team?.id">Next to start</div>
+                    <div class="ml-2 badge badge-pill badge-info" v-if="actingTeam?.id === team?.id">Acting as this team</div>
                     <ul>
                         <li v-for="player in team.players" :key="player.id">
                             <router-link :to="url('player', player)" target="_blank">{{ player?.name }}</router-link>
@@ -109,8 +110,8 @@
                             <div class="text money">{{ money(team.balance) }} left over</div>
                         </div>
                     </div>
-
                     <div class="ml-2 badge badge-pill badge-secondary" v-if="lastStartedTeam?.id === team?.id">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>
+                    <div class="ml-2 badge badge-pill badge-info" v-if="actingTeam?.id === team?.id">Acting as this team</div>
                     <ul>
                         <li v-for="player in team.players" :key="player.id">
                             <router-link :to="url('player', player)" target="_blank">{{ player?.name }}</router-link>

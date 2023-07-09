@@ -1,7 +1,7 @@
 const {
     ContextMenuCommandBuilder,
     userMention,
-    ContextMenuCommandType
+    ApplicationCommandType
 } = require("discord.js");
 const Cache = require("../../../cache.js");
 
@@ -11,7 +11,7 @@ module.exports = {
     data: new ContextMenuCommandBuilder()
         .setName("Associate with SLMN.GG player")
         .setDMPermission(false)
-        .setType(ContextMenuCommandType.User),
+        .setType(ApplicationCommandType.User),
     async execute(interaction) {
         const ephemeral = true;
 
@@ -20,24 +20,24 @@ module.exports = {
         const { token } = await Cache.auth.startRawDiscordAuth(interaction.user);
 
         if (!token) {
-            return interaction.editReply({ ephemeral, content: "Auth failed: no user player data found" });
+            return interaction.followUp({ ephemeral, content: "Action failed: no user player data found" });
         }
 
         const internalManager = getInternalManager();
         if (!internalManager) {
-            return interaction.editReply("No action handlers can process your request.");
+            return interaction.followUp("No action handlers can process your request.");
         }
 
         await internalManager.runAction("update-player-discord-id", { discordData: interaction.targetUser }, token)
             .then(async slmnggUser => {
-                await interaction.editReply({ ephemeral, content: `Linked discord user ${userMention(interaction.targetUser)} to SLMN.GG user ${slmnggUser}` });
+                await interaction.followUp({ ephemeral, content: `Linked discord user ${userMention(interaction.targetUser.id)} to SLMN.GG user ${slmnggUser}` });
             })
             .catch(({
                 errorCode,
                 errorMessage
             }) => {
                 console.error({ errorCode, errorMessage });
-                interaction.editReply({
+                interaction.followUp({
                     ephemeral, content: `Action failed: ${errorMessage}`
                 });
             });

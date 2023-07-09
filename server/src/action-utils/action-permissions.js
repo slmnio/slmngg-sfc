@@ -75,7 +75,7 @@ async function isEventStaffOrHasRole(user, event, role, websiteRoles) {
     return false;
 }
 
-async function canUpdateUserDetails(user) {
+function canUpdateUserDetails(user) {
     // TODO: Better / specific permission?
     return (user.airtable?.website_settings ?? []).includes("Full broadcast permissions");
 }

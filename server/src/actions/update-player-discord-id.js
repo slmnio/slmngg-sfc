@@ -1,4 +1,7 @@
-import { canUpdateUserDetails } from "../action-utils/action-permissions";
+const { canUpdateUserDetails } = require("../action-utils/action-permissions");
+const {
+    User
+} = require("discord.js");
 const Cache = require("../cache");
 
 module.exports = {
@@ -6,12 +9,11 @@ module.exports = {
     requiredParams: ["discordData"],
     auth: ["user"],
     /***
-     * @param {object} discordData
+     * @param {User} discordData
      * @param {UserData} user
      * @returns {Promise<string>}
      */
     async handler({ discordData }, { user }) {
-        // TODO: Check auth level of current user
         if (!canUpdateUserDetails(user)) {
             throw {
                 errorMessage: "You don't have permission update user details",
@@ -19,11 +21,27 @@ module.exports = {
             };
         }
 
-        // TODO: Get airtable user based on discordData
-        let players = (await Promise.all((await Cache.get("Players")).ids.map(id => (Cache.get(id.slice(3))))));
-        let searchValues = [`${discordData.username}`, `${discordData.username}#${discordData.discriminator ?? "0000"}`];
+        let players = await Promise.all((await Cache.get("Players")).ids.map(id => (Cache.get(id.slice(3)))));
+
+        if (await Cache.auth.getPlayer(discordData.id)) {
+            throw {
+                errorMessage: "This user is already linked to a SLMN.GG profile",
+                errorCode: 400
+            };
+        }
+
+        const isNewUsername = discordData.discriminator === "0";
+
+        let searchValues = [discordData.username, discordData.globalName, !isNewUsername && `${discordData.username}#${discordData.discriminator}`]
+            .filter(Boolean)
+            .map((value) => value.toLocaleLowerCase());
+
         let potentials = players.filter((player) => {
-            return (!player.discord_id) && searchValues.includes(player.discord_tag);
+            if (player.discord_id) return false;
+
+            const discordSimple = player.discord_tag?.split("#")[0].toLocaleLowerCase();
+
+            return searchValues.includes(discordSimple) || searchValues.includes(player.discord_tag?.toLocaleLowerCase()) || searchValues.includes(player.name?.toLocaleLowerCase());
         });
 
         if (potentials.length === 0) {
@@ -33,18 +51,17 @@ module.exports = {
             };
         } else if (potentials.length > 1) {
             throw {
-                errorMessage: "Found more than 1 SLMN.GG player baesd on discord details",
+                errorMessage: "Found more than 1 SLMN.GG player based on discord details",
                 errorCode: 500
             };
         }
 
         const targetUser = potentials[0];
 
-        // TODO: Update record with discord ID
-
         console.log("[profile]", user.airtable.name, user.airtable.id, "is setting discord id for", targetUser.name, targetUser.id, "to", discordData.id);
         let response = await this.helpers.updateRecord("Players", targetUser, {
-            "Discord Id": discordData.id
+            "Discord ID": discordData.id,
+            "Discord Tag": discordData.username
         });
 
         if (response?.error) {

@@ -1,5 +1,6 @@
 const bodyParser = require("body-parser");
 const fetch = require("node-fetch");
+const { updateRecord } = require("../action-utils/action-utils");
 
 function discordEnvSet() {
     return ["DISCORD_CLIENT_ID", "DISCORD_CLIENT_SECRET"].every(key => !!process.env[key])
@@ -145,6 +146,11 @@ module.exports = ({ app, router, cors, Cache, io }) => {
         }).then(res => res.json());
 
         let airtable = await getAirtablePlayer(discord);
+
+        if (![discord.username, `${discord.username}#${discord.discriminator}`].includes(airtable.discord_tag)) {
+            const updatedUsername = discord.discriminator === "0" ? discord.username : `${discord.username}#${discord.discriminator}`;
+            await updateRecord(Cache, "Players", airtable, { "Discord Tag": updatedUsername });
+        }
 
         return { discord, airtable };
     }

@@ -17,7 +17,7 @@
                 <!-- :style="cleanID(map.winner?.[0]) === team.id ? themeBackground1(team) : {}" -->
                 <div class="map flex-center map-score" v-for="map in maps" :key="map.id"
                 :class="{'map-won': cleanID(map.winner?.[0]) === team.id}">
-                    <div class="industry-align">{{ map[`score_${ti + 1}`] || "-" }}</div>
+                    <div class="industry-align">{{ !map.showNumbers ? "-" : (map[`score_${ti + 1}`] || 0) }}</div>
            </div>
            <div class="match-score flex-center"
                 :style="match[`score_${ti+1}`] === match.first_to ? themeBackground1(team) : {}">
@@ -56,11 +56,14 @@ export default {
             return MapTypeIcons;
         },
         maps() {
-            const maps = ReactiveRoot(this.match.id, {
+            const maps = (ReactiveRoot(this.match.id, {
                 maps: ReactiveArray("maps", {
                     map: ReactiveThing("map")
                 })
-            })?.maps || [];
+            })?.maps || []).map(map => ({
+                ...map,
+                showNumbers: map.draw || map.winner
+            }));
 
             const dummyMapCount = likelyNeededMaps(this.match) - maps.length;
             console.log("extra maps", this.mapCount, dummyMapCount);
@@ -80,7 +83,8 @@ export default {
                             } : {}),
                             map: {
                                 type: this.mapTypes && this.mapTypes[num]
-                            }
+                            },
+                            showNumbers: false
                         });
                     }
                 }

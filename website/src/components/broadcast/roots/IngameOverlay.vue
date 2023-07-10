@@ -126,24 +126,35 @@ export default {
 
                 let mapText;
 
-                const currentMap = (this.match.maps || []).map((map, i) => ({
+                const maps = (this.match.maps || []).map((map, i) => ({
                     ...map,
                     number: map.number || i + 1
-                })).find(map => !(map.draw || map.winner));
+                })).filter(map => !map.banner);
 
+                let currentMap = maps.find(map => !(map.draw || map.winner));
 
-                if ([this.match.score_1, this.match.score_2].includes(this.match.first_to)) {
-                    // match has finished
-                    mapText = "Final Score"; // maybe
-                    // mapText = `Map ${currentMap.number - 1}`;
-                } else if (currentMap) {
+                if (!currentMap && maps.length) {
+                    currentMap = maps[maps.length - 1];
+                }
+
+                // if ([this.match.score_1, this.match.score_2].includes(this.match.first_to)) {
+                //     // match has finished
+                //     // mapText = "Final Score"; // maybe
+                //     mapText = `Map ${currentMap.number}`;
+                // } else if (currentMap) {
+                //     mapText = `Map ${currentMap.number}`;
+                // }
+
+                if (currentMap) {
                     mapText = `Map ${currentMap.number}`;
                 }
 
+                console.log("map text", mapText, currentMap);
 
-                if (this.match.first_to && mapText) {
+
+                if (this.match.first_to && currentMap) {
                     // Map X - First to Y
-                    return `${mapText} - First to ${this.match.first_to}`;
+                    return `Map ${currentMap.number} - First to ${this.match.first_to}`;
                 } else {
                     // Semifinals - Map X
                     const matchRound = this.match.round || this.match.week_text;

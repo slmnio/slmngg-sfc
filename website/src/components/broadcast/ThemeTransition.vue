@@ -112,13 +112,13 @@ export default {
         },
         borderClasses() {
             if (!this.border) return {};
-            if (this.border === "left") return { "border-left": true };
-            if (this.border === "right") return { "border-right": true };
-            if (this.border === "top") return { "border-top": true };
-            if (this.border === "bottom") return { "border-bottom": true };
-            if (this.border === "x") return { "border-left": true, "border-right": true };
-            if (this.border === "y") return { "border-top": true, "border-bottom": true };
-            if (this.border === "all") return { "border-top": true, "border-bottom": true, "border-left": true, "border-right": true };
+            if (this.border === "left") return { "tt-border-left": true };
+            if (this.border === "right") return { "tt-border-right": true };
+            if (this.border === "top") return { "tt-border-top": true };
+            if (this.border === "bottom") return { "tt-border-bottom": true };
+            if (this.border === "x") return { "tt-border-left": true, "tt-border-right": true };
+            if (this.border === "y") return { "tt-border-top": true, "tt-border-bottom": true };
+            if (this.border === "all") return { "tt-border-top": true, "tt-border-bottom": true, "tt-border-left": true, "tt-border-right": true };
             return {};
         }
     },
@@ -158,10 +158,10 @@ export default {
     height: fit-content;
 }
 
-.theme-transition.border-left .theme-transition-inner { border-left: var(--tt-border-width) solid transparent; }
-.theme-transition.border-right .theme-transition-inner { border-right: var(--tt-border-width) solid transparent; }
-.theme-transition.border-top .theme-transition-inner { border-top: var(--tt-border-width) solid transparent; }
-.theme-transition.border-bottom .theme-transition-inner { border-bottom: var(--tt-border-width) solid transparent; }
+.theme-transition.tt-border-left .theme-transition-inner { border-left: var(--tt-border-width) solid transparent; }
+.theme-transition.tt-border-right .theme-transition-inner { border-right: var(--tt-border-width) solid transparent; }
+.theme-transition.tt-border-top .theme-transition-inner { border-top: var(--tt-border-width) solid transparent; }
+.theme-transition.tt-border-bottom .theme-transition-inner { border-bottom: var(--tt-border-width) solid transparent; }
 
 .tt-enter-active,
 .tt-enter-active .theme-transition-inner,

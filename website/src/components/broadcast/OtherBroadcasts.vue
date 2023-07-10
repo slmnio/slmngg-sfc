@@ -9,7 +9,7 @@
                 </div>
             </div>
             <div class="broadcast-main d-flex">
-                <BreakMatch class="broadcast-match" :match="broadcast.live_match" :live="true" />
+                <BreakMatch class="broadcast-match" :match="broadcast.live_match" :live="true" :theme-color="themeColor" />
                 <div class="broadcast-details">
 <!--                    <div class="details">-->
 <!--                        <span class="detail" v-if="broadcast.live_match.sub_event">{{ broadcast.live_match.sub_event}}</span>-->
@@ -29,6 +29,7 @@
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import BreakMatch from "@/components/broadcast/break/BreakMatch";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
+import { themeBackground } from "@/utils/theme-styles";
 
 export default {
     name: "OtherBroadcasts",
@@ -55,8 +56,16 @@ export default {
                             theme: ReactiveThing("theme")
                         })
                     })
-                })
+                }),
+                theme_override: ReactiveThing("theme_override")
             })({ broadcast: this.startingBroadcast.id });
+        },
+        broadcastEventTheme() {
+            return this.broadcast?.theme_override || this.broadcast?.event?.theme;
+        },
+        themeColor() {
+            if (!this.broadcastEventTheme) return {};
+            return themeBackground(this.broadcastEventTheme);
         },
         broadcasts() {
             if (!this.broadcast?.other_broadcasts?.length) return [];

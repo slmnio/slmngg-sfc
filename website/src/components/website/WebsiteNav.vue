@@ -16,9 +16,9 @@
         <WebsiteNavBanner v-if="siteMode === 'staging'" class="bg-warning text-dark">
             <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-dark">Beta development version:</a></b> things may break. Use <a href="https://slmn.gg" class="text-dark font-weight-bold">slmn.gg</a> for the latest stable update.
         </WebsiteNavBanner>
-        <WebsiteNavBanner v-if="siteMode === 'local'" :class="dataServerMode === 'local' ? 'text-light bg-primary' : 'text-dark bg-warning'">
-            <span v-if="dataServerMode === 'local'">SLMN.GG is running in local development mode.</span>
-            <span v-else><i class="fas fa-exclamation-triangle fa-fw mr-1"></i> SLMN.GG is running in local development mode <strong>but not using a local data server.</strong></span>
+        <WebsiteNavBanner v-if="siteMode === 'local'" class="text-light bg-primary">
+            <i v-if="dataServerMode !== 'local'" class="fas fa-exclamation-triangle fa-fw mr-1"></i>
+            SLMN.GG is running in local development mode<strong v-if="dataServerMode !== 'local'"> but not using a local data server</strong>.
         </WebsiteNavBanner>
 <!--       example: <WebsiteNavBanner class="bg-success" v-if="$socket.connected">Connected to the data server for live data updates!</WebsiteNavBanner>-->
 

@@ -1,4 +1,5 @@
 const { canUpdateUserDetails } = require("../action-utils/action-permissions");
+const { log } = require("../discord/slmngg-log");
 const {
     User
 } = require("discord.js");
@@ -58,7 +59,7 @@ module.exports = {
 
         const targetUser = potentials[0];
 
-        console.log("[profile]", user.airtable.name, user.airtable.id, "is setting discord id for", targetUser.name, targetUser.id, "to", discordData.id);
+        log("[profile]", user.airtable.name, user.airtable.id, "is setting discord id for", targetUser.name, targetUser.id, "to", discordData.id);
         let response = await this.helpers.updateRecord("Players", targetUser, {
             "Discord ID": discordData.id,
             "Discord Tag": discordData.username

@@ -25,7 +25,7 @@ module.exports = {
 
         const internalManager = getInternalManager();
         if (!internalManager) {
-            return interaction.followUp("No action handlers can process your request.");
+            return interaction.followUp({ ephemeral, content: "No action handlers can process your request." });
         }
 
         await internalManager.runAction("update-player-discord-id", { discordData: interaction.targetUser }, token)

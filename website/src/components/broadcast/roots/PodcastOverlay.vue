@@ -2,7 +2,7 @@
     <div class="podcast-overlay">
         <div class="podcast-row" v-for="(row, i) in rowsOfGuests(rows || 2)" :key="i">
             <transition-group class="casters flex-center" name="anim-talent">
-                <Caster v-for="caster in row" :key="caster.id" :guest="caster" :disable-video="shouldDisablePodcastVideo" />
+                <Caster v-for="(caster, ci) in row" :key="caster.id" :color="getColor(caster.i)" :guest="caster" :disable-video="shouldDisablePodcastVideo" />
             </transition-group>
         </div>
         <v-style>{{ autoWidth }}</v-style>
@@ -28,7 +28,7 @@ export default {
                 player: ReactiveThing("player", {
                     socials: ReactiveArray("socials")
                 })
-            })(this.broadcast).filter(g => !g.hide);
+            })(this.broadcast).filter(g => !g.hide).map((c, i) => ({ ...c, i }));
         },
         autoWidth() {
             const maxGroupSize = Math.max(...this.rowsOfGuests(this.rows || 2).map(r => r.length));
@@ -39,9 +39,17 @@ export default {
             };
 
             return `.podcast-overlay, .caster { --caster-width: ${sizes[maxGroupSize] || "700"}px !important; }`;
+        },
+        deskColors() {
+            if (!this.broadcast?.event?.theme?.desk_colors) return [];
+            return this.broadcast.event.theme.desk_colors.trim().split(/[\n,]/g).map(e => e.trim());
         }
     },
     methods: {
+        getColor(index) {
+            if (!this.deskColors?.length) return this.broadcast?.event?.theme?.color_logo_background || this.broadcast?.event?.theme?.color_theme;
+            return this.deskColors[index % this.deskColors.length];
+        },
         rowsOfGuests(number) {
             if (!this.guests) return [];
             const rows = [];

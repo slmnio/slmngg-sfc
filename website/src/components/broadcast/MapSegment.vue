@@ -12,6 +12,7 @@
                 <ThemeLogo class="pick-ban-team" :theme="pickBanTheme" border-width="4px" logo-size="w-100" icon-padding="2" />
                 <div class="pick-ban-text" :style="pickBanBorder">{{ map.banner ? 'Ban' : (map.picker ? 'Pick' : '')  }}</div>
             </div>
+            <div class="map-upper-spacer" v-else></div>
             <div class="map-top flex-grow-1 h-100 w-100 flex-center flex-column">
                 <div class="map-logo-holder w-100 h-50 flex-center" v-if="winnerBG">
                     <div class="map-logo bg-center" :style="winnerLogo"></div>
@@ -138,7 +139,7 @@ export default {
         background-color: #333333;
         color: #ffffff;
     }
-    .map-upper {
+    .map-upper, .map-upper-spacer {
         font-size: 24px;
         min-height: 2em;
         padding: 0;

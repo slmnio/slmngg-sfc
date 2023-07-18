@@ -201,9 +201,9 @@ export default {
             if (!(this.broadcast?.broadcast_settings || []).includes("Show borders on middle")) return null;
             return this.teams.map(t => {
                 if (!t?.theme) return {};
-                let color = t.theme.color_accent;
+                let color = t.theme.color_theme;
                 if (!color || color.toLowerCase() === "#ffffff") color = t.theme.color_logo_accent;
-                if (!color || color.toLowerCase() === "#ffffff") color = t.theme.color_theme;
+                if (!color || color.toLowerCase() === "#ffffff") color = t.theme.color_accent;
                 return {
                     backgroundColor: color
                 };

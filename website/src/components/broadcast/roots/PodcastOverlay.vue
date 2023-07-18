@@ -2,7 +2,7 @@
     <div class="podcast-overlay">
         <div class="podcast-row" v-for="(row, i) in rowsOfGuests(rows || 2)" :key="i">
             <transition-group class="casters flex-center" name="anim-talent">
-                <Caster v-for="(caster, ci) in row" :key="caster.id" :color="getColor(caster.i)" :guest="caster" :disable-video="shouldDisablePodcastVideo" />
+                <Caster v-for="caster in row" :key="caster.id" :color="getColor(caster.i)" :guest="caster" :disable-video="shouldDisablePodcastVideo" />
             </transition-group>
         </div>
         <v-style>{{ autoWidth }}</v-style>

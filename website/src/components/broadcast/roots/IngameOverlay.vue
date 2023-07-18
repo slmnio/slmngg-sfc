@@ -23,7 +23,6 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import IngameTeam from "@/components/broadcast/IngameTeam";
 import Middle from "@/components/broadcast/Middle";
 import Sponsors from "@/components/broadcast/Sponsors";
-import { themeBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "IngameOverlay",

@@ -1,12 +1,23 @@
 <template>
     <div class="event-schedule container">
-
+<!--        <div class="d-sm-flex w-100 gap-1 align-items-center justify-content-end timezone-swapper-holder d-none">-->
+<!--            <h2 class="mr-5">Schedule</h2>-->
+<!--            <TimezoneSwapper :inline="true"/>-->
+<!--            <AddToCalendar :event="event"/>-->
+<!--        </div>-->
         <div class="d-sm-flex w-100 justify-content-end timezone-swapper-holder d-none">
             <TimezoneSwapper :inline="true" />
         </div>
 
+        <div class="d-flex align-items-center flex-wrap-reverse">
+            <div style="width: 50%"></div>
+            <h2 style="transform: translateX(-50%);">Schedule</h2>
+            <div class="d-flex align-items-end flex-col gap-1 ml-auto">
+                <AddToCalendar :event="event" />
+            </div>
+        </div>
+
         <div class="schedule-top mb-2">
-            <h2 class="text-center">Schedule</h2>
             <ul class="schedule-group-holder nav justify-content-center" v-if="pagedMatches.length > 1">
                 <li class="nav-item schedule-group" v-for="(pm) in pagedMatches" :key="pm.num"
                     :class="{ 'active': activeScheduleGroup.num === pm.num, 'ct-active': activeScheduleGroup.num === pm.num, 'ct-passive': activeScheduleGroup.num !== pm.num }">
@@ -42,10 +53,11 @@ import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 import { canEditMatch } from "@/utils/client-action-permissions";
+import AddToCalendar from "@/components/website/AddToCalendar.vue";
 
 export default {
     name: "EventSchedule",
-    components: { TimezoneSwapper, ScheduleMatch },
+    components: { AddToCalendar, TimezoneSwapper, ScheduleMatch },
     props: ["event"],
     data: () => ({
         showAll: false,

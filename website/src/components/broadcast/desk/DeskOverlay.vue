@@ -12,6 +12,10 @@
             <DeskMatch :broadcast="broadcast" class="w-100" :_match="liveMatch" :theme-color="themeColor" :guests="guests" v-if="liveMatch && !useScoreboard" key="desk-match" />
             <MatchScoreboard :active="animationActive" class="scoreboard" v-if="liveMatch && useScoreboard" :match="liveMatch" :broadcast="broadcast" key="scoreboard" :animate-on-mount="true" />
         </transition>
+
+        <div class="preload">
+            <DeskMatch class="w-100" :broadcast="broadcast" :_match="liveMatch" :theme-color="themeColor" v-if="liveMatch" force-mode="Maps" key="desk-match" />
+        </div>
     </div>
 </template>
 
@@ -213,5 +217,12 @@ export default {
     }
     .caster.wide-feed >>> .caster-frame {
         --oversize: 1% !important;
+    }
+
+    .preload {
+        opacity: 0;
+        max-width: 0;
+        max-height: 0;
+        overflow: hidden;
     }
 </style>

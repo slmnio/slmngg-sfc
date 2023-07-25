@@ -10,6 +10,9 @@
             <b-form-group label="Name" label-cols-lg="2" label-cols-sm="3" label-cols="12">
                 <div class="fake-input" v-b-tooltip.bottom="'To change your player name, send a message to #slmngg-requests or send in a ModMail.'">{{ player.name }}</div>
             </b-form-group>
+            <b-form-group label="Battletag" label-cols-lg="2" label-cols-sm="3" label-cols="12">
+                <div class="fake-input" v-b-tooltip.bottom="'To change your Battletag, send a message to #slmngg-requests or send in a ModMail.'">{{ player.battletag }}</div>
+            </b-form-group>
             <b-form-group label="Pronouns" label-cols-lg="2" label-cols-sm="3" label-cols="12">
                 <b-form-select :options="pronouns" v-model="profile.pronouns"/>
             </b-form-group>

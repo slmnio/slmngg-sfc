@@ -253,7 +253,8 @@ export function getTeamsMapStats(teams, requestMatch, requestMap, filters) {
             played: 0,
             wins: 0,
             losses: 0,
-            draws: 0
+            draws: 0,
+            unplayed: 0
         };
 
         const prevMatches = (team.matches || [])
@@ -284,7 +285,11 @@ export function getTeamsMapStats(teams, requestMatch, requestMap, filters) {
                     if (scheduledMap) stat.scheduled_for_match = true;
                 }
 
-                if (!(matchMap.draw || matchMap.winner)) return; // wasn't played fully
+                if (!(matchMap.draw || matchMap.winner || matchMap.banner)) {
+                    // wasn't played fully
+                    if ([match.score_1, match.score_2].includes(match.first_to)) stat.unplayed++;
+                    return;
+                }
 
                 // woo right map
 

@@ -1,12 +1,15 @@
 <template>
     <div class="match-history">
         <h1>Map Head To Head</h1>
-        <div class="settings flex w-100 justify-content-end mb-2" v-if="match.sub_event || match.match_group">
+        <div class="settings flex w-100 justify-content-end mb-2">
             <b-form-checkbox v-if="match.sub_event" v-model="filterSubEvent">
-                Only show maps from sub event <b>{{ match.sub_event}}</b>.
+                Only show maps from sub event <b>{{ match.sub_event}}</b>
             </b-form-checkbox>
             <b-form-checkbox v-if="match.match_group" v-model="filterMatchGroup">
-                Only show maps from group <b>{{ match.match_group}}</b>.
+                Only show maps from group <b>{{ match.match_group}}</b>
+            </b-form-checkbox>
+            <b-form-checkbox v-model="showUnplayedMaps">
+                Show maps that were scheduled but not played
             </b-form-checkbox>
         </div>
         <div class="text-light">
@@ -16,7 +19,7 @@
                 </div>
                 <div>
                     <table class="w-100">
-                        <MatchMapHistory v-for="map in mapType.maps" :key="map.id" :data="_getTeamMapStats(map)" :map="map" />
+                        <MatchMapHistory v-for="map in mapType.maps" :key="map.id" :data="_getTeamMapStats(map)" :map="map" :show-unplayed-maps="showUnplayedMaps" />
                     </table>
                 </div>
             </div>
@@ -44,7 +47,8 @@ export default {
     components: { MapDisplay, MatchMapHistory, BFormCheckbox },
     data: () => ({
         filterSubEvent: false,
-        filterMatchGroup: true
+        filterMatchGroup: true,
+        showUnplayedMaps: false
     }),
     computed: {
         pool() {

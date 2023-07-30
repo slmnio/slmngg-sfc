@@ -62,13 +62,30 @@ async function checkBroadcast(id, broadcast) {
         console.log("Creating a new caster job", broadcastKey, channelIDs.get("live"));
         manager.getOrCreateJob(channelIDs.get("live"), broadcastKey, taskKey);
     } else {
-        // if there's a job that's bpl4/casters kill it
+        // if there's a job that's casters kill it
         manager.jobs.filter(job => job.broadcastKey === broadcastKey && job.taskKey === "casters")
             .forEach(job => {
                 if (!job.client) return;
                 job.client.endJob();
             });
         manager.jobs = manager.jobs.filter(job => !(job.broadcastKey === broadcastKey && job.taskKey === "casters"));
+    }
+
+    if (broadcast.broadcast_settings.includes("Connect for production voice")) {
+        let taskKey = "prod";
+        if (!broadcast.discord_control) return console.warn(`[Voice] Couldn't connect for prod voice because ${broadcast.name} has no discord_control set.`);
+        let channelIDs = new MapObject(broadcast.discord_control);
+        if (!channelIDs.get("prod")) return console.warn(`[Voice] Couldn't connect for prod voice because ${broadcast.name} has no discord_control.prod set.`);
+        console.log("Creating a new prod job", broadcastKey, channelIDs.get("prod"));
+        manager.getOrCreateJob(channelIDs.get("prod"), broadcastKey, taskKey);
+    } else {
+        // if there's a job that's prod kill it
+        manager.jobs.filter(job => job.broadcastKey === broadcastKey && job.taskKey === "prod")
+            .forEach(job => {
+                if (!job.client) return;
+                job.client.endJob();
+            });
+        manager.jobs = manager.jobs.filter(job => !(job.broadcastKey === broadcastKey && job.taskKey === "prod"));
     }
 
     if (broadcast.broadcast_settings.includes("Connect for team comms")) {

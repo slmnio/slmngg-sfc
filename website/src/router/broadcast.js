@@ -224,9 +224,22 @@ export default [
     {
         path: "tally-dot",
         component: () => import("@/components/broadcast/roots/TallyDot.vue"),
-        props: route => ({ number: parseInt(route.query.number || route.query.number) })
+        props: route => ({
+            number: parseInt(route.query.number || route.query.number || "1"),
+            align: route.query.align || (route.query.left ? "left" : "") || (route.query.right ? "right" : "") || "right"
+        })
     },
-    { path: "quad", component: () => import("@/components/broadcast/roots/QuadTallyDot.vue") },
+    {
+        path: "dot",
+        redirect: "tally-dot"
+    },
+    {
+        path: "quad",
+        component: () => import("@/components/broadcast/roots/QuadTallyDot.vue"),
+        props: route => ({
+            align: route.query.align || (route.query.left ? "left" : "") || (route.query.right ? "right" : "") || "right"
+        })
+    },
     {
         path: "tally-transmitter",
         component: () => import("@/components/broadcast/roots/TallyTransmitter.vue"),

@@ -1,12 +1,12 @@
 <template>
-    <div class="tally-dot" :class="{ preview: state === 'preview', active: state === 'active', 'unassigned': !observer }">
-        <div class="d-flex">
+    <div class="tally-dot" :class="{ preview: state === 'preview', active: state === 'active', 'unassigned': !observer, 'align-left': align === 'left', 'align-right': align === 'right' }">
+        <div class="d-flex dot-content">
             <div class="dot" :class="{ preview: state === 'preview', active: state === 'active', 'unassigned': !observer }">
                 <span class="industry-align">{{ number }}</span>
             </div>
-            <div class="text">
+            <div class="text d-flex">
                 <span class="name">{{ observerName || '' }}</span>
-                <span class="team-cams">
+                <span class="team-cams mx-3">
                     <span class="team" v-for="team in teamCams" :key="team">{{ team.slice(-1) }}</span>
                 </span>
             </div>
@@ -19,7 +19,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "TallyDot",
-    props: ["client", "number"],
+    props: ["client", "number", "align"],
     sockets: {
         tally_change({ state, number }) {
             this.state = state;
@@ -108,6 +108,15 @@ export default {
     justify-content: flex-start;
     align-items: flex-end;
 }
+.tally-dot.align-right {
+    justify-content: flex-end;
+    left: auto;
+    right: 0;
+}
+.tally-dot.align-right .dot-content,
+.tally-dot.align-right .text {
+    flex-direction: row-reverse;
+}
 .tally-dot.active {
     border-color: rgba(255,0,0,0.5);
 }
@@ -131,7 +140,7 @@ export default {
 
 .text {
     font-weight: bold;
-    margin-left: .2em;
+    margin: 0 .2em;
     text-shadow: 8px 8px black, 0 0 8px black;
 }
 

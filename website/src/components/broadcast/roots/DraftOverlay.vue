@@ -4,25 +4,25 @@
             <div class="available-players">
                 <ThemeLogo v-if="event && event.theme" class="event-logo" :theme="event.theme" border-width="6px" logo-size="w-500" icon-padding="24px"></ThemeLogo>
                 <div class="title" :style="background">DRAFTABLE PLAYERS</div>
-                <!--<div class="player" v-for="player in availablePlayers" v-bind:key="player.id">
+                <!--<div class="player" v-for="player in availablePlayers" :key="player.id">
                     {{ player.name }}
                 </div>-->
                 <transition-group class="players-transition" name="draftable">
-                    <DraftPlayer :style="draftPlayerStyle" v-for="player in availablePlayers" v-bind:key="player.id"
+                    <DraftPlayer :style="draftPlayerStyle" v-for="player in availablePlayers" :key="player.id"
                                  :player="player" :theme="event.theme" :show-icon="icons" :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
                 </transition-group>
             </div>
             <div class="teams d-flex">
-                <div class="team-row" v-for="(row, rowI) in draftRows" v-bind:key="rowI">
-                    <div class="team flex-grow-1" v-for="team in row" v-bind:key="team.id">
-                        <DraftTeam class="team-top" v-bind:class="{'team-bottom-border': !showStaff}" :show-logo="showLogos" :team="team"></DraftTeam>
+                <div class="team-row" v-for="(row, rowI) in draftRows" :key="rowI">
+                    <div class="team flex-grow-1" v-for="team in row" :key="team.id">
+                        <DraftTeam class="team-top" :class="{'team-bottom-border': !showStaff}" :show-logo="showLogos" :team="team"></DraftTeam>
                         <div class="team-staff-list default-thing" v-if="showStaff" :style="logoBackground1(team)">
-                            <div class="team-staff" v-for="staff in getTeamStaff(team)" v-bind:key="staff.id">
+                            <div class="team-staff" v-for="staff in getTeamStaff(team)" :key="staff.id">
                                 {{ staff.name }}
                             </div>
                         </div>
                         <transition-group name="player" class="team-players">
-                            <DraftPlayer class="drafted-player" v-for="player in insertDummies(team.players)" v-bind:key="player.id"
+                            <DraftPlayer class="drafted-player" v-for="player in insertDummies(team.players)" :key="player.id"
                                          :player="player" :theme="event.theme" :show-icon="icons" :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
                         </transition-group>
                     </div>
@@ -49,7 +49,7 @@ export default {
         dummy: false
     }),
     methods: {
-        insertDummies(players) {
+        insertDummies(players = []) {
             if (!this.eachTeam) return players;
             const dummyRecord = { dummy: true };
             const dummiedPlayers = [];

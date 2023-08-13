@@ -2,7 +2,7 @@
     <div class="match-thumbnail" :style="eventBackground">
 
         <div class="match-thumbnail-half flex-center"
-             v-for="team in teams" v-bind:key="team.id"
+             v-for="team in teams" :key="team.id"
              :style="teamBackground(team)">
 <!--            <div class="match-loading-code" v-if="isLoading">LOADING: {{ team.code }}</div>-->
             <div class="match-thumbnail-logo bg-center" :style="logo(team)"></div>
@@ -70,7 +70,13 @@ export default {
         },
         teams() {
             if (this.noTeams) return [];
-            return this.match?.teams || [];
+            if (this.match?.teams?.length === 1) {
+                return [
+                    ...this.match.teams,
+                    this.match?.event
+                ];
+            }
+            return this.match?.teams?.slice(0, 2) || [];
         }
     },
     methods: {

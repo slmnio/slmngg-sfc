@@ -6,20 +6,30 @@
         </template>
         <b-dropdown-item variant="dark" :to="url('player', { id: playerID })" active-class="active">Player page</b-dropdown-item>
         <b-dropdown-item variant="dark" :href="rootLinkExternal('/profile')" :to="rootLinkRouter('/profile')" active-class="active">Edit profile</b-dropdown-item>
+        <b-dropdown-divider v-if="isProduction"></b-dropdown-divider>
         <b-dropdown-item v-if="isProduction" variant="dark" :href="rootLinkExternal('/dashboard')" :to="rootLinkRouter('/dashboard')" active-class="active">Dashboard</b-dropdown-item>
+        <b-dropdown-item v-if="isProduction" variant="dark" v-b-modal.token-modal>Token</b-dropdown-item>
+        <b-dropdown-item v-if="isProduction" variant="dark" to="/login">Re-auth</b-dropdown-item>
+        <TokenModal />
     </b-nav-item-dropdown>
 </template>
 
 <script>
 import { url } from "@/utils/content-utils.js";
-import { BDropdownItem, BNavItemDropdown } from "bootstrap-vue";
+import { BDropdownDivider, BDropdownItem, BNavItemDropdown, VBModal } from "bootstrap-vue";
 import { isAuthenticated, isOnMainDomain } from "@/utils/auth";
 import { getMainDomain } from "@/utils/fetch";
+import { bg } from "@/utils/images";
+import TokenModal from "@/components/website/dashboard/TokenModal.vue";
 
 export default {
     name: "LoggedInUser",
+    directives: { BModal: VBModal },
     components: {
-        BDropdownItem, BNavItemDropdown
+        TokenModal,
+        BDropdownItem,
+        BNavItemDropdown,
+        BDropdownDivider
     },
     computed: {
         user() {
@@ -29,9 +39,7 @@ export default {
             return this.user?.airtableID;
         },
         avatar() {
-            return {
-                backgroundImage: `url(${this.user.avatar})`
-            };
+            return bg(this.user.avatar);
         },
         isProduction() {
             if (!isAuthenticated(this.$root)) return false;

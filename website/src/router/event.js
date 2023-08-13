@@ -1,28 +1,20 @@
-const EventMain = () => import("@/views/sub-views/EventMain");
-const EventRosters = () => import("@/views/sub-views/EventRosters");
-const EventBrackets = () => import("@/views/sub-views/EventBrackets");
-const EventSchedule = () => import("@/views/sub-views/EventSchedule");
-const EventDraft = () => import("@/views/sub-views/EventDraft");
-const EventStaff = () => import("@/views/sub-views/EventStaff");
-const EventAbout = () => import("@/views/sub-views/EventAbout");
-const EventScenarios2 = () => import("@/views/sub-views/EventScenarios2");
-const EventStandings = () => import("@/views/sub-views/EventStandings");
-const ThingTheme = () => import("@/views/sub-views/ThingTheme");
-const EventBrands = () => import("@/views/sub-views/EventBrands");
-
 export default [
-    { path: "", component: EventMain },
-    { path: "rosters", component: EventRosters },
-    { path: "bracket", component: EventBrackets },
+    { path: "", component: () => import("@/views/sub-views/EventMain.vue") },
+    { path: "rosters", component: () => import("@/views/sub-views/EventRosters.vue") },
+    { path: "bracket", component: () => import("@/views/sub-views/EventBrackets.vue") },
     { path: "brackets", redirect: "bracket" },
-    { path: "schedule", component: EventSchedule },
+    { path: "schedule", component: () => import("@/views/sub-views/EventSchedule.vue") },
     { path: "matches", redirect: "schedule" },
     // { path: "scenarios", component: EventScenarios },
-    { path: "scenarios", component: EventScenarios2 },
-    { path: "draft", component: EventDraft },
-    { path: "staff", component: EventStaff },
-    { path: "about", component: EventAbout },
-    { path: "standings", component: EventStandings },
-    { path: "theme", component: ThingTheme },
-    { path: "brands", component: EventBrands }
+    { path: "scenarios", component: () => import("@/views/sub-views/EventScenarios2.vue") },
+    { path: "draft", component: () => import("@/views/sub-views/EventDraft.vue") },
+    { path: "staff", component: () => import("@/views/sub-views/EventStaff.vue") },
+    { path: "about", component: () => import("@/views/sub-views/EventAbout.vue") },
+    { path: "standings", component: () => import("@/views/sub-views/EventStandings.vue") },
+    { path: "theme", component: () => import("@/views/sub-views/ThingTheme.vue") },
+    { path: "brands", component: () => import("@/views/sub-views/EventBrands.vue") },
+    { path: "auction", component: () => import("@/views/sub-views/EventAuction.vue") },
+    { path: "stream", redirect: "streams" },
+    { path: "stream-details", redirect: "streams" },
+    { path: "streams", component: () => import("@/views/sub-views/EventStreamDetails.vue") }
 ];

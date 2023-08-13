@@ -12,20 +12,19 @@ function getFileEnding(url) {
 }
 
 const dataServer = process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg";
-function getResizedImage(airtableURL, size = "s-500") {
-    // just using orig for now
-    return `${dataServer}/image.${getFileEnding(airtableURL) || "png"}?size=orig&url=${encodeURIComponent(airtableURL.replace("?", "&"))}`;
+
+function getImageURL(attachment, size = "orig") {
+    return `${dataServer}/image.${attachment.fileExtension}?id=${attachment.id}&size=${size}`;
 }
 
-function aImg(airtableImage, size) {
-    // console.log(airtableImage);
-    if (!airtableImage || !airtableImage.length) return null;
-    let i = airtableImage[0];
+
+function aImg(attachment, size) {
+    if (!attachment) return null;
     return {
-        width: i.width,
-        height: i.height,
-        type: i.type,
-        url: getResizedImage(i.url, size)
+        width: attachment.width,
+        height: attachment.height,
+        type: attachment.type,
+        url: getImageURL(attachment, size)
     };
 }
 function themeSquare(id, size = 500) {
@@ -131,10 +130,15 @@ module.exports = ({ app, Cache }) => {
 
                 return meta({
                     title: thing.name,
-                    ...(thing.overwatch_icon ? {
-                        image: { url: thing.overwatch_icon,
-                            width: 128, height: 128 }
-                    } : {}),
+                    ...(thing.profile_picture_theme ?
+                        {
+                            image: {
+                                url: themeSquare(cleanID(thing.profile_picture_theme?.[0])),
+                                width: 500,
+                                height: 500
+                            }
+                        } : {}
+                    ),
                     description: `${thing.name}'s player profile.`
                 });
             }
@@ -242,6 +246,11 @@ module.exports = ({ app, Cache }) => {
                 let event = thing?.event && await Cache.get(thing.event[0]);
                 let theme = event?.theme && await Cache.get(event.theme[0]);
 
+                let thumbnail = thing?.thumbnail?.[0] && Cache.getAttachment(thing.thumbnail[0].id);
+                let header = !thumbnail && thing?.header?.[0] && Cache.getAttachment(thing.header[0].id);
+
+                console.log({ thing, thumbnail, header });
+
 
                 /*
                 need to get:
@@ -259,7 +268,7 @@ module.exports = ({ app, Cache }) => {
                     /* solo_description removes slmn.gg footer */
                     solo_description: text.slice(0, cutoff) + (text.length > cutoff ? "..." : ""),
                     color: theme?.color_theme,
-                    image: aImg(thing?.thumbnail, "w-1000") || aImg(thing?.header, "w-1000") || themeSquare(theme?.id),
+                    image: aImg(thumbnail || header, "w-1000") || themeSquare(theme?.id),
                     card_type: (thing?.thumbnail || thing?.header) ? "summary_large_image" : null
                 };
 

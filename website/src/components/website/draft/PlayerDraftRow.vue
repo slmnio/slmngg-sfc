@@ -1,5 +1,5 @@
 <template>
-    <tr v-bind:key="player.id">
+    <tr :key="player.id">
         <td class="draft--name"><router-link :to="url('player', player)">{{ player.name }} <i class="fas fa-badge-check" v-if="player.verified"></i></router-link></td>
         <td class="draft--highest-rank" v-if="game === 'Valorant'">{{ player._draftData && player._draftData.highest_rank }}</td>
         <td class="draft--current-rank" v-if="game === 'Valorant'">{{ player._draftData && player._draftData.current_rank }}</td>
@@ -10,11 +10,11 @@
         </td>
         <td class="draft--heroes" v-if="hasDraftData && settings.heroes">
             <div class="player-heroes" v-if="player.heroes" v-b-tooltip.hover.top="player.heroes && player.heroes.join(', ')">
-                <HeroIcon v-for="hero in player.heroes" :hero="hero" v-bind:key="hero" />
+                <HeroIcon v-for="hero in player.heroes" :hero="hero" :key="hero" />
             </div>
         </td>
         <td v-if="settings.slmn_events">
-            <PlayerDraftTeamInfo v-for="team in teams" :team="team" v-bind:key="team.id"/>
+            <PlayerDraftTeamInfo v-for="team in teams" :team="team" :key="team.id"/>
         </td>
         <td v-if="hasDraftData && settings.info_for_captains" class="info-for-captains">{{  player.info_for_captains }}</td>
         <td v-if="settings.custom_notes">

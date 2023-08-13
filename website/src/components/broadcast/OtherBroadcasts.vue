@@ -3,13 +3,13 @@
         <div class="broadcast" v-for="broadcast in broadcasts" :key="broadcast.id">
             <div class="broadcast-top d-flex">
                 <div class="broadcast-name flex-grow-1">{{ broadcast.relative_name || broadcast.name }}</div>
-                <div class="broadcast-link" v-if="broadcast.stream_link">
-                    <i class="fab fa-twitch" v-if="broadcast.stream_link.includes('twitch.tv')"></i>
-                    {{ broadcast.stream_link.replace("twitch.tv/", "/") }}
+                <div class="broadcast-link" v-if="broadcast._stream_link">
+                    <i class="fab fa-twitch" v-if="broadcast._stream_link.includes('twitch.tv')"></i>
+                    {{ (broadcast._stream_link).replace("twitch.tv/", "/") }}
                 </div>
             </div>
             <div class="broadcast-main d-flex">
-                <BreakMatch class="broadcast-match" :match="broadcast.live_match" :live="true" />
+                <BreakMatch class="broadcast-match" :match="broadcast.live_match" :live="true" :theme-color="themeColor" />
                 <div class="broadcast-details">
 <!--                    <div class="details">-->
 <!--                        <span class="detail" v-if="broadcast.live_match.sub_event">{{ broadcast.live_match.sub_event}}</span>-->
@@ -29,6 +29,7 @@
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import BreakMatch from "@/components/broadcast/break/BreakMatch";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
+import { themeBackground } from "@/utils/theme-styles";
 
 export default {
     name: "OtherBroadcasts",
@@ -55,15 +56,26 @@ export default {
                             theme: ReactiveThing("theme")
                         })
                     })
-                })
+                }),
+                theme_override: ReactiveThing("theme_override")
             })({ broadcast: this.startingBroadcast.id });
+        },
+        broadcastEventTheme() {
+            return this.broadcast?.theme_override || this.broadcast?.event?.theme;
+        },
+        themeColor() {
+            if (!this.broadcastEventTheme) return {};
+            return themeBackground(this.broadcastEventTheme);
         },
         broadcasts() {
             if (!this.broadcast?.other_broadcasts?.length) return [];
             return [
                 this.broadcast,
                 ...(this.broadcast?.other_broadcasts || [])
-            ];
+            ].map(broadcast => ({
+                ...broadcast,
+                _stream_link: broadcast?.stream_link || (broadcast?.channel_username?.[0] ? `twitch.tv/${broadcast?.channel_username?.[0]}` : null)
+            }));
         }
     }
 };

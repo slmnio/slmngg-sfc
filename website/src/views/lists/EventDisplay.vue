@@ -1,21 +1,22 @@
 <template>
-    <router-link :to="url('event', event)" class="event no-link-style d-flex ct-passive">
+    <div class="event d-flex ct-passive">
         <div class="event-block flex-center default-thing" :style="blockTheme">
             <div class="event-block-logo bg-center" :style="blockLogo"></div>
         </div>
-        <div class="event-name flex-grow-1">
+        <router-link :to="url('event', event)" class="event-name flex-grow-1 no-link-style">
             {{ event.name }}
-        </div>
+        </router-link>
         <div class="event-date">
             {{ startMonth }}
         </div>
-    </router-link>
+    </div>
 </template>
 
 <script>
 import { url } from "@/utils/content-utils";
 import { resizedImage } from "@/utils/images";
 import spacetime from "spacetime";
+import { logoBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "EventDisplay",
@@ -23,14 +24,11 @@ export default {
     methods: { url },
     computed: {
         blockTheme() {
-            if (!this.event || !this.event.theme) return {};
-            return {
-                backgroundColor: this.event.theme.color_logo_background,
-                borderColor: this.event.theme.color_logo_accent
-            };
+            if (!this.event?.theme) return {};
+            return logoBackground1(this.event);
         },
         blockLogo() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return resizedImage(this.event.theme, ["small_logo", "default_logo"], "w-50");
         },
         startMonth() {

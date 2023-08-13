@@ -2,6 +2,9 @@
     <div class="stat mb-2" v-if="shouldShow">
         <div class="stat-a"><slot></slot></div>
         <div class="stat-b" v-if="raw" v-html="formattedTargetData"></div>
+        <div class="" v-if="$slots.content">
+            <slot name="content"></slot>
+        </div>
         <div class="stat-b" v-else-if="time">{{ prettyDate(targetData) }}</div>
         <div class="stat-b" v-else-if="players">
             <LinkedPlayers :players="targetData" :show-tally="showTally" />
@@ -9,7 +12,7 @@
         <div class="stat-b" v-else-if="externalLink">
             <a class="ct-active" :href="targetData" target="_blank">{{ targetData.replace('https://', '') }}</a>
         </div>
-        <div class="stat-b" v-else>{{ formattedTargetData }}</div>
+        <div class="stat-b" v-else-if="formattedTargetData">{{ formattedTargetData }}</div>
     </div>
 </template>
 
@@ -23,7 +26,7 @@ export default {
     components: { LinkedPlayers },
     methods: {
         prettyDate(timeString) {
-            return formatTime(timeString, this.$store.state.timezone);
+            return formatTime(timeString, { tz: this.$store.state.timezone, use24HourTime: this.$store.state.use24HourTime });
         }
     },
     computed: {
@@ -31,7 +34,7 @@ export default {
             return this.override || this.match[this.data];
         },
         shouldShow() {
-            return this.targetData && this.targetData?.length !== 0;
+            return this.$slots.content || (this.targetData && this.targetData?.length !== 0);
         },
         formattedTargetData() {
             return this.format ? this.format(this.targetData) : this.targetData;

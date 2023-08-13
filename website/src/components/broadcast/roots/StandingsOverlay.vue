@@ -1,6 +1,6 @@
 <template>
-    <GenericOverlay :title="title || (stageTitle ? `Standings: ${stageTitle}` : 'Standings')">
-        <Standings class="standings" :event="event" :stage="_stage" :tie-text="standingsSettings && standingsSettings.tieText" />
+    <GenericOverlay :title="title || stageTitle || 'Standings'">
+        <Standings class="standings" :event="event" :stage="_stage" :tie-text="standingsSettings && standingsSettings.tieText" use-auto-font-size />
     </GenericOverlay>
 </template>
 
@@ -16,15 +16,21 @@ export default {
     computed: {
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;
-            return ReactiveRoot(this.broadcast.event.id, {
+            return ReactiveRoot(this.broadcast?.event?.id, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
                 })
             });
         },
+        liveMatch() {
+            if (!this.broadcast?.live_match) return null;
+            return ReactiveRoot(this.broadcast?.live_match?.[0], {
+                teams: ReactiveArray("teams")
+            });
+        },
         _stage() {
-            return this.stage || this.broadcast?.current_stage;
+            return (this.stage || this.broadcast?.current_stage || this.liveMatch?.match_group || "").toLowerCase();
         },
         blocks() {
             if (!this.event || !this.event.blocks) return null;
@@ -36,7 +42,7 @@ export default {
             }
         },
         standingsSettings() {
-            return (this.blocks?.standings || []).find(s => s.group === this._stage);
+            return (this.blocks?.standings || []).find(s => s.group?.toLowerCase() === this._stage || s.key?.toLowerCase() === this._stage);
         },
         stageTitle() {
             return this.standingsSettings?.short || this.standingsSettings?.title || this._stage;

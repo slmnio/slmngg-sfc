@@ -4,7 +4,7 @@
             <NewsHeader class="news-header" :header-image="headerImage" :theme="theme" />
         </OptionalLink>
         <h1 class="news-headline">{{ news.headline }}</h1>
-        <div class="content">
+        <div class="content" :class="{'pdf-embedded': embedData.service === 'pdf' }">
             <div class="news-line">
             <span v-if="newsLine && newsLine.author">
                 {{  newsLine.ahead }} <router-link :to="url('player', news.author)">{{ news.author.name }}<i class="fas fa-badge-check fa-fw" style="margin-left: .5ex" title="REAL" v-if="news.author.verified"></i></router-link>{{ newsLine.after ? ", " + newsLine.after : "" }}
@@ -27,7 +27,7 @@
 
 <script>
 import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { url } from "@/utils/content-utils";
+import { getEmbedData, url } from "@/utils/content-utils";
 import NewsHeader from "@/components/website/news/NewsHeader";
 import Markdown from "@/components/website/Markdown";
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
@@ -116,6 +116,9 @@ export default {
                 text: str.slice(0, 2).join(", ")
             };
             // }
+        },
+        embedData() {
+            return this.news?.embed ? getEmbedData(this.news.embed) : {};
         }
     },
     metaInfo() {
@@ -143,6 +146,10 @@ export default {
     .content {
         max-width: 90ex;
         margin: 0 auto;
+    }
+
+    .content.pdf-embedded {
+        max-width: 100%;
     }
 
     .news-content {

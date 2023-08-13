@@ -15,7 +15,7 @@ import { Notyf } from "notyf";
 import "notyf/notyf.min.css";
 
 import defaultRoutes from "@/router/default";
-import { getDataServerAddress, fetchThings, getMainDomain } from "@/utils/fetch";
+import { fetchThings, getDataServerAddress, getMainDomain } from "@/utils/fetch";
 import EventRoutes from "@/router/event";
 
 import Event from "@/views/Event";
@@ -23,7 +23,7 @@ import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp";
 import SharedRoutes from "@/router/shared-routes";
 import AuthRoutes from "@/router/auth-redirects";
 import { ReactiveRoot } from "@/utils/reactive";
-import { authenticateWithToken, setAuthNext } from "@/utils/auth";
+import { authenticateWithToken, getAuthNext, setAuthNext } from "@/utils/auth";
 import NotFoundContent from "@/views/sub-views/NotFoundContent";
 
 // eslint-disable-next-line prefer-const
@@ -58,6 +58,8 @@ const socket = io(getDataServerAddress(), { transports: ["websocket", "polling"]
 Vue.use(VueSocketIOExt, socket, { store });
 
 Vue.config.productionTip = false;
+
+Vue.config.devtools = ["local", "staging"].includes(import.meta.env.VITE_DEPLOY_MODE);
 
 Vue.component("v-style", {
     render: function (createElement) {
@@ -126,11 +128,12 @@ if (subdomain) {
 
 const router = new VueRouter({
     mode: "history",
-    base: process.env.BASE_URL,
+    base: import.meta.env.BASE_URL,
     routes
 });
 
 let preloadAuthCheckRequired = false;
+let preloadAuthReturn = null;
 
 // TODO: this doesn't really work very well nor work on the first run
 router.beforeEach((to, from, next) => {
@@ -139,24 +142,25 @@ router.beforeEach((to, from, next) => {
         if (to.meta.requiresAuth) {
             // authenticating!
 
-            setAuthNext(app?.$root, to.fullPath);
+            getAuthNext(app); // empty auth
 
             if (app && !app.auth.user) {
-                return next({ path: "/login" });
+                setAuthNext(app?.$root, to.fullPath);
+                return router.push({ path: "/login", query: { return: to.fullPath } });
                 // TODO: to.fullPath can be used for return (set in localstorage or something  /redirect?to=)
             } else {
                 console.warn("Need to check if authenticated, but the app hasn't loaded yet.");
                 preloadAuthCheckRequired = true;
+                preloadAuthReturn = to.fullPath;
                 // console.log(document.cookie);
                 // return next({ path: "/login" });
             }
         }
-
-        next();
     } catch (e) {
         console.error("Vue navigation error", e);
-        next();
     }
+
+    next();
 });
 
 
@@ -173,13 +177,10 @@ app = new Vue({
             // handled by vuex
             console.log("[socket]", "data_update", d);
         },
-        server_rebuilding(x) {
-            console.log("rebuilding", x);
-            this.isRebuilding = x;
-        },
-        high_error_rate(x) {
-            console.log("high error rate", x);
-            this.highErrorRate = x;
+        website_flags(flags) {
+            console.log("website_flags", flags);
+            this.isRebuilding = flags.includes("server_rebuilding");
+            this.highErrorRate = flags.includes("high_error_rate");
         }
     },
     metaInfo: {
@@ -218,6 +219,7 @@ app = new Vue({
         }
 
         setInterval(() => app.$store.commit("executeRequestBuffer"), 100);
+        setInterval(() => app.$store.commit("executeUpdateBuffer"), 50);
 
         try {
             if (localStorage.getItem("draft-notes")) {
@@ -237,7 +239,14 @@ app = new Vue({
         if (!this.auth.user && preloadAuthCheckRequired) {
             console.warn("App loaded, recognising preload check is required and we're not authenticated. Sending to login");
             preloadAuthCheckRequired = false;
-            this.$router.push("/login");
+            if (preloadAuthReturn) setAuthNext(app, preloadAuthReturn);
+
+            this.$router.push({
+                path: "/login",
+                query: {
+                    return: getAuthNext(app, true)
+                }
+            });
         }
     },
     computed: {
@@ -245,7 +254,7 @@ app = new Vue({
             return this.$store.getters.thing(`subdomain-${subdomain}`);
         },
         version() {
-            return process.env?.VUE_APP_SLMNGG_VERSION;
+            return import.meta.env?.VITE_SLMNGG_VERSION;
         },
         authUser() {
             if (!this.auth.user?.airtableID) return null;

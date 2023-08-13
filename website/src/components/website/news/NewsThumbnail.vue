@@ -1,5 +1,8 @@
 <template>
     <div class="news-thumbnail default-thing" :style="border">
+        <div class="icons">
+            <i class="fa-fw fas fa-external-link" v-if="item.redirect_url"></i>
+        </div>
         <div class="news-custom-thumbnail w-100 bg-center" v-if="customThumbnail" :style="customThumbnail"></div>
         <div class="news-generated-thumbnail w-100 flex-center" v-else :style="{ backgroundColor: generatedThumbnail.backgroundColor }">
             <div class="news-generated-thumbnail-logo bg-center" :style="{backgroundImage: generatedThumbnail.backgroundImage}"></div>
@@ -8,7 +11,7 @@
 </template>
 
 <script>
-import { resizedImage } from "@/utils/images";
+import { bg, resizedImage } from "@/utils/images";
 
 export default {
     name: "NewsThumbnail",
@@ -26,10 +29,10 @@ export default {
                 if (this.item.embed && this.item.use_embed_thumbnail) {
                     const vodURL = new URL(this.item.embed);
                     if (["www.youtube.com", "youtube.com"].includes(vodURL.host)) {
-                        return { backgroundImage: `url(https://i.ytimg.com/vi/${vodURL.searchParams.get("v")}/maxresdefault.jpg)` };
+                        return bg(`https://i.ytimg.com/vi/${vodURL.searchParams.get("v")}/maxresdefault.jpg`);
                     }
                     if (["youtu.be"].includes(vodURL.host)) {
-                        return { backgroundImage: `url(https://i.ytimg.com/vi/${vodURL.pathname.slice(1)}/maxresdefault.jpg)` };
+                        return bg(`https://i.ytimg.com/vi/${vodURL.pathname.slice(1)}/maxresdefault.jpg`);
                     }
                 }
                 return null;
@@ -75,5 +78,20 @@ export default {
     .news-generated-thumbnail-logo {
         width: calc(100% - 16px);
         height: calc(100% - 24px);
+    }
+
+    .icons {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: .5em .25em;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .icons i {
+        color: white;
+        text-shadow: 0 0 5px black;
     }
 </style>

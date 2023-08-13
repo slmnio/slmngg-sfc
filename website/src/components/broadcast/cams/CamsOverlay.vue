@@ -2,7 +2,7 @@
     <div class="cams-overlay">
         <transition name="slide-in">
             <div class="team-cams" v-show="showCams">
-                <TeamCamsGroup :style="{ order: match.flip_teams ? +!ti : ti }" v-for="(team, ti) in teams" v-bind:key="team.id"
+                <TeamCamsGroup :style="{ order: match.flip_teams ? +!ti : ti }" v-for="(team, ti) in teams" :key="team.id"
                                :team="team" :guests="guests[ti]" :params="camParams" :event="broadcast && broadcast.event"
                                :relay-prefix="relayPrefix" :ti="match.flip_teams ? +!ti : ti" :disable-cams="disable" />
             </div>

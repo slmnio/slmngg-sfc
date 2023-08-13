@@ -1,7 +1,7 @@
 <template>
     <GenericOverlay class="staff-overlay" :title="title || 'Staff'">
         <div class="staff-holder">
-            <div class="staff-name m-2" v-for="person in staff" v-bind:key="person">
+            <div class="staff-name m-2" v-for="person in staff" :key="person">
                 {{ person }}
             </div>
         </div>

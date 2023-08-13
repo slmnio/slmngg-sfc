@@ -3,7 +3,7 @@
         <div class="main-content row">
             <div class="center-holder col-9">
                 <div class="maps-holder mt-1" v-if="match.maps && showMatchMaps">
-                    <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="_theme" v-bind:key="map.id" :show-banned-maps="showMapBans"/>
+                    <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="_theme" :key="map.id" :show-banned-maps="showMapBans"/>
                 </div>
 
                 <div class="special-event-notice" v-if="match.special_event">
@@ -12,7 +12,7 @@
                 </div>
 
                 <div class="team-holder f-row mb-2">
-                    <div class="team f-col w-50 mt-2" v-for="team in match.teams" v-bind:key="team.id">
+                    <div class="team f-col w-50 mt-2" v-for="team in match.teams" :key="team.id">
                         <div :style="theme(team)" class="team-header flex-center f-col default-thing">
                             <div class="team-code">{{ team.code }}</div>
                             <div class="team-overlay-text">{{ team.small_overlay_text }}</div>
@@ -20,7 +20,7 @@
                             <router-link :to="url('team', team, match.event)" class="team-name">{{ team.name }}</router-link>
                         </div>
                         <div class="team-players f-col p-1" v-if="showRosters">
-                            <div class="team-player" v-for="player in showLimitedPlayers(team) ? team.limited_players : team.players" v-bind:key="player.id">
+                            <div class="team-player" v-for="player in showLimitedPlayers(team) ? team.limited_players : team.players" :key="player.id">
                                 <div class="player-info player-name flex-center">
                                     <div class="player-role-holder player-icon-holder flex-center" v-if="player.role">
                                         <div class="player-role" v-html="getRoleSVG(player.role)"></div>
@@ -39,38 +39,42 @@
                     </div>
                 </div>
                 <div class="team-holder f-row mb-2" v-if="showManagers">
-                    <div class="team f-col w-50" v-for="team in match.teams" v-bind:key="team.id">
+                    <div class="team f-col w-50" v-for="team in match.teams" :key="team.id">
                         <div class="team-players team-managers f-col p-1">
-                            <div class="team-player" v-for="player in getTeamStaff(team)" v-bind:key="player.id">
+                            <div class="team-player" v-for="player in getTeamStaff(team)" :key="player.id">
                                 <div class="player-info player-name flex-center">
                                     <div class="player-role-holder player-icon-holder">
-                                        <div v-for="role in player.is" v-bind:key="role" class="player-role" v-html="getRoleSVG(role)" v-b-tooltip="role"></div>
+                                        <div v-for="role in player.is" :key="role" class="player-role" v-html="getRoleSVG(role)" v-b-tooltip="role"></div>
                                         <div v-if="!player.is.length" class="player-role" v-html="getRoleSVG('Staff')" v-b-tooltip="'Team staff'"></div>
                                     </div>
                                     <router-link class="ct-active" :to="url('player', player)">{{ player.name }} <i class="fas fa-badge-check fa-fw" title="REAL" v-if="player.verified"></i></router-link>
                                 </div>
                                 <div class="player-info player-dtag" v-if="showPlayerInfo && player.discord_tag">
-                                    <i class="fab fa-fw fa-discord player-icon-holder"></i> {{ player.discord_tag }}
+                                    <i class="fab fa-fw fa-discord player-icon-holder"></i> <CopyTextButton>{{player.discord_tag}}</CopyTextButton>
                                 </div>
                                 <div class="player-info player-btag" v-if="showPlayerInfo && player.battletag">
-                                    <i class="fab fa-fw fa-battle-net player-icon-holder"></i> {{ player.battletag }}
+                                    <i class="fab fa-fw fa-battle-net player-icon-holder"></i> <CopyTextButton>{{player.battletag}}</CopyTextButton>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="prev-matches-holder d-flex mt-2" v-if="showMatchHistory">
-                    <div class="team-prev-wrapper w-50" v-for="team in match.teams" v-bind:key="team.id">
-                        <PreviousMatch v-for="match in teamMatches(team)" :match="match" :team="team" v-bind:key="match.id" />
+                    <div class="team-prev-wrapper w-50" v-for="team in match.teams" :key="team.id">
+                        <PreviousMatch v-for="match in teamMatches(team)" :match="match" :team="team" :key="match.id" />
                     </div>
                 </div>
+
+                <bracket-implications class="bracket-implications mt-3" :match="match" link-to-detailed-match
+                                      v-if="showImplications && match.brackets"></bracket-implications>
+
                 <div class="show-notes mt-3" v-if="showShowNotes && match.show_notes">
                     <h2>Show notes</h2>
                     <Markdown :markdown="match.show_notes"/>
                 </div>
             </div>
             <div class="right-holder col-3">
-                <router-link :to="url('event', match.event)">
+                <router-link v-if="match.event" :to="url('event', match.event)">
                     <ThemeLogo class="top-right-logo mb-3" logo-size="w-200" :theme="_theme" border-width="8"/>
                 </router-link>
                 <div class="info-block">
@@ -79,6 +83,11 @@
                     :style="theme(match.event)">
                         <i class="fa-fw fas fa-external-link"></i>
                         See match page
+                    </router-link>
+                    <router-link :to="`/match/${match.id}/editor`" v-if="matchEditable" class="btn btn-block border-transparent btn-primary text-dark-low"
+                    :style="theme(match.event)">
+                        <i class="fa-fw fas fa-pencil"></i>
+                        Match editor
                     </router-link>
 
                     <div :class="`mt-3 btn btn-block btn-${showRosters ? 'light' : 'secondary'} mb-2`" v-on:click="showRosters = !showRosters">
@@ -101,6 +110,9 @@
                     </div>
                     <div v-if="match.maps" :class="`btn btn-block btn-${showMatchMaps ? 'light' : 'secondary'} mb-2`" v-on:click="showMatchMaps = !showMatchMaps">
                         <i class="fa-fw fas fa-map"></i> Match maps
+                    </div>
+                    <div v-if="match.brackets" :class="`btn btn-block btn-${showImplications ? 'light' : 'secondary'}`" v-on:click="showImplications = !showImplications">
+                        <i class="fa-fw fas fa-sitemap"></i> Bracket implications
                     </div>
                     <div v-if="match.maps && showMatchMaps" :class="`btn btn-block btn-${showMapBans ? 'light' : 'secondary'} mb-2`" v-on:click="showMapBans = !showMapBans">
                         <i class="fa-fw fas fa-ban"></i> Show map bans
@@ -143,10 +155,17 @@
                     <stat :match="match" data="vod" :external-link="true">VOD Link</stat>
                     <stat :match="match" data="clean_feed" :external-link="true">Clean Feed</stat>
                     <stat :match="match" data="first_to">First to</stat>
-                    <stat :override="relGroup.items" v-for="relGroup in playerRelationshipGroups" v-bind:key="relGroup.meta.singular_name" :players="true" :show-tally="relGroup.meta.singular_name === 'Observer'">
+                    <stat :override="relGroup.items" v-for="relGroup in playerRelationshipGroups" :key="relGroup.meta.singular_name" :players="true" :show-tally="relGroup.meta.singular_name === 'Observer'">
                         {{ relGroup.items.length === 1 ? relGroup.meta.singular_name : relGroup.meta.plural_name }}
                     </stat>
                     <stat :match="match" data="replay_codes" :raw="true" :format="(t) => t[0].replace(/\n/g, '<br>')">Replay codes</stat>
+                    <stat :match="match">
+                        Match Thumbnails
+                        <template v-slot:content class="d-inline">
+                            <a class="ct-active" :href="matchThumbnailURL(match, 720)"  rel="nofollow" target="_blank">720p</a>,
+                            <a class="ct-active" :href="matchThumbnailURL(match, 1080)"  rel="nofollow" target="_blank">1080p</a>
+                        </template>
+                    </stat>
                 </div>
             </div>
         </div>
@@ -164,10 +183,14 @@ import DetailedMatchStat from "@/components/website/match/DetailedMatchStat";
 import Markdown from "@/components/website/Markdown";
 import { resizedImage, resizedImageNoWrap } from "@/utils/images";
 import CopyTextButton from "@/components/website/CopyTextButton";
+import BracketImplications from "@/components/website/dashboard/BracketImplications.vue";
+import { getDataServerAddress } from "@/utils/fetch";
+import { canEditMatch } from "@/utils/client-action-permissions";
+import { isAuthenticated } from "@/utils/auth";
 
 export default {
     name: "DetailedMatch",
-    components: { CopyTextButton, Markdown, PreviousMatch, ThemeLogo, MapDisplay, stat: DetailedMatchStat },
+    components: { BracketImplications, CopyTextButton, Markdown, PreviousMatch, ThemeLogo, MapDisplay, stat: DetailedMatchStat },
     props: ["id"],
     data: () => ({
         showPlayerInfo: false,
@@ -180,7 +203,8 @@ export default {
         showMapBans: true,
         showVod: false,
 
-        showManagers: false
+        showManagers: false,
+        showImplications: true
     }),
     methods: {
         url,
@@ -221,6 +245,10 @@ export default {
         },
         showLimitedPlayers(team) {
             return ((team.players || [])?.length === 0) && (team.limited_players || []).length !== 0;
+        },
+        matchThumbnailURL(match, size) {
+            const dataServerURL = getDataServerAddress();
+            return `${dataServerURL}/match.png?id=${match.id}&size=${size || "720"}&padding=30`;
         }
     },
     computed: {
@@ -296,6 +324,10 @@ export default {
             if (groups[undefined]) return [];
 
             return Object.values(groups);
+        },
+        matchEditable() {
+            if (!isAuthenticated(this.$root)) return false;
+            return canEditMatch(this.$root.auth?.user, { event: this.match?.event, match: this.match });
         }
     },
     metaInfo() {
@@ -402,5 +434,9 @@ export default {
 
     a.btn-primary.text-dark-low:focus, a.btn-primary.text-dark-low:hover {
         color: #121416
+    }
+
+    .bracket-implications {
+        border: 1px solid #454d55;
     }
 </style>

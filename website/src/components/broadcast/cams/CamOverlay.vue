@@ -1,6 +1,6 @@
 <template>
     <div class="cam-overlay">
-        <div class="guest" v-bind:class="{ full }" v-if="shouldShowCam" v-show="alwaysShowBox || childCameraIsOn" :style="theme">
+        <div class="guest" :class="{ full }" v-if="shouldShowCam" v-show="alwaysShowBox || childCameraIsOn" :style="theme">
             <CasterCam class="team-cam" :guest="activeGuest" :extra-params="camParams" :disable-video="false"
                        :event="broadcast && broadcast.event" :relay-prefix="relayPrefix" :team="activeTeam"
              @cam_visible="(isVisible) => childCameraIsOn = isVisible"/>
@@ -149,19 +149,18 @@ export default {
 <style scoped>
     .guest {
         position: absolute;
-        bottom: 123px;
-        left: 494px;
+        bottom: 222px;
+        left: 160px;
         height: 151px;
-        width: 220px;
-        transform: rotate(-4deg) skewX(-16.5deg);
-        border-radius: 4px;
+        width: 249px;
+        transform: rotate(-3.7deg) skewX(357deg);
+        border-radius: 8px;
         overflow: hidden;
         border-bottom: 6px solid transparent;
     }
     .guest >>> .caster-cam-wrapper {
-        transform: skewX(12.5deg) translateX(-15px) rotate(4deg) scale(1.1);
         height: 100%;
-        width: calc(100% + 30px);
+        width: 100%;
     }
     .cam-overlay {
         /* Margin: 0.5 */

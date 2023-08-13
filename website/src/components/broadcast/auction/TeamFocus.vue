@@ -1,11 +1,12 @@
 <template>
     <div class="team-focus p-3" v-if="team">
-        <ThemeLogo v-bind:class="{'leading': isLeading }" class="top-logo w-100" :theme="team.theme"/>
+        <ThemeLogo :class="{'leading': isLeading }" class="top-logo w-100" :theme="team.theme"/>
         <div class="title pt-3 font-weight-bold text-center">{{ team.name }}</div>
 
         <div class="player-list">
-            <div class="player" v-bind:class="{empty: player.empty, latest: player.latest}" v-for="player in players" v-bind:key="player.id"  :style="(player.latest ? teamBG : {})">
+            <div class="player" :class="{empty: player.empty, latest: player.latest}" v-for="player in players" :key="player.id"  :style="(player.latest ? teamBG : {})">
                 <div class="player-internal" v-if="!player.empty" >
+                    <span class="player-role" v-html="getRoleSVG(player.role)"></span>
                     <span class="player-name">{{ player.name }}</span>
                     <span class="player-money" v-if="player.auction_price">{{ money(player.auction_price) }}</span>
                 </div>
@@ -20,7 +21,7 @@
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { cleanID, getAuctionMax, money } from "@/utils/content-utils";
+import { cleanID, getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
 import MoneyBar from "@/components/broadcast/auction/MoneyBar";
 
 
@@ -28,7 +29,7 @@ export default {
     name: "TeamFocus",
     components: { MoneyBar, ThemeLogo },
     props: ["team", "leading", "auctionSettings"],
-    methods: { money },
+    methods: { money, getRoleSVG },
     computed: {
         players() {
             const max = (this.auctionSettings?.each_team || getAuctionMax());
@@ -42,7 +43,7 @@ export default {
         },
         isLeading() {
             if (!this.leading) return false;
-            return cleanID(this.leading.team.id) === this.team.id;
+            return cleanID(this.leading.teamID) === this.team?.id;
         }
     }
 };
@@ -87,5 +88,12 @@ export default {
 
 .player-internal {
     display: flex;
+}
+
+.player-role {
+    width: 36px;
+    height: 36px;
+    margin-right: 2px;
+    transform: translate(-2px, -4px);
 }
 </style>

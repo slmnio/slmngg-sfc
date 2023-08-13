@@ -1,38 +1,38 @@
 <template>
     <div>
         <div class="container">
-            <ContentRow v-if="accolades">
+            <ContentRow v-if="accolades" class="accolades">
                 <ContentThing :thing="accolade" type="event" :link-to="accolade.event" :theme="accolade.event && accolade.event.theme" v-for="accolade in accolades"
-                              v-bind:key="accolade.id" :show-logo="true" :text="accolade.player_text" />
+                              :key="accolade.id" :show-logo="true" :text="accolade.player_text" />
             </ContentRow>
             <ContentRow title="Owner of" v-if="ownedTeams">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in ownedTeams"
-                              :text="clarifyTeam(team)" v-bind:key="team.id" :show-logo="true" />
+                              :text="clarifyTeam(team)" :key="team.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Captain of" v-if="captainedTeams">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in captainedTeams"
-                              :text="clarifyTeam(team)" v-bind:key="team.id" :show-logo="true" />
+                              :text="clarifyTeam(team)" :key="team.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Team staff for" v-if="teamStaff">
               <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teamStaff"
-                            :text="clarifyTeam(team)" v-bind:key="team.id" :show-logo="true" />
+                            :text="clarifyTeam(team)" :key="team.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Player for" v-if="teams">
                 <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teams"
-                              :text="clarifyTeam(team)" v-bind:key="team.id" :show-logo="true" />
+                              :text="clarifyTeam(team)" :key="team.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Event staff for" v-if="eventStaff">
                 <ContentThing :thing="event" type="event" :theme="event.theme" v-for="event in eventStaff"
-                              v-bind:key="event.id" :show-logo="true" />
+                              :key="event.id" :show-logo="true" />
             </ContentRow>
             <ContentRow title="Caster for" v-if="castedEvents">
                 <ContentThing :thing="event" type="event" :theme="event.theme" v-for="event in castedEvents"
-                              v-bind:key="event.id" :show-logo="true" />
+                              :key="event.id" :show-logo="true" />
             </ContentRow>
-            <ContentRow :title="group.meta.player_text" v-for="group in mainPlayerRelationships" v-bind:key="group.meta.singular_name">
+            <ContentRow :title="group.meta.player_text" v-for="group in mainPlayerRelationships" :key="group.meta.singular_name">
                 <ContentThing
                     v-for="item in group.items"
-                    v-bind:key="item.item.id"
+                    :key="item.item.id"
                     :thing="item.item"
                     :type="item.type"
                     :theme="item.item.theme"
@@ -61,9 +61,9 @@ export default {
 
             return [
                 // team things
-                ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => e.accolades).filter(e => !!e)) : []),
+                ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => (e.accolades || []).filter(a => a?.show_for_players)).filter(Boolean)) : []),
                 ...(this.player.accolades ? this.player.accolades : [])
-            ];
+            ].filter(accolade => !accolade.trophy_tier).sort((a, b) => sortEvents(a?.event, b?.event));
         },
         teams() {
             if (!this.player?.member_of) return null;
@@ -142,5 +142,7 @@ export default {
 </script>
 
 <style scoped>
-
+    .content-row.accolades {
+        font-size: 1.1em;
+    }
 </style>

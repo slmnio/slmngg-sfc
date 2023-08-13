@@ -1,5 +1,5 @@
 <template>
-    <div class="bid-focus-team d-flex" :style="canBid ? teamBG : {...dark, opacity: 0.25 }" v-bind:class="{ leading: isLeading }">
+    <div class="bid-focus-team d-flex" :style="canBid ? teamBG : {...dark, opacity: 0.25 }" :class="{ leading: isLeading }">
         <div class="team-logo flex-center">
             <div class="logo-inner bg-center" :style="teamLogo"></div>
         </div>
@@ -28,13 +28,13 @@ export default {
         },
         isLeading() {
             if (!this.leading) return false;
-            return cleanID(this.leading.team.id) === this.team.id;
+            return cleanID(this.leading.teamID) === this.team.id;
         },
         canBid() {
-            if (this.auctionSettings?.each_team <= this.team?.players?.length) return false;
+            if ((this.auctionSettings?.each_team || 7) <= this.team?.players?.length) return false;
             // TODO: add something about the amount of players they have
-            if (!this.leading?.team) return true;
-            if (cleanID(this.leading.team.id) === this.team.id && this.leading.amount === this.team.balance) return true;
+            if (!this.leading?.teamID) return true;
+            if (cleanID(this.leading.teamID) === this.team.id && this.leading.amount === this.team.balance) return true;
             return (this.leading.amount + 1) <= this.team.balance;
         },
         dark() {

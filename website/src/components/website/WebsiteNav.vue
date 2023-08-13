@@ -16,8 +16,9 @@
         <WebsiteNavBanner v-if="siteMode === 'staging'" class="bg-warning text-dark">
             <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-dark">Beta development version:</a></b> things may break. Use <a href="https://slmn.gg" class="text-dark font-weight-bold">slmn.gg</a> for the latest stable update.
         </WebsiteNavBanner>
-        <WebsiteNavBanner v-if="siteMode === 'local'" class="bg-primary text-light">
-            SLMN.GG is running in local development mode.
+        <WebsiteNavBanner v-if="siteMode === 'local'" class="text-light bg-primary">
+            <i v-if="dataServerMode !== 'local'" class="fas fa-exclamation-triangle fa-fw mr-1"></i>
+            SLMN.GG is running in local development mode<strong v-if="dataServerMode !== 'local'"> but not using a local data server</strong>.
         </WebsiteNavBanner>
 <!--       example: <WebsiteNavBanner class="bg-success" v-if="$socket.connected">Connected to the data server for live data updates!</WebsiteNavBanner>-->
 
@@ -46,8 +47,8 @@
                     <router-link active-class="active" v-if="minisiteSettings && minisiteSettings.standings" class="nav-link" to="/standings">Standings</router-link>
                     <div class="nav-divider" v-if="navbarEvents.length"></div>
 
-                    <router-link v-for="event in navbarEvents" v-bind:key="event.id"
-                                 active-class="active"
+                    <router-link v-for="event in navbarEvents" :key="event.id"
+                                 active-class="active" :class="{'active': event._original_data_id === activeEventID }"
                                  class="nav-link" :to="event._link" :exact="event.__id === minisite.__id">
                         {{ event.navbar_short || event.short || event.series_subtitle || event.name }}</router-link>
 <!--                    <router-link :to="'/'" v-if="minisite.navbar_short" active-class="active" exact class="nav-link">{{ minisite.navbar_short }}</router-link>-->
@@ -76,7 +77,7 @@
 
         <div class="live-matches flex-wrap flex-center" v-if="liveMatches.length">
             <div class="live-matches-text">🔴 LIVE</div>
-            <NavLiveMatch v-for="match in liveMatches" :match="match" v-bind:key="match.id" />
+            <NavLiveMatch v-for="match in liveMatches" :match="match" :key="match.id" />
         </div>
 
         <b-modal ref="timezone-swapper-modal" id="timezone-swapper-modal" title="Timezone swapper" hide-footer>
@@ -123,7 +124,7 @@ export default {
     directives: {
         BModal: VBModal
     },
-    props: ["minisite"],
+    props: ["minisite", "activeEventID"],
     data: () => ({
         pageNoLongerNew: false,
         resizeObserver: null,
@@ -140,14 +141,17 @@ export default {
                         theme: ReactiveThing("theme")
                     })
                 })
-            }).matches || [];
+            })?.matches || [];
         },
         slmnggDomain() {
             return getMainDomain(this.minisite?.subdomain);
         },
         siteMode() {
-            // console.log("env", process.env);
-            return process.env.VUE_APP_DEPLOY_MODE || process.env.NODE_ENV;
+            return import.meta.env.VITE_DEPLOY_MODE || import.meta.env.NODE_ENV;
+        },
+        dataServerMode() {
+            const dataServerURL = new URL(import.meta.env.VITE_DATA_SERVER);
+            return ["localhost", "127.0.0.1"].includes(dataServerURL.hostname) ? "local" : "remote";
         },
         navbarEvents() {
             if (!this.minisite?.id) return [];

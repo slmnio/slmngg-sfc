@@ -1,19 +1,24 @@
 <template>
     <div class="dashboard-clock bg-dark px-2" @click="() => use12hr = !use12hr">
         <div class="title">{{ title }}</div>
-        <div class="clock">{{  text  }}</div>
+        <div class="clock">{{ text }}</div>
     </div>
 </template>
 
 <script>
 import spacetime from "spacetime";
+import { create } from "timesync";
+
 
 export default {
     name: "DashboardClock",
     props: ["title", "timezone", "clockType"],
     data: () => ({
-        now: new Date(),
-        use12hr: false
+        use12hr: false,
+        ts: create({
+            server: "https://api.syncer.live/api/time"
+        }),
+        now: new Date()
     }),
     computed: {
         time() {
@@ -30,8 +35,8 @@ export default {
     },
     mounted() {
         setInterval(() => {
-            this.now = new Date();
-        }, 1000);
+            this.now = this.ts.now();
+        }, 50);
     }
 };
 </script>
@@ -46,6 +51,7 @@ export default {
 
         padding: 4px;
         height: 48px;
+        margin: 0.25rem;
     }
     .title {
         font-size: 0.9em;

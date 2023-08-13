@@ -1,12 +1,12 @@
 <template>
-    <div class="standings" v-if="standings && standings.standings && standings.standings.length">
+    <div class="standings" v-if="standings && standings.standings && standings.standings.length" :style="useAutoFontSize ? { 'fontSize': autoFontSize} : {}">
 <!--        <div>{{ event.name }} / {{ stage }} / {{ allMatches.length }} -> {{ stageMatches.length }} ({{ teams.length }} teams)</div>-->
         <h3 class="top-standings-name text-center d-md-none">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</h3>
         <div class="standings-header d-flex align-items-center">
             <div class="team-name flex-grow-1 text-left d-none d-md-flex">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</div>
             <div class="team-name team-code flex-grow-1 text-left d-md-none"></div>
             <div class="team-stats d-flex">
-                <div class="team-stat text-center" v-for="col in showColumns" v-bind:key="col" v-b-tooltip="getColumnText(col).title">
+                <div class="team-stat text-center" v-for="col in showColumns" :key="col" v-b-tooltip="getColumnText(col).title">
                     {{ getColumnText(col).header }}
                 </div>
 <!--                <div class="team-stat text-center">Matches</div>-->
@@ -17,14 +17,14 @@
             </div>
         </div>
         <div class="teams">
-            <div class="team-group" v-for="(group, i) in standings.standings" v-bind:key="i">
-                <div class="team" v-for="team in group" v-bind:key="team.id">
+            <div class="team-group" v-for="(group, i) in standings.standings" :key="i">
+                <div class="team" v-for="team in group" :key="team.id">
                     <StandingsTeam :team="team" :tie-text="tieText" :showColumns="showColumns" icon-size="w-60" :use-codes="useCodes" />
                 </div>
             </div>
         </div>
         <div class="warnings flex-center flex-column mt-2 mx-2" v-if="standings && standings.warnings.length">
-            <div class="warning bg-warning text-dark p-1 px-2 mb-1" v-for="warn in standings.warnings" v-bind:key="warn">{{ warn }}</div>
+            <div class="warning bg-warning text-dark p-1 px-2 mb-1" v-for="warn in standings.warnings" :key="warn">{{ warn }}</div>
         </div>
     </div>
 </template>
@@ -33,6 +33,7 @@
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import StandingsTeam from "@/components/broadcast/StandingsTeam";
 import { sortTeamsIntoStandings } from "@/utils/scenarios";
+import { cleanID } from "@/utils/content-utils";
 
 
 function avg(arr) {
@@ -52,7 +53,8 @@ export default {
         tieText: String,
         showMapDiff: Boolean,
         useCodes: Boolean,
-        overrideShowColumns: Array
+        overrideShowColumns: Array,
+        useAutoFontSize: Boolean
     },
     components: { StandingsTeam },
     methods: {
@@ -83,6 +85,15 @@ export default {
         }
     },
     computed: {
+        autoFontSize() {
+            const teams = this.standings?.standings;
+            if (!teams) return "";
+
+            function clamp(number, min, max) {
+                return Math.max(min, Math.min(number, max));
+            }
+            return clamp(380 / ((teams?.length || 0) + 1.2), 16, 46) + "px";
+        },
         allMatches() {
             if (!this.event || !this.event.matches) return [];
             return ReactiveArray("matches", {
@@ -115,10 +126,10 @@ export default {
             // return this.settings?.useOMW && this.stageMatches.every(m => [m.score_1, m.score_2].some(s => s === m.first_to));
         },
         standingsSort() {
-            return this.standingsSettings?.sort;
+            return this.standingsSettings?.sort || [];
         },
         standingsSettings() {
-            return (this.blocks?.standings || []).find(s => s.group === this.stage);
+            return (this.blocks?.standings || []).find(s => s.group?.toLowerCase() === this.stage.toLowerCase() || s.key?.toLowerCase() === this.stage.toLowerCase());
         },
         showColumns() {
             return this.overrideShowColumns || this.standingsSettings?.show || [
@@ -179,7 +190,7 @@ export default {
                 // }
 
 
-                if (this.settings && this.settings.points) team.standings.points = team.extra_points || 0;
+                if (this.settings && this.settings.points) team.standings.points = 0;
                 // get matches here
                 this.stageMatches.forEach(match => {
                     if (!match.teams) return;
@@ -207,7 +218,7 @@ export default {
                     if (match.maps?.length) {
                         match.maps.forEach(map => {
                             if (!map.id) return;
-                            if (map.score_1 === undefined || map.score_2 === undefined) return;
+                            if (map.score_1 == null || map.score_2 == null) return;
                             const mapScores = [map.score_1, map.score_2];
                             team.standings.map_round_wins += mapScores[teamIndex];
                             team.standings.map_round_losses += mapScores[+!teamIndex];
@@ -288,6 +299,10 @@ export default {
                 if (a.standings.map_losses < b.standings.map_losses) return -1;
             };
 
+            if (this.standingsSettings?.hide?.length) {
+                teams = teams.filter(team => !this.standingsSettings.hide.find(id => cleanID(id) === cleanID(team.id)));
+            }
+
             teams = teams.sort(sortFunction);
 
             // console.log("[standings teams]", teams);
@@ -297,11 +312,12 @@ export default {
             });
             // console.log("[new standings]", standings);
 
-            let rank = 1; let display = 1;
+            let rank = 1; let display = 1; let teamNum = 1;
             standings.forEach(group => {
                 group.forEach((team, i) => {
                     team.standings.rank = display;
                     team.standings.tie_show_number = i === 0;
+                    team.standings.teamNum = teamNum++;
 
                     if (standings.length === 1) {
                         team.standings.tie_show_number = false;

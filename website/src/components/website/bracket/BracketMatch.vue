@@ -1,23 +1,26 @@
 <template>
     <router-link :to="url('match', this.match)" class="bracket-match no-link-style" v-if="!!match"
-                 v-bind:class="{'hover': hover, 'forfeit': match && match.forfeit }"
+                 :class="{'hover': hover, 'forfeit': match && match.forfeit }"
                  @mouseover.native="matchHover" @mouseleave.native="matchEmpty">
         <div class="match-name d-none">{{ match && match.name }}</div>
-        <div class="match-number" v-bind:class="{'lowlight': lowlight}" v-if="matchNumber">{{ matchNumber }}</div>
-        <div class="match-time" v-bind:class="{'lowlight': lowlight}" v-if="showTimes && friendlyStartTime">{{ friendlyStartTime }}</div>
+        <div class="match-number" :class="{'lowlight': lowlight}" v-if="matchNumber">{{ matchNumber }}</div>
+        <div class="match-extra-info">
+            <div class="match-stream" :class="{'lowlight': lowlight}" v-if="showBroadcasts && match.stream_code">{{ match.stream_code }} stream</div>
+            <div class="match-time" :class="{'lowlight': lowlight}" v-if="showTimes && friendlyStartTime">{{ friendlyStartTime }}</div>
+        </div>
         <div class="match-teams">
             <BracketTeam v-for="(team, i) in teams"
                          :team="team.id && team"
                          :text="team.dummy && team.text"
                          :short="team.dummy && team.short"
                          :empty="team._empty"
-                         v-bind:key="team.id"
+                         :key="team.id"
                          :score="displayScores[i]" :win="scores[i] === match.first_to"
             />
         </div>
         <transition name="fade">
             <div class="match-highlight-text" v-if="matchHighlight"
-                 :data-side="matchHighlight.side" v-bind:class="{ 'feeder': matchHighlight.feeder }">
+                 :data-side="matchHighlight.side" :class="{ 'feeder': matchHighlight.feeder }">
                 {{ matchHighlight.text }}
                 <i class="fas fa-chevron-down" v-if="matchHighlight.feeder && matchHighlight.text === 'Loser'"></i>
                 <i class="fas fa-chevron-right" v-if="matchHighlight.feeder && matchHighlight.text !== 'Loser'"></i>
@@ -33,7 +36,7 @@
                          :text="team.dummy && team.text"
                          :short="team.dummy && team.short"
                          :empty="team._empty"
-                         v-bind:key="team.id"
+                         :key="team.id"
                          :score="displayScores[i]"
             />
         </div>
@@ -49,7 +52,7 @@ import spacetime from "spacetime";
 export default {
     name: "BracketMatch",
     components: { BracketTeam },
-    props: ["match", "showTimes"],
+    props: ["match", "showTimes", "showBroadcasts", "customTimezone"],
     data: () => ({
         hover: false
     }),
@@ -112,11 +115,10 @@ export default {
             return dummies;
         },
         generateDummyText(match) {
-            console.log("dummy text", match);
             if (match?.teams?.length === 2 && match.teams.every(team => team.code)) {
                 return `${match._m} of ${match.teams.map(team => team.code).join(" vs ")}`;
             }
-            return `${match._m} M${match.side}`;
+            return `${match._m} M${(match.match_number || match.side)}`;
         }
     },
     computed: {
@@ -207,7 +209,7 @@ export default {
             return time.format(format);
         },
         activeTimezone() {
-            const stz = store.state.timezone;
+            const stz = this.customTimezone || store.state.timezone;
             if (!stz || stz === "local") return spacetime.now().timezone().name;
             return stz;
         }
@@ -217,12 +219,13 @@ export default {
 
 <style scoped>
     .bracket-match {
-        margin: 0.6em 0;
+        margin: 0.8em 0;
         position: relative;
-        border: .125em solid transparent;
+        /*border: .125em solid transparent;*/
+        outline: .125em solid transparent;
     }
     .bracket-match {
-        transition: border-color .15s ease;
+        transition: outline-color .15s ease;
     }
 
     .match-highlight-text {
@@ -262,35 +265,54 @@ export default {
         margin-top: .15em;
     }
 
-    .match-number, .match-time {
-        position: absolute;
+    .match-number, .match-extra-info > div {
         background: #333;
         text-align: center;
-        bottom: 100%;
-        font-size: 0.75em;
-        line-height: 1;
-        padding: 0 .3em;
-        padding-bottom: .3em;
+        padding: 0 .3em .3em;
         color: white;
         border: 2px solid transparent;
         border-bottom: none;
-        transition: opacity 150ms, border-color 150ms;
+        transition: opacity 150ms, outline-color 150ms;
+
+    }
+
+    .match-extra-info > div + div {
+        margin-left: 5px;
+    }
+
+    .match-extra-info {
+        position: absolute;
+        bottom: 100%;
+        line-height: 1;
+        font-size: 0.75em;
+        right: 0;
+
+        display: flex;
+        justify-content: flex-end;
     }
 
     .match-number {
+        position: absolute;
+        bottom: 100%;
         left: 0;
+        font-size: 0.75em;
+        line-height: 1;
+        border-bottom: none;
+        white-space: nowrap;
     }
-    .match-time {
-        right: 0;
+
+    .match-extra-info  .match-stream {
+        background-color: var(--win-background-color);
+        color: var(--win-color);
     }
 
     .bracket-match.hover,
     .bracket-match.hover .match-number,
-    .bracket-match.hover .match-time {
-        border-color:  rgba(255, 255, 255, 0.5);
+    .bracket-match.hover .match-extra-info > div {
+        outline-color:  rgba(255, 255, 255, 0.5);
     }
     .bracket-match:not(:hover) .match-number.lowlight,
-    .bracket-match:not(:hover) .match-time.lowlight {
+    .bracket-match:not(:hover) .match-extra-info > div.lowlight {
         opacity: 0.2;
     }
 </style>

@@ -58,6 +58,7 @@
 /**
  * @typedef {Object} AirtableUserData
  *
+ * @property {DirtyAirtableID} id
  * @property {string} name
  * @property {string?} pronunciation
  * @property {string?} pronouns
@@ -122,6 +123,3 @@
  * @returns {Promise<UpdateRecordResponse>}
  */
 
-/**
- * @typedef {'create'|'lock'|'resolve'|'cancel'} PredictionAction
- */

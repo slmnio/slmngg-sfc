@@ -1,7 +1,9 @@
 <template>
 <!--    <transition name="ingame-team-anim">-->
-        <div class="ingame-team-holder" v-if="loaded" v-bind:class="{'right': right, 'left': !right}">
-            <div class="ingame-team default-thing" :style="style" :key="team.id" :class="{ 'extend-map-icon': extendIcons && mapAttack }">
+        <ThemeTransition class="ingame-team-holder" v-if="loaded" :class="{'right': right, 'left': !right}" :duration="500"
+                         :key="`${team.id}-${right ? '1':'0'}`" :transitionKey="`${team.id}-${right ? '1':'0'}`" :use-fit-content="true"
+                         :active="active" :theme="_theme" :start="right ? 'left' : 'right'" :end="right ? 'right' : 'left'" clip-slot :clip-delay="500">
+            <div class="ingame-team default-thing clip-target" :style="style" :key="team.id" :class="{ 'extend-map-icon': extendIcons && mapAttack }">
                 <div class="texture-holder position-absolute w-100 h-100" v-if="texture">
                     <div class="ingame-texture">
                         <img :src="texture" alt="">
@@ -14,17 +16,19 @@
                         </span>
                     </transition>
                 </div>
-                <div class="flex-center team-name">
+                <Squeezable class="flex-center team-name" :align="right ? 'left' : 'right'">
                     <span class="industry-align team-sub-name" v-if="!codes">{{ team.name }}</span>
                     <span class="industry-align team-sub-subtitle" v-if="!codes && team.subtitle">{{ team.subtitle }}</span>
                     <span class="industry-align team-sub-code" v-if="codes">{{ team.code }}</span>
-                </div>
+                </Squeezable>
                 <div class="flex-center team-logo-holder flex-center" v-if="teamLogo">
                     <div class="team-logo bg-center" :style="teamLogo"></div>
                 </div>
                 <transition name="score">
                     <div class="flex-center team-score" v-if="!hideScores && !useDots">
-                        <span class="industry-align">{{ score || '0' }}</span>
+                        <transition name="fade" mode="out-in">
+                            <span class="industry-align" :key="score || '0'">{{ score || '0' }}</span>
+                        </transition>
                     </div>
                 </transition>
                 <transition name="score">
@@ -32,6 +36,7 @@
                         <div class="dot" v-for="(dot, i) in dots" :class="{'active': dot.active}" :key="i" :style="dot.active ? teamSlice : {}"></div>
                     </div>
                 </transition>
+                <div class="team-alt-slice" :style="teamSlice"></div>
                 <transition name="slide" mode="out-in">
                     <div class="attack-holder" v-if="mapAttack">
                         <transition name="attack" mode="out-in">
@@ -39,27 +44,31 @@
                         </transition>
                     </div>
                 </transition>
-                <div class="team-alt-slice" :style="teamSlice"></div>
             </div>
-        </div>
+        </ThemeTransition>
 <!--    </transition>-->
 </template>
 
 <script>
-import { resizedImage } from "@/utils/images";
+import { getNewURL, resizedImage } from "@/utils/images";
+import Squeezable from "@/components/broadcast/Squeezable.vue";
+import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
 
 export default {
     name: "IngameTeam",
-    props: ["team", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo"],
+    components: { Squeezable, ThemeTransition },
+    props: ["team", "active", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo"],
     data: () => ({
         textureData: {
             url: null,
             svg: null,
-            loading: true
-        }
+            loading: false
+        },
+        show: true
     }),
     methods: {
         async loadSVG(url) {
+            console.log("Load SVG", url);
             this.textureData.loading = true;
             this.textureData.url = url;
             const data = await fetch(url).then(res => res.text());
@@ -73,7 +82,7 @@ export default {
             const _dots = [];
             for (let i = 1; i <= (this.firstTo || 2); i++) {
                 console.log(this.score, i);
-                if (this.score === i) {
+                if (this.score >= i) {
                     _dots.push({ active: true });
                 } else {
                     _dots.push({ active: false });
@@ -119,10 +128,12 @@ export default {
         texture() {
             const texture = this.event?.broadcast_texture?.[0];
             if (!texture) return null;
-            if (this.textureData.loading && this.textureData.url === texture.url) return null;
+            console.log("texture data", texture);
+            if (this.textureData.loading) return null;
+            const textureURL = getNewURL(texture, "orig");
 
-            if (this.textureData.url !== texture.url) {
-                return this.loadSVG(texture.url);
+            if (this.textureData.url !== textureURL) {
+                return this.loadSVG(textureURL);
             }
             // console.log(texture);
             return "data:image/svg+xml;base64," + btoa(this.textureData.svg.replace(/#696969/g, this.svgColor).trim());
@@ -152,7 +163,7 @@ export default {
             if (!this._theme) return {};
             let color = this._theme.color_accent;
             if (!color || color.toLowerCase() === "#ffffff") color = this._theme.color_logo_accent;
-            if (!color || color.toLowerCase() === "#ffffff") color = this._theme.color_logo_theme;
+            if (!color || color.toLowerCase() === "#ffffff") color = this._theme.color_theme;
             return {
                 backgroundColor: color
             };
@@ -161,82 +172,79 @@ export default {
             return resizedImage(this._theme, ["small_logo", "default_logo"], "h-80");
         },
         teamWidth() {
-            return this.width || 690;
+            return this.width || 567;
         },
         teamWidthCSS() {
             if (!this.teamWidth) return {};
             return { width: `calc(${this.teamWidth}px + var(--team-expand))` };
         }
-    },
-    watch: {
-        style() {
-            if (this.$el && this.$el.querySelector) {
-                // console.log("tick", this.$el.querySelector(".team-name"));
-            }
-        },
-        loaded() {
-            console.log("load", this.loaded);
-        },
-        team() {
-            if (this.$el && this.$el.querySelector) {
-                // console.log("team watch");
-                updateWidth(this.$el, this.teamWidth);
-            }
-        }
-    },
+    }, //,
+    // watch: {
+    //     style() {
+    //         if (this.$el && this.$el.querySelector) {
+    //             // console.log("tick", this.$el.querySelector(".team-name"));
+    //         }
+    //     },
+    //     loaded() {
+    //         console.log("load", this.loaded);
+    //     },
+    //     team() {
+    //         if (this.$el && this.$el.querySelector) {
+    //             // console.log("team watch");
+    //             updateWidth(this.$el, this.teamWidth);
+    //         }
+    //     }
+    // },
     mounted() {
-        this.$nextTick(() => {
-            if (this.$el && this.$el.querySelector) {
-                // console.log("mount - tick");
-                updateWidth(this.$el, this.teamWidth);
-            }
-        });
+        setInterval(() => {
+            // this.show = !this.show;
+        }, 2500);
     }
 };
 
-function updateWidth(vueEl, fullWidth) {
-    const holder = vueEl.querySelector(".team-name");
-    const bigHolder = vueEl.querySelector(".ingame-team");
-    const span = holder.querySelector("span");
-    // console.log(vueEl.getBoundingClientRect());
-
-    // console.log(holder, internal, span);
-
-    // const el = vueEl.querySelector(".team-name");
-    // const text = el.children[0]; // target the .team-name > span.industry-align for width checking
-
-    holder.style.transform = "none";
-    // holder.style.width = "auto";
-    requestAnimationFrame(() => {
-        let diff = 0;
-        [...bigHolder.children].map(el => {
-            if (["team-name", "texture-holder"].some(cl => el.classList.contains(cl))) return;
-            // console.log(el);
-            if (el) diff += el.getBoundingClientRect().width;
-        });
-        diff += 32; // extra padding
-
-        // const target = 530 - (smallText);
-        const target = fullWidth - diff;
-        // const target = 0;
-        const width = span.getBoundingClientRect().width;
-        // console.log(diff, target, width);
-
-        if (width > target) {
-            const scale = target / width;
-            holder.style.transform = `scaleX(${scale})`;
-            holder.style.setProperty("--scaleX", scale);
-            // holder.style.width = `${scale * 100}%`;
-        }
-    });
-}
+// function updateWidth(vueEl, fullWidth) {
+//     const holder = vueEl.querySelector(".team-name");
+//     const bigHolder = vueEl.querySelector(".ingame-team");
+//     const span = holder.querySelector("span");
+//     // console.log(vueEl.getBoundingClientRect());
+//
+//     // console.log(holder, internal, span);
+//
+//     // const el = vueEl.querySelector(".team-name");
+//     // const text = el.children[0]; // target the .team-name > span.industry-align for width checking
+//
+//     holder.style.transform = "none";
+//     // holder.style.width = "auto";
+//     requestAnimationFrame(() => {
+//         let diff = 0;
+//         [...bigHolder.children].map(el => {
+//             if (["team-name", "texture-holder"].some(cl => el.classList.contains(cl))) return;
+//             // console.log(el);
+//             if (el) diff += el.getBoundingClientRect().width;
+//         });
+//         diff += 32; // extra padding
+//
+//         // const target = 530 - (smallText);
+//         const target = fullWidth - diff;
+//         // const target = 0;
+//         const width = span.getBoundingClientRect().width;
+//         // console.log(diff, target, width);
+//
+//         if (width > target) {
+//             const scale = target / width;
+//             holder.style.transform = `scaleX(${scale})`;
+//             holder.style.setProperty("--scaleX", scale);
+//             // holder.style.width = `${scale * 100}%`;
+//         }
+//     });
+// }
 
 </script>
 
 <style scoped>
     .ingame-team {
         --team-expand: 0px;
-        width: calc(690px + var(--team-expand));
+        width: calc(567px + var(--team-expand));
         height: 48px;
 
         display: flex;
@@ -317,6 +325,7 @@ function updateWidth(vueEl, fullWidth) {
     }
     span.industry-align {
         transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
+        --translate-y: -0.0925em;
     }
 
     .ingame-team-anim-enter-active, .ingame-team-anim-leave-active {
@@ -335,13 +344,13 @@ function updateWidth(vueEl, fullWidth) {
         margin: 0 12px 0 0;
     }
     .team-name {
-        margin: 0 12px 0 0;
+        margin: 0 12px 0 24px;
     }
     .ingame-team-holder.right .team-logo-holder {
         margin: 0 0 0 12px;
     }
     .ingame-team-holder.right .team-name {
-        margin: 0 0 0 12px;
+        margin: 0 24px 0 12px;
     }
 
     .team-logo {
@@ -383,7 +392,7 @@ function updateWidth(vueEl, fullWidth) {
         right: 0;
     }
     .ingame-texture img {
-        min-height: 121px;
+        height: 100%;
     }
 
     .attack-holder {
@@ -433,5 +442,8 @@ function updateWidth(vueEl, fullWidth) {
         width: 1.5em;
         height: .8em;
         margin: 0 2px;
+    }
+    .dot.active {
+        background-color: white;
     }
 </style>

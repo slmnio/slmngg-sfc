@@ -1,5 +1,5 @@
 <template>
-    <div class="tourney-bar" :style="gradient" v-bind:class="{'small-bar': !(left && right) }">
+    <div class="tourney-bar" :style="gradient" :class="{'small-bar': !(left && right) }">
         <div class="bar-text flex-center bar-text-left">
             <transition name="fade" mode="out-in">
                 <span :key="left" v-if="left && right">{{ left }}</span>

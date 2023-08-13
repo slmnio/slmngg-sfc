@@ -19,6 +19,7 @@ let _rebuildStart = null;
 
 const reqLog = {
     highErrorRate: false,
+    errorRate: 0,
     counts: {
         started: 0,
         succeeded: 0,
@@ -28,7 +29,7 @@ const reqLog = {
     trigger(key) {
         this.counts[key]++;
         setTimeout(() => this.counts[key]--, this.period * 1000);
-        this.setHighRate(this.counts.started > 20 && this.counts.failed / this.counts.started > 0.2);
+        if (this.counts.started > 20) this.setHighRate(this.counts.failed / this.counts.started);
     },
     start() {
         this.trigger("started");
@@ -40,19 +41,21 @@ const reqLog = {
         this.trigger("failed");
     },
     output() {
-        console.log(`[Request log] last ${this.period}s: ${this.counts.started} started, ${this.counts.succeeded} succeeded (${Math.floor((this.counts.succeeded / this.counts.started) * 100)}% success), ${this.counts.failed} failed (${Math.floor((this.counts.failed / this.counts.started) * 100)}% start-fails)`);
+        console.log(`[Request log] last ${this.period}s: ${this.counts.started} started (${(this.counts.started / this.period).toFixed(1)}/s, ${(((this.counts.started / this.period) / 5) * 100).toFixed(1)}% of limit), ${this.counts.succeeded} succeeded (${Math.floor((this.counts.succeeded / this.counts.started) * 100)}% success), ${this.counts.failed} failed (${Math.floor((this.counts.failed / this.counts.started) * 100)}% start-fails)`);
     },
     setHighRate(newRate) {
-        if (this.highErrorRate !== newRate) {
+        if (!this.highErrorRate && newRate >= 0.2) { // not alerted and should be
             console.log("high_error_rate", newRate);
-            if (newRate) {
-                log(`**High error rate**: ${Math.floor((this.counts.failed / this.counts.started) * 100)}% requests failed in the last ${this.period}s.`);
-            } else {
-                log(`**High error rate** (Resolved): ${Math.floor((this.counts.failed / this.counts.started) * 100)}% requests failed in the last ${this.period}s.`);
-            }
-            io.emit("high_error_rate", newRate);
+            log(`**High error rate**: ${Math.floor((this.counts.failed / this.counts.started) * 100)}% requests failed in the last ${this.period}s.`);
+            io.emit("high_error_rate", true);
+            this.highErrorRate = true;
+
+        } else if (this.highErrorRate && newRate <= 0.05) { // alerted and should not be
+            io.emit("high_error_rate", false);
+            log(`**High error rate** (Resolved): ${Math.floor((this.counts.failed / this.counts.started) * 100)}% requests failed in the last ${this.period}s.`);
+            this.highErrorRate = false;
         }
-        this.highErrorRate = newRate;
+        this.errorRate = newRate;
     }
 };
 setInterval(() => {
@@ -87,15 +90,21 @@ function setRebuilding(isRebuilding) {
 // Starting with syncing Matches
 
 // const tables = ["Matches", "Teams", "Themes", "Events", "Players", "Player Relationships"];
-const tables = ["Broadcasts", "Clients", "Channels", "Discord Bots", "Players", "Events", "Event Series", "Teams", "Ad Reads", "Ad Read Groups", "News", "Matches",  "Themes",  "Socials", "Accolades", "Player Relationships", "Brackets", "Live Guests", "Headlines", "Maps", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles"];
+const tables = ["Broadcasts", "Clients", "Channels", "Discord Bots", "Players", "Live Guests", "Events", "GFX", "Event Series", "Teams", "Ad Reads", "Ad Read Groups", "News", "Matches",  "Themes",  "Socials", "Accolades", "Player Relationships", "Brackets", "Headlines", "Maps", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles"];
 const staticTables = ["Redirects"];
+
+function sortKeys([aKey], [bKey]) {
+    if (aKey > bKey) return 1;
+    if (aKey < bKey) return -1;
+    return 0;
+}
 
 function deAirtable(obj) {
     const data = {};
     if (!obj.fields) {
         console.error(obj);
     }
-    Object.entries(obj.fields).forEach(([key, val]) => {
+    Object.entries(obj.fields).sort(sortKeys).forEach(([key, val]) => {
         data[key.replace(/ +/g, "_").replace(/[:()]/g, "_").replace(/_+/g,"_").toLowerCase()] = val;
     });
     data.id = obj.id;
@@ -163,7 +172,7 @@ const customTableUpdate = require("./custom-datasets");
 const { log } = require("./discord/slmngg-log");
 
 function registerUpdater(tableName, options) {
-    let pollRate = 3000;
+    let pollRate = 5000;
     setInterval(async function() {
         let date = (new Date(new Date().getTime() - pollRate)).toISOString().slice(0, 19);
         try {
@@ -218,7 +227,7 @@ let firstRun = true;
 async function sync() {
     for (let table of staticTables) {
         await processTableData(table, await getAllTableData(table), true);
-        setInterval(async () => processTableData(table, await getAllTableData(table), true), 5 * 1000);
+        setInterval(async () => processTableData(table, await getAllTableData(table), true), 8 * 1000);
         if (firstRun) console.log(`[rebuild] static table ${table} complete`);
     }
     for (let table of tables) {
@@ -237,12 +246,12 @@ async function sync() {
 sync();
 // setInterval(sync, 5 * 1000);
 
-module.exports = {
-    async update(table, id, data) {
-        return await slmngg(table).update(id, data);
-    },
-    async select(table, filter) {
-        return await slmngg(table).select(filter).all();
-    },
-    setup
-};
+// module.exports = {
+//     async update(table, id, data) {
+//         return await slmngg(table).update(id, data);
+//     },
+//     async select(table, filter) {
+//         return await slmngg(table).select(filter).all();
+//     },
+//     setup
+// };

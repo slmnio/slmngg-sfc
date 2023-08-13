@@ -11,7 +11,7 @@
 
 <!--                <div class="segment-wrapper" v-if="showBigSegment('Schedule')" :key="'Schedule'">-->
 <!--                    <div class="overlay&#45;&#45;bg bar-segment segment-schedule flex-column">-->
-<!--                        <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />-->
+<!--                        <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />-->
 <!--                    </div>-->
 <!--                </div>-->
 <!--            </transition>-->
@@ -34,7 +34,7 @@
                 <div class="segment-wrapper" v-if="showSegment('Title') && (title || (broadcast && broadcast.title))" :key="'Title-' + (title || broadcast.title)">
                     <div class="overlay--bg bar-segment segment-title">
                         <span class="segment-text" v-html="nbr(title || broadcast.title)"
-                        v-bind:class="{'has-br': (title || broadcast.title || '').includes('\\n')}"></span>
+                        :class="{'has-br': (title || broadcast.title || '').includes('\\n')}"></span>
                     </div>
                 </div>
             </transition>
@@ -73,7 +73,7 @@
 
         <div class="break-preload">
             <Bracket class="segment-bracket-inner" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.6" />
-            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" v-bind:key="match.id" :theme-color="themeColor" />
+            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />
         </div>
 
     </div>
@@ -216,6 +216,7 @@ export default {
 
     span.industry-align {
         transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
+        --translate-y: -0.0925em;
     }
 
     .lower-bar {

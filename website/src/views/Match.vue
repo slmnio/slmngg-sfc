@@ -38,7 +38,7 @@
                                 <td>{{ match.casters.length === 1 ? 'Caster' : 'Casters' }}</td>
                                 <td><LinkedPlayers :players="match.casters" /></td>
                             </tr>
-                            <tr v-for="group in playerRelationshipGroups" v-bind:key="group.meta.singular_name">
+                            <tr v-for="group in playerRelationshipGroups" :key="group.meta.singular_name">
                                 <td>{{ group.items.length === 1 ? group.meta.singular_name : group.meta.plural_name }}</td>
                                 <td><LinkedPlayers :players="group.items"/></td>
                             </tr>
@@ -46,9 +46,9 @@
                                 <td>MVP</td>
                                 <td><LinkedPlayers :players="[match.mvp]" /></td>
                             </tr>
-                            <tr v-if="match.log_files && match.log_files.replay_codes">
+                            <tr v-if="replayCodes">
                                 <td>Replay codes</td>
-                                <td>{{ match.log_files.replay_codes }}</td>
+                                <td>{{ replayCodes }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -63,9 +63,10 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import MatchHero from "@/components/website/match/MatchHero";
 import MatchScore from "@/components/website/match/MatchScore";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
-import { formatTime, getMatchContext, url } from "@/utils/content-utils";
+import { cleanID, formatTime, getMatchContext, url } from "@/utils/content-utils";
 import { resizedImageNoWrap } from "@/utils/images";
 import { isAuthenticated } from "@/utils/auth";
+import { canEditMatch } from "@/utils/client-action-permissions";
 
 export default {
     name: "Match",
@@ -84,7 +85,9 @@ export default {
                     theme: ReactiveThing("theme")
                 }),
                 event: ReactiveThing("event", {
-                    theme: ReactiveThing("theme")
+                    theme: ReactiveThing("theme"),
+                    player_relationships: ReactiveArray("player_relationships"),
+                    broadcasts: ReactiveThing("broadcasts")
                 }),
                 casters: ReactiveArray("casters"),
                 player_relationships: ReactiveArray("player_relationships", {
@@ -139,7 +142,10 @@ export default {
             return Object.values(groups);
         },
         date() {
-            return formatTime(this.match.start, this.$store.state.timezone);
+            return formatTime(this.match.start, {
+                tz: this.$store.state.timezone,
+                use24HourTime: this.$store.state.use24HourTime
+            });
         },
         theme() {
             return this.match?.event?.theme;
@@ -150,9 +156,8 @@ export default {
         },
         showEditor() {
             if (!isAuthenticated(this.$root)) return false;
-            console.log("match editor show", this.$root.auth?.user?.website_settings?.includes("Can edit any match"));
             // TODO: Make sure user is an admin or has perms here
-            return true;
+            return canEditMatch(this.$root.auth?.user, { event: this.match?.event, match: this.match });
         },
         sidebarItems() {
             const items = ["vod"];
@@ -161,7 +166,28 @@ export default {
             if (this.showEditor) items.push("editor");
 
             return items;
+        },
+        replayCodes() {
+            if (this.match?.log_files?.replay_codes) return this.match.log_files.replay_codes;
+            if (!this.match?.maps?.some(map => map.replay_code)) return null;
+            return this.match.maps.map(map => `${map.name?.[0]}: ${map.replay_code}`).join(", \n");
+        },
+        eventID() {
+            return this.match?.event?.id;
         }
+    },
+    watch: {
+        eventID: {
+            handler(id) {
+                console.log("match's event id change", cleanID(id));
+                this.$emit("id_change", cleanID(id));
+            },
+            immediate: true
+        }
+    },
+    beforeRouteLeave(to, from, next) {
+        this.$emit("id_change", null);
+        next();
     },
     metaInfo() {
         return {

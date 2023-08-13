@@ -1,7 +1,7 @@
 const { getTwitchChannel,
     getTwitchAPIClient,
     getMatchData
-} = require("../action-utils");
+} = require("../action-utils/action-utils");
 
 const automaticPredictionTitleStartCharacter = "⬥";
 
@@ -34,8 +34,8 @@ function getTargetPrediction(predictions, teams) {
 
 
 function getMatchWinner(match, team1, team2) {
-    if (match.score1 >= match.first_to) return team1;
-    if (match.score2 >= match.first_to) return team2;
+    if (match.score_1 >= match.first_to) return team1;
+    if (match.score_2 >= match.first_to) return team2;
     return null;
 }
 
@@ -44,24 +44,19 @@ module.exports = {
     key: "manage-prediction",
     auth: ["client"],
     requiredParams: ["predictionAction"],
-    optionalParams: ["autoLockAfter"],
+    optionalParams: ["autoLockAfter", "predictionType"],
     /***
-     * @param {PredictionAction} predictionAction
+     * @param {"create"|"lock"|"resolve"|"cancel"} predictionAction
+     * @param {"match"|"map"} predictionType
      * @param {number?} autoLockAfter
      * @param {ClientData} client
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern
-    async handler({ predictionAction, autoLockAfter = 120 }, { client }) {
+    async handler({ predictionAction, predictionType = "match", autoLockAfter = 120 }, { client }) {
         if (!(["create", "lock", "resolve", "cancel"].includes(predictionAction))) throw ("Invalid action");
-        console.log(predictionAction);
-
-        // TODO: move cancel action to here
-
         const { broadcast, channel } = await getTwitchChannel(client, ["channel:manage:predictions", "channel:read:predictions"]);
-        // console.log(channel);
         const api = await getTwitchAPIClient(channel);
-        const predictionType = (broadcast.broadcast_settings || []).includes("Predict every map") ? "map" : "match";
         const { match, team1, team2 } = await getMatchData(broadcast, true);
 
         const maps = await Promise.all((match.maps || []).map(async m => {
@@ -90,7 +85,6 @@ module.exports = {
             if (predictionType === "map" && !currentMap) throw ("No valid map to start a prediction for");
 
             const targetPrediction = getTargetPrediction(predictions, [team1, team2]);
-            console.log(targetPrediction);
 
             if (predictionAction === "create") {
                 if (targetPrediction) throw ("Prediction already exists");
@@ -99,7 +93,7 @@ module.exports = {
                 let outcomes = [team1.name, team2.name];
 
                 if (predictionType === "map" &&
-                    !(currentMap && currentMap.map.type === "Control") &&
+                    !(currentMap && currentMap.map?.type === "Control") &&
                     (broadcast.broadcast_settings || []).includes("Allow draw predictions")) {
                     outcomes.push("Draw");
                 }
@@ -109,7 +103,6 @@ module.exports = {
                     outcomes: outcomes,
                     autoLockAfter: autoLockAfter || 120
                 });
-                console.log(responsePrediction);
                 // TODO: check responsePrediction for errors
                 return;
             }
@@ -118,34 +111,37 @@ module.exports = {
 
             if (predictionAction === "lock") {
                 const responsePrediction = await api.predictions.lockPrediction(channel.channel_id, targetPrediction.id);
-                console.log(responsePrediction);
+                console.log(JSON.stringify({...responsePrediction}));
             }
 
         } else if (["resolve"].includes(predictionAction)) {
-            const lastMap = maps.filter(m => !m.dummy && !m.banner && (m.winner || m.draw)).pop();
             const targetPrediction = getTargetPrediction(predictions, [team1, team2]);
-            if (!targetPrediction) throw ("Prediction does not exist");
-            console.log(targetPrediction);
+            if (!targetPrediction) {
+                console.log(targetPrediction, Object.entries(predictions), [team1, team2]);
+                throw ("Prediction does not exist");
+            }
 
-            if (predictionType === "match") {
+            const targetPredictionType = targetPrediction?.title?.includes("match?") ? "match" : "map";
+
+            if (targetPredictionType === "match") {
                 if (!matchWinner) throw ("Match has not been won yet");
-                const responsePrediction = await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === matchWinner.name).id);
-                console.log(responsePrediction);
+                await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === matchWinner.name).id);
             } else {
+                const lastMap = maps.filter(m => !m.dummy && !m.banner && (m.winner || m.draw)).pop();
+                if (!lastMap) {
+                    throw ("No valid maps have been completed");
+                }
                 if (lastMap.draw) {
-                    const responsePrediction = await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === "Draw").id);
-                    console.log(responsePrediction);
+                    await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === "Draw").id);
                 } else {
-                    const responsePrediction = await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === lastMap.winner.name).id);
-                    console.log(responsePrediction);
+                    await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === lastMap.winner.name).id);
                 }
             }
 
         } else if (["cancel"].includes(predictionAction)) {
             const activePredictions = predictions.filter(p => ["ACTIVE", "LOCKED"].includes(p.status));
             for (const prediction of activePredictions) {
-                const responsePrediction = await api.predictions.cancelPrediction(channel.channel_id, prediction.id);
-                console.log(responsePrediction);
+                await api.predictions.cancelPrediction(channel.channel_id, prediction.id);
             }
         }
     }

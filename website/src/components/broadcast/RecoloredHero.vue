@@ -1,5 +1,5 @@
 <template>
-    <div class="recolored-hero">
+    <div class="recolored-hero" :data-hero="hero?.name">
         <div class="color-holder">
             <div class="hero-image-base" :style="mainImage || fallbackImage" :class="{ 'fallback-image': !mainImage && fallbackImage }"></div>
 
@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import Jimp from "jimp/es";
-import { logoBackground } from "@/utils/theme-styles";
+import { Image } from "image-js";
+import { heroRecolorColors } from "@/utils/theme-styles";
 import { bg, resizedAttachment } from "@/utils/images";
 
 function deHex(hexString) {
@@ -28,12 +28,9 @@ function deHex(hexString) {
 
 async function recolorImage(imageURL, toColor, fromColor) {
     const [from, to] = [fromColor, toColor].map(deHex);
-    const image = await Jimp.read({
-        url: imageURL
-    });
-
-    // console.log({ image, from, to });
-    const frame = image.bitmap.data;
+    const image = await Image.load(imageURL);
+    // console.log("image width", image.bitmap.width);
+    const frame = image.data;
 
     const outputFrame = new Uint8Array(frame);// (new Uint8Array(frame)).slice(0, image.bitmap.width * image.bitmap.height * 4);
 
@@ -52,8 +49,11 @@ async function recolorImage(imageURL, toColor, fromColor) {
     // console.log("output should be", (image.bitmap.width * image.bitmap.height * 4));
     // console.log("output is", frame.length, outputFrame.length);
     return {
-        ...image.bitmap,
-        data: outputFrame
+        pixels: {
+            ...image,
+            data: outputFrame
+        },
+        width: image.width
     };
 }
 
@@ -106,12 +106,12 @@ export default {
     }),
     computed: {
         mainImage() {
-            const img = this.hero?.recolor_base;
+            const img = this.hero?.recolor_base?.[0];
             if (!img) return null;
             return bg(resizedAttachment(img, "orig"));
         },
         fallbackImage() {
-            const img = this.hero?.main_image;
+            const img = this.hero?.main_image?.[0];
             if (!img) return null;
             return bg(resizedAttachment(img, "orig"));
         },
@@ -120,10 +120,10 @@ export default {
             return this.hero.recolor_layers.map(layer => resizedAttachment(layer, "orig"));
         },
         themeColors() {
-            const style = logoBackground(this.theme);
+            const style = heroRecolorColors(this.theme);
             return [
-                style.backgroundColor,
-                style.borderColor || style.color
+                style.primary,
+                style.secondary
             ];
         }
     },
@@ -149,7 +149,9 @@ export default {
         async recolor(imageURL, color, number) {
             // console.log("recolor", { imageURL, color, number });
             if (!imageURL || !color) return;
-            const pixels = await recolorImage(imageURL, color);
+            const { pixels, width } = await recolorImage(imageURL, color);
+
+            this.$emit("recolor_width", width);
 
             let hue = (this.$refs[`hue-color-${number}`]);
             if (!hue.id && hue?.[0]) hue = hue?.[0];

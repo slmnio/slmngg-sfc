@@ -1,6 +1,7 @@
 import { getDataServerAddress } from "@/utils/fetch";
 
 import { Notyf } from "notyf";
+
 const notyf = new Notyf({ duration: 5000, position: { x: "right", y: "top" }, dismissible: true });
 
 export async function authenticatedRequest(auth, url, data) {
@@ -63,15 +64,16 @@ export async function updateMatchData(auth, match, updatedData) {
     });
 }
 
-export async function managePred(auth, client, predictionAction) {
+export async function managePred(auth, client, predictionAction, predictionType) {
     if (!auth?.user) {
         notyf.error("Not authenticated");
         return { error: true, errorMessage: "Not authenticated" };
     }
     return await authenticatedRequest(auth, "actions/manage-prediction", {
         client: client.id || client,
-        predictionAction//,
-        // autoLockAfter: 60
+        predictionAction,
+        predictionType,
+        autoLockAfter: predictionType === "map" ? 180 : 300
     });
 }
 
@@ -132,5 +134,55 @@ export async function setMatchOverlayState(auth, matchID, overlayType, state) {
         match: matchID,
         overlayType,
         state
+    });
+}
+
+export async function resolveEntireBracket(auth, bracketID) {
+    if (!auth?.user) {
+        notyf.error("Not authenticated");
+        return { error: true, errorMessage: "Not authenticated" };
+    }
+    return await authenticatedRequest(auth, "actions/resolve-entire-bracket", {
+        bracketID
+    });
+}
+
+export async function setObserverSetting(auth, setting, value) {
+    if (!auth?.user) {
+        notyf.error("Not authenticated");
+        return { error: true, errorMessage: "Not authenticated" };
+    }
+    return await authenticatedRequest(auth, "actions/set-observer-setting", {
+        setting, value
+    });
+}
+
+export async function updateBreakAutomation(auth, options) {
+    if (!auth?.user) {
+        notyf.error("Not authenticated");
+        return { error: true, errorMessage: "Not authenticated" };
+    }
+    return await authenticatedRequest(auth, "actions/update-break-automation", {
+        options
+    });
+}
+
+export async function updateBreakDisplay(auth, option) {
+    if (!auth?.user) {
+        notyf.error("Not authenticated");
+        return { error: true, errorMessage: "Not authenticated" };
+    }
+    return await authenticatedRequest(auth, "actions/update-break-display", {
+        option
+    });
+}
+
+export async function updateGfxIndex(auth, gfxID, index) {
+    if (!auth?.user) {
+        notyf.error("Not authenticated");
+        return { error: true, errorMessage: "Not authenticated" };
+    }
+    return await authenticatedRequest(auth, "actions/update-gfx-index", {
+        gfxID, index
     });
 }

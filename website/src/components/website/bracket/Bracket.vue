@@ -1,9 +1,10 @@
 <template>
-    <div class="bracket row flex-column" :style="winVars" v-bind:class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
+    <div class="bracket row flex-column" :style="winVars" :class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
         <div class="connections" ref="connections-holder">
-            <div class="connection" v-for="bug in connectionBugs" :key="bug.key" :class="connectionBugClass(bug)" :style="bug.style"
+            <div class="connection" v-for="bug in connectionBugs" :key="bug.key" :data-key="bug.key" :class="connectionBugClass(bug)" :style="bug.style"
                 :data-column-num="bug.column">
-                <div class="c-top"></div><div class="c-middle"></div><div class="c-bottom"></div>
+                <div class="c-top" v-if="bug.type === 'normal'"></div><div class="c-middle"></div><div class="c-bottom"></div>
+                <div class="c-text" :title="bug.title" v-if="bug.type === 'loser-drops'">{{ bug.text }}</div>
             </div>
         </div>
         <v-style>
@@ -14,11 +15,12 @@
                 --b-width: {{ connectionWidth }}px !important;
             }
         </v-style>
-        <div class="internal-bracket d-flex" v-for="(_bracket, i) in brackets" v-bind:key="i">
-            <div class="column" v-for="(column, ci) in _bracket.columns" v-bind:key="ci">
+        <div class="internal-bracket d-flex" v-for="(_bracket, i) in brackets" :key="i">
+            <div class="column" v-for="(column, ci) in _bracket.columns" :key="ci">
                 <div class="header text-center mb-3" :style="logoBackground1(event)" v-if="showHeaders && column.header">{{ column.header }}</div>
                 <div class="column-matches flex-grow-1">
-                    <BracketMatch :ref="`match-${matchNum}`" :show-times="bracket.show_times" v-for="matchNum in column.games" :match="getMatch(matchNum)" v-bind:key="matchNum"/>
+                    <BracketMatch v-for="matchNum in column.games" :key="matchNum" :ref="`match-${matchNum}`" :custom-timezone="customTimezone"
+                                  :show-times="bracket.show_times" :show-broadcasts="bracket.show_broadcasts" :match="getMatch(matchNum)"/>
                 </div>
             </div>
         </div>
@@ -41,7 +43,8 @@ export default {
         scale: Number,
         extended: Boolean,
         broadcastHighlightMatch: {},
-        broadcastHighlightTeam: {}
+        broadcastHighlightTeam: {},
+        customTimezone: String
     },
     data: () => ({
         connectionElements: [],
@@ -156,7 +159,7 @@ export default {
 
             if (this.connectionsToHighlight?.matches) {
                 // console.log("bug highlight", bug, this.connectionsToHighlight);
-                const bugMatches = bug.key.split("->");
+                const bugMatches = bug.key.split("->").map(e => e.split(".").shift());
 
                 // TODO: make sure the connection (11 -> 14.1) is what the team did
                 //  (ie upper finals -> lower finals -> grand finals shouldn't highlight upper -> grands connection)
@@ -234,7 +237,7 @@ export default {
         },
         logoBackground1,
         createConnections() {
-            console.log("creating connections");
+            // console.log("creating connections");
             this.connectionElements.forEach(el => el.remove());
             this.connectionBugs = [];
 
@@ -248,10 +251,10 @@ export default {
                     const [otherMatchNum, destNum] = connectionData.win.toString().split(".");
                     this.createConnectionBetweenRefs(matchRef, this.getMatchRef(otherMatchNum), matchNum, otherMatchNum, parseInt(destNum || "0"));
                 }
-                // if (connectionData.lose) {
-                //     const [otherMatchNum, destNum] = connectionData.lose.toString().split(".");
-                //     this.createConnectionBetweenRefs(matchRef, this.getMatchRef(otherMatchNum), matchNum, parseInt(destNum || "0"));
-                // }
+                if (connectionData.lose) {
+                    const [otherMatchNum, destNum] = connectionData.lose.toString().split(".");
+                    this.createLoserDropsConnection(this.getMatchRef(otherMatchNum), matchNum, otherMatchNum, parseInt(destNum || "0"));
+                }
             });
         },
         getMatchRef(matchNum) {
@@ -321,6 +324,7 @@ export default {
 
 
             this.connectionBugs.push({
+                type: "normal",
                 key: `${sourceNum}->${destNum}`,
                 column: Math.max(this.getMatchColumnNum(sourceNum), this.getMatchColumnNum(destNum)),
                 direction: coord.direction,
@@ -334,6 +338,62 @@ export default {
 
             // container.appendChild(connection);
             this.connectionElements.push(connection);
+        },
+        createLoserDropsConnection(dest, sourceNum, destNum, destSide) {
+            if (!dest || !destSide) return; // console.log("No destination for loser drops from", sourceNum, "to", destSide);
+            // console.log(dest, sourceNum, destSide);
+
+            const destBox = dest?.[0].$el.getBoundingClientRect();
+            const container = this.$refs["connections-holder"];
+
+            const coord = {};
+            coord.leftSide = destBox.left;
+            coord.rightSide = destBox.left;
+
+            const sourcePoint = (destBox.bottom - (destBox.height / 2));
+            let destPoint = (destBox.bottom - (destBox.height / 2));
+
+
+            const quarterHeight = destBox.height / 4;
+            if (destSide) {
+                if (destSide === 1) {
+                    destPoint -= quarterHeight * 2;
+                } else if (destSide === 2) {
+                    destPoint += quarterHeight;
+                }
+            }
+
+            const alignmentDiff = container.getBoundingClientRect();
+
+
+            coord.topSide = Math.min(sourcePoint, destPoint);
+            coord.bottomSide = Math.max(sourcePoint, destPoint);
+
+            coord.direction = sourcePoint > destPoint ? "up" : "down";
+
+            const HalfLine = 1;
+            if (coord.direction === "up") {
+                coord.topSide -= (HalfLine * 2);
+                coord.bottomSide += HalfLine;
+            } else {
+                coord.topSide -= HalfLine;
+                coord.bottomSide += HalfLine * 2;
+            }
+
+            this.connectionBugs.push({
+                type: "loser-drops",
+                direction: "loser-drops",
+                key: `${sourceNum}->${destNum}.${destSide}`,
+                text: this.getMatch(sourceNum)?.match_number || sourceNum,
+                title: `Loser of match ${sourceNum}`,
+                column: this.getMatchColumnNum(destNum),
+                style: {
+                    left: `${coord.leftSide - alignmentDiff.left - (quarterHeight)}px`,
+                    top: `${coord.topSide - alignmentDiff.bottom}px`,
+                    height: `${quarterHeight}px`,
+                    width: `${(quarterHeight)}px`
+                }
+            });
         }
     },
     beforeDestroy() {
@@ -348,20 +408,20 @@ export default {
         layout: {
             deep: true,
             handler() {
-                console.log("[layout data update]");
+                // console.log("[layout data update]");
                 this.$nextTick(() => this.createConnections());
             }
         },
         bracket: {
             deep: true,
             handler() {
-                console.log("[bracket data update]");
+                // console.log("[bracket data update]");
                 this.$nextTick(() => this.createConnections());
             }
         }
     },
     mounted() {
-        console.log("[bracket mounted]");
+        // console.log("[bracket mounted]");
         this.$nextTick(() => this.createConnections());
     }
 };
@@ -383,6 +443,10 @@ export default {
         justify-content: center;
     }
 
+    .internal-bracket {
+        padding: 0 6px;
+    }
+
     .internal-bracket + .internal-bracket {
         margin-top: 1.5em;
     }
@@ -392,10 +456,9 @@ export default {
         display: initial;
         font-size: 1.75em;
     }
-    .bracket.small >>> .inner .text {
-        display: none;
-    }
-    .bracket.small >>> .match-number {
+    .bracket.small >>> .inner .text,
+    .bracket.small >>> .match-number,
+    .bracket.small >>> .match-extra-info {
         display: none
     }
     .bracket >>> .connection {
@@ -406,6 +469,7 @@ export default {
         justify-content: center;
         align-items: center;
         transition: opacity 150ms ease, border-color 150ms ease, background-color 150ms ease;
+        overflow: hidden;
     }
     /*.bracket >>> .connection.dir-up { background-color: rgba(255,255,0,0.25); }*/
     /*.bracket >>> .connection.dir-down { background-color: rgba(0, 255,255,0.25); }*/
@@ -414,6 +478,14 @@ export default {
         top: 0;
         left: 0;
         width: 100%;
+    }
+
+
+    .bracket {
+        z-index: 2;
+    }
+    .connections {
+        z-index: 1;
     }
 
     .bracket >>> .connections {
@@ -468,6 +540,21 @@ export default {
         border: none;
         border-bottom: var(--b-width) solid var(--b-color);
         border-right: var(--b-width) solid var(--b-color);
+    }
+
+    .bracket >>> .connection.dir-loser-drops .c-bottom {
+        margin-left: 0;
+        width: 100%;
+        border-bottom-left-radius: var(--b-curve);
+    }
+    .bracket >>> .c-text {
+        position: absolute;
+        font-size: 0.8em;
+        width: 100%;
+        text-align: center;
+        margin-bottom: .2em;
+        margin-left: var(--b-width);
+        color: var(--b-color);
     }
 
 </style>

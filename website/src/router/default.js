@@ -13,6 +13,8 @@ import Authenticator from "@/views/Authenticator";
 import Dashboard from "@/views/Dashboard";
 import ProfilePage from "@/views/ProfilePage";
 import TwitchAuthScopeSelector from "@/components/website/TwitchAuthScopeSelector";
+import BracketCreator from "@/views/BracketCreator.vue";
+import NotFoundPage from "@/views/NotFoundPage";
 
 export default [
     {
@@ -39,14 +41,6 @@ export default [
             },
             ...SharedRoutes,
             {
-                path: "/about",
-                // name: "About",
-                // route level code-splitting
-                // this generates a separate chunk (about.[hash].js) for this route
-                // which is lazy-loaded when the route is visited.
-                component: () => import(/* webpackChunkName: "about" */ "../views/About.vue")
-            },
-            {
                 path: "/profile",
                 meta: { requiresAuth: true },
                 component: ProfilePage
@@ -64,6 +58,10 @@ export default [
             {
                 path: "/twitch-auth",
                 component: TwitchAuthScopeSelector
+            },
+            {
+                path: "/bracket-creator",
+                component: BracketCreator
             }
         ]
     },
@@ -77,7 +75,8 @@ export default [
             noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation),
             noStinger: (route.query.noStinger || route.query.stinger === "false"),
             bodyClass: route.query.class || route.query.bodyClass,
-            full: !!route.query.full
+            full: !!route.query.full,
+            backgroundIndex: route.query.background && parseInt(route.query.background)
         }),
         children: BroadcastRoutes
     },
@@ -90,10 +89,12 @@ export default [
             noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation),
             noStinger: (route.query.noStinger || route.query.stinger === "false"),
             bodyClass: route.query.class || route.query.bodyClass,
-            full: !!route.query.full
+            full: !!route.query.full,
+            backgroundIndex: route.query.background && parseInt(route.query.background)
         }),
         children: BroadcastRoutes
-    }
+    },
+    { path: "*", component: NotFoundPage }
     // {
     //     path: "/redirect",
     //     beforeEnter: (to, from, next) => {

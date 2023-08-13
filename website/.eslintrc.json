@@ -9,8 +9,7 @@
     ],
     "parserOptions": {
         "ecmaVersion": 12,
-        "sourceType": "module",
-        "parser": "babel-eslint"
+        "sourceType": "module"
     },
     "rules": {
         "indent": [
@@ -34,6 +33,7 @@
         ],
         "no-multiple-empty-lines": ["warn", { "max": 2 }],
         "no-trailing-spaces": ["warn"],
-        "space-before-function-paren": "off"
+        "space-before-function-paren": "off",
+        "no-throw-literal": "off"
     }
 }

@@ -5,16 +5,20 @@
             <div class="opponent-icon bg-center" :style="opponentTheme.logo"></div>
         </div>
         <div class="item scores">{{ scores }}</div>
-        <div class="item date">{{ match.round }}</div>
+        <squeezable class="item date">
+            <div>{{ match.round }}</div>
+        </squeezable>
     </div>
 </template>
 
 <script>
 import { logoBackground1 } from "@/utils/theme-styles";
 import { resizedImage } from "@/utils/images";
+import Squeezable from "@/components/broadcast/Squeezable.vue";
 
 export default {
     name: "MatchHistory",
+    components: { Squeezable },
     props: ["match", "thisTeam"],
     computed: {
         opponent() {
@@ -72,7 +76,7 @@ export default {
 }
 
 .item.letter {
-    width: 1.5em;
+    width: 1.75em;
     text-align: center;
     font-weight: bold;
     flex-shrink: 0;
@@ -97,7 +101,7 @@ export default {
 }
 
 .item.date {
-    padding: 0 .5em;
+    margin: 0 .5em;
     font-size: 0.6em;
     text-align: right;
 }

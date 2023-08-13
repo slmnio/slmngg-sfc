@@ -126,6 +126,14 @@ export function sortByOMapWinrate(a, b) {
     return 0;
 }
 
+export function sortByExtraPoints(a, b) {
+    const [aPoints, bPoints] = [a, b].map(x => (x.extra_points));
+    if (aPoints !== bPoints) {
+        if (aPoints > bPoints) return -1;
+        if (aPoints < bPoints) return 1;
+    }
+    return 0;
+}
 export function sortByMapDiff(a, b) {
     // if (a.map_wins > b.map_wins) return -1;
     // if (a.map_wins < b.map_wins) return 1;
@@ -335,22 +343,34 @@ function miniLeaguePrep(standings) {
             team.standings.minileague = {
                 wins: 0,
                 losses: 0,
-                map_diff: 0
+                map_diff: 0,
+                matches: 0
             };
             groupIDs.forEach(opponentID => {
                 const diff = team.standings.h2h[opponentID];
-                if (diff === 1) team.standings.minileague.wins++;
-                if (diff === -1) team.standings.minileague.losses++;
-
-                if (team.standings.h2h_maps) {
-                    const mapDiff = team.standings.h2h_maps[opponentID];
-                    if (!isNaN(mapDiff)) team.standings.minileague.map_diff += mapDiff;
+                if (diff) {
+                    team.standings.minileague.matches++;
+                    if (diff === 1) team.standings.minileague.wins++;
+                    if (diff === -1) team.standings.minileague.losses++;
+                    if (team.standings.h2h_maps) {
+                        const mapDiff = team.standings.h2h_maps[opponentID];
+                        if (!isNaN(mapDiff)) team.standings.minileague.map_diff += mapDiff;
+                    }
                 }
             });
         });
 
+
+        console.log(group.sort(miniLeagueMatchDiff).map(t => `|${t?.code.padStart(6, " ")} ${t.standings.minileague.wins}-${t.standings.minileague.losses} (${t.standings.minileague.map_diff}) [${t.standings.minileague.matches}]`).join("\n"));
+
+        if (group.some(team => team.standings?.minileague?.matches === 0)) {
+            console.warn("team has no matches in this minileague");
+            group.forEach(team => {
+                team.standings.minileague = {};
+            });
+        }
+
         // console.log(group);
-        // console.log(group.sort(miniLeagueMatchDiff).map(t => `|${t.code.padStart(6, " ")} ${t.standings.minileague.wins}-${t.standings.minileague.losses} (${t.standings.minileague.map_diff})`).join("\n"));
 
         // if (group.length === 2) console.log("minileague h2h", standings);
         /*
@@ -376,11 +396,12 @@ function getSortMethod(stringMethod) {
     if (stringMethod === "MiniLeagueMaps") return { prep: miniLeaguePrep, method: miniLeagueMapDiff, max: null };
     if (stringMethod === "MapRoundsDiff") return { method: mapRoundsDiff, max: null };
     if (stringMethod === "MapRoundWins") return { method: mapRoundWins, max: null };
+    if (stringMethod === "Points") return { method: sortByExtraPoints, max: null };
     return null;
 }
 
 export function sortTeamsIntoStandings(teams, settings = {}) {
-    const log = false;
+    const log = true;
     if (log) console.log("[standings]", "starting sort", teams, settings);
     let warnings = [];
 

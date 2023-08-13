@@ -4,13 +4,17 @@
             <TourneyBar :left="broadcast.event && broadcast.event.short" :right="broadcast.subtitle" :event="broadcast.event" />
         </div>
         <transition-group class="casters flex-center" name="anim-talent">
-            <Caster v-for="(caster, i) in casters" v-bind:key="caster.id" :guest="caster" :color="getColor(i)"
-                    :event="event" :disable-video="shouldDisableCasterVideo" :class="{'wide-feed': caster.wide_feed}" />
+            <Caster v-for="(caster, i) in casters" :key="caster.manual ? caster.name : caster.id" :guest="caster" :color="getColor(i)"
+                    :event="event" :disable-video="shouldDisableCasterVideo" :class="{'wide-feed': caster.wide_feed}"
+                    :show-pronouns="showPronouns" :pronouns-on-newline="pronounsOnNewline" />
         </transition-group>
-        <div class="lower-holder flex-center">
-            <transition mode="out-in" name="break-content">
-                <DeskMatch :broadcast="broadcast" class="w-100" :_match="liveMatch" :theme-color="themeColor" :guests="guests" v-if="liveMatch" />
-            </transition>
+        <transition tag="div" class="lower-holder flex-center" mode="out-in" name="break-content">
+            <DeskMatch :broadcast="broadcast" class="w-100" :_match="liveMatch" :theme-color="themeColor" :guests="guests" v-if="liveMatch && !useScoreboard" key="desk-match" />
+            <MatchScoreboard :active="animationActive" class="scoreboard" v-if="liveMatch && useScoreboard" :match="liveMatch" :broadcast="broadcast" key="scoreboard" :animate-on-mount="true" />
+        </transition>
+
+        <div class="preload">
+            <DeskMatch class="w-100" :broadcast="broadcast" :_match="liveMatch" :theme-color="themeColor" v-if="liveMatch" force-mode="Maps" key="desk-match" />
         </div>
     </div>
 </template>
@@ -21,11 +25,13 @@ import TourneyBar from "@/components/broadcast/TourneyBar";
 import Caster from "@/components/broadcast/desk/Caster";
 import DeskMatch from "@/components/broadcast/desk/DeskMatch";
 import { themeBackground1 } from "@/utils/theme-styles";
+import { createGuestObject } from "@/utils/content-utils";
+import MatchScoreboard from "@/components/broadcast/MatchScoreboard.vue";
 
 export default {
     name: "DeskOverlay",
-    components: { DeskMatch, Caster, TourneyBar },
-    props: ["broadcast", "group"],
+    components: { MatchScoreboard, DeskMatch, Caster, TourneyBar },
+    props: ["broadcast", "group", "disableCasters", "animationActive"],
     methods: {
         getColor(index) {
             if (!this.deskColors?.length) return this.broadcast?.event?.theme?.color_logo_background || this.broadcast?.event?.theme?.color_theme;
@@ -37,6 +43,7 @@ export default {
             return this.broadcast?.event;
         },
         shouldDisableCasterVideo() {
+            if (this.disableCasters) return true;
             if (!this.broadcast?.broadcast_settings) return false;
             return this.broadcast.broadcast_settings.includes("Disable casters");
         },
@@ -58,9 +65,14 @@ export default {
                 })
             });
         },
+        manualGuests() {
+            if (!this.broadcast?.manual_guests) return [];
+            const manualGuests = this.broadcast.manual_guests.split("\n").filter(Boolean).map(guestString => createGuestObject(guestString));
+            console.log(manualGuests);
+            return manualGuests;
+        },
         guests: function() {
-            if (!this.broadcast?.guests) return [];
-            return ReactiveArray("guests", {
+            const guests = (!this.broadcast?.guests) ? [] : ReactiveArray("guests", {
                 player: ReactiveThing("player", {
                     socials: ReactiveArray("socials")
                 }),
@@ -69,9 +81,20 @@ export default {
                     theme: ReactiveThing("theme")
                 })
             })(this.broadcast);
+
+            return [
+                ...guests,
+                ...this.manualGuests
+            ];
         },
         casters() {
-            return this.guests;/* .filter(g => g.show); */
+            if (!this.guests.length) {
+                return (this.liveMatch?.casters || []).map(caster => ({
+                    ...caster.live_guests,
+                    player: caster
+                }));
+            }
+            return this.guests;
         },
         themeColor() {
             if (!this.broadcast?.event?.theme) return {};
@@ -80,7 +103,17 @@ export default {
         deskColors() {
             if (!this.broadcast?.event?.theme?.desk_colors) return [];
             return this.broadcast.event.theme.desk_colors.trim().split(/[\n,]/g).map(e => e.trim());
+        },
+        showPronouns() {
+            return (this.broadcast?.broadcast_settings || []).includes("Show pronouns on desk");
+        },
+        pronounsOnNewline() {
+            return (this.broadcast?.broadcast_settings || []).includes("Show desk pronouns on new lines");
+        },
+        useScoreboard() {
+            return (this.broadcast?.desk_display) === "Scoreboard";
         }
+
     },
     metaInfo() {
         return {
@@ -184,5 +217,12 @@ export default {
     }
     .caster.wide-feed >>> .caster-frame {
         --oversize: 1% !important;
+    }
+
+    .preload {
+        opacity: 0;
+        max-width: 0;
+        max-height: 0;
+        overflow: hidden;
     }
 </style>

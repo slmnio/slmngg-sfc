@@ -7,9 +7,7 @@
 </template>
 
 <script>
-import spacetime from "spacetime";
-import informal from "spacetime-informal";
-import store from "@/thing-store";
+import { formatTime } from "@/utils/content-utils";
 
 export default {
     name: "ScheduleTime",
@@ -20,31 +18,19 @@ export default {
         customTimezone: String
     },
     computed: {
-        activeTimezone() {
-            if (this.customTimezone) return this.customTimezone;
-            const stz = store.state.timezone;
-            if (stz === "local") return this.localTimezone;
-            return stz;
-        },
-        localTimezone() {
-            return spacetime.now().timezone().name;
-        },
-        _time() {
-            const utc = spacetime(this.time);
-            return utc.goto(this.activeTimezone);
-        },
         top() {
-            // console.log(informal.display(this._time));
-            return this.time && (this._time.format("{date} {month-short}") + (this._time.year() === spacetime.now().year() ? "" : ` ${this._time.format("{year-short}")}`));
+            return this.time && formatTime(this.time, {
+                format: "{date} {month-short} {year-short-prev-only}",
+                tz: this.$store.state.timezone,
+                use24HourTime: this.$store.state.use24HourTime
+            });
         },
         bottom() {
-            if (this.noTimes) return null;
-            const display = informal.display(this.activeTimezone);
-            const abbrev = this._time.isDST() ? display.daylight.abbrev : display.standard.abbrev;
-
-            return this.time && this._time.time() + " " + abbrev;
-            // console.log(informal.display(this._time.format("timezone")));
-            // return this._time.format("{time}") + this._time.isDST() ? "DAYLIGHT" : "display.standard.abbrev";
+            return !this.noTimes && formatTime(this.time, {
+                format: "{time} {tz}",
+                tz: this.$store.state.timezone,
+                use24HourTime: this.$store.state.use24HourTime
+            });
         }
     }
 };

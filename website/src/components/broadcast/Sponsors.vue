@@ -4,7 +4,7 @@
         <div class="sponsors-holder">
             <transition class="sponsors" name="spon-anim" :mode="mode || 'in-out'">
                 <div class="break-sponsor flex-center" :style="bg(activeSponsor)"
-                     v-bind:key="activeSponsor ? activeSponsor.id : 'empty'">
+                     :key="activeSponsor ? activeSponsor.id : 'empty'">
                     <div class="break-sponsor-logo bg-center" :style="logo(activeSponsor)"></div>
                 </div>
             </transition>

@@ -10,6 +10,7 @@
             <li class="nav-item ct-passive" v-if="showStandings"><router-link class="nav-link" :to="subLink('standings')">Standings</router-link></li>
             <li class="nav-item ct-passive" v-if="showFoldy"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
             <li class="nav-item ct-passive" v-if="showDraft"><router-link class="nav-link" :to="subLink('draft')">Draft</router-link></li>
+            <li class="nav-item ct-passive" v-if="showAuction"><router-link class="nav-link" :to="subLink('auction')">Auction</router-link></li>
             <li class="nav-item ct-passive" v-if="showStaff"><router-link class="nav-link" :to="subLink('staff')">Staff</router-link></li>
             <li class="nav-item ct-passive" v-if="event.theme"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
             <li class="nav-item ct-passive" v-if="event.about"><router-link class="nav-link" :to="subLink('about')">About</router-link></li>
@@ -18,7 +19,7 @@
 
             <ul class="socials d-flex" v-if="event.socials">
                 <li class="nav-item">
-                    <Social class="ct-active" :social="social" v-for="social in event.socials" v-bind:key="social.id"/>
+                    <Social class="ct-active" :social="social" v-for="social in event.socials" :key="social.id"/>
                 </li>
             </ul>
 
@@ -39,6 +40,7 @@ import SubPageNav from "@/components/website/SubPageNav";
 import Social from "@/components/website/Social";
 import { themeBackground1 } from "@/utils/theme-styles";
 import { resizedImageNoWrap } from "@/utils/images";
+import { cleanID } from "@/utils/content-utils";
 
 export default {
     name: "Event",
@@ -75,7 +77,8 @@ export default {
                         theme: ReactiveThing("theme")
                     })
                 }),
-                socials: ReactiveArray("socials")
+                socials: ReactiveArray("socials"),
+                matches: ReactiveArray("matches")
             });
         },
         settings() {
@@ -94,6 +97,9 @@ export default {
         },
         showDraft() {
             return this.settings?.draft?.use || false;
+        },
+        showAuction() {
+            return this.settings?.auction?.public || false;
         },
         showStaff() {
             return this.settings?.extendedStaffPage ||
@@ -116,7 +122,7 @@ export default {
             return "on-foreign-subdomain";
         },
         shouldShowMinisitePrompt() {
-            return ["no-root-minisite", "on-foreign-subdomain"].includes(this.ownMinisiteStatus);
+            return this.minisiteDomain && ["no-root-minisite", "on-foreign-subdomain"].includes(this.ownMinisiteStatus);
         },
         minisiteLink() {
             if (!this.event?.id || !this.minisiteDomain) return null;
@@ -131,9 +137,9 @@ export default {
             if (!this.event) return null;
 
             try {
-                if ([process.env.VUE_APP_DEPLOY_MODE, process.env.NODE_ENV].includes("staging")) return `https://${this.subdomain}.dev.slmn.gg`;
-                if (process.env.NODE_ENV === "development" || process.env.VUE_APP_DEPLOY_MODE === "local") return `http://${this.subdomain}.localhost:8080`;
-                if ([process.env.VUE_APP_DEPLOY_MODE, process.env.NODE_ENV].includes("production")) return `https://${this.subdomain}.slmn.gg`;
+                if ([import.meta.env.VITE_DEPLOY_MODE, import.meta.env.NODE_ENV].includes("staging")) return `https://${this.subdomain}.dev.slmn.gg`;
+                if (import.meta.env.NODE_ENV === "development" || import.meta.env.VITE_DEPLOY_MODE === "local") return `http://${this.subdomain}.localhost:8080`;
+                if ([import.meta.env.VITE_DEPLOY_MODE, import.meta.env.NODE_ENV].includes("production")) return `https://${this.subdomain}.slmn.gg`;
                 return null;
             } catch (e) {
                 return null;
@@ -143,6 +149,15 @@ export default {
     mounted() {
         console.log("[event mount]", this.id, this.event, this.$root.minisiteEvent);
     },
+    watch: {
+        id: {
+            handler(id) {
+                console.log("id change", cleanID(id));
+                this.$emit("id_change", cleanID(id));
+            },
+            immediate: true
+        }
+    },
     methods: {
         subLink(page) {
             if (this.isMinisite) {
@@ -151,6 +166,10 @@ export default {
             return `/event/${this.event.id}/${page}`;
         },
         themeBackground1
+    },
+    beforeRouteLeave(to, from, next) {
+        this.$emit("id_change", null);
+        next();
     }
 };
 

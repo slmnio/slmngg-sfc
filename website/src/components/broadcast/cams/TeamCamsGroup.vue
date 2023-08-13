@@ -4,7 +4,7 @@
             <div class="industry-align">{{ team.name }}</div>
         </div>
         <div class="team-guests d-flex">
-            <div class="guest" v-for="(guest, gi) in _guests" v-bind:key="guest.id">
+            <div class="guest" v-for="(guest, gi) in _guests" :key="guest.id">
                 <CasterCam class="team-cam" :guest="guest" :extra-params="params" :event="event"
                  :relay-prefix="relayPrefix + getNumber(ti, gi)" :disable-video="disableCams" :team="team"/>
                 <div class="guest-name">{{ guest.name }}</div>
@@ -64,7 +64,7 @@ export default {
         overflow: hidden;
     }
     .team-guests .guest {
-        width: calc((100% / 6) - 4px);
+        width: calc((100% / 5) - 4px);
         margin: 0 2px;
         --caster-width: 375px;
     }

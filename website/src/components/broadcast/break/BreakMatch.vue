@@ -1,5 +1,5 @@
 <template>
-    <div class="break-match flex-center" v-bind:class="{'expanded': expanded}" :data-center="centerShow">
+    <div class="break-match flex-center" :class="{'expanded': expanded}" :data-center="centerShow">
         <div class="match-next-details" v-if="!expanded">
             <transition name="fade" mode="out-in">
                 <span :key="match ? match.round : 'empty'">{{ hasFinished ? 'FINAL SCORE:' : 'UP NEXT:'}} {{ match && match.round }}</span>
@@ -13,13 +13,13 @@
 <!--        <transition-group name="fade" mode="out-in" class="match-teams flex-center">-->
 
 
-        <div class="match-teams flex-center">
+        <div class="match-teams flex-center" v-if="match">
 
             <div class="match-special-event-name" v-if="match.special_event">
                 {{ match.custom_name }}
             </div>
 
-                <div class="match-team" v-for="(team, i) in teams" v-bind:key="team ? `${team.id}-${team.name}-${team.code}-${i}` : i" :style="{ order: i*2 }">
+                <div class="match-team" v-for="(team, i) in teams" :key="team ? `${team.id}-${team.name}-${team.code}-${i}` : i" :style="{ order: i*2 }">
                     <div :class="expanded ? 'match-team-name' : 'match-team-code'" v-if="team && expanded" :data-code="team.code">
                         <span class="industry-align" v-if="team.dummy">{{ team.text }}</span>
                         <span class="industry-align" v-else-if="expanded && team.split_name" v-html="nbr(team.split_name)"></span>
@@ -30,11 +30,11 @@
                     </div>
                     <div class="match-team-logo-spacer" v-if="expanded"></div>
                 </div>
-            <div class="match-team-center" v-if="match">
+            <div class="match-team-center industry-align" v-if="match">
                 <div v-if="centerShow === 'scores'" class="center-scores flex-center">
-                    <div class="center-score" :style="winCSS(0)" v-bind:class="{'win': scores[0] === match.first_to}"><span class="industry-align">{{ scores[0] }}</span></div>
+                    <div class="center-score" :style="winCSS(0)" :class="{'win': scores[0] === match.first_to}"><span class="industry-align">{{ scores[0] }}</span></div>
                     <div class="center-dash">-</div>
-                    <div class="center-score" :style="winCSS(1)" v-bind:class="{'win': scores[1] === match.first_to}"><span class="industry-align">{{ scores[1] }}</span></div>
+                    <div class="center-score" :style="winCSS(1)" :class="{'win': scores[1] === match.first_to}"><span class="industry-align">{{ scores[1] }}</span></div>
                 </div>
                 <div v-if="centerShow === 'time'" class="center-time">{{ start }}</div>
                 <div v-if="centerShow === 'vs'" class="center-vs">vs</div>
@@ -240,7 +240,7 @@ export default {
     }
     span.industry-align {
         transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
-        display: inline-flex;
+        --translate-y: -0.0925em;
     }
 
     .match-details {
@@ -335,6 +335,7 @@ export default {
         line-height: 1;
         font-size: calc(1.1em);
         transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
+        --translate-y: -0.0925em;
     }
     .match-special-event-name {
         flex-grow: 1;

@@ -1,4 +1,4 @@
-const { dirtyID } = require("../action-utils");
+const { dirtyID } = require("../action-utils/action-utils");
 
 module.exports = {
     key: "set-active-broadcast",

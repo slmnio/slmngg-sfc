@@ -1,13 +1,10 @@
 <template>
-    <div class="schedule-editor">
-        <div class="dropdown-top bg-dark p-2 d-flex flex-center" @click="() => showDropdown = !showDropdown">
-            <div class="text"><i class="fas fa-fw fa-calendar-alt"></i> <b>Schedule</b> • {{ status }}</div>
-            <div class="spacer flex-grow-1"></div>
-            <i class="fa fa-fw fa-chevron-left" :class="{ 'rotate': showDropdown }"></i>
-        </div>
-        <table class="table table-bordered table-sm table-dark" v-if="showDropdown">
+    <DashboardModule class="schedule-editor" title="Schedule" icon-class="fas fa-calendar-alt">
+        <template v-slot:header>{{ status }}</template>
+
+        <table class="table table-bordered table-sm table-dark mb-0">
             <tr>
-                <th>Match</th>
+                <th colspan="2">Match</th>
                 <th>Start time</th>
                 <th>Show on overlays</th>
                 <th>Live Match</th>
@@ -15,20 +12,18 @@
             <ScheduleEditorMatch v-for="match in schedule" :match="match" :key="match.id"
                                  :is-live-match="match._isLiveMatch" :timezone="broadcast.timezone || 'America/New_York'"></ScheduleEditorMatch>
         </table>
-    </div>
+    </DashboardModule>
 </template>
 
 <script>
 import ScheduleEditorMatch from "@/components/website/dashboard/ScheduleEditorMatch";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
+import DashboardModule from "@/components/website/dashboard/DashboardModule.vue";
 export default {
     name: "ScheduleEditor",
-    components: { ScheduleEditorMatch },
+    components: { DashboardModule, ScheduleEditorMatch },
     props: ["broadcast"],
-    data: () => ({
-        showDropdown: false
-    }),
     computed: {
         schedule() {
             if (!this.broadcast?.schedule?.length) return [];
@@ -92,17 +87,7 @@ export default {
 </script>
 
 <style scoped>
-    .dropdown-top {
-        border: 1px solid #454d55;
-        cursor: pointer;
-        margin-bottom: .5em;
-        user-select: none;
-
-    }
-    .dropdown-top i {
-        transition: transform 200ms ease;
-    }
-    .dropdown-top i.rotate {
-        transform: rotate(-90deg);
+    table tr.schedule-editor-match:last-child >>> td {
+        border-bottom: none;
     }
 </style>

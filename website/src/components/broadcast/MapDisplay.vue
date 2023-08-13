@@ -1,12 +1,12 @@
 <template>
     <transition v-if="useTransitions" mode="out-in" name="break-content" class="map-anim-holder">
-        <div :key="autoKey" class="map-display d-flex w-100 h-100" v-bind:class="{'show-next-map': showNextMap && nextMap}">
-            <MapSegment class="map" v-bind:class="{ 'map-dummy' : map.dummy }" v-for="map in maps" v-bind:key="map.id"
+        <div :key="autoKey" class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" :class="{'show-next-map': showNextMap && nextMap}">
+            <MapSegment class="map" v-for="map in maps" :key="map.id" :small="small"
                 :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
         </div>
     </transition>
-    <div v-else class="map-display d-flex w-100 h-100" v-bind:class="{'show-next-map': showNextMap && nextMap}">
-        <MapSegment class="map" v-bind:class="{ 'map-dummy' : map.dummy }" v-for="map in maps" v-bind:key="map.id"
+    <div v-else class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" :class="{'show-next-map': showNextMap && nextMap}">
+        <MapSegment class="map" v-for="map in maps" :key="map.id" :small="small"
                     :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
     </div>
 </template>
@@ -15,11 +15,12 @@
 import MapSegment from "@/components/broadcast/MapSegment";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { DefaultMapImages, likelyNeededMaps } from "@/utils/content-utils";
+import { getNewURL } from "@/utils/images";
 
 export default {
     name: "MapDisplay",
     components: { MapSegment },
-    props: ["broadcast", "animationActive", "useTransitions", "noMapVideos"],
+    props: ["broadcast", "animationActive", "useTransitions", "virtualMatch", "noMapVideos", "small"],
     data: () => ({
         activeAudio: null,
         showNextMap: false,
@@ -28,6 +29,7 @@ export default {
     }),
     computed: {
         match() {
+            if (this.virtualMatch) return this.virtualMatch;
             if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
@@ -82,6 +84,7 @@ export default {
             const initialMapCount = maps.length;
 
             const next = maps.find(m => !m.winner && !m.draw && !m.banner);
+            console.log({ next, maps });
             if (next) next._next = true;
 
             if (!this.match?.first_to) return maps;
@@ -89,7 +92,7 @@ export default {
             if (dummyMapCount > 0) {
                 for (let i = 0; i < dummyMapCount; i++) {
                     const num = initialMapCount + i;
-                    if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[num]], image: [{ url: DefaultMapImages[this.mapTypes[num]] }] } : {}) });
+                    if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: this.mapTypes && this.mapTypes[num], image: [{ url: DefaultMapImages[this.mapTypes[num]] }] } : {}) });
                 }
             }
             return maps;
@@ -123,7 +126,7 @@ export default {
             return this.broadcast.broadcast_settings.includes("Use map videos");
         },
         nextMap() {
-            const unplayedMaps = (this.maps || []).filter(m => !m.dummy && !m.winner && !m.draw);
+            const unplayedMaps = (this.maps || []).filter(m => !m.dummy && !m.winner && !m.draw && !m.banner);
             return unplayedMaps?.[0];
         },
         autoKey() {
@@ -134,23 +137,28 @@ export default {
         },
         useShorterMapNames() {
             return this.broadcast?.broadcast_settings?.includes("Use shorter map names");
+        },
+        isInMapsScene() {
+            return this.$root?.activeScene?.name?.toLowerCase().includes("maps");
         }
     },
     sockets: {
         map_music() {
+            console.log("Map Music trigger");
             this.playAudio();
         },
         fade_map_music() {
+            console.log("Fade Map Music trigger");
             this.fadeOutAudio(0, 5);
         }
     },
     methods: {
         playAudio() {
-            if (this.nextMap?.map?.map_audio) {
+            if (this.nextMap?.map?.audio) {
                 try {
                     this.runAudio({
-                        audio: this.nextMap.map.map_audio,
-                        volume: this.nextMap.map.map_audio_volume || 100
+                        audio: this.nextMap.map.audio,
+                        volume: this.nextMap.map.audio_volume || 100
                     });
                 } catch (e) {
                     this.activeAudio.stop();
@@ -160,15 +168,21 @@ export default {
         },
         async runAudio(read) {
             if (this.audioStatus === "playing") {
+                console.log("Audio is playing. Fading out...");
                 return this.fadeOutAudio(0, 5);
             } else if (this.audioStatus === "fading out") {
                 return console.log("Not doing anything since music is already fading out");
             }
             console.log("running audio", read);
-            if (!read?.audio?.length || !read?.audio[0]?.url) return console.warn("no valid data", read);
-            const url = read.audio[0].url;
-            const audio = new Audio(url);
+
+            const audioURL = getNewURL(read.audio?.[0], "orig");
+            if (!audioURL) return console.warn("no valid data", read);
+            const audio = new Audio(audioURL);
             audio.volume = (read.volume || 100) / 100;
+            audio.onended = () => {
+                this.activeAudio = null;
+                this.audioStatus = "not playing";
+            };
             this.activeAudio = audio;
             this.audioStatus = "playing";
             await audio.play();
@@ -188,6 +202,8 @@ export default {
             console.log(`Climbing to ${targetVolume} at ${climbAmount}p`);
 
             const interval = setInterval(() => {
+                if (!this.activeAudio) return;
+
                 if (this.activeAudio.volume + climbAmount >= 1) {
                     this.activeAudio.volume = 1;
                 } else if (this.activeAudio.volume + climbAmount <= 0) {
@@ -219,18 +235,31 @@ export default {
                 if (targetVolume === 0) this.activeAudio = null;
                 this.audioStatus = "not playing";
             }, (duration + 1) * 1000);
+        },
+        stopAudio() {
+            if (this.activeAudio) {
+                this.activeAudio.pause();
+                this.activeAudio = null;
+                this.audioStatus = "not playing";
+            }
         }
     },
     watch: {
         animationActive(isActive) {
             this.showNextMap = false;
 
+            console.log("animation active", isActive, this.isInMapsScene);
+
             if (isActive && this.nextMap?.map) {
                 console.log("Animation trigger");
-                if ((this.$root?.activeScene?.name?.toLowerCase().includes("maps"))) this.playAudio();
+                if (this.isInMapsScene) this.playAudio();
                 setTimeout(() => {
                     this.showNextMap = true;
                 }, 3000);
+            }
+            if (!isActive && this.activeAudio) {
+                console.log("Animation reset - stopping audio");
+                this.stopAudio();
             }
         },
         audioStatus(is, was) {
@@ -256,11 +285,18 @@ export default {
         transform: scale(1);
         transition: all 800ms ease;
         width: 100%;
+        /*border: 1px solid red;*/
     }
-    .map-display.show-next-map >>> .map.next-map .map-lower-name {
-        width: 40%;
+    .map-display >>> .map.next-map .map-lower-name {
+        width: 39.8%;
+        /*border: 1px solid lime;*/
+    }
+    .map-display:not(.show-next-map) >>> .map .map-lower-name {
+        width: 76.8%;
+        /*transform: scale(0.75);*/
     }
     .map-display.show-next-map >>> .map:not(.next-map) .map-lower-name {
+        width: 100%;
         transform: scale(0.75);
     }
     .break-content-enter-active, .break-content-leave-active { transition: all .35s ease; overflow: hidden }

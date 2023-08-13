@@ -3,10 +3,10 @@
         <div class="row">
             <div class="col-12 my-2 small-rosters" v-if="settings.show_rosters">
                 <h2>Rosters</h2>
-                <div class="team my-2 d-flex" v-for="team in draftTeams" v-bind:key="team.id">
+                <div class="team my-2 d-flex" v-for="team in draftTeams" :key="team.id">
                     <ThemeLogo class="team-logo" :theme="team.theme" border-width="6" />
                     <div class="team-roster d-flex">
-                        <ContentThing v-for="player in team.players" v-bind:key="player.id"
+                        <ContentThing v-for="player in team.players" :key="player.id"
                                       :theme="team.theme" :text="player.text" :thing="player" type="player" />
                     </div>
                 </div>
@@ -26,21 +26,21 @@
                 <h2>Starred players</h2>
                 <table class="table table-bordered bg-warning table-warning table-sm">
                     <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
-                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('starred')" :player="player" v-bind:key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('starred')" :player="player" :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
                 </table>
             </div>
             <div class="col-12 my-2">
                 <h2>Available players</h2>
                 <table class="table table-bordered table-dark table-sm">
                     <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
-                    <PlayerDraftRow :settings="settings" v-for="player in ungroupedPlayers" :player="player" v-bind:key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    <PlayerDraftRow :settings="settings" v-for="player in ungroupedPlayers" :player="player" :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
                 </table>
             </div>
             <div class="col-12 my-2" v-if="playerGroup('ignored').length">
                 <h2>Ignored players</h2>
                 <table class="table table-bordered bg-danger table-danger text-white table-sm">
                     <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
-                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('ignored')" :player="player" v-bind:key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('ignored')" :player="player" :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
                 </table>
             </div>
         </div>
@@ -56,7 +56,7 @@ import PlayerDraftRow from "@/components/website/draft/PlayerDraftRow";
 import store from "@/thing-store";
 import EventDraftHeaders from "@/components/website/draft/EventDraftHeaders";
 import { BFormCheckbox, BFormSelect } from "bootstrap-vue";
-const { url } = require("@/utils/content-utils");
+import { url } from "@/utils/content-utils";
 
 
 function getRoleString(sr) {

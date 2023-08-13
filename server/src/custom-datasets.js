@@ -6,6 +6,7 @@ function tableUpdated(tableName, Cache) {
     if (tableName === "Matches") matchUpdate(Cache);
     if (tableName === "Broadcasts") broadcastUpdate(Cache);
     if (tableName === "Players") playerList(Cache);
+    if (tableName === "Teams") teamList(Cache);
     if (tableName === "Events") publicEvents(Cache);
     // TODO: maybe add discord bots here?
 }
@@ -16,7 +17,19 @@ async function publicEvents(Cache) {
     if (!allEvents?.ids) return;
 
     let allEventData = (await Promise.all(allEvents.ids.map(id => (Cache.get(id.slice(3))))));
-    let liveEvents = allEventData.filter(event => event.show_in_events && event.teams && event.teams.length !== 0);
+    let liveEvents = allEventData.filter(event => event.show_in_events && event.teams && event.teams.length !== 0)
+        .sort(function (a, b) {
+            if (!a || !b) return 0;
+            if (!a) return 1;
+            if (!b) return -1;
+
+            if (a.start_date && b.start_date) {
+                return (new Date(a.start_date) - new Date(b.start_date));
+            }
+            if (a.start_date) return -1;
+            if (b.start_date) return 1;
+        });
+
     Cache.set("special:public-events", { events: liveEvents.map(m => m.id) });
 }
 
@@ -116,4 +129,32 @@ async function playerList(Cache) {
 
     Cache.set("special:players", { players: publicPlayers });
     Cache.set("special:pro-players", { players: proPlayers });
+}
+
+async function teamList(Cache) {
+    const allTeams = await Cache.get("Teams");
+    if (!allTeams.ids) return;
+    let teams = (await Promise.all(allTeams.ids.map(id => Cache.get(id.slice(3)))));
+    const allEvents = await Cache.get("Events");
+    if (!allEvents.ids) return;
+    let events = (await Promise.all(allEvents.ids.map(id => Cache.get(id.slice(3)))));
+
+    const publicTeams = [];
+    teams.forEach(team => {
+        // if (!team.event.show_in_events) return false;
+        const eventID = team.event?.[0];
+        if (!eventID) return;
+        const event = events.find(e => e.id === eventID);
+        if (!event) return;
+        if (!event.show_in_events) return;
+        publicTeams.push({
+            id: team.id,
+            name: team.name,
+            code: team.code,
+            theme: team.theme?.[0],
+            event: eventID,
+            eventStart: event.start_date
+        });
+    });
+    Cache.set("special:teams", { teams: publicTeams });
 }

@@ -1,11 +1,11 @@
 <template>
     <GenericOverlay class="bracket-overlay" v-if="!extended" :title="title || 'Bracket'">
         <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :scale="scale" :small="small"
-                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" />
+                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" :custom-timezone="broadcastTimezone" />
     </GenericOverlay>
     <div class="bracket-overlay bracket-extended" :style="zoom" v-else>
         <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :scale="scale" :small="small"
-                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" :extended="extended" />
+                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" :extended="extended" :custom-timezone="broadcastTimezone" />
     </div>
 </template>
 
@@ -17,7 +17,7 @@ import { cleanID } from "@/utils/content-utils";
 export default {
     name: "BracketOverlay",
     components: { Bracket, GenericOverlay },
-    props: ["broadcast", "title", "bracketKey", "extended", "scale", "small"],
+    props: ["broadcast", "title", "bracketKey", "extended", "scale", "small", "forceBracket"],
     computed: {
         event() {
             if (!this.broadcast || !this.broadcast.event) return null;
@@ -33,6 +33,9 @@ export default {
             });
         },
         bracket() {
+            if (this.forceBracket) {
+                return this.forceBracket;
+            }
             if (!this.event?.brackets) return null;
             let key;
             if (this.broadcast?.bracket_key) key = this.broadcast.bracket_key;
@@ -63,6 +66,9 @@ export default {
                 return this.broadcast?.highlight_team || null;
             }
             return null;
+        },
+        broadcastTimezone() {
+            return this.broadcast?.timezone || "America/New_York";
         }
     },
     watch: {

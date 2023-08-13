@@ -10,15 +10,20 @@
                     <div class="industry-align text-center">{{ title || 'Player Auction' }}</div>
                 </div>
                 <div class="event-stats flex-center d-flex flex-column">
+                    <div>{{ autoSettings?.drafted }} / {{ autoSettings?.totalSlots }} {{ autoSettings?.drafted === 1 ? 'player' : 'players' }} signed</div>
+                    <div>{{ autoSettings?.slotsRemaining }} {{ autoSettings?.slotsRemaining === 1 ? 'slot' : 'slots' }} remaining</div>
+                    <div>{{ autoSettings?.undraftedPlayerCount }} {{ autoSettings?.undraftedPlayerCount === 1 ? 'player' : 'players' }} in the pool</div>
+                    <div class="small">({{ (autoSettings?.totalDraftablePlayerCount - autoSettings?.totalSlots) }} {{ autoSettings?.totalDraftablePlayerCount - autoSettings?.totalSlots === 1 ? 'player' : 'players' }} won't be drafted)</div>
                     <div v-if="stats && stats.allPlayers">{{ stats.remainingEligiblePlayers }} / {{ stats.allPlayers }} player{{ stats.remainingEligiblePlayers === 1 ? '' : 's' }} remaining</div>
                     <div v-if="stats && stats.remainingPlaces">{{ stats.remainingPlaces }} spot{{ stats.remainingPlaces === 1 ? '' : 's' }} remaining</div>
                     <div v-if="stats && stats.signedPlayers">{{ stats.signedPlayers }} player{{ stats.signedPlayers === 1 ? '' : 's' }} signed</div>
                 </div>
             </div>
             <div class="player-middle d-flex flex-grow-1">
-                <div class="player-info w-100 flex-center flex-column position-relative">
-                    <transition name="fade-down">
-                        <AuctionCountdown v-if="player && bids.length" />
+                <div class="player-info-holder w-100 flex-center flex-column position-relative">
+                    <AuctionCountdown v-if="player" />
+                    <transition name="color-block-fade">
+                        <div class="color-block" v-if="blockColorCSS" :style="blockColorCSS"></div>
                     </transition>
                     <transition name="fade-right">
                         <RecoloredHero v-if="!showCaptainInfo && player && player.favourite_hero" :theme="heroColor" :hero="player.favourite_hero"></RecoloredHero>
@@ -26,28 +31,37 @@
                     <transition name="fade-right">
                         <div class="player-info" v-if="player">
                             <div class="player-name">{{ player.name }}</div>
-                            <div class="accolades" v-if="accolades.length">
-                                <ContentThing :thing="accolade" type="event" :link-to="accolade.event" :theme="accolade.event && accolade.event.theme" v-for="accolade in accolades"
-                                              v-bind:key="accolade.id" :show-logo="true" :text="accolade.player_text" />
-                            </div>
-                            <div class="player-captain-info" v-if="showCaptainInfo">
-                                {{ player.pronouns }}
+                            <div class="player-extras">
+                                <div class="player-role" v-if="player.role && !player.eligible_roles" v-html="getRoleSVG(player.role)"></div>
+                                <div class="player-eligible-roles d-flex">
+                                    <div class="role" v-for="role in playerRoles(player?.eligible_roles)" :class="{'ineligible': !role.eligible, 'eligible': role.eligible, 'primary': role.role === player.role}"
+                                         :key="role?.role" v-html="getRoleSVG(role?.role)"></div>
+                                </div>
+                                <div class="accolades" v-if="accolades.length">
+                                    <ContentThing :thing="accolade" type="event" :link-to="accolade.event"
+                                                  :theme="accolade.event && accolade.event.theme"
+                                                  v-for="accolade in accolades"
+                                                  :key="accolade.id" :show-logo="true" :text="accolade.player_text"/>
+                                </div>
+                                <div class="player-captain-info" v-if="showCaptainInfo">
+                                    {{ player.pronouns }}
                                     <br>
-                                {{ player.draft_data }}
-                            </div>
-                            <div class="player-teams d-flex flex-wrap flex-center" v-for="group in groupedTeams"
-                                 :key="group.group" :class="`group-${group.group}`">
-                                <PlayerTeamDisplay :team="team" v-for="team in group.teams" v-bind:key="team.id"/>
+                                    {{ player.draft_data }}
+                                </div>
+                                <div class="player-teams d-flex flex-wrap flex-center" v-for="group in groupedTeams"
+                                     :key="group.group" :class="`group-${group.group}`">
+                                    <PlayerTeamDisplay :team="team" v-for="team in group.teams" :key="team.id"/>
+                                </div>
                             </div>
                         </div>
                     </transition>
                 </div>
                 <div class="bids flex-column-reverse d-flex justify-content-end" :class="{ 'has-bids': (player || bids.length) }">
                     <transition-group name="fade-down">
-                        <div class="bid d-flex align-content-center" v-for="(bid, i) in bids" v-bind:key="i"
-                             :style="getTheme(bid.team.id)">
+                        <div class="bid d-flex align-content-center" v-for="(bid, i) in bids" :key="i"
+                             :style="getTheme(bid.teamID)">
                             <div class="team-logo flex-center">
-                                <div class="logo-inner bg-center" :style="getLogo(bid.team.id)"></div>
+                                <div class="logo-inner bg-center" :style="getLogo(bid.teamID)"></div>
                             </div>
                             <div class="team-text flex-center ml-2">{{ money(bid.amount) }}</div>
                         </div>
@@ -63,7 +77,7 @@
 <!--                </transition-group>-->
 <!--            </div>-->
 <!--            <div class="team-lists" v-if="['teams', 'teams-1', 'teams-2'].includes(rightDisplay)">-->
-<!--                <TeamPlayerList v-for="team in displayTeams" :team="team" v-bind:key="team.id" :leading="leadingBid" :auction-settings="auctionSettings" />-->
+<!--                <TeamPlayerList v-for="team in displayTeams" :team="team" :key="team.id" :leading="leadingBid" :auction-settings="auctionSettings" />-->
 <!--            </div>-->
             <transition name="fade-left" mode="out-in">
                 <transition-group  :style="background" tag="div" v-if="['teams-1', 'teams-2', 'teams'].includes(rightDisplay)" name="move" class="team-rows-holder">
@@ -73,16 +87,16 @@
                     </div>
                 </transition-group>
                 <div :style="background" class="team-focus h-100" v-if="rightDisplay === 'sign-focus'" key="signed-focus">
-                    <SignedTeamList :team="signedTeam" :amount="signAmount" :signedPlayer="signedPlayer" :auction-settings="auctionSettings" />
+                    <SignedTeamList :team="signedTeam" :amount="signAmount" :signedPlayer="socketPlayerID" :auction-settings="auctionSettings" />
                 </div>
                 <div :style="background" class="bid-focus flex-center h-100 w-100" v-if="rightDisplay === 'bid-focus'" key="bid-focus">
-                    <BidFocus :teams="teams" :bids="bids"/>
+                    <BidFocus :teams="teams" :bids="bids" :auction-settings="auctionSettings" />
                 </div>
                 <div :style="background" class="team-focus" v-if="rightDisplay === 'team-focus'" key="team-focus">
                     <TeamFocus :team="highlightedTeam" :auction-settings="auctionSettings" />
                 </div>
                 <div :style="background" class="bidding-war" v-if="rightDisplay === 'bidding-war'" key="bidding-war">
-                    <BiddingWar :teams="biddingWar" :leading="leadingBid"/>
+                    <BiddingWar :teams="biddingWar" :leading="leadingBid" :auction-settings="auctionSettings"/>
                 </div>
             </transition>
         </div>
@@ -92,11 +106,11 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import TeamPlayerList from "./TeamPlayerList";
-import { cleanID, money } from "@/utils/content-utils";
+import { cleanID, getRoleSVG, money } from "@/utils/content-utils";
 import PlayerTeamDisplay from "./PlayerTeamDisplay";
 import { sortEvents } from "@/utils/sorts";
 import SignedTeamList from "@/components/broadcast/auction/SignedTeamList";
-import { logoBackground1 } from "@/utils/theme-styles";
+import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import BidFocus from "./BidFocus";
 import TeamFocus from "@/components/broadcast/auction/TeamFocus";
 import BiddingWar from "@/components/broadcast/auction/BiddingWar";
@@ -112,14 +126,68 @@ export default {
     data: () => ({
         tick: 0,
         socketPlayer: null,
+        socketPlayerID: null,
         bids: [],
-        justSigned: null,
+        justSignedTeamID: null,
         signedPlayer: null,
         signAmount: null,
         biddingActive: false,
-        stats: null
+        stats: null,
+        auctionServerConnected: true,
+        auctionState: "NOT_CONNECTED"
     }),
     computed: {
+        autoSettings() {
+            let totalSlots = 0;
+            let drafted = 0;
+            let slotsRemaining = 0;
+            const playersEachTeam = this.auctionSettings.each_team ?? 7;
+
+            (this.teams || []).forEach(team => {
+                totalSlots += playersEachTeam;
+                const playerCount = (team.players || []).length ?? 0;
+                drafted += playerCount;
+                slotsRemaining += (playersEachTeam - playerCount);
+            });
+
+            const draftablePlayerIDs = this.broadcast?.event?.draftable_players || [];
+            const preDraftedPlayerIDs = [];
+            const draftedPlayerIDs = [];
+            const undraftedPlayerIDs = [];
+
+            draftablePlayerIDs.forEach(id => {
+                if ((this.preDraftedTeams).some(team => team?.players?.some(p => cleanID(p.id) === cleanID(id)))) {
+                    preDraftedPlayerIDs.push(id);
+                } else if (this.teams.some(team => team?.players?.some(p => cleanID(p.id) === cleanID(id)))) {
+                    draftedPlayerIDs.push(id);
+                } else {
+                    undraftedPlayerIDs.push(id);
+                }
+            });
+
+            console.log("player IDs", {
+                preDraftedPlayerIDs,
+                draftedPlayerIDs,
+                undraftedPlayerIDs
+            });
+
+            return {
+                totalSlots,
+                drafted,
+                slotsRemaining,
+                totalPreDraftedPlayerCount: preDraftedPlayerIDs.length,
+                totalDraftablePlayerCount: draftablePlayerIDs.length - preDraftedPlayerIDs.length,
+                undraftedPlayerCount: undraftedPlayerIDs.length
+            };
+        },
+        // playersRemaining() {
+        //     let num = 0;
+        //     this.teams.forEach(team => {
+        //         if (team.players.length >= 7) return;
+        //         num += (7 - team.players.length);
+        //     });
+        //     return num;
+        // },
         background() {
             return logoBackground1(this.broadcast?.event);
         },
@@ -140,6 +208,7 @@ export default {
         },
         playerID() {
             // if (!this.biddingActive && !this.justSigned) return null;
+            if (this.socketPlayerID) return this.socketPlayerID;
             if (this.socketPlayer) return this.socketPlayer.id;
             if (!this.broadcast?.highlight_player) return null;
             return this.broadcast?.highlight_player[0];
@@ -169,9 +238,10 @@ export default {
         accolades() {
             if (!this.player) return [];
 
+            console.log("accolades", this.players?.member_of);
             return [
                 // team things
-                ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => e.accolades).filter(e => !!e)) : []),
+                ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => e.accolades).filter(e => e?.show_for_players)) : []),
                 ...(this.player.accolades ? this.player.accolades : [])
             ];
         },
@@ -232,8 +302,6 @@ export default {
             });
         },
         rightDisplay() {
-            // return "bid-focus";
-            // // eslint-disable-next-line no-unreachable
             if (this.justSigned) return "sign-focus";
             if (this.biddingWar && !this.showCaptainInfo) return "bidding-war";
             if (this.highlightedTeam) return "team-focus";
@@ -253,12 +321,18 @@ export default {
             const avg = (sum / balances.length) || 0;
             return avg;
         },
+        preDraftedTeams() {
+            if (!this._broadcast?.event?.teams?.length) return [];
+            let teams = this._broadcast.event.teams;
+            if (this.category) teams = teams.filter(t => !this.category || (t.team_category?.includes(";") ? t.team_category.split(";")[1] : t.team_category) !== this.category);
+            return teams;
+        },
         teams() {
             if (!this._broadcast?.event?.teams?.length) return null;
             let teams = this._broadcast.event.teams;// .filter(t => t.players?.length);
             if (this.category) teams = teams.filter(t => (t.team_category?.includes(";") ? t.team_category.split(";")[1] : t.team_category) === this.category);
 
-            return teams.sort((a, b) => a.draft_order - b.draft_order);
+            return teams.sort((a, b) => a.draft_order - b.draft_order);// .filter(t => t.players.length !== 7);
         },
         displayTeams() {
             if (!this.teams?.length) return [];
@@ -312,8 +386,8 @@ export default {
             // if (this.rightDisplay === "teams-2") teams = teams.slice(8, 16);
         },
         signedTeam() {
-            if (!this.justSigned?.id) return null;
-            return ReactiveRoot(this.justSigned.id, {
+            if (!this.justSignedTeamID) return null;
+            return ReactiveRoot(this.justSignedTeamID, {
                 theme: ReactiveThing("theme"),
                 players: ReactiveArray("players")
             });
@@ -321,21 +395,38 @@ export default {
         heroColor() {
             return this.signedTeam?.theme || this.broadcast?.event?.theme;
         },
+        blockColorCSS() {
+            if (!this.signedTeam?.theme?.color_theme) return null;
+            return {
+                backgroundImage: `linear-gradient(to top, ${this.signedTeam?.theme?.color_theme}, transparent)`
+            };
+        },
         leadingBid() {
             if (!this.bids) return null;
             return this.bids[this.bids.length - 1];
         },
         biddingWar() {
             // if (!this.biddingActive) return false;
-            const count = 5;
+            const count = 6;
             const latestBids = this.bids.slice(Math.max(this.bids.length - count, 0));
             if (latestBids.length !== count) return false;
             const teams = [];
+            console.log("latest bids", latestBids);
             latestBids.forEach((bid) => {
-                if (teams.indexOf(bid.team.id) === -1) teams.push(bid.team.id);
+                if (!teams.find(t => cleanID(t?.id) === cleanID(bid.teamID))) {
+                    teams.push(this.teams.find(t => cleanID(t.id) === cleanID(bid.teamID)));
+                }
             });
+            console.log("bidding war teams", teams);
             if (teams.length === 2) return teams;
             return null;
+        },
+        eventID() {
+            return cleanID(this._broadcast?.event?._original_data_id);
+        },
+        justSigned() {
+            if (!this.justSignedTeamID) return null;
+            return this.teams.find(t => t.id === this.justSignedTeamID);
         }
     },
     watch: {
@@ -344,15 +435,48 @@ export default {
             if (this.broadcastPlayerID !== null && this.broadcastPlayerID === this.socketPlayer.id) {
                 this.socketPlayer = null;
             }
+        },
+        eventID: {
+            immediate: true,
+            handler(eventID) {
+                console.log("eventID", eventID, this._broadcast);
+                if (!eventID) return;
+                console.log("Socket client subscribing", `auction:${eventID}`);
+                this.sendToAuctionServer("auction:subscribe");
+            }
         }
     },
     methods: {
+        themeBackground1,
         money,
+        getRoleSVG,
         getLogo(teamID) {
             return resizedImage(this.teams.find(t => t.id === cleanID(teamID))?.theme, ["small_logo", "default_logo"], "h-100");
         },
         getTheme(teamID) {
+            // console.log(teamID, this.teams.find(t => t.id === cleanID(teamID)));
             return logoBackground1(this.teams.find(t => t.id === cleanID(teamID)));
+        },
+        sendToAuctionServer(event, data) {
+            console.log("[socket]", "sending", event, data);
+            this.$socket.client.emit(event, {
+                auctionID: this.eventID,
+                ...data
+            });
+        },
+        playerRoles(roles) {
+            const allRoles = ["DPS", "Tank", "Support"];
+            const output = [];
+            if (!roles?.length) return output;
+            roles = roles.map(r => r === "Damage" ? "DPS" : r);
+            allRoles.forEach(role => {
+                if (roles.includes(role)) {
+                    output.push({ role, eligible: true });
+                } else {
+                    output.push({ role, eligible: false });
+                }
+            });
+            return output;
         }
     },
     mounted() {
@@ -364,12 +488,47 @@ export default {
         }, 8000);
     },
     sockets: {
-        auction_start(player) {
-            console.log("auction_start", player);
-            this.socketPlayer = player;
-            this.justSigned = null;
-            this.bids = [];
+        auction_welcome({ auctionID, ready, state, activePlayerID }) {
+            if (auctionID !== this.eventID) return console.warn("Auction welcome from unknown source", auctionID);
+            this.auctionServerConnected = true;
+            this.auctionState = state;
+            if (state === "IN_ACTION" && activePlayerID) {
+                this.socketPlayerID = activePlayerID;
+            }
+            console.log("auction welcome", { auctionID, ready, state });
+        },
+        auction_state({ state, oldState }) {
+            this.auctionState = state;
+            if (["RESTRICTED", "READY"].includes(state)) {
+                this.socketPlayerID = null;
+                this.justSignedTeamID = null;
+                this.signAmount = null;
+                this.bids = [];
+            }
+        },
+        auction_error(error) {
+            console.warn("Auction error", error);
+        },
+
+
+        auction_start({ activePlayerID }) {
+            console.log("auction_start", activePlayerID);
+            this.state = "IN_ACTION";
+            this.socketPlayerID = activePlayerID;
+            this.justSignedTeamID = null;
             this.biddingActive = true;
+        },
+        auction_pre_auction({ activePlayerID }) {
+            this.state = "PRE_AUCTION";
+            this.socketPlayerID = activePlayerID;
+            this.justSignedTeamID = null;
+            this.biddingActive = false;
+        },
+        auction_post_auction({ activePlayerID }) {
+            this.state = "POST_AUCTION";
+            this.justSignedTeamID = this.leadingBid?.teamID;
+            this.signAmount = this.leadingBid?.amount;
+            console.log("POST AUCTION SIGNED", this.leadingBid);
         },
         auction_bids(bids) {
             console.log("auction_bids", bids);
@@ -377,19 +536,19 @@ export default {
         },
         auction_signed({ player, team, amount }) {
             console.log("signed", { player, team, amount });
-            this.justSigned = team;
             this.signAmount = amount;
             this.biddingActive = false;
             this.signedPlayer = player;
-            setTimeout(() => {
-                // TODO: uncomment
-                if (this.justSigned) {
-                    this.socketPlayer = null;
-                    this.justSigned = null;
-                    this.signedPlayer = null;
-                    this.bids = [];
-                }
-            }, 20 * 1000);
+            this.justSignedTeamID = team;
+            // setTimeout(() => {
+            //     // TODO: uncomment
+            //     if (this.justSigned) {
+            //         this.socketPlayer = null;
+            //         this.justSigned = null;
+            //         this.signedPlayer = null;
+            //         this.bids = [];
+            //     }
+            // }, 20 * 1000);
         },
         auction_stats(stats) {
             console.log(stats);
@@ -504,6 +663,7 @@ export default {
         transform: translate(0,0)
     }
 
+
     .fade-scroll-enter-active, .fade-scroll-leave-active {
         transition: all 500ms ease;
     }
@@ -606,6 +766,10 @@ export default {
         transform: translate(0, -100%);
         opacity: 0;
     }
+    .fade-down-leave, .fade-down-enter-to {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
 
     .bids {
         transition: background-color 500ms ease;
@@ -652,5 +816,96 @@ export default {
         text-align: center;
         font-size: 32px;
         white-space: pre-wrap;
+    }
+
+
+    .auction-overlay .recolored-hero {
+        position: absolute;
+        left: -5vw !important;
+        height: 100vh !important;
+        bottom: -15vh !important;
+        width: 58vw !important;
+        z-index: 0;
+        opacity: 0.7;
+    }
+
+
+    .auction-overlay .color-holder {
+        width: 100% !important;
+    }
+    .auction-overlay .hero-image-base {
+        background-size: contain !important;
+    }
+    .auction-overlay .color-holder,
+    .auction-overlay .color-holder canvas {
+        object-fit: contain !important;
+    }
+
+    .auction-overlay .player-info,
+    .auction-overlay .countdown-holder {
+        z-index: 2;
+    }
+
+    .auction-overlay .event-stats {
+        display: none;
+    }
+
+    .auction-overlay .player-middle .player-name {
+        text-shadow: 0 0 8px #222222, 0 0 2px #222222;
+    }
+
+    .team-row .player-list .player {
+        font-size: 16px !important;
+    }
+    .player-info .player-role {
+        height: 60px;
+        margin-bottom: 20px;
+    }
+    .color-block {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0.5;
+    }
+    .color-block-fade-enter-active, .color-block-fade-leave-active { transition: opacity 750ms ease; }
+    .color-block-fade-enter, .color-block-fade-leave-to { opacity: 0; }
+    .color-block-fade-enter-to, .color-block-fade-leave { opacity: 0.5; }
+
+
+    .player-extras {
+        max-height: 670px;
+    }
+
+    .player-info-holder {
+        padding-top: 48px;
+    }
+
+    .role.ineligible {
+        opacity: 0.5;
+        transform: scale(0.6)
+    }
+    .role.eligible:not(.primary) {
+        transform: scale(0.8)
+    }
+    .player-eligible-roles {
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .player-eligible-roles .role {
+        width: 4em;
+        position: relative;
+    }
+    .role.ineligible:after {
+        content: "❌";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2em;
+        opacity: 0.8;
     }
 </style>

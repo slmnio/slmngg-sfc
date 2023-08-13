@@ -1,5 +1,5 @@
 <template>
-    <component :is="noLink ? 'div' : 'router-link'" :to="noLink ? null : this.overrideURL || url(this.type, this.linkTo || this.thing, this.linkOptions || {})" class="link content-thing default-thing" :style="bgStyle" v-bind:class="{ 'has-headshot' : showHeadshot && headshot }">
+    <component :is="noLink ? 'div' : 'router-link'" :to="noLink ? null : this.overrideURL || url(this.type, this.linkTo || this.thing, this.linkOptions || {})" class="link content-thing default-thing" :style="bgStyle" :class="{ 'has-headshot' : showHeadshot && headshot }">
       <span class="link-headshot" v-if="showHeadshot">
         <span class="headshot" :style="headshot"></span>
       </span>
@@ -61,7 +61,7 @@ export default {
         },
         logo () {
             if (!this.theme || !this.theme.default_logo) return null;
-            return resizedImage(this.theme, ["small_logo", "default_logo"], "h-120");
+            return resizedImage(this.theme, ["small_logo", "default_logo"], "s-120");
         },
         headshot () {
             if (!this.thing) return null;

@@ -2,7 +2,7 @@
     <div v-if="team">
         <ThingTop :thing="team" type="team" :themeURL="subLink('theme')"></ThingTop>
         <SubPageNav class="my-2">
-            <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
+            <li class="nav-item"><router-link class="nav-link" :to="subLink('')">{{ showPublicTeamDetails === true ? 'Details' : 'Overview' }}</router-link></li>
             <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
             <li class="nav-item" v-if="useTeamCompositions"><router-link class="nav-link" :to="subLink('composition')">Composition</router-link></li>
             <li class="nav-item" v-if="team.theme"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
@@ -10,7 +10,7 @@
 
             <ul class="socials d-flex" v-if="team.socials">
                 <li class="nav-item">
-                    <Social class="ct-active" :social="social" v-for="social in team.socials" v-bind:key="social.id"/>
+                    <Social class="ct-active" :social="social" v-for="social in team.socials" :key="social.id"/>
                 </li>
             </ul>
 
@@ -25,6 +25,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import SubPageNav from "@/components/website/SubPageNav";
 import Social from "@/components/website/Social";
 import { resizedImageNoWrap } from "@/utils/images";
+import { cleanID } from "@/utils/content-utils";
 
 export default {
     name: "Team",
@@ -86,6 +87,16 @@ export default {
                 })
             });
         },
+        showPublicTeamDetails() {
+            if (this.team.__loading || !this.team?.id) return null;
+            if (this.team.event === undefined) return false;
+            if (this.team.event?.__loading || !this.team.event?.id) return null;
+
+            return this.team.event?.show_public_team_details || false;
+        },
+        eventID() {
+            return this.team?.event?.id;
+        },
         eventSettings() {
             if (!this.team?.event?.blocks) return null;
             try {
@@ -97,6 +108,19 @@ export default {
         useTeamCompositions() {
             return this.eventSettings?.composition?.use && (this.team?.players || []).some(p => p.composition_tank_sr || p.composition_dps_sr || p.composition_support_sr);
         }
+    },
+    watch: {
+        eventID: {
+            handler(id) {
+                console.log("team's event id change", cleanID(id));
+                this.$emit("id_change", cleanID(id));
+            },
+            immediate: true
+        }
+    },
+    beforeRouteLeave(to, from, next) {
+        this.$emit("id_change", null);
+        next();
     }
 };
 

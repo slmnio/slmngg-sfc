@@ -1,6 +1,6 @@
 <template>
     <BroadcastApp v-if="broadcastID" :id="broadcastID" :title="title" :client="_client" :no-animation="noAnimation"
-        :no-stinger="noStinger" :body-class="bodyClass" :full="full" :clientName="client" />
+        :no-stinger="noStinger" :body-class="bodyClass" :full="full" :clientName="client" :background-index="backgroundIndex" />
 </template>
 
 <script>
@@ -9,7 +9,7 @@ import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "ClientApp",
     components: { BroadcastApp },
-    props: ["client", "title", "noAnimation", "noStinger", "bodyClass", "full"],
+    props: ["client", "title", "noAnimation", "noStinger", "bodyClass", "full", "backgroundIndex"],
     computed: {
         _client() {
             return ReactiveRoot(`client-${this.client}`, {

@@ -1,94 +1,73 @@
 import EventRoutes from "@/router/event";
-const Team = () => import("@/views/Team");
-const Cams = () => import("@/views/sub-views/Cams");
-const TeamMain = () => import("@/views/sub-views/TeamMain");
-const TeamSchedule = () => import("@/views/sub-views/TeamSchedule");
-const TeamTheme = () => import("@/views/sub-views/ThingTheme");
-const TeamDetails = () => import("@/views/sub-views/TeamDetails");
-const Event = () => import("@/views/Event");
-const Player = () => import("@/views/Player");
-const PlayerMain = () => import("@/views/sub-views/PlayerMain");
-const PlayerCasts = () => import("@/views/sub-views/PlayerCasts");
-const PlayerNews = () => import("@/views/sub-views/PlayerNews");
-const PlayerMatches = () => import("@/views/sub-views/PlayerMatches");
-const PlayerPlayedMatches = () => import("@/views/sub-views/PlayerPlayedMatches");
-const Match = () => import("@/views/Match");
-const News = () => import("@/views/News");
-const DetailedMatch = () => import("@/views/DetailedMatch");
-const MatchVOD = () => import("@/views/sub-views/MatchVOD");
-const MatchHistory = () => import("@/views/sub-views/MatchHistory");
-const TeamComposition = () => import("@/views/sub-views/TeamComposition");
-const PlayerBrands = () => import("@/views/sub-views/PlayerBrands");
-const MatchEditor = () => import("@/components/website/dashboard/MatchEditor");
-const PlayerParticipation = () => import("@/views/sub-views/PlayerParticipation");
-const Me = () => import("@/views/Me");
 
 export default [
     {
         path: "/team/:id",
         // name: "Team",
-        component: Team,
+        component: () => import("@/views/Team"),
         props: route => ({ id: route.params.id }),
         children: [
-            { path: "", component: TeamMain },
-            { path: "matches", component: TeamSchedule },
-            { path: "theme", component: TeamTheme },
-            { path: "details", component: TeamDetails },
-            { path: "composition", component: TeamComposition }
+            { path: "", component: () => import("@/views/sub-views/TeamMainPage.vue") },
+            { path: "matches", component: () => import("@/views/sub-views/TeamSchedule.vue") },
+            { path: "theme", component: () => import("@/views/sub-views/ThingTheme.vue") },
+            { path: "details", component: () => import("@/views/sub-views/TeamDetails.vue") },
+            { path: "composition", component: () => import("@/views/sub-views/TeamComposition.vue") }
         ]
     },
     {
         path: "/event/:id",
         // name: "Event",
-        component: Event,
+        component: () => import("@/views/Event.vue"),
         props: route => ({ id: route.params.id }),
         children: EventRoutes
     },
     {
         path: "/player/:id",
         // name: "Player",
-        component: Player,
+        component: () => import("@/views/Player"),
         props: route => ({ id: route.params.id }),
         children: [
-            { path: "", component: PlayerMain },
-            { path: "casts", component: PlayerCasts },
-            { path: "news", component: PlayerNews },
-            { path: "matches", component: PlayerMatches },
-            { path: "played-matches", component: PlayerPlayedMatches },
-            { path: "brands", component: PlayerBrands },
-            { path: "participation", component: PlayerParticipation }
+            { path: "", component: () => import("@/views/sub-views/PlayerMain.vue") },
+            { path: "casts", component: () => import("@/views/sub-views/PlayerCasts.vue") },
+            { path: "news", component: () => import("@/views/sub-views/PlayerNews.vue") },
+            { path: "matches", component: () => import("@/views/sub-views/PlayerMatches.vue") },
+            { path: "played-matches", component: () => import("@/views/sub-views/PlayerPlayedMatches.vue") },
+            { path: "match-stats", component: () => import("@/views/sub-views/PlayerMatchStats.vue") },
+            { path: "brands", component: () => import("@/views/sub-views/PlayerBrands.vue") },
+            { path: "participation", component: () => import("@/views/sub-views/PlayerParticipation.vue") },
+            { path: "banner", component: () => import("@/views/sub-views/PlayerBannerCreator.vue") }
         ]
     },
     {
         path: "/me",
-        component: Me,
+        component: () => import("@/views/Me.vue"),
         meta: {
             requiresAuth: true
         }
     },
     {
         path: "/me/:subPage",
-        component: Me,
+        component: () => import("@/views/Me.vue"),
         props: route => ({ subPage: route.params.subPage }),
         meta: {
             requiresAuth: true
         }
     },
-    { path: "cams", component: Cams },
+    { path: "cams", component: () => import("@/views/sub-views/Cams.vue") },
     {
         path: "/match/:id",
-        component: Match,
+        component: () => import("@/views/Match.vue"),
         props: route => ({ id: route.params.id }),
         children: [
-            { path: "", component: MatchVOD },
-            { path: "history", component: MatchHistory },
-            { path: "editor", component: MatchEditor, meta: { requiresAuth: true } }
+            { path: "", component: () => import("@/views/sub-views/MatchVOD.vue") },
+            { path: "history", component: () => import("@/views/sub-views/MatchHistory.vue") },
+            { path: "editor", component: () => import("@/views/sub-views/EventMatchEditor.vue"), meta: { requiresAuth: true } }
         ]
     },
-    { path: "/detailed/:id", component: DetailedMatch, props: route => ({ id: route.params.id }) },
+    { path: "/detailed/:id", component: () => import("@/views/DetailedMatch.vue"), props: route => ({ id: route.params.id }) },
     {
         path: "/news/:slug",
-        component: News,
+        component: () => import("@/views/News.vue"),
         props: route => ({ slug: route.params.slug })
     }
 ];

@@ -2,11 +2,14 @@
     <div class="generic-overlay flex-center flex-column" :class="{'full': full}">
         <TourneyBar class="st4-top" v-if="top === 'st4'" :broadcast="broadcast" left="Schedule" :right="title"/>
         <div class="g-title-wrapper">
-            <theme-transition :theme="theme" :active="$root.animationActive" end="middle"  :duration="500" :inner-delay="150" one-color="true">
+            <theme-transition :theme="theme" :active="$root.animationActive" one-color end="middle"  :duration="500" :inner-delay="150">
                 <div class="generic-overlay-title g-title overlay--bg flex-center" :style="{borderColor: _accentColor, ...(titleStyle || {})}">
-                    <transition name="fade" mode="out-in">
-                        <span class="industry-align" :key="title" v-bind:class="{'has-br': title.includes('\\n') }" v-html="nbr(title)"></span>
-                    </transition>
+                    <Squeezable align="middle" :disabled="(title || '').includes('\\n')" class="w-100 flex-center industry-align">
+                        <transition name="fade" mode="out-in">
+                            <div class="industry-align title-text" :key="title" :class="{'has-br': title?.includes('\\n') }"
+                                  v-html="nbr(title)"></div>
+                        </transition>
+                    </Squeezable>
                 </div>
             </theme-transition>
         </div>
@@ -14,7 +17,7 @@
                 <div v-if="noBottomAnimate" class="generic-overlay-body g-body overlay--bg flex-center" :style="bodyStyle">
                     <slot></slot>
                 </div>
-            <theme-transition v-else :active="$root.animationActive" :theme="theme" :starting-delay="100" end="middle" :duration="500" :inner-delay="150" one-color="true">
+            <theme-transition v-else :active="$root.animationActive" one-color :theme="theme" :starting-delay="100" end="middle" :duration="500" :inner-delay="150">
                 <div class="generic-overlay-body g-body overlay--bg flex-center" :style="bodyStyle">
                     <slot></slot>
                 </div>
@@ -26,9 +29,10 @@
 <script>
 import TourneyBar from "@/components/broadcast/TourneyBar";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
+import Squeezable from "@/components/broadcast/Squeezable.vue";
 export default {
     name: "GenericOverlay",
-    components: { ThemeTransition, TourneyBar },
+    components: { Squeezable, ThemeTransition, TourneyBar },
     props: ["title", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "titleStyle", "customTheme", "full"],
     methods: {
         nbr(text) {
@@ -51,6 +55,7 @@ export default {
             if (this.noBottom) {
                 css.borderColor = "transparent";
                 css.borderBottomWidth = "0";
+                css.padding = "0";
             }
             return css;
         }
@@ -95,6 +100,7 @@ export default {
     line-height: 1;
     text-align: center;
     height: 100%;
+    padding: 0 .4em;
 }
 .g-title-wrapper {
     width: 100%;

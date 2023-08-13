@@ -13,7 +13,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="player in people" v-bind:key="player.id">
+            <tr v-for="player in people" :key="player.id">
                 <td class="wide">
                     <span v-for="role in player.is" :key="role" v-b-tooltip="role" v-html="getRoleSVG(role)" class="mr-1"></span>
                     <LinkedPlayers :players="[player]"/>

@@ -4,12 +4,17 @@
             <!--        <div style="font-size: 5em; color: black">{{ $root.activeScene }}</div>-->
             <router-view id="overlay" :class="bodyClass" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active"
                          :animation-active="animationActive" :full="full" @prodUpdate="(x) => prodUpdate(x)" ref="overlay"/>
+
+            <BroadcastBackground class="force-background" v-if="backgroundIndex" :broadcast="broadcast" :index="backgroundIndex" />
+
             <v-style v-if="broadcast && broadcast.event && !noBroadcastStyle">
                 {{ broadcast.event.broadcast_css }}
-
                 :root {
                 --broadcast-transition-offset: {{ broadcast.transition_offset || 0 }}ms;
                 }
+            </v-style>
+            <v-style v-if="broadcast && broadcast.broadcast_css && !noBroadcastStyle">
+                {{ broadcast.broadcast_css }}
             </v-style>
         </div>
     </StingerWrap>
@@ -18,6 +23,7 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import StingerWrap from "@/components/broadcast/StingerWrap";
+import BroadcastBackground from "@/components/broadcast/BroadcastBackground.vue";
 
 function getComponentName(route) {
     try {
@@ -30,8 +36,9 @@ function getComponentName(route) {
 
 export default {
     name: "BroadcastApp",
-    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass", "full", "clientName"],
+    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass", "full", "clientName", "backgroundIndex"],
     components: {
+        BroadcastBackground,
         StingerWrap
     },
     data: () => ({
@@ -52,15 +59,27 @@ export default {
             return classes.join(" ");
         },
         broadcast() {
-            return ReactiveRoot(this.id || `broadcast-${this.code}`, {
+            const broadcast = ReactiveRoot(this.id || `broadcast-${this.code}`, {
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")
                 }),
+                theme_override: ReactiveThing("theme_override"),
+                gfx: ReactiveArray("gfx"),
                 other_broadcasts: ReactiveArray("other_broadcasts"),
                 headlines: ReactiveArray("headlines"),
                 highlight_media: ReactiveThing("highlight_media"),
                 highlight_hero: ReactiveThing("highlight_hero")
             });
+            if (broadcast?.event?.id && broadcast?.theme_override?.id) {
+                return {
+                    ...broadcast,
+                    event: {
+                        ...broadcast.event,
+                        theme: broadcast.theme_override
+                    }
+                };
+            }
+            return broadcast;
         },
         haltAnimations() {
             return this.noAnimation || (this.broadcast?.broadcast_settings || []).includes("No animations");
@@ -87,6 +106,9 @@ export default {
                     ...this.lastProdData
                 }
             };
+        },
+        broadcastKey() {
+            return this.code || this.broadcast?.key;
         }
     },
     methods: {
@@ -111,9 +133,9 @@ export default {
                 this.active = !this.active;
             });
         }
-        if (!this.client) {
-            console.log("loading with broadcast client");
-            this.$socket.client.emit("prod-join", `broadcast--${this.code}`);
+        if (this.broadcastKey) {
+            console.log("loading with broadcastKey");
+            this.$socket.client.emit("prod-broadcast-join", this.broadcastKey);
         }
 
 
@@ -152,6 +174,10 @@ export default {
             handler() {
                 this.prodUpdate();
             }
+        },
+        broadcastKey(newCode) {
+            console.log(newCode);
+            this.$socket.client.emit("prod-broadcast-join", newCode);
         }
     },
     beforeCreate () {
@@ -178,5 +204,15 @@ export default {
     }
     body.overlay {
         --overlay-line-height-adjust: translate(0, -0.0925em);
+    }
+</style>
+<style scoped>
+    .force-background {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        top: 0;
+        left: 0;
     }
 </style>

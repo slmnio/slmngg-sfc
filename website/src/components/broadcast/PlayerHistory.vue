@@ -14,7 +14,7 @@
 
                 <div class="title d-flex flex-column text-center mb-2">Team History</div>
                 <div class="player-teams d-flex flex-wrap flex-center">
-                    <PlayerTeamDisplay :team="team" v-for="team in playerTeams" v-bind:key="team.id" :showName="true"/>
+                    <PlayerTeamDisplay :team="team" v-for="team in playerTeams" :key="team.id" :showName="true"/>
                 </div>
             </div>
         </div>

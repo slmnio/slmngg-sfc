@@ -1,5 +1,6 @@
 import spacetime from "spacetime";
 import informal from "spacetime-informal";
+import { sortEvents, sortTeams } from "@/utils/sorts";
 
 export function getImage (i) {
     // console.log(i);
@@ -48,7 +49,7 @@ export function image (theme, key) {
     return `url(${getImage(theme[key])})`;
 }
 
-export function resizedImage(theme, key, minSize = 30) {
+function resizedImage(theme, key, minSize = 30) {
     if (!theme || !theme[key] || !theme[key][0]) return "";
     const image = theme[key][0];
     if (!image.thumbnails) return image.url;
@@ -65,6 +66,12 @@ export function cleanID (id) {
     if (!id) return null;
     if (typeof id !== "string") return null;
     if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
+    return id;
+}
+export function dirtyID(id) {
+    // add rec
+    if (!id) return id;
+    if (id.length === 14) return "rec" + id;
     return id;
 }
 
@@ -169,7 +176,7 @@ export function money(num) {
 }
 
 export function getAuctionMax() {
-    return 8;
+    return 7;
 }
 
 export function clarifyTeam(team) {
@@ -230,15 +237,24 @@ export const DefaultMapImages = {
     Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png"
 };
 
-export function getTeamsMapStats(teams, requestMatch, requestMap) {
-    console.log(requestMatch);
+export const MapTypeIcons = {
+    Hybrid: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907303867088896/180.png",
+    Escort: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907343893336097/180.png",
+    Control: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907374708903946/180.png",
+    Push: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908279537717392/Push.png",
+    Assault: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908385250934904/assault.png"
+};
+
+export function getTeamsMapStats(teams, requestMatch, requestMap, filters) {
+    console.log("get teams map stats", requestMatch, filters);
     if (!teams) return null;
     const stats = teams.map(team => {
         const stat = {
             played: 0,
             wins: 0,
             losses: 0,
-            draws: 0
+            draws: 0,
+            unplayed: 0
         };
 
         const prevMatches = (team.matches || [])
@@ -248,7 +264,17 @@ export function getTeamsMapStats(teams, requestMatch, requestMap) {
         const latestMatch = prevMatches.length ? prevMatches[0] : null;
 
 
-        (team.matches || []).forEach(match => {
+        (team.matches || []).filter(m => {
+            if (filters?.match_group) {
+                console.log("match group", filters.match_group, m.match_group, filters.match_group !== m.match_group);
+                if (filters.match_group !== m.match_group) return false;
+            }
+            if (filters?.sub_event) {
+                console.log("sub event", filters.sub_event, m.sub_event, filters.sub_event !== m.sub_event);
+                if (filters.sub_event !== m.sub_event) return false;
+            }
+            return true;
+        }).forEach(match => {
             (match.maps || []).forEach(matchMap => {
                 if (!matchMap.map) return; // no proper map data
                 if (requestMap.id !== cleanID(matchMap.map[0])) return; // isn't this map
@@ -259,7 +285,11 @@ export function getTeamsMapStats(teams, requestMatch, requestMap) {
                     if (scheduledMap) stat.scheduled_for_match = true;
                 }
 
-                if (!(matchMap.draw || matchMap.winner)) return; // wasn't played fully
+                if (!(matchMap.draw || matchMap.winner || matchMap.banner)) {
+                    // wasn't played fully
+                    if ([match.score_1, match.score_2].includes(match.first_to)) stat.unplayed++;
+                    return;
+                }
 
                 // woo right map
 
@@ -305,14 +335,175 @@ export function getTeamsMapStats(teams, requestMatch, requestMap) {
     };
 }
 
-function getAbbrev(timezone, time) {
+/**
+ * @param {string?} stateTimezone - timezone from state
+ * @returns {string} - proper timezone name
+ */
+export function getTimezone(stateTimezone) {
+    return (stateTimezone === "local" || !stateTimezone) ? spacetime.now().timezone().name : stateTimezone;
+}
+
+
+/**
+ * @param {string} timezone
+ * @param {Spacetime} time
+ * @returns {string} abbreviation
+ */
+export function getAbbrev(timezone, time) {
+    timezone = getTimezone(timezone);
     const display = informal.display(timezone);
     return time.isDST() ? display.daylight.abbrev : display.standard.abbrev;
 }
 
-export function formatTime(timeString, stateTimezone, format) {
-    const timezone = stateTimezone === "local" ? spacetime.now().timezone().name : stateTimezone;
+
+/**
+ *
+ * @param {ParsableDate | Date | number | Array<number> | string} timeString - spacetime parsable date/time string
+ * @param {string?} tz - site timezone from store
+ * @param {string?} format - override for format
+ * @param {boolean?} use24HourTime - use 24 hour time
+ * @returns {string}
+ */
+export function formatTime(timeString, { tz, use24HourTime = false, format = "{day-short} {date-ordinal} {month-short} {year} {time} {tz}" }) {
+    const timezone = getTimezone(tz);
     const time = spacetime(timeString).goto(timezone);
     const abbrev = getAbbrev(timezone, time);
-    return time.format((format || "{date-ordinal} {month-short} {year} {time} {tz}").replace("{tz}", abbrev));
+    return time.format(
+        format
+            .replace("{tz}", abbrev)
+            .replace("{time}", use24HourTime ? "{time-24}" : "{time}")
+            .replace("{year-short-prev-only}", time.year() === spacetime.now().year() ? "" : "{year-short}")
+            .trim()
+    );
+}
+
+
+export function getEmbedData(url) {
+    const vodURL = new URL(url);
+
+    if (vodURL.host === "www.youtube.com") {
+        let ts = 0;
+        if (vodURL.searchParams.get("t")) {
+            let timestamp = vodURL.searchParams.get("t");
+            if (["h", "m", "s"].some(t => timestamp.includes(t))) {
+                // has a hms in it
+                timestamp = timestamp.match(/\d+[hms]/g);
+                timestamp.forEach(t => {
+                    const time = t.slice(0, -1);
+                    const hms = t.slice(-1);
+                    const mult = {
+                        s: 1,
+                        m: 60,
+                        h: 60 * 60
+                    };
+                    ts += parseInt(time) * mult[hms];
+                });
+            } else {
+                ts = timestamp;
+            }
+        }
+
+        console.log(ts);
+
+        return { service: "youtube", key: vodURL.searchParams.get("v"), timestamp: ts || null };
+    }
+    if (vodURL.host === "youtu.be") {
+        return { service: "youtube", key: vodURL.pathname.slice(1), timestamp: vodURL.searchParams.get("t") || null };
+    }
+    if (["www.twitch.tv", "twitch.tv"].includes(vodURL.host)) {
+        const embed = {
+            service: (vodURL.pathname.split("/").length === 3 ? "twitch" : "twitch-live"),
+            key: vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1)
+        };
+        if (embed.service === "twitch") {
+            embed.timestamp = vodURL.searchParams.get("t") || null;
+        }
+        return embed;
+    }
+
+    if (url.endsWith(".pdf")) {
+        return {
+            service: "pdf",
+            url: url
+        };
+    }
+
+    if (["mp4", "webm"].some(file => url.endsWith("." + file))) {
+        return {
+            service: "unknown-video",
+            url: url
+        };
+    }
+
+    return { service: "unknown", url: url };
+}
+
+
+export function unescapeText(text) {
+    return text
+        .replaceAll("&amp;", "&")
+        .replaceAll("&lt;", "<")
+        .replaceAll("&gt;", ">")
+        .replaceAll("&quot;", "\"")
+        .replaceAll("&#039;", "'");
+}
+
+
+export function createGuestObject(str) {
+    const guest = {
+        manual: true
+    };
+
+    str.split(/[,|]/).forEach(part => {
+        if (!part) return;
+        part = part.trim();
+
+        if (part.startsWith("@")) {
+            guest.twitter = part;
+        } else if (part.includes("view=")) {
+            guest.webcam = part;
+        } else if (part.startsWith("http")) {
+            guest.avatar = part;
+        } else if (part.includes("/")) {
+            guest.pronouns = part;
+        } else {
+            guest.name = part;
+        }
+    });
+    return guest;
+}
+
+export function getGuestString(guest) {
+    delete guest.manual;
+    return Object.values(guest).join("|");
+}
+
+export function getAssociatedThemeOptions(player, valueFn) {
+    let teams = [
+        ...player.member_of || [],
+        ...player.captain_of || [],
+        ...player.team_staff || [],
+        ...player.brands_designed || [],
+        ...player.owned_teams || []
+    ];
+    let events = [
+        ...player.event_staff || [],
+        ...player.event_brands_designed || [],
+        ...player.casted_events || []
+    ];
+
+    (player.player_relationships || []).forEach(rel => {
+        if (rel.teams) {
+            teams = [...teams, ...rel.teams];
+        }
+        if (rel.events) {
+            events = [...events, ...rel.events];
+        }
+    });
+
+    return [
+        { value: null, disabled: true, text: "Choose a theme" },
+        { label: "Teams", options: teams.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortTeams).map((t) => ({ ...t, text: t.name, value: valueFn ? valueFn(t) : t.id })) },
+        { label: "Events", options: events.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortEvents).map((e) => ({ ...e, text: e.name, value: valueFn ? valueFn(e) : e.id })) }
+    ];
 }

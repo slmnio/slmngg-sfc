@@ -353,7 +353,7 @@ module.exports = ({ app, Cache }) => {
     }
 
     async function getAllRedirects() {
-        return Promise.all((await Cache.get("Redirects"))?.ids?.map(id => Cache.get(id)));
+        return Promise.all(((await Cache.get("Redirects"))?.ids || []).map(id => Cache.get(id)));
     }
 
     async function getRedirect(path = "", subdomain) {

@@ -24,7 +24,7 @@ function niceJoin(array) {
 module.exports = ({ app, cors, Cache, io }) => {
     app.get("/redirect", async (req, res) => {
         try {
-            let redirects = (await Cache.get("Redirects"))?.items;
+            let redirects = await Promise.all(((await Cache.get("Redirects"))?.ids || []).map(id => Cache.get(id)));
 
             let subdomain = req.query.subdomain || null;
             let path = req.query.path;
@@ -32,7 +32,7 @@ module.exports = ({ app, cors, Cache, io }) => {
             path = path.trim().toLowerCase();
 
 
-            if (!redirects) return res.send({ redirect: null, warn: "no redirects loaded" });
+            if (!redirects?.length) return res.send({ redirect: null, warn: "no redirects loaded" });
 
             let redirect = redirects.find(r => {
                 if (!r.active) return false;

@@ -166,6 +166,12 @@
                             <a class="ct-active" :href="matchThumbnailURL(match, 1080)"  rel="nofollow" target="_blank">1080p</a>
                         </template>
                     </stat>
+                    <stat>
+                        Credits
+                        <template v-slot:content>
+                            <CopyTextButton style="white-space: pre" :content="credits">Copy credits</CopyTextButton>
+                        </template>
+                    </stat>
                 </div>
             </div>
         </div>
@@ -299,6 +305,25 @@ export default {
                     })
                 })
             });
+        },
+        credits() {
+            const groups = [
+                {
+                    meta: {
+                        singular_name: "Caster",
+                        plural_name: "Casters"
+                    },
+                    items: this.match?.casters
+                },
+                ...this.playerRelationshipGroups
+            ];
+
+            console.log("credits groups", groups);
+
+            return groups.map(group => [
+                (group.items.length === 1 ? group.meta.singular_name + ": " : group.meta.plural_name + ":"),
+                group.items.map(p => p.name + (p.twitter_link ? " " + p.twitter_link : "")).join("\n")
+            ].join("\n")).join("\n\n");
         },
         _theme() {
             return this.match?.event?.theme;

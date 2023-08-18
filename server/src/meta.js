@@ -352,12 +352,15 @@ module.exports = ({ app, Cache }) => {
         ].includes(domain.toLowerCase());
     }
 
+    async function getAllRedirects() {
+        return Promise.all(((await Cache.get("Redirects"))?.ids || []).map(id => Cache.get(id)));
+    }
+
     async function getRedirect(path = "", subdomain) {
         // get all redirects
         // see if any match path/subdomain combo
         // if it does, send back data for indexer
-
-        let redirects = (await Cache.get("Redirects"))?.items;
+        let redirects = await getAllRedirects();
         if (!path.startsWith("/")) path = "/" + path;
         path = path.trim().toLowerCase();
         if (!redirects?.length) return null;

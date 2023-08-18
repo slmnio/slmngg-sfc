@@ -1,7 +1,7 @@
 <template>
-    <div class="break-text-overlay flex-center">
+    <div class="break-text-overlay flex-center text-center">
         <div class="event-logo bg-center" :style="eventLogo"></div>
-        <div class="break-text">{{ title }}</div>
+        <div class="break-text" v-html="nbr(title)"></div>
     </div>
 </template>
 
@@ -14,6 +14,12 @@ export default {
     computed: {
         eventLogo() {
             return resizedImage(this.broadcast?.event?.theme, ["allmode_logo", "default_wordmark", "default_logo"], "w-1920");
+        }
+    },
+    methods: {
+        nbr(text) {
+            if (!text) return "";
+            return text.replace(/\\n/g, "<br>");
         }
     }
 };
@@ -33,5 +39,6 @@ export default {
         font-size: 8em;
         font-weight: bold;
         text-transform: uppercase;
+        line-height: 1;
     }
 </style>

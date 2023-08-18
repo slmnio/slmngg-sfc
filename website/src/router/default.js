@@ -14,6 +14,7 @@ import Dashboard from "@/views/Dashboard";
 import ProfilePage from "@/views/ProfilePage";
 import TwitchAuthScopeSelector from "@/components/website/TwitchAuthScopeSelector";
 import BracketCreator from "@/views/BracketCreator.vue";
+import NotFoundPage from "@/views/NotFoundPage";
 
 export default [
     {
@@ -92,7 +93,8 @@ export default [
             backgroundIndex: route.query.background && parseInt(route.query.background)
         }),
         children: BroadcastRoutes
-    }
+    },
+    { path: "*", component: NotFoundPage }
     // {
     //     path: "/redirect",
     //     beforeEnter: (to, from, next) => {

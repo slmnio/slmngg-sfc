@@ -1,5 +1,5 @@
 <template>
-    <div class="recolored-hero">
+    <div class="recolored-hero" :data-hero="hero?.name">
         <div class="color-holder">
             <div class="hero-image-base" :style="mainImage || fallbackImage" :class="{ 'fallback-image': !mainImage && fallbackImage }"></div>
 

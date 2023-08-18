@@ -35,7 +35,7 @@
                             <DeskPrediction v-for="guest in guests" :key="guest.id" :guest="guest" :event="broadcast.event" />
                         </div>
                         <div class="match-middle-maps flex-center" v-if="middleMode === 'Maps'" key="Maps">
-                            <MapDisplay :broadcast="broadcast" no-map-videos="true" />
+                            <MapDisplay :small="true" :broadcast="broadcast" no-map-videos="true" />
                         </div>
                     </transition>
                 </div>
@@ -59,7 +59,7 @@ import MapDisplay from "@/components/broadcast/MapDisplay";
 export default {
     name: "DeskMatch",
     components: { DeskPrediction, DeskTeam, DeskNotice, DeskTeamName, MapDisplay },
-    props: ["_match", "themeColor", "matchID", "broadcast", "guests"],
+    props: ["_match", "themeColor", "matchID", "broadcast", "guests", "forceMode"],
     computed: {
         matchData() {
             return this._match || ReactiveRoot(this.matchID, {
@@ -106,6 +106,7 @@ export default {
             };
         },
         middleMode() {
+            if (this.forceMode) return this.forceMode;
             let display = this.broadcast?.desk_display || "";
 
             if (display.indexOf("(") !== -1) {
@@ -220,7 +221,7 @@ export default {
         border-top-width: 4px;
     }
     .match-middle-maps >>> .map-logo-holder {
-        height: 70% !important;
+        height: 80% !important;
     }
     .match-middle-maps >>> .map-bg {
         transform: translate(0, -12%);

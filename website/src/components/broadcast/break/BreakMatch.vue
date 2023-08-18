@@ -30,7 +30,7 @@
                     </div>
                     <div class="match-team-logo-spacer" v-if="expanded"></div>
                 </div>
-            <div class="match-team-center" v-if="match">
+            <div class="match-team-center industry-align" v-if="match">
                 <div v-if="centerShow === 'scores'" class="center-scores flex-center">
                     <div class="center-score" :style="winCSS(0)" :class="{'win': scores[0] === match.first_to}"><span class="industry-align">{{ scores[0] }}</span></div>
                     <div class="center-dash">-</div>

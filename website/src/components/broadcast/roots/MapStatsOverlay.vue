@@ -87,7 +87,7 @@ export default {
             }
 
             return maps.map((map) => ({
-                hide_records: !!(!matchIsFinished && this.hideCompletedRecords && map.winner),
+                hide_records: !!(!matchIsFinished && this.hideCompletedRecords && (map.winner || map.banner || map.draw)),
                 ...map
             }));
         },

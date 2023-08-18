@@ -37,10 +37,16 @@ module.exports = {
                 return interaction.followUp("Couldn't find a broadcast");
             }
             const clientID = player.clients?.[0];
-            targetBroadcast = broadcasts.filter(broadcast => {
-                if (!broadcast.active) return false;
-                return (broadcast.clients || []).includes(clientID);
-            })?.[0];
+
+            const client = await Cache.get(clientID);
+            if (!client) {
+                return interaction.followUp("Couldn't find player client");
+            }
+
+            targetBroadcast = client?.broadcast
+                .map(broadcastID => broadcasts.find(broadcast => broadcast.id === broadcastID))
+                .find(broadcast => broadcast?.active);
+
         }
 
         if (!targetBroadcast) {

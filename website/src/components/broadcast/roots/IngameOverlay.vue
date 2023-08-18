@@ -23,7 +23,6 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import IngameTeam from "@/components/broadcast/IngameTeam";
 import Middle from "@/components/broadcast/Middle";
 import Sponsors from "@/components/broadcast/Sponsors";
-import { themeBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "IngameOverlay",
@@ -126,24 +125,35 @@ export default {
 
                 let mapText;
 
-                const currentMap = (this.match.maps || []).map((map, i) => ({
+                const maps = (this.match.maps || []).map((map, i) => ({
                     ...map,
                     number: map.number || i + 1
-                })).find(map => !(map.draw || map.winner));
+                })).filter(map => !map.banner);
 
+                let currentMap = maps.find(map => !(map.draw || map.winner));
 
-                if ([this.match.score_1, this.match.score_2].includes(this.match.first_to)) {
-                    // match has finished
-                    mapText = "Final Score"; // maybe
-                    // mapText = `Map ${currentMap.number - 1}`;
-                } else if (currentMap) {
+                if (!currentMap && maps.length) {
+                    currentMap = maps[maps.length - 1];
+                }
+
+                // if ([this.match.score_1, this.match.score_2].includes(this.match.first_to)) {
+                //     // match has finished
+                //     // mapText = "Final Score"; // maybe
+                //     mapText = `Map ${currentMap.number}`;
+                // } else if (currentMap) {
+                //     mapText = `Map ${currentMap.number}`;
+                // }
+
+                if (currentMap) {
                     mapText = `Map ${currentMap.number}`;
                 }
 
+                console.log("map text", mapText, currentMap);
 
-                if (this.match.first_to && mapText) {
+
+                if (this.match.first_to && currentMap) {
                     // Map X - First to Y
-                    return `${mapText} - First to ${this.match.first_to}`;
+                    return `Map ${currentMap.number} - First to ${this.match.first_to}`;
                 } else {
                     // Semifinals - Map X
                     const matchRound = this.match.round || this.match.week_text;
@@ -190,9 +200,9 @@ export default {
             if (!(this.broadcast?.broadcast_settings || []).includes("Show borders on middle")) return null;
             return this.teams.map(t => {
                 if (!t?.theme) return {};
-                let color = t.theme.color_accent;
+                let color = t.theme.color_theme;
                 if (!color || color.toLowerCase() === "#ffffff") color = t.theme.color_logo_accent;
-                if (!color || color.toLowerCase() === "#ffffff") color = t.theme.color_theme;
+                if (!color || color.toLowerCase() === "#ffffff") color = t.theme.color_accent;
                 return {
                     backgroundColor: color
                 };

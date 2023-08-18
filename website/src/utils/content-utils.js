@@ -245,15 +245,16 @@ export const MapTypeIcons = {
     Assault: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908385250934904/assault.png"
 };
 
-export function getTeamsMapStats(teams, requestMatch, requestMap) {
-    console.log(requestMatch);
+export function getTeamsMapStats(teams, requestMatch, requestMap, filters) {
+    console.log("get teams map stats", requestMatch, filters);
     if (!teams) return null;
     const stats = teams.map(team => {
         const stat = {
             played: 0,
             wins: 0,
             losses: 0,
-            draws: 0
+            draws: 0,
+            unplayed: 0
         };
 
         const prevMatches = (team.matches || [])
@@ -263,7 +264,17 @@ export function getTeamsMapStats(teams, requestMatch, requestMap) {
         const latestMatch = prevMatches.length ? prevMatches[0] : null;
 
 
-        (team.matches || []).forEach(match => {
+        (team.matches || []).filter(m => {
+            if (filters?.match_group) {
+                console.log("match group", filters.match_group, m.match_group, filters.match_group !== m.match_group);
+                if (filters.match_group !== m.match_group) return false;
+            }
+            if (filters?.sub_event) {
+                console.log("sub event", filters.sub_event, m.sub_event, filters.sub_event !== m.sub_event);
+                if (filters.sub_event !== m.sub_event) return false;
+            }
+            return true;
+        }).forEach(match => {
             (match.maps || []).forEach(matchMap => {
                 if (!matchMap.map) return; // no proper map data
                 if (requestMap.id !== cleanID(matchMap.map[0])) return; // isn't this map
@@ -274,7 +285,11 @@ export function getTeamsMapStats(teams, requestMatch, requestMap) {
                     if (scheduledMap) stat.scheduled_for_match = true;
                 }
 
-                if (!(matchMap.draw || matchMap.winner)) return; // wasn't played fully
+                if (!(matchMap.draw || matchMap.winner || matchMap.banner)) {
+                    // wasn't played fully
+                    if ([match.score_1, match.score_2].includes(match.first_to)) stat.unplayed++;
+                    return;
+                }
 
                 // woo right map
 

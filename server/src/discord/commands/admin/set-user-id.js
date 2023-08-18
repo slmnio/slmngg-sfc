@@ -77,19 +77,22 @@ module.exports = {
             } else if (typeof (i) === ButtonInteraction) {
                 if (i.customId === "cancel") {
                     await interaction.followUp({ ephemeral, content: "Cancelled action." });
+                    collector.stop();
                 } else if (i.customId === "confirm" && selectedUser !== null) {
                     await internalManager.runAction("update-player-discord-id", { discordData: interaction.targetUser, slmnggId: selectedUser }, token)
                         .then(async slmnggUser => {
                             await interaction.followUp({ ephemeral, content: `Linked discord user ${userMention(interaction.targetUser.id)} to SLMN.GG user ${slmnggUser}` });
+                            collector.stop();
                         })
-                        .catch(({
+                        .catch(async ({
                             errorCode,
                             errorMessage
                         }) => {
                             console.error({ errorCode, errorMessage });
-                            interaction.followUp({
+                            await interaction.followUp({
                                 ephemeral, content: `Action failed: ${errorMessage}`
                             });
+                            collector.stop();
                         });
                 }
             }

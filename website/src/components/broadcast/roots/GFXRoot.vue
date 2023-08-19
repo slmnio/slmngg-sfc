@@ -5,7 +5,7 @@
         <ImageOverlay v-if="gfx?.type === 'Image'" v-bind="overlayProps" />
         <TweetOverlay v-if="gfx?.type === 'Tweet'" v-bind="overlayProps" />
         <IframeOverlay v-if="gfx?.type === 'Iframe'" v-bind="overlayProps" />
-        <StandingsOverlay v-if="gfx?.type === 'Standings'" v-bind="overlayProps" />
+        <StandingsOverlay v-if="gfx?.type === 'Standings'" v-bind="overlayProps" :key="overlayProps.identifier" />
         <v-style>
             {{ gfx?.custom_css }}
         </v-style>

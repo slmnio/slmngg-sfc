@@ -298,6 +298,7 @@ export default {
                         teams.push({
                             id: team.id,
                             code: team.code,
+                            extra_points: team.extra_points,
                             standings
                         });
                     }

@@ -98,7 +98,7 @@
 <!--                    first round of sorting (match wins)-->
                     <ol class="mb-0 small">
                         <li v-for="(g, gi) in scenario.standings?.standings" :key="gi">
-                            <div class="standings-entry" v-for="(team,ei) in g" :key="ei">{{ team.code.padEnd(5, " ") }} {{ team.standings?.wins }}-{{ team.standings?.losses }} (m {{ team.standings?.map_wins.toString().padEnd(2, " ") }}-{{ team.standings?.map_losses.toString().padStart(2, " ") }}) ({{ sign(team.standings?.map_wins - team.standings?.map_losses)}})</div>
+                            <div class="standings-entry" v-for="(team,ei) in g" :key="ei">{{ team.code?.padEnd(5, " ") }} {{ team.standings?.wins }}-{{ team.standings?.losses }} (m {{ team.standings?.map_wins.toString().padEnd(2, " ") }}-{{ team.standings?.map_losses.toString().padStart(2, " ") }}) ({{ sign(team.standings?.map_wins - team.standings?.map_losses)}})</div>
                         </li>
                     </ol>
                 </td>

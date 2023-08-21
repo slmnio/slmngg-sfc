@@ -38,6 +38,10 @@ export default {
             {
                 text: "Ads (channel:edit:commercial)",
                 value: "channel:edit:commercial"
+            },
+            {
+                text: "Stream Key (channel:read:stream_key)",
+                value: "channel:read:stream_key"
             }
         ]
     }),

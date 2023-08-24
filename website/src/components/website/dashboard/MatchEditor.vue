@@ -29,7 +29,7 @@
                     <ContentThing v-if="!team.empty" :thing="team" :theme="team.theme" show-logo="true" type="team" text="" />
                     <div class="team-dummy" v-else>Dummy</div>
                 </div>
-                <b-form-input v-for="(score, i) in scores" :key="i" v-model.number="matchData.scores[i]"
+                <b-form-input v-for="(score, i) in scores" :key="i" v-model.number="matchData.scores[i]" autocomplete="off"
                               type="number" :min="0" :max="match.first_to" class="opacity-changes score-input" />
                 <div class="spacer" style="order:10"></div>
                 <div class="right-buttons" style="order:11">

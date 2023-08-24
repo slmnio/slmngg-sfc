@@ -5,10 +5,15 @@
         <div class="prev-match-result">{{ resultLetter }}</div>
         <router-link :to="url('detailed', match)" class="prev-match-vs ct-active">vs</router-link>
         <div class="prev-match-opponent default-thing flex-center flex-shrink-0" :style="teamTheme(opponent)"><div class="prev-match-opponent-logo bg-center" :style="largeIcon(opponent)"></div></div>
-        <div class="prev-match-maps"><MapDisplay class="map"
-                v-for="map in (match.maps || []).filter(map => map.number <= match.first_to || map.winner)"
+        <div class="prev-match-maps d-none d-lg-flex">
+            <MapDisplay class="map"
+                v-for="map in (match.maps || []).filter(map => map.draw || map.winner)"
                 :key="map.id" :map="map" :theme="team.theme"
-                :match="match" condensed="true"></MapDisplay></div>
+                :match="match" condensed="true" :showSelfPicks="showSelfPicks" :self="team"></MapDisplay>
+        </div>
+        <div class="prev-match-maps scoreline d-flex d-lg-none">
+            {{ scoreline }}
+        </div>
     </div>
 </template>
 
@@ -20,7 +25,7 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "PreviousMatch",
-    props: ["match", "team"],
+    props: ["match", "team", "showSelfPicks"],
     components: { MapDisplay },
     computed: {
         winner() {
@@ -37,6 +42,13 @@ export default {
             if (!this.winner) return "-";
             if (this.winner.id === this.team.id) return "W";
             return "L";
+        },
+        scoreline() {
+            const scores = [this.match.score_1, this.match.score_2].sort().reverse();
+            if (this.resultLetter === "L") {
+                scores.reverse();
+            }
+            return scores.join("-");
         },
         opponent() {
             if (!this.match?.teams) return null;
@@ -119,5 +131,11 @@ export default {
         text-align: center;
         line-height: 1;
         bottom: 0;
+    }
+    .prev-match-maps.scoreline {
+        font-weight: bold;
+        text-align: center;
+        padding-left: .5em;
+        font-size: 1.5em;
     }
 </style>

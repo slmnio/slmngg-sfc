@@ -1,6 +1,6 @@
 <template>
     <div class="match-history">
-        <h1>Map Head To Head</h1>
+        <h1 v-if="!hideMapDisplay">Map Head To Head</h1>
         <div class="settings flex w-100 justify-content-end mb-2">
             <b-form-checkbox v-if="match.sub_event" v-model="filterSubEvent">
                 Only show maps from sub event <b>{{ match.sub_event}}</b>
@@ -25,8 +25,8 @@
             </div>
         </div>
 
-        <h2 class="text-center mt-4">This match</h2>
-        <div class="this-match-maps d-flex flex-center align-items-start">
+        <h2 v-if="!hideMapDisplay" class="text-center mt-4">This match</h2>
+        <div v-if="!hideMapDisplay" class="this-match-maps d-flex flex-center align-items-start">
             <MapDisplay v-for="map in match.maps" :map="map" :key="map.id" :match="match"/>
         </div>
 
@@ -43,7 +43,7 @@ import { BFormCheckbox } from "bootstrap-vue";
 
 export default {
     name: "MatchHistory",
-    props: ["match"],
+    props: ["match", "hideMapDisplay"],
     components: { MapDisplay, MatchMapHistory, BFormCheckbox },
     data: () => ({
         filterSubEvent: false,

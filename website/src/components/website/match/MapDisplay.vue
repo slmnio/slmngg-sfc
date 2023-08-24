@@ -15,9 +15,12 @@
         </div>
         <div class="map-lower-text map-name">{{ name || '--' }}</div>
         <div class="map-lower-text map-scores" v-if="scores">{{ scores }}</div>
-        <div class="map-lower-text map-pick" v-if="!condensed && banText || pickText">{{ banText || pickText  || '' }}</div>
+        <div class="map-lower-text map-pick" v-if="!condensed && (banText || pickText)">{{ banText || pickText  || '' }}</div>
         <div class="map-lower-text map-replay-code" v-if="!condensed && map.replay_code">
              <i class="fas fa-history fa-fw" v-b-tooltip="'Replay Code'"></i> <CopyTextButton>{{ map.replay_code }}</CopyTextButton>
+        </div>
+        <div class="map-self-pick" v-if="showSelfPicks && map.picker && map.picker?.id === self?.id">
+            {{ self.code }} PICK
         </div>
     </div>
 </template>
@@ -31,7 +34,7 @@ import CopyTextButton from "@/components/website/CopyTextButton.vue";
 export default {
     name: "MapDisplay",
     components: { CopyTextButton },
-    props: ["map", "theme", "match", "i", "condensed", "showBannedMaps"],
+    props: ["map", "theme", "match", "i", "condensed", "showBannedMaps", "showSelfPicks", "self"],
     computed: {
         mapClass() {
             if (!this.match) return "";
@@ -102,6 +105,7 @@ export default {
     .map {
         width: 160px;
         margin: 10px;
+        position: relative;
     }
     .map-image {
         padding-bottom: 56.25%;
@@ -176,5 +180,15 @@ export default {
     .map.condensed .map-name {
         font-size: 0.6em;
         margin-top: 3px;
+    }
+    .map-self-pick {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        background-color: rgba(0,0,0,0.8);
+        font-size: 0.55em;
+        font-weight: bold;
     }
 </style>

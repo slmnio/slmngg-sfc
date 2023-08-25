@@ -239,6 +239,8 @@ async function set(id, data, options) {
                 if (data[key] === "\n") delete data[key];
             });
         }
+    } else {
+        console.warn("Data set without a table name", id);
     }
     if (options?.eager) {
         // console.log({

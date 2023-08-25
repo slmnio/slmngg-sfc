@@ -74,7 +74,8 @@ class TableManager {
 
             await Cache.set(this.tableName, {
                 id: this.tableName,
-                ids: data.map(d => d.id)
+                ids: data.map(d => d.id),
+                __tableName: "Table"
             });
             customTableUpdate(this.tableName, Cache);
 

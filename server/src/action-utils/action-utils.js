@@ -80,16 +80,14 @@ async function updateRecord(Cache, tableName, item, data) {
  */
 async function createRecord(Cache, tableName, records) {
     console.log(`[create record] creating table=${tableName} records=${records.length}`);
-
-    // TODO: think about how eager update would work
-
     try {
         let newRecords = await slmngg(tableName).create(records.map(recordData => ({ fields: recordData })));
         newRecords.forEach(record => {
-            Cache.set(cleanID(record.id), deAirtable(record.fields), { eager: true });
+            Cache.set(cleanID(record.id), {
+                ...deAirtable(record.fields),
+                __tableName: tableName
+            }, { eager: true });
         });
-        // console.log(newRecords.length);
-        // console.log(newRecords);
         return newRecords;
     } catch (e) {
         console.error("Airtable create failed", e);
@@ -199,15 +197,8 @@ function safeInputNoQuotes(string) {
         .replace(/>/g, "&gt;");
 }
 
-const adminClient = {
-    admin: true,
-    id: "slmngg-admin",
-    name: "SLMN.GG Admin",
-    website_settings: ["Can edit any match", "Full broadcast permissions"]
-};
-
 
 module.exports = {
     getSelfClient, cleanID, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord, safeInput, safeInputNoQuotes,
-    getTwitchChannel, getMatchData, getTwitchAPIClient, getTwitchAPIError, getBroadcast, getMaps, getAll, adminClient
+    getTwitchChannel, getMatchData, getTwitchAPIClient, getTwitchAPIError, getBroadcast, getMaps, getAll
 };

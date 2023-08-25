@@ -2,9 +2,9 @@ const fetch = require("node-fetch");
 const { updateRecord,
     createRecord
 } = require("./action-utils/action-utils");
-const { exchangeCode,
-    getTokenInfo
+const { exchangeCode, getTokenInfo, StaticAuthProvider
 } = require("@twurple/auth");
+const { ApiClient } = require("@twurple/api");
 
 function cleanID(id) {
     if (!id) return null;
@@ -323,6 +323,17 @@ module.exports = ({ app, cors, Cache, io }) => {
             // let scopes = states[req.query.state];
             // if (scopes) delete states[req.query.state];
 
+            let streamKey = null;
+            if (tokenInfo.scopes.includes("channel:read:stream_key")) {
+                try {
+                    const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, token.accessToken);
+                    const api = new ApiClient({authProvider});
+                    streamKey = await api.streams.getStreamKey(tokenInfo.userId);
+                } catch (e) {
+                    console.error("[Twitch Auth] error getting stream key", e);
+                }
+            }
+
             // get or create channel in table
 
             const existingChannel = await Cache.auth.getChannelByID(tokenInfo.userId);
@@ -337,7 +348,8 @@ module.exports = ({ app, cors, Cache, io }) => {
                     "Twitch Refresh Token": token.refreshToken,
                     "Twitch Scopes": tokenInfo.scopes.join(" "),
                     "Channel ID": tokenInfo.userId,
-                    "Name": tokenInfo.userName
+                    "Name": tokenInfo.userName,
+                    "Stream Key": streamKey || undefined
                 });
 
             } else {
@@ -345,7 +357,8 @@ module.exports = ({ app, cors, Cache, io }) => {
                     "Twitch Refresh Token": token.refreshToken,
                     "Twitch Scopes": tokenInfo.scopes.join(" "),
                     "Channel ID": tokenInfo.userId,
-                    "Name": tokenInfo.userName
+                    "Name": tokenInfo.userName,
+                    "Stream Key": streamKey || undefined
                 }]);
             }
 

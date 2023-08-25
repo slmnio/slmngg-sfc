@@ -42,6 +42,13 @@ export default {
             if (this.relayPrefix) return this.relayPrefix;
             return this.guest?.cam_code || "";
         },
+        streamCode() {
+            if (this.streamID.includes("view=")) {
+                const url = new URL(this.streamID);
+                return url.searchParams.get("view");
+            }
+            return this.streamID;
+        },
         src() {
             const vdoDomain = "https://cams.prod.slmn.gg";
             if (this.streamID.includes("http")) {
@@ -96,14 +103,16 @@ export default {
             console.log("[global iframe]", e.data);
             const data = e.data;
 
-            if (data.action === "new-track-added" && data.streamID === this.streamID) {
+            console.log("stream ID", this.streamCode, data.streamID);
+
+            if (data.action === "new-track-added" && data.streamID === this.streamCode) {
                 setTimeout(() => {
                     this.apiVisible = true;
                     this.extendedIframeVisible = true;
                 }, 400);
                 console.log("track added, loaded");
             }
-            if (data.action === "end-view-connection" && data.value === this.streamID) {
+            if (data.action === "end-view-connection" && data.value === this.streamCode) {
                 this.slowDisableCam(); // we need it to stay open if they reconnect
                 console.log("view dc, unloaded");
             }

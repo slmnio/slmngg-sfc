@@ -326,7 +326,7 @@ module.exports = ({ app, cors, Cache, io }) => {
             let streamKey = null;
             if (tokenInfo.scopes.includes("channel:read:stream_key")) {
                 try {
-                    const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, accessToken);
+                    const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, token.accessToken);
                     const api = new ApiClient({authProvider});
                     streamKey = await api.streams.getStreamKey(tokenInfo.userId);
                 } catch (e) {

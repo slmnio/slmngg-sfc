@@ -53,7 +53,7 @@
             <Commercials v-if="hasPermission('Full broadcast permissions')" :client="client" />
             <div class="mt-2">
                 <b-button variant="secondary" @click="updateTitle" :disabled="titleProcessing || !liveMatch || !broadcast?.title_format" :title="`Title will be set to: '${parsedTitle}'`" v-b-tooltip.top>
-                    <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title
+                    <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title<span v-if="titleAutomated"> (automated) <i class="fas fa-sparkles"></i></span>
                 </b-button>
                 <b-button class="ml-2 no-link-style d-inline-block" variant="outline-secondary" v-if="streamLink" :href="`https://${streamLink}`" target="_blank">
                     Stream <i class="fas fa-fw fa-external-link"></i>
@@ -128,6 +128,10 @@ export default {
                     })
                 }) // TODO: make this just client
             });
+        },
+        titleAutomated() {
+            const settings = this.broadcast?.automation_settings || [];
+            return settings.includes("Set title when live match changes");
         },
         client() {
             const client = this.user?.clients?.[0];

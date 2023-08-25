@@ -14,10 +14,10 @@
             </div>
         </div>
         <div class="tally-overlay">
-            <div class="team-info" v-if="teams">
+            <div class="team-info" v-if="liveMatch && teams">
                 <div class="team" v-for="(team, i) in teams" :key="team.id" :style="{order: (2 * i) + 1}">
                     <div class="team-name">{{ team.name }}</div>
-                    <ThemeLogo class="team-logo" :theme="team.theme" border-width=".3em" icon-padding="1em"  />
+                    <ThemeLogo class="team-logo" :theme="team.theme" border-width=".3em" icon-padding="1em" logo-size="w-200"  />
                     <div class="team-score">{{ scores[i] }}</div>
                 </div>
                 <div class="first-to">{{ liveMatch.first_to ? `FT${liveMatch.first_to}` : 'vs' }}</div>

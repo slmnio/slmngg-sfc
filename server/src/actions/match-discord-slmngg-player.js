@@ -1,8 +1,6 @@
 const { canUpdateUserDetails } = require("../action-utils/action-permissions");
 const { log } = require("../discord/slmngg-log");
-const {
-    User
-} = require("discord.js");
+const { User } = require("discord.js");
 const Cache = require("../cache");
 
 module.exports = {
@@ -47,7 +45,7 @@ module.exports = {
 
         if (potentials.length === 0) {
             throw {
-                errorMessage: "Unable to find SLMN.GG user based on discord details",
+                errorMessage: "Unable to find a SLMN.GG user that matches that Discord account.",
                 errorCode: 404
             };
         }

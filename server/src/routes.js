@@ -349,7 +349,7 @@ module.exports = ({ app, cors, Cache, io }) => {
                     "Twitch Scopes": tokenInfo.scopes.join(" "),
                     "Channel ID": tokenInfo.userId,
                     "Name": tokenInfo.userName,
-                    "Stream Key": streamKey
+                    "Stream Key": streamKey || undefined
                 });
 
             } else {
@@ -358,7 +358,7 @@ module.exports = ({ app, cors, Cache, io }) => {
                     "Twitch Scopes": tokenInfo.scopes.join(" "),
                     "Channel ID": tokenInfo.userId,
                     "Name": tokenInfo.userName,
-                    "Stream Key": streamKey
+                    "Stream Key": streamKey || undefined
                 }]);
             }
 

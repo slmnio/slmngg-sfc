@@ -36,10 +36,10 @@ function sluggify(text) {
 }
 
 async function checkExtraRecord(tableName, item) {
-    if (tableName === "Broadcasts" && item.key) return Cache.set(`broadcast-${item.key}`, item);
-    if (tableName === "Clients" && item.key) return Cache.set(`client-${item.key}`, item);
-    if (tableName === "Events" && item.subdomain) return Cache.set(`subdomain-${item.subdomain}`, item);
-    if (tableName === "News" && item.slug) return Cache.set(`news-${item.slug}`, item);
+    if (tableName === "Broadcasts" && item.key) return Cache.set(`broadcast-${item.key}`, { ...item, customKey: true });
+    if (tableName === "Clients" && item.key) return Cache.set(`client-${item.key}`, { ...item, customKey: true });
+    if (tableName === "Events" && item.subdomain) return Cache.set(`subdomain-${item.subdomain}`, { ...item, customKey: true });
+    if (tableName === "News" && item.slug) return Cache.set(`news-${item.slug}`, { ...item, customKey: true });
 }
 
 const customTableUpdate = require("./custom-datasets");

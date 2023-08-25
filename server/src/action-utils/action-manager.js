@@ -54,9 +54,14 @@ async function load(expressApp, cors, Cache, io) {
         actions.forEach(action => {
             action = new Action(action);
 
-            manager.register(action, async ({ token, args, error, execute }) => {
+            manager.register(action, async ({ token, args, error, execute, isAutomation }) => {
                 let params = {};
                 let authObjects = {};
+
+                if (isAutomation) {
+                    requireAuth = false;
+                    authObjects.isAutomation = true;
+                }
 
                 if (requireAuth && !token) return error(401, "Unauthorized");
 
@@ -64,11 +69,11 @@ async function load(expressApp, cors, Cache, io) {
                     return error(400, "Missing required parameter");
                 }
 
-                if (action.auth?.includes("user")) {
+                if (!isAutomation && action.auth?.includes("user")) {
                     authObjects.user = (await Cache.auth.getData(token))?.user;
                     if (!authObjects.user) return error(401, "Unauthorized operation. You might have a stale token (try logging in again)");
                 }
-                if (action.auth?.includes("client")) {
+                if (!isAutomation && action.auth?.includes("client")) {
                     authObjects.client = await getSelfClient(Cache, token);
                     if (!authObjects.client) return error(401, "No client data associated with this token");
                 }

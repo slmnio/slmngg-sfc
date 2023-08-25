@@ -51,6 +51,7 @@ async function updateRecord(Cache, tableName, item, data) {
     console.log(`[update record] updating table=${tableName} id=${item.id}`, data);
 
     let slmnggData = {
+        __tableName: tableName,
         ...deAirtable({ ...item, ...data }),
         modified: (new Date((new Date()).getTime() + TimeOffset)).toString()
     };
@@ -58,10 +59,10 @@ async function updateRecord(Cache, tableName, item, data) {
     Cache.set(cleanID(item.id), slmnggData, { eager: true });
 
     // Update custom keys
-    if (tableName === "Broadcasts" && item.key) Cache.set(`broadcast-${item.key}`, slmnggData, { eager: true });
-    if (tableName === "Clients" && item.key) Cache.set(`client-${item.key}`, slmnggData, { eager: true });
-    if (tableName === "Events" && item.subdomain) Cache.set(`subdomain-${item.subdomain}`, slmnggData, { eager: true });
-    if (tableName === "News" && item.slug) Cache.set(`news-${item.slug}`, slmnggData, { eager: true });
+    if (tableName === "Broadcasts" && item.key) Cache.set(`broadcast-${item.key}`, { ...slmnggData, customKey: true }, { eager: true });
+    if (tableName === "Clients" && item.key) Cache.set(`client-${item.key}`, { ...slmnggData, customKey: true }, { eager: true });
+    if (tableName === "Events" && item.subdomain) Cache.set(`subdomain-${item.subdomain}`, { ...slmnggData, customKey: true }, { eager: true });
+    if (tableName === "News" && item.slug) Cache.set(`news-${item.slug}`, { ...slmnggData, customKey: true }, { eager: true });
 
     try {
         return await slmngg(tableName).update(item.id, data);
@@ -134,8 +135,8 @@ async function getMaps(match) {
     return getAll(match.maps);
 }
 
-async function getTwitchChannel(client, requestedScopes) {
-    let broadcast = await getBroadcast(client);
+async function getTwitchChannel(client, requestedScopes, forceBroadcastID) {
+    let broadcast = await (forceBroadcastID ? Cache.get(forceBroadcastID) : getBroadcast(client));
     const channel = await Cache.auth.getChannel(broadcast?.channel?.[0]);
     if (!channel?.twitch_refresh_token) throw "No Twitch auth token associated with channel";
     if (!channel?.channel_id || !channel?.name || !channel.twitch_scopes) throw "Invalid channel data";
@@ -198,8 +199,15 @@ function safeInputNoQuotes(string) {
         .replace(/>/g, "&gt;");
 }
 
+const adminClient = {
+    admin: true,
+    id: "slmngg-admin",
+    name: "SLMN.GG Admin",
+    website_settings: ["Can edit any match", "Full broadcast permissions"]
+};
+
 
 module.exports = {
     getSelfClient, cleanID, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord, safeInput, safeInputNoQuotes,
-    getTwitchChannel, getMatchData, getTwitchAPIClient, getTwitchAPIError, getBroadcast, getMaps, getAll
+    getTwitchChannel, getMatchData, getTwitchAPIClient, getTwitchAPIError, getBroadcast, getMaps, getAll, adminClient
 };

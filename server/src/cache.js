@@ -2,6 +2,8 @@ const crypto = require("crypto");
 const { accessTokenIsExpired,
     refreshUserToken
 } = require("@twurple/auth");
+
+const { EventEmitter } = require("events");
 /*
     - Get and set data
     - Store data
@@ -13,6 +15,8 @@ const hiddenEvents = new Map();
 const auth = new Map();
 const players = new Map();
 const attachments = new Map();
+
+const emitter = new EventEmitter();
 
 function getAntiLeakIDs() {
     if (process.env.DISABLE_ANTILEAK === "true") return []; // don't hide anything on local
@@ -43,13 +47,19 @@ async function broadcast(room, command, ...data) {
     io.to(room).emit(command, ...data);
 }
 
-let updateFunctions = [];
-function onUpdate(fn) {
-    updateFunctions.push(fn);
+// let updateFunctions = [];
+/**
+ *
+ * @param {function(id: AnyAirtableID, data: {oldData: object, newData: object})} callback
+ */
+function onUpdate(callback) {
+    emitter.on("update", callback);
+    // updateFunctions.push(fn);
 }
 
 const updateFunction = function(id, data) {
-    updateFunctions.forEach(fn => fn(id, data));
+    emitter.emit("update", id, data);
+    // updateFunctions.forEach(fn => fn(id, data));
 };
 
 async function removeAntiLeak(id, data) {

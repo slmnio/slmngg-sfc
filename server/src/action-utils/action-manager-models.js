@@ -277,7 +277,7 @@ class InternalActionManager extends ActionManager {
         };
     }
 
-    async runAction(actionKey, args, token) {
+    async runAction(actionKey, args, token, isAutomation) {
         let action = this.actions.get(actionKey);
         if (!(action instanceof Action)) action = new Action(action);
         if (!action) return console.error(`Oh god no action ${actionKey}`);
@@ -290,6 +290,18 @@ class InternalActionManager extends ActionManager {
                     error: (errorCode, errorMessage) => reject({ errorCode, errorMessage }),
                     success: resolve,
                 }),
+                isAutomation
+            });
+        });
+    }
+
+    async runActionAsAutomation(actionKey, args) {
+        let action = this.actions.get(actionKey);
+        if (!(action instanceof Action)) action = new Action(action);
+        return new Promise((resolve, reject) => {
+            return action.execute(args, { isAutomation: true }, {
+                success: (s) => resolve(s),
+                error: (e) => reject(e)
             });
         });
     }

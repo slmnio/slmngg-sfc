@@ -49,15 +49,15 @@ const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials:
 //     test: ["hi"]
 // });
 
-const test = require("./discord/slash-commands.js");
-
-
 const Cache = (require("./cache.js")).setup(io);
 (require("./airtable-v2.js")).setup({ web: app, io });
 (require("./discord/bot-controller.js")).setup(io);
 
 const actions = require("./action-utils/action-manager.js");
 actions.load(app, localCors, Cache, io);
+
+require("./discord/slash-commands.js");
+require("./automation-manager.js");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 

@@ -147,7 +147,7 @@ module.exports = ({ app, router, cors, Cache, io }) => {
 
         let airtable = await getAirtablePlayer(discord);
 
-        if (![discord.username, `${discord.username}#${discord.discriminator}`].includes(airtable.discord_tag)) {
+        if (airtable && ![discord.username, `${discord.username}#${discord.discriminator}`].includes(airtable.discord_tag)) {
             const updatedUsername = discord.discriminator === "0" ? discord.username : `${discord.username}#${discord.discriminator}`;
             await updateRecord(Cache, "Players", airtable, { "Discord Tag": updatedUsername });
         }

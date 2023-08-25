@@ -5,6 +5,7 @@ const {
 
 const Cache = require("../../../cache.js");
 const { MapObject } = require("../../managers");
+const { cleanID } = require("../../../action-utils/action-utils");
 
 
 module.exports = {
@@ -66,6 +67,6 @@ module.exports = {
             }
         }
 
-        return interaction.followUp(`https://${subdomain}slmn.gg/detailed/${match.id}`);
+        return interaction.followUp(`https://${subdomain}slmn.gg/detailed/${cleanID(match.id)}`);
     },
 };

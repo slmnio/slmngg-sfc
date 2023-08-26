@@ -50,7 +50,7 @@ export default {
         },
         mapGroup() {
             if (!this.map || !this.mapGroups.length) return null;
-            const group = this.mapGroups.find(group => group.name === this.map.map?.type?.[0]);
+            const group = this.mapGroups.find(group => group.name === this.map.map?.type);
             if (!group) return null;
             if (!this.map.dummy) {
                 group.maps = group.maps.sort((a, b) => a.name === this.map.name?.[0] ? -1 : (b.name === this.map.name?.[0] ? 1 : 0));

@@ -78,8 +78,8 @@ export default {
                             dummy: true,
                             ...(this.mapTypes ? {
                                 map: {
-                                    name: [this.mapTypes && this.mapTypes[num]],
-                                    type: [this.mapTypes && this.mapTypes[num]],
+                                    name: this.mapTypes && this.mapTypes[num],
+                                    type: this.mapTypes && this.mapTypes[num],
                                     image: [{ url: DefaultMapImages[this.mapTypes[num]] }]
                                 }
                             } : {})

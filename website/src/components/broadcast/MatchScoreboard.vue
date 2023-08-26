@@ -4,25 +4,25 @@
             <div class="scoreboard-row scoreboard-header" v-if="shouldAnimate">
                 <div class="scoreboard-team blank"></div>
                 <div class="map flex-center map-type bg-center" v-for="map in maps" :key="map.id"
-                    :style="bg(mapTypeIcon(map))"></div>
+                     :style="bg(mapTypeIcon(map))"></div>
             </div>
         </transition>
         <ThemeTransition class="scoreboard-team-transition" :active="shouldAnimate" v-for="(team, ti) in match.teams"
-            :key="team.id" :theme="team?.theme" :border-width="6" border="x">
+                         :key="team.id" :theme="team?.theme" :border-width="6" border="x">
             <div class="scoreboard-row team-row">
                 <div class="scoreboard-team" :style="logoBackground1(team)">
-                    <ThemeLogo class="team-logo" :theme="team?.theme" border-width="0px" logo-size="" />
+                    <ThemeLogo class="team-logo" :theme="team?.theme" border-width="0px" logo-size=""/>
                     <Squeezable class="team-name flex-center" align="center">
                         <div class="industry-align">{{ team.name }}</div>
                     </Squeezable>
                 </div>
                 <!-- :style="cleanID(map.winner?.[0]) === team.id ? themeBackground1(team) : {}" -->
                 <div class="map flex-center map-score" v-for="map in maps" :key="map.id"
-                    :class="{ 'map-won': cleanID(map.winner?.[0]) === team.id }">
+                     :class="{ 'map-won': cleanID(map.winner?.[0]) === team.id }">
                     <div class="industry-align">{{ !map.showNumbers ? "-" : (map[`score_${ti + 1}`] || 0) }}</div>
                 </div>
                 <div class="match-score flex-center"
-                    :style="match[`score_${ti + 1}`] === match.first_to ? themeBackground1(team) : {}">
+                     :style="match[`score_${ti + 1}`] === match.first_to ? themeBackground1(team) : {}">
                     <div class="industry-align">{{ match[`score_${ti + 1}`] || 0 }}</div>
                 </div>
             </div>
@@ -41,15 +41,22 @@ import { bg } from "@/utils/images";
 
 export default {
     name: "MatchScoreboard",
-    components: { ThemeTransition, Squeezable, ThemeLogo },
+    components: {
+        ThemeTransition,
+        Squeezable,
+        ThemeLogo
+    },
     methods: {
-        themeBackground1, logoBackground1, cleanID, bg,
+        themeBackground1,
+        logoBackground1,
+        cleanID,
+        bg,
         mapTypeIcon(map) {
             if (map.map) return MapTypeIcons[map.map.type];
             if (!this.match?.first_to || !this.mapTypes) return null;
             const mapIndex = this.maps.indexOf(map);
             return MapTypeIcons[this.mapTypes[mapIndex]];
-        },
+        }
     },
     props: ["match", "active", "broadcast", "animateOnMount"],
     data: () => ({
@@ -225,7 +232,7 @@ export default {
     position: relative;
 }
 
-.team-row .map~.map:before {
+.team-row .map ~ .map:before {
     content: "";
     position: absolute;
     background-color: rgba(0, 0, 0, 0.1);

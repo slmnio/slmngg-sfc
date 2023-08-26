@@ -155,6 +155,13 @@ export default [
     { path: "podcast", component: () => import("@/components/broadcast/roots/PodcastOverlay.vue"), props: route => ({ rows: route.query.rows }) },
     { path: "custom", component: () => import("@/components/broadcast/roots/CustomOverlay.vue") },
     { path: "info", component: () => import("@/components/broadcast/roots/InfoOverlay.vue") },
+    {
+        path: "bug",
+        component: () => import("@/components/broadcast/roots/BugOverlay.vue"),
+        props: route => ({
+            small: !!route.query.small
+        })
+    },
     { path: "background", component: () => import("@/components/broadcast/BroadcastBackground.vue"), props: route => ({ index: route.query.index }) },
     { path: "sponsors", component: () => import("@/components/broadcast/roots/SponsorOverlay.vue") },
     { path: "maps", component: () => import("@/components/broadcast/roots/MapsOverlay.vue"), props: route => ({ autoTitle: route.query.auto }) },

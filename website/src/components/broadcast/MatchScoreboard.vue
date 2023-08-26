@@ -52,7 +52,7 @@ export default {
         cleanID,
         bg,
         mapTypeIcon(map) {
-            if (map.map) return MapTypeIcons[map.map.type];
+            if (map.map?.type) return MapTypeIcons[map.map.type];
             if (!this.match?.first_to || !this.mapTypes) return null;
             const mapIndex = this.maps.indexOf(map);
             return MapTypeIcons[this.mapTypes[mapIndex]];
@@ -68,9 +68,6 @@ export default {
                 if (this.manualAnimate === true || this.manualAnimate === false) return this.manualAnimate;
             }
             return this.active;
-        },
-        MapTypeIcons() {
-            return MapTypeIcons;
         },
         maps() {
             const maps = (ReactiveRoot(this.match.id, {

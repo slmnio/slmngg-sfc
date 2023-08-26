@@ -53,7 +53,7 @@ export default {
         bg,
         mapTypeIcon(map) {
             if (map.map?.type) return MapTypeIcons[map.map.type];
-            if (!this.match?.first_to || !this.mapTypes) return null;
+            if (!this.mapTypes) return null;
             const mapIndex = this.maps.indexOf(map);
             return MapTypeIcons[this.mapTypes[mapIndex]];
         }

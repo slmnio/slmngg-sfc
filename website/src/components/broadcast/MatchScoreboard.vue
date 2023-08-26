@@ -3,10 +3,12 @@
         <transition name="scoreboard-fade">
             <div class="scoreboard-row scoreboard-header" v-if="shouldAnimate">
                 <div class="scoreboard-team blank"></div>
-                <div class="map flex-center map-type bg-center" v-for="map in maps" :key="map.id" :style="bg(MapTypeIcons[map.map?.type])"></div>
+                <div class="map flex-center map-type bg-center" v-for="map in maps" :key="map.id"
+                     :style="bg(mapTypeIcon(map))"></div>
             </div>
         </transition>
-        <ThemeTransition class="scoreboard-team-transition" :active="shouldAnimate" v-for="(team, ti) in match.teams" :key="team.id" :theme="team?.theme" :border-width="6" border="x">
+        <ThemeTransition class="scoreboard-team-transition" :active="shouldAnimate" v-for="(team, ti) in match.teams"
+                         :key="team.id" :theme="team?.theme" :border-width="6" border="x">
             <div class="scoreboard-row team-row">
                 <div class="scoreboard-team" :style="logoBackground1(team)">
                     <ThemeLogo class="team-logo" :theme="team?.theme" border-width="0px" logo-size=""/>
@@ -16,16 +18,16 @@
                 </div>
                 <!-- :style="cleanID(map.winner?.[0]) === team.id ? themeBackground1(team) : {}" -->
                 <div class="map flex-center map-score" v-for="map in maps" :key="map.id"
-                :class="{'map-won': cleanID(map.winner?.[0]) === team.id}">
+                     :class="{ 'map-won': cleanID(map.winner?.[0]) === team.id }">
                     <div class="industry-align">{{ !map.showNumbers ? "-" : (map[`score_${ti + 1}`] || 0) }}</div>
-           </div>
-           <div class="match-score flex-center"
-                :style="match[`score_${ti+1}`] === match.first_to ? themeBackground1(team) : {}">
-               <div class="industry-align">{{ match[`score_${ti + 1}`] || 0 }}</div>
-           </div>
-       </div>
-   </ThemeTransition>
-</div>
+                </div>
+                <div class="match-score flex-center"
+                     :style="match[`score_${ti + 1}`] === match.first_to ? themeBackground1(team) : {}">
+                    <div class="industry-align">{{ match[`score_${ti + 1}`] || 0 }}</div>
+                </div>
+            </div>
+        </ThemeTransition>
+    </div>
 </template>
 
 <script>
@@ -39,8 +41,23 @@ import { bg } from "@/utils/images";
 
 export default {
     name: "MatchScoreboard",
-    components: { ThemeTransition, Squeezable, ThemeLogo },
-    methods: { themeBackground1, logoBackground1, cleanID, bg },
+    components: {
+        ThemeTransition,
+        Squeezable,
+        ThemeLogo
+    },
+    methods: {
+        themeBackground1,
+        logoBackground1,
+        cleanID,
+        bg,
+        mapTypeIcon(map) {
+            if (map.map?.type) return MapTypeIcons[map.map.type];
+            if (!this.mapTypes) return null;
+            const mapIndex = this.maps.indexOf(map);
+            return MapTypeIcons[this.mapTypes[mapIndex]];
+        }
+    },
     props: ["match", "active", "broadcast", "animateOnMount"],
     data: () => ({
         manualAnimate: null
@@ -51,9 +68,6 @@ export default {
                 if (this.manualAnimate === true || this.manualAnimate === false) return this.manualAnimate;
             }
             return this.active;
-        },
-        MapTypeIcons() {
-            return MapTypeIcons;
         },
         maps() {
             const maps = (ReactiveRoot(this.match.id, {
@@ -112,95 +126,114 @@ export default {
 </script>
 
 <style scoped>
-.scoreboard-row, .scoreboard-team {
-   display: flex;
-}
-.scoreboard-header {
-   border-left: 7px solid transparent;
-}
-.scoreboard-row.team-row {
-   background-color: white;
-   color: black;
-   width: fit-content;
-}
-.team-logo {
-   height: 70px;
-   width: 90px;
-}
+.scoreboard-row,
 .scoreboard-team {
-   width: 400px;
-   margin-right: .5em
+    display: flex;
+}
+
+.scoreboard-header {
+    border-left: 7px solid transparent;
+}
+
+.scoreboard-row.team-row {
+    background-color: white;
+    color: black;
+    width: fit-content;
+}
+
+.team-logo {
+    height: 70px;
+    width: 90px;
+}
+
+.scoreboard-team {
+    width: 400px;
+    margin-right: .5em
 }
 
 
 .team-name {
-   font-size: 42px;
-   text-transform: uppercase;
-   margin-left: .2em;
-   margin-right: .3em;
+    font-size: 42px;
+    text-transform: uppercase;
+    margin-left: .2em;
+    margin-right: .3em;
 }
 
-.map, .match-score {
-   width: 70px;
-   /*margin: 0 2px;*/
+.map,
+.match-score {
+    width: 70px;
+    /*margin: 0 2px;*/
 }
-.map-score, .match-score {
-   font-size: 42px;
+
+.map-score,
+.match-score {
+    font-size: 42px;
 }
+
 /*.map.map-type {*/
 /*    background-color: black;*/
 /*    color: white;*/
 /*}*/
 .map-type {
-   height: 30px;
-   background-size: 25px;
-   filter: invert(1);
-   margin-bottom: 4px;
-   /*background-color: rgba(255,255,255,0.2);*/
+    height: 30px;
+    background-size: 25px;
+    filter: invert(1);
+    margin-bottom: 4px;
+    /*background-color: rgba(255,255,255,0.2);*/
 }
+
 .match-score {
-   margin-left: .25em;
+    margin-left: .25em;
 }
+
 .map-score:not(.map-won) {
-   font-weight: 400;
+    font-weight: 400;
 }
+
 .match-score {
-   font-weight: 900;
+    font-weight: 900;
 }
+
 .scoreboard-team-transition {
-   width: fit-content;
+    width: fit-content;
 }
 
 
 .scoreboard-clip-right-enter-active {
-   transition: all 2s ease; overflow: hidden
+    transition: all 2s ease;
+    overflow: hidden
 }
+
 .scoreboard-clip-right-enter {
-   clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+    clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
 }
+
 .scoreboard-clip-right-enter-to {
-   clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
 }
 
 .scoreboard-fade-enter-active {
-   transition: all .2s ease;
-   transition-delay: .75s;
+    transition: all .2s ease;
+    transition-delay: .75s;
 }
+
 .scoreboard-fade-enter {
-   opacity: 0;
+    opacity: 0;
 }
+
 .scoreboard-fade-enter-to {
-   opacity: 1;
+    opacity: 1;
 }
+
 .map {
-   position: relative;
+    position: relative;
 }
+
 .team-row .map ~ .map:before {
-   content: "";
-   position: absolute;
-   background-color: rgba(0,0,0,0.1);
-   right: 100%;
-   width: 2px;
-   height: 60%;
-}
-</style>
+    content: "";
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.1);
+    right: 100%;
+    width: 2px;
+    height: 60%;
+}</style>

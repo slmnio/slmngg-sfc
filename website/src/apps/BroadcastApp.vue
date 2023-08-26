@@ -1,5 +1,5 @@
 <template>
-    <StingerWrap :theme="broadcast.event && broadcast.event.theme" :active="active" :should-use="useBuiltInStingers">
+    <StingerWrap :theme="broadcast.event && broadcast.event.theme" :active="active" :should-use="useBuiltInStingers" :text="stingerText">
         <div class="broadcast-app" :class="broadcastClass">
             <!--        <div style="font-size: 5em; color: black">{{ $root.activeScene }}</div>-->
             <router-view id="overlay" :class="bodyClass" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active"
@@ -36,7 +36,7 @@ function getComponentName(route) {
 
 export default {
     name: "BroadcastApp",
-    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass", "full", "clientName", "backgroundIndex"],
+    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass", "full", "clientName", "backgroundIndex", "stingerText"],
     components: {
         BroadcastBackground,
         StingerWrap

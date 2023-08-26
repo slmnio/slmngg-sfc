@@ -2,8 +2,9 @@
     <div class="stinger-wrap" :class="{'s-active': active, 's-show': showStinger}">
         <theme-transition class="stinger-transition" name="stinger-out" start="left" end="left" :active="active && shouldUse" :theme="useTheme" :start-inner-full="true" :trigger="true"
                           :starting-inner-delay="150" :trigger-duration="800" :duration="300" :inner-delay="200">
-            <div class="stinger flex-center" :style="bg" :class="{'stinging': active || showStinger}">
-                <theme-logo class="w-100 h-100" :theme="useTheme" logo-size="h-1080" border-width="0" icon-padding="200px" />
+            <div class="stinger flex-center" :style="bg" :class="{'stinging': active || showStinger, 'has-text': !!stingerText}">
+                <theme-logo class="w-100 h-100" :theme="useTheme" logo-size="h-1080" border-width="0" :icon-padding="!!stingerText ? '50px' : '200px'" />
+                <div class="text" v-if="stingerText">{{ stingerText }}</div>
             </div>
         </theme-transition>
         <slot></slot>
@@ -19,11 +20,12 @@ import { logoBackground } from "@/utils/theme-styles";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
 export default {
     name: "StingerWrap",
-    props: ["theme", "active", "waitBeforeAnimOut", "shouldUse"],
+    props: ["theme", "active", "waitBeforeAnimOut", "shouldUse", "text"],
     components: { ThemeLogo, ThemeTransition },
     data: () => ({
         showStinger: null,
-        customTheme: null
+        customTheme: null,
+        customText: null
     }),
     watch: {
         active(isActive) {
@@ -41,6 +43,9 @@ export default {
         },
         bg() {
             return logoBackground(this.useTheme);
+        },
+        stingerText() {
+            return this.customText || this.text;
         }
     },
     methods: {
@@ -64,6 +69,7 @@ export default {
         /*border-width: 20px 0;*/
         /*border-style: solid;*/
         border-bottom: 20px solid transparent;
+        flex-direction: column;
     }
     .stinger-wrap {
         position: absolute;
@@ -76,13 +82,38 @@ export default {
         z-index: 1000;
     }
 
+
+    .stinger.has-text {
+        --text-height: 25vh;
+        padding: 5vh 0;
+    }
+
+    .stinger .text {
+        font-weight: bold;
+        font-size: 12em;
+        text-transform: uppercase;
+        height: var(--text-height);
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        line-height: 1.1;
+    }
+
+    .stinger.has-text .icon-holder {
+        height: calc(100% - var(--text-height)) !important;
+    }
+
+
     /*.stinger-out-leave-active {*/
     /*    transition: all .3s ease;*/
     /*}*/
     /*.stinger-out-leave-to {*/
     /*    clip-path: polygon(0% 0%, 0% 0, 0% 100%, 0% 100%);*/
     /*}*/
-    .stinger.stinging .icon-holder {
+    .stinger.stinging .icon-holder,
+    .stinger.stinging .text {
         animation: zoom 1.5s forwards;
     }
 

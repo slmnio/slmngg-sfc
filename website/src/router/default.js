@@ -71,6 +71,7 @@ export default [
         props: route => ({
             code: route.params.broadcastCode,
             title: route.query.title,
+            stingerText: route.query.stingerText,
             top: route.query.top,
             noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation),
             noStinger: (route.query.noStinger || route.query.stinger === "false"),
@@ -86,6 +87,7 @@ export default [
         props: route => ({
             client: route.params.clientID,
             title: route.query.title,
+            stingerText: route.query.stingerText,
             noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation),
             noStinger: (route.query.noStinger || route.query.stinger === "false"),
             bodyClass: route.query.class || route.query.bodyClass,

@@ -73,6 +73,8 @@ export default {
     .client-overview {
         background-color: #222;
         color: white;
+        overflow-y: initial !important;
+        height: 100vh;
     }
     .b-pad {
         padding: 0 0.5rem;

@@ -184,8 +184,11 @@ export default {
         document.body.className = "overlay";
     },
     sockets: {
+        connect() {
+            this.$socket.client.emit("prod-broadcast-join", this.broadcastKey);
+        },
         send_prod_update() {
-            if (!this.lastProdData) this.prodUpdate();
+            this.prodUpdate();
         },
         prod_button_reload() {
             document.location.reload();

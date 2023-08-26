@@ -23,6 +23,11 @@ export default {
     mounted() {
         console.log("prod-join", this.client);
         this.$socket.client.emit("prod-join", this.client);
+    },
+    sockets: {
+        connect() {
+            this.$socket.client.emit("prod-join", this.client);
+        }
     }
 };
 </script>

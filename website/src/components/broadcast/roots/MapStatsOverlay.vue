@@ -77,9 +77,11 @@ export default {
                         maps.push({
                             dummy: true,
                             ...(this.mapTypes ? {
-                                name: [this.mapTypes && this.mapTypes[num]],
-                                type: [this.mapTypes && this.mapTypes[num]],
-                                image: [{ url: DefaultMapImages[this.mapTypes[num]] }]
+                                map: {
+                                    name: [this.mapTypes && this.mapTypes[num]],
+                                    type: [this.mapTypes && this.mapTypes[num]],
+                                    image: [{ url: DefaultMapImages[this.mapTypes[num]] }]
+                                }
                             } : {})
                         });
                     }

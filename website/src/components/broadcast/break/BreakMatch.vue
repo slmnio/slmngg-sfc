@@ -207,7 +207,7 @@ export default {
         font-weight: bold;
         font-size: 0.6em;
         text-transform: uppercase;
-        margin-bottom: .3em;
+        margin: .3em;
         line-height: 1;
         text-align: center;
     }

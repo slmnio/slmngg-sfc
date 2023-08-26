@@ -538,6 +538,8 @@ export default {
         },
         winnerSelected(i, teamID) {
             console.log("winner selected", i, teamID);
+            if (!teamID) return;
+
             if (this.autoLoserPicks && this.maps?.[i + 1] && !this.banners?.[i + 1]) {
                 const teamIDs = this.teams.map(t => t?.id).filter(Boolean);
                 const loserID = teamIDs.find(id => id !== teamID);

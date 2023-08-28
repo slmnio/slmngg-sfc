@@ -26,7 +26,7 @@ export default {
             });
         },
         bottom() {
-            return !this.noTimes && formatTime(this.time, {
+            return !this.noTimes && this.time && formatTime(this.time, {
                 format: "{time} {tz}",
                 tz: this.$store.state.timezone,
                 use24HourTime: this.$store.state.use24HourTime

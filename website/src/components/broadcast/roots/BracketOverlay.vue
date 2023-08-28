@@ -42,7 +42,7 @@ export default {
             if (this.bracketKey) key = this.bracketKey;
 
             if ((!key || key === "match") && this.liveMatch) {
-                key = this.liveMatch.brackets[0].key;
+                key = this.liveMatch.brackets?.[0]?.key || key;
             }
 
             if (!key) return this.event.brackets[0];

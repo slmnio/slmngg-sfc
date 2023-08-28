@@ -41,6 +41,10 @@ export default {
             if (this.broadcast?.bracket_key) key = this.broadcast.bracket_key;
             if (this.bracketKey) key = this.bracketKey;
 
+            if ((!key || key === "match") && this.liveMatch) {
+                key = this.liveMatch.brackets[0].key;
+            }
+
             if (!key) return this.event.brackets[0];
             const bracket = this.event.brackets.find(b => b && b.key === key);
             return bracket || this.event.brackets[0];
@@ -52,7 +56,8 @@ export default {
         liveMatch() {
             if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
-                teams: ReactiveArray("teams")
+                teams: ReactiveArray("teams"),
+                brackets: ReactiveArray("brackets")
             });
         },
         highlightMatch() {

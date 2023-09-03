@@ -25,7 +25,8 @@ export default {
     data: () => ({
         showStinger: null,
         customTheme: null,
-        customText: null
+        customText: null,
+        hideText: false
     }),
     watch: {
         active(isActive) {
@@ -45,6 +46,7 @@ export default {
             return logoBackground(this.useTheme);
         },
         stingerText() {
+            if (this.hideText) return;
             return this.customText || this.text;
         }
     },
@@ -56,6 +58,9 @@ export default {
         updateText(text) {
             this.customText = text;
             console.log("custom stinger text", text);
+        },
+        setTextVisibility(visibility) {
+            this.hideText = !visibility;
         }
     }
 };

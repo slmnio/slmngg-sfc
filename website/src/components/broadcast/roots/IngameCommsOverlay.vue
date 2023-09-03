@@ -3,12 +3,12 @@
         <div class="teams" :class="{'flip': match.flip_teams}" :style="{ marginTop: topOffset }">
             <div class="team" v-for="(team, i) in match.teams" :key="team.id" :style="{ width: teamWidth }" :class="{'left': match.flip_teams ? i === 1 : i === 0}">
                 <ThemeTransition class="listen-in-holder" :duration="250" :theme="team.theme"
-                                 :active="activeTeamIndex === i"
+                                 :active="(activeTeamIndex - 1) === i"
                                  :start="match.flip_teams ? i === 1 : i === 0 ? 'left' : 'right'"
                                  :end="match.flip_teams ? i === 1 : i === 0 ? 'right' : 'left'">
                     <ListenInBug :text="listenInText" :team="team" />
                 </ThemeTransition>
-                <TeamAudio :always-unmuted="forceTeam && activeTeamIndex === i" :team="team" :broadcast="broadcast" :task-key="`team${i+1}`" :ref="`team${i+1}`" :buffer="buffer" />
+                <TeamAudio :always-unmuted="forceTeam && (activeTeamIndex - 1) === i" :team="team" :broadcast="broadcast" :task-key="`team${i+1}`" :ref="`team${i+1}`" :buffer="buffer" />
             </div>
         </div>
     </div>

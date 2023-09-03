@@ -40,7 +40,7 @@ export default {
         streamID() {
             if (this.guest?.webcam) return this.guest.webcam;
             if (this.relayPrefix) return this.relayPrefix;
-            return this.guest?.cam_code || "";
+            return this.guest?.cam_code || this.guest?.discord_id || "";
         },
         streamCode() {
             if (this.streamID.includes("view=")) {

@@ -41,8 +41,8 @@ export default {
             if (this.broadcast?.bracket_key) key = this.broadcast.bracket_key;
             if (this.bracketKey) key = this.bracketKey;
 
-            if ((!key || key === "match") && this.liveMatch) {
-                key = this.liveMatch.brackets?.[0]?.key || key;
+            if (this.liveMatch && (!key || key === "match")) {
+                key = this.liveMatch.brackets?.[0]?.key;
             }
 
             if (!key) return this.event.brackets[0];

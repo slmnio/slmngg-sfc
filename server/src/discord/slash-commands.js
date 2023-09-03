@@ -26,12 +26,10 @@ for (const folder of commandFolders) {
 }
 
 client.on(Events.InteractionCreate, async (interaction) => {
-    if (!interaction.isChatInputCommand()) return;
-
     const command = interaction.client.commands.get(interaction.commandName);
 
     if (!command) {
-        console.error(`No command matching ${interaction.commandName} was found.`);
+        if (interaction.commandName) console.error(`No command matching ${interaction.commandName} was found.`);
         return;
     }
 
@@ -41,12 +39,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
         console.error(error);
         if (interaction.replied || interaction.deferred) {
             await interaction.followUp({
-                content: "There was an error while executing this command!",
+                content: `There was an error while executing this command: \n> ${error.errorMessage}`,
                 ephemeral: true
             });
         } else {
             await interaction.reply({
-                content: "There was an error while executing this command!",
+                content: `There was an error while executing this command: \n> ${error.errorMessage}`,
                 ephemeral: true
             });
         }

@@ -58,7 +58,7 @@ class Action {
     }) {
         return this.handler(args, auth)
             .then(data => {
-                console.log(`[actions] Success in ${this.key}`, data);
+                console.log(`[actions] Success in ${this.key}`);
                 success(data);
             },
             e => {

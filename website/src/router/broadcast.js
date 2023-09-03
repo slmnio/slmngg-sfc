@@ -221,6 +221,20 @@ export default [
             index: parseInt(route.params.index) || parseInt(route.query.index ?? route.query.number) || 1
         })
     },
+    {
+        path: "confetti",
+        component: () => import("@/components/broadcast/roots/ConfettiOverlay.vue"),
+        props: route => ({
+            themeId: route.query.theme || route.query.themeId || route.query.themeid || route.query.themeID
+        })
+    },
+    {
+        path: "champions",
+        component: () => import("@/components/broadcast/roots/ChampionsOverlay.vue"),
+        props: route => ({
+            stingerText: route.query.stingerText
+        })
+    },
 
     /* Production staff stuff */
     { path: "clock", component: () => import("@/components/broadcast/roots/MediaClock.vue") },

@@ -52,6 +52,10 @@ export default {
         updateTheme(theme) {
             this.customTheme = theme;
             console.log("custom stinger theme", theme);
+        },
+        updateText(text) {
+            this.customText = text;
+            console.log("custom stinger text", text);
         }
     }
 };

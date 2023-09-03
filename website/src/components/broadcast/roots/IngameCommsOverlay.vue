@@ -38,7 +38,7 @@ export default {
         },
         activeTeam() {
             if (!this.match?.teams?.length || this.activeTeamIndex === null) return;
-            return this.match.teams[this.activeTeamIndex];
+            return this.match.teams[this.activeTeamIndex - 1];
         },
         teamWidth() {
             return `${this.broadcast?.ingame_team_width || 690}px`;
@@ -55,7 +55,7 @@ export default {
             return !!this.forceTeam;
         },
         activeTeamIndex() {
-            return this.forceTeam || (this.socketActiveTeamIndex - 1);
+            return this.forceTeam || this.socketActiveTeamIndex;
         }
     },
     sockets: {
@@ -65,7 +65,7 @@ export default {
             const teamRef = `team${team}`;
             this.$refs[teamRef]?.[0]?.enable();
 
-            this.socketActiveTeamIndex = team - 1;
+            this.socketActiveTeamIndex = team;
 
             const otherTeamRef = `team${(+!(team - 1)) + 1}`;
             this.$refs[otherTeamRef]?.[0]?.disable();

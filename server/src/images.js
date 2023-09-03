@@ -288,7 +288,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
 
             let heldImage = await getImage(filename, sizeText);
             if (heldImage) {
-                console.log("[image|theme]", `theme using saved @${size} in ${Date.now() - t}ms`);
+                // console.log("[image|theme]", `theme using saved @${size} in ${Date.now() - t}ms`);
                 return res.sendFile(heldImage);
             }
 

@@ -29,7 +29,8 @@ export default (app, mainDomain) => ([
                 client_id: import.meta.env.VITE_DISCORD_CLIENT_ID,
                 redirect_uri: `${mainDomain}/auth/discord/return`,
                 response_type: "code",
-                scope: ["identify"].join(" ")
+                scope: ["identify"].join(" "),
+                prompt: "none"
             };
 
             const stringParams = Object.entries(params)

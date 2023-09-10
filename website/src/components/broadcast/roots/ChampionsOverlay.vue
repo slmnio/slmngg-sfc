@@ -1,5 +1,5 @@
 <template>
-    <ConfettiOverlay v-if="winner" :theme="winner?.theme" :active="active" :animation-active="animationActive"/>
+    <ConfettiOverlay v-if="winner" :theme="winner?.theme"/>
 </template>
 
 <script>
@@ -9,7 +9,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export default {
     components: { ConfettiOverlay },
-    props: ["broadcast", "stingerText", "active", "animationActive"],
+    props: ["broadcast", "stingerText"],
     name: "ChampionsOverlay",
     data: () => ({
         confettiStarted: false,
@@ -44,7 +44,7 @@ export default {
         winner: {
             deep: true,
             handler(winner) {
-                console.log("winner change", this.$parent);
+                console.log("winner", winner);
                 this.$parent.updateTheme(winner?.theme);
                 this.$parent.updateText(this.winner ? (this.stingerText || "Winners") : null);
                 this.$parent.setTextVisibility(this.stingerTextVal);

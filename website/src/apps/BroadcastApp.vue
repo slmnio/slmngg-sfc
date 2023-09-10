@@ -179,7 +179,6 @@ export default {
             }
         },
         broadcastKey(newCode) {
-            console.log(newCode);
             this.$socket.client.emit("prod-broadcast-join", newCode);
         }
     },

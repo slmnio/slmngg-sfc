@@ -8,7 +8,7 @@ import Vue from "vue";
 Vue.use(VueConfetti);
 
 export default {
-    props: ["themeId", "theme", "active", "animationActive"],
+    props: ["themeId", "theme"],
     name: "ConfettiOverlay",
     data: () => ({
         confettiStarted: false,
@@ -18,11 +18,14 @@ export default {
             minor: true
         }
     }),
+    beforeDestroy() {
+        this.stopConfetti();
+    },
     methods: {
         startOrUpdateConfetti() {
             if (this.confettiDisabled) return;
-            console.log("start confetti");
             if (!this.confettiStarted) {
+                console.log("start confetti");
                 this.$confetti.start({
                     particles: [
                         {
@@ -42,24 +45,22 @@ export default {
                     defaultColors: this.confettiColors
                 });
             }
+        },
+        stopConfetti() {
+            console.log("stopping confetti");
+            this.confettiStarted = false;
+            this.$confetti.stop();
         }
     },
     watch: {
         confettiColors: {
             handler() {
-                if (this.confettiColors.length === 0) return;
+                console.log("confetti color change", this.confettiColors);
+                if (this.confettiColors.length === 0) return this.stopConfetti();
                 this.startOrUpdateConfetti();
             },
-            immediate: true
-        },
-        animationActive: {
-            handler(isActive) {
-                console.log("active", isActive);
-                if (!isActive) return;
-                if (this.confettiColors.length === 0) return;
-                this.startOrUpdateConfetti();
-            },
-            immediate: true
+            immediate: true,
+            deep: true
         }
     },
     computed: {
@@ -86,8 +87,7 @@ export default {
     sockets: {
         stop_confetti() {
             console.log("confetti stop");
-            this.confettiStarted = false;
-            this.$confetti.stop();
+            this.stopConfetti();
         },
         disable_confetti() {
             this.confettiDisabled = true;

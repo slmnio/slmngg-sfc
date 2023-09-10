@@ -47,7 +47,7 @@
             <Bracket :scale="0.75" v-for="bracket in bracketData" :event="liveMatch.event" :bracket="bracket" :key="bracket.id"></Bracket>
         </DashboardModule>
         <ScheduleEditor class="broadcast-schedule-editor mb-2" :broadcast="broadcast"></ScheduleEditor>
-        <DashboardModule title="Twitch Controls" icon-class="fas fa-wrench" content-class="p-2" v-if="broadcast && broadcast.channel">
+        <DashboardModule class="mb-2" title="Twitch Controls" icon-class="fas fa-wrench" content-class="p-2" v-if="broadcast && broadcast.channel">
             <template v-slot:header v-if="streamLink">{{ streamLink }}</template>
             <Predictions v-if="liveMatch" :client="client"/>
             <Commercials v-if="hasPermission('Full broadcast permissions')" :client="client" />
@@ -66,7 +66,9 @@
                 </b-button>
             </div>
         </DashboardModule>
-        <CommsControl v-if="useTeamComms" :match="liveMatch"/>
+        <DashboardModule class="mb-2" v-if="useTeamComms" icon-class="fas fa-microphone" title="Team Comms Listen-In">
+            <CommsControls :match="liveMatch"/>
+        </DashboardModule>
     </div>
 </template>
 
@@ -79,7 +81,7 @@ import MatchEditor from "@/components/website/dashboard/MatchEditor";
 import { BButton } from "bootstrap-vue";
 import { updateAutomaticTitle } from "@/utils/dashboard";
 import Predictions from "@/components/website/dashboard/Predictions";
-import CommsControl from "@/components/website/dashboard/CommsControls";
+import CommsControls from "@/components/website/dashboard/CommsControls";
 import Commercials from "@/components/website/dashboard/Commercials";
 import BroadcastEditor from "@/components/website/dashboard/BroadcastEditor";
 import ScheduleEditor from "@/components/website/dashboard/ScheduleEditor";
@@ -95,7 +97,7 @@ import GFXController from "@/views/GFXController.vue";
 
 export default {
     name: "Dashboard",
-    components: { GFXController, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControl, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
+    components: { GFXController, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControls, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
     data: () => ({
         titleProcessing: false
     }),

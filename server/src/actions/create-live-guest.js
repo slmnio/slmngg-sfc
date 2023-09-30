@@ -29,7 +29,6 @@ module.exports = {
             let response = await this.helpers.createRecord("Live Guests", {
                 "Discord ID": user.discord.id,
                 "Avatar": `https://cdn.discordapp.com/avatars/${user.discord.id}/${user.discord.avatar}.webp?size=512`,
-                "Name": user.discord.username,
                 "Player": [user.airtable.id],
                 "Use Cam": true
             });

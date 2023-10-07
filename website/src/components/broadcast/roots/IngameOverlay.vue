@@ -235,6 +235,7 @@ export default {
                 next map or type
             ]
              */
+            return [];
         }
     },
     watch: {

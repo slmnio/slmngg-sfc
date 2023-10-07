@@ -6,7 +6,7 @@
             </div>
             <div class="team-text">
                 <div class="team-name">{{ team?.name }}</div>
-                <div class="team-subtitle" v-if="subtitle">{{ subtitle.replace("{small}", team?.small_overlay_text || "") }}</div>
+                <div class="team-subtitle" v-if="decoratedSubtitle">{{ decoratedSubtitle }}</div>
             </div>
         </div>
 
@@ -37,7 +37,7 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
-import { getRoleSVG } from "@/utils/content-utils";
+import { autoRecord, getRoleSVG } from "@/utils/content-utils";
 import { bg, resizedAttachment, resizedImage } from "@/utils/images";
 
 function niceJoin(array, and = "and") {
@@ -63,6 +63,9 @@ export default {
                     players: ReactiveArray("players", {
                         favourite_hero: ReactiveThing("favourite_hero")
                     }),
+                    matches: ReactiveArray("matches", {
+                        teams: ReactiveArray("teams")
+                    }),
                     staff: ReactiveArray("staff")
                 })
             });
@@ -87,6 +90,14 @@ export default {
                 })?.highlight_team;
             }
             return this.match?.teams?.[0];
+        },
+        decoratedSubtitle() {
+            let text;
+            if ((this.broadcast?.broadcast_settings || [])?.includes("Show match records ingame")) {
+                console.log("auto small text", this.team, this.team.matches);
+                text = autoRecord(this.team, this.broadcast?.current_stage || this.match?.match_group);
+            }
+            return this.subtitle.replace("{small}", (this.team.small_overlay_text || text || ""));
         },
         teamLogo() {
             return resizedImage(this.team?.theme, ["default_logo", "small_logo"], "w-200");

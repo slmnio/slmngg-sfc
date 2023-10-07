@@ -3,7 +3,7 @@
         <div class="solo-part solo--ingame">
             <div class="solo-pixel-info">200px</div>
             <transition-group name="fade" mode="out-in">
-                <IngameTeam :key="`${team.name}-${i}`" v-for="(team, i) in teams"
+                <IngameTeam :key="`${team.name}-${i}`" v-for="(team, i) in teams" :color-logo-holder="colorLogoHolder"
                             :team="team" :right="i === 1" :score="scores[i]" :active="true"/>
             </transition-group>
             <!--  :score="scores[i]" :hideScores="broadcast.hide_scores"
@@ -464,6 +464,9 @@ export default {
                 "use: Bracket",
                 "setting: Always do 30s Matchup"
             ];
+        },
+        colorLogoHolder() {
+            return (this.broadcast?.broadcast_settings || []).includes("Color ingame team logo holder");
         }
     }
 };

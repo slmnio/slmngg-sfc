@@ -63,6 +63,20 @@ export default {
                 }
             },
             {
+                text: "Drafted Maps",
+                value: {
+                    hasText: false,
+                    text: "Drafted Maps"
+                }
+            },
+            {
+                text: "Interview",
+                value: {
+                    hasText: false,
+                    text: "Interview"
+                }
+            },
+            {
                 text: "Text (Event)",
                 value: {
                     hasText: true,
@@ -81,6 +95,13 @@ export default {
                 value: {
                     hasText: true,
                     text: "Notice (Team 2)"
+                }
+            },
+            {
+                text: "Empty",
+                value: {
+                    hasText: false,
+                    text: "Empty"
                 }
             }
         ]

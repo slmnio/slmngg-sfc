@@ -1,5 +1,5 @@
 <template>
-    <div class="map d-flex position-relative" :class="{'next-map': map._next, 'map-dummy': map.dummy }">
+    <div class="map d-flex position-relative" :class="{'next-map': map._next, 'map-dummy': map.dummy, 'drafted-map': draftedStyle, 'upcoming-map': draftedStyle && !complete && !map._next }">
         <div v-if="mapVideo" class="map-bg map-video w-100 h-100 bg-center" :class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground">
             <video :src="mapVideo" autoplay muted loop></video>
         </div>
@@ -7,6 +7,7 @@
         <div class="map-gel w-100 h-100 position-absolute" :style="winnerBG"></div>
         <div class="map-gel w-100 h-100 position-absolute draw-gel" v-if="map && map.draw"></div>
         <div class="map-gel w-100 h-100 position-absolute ban-gel flex-center" v-if="map && map.banner"></div>
+        <div class="map-gel w-100 h-100 position-absolute upcoming-gel flex-center" v-if="draftedStyle && !complete && !map._next"></div>
         <div class="map-main d-flex flex-column h-100 w-100 position-absolute">
             <div v-if="!small">
                 <div class="map-upper flex-center" :style="accent" v-if="map.picker || map.banner">
@@ -19,7 +20,7 @@
                 </div>
                 <div class="map-upper-spacer" v-else></div>
             </div>
-            <div class="map-top flex-grow-1 h-100 w-100 flex-center flex-column">
+            <div class="map-top flex-grow-1 h-100 w-100 flex-center flex-column" v-if="!draftedStyle">
                 <div class="map-logo-holder w-100 h-50 flex-center" v-if="winnerBG">
                     <div class="map-logo bg-center" :style="winnerLogo"></div>
                 </div>
@@ -33,9 +34,28 @@
                     <div class="map-score">{{ map.score_2 }}</div>
                 </div>
             </div>
-            <div class="map-lower flex-center flex-column" :style="accent">
+            <div class="map-lower flex-center flex-column" v-if="!draftedStyle" :style="accent">
                 <div class="map-lower-name flex-center"><span class="industry-align">{{ name }}</span></div>
                 <div class="map-lower-type" v-if="type"><span class="industry-align">{{ type }}</span></div>
+            </div>
+
+            <div class="map-draft-top flex-center" v-if="draftedStyle" :class="{'complete': complete, 'next': map._next, 'draw': map.draw}" :style="winnerBG">
+                <div class="draft-map-data flex-grow-1 font-weight-bold">
+                    <div class="draft-map-type">{{ map.mode || map.type?.[0] }}</div>
+                    <div class="draft-map-name">{{ name }}</div>
+                </div>
+                <div class="draft-map-status">
+                    <div class="status-complete flex-center flex-column" v-if="complete">
+                        <div class="team-logo" :style="winnerLogo"></div>
+                        <div class="map-score text-nowrap" v-if="map.score_1 || map.score_2">{{ teamLeadingScoresText }}</div>
+                    </div>
+                    <div class="status-up-next text-center flex-center" v-else-if="map._next">
+                        <div class="text">UP NEXT</div>
+                    </div>
+                    <div class="status-up-later text-center flex-center" v-else>
+                        <div class="text">MAP {{ map._number }}</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -49,11 +69,22 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 
 export default {
     name: "MapSegment",
-    props: ["broadcast", "map", "accentColor", "showMapVideo", "firstTo", "useShorterNames", "small"],
+    props: ["broadcast", "map", "accentColor", "showMapVideo", "firstTo", "useShorterNames", "small", "draftedStyle"],
     components: {
         ThemeLogo
     },
     computed: {
+        complete() {
+            return this.map.winner || this.map.draw;
+        },
+        teamLeadingScoresText() {
+            if (!(this.map?.score_1 || this.map?.score_2)) return "";
+            if (this.map.score_1 > this.map.score_2) {
+                return `${this.map.score_1} - ${this.map.score_2}`;
+            } else {
+                return `${this.map.score_2} - ${this.map.score_1}`;
+            }
+        },
         pickBanTheme() {
             return (this.map.banner || this.map.picker)?.theme;
         },
@@ -210,5 +241,38 @@ export default {
     }
     .map-dash {
         margin: 0 .2em;
+    }
+
+    .map.drafted-map .map-main {
+        justify-content: center;
+    }
+
+    .map-draft-top {
+        width: 100%;
+        background: #444;
+        color: white;
+        padding: 0.5em 0.75em;
+        font-size: 18px;
+        height: 50%;
+    }
+
+
+    .draft-map-name {
+        font-size: 1.75em;
+        line-height: 1;
+    }
+
+
+    .draft-map-status {
+        line-height: 1.25em;
+    }
+
+    .team-logo {
+        width: 2.5em;
+        height: 2.5em;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        margin-bottom: .75em;
     }
 </style>

@@ -1,29 +1,50 @@
 <template>
         <div class="desk-match" v-if="match">
             <div class="teams d-flex" v-if="!match.special_event">
-                <DeskTeam class="team" v-for="(team, i) in match.teams" :key="team.id" :team="team" :style="{order: i * 2}" />
+                <DeskTeam class="team" v-for="(team, i) in (useFlatElements ? [] : match.teams)" :key="team.id" :team="team" :style="{order: i * 2}" />
 
                 <div class="match-middle flex-center w-100">
                     <transition name="break-content" mode="out-in">
-                        <div class="match-middle-match flex-center" v-if="middleMode === 'Match'">
-                            <DeskTeamName v-for="(team, i) in match.teams" :key="team.id" :team="team" :style="{order: i*2}" />
-
-                            <div class="match-center flex-center" v-if="!splitMatchScore">
-                                <div class="match-score flex-center" v-if="show.score">
-                                    <div class="score flex-center" :class="{'win': match.score_1 === match.first_to}"><span class="industry-align">{{ match.score_1 }}</span></div>
-                                    <div class="dash">-</div>
-                                    <div class="score flex-center" :class="{'win': match.score_2 === match.first_to}"><span class="industry-align">{{ match.score_2 }}</span></div>
-                                </div>
-                                <div class="match-vs flex-center" :style="centerBorder" v-if="show.vs">
-                                    <span class="industry-align">{{ scoreText }}</span>
-                                </div>
+                        <div class="match-middle-match flex-center flex-column" v-if="middleMode === 'Match'">
+                            <div class="scoreboard-title" v-if="scoreboardTitle">
+                                <transition name="fade" mode="out-in">
+                                    <span :key="scoreboardTitle">{{ scoreboardTitle }}</span>
+                                </transition>
                             </div>
-                            <div class="match-center flex-center" v-else>
-                                <div class="match-score-split">
-                                    <div class="score flex-center" :style="centerBorder"><span class="industry-align">{{ match.score_1 }}</span></div>
-                                    <div class="vs flex-center" :style="themeColor"><span class="industry-align">VS</span></div>
-<!--                                    <div class="vs-empty"></div>-->
-                                    <div class="score flex-center" :style="centerBorder"><span class="industry-align">{{ match.score_2 }}</span></div>
+                            <div class="match-middle-match-holder w-100 h-100 flex-center">
+                                <div class="team-alt-slice" :class="`team-${i+1}`" v-for="(team, i) in match.teams"
+                                     :key="team.id"
+                                     :style="{ backgroundColor: getTeamAltSlice(team), order: (i) * 9}"></div>
+                                <DeskTeam class="team" :class="`team-${i+1}`"
+                                          v-for="(team, i) in (useFlatElements ? match.teams:  [])" :key="team.id"
+                                          :team="team" :style="{order: (i * 2) + i}"/>
+                                <DeskTeamName :broadcast="broadcast" :match="matchData" :class="`team-${i+1}`" v-for="(team, i) in match.teams" :key="team.id"
+                                              :team="team" :style="{order: i * 2}"/>
+
+                                <div class="match-center flex-center" v-if="!splitMatchScore">
+                                    <div class="match-score flex-center" v-if="show.score">
+                                        <div class="score flex-center"
+                                             :class="{'win': match.score_1 === match.first_to}"><span
+                                            class="industry-align">{{ match.score_1 }}</span></div>
+                                        <div class="dash">-</div>
+                                        <div class="score flex-center"
+                                             :class="{'win': match.score_2 === match.first_to}"><span
+                                            class="industry-align">{{ match.score_2 }}</span></div>
+                                    </div>
+                                    <div class="match-vs flex-center" :style="centerBorder" v-if="show.vs">
+                                        <span class="industry-align">{{ scoreText }}</span>
+                                    </div>
+                                </div>
+                                <div class="match-center flex-center" v-else>
+                                    <div class="match-score-split">
+                                        <div class="score flex-center" :style="centerBorder"><span
+                                            class="industry-align">{{ match.score_1 }}</span></div>
+                                        <div class="vs flex-center" :style="themeColor"><span
+                                            class="industry-align">VS</span></div>
+                                        <!--                                    <div class="vs-empty"></div>-->
+                                        <div class="score flex-center" :style="centerBorder"><span
+                                            class="industry-align">{{ match.score_2 }}</span></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -36,6 +57,13 @@
                         </div>
                         <div class="match-middle-maps flex-center" v-if="middleMode === 'Maps'" key="Maps">
                             <MapDisplay :small="true" :broadcast="broadcast" no-map-videos="true" />
+                        </div>
+                        <div class="match-middle-drafted-maps flex-center" v-if="middleMode === 'Drafted Maps'" key="Drafted Maps">
+                            <MapDisplay :small="true" :broadcast="broadcast" :drafted-style="true" />
+                        </div>
+                        <div class="match-middle-interview flex-center flex-column" v-if="middleMode === 'Interview'" key="Interview">
+                            <div class="scoreboard-title">Interview</div>
+                            <DeskInterview :broadcast="broadcast"></DeskInterview>
                         </div>
                     </transition>
                 </div>
@@ -56,9 +84,10 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import DeskPrediction from "@/components/broadcast/desk/DeskPrediction";
 import MapDisplay from "@/components/broadcast/MapDisplay";
+import DeskInterview from "@/components/broadcast/desk/DeskInterview.vue";
 export default {
     name: "DeskMatch",
-    components: { DeskPrediction, DeskTeam, DeskNotice, DeskTeamName, MapDisplay },
+    components: { DeskInterview, DeskPrediction, DeskTeam, DeskNotice, DeskTeamName, MapDisplay },
     props: ["_match", "themeColor", "matchID", "broadcast", "guests", "forceMode"],
     computed: {
         matchData() {
@@ -137,12 +166,25 @@ export default {
         },
         splitMatchScore() {
             return (this.broadcast?.broadcast_settings || []).includes("Split desk match score");
+        },
+        useFlatElements() {
+            return (this.broadcast?.broadcast_settings || []).includes("Use flat desk elements");
+        },
+        scoreboardTitle() {
+            return this.broadcast?.scoreboard_title || this.matchData?.round;
         }
     },
     methods: {
         nbr(text) {
             if (!text) return "";
             return text.replace(/\\n/g, "<br>");
+        },
+        getTeamAltSlice(team) {
+            if (!team.theme) return {};
+            let color = team.theme.color_accent;
+            if (!color || color.toLowerCase() === "#ffffff") color = team.theme.color_logo_accent;
+            if (!color || color.toLowerCase() === "#ffffff") color = team.theme.color_theme;
+            return color;
         }
     }
 };
@@ -247,5 +289,28 @@ export default {
     }
     .match-score-split .score, .match-score-split .vs {
         border-bottom: 6px solid transparent;
+    }
+    .team-alt-slice {
+        height: 100%;
+        width: 6px;
+        flex-shrink: 0;
+    }
+
+
+    .scoreboard-title {
+        height: 36px;
+        background: #222;
+        color: white;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-weight: bold;
+        font-size: 24px;
+        text-transform: uppercase;
+    }
+    .match-middle-interview {
+        background-color: white;
     }
 </style>

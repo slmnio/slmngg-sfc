@@ -200,7 +200,7 @@ export default {
 .tt-leave .theme-transition-outer,
 .tt-leave .theme-transition-inner {
     /* full open */
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+    clip-path: polygon(-1% -1%, 101% -1%, 101% 101%, -1% 101%);
 }
 
 .theme-transition.start-right.tt-enter.clip-slot >>> .clip-target,

@@ -1,19 +1,31 @@
 <template>
     <div class="team-name-holder d-flex align-items-center">
         <div class="team-name flex-center w-100" :style="bg">
-            <span class="industry-align">{{ team.name }}</span>
+            <span class="industry-align team-sub-name">{{ team.name }}</span>
+            <span class="industry-align d-none small-overlay-text" v-if="smallText">({{ smallText }})</span>
         </div>
     </div>
 </template>
 
 <script>
 import { logoBackground1 } from "@/utils/theme-styles";
+import { autoRecord } from "@/utils/content-utils";
 
 export default {
     name: "DeskTeamName",
-    props: ["team"],
+    props: ["broadcast", "team", "match"],
     computed: {
-        bg() { return logoBackground1(this.team); }
+        bg() {
+            return logoBackground1(this.team);
+        },
+        smallText() {
+            let text;
+            if ((this.broadcast?.broadcast_settings || [])?.includes("Show match records ingame")) {
+                console.log("auto small text", this.team, this.team.matches);
+                text = autoRecord(this.team, this.broadcast?.current_stage || this.match?.match_group);
+            }
+            return this.team.small_overlay_text || text;
+        }
     }
 };
 </script>

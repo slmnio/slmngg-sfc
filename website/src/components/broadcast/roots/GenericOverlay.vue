@@ -1,7 +1,7 @@
 <template>
     <div class="generic-overlay flex-center flex-column" :class="{'full': full}">
         <TourneyBar class="st4-top" v-if="top === 'st4'" :broadcast="broadcast" left="Schedule" :right="title"/>
-        <div class="g-title-wrapper">
+        <div class="g-title-wrapper" v-if="!hideTitle">
             <theme-transition :theme="theme" :active="$root.animationActive" one-color end="middle"  :duration="500" :inner-delay="150">
                 <div class="generic-overlay-title g-title overlay--bg flex-center" :style="{borderColor: _accentColor, ...(titleStyle || {})}">
                     <Squeezable align="middle" :disabled="(title || '').includes('\\n')" class="w-100 flex-center industry-align">
@@ -33,7 +33,7 @@ import Squeezable from "@/components/broadcast/Squeezable.vue";
 export default {
     name: "GenericOverlay",
     components: { Squeezable, ThemeTransition, TourneyBar },
-    props: ["title", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "titleStyle", "customTheme", "full"],
+    props: ["title", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "titleStyle", "customTheme", "full", "hideTitle"],
     methods: {
         nbr(text) {
             if (!text) return "";

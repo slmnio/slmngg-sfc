@@ -248,6 +248,7 @@ export default {
             });
         },
         sortPlayers(players) {
+            if (!players?.length) return [];
             return players.sort((a, b) => {
                 if (a.role !== b.role) {
                     const order = ["Tank", "DPS", "Support"];

@@ -1,32 +1,38 @@
 <template>
-    <transition v-if="useTransitions" mode="out-in" name="break-content" class="map-anim-holder">
-        <div :key="autoKey" class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" :class="{'show-next-map': showNextMap && nextMap}">
-            <MapSegment class="map" v-for="map in maps" :key="map.id" :small="small" :drafted-style="draftedStyle"
-                :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
-        </div>
-    </transition>
-    <div v-else class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" :class="{'show-next-map': showNextMap && nextMap}">
-        <MapSegment class="map" v-for="map in maps" :key="map.id" :small="small" :drafted-style="draftedStyle"
-                    :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
+    <div class="map-bump-overlay">
+        <transition name="swipe-right">
+            <div class="overlay-container" v-if="animationActive && nextMap">
+                <div class="last-map" v-if="mostRecentMap">
+                    <div class="title flex-center">PREVIOUSLY</div>
+                    <div class="content map-holder">
+                        <div class="map-image" :style="mostRecentMapBG"></div>
+                        <div class="map-gel dark"></div>
+                        <div class="map-gel winners d-none" :style="winnerBG(mostRecentMap)"></div>
+                        <div class="map-winners-logo-holder flex-center d-none">
+                            <div class="map-winners-logo bg-center" :style="winnerLogo(mostRecentMap)"></div>
+                            <div class="map-winners-score"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="up-next-map">
+                    <div class="title flex-center">UP NEXT: MAP {{ nextMap?._number }}</div>
+                    <div class="content text flex-center">
+                        {{ nextMap?.name?.[0] }}
+                    </div>
+                </div>
+            </div>
+        </transition>
     </div>
 </template>
-
 <script>
-import MapSegment from "@/components/broadcast/MapSegment";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { DefaultMapImages, likelyNeededMaps } from "@/utils/content-utils";
-import { getNewURL } from "@/utils/images";
+import { bg, getNewURL, resizedImage } from "@/utils/images";
+import { logoBackground1 } from "@/utils/theme-styles";
 
 export default {
-    name: "MapDisplay",
-    components: { MapSegment },
-    props: ["broadcast", "animationActive", "useTransitions", "virtualMatch", "noMapVideos", "small", "draftedStyle"],
-    data: () => ({
-        activeAudio: null,
-        showNextMap: false,
-        showBannedMaps: true,
-        audioStatus: "not playing"
-    }),
+    name: "MapBumpOverlay",
+    props: ["broadcast", "animationActive"],
     computed: {
         match() {
             if (this.virtualMatch) return this.virtualMatch;
@@ -56,19 +62,10 @@ export default {
             return this.broadcast.map_set.split(",");
         },
         maps() {
-            // if (!this.match?.maps) {
-            //     const maps = [];
-            //     for (let i = 0; i < this.mapCount; i++) {
-            //         maps.push({ dummy: true, ...(this.mapTypes ? { name: [this.mapTypes && this.mapTypes[i]], image: [{ url: DefaultMapImages[this.mapTypes[i]] }] } : {}) });
-            //     }
-            //     return maps;
-            // }
-
             if (!this.match?.first_to) return this.match?.maps;
 
             let maps = [...(this.match?.maps || [])].filter(m => m.map);
 
-            console.log("maps 75", maps);
             if (this.showBannedMaps) {
             } else {
                 maps = maps.filter(m => !(m.banner || m.banned));
@@ -136,6 +133,19 @@ export default {
             const unplayedMaps = (this.maps || []).filter(m => !m.dummy && !m.winner && !m.draw && !m.banner);
             return unplayedMaps?.[0];
         },
+        mostRecentMap() {
+            const playedMaps = (this.maps || []).filter(m => !m.dummy && (m.winner || m.draw));
+            if (!playedMaps?.length) return null;
+            return playedMaps?.[playedMaps.length - 1];
+        },
+        mostRecentMapBG() {
+            if (!this.mostRecentMap) return {};
+
+            const map = this.mostRecentMap;
+            const image = (map?.map?.big_image || map?.map?.image || map?.big_image || map?.image)?.[0];
+            if (!(image)) return {};
+            return bg(image?.url || getNewURL(image, "w-400"));
+        },
         autoKey() {
             return [
                 this.match?.id,
@@ -146,9 +156,10 @@ export default {
             return this.broadcast?.broadcast_settings?.includes("Use shorter map names");
         },
         isInMapsScene() {
-            return this.$root?.activeScene?.name?.toLowerCase().includes("maps");
+            return this.$root?.activeScene?.name?.toLowerCase().includes("map");
         }
     },
+
     sockets: {
         map_music() {
             console.log("Map Music trigger");
@@ -160,6 +171,12 @@ export default {
         }
     },
     methods: {
+        winnerBG(map) {
+            return logoBackground1(map.winner);
+        },
+        winnerLogo(map) {
+            return resizedImage(map.winner?.theme, ["default_logo", "small_logo"], "w-400");
+        },
         playAudio() {
             if (this.nextMap?.map?.audio) {
                 try {
@@ -268,53 +285,100 @@ export default {
                 console.log("Animation reset - stopping audio");
                 this.stopAudio();
             }
-        },
-        audioStatus(is, was) {
-            console.log({ was, is });
         }
     }
 };
 </script>
-
 <style scoped>
-    .map:first-of-type {
-        margin-left: 0;
-    }
-    .map:last-of-type {
-        margin-right: 0;
-    }
-
-    .map-display.show-next-map >>> .map.next-map {
-        flex-grow: 5;
+    .overlay-container {
+        position: absolute;
+        bottom: 120px;
+        left: 40px;
+        height: 140px;
+        display: flex;
     }
 
-    .map-display >>> .map-lower-name {
-        transform: scale(1);
-        transition: all 800ms ease;
+    .title {
+        height: 40px;
+        padding: 0 10px;
+        background-color: #222;
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .last-map {
+        width: 165px;
+    }
+
+    .up-next-map {
+        margin-left: 10px;
+        width: 450px;
+    }
+
+    .content {
+        flex-grow: 1;
         width: 100%;
-        /*border: 1px solid red;*/
     }
-    .map-display >>> .map.next-map .map-lower-name {
-        width: 39.8%;
-        /*border: 1px solid lime;*/
-    }
-    .map-display:not(.show-next-map) >>> .map .map-lower-name {
-        width: 76.8%;
-        /*transform: scale(0.75);*/
-    }
-    .map-display.show-next-map >>> .map:not(.next-map) .map-lower-name {
-        width: 100%;
-        transform: scale(0.75);
-    }
-    .break-content-enter-active, .break-content-leave-active { transition: all .35s ease; overflow: hidden }
-    .break-content-enter { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); }
-    .break-content-leave-to { clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); }
-    .break-content-enter-to, .break-content-leave { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
 
-    .map-anim-holder {
+    .last-map, .up-next-map {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .content.map-holder {
         position: relative;
+    }
+    .map-image {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        filter: grayscale(1);
+    }
+
+    .content.text {
+        background-color: white;
+        font-size: 48px;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-align: center;
+        line-height: 0.9;
+    }
+
+    .map-gel, .map-image, .map-winners-logo-holder {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
-        display: block;
     }
+
+    .map-gel {
+        opacity: 0.33;
+    }
+    .map-gel.dark {
+        background-color: black;
+    }
+    .map-winners-logo {
+        width: 50%;
+        height: 60%;
+    }
+
+
+    .swipe-right-enter-active {
+        transition: clip-path .5s ease 2s;
+    }
+
+
+    .swipe-right-enter-to {
+        /* full open */
+        clip-path: polygon(-1% -1%, 101% -1%, 101% 101%, -1% 101%);
+    }
+
+    .swipe-right-enter {
+        /* closed left */
+        clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+    }
+
 </style>

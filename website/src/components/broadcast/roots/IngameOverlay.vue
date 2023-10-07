@@ -4,9 +4,11 @@
           <IngameTeam :key="team.id" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
                       :team="team"  :right="i === 1"
                       :active="noAnimation || shouldShowTeams" :score="scores[i]" :hide-scores="broadcast.hide_scores"
-                      :extend-icons="extendIcons"
+                      :extend-icons="extendIcons" :color-logo-holder="colorLogoHolder"
                       :width="teamWidth" :codes="useCodes" :event="broadcast.event" :auto-small="autoSmall"
                       :map-attack="attacks[i]" :use-dots="useDots" :first-to="match && match.first_to"
+                      :event-info="i === 0 ? eventData : null"
+                      :map-info="i === 1 ? mapInformation : null"
           />
           <!--   -->
           <Middle v-if="!basicMode" :active="shouldShowMiddle" :theme="broadcast?.event?.theme" :text="middleText"
@@ -207,6 +209,32 @@ export default {
                     backgroundColor: color
                 };
             });
+        },
+        colorLogoHolder() {
+            return (this.broadcast?.broadcast_settings || []).includes("Color ingame team logo holder");
+        },
+        showEventData() {
+            return (this.broadcast?.broadcast_settings || []).includes("Show event details ingame");
+        },
+        eventData() {
+            if (!this.showEventData) return [];
+            return [
+                this.broadcast?.event?.name,
+                this.match.round || ""
+            ].filter(Boolean);
+        },
+        showMapInformation() {
+            return (this.broadcast?.broadcast_settings || []).includes("Show map information ingame");
+        },
+        mapInformation() {
+            if (!this.showMapInformation) return [];
+            /*
+            [
+                last map with winner,
+                current map with type,
+                next map or type
+            ]
+             */
         }
     },
     watch: {
@@ -340,6 +368,7 @@ export default {
 .ingame-fade-sponsors >>> .break-sponsor-logo {
     height: calc(100% - 1.5em) !important;
 }
+.ingame-overlay.basic >>> .small-overlay-text,
 .ingame-overlay.basic >>> .team-score,
 .ingame-overlay.basic >>> .attack-holder {
     display: none !important;

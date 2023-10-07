@@ -51,7 +51,10 @@ export default {
             if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
-                    theme: ReactiveThing("theme")
+                    theme: ReactiveThing("theme"),
+                    matches: ReactiveArray("matches", {
+                        teams: ReactiveArray("teams")
+                    })
                 }),
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")
@@ -71,7 +74,7 @@ export default {
             console.log(manualGuests);
             return manualGuests;
         },
-        guests: function() {
+        guests() {
             const guests = (!this.broadcast?.guests) ? [] : ReactiveArray("guests", {
                 player: ReactiveThing("player", {
                     socials: ReactiveArray("socials")

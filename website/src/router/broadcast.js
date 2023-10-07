@@ -45,6 +45,9 @@ export default [
             interval: route.query.interval || route.query.headlineInterval
         })
     },
+    { path: "break-schedule", component: () => import("@/components/broadcast/break/BreakScheduleOverlay.vue") },
+    { path: "versus", component: () => import("@/components/broadcast/roots/VersusOverlay.vue") },
+    { path: "map-bump", component: () => import("@/components/broadcast/roots/MapBumpOverlay.vue") },
     { path: "break-bar", component: () => import("@/components/broadcast/break/BreakBarOverlay.vue") },
     {
         path: "break-text",
@@ -86,6 +89,9 @@ export default [
         })
     },
     { path: "hero-rosters", redirect: "hero-roster" },
+    { path: "boxed-hero-rosters", redirect: "boxed-roster" },
+    { path: "boxed-hero-roster", redirect: "boxed-roster" },
+    { path: "boxed-rosters", redirect: "boxed-roster" },
     {
         path: "hero-roster",
         component: () => import("@/components/broadcast/roots/HeroRosterOverlay.vue"),
@@ -94,6 +100,19 @@ export default [
             playerCount: route.query.count || route.query.players || route.query.playerCount,
             showRoles: !!route.query.role || !!route.query.roles || !!route.query.icons,
             showPronouns: !!route.query.pronouns
+        })
+    },
+    {
+        path: "boxed-roster",
+        component: () => import("@/components/broadcast/roots/BoxedHeroRosterOverlay.vue"),
+        props: route => ({
+            teamNum: route.query.team || route.query.teamNum,
+            playerCount: route.query.count || route.query.players || route.query.playerCount,
+            showRoles: !!route.query.role || !!route.query.roles || !!route.query.icons,
+            showPronouns: !!route.query.pronouns,
+            subtitle: route.query.subtitle,
+            alternate: route.query.alternate ? parseInt(route.query.alternate) : null,
+            showStaff: !!route.query.staff
         })
     },
     {

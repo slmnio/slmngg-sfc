@@ -21,7 +21,7 @@
                     <span class="industry-align team-sub-subtitle" v-if="!codes && team.subtitle">{{ team.subtitle }}</span>
                     <span class="industry-align team-sub-code" v-if="codes">{{ team.code }}</span>
                 </Squeezable>
-                <div class="flex-center team-logo-holder flex-center" v-if="teamLogo">
+                <div class="flex-center team-logo-holder flex-center" v-if="teamLogo" :style="colorLogoHolder ? logoBackground(_theme) : {}" :data-clh="colorLogoHolder">
                     <div class="team-logo bg-center" :style="teamLogo"></div>
                 </div>
                 <transition name="score">
@@ -44,6 +44,16 @@
                         </transition>
                     </div>
                 </transition>
+                <transition name="fly-in">
+                    <div class="event-info" v-if="active && eventInfo">
+                        <div class="text" v-for="(item, i) in eventInfo" :key="item" :style="{order: i * 2}">
+                            {{ item }}
+                        </div>
+                        <div class="dash" v-for="(item, i) in eventInfo" :key="i" :style="{order: (i * 2) + 1}">
+                            -
+                        </div>
+                    </div>
+                </transition>
             </div>
         </ThemeTransition>
 <!--    </transition>-->
@@ -53,11 +63,13 @@
 import { getNewURL, resizedImage } from "@/utils/images";
 import Squeezable from "@/components/broadcast/Squeezable.vue";
 import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
+import { logoBackground } from "@/utils/theme-styles";
+import { autoRecord } from "@/utils/content-utils";
 
 export default {
     name: "IngameTeam",
     components: { Squeezable, ThemeTransition },
-    props: ["team", "active", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo"],
+    props: ["team", "active", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo", "colorLogoHolder", "eventInfo"],
     data: () => ({
         textureData: {
             url: null,
@@ -67,6 +79,7 @@ export default {
         show: true
     }),
     methods: {
+        logoBackground,
         async loadSVG(url) {
             console.log("Load SVG", url);
             this.textureData.loading = true;
@@ -97,26 +110,7 @@ export default {
             if (this.autoSmall?.show !== "record") return null;
             const stage = this.autoSmall?.stage;
             if (!stage) return null;
-
-            const matches = this.team?.matches?.filter(m => m.match_group === stage);
-
-            console.log(matches);
-            if (!matches?.length) return null;
-
-            let [wins, losses] = [0, 0];
-
-            matches.forEach(m => {
-                const scores = [m.score_1 || 0, m.score_2 || 0];
-                if (!scores.some(s => s === m.first_to)) return; // not finished
-                const won = scores[0] === m.first_to ? this.team.id === m.teams[0].id : this.team.id === m.teams[1].id;
-                if (won) {
-                    wins++;
-                } else {
-                    losses++;
-                }
-            });
-
-            return [wins, losses].join(" - ");
+            return autoRecord(this.team, stage);
         },
         smallText() {
             if (this.team?.small_overlay_text) return this.team.small_overlay_text;
@@ -251,7 +245,6 @@ export default {
     }
     .ingame-team-holder {
         position: absolute;
-        overflow: hidden;
         top: 12px;
         display: flex;
         justify-content: flex-end;
@@ -311,7 +304,6 @@ export default {
         padding: 0 16px;
         white-space: nowrap;
         position: relative;
-        letter-spacing: -1px;
     }
 
     .team-score {
@@ -445,5 +437,42 @@ export default {
     }
     .dot.active {
         background-color: white;
+    }
+
+    .event-info {
+        position: absolute;
+        bottom: 100%;
+        background-color: rgba(0,0,0,0.75);
+        width: 100%;
+        left: 0;
+        margin-bottom: 6px;
+        height: 30px;
+        padding: 0 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: bold;
+        font-size: 20px;
+        text-transform: uppercase;
+    }
+    .dash:last-of-type {
+        display: none;
+    }
+
+    .fly-in-enter-active {
+        transition: all .75s ease 1.5s;
+    }
+    .fly-in-enter {
+        transform: translate(0, -40px);
+    }
+    .fly-in-enter-to {
+        transform: translate(0, 0);
+    }
+
+    .fly-in-leave-active {
+        transition: opacity .3s ease;
+    }
+    .fly-in-leave-to {
+        opacity: 0;
     }
 </style>

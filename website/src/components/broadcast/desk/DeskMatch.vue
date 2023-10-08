@@ -1,79 +1,79 @@
 <template>
-        <div class="desk-match" v-if="match">
-            <div class="teams d-flex" v-if="!match.special_event">
-                <DeskTeam class="team" v-for="(team, i) in (useFlatElements ? [] : match.teams)" :key="team.id" :team="team" :style="{order: i * 2}" />
+    <div class="desk-match" v-if="match">
+        <div class="teams d-flex" v-if="!match.special_event">
+            <DeskTeam class="team" v-for="(team, i) in (useFlatElements ? [] : match.teams)" :key="team.id" :team="team" :style="{order: i * 2}" />
 
-                <div class="match-middle flex-center w-100">
-                    <transition name="break-content" mode="out-in">
-                        <div class="match-middle-match flex-center flex-column" v-if="middleMode === 'Match'">
-                            <div class="scoreboard-title" v-if="scoreboardTitle">
-                                <transition name="fade" mode="out-in">
-                                    <span :key="scoreboardTitle">{{ scoreboardTitle }}</span>
-                                </transition>
-                            </div>
-                            <div class="match-middle-match-holder w-100 h-100 flex-center">
-                                <div class="team-alt-slice" :class="`team-${i+1}`" v-for="(team, i) in match.teams"
-                                     :key="team.id"
-                                     :style="{ backgroundColor: getTeamAltSlice(team), order: (i) * 9}"></div>
-                                <DeskTeam class="team" :class="`team-${i+1}`"
-                                          v-for="(team, i) in (useFlatElements ? match.teams:  [])" :key="team.id"
-                                          :team="team" :style="{order: (i * 2) + i}"/>
-                                <DeskTeamName :broadcast="broadcast" :match="matchData" :class="`team-${i+1}`" v-for="(team, i) in match.teams" :key="team.id"
-                                              :team="team" :style="{order: i * 2}"/>
+            <div class="match-middle flex-center w-100">
+                <transition name="break-content" mode="out-in">
+                    <div class="match-middle-match flex-center flex-column" v-if="middleMode === 'Match'">
+                        <div class="scoreboard-title" v-if="scoreboardTitle">
+                            <transition name="fade" mode="out-in">
+                                <span :key="scoreboardTitle">{{ scoreboardTitle }}</span>
+                            </transition>
+                        </div>
+                        <div class="match-middle-match-holder w-100 h-100 flex-center">
+                            <div class="team-alt-slice" :class="`team-${i+1}`" v-for="(team, i) in match.teams"
+                                 :key="team.id"
+                                 :style="{ backgroundColor: getTeamAltSlice(team), order: (i) * 9}"></div>
+                            <DeskTeam class="team" :class="`team-${i+1}`"
+                                      v-for="(team, i) in (useFlatElements ? match.teams:  [])" :key="team.id"
+                                      :team="team" :style="{order: (i * 2) + i}"/>
+                            <DeskTeamName :broadcast="broadcast" :match="matchData" :class="`team-${i+1}`" v-for="(team, i) in match.teams" :key="team.id"
+                                          :team="team" :style="{order: i * 2}"/>
 
-                                <div class="match-center flex-center" v-if="!splitMatchScore">
-                                    <div class="match-score flex-center" v-if="show.score">
-                                        <div class="score flex-center"
-                                             :class="{'win': match.score_1 === match.first_to}"><span
-                                            class="industry-align">{{ match.score_1 }}</span></div>
-                                        <div class="dash">-</div>
-                                        <div class="score flex-center"
-                                             :class="{'win': match.score_2 === match.first_to}"><span
-                                            class="industry-align">{{ match.score_2 }}</span></div>
-                                    </div>
-                                    <div class="match-vs flex-center" :style="centerBorder" v-if="show.vs">
-                                        <span class="industry-align">{{ scoreText }}</span>
-                                    </div>
+                            <div class="match-center flex-center" v-if="!splitMatchScore">
+                                <div class="match-score flex-center" v-if="show.score">
+                                    <div class="score flex-center"
+                                         :class="{'win': match.score_1 === match.first_to}"><span
+                                        class="industry-align">{{ match.score_1 }}</span></div>
+                                    <div class="dash">-</div>
+                                    <div class="score flex-center"
+                                         :class="{'win': match.score_2 === match.first_to}"><span
+                                        class="industry-align">{{ match.score_2 }}</span></div>
                                 </div>
-                                <div class="match-center flex-center" v-else>
-                                    <div class="match-score-split">
-                                        <div class="score flex-center" :style="centerBorder"><span
-                                            class="industry-align">{{ match.score_1 }}</span></div>
-                                        <div class="vs flex-center" :style="themeColor"><span
-                                            class="industry-align">VS</span></div>
-                                        <!--                                    <div class="vs-empty"></div>-->
-                                        <div class="score flex-center" :style="centerBorder"><span
-                                            class="industry-align">{{ match.score_2 }}</span></div>
-                                    </div>
+                                <div class="match-vs flex-center" :style="centerBorder" v-if="show.vs">
+                                    <span class="industry-align">{{ scoreText }}</span>
                                 </div>
                             </div>
+                            <div class="match-center flex-center" v-else>
+                                <div class="match-score-split">
+                                    <div class="score flex-center" :style="centerBorder"><span
+                                        class="industry-align">{{ match.score_1 }}</span></div>
+                                    <div class="vs flex-center" :style="themeColor"><span
+                                        class="industry-align">VS</span></div>
+                                    <!--                                    <div class="vs-empty"></div>-->
+                                    <div class="score flex-center" :style="centerBorder"><span
+                                        class="industry-align">{{ match.score_2 }}</span></div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="match-middle-notice flex-center" v-if="middleMode === 'Notice'" :key="broadcast.notice_text + '-' + broadcast.desk_display">
-                            <DeskNotice class="notice" :notice="broadcast.notice_text" :main-theme="middleTheme" :alt-theme="altTheme"
-                                        :right="broadcast.desk_display.includes('2')" />
-                        </div>
-                        <div class="match-middle-predictions flex-center" v-if="middleMode === 'Predictions'" key="Predictions">
-                            <DeskPrediction v-for="guest in guests" :key="guest.id" :guest="guest" :event="broadcast.event" />
-                        </div>
-                        <div class="match-middle-maps flex-center" v-if="middleMode === 'Maps'" key="Maps">
-                            <MapDisplay :small="true" :broadcast="broadcast" no-map-videos="true" />
-                        </div>
-                        <div class="match-middle-drafted-maps flex-center" v-if="middleMode === 'Drafted Maps'" key="Drafted Maps">
-                            <MapDisplay :small="true" :broadcast="broadcast" :drafted-style="true" />
-                        </div>
-                        <div class="match-middle-interview flex-center flex-column" v-if="middleMode === 'Interview'" key="Interview">
-                            <div class="scoreboard-title">Interview</div>
-                            <DeskInterview :broadcast="broadcast"></DeskInterview>
-                        </div>
-                    </transition>
-                </div>
-            </div>
-            <div class="desk-match-text flex-center" v-if="match.special_event" :style="textBackground">
-                <transition name="fade" mode="out-in">
-                    <span :key="match.custom_name">{{ match.custom_name }}</span>
+                    </div>
+                    <div class="match-middle-notice flex-center" v-if="middleMode === 'Notice'" :key="broadcast.notice_text + '-' + broadcast.desk_display">
+                        <DeskNotice class="notice" :notice="broadcast.notice_text" :main-theme="middleTheme" :alt-theme="altTheme"
+                                    :right="broadcast.desk_display.includes('2')" />
+                    </div>
+                    <div class="match-middle-predictions flex-center" v-if="middleMode === 'Predictions'" key="Predictions">
+                        <DeskPrediction v-for="guest in guests" :key="guest.id" :guest="guest" :event="broadcast.event" />
+                    </div>
+                    <div class="match-middle-maps flex-center" v-if="middleMode === 'Maps'" key="Maps">
+                        <MapDisplay :small="true" :broadcast="broadcast" no-map-videos="true" />
+                    </div>
+                    <div class="match-middle-drafted-maps flex-center" v-if="middleMode === 'Drafted Maps'" key="Drafted Maps">
+                        <MapDisplay :small="true" :broadcast="broadcast" :drafted-style="true" />
+                    </div>
+                    <div class="match-middle-interview flex-center flex-column" v-if="middleMode === 'Interview'" key="Interview">
+                        <div class="scoreboard-title">Interview</div>
+                        <DeskInterview :broadcast="broadcast"></DeskInterview>
+                    </div>
                 </transition>
             </div>
         </div>
+        <div class="desk-match-text flex-center" v-if="match.special_event" :style="textBackground">
+            <transition name="fade" mode="out-in">
+                <span :key="match.custom_name">{{ match.custom_name }}</span>
+            </transition>
+        </div>
+    </div>
 </template>
 
 <script>

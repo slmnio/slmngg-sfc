@@ -49,13 +49,13 @@ export default {
         },
         soloTeamTheme() {
             // return this.interviewGuests?.[0]?.theme;
-
-            if (!this.interviewGuests?.length) return false;
-            if (this.interviewGuests?.length > 1 ||
-                this.interviewGuests.slice(1).every(g => g.theme?.id === this.interviewGuests?.[0]?.theme?.id)) {
-                return this.interviewGuests[0]?.theme;
-            }
-            return false;
+            return null;
+            // if (!this.interviewGuests?.length) return false;
+            // if (this.interviewGuests?.length > 1 ||
+            //     this.interviewGuests.slice(1).every(g => g.theme?.id === this.interviewGuests?.[0]?.theme?.id)) {
+            //     return this.interviewGuests[0]?.theme;
+            // }
+            // return false;
         }
     },
     methods: {
@@ -80,7 +80,7 @@ export default {
     }
     .guest-name {
         font-weight: bold;
-        font-size: 1.25em;
+        font-size: 1.5em;
         line-height: 1.2;
     }
     .guest-pronouns {
@@ -90,8 +90,8 @@ export default {
     }
 
     .team-theme .team-logo-holder {
-        height: 3em;
-        width: 4em;
+        height: 4em;
+        width: 5em;
     }
     .team-theme .team-logo {
         width: 90%;

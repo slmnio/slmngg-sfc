@@ -248,7 +248,8 @@ export const DefaultMapImages = {
     Slayer: "https://media.discordapp.net/attachments/855517740914573342/913747752729595904/slayer.png",
     Strongholds: "https://media.discordapp.net/attachments/855517740914573342/913747753086107668/strongholds.png",
     CTF: "https://media.discordapp.net/attachments/855517740914573342/913747753392304158/ctf.png",
-    Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png"
+    Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png",
+    Flashpoint: "https://cdn.discordapp.com/attachments/855515391225102336/1145463994581254154/flashpoint.png"
 };
 
 export const MapTypeIcons = {
@@ -256,7 +257,8 @@ export const MapTypeIcons = {
     Escort: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907343893336097/180.png",
     Control: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907374708903946/180.png",
     Push: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908279537717392/Push.png",
-    Assault: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908385250934904/assault.png"
+    Assault: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908385250934904/assault.png",
+    Flashpoint: "https://media.slmn.io/flashpoint-crop.png"
 };
 
 export function getTeamsMapStats(teams, requestMatch, requestMap, filters) {

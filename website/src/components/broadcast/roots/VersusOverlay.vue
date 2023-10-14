@@ -15,7 +15,7 @@
                 </div>
                 <transition name="slide-out">
                     <div class="vs slant" v-if="animationActive">
-                        <div class="reverse-slant">VS</div>
+                        <div class="reverse-slant">{{ versusText }}</div>
                     </div>
                 </transition>
             </div>
@@ -48,6 +48,13 @@ export default {
         eventLogo() {
             if (!this.broadcast?.event?.theme) return {};
             return resizedImage(this.broadcast?.event?.theme, ["allmode_logo", "default_wordmark", "default_logo"], "h-154");
+        },
+        versusText() {
+            const scores = [this.match?.score_1 || 0, this.match?.score_2 || 0];
+            if (scores.some(s => s > 0)) {
+                return scores.join(" - ");
+            }
+            return "VS";
         }
     },
     methods: {

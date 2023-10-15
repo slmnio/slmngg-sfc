@@ -184,7 +184,6 @@ function getTwitchAPIError(error) {
 
 function safeInput(string) {
     return string
-        .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
@@ -192,7 +191,6 @@ function safeInput(string) {
 }
 function safeInputNoQuotes(string) {
     return string
-        .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
 }

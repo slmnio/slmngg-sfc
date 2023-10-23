@@ -47,6 +47,13 @@ export default [
     },
     { path: "break-schedule", component: () => import("@/components/broadcast/break/BreakScheduleOverlay.vue") },
     { path: "versus", component: () => import("@/components/broadcast/roots/VersusOverlay.vue") },
+    {
+        path: "winners",
+        component: () => import("@/components/broadcast/roots/WinnersOverlay.vue"),
+        props: route => ({
+            useConfetti: !!route.query.confetti
+        })
+    },
     { path: "map-bump", component: () => import("@/components/broadcast/roots/MapBumpOverlay.vue") },
     { path: "break-bar", component: () => import("@/components/broadcast/break/BreakBarOverlay.vue") },
     {

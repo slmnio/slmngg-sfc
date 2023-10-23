@@ -1,6 +1,7 @@
 <template>
     <div class="desk-text-editor p-2">
         <div class="d-flex gap-2">
+            <b-button v-b-tooltip="'Set prefix to the team names & scores'" class="flex-shrink-0" :disabled="processing || chosenDisplayOption?.hasText === false" @click="autoSetPrefixText()">Team scores</b-button>
             <b-form-input class="opacity-changes disabled-low-opacity" :disabled="chosenDisplayOption?.hasText === false"
                           @keydown.ctrl.enter="saveData({mode: 'show'})"
                           type="text" v-model="deskTextPrefix" placeholder="Text prefix"/>
@@ -98,10 +99,10 @@ export default {
                 }
             },
             {
-                text: "Empty",
+                text: "Hidden",
                 value: {
                     hasText: false,
-                    text: "Empty"
+                    text: "Hidden"
                 }
             }
         ]
@@ -132,6 +133,18 @@ export default {
             } finally {
                 this.processing = false;
             }
+        },
+        autoSetPrefixText() {
+            console.log(this.broadcast?.match);
+            this.deskTextPrefix = this.broadcast?.live_match?.teams.map((t, i) => {
+                let text = [
+                    t.name,
+                    this.broadcast?.live_match[`score_${i + 1}`]
+                ];
+                console.log(text);
+                if (i === 1) text = text.reverse();
+                return text.join(" ");
+            }).join("-");
         }
     },
     computed: {

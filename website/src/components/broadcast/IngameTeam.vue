@@ -45,7 +45,7 @@
                     </div>
                 </transition>
                 <transition name="fly-in">
-                    <div class="event-info" v-if="active && eventInfo">
+                    <div class="event-info" v-if="active && eventInfo?.length">
                         <div class="text" v-for="(item, i) in eventInfo" :key="item" :style="{order: i * 2}">
                             {{ item }}
                         </div>

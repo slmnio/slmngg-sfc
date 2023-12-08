@@ -46,12 +46,16 @@
                 </transition>
                 <transition name="fly-in">
                     <div class="event-info" v-if="active && eventInfo?.length">
-                        <div class="text" v-for="(item, i) in eventInfo" :key="item" :style="{order: i * 2}">
-                            {{ item }}
-                        </div>
-                        <div class="dash" v-for="(item, i) in eventInfo" :key="i" :style="{order: (i * 2) + 1}">
-                            -
-                        </div>
+                        <squeezable>
+                            <div class="event-info-text">
+                                <div class="text" v-for="(item, i) in eventInfo" :key="item" :style="{order: i * 2}">
+                                    {{ item }}
+                                </div>
+                                <div class="dash" v-for="(item, i) in eventInfo" :key="i" :style="{order: (i * 2) + 1}">
+                                    -
+                                </div>
+                            </div>
+                        </squeezable>
                     </div>
                 </transition>
             </div>
@@ -446,6 +450,8 @@ export default {
         width: 100%;
         left: 0;
         margin-bottom: 6px;
+    }
+    .event-info .event-info-text {
         height: 30px;
         padding: 0 20px;
         display: flex;
@@ -454,6 +460,10 @@ export default {
         font-weight: bold;
         font-size: 20px;
         text-transform: uppercase;
+        min-width: 100%;
+    }
+    .event-info .dash {
+        margin: 0 0.5em;
     }
     .dash:last-of-type {
         display: none;

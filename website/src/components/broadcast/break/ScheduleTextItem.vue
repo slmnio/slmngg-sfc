@@ -28,7 +28,7 @@ export default {
         teamsVs() {
             if (!this.match.teams?.length) return "TBD";
             const names = [0, 1].map(i => this.match.teams?.[i]?.name || "TBD").map(e => `<span class="no-wrap">${e}</span>`);
-            return names.join(" vs ");
+            return names.join((this.match.score_1 || this.match.score_2) ? ` ${this.match.score_1 || 0}-${this.match.score_2 || 0} ` : " vs ");
         },
         scheduleTime() {
             return formatTime(this.match.start, {

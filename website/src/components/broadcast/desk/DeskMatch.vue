@@ -171,6 +171,7 @@ export default {
             return (this.broadcast?.broadcast_settings || []).includes("Use flat desk elements");
         },
         scoreboardTitle() {
+            if (!(this.broadcast?.broadcast_settings || []).includes("Show scoreboard title")) return;
             return this.broadcast?.scoreboard_title || this.matchData?.round;
         }
     },

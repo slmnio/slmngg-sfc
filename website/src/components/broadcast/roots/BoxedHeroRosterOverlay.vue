@@ -97,7 +97,7 @@ export default {
                 console.log("auto small text", this.team, this.team.matches);
                 text = autoRecord(this.team, this.broadcast?.current_stage || this.match?.match_group);
             }
-            return this.subtitle.replace("{small}", (this.team.small_overlay_text || text || ""));
+            return (this.subtitle || "").replace("{small}", (this.team.small_overlay_text || text || ""));
         },
         teamLogo() {
             return resizedImage(this.team?.theme, ["default_logo", "small_logo"], "w-200");

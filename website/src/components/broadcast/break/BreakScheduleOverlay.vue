@@ -69,10 +69,8 @@ export default {
 </script>
 <style scoped>
     .break-schedule-overlay {
-        //background-image: url(https://cdn.discordapp.com/attachments/485493459357007876/1158892855297851423/CAH_RHM_StartingSoon.png?ex=651de693&is=651c9513&hm=86427fd4cd54e208cfb513c25281d16dd3c4b71c5e1c947f45d7f0e3f43f9060&);
         width: 100vw;
         height: 100vh;
-        background-size: 1920px 1080px;
     }
     .left-logo-block {
         width: 60%;

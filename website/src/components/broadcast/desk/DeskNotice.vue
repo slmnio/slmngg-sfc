@@ -3,7 +3,13 @@
         <div class="alt" v-if="alt" :style="altTheme">
             <div class="industry-align">{{ alt }}</div>
         </div>
-        <div class="main">
+        <div class="main main-guests" v-if="guests?.length">
+            <div class="guest" v-for="guest in guests" :key="guest.id">
+                <div class="guest-name">{{ guest.name }}</div>
+                <div class="guest-socials">{{ guest?.player?.twitter_handle?.[0] }}</div>
+            </div>
+        </div>
+        <div class="main" v-else>
             <div class="industry-align" v-html="nbr(main)"></div>
         </div>
     </div>
@@ -12,7 +18,7 @@
 <script>
 export default {
     name: "DeskNotice",
-    props: ["notice", "mainTheme", "altTheme", "right"],
+    props: ["notice", "mainTheme", "altTheme", "right", "guests"],
     computed: {
         parts() {
             return (this.notice || "").split("|");
@@ -69,5 +75,13 @@ export default {
 .desk-notice.is-right .alt {
     left: auto;
     right: 10px;
+}
+.main-guests {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+.guest-socials {
+    font-size: .75em;
 }
 </style>

@@ -104,6 +104,13 @@ export default {
                     hasText: false,
                     text: "Hidden"
                 }
+            },
+            {
+                text: "Casters",
+                value: {
+                    hasText: false,
+                    text: "Casters"
+                }
             }
         ]
     }),

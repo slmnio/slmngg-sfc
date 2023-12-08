@@ -12,7 +12,7 @@
                             </transition>
                         </div>
                         <div class="match-middle-match-holder w-100 h-100 flex-center">
-                            <div class="team-alt-slice" :class="`team-${i+1}`" v-for="(team, i) in match.teams"
+                            <div class="team-alt-slice d-none" :class="`team-${i+1}`" v-for="(team, i) in match.teams"
                                  :key="team.id"
                                  :style="{ backgroundColor: getTeamAltSlice(team), order: (i) * 9}"></div>
                             <DeskTeam class="team" :class="`team-${i+1}`"
@@ -51,6 +51,9 @@
                     <div class="match-middle-notice flex-center" v-if="middleMode === 'Notice'" :key="broadcast.notice_text + '-' + broadcast.desk_display">
                         <DeskNotice class="notice" :notice="broadcast.notice_text" :main-theme="middleTheme" :alt-theme="altTheme"
                                     :right="broadcast.desk_display.includes('2')" />
+                    </div>
+                    <div class="match-middle-casters flex-center" v-if="middleMode === 'Casters'" :key="casterString">
+                        <DeskNotice class="notice casters-notice" :guests="guests" :main-theme="lowerBackground" />
                     </div>
                     <div class="match-middle-predictions flex-center" v-if="middleMode === 'Predictions'" key="Predictions">
                         <DeskPrediction v-for="guest in guests" :key="guest.id" :guest="guest" :event="broadcast.event" />
@@ -173,6 +176,9 @@ export default {
         scoreboardTitle() {
             if (!(this.broadcast?.broadcast_settings || []).includes("Show scoreboard title")) return;
             return this.broadcast?.scoreboard_title || this.matchData?.round;
+        },
+        casterString() {
+            return (this.guests || []).map(g => [g?.name, g?.player?.twitter_handle?.[0]].join("_")).join(",");
         }
     },
     methods: {

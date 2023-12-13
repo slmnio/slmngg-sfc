@@ -115,7 +115,6 @@
 import { ReactiveArray } from "@/utils/reactive";
 import { BitCounter, sortTeamsIntoStandings } from "@/utils/scenarios";
 import { BFormCheckbox } from "bootstrap-vue";
-import team from "@/views/Team.vue";
 
 
 function generateScoreline(firstTo) {
@@ -392,7 +391,7 @@ export default {
             console.log("teams", this.scenarioTeams);
             const allMatches = this.scenarioMatchesWithOutcomes;
             const matches = allMatches.filter(m => ![m.score_1, m.score_2].includes(m.first_to));
-            const remainingMatches = JSON.stringify(allMatches.filter(m => [m.score_1, m.score_2].includes(m.first_to)));
+            // const remainingMatches = JSON.stringify(allMatches.filter(m => [m.score_1, m.score_2].includes(m.first_to)));
             const maxBits = matches.map(m => m.first_to * 2);
             const scenarioCount = maxBits.reduce((last, curr) => last * curr, 1);
             // const scenarioCount = 1;
@@ -707,8 +706,8 @@ export default {
                             differenceMap[s] = [c];
                         }
                     });
-                    const differences = Object.entries(differenceMap);
-                    const only = differences.find(([c, diffScorelines]) => diffScorelines.length === 1);
+                    // const differences = Object.entries(differenceMap);
+                    // const only = differences.find(([c, diffScorelines]) => diffScorelines.length === 1);
 
                     return `${teamCodes[0]} must win, not locked`;
                     // if (differences.length === 1) {

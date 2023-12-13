@@ -171,19 +171,19 @@ C13.888,14.756,13.487,14.83,13.065,14.847z"/>
     return "";
 }
 
-export function getMapData(match, mapSet, { showBannedMaps = false }) {
-    const firstTo = match.first_to;
-    let maps = [...(match.maps || [])];
-    if (!firstTo) return maps; // can't predict if we don't know first_to
-    maps = maps.filter(m => m.map); // hide things without map objects
-
-    if (!showBannedMaps) {
-        maps = maps.filter(m => !(m.banner || m.banned));
-    }
-
-    const neededMapCount = likelyNeededMaps(match);
-    const dummyMapCount = neededMapCount - maps.length;
-}
+// export function getMapData(match, mapSet, { showBannedMaps = false }) {
+//     const firstTo = match.first_to;
+//     let maps = [...(match.maps || [])];
+//     if (!firstTo) return maps; // can't predict if we don't know first_to
+//     maps = maps.filter(m => m.map); // hide things without map objects
+//
+//     if (!showBannedMaps) {
+//         maps = maps.filter(m => !(m.banner || m.banned));
+//     }
+//
+//     const neededMapCount = likelyNeededMaps(match);
+//     const dummyMapCount = neededMapCount - maps.length;
+// }
 
 export function money(num) {
     return `$${num || 0}k`;

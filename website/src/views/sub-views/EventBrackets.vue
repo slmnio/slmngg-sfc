@@ -24,14 +24,14 @@ export default {
     computed: {
         brackets() {
             if (!this.event || !this.event.brackets) return [];
-            return ReactiveArray("brackets", {
+            return (ReactiveArray("brackets", {
                 ordered_matches: ReactiveArray("ordered_matches", {
                     teams: ReactiveArray("teams", {
                         theme: ReactiveThing("theme")
                     }),
                     maps: ReactiveArray("maps")
                 })
-            })(this.event);
+            })(this.event)).filter(e => !e?.hide_bracket);
             // return this.event.brackets;
         }
     }

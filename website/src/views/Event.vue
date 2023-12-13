@@ -6,7 +6,7 @@
             <li class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
 <!--            <li class="nav-item"><router-link class="nav-link" :to="subLink('rosters')">Rosters</router-link></li>-->
             <li class="nav-item ct-passive" v-if="event.matches"><router-link class="nav-link" :to="subLink('schedule')">Schedule</router-link></li>
-            <li class="nav-item ct-passive" v-if="event.brackets"><router-link class="nav-link" :to="subLink('bracket')">{{ event.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link></li>
+            <li class="nav-item ct-passive" v-if="brackets?.length"><router-link class="nav-link" :to="subLink('bracket')">{{ event.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link></li>
             <li class="nav-item ct-passive" v-if="showStandings"><router-link class="nav-link" :to="subLink('standings')">Standings</router-link></li>
             <li class="nav-item ct-passive" v-if="showFoldy"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
             <li class="nav-item ct-passive" v-if="showDraft"><router-link class="nav-link" :to="subLink('draft')">Draft</router-link></li>
@@ -78,8 +78,12 @@ export default {
                     })
                 }),
                 socials: ReactiveArray("socials"),
-                matches: ReactiveArray("matches")
+                matches: ReactiveArray("matches"),
+                brackets: ReactiveArray("brackets")
             });
+        },
+        brackets() {
+            return (this.event?.brackets || []).filter(e => e?.name && !e?.hide_bracket);
         },
         settings() {
             if (!this.event?.blocks) return null;

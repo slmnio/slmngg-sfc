@@ -197,7 +197,14 @@ export default [
     { path: "logos", component: () => import("@/components/broadcast/roots/LogoAdOverlay.vue") },
     { path: "staff", component: () => import("@/components/broadcast/roots/StaffOverlay.vue") },
     { path: "player-history", component: () => import("@/components/broadcast/PlayerHistory.vue"), props: route => ({ showMinor: route.query.minor }) },
-    { path: "overview", component: () => import("@/components/broadcast/roots/OverviewOverlay.vue"), props: route => ({ noMapVideos: (route.query.video === "false" || route.query.videos === "false") }) },
+    {
+        path: "overview",
+        component: () => import("@/components/broadcast/roots/OverviewOverlay.vue"),
+        props: route => ({
+            noMapVideos: (route.query.video === "false" || route.query.videos === "false"),
+            useLiveDesk: !!route.query.live
+        })
+    },
     { path: "media", component: () => import("@/components/broadcast/roots/MediaOverlay.vue") },
     {
         path: "music",

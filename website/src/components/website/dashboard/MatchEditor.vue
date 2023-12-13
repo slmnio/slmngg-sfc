@@ -9,7 +9,6 @@
 <!--                                 v-model="matchData.special_event" name="special-event-checkbox" @change="(checked) => sendMatchDataChange('special_event', checked)">-->
 <!--                    Special Event-->
 <!--                </b-form-checkbox>-->
-<!--                <AdvancedDateEditor class="mr-3" :saved-time="match.start" :is-processing="processing['start']" @submit="(timeString) => setMatchStart(timeString)"></AdvancedDateEditor>-->
 <!--            </div>-->
             <!--                <div class="mid-label mr-3 text-nowrap">-->
             <!--                    Custom Name-->
@@ -115,6 +114,7 @@
                 <div class="d-flex mb-2">
                     <h3 class="mb-0">Match Details</h3>
                     <div class="spacer flex-grow-1"></div>
+                    <AdvancedDateEditor :saved-time="match.start" :is-processing="processing['start']" @submit="(timeString) => setMatchStart(timeString)">Change date/time</AdvancedDateEditor>
                     <b-button class="ml-2 top-button flex-shrink-0" :class="{'low-opacity': processing.details}" :disabled="processing.details"  variant="success" @click="() => saveMatchDetails()"><i class="fas fa-save fa-fw"></i> Save details</b-button>
                 </div>
                 <div class="match-details py-2">

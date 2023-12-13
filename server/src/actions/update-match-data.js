@@ -18,7 +18,11 @@ module.exports = {
             "custom_name": "Custom Name",
             "score_1": "Score 1",
             "score_2": "Score 2",
-            "start": "Start"
+            "start": "Start",
+            "forfeit": "Forfeit",
+            "forfeit_reason": "Forfeit Reason",
+            "vod": "VOD",
+            "vod_2": "VOD 2",
         };
         let validatedData = {};
 

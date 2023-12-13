@@ -60,7 +60,7 @@ async function updateRecord(Cache, tableName, item, data) {
 
     // Update custom keys
     if (tableName === "Broadcasts" && item.key) Cache.set(`broadcast-${item.key}`, { ...slmnggData, customKey: true }, { eager: true });
-    if (tableName === "Clients" && item.key) Cache.set(`client-${item.key}`, { ...slmnggData, customKey: true }, { eager: true });
+    if (tableName === "Clients" && item.key) Cache.set(`client-${item.key?.toLowerCase()}`, { ...slmnggData, customKey: true }, { eager: true });
     if (tableName === "Events" && item.subdomain) Cache.set(`subdomain-${item.subdomain}`, { ...slmnggData, customKey: true }, { eager: true });
     if (tableName === "News" && item.slug) Cache.set(`news-${item.slug}`, { ...slmnggData, customKey: true }, { eager: true });
 

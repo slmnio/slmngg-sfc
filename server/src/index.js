@@ -130,7 +130,7 @@ io.on("connection", (socket) => {
     });
     socket.on("disconnect", () => {
         if (socket._clientName)
-            io.sockets.to(`prod:client-${socket._clientName}-overview`).emit("prod_disconnect", socket.id);
+            io.sockets.to(`prod:client-${socket._clientName?.toLowerCase()}-overview`).emit("prod_disconnect", socket.id);
         connected--;
     });
 
@@ -142,12 +142,14 @@ io.on("connection", (socket) => {
         // console.log("get and subscribe out:", id);
     });
     socket.on("prod-join", (clientName) => {
+        clientName = clientName.toLowerCase();
         console.log("[prod:client] join", `prod:client-${clientName}`);
         socket._clientName = clientName;
         socket.join(`prod:client-${clientName}`);
     });
 
     socket.on("prod-overview-join", (clientName) => {
+        clientName = clientName.toLowerCase();
         console.log("[prod-overview] join ", clientName);
         socket._clientName = clientName;
         socket.join(`prod:client-${clientName}-overview`);
@@ -176,7 +178,7 @@ io.on("connection", (socket) => {
 
     socket.on("prod-update", (data) => {
         if (data.clientName) {
-            socket._clientName = data.clientName;
+            socket._clientName = data.clientName.toLowerCase();
         }
         if (!socket._clientName) return console.warn("prod update without client name", data);
         data = {
@@ -188,6 +190,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("obs_data_change", async ({ clientName, previewScene, programScene }) => {
+        clientName = clientName.toLowerCase();
         let client = await Cache.get(`client-${clientName}`);
         console.log("obs_data_change", { clientName, previewScene, programScene });
 
@@ -201,6 +204,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("tally_change", ({ clientName, state, number, data }) => {
+        clientName = clientName.toLowerCase();
         console.log("[tally]", clientName, state, number, data);
         socket.to(`prod:client-${clientName}`).emit("tally_change", { state, number });
     });

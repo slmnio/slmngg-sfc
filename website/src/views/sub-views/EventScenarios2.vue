@@ -711,12 +711,12 @@ export default {
                     const only = differences.find(([c, diffScorelines]) => diffScorelines.length === 1);
 
                     return `${teamCodes[0]} must win, not locked`;
-                    if (differences.length === 1) {
-                        const other = differences.find(([c, diffScorelines]) => diffScorelines.length !== 1);
-                        return `${teamCodes[0]} must win, ${JSON.stringify({ only, other })}`;
-                    } else {
-                        return `${teamCodes[0]} must win, 3 different nums`;
-                    }
+                    // if (differences.length === 1) {
+                    //     const other = differences.find(([c, diffScorelines]) => diffScorelines.length !== 1);
+                    //     return `${teamCodes[0]} must win, ${JSON.stringify({ only, other })}`;
+                    // } else {
+                    //     return `${teamCodes[0]} must win, 3 different nums`;
+                    // }
                 }
             }
             if (rightScores.every(([s, c]) => c) && !leftScores.some(([s, c]) => c)) {

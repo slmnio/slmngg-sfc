@@ -148,7 +148,13 @@ export default [
             stage: route.query.stage || route.query.group
         })
     },
-    { path: "thumbnail", component: () => import("@/components/broadcast/EventThumbnailCreator.vue") },
+    {
+        path: "thumbnail",
+        component: () => import("@/components/broadcast/EventThumbnailCreator.vue"),
+        props: route => ({
+            showSchedule: route.query.schedule
+        })
+    },
     {
         path: "draft",
         component: () => import("@/components/broadcast/roots/DraftOverlay.vue"),

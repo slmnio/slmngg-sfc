@@ -6,6 +6,11 @@
             <div class="event-icon-holder flex-center">
                 <div class="event-icon bg-center" :style="eventIcon"></div>
             </div>
+            <div class="schedule-holder d-flex" v-if="showSchedule" :class="{'has-title': !!title}">
+                <div class="match d-flex" v-for="match in schedule" :key="match.id">
+                    <ThemeLogo icon-padding="32px" class="team" :theme="team.theme" v-for="team in match.teams" :key="team.id" />
+                </div>
+            </div>
             <div class="title" v-if="title" :style="textColor" contenteditable="true">{{ title }}</div>
         </div>
 
@@ -19,12 +24,14 @@
 </template>
 
 <script>
-import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { resizedImage } from "@/utils/images";
+import ThemeLogo from "@/components/website/ThemeLogo.vue";
 
 export default {
     name: "EventThumbnailCreator",
-    props: ["broadcast", "title"],
+    components: { ThemeLogo },
+    props: ["broadcast", "title", "showSchedule"],
     data: () => ({
         noStinger: true
     }),
@@ -34,6 +41,15 @@ export default {
             return ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme")
             });
+        },
+        schedule() {
+            return (ReactiveRoot(this.broadcast, {
+                schedule: ReactiveArray("schedule", {
+                    teams: ReactiveArray("teams", {
+                        theme: ReactiveThing("theme")
+                    })
+                })
+            })?.schedule || []).filter(m => m.show_on_overlays);
         },
         eventIcon() {
             if (!this.event || !this.event.theme) return {};
@@ -118,6 +134,24 @@ export default {
         padding: 2vh 0;
         white-space: pre-wrap;
         text-align: center;
+    }
+
+    .schedule-holder {
+        width: 80%;
+        height: 25%;
+        display: flex;
+        justify-content: center;
+        gap: 5%;
+        margin-bottom: 2%;
+        flex-shrink: 0;
+    }
+    .schedule-holder.has-title {
+        margin-bottom: 1%;
+    }
+
+    .team {
+        height: 100% !important;
+        width: 250px !important;
     }
 
 </style>

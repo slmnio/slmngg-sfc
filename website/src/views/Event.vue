@@ -14,6 +14,7 @@
             <li class="nav-item ct-passive" v-if="showStaff"><router-link class="nav-link" :to="subLink('staff')">Staff</router-link></li>
             <li class="nav-item ct-passive" v-if="event.theme"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
             <li class="nav-item ct-passive" v-if="event.about"><router-link class="nav-link" :to="subLink('about')">About</router-link></li>
+            <li class="nav-item ct-passive" v-if="canEditEvent"><router-link class="nav-link" :to="subLink('editor')">Event Editor</router-link></li>
 <!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
 
 
@@ -41,6 +42,8 @@ import Social from "@/components/website/Social";
 import { themeBackground1 } from "@/utils/theme-styles";
 import { resizedImageNoWrap } from "@/utils/images";
 import { cleanID } from "@/utils/content-utils";
+import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
+import { isAuthenticated } from "@/utils/auth";
 
 export default {
     name: "Event",
@@ -148,6 +151,13 @@ export default {
             } catch (e) {
                 return null;
             }
+        },
+        canEditEvent() {
+            if (!isAuthenticated(this.$root)) return false;
+            return isEventStaffOrHasRole(this.$root.auth.user, {
+                event: this.event,
+                websiteRoles: ["Can edit any match"]
+            });
         }
     },
     mounted() {

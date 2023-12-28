@@ -15,9 +15,17 @@ export function canEditMatch(user, { event, match } = {}) {
 
     return false;
 }
+
+/**
+ * @param {RootAuthUser} user
+ * @param {Event} event
+ * @param {string} role
+ * @param {string[]} websiteRoles
+ * @returns {boolean}
+ */
 export function isEventStaffOrHasRole(user, { event, role, websiteRoles } = {}) {
     if (!user || !event) return false;
-    if ([...websiteRoles, role].some(websiteRole => (user.website_settings || []).includes(websiteRole)) || (event.staff || []).map(x => dirtyID(x?.id) || dirtyID(x)).includes(dirtyID(user.airtableID))) return true;
-    if ((event.player_relationships || []).some(rel => rel.player === dirtyID(user.airtableID) && (rel.permissions || []).includes(role))) return true;
+    if ((websiteRoles?.length || role) && ([...websiteRoles, role].some(websiteRole => (user.website_settings || []).includes(websiteRole)) || (event.staff || []).map(x => dirtyID(x?.id) || dirtyID(x)).includes(dirtyID(user.airtableID)))) return true;
+    if (role && (event.player_relationships || []).some(rel => rel.player === dirtyID(user.airtableID) && (rel.permissions || []).includes(role))) return true;
     return false;
 }

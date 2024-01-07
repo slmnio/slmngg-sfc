@@ -45,6 +45,45 @@ export function sortByMatchDiff(a, b) {
     return 0;
 }
 
+export function sortByMatchWins(a, b) {
+    const [aMatchDiff, bMatchDiff] = [a, b].map(x => (x.wins || x.standings.wins));
+
+    if (aMatchDiff < bMatchDiff) return 1;
+    if (aMatchDiff > bMatchDiff) return -1;
+    return 0;
+}
+
+export function sortByMatchWinsAndPoints(a, b) {
+    const [aNum, bNum] = [a, b].map(x => (x.wins || x.standings.wins) + (x.extra_points || 0));
+
+    if (aNum < bNum) return 1;
+    if (aNum > bNum) return -1;
+    return 0;
+}
+
+export function sortByMatchDiffAndPoints(a, b) {
+    const [aNum, bNum] = [a, b].map(x => (x.wins || x.standings.wins) - (x.losses || x.standings.losses) + (x.extra_points || 0));
+
+    if (aNum < bNum) return 1;
+    if (aNum > bNum) return -1;
+    return 0;
+}
+export function sortByOPoints(a, b) {
+    const [aNum, bNum] = [a, b].map(x => x.standings.opponent_points);
+
+    if (aNum < bNum) return 1;
+    if (aNum > bNum) return -1;
+    return 0;
+}
+
+export function sortByOMatchWinsPoints(a, b) {
+    const [aNum, bNum] = [a, b].map(x => x.standings.opponent_points_wins);
+
+    if (aNum < bNum) return 1;
+    if (aNum > bNum) return -1;
+    return 0;
+}
+
 export function miniLeagueMatchDiff(a, b) {
     const [aMatchDiff, bMatchDiff] = [a, b].map(x => x.standings.minileague.wins - x.standings.minileague.losses);
     if (aMatchDiff < bMatchDiff) return 1;
@@ -127,7 +166,7 @@ export function sortByOMapWinrate(a, b) {
 }
 
 export function sortByExtraPoints(a, b) {
-    const [aPoints, bPoints] = [a, b].map(x => (x.extra_points));
+    const [aPoints, bPoints] = [a, b].map(x => (x.extra_points || 0));
     if (aPoints !== bPoints) {
         if (aPoints > bPoints) return -1;
         if (aPoints < bPoints) return 1;
@@ -397,6 +436,11 @@ function getSortMethod(stringMethod) {
     if (stringMethod === "MapRoundsDiff") return { method: mapRoundsDiff, max: null };
     if (stringMethod === "MapRoundWins") return { method: mapRoundWins, max: null };
     if (stringMethod === "Points") return { method: sortByExtraPoints, max: null };
+    if (stringMethod === "MatchWins") return { method: sortByMatchWins, max: null };
+    if (stringMethod === "MatchWinsPoints") return { method: sortByMatchWinsAndPoints, max: null };
+    if (stringMethod === "MatchDiffPoints") return { method: sortByMatchDiffAndPoints, max: null };
+    if (stringMethod === "OPoints") return { method: sortByOPoints, max: null };
+    if (stringMethod === "OMatchWinsPoints") return { method: sortByOMatchWinsPoints, max: null };
     return null;
 }
 

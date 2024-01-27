@@ -194,6 +194,7 @@ export default [
             small: !!route.query.small
         })
     },
+    { path: "l-bar", component: () => import("@/components/broadcast/roots/LBarOverlay") },
     { path: "background", component: () => import("@/components/broadcast/BroadcastBackground.vue"), props: route => ({ index: route.query.index }) },
     { path: "sponsors", component: () => import("@/components/broadcast/roots/SponsorOverlay.vue") },
     { path: "maps", component: () => import("@/components/broadcast/roots/MapsOverlay.vue"), props: route => ({ autoTitle: route.query.auto }) },

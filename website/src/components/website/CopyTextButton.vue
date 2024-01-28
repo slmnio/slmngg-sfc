@@ -1,6 +1,6 @@
 <template>
     <span class="parent" @click="copyText">
-        <span ref="copy"><slot></slot></span> <i :class="`fas fa-fw ${recentlyCopied ? 'fa-clipboard-check' : 'fa-copy'}`"></i>
+        <span ref="copy"><slot></slot></span><i v-if="!noIcon" :class="`ml-1 fas fa-fw ${recentlyCopied ? 'fa-clipboard-check' : 'fa-copy'}`"></i>
     </span>
 </template>
 
@@ -8,7 +8,7 @@
 
 export default {
     name: "CopyTextButton",
-    props: ["content"],
+    props: ["content", "noIcon"],
     data: () => ({
         recentlyCopied: false
     }),

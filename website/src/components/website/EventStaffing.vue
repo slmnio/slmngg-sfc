@@ -15,16 +15,19 @@
                 <td>{{ staff.matches.size }}</td>
             </tr>
         </table>
+
+        <CopyTextButton :no-icon="true" class="btn btn-dark" style="white-space: pre" :content="credits">Copy full event credits</CopyTextButton>
     </div>
 </template>
 
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
+import CopyTextButton from "@/components/website/CopyTextButton.vue";
 
 export default {
     name: "EventStaffing",
-    components: { LinkedPlayers },
+    components: { CopyTextButton, LinkedPlayers },
     props: ["event"],
     computed: {
         matches() {
@@ -32,7 +35,10 @@ export default {
             return ReactiveArray("matches", {
                 casters: ReactiveArray("casters"),
                 player_relationships: ReactiveArray("player_relationships", {
-                    player: ReactiveThing("player")
+                    player: ReactiveThing("player", {
+                        // this is silly to add for performance
+                        player_relationships: ReactiveArray("player_relationships")
+                    })
                 })
             })(this.event);
         },
@@ -45,12 +51,12 @@ export default {
             });
             return roles;
         },
-        appearances() {
+        staff() {
             const staff = [];
-            function addToStaff(id, name, role, matchID) {
+            function addToStaff(playerObj, id, name, role, matchID) {
                 let player = staff.find(s => s.id === id);
                 if (!player) {
-                    staff.push({ id: id, name: name, roles: {}, matches: new Set(), user: { id, name } });
+                    staff.push({ id: id, name: name, roles: {}, matches: new Set(), user: { id, name }, player: playerObj });
                     player = staff[staff.length - 1];
                 }
                 if (!player.roles[role]) {
@@ -62,13 +68,16 @@ export default {
 
             this.matches.forEach(match => {
                 (match.casters || []).forEach(caster => {
-                    if (caster?.id) addToStaff(caster.id, caster.name, "Caster", match.id);
+                    if (caster?.id) addToStaff(caster, caster.id, caster.name, "Caster", match.id);
                 });
                 (match.player_relationships || []).forEach(pr => {
-                    if (pr?.player?.id) addToStaff(pr.player.id, pr.player.name, pr.singular_name, match.id);
+                    if (pr?.player?.id) addToStaff(pr.player, pr.player.id, pr.player.name, pr.singular_name, match.id);
                 });
             });
-            return staff.sort((a, b) => b.matches.size - a.matches.size).map(s => {
+            return staff;
+        },
+        appearances() {
+            return [...this.staff].sort((a, b) => b.matches.size - a.matches.size).map(s => {
                 s.listed_roles = Object.keys(s.roles).filter(role => this.isListedOnEvent(s.id, role));
                 return s;
             });
@@ -77,6 +86,37 @@ export default {
             return ReactiveThing("event", {
                 player_relationships: ReactiveArray("player_relationships")
             })({ event: this.event.id });
+        },
+        credits() {
+            const groups = [];
+
+            this.staff.forEach(player => {
+                if (!player.roles) return;
+                Object.entries(player.roles).forEach(([roleName, matchCount]) => {
+                    let group = groups.find(g => g.meta?.singular_name === roleName);
+                    if (!group) {
+                        groups.push({
+                            meta: {
+                                singular_name: roleName
+                            },
+                            items: []
+                        });
+                        group = groups[groups.length - 1];
+                        if (!group.meta?.plural_name && roleName === "Caster") {
+                            group.meta.plural_name = "Casters";
+                        } else if (!group.meta?.plural_name) {
+                            group.meta.plural_name = player?.player?.player_relationships?.find(r => r.singular_name === roleName)?.plural_name;
+                        }
+                    }
+                    group.items.push(player?.player || player?.user);
+                });
+            });
+
+
+            return groups.filter(g => g.items?.length).map(group => [
+                (group.items?.length === 1 ? group.meta.singular_name + ": " : group.meta.plural_name + ":"),
+                group.items?.map(p => p.name + (p.twitter_link ? " " + p.twitter_link : "")).join("\n")
+            ].join("\n")).join("\n\n");
         }
     },
     methods: {
@@ -87,8 +127,7 @@ export default {
             }
             if (!this.eventRelationships?.player_relationships?.length) return false;
             const rel = this.eventRelationships.player_relationships.find(r => r.player?.[0] && r.player[0] === "rec" + playerID && r.singular_name === role);
-            if (rel) return true;
-            return false;
+            return !!rel;
         }
     }
 };

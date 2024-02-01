@@ -134,6 +134,15 @@ export default {
             return [this.match.score_1, this.match.score_2];
         },
         displayScores() {
+            if (this.match?.forfeit) {
+                // check that it was a 3-0 or similar
+                // some matches are forfeited with other scores that are important to display
+                if (this.scores[0] === this.match.first_to && !this.scores[1]) {
+                    return ["W", "FF"];
+                } else if (this.scores[1] === this.match.first_to && !this.scores[0]) {
+                    return ["FF", "W"];
+                }
+            }
             if (this.match && this.match.first_to === 1 && this.match.maps?.length === 1) {
                 const map = this.match.maps[0];
                 if (map.id && (map.score_1 !== undefined && map.score_2 !== undefined)) {

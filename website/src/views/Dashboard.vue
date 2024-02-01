@@ -159,7 +159,7 @@ export default {
             return this.liveMatch?.brackets?.length;
         },
         bracketData() {
-            return ReactiveArray("brackets", {
+            const brackets = ReactiveArray("brackets", {
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")
                 }),
@@ -169,6 +169,8 @@ export default {
                     })
                 })
             })(this.liveMatch);
+            if (brackets.length === 1) return brackets;
+            return brackets.filter(b => !b.hide_bracket);
         },
         deskGuestSource() {
             if (this.broadcast?.guests) {

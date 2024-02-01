@@ -572,6 +572,19 @@ export default {
             }
             return response;
         },
+        autoUpdateScore() {
+            if (this.teams?.length !== 2) return;
+            const score = [0, 0];
+            const teamIDs = this.teams.map(t => t.id);
+            this.winners.forEach((winnerID, idx) => {
+                if (teamIDs[0] === winnerID) {
+                    score[0]++;
+                } else {
+                    score[1]++;
+                }
+            });
+            this.$set(this.matchData, "scores", score);
+        },
         checkAutoWinner(i, val) {
             console.log("checkAutoWinner", { val, i }, this.score_1s[i], this.score_2s[i]);
 
@@ -585,6 +598,7 @@ export default {
                     if (this.autoLoserPicks && this.maps?.[i + 1]) {
                         this.$set(this.pickers, i + 1, this.teams[1].id);
                     }
+                    this.autoUpdateScore();
                 } else if (this.score_1s[i] < this.score_2s[i]) {
                     // set right winner
 
@@ -592,6 +606,7 @@ export default {
                     if (this.autoLoserPicks && this.maps?.[i + 1]) {
                         this.$set(this.pickers, i + 1, this.teams[0].id);
                     }
+                    this.autoUpdateScore();
                 }
             }
         },

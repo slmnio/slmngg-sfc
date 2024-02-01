@@ -1,7 +1,7 @@
 <template>
     <div class="map-score-editor d-flex" :class="{'flex-row-reverse': reverse}">
         <div class="team-slice" :style="teamSliceBackground"></div>
-        <b-form-input class="score-input no-arrows" autocomplete="off" :value="score" @input="(n) => this.$emit('input', parseInt(n))" type="number"></b-form-input>
+        <b-form-input class="score-input no-arrows" autocomplete="off" :value="score" @input="(n) => this.$emit('input', parseInt(n))" type="number" min="0" step="1"></b-form-input>
     </div>
 </template>
 

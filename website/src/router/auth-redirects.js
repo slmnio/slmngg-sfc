@@ -1,7 +1,7 @@
 import { isOnMainDomain, setAuthNext } from "@/utils/auth";
 import { getMainDomain } from "@/utils/fetch";
 
-export default (app, mainDomain) => ([
+export default (app) => ([
     {
         path: "/login",
         redirect: to => ({
@@ -16,6 +16,8 @@ export default (app, mainDomain) => ([
     {
         path: "/auth/discord/redirect",
         beforeEnter(to, from, next) {
+            const mainDomain = getMainDomain(null);
+
             console.log("ZOOM DISCORD TIME", mainDomain, from.fullPath, to.query.return, to, from);
 
             if (!isOnMainDomain()) {

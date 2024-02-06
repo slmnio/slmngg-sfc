@@ -1,11 +1,8 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import { createStore } from 'vuex'
 import { cleanID } from "@/utils/content-utils";
 import { fetchThings } from "@/utils/fetch";
 
-Vue.use(Vuex);
-
-export default new Vuex.Store({
+const store = createStore({
     state: {
         things: [],
         thing_map: {},
@@ -152,4 +149,8 @@ export default new Vuex.Store({
         subscribe: (state, data) => state.commit("subscribe", data),
         unsubscribe: (state, data) => state.commit("unsubscribe", data)
     }
-});
+})
+
+
+export default store;
+

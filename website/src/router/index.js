@@ -1,42 +1,86 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
-import WebsiteApp from "@/apps/WebsiteApp";
+import { createRouter as _createRouter, createWebHistory } from 'vue-router'
 import defaultRoutes from "@/router/default";
 import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp";
+import Event from "@/views/Event.vue";
+import EventRoutes from "@/router/event";
+import SharedRoutes from "@/router/shared-routes";
+import NotFoundContent from "@/views/sub-views/NotFoundContent.vue";
+import {fetchThings, getMainDomain} from "@/utils/fetch";
 
-Vue.use(VueRouter);
 
-const host = window.location.hostname;
-const domains = ["slmn.gg", "localslmn", "localhost"].map(d => new RegExp(`(?:^|(.*)\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
-let subdomain = null;
+export async function createRouter() {
+    const host = window.location.hostname;
+    const domains = ["slmn.gg", "localslmn", "localhost"].map(d => ({
+        main: d,
+        r: new RegExp(`(?:^|(.*)\\.)${d.replace(".", "\\.")}(?:$|\\n)`)
+    }));
 
-domains.forEach(r => {
-    const result = host.match(r);
-    if (result && result[1]) {
-        subdomain = result[1];
+    let subdomain = null;
+
+    for (const { r} of domains) {
+        const result = host.match(r);
+        if (result && result[1] && !["dev", "live"].includes(result[1])) {
+            if (result[1].endsWith(".dev")) {
+                result[1] = result[1].slice(0, -4);
+            }
+            if (result[1].endsWith(".live")) {
+                result[1] = result[1].slice(0, -5);
+            }
+            subdomain = result[1];
+        }
     }
-});
 
-let routes = [];
+    if (!subdomain) {
+        console.log("[subdomain]", "no subdomain, using default routes");
 
-if (subdomain) {
-    /* start with only one route, loading route
-    *
-    * once we have verified & loaded the event, add other routes
-    * if unverified, add a 404 */
+        return _createRouter({
+            history: createWebHistory(import.meta.env.BASE_URL),
+            routes: defaultRoutes
+        });
+    }
 
-    routes = [
-        { path: "/", name: "default", component: WebsiteApp, children: [{ path: "*", component: MinisiteWrapperApp }] }
-    ];
-} else {
-    routes = defaultRoutes;
+    console.log("[subdomain]", `found ${subdomain}, checking for minisite`);
+
+    const data = await fetchThings([`subdomain-${subdomain}`]);
+
+    if (!data || !data[0] || !data[0].id) {
+        console.log("[subdomain]", "no valid minisite");
+        return _createRouter({
+            history: createWebHistory(import.meta.env.BASE_URL),
+            routes: defaultRoutes
+        });
+    }
+
+    let subID;
+
+    subID = data[0]._original_data_id || data[0].id;
+    // store.dispatch("subscribe", subID);
+    // store.dispatch("subscribe", `subdomain-${subdomain}`);
+    console.log("[subID]", subID);
+
+    return _createRouter({
+        history: createWebHistory(import.meta.env.BASE_URL),
+        routes: [
+            {
+                path: "/",
+                component: MinisiteWrapperApp,
+                children: [
+                    {
+                        path: "/",
+                        component: Event,
+                        children: EventRoutes,
+                        props: (route) => {
+                            return {
+                                id: subID,
+                                isMinisite: true
+                            };
+                        }
+                    },
+                    ...SharedRoutes,
+                    { path: '/:pathMatch(.*)*', component: NotFoundContent }
+                ]
+            }
+        ]
+    });
 }
 
-
-const router = new VueRouter({
-    mode: "history",
-    base: import.meta.env.BASE_URL,
-    routes
-});
-
-export default router;

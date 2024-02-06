@@ -19,7 +19,7 @@
 
 
                 <div class="thing-lower" v-if="thing.event">
-                    <span>{{ thing.type_description || 'from'}} </span>
+                    <span>{{ thing.type_description || 'from'}}&nbsp;</span>
                     <router-link class="ct-active" :to="url('event', thing.event)">{{ thing.event.name }}</router-link>
                 </div>
 

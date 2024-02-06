@@ -55,7 +55,8 @@ Vue.directive("b-tooltip", VBTooltip);
 
 const socket = io(getDataServerAddress(), { transports: ["websocket", "polling"] });
 
-Vue.use(VueSocketIOExt, socket, { store });
+
+Vue.prototype.$socket = { client: socket };
 
 Vue.config.productionTip = false;
 

@@ -71,14 +71,14 @@ export default new Vuex.Store({
         subscribe(state, id) {
             if (!id) return;
             if (state.subscribed_ids.includes(id)) return;
-            this._vm.$socket.client.emit("subscribe", id);
+            // this._vm.$socket.client.emit("subscribe", id); TODO
             // console.log("[socket]", "subscribed to", id);
             state.subscribed_ids.push(id);
         },
         unsubscribe(state, id) {
             if (!id) return;
             if (!state.subscribed_ids.includes(id)) return;
-            this._vm.$socket.client.emit("unsubscribe", id);
+            // this._vm.$socket.client.emit("unsubscribe", id);
             // console.log("[socket]", "unsubscribed from", id);
             state.subscribed_ids.splice(this.state.subscribed_ids.indexOf(id), 1);
         },

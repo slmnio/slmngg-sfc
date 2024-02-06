@@ -69,8 +69,8 @@ export default {
 .mid-enter-active,
 .mid-enter-active .middle-holder { transition: all .5s ease-in-out .25s; }
 
-.mid-enter-to .middle-holder, .mid-leave .middle-holder { width: 450px; }
-.mid-enter .middle-holder, .mid-leave-to .middle-holder { width: 0; }
+.mid-enter-to .middle-holder, .mid-leave-from .middle-holder { width: 450px; }
+.mid-enter-from .middle-holder, .mid-leave-to .middle-holder { width: 0; }
 
 
 .centerer.tiny {

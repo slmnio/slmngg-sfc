@@ -315,8 +315,8 @@ export default {
 
     .seg-enter-active { transition: max-width 2000ms ease; }
     .seg-leave-active { transition: max-width 500ms ease; }
-    .seg-enter, .seg-leave-to { max-width: 0; }
-    .seg-enter-to, .seg-leave { max-width: 100%; }
+    .seg-enter-from, .seg-leave-to { max-width: 0; }
+    .seg-enter-to, .seg-leave-from { max-width: 100%; }
 
     .break-preload {
         opacity: 0;

@@ -154,6 +154,6 @@ export default {
 
     .hero-move-enter-active { transition: all .5s; transform: translate(0%, 0%); transition-delay: 500ms; }
     .hero-move-leave-active { transition: none; }
-    .hero-move-enter, .hero-move-leave-to { transform: translate(100%, 0%) }
-    .hero-move-enter-to, .hero-move-leave { transform: translate(0%, 0%) }
+    .hero-move-enter-from, .hero-move-leave-to { transform: translate(100%, 0%) }
+    .hero-move-enter-to, .hero-move-leave-from { transform: translate(0%, 0%) }
 </style>

@@ -140,7 +140,7 @@ span.industry-align {
     max-width: 100%;
     transition: opacity 0s;
 }
-.broadcast-mid-split-enter {
+.broadcast-mid-split-enter-from {
     /*clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);*/
     /*clip-path: polygon(0% 0%, 0% 100%, 0% 100%, 0% 0, 100% 0, 100% 100%, 100% 100%, 100% 0%);*/
     clip-path: polygon(50% 0, 50% 100%, 50% 100%, 50% 0%, 50% 0%, 50% 100%, 50% 100%, 50% 0);

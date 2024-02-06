@@ -194,29 +194,29 @@ export default {
 }
 
 .tt-enter-to.clip-slot >>> .clip-target,
-.tt-leave.clip-slot >>> .clip-target,
+.tt-leave-from.clip-slot >>> .clip-target,
 .tt-enter-to .theme-transition-outer,
 .tt-enter-to .theme-transition-inner,
-.tt-leave .theme-transition-outer,
-.tt-leave .theme-transition-inner {
+.tt-leave-from .theme-transition-outer,
+.tt-leave-from .theme-transition-inner {
     /* full open */
     clip-path: polygon(-1% -1%, 101% -1%, 101% 101%, -1% 101%);
 }
 
-.theme-transition.start-right.tt-enter.clip-slot >>> .clip-target,
+.theme-transition.start-right.tt-enter-from.clip-slot >>> .clip-target,
 .theme-transition.start-right.tt-leave-to.clip-slot >>> .clip-target,
-.theme-transition.start-right.tt-enter .theme-transition-inner,
-.theme-transition.start-right.tt-enter .theme-transition-outer,
+.theme-transition.start-right.tt-enter-from .theme-transition-inner,
+.theme-transition.start-right.tt-enter-from .theme-transition-outer,
 .theme-transition.end-left.tt-leave-to .theme-transition-outer,
 .theme-transition.end-left.tt-leave-to .theme-transition-inner {
     /* closed left */
     clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
 }
 
-.theme-transition.start-left.tt-enter.clip-slot >>> .clip-target,
+.theme-transition.start-left.tt-enter-from.clip-slot >>> .clip-target,
 .theme-transition.start-left.tt-leave-to.clip-slot >>> .clip-target,
-.theme-transition.start-left.tt-enter .theme-transition-outer,
-.theme-transition.start-left.tt-enter .theme-transition-inner,
+.theme-transition.start-left.tt-enter-from .theme-transition-outer,
+.theme-transition.start-left.tt-enter-from .theme-transition-inner,
 .theme-transition.end-right.tt-leave-to .theme-transition-outer,
 .theme-transition.end-right.tt-leave-to .theme-transition-inner {
     /* closed right */
@@ -224,27 +224,27 @@ export default {
 }
 
 .theme-transition.end-middle.tt-enter-to.clip-slot >>> .clip-target,
-.theme-transition.end-middle.tt-leave.clip-slot >>> .clip-target,
+.theme-transition.end-middle.tt-leave-from.clip-slot >>> .clip-target,
 .theme-transition.end-middle.tt-enter-to .theme-transition-outer,
 .theme-transition.end-middle.tt-enter-to .theme-transition-inner,
-.theme-transition.start-middle.tt-leave .theme-transition-outer,
-.theme-transition.start-middle.tt-leave .theme-transition-inner {
+.theme-transition.start-middle.tt-leave-from .theme-transition-outer,
+.theme-transition.start-middle.tt-leave-from .theme-transition-inner {
     /* middle open */
     clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 100% 100%, 100% 0%);
 }
 
-.theme-transition.end-middle.tt-enter.clip-slot >>> .clip-target,
+.theme-transition.end-middle.tt-enter-from.clip-slot >>> .clip-target,
 .theme-transition.end-middle.tt-leave-to.clip-slot >>> .clip-target,
-.theme-transition.end-middle.tt-enter .theme-transition-outer,
-.theme-transition.end-middle.tt-enter .theme-transition-inner,
+.theme-transition.end-middle.tt-enter-from .theme-transition-outer,
+.theme-transition.end-middle.tt-enter-from .theme-transition-inner,
 .theme-transition.start-middle.tt-leave-to .theme-transition-outer,
 .theme-transition.start-middle.tt-leave-to .theme-transition-inner {
     /* middle closed */
     clip-path: polygon(50% 0, 50% 100%, 50% 100%, 50% 0%, 50% 0%, 50% 100%, 50% 100%, 50% 0);
 }
 
-/*.tt-enter .theme-transition-inner,*/
-/*.tt-enter .theme-transition-outer {*/
+/*.tt-enter-from .theme-transition-inner,*/
+/*.tt-enter-from .theme-transition-outer {*/
 /*    clip-path: polygon(0 0, -10% 0, 0 100%, 0% 100%);*/
 /*}*/
 

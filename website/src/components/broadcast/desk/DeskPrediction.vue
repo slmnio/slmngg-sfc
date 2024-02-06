@@ -106,9 +106,9 @@ export default {
     /*.pred-reveal-enter-active {*/
     /*    transition-delay: 100ms*/
     /*}*/
-    /*.pred-reveal-enter { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); !* closed right *! }*/
+    /*.pred-reveal-enter-from { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); !* closed right *! }*/
     /*.pred-reveal-leave-to { clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); !* closed left *! }*/
-    .pred-reveal-enter { clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%) /* closed bottom */ }
+    .pred-reveal-enter-from { clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%) /* closed bottom */ }
     .pred-reveal-leave-to { clip-path: polygon(0 0, 100% 0%, 100% 0%, 0% 0%) /* closed top */ }
-    .pred-reveal-enter-to, .pred-reveal-leave { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); /* open */ }
+    .pred-reveal-enter-to, .pred-reveal-leave-from { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); /* open */ }
 </style>

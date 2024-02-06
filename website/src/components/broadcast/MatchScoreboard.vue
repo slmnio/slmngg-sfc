@@ -204,7 +204,7 @@ export default {
     overflow: hidden
 }
 
-.scoreboard-clip-right-enter {
+.scoreboard-clip-right-enter-from {
     clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
 }
 
@@ -217,7 +217,7 @@ export default {
     transition-delay: .75s;
 }
 
-.scoreboard-fade-enter {
+.scoreboard-fade-enter-from {
     opacity: 0;
 }
 

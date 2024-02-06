@@ -339,10 +339,10 @@ export default {
 .itah-enter-active, .itah-leave-active {
     transition: all .5s ease-in-out;
 }
-.itah-enter-to, .itah-leave {
+.itah-enter-to, .itah-leave-from {
     max-width: 700px;
 }
-.itah-enter, .itah-leave-to {
+.itah-enter-from, .itah-leave-to {
     max-width: 0;
 }
 

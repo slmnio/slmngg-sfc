@@ -377,7 +377,7 @@ export default {
         transition: transform .5s ease;
     }
 
-    .draftable-enter {
+    .draftable-enter-from {
         max-height: 0;
         padding: 0 8px !important;
         opacity: 0;
@@ -398,7 +398,7 @@ export default {
         transition: all .5s ease;
         /*transition: none !important;*/
     }
-    .player-enter, .player-leave-to {
+    .player-enter-from, .player-leave-to {
         max-height: 0;
         padding: 0 8px !important;
         opacity: 0;

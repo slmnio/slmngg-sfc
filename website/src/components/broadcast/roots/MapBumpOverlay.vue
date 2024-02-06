@@ -376,7 +376,7 @@ export default {
         clip-path: polygon(-1% -1%, 101% -1%, 101% 101%, -1% 101%);
     }
 
-    .swipe-right-enter {
+    .swipe-right-enter-from {
         /* closed left */
         clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
     }

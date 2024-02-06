@@ -249,7 +249,7 @@ export default {
     transition: all 400ms ease;
 }
 
-.song-enter, .song-leave-to {
+.song-enter-from, .song-leave-to {
     opacity: 0;
 }
 

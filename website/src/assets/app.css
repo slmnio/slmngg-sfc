@@ -197,8 +197,8 @@ a.nav-link.no-link-style, a.nav-link.no-link-style:hover {
 /* global transitions */
 
 .fade-enter-active, .fade-leave-active { transition: opacity 250ms ease; }
-.fade-enter, .fade-leave-to { opacity: 0; }
-.fade-enter-to, .fade-leave { opacity: 1; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+.fade-enter-to, .fade-leave-from { opacity: 1; }
 
 body.overlay {
     background: transparent;

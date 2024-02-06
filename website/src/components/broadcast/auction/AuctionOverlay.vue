@@ -656,10 +656,10 @@ export default {
     .scroll-enter-active, .scroll-leave-active {
         transition: all 500ms ease;
     }
-    .scroll-enter { transform: translate(0%, 100%) }
+    .scroll-enter-from { transform: translate(0%, 100%) }
     .scroll-leave-to { transform: translate(0%, -100%) }
     .scroll-enter-to,
-    .scroll-leave {
+    .scroll-leave-from {
         transform: translate(0,0)
     }
 
@@ -667,7 +667,7 @@ export default {
     .fade-scroll-enter-active, .fade-scroll-leave-active {
         transition: all 500ms ease;
     }
-    .fade-scroll-enter {
+    .fade-scroll-enter-from {
         opacity: 0;
         transform: translate(0, 30px)
     }
@@ -676,7 +676,7 @@ export default {
         transform: translate(0, -30px)
     }
     .fade-scroll-enter-to,
-    .fade-scroll-leave {
+    .fade-scroll-leave-from {
         transform: translate(0, 0%)
     }
 
@@ -704,7 +704,7 @@ export default {
     /*.move-leave-active:nth-of-type(2) {*/
     /*    right: 0;*/
     /*}*/
-    .move-enter {
+    .move-enter-from {
         transform: translate(0, 105%);
     }
     .team-list-holder, .team-rows-holder {
@@ -737,7 +737,7 @@ export default {
     .fade-right-leave-active {
         transition: opacity 500ms ease, transform 500ms ease;
     }
-    .fade-right-enter, .fade-right-leave-to {
+    .fade-right-enter-from, .fade-right-leave-to {
         transform: translate(-100%, 0);
         opacity: 0;
     }
@@ -746,7 +746,7 @@ export default {
     .fade-left-leave-active {
         transition: opacity 500ms ease, transform 500ms ease;
     }
-    .fade-left-enter, .fade-left-leave-to {
+    .fade-left-enter-from, .fade-left-leave-to {
         transform: translate(100%, 0);
         opacity: 0;
     }
@@ -754,7 +754,7 @@ export default {
     .fade-up-leave-active {
         transition: opacity 500ms ease, transform 500ms ease;
     }
-    .fade-up-enter, .fade-up-leave-to {
+    .fade-up-enter-from, .fade-up-leave-to {
         transform: translate(0, 100%);
         opacity: 0;
     }
@@ -762,11 +762,11 @@ export default {
     .fade-down-leave-active {
         transition: opacity 500ms ease, transform 500ms ease;
     }
-    .fade-down-enter, .fade-down-leave-to {
+    .fade-down-enter-from, .fade-down-leave-to {
         transform: translate(0, -100%);
         opacity: 0;
     }
-    .fade-down-leave, .fade-down-enter-to {
+    .fade-down-leave-from, .fade-down-enter-to {
         transform: translate(0, 0);
         opacity: 1;
     }
@@ -868,8 +868,8 @@ export default {
         opacity: 0.5;
     }
     .color-block-fade-enter-active, .color-block-fade-leave-active { transition: opacity 750ms ease; }
-    .color-block-fade-enter, .color-block-fade-leave-to { opacity: 0; }
-    .color-block-fade-enter-to, .color-block-fade-leave { opacity: 0.5; }
+    .color-block-fade-enter-from, .color-block-fade-leave-to { opacity: 0; }
+    .color-block-fade-enter-to, .color-block-fade-leave-from { opacity: 0.5; }
 
 
     .player-extras {

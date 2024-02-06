@@ -258,9 +258,9 @@ export default {
     }
 
     .break-content-enter-active, .break-content-leave-active { transition: all .35s ease; overflow: hidden }
-    .break-content-enter { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); }
+    .break-content-enter-from { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); }
     .break-content-leave-to { clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); }
-    .break-content-enter-to, .break-content-leave { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+    .break-content-enter-to, .break-content-leave-from { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
 
     .match-middle-maps >>> .map-lower {
         font-size: 20px !important;

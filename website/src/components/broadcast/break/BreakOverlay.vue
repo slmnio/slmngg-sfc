@@ -438,19 +438,19 @@ export default {
         transition: all .5s ease;
         overflow: hidden;
     }
-    .anim-break-next-enter, .anim-break-next-leave-to {
+    .anim-break-next-enter-from, .anim-break-next-leave-to {
         max-height: 0;
         opacity: 0;
         padding: 0 20px;
     }
-    .anim-break-next-enter-to, .anim-break-next-leave {
+    .anim-break-next-enter-to, .anim-break-next-leave-from {
         max-height: 200px;
         opacity: 1;
     }
 
     .a--match-enter-active, .a--match-leave-active, .a--match-move { transition: all .5s ease; overflow: hidden; }
-    .a--match-enter, .a--match-leave-to { max-height: 0; padding: 0 !important; }
-    .a--match-enter-to, .a--match-leave { max-height: 180px; }
+    .a--match-enter-from, .a--match-leave-to { max-height: 0; padding: 0 !important; }
+    .a--match-enter-to, .a--match-leave-from { max-height: 180px; }
 
     .break-content {
         display: flex;
@@ -465,13 +465,13 @@ export default {
     }
 
     /*.break-content-enter-active, .break-content-leave-active { transition: all .5s ease-in-out; overflow: hidden }*/
-    /*.break-content-enter, .break-content-leave-to { max-height: 0; padding: 0 40px; }*/
-    /*.break-content-enter-to, .break-content-leave { max-height: 100%; }*/
+    /*.break-content-enter-from, .break-content-leave-to { max-height: 0; padding: 0 40px; }*/
+    /*.break-content-enter-to, .break-content-leave-from { max-height: 100%; }*/
 
     .break-content-enter-active, .break-content-leave-active { transition: all .35s ease; overflow: hidden }
-    .break-content-enter { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); }
+    .break-content-enter-from { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); }
     .break-content-leave-to { clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); }
-    .break-content-enter-to, .break-content-leave { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+    .break-content-enter-to, .break-content-leave-from { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
 
 
     .break-image {
@@ -539,7 +539,7 @@ export default {
         max-width: 100%;
         transition: opacity 0s;
     }
-    .broadcast-mid-split-enter {
+    .broadcast-mid-split-enter-from {
         /*clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);*/
         /*clip-path: polygon(0% 0%, 0% 100%, 0% 100%, 0% 0, 100% 0, 100% 100%, 100% 100%, 100% 0%);*/
         clip-path: polygon(50% 0, 50% 100%, 50% 100%, 50% 0%, 50% 0%, 50% 100%, 50% 100%, 50% 0);

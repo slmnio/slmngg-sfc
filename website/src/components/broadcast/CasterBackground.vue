@@ -105,6 +105,6 @@ export default {
 
 
     .map-fade-enter-active, .map-fade-leave-active { transition: opacity 250ms ease 2s; }
-    .map-fade-enter, .map-fade-leave-to { opacity: 0; }
-    .map-fade-enter-to, .map-fade-leave { opacity: 1; }
+    .map-fade-enter-from, .map-fade-leave-to { opacity: 0; }
+    .map-fade-enter-to, .map-fade-leave-from { opacity: 1; }
 </style>

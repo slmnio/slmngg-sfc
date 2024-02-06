@@ -110,13 +110,13 @@ export default {
     .anim-talent-leave-active {
         transition: all .4s ease-in-out, opacity .4s ease;
     }
-    .anim-talent-enter, .anim-talent-leave-to {
+    .anim-talent-enter-from, .anim-talent-leave-to {
         /* hide */
         max-width: 0;
         opacity: 0;
         padding: 0 0;
     }
-    .anim-talent-enter-to, .anim-talent-leave {
+    .anim-talent-enter-to, .anim-talent-leave-from {
         /* show */
         opacity: 1;
     }

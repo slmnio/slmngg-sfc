@@ -109,12 +109,12 @@ export default {
         overflow: hidden;
     }
 
-    .a--match-enter, .a--match-leave-to {
+    .a--match-enter-from, .a--match-leave-to {
         max-height: 0;
         padding: 0 !important;
     }
 
-    .a--match-enter-to, .a--match-leave {
+    .a--match-enter-to, .a--match-leave-from {
         max-height: 230px;
     }
 </style>

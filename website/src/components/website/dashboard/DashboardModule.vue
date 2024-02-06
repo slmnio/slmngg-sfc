@@ -106,11 +106,11 @@ export default {
     }
 
     .clip-swipe-down-enter-to,
-    .clip-swipe-down-leave {
+    .clip-swipe-down-leave-from {
         clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
         max-height: var(--height, 50vh);
     }
-    .clip-swipe-down-enter,
+    .clip-swipe-down-enter-from,
     .clip-swipe-down-leave-to {
         clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
         max-height: 0;

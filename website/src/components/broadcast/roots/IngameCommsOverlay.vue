@@ -44,7 +44,7 @@ export default {
             return `${this.broadcast?.ingame_team_width || 690}px`;
         },
         topOffset() {
-            let num = (this.broadcast?.margin || 0) * 55;
+            let num = Math.floor((this.broadcast?.margin || 0) * 55);
             num += 12; // top of overlay
             num += 48; // bottom of top banner
             num += 12; // top of player boxes

@@ -174,7 +174,7 @@ export default {
         },
         teamWidthCSS() {
             if (!this.teamWidth) return {};
-            return { width: `calc(${this.teamWidth}px + var(--team-expand))` };
+            return { width: `calc(${this.teamWidth}px + var(--team-expand, 0px) - var(--side-margins, 0px))` };
         }
     }, //,
     // watch: {
@@ -241,15 +241,19 @@ export default {
 
 <style scoped>
     .ingame-team {
+        display: flex;
+
         --team-expand: 0px;
         width: calc(567px + var(--team-expand));
-        height: 48px;
 
-        display: flex;
+        /* from .top-overlay  */
+        height: var(--team-height, 48px);
+
+        transition: background-color .2s, border-color .2s, color .2s, width 200ms ease;
     }
     .ingame-team-holder {
         position: absolute;
-        top: 12px;
+        top: calc(12px - (var(--team-height, 48px) - 48px));
         display: flex;
         justify-content: flex-end;
     }
@@ -364,7 +368,7 @@ export default {
     /*}*/
 
     .score-enter-active, .score-leave-active { overflow: hidden; transition: max-width .3s; }
-    .score-enter-to, .score-leave { max-width: 48px; }
+    .score-enter-to, .score-leave { max-width: var(--team-height); }
     .score-enter, .score-leave-to { max-width: 0; }
 
     .ingame-team.default-thing {
@@ -397,8 +401,8 @@ export default {
     }
     .attack {
         background-color: #222;
-        width: 48px;
-        height: 48px;
+        width: var(--team-height);
+        height: var(--team-height);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -407,11 +411,7 @@ export default {
         background-repeat: no-repeat;
     }
     .ingame-team.extend-map-icon {
-        --team-expand: 48px;
-    }
-
-    .ingame-team {
-        transition: background-color .2s, border-color .2s, color .2s, width 200ms ease;
+        --team-expand: var(--team-height);
     }
 
     .icon-atk { background-image: url("https://media.slmn.io/atk.png"); }
@@ -424,7 +424,7 @@ export default {
         width: 0;
     }
     .slide-enter-to, .slide-leave {
-        width: 48px;
+        width: var(--team-height);
     }
     .attack-enter-active, .attack-leave-active { transition: all 200ms ease; }
 

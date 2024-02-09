@@ -41,7 +41,7 @@ export default {
         },
         broadcastMargin() {
             if (!this.broadcast) return { "--broadcast-margin-px": "0px" };
-            return { "--broadcast-margin-px": `${(this.broadcast.margin * 55)}px` };
+            return { "--broadcast-margin-px": `${Math.floor(this.broadcast.margin * 55)}px` };
         }
     },
     methods: {

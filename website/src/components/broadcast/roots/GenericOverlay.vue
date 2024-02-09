@@ -6,7 +6,7 @@
                 <div class="generic-overlay-title g-title overlay--bg flex-center" :style="{borderColor: _accentColor, ...(titleStyle || {})}">
                     <Squeezable align="middle" :disabled="(title || '').includes('\\n')" class="w-100 flex-center industry-align">
                         <transition name="fade" mode="out-in">
-                            <div class="industry-align title-text" :key="title" :class="{'has-br': title?.includes('\\n') }"
+                            <div class="title-text" :key="title" :class="{'has-br': title?.includes('\\n') }"
                                   v-html="nbr(title)"></div>
                         </transition>
                     </Squeezable>

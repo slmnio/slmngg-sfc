@@ -169,7 +169,7 @@ export default {
         },
         broadcastMargin() {
             if (!this.broadcast) return { marginTop: "0px" };
-            return { marginTop: `${(this.broadcast.margin * 55)}px` };
+            return { marginTop: `${Math.floor(this.broadcast.margin * 55)}px` };
         },
         teamWidth() {
             if (!this.broadcast?.ingame_team_width) return null;
@@ -333,6 +333,11 @@ export default {
 .top-overlay {
     position: relative;
     transition: margin-top .2s;
+    --team-height: 48px;
+    --side-margins: 43px;
+    --side-margins: 0px;
+    margin-left: var(--side-margins);
+    margin-right: var(--side-margins);
 }
 
 

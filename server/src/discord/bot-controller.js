@@ -330,6 +330,7 @@ class DiscordBot {
             }
             if (newState.channelId === this.job?.channelID) {
                 this.subscribeUserAudio(newState.member);
+                this.memberList.updateMembers(newState.channel.members);
             }
         });
 
@@ -462,7 +463,7 @@ class DiscordBot {
 
     async disconnect() {
         // TODO: implement
-        this.connection.disconnect();
+        if (this.connection) this.connection.disconnect();
         this.setStatus("ready");
         this.manager.deleteWorkerJob(this);
     }
@@ -496,7 +497,7 @@ class MemberList {
 
     updateMembers(discordMembers) {
         this.members = discordMembers.filter(m => !m.user.bot).map(member => ({
-            name: member.name,
+            name: member.nickname || member.user?.username,
             id: member.id,
             tag: member.tag
         }));

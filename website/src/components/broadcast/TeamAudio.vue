@@ -1,8 +1,8 @@
 <template>
     <div class="player-audio" @click="isMuted = !isMuted">
-        <div class="member-list" v-if="showMemberList">
-            <div class="member" v-for="member in decoratedMemberList" :key="member.id" :class="{'speaking': member.speaking}">
-                {{ member.airtable && member.airtable.name }} {{ member.name }} {{ member.id }} {{ member.speaking }}
+        <div class="member-list" v-if="!isMuted">
+            <div class="member" v-for="member in sortedMemberList" :key="member.id" :class="{'speaking': member.speaking}">
+<!--                {{ member.airtable && member.airtable.name }} {{ member.name }} {{ member.id }} {{ member.speaking }}-->
             </div>
         </div>
     </div>
@@ -16,7 +16,7 @@ import { cleanID } from "@/utils/content-utils";
 
 export default {
     name: "TeamAudio",
-    props: ["broadcast", "taskKey", "buffer", "alwaysUnmuted"],
+    props: ["broadcast", "taskKey", "buffer", "alwaysUnmuted", "team"],
     sockets: {
         async audio(room, { data, user }) {
             if (room !== this.roomKey) return;
@@ -85,6 +85,25 @@ export default {
                 ...member,
                 airtable: airtableData.find(m => cleanID(m.id) === cleanID(member.airtableID))
             }));
+        },
+        sortedMemberList() {
+            const players = (this.team?.players || this.team?.limited_players || []);
+            console.log(players, this.team);
+            if (!players.length) {
+                return [...this.decoratedMemberList].sort((a, b) => {
+                    if (a.name > b.name) return 1;
+                    if (a.name < b.name) return -1;
+                    return 0;
+                });
+            }
+
+            const p = players.map(player => {
+                return this.decoratedMemberList.find(member => {
+                    if (player.id === member.airtableID || player.discord_id === member.id) return member;
+                });
+            }).filter(p => !!p);
+            console.log("sorted member list", p);
+            return p;
         },
         roomKey() {
             return `${this.broadcastKey}/${this.taskKey}`;

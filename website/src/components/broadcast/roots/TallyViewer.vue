@@ -7,7 +7,7 @@
             </div>
             <div class="metadata d-flex flex-column align-items-center">
                 <div>
-                    <span v-if="number || selfObserverNumber">{{ number || selfObserverNumber }} </span>
+                    <span v-if="tallyRolesText">{{ tallyRolesText }} </span>
                     <span v-else><i class="fas fa-exclamation-circle"></i> Not assigned </span>
                     <span>&middot; {{ client.name }}</span>
                 </div>
@@ -91,6 +91,21 @@ export default {
         },
         selfObserverNumber() {
             return (this.liveMatch?.player_relationships || []).filter(rel => rel.singular_name === "Observer").findIndex(rel => rel.player?.[0] === this.client?.staff?.[0]) + 1;
+        },
+        tallyRoles() {
+            const nonProductionRoles = [
+                "Lobby Admin",
+                "Tournament Admin",
+                "Desk Host",
+                "Host",
+                "Preshow Host",
+                "Preshow Guest"
+            ];
+            return (this.liveMatch?.player_relationships || [])
+                .filter(rel => !nonProductionRoles.includes(rel.singular_name) && rel.player?.[0] === this.client?.staff?.[0]);
+        },
+        tallyRolesText() {
+            return this.tallyRoles.map(r => r.singular_name === "Observer" ? `Observer ${this.selfObserverNumber}` : r.singular_name).join("/");
         }
     },
     methods: {
@@ -101,10 +116,21 @@ export default {
             });
             console.log("Screen Wake Lock released:", this.wakeLock.released);
         },
-        targetsMe(sceneName) {
-            const number = this.number || this.selfObserverNumber;
-            if (!number) return false;
-            return ["Obs", "Game"].some(str => sceneName.toLowerCase().includes(str.toLowerCase())) && sceneName.includes(number.toString());
+        targetsMe(_sceneName) {
+            const sceneName = _sceneName.toLowerCase().trim();
+            return this.tallyRoles.some(rel => {
+                if (rel.singular_name === "Observer") {
+                    const observerNumber = this.number || this.selfObserverNumber;
+                    if (!observerNumber) return false;
+                    return ["Obs", "Game"].some(str => sceneName.includes(str.toLowerCase())) && sceneName.includes(observerNumber.toString());
+                } else if (rel.singular_name.includes("Replay")) {
+                    return ["Replay"].some(str => sceneName.includes(str.toLowerCase()));
+                } else if (rel.singular_name === "Observer Director") {
+                    return ["OBSDIR", "Director", "Clean feed"].some(str => sceneName.includes(str.toLowerCase()));
+                } else if (rel.singular_name.includes("Stats")) {
+                    return ["Stats"].some(str => sceneName.includes(str.toLowerCase()));
+                }
+            });
         }
 
     },
@@ -157,7 +183,7 @@ export default {
 }
 
 .metadata {
-  font-size: .75em;
+  font-size: .6em;
 }
 
 

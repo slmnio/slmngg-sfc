@@ -6,10 +6,13 @@
                 {{ state.toLocaleUpperCase() }}
             </div>
             <div class="metadata d-flex flex-column align-items-center">
-                <div>
+                <div v-if="!customText">
                     <span v-if="tallyRolesText">{{ tallyRolesText }} </span>
                     <span v-else><i class="fas fa-exclamation-circle"></i> Not assigned </span>
                     <span>&middot; {{ client.name }}</span>
+                </div>
+                <div v-else>
+                    <span>Scenes containing <b>{{ customText }}</b></span>
                 </div>
             </div>
         </div>
@@ -41,7 +44,7 @@ import ThemeLogo from "@/components/website/ThemeLogo.vue";
 export default {
     name: "TallyViewer",
     components: { ThemeLogo },
-    props: ["client", "scene"],
+    props: ["client", "scene", "customText"],
     sockets: {
         tally_change({ state, number }) {
             this.state = state;
@@ -118,6 +121,9 @@ export default {
         },
         targetsMe(_sceneName) {
             const sceneName = _sceneName.toLowerCase().trim();
+            if (this.customText) {
+                return sceneName.includes(this.customText.toLowerCase());
+            }
             return this.tallyRoles.some(rel => {
                 if (rel.singular_name === "Observer") {
                     const observerNumber = this.number || this.selfObserverNumber;

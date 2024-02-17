@@ -281,7 +281,14 @@ export default [
     { path: "tester", component: () => import("@/components/broadcast/roots/ThemeTransitionTester.vue") },
     { path: "admin", component: () => import("@/components/broadcast/roots/ClientOverview.vue") },
     { path: "syncer", component: () => import("@/components/broadcast/roots/SyncerOverlay.vue") },
-    { path: "tally-viewer", component: () => import("@/components/broadcast/roots/TallyViewer.vue") },
+    { path: "tally", redirect: "tally-viewer" },
+    {
+        path: "tally-viewer",
+        component: () => import("@/components/broadcast/roots/TallyViewer.vue"),
+        props: route => ({
+            customText: ["scene", "scenes", "text", "custom", "customText", "force"].reduce((prev, current) => prev || route.query[current], null)
+        })
+    },
     {
         path: "tally-dot",
         component: () => import("@/components/broadcast/roots/TallyDot.vue"),

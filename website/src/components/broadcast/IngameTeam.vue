@@ -142,7 +142,11 @@ export default {
             return this.team && this._theme && !this._theme.__loading;
         },
         style() {
-            if (!this._theme) return {};
+            if (!this._theme) {
+                return {
+                    ...this.teamWidthCSS
+                };
+            }
             return {
                 backgroundColor: this._theme.color_logo_background || this._theme.color_theme,
                 color: this._theme.color_text_on_logo_background || this._theme.color_text_on_theme,

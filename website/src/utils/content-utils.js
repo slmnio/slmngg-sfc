@@ -237,28 +237,28 @@ export function likelyNeededMaps(match) {
 }
 
 export const DefaultMapImages = {
-    Assault: "https://cdn.discordapp.com/attachments/855517740914573342/868231135224819743/44684849494984.png",
-    Escort: "https://cdn.discordapp.com/attachments/855517740914573342/868231132444000276/484444884949494949494948421651615641.png",
-    Hybrid: "https://cdn.discordapp.com/attachments/855517740914573342/868231133765201950/448489494949849494949494949494949.png",
-    Control: "https://cdn.discordapp.com/attachments/855517740914573342/868230457622396928/63541654456789487695.png",
-    Push: "https://cdn.discordapp.com/attachments/855517740914573342/969692510249177098/puuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuush.png",
-    Spike: "https://cdn.discordapp.com/attachments/880305022716481639/883811894463447110/newspikeplant.png",
-    SpikeRush: "https://cdn.discordapp.com/attachments/880305022716481639/883809271198924840/spikerush_default.png",
-    ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png",
-    Slayer: "https://media.discordapp.net/attachments/855517740914573342/913747752729595904/slayer.png",
-    Strongholds: "https://media.discordapp.net/attachments/855517740914573342/913747753086107668/strongholds.png",
-    CTF: "https://media.discordapp.net/attachments/855517740914573342/913747753392304158/ctf.png",
-    Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png",
-    Flashpoint: "https://cdn.discordapp.com/attachments/855515391225102336/1145463994581254154/flashpoint.png"
+    Assault: "https://media.slmn.io/maps/Assault.png",
+    Escort: "https://media.slmn.io/maps/Escort.png",
+    Hybrid: "https://media.slmn.io/maps/Hybrid.png",
+    Control: "https://media.slmn.io/maps/Control.png",
+    Push: "https://media.slmn.io/maps/Push.png",
+    Flashpoint: "https://media.slmn.io/maps/Flashpoint.png"
+    // Spike: "https://cdn.discordapp.com/attachments/880305022716481639/883811894463447110/newspikeplant.png",
+    // SpikeRush: "https://cdn.discordapp.com/attachments/880305022716481639/883809271198924840/spikerush_default.png",
+    // ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png",
+    // Slayer: "https://media.discordapp.net/attachments/855517740914573342/913747752729595904/slayer.png",
+    // Strongholds: "https://media.discordapp.net/attachments/855517740914573342/913747753086107668/strongholds.png",
+    // CTF: "https://media.discordapp.net/attachments/855517740914573342/913747753392304158/ctf.png",
+    // Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png"
 };
 
 export const MapTypeIcons = {
-    Hybrid: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907303867088896/180.png",
-    Escort: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907343893336097/180.png",
-    Control: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907374708903946/180.png",
-    Push: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908279537717392/Push.png",
-    Assault: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908385250934904/assault.png",
-    Flashpoint: "https://media.slmn.io/flashpoint-crop.png"
+    Hybrid: "https://media.slmn.io/maps/Hybrid-Icon.png",
+    Escort: "https://media.slmn.io/maps/Escort-Icon.png",
+    Control: "https://media.slmn.io/maps/Control-Icon.png",
+    Push: "https://media.slmn.io/maps/Push-Icon.png",
+    Assault: "https://media.slmn.io/maps/Assault-Icon.png",
+    Flashpoint: "https://media.slmn.io/maps/Flashpoint-Icon.png"
 };
 
 export function getTeamsMapStats(teams, requestMatch, requestMap, filters) {

@@ -53,7 +53,7 @@
                                     :right="broadcast.desk_display.includes('2')" />
                     </div>
                     <div class="match-middle-casters flex-center" v-if="middleMode === 'Casters'" :key="casterString">
-                        <DeskNotice class="notice casters-notice" :guests="guests" :main-theme="lowerBackground" />
+                        <DeskNotice class="notice casters-notice" :guests="guests" :main-theme="lowerBackground" :show-full-names="showFullNames" :show-pronouns="showPronouns" />
                     </div>
                     <div class="match-middle-predictions flex-center" v-if="middleMode === 'Predictions'" key="Predictions">
                         <DeskPrediction v-for="guest in guests" :key="guest.id" :guest="guest" :event="broadcast.event" />
@@ -172,6 +172,12 @@ export default {
         },
         useFlatElements() {
             return (this.broadcast?.broadcast_settings || []).includes("Use flat desk elements");
+        },
+        showFullNames() {
+            return (this.broadcast?.broadcast_settings || []).includes("Show full names on casters");
+        },
+        showPronouns() {
+            return (this.broadcast?.broadcast_settings || []).includes("Show pronouns on desk");
         },
         scoreboardTitle() {
             if (!(this.broadcast?.broadcast_settings || []).includes("Show scoreboard title")) return;

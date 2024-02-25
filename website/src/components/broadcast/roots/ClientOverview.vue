@@ -10,6 +10,28 @@
                 <td><span class="b-pad">{{ decodeURIComponent(overlay.fullPath.replace(overlay.path, "")) }}</span></td>
             </tr>
         </table>
+
+        <div class="remote-obs-data">
+            <div class="d-flex">
+                <b-button @click="$socket.client.emit('prod_trigger', 'request_obs_remote_control_update')">Request update</b-button>
+                <div class="ml-2 p-2 font-weight-bold">Remote OBS control</div>
+            </div>
+
+            <div class="d-flex">
+                <div class="p-2">
+                    <b>Scenes</b>
+                    <ul>
+                        <li v-for="scene in (remoteObsData?.scenes || [])" :key="scene?.sceneName">{{ scene?.sceneName }}</li>
+                    </ul>
+                </div>
+                <div class="p-2">
+                    <b>Input</b>
+                    <ul>
+                        <li v-for="input in (remoteObsData?.inputs || [])" :key="input.inputName">{{ input.inputName }} <span class="ml-2 badge badge-pill badge-secondary">{{ input?.inputKind }}</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -26,7 +48,9 @@ export default {
             forHumans: true
         },
         noBroadcastStyle: true,
-        noStinger: true
+        noStinger: true,
+
+        remoteObsData: null
     }),
     methods: {
         sendToOverlay(socketID, event, data) {
@@ -55,7 +79,10 @@ export default {
     },
     mounted() {
         console.log("prod-join", this.client?.key);
-        if (this.$socket.client) this.$socket.client.emit("prod-overview-join", this.client?.key);
+        if (this.$socket.client) {
+            this.$socket.client.emit("prod-overview-join", this.client?.key);
+            this.$socket.client.emit("prod_trigger", "request_obs_remote_control_update");
+        }
     },
     sockets: {
         prod_update(data) {
@@ -63,6 +90,14 @@ export default {
         },
         prod_disconnect(socketID) {
             this.$delete(this.overlays, socketID);
+        },
+        obs_remote_data(data) {
+            const [scenes, inputs] = data?.[0]?.results;
+            console.log(scenes, inputs);
+            this.remoteObsData = {
+                scenes: scenes.scenes,
+                inputs: inputs.inputs
+            };
         }
     }
 

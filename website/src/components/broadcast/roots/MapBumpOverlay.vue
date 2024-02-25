@@ -17,7 +17,7 @@
                 <div class="up-next-map">
                     <div class="title flex-center">UP NEXT: MAP {{ nextMap?._number }}</div>
                     <div class="content text flex-center">
-                        {{ nextMap?.name?.[0] }}
+                        {{ nextMap?.map?.name || nextMap?.name?.[0] }}
                     </div>
                 </div>
             </div>

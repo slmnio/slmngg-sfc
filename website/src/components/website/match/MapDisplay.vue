@@ -59,11 +59,11 @@ export default {
         },
         imageCSS() {
             let mapTheme = { color: "#ffffff" };
-            if (!this.map?.image && this.theme) {
+            if (!(this.map?.map?.image || this.map?.image) && this.theme) {
                 mapTheme = themeBackground(this.theme);
             }
             return {
-                ...resizedImage(this.map, ["image"], "h-160"),
+                ...resizedImage((this.map?.map || this.map), ["image"], "h-160"),
                 ...mapTheme
             };
         },
@@ -72,9 +72,10 @@ export default {
             return [this.match.score_1, this.match.score_2].some(s => s === this.match.first_to);
         },
         name() {
+            console.log(this.map);
             try {
-                if (this.condensed) return this.map.short_name[0];
-                return this.map.name[0];
+                if (this.condensed) return this.map.map?.short_name || this.map.short_name[0];
+                return this.map.map?.name || this.map.name[0];
             } catch (e) { return ""; }
         },
         scores() {

@@ -336,6 +336,7 @@ export default {
                     theme: ReactiveThing("theme")
                 }),
                 maps: ReactiveArray("maps", {
+                    map: ReactiveThing("map"),
                     winner: ReactiveThing("winner", {
                         theme: ReactiveThing("theme")
                     }),

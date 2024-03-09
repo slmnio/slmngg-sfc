@@ -35,7 +35,8 @@ export default [
             { path: "match-stats", component: () => import("@/views/sub-views/PlayerMatchStats.vue") },
             { path: "brands", component: () => import("@/views/sub-views/PlayerBrands.vue") },
             { path: "participation", component: () => import("@/views/sub-views/PlayerParticipation.vue") },
-            { path: "banner", component: () => import("@/views/sub-views/PlayerBannerCreator.vue") }
+            { path: "banner", component: () => import("@/views/sub-views/PlayerBannerCreator.vue") },
+            { path: "partners", component: () => import("@/views/sub-views/PlayerPartners.vue") }
         ]
     },
     {

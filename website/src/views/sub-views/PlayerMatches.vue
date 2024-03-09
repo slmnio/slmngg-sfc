@@ -2,7 +2,10 @@
     <div>
         <div class="container">
             <div>
-                <h6 class="d-flex flex-wrap matches-bar">Games: <a v-for="rel in mainPlayerRelationships" :key="rel.meta.singular_name" :href="'#' + convertToSlug(rel.meta.singular_name)">{{ rel.items.length }} as {{ rel.meta.singular_name }}</a></h6>
+                <h6 class="d-flex flex-wrap matches-bar">Games:
+                    <a v-for="rel in mainPlayerRelationships" :key="rel.meta.singular_name"
+                       :href="'#' + convertToSlug(rel.meta.singular_name)">{{ rel.items.length }} as {{ rel.meta.singular_name }}</a>
+                </h6>
             </div>
             <div class="role-group" v-for="rel in mainPlayerRelationships" :key="rel.meta.singular_name">
                 <h1 :id="convertToSlug(rel.meta.singular_name)">as {{ rel.meta.singular_name }} ({{ rel.items.length }})</h1>
@@ -14,25 +17,6 @@
                     />
                 </div>
             </div>
-
-            <b-form-checkbox v-model="showPartners">Show production partners (will load more data)</b-form-checkbox>
-            <div class="casting-partners mt-2" v-if="showPartners && partners?.length">
-                <h2 id="partners">Production Partners</h2>
-                <table class="table table-bordered table-dark table-sm">
-                    <tr>
-                        <th>Partner</th>
-                        <th>Matches together</th>
-                        <th>Last match together</th>
-                    </tr>
-                    <tr v-for="partner in partners" :key="partner.player.id">
-                        <td><router-link :to="`/player/${partner.player.id}/matches`">{{ partner.player.name }}</router-link></td>
-                        <td>{{ partner.matches }}</td>
-                        <td>{{ formatTime(partner.lastMatch.start, {format: "{day} {date-ordinal} {month} {year}", tz: $store.state.timezone, use24HourTime: $store.state.use24HourTime}) }} -
-                            <span v-if="partner.lastMatch?.event"><router-link :to="url('event', partner.lastMatch?.event)">{{ partner.lastMatch?.event?.name }}</router-link> - </span>
-                            <router-link :to="url('match', partner.lastMatch)">{{ partner.lastMatch?.name}}</router-link></td>
-                    </tr>
-                </table>
-            </div>
         </div>
     </div>
 </template>
@@ -41,8 +25,7 @@
 import Match from "@/components/website/match/Match";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
-import { formatTime, url } from "../../utils/content-utils";
-import { BFormCheckbox } from "bootstrap-vue";
+import { formatTime, url } from "@/utils/content-utils";
 
 export default {
     name: "PlayerMatches",
@@ -51,7 +34,6 @@ export default {
         showPartners: false
     }),
     components: {
-        BFormCheckbox,
         Match
     },
     computed: {
@@ -86,7 +68,7 @@ export default {
                     if (item.type !== "match") return;
                     const match = item.item;
                     (match?.player_relationships || []).forEach(rel => {
-                        if (!["Producer", "Observer", "Replay Producer", "Observer Director", "Lobby Admin", "Tournament Admin", "Graphics Operator", "Stat Producer"].includes(rel.singular_name)) return;
+                        if (!["Producer", "Observer", "Replay Producer", "Observer Director", "Lobby Admin", "Tournament Admin", "Graphics Operator", "Stats Producer"].includes(rel.singular_name)) return;
                         if (!rel?.player?.name) return;
                         if (rel.player.id === this.player?.id) return;
                         if (!partners.has(rel.player.id)) {

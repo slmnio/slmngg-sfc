@@ -22,13 +22,14 @@
                 <td><select></select></td>
             </tr> -->
         </table>
+        <b-button size="sm" variant="success" @click="saveToCurrentMatch"><i class="fa fa-save"></i> Save to current match</b-button>
         <pre class="text-white">{{ formData }}</pre>
     </div>
 </template>
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { BButton, BButtonGroup, BFormSelect } from "bootstrap-vue";
-import { updateGfxIndex } from "@/utils/dashboard";
+import { setPlayerRelationships } from "@/utils/dashboard";
 
 export default {
     name: "BroadcastRoles",
@@ -80,16 +81,15 @@ export default {
         }
     },
     methods: {
-        async setGfxIndex(id, num) {
+        async saveToCurrentMatch() {
             this.processing = true;
             try {
-                await updateGfxIndex(this.$root.auth, id, num);
+                await setPlayerRelationships(this.$root.auth, this.liveMatch.id, this.formData);
             } finally {
                 this.processing = false;
             }
         },
         updateData(newShit, oldShit) {
-            // HERE
             if (!newShit) return;
             this.clearFormData()
             console.log("updating data", newShit)

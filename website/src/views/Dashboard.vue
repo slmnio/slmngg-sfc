@@ -47,7 +47,7 @@
             <Bracket :scale="0.75" v-for="bracket in bracketData" :event="liveMatch.event" :bracket="bracket" :key="bracket.id"></Bracket>
         </DashboardModule>
         <ScheduleEditor class="broadcast-schedule-editor mb-2" :broadcast="broadcast"></ScheduleEditor>
-        <DashboardModule class="mb-2" title="Broadcast Roles" icon-class="fas fa-users-class" conten-class="p-2">
+        <DashboardModule class="mb-2" title="Broadcast Roles" icon-class="fas fa-users-class" v-if="liveMatch">
             <BroadcastRoles :broadcast="broadcast" :liveMatch="liveMatch" />
         </DashboardModule>
         <DashboardModule class="mb-2" title="Twitch Controls" icon-class="fas fa-wrench" content-class="p-2" v-if="broadcast && broadcast.channel">

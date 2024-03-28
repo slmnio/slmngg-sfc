@@ -15,17 +15,19 @@ function getLanguage(role) {
 module.exports = {
     key: "set-player-relationships",
     requiredParams: ["matchID", "roles"],
-    auth: ["client"],
+    auth: ["client", "user"],
     /***
      * @param {Object?} params
      * @param {ClientData} client
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern
-    async handler({ matchID, roles }, { client }) {
+    async handler({ matchID, roles }, { user }) {
 
         let match = await this.helpers.get(matchID);
         if (!match) throw "No match associated";
+        if (!(await this.helpers.permissions.canEditMatch(user, { match }))) throw { errorMessage: "You don't have permission to edit this item", errorCode: 403 };
+
         const matchRelationships = await Promise.all((match.player_relationships || []).map(id => this.helpers.get(id)));
 
         const newToAdd = [];

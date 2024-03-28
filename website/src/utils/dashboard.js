@@ -187,12 +187,12 @@ export async function updateGfxIndex(auth, gfxID, index) {
     });
 }
 
-export async function setPlayerRelationships(auth, matchID, data) {
+export async function setPlayerRelationships(auth, matchID, roles) {
     if (!auth?.user) {
         notyf.error("Not authenticated");
         return { error: true, errorMessage: "Not authenticated" };
     }
     return await authenticatedRequest(auth, "actions/set-player-relationships", {
-        matchID, data
+        matchID, roles
     });
 }

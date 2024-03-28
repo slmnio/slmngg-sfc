@@ -86,4 +86,8 @@ export default {
 .timezone-swapper:not(.align-left) option {
     direction: rtl;
 }
+
+.timezone-swapper:not(.align-left) .form-group {
+    margin-bottom: 0;
+}
 </style>

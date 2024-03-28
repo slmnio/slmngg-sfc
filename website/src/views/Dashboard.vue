@@ -47,6 +47,9 @@
             <Bracket :scale="0.75" v-for="bracket in bracketData" :event="liveMatch.event" :bracket="bracket" :key="bracket.id"></Bracket>
         </DashboardModule>
         <ScheduleEditor class="broadcast-schedule-editor mb-2" :broadcast="broadcast"></ScheduleEditor>
+        <DashboardModule class="mb-2" title="Broadcast Roles" icon-class="fas fa-users-class" v-if="liveMatch">
+            <BroadcastRoles :broadcast="broadcast" :liveMatch="liveMatch" />
+        </DashboardModule>
         <DashboardModule class="mb-2" title="Twitch Controls" icon-class="fas fa-wrench" content-class="p-2" v-if="broadcast && broadcast.channel">
             <template v-slot:header v-if="streamLink">{{ streamLink }}</template>
             <Predictions v-if="liveMatch" :client="client"/>
@@ -94,10 +97,11 @@ import DeskEditor from "@/components/website/dashboard/DeskEditor.vue";
 import DeskTextEditor from "@/components/website/dashboard/DeskTextEditor.vue";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import GFXController from "@/views/GFXController.vue";
+import BroadcastRoles from "@/components/website/dashboard/BroadcastRoles.vue";
 
 export default {
     name: "Dashboard",
-    components: { GFXController, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControls, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
+    components: { GFXController, BroadcastRoles, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControls, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
     data: () => ({
         titleProcessing: false
     }),

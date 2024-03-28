@@ -1,6 +1,6 @@
 <template>
     <div class="gfx-controller">
-        <table class="table table-bordered table-sm table-dark mb-0">
+        <table class="table table-bordered table-sm table-dark mb-0 border-no-top">
             <tr>
                 <th>GFX #</th>
                 <th>Name</th>

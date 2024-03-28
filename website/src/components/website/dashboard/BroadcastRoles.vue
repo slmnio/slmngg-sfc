@@ -1,6 +1,6 @@
 <template>
     <div class="broadcast-roles">
-        <table class="table table-bordered table-sm table-dark mb-0" style="table-layout: auto">
+        <table class="table table-bordered table-sm table-dark mb-0 border-no-top" style="table-layout: auto">
             <tr>
                 <th>Role</th>
                 <th class="text-nowrap">Assigned staff</th>

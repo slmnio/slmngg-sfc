@@ -2,7 +2,7 @@
     <DashboardModule class="schedule-editor" title="Schedule" icon-class="fas fa-calendar-alt">
         <template v-slot:header>{{ status }}</template>
 
-        <table class="table table-bordered table-sm table-dark mb-0">
+        <table class="table table-bordered table-sm table-dark mb-0 border-no-top">
             <tr>
                 <th colspan="2">Match</th>
                 <th>Start time</th>

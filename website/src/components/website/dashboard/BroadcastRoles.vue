@@ -88,7 +88,7 @@ export default {
                 player_relationships: ReactiveArray("player_relationships", {
                     player: ReactiveThing("player")
                 })
-            })?.player_relationships;
+            })?.player_relationships || [];
         }
     },
     methods: {

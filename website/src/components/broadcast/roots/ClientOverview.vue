@@ -1,13 +1,16 @@
 <template>
     <div class="client-overview container">
         <h1>Client Overview - {{ client && client.key }}</h1>
+
+        <b-button class="mt-2" variant="danger" @click="reloadAll"><i class="fas fa-redo fa-fw"></i> Reload all sources</b-button>
+
         <table class="my-3">
-            <tr v-for="overlay in sortedOverlays" :key="overlay.socket" :class="{ 'overlay-minor': overlay.minor || overlay.forHumans, 'overlay-for-humans': overlay.forHumans, 'overlay-active bg-danger': overlay.active }">
+            <tr v-for="overlay in sortedOverlays" :key="overlay.socket" :class="{ 'overlay-minor': overlay.minor || overlay.forHumans, 'overlay-for-humans': overlay.forHumans, 'overlay-active bg-danger': overlay.active, 'overlay-this bg-secondary': $socket.client.id === overlay.socket }">
                 <td><b-button @click="sendToOverlay(overlay.socket, 'reload')" size="sm" variant="dark"><i class="fa fa-fw fa-sync"></i></b-button></td>
                 <td><b-button size="sm" variant="dark" :href="overlay.fullPath" target="_blank"><i class="fa fa-fw fa-external-link"></i></b-button></td>
                 <td><span class="b-pad"><i class="fa fa-fw" :class="{'fa-eye': overlay.visible, 'fa-eye-slash': !overlay.visible}"></i></span></td>
                 <td><span class="b-pad font-weight-bold">{{ overlay.component }}</span></td>
-                <td><span class="b-pad">{{ decodeURIComponent(overlay.fullPath.replace(overlay.path, "")) }}</span></td>
+                <td><span class="b-pad">{{ decodeURIComponent(overlay.fullPath.replace(overlay.path, "")) }}</span><span v-if="$socket.client.id === overlay.socket">(this page)</span></td>
             </tr>
         </table>
 
@@ -17,7 +20,7 @@
                 <div class="ml-2 p-2 font-weight-bold">Remote OBS control</div>
             </div>
 
-            <div class="d-flex">
+            <div class="d-flex" v-if="remoteObsData">
                 <div class="p-2">
                     <b>Scenes</b>
                     <ul>
@@ -61,6 +64,13 @@ export default {
                     data
                 });
             }
+        },
+        reloadAll() {
+            if (!confirm("Are you sure you want to reload all client sources?")) return;
+            this.sortedOverlays.forEach(overlay => {
+                if (overlay.socket === this.$socket.client.id) return;
+                this.sendToOverlay(overlay.socket, "reload");
+            });
         }
     },
     computed: {

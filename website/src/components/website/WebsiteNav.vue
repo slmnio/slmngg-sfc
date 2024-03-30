@@ -39,7 +39,7 @@
                     <router-link active-class="active" class="nav-link" to="/players">Players</router-link>
                     <router-link v-if="isAuthenticated" active-class="active" class="nav-link" to="/profile">Profile</router-link>
                     <router-link v-if="isProduction" active-class="active" class="nav-link" to="/dashboard">Dashboard</router-link>
-                    <a v-if="productionClient?.key" target="_blank" class="nav-link" :href="`//dev.slmn.gg/client/${productionClient?.key}/tally-viewer`">Tally <i class="far fa-external-link ml-1"></i></a>
+<!--                    <a v-if="productionClient?.key" target="_blank" class="nav-link" :href="`//dev.slmn.gg/client/${productionClient?.key}/tally-viewer`">Tally <i class="far fa-external-link ml-1"></i></a>-->
 <!--                    <router-link active-class="active" class="nav-link" to="/news">News</router-link>-->
                 </b-navbar-nav>
                 <b-navbar-nav v-if="minisite" class="flex-wrap">
@@ -200,11 +200,11 @@ export default {
         isProduction() {
             if (!isAuthenticated(this.$root)) return false;
             return this.$root.authUser?.clients?.length;
-        },
-        productionClient() {
-            if (!isAuthenticated(this.$root)) return false;
-            return ReactiveRoot(this.$root.authUser?.clients?.[0]);
-        }
+        } //,
+        // productionClient() {
+        //     if (!isAuthenticated(this.$root)) return false;
+        //     return ReactiveRoot(this.$root.authUser?.clients?.[0]);
+        // }
     },
     mounted() {
         setTimeout(() => {
@@ -223,7 +223,7 @@ export default {
             this.height = this.$el.offsetHeight;
         }
     },
-    beforeDestroy () {
+    beforeDestroy() {
         this.resizeObserver.unobserve(this.$el);
     }
 };

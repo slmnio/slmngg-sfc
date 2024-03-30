@@ -52,7 +52,7 @@ module.exports = {
                     });
 
                     await this.helpers.updateRecord("Players", player, {
-                        "Player Relationships": [...player.player_relationships, newRelationship.id]
+                        "Player Relationships": [...(player.player_relationships || []), newRelationship.id]
                     });
 
                     newToAdd.push(newRelationship.id);

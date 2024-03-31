@@ -142,6 +142,7 @@ io.on("connection", (socket) => {
         // console.log("get and subscribe out:", id);
     });
     socket.on("prod-join", (clientName) => {
+        if (!clientName) return;
         clientName = clientName.toLowerCase();
         console.log("[prod:client] join", `prod:client-${clientName}`);
         socket._clientName = clientName;
@@ -149,6 +150,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("prod-overview-join", (clientName) => {
+        if (!clientName) return;
         clientName = clientName.toLowerCase();
         console.log("[prod-overview] join ", clientName);
         socket._clientName = clientName;
@@ -157,6 +159,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("prod-broadcast-join", (broadcastKey) => {
+        if (!broadcastKey) return;
         if (socket._broadcastKey) {
             // console.log("[prod:broadcast] leaving", `prod:broadcast-${socket._broadcastKey}`);
             socket.leave(`prod:broadcast-${socket._broadcastKey}`);

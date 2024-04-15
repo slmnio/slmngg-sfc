@@ -1,7 +1,7 @@
 <template>
     <div class="song-holder">
         <transition name="song" mode="out-in">
-            <div v-if="mainPlayer && showTitle && visible" class="song-title industry-align">
+            <div v-if="mainPlayer && showTitle && visible" class="song-title industry-align overlay--text-on-bg">
                 <i class="fas fa-music song-icon"></i>
                 <transition name="song" mode="out-in">
                     <span class="song-text" :key="mainPlayer.title">

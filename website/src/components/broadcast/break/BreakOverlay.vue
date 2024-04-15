@@ -1,7 +1,7 @@
 <template>
     <div class="break-overlay">
         <div class="break-center">
-            <ThemeTransition class="break-transition-top w-100 h-100" :theme="event && event.theme" :active="animationActive" one-color start="middle" end="middle">
+            <ThemeTransition class="break-transition-top w-100 h-100" :theme="event && event.theme" :active="animationActive" one-color start="middle" end="middle" :duration="500" :starting-delay="0">
                 <div class="break-top event-theme-border flex-center overlay--bg px-4" :style="eventBorder">
                     <Squeezable align="middle" :disabled="(overlayTitle).includes('\\n')" class="w-100 flex-center">
                         <transition name="fade" mode="out-in">
@@ -13,64 +13,70 @@
                     </Squeezable>
                 </div>
             </ThemeTransition>
-            <ThemeTransition class="break-transition-main w-100 h-100" :theme="event && event.theme" :active="animationActive" one-color start="middle" end="middle" :starting-delay="100">
-                <div class="break-main event-theme-border overlay--bg" :style="eventBorder">
-                    <div class="break-col break-left-col">
-                        <transition name="anim-break-next">
-                            <div class="break-next" v-if="nextMatch">
-                                <BreakMatch :match="nextMatch" :expanded="false" :theme-color="themeColor"/>
-                            </div>
-                        </transition>
-                        <transition name="anim-break-next">
-                            <!-- TODO: make this mirror the actual countdown, handling the not-starting-on-zero thing -->
-                            <div class="countdown-text" v-if="!countdownEnd && !nextMatch">Current time</div>
-                        </transition>
-                        <Countdown class="break-countdown" :to="countdownEnd" :timezone="broadcast.timezone"
-                                   :update="(e) => countdownTick(e)"/>
-                        <Sponsors class="break-sponsors" :sponsors="sponsorThemes"/>
+            <div class="break-area w-100 h-100 d-flex">
+                <ThemeTransition class="break-transition-left h-100" :theme="event && event.theme" :active="animationActive" one-color start="top" end="bottom" :starting-delay="350" :inner-delay="150" :duration="500">
+                    <div class="break-main event-theme-border overlay--bg" :style="eventBorder">
+                        <div class="break-col break-left-col">
+                            <transition name="anim-break-next">
+                                <div class="break-next" v-if="nextMatch">
+                                    <BreakMatch :match="nextMatch" :expanded="false" :theme-color="themeColor"/>
+                                </div>
+                            </transition>
+                            <transition name="anim-break-next">
+                                <!-- TODO: make this mirror the actual countdown, handling the not-starting-on-zero thing -->
+                                <div class="countdown-text" v-if="!countdownEnd && !nextMatch">Current time</div>
+                            </transition>
+                            <Countdown class="break-countdown" :to="countdownEnd" :timezone="broadcast.timezone"
+                                       :update="(e) => countdownTick(e)"/>
+                            <Sponsors class="break-sponsors" :sponsors="sponsorThemes"/>
+                        </div>
                     </div>
-                    <transition name="break-content" mode="out-in">
-                        <transition-group class="break-col break-schedule" name="a--match"
-                                          v-if="automatedShow === 'Schedule'" key="Schedule">
-                            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match"
-                                        :expanded="true" :key="match.id" :theme-color="themeColor"/>
-                        </transition-group>
-                        <div class="break-col break-standings" v-if="automatedShow === 'Standings'"
-                             :key="`Standings-${currentStage || ''}`">
-                            <Standings :event="event" :stage="currentStage"/>
-                        </div>
-                        <div class="break-col break-image" v-if="automatedShow === 'Image'"
-                             :key="`image-${breakImageURL}`">
-                            <div v-if="breakImageURL" class="break-image-inner" :style="breakImage"></div>
-                            <ThemeLogo v-else class="break-image-inner break-image-default" :theme="event.theme"
-                                       icon-padding="10%" border-width="0" logo-size="h-500"/>
-                        </div>
-                        <div class="break-col break-title" v-if="automatedShow === 'Title'"
-                             :key="`title-${breakContentTitle}`">
-                            <div :style="themeBG" class="break-title-inner" v-html="breakContentTitle"></div>
-                        </div>
-                        <Bracket class="break-col break-bracket" v-if="automatedShow === 'Bracket'"
-                                 :key="`Bracket-${bracket && bracket.key}`" :event="event" :bracket="bracket"
-                                 use-overlay-scale small :scale="0.85"/>
-                        <div class="break-col break-others" v-if="automatedShow === 'Other Streams'"
-                             key="Other-Streams">
-                            <div class="broadcast-previews-title">
-                                {{ broadcasts.length === 1 ? broadcasts[0].name : "Other broadcasts" }}
+                </ThemeTransition>
+                <ThemeTransition class="break-transition-main h-100" :theme="event && event.theme" :active="animationActive" one-color start="top" end="bottom" :starting-delay="350" :inner-delay="150" :duration="500">
+                    <div class="break-main event-theme-border overlay--bg" :style="eventBorder">
+                        <transition name="break-content" mode="out-in">
+                            <transition-group class="break-col break-schedule" name="a--match"
+                                              v-if="automatedShow === 'Schedule'" key="Schedule">
+                                <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match"
+                                            :expanded="true" :key="match.id" :theme-color="themeColor"/>
+                            </transition-group>
+                            <div class="break-col break-standings" v-if="automatedShow === 'Standings'"
+                                 :key="`Standings-${currentStage || ''}`">
+                                <Standings :event="event" :stage="currentStage"/>
                             </div>
-                            <div class="broadcast-previews">
-                                <BroadcastPreview v-for="other in broadcasts" :key="other.id" :broadcast="other"/>
+                            <div class="break-col break-image" v-if="automatedShow === 'Image'"
+                                 :key="`image-${breakImageURL}`">
+                                <div v-if="breakImageURL" class="break-image-inner" :style="breakImage"></div>
+                                <ThemeLogo v-else class="break-image-inner break-image-default" :theme="event.theme"
+                                           icon-padding="10%" border-width="0" logo-size="h-500"/>
                             </div>
-                        </div>
-                        <div class="break-col break-others-info" v-if="automatedShow === 'Other Info'" key="Other-Info">
-                            <OtherBroadcasts :starting-broadcast="broadcast"/>
-                        </div>
-                        <BreakStaffList class="break-col break-staff-list" v-if="automatedShow === 'Staff'" key="Staff"
-                                        :matches="fullSchedule"/>
-                        <BreakMatchup class="break-col break-matchup" v-if="automatedShow === 'Matchup'"
-                                      :key="`Matchup-${nextMatch ? nextMatch.id : ''}`" :match="nextMatch"/>
-                    </transition>
-                </div>
-            </ThemeTransition>
+                            <div class="break-col break-title" v-if="automatedShow === 'Title'"
+                                 :key="`title-${breakContentTitle}`">
+                                <div :style="themeBG" class="break-title-inner" v-html="breakContentTitle"></div>
+                            </div>
+                            <Bracket class="break-col break-bracket" v-if="automatedShow === 'Bracket'"
+                                     :key="`Bracket-${bracket && bracket.key}`" :event="event" :bracket="bracket"
+                                     use-overlay-scale small :scale="0.85"/>
+                            <div class="break-col break-others" v-if="automatedShow === 'Other Streams'"
+                                 key="Other-Streams">
+                                <div class="broadcast-previews-title">
+                                    {{ broadcasts.length === 1 ? broadcasts[0].name : "Other broadcasts" }}
+                                </div>
+                                <div class="broadcast-previews">
+                                    <BroadcastPreview v-for="other in broadcasts" :key="other.id" :broadcast="other"/>
+                                </div>
+                            </div>
+                            <div class="break-col break-others-info" v-if="automatedShow === 'Other Info'" key="Other-Info">
+                                <OtherBroadcasts :starting-broadcast="broadcast"/>
+                            </div>
+                            <BreakStaffList class="break-col break-staff-list" v-if="automatedShow === 'Staff'" key="Staff"
+                                            :matches="fullSchedule"/>
+                            <BreakMatchup class="break-col break-matchup" v-if="automatedShow === 'Matchup'"
+                                          :key="`Matchup-${nextMatch ? nextMatch.id : ''}`" :match="nextMatch"/>
+                        </transition>
+                    </div>
+                </ThemeTransition>
+            </div>
         </div>
         <div class="break-preload">
             <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />
@@ -398,10 +404,14 @@ export default {
         padding: 20px;
     }
     .break-left-col {
-        width: 480px;
         flex-shrink: 0;
-        border-right: 1px solid white;
+        //border-right: 1px solid rgba(255,255,255,0.2);
         padding: 5px 20px;
+    }
+
+    .break-left-col,
+    .break-transition-left {
+        width: 460px;
     }
     .break-schedule {
         flex-grow: 1;
@@ -444,7 +454,7 @@ export default {
         padding: 0 20px;
     }
     .anim-break-next-enter-to, .anim-break-next-leave {
-        max-height: 200px;
+        max-height: 240px;
         opacity: 1;
     }
 
@@ -580,10 +590,11 @@ export default {
     .break-transition-top {
         height: 160px !important;
     }
-
+    .break-area {
+        margin-top: 60px;
+        gap: 40px;
+    }
     .break-transition-main {
-        height: 0 !important;
         flex-grow: 1;
-        margin-top: 80px !important;
     }
 </style>

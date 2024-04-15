@@ -203,6 +203,28 @@ export default {
     clip-path: polygon(-1% -1%, 101% -1%, 101% 101%, -1% 101%);
 }
 
+.theme-transition.start-top.tt-enter.clip-slot >>> .clip-target,
+.theme-transition.start-top.tt-leave-to.clip-slot >>> .clip-target,
+.theme-transition.start-top.tt-enter .theme-transition-inner,
+.theme-transition.start-top.tt-enter .theme-transition-outer,
+.theme-transition.end-bottom.tt-leave-to .theme-transition-outer,
+.theme-transition.end-bottom.tt-leave-to .theme-transition-inner {
+    /* closed top */
+    clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+}
+
+
+.theme-transition.start-bottom.tt-enter.clip-slot >>> .clip-target,
+.theme-transition.start-bottom.tt-leave-to.clip-slot >>> .clip-target,
+.theme-transition.start-bottom.tt-enter .theme-transition-inner,
+.theme-transition.start-bottom.tt-enter .theme-transition-outer,
+.theme-transition.end-top.tt-leave-to .theme-transition-outer,
+.theme-transition.end-top.tt-leave-to .theme-transition-inner {
+    /* closed bottom */
+    clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+}
+
+
 .theme-transition.start-right.tt-enter.clip-slot >>> .clip-target,
 .theme-transition.start-right.tt-leave-to.clip-slot >>> .clip-target,
 .theme-transition.start-right.tt-enter .theme-transition-inner,

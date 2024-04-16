@@ -1,8 +1,11 @@
 <template>
     <div class="event-schedule container">
 
-        <div class="d-sm-flex w-100 justify-content-end timezone-swapper-holder d-none">
+        <div class="d-none d-sm-flex flex-column align-items-end gap-1 w-100 justify-content-end timezone-swapper-holder">
             <TimezoneSwapper :inline="true" />
+            <b-form-group label-cols="auto" label-size="sm" label="Broadcast" v-if="showBroadcastSettings">
+                <b-form-select v-if="eventBroadcasts?.length" :options="eventBroadcasts" v-model="selectedBroadcastID" size="sm" class="w-auto"/>
+            </b-form-group>
         </div>
 
         <div class="schedule-top mb-2">
@@ -32,25 +35,28 @@
         <div class="schedule-matches mt-3" v-if="activeScheduleGroup">
             <ScheduleMatch v-for="(match, i) in groupMatches" :key="match.id" :match="match"
                            :class="i > 0 && getMatchClass(match, groupMatches[i-1])" :custom-text="showAll && match.match_group ? match.match_group : null"
-                           :show-editor-button="showEditorButton" />
+                           :can-edit-matches="showEditorButton" :can-edit-broadcasts="showBroadcastSettings" :selectedBroadcast="selectedBroadcast" />
         </div>
     </div>
 </template>
 
 <script>
-import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
+import { ReactiveArray, ReactiveThing, ReactiveRoot } from "@/utils/reactive";
+import { isAuthenticated } from "@/utils/auth";
 import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
-import { canEditMatch } from "@/utils/client-action-permissions";
+import { canEditMatch, isEventStaffOrHasRole } from "@/utils/client-action-permissions";
+import { BFormSelect, BFormGroup } from "bootstrap-vue";
 
 export default {
     name: "EventSchedule",
-    components: { TimezoneSwapper, ScheduleMatch },
+    components: { TimezoneSwapper, ScheduleMatch, BFormSelect, BFormGroup },
     props: ["event"],
     data: () => ({
         showAll: false,
         hideCompleted: false,
-        hideNoVods: false
+        hideNoVods: false,
+        selectedBroadcastID: null
     }),
     computed: {
         defaultScheduleNum() {
@@ -180,6 +186,29 @@ export default {
         },
         showEditorButton() {
             return canEditMatch(this.$root?.auth?.user, { event: this.event });
+        },
+        _event() {
+            return ReactiveRoot(this.event?.id, {
+                broadcasts: ReactiveArray("broadcasts")
+            });
+        },
+        eventBroadcasts() {
+            return (this._event?.broadcasts || []).map(broadcast => ({
+                value: broadcast.id,
+                text: broadcast.relative_name || broadcast.name
+            }));
+        },
+        selectedBroadcast() {
+            if (!this.selectedBroadcastID) return null;
+            return (this._event?.broadcasts || []).find(b => b.id === this.selectedBroadcastID);
+        },
+        showBroadcastSettings() {
+            if (!isAuthenticated(this.$root)) return false;
+            return isEventStaffOrHasRole(this.$root.auth.user, {
+                event: this.event,
+                role: "Broadcast Manager",
+                websiteRoles: ["Can edit any match", "Can edit any event", "Full broadcast permissions"]
+            });
         }
     },
     methods: {
@@ -194,6 +223,18 @@ export default {
             }
 
             return Object.fromEntries(classes.map(c => ([c, true])));
+        }
+    },
+    watch: {
+        eventBroadcasts: {
+            deep: true,
+            immediate: true,
+            handler(broadcasts) {
+                if (!broadcasts?.length) return;
+                if (!this.selectedBroadcastID) {
+                    this.selectedBroadcastID = broadcasts[0]?.value;
+                }
+            }
         }
     },
     // watch: {

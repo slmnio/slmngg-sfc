@@ -196,3 +196,13 @@ export async function setPlayerRelationships(auth, matchID, roles) {
         matchID, roles
     });
 }
+
+export async function adjustMatchBroadcast(auth, mode, broadcastID, matchID) {
+    if (!auth?.user) {
+        notyf.error("Not authenticated");
+        return { error: true, errorMessage: "Not authenticated" };
+    }
+    return await authenticatedRequest(auth, "actions/adjust-match-broadcast", {
+        mode, broadcastID, matchID
+    });
+}

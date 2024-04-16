@@ -2,7 +2,7 @@
     <div class="match-wrapper my-2" v-if="loaded" :class="{ 'bg-danger' : !loaded }">
         <div class="match" :class="{'special-event': match.special_event}">
             <div class="match-left match-details flex-center flex-column text-center">
-                <div class="match-detail" v-for="detail in details" :key="detail.sort" v-b-tooltip="detail.long">
+                <div class="match-detail" v-for="detail in details" :key="detail.short" v-b-tooltip="detail.long">
                     {{ detail.short }}
                 </div>
             </div>
@@ -47,11 +47,25 @@
             </div>
         </div>
 
-        <div class="buttons flex-center ml-2 gap-1" v-if="showEditorButton">
-            <b-button-group v-if="showEditorButton">
-                <b-button class="text-white" size="sm" :to="url('match', this.match, { subPage: 'editor' })">
+        <div class="buttons flex-center ml-2 gap-1" v-if="canEditMatches || canEditBroadcasts">
+            <b-button-group class="gap-2">
+                <b-button class="text-white" size="sm" :to="url('match', this.match, { subPage: 'editor' })" v-if="canEditMatches">
                     <i class="fas fa-pencil"></i>
                 </b-button>
+                <b-button v-if="canEditBroadcasts"
+                          @click="matchBroadcastAdjust(isOnSelectedBroadcast ? 'remove' : 'add')"
+                          v-b-tooltip.right="`${isOnSelectedBroadcast ? 'Remove match from' : 'Add match to'} ${this.selectedBroadcast?.name}`" 
+                          class="text-white opacity-changes" :class="{'low-opacity': processing['match_broadcast']}" size="sm" :variant="isOnSelectedBroadcast ? 'primary' : 'secondary'">
+                    <i class="fas" :class="isOnSelectedBroadcast ? 'fa-minus' : 'fa-plus'"></i>
+                    <!-- //{{  isOnSelectedBroadcast ? 'YAH' : 'NOPERS '}} -->
+                </b-button>
+                <!-- <b-button v-if="canEditBroadcasts && isOnSelectedBroadcast"
+                          :disabled="!selectedBroadcast"
+                          @click="matchBroadcastAdjust('remove')"
+                          v-b-tooltip.right="`Remove match from ${this.selectedBroadcast?.name}`"
+                          class="text-white opacity-changes" :class="{'low-opacity': processing['match_broadcast']}" size="sm" variant="primary">
+                    <i class="fas fa-minus"></i>
+                </b-button> -->
             </b-button-group>
         </div>
     </div>
@@ -59,15 +73,45 @@
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { url } from "@/utils/content-utils";
+import { url, cleanID } from "@/utils/content-utils";
 import ScheduleTime from "@/components/website/schedule/ScheduleTime";
 import { BButton, BButtonGroup } from "bootstrap-vue";
+import { adjustMatchBroadcast } from "@/utils/dashboard";
+
+function sendToAirtable(mode, broadcastID, matchID) {
+    console.log("sending to airtable wow spooky", { mode, broadcastID, matchID })
+}
 
 export default {
     name: "ScheduleMatch",
+    props: ["match", "customText", "leftTeam", "canEditMatches", "canEditBroadcasts", "selectedBroadcast"],
     components: { BButtonGroup, BButton, ScheduleTime, ThemeLogo },
-    methods: { url },
-    props: ["match", "customText", "leftTeam", "showEditorButton"],
+    data: () => ({
+        processing: {
+            "match_broadcast": false
+        }
+    }),
+    methods: { 
+        url,
+        async matchBroadcastAdjust(mode) {
+            if (this.processing["match_broadcast"]) return;
+            if (!this.selectedBroadcast?.id) return this.$notyf.error("No broadcast selected!!! D:"); 
+
+            // SEND TO AIRTABLE:
+            // - mode ('add' or 'remove')
+            // - broadcastID
+            // - matchID
+
+            this.$set(this.processing, "match_broadcast", true);
+            const response = await adjustMatchBroadcast(this.$root.auth, mode, this.selectedBroadcast.id, this.match.id);
+            this.$set(this.processing, "match_broadcast", false);
+
+            if (response.error) {
+                console.error(":(", response.error);
+            }
+
+        }
+    },
     computed: {
         shouldSwapTeams() {
             if (!this.leftTeam?.id) return false;
@@ -156,6 +200,10 @@ export default {
             } else {
                 return this.match?.custom_name;
             }
+        },
+        isOnSelectedBroadcast() {
+            console.log(this.match?.scheduled_broadcast, this.selectedBroadcast);
+            return (this.match?.scheduled_broadcast || [])?.map(cleanID).includes(this.selectedBroadcast?.id);
         }
     }
 };
@@ -257,5 +305,15 @@ export default {
     }
     .buttons {
         order: 3;
+    }
+
+    
+    .opacity-changes {
+        opacity: 1;
+        transition: opacity .3s ease;
+    }
+    .low-opacity {
+        opacity: 0.5;
+        cursor: wait;
     }
 </style>

@@ -54,18 +54,10 @@
                 </b-button>
                 <b-button v-if="canEditBroadcasts"
                           @click="matchBroadcastAdjust(isOnSelectedBroadcast ? 'remove' : 'add')"
-                          v-b-tooltip.right="`${isOnSelectedBroadcast ? 'Remove match from' : 'Add match to'} ${this.selectedBroadcast?.name}`" 
+                          v-b-tooltip.right="`${isOnSelectedBroadcast ? 'Remove match from' : 'Add match to'} ${this.selectedBroadcast?.name}`"
                           class="text-white opacity-changes" :class="{'low-opacity': processing['match_broadcast']}" size="sm" :variant="isOnSelectedBroadcast ? 'primary' : 'secondary'">
                     <i class="fas" :class="isOnSelectedBroadcast ? 'fa-minus' : 'fa-plus'"></i>
-                    <!-- //{{  isOnSelectedBroadcast ? 'YAH' : 'NOPERS '}} -->
                 </b-button>
-                <!-- <b-button v-if="canEditBroadcasts && isOnSelectedBroadcast"
-                          :disabled="!selectedBroadcast"
-                          @click="matchBroadcastAdjust('remove')"
-                          v-b-tooltip.right="`Remove match from ${this.selectedBroadcast?.name}`"
-                          class="text-white opacity-changes" :class="{'low-opacity': processing['match_broadcast']}" size="sm" variant="primary">
-                    <i class="fas fa-minus"></i>
-                </b-button> -->
             </b-button-group>
         </div>
     </div>
@@ -78,24 +70,20 @@ import ScheduleTime from "@/components/website/schedule/ScheduleTime";
 import { BButton, BButtonGroup } from "bootstrap-vue";
 import { adjustMatchBroadcast } from "@/utils/dashboard";
 
-function sendToAirtable(mode, broadcastID, matchID) {
-    console.log("sending to airtable wow spooky", { mode, broadcastID, matchID })
-}
-
 export default {
     name: "ScheduleMatch",
     props: ["match", "customText", "leftTeam", "canEditMatches", "canEditBroadcasts", "selectedBroadcast"],
     components: { BButtonGroup, BButton, ScheduleTime, ThemeLogo },
     data: () => ({
         processing: {
-            "match_broadcast": false
+            match_broadcast: false
         }
     }),
-    methods: { 
+    methods: {
         url,
         async matchBroadcastAdjust(mode) {
-            if (this.processing["match_broadcast"]) return;
-            if (!this.selectedBroadcast?.id) return this.$notyf.error("No broadcast selected!!! D:"); 
+            if (this.processing.match_broadcast) return;
+            if (!this.selectedBroadcast?.id) return this.$notyf.error("No broadcast selected!!! D:");
 
             // SEND TO AIRTABLE:
             // - mode ('add' or 'remove')
@@ -109,7 +97,6 @@ export default {
             if (response.error) {
                 console.error(":(", response.error);
             }
-
         }
     },
     computed: {
@@ -307,7 +294,6 @@ export default {
         order: 3;
     }
 
-    
     .opacity-changes {
         opacity: 1;
         transition: opacity .3s ease;

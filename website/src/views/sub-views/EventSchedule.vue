@@ -42,11 +42,11 @@
 
 <script>
 import { ReactiveArray, ReactiveThing, ReactiveRoot } from "@/utils/reactive";
-import { isAuthenticated } from "@/utils/auth"
+import { isAuthenticated } from "@/utils/auth";
 import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 import { canEditMatch, isEventStaffOrHasRole } from "@/utils/client-action-permissions";
-import { BFormSelect, BFormGroup } from "bootstrap-vue"
+import { BFormSelect, BFormGroup } from "bootstrap-vue";
 
 export default {
     name: "EventSchedule",
@@ -190,16 +190,13 @@ export default {
         _event() {
             return ReactiveRoot(this.event?.id, {
                 broadcasts: ReactiveArray("broadcasts")
-            })
+            });
         },
         eventBroadcasts() {
-            const broadcastIDs = (this.event?.broadcasts || []);
-            console.log("knock look here", broadcastIDs);
-
             return (this._event?.broadcasts || []).map(broadcast => ({
                 value: broadcast.id,
                 text: broadcast.relative_name || broadcast.name
-            }))
+            }));
         },
         selectedBroadcast() {
             if (!this.selectedBroadcastID) return null;
@@ -207,9 +204,9 @@ export default {
         },
         showBroadcastSettings() {
             if (!isAuthenticated(this.$root)) return false;
-            return isEventStaffOrHasRole(this.$root.auth.user, { 
-                event: this.event, 
-                role: "Broadcast Manager", 
+            return isEventStaffOrHasRole(this.$root.auth.user, {
+                event: this.event,
+                role: "Broadcast Manager",
                 websiteRoles: ["Can edit any match", "Can edit any event", "Full broadcast permissions"]
             });
         }

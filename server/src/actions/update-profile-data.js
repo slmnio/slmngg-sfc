@@ -1,5 +1,6 @@
 const { getValidHeroes,
-    dirtyID
+    dirtyID,
+    cleanID
 } = require("../action-utils/action-utils");
 module.exports = {
     key: "update-profile-data",
@@ -30,8 +31,8 @@ module.exports = {
 
         if (profileData.favourite_hero) {
             let validHeroes = await getValidHeroes();
-            if (validHeroes.find(hero => hero.id === profileData.favourite_hero)) {
-                validatedData["Favourite Hero"] = [profileData.favourite_hero]; // Needs to be in an array since it's a linked record
+            if (validHeroes.find(hero => cleanID(hero.id) === cleanID(profileData.favourite_hero))) {
+                validatedData["Favourite Hero"] = [dirtyID(profileData.favourite_hero)]; // Needs to be in an array since it's a linked record
             }
         }
 
@@ -40,7 +41,7 @@ module.exports = {
             validatedData["Profile Picture Theme"] = [dirtyID(profileData.profile_picture_theme)];
         }
 
-        console.log("[profile]", user.airtable.name, user.airtable.id, "is setting", validatedData);
+        console.log("[Profile]", user.airtable.name, user.airtable.id, "is setting", validatedData);
         let response = await this.helpers.updateRecord("Players", user.airtable, {
             ...validatedData
         });

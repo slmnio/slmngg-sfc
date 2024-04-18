@@ -1,5 +1,5 @@
 <template>
-    <div class="map d-flex position-relative" :class="{'next-map': map._next }">
+    <div class="map d-flex position-relative" :class="{'next-map': map._next, 'map-dummy': map.dummy }">
         <div v-if="mapVideo" class="map-bg map-video w-100 h-100 bg-center" :class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground">
             <video :src="mapVideo" autoplay muted loop></video>
         </div>
@@ -8,9 +8,16 @@
         <div class="map-gel w-100 h-100 position-absolute draw-gel" v-if="map && map.draw"></div>
         <div class="map-gel w-100 h-100 position-absolute ban-gel flex-center" v-if="map && map.banner"></div>
         <div class="map-main d-flex flex-column h-100 w-100 position-absolute">
-            <div class="map-upper flex-center" :style="accent" v-if="map.picker || map.banner">
-                <ThemeLogo class="pick-ban-team" :theme="pickBanTheme" border-width="4px" logo-size="w-100" icon-padding="2" />
-                <div class="pick-ban-text" :style="pickBanBorder">{{ map.banner ? 'Ban' : (map.picker ? 'Pick' : '')  }}</div>
+            <div v-if="!small">
+                <div class="map-upper flex-center" :style="accent" v-if="map.picker || map.banner">
+                    <ThemeLogo class="pick-ban-team" :theme="pickBanTheme" border-width="4px" logo-size="w-100"
+                               icon-padding="2"/>
+                    <div class="pick-ban-text" :style="pickBanBorder">{{
+                            map.banner ? "Ban" : (map.picker ? "Pick" : "")
+                        }}
+                    </div>
+                </div>
+                <div class="map-upper-spacer" v-else></div>
             </div>
             <div class="map-top flex-grow-1 h-100 w-100 flex-center flex-column">
                 <div class="map-logo-holder w-100 h-50 flex-center" v-if="winnerBG">
@@ -42,7 +49,7 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 
 export default {
     name: "MapSegment",
-    props: ["broadcast", "map", "accentColor", "showMapVideo", "firstTo", "useShorterNames"],
+    props: ["broadcast", "map", "accentColor", "showMapVideo", "firstTo", "useShorterNames", "small"],
     components: {
         ThemeLogo
     },
@@ -61,7 +68,7 @@ export default {
             if (!(image)) return {};
 
             try {
-                return bg(image?.url || getNewURL(image, "orig"));
+                return bg(image?.url || getNewURL(image, this.small ? "w-400" : "orig"));
             } catch (e) {
                 return {};
             }
@@ -104,6 +111,10 @@ export default {
         mapVideo() {
             if (!this.showMapVideo) return null;
             if (!this.map?.map?.video?.length) return null;
+
+            if (!this.map._next && !this.broadcast?.broadcast_settings?.includes("Always show map videos")) {
+                return null;
+            }
             return getNewURL(this.map.map.video?.[0], "orig");
         }
     }
@@ -138,7 +149,7 @@ export default {
         background-color: #333333;
         color: #ffffff;
     }
-    .map-upper {
+    .map-upper, .map-upper-spacer {
         font-size: 24px;
         min-height: 2em;
         padding: 0;

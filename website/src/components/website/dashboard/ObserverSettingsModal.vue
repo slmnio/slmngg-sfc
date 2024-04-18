@@ -3,7 +3,6 @@
         <div v-b-modal.observer-settings >
             <b-button size="sm" :variant="hasSettingOn ? 'primary' : 'secondary'" :class="{'active': hasSettingOn}"><DashboardModalIcon/> {{ autoText }}</b-button>
         </div>
-
         <b-modal ref="observer-settings" id="observer-settings" title="Observer Settings">
             <div class="w-100 flex-center">
                 <div class="d-inline-flex flex-column">
@@ -43,23 +42,31 @@ export default {
     data: () => ({
         settings: [
             "Show syncer",
-            "Show overlay"
+            "Show overlay",
+            "Use basic overlay"
         ]
     }),
     computed: {
+        liveSettings() {
+            return this.broadcast?.observer_settings || [];
+        },
         autoText() {
-            const settings = this.broadcast?.observer_settings || [];
-            if (!settings.length) {
+            if (!this.settingsGroups.disruptive.length) {
                 return "All off";
             }
             const on = [];
-            if (settings.includes("Show overlay")) on.push("overlay");
-            if (settings.includes("Show syncer")) on.push("syncer");
+            if (this.liveSettings.includes("Show overlay")) on.push(this.liveSettings.includes("Use basic overlay") ? "basic overlay" : "overlay");
+            if (this.liveSettings.includes("Show syncer")) on.push("syncer");
             if (on[0]) on[0] = on[0].slice(0, 1).toUpperCase() + on[0].slice(1);
             return `${on.join(" & ")} on`;
         },
+        settingsGroups() {
+            const disruptive = ["Show overlay", "Show syncer"];
+            const options = ["Use basic overlay"];
+            return { disruptive: disruptive.filter(key => this.liveSettings.includes(key)), options: options.filter(key => this.liveSettings.includes(key)) };
+        },
         hasSettingOn() {
-            return !!this.broadcast?.observer_settings?.length;
+            return !!this.settingsGroups.disruptive?.length;
         }
     },
     methods: {

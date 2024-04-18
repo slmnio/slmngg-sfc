@@ -3,8 +3,12 @@
         <div class="connections" ref="connections-holder">
             <div class="connection" v-for="bug in connectionBugs" :key="bug.key" :data-key="bug.key" :class="connectionBugClass(bug)" :style="bug.style"
                 :data-column-num="bug.column">
-                <div class="c-top" v-if="bug.type === 'normal'"></div><div class="c-middle"></div><div class="c-bottom"></div>
-                <div class="c-text" :title="bug.title" v-if="bug.type === 'loser-drops'">{{ bug.text }}</div>
+                <div class="c-top"    v-if="['normal'].includes(bug.type)"></div>
+                <div class="c-middle" v-if="['normal', 'loser-drops'].includes(bug.type)"></div>
+                <div class="c-bottom" v-if="['normal', 'loser-drops'].includes(bug.type)"></div>
+                <div class="c-arrow c-arrow-line" v-if="['arrow', 'arrow-number'].includes(bug.type)"></div>
+                <div class="c-arrow c-arrow-head" v-if="['arrow', 'arrow-number'].includes(bug.type)"></div>
+                <div class="c-text"   v-if="['loser-drops', 'arrow-number'].includes(bug.type)" :title="bug.title">{{ bug.text }}</div>
             </div>
         </div>
         <v-style>
@@ -16,7 +20,7 @@
             }
         </v-style>
         <div class="internal-bracket d-flex" v-for="(_bracket, i) in brackets" :key="i">
-            <div class="column" v-for="(column, ci) in _bracket.columns" :key="ci">
+            <div class="column" v-for="(column, ci) in _bracket.columns" :key="ci" :class="{'gap-right': column.gapRight}">
                 <div class="header text-center mb-3" :style="logoBackground1(event)" v-if="showHeaders && column.header">{{ column.header }}</div>
                 <div class="column-matches flex-grow-1">
                     <BracketMatch v-for="matchNum in column.games" :key="matchNum" :ref="`match-${matchNum}`" :custom-timezone="customTimezone"
@@ -157,6 +161,10 @@ export default {
             const classes = [`dir-${bug.direction}`];
             let highlight = null;
 
+            if (bug.customStyle) {
+                classes.push(`style-${bug.customStyle}`);
+            }
+
             if (this.connectionsToHighlight?.matches) {
                 // console.log("bug highlight", bug, this.connectionsToHighlight);
                 const bugMatches = bug.key.split("->").map(e => e.split(".").shift());
@@ -249,11 +257,11 @@ export default {
 
                 if (connectionData.win) {
                     const [otherMatchNum, destNum] = connectionData.win.toString().split(".");
-                    this.createConnectionBetweenRefs(matchRef, this.getMatchRef(otherMatchNum), matchNum, otherMatchNum, parseInt(destNum || "0"));
+                    this.createConnectionBetweenRefs(matchRef, this.getMatchRef(otherMatchNum), matchNum, otherMatchNum, parseInt(destNum || "0"), connectionData.winStyle);
                 }
                 if (connectionData.lose) {
                     const [otherMatchNum, destNum] = connectionData.lose.toString().split(".");
-                    this.createLoserDropsConnection(this.getMatchRef(otherMatchNum), matchNum, otherMatchNum, parseInt(destNum || "0"));
+                    this.createLoserDropsConnection(this.getMatchRef(otherMatchNum), matchNum, otherMatchNum, parseInt(destNum || "0"), connectionData.loseStyle);
                 }
             });
         },
@@ -261,24 +269,25 @@ export default {
             // console.log(this.$refs);
             return this.$refs[`match-${matchNum}`];
         },
-        createConnectionBetweenRefs(source, dest, sourceNum, destNum, destSide) {
+        createConnectionBetweenRefs(source, dest, sourceNum, destNum, destSide, customStyle) {
             if (!source || !dest || !destSide) return;
+
+            if (["hidden", "none", "empty", "null", null].includes(customStyle)) return;
+
             const container = this.$refs["connections-holder"];
+            const alignmentDiff = container.getBoundingClientRect();
             // console.log({ container });
 
             // console.log("connection between", { source, dest });
             const [sourceBox, destBox] = [source, dest].map(c => c[0].$el.getBoundingClientRect());
             // console.log({ sourceBox, destBox });
 
-            const connection = document.createElement("div");
-            connection.className = "connection";
-            // connection.dataset.data = JSON.stringify(data);
-
             const HalfLine = 1;
 
             const coord = {};
             coord.leftSide = sourceBox.right;
             coord.rightSide = destBox.left;
+
 
             const sourcePoint = (sourceBox.bottom - (sourceBox.height / 2));
             let destPoint = (destBox.bottom - (destBox.height / 2));
@@ -291,10 +300,6 @@ export default {
                     destPoint += quarterHeight;
                 }
             }
-
-            connection.dataset.points = JSON.stringify({ sourcePoint, destPoint });
-
-            const alignmentDiff = container.getBoundingClientRect();
 
 
             coord.topSide = Math.min(sourcePoint, destPoint);
@@ -310,18 +315,22 @@ export default {
                 coord.bottomSide += HalfLine * 2;
             }
 
-            connection.classList.add(`dir-${coord.direction}`);
-
-
-            connection.style.left = `${coord.leftSide - alignmentDiff.left}px`;
-            connection.style.top = `${coord.topSide - alignmentDiff.bottom}px`;
-
-            connection.style.height = `${coord.bottomSide - coord.topSide}px`;
-            connection.style.width = `${coord.rightSide - coord.leftSide}px`;
-
-
-            connection.innerHTML = "<div class=\"c-top\"></div><div class=\"c-middle\"></div><div class=\"c-bottom\"></div>";
-
+            if (["arrow", "arrow-number"].includes(customStyle)) {
+                return this.connectionBugs.push({
+                    type: customStyle,
+                    customStyle,
+                    key: `${sourceNum}->${destNum}`,
+                    column: Math.max(this.getMatchColumnNum(sourceNum), this.getMatchColumnNum(destNum)),
+                    text: customStyle === "arrow-number" ? destNum : null,
+                    direction: "down",
+                    style: {
+                        left: `${sourceBox.right - alignmentDiff.left}px`,
+                        top: `${sourceBox.top - alignmentDiff.top}px`,
+                        height: `${sourceBox.height}px`,
+                        width: "32px"
+                    }
+                });
+            }
 
             this.connectionBugs.push({
                 type: "normal",
@@ -335,9 +344,6 @@ export default {
                     width: `${coord.rightSide - coord.leftSide}px`
                 }
             });
-
-            // container.appendChild(connection);
-            this.connectionElements.push(connection);
         },
         createLoserDropsConnection(dest, sourceNum, destNum, destSide) {
             if (!dest || !destSide) return; // console.log("No destination for loser drops from", sourceNum, "to", destSide);
@@ -432,10 +438,16 @@ export default {
         position: relative;
     }
     .column {
-        width: 12.5em;
-        margin: 0 1em;
+        --column-width: 12.5em;
+        --margin-width: 1em;
+        width: var(--column-width);
+        margin: 0 var(--margin-width);
         display: flex;
         flex-direction: column;
+    }
+    .column.gap-right {
+        --gap-width: 4em;
+        margin-right: calc((2 * var(--margin-width)) + var(--gap-width));
     }
     .column-matches {
         display: flex;
@@ -556,5 +568,33 @@ export default {
         margin-left: var(--b-width);
         color: var(--b-color);
     }
+    .bracket >>> .connection.style-arrow,
+    .bracket >>> .connection.style-arrow-number {
+        align-items: flex-start;
+        --b-arrow-length: 75%;
+    }
 
+    .bracket >>> .c-arrow.c-arrow-line {
+        height: var(--b-width);
+        width: var(--b-arrow-length);
+        background-color: var(--b-color);
+    }
+
+    .bracket >>> .c-arrow.c-arrow-head {
+        --b-arrow-size: calc(min(var(--b-width) * 4, 40%));
+        border-top: var(--b-width) solid var(--b-color);
+        border-right: var(--b-width) solid var(--b-color);
+        width: var(--b-arrow-size);
+        height: var(--b-arrow-size);
+        transform: rotate(45deg);
+        position: absolute;
+        right: calc(100% - var(--b-arrow-length));
+    }
+
+    .bracket >>> .connection.style-arrow .c-text,
+    .bracket >>> .connection.style-arrow-number .c-text {
+        width: var(--b-arrow-length);
+        margin-left: 0;
+        bottom: 50%;
+    }
 </style>

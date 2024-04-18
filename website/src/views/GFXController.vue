@@ -41,7 +41,7 @@ export default {
     name: "GFXController",
     components: { BButtonGroup, BButton },
     data: () => ({
-        buttonCount: 4,
+        buttonCount: 6,
         processing: false
     }),
     computed: {

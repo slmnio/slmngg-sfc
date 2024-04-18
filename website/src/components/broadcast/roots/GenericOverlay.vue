@@ -2,7 +2,7 @@
     <div class="generic-overlay flex-center flex-column" :class="{'full': full}">
         <TourneyBar class="st4-top" v-if="top === 'st4'" :broadcast="broadcast" left="Schedule" :right="title"/>
         <div class="g-title-wrapper">
-            <theme-transition :theme="theme" :active="$root.animationActive" end="middle"  :duration="500" :inner-delay="150">
+            <theme-transition :theme="theme" :active="$root.animationActive" one-color end="middle"  :duration="500" :inner-delay="150">
                 <div class="generic-overlay-title g-title overlay--bg flex-center" :style="{borderColor: _accentColor, ...(titleStyle || {})}">
                     <Squeezable align="middle" :disabled="(title || '').includes('\\n')" class="w-100 flex-center industry-align">
                         <transition name="fade" mode="out-in">
@@ -17,7 +17,7 @@
                 <div v-if="noBottomAnimate" class="generic-overlay-body g-body overlay--bg flex-center" :style="bodyStyle">
                     <slot></slot>
                 </div>
-            <theme-transition v-else :active="$root.animationActive" :theme="theme" :starting-delay="100" end="middle" :duration="500" :inner-delay="150">
+            <theme-transition v-else :active="$root.animationActive" one-color :theme="theme" :starting-delay="100" end="middle" :duration="500" :inner-delay="150">
                 <div class="generic-overlay-body g-body overlay--bg flex-center" :style="bodyStyle">
                     <slot></slot>
                 </div>

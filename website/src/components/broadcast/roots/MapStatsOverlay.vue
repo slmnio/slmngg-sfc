@@ -1,7 +1,7 @@
 <template>
     <GenericOverlay class="map-stats-overlay" :title="title || 'Map Stats'">
         <div class="maps d-flex w-100 h-100">
-            <MapStatsSegment :match="match" :broadcast="broadcast" class="map w-100" :map="map" v-for="map in mapSlots" :key="map.id"/>
+            <MapStatsSegment :match="match" :broadcast="broadcast" class="map w-100" :map="map" v-for="map in displayMapSlots" :key="map.id"/>
         </div>
     </GenericOverlay>
 </template>
@@ -14,7 +14,7 @@ import MapStatsSegment from "@/components/broadcast/MapStatsSegment";
 export default {
     name: "MapStatsOverlay",
     components: { MapStatsSegment, GenericOverlay },
-    props: ["broadcast", "client", "title"],
+    props: ["broadcast", "client", "title", "number", "hideCompletedRecords"],
     computed: {
         match() {
             if (!this.broadcast?.live_match?.[0]) return null;
@@ -49,6 +49,7 @@ export default {
             // just like the maps overlay, either the set maps or map type from broadcast
 
             const needMaps = likelyNeededMaps(this.match);
+            const matchIsFinished = ((this.match.score_1 || 0) === this.match.first_to) || ((this.match.score_2 || 0) === this.match.first_to);
 
             let maps = [...(this.match?.maps || [])].filter(m => m.map);
             if (!this.showBannedMaps) {
@@ -76,16 +77,34 @@ export default {
                         maps.push({
                             dummy: true,
                             ...(this.mapTypes ? {
-                                name: [this.mapTypes && this.mapTypes[num]],
-                                type: [this.mapTypes && this.mapTypes[num]],
-                                image: [{ url: DefaultMapImages[this.mapTypes[num]] }]
+                                map: {
+                                    name: this.mapTypes && this.mapTypes[num],
+                                    type: this.mapTypes && this.mapTypes[num],
+                                    image: [{ url: DefaultMapImages[this.mapTypes[num]] }]
+                                }
                             } : {})
                         });
                     }
                 }
             }
 
-            return maps;
+            return maps.map((map) => ({
+                hide_records: !!(!matchIsFinished && this.hideCompletedRecords && (map.winner || map.banner || map.draw)),
+                ...map
+            }));
+        },
+        displayMapSlots() {
+            if (!this.match) return [];
+            // get 4
+            const display = this.number || 4;
+
+            const mapsUsed = ((this.match.score_1 || 0) + (this.match.score_2 || 0) + (this.match?.maps || []).filter(m => m.draw)?.length);
+            const matchIsFinished = ((this.match.score_1 || 0) === this.match.first_to) || ((this.match.score_2 || 0) === this.match.first_to);
+            const mapToShow = mapsUsed + (!matchIsFinished ? 1 : 0);
+
+            const offset = mapToShow > display ? (mapToShow - display) : 0;
+
+            return this.mapSlots.slice(offset, display + offset);
         }
     }
 };
@@ -93,6 +112,6 @@ export default {
 
 <style scoped>
     .map-stats-segment + .map-stats-segment {
-        margin-left: 3em;
+        margin-left: 2em;
     }
 </style>

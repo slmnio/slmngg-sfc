@@ -14,6 +14,7 @@ import Dashboard from "@/views/Dashboard";
 import ProfilePage from "@/views/ProfilePage";
 import TwitchAuthScopeSelector from "@/components/website/TwitchAuthScopeSelector";
 import BracketCreator from "@/views/BracketCreator.vue";
+import NotFoundPage from "@/views/NotFoundPage";
 
 export default [
     {
@@ -80,6 +81,8 @@ export default [
         props: route => ({
             code: route.params.broadcastCode,
             title: route.query.title,
+            stingerText: route.query.stingerText,
+            stingerThemeOverride: route.query.stingerThemeOverride || route.query.stingerTheme,
             top: route.query.top,
             noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation),
             noStinger: (route.query.noStinger || route.query.stinger === "false"),
@@ -95,6 +98,8 @@ export default [
         props: route => ({
             client: route.params.clientID,
             title: route.query.title,
+            stingerText: route.query.stingerText,
+            stingerThemeOverride: route.query.stingerThemeOverride || route.query.stingerTheme,
             noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation),
             noStinger: (route.query.noStinger || route.query.stinger === "false"),
             bodyClass: route.query.class || route.query.bodyClass,
@@ -102,7 +107,8 @@ export default [
             backgroundIndex: route.query.background && parseInt(route.query.background)
         }),
         children: BroadcastRoutes
-    }
+    },
+    { path: "*", component: NotFoundPage }
     // {
     //     path: "/redirect",
     //     beforeEnter: (to, from, next) => {

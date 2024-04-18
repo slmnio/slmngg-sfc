@@ -361,7 +361,7 @@ function miniLeaguePrep(standings) {
         });
 
 
-        console.log(group.sort(miniLeagueMatchDiff).map(t => `|${t.code.padStart(6, " ")} ${t.standings.minileague.wins}-${t.standings.minileague.losses} (${t.standings.minileague.map_diff}) [${t.standings.minileague.matches}]`).join("\n"));
+        console.log("minileague\n", group.sort(miniLeagueMatchDiff).sort(miniLeagueMapDiff).map(t => `|${t?.code?.padStart(6, " ")} ${t.standings.minileague.wins}-${t.standings.minileague.losses} (map: ${t.standings.minileague.map_diff}) [${t.standings.minileague.matches}]`).join("\n"));
 
         if (group.some(team => team.standings?.minileague?.matches === 0)) {
             console.warn("team has no matches in this minileague");

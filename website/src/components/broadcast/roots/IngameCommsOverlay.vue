@@ -2,7 +2,7 @@
     <div class="overlay ingame-comms-overlay" v-if="match && match.teams">
         <div class="teams" :class="{'flip': match.flip_teams}" :style="{ marginTop: topOffset }">
             <div class="team" v-for="(team, i) in match.teams" :key="team.id" :style="{ width: teamWidth }" :class="{'left': match.flip_teams ? i === 1 : i === 0}">
-                <ThemeTransition class="listen-in-holder" :duration="250" :theme="team.theme"
+                <ThemeTransition class="listen-in-holder" :duration="250" :theme="team.theme" use-fit-content
                                  :active="activeTeamIndex === i"
                                  :start="match.flip_teams ? i === 1 : i === 0 ? 'left' : 'right'"
                                  :end="match.flip_teams ? i === 1 : i === 0 ? 'right' : 'left'">

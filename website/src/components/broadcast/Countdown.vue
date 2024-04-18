@@ -25,7 +25,7 @@ export default {
             return diff;
         },
         text() {
-            if (!this.to || !this.startingCountdown) {
+            if (!this.to) {
                 // return current date if no time set
                 //        or if the "to" starts the countdown at 0
                 const utc = spacetime(this.now);

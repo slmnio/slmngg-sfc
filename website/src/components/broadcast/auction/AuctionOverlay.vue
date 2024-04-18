@@ -32,7 +32,11 @@
                         <div class="player-info" v-if="player">
                             <div class="player-name">{{ player.name }}</div>
                             <div class="player-extras">
-                                <div class="player-role" v-if="player.role" v-html="getRoleSVG(player.role)"></div>
+                                <div class="player-role" v-if="player.role && !player.eligible_roles" v-html="getRoleSVG(player.role)"></div>
+                                <div class="player-eligible-roles d-flex">
+                                    <div class="role" v-for="role in playerRoles(player?.eligible_roles)" :class="{'ineligible': !role.eligible, 'eligible': role.eligible, 'primary': role.role === player.role}"
+                                         :key="role?.role" v-html="getRoleSVG(role?.role)"></div>
+                                </div>
                                 <div class="accolades" v-if="accolades.length">
                                     <ContentThing :thing="accolade" type="event" :link-to="accolade.event"
                                                   :theme="accolade.event && accolade.event.theme"
@@ -459,6 +463,20 @@ export default {
                 auctionID: this.eventID,
                 ...data
             });
+        },
+        playerRoles(roles) {
+            const allRoles = ["DPS", "Tank", "Support"];
+            const output = [];
+            if (!roles?.length) return output;
+            roles = roles.map(r => r === "Damage" ? "DPS" : r);
+            allRoles.forEach(role => {
+                if (roles.includes(role)) {
+                    output.push({ role, eligible: true });
+                } else {
+                    output.push({ role, eligible: false });
+                }
+            });
+            return output;
         }
     },
     mounted() {
@@ -860,5 +878,34 @@ export default {
 
     .player-info-holder {
         padding-top: 48px;
+    }
+
+    .role.ineligible {
+        opacity: 0.5;
+        transform: scale(0.6)
+    }
+    .role.eligible:not(.primary) {
+        transform: scale(0.8)
+    }
+    .player-eligible-roles {
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .player-eligible-roles .role {
+        width: 4em;
+        position: relative;
+    }
+    .role.ineligible:after {
+        content: "❌";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2em;
+        opacity: 0.8;
     }
 </style>

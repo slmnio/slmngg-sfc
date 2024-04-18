@@ -10,23 +10,23 @@
 <!--                <option value="incomplete">Incomplete</option>-->
 <!--            </select>-->
 
-            <BFormCheckbox class="mr-3" v-model="showOnlyPossible">Show only possible</BFormCheckbox>
+<!--            <BFormCheckbox class="mr-3" v-model="showOnlyPossible">Show only possible</BFormCheckbox>-->
             <BFormCheckbox class="mr-3" v-model="showOnlyIncomplete">Show only incomplete</BFormCheckbox>
             <BFormCheckbox class="mr-3" v-model="showCountsAsPercentages">Show counts as percentages</BFormCheckbox>
 
 <!--            <div class="btn btn-secondary" v-if="showCountsAsPercentages" @click="showCountsAsPercentages = false">View as numbers</div>-->
 <!--            <div class="btn btn-secondary" v-if="!showCountsAsPercentages" @click="showCountsAsPercentages = true">View as percentages</div>-->
         </div>
-
-
-        <div v-if="scenarios" class="mb-2">
-            {{ currentScenarioView && currentScenarioView.length }} in view ~ {{ scenarios.scenarios && scenarios.scenarios.length }} / {{ scenarios.scenarioCount }}
-<!--            {{ scenarios.maxBits }}-->
-<!--            {{ scenarios.bitCounter }}-->
-<!--            {{ scenarios.bits }}-->
-             --- {{ matchesForHistorical.length }} historical matches added
-        </div>
-
+<!--        <div>-->
+<!--            matches: {{ matches?.length }} / scenario matches: {{ scenarioMatches?.length }} / for scenarios: {{ matchesForScenarios?.length }} / with outcomes: {{ scenarioMatchesWithOutcomes?.length }} <br>-->
+<!--        </div>-->
+<!--        <div v-if="scenarios" class="mb-2">-->
+<!--            {{ currentScenarioView && currentScenarioView.length }} in view ~ {{ scenarios.scenarios && scenarios.scenarios.length }} / {{ scenarios.scenarioCount }}-->
+<!--&lt;!&ndash;            {{ scenarios.maxBits }}&ndash;&gt;-->
+<!--&lt;!&ndash;            {{ scenarios.bitCounter }}&ndash;&gt;-->
+<!--&lt;!&ndash;            {{ scenarios.bits }}&ndash;&gt;-->
+<!--             -&#45;&#45; {{ matchesForHistorical.length }} historical matches added-->
+<!--        </div>-->
         <div class="mb-2" v-if="sortingMethods">
             Sorting methods: {{ sortingMethods.join(' / ') }}
         </div>
@@ -51,7 +51,7 @@
                 <td class="p-2 border-dark text-right font-weight-bold">{{ team.code }}</td>
                 <td class="p-2 border-dark cell-num" v-for="(pos, posi) in team.positions" :key="posi"
                     @click="() => showWhen(team.code, posi)"
-                    :class="{ 'bg-info': manualScenarioFilters.find((f) => f.team === team.code && f.position === posi ) }"
+                    :class="{ 'bg-info selected': manualScenarioFilters.find((f) => f.team === team.code && f.position === posi ), 'bg-warning text-dark': pos !== 0 && pos === currentScenarioView.length, 'text-muted': pos === 0 }"
                 >
                     <span v-if="showCountsAsPercentages">{{ (pos / currentScenarioView.length) | perc }}</span>
                     <span v-else>{{ pos }}</span>
@@ -59,17 +59,31 @@
             </tr>
         </table>
 
+        <table class="table-bordered text-light mb-3 border-dark" v-if="scenarios">
+            <tr>
+                <th class="p-2 border-dark"></th>
+                <th class="p-2 border-dark text-center" :key="scoreline" v-for="([scoreline]) in Object.entries(matchCounts?.[0]?.scorelines)">{{ scoreline }}</th>
+                <th class="p-2 border-dark"></th>
+            </tr>
+            <tr v-for="match in matchCounts" :key="match.id">
+                <td class="p-2 border-dark font-weight-bold text-right">{{ match.teams?.[0]?.code }}</td>
+                <td class="p-2 border-dark text-center cell-num" @click="showMatchScoreline(match.id, scoreline)" :class="{'bg-info selected': scorelineFilterHas(match.id, scoreline), 'text-muted': count === 0}"
+                    v-for="([scoreline, count]) in Object.entries(match.scorelines)" :key="scoreline">{{ count }}</td>
+                <td class="p-2 border-dark font-weight-bold text-left">{{ match.teams?.[1]?.code }}</td>
+            </tr>
+        </table>
+
         <table class="table text-white" v-if="scenarios">
             <tr class="sticky-top bg-dark">
                 <td>#</td>
-                <td class="text-center" v-for="match in matchesForScenarios" :key="match.id">
+                <td class="text-center" v-for="match in incompleteMatches" :key="match.id">
                     {{ match.teams.map(t => t.code).join(' vs ') }}
                 </td>
                 <td class="text-center">Standings</td>
             </tr>
             <tr v-for="(scenario, i) in currentScenarioView" :key="i">
                 <td>{{ scenario.i + 1 }}</td>
-                <td v-for="(match, mi) in scenario.outcomes" :key="mi">
+                <td v-for="(match, mi) in (scenario.outcomes?.filter(m => !m.completed))" :key="mi">
                     {{ match.scoreFirstWinner && match.scoreFirstWinner.join('-') }} {{ match.winner && match.winner.code }}
                 </td>
 <!--                <td>-->
@@ -83,8 +97,8 @@
                 <td class="text-nowrap">
 <!--                    first round of sorting (match wins)-->
                     <ol class="mb-0 small">
-                        <li v-for="(g, gi) in scenario.standings" :key="gi">
-                            <div v-for="(team,ei) in g" :key="ei">{{ team.code }} ({{ team.standings.wins }}-{{ team.standings.losses }}) (m{{ team.standings.map_wins }}-{{ team.standings.map_losses }})</div>
+                        <li v-for="(g, gi) in scenario.standings?.standings" :key="gi">
+                            <div class="standings-entry" v-for="(team,ei) in g" :key="ei">{{ team.code?.padEnd(5, " ") }} {{ team.standings?.wins }}-{{ team.standings?.losses }} (m {{ team.standings?.map_wins.toString().padEnd(2, " ") }}-{{ team.standings?.map_losses.toString().padStart(2, " ") }}) ({{ sign(team.standings?.map_wins - team.standings?.map_losses)}})</div>
                         </li>
                     </ol>
                 </td>
@@ -99,6 +113,16 @@ import { BitCounter, sortTeamsIntoStandings } from "@/utils/scenarios";
 import { BFormCheckbox } from "bootstrap-vue";
 
 
+function generateScoreline(firstTo) {
+    const scorelines = [];
+    for (let i = 0; i < firstTo; i++) {
+        scorelines.splice(i, 0, `${firstTo}-${i}`);
+        scorelines.splice(i + 1, 0, `${i}-${firstTo}`);
+    }
+    return scorelines;
+}
+
+
 export default {
     name: "EventScenarios2.vue",
     props: ["event"],
@@ -106,10 +130,11 @@ export default {
     data: () => ({
         activeMatchGroup: "B League Regular Season", // todo: return this to null
         activeScenarioView: "all",
-        showCountsAsPercentages: true,
+        showCountsAsPercentages: false,
         showOnlyPossible: true,
         showOnlyIncomplete: false,
-        manualScenarioFilters: []
+        manualScenarioFilters: [],
+        manualScorelineFilters: []
     }),
     computed: {
         blocks() {
@@ -129,13 +154,22 @@ export default {
             if (!this.scenarios) return [];
             let scenarios = this.scenarios.scenarios;
             if (!scenarios) return [];
-            if (this.showOnlyIncomplete) scenarios = scenarios.filter(s => s.standings.length !== s.teams.length);
+            if (this.showOnlyIncomplete) scenarios = scenarios.filter(s => s.standings?.standings.length !== s.teams.length);
             if (this.showOnlyPossible) scenarios = scenarios.filter(s => !s.impossible);
 
-            if (this.manualScenarioFilters?.length) {
-                scenarios = scenarios.filter(s => this.manualScenarioFilters.some(({ team, position }) => {
-                    return s.standings[position].some(t => t.code === team);
-                }));
+            if (this.manualScenarioFilters?.length || this.manualScorelineFilters?.length) {
+                scenarios = scenarios.filter(s => {
+                    const scenarioFilter = this.manualScenarioFilters.some(({ team, position }) => {
+                        return s.standings?.standings[position]?.some(t => t.code === team);
+                    });
+                    if (scenarioFilter) return true;
+
+                    const scorelineFilter = this.manualScorelineFilters.some(({ matchID, scoreline }) => {
+                        console.log("scoreline filter", s, matchID, scoreline);
+                        return s.outcomes.find(outcome => outcome.id === matchID && outcome.scores.join("-") === scoreline);
+                    });
+                    if (scorelineFilter) return true;
+                });
             }
             return scenarios;
         },
@@ -182,6 +216,16 @@ export default {
         matchesForScenarios() {
             if (this.settings?.week) return this.matches.filter(m => m.week && m.week >= this.settings.week);
             return this.matches;
+            // .filter(m => {
+            //     console.log("matches for scenarios", m.first_to, m.score_1, m.score_2, ([m.score_1, m.score_2]).includes(m.first_to));
+            //     return !([m.score_1, m.score_2]).includes(m.first_to);
+            // });
+        },
+        incompleteMatches() {
+            return this.matches.filter(m => {
+                console.log("matches for scenarios", m.first_to, m.score_1, m.score_2, ([m.score_1, m.score_2]).includes(m.first_to));
+                return !([m.score_1, m.score_2]).includes(m.first_to);
+            });
         },
         matchesForHistorical() {
             if (this.settings?.week) return this.matches.filter(m => !(m.week && m.week >= this.settings.week));
@@ -254,6 +298,7 @@ export default {
                         teams.push({
                             id: team.id,
                             code: team.code,
+                            extra_points: team.extra_points,
                             standings
                         });
                     }
@@ -280,11 +325,11 @@ export default {
 
             this.currentScenarioView.forEach(scenario => {
                 // console.log("scenario", scenario);
-                if (scenario.standings.length !== scenario.teams.length) {
+                if (scenario.standings?.standings.length !== scenario.teams.length) {
                     // add to end
                     teams.forEach(t => t.positions[teams.length]++);
                 } else {
-                    scenario.standings.forEach((standing, i) => {
+                    scenario.standings?.standings.forEach((standing, i) => {
                         // console.log(standing, i, standing[0], teamMap[standing[0].code], teams[teamMap[standing[0].code]].positions[i]);
                         teams[teamMap[standing[0].code]].positions[i]++;
                     });
@@ -294,8 +339,36 @@ export default {
 
             return teams;
         },
+        matchCounts() {
+            const matchMap = {};
+            this.incompleteMatches.forEach(match => {
+                const scorelines = {};
+
+                generateScoreline(match.first_to).forEach(line => {
+                    scorelines[line] = 0;
+                });
+
+                matchMap[match.id] = {
+                    id: match.id,
+                    scorelines
+                };
+            });
+            console.log(matchMap);
+            this.currentScenarioView.forEach(scenario => {
+                scenario.outcomes.forEach(match => {
+                    if (!matchMap[match.id]) return;
+                    matchMap[match.id].scorelines[match.scores.join("-")]++;
+                    matchMap[match.id].teams = scenario.matches.find(m => m.id === match.id)?.teams;
+                });
+            });
+            return Object.values(matchMap);
+        },
+        matchGroupData() {
+            return (this.blocks?.standings || [])?.find(s => [s.group, s.key, s.title].map(e => e.toLowerCase()).includes(this.activeMatchGroup.toLowerCase()));
+        },
         sortingMethods() {
             try {
+                if (this.matchGroupData?.sort) return this.matchGroupData.sort;
                 const sorters = this.blocks.standingsSort;
                 if (sorters && sorters.length) {
                     const sorter = sorters.find(s => s.group === this.activeMatchGroup);
@@ -310,7 +383,9 @@ export default {
             if (!this.matchesForScenarios?.length) return null;
             if (!this.scenarioTeams?.length) return null;
             console.log("teams", this.scenarioTeams);
-            const matches = this.scenarioMatchesWithOutcomes;
+            const allMatches = this.scenarioMatchesWithOutcomes;
+            const matches = allMatches.filter(m => ![m.score_1, m.score_2].includes(m.first_to));
+            const remainingMatches = JSON.stringify(allMatches.filter(m => [m.score_1, m.score_2].includes(m.first_to)));
             const maxBits = matches.map(m => m.first_to * 2);
             const scenarioCount = maxBits.reduce((last, curr) => last * curr, 1);
             // const scenarioCount = 1;
@@ -331,17 +406,53 @@ export default {
                     teams: JSON.parse(_json.teams),
                     matches: JSON.parse(_json.matches),
                     i,
-                    impossible: false
+                    impossible: false,
+                    outcomes: []
                 };
-                scenario.outcomes = bitCounter.bits.map((bit, i) => {
-                    return matches[i].outcomes[bit];
-                    /*
-                    const match = scenario.matches[i];
-                    match.outcome = matches[i].outcomes[bit];
-                    delete match.outcomes;
-                    return match;
-                     */
+
+                // let outcomes = allMatches.forEach()
+
+                // loop through all matches to add them
+                // if they're complete then find the outcome that works (see below ↓)
+                // if they're not complete then pop one off the bit counter (might need to copy it) and use that outcome instead
+                const bits = [...bitCounter.bits];
+
+                allMatches.forEach(match => {
+                    if ([match.score_1, match.score_2].includes(match.first_to)) {
+                        // if they're complete then find the outcome that works (see below ↓)
+                        scenario.outcomes.push({
+                            ...match.outcomes.find(outcome => JSON.stringify(outcome.scores) === JSON.stringify([match.score_1, match.score_2])),
+                            completed: true,
+                            id: match.id
+                        });
+                    } else {
+                        // if they're not complete then pop one off the bit counter (might need to copy it) and use that outcome instead
+                        scenario.outcomes.push({
+                            ...match.outcomes[bits.shift()],
+                            completed: false,
+                            id: match.id
+                        });
+                    }
                 });
+
+                // scenario.outcomes = bitCounter.bits.map((bit, i) => {
+                //     return matches[i].outcomes[bit];
+                //     /*
+                //     const match = scenario.matches[i];
+                //     match.outcome = matches[i].outcomes[bit];
+                //     delete match.outcomes;
+                //     return match;
+                //      */
+                // });
+                //
+                // console.log("scenario creation", bitCounter.bits, i, scenario.outcomes, matches);
+                // scenario.outcomes = [
+                //     ...scenario.outcomes,
+                //     // here ↓
+                //     ...JSON.parse(remainingMatches)?.map(m => m.outcomes.find(outcome => JSON.stringify(outcome.scores) === JSON.stringify([m.score_1, m.score_2])))
+                // ];
+
+                console.log("scenario creation", bitCounter.bits, i, scenario.outcomes, matches);
                 scenario.outcomes.forEach((outcome, i) => {
                     const match = scenario.matches[i];
                     // console.log("match", match, match.completed, match.scores, outcome.scores);
@@ -506,15 +617,35 @@ export default {
         }
     },
     methods: {
+        sign(num) {
+            if (num > 0) return "+" + num;
+            return num;
+        },
         showWhen(team, position) {
             if (this.filterHas(team, position)) return this.manualScenarioFilters.splice(this.filterIndex(team, position), 1);
             this.manualScenarioFilters.push({ team, position });
+        },
+        showMatchScoreline(matchID, scoreline) {
+            const existingIndex = this.manualScorelineFilters.findIndex(filter => filter.matchID === matchID && filter.scoreline === scoreline);
+            if (existingIndex !== -1) {
+                return this.manualScorelineFilters.splice(existingIndex, 1);
+            }
+            this.manualScorelineFilters.push({ matchID, scoreline });
         },
         filterIndex(team, position) {
             return this.manualScenarioFilters.findIndex((f) => f.team === team && f.position === position);
         },
         filterHas(team, position) {
             return this.filterIndex(team, position) !== -1;
+        },
+        scorelineFilterHas(matchID, scoreline) {
+            return this.manualScorelineFilters.find(filter => filter.matchID === matchID && filter.scoreline === scoreline);
+        }
+    },
+    watch: {
+        activeMatchGroup(key) {
+            this.manualScenarioFilters = [];
+            this.manualScorelineFilters = [];
         }
     }
 };
@@ -527,5 +658,16 @@ export default {
     .cell-num {
         min-width: 3em;
         text-align: center;
+        cursor: pointer;
+        user-select: none;
+    }
+    .cell-num.selected {
+        background-color: var(--info) !important;
+        color: var(--light) !important;
+    }
+    .standings-entry {
+        white-space: pre;
+        font-family: monospace;
+        line-height: 1;
     }
 </style>

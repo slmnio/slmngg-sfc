@@ -8,12 +8,13 @@
 
 export default {
     name: "CopyTextButton",
+    props: ["content"],
     data: () => ({
         recentlyCopied: false
     }),
     methods: {
         copyText() {
-            navigator.clipboard.writeText(this.$refs.copy.innerText);
+            navigator.clipboard.writeText(this.content || this.$refs.copy.innerText);
             this.recentlyCopied = true;
             setTimeout(() => {
                 this.recentlyCopied = false;

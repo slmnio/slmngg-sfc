@@ -4,9 +4,9 @@
             <!--        <div class="stat team">{{ team.code }}</div>-->
             <ThemeLogo logo-size="w-50" class="team-icon" :theme="team.theme" border-width="4" icon-padding="4" />
             <div class="stat scoreline">{{ scoreline }}</div>
-            <div class="stat recent"><i v-if="stats.played_recently" class="far fa-clock fa-fw" v-b-tooltip.top="'Played in their last match'"></i></div>
+            <div class="stat unplayed" v-if="showUnplayedMaps && stats.unplayed">Unplayed: {{ stats.unplayed }}</div>
+            <div class="stat recent" v-if="stats.played_recently"><i class="far fa-clock fa-fw" v-b-tooltip.top="'Played in their last match'"></i></div>
             <!--        <div class="stat played">{{ stats.played }}</div>-->
-
         </div>
     </td>
 </template>
@@ -17,7 +17,7 @@ import { VBTooltip } from "bootstrap-vue";
 export default {
     name: "TeamMapStats",
     components: { ThemeLogo },
-    props: ["data"],
+    props: ["data", "showUnplayedMaps"],
     directives: {
         VBTooltip
     },
@@ -52,5 +52,9 @@ export default {
     }
     .recent {
         margin: 0 0.2em;
+    }
+    .stat.unplayed {
+        min-width: 6em;
+        text-align: center;
     }
 </style>

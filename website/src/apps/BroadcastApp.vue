@@ -1,5 +1,5 @@
 <template>
-    <StingerWrap :theme="broadcast.event && broadcast.event.theme" :active="active" :should-use="useBuiltInStingers">
+    <StingerWrap :theme="stingerThemeOverride && overrideTheme || broadcast.event && broadcast.event.theme" :active="active" :should-use="useBuiltInStingers" :text="stingerText">
         <div class="broadcast-app" :class="broadcastClass">
             <!--        <div style="font-size: 5em; color: black">{{ $root.activeScene }}</div>-->
             <router-view id="overlay" :class="bodyClass" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active"
@@ -9,10 +9,12 @@
 
             <v-style v-if="broadcast && broadcast.event && !noBroadcastStyle">
                 {{ broadcast.event.broadcast_css }}
-
                 :root {
                 --broadcast-transition-offset: {{ broadcast.transition_offset || 0 }}ms;
                 }
+            </v-style>
+            <v-style v-if="broadcast && broadcast.broadcast_css && !noBroadcastStyle">
+                {{ broadcast.broadcast_css }}
             </v-style>
         </div>
     </StingerWrap>
@@ -34,7 +36,7 @@ function getComponentName(route) {
 
 export default {
     name: "BroadcastApp",
-    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass", "full", "clientName", "backgroundIndex"],
+    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass", "full", "clientName", "backgroundIndex", "stingerText", "stingerThemeOverride"],
     components: {
         BroadcastBackground,
         StingerWrap
@@ -57,16 +59,30 @@ export default {
             return classes.join(" ");
         },
         broadcast() {
-            return ReactiveRoot(this.id || `broadcast-${this.code}`, {
+            const broadcast = ReactiveRoot(this.id || `broadcast-${this.code}`, {
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")
                 }),
+                theme_override: ReactiveThing("theme_override"),
                 gfx: ReactiveArray("gfx"),
                 other_broadcasts: ReactiveArray("other_broadcasts"),
                 headlines: ReactiveArray("headlines"),
                 highlight_media: ReactiveThing("highlight_media"),
                 highlight_hero: ReactiveThing("highlight_hero")
             });
+            if (broadcast?.event?.id && broadcast?.theme_override?.id) {
+                return {
+                    ...broadcast,
+                    event: {
+                        ...broadcast.event,
+                        theme: broadcast.theme_override
+                    }
+                };
+            }
+            return broadcast;
+        },
+        overrideTheme() {
+            return ReactiveRoot(this.stingerThemeOverride);
         },
         haltAnimations() {
             return this.noAnimation || (this.broadcast?.broadcast_settings || []).includes("No animations");
@@ -163,7 +179,6 @@ export default {
             }
         },
         broadcastKey(newCode) {
-            console.log(newCode);
             this.$socket.client.emit("prod-broadcast-join", newCode);
         }
     },
@@ -171,8 +186,11 @@ export default {
         document.body.className = "overlay";
     },
     sockets: {
+        connect() {
+            this.$socket.client.emit("prod-broadcast-join", this.broadcastKey);
+        },
         send_prod_update() {
-            if (!this.lastProdData) this.prodUpdate();
+            this.prodUpdate();
         },
         prod_button_reload() {
             document.location.reload();

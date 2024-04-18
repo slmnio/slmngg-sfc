@@ -1,4 +1,5 @@
-const {Client, Intents} = require("discord.js");
+const { Client, GatewayIntentBits } = require("discord.js");
+
 const {joinVoiceChannel, EndBehaviorType} = require("@discordjs/voice");
 
 const { onUpdate, auth: { getBots, getPlayer }, get } = require("../cache.js");
@@ -55,9 +56,9 @@ async function checkBroadcast(id, broadcast) {
 
     if (broadcast.broadcast_settings.includes("Connect for caster voice")) {
         let taskKey = "casters";
-        if (!broadcast.voice_channels) return console.warn(`[Voice] Couldn't connect for caster voice because ${broadcast.name} has no voice_channels set.`);
-        let channelIDs = new MapObject(broadcast.voice_channels);
-        if (!channelIDs.get("live")) return console.warn(`[Voice] Couldn't connect for caster voice because ${broadcast.name} has no voice_channels.live set.`);
+        if (!broadcast.discord_control) return console.warn(`[Voice] Couldn't connect for caster voice because ${broadcast.name} has no discord_control set.`);
+        let channelIDs = new MapObject(broadcast.discord_control);
+        if (!channelIDs.get("live")) return console.warn(`[Voice] Couldn't connect for caster voice because ${broadcast.name} has no discord_control.live set.`);
         console.log("Creating a new caster job", broadcastKey, channelIDs.get("live"));
         manager.getOrCreateJob(channelIDs.get("live"), broadcastKey, taskKey);
     } else {
@@ -100,30 +101,34 @@ async function checkBroadcast(id, broadcast) {
     }
 }
 
-onUpdate(async(id, { newData, oldData }) => {
-    setTimeout(async () => {
-        if (id === "Broadcasts") {
-            broadcastIDs = newData.ids.map(id => cleanID(id));
-            // check all broadcasts
-            broadcastIDs.map(id => checkBroadcast(id));
-        }
+if (!process.env.DISCORD_RUN_VOICE_BOTS) {
+    console.log("Discord voice bots won't run because DISCORD_RUN_VOICE_BOTS is not set.");
+} else {
+    onUpdate(async(id, { newData, oldData }) => {
+        setTimeout(async () => {
+            if (id === "Broadcasts") {
+                broadcastIDs = newData.ids.map(id => cleanID(id));
+                // check all broadcasts
+                broadcastIDs.map(id => checkBroadcast(id));
+            }
 
-        if (broadcastIDs.includes(cleanID(id))) {
-            checkBroadcast(id, newData);
-        // check broadcast ID
-        }
-        if (watchIDs.includes(cleanID(id))) {
-            broadcastIDs.map(id => checkBroadcast(id));
-        }
+            if (broadcastIDs.includes(cleanID(id))) {
+                checkBroadcast(id, newData);
+                // check broadcast ID
+            }
+            if (watchIDs.includes(cleanID(id))) {
+                broadcastIDs.map(id => checkBroadcast(id));
+            }
 
-        if (id === "Discord Bots") {
-            let botData = await getBots(); // update manager?
-            manager.setTokens(botData.map(d => d.token).filter(d => d));
+            if (id === "Discord Bots") {
+                let botData = await getBots(); // update manager?
+                manager.setTokens(botData.filter(d => d?.token).map(d => d.token));
 
-            // manager.createJob("996236081819303936", "bpl4", "assistance");
-        }
-    }, 100);
-});
+                // manager.createJob("996236081819303936", "bpl4", "assistance");
+            }
+        }, 100);
+    });
+}
 
 
 /**
@@ -299,8 +304,8 @@ class DiscordBot {
 
         this.client = new Client({
             intents: [
-                Intents.FLAGS.GUILDS,
-                Intents.FLAGS.GUILD_VOICE_STATES
+                GatewayIntentBits.Guilds,
+                GatewayIntentBits.GuildVoiceStates
             ]
         });
 
@@ -377,6 +382,7 @@ class DiscordBot {
     }
 
     checkJob(currentChannelID) {
+        console.log("checking job", this.job);
         if (!this.job) return this.log(`No job but currently in channel ${currentChannelID}`);
 
         this.log(`Current job is ${this.socketRoom} ${this.job.broadcastKey}/${this.job.taskKey} ${this.job.channelID}`);

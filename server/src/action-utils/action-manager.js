@@ -8,10 +8,12 @@ const { getSelfClient } = require("./action-utils");
 const {
     HTTPActionManager,
     SocketActionManager,
-    Action
+    Action,
+    InternalActionManager
 } = require("./action-manager-models");
 
 let actions = [];
+
 async function loadActions(directory) {
     try {
         await fs.stat(directory);
@@ -24,6 +26,8 @@ async function loadActions(directory) {
     console.log(files.map(filename => ` + ${filename}`).join("\n"));
     return files.map(file => require(path.join(directory, file)));
 }
+
+let managers = {};
 
 async function load(expressApp, cors, Cache, io) {
     const actionApp = express.Router();
@@ -38,9 +42,10 @@ async function load(expressApp, cors, Cache, io) {
      * @type {(ActionManager)[]}
      */
 
-    const managers = {
+    managers = {
         http: new HTTPActionManager({ cors }),
-        socket: new SocketActionManager({ cors })
+        socket: new SocketActionManager({ cors }),
+        internal: new InternalActionManager()
     };
 
     let requireAuth = true;
@@ -49,9 +54,14 @@ async function load(expressApp, cors, Cache, io) {
         actions.forEach(action => {
             action = new Action(action);
 
-            manager.register(action, async({ token, args, error, execute }) => {
+            manager.register(action, async ({ token, args, error, execute, isAutomation }) => {
                 let params = {};
                 let authObjects = {};
+
+                if (isAutomation) {
+                    requireAuth = false;
+                    authObjects.isAutomation = true;
+                }
 
                 if (requireAuth && !token) return error(401, "Unauthorized");
 
@@ -59,11 +69,11 @@ async function load(expressApp, cors, Cache, io) {
                     return error(400, "Missing required parameter");
                 }
 
-                if (action.auth?.includes("user")) {
+                if (!isAutomation && action.auth?.includes("user")) {
                     authObjects.user = (await Cache.auth.getData(token))?.user;
                     if (!authObjects.user) return error(401, "Unauthorized operation. You might have a stale token (try logging in again)");
                 }
-                if (action.auth?.includes("client")) {
+                if (!isAutomation && action.auth?.includes("client")) {
                     authObjects.client = await getSelfClient(Cache, token);
                     if (!authObjects.client) return error(401, "No client data associated with this token");
                 }
@@ -88,12 +98,18 @@ async function load(expressApp, cors, Cache, io) {
         });
     });
 
-
+    // EXPORT NOW
     managers.http.finalSetup(expressApp);
     managers.socket.finalSetup(io);
 }
 
 
 module.exports = {
-    load
+    load,
+    /**
+     * @returns {InternalActionManager}
+     */
+    getInternalManager() {
+        return managers?.internal;
+    }
 };

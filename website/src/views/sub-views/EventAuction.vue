@@ -7,10 +7,10 @@
                 <button class="btn btn-warning mr-1" @click="sendToAuctionServer('auction:admin_set_state', {'state': 'RESTRICTED'})">Set state: RESTRICTED</button>
                 <div class="btn-text text-right flex-grow-1">{{ auctionState }}</div>
             </div>
-            <AuctionCountdown class="auction-countdown mb-2" web :style="themeBackground1(event)" />
+            <AuctionCountdown class="auction-countdown mb-2" web :style="themeBackground1(event)" show-time />
 
-            <div class="row">
-                <div class="active-player col-7 mb-5">
+            <div class="action-row d-flex mb-3">
+                <div class="active-player col-7">
                     <div class="last-started" v-if="lastStartedTeam && ['PRE_AUCTION', 'IN_ACTION'].includes(auctionState)">
                         <div class="badge badge-pill badge-secondary">Started by</div> <ThemeLogo :theme="lastStartedTeam?.theme" border-width="3px" icon-padding="4px" /> <router-link class="no-link-style" :to="url('team', lastStartedTeam)" target="_blank">{{ lastStartedTeam?.name || '&nbsp;' }}</router-link>
                     </div>
@@ -19,9 +19,14 @@
                     </div>
                     <div class="player-name" v-if="activePlayer">
                         <router-link class="no-link-style" :to="url('player', activePlayer)" target="_blank">{{ activePlayer?.name || '&nbsp;' }}</router-link>
-                        <div class="player-role" v-if="activePlayer?.role" v-html="getRoleSVG(activePlayer.role)"></div>
+                        <div class="player-role" v-if="activePlayer?.role" v-html="getRoleSVG(activePlayer.role)" v-b-tooltip :title="`Main role: ${activePlayer.role}`"></div>
                     </div>
 <!--                    <h3 class="player-signed">SIGNED TO</h3>-->
+                    <div class="player-roles d-flex mb-1">
+                        <div class="role" v-for="role in playerRoles(activePlayer?.eligible_roles)" :class="{'text-danger': !role.eligible, 'text-success': role.eligible}"
+                             :key="role?.role" v-html="getRoleSVG(role?.role)" :title="role.eligible ? `Eligible for ${role.role}` : `Not eligible for ${role.role}`" v-b-tooltip
+                        ></div>
+                    </div>
                     <div class="player-info">{{ activePlayer?.draft_data }}</div>
                 </div>
                 <div class="bids col-5">
@@ -32,6 +37,7 @@
             </div>
             <div class="row mt-2">
                 <div class="col-12 col-lg-6 d-flex justify-content-end align-items-center control-box">
+                    <div class="mr-3">Team control</div>
                     <div class="active-team-select">
                         <select v-model="actingTeamID">
                             <option :value="null" disabled>Choose a team to control</option>
@@ -81,11 +87,14 @@
                 <div class="team-group" v-for="team in groupedTeams.active" :key="team.id">
                     <div class="d-flex">
                         <ContentThing class="team-display d-inline-flex" type="team" :text="team.name" :theme="team.theme" :show-logo="true" :thing="team" />
-                        <div class="text money">{{ money(team.balance) }}</div>
-                        <div class="text player-count ml-2">({{ auctionSettings.each_team - (team.players?.length || 0) }} to draft)</div>
+                        <div class="d-flex team-help-text flex-wrap align-items-center">
+                            <div class="text money">{{ money(team.balance) }}</div>
+                            <div class="text player-count ml-2">({{ auctionSettings.each_team - (team.players?.length || 0) }} to draft)</div>
+                        </div>
                     </div>
                     <div class="ml-2 badge badge-pill badge-secondary" v-if="lastStartedTeam?.id === team?.id">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>
                     <div class="ml-2 badge badge-pill badge-primary" v-if="nextTeamToStart?.id === team?.id">Next to start</div>
+                    <div class="ml-2 badge badge-pill badge-info" v-if="actingTeam?.id === team?.id">Acting as this team</div>
                     <ul>
                         <li v-for="player in team.players" :key="player.id">
                             <router-link :to="url('player', player)" target="_blank">{{ player?.name }}</router-link>
@@ -97,8 +106,12 @@
                 <div class="team-group" v-for="team in groupedTeams.finished" :key="team.id">
                     <div class="d-flex">
                         <ContentThing class="team-display d-inline-flex" type="team" :text="team.name" :theme="team.theme" :show-logo="true" :thing="team" />
-                        <div class="text money">{{ money(team.balance) }} left over</div>
+                        <div class="d-flex team-help-text align-items-center">
+                            <div class="text money">{{ money(team.balance) }} left over</div>
+                        </div>
                     </div>
+                    <div class="ml-2 badge badge-pill badge-secondary" v-if="lastStartedTeam?.id === team?.id">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>
+                    <div class="ml-2 badge badge-pill badge-info" v-if="actingTeam?.id === team?.id">Acting as this team</div>
                     <ul>
                         <li v-for="player in team.players" :key="player.id">
                             <router-link :to="url('player', player)" target="_blank">{{ player?.name }}</router-link>
@@ -138,11 +151,14 @@
                 </div>
 
                 <table class="table table-bordered table-dark table-sm w-100">
-                    <tr class="player" v-for="(player, i) in undraftedPlayers" :key="player.id" :class="{'striped': i % 2 === 1, 'bg-primary': activePlayer?.id === player.id}">
+                    <tr class="player" v-for="(player, i) in undraftedPlayers" :key="player.id" :class="{'striped': i % 2 === 1, 'currently-active-player': activePlayer?.id === player.id}">
                         <td class="player-name">
                             <div class="player-info-box d-flex align-items-center">
                                 <div v-if="player.role" class="player-role" v-html="getRoleSVG(player.role)"></div>
                                 <router-link :to="url('player', player)">{{ player.name }}</router-link>
+                            </div>
+                            <div class="player-eligible-roles" :title="`Eligible for ${niceJoin(eligibleRoles(player.eligible_roles).map(r => r.role))}`" v-b-tooltip>
+                                <div class="role text-success" v-for="role in eligibleRoles(player.eligible_roles)" :key="role?.role" v-html="getRoleSVG(role?.role)"></div>
                             </div>
                         </td>
                         <td class="draft-data">{{ player.draft_data }}</td>
@@ -163,7 +179,6 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { isAuthenticated } from "@/utils/auth";
 import { cleanID, dirtyID, getRoleSVG, money, url } from "@/utils/content-utils";
-import { sortAlpha } from "@/utils/sorts";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import AuctionCountdown from "@/components/broadcast/auction/AuctionCountdown.vue";
 import AuctionBid from "@/components/website/AuctionBid.vue";
@@ -220,19 +235,26 @@ export default {
         nextTeamToStart() {
             // || !["POST_AUCTION", "READY", "IN_ACTION"].includes(this.auctionState)
             if (!this.lastStartedTeamID) return null;
-            const lastTeamIndex = this.groupedTeams.active.findIndex(t => cleanID(t.id) === cleanID(this.lastStartedTeamID));
+            const lastTeamIndex = this.teams.findIndex(t => cleanID(t.id) === cleanID(this.lastStartedTeamID));
             if (lastTeamIndex === -1) return null;
-            let nextTeamIndex = lastTeamIndex + 1;
-            if (lastTeamIndex >= this.groupedTeams.active?.length - 1) {
-                nextTeamIndex = 0;
-            }
-            return this.groupedTeams.active[nextTeamIndex];
+
+            const next = this.groupedTeams.active.find(t => {
+                const orderIndex = this.teams.findIndex(s => cleanID(s.id) === cleanID(t.id));
+                return orderIndex > lastTeamIndex;
+            });
+            if (next) return next;
+            return this.groupedTeams.active[0];
+            //
+            // let nextTeamIndex = lastTeamIndex + 1;
+            // if (lastTeamIndex >= this.groupedTeams.active?.length - 1) {
+            //     nextTeamIndex = 0;
+            // }
+            // return this.groupedTeams.active[nextTeamIndex];
         },
         eventSettings() {
             if (!this.event?.blocks) return null;
             try {
-                const data = JSON.parse(this.event?.blocks);
-                return data;
+                return JSON.parse(this.event?.blocks);
             } catch (e) {
                 console.warn("Event block data parse error", e);
             }
@@ -382,6 +404,31 @@ export default {
         money,
         getRoleSVG,
         url,
+        niceJoin(array) {
+            if (array.length > 1) {
+                const last = array.pop();
+                return array.join(", ") + " and " + last;
+            }
+            return array[0];
+        },
+        playerRoles(roles) {
+            const allRoles = ["DPS", "Tank", "Support"];
+            const output = [];
+            if (!roles?.length) return output;
+            roles = roles.map(r => r === "Damage" ? "DPS" : r);
+            allRoles.forEach(role => {
+                if (roles.includes(role)) {
+                    output.push({ role, eligible: true });
+                } else {
+                    output.push({ role, eligible: false });
+                }
+            });
+            return output;
+        },
+        eligibleRoles(roles) {
+            if (!roles?.length) return [];
+            return this.playerRoles(roles).filter(role => role.eligible);
+        },
         sendToAuctionServer(event, data) {
             // if (!isAuthenticated()) return console.error("Tried to send data while not authed", { event, data });
             console.log("[socket]", "sending", event, data);
@@ -393,6 +440,10 @@ export default {
         },
         startPlayer(player) {
             if (!this.actingTeam) return this.$notyf.error("You need to choose a team to control");
+            if (!confirm(`Start ${player?.name}?`)) return;
+            if (this.nextTeamToStart?.id && this.actingTeam.id !== this.nextTeamToStart.id) {
+                if (!confirm(`It doesn't look like you're the next team to start a player.\nStill continue with ${player.name}?`)) return;
+            }
             this.sendToAuctionServer("auction:request_start_player", { playerID: player.id, teamID: this.actingTeam.id });
         },
         async askStarting(player) {
@@ -514,6 +565,9 @@ export default {
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
     }
+    .active-player {
+        background-color: rgba(0,0,0,0.1);
+    }
     .bids {
         min-height: 15em;
         background-color: rgba(0,0,0,0.1);
@@ -554,7 +608,7 @@ export default {
         white-space: pre-wrap;
     }
     .team-group .text {
-        line-height: 40px;
+        /*line-height: 40px;*/
         margin-left: 4px;
         font-size: 18px;
     }
@@ -572,6 +626,42 @@ export default {
     }
     .last-started .badge {
         font-size: 1em;
+    }
+    .player-eligible-roles .role {
+        width: 1em;
+        height: 1em;
+    }
+    .player-eligible-roles {
+        display: flex;
+        width: fit-content;
+    }
+    .active-player .role {
+        width: 2em;
+        height: 2em;
+    }
+    .role.text-danger {
+        opacity: 0.5;
+    }
+    .currently-active-player {
+        background-color: var(--primary);
+    }
+
+    .currently-active-player >>> a,
+    .currently-active-player .role {
+        color: white !important;
+    }
+    .team-help-text {
+        line-height: 1;
+    }
+
+    .spacer-text {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5em;
+        opacity: 0.7;
     }
 </style>
 

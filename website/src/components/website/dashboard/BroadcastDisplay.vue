@@ -18,7 +18,7 @@ export default {
     props: ["broadcast", "setMethod"],
     computed: {
         theme() {
-            return this.broadcast?.event?.theme;
+            return this.broadcast?.theme_override ?? this.broadcast?.event?.theme;
         },
         style() {
             if (!this.theme) return {};
@@ -62,5 +62,8 @@ export default {
     .event-logo-inner {
         width: 100%;
         height: 100%;
+    }
+    .broadcast-name {
+        line-height: 1;
     }
 </style>

@@ -2,11 +2,31 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const {
     updateRecord,
-    createRecord
+    createRecord,
+    getSelfClient
 } = require("./action-utils");
 
 const Cache = require("../cache.js");
 const permissions = require("./action-permissions");
+
+function cleanID(id) {
+    // console.log(">id", id);
+    if (!id) return null;
+    if (typeof id !== "string") return null;
+    if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
+    return id;
+}
+function cleanUser(user) {
+    // console.log("clean user", user);
+    return ({
+        discordID: user.discord?.id,
+        airtableID: cleanID(user.airtable?.id),
+        name: user.airtable.name,
+        avatar: `https://cdn.discordapp.com/avatars/${user.discord.id}/${user.discord.avatar}.png`,
+        website_settings: user.airtable.website_settings || []
+    });
+}
+
 
 class Action {
     /**
@@ -16,7 +36,14 @@ class Action {
      * @param {string[]} requiredParams
      * @param {string[]} optionalParams
      */
-    constructor({ key, handler, auth, requiredParams, optionalParams, registerFunction }) {
+    constructor({
+        key,
+        handler,
+        auth,
+        requiredParams,
+        optionalParams,
+        registerFunction
+    }) {
         this.key = key;
         this.handler = handler;
         this.auth = auth;
@@ -25,10 +52,13 @@ class Action {
         this.registerFunction = registerFunction;
     }
 
-    execute(args, auth, { success, error }) {
-        this.handler(args, auth)
+    async execute(args, auth, {
+        success,
+        error
+    }) {
+        return this.handler(args, auth)
             .then(data => {
-                console.log(`[actions] Success in ${this.key}`, data);
+                console.log(`[actions] Success in ${this.key}`);
                 success(data);
             },
             e => {
@@ -67,7 +97,10 @@ class ActionManager {
 
     async register(action, registerFunction) {
         if (!(action instanceof Action)) action = new Action(action);
-        this.actions.set(action.key, action);
+        this.actions.set(action.key, {
+            ...action,
+            registerFunction
+        });
     }
 }
 
@@ -92,7 +125,7 @@ class HTTPActionManager extends ActionManager {
     async register(action, registerFunction) {
         await super.register(action, registerFunction);
 
-        this.app.post(`/${action.key}`, this.cors(), async(req, res) => {
+        this.app.post(`/${action.key}`, this.cors(), async (req, res) => {
             let args = req.body;
             let token = this.getToken(req);
 
@@ -107,7 +140,10 @@ class HTTPActionManager extends ActionManager {
                     });
                 },
                 execute: (params, auth) => action.execute(params, auth, {
-                    success: (data) => res.send({ error: false, data }),
+                    success: (data) => res.send({
+                        error: false,
+                        data
+                    }),
                     error: (errorCode, errorMessage) => {
                         console.error(`[actions] Error during execution in action [${action.key}]`, {
                             errorCode,
@@ -121,7 +157,12 @@ class HTTPActionManager extends ActionManager {
                 })
             }).catch(e => {
                 console.error("[actions] Manager register error", e);
-                if (!res.headersSent) res.status(500).send({ error: true, errorMessage: "Error executing the action" });
+                if (!res.headersSent) {
+                    res.status(500).send({
+                        error: true,
+                        errorMessage: "Error executing the action"
+                    });
+                }
             });
         });
     }
@@ -156,6 +197,18 @@ class SocketActionManager extends ActionManager {
 
     finalSetup(io) {
         io.on("connection", socket => {
+            if (socket.handshake?.query?.token) {
+                // auth check
+                (async () => {
+                    let userData = await Cache.auth.getData(socket.handshake.query.token);
+                    if (!userData?.user) {
+                        socket.emit("auth_status", { error: true, message: "Unknown token" });
+                    } else {
+                        socket.emit("auth_status", { error: false, user: cleanUser(userData.user)});
+                    }
+                })();
+            }
+
             for (let [key, action] of this.actions) {
                 if (!(action instanceof Action)) action = new Action(action);
 
@@ -213,6 +266,51 @@ class SocketActionManager extends ActionManager {
 
 }
 
+class InternalActionManager extends ActionManager {
+
+    constructor(props) {
+        super(props);
+
+        this.auth = {
+            user: null,
+            client: null
+        };
+    }
+
+    async runAction(actionKey, args, token, isAutomation) {
+        let action = this.actions.get(actionKey);
+        if (!(action instanceof Action)) action = new Action(action);
+        if (!action) return console.error(`Oh god no action ${actionKey}`);
+        return new Promise((resolve, reject) => {
+            action.registerFunction({
+                token,
+                args,
+                error: (errorCode, errorMessage) => reject({ errorCode, errorMessage }),
+                execute: (params, authObjects) => action.execute(params, authObjects, {
+                    error: (errorCode, errorMessage) => reject({ errorCode, errorMessage }),
+                    success: resolve,
+                }),
+                isAutomation
+            });
+        });
+    }
+
+    async runActionAsAutomation(actionKey, args) {
+        let action = this.actions.get(actionKey);
+        if (!(action instanceof Action)) action = new Action(action);
+        return new Promise((resolve, reject) => {
+            return action.execute(args, { isAutomation: true }, {
+                success: (s) => resolve(s),
+                error: (e) => reject(e)
+            });
+        });
+    }
+}
+
+
 module.exports = {
-    Action, HTTPActionManager, SocketActionManager
+    Action,
+    HTTPActionManager,
+    SocketActionManager,
+    InternalActionManager
 };

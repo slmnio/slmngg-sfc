@@ -2,7 +2,7 @@
     <div class="event">
         <EventDisplay class="team-display" :event="event"/>
         <div class="event-teams d-flex row">
-            <div class="team col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2 tight-col" v-for="team in event.teams" :key="team.id">
+            <div class="team col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2 tight-col" v-for="team in teams" :key="team.id">
                 <TeamDisplay :team="team" />
             </div>
         </div>
@@ -13,12 +13,14 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import EventDisplay from "@/views/lists/EventDisplay.vue";
 import TeamDisplay from "@/views/lists/TeamDisplay.vue";
+import { searchInCollection } from "@/utils/search";
 
 export default {
     name: "EventTeamsDisplay",
     components: { EventDisplay, TeamDisplay },
     props: {
-        eventID: String
+        eventID: String,
+        searchText: String
     },
     computed: {
         event() {
@@ -28,6 +30,11 @@ export default {
                     theme: ReactiveThing("theme")
                 })
             });
+        },
+        teams() {
+            if (!this.searchText) return this.event?.teams;
+            if (!(this.event?.teams || [])?.length) return [];
+            return searchInCollection(this.event?.teams, this.searchText, "name");
         }
     }
 };

@@ -1,8 +1,9 @@
 <template>
-    <div class="season-history-match">
-        <ThemeLogo class="opponent-logo" :theme="opponent && opponent.theme" icon-padding="25" />
+    <div class="season-history-match"
+         :class="{'live': isLive, 'home-win': homeTeamWon, 'home-lose': homeTeamWon === false}">
+        <ThemeLogo class="opponent-logo" :theme="opponent && opponent.theme" icon-padding="25"/>
         <div class="status status--upcoming" v-if="lower === 'time'">
-            <ScheduleTime :time="match.start" no-times :custom-timezone="timezone" />
+            <ScheduleTime :time="match.start" no-times :custom-timezone="timezone"/>
         </div>
         <div class="status status--score" v-if="lower === 'score'">
             {{ scoreText }}
@@ -45,6 +46,12 @@ export default {
         },
         scoreText() {
             return this.scores.join(" - ");
+        },
+        homeTeamWon() {
+            if (![this.match.score_2 || 0, this.match.score_1 || 0].some(score => this.match.first_to === score)) {
+                return null;
+            }
+            return this.scores[0] === this.match.first_to;
         }
     }
 };

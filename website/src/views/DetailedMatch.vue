@@ -1,7 +1,7 @@
 <template>
     <div class="detailed-match container">
         <div class="main-content row">
-            <div class="center-holder col-9">
+            <div class="center-holder col-12 col-md-9 mb-4">
                 <div class="maps-holder mt-1" v-if="match.maps && showMatchMaps">
                     <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="_theme" :key="map.id" :show-banned-maps="showMapBans"/>
                 </div>
@@ -20,7 +20,7 @@
                             <router-link :to="url('team', team, match.event)" class="team-name">{{ team.name }}</router-link>
                         </div>
                         <div class="team-players f-col p-1" v-if="showRosters">
-                            <div class="team-player" v-for="player in showLimitedPlayers(team) ? team.limited_players : team.players" :key="player.id">
+                            <div class="team-player" v-for="player in sortPlayers(showLimitedPlayers(team) ? team.limited_players : team.players)" :key="player.id">
                                 <div class="player-info player-name flex-center">
                                     <div class="player-role-holder player-icon-holder flex-center" v-if="player.role">
                                         <div class="player-role" v-html="getRoleSVG(player.role)"></div>
@@ -59,10 +59,25 @@
                         </div>
                     </div>
                 </div>
-                <div class="prev-matches-holder d-flex mt-2" v-if="showMatchHistory">
-                    <div class="team-prev-wrapper w-50" v-for="team in match.teams" :key="team.id">
-                        <PreviousMatch v-for="match in teamMatches(team)" :match="match" :team="team" :key="match.id" />
+                <div class="prev-matches-holder d-flex mt-2 flex-column" v-if="showMatchHistory">
+<!--                    <div class="team-prev-wrapper w-50" v-for="team in match.teams" :key="team.id">-->
+<!--                        <PreviousMatch v-for="match in teamMatches(team)" :match="match" :team="team" :key="match.id" />-->
+<!--                    </div>-->
+                    <div class="match-group d-flex flex-column" v-for="([groupKey, group]) in teamsMatchGroups" :key="groupKey">
+                        <div class="match-group-title mt-3 text-center font-weight-bold" v-if="groupKey && groupKey !== 'undefined'">{{ groupKey }}</div>
+                        <div class="match-group-teams w-100 d-flex">
+                            <div class="team-prev-wrapper w-50" v-for="team in group.teams" :key="team.id">
+                                <div class="match-group" v-for="match in team.matches" :key="match.id">
+                                    <PreviousMatch :match="match" :key="match.id" :team="team" :show-self-picks="true" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <div class="map-stats mt-4" v-if="showMapStats">
+                    <h2>Map stats</h2>
+                    <MatchHistory :match="match" :hide-map-display="true" />
                 </div>
 
                 <bracket-implications class="bracket-implications mt-3" :match="match" link-to-detailed-match
@@ -73,7 +88,7 @@
                     <Markdown :markdown="match.show_notes"/>
                 </div>
             </div>
-            <div class="right-holder col-3">
+            <div class="right-holder col-12 col-md-3">
                 <router-link v-if="match.event" :to="url('event', match.event)">
                     <ThemeLogo class="top-right-logo mb-3" logo-size="w-200" :theme="_theme" border-width="8"/>
                 </router-link>
@@ -111,11 +126,14 @@
                     <div v-if="match.maps" :class="`btn btn-block btn-${showMatchMaps ? 'light' : 'secondary'} mb-2`" v-on:click="showMatchMaps = !showMatchMaps">
                         <i class="fa-fw fas fa-map"></i> Match maps
                     </div>
+                    <div v-if="match.maps && showMatchMaps" :class="`btn btn-block mb-3 btn-${showMapBans ? 'light' : 'secondary'} mb-2`" v-on:click="showMapBans = !showMapBans">
+                        <i class="fa-fw fas fa-ban"></i> Show map bans
+                    </div>
+                    <div :class="`btn btn-block btn-${showMapStats ? 'light' : 'secondary'}`" v-on:click="showMapStats = !showMapStats">
+                        <i class="fa-fw fas fa-abacus"></i> Map stats
+                    </div>
                     <div v-if="match.brackets" :class="`btn btn-block btn-${showImplications ? 'light' : 'secondary'}`" v-on:click="showImplications = !showImplications">
                         <i class="fa-fw fas fa-sitemap"></i> Bracket implications
-                    </div>
-                    <div v-if="match.maps && showMatchMaps" :class="`btn btn-block btn-${showMapBans ? 'light' : 'secondary'} mb-2`" v-on:click="showMapBans = !showMapBans">
-                        <i class="fa-fw fas fa-ban"></i> Show map bans
                     </div>
                     <div :class="`btn btn-block btn-${showMatchHistory ? 'light' : 'secondary'} mb-2`"
                          v-on:click="showMatchHistory = !showMatchHistory">
@@ -166,6 +184,12 @@
                             <a class="ct-active" :href="matchThumbnailURL(match, 1080)"  rel="nofollow" target="_blank">1080p</a>
                         </template>
                     </stat>
+                    <stat v-if="credits">
+                        Credits
+                        <template v-slot:content>
+                            <CopyTextButton style="white-space: pre" :content="credits">Copy credits</CopyTextButton>
+                        </template>
+                    </stat>
                 </div>
             </div>
         </div>
@@ -187,10 +211,11 @@ import BracketImplications from "@/components/website/dashboard/BracketImplicati
 import { getDataServerAddress } from "@/utils/fetch";
 import { canEditMatch } from "@/utils/client-action-permissions";
 import { isAuthenticated } from "@/utils/auth";
+import MatchHistory from "@/views/sub-views/MatchHistory.vue";
 
 export default {
     name: "DetailedMatch",
-    components: { BracketImplications, CopyTextButton, Markdown, PreviousMatch, ThemeLogo, MapDisplay, stat: DetailedMatchStat },
+    components: { MatchHistory, BracketImplications, CopyTextButton, Markdown, PreviousMatch, ThemeLogo, MapDisplay, stat: DetailedMatchStat },
     props: ["id"],
     data: () => ({
         showPlayerInfo: false,
@@ -202,6 +227,7 @@ export default {
         showMatchMaps: true,
         showMapBans: true,
         showVod: false,
+        showMapStats: false,
 
         showManagers: false,
         showImplications: true
@@ -219,6 +245,33 @@ export default {
             if (this.showNonEventMatches) return team?.matches || [];
             return (team?.matches || []).filter(m => {
                 return m.event?.id === this.match?.event?.id;
+            });
+        },
+        sortPlayers(players) {
+            return players.sort((a, b) => {
+                if (a.role !== b.role) {
+                    const order = ["Tank", "DPS", "Support"];
+                    return order.indexOf(a.role) - order.indexOf(b.role);
+                }
+            });
+        },
+        teamMatchGroups(team) {
+            const matches = this.teamMatches(team);
+            const groups = {};
+            matches.forEach(match => {
+                if (!groups[match.sub_event]) {
+                    groups[match.sub_event] = {
+                        items: [],
+                        earliest: null
+                    };
+                }
+                const group = groups[match.sub_event];
+                group.items.push(match);
+
+                if (group.earliest < match.start) group.earliest = match.start;
+            });
+            return Object.entries(groups).sort(([aSubEvent, aData], [bSubEvent, bData]) => {
+                return bData.earliest - aData.earliest;
             });
         },
         getTeamStaff(team) {
@@ -299,6 +352,55 @@ export default {
                     })
                 })
             });
+        },
+        teamsMatchGroups() {
+            const groups = {};
+            (this.match?.teams || []).forEach((team, i) => {
+                const matches = this.teamMatches(team);
+                matches.forEach(match => {
+                    if (!groups[match.sub_event]) {
+                        groups[match.sub_event] = {
+                            teams: [...this.match.teams].map(t => ({
+                                code: t.code,
+                                id: t.id,
+                                theme: t.theme,
+                                matches: []
+                            })),
+                            earliest: null
+                        };
+                    }
+                    const group = groups[match.sub_event];
+                    group.teams?.[i]?.matches.push(match);
+
+                    if (!group.earliest) {
+                        group.earliest = match.start;
+                    } else if (match.start && new Date(group.earliest) > new Date(match.start)) {
+                        group.earliest = match.start;
+                    }
+                });
+            });
+            return Object.entries(groups).sort(([aSubEvent, aData], [bSubEvent, bData]) => {
+                return bData.earliest - aData.earliest;
+            });
+        },
+        credits() {
+            const groups = [
+                {
+                    meta: {
+                        singular_name: "Caster",
+                        plural_name: "Casters"
+                    },
+                    items: this.match?.casters
+                },
+                ...this.playerRelationshipGroups
+            ];
+
+            console.log("credits groups", groups);
+
+            return groups.filter(g => g.items?.length).map(group => [
+                (group.items?.length === 1 ? group.meta.singular_name + ": " : group.meta.plural_name + ":"),
+                group.items?.map(p => p.name + (p.twitter_link ? " " + p.twitter_link : "")).join("\n")
+            ].join("\n")).join("\n\n");
         },
         _theme() {
             return this.match?.event?.theme;

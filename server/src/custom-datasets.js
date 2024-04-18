@@ -6,6 +6,7 @@ function tableUpdated(tableName, Cache) {
     if (tableName === "Matches") matchUpdate(Cache);
     if (tableName === "Broadcasts") broadcastUpdate(Cache);
     if (tableName === "Players") playerList(Cache);
+    if (tableName === "Teams") teamList(Cache);
     if (tableName === "Events") publicEvents(Cache);
     // TODO: maybe add discord bots here?
 }
@@ -128,4 +129,32 @@ async function playerList(Cache) {
 
     Cache.set("special:players", { players: publicPlayers });
     Cache.set("special:pro-players", { players: proPlayers });
+}
+
+async function teamList(Cache) {
+    const allTeams = await Cache.get("Teams");
+    if (!allTeams.ids) return;
+    let teams = (await Promise.all(allTeams.ids.map(id => Cache.get(id.slice(3)))));
+    const allEvents = await Cache.get("Events");
+    if (!allEvents.ids) return;
+    let events = (await Promise.all(allEvents.ids.map(id => Cache.get(id.slice(3)))));
+
+    const publicTeams = [];
+    teams.forEach(team => {
+        // if (!team.event.show_in_events) return false;
+        const eventID = team.event?.[0];
+        if (!eventID) return;
+        const event = events.find(e => e.id === eventID);
+        if (!event) return;
+        if (!event.show_in_events) return;
+        publicTeams.push({
+            id: team.id,
+            name: team.name,
+            code: team.code,
+            theme: team.theme?.[0],
+            event: eventID,
+            eventStart: event.start_date
+        });
+    });
+    Cache.set("special:teams", { teams: publicTeams });
 }

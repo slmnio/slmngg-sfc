@@ -46,7 +46,7 @@
             <li class="nav-item" v-if="player.member_of && player.member_of.some(t => t.matches)"><router-link class="nav-link" :to="subLink('match-stats')">Match Stats</router-link></li>
             <li class="nav-item"><router-link class="nav-link" :to="subLink('banner')">Banner Creator</router-link></li>
         </SubPageNav>
-        <router-view :player="/*{...*/player /*, participationEvents, participationPoints } */"></router-view>
+        <router-view :player="{...player, participationEvents, participationPoints }"></router-view>
     </div>
 </template>
 
@@ -159,19 +159,19 @@ export default {
                 if (tierCompare !== 0) return tierCompare;
                 return sortEvents(b.event, a.event);
             });
+        },
+        participationEvents() {
+            const events = (this.player.member_of || []).map(team => team?.event).filter(f => f?.participation_points);
+            const uniqueEvents = new Map();
+            events.forEach(ev => {
+                if (uniqueEvents.has(ev.id)) return;
+                uniqueEvents.set(ev.id, ev);
+            });
+            return [...uniqueEvents.values()].sort(sortEvents).reverse();
+        },
+        participationPoints() {
+            return (this.participationEvents).map(e => e.participation_points).filter(f => f).reduce((c, v) => c + v, 0);
         }
-        // participationEvents() {
-        //     const events = (this.player.member_of || []).map(team => team?.event).filter(f => f?.participation_points);
-        //     const uniqueEvents = new Map();
-        //     events.forEach(ev => {
-        //         if (uniqueEvents.has(ev.id)) return;
-        //         uniqueEvents.set(ev.id, ev);
-        //     });
-        //     return [...uniqueEvents.values()].sort(sortEvents);
-        // },
-        // participationPoints() {
-        //     return (this.participationEvents).map(e => e.participation_points).filter(f => f).reduce((c, v) => c + v, 0);
-        // }
     },
     metaInfo() {
         return {

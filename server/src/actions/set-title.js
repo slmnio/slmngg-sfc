@@ -12,8 +12,8 @@ module.exports = {
      * @returns {Promise<string>}
      */
     // eslint-disable-next-line no-empty-pattern
-    async handler(params, { client }) {
-        const { broadcast, channel } = await getTwitchChannel(client, ["channel:manage:broadcast"]);
+    async handler(params, { client, isAutomation }) {
+        const { broadcast, channel } = await getTwitchChannel(client, ["channel:manage:broadcast"], isAutomation ? params?.broadcastID : null);
 
         if (!broadcast.title_format) throw "The broadcast has no title format";
 

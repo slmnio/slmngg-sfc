@@ -71,7 +71,7 @@ export default {
         flex-shrink: 0;
     }
     .team-logo {
-        --padding: 4px;
+        --padding: .25em;
         width: calc(100% - var(--padding));
         height: calc(100% - var(--padding));
     }

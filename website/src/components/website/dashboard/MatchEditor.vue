@@ -22,13 +22,14 @@
                 <div class="checkboxes">
                     <b-form-checkbox v-if="showRestrictCheckbox" class="mr-2" v-model="restrictToMapPool" id="map-pool-checkbox">Restrict to map pool</b-form-checkbox>
                     <b-form-checkbox class="mr-2" v-model="showMapBanButtons" id="map-ban-checkbox">Show map bans</b-form-checkbox>
+                    <b-form-checkbox class="mr-2" v-model="autoLoserPicks" id="loser-picks-checkbox">Assume loser picks</b-form-checkbox>
                 </div>
                 <div class="spacer" style="order:0"></div>
                 <div class="team" v-for="(team, i) in teams" :key="team.id" :class="{'end': i === 1}">
                     <ContentThing v-if="!team.empty" :thing="team" :theme="team.theme" show-logo="true" type="team" text="" />
                     <div class="team-dummy" v-else>Dummy</div>
                 </div>
-                <b-form-input v-for="(score, i) in scores" :key="i" v-model.number="matchData.scores[i]"
+                <b-form-input v-for="(score, i) in scores" :key="i" v-model.number="matchData.scores[i]" autocomplete="off"
                               type="number" :min="0" :max="match.first_to" class="opacity-changes score-input" />
                 <div class="spacer" style="order:10"></div>
                 <div class="right-buttons" style="order:11">
@@ -106,7 +107,7 @@
                         </td>
                         <td>
                             <TeamPicker title="Winner" :class="{ 'very-low-opacity': banners[i] }" :teams="teams"
-                                        v-model="winners[i]"></TeamPicker>
+                                        v-model="winners[i]" @change="(val) => winnerSelected(i, val)"></TeamPicker>
                         </td>
                     </tr>
                 </table>
@@ -336,7 +337,8 @@ export default {
         previousAutoData: null,
         scoreDebounceTimeouts: [],
         restrictToMapPool: true,
-        showMapBanButtons: false
+        showMapBanButtons: false,
+        autoLoserPicks: true
     }),
     methods: {
         getMapOptions(mapIndex) {
@@ -383,7 +385,7 @@ export default {
         async setMatchStart(timeString) {
             const response = await this.sendMatchDataChange("start", timeString);
             if (!response.error) {
-                this.$notyf.success(`Set match start to: ${formatTime(timeString, this.$store.state.timezone)}`);
+                this.$notyf.success(`Set match start to: ${formatTime(timeString, { tz: this.$store.state.timezone, use24HourTime: this.$store.state.use24HourTime })}`);
             }
         },
         setIfNew(key, index, value) {
@@ -521,11 +523,29 @@ export default {
                     // set left winner
 
                     this.$set(this.winners, i, this.teams[0].id);
+                    if (this.autoLoserPicks && this.maps?.[i + 1]) {
+                        this.$set(this.pickers, i + 1, this.teams[1].id);
+                    }
                 } else if (this.score_1s[i] < this.score_2s[i]) {
                     // set right winner
 
                     this.$set(this.winners, i, this.teams[1].id);
+                    if (this.autoLoserPicks && this.maps?.[i + 1]) {
+                        this.$set(this.pickers, i + 1, this.teams[0].id);
+                    }
                 }
+            }
+        },
+        winnerSelected(i, teamID) {
+            console.log("winner selected", i, teamID);
+            if (!teamID) return;
+
+            if (this.autoLoserPicks && this.maps?.[i + 1] && !this.banners?.[i + 1]) {
+                const teamIDs = this.teams.map(t => t?.id).filter(Boolean);
+                const loserID = teamIDs.find(id => id !== teamID);
+                // console.log("loser", loserID);
+                if (!loserID) return console.warn("can't find a team", teamID, teamIDs, loserID);
+                this.$set(this.pickers, i + 1, loserID);
             }
         }
     },

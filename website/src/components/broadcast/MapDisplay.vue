@@ -1,12 +1,12 @@
 <template>
     <transition v-if="useTransitions" mode="out-in" name="break-content" class="map-anim-holder">
         <div :key="autoKey" class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" :class="{'show-next-map': showNextMap && nextMap}">
-            <MapSegment class="map" :class="{ 'map-dummy' : map.dummy }" v-for="map in maps" :key="map.id"
+            <MapSegment class="map" v-for="map in maps" :key="map.id" :small="small"
                 :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
         </div>
     </transition>
     <div v-else class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" :class="{'show-next-map': showNextMap && nextMap}">
-        <MapSegment class="map" :class="{ 'map-dummy' : map.dummy }" v-for="map in maps" :key="map.id"
+        <MapSegment class="map" v-for="map in maps" :key="map.id" :small="small"
                     :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
     </div>
 </template>
@@ -20,7 +20,7 @@ import { getNewURL } from "@/utils/images";
 export default {
     name: "MapDisplay",
     components: { MapSegment },
-    props: ["broadcast", "animationActive", "useTransitions", "virtualMatch", "noMapVideos"],
+    props: ["broadcast", "animationActive", "useTransitions", "virtualMatch", "noMapVideos", "small"],
     data: () => ({
         activeAudio: null,
         showNextMap: false,
@@ -126,7 +126,7 @@ export default {
             return this.broadcast.broadcast_settings.includes("Use map videos");
         },
         nextMap() {
-            const unplayedMaps = (this.maps || []).filter(m => !m.dummy && !m.winner && !m.draw);
+            const unplayedMaps = (this.maps || []).filter(m => !m.dummy && !m.winner && !m.draw && !m.banner);
             return unplayedMaps?.[0];
         },
         autoKey() {

@@ -1,5 +1,5 @@
 <template>
-  <div class="ingame-overlay">
+  <div class="ingame-overlay" :class="{'basic': basicMode}">
       <div class="top-overlay" :style="broadcastMargin">
           <IngameTeam :key="team.id" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
                       :team="team"  :right="i === 1"
@@ -9,12 +9,11 @@
                       :map-attack="attacks[i]" :use-dots="useDots" :first-to="match && match.first_to"
           />
           <!--   -->
-          <Middle :active="shouldShowMiddle" :theme="broadcast?.event?.theme" :text="middleText"
-                  :tiny="broadcast.margin === 0"/>
+          <Middle v-if="!basicMode" :active="shouldShowMiddle" :theme="broadcast?.event?.theme" :text="middleText"
+                  :tiny="broadcast.margin === 0" :borders="middleBorders" />
       </div>
       <transition name="fade" mode="out-in">
-          {{ fadeSponsors }}
-          <Sponsors v-if="showFadeSponsors" class="ingame-fade-sponsors" :sponsors="fadeSponsors" mode="out-in" :speed="sponsorFadeSpeed" />
+          <Sponsors v-if="showFadeSponsors && !basicMode" class="ingame-fade-sponsors" :sponsors="fadeSponsors" mode="out-in" :speed="sponsorFadeSpeed" />
       </transition>
   </div>
 </template>
@@ -27,7 +26,7 @@ import Sponsors from "@/components/broadcast/Sponsors";
 
 export default {
     name: "IngameOverlay",
-    props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed", "noAnimation"],
+    props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed", "noAnimation", "basicMode"],
     components: { IngameTeam, Middle, Sponsors },
     data: () => ({
         flippingTeams: false
@@ -126,24 +125,35 @@ export default {
 
                 let mapText;
 
-                const currentMap = (this.match.maps || []).map((map, i) => ({
+                const maps = (this.match.maps || []).map((map, i) => ({
                     ...map,
                     number: map.number || i + 1
-                })).find(map => !(map.draw || map.winner));
+                })).filter(map => !map.banner);
 
+                let currentMap = maps.find(map => !(map.draw || map.winner));
 
-                if ([this.match.score_1, this.match.score_2].includes(this.match.first_to)) {
-                    // match has finished
-                    mapText = "Final Score"; // maybe
-                    // mapText = `Map ${currentMap.number - 1}`;
-                } else if (currentMap) {
+                if (!currentMap && maps.length) {
+                    currentMap = maps[maps.length - 1];
+                }
+
+                // if ([this.match.score_1, this.match.score_2].includes(this.match.first_to)) {
+                //     // match has finished
+                //     // mapText = "Final Score"; // maybe
+                //     mapText = `Map ${currentMap.number}`;
+                // } else if (currentMap) {
+                //     mapText = `Map ${currentMap.number}`;
+                // }
+
+                if (currentMap) {
                     mapText = `Map ${currentMap.number}`;
                 }
 
+                console.log("map text", mapText, currentMap);
 
-                if (this.match.first_to && mapText) {
+
+                if (this.match.first_to && currentMap) {
                     // Map X - First to Y
-                    return `${mapText} - First to ${this.match.first_to}`;
+                    return `Map ${currentMap.number} - First to ${this.match.first_to}`;
                 } else {
                     // Semifinals - Map X
                     const matchRound = this.match.round || this.match.week_text;
@@ -185,6 +195,18 @@ export default {
         },
         shouldShowTeams() {
             return this.animationActive && !this.flippingTeams;
+        },
+        middleBorders() {
+            if (!(this.broadcast?.broadcast_settings || []).includes("Show borders on middle")) return null;
+            return this.teams.map(t => {
+                if (!t?.theme) return {};
+                let color = t.theme.color_theme;
+                if (!color || color.toLowerCase() === "#ffffff") color = t.theme.color_logo_accent;
+                if (!color || color.toLowerCase() === "#ffffff") color = t.theme.color_accent;
+                return {
+                    backgroundColor: color
+                };
+            });
         }
     },
     watch: {
@@ -317,5 +339,12 @@ export default {
 
 .ingame-fade-sponsors >>> .break-sponsor-logo {
     height: calc(100% - 1.5em) !important;
+}
+.ingame-overlay.basic >>> .team-score,
+.ingame-overlay.basic >>> .attack-holder {
+    display: none !important;
+}
+.ingame-overlay.basic >>> .ingame-team {
+    --team-expand: 0px !important;
 }
 </style>

@@ -16,8 +16,9 @@
         <WebsiteNavBanner v-if="siteMode === 'staging'" class="bg-warning text-dark">
             <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-dark">Beta development version:</a></b> things may break. Use <a href="https://slmn.gg" class="text-dark font-weight-bold">slmn.gg</a> for the latest stable update.
         </WebsiteNavBanner>
-        <WebsiteNavBanner v-if="siteMode === 'local'" class="bg-primary text-light">
-            SLMN.GG is running in local development mode.
+        <WebsiteNavBanner v-if="siteMode === 'local'" class="text-light bg-primary">
+            <i v-if="dataServerMode !== 'local'" class="fas fa-exclamation-triangle fa-fw mr-1"></i>
+            SLMN.GG is running in local development mode<strong v-if="dataServerMode !== 'local'"> but not using a local data server</strong>.
         </WebsiteNavBanner>
 <!--       example: <WebsiteNavBanner class="bg-success" v-if="$socket.connected">Connected to the data server for live data updates!</WebsiteNavBanner>-->
 
@@ -38,6 +39,7 @@
                     <router-link active-class="active" class="nav-link" to="/players">Players</router-link>
                     <router-link v-if="isAuthenticated" active-class="active" class="nav-link" to="/profile">Profile</router-link>
                     <router-link v-if="isProduction" active-class="active" class="nav-link" to="/dashboard">Dashboard</router-link>
+                    <a v-if="productionClient?.key" target="_blank" class="nav-link" :href="`//dev.slmn.gg/client/${productionClient?.key}/tally-viewer`">Tally <i class="far fa-external-link ml-1"></i></a>
 <!--                    <router-link active-class="active" class="nav-link" to="/news">News</router-link>-->
                 </b-navbar-nav>
                 <b-navbar-nav v-if="minisite" class="flex-wrap">
@@ -148,6 +150,10 @@ export default {
         siteMode() {
             return import.meta.env.VITE_DEPLOY_MODE || import.meta.env.NODE_ENV;
         },
+        dataServerMode() {
+            const dataServerURL = new URL(import.meta.env.VITE_DATA_SERVER);
+            return ["localhost", "127.0.0.1"].includes(dataServerURL.hostname) ? "local" : "remote";
+        },
         navbarEvents() {
             if (!this.minisite?.id) return [];
             const events = ReactiveRoot(this.minisite.id, {
@@ -194,6 +200,10 @@ export default {
         isProduction() {
             if (!isAuthenticated(this.$root)) return false;
             return this.$root.authUser?.clients?.length;
+        },
+        productionClient() {
+            if (!isAuthenticated(this.$root)) return false;
+            return ReactiveRoot(this.$root.authUser?.clients?.[0]);
         }
     },
     mounted() {

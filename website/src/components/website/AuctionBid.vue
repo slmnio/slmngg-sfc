@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { money } from "../../utils/content-utils";
+import { money } from "@/utils/content-utils";
 import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { logoBackground1 } from "@/utils/theme-styles";
 import { resizedImage } from "@/utils/images";

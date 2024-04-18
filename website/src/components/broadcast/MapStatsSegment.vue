@@ -2,7 +2,8 @@
     <div class="map-stats-segment">
         <MapSegment class="map-segment" :broadcast="broadcast" :map="map" :basic="true" />
 <!--        <div class="records-header">{{ mapGroup.name }} Stats</div>-->
-        <div class="map-records" v-if="mapGroup">
+
+        <div class="map-records" v-if="mapGroup && !map?.hide_records">
             <div class="record-map" v-for="map in mapGroup.maps" :key="map.id">
                 <div class="map-name">{{ map.name }}</div>
                 <div class="team-stats flex-center w-100" v-if="mapStats(map)">
@@ -49,7 +50,7 @@ export default {
         },
         mapGroup() {
             if (!this.map || !this.mapGroups.length) return null;
-            const group = this.mapGroups.find(group => group.name === this.map.type?.[0]);
+            const group = this.mapGroups.find(group => group.name === this.map.map?.type);
             if (!group) return null;
             if (!this.map.dummy) {
                 group.maps = group.maps.sort((a, b) => a.name === this.map.name?.[0] ? -1 : (b.name === this.map.name?.[0] ? 1 : 0));
@@ -109,13 +110,13 @@ export default {
 
     .map-name {
         background-color: #333;
-        font-size: 32px;
+        font-size: 24px;
         text-align: center;
     }
 
 
     .team-stats-box {
-        font-size: 28px;
+        font-size: 20px;
         letter-spacing: 2px;
         font-variant-numeric: tabular-nums;
         padding: 3px 6px;

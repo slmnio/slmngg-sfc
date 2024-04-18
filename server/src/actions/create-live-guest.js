@@ -1,3 +1,4 @@
+const { deAirtable } = require("../action-utils/action-utils");
 module.exports = {
     key: "create-live-guest",
     requiredParams: [],
@@ -5,11 +6,15 @@ module.exports = {
     /***
      * @param {Object?} params
      * @param {UserData} user
-     * @returns {Promise<void>}
+     * @returns {Promise<{}>}
      */
     async handler(params, { user }) {
         if (user.airtable?.live_guests?.length > 0) {
             const currentLiveGuest = await this.helpers.get(user.airtable?.live_guests[0]);
+            if (!currentLiveGuest?.id) {
+                console.error("No live guest data loaded", user.airtable?.live_guests[0], currentLiveGuest);
+                throw "No live guest data available";
+            }
             let response = await this.helpers.updateRecord("Live Guests", currentLiveGuest, {
                 "Discord ID": user.discord.id,
                 "Avatar": `https://cdn.discordapp.com/avatars/${user.discord.id}/${user.discord.avatar}.webp?size=512`,
@@ -19,11 +24,11 @@ module.exports = {
                 console.error("Airtable error", response.error);
                 throw "Airtable error";
             }
+            return deAirtable(response.fields);
         } else {
             let response = await this.helpers.createRecord("Live Guests", {
                 "Discord ID": user.discord.id,
                 "Avatar": `https://cdn.discordapp.com/avatars/${user.discord.id}/${user.discord.avatar}.webp?size=512`,
-                "Name": user.discord.username,
                 "Player": [user.airtable.id],
                 "Use Cam": true
             });
@@ -31,6 +36,7 @@ module.exports = {
                 console.error("Airtable error", response.error);
                 throw "Airtable error";
             }
+            return deAirtable(response.fields);
         }
     }
 };

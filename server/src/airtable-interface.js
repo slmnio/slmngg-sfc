@@ -90,7 +90,7 @@ function setRebuilding(isRebuilding) {
 // Starting with syncing Matches
 
 // const tables = ["Matches", "Teams", "Themes", "Events", "Players", "Player Relationships"];
-const tables = ["Broadcasts", "Clients", "Channels", "Discord Bots", "Players", "Events", "GFX", "Event Series", "Teams", "Ad Reads", "Ad Read Groups", "News", "Matches",  "Themes",  "Socials", "Accolades", "Player Relationships", "Brackets", "Live Guests", "Headlines", "Maps", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles"];
+const tables = ["Broadcasts", "Clients", "Channels", "Discord Bots", "Players", "Live Guests", "Events", "GFX", "Event Series", "Teams", "Ad Reads", "Ad Read Groups", "News", "Matches",  "Themes",  "Socials", "Accolades", "Player Relationships", "Brackets", "Headlines", "Maps", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles"];
 const staticTables = ["Redirects"];
 
 function sortKeys([aKey], [bKey]) {
@@ -246,12 +246,12 @@ async function sync() {
 sync();
 // setInterval(sync, 5 * 1000);
 
-module.exports = {
-    async update(table, id, data) {
-        return await slmngg(table).update(id, data);
-    },
-    async select(table, filter) {
-        return await slmngg(table).select(filter).all();
-    },
-    setup
-};
+// module.exports = {
+//     async update(table, id, data) {
+//         return await slmngg(table).update(id, data);
+//     },
+//     async select(table, filter) {
+//         return await slmngg(table).select(filter).all();
+//     },
+//     setup
+// };

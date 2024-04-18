@@ -2,6 +2,8 @@ const crypto = require("crypto");
 const { accessTokenIsExpired,
     refreshUserToken
 } = require("@twurple/auth");
+
+const { EventEmitter } = require("events");
 /*
     - Get and set data
     - Store data
@@ -13,6 +15,8 @@ const hiddenEvents = new Map();
 const auth = new Map();
 const players = new Map();
 const attachments = new Map();
+
+const emitter = new EventEmitter();
 
 function getAntiLeakIDs() {
     if (process.env.DISABLE_ANTILEAK === "true") return []; // don't hide anything on local
@@ -43,13 +47,19 @@ async function broadcast(room, command, ...data) {
     io.to(room).emit(command, ...data);
 }
 
-let updateFunctions = [];
-function onUpdate(fn) {
-    updateFunctions.push(fn);
+// let updateFunctions = [];
+/**
+ *
+ * @param {function(id: AnyAirtableID, data: {oldData: object, newData: object})} callback
+ */
+function onUpdate(callback) {
+    emitter.on("update", callback);
+    // updateFunctions.push(fn);
 }
 
 const updateFunction = function(id, data) {
-    updateFunctions.forEach(fn => fn(id, data));
+    emitter.emit("update", id, data);
+    // updateFunctions.forEach(fn => fn(id, data));
 };
 
 async function removeAntiLeak(id, data) {
@@ -114,7 +124,7 @@ const slmnggAttachments = {
     "Heroes": ["main_image", "recolor_base", "recolor_layers"],
     "Ad Reads": ["audio", "image"],
     "Tracks": ["file"],
-    "Teams": ["icon"],
+    "Teams": ["icon", "images"],
     "GFX": ["image"]
 };
 
@@ -229,6 +239,8 @@ async function set(id, data, options) {
                 if (data[key] === "\n") delete data[key];
             });
         }
+    } else {
+        console.warn("Data set without a table name", id);
     }
     if (options?.eager) {
         // console.log({
@@ -343,6 +355,10 @@ async function createToken() {
         });
     });
 }
+async function getOrCreateToken() {
+    // TODO: lookup existing tokens
+    return createToken();
+}
 
 async function authStart(storedData) {
     const token = await createToken();
@@ -403,12 +419,37 @@ async function getTwitchAccessToken(channel) {
     return storedToken;
 }
 
+async function startRawDiscordAuth(discordUser) {
+    /*
+    - get or create a token using the discord ID (trusted)
+    - get player/user objects that will work directly with the auth system
+     */
+    const player = await getPlayer(discordUser.id);
+    if (!player) {
+        console.error(`No player for ID ${discordUser.id}`);
+        return {};
+    }
+    const userData = {
+        discordID: discordUser.id,
+        airtableID: player.id,
+        user: {
+            discord: discordUser,
+            airtable: player
+        }
+    };
+    const token = await authStart(userData);
+
+    return {
+        token, player, user: userData
+    };
+}
 
 module.exports = {
     set, get, setup, onUpdate,
     auth: {
         start: authStart,
         getData: getAuthenticatedData,
+        startRawDiscordAuth,
         getPlayer,
         getChannel,
         getChannelByID,

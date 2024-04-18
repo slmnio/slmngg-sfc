@@ -48,10 +48,8 @@ async function downloadImage(url, filename, size) {
     return await heldPromise(["download", url, size, filename], new Promise((resolve, reject) => {
         const pathName = getPath(filename, size);
         const file = fs.createWriteStream(pathName);
-        https.get(url, res => {
-            res.pipe(file);
-            file.on("finish", () => file.close(resolve));
-        }).on("error", err => {
+
+        function error(err) {
             console.error(`[image] file error for ${filename} ${err.code} ${err.message}`);
             fs.unlink(pathName, function(err) {
                 if (err) {
@@ -61,7 +59,15 @@ async function downloadImage(url, filename, size) {
                 }
             });
             reject(err);
-        });
+        }
+
+        https.get(url, res => {
+            if (![200].includes(res.statusCode)) return error({ code: res.statusCode, message: res.statusMessage });
+            res.pipe(file);
+            file.on("finish", () => {
+                file.close(resolve);
+            });
+        }).on("error", err => error(err));
     }));
 }
 
@@ -257,7 +263,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                 return res.status(404).send("No theme ID requested");
             }
             let size = parseInt(req.query.size) || 500;
-            let padding = size * ((req.query.padding || 5) / 100);
+            let padding = Math.floor(size * ((req.query.padding || 5) / 100));
 
             if (size > 3000) return res.status(400).send("Requested image too large");
 
@@ -282,7 +288,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
 
             let heldImage = await getImage(filename, sizeText);
             if (heldImage) {
-                console.log("[image|theme]", `theme using saved @${size} in ${Date.now() - t}ms`);
+                // console.log("[image|theme]", `theme using saved @${size} in ${Date.now() - t}ms`);
                 return res.sendFile(heldImage);
             }
 
@@ -336,7 +342,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
             if (size > 3000) return res.status(400).send("Requested image too large");
             let width = Math.floor(size * (16 / 9));
             let halfWidth = Math.floor(width / 2);
-            let padding = size * ((req.query.padding || 5) / 100);
+            let padding = Math.floor(size * ((req.query.padding || 5) / 100));
 
             let match = await Cache.get(id);
             if (!match?.id) return res.status(400).send("No valid match data");

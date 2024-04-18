@@ -2,7 +2,7 @@
     <div class="event-schedule container">
 
         <div class="d-sm-flex w-100 justify-content-end timezone-swapper-holder d-none">
-            <TimezoneSwapper/>
+            <TimezoneSwapper :inline="true" />
         </div>
 
         <div class="schedule-top mb-2">

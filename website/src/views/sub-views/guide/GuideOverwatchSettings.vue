@@ -60,7 +60,7 @@ import { computed, ref } from "vue";
 import { merge } from "lodash";
 import { BAlert, BButton, BFormGroup, BFormRadioGroup } from "bootstrap-vue";
 
-const settings = {D
+const settings = {
     bpl: {
         Render: {
             13: {

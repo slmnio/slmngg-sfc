@@ -67,10 +67,11 @@ export default [
                 path: "/guide",
                 component: () => import("@/views/Guide"),
                 children: [
-                    { path: "basics", component: () => import("@/views/sub-views/GuideBasics.vue") },
-                    { path: "virtual-cable", component: () => import("@/views/sub-views/GuideVirtualCable.vue") },
-                    { path: "obs-profile", component: () => import("@/views/sub-views/GuideObsProfile.vue") },
-                    { path: "ow-settings", component: () => import("@/views/sub-views/GuideOverwatchSettings.vue") }
+                    { path: "", component: () => import("@/views/sub-views/guide/GuideIntro.vue") },
+                    { path: "virtual-cable", component: () => import("@/views/sub-views/guide/GuideVirtualCable.vue") },
+                    { path: "obs", component: () => import("@/views/sub-views/guide/GuideObsSetup.vue") },
+                    { path: "obs-profile", component: () => import("@/views/sub-views/guide/GuideObsProfile.vue") },
+                    { path: "ow-settings", component: () => import("@/views/sub-views/guide/GuideOverwatchSettings.vue") }
                 ]
             }
         ]

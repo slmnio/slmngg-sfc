@@ -242,7 +242,8 @@ export const DefaultMapImages = {
     Hybrid: "https://media.slmn.io/maps/Hybrid.png",
     Control: "https://media.slmn.io/maps/Control.png",
     Push: "https://media.slmn.io/maps/Push.png",
-    Flashpoint: "https://media.slmn.io/maps/Flashpoint.png"
+    Flashpoint: "https://media.slmn.io/maps/Flashpoint.png",
+    Clash: "https://media.slmn.io/maps/Clash.png"
     // Spike: "https://cdn.discordapp.com/attachments/880305022716481639/883811894463447110/newspikeplant.png",
     // SpikeRush: "https://cdn.discordapp.com/attachments/880305022716481639/883809271198924840/spikerush_default.png",
     // ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png",
@@ -258,7 +259,8 @@ export const MapTypeIcons = {
     Control: "https://media.slmn.io/maps/Control-Icon.png",
     Push: "https://media.slmn.io/maps/Push-Icon.png",
     Assault: "https://media.slmn.io/maps/Assault-Icon.png",
-    Flashpoint: "https://media.slmn.io/maps/Flashpoint-Icon.png"
+    Flashpoint: "https://media.slmn.io/maps/Flashpoint-Icon.png",
+    Clash: "https://media.slmn.io/maps/Clash-Icon.png"
 };
 
 export function getTeamsMapStats(teams, requestMatch, requestMap, filters) {

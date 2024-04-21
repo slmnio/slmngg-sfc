@@ -197,10 +197,10 @@ export default {
                 event_long: event.name,
                 event_short: event.short,
 
-                team_1_code: this.liveMatch?.teams?.[0].code,
-                team_1_name: this.liveMatch?.teams?.[0].name,
-                team_2_code: this.liveMatch?.teams?.[1].code,
-                team_2_name: this.liveMatch?.teams?.[1].name,
+                team_1_code: this.liveMatch?.teams?.[0]?.code,
+                team_1_name: this.liveMatch?.teams?.[0]?.name,
+                team_2_code: this.liveMatch?.teams?.[1]?.code,
+                team_2_name: this.liveMatch?.teams?.[1]?.name,
 
                 match_custom_name: this.liveMatch?.custom_name,
                 match_sub_event: this.liveMatch?.sub_event,

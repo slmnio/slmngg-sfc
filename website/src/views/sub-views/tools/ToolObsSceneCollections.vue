@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <div class="container">
         <b-form-group label="Client">
-            <b-form-input v-model="client"/>
+            <b-form-input @update="updateClient" v-model="client"/>
             <template v-slot:description>
                 Clients identify production staff and will dynamically change your setup to whichever broadcast you're
                 working on.<br>
@@ -11,7 +11,7 @@
 
         <div class="text-center font-bold">or</div>
 
-        <b-form-group label="Broadcast">
+        <b-form-group label="Broadcast" >
             <b-form-input v-model="broadcast" :disabled="!(client === '' || !client)"/>
             <template v-slot:description>
                 Broadcast keys are locked to specific broadcasts and won't update if you work on a different
@@ -29,6 +29,15 @@
             <b-form-select :options="observingKeybinds.map((keybind) => ({value: keybind, text: keybind.name}))"
                            v-model="selectedKeybinds"/>
         </b-form-group>
+
+        <div class="d-flex gap-2" v-if="selectedJSON && selectedJSON.name === 'Observing' && selectedKeybinds">
+            <div v-for="i in 6" :style="{backgroundColor: '#2563eb', opacity: i === 6 ? '0.7': '1'}" class="keybind">
+                {{selectedKeybinds.keys[i - 1]}}
+            </div>
+            <div v-for="i in 6" :style="{backgroundColor: '#ef4444', opacity: i === 6 ? '0.7': '1'}" class="keybind">
+                {{selectedKeybinds.keys[i + 5]}}
+            </div>
+        </div>
 
         <div v-if="selectedJSON?.customizable">
             <h2 class="text-lg bold">Customisation</h2>
@@ -96,17 +105,10 @@
 <script>
 import { BButton, BFormCheckbox, BFormGroup, BFormInput, BFormSelect } from "bootstrap-vue";
 
-function uuid() {
-    var u = "";
-    var i = 0;
-    while (i++ < 36) {
-        var c = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"[i - 1];
-        var r = Math.random() * 16 | 0;
-        var v = c === "x" ? r : (r & 0x3 | 0x8);
-        u += (c === "-" || c === "4") ? c : v.toString(16);
-    }
-    return u;
-}
+import obs from "./collections/obs.json";
+import prod from "./collections/prod.json";
+import timelessProd from "./collections/timeless_prod.json";
+import prodBeta from "./collections/24.0 prod.json";
 
 const OBS = {
     scene: {
@@ -197,7 +199,7 @@ const globalCustomisationDefault = {
 
 
 export default {
-    name: "GuideObsProfile",
+    name: "ToolsObsSceneCollections",
     components: {
         BButton,
         BFormInput,
@@ -212,24 +214,20 @@ export default {
         jsons: [
             {
                 name: "Observing",
-                file: "https://slmn.io/obs/obs.json",
-                data: null
+                data: JSON.stringify(obs)
             },
             {
                 name: "Producing - SLMN.GG Full",
-                file: "https://slmn.io/obs/prod.json",
-                data: null
+                data: JSON.stringify(prod)
             },
             {
                 name: "Producing - SLMN.GG 24 Beta",
-                file: "https://slmn.io/obs/24.0 prod.json",
-                data: null,
+                data: JSON.stringify(prodBeta),
                 customizable: true
             },
             {
                 name: "Producing - SLMN.GG Timeless",
-                file: "https://slmn.io/obs/timeless_prod.json",
-                data: null
+                data: JSON.stringify(timelessProd)
             }
         ],
         observingKeybinds: [
@@ -339,10 +337,6 @@ export default {
     }),
     async mounted() {
         this.selectedKeybinds = this.observingKeybinds[0];
-
-        this.jsons.forEach(async json => {
-            json.data = await fetch(json.file).then(res => res.text());
-        });
     },
     computed: {
         output() {
@@ -373,7 +367,7 @@ export default {
                 }
             }
 
-            if (this.customisation.length || this.customGFXcount) {
+            if (this.selectedJSON?.customizable && (this.customisation.length || this.customGFXcount)) {
                 /*
                 For new scenes:
                 - add string name to scene_order
@@ -436,7 +430,7 @@ export default {
                 ].forEach(newScene => {
                     if (!newScene.scene) return;
 
-                    const sceneID = uuid();
+                    const sceneID = crypto.randomUUID();
                     let sourceIDcounter = 1;
 
                     const scene = {
@@ -449,7 +443,7 @@ export default {
                     };
 
                     if (newScene.scene.url) {
-                        const mainSourceID = uuid();
+                        const mainSourceID = crypto.randomUUID();
                         scene.settings.items.push({
                             ...({ ...OBS.sceneItem }),
                             name: `Browser - ${newScene.scene.name}`,
@@ -472,7 +466,7 @@ export default {
 
                     if (!newScene.scene.url?.includes("slmn.gg")) {
                         // Add a custom stinger
-                        const stingerID = uuid();
+                        const stingerID = crypto.randomUUID();
                         scene.settings.items.push({
                             ...({ ...OBS.sceneItem }),
                             name: `Stinger - ${newScene.scene.name}`,
@@ -586,8 +580,8 @@ export default {
             return this.download(this.output, this.selectedJSON.name + ".json", "application/json");
         },
         download(content, fileName, contentType) {
-            var a = document.createElement("a");
-            var file = new Blob([content], { type: contentType });
+            const a = document.createElement("a");
+            const file = new Blob([content], { type: contentType });
             a.href = URL.createObjectURL(file);
             a.download = fileName;
             a.click();
@@ -605,7 +599,23 @@ export default {
             Object.entries(scene.defaults || globalCustomisationDefault).forEach(([key, val]) => {
                 this.customisation[i][key] = val;
             });
+        },
+        updateClient() {
+            this.client = this.client
+                .replace(/ /g, "-")
+                .replace(/[^a-zA-Z0-9-_]/g, "")
+                .toLocaleLowerCase()
+                .trim();
         }
     }
 };
 </script>
+
+<style scoped>
+.keybind {
+    padding: .2rem .5rem;
+    display: grid;
+    place-items: center;
+    border-radius: .2rem;
+}
+</style>

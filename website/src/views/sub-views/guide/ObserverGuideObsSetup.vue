@@ -19,6 +19,8 @@
             <strong>File > Settings</strong>.
         </p>
 
+        <b-alert show>Go to each of the tabs below and change the settings mentioned here.</b-alert>
+
         <h4>Stream</h4>
 
         <ul>
@@ -110,18 +112,6 @@
         <ul>
             <li><strong>Global Audio Devices</strong>: Set all devices to Disabled</li>
         </ul>
-
-        <h3>OBS Profile</h3>
-
-        <p>
-            Go and download and import that <!-- TODO -->.
-        </p>
-
-        <h3>Select Audio Cable</h3>
-
-        <p> TODO</p>
-
-
     </div>
 </template>
 

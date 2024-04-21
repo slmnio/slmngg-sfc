@@ -15,6 +15,7 @@ import ProfilePage from "@/views/ProfilePage";
 import TwitchAuthScopeSelector from "@/components/website/TwitchAuthScopeSelector";
 import BracketCreator from "@/views/BracketCreator.vue";
 import NotFoundPage from "@/views/NotFoundPage";
+import Learn from "@/views/Learn.vue";
 
 export default [
     {
@@ -64,15 +65,40 @@ export default [
                 component: BracketCreator
             },
             {
-                path: "/guide",
-                component: () => import("@/views/Guide"),
+                path: "/learn",
+                component: Learn
+            },
+            {
+                path: "/learn/guides/observing",
+                component: () => import("@/views/sub-views/guide/ObserverGuideContainer.vue"),
                 children: [
-                    { path: "", component: () => import("@/views/sub-views/guide/GuideIntro.vue") },
-                    { path: "virtual-cable", component: () => import("@/views/sub-views/guide/GuideVirtualCable.vue") },
-                    { path: "obs", component: () => import("@/views/sub-views/guide/GuideObsSetup.vue") },
-                    { path: "obs-profile", component: () => import("@/views/sub-views/guide/GuideObsProfile.vue") },
-                    { path: "ow-settings", component: () => import("@/views/sub-views/guide/GuideOverwatchSettings.vue") }
+                    { path: "", component: () => import("@/views/sub-views/guide/ObserverGuideIntro.vue") },
+                    { path: "virtual-cable", component: () => import("@/views/sub-views/guide/ObserverGuideVirtualCable.vue") },
+                    { path: "obs-setup", component: () => import("@/views/sub-views/guide/ObserverGuideObsSetup.vue") },
+                    { path: "obs-scenes", component: () => import("@/views/sub-views/guide/ObserverGuideObsScenes.vue") },
+                    { path: "ow-settings", component: () => import("@/views/sub-views/guide/ObserverGuideOverwatchSettings.vue") }
                 ]
+            },
+            {
+                path: "/learn/guides/ow-settings",
+                component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideContainer.vue"),
+                children: [
+                    { path: "", component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideIntro.vue") },
+                    { path: "video", component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideVideo.vue") },
+                    { path: "sound", component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideSound.vue") },
+                    { path: "controls", component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideControls.vue") },
+                    { path: "gameplay", component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideGameplay.vue") },
+                    { path: "social", component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideSocial.vue") },
+                    { path: "a11y", component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideAccessibility.vue") }
+                ]
+            },
+            {
+                path: "/tools/obs-scene-collections",
+                component: () => import("@/views/sub-views/tools/ToolObsSceneCollections.vue")
+            },
+            {
+                path: "/tools/ow-settings",
+                component: () => import("@/views/sub-views/tools/ToolOWProfile.vue")
             }
         ]
     },

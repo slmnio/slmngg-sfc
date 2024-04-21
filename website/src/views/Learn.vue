@@ -1,0 +1,39 @@
+<template>
+    <div class="container">
+        <h1>SLMN.GG Learn</h1>
+
+        <p>
+            Welcome to SLMN.GG Learn! This is a list of all resources we use for running our productions.
+        </p>
+
+        <h2>Guides</h2>
+
+        <ul>
+            <li>
+                <router-link to="/learn/guides/observing">Observer Guide</router-link>
+            </li>
+            <li>
+                <router-link to="/learn/guides/ow-settings">Overwatch Settings Guide</router-link>
+            </li>
+        </ul>
+
+        <h2>Quick Links</h2>
+
+        <ul>
+            <li>
+                <router-link to="/tools/ow-settings">Overwatch Settings Switcher</router-link>
+            </li>
+            <li>
+                <router-link to="/tools/obs-scene-collections">OBS Scene Collections</router-link>
+            </li>
+        </ul>
+
+
+    </div>
+</template>
+<script lang="ts">
+
+export default {
+    name: "Learn"
+};
+</script>

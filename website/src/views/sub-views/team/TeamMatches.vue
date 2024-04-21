@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import Match from "@/components/website/match/Match";
+import Match from "@/components/website/match/Match.vue";
 
 export default {
     name: "TeamMatches",

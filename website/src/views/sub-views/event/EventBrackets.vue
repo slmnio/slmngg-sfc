@@ -14,7 +14,7 @@
 
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
-import Bracket from "@/components/website/bracket/Bracket";
+import Bracket from "@/components/website/bracket/Bracket.vue";
 import BracketResolveButton from "@/components/website/bracket/BracketResolveButton.vue";
 
 export default {

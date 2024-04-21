@@ -40,9 +40,9 @@
 </template>
 
 <script>
-import ContentThing from "@/components/website/ContentThing";
-import ContentRow from "@/components/website/ContentRow";
-import News from "@/components/website/news/News";
+import ContentThing from "@/components/website/ContentThing.vue";
+import ContentRow from "@/components/website/ContentRow.vue";
+import News from "@/components/website/news/News.vue";
 export default {
     name: "TeamMain",
     components: { ContentRow, ContentThing, News },

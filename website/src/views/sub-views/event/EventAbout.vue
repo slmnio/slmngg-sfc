@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import Markdown from "@/components/website/Markdown";
+import Markdown from "@/components/website/Markdown.vue";
 export default {
     name: "EventAbout",
     components: { Markdown },

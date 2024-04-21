@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import ContentThing from "@/components/website/ContentThing";
+import ContentThing from "@/components/website/ContentThing.vue";
 
 export default {
     props: ["player"],

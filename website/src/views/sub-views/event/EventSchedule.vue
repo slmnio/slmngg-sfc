@@ -39,8 +39,8 @@
 
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
-import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
-import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
+import ScheduleMatch from "@/components/website/schedule/ScheduleMatch.vue";
+import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper.vue";
 import { canEditMatch } from "@/utils/client-action-permissions";
 
 export default {

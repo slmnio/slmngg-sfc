@@ -49,12 +49,12 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import ThemeLogo from "@/components/website/ThemeLogo";
-import ContentThing from "@/components/website/ContentThing";
+import ThemeLogo from "@/components/website/ThemeLogo.vue";
+import ContentThing from "@/components/website/ContentThing.vue";
 import "bootstrap-vue/dist/bootstrap-vue.css";
-import PlayerDraftRow from "@/components/website/draft/PlayerDraftRow";
+import PlayerDraftRow from "@/components/website/draft/PlayerDraftRow.vue";
 import store from "@/thing-store";
-import EventDraftHeaders from "@/components/website/draft/EventDraftHeaders";
+import EventDraftHeaders from "@/components/website/draft/EventDraftHeaders.vue";
 import { BFormCheckbox, BFormSelect } from "bootstrap-vue";
 import { url } from "@/utils/content-utils";
 

@@ -31,8 +31,8 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import TwitterLink from "@/components/website/TwitterLink";
-import LinkedPlayers from "@/components/website/LinkedPlayers";
+import TwitterLink from "@/components/website/TwitterLink.vue";
+import LinkedPlayers from "@/components/website/LinkedPlayers.vue";
 import { getRoleSVG } from "@/utils/content-utils";
 
 export default {

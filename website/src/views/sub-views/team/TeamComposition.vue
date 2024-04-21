@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import LinkedPlayers from "@/components/website/LinkedPlayers";
+import LinkedPlayers from "@/components/website/LinkedPlayers.vue";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { getRoleSVG } from "@/utils/content-utils";
 export default {

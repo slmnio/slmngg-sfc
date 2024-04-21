@@ -4,8 +4,8 @@
 </template>
 
 <script>
-import TeamMain from "@/views/sub-views/TeamMain.vue";
-import TeamPublicDetails from "@/views/sub-views/TeamPublicDetails.vue";
+import TeamMain from "@/views/sub-views/team/TeamMain.vue";
+import TeamPublicDetails from "@/views/sub-views/team/TeamPublicDetails.vue";
 
 export default {
     name: "TeamMainPage",

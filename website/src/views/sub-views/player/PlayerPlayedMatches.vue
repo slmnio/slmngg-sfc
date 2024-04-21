@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import Match from "@/components/website/match/Match";
+import Match from "@/components/website/match/Match.vue";
 import { sortMatches } from "@/utils/sorts";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 

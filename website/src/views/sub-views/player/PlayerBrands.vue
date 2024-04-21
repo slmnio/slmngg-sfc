@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import ThemeLogo from "@/components/website/ThemeLogo";
+import ThemeLogo from "@/components/website/ThemeLogo.vue";
 
 export default {
     name: "PlayerBrands",

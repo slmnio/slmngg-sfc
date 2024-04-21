@@ -21,9 +21,9 @@
 </template>
 
 <script>
-import ContentThing from "@/components/website/ContentThing";
-import ContentRow from "@/components/website/ContentRow";
-import EventStaffing from "@/components/website/EventStaffing";
+import ContentThing from "@/components/website/ContentThing.vue";
+import ContentRow from "@/components/website/ContentRow.vue";
+import EventStaffing from "@/components/website/EventStaffing.vue";
 
 export default {
     name: "EventStaff",

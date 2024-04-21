@@ -9,8 +9,8 @@
 
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
-import ContentRow from "@/components/website/ContentRow";
-import ContentThing from "@/components/website/ContentThing";
+import ContentRow from "@/components/website/ContentRow.vue";
+import ContentThing from "@/components/website/ContentThing.vue";
 
 export default {
     name: "EventRosters",

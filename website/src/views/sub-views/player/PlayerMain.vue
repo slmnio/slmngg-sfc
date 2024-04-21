@@ -43,8 +43,8 @@
 </template>
 
 <script>
-import ContentRow from "@/components/website/ContentRow";
-import ContentThing from "@/components/website/ContentThing";
+import ContentRow from "@/components/website/ContentRow.vue";
+import ContentThing from "@/components/website/ContentThing.vue";
 import { sortTeams, sortEvents } from "@/utils/sorts";
 import { clarifyTeam } from "@/utils/content-utils";
 

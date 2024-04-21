@@ -28,10 +28,10 @@
 </template>
 
 <script>
-import Match from "@/components/website/match/Match";
+import Match from "@/components/website/match/Match.vue";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
-import { formatTime, url } from "../../utils/content-utils";
+import { formatTime, url } from "../../../utils/content-utils";
 
 export default {
     name: "PlayerCasts",

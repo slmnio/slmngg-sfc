@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
+import ScheduleMatch from "@/components/website/schedule/ScheduleMatch.vue";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
 import { canEditMatch } from "@/utils/client-action-permissions";

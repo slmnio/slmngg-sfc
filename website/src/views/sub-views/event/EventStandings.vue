@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import Standings from "@/components/broadcast/Standings";
+import Standings from "@/components/broadcast/Standings.vue";
 export default {
     name: "EventStandings",
     components: { Standings },

@@ -57,14 +57,6 @@ export default [
                 component: Authenticator
             },
             {
-                path: "/twitch-auth",
-                component: TwitchAuthScopeSelector
-            },
-            {
-                path: "/bracket-creator",
-                component: BracketCreator
-            },
-            {
                 path: "/learn",
                 component: Learn
             },
@@ -114,6 +106,14 @@ export default [
             {
                 path: "/tools/standings",
                 component: () => import("@/views/sub-views/tools/ToolStandings.vue")
+            },
+            {
+                path: "/tools/twitch-auth",
+                component: TwitchAuthScopeSelector
+            },
+            {
+                path: "/tools/bracket-creator",
+                component: BracketCreator
             }
         ]
     },

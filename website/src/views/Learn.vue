@@ -35,6 +35,12 @@
             <li>
                 <router-link to="/tools/standings">Standings</router-link>
             </li>
+            <li>
+                <router-link to="/tools/bracket-creator">Bracket Creator</router-link>
+            </li>
+            <li>
+                <router-link to="/tools/twitch-auth">Connect Twitch channel to SLMN.GG</router-link>
+            </li>
         </ul>
 
         <h2>Quick Links</h2>

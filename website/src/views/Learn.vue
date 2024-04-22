@@ -32,6 +32,9 @@
             <li>
                 <router-link to="/tools/broadcast-routes">Broadcast Routes</router-link>
             </li>
+            <li>
+                <router-link to="/tools/standings">Standings</router-link>
+            </li>
         </ul>
 
         <h2>Quick Links</h2>

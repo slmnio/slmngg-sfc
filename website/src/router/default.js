@@ -110,6 +110,10 @@ export default [
             {
                 path: "/tools/broadcast-routes",
                 component: () => import("@/views/sub-views/tools/ToolProdRoutes.vue")
+            },
+            {
+                path: "/tools/standings",
+                component: () => import("@/views/sub-views/tools/ToolStandings.vue")
             }
         ]
     },

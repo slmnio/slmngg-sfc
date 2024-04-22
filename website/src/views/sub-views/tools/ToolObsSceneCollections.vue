@@ -42,43 +42,44 @@
         <div v-if="selectedJSON?.customizable">
             <h2 class="text-lg bold">Customisation</h2>
 
-            <table>
-                <tr></tr>
-                <tr v-for="(row, i) in customisation">
-                    <td>
-                        <b-form-group label="Scene Type">
-                            <b-form-select :options="customScenes.map((scene) => ({value: scene, text: scene.name}))"
-                                           v-model="customisation[i].scene"/>
-                        </b-form-group>
-                    </td>
-                    <td>
+            <div v-for="(row, i) in customisation">
+                <div class="d-flex gap-3 align-items-center">
+                    <b-form-group label="Scene Type">
+                        <b-form-select :options="customScenes.map((scene) => ({value: scene, text: scene.name}))"
+                                       v-model="customisation[i].scene"/>
+                    </b-form-group>
+
+                    <b-form-group label="​"> <!-- There's a zero-width space here so that all the form groups align -->
                         <b-form-checkbox v-model="customisation[i].withStinger">
                             {{ row.scene?.url && !row.scene.url?.includes('slmn.gg') ? 'Extra stinger' : 'Stinger' }}
                         </b-form-checkbox>
-                    </td>
-                    <td>
+
                         <b-form-checkbox v-model="customisation[i].casterAudio">
                             Caster Audio
                         </b-form-checkbox>
-                    </td>
-                    <td>
-                        <b-form-group label="Background">
-                            <b-form-select
-                                :options="['Desk', 'Break', null].map((bg) => ({value: bg, text: bg ? `${bg} background` : 'No background'}))"
-                                v-model="customisation[i].background"/>
-                        </b-form-group>
-                    </td>
-                    <td>
-                        <b-form-group label="Music">
-                            <b-form-select
-                                :options="['Desk', 'Break', null].map((bg) => ({value: bg, text: bg ? `${bg} music` : 'No music'}))"
-                                v-model="customisation[i].music"/>
-                        </b-form-group>
-                    </td>
-                </tr>
-            </table>
+                    </b-form-group>
 
-            <b-button @click="addCustomisation">Add scene</b-button>
+                    <b-form-group label="Background">
+                        <b-form-select
+                            :options="['Desk', 'Break', null].map((bg) => ({value: bg, text: bg ? `${bg} background` : 'No background'}))"
+                            v-model="customisation[i].background"/>
+                    </b-form-group>
+                    <b-form-group label="Music">
+                        <b-form-select
+                            :options="['Desk', 'Break', null].map((bg) => ({value: bg, text: bg ? `${bg} music` : 'No music'}))"
+                            v-model="customisation[i].music"/>
+                    </b-form-group>
+
+                    <b-form-group label="​"> <!-- There's a zero-width space here so that all the form groups align -->
+                        <b-button @click="customisation.splice(i, 1)">Remove Scene</b-button>
+                    </b-form-group>
+                </div>
+            </div>
+
+            <b-button-group>
+                <b-button @click="addCustomisation">Add scene</b-button>
+                <b-button @click="addAllCustomisation">Add all scenes</b-button>
+            </b-button-group>
 
             <div>
                 <b-form-group :label="`${customGFXcount} GFX scenes to add`">
@@ -103,7 +104,7 @@
 </template>
 
 <script>
-import { BButton, BFormCheckbox, BFormGroup, BFormInput, BFormSelect } from "bootstrap-vue";
+import { BButton, BButtonGroup, BFormCheckbox, BFormGroup, BFormInput, BFormSelect } from "bootstrap-vue";
 
 import obs from "./collections/obs.json";
 import prod from "./collections/prod.json";
@@ -202,6 +203,7 @@ export default {
     name: "ToolsObsSceneCollections",
     components: {
         BButton,
+        BButtonGroup,
         BFormInput,
         BFormGroup,
         BFormSelect,
@@ -248,86 +250,44 @@ export default {
         ],
         selectedKeybinds: null,
         customScenes: [
-            {
-                name: "Break Schedule",
-                url: "https://dev.slmn.gg/client/X-CLIENT/break-schedule",
-                defaults: {
-                    music: "Break",
-                    background: "Break",
-                    casterAudio: false
-                },
-                insertInGroup: "Break"
-            },
-            {
-                name: "Break Text",
-                url: "https://dev.slmn.gg/client/X-CLIENT/break-text?title=Be Right Back",
-                defaults: {
-                    music: "Break",
-                    background: "Break",
-                    casterAudio: false
-                },
-                insertInGroup: "Break"
-            },
-            {
-                name: "Main Stream Twitch",
-                url: "https://player.twitch.tv/?parent=twitch.tv&channel=badpachimarileague",
-                defaults: {
-                    music: null,
-                    background: "Break",
-                    casterAudio: false
-                },
-                insertInGroup: "Break"
-            },
-            {
-                name: "MVP",
-                url: "https://dev.slmn.gg/client/X-CLIENT/mvp",
-                insertInGroup: "Live"
-            },
-            {
-                name: "Map Stats",
-                url: "https://dev.slmn.gg/client/X-CLIENT/map-stats",
-                insertInGroup: "Live"
-            },
-            {
-                name: "Multi Standings",
-                url: "https://dev.slmn.gg/client/X-CLIENT/multi-standings?show=Matches",
-                insertInGroup: "Live"
-            },
-            {
-                name: "Versus",
-                url: "https://dev.slmn.gg/client/X-CLIENT/versus",
-                insertInGroup: "Live"
-            },
-            {
-                name: "Victory",
-                url: "https://dev.slmn.gg/client/X-CLIENT/winners?title=Victory",
-                insertInGroup: "Live"
-            },
+            { name: "Break Ad-Read", url: "https://dev.slmn.gg/client/X-CLIENT/ad-read", defaults: { music: "Ads", background: "Break", casterAudio: false }, insertInGroup: "Break" },
+            { name: "Break Schedule", url: "https://dev.slmn.gg/client/X-CLIENT/break-schedule", defaults: { music: "Break", background: "Break", casterAudio: false }, insertInGroup: "Break" },
+            { name: "Break Text", url: "https://dev.slmn.gg/client/X-CLIENT/break-text?title=Be Right Back", defaults: { music: "Break", background: "Break", casterAudio: false }, insertInGroup: "Break" },
+            { name: "Break L-Bar", url: "https://dev.slmn.gg/client/X-CLIENT/l-bar", defaults: { music: "Break", background: "Break", casterAudio: false }, insertInGroup: "Break" },
+            { name: "Main Stream Twitch", url: "https://player.twitch.tv/?parent=twitch.tv&channel=badpachimarileague", defaults: { music: null, background: "Break", casterAudio: false }, insertInGroup: "Break" },
+            { name: "MVP", url: "https://dev.slmn.gg/client/X-CLIENT/mvp", insertInGroup: "Live" },
+            { name: "Map Stats", url: "https://dev.slmn.gg/client/X-CLIENT/map-stats", insertInGroup: "Live" },
+            { name: "Multi Standings", url: "https://dev.slmn.gg/client/X-CLIENT/multi-standings?show=Matches", insertInGroup: "Live" },
+            { name: "Versus", url: "https://dev.slmn.gg/client/X-CLIENT/versus", insertInGroup: "Live" },
+            { name: "Victory", url: "https://dev.slmn.gg/client/X-CLIENT/winners?title=Victory", insertInGroup: "Live" },
+            { name: "Match History", url: "https://dev.slmn.gg/client/X-CLIENT/history", insertInGroup: "Live" },
+            { name: "Season History", url: "https://dev.slmn.gg/client/X-CLIENT/season-history", insertInGroup: "Live" },
+
+            { name: "Draft", url: "https://dev.slmn.gg/client/X-CLIENT/draft", insertInGroup: "Events" },
+            { name: "Auction", url: "https://dev.slmn.gg/client/X-CLIENT/auction", insertInGroup: "Events" },
+            { name: "Branding", url: "https://dev.slmn.gg/client/X-CLIENT/branding", insertInGroup: "Events" },
+
             {
                 name: "Hero Rosters",
                 multiple: [
-                    {
-                        name: "Hero Roster 1",
-                        url: "https://dev.slmn.gg/client/X-CLIENT/hero-roster?team=1"
-                    },
-                    {
-                        name: "Hero Roster 2",
-                        url: "https://dev.slmn.gg/client/X-CLIENT/hero-roster?team=2"
-                    }
+                    { name: "Hero Roster 1", url: "https://dev.slmn.gg/client/X-CLIENT/hero-roster?team=1" },
+                    { name: "Hero Roster 2", url: "https://dev.slmn.gg/client/X-CLIENT/hero-roster?team=2" }
                 ],
                 insertInGroup: "Live"
             },
             {
                 name: "Boxed Rosters",
                 multiple: [
-                    {
-                        name: "Boxed Roster 1",
-                        url: "https://dev.slmn.gg/client/X-CLIENT/boxed-roster?team=1"
-                    },
-                    {
-                        name: "Boxed Roster 2",
-                        url: "https://dev.slmn.gg/client/X-CLIENT/boxed-roster?team=2"
-                    }
+                    { name: "Boxed Roster 1", url: "https://dev.slmn.gg/client/X-CLIENT/boxed-roster?team=1" },
+                    { name: "Boxed Roster 2", url: "https://dev.slmn.gg/client/X-CLIENT/boxed-roster?team=2" }
+                ],
+                insertInGroup: "Live"
+            },
+            {
+                name: "Team Images",
+                multiple: [
+                    { name: "Team Image 1", url: "https://dev.slmn.gg/client/X-CLIENT/team-image?image=1&team=1" },
+                    { name: "Team Image 2", url: "https://dev.slmn.gg/client/X-CLIENT/team-image?image=1&team=2" }
                 ],
                 insertInGroup: "Live"
             }
@@ -590,6 +550,15 @@ export default {
             this.customisation.push({
                 scene: null,
                 ...({ ...globalCustomisationDefault })
+            });
+        },
+        addAllCustomisation() {
+            this.customScenes.forEach(scene => {
+                this.customisation.push({
+                    ...({ ...globalCustomisationDefault }),
+                    scene,
+                    ...scene.defaults
+                });
             });
         },
         setDefaults(i) {

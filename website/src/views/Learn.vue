@@ -15,6 +15,9 @@
             <li>
                 <router-link to="/learn/guides/ow-settings">Overwatch Settings Guide</router-link>
             </li>
+            <li>
+                <router-link to="/learn/guides/companion-module">SLMN.GG Companion Module</router-link>
+            </li>
         </ul>
 
         <h2>Tools</h2>
@@ -28,6 +31,14 @@
             </li>
             <li>
                 <router-link to="/tools/broadcast-routes">Broadcast Routes</router-link>
+            </li>
+        </ul>
+
+        <h2>Quick Links</h2>
+
+        <ul>
+            <li>
+                <a href="https://borpa.business">List of active SRT feeds</a>
             </li>
         </ul>
 

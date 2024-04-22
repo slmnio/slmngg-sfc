@@ -70,26 +70,33 @@ export default [
             },
             {
                 path: "/learn/guides/observing",
-                component: () => import("@/views/sub-views/guide/ObserverGuideContainer.vue"),
+                component: () => import("@/views/sub-views/guide/observer/ObserverGuideContainer.vue"),
                 children: [
-                    { path: "", component: () => import("@/views/sub-views/guide/ObserverGuideIntro.vue") },
-                    { path: "virtual-cable", component: () => import("@/views/sub-views/guide/ObserverGuideVirtualCable.vue") },
-                    { path: "obs-setup", component: () => import("@/views/sub-views/guide/ObserverGuideObsSetup.vue") },
-                    { path: "obs-scenes", component: () => import("@/views/sub-views/guide/ObserverGuideObsScenes.vue") },
-                    { path: "ow-settings", component: () => import("@/views/sub-views/guide/ObserverGuideOverwatchSettings.vue") }
+                    { path: "", component: () => import("@/views/sub-views/guide/observer/ObserverGuideIntro.vue") },
+                    { path: "virtual-cable", component: () => import("@/views/sub-views/guide/observer/ObserverGuideVirtualCable.vue") },
+                    { path: "obs-setup", component: () => import("@/views/sub-views/guide/observer/ObserverGuideObsSetup.vue") },
+                    { path: "obs-scenes", component: () => import("@/views/sub-views/guide/observer/ObserverGuideObsScenes.vue") },
+                    { path: "ow-settings", component: () => import("@/views/sub-views/guide/observer/ObserverGuideOverwatchSettings.vue") }
                 ]
             },
             {
                 path: "/learn/guides/ow-settings",
-                component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideContainer.vue"),
+                component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideContainer.vue"),
                 children: [
-                    { path: "", component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideIntro.vue") },
-                    { path: "video", component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideVideo.vue") },
-                    { path: "sound", component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideSound.vue") },
-                    { path: "controls", component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideControls.vue") },
-                    { path: "gameplay", component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideGameplay.vue") },
-                    { path: "social", component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideSocial.vue") },
-                    { path: "a11y", component: () => import("@/views/sub-views/guide/OverwatchSettingsGuideAccessibility.vue") }
+                    { path: "", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideIntro.vue") },
+                    { path: "video", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideVideo.vue") },
+                    { path: "sound", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideSound.vue") },
+                    { path: "controls", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideControls.vue") },
+                    { path: "gameplay", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideGameplay.vue") },
+                    { path: "social", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideSocial.vue") },
+                    { path: "a11y", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideAccessibility.vue") }
+                ]
+            },
+            {
+                path: "/learn/guides/companion-module",
+                component: () => import("@/views/sub-views/guide/companion-module/CompanionModuleGuideContainer.vue"),
+                children: [
+                    { path: "", component: () => import("@/views/sub-views/guide/companion-module/CompanionModuleGuideIntro.vue") }
                 ]
             },
             {

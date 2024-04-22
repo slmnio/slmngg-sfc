@@ -99,6 +99,10 @@ export default [
             {
                 path: "/tools/ow-settings",
                 component: () => import("@/views/sub-views/tools/ToolOWProfile.vue")
+            },
+            {
+                path: "/tools/broadcast-routes",
+                component: () => import("@/views/sub-views/tools/ToolProdRoutes.vue")
             }
         ]
     },

@@ -17,7 +17,7 @@
             </li>
         </ul>
 
-        <h2>Quick Links</h2>
+        <h2>Tools</h2>
 
         <ul>
             <li>
@@ -25,6 +25,9 @@
             </li>
             <li>
                 <router-link to="/tools/obs-scene-collections">OBS Scene Collections</router-link>
+            </li>
+            <li>
+                <router-link to="/tools/broadcast-routes">Broadcast Routes</router-link>
             </li>
         </ul>
 

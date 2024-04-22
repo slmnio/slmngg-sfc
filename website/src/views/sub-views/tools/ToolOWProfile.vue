@@ -24,7 +24,7 @@
         <div v-else-if="appStatus === 'idle'">
             <b-alert show variant="warning">
                 Overwatch <strong>must be fully closed</strong> during this! Make sure Battle.net is showing "Play"
-                instead of "Playing".
+                instead of "Playing Now".
             </b-alert>
             <p>
                 Select Documents › Overwatch › Settings › Settings_v0.ini
@@ -44,7 +44,8 @@
                         Only sets Broadcast Margins, disables Overlays like the FPS Counter, and sets Volume levels.
                     </template>
                     <template v-else-if="action === 'bplOpinionated'">
-                        In addition to the BPL settings, this also sets an FPS cap, disables dynamic resolution and enables Reduce Buffering.
+                        In addition to the BPL settings, this also sets an FPS cap and a bunch of graphics settings that
+                        your PC should be able to handle.
                     </template>
                     <template v-else-if="action === 'custom'">
                         Restores the backup you made when applying settings.
@@ -81,7 +82,8 @@ const settings = {
                 ShowGPUTemp: "0",
                 ShowIND: "0",
                 ShowRTT: "0",
-                ShowSystemClock: "0"
+                ShowSystemClock: "0",
+                HDR: "0"
             }
         },
         Sound: {
@@ -90,7 +92,8 @@ const settings = {
                 MusicVolume: "69.000000",
                 SFXVolume: "100.000000",
                 VoiceVolume: "100.000000",
-                DolbyAtmosHeadphone: "0"
+                DolbyAtmosHeadphone: "0",
+                AudioMix: "3"
             }
         },
         network: {
@@ -115,7 +118,13 @@ const settings = {
                 FullscreenWindowEnabled: "0",
                 LimitToRefresh: "0",
                 UseCustomFrameRates: "1",
-                UseCustomWorldScale: "1"
+                UseCustomWorldScale: "1",
+                TripleBufferingEnabled: "0",
+                AADetail: "3",
+                TextureDetail: "3",
+                HDR: "0",
+                WindowMode: "1",
+                WindowedFullscreen: "1"
             }
         },
         Sound: {
@@ -124,7 +133,8 @@ const settings = {
                 MusicVolume: "69.000000",
                 SFXVolume: "100.000000",
                 VoiceVolume: "100.000000",
-                DolbyAtmosHeadphone: "0"
+                DolbyAtmosHeadphone: "0",
+                AudioMix: "3"
             }
         },
         network: {

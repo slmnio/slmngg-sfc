@@ -1,33 +1,13 @@
 <template>
-    <div>
-        <h2>Video Settings</h2>
-        <div v-for="tab in tabs" :key="tab.title">
-            <h3>{{ tab.title }} Tab</h3>
-
-            <div v-for="setting in tab.settings">
-                <b class="mr-1">
-                    <i v-if="setting.type === 'file'" class="fa fa-file mx-1"></i>
-                    <i v-else-if="setting.type === 'account'" class="fa fa-user mx-1"></i>
-                    <i v-else class="fa fa-question mx-1"></i>
-                    {{ setting.title }}
-                    <i v-b-tooltip="'Only available on the advanced profile'" v-if="setting.automated === 'advanced'"
-                       class="fa fa-sparkles mx-1"></i>
-                    <i v-b-tooltip="'Available on all profiles'" v-else-if="setting.automated === 'basic'"
-                       class="fa fa-sparkles mx-1"></i>:
-                </b>
-                {{ setting.description }}
-                <i v-if="setting.tooltip" v-b-tooltip="setting.tooltip" class="fa fa-question-circle mx-1"></i>
-            </div>
-
-            <p v-if="tab.endtext">
-                {{tab.endtext}}
-            </p>
-        </div>
-    </div>
+    <SettingsGuide title="Video Settings" :tabs="tabs" />
 </template>
 <script>
+import SettingsGuide from "@/components/website/guide/SettingsGuide.vue";
 export default {
     name: "OverwatchSettingsGuideVideo",
+    components: {
+        SettingsGuide
+    },
     data: () => ({
         tabs: [
             {
@@ -85,11 +65,15 @@ export default {
                     },
                     {
                         title: "V-Sync",
-                        description: "Off"
+                        description: "Off",
+                        type: "file",
+                        automated: "advanced"
                     },
                     {
                         title: "Triple Buffering",
-                        description: "Off"
+                        description: "Off",
+                        type: "file",
+                        automated: "advanced"
                     },
                     {
                         title: "Reduce Buffering",
@@ -99,7 +83,9 @@ export default {
                     },
                     {
                         title: "HDR",
-                        description: "Off"
+                        description: "Off",
+                        type: "file",
+                        automated: "basic"
                     }
                 ]
             },
@@ -108,11 +94,15 @@ export default {
                 settings: [
                     {
                         title: "Antialias Quality",
-                        description: "Medium or Higher"
+                        description: "Medium or Higher",
+                        type: "file",
+                        automated: "advanced"
                     },
                     {
                         title: "Texture Quality",
-                        description: "High"
+                        description: "High",
+                        type: "file",
+                        automated: "advanced"
                     }
                 ],
                 endtext: "Other settings should be set to a level that your PC can handle."
@@ -129,6 +119,36 @@ export default {
                     {
                         title: "Display System Clock",
                         description: "Off",
+                        type: "file",
+                        automated: "basic"
+                    }
+                ]
+            },
+            {
+                title: "Broadcast Margins",
+                alert: "Broadcast Margins are an important setting that can only be changed in the settings file. Our tool will automatically set these for you.",
+                settings: [
+                    {
+                        title: "Broadcast Margin Top",
+                        description: "0.5",
+                        type: "file",
+                        automated: "basic"
+                    },
+                    {
+                        title: "Broadcast Margin Bottom",
+                        description: "0",
+                        type: "file",
+                        automated: "basic"
+                    },
+                    {
+                        title: "Broadcast Margin Left",
+                        description: "0",
+                        type: "file",
+                        automated: "basic"
+                    },
+                    {
+                        title: "Broadcast Margin Right",
+                        description: "0",
                         type: "file",
                         automated: "basic"
                     }

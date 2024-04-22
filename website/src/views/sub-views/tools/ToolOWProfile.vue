@@ -35,7 +35,7 @@
             <b-form-group label="Preset">
                 <b-form-radio-group
                     v-model="action"
-                    :options="[...presetOptions.map((presetOption) => ({ text: presetOption.name, value: presetOption.id })), { text: `Restore Backup${!hasValidBackup ? ' (Unavailable)' : ''}`, value: 'custom', disabled: !hasValidBackup}]"
+                    :options="[...presetOptions.map((presetOption) => ({ text: presetOption.name, value: presetOption.id })), { text: `Restore Backup${!hasValidBackup ? ' (Unavailable)' : ''}`, value: 'restore', disabled: !hasValidBackup}]"
                     buttons
                     stacked
                 ></b-form-radio-group>
@@ -47,7 +47,7 @@
                         In addition to the BPL settings, this also sets an FPS cap and a bunch of graphics settings that
                         your PC should be able to handle.
                     </template>
-                    <template v-else-if="action === 'custom'">
+                    <template v-else-if="action === 'restore'">
                         Restores the backup you made when applying settings.
                     </template>
                 </template>
@@ -67,7 +67,7 @@
 
 </template>
 <script setup>
-import { useFileSystemAccess } from "@vueuse/core";
+import { useFileSystemAccess, useLocalStorage } from "@vueuse/core";
 import { encode, parse } from "ini";
 import { computed, ref } from "vue";
 import { merge } from "lodash";
@@ -174,7 +174,7 @@ const res = useFileSystemAccess({
 });
 const appStatus = ref("idle");
 
-const backup = ref({});
+const backup = useLocalStorage("ow-settings-backup", {});
 
 async function loadSettings() {
     await res.open();
@@ -189,6 +189,7 @@ const settingsData = computed(() => {
 });
 
 const wasOverwritten = computed(() => {
+    // eslint-disable-next-line eqeqeq
     return settingsData.value.WasOverwritten?.["1"]?.Value == 1;
 });
 

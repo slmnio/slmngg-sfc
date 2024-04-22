@@ -120,7 +120,7 @@ export function getRoleSVG(name) {
 <path d="M51.4,24.1c0,3.1,0,6.2,0,9.3a4.7,4.7,0,0,1-.6,2.4A57.2,57.2,0,0,1,33.2,55.5a1.8,1.8,0,0,1-2.4,0A57.4,57.4,0,0,1,13.2,36a5.5,5.5,0,0,1-.7-2.8c0-5.8.1-11.7,0-17.5-.1-4.2,3.2-4.9,6.1-5.6A59.4,59.4,0,0,1,32.9,8C37.5,8,44.5,9.6,47,10.4s4.1,1.4,4.3,3.3.1,3.2.1,4.9,0,3.7,0,5.5Z"/>
 </svg>`;
     }
-    if (name === "DPS") {
+    if (["Damage", "DPS"].includes(name)) {
         return `<svg id="role_offense" style="fill:currentColor" viewBox="0 0 64 64" width="100%" height="100%">
 <rect class="cls-1" x="12" y="49.3" width="10.2" height="5.61"/>
 <path class="cls-1" d="M22.2,19.1a10.2,10.2,0,0,0,0-1c-.8-6.9-5.1-9-5.1-9s-4.3,2.1-5.1,9c0,.3,0,1,0,1V45.4H22.2Z"/>
@@ -170,6 +170,20 @@ C13.888,14.756,13.487,14.83,13.065,14.847z"/>
 
     return "";
 }
+
+// export function getMapData(match, mapSet, { showBannedMaps = false }) {
+//     const firstTo = match.first_to;
+//     let maps = [...(match.maps || [])];
+//     if (!firstTo) return maps; // can't predict if we don't know first_to
+//     maps = maps.filter(m => m.map); // hide things without map objects
+//
+//     if (!showBannedMaps) {
+//         maps = maps.filter(m => !(m.banner || m.banned));
+//     }
+//
+//     const neededMapCount = likelyNeededMaps(match);
+//     const dummyMapCount = neededMapCount - maps.length;
+// }
 
 export function money(num) {
     return `$${num || 0}k`;
@@ -223,26 +237,30 @@ export function likelyNeededMaps(match) {
 }
 
 export const DefaultMapImages = {
-    Assault: "https://cdn.discordapp.com/attachments/855517740914573342/868231135224819743/44684849494984.png",
-    Escort: "https://cdn.discordapp.com/attachments/855517740914573342/868231132444000276/484444884949494949494948421651615641.png",
-    Hybrid: "https://cdn.discordapp.com/attachments/855517740914573342/868231133765201950/448489494949849494949494949494949.png",
-    Control: "https://cdn.discordapp.com/attachments/855517740914573342/868230457622396928/63541654456789487695.png",
-    Push: "https://cdn.discordapp.com/attachments/855517740914573342/969692510249177098/puuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuush.png",
-    Spike: "https://cdn.discordapp.com/attachments/880305022716481639/883811894463447110/newspikeplant.png",
-    SpikeRush: "https://cdn.discordapp.com/attachments/880305022716481639/883809271198924840/spikerush_default.png",
-    ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png",
-    Slayer: "https://media.discordapp.net/attachments/855517740914573342/913747752729595904/slayer.png",
-    Strongholds: "https://media.discordapp.net/attachments/855517740914573342/913747753086107668/strongholds.png",
-    CTF: "https://media.discordapp.net/attachments/855517740914573342/913747753392304158/ctf.png",
-    Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png"
+    Assault: "https://media.slmn.io/maps/Assault.png",
+    Escort: "https://media.slmn.io/maps/Escort.png",
+    Hybrid: "https://media.slmn.io/maps/Hybrid.png",
+    Control: "https://media.slmn.io/maps/Control.png",
+    Push: "https://media.slmn.io/maps/Push.png",
+    Flashpoint: "https://media.slmn.io/maps/Flashpoint.png",
+    Clash: "https://media.slmn.io/maps/Clash.png"
+    // Spike: "https://cdn.discordapp.com/attachments/880305022716481639/883811894463447110/newspikeplant.png",
+    // SpikeRush: "https://cdn.discordapp.com/attachments/880305022716481639/883809271198924840/spikerush_default.png",
+    // ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png",
+    // Slayer: "https://media.discordapp.net/attachments/855517740914573342/913747752729595904/slayer.png",
+    // Strongholds: "https://media.discordapp.net/attachments/855517740914573342/913747753086107668/strongholds.png",
+    // CTF: "https://media.discordapp.net/attachments/855517740914573342/913747753392304158/ctf.png",
+    // Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png"
 };
 
 export const MapTypeIcons = {
-    Hybrid: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907303867088896/180.png",
-    Escort: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907343893336097/180.png",
-    Control: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907374708903946/180.png",
-    Push: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908279537717392/Push.png",
-    Assault: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908385250934904/assault.png"
+    Hybrid: "https://media.slmn.io/maps/Hybrid-Icon.png",
+    Escort: "https://media.slmn.io/maps/Escort-Icon.png",
+    Control: "https://media.slmn.io/maps/Control-Icon.png",
+    Push: "https://media.slmn.io/maps/Push-Icon.png",
+    Assault: "https://media.slmn.io/maps/Assault-Icon.png",
+    Flashpoint: "https://media.slmn.io/maps/Flashpoint-Icon.png",
+    Clash: "https://media.slmn.io/maps/Clash-Icon.png"
 };
 
 export function getTeamsMapStats(teams, requestMatch, requestMap, filters) {
@@ -355,6 +373,18 @@ export function getAbbrev(timezone, time) {
     return time.isDST() ? display.daylight.abbrev : display.standard.abbrev;
 }
 
+function getNoSunAbbreviation(abbrev) {
+    const map = {
+        PDT: "PT",
+        PST: "PT",
+        EDT: "ET",
+        EST: "ET",
+        BST: "UK",
+        GMT: "UK"
+    };
+    return map[abbrev] ?? abbrev;
+}
+
 
 /**
  *
@@ -371,6 +401,7 @@ export function formatTime(timeString, { tz, use24HourTime = false, format = "{d
     return time.format(
         format
             .replace("{tz}", abbrev)
+            .replace("{tz-no-sun}", getNoSunAbbreviation(abbrev))
             .replace("{time}", use24HourTime ? "{time-24}" : "{time}")
             .replace("{year-short-prev-only}", time.year() === spacetime.now().year() ? "" : "{year-short}")
             .trim()
@@ -506,4 +537,29 @@ export function getAssociatedThemeOptions(player, valueFn) {
         { label: "Teams", options: teams.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortTeams).map((t) => ({ ...t, text: t.name, value: valueFn ? valueFn(t) : t.id })) },
         { label: "Events", options: events.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortEvents).map((e) => ({ ...e, text: e.name, value: valueFn ? valueFn(e) : e.id })) }
     ];
+}
+
+export function autoRecord(team, stage) {
+    console.log("auto record", team, stage);
+    if (!stage) return null;
+
+    const matches = team?.matches?.filter(m => m.match_group === stage);
+
+    console.log(matches);
+    if (!matches?.length) return null;
+
+    let [wins, losses] = [0, 0];
+
+    matches.forEach(m => {
+        const scores = [m.score_1 || 0, m.score_2 || 0];
+        if (!scores.some(s => s === m.first_to)) return; // not finished
+        const won = scores[0] === m.first_to ? team.id === m.teams[0].id : team.id === m.teams[1].id;
+        if (won) {
+            wins++;
+        } else {
+            losses++;
+        }
+    });
+
+    return [wins, losses].join(" - ");
 }

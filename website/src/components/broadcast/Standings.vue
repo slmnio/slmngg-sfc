@@ -70,7 +70,16 @@ export default {
                 "Maps": { header: "Maps", title: "Maps won and lost" },
                 "MapDiff": { header: "Map Diff", title: "Maps won - maps lost" },
                 "ValorantRounds": { header: "RW-RL", title: "Rounds won - rounds lost" },
-                "ValorantRoundDiff": { header: "ΔR", title: "Round diff" }
+                "ValorantRoundDiff": { header: "ΔR", title: "Round diff" },
+                "Points": { header: "Points", title: "Team points" },
+                "MatchWins": { header: "Wins", title: "Match wins" },
+                "MatchLosses": { header: "Losses", title: "Match losses" },
+                "MatchDiffPoints": { header: "Match diff", title: "Matches won and lost (+ team points)" },
+                "MatchWinsPoints": { header: "Points", title: "Match wins + team points" },
+                "MatchesPoints": { header: "Summit Sorting", title: "Matches won - matches lost + team points" },
+                "Played": { header: "Played", title: "Matches played" },
+                "OPoints": { header: "Opp Pts", title: "Opponent points" },
+                "OMatchWinsPoints": { header: "Opp Pts", title: "Opponent points + match wins" }
             })[col] || {
                 header: "-", title: col
             };
@@ -274,6 +283,30 @@ export default {
                     // console.log(team.standings.opponentWinrates, avg(team.standings.opponentWinrates));
                     team.standings.opponent_winrate = avg(team.standings.opponentWinrates);
                     team.standings.opponent_map_winrate = avg(team.standings.opponentMapWinrates);
+                    return team;
+                });
+            }
+            console.log("preparing standings sort", this.standingsSort);
+            if (["OMatchWinsPoints", "OPoints"].some(s => this.standingsSort.includes(s))) {
+                console.log("preparing opponent points");
+                teams.map(team => {
+                    team.standings.opponentPoints = [];
+                    team.standings.opponentPointsMatchWins = [];
+
+                    this.stageMatches.forEach(match => {
+                        if (!(match.teams || []).some(t => t.code === team.code)) return;
+                        const scores = [match.score_1, match.score_2];
+                        if (!scores.some(score => score === match.first_to)) return; // not finished
+                        const opponent = match.teams.find(t => t.code !== team.code);
+                        if (!opponent) return null;
+                        const localOpponent = teams.find(t => t.code === opponent.code);
+                        team.standings.opponentPoints.push(localOpponent.extra_points || 0);
+                        team.standings.opponentPointsMatchWins.push(localOpponent.standings.wins + (localOpponent.extra_points || 0));
+                    });
+
+                    // console.log(team.standings.opponentWinrates, avg(team.standings.opponentWinrates));
+                    team.standings.opponent_points = team.standings.opponentPoints.reduce((c, v) => c + v, 0);
+                    team.standings.opponent_points_wins = team.standings.opponentPointsMatchWins.reduce((c, v) => c + v, 0);
                     return team;
                 });
             }

@@ -53,7 +53,7 @@ export default {
 }
 
 .middle {
-    background-color: rgba(0, 0, 0, 0.65);
+    background-color: rgba(0, 0, 0, 0.75);
     color: white;
     padding: .0em .5em;
     font-size: 24px;

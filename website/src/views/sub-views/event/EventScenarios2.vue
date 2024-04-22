@@ -32,12 +32,14 @@
         </div>
 
 
-        <div class="n-nav mb-3" v-if="matchGroups">
+        <div class="n-nav mb-3 d-flex" v-if="matchGroups">
             <select name="match-group-selector" id="match-group-selector" v-model="activeMatchGroup">
                 <option selected disabled value="null">Select a group</option>
                 <option v-for="group in matchGroups" :value="group" :key="group">{{ group }}</option>
             </select>
+            <div class="ml-2" v-if="activeMatchGroup">{{ matches?.length }} {{ matches?.length === 1 ? "match" : "matches"}}, {{ incompleteMatches?.length }} to play</div>
         </div>
+
 
         <table class="table-bordered text-light mb-3" v-if="counts && counts[0] && counts[0].positions">
             <tr v-if="counts" class="font-weight-bold">
@@ -64,12 +66,14 @@
                 <th class="p-2 border-dark"></th>
                 <th class="p-2 border-dark text-center" :key="scoreline" v-for="([scoreline]) in Object.entries(matchCounts?.[0]?.scorelines)">{{ scoreline }}</th>
                 <th class="p-2 border-dark"></th>
+                <th class="p-2 border-dark">Analysis</th>
             </tr>
             <tr v-for="match in matchCounts" :key="match.id">
                 <td class="p-2 border-dark font-weight-bold text-right">{{ match.teams?.[0]?.code }}</td>
                 <td class="p-2 border-dark text-center cell-num" @click="showMatchScoreline(match.id, scoreline)" :class="{'bg-info selected': scorelineFilterHas(match.id, scoreline), 'text-muted': count === 0}"
                     v-for="([scoreline, count]) in Object.entries(match.scorelines)" :key="scoreline">{{ count }}</td>
                 <td class="p-2 border-dark font-weight-bold text-left">{{ match.teams?.[1]?.code }}</td>
+                <td class="p-2 border-dark text-center" :class="{'text-muted': matchAnalysis(match) === 'No effect'}">{{ matchAnalysis(match) }} </td>
             </tr>
         </table>
 
@@ -124,11 +128,11 @@ function generateScoreline(firstTo) {
 
 
 export default {
-    name: "EventScenarios2.vue",
+    name: "EventScenarios2",
     props: ["event"],
     components: { BFormCheckbox },
     data: () => ({
-        activeMatchGroup: "B League Regular Season", // todo: return this to null
+        activeMatchGroup: "null", // this works for now
         activeScenarioView: "all",
         showCountsAsPercentages: false,
         showOnlyPossible: true,
@@ -162,13 +166,15 @@ export default {
                     const scenarioFilter = this.manualScenarioFilters.some(({ team, position }) => {
                         return s.standings?.standings[position]?.some(t => t.code === team);
                     });
-                    if (scenarioFilter) return true;
-
                     const scorelineFilter = this.manualScorelineFilters.some(({ matchID, scoreline }) => {
                         console.log("scoreline filter", s, matchID, scoreline);
                         return s.outcomes.find(outcome => outcome.id === matchID && outcome.scores.join("-") === scoreline);
                     });
-                    if (scorelineFilter) return true;
+
+                    if (this.manualScenarioFilters.length && this.manualScorelineFilters.length) {
+                        return scenarioFilter && scorelineFilter;
+                    }
+                    return scenarioFilter || scorelineFilter;
                 });
             }
             return scenarios;
@@ -385,7 +391,7 @@ export default {
             console.log("teams", this.scenarioTeams);
             const allMatches = this.scenarioMatchesWithOutcomes;
             const matches = allMatches.filter(m => ![m.score_1, m.score_2].includes(m.first_to));
-            const remainingMatches = JSON.stringify(allMatches.filter(m => [m.score_1, m.score_2].includes(m.first_to)));
+            // const remainingMatches = JSON.stringify(allMatches.filter(m => [m.score_1, m.score_2].includes(m.first_to)));
             const maxBits = matches.map(m => m.first_to * 2);
             const scenarioCount = maxBits.reduce((last, curr) => last * curr, 1);
             // const scenarioCount = 1;
@@ -640,6 +646,220 @@ export default {
         },
         scorelineFilterHas(matchID, scoreline) {
             return this.manualScorelineFilters.find(filter => filter.matchID === matchID && filter.scoreline === scoreline);
+        },
+        matchAnalysis(match) {
+            // TODO: Split this into must/better; must = non-0, better = higher probability
+            const scorelines = Object.entries(match.scorelines);
+            const nonZeroScorelines = scorelines.filter(([s, c]) => c !== 0);
+
+            const nonZeroScorelineDirection = { direction: null, incorrect: false };
+
+            let lastCount = null;
+            nonZeroScorelines.forEach(([scoreline, count]) => {
+                if (!lastCount) {
+                    lastCount = count;
+                    return;
+                }
+                if (nonZeroScorelineDirection?.direction) {
+                    // check it's all good
+                    if (nonZeroScorelineDirection.direction === "up" && count < lastCount) {
+                        nonZeroScorelineDirection.incorrect = true;
+                    } else if (nonZeroScorelineDirection.direction === "down" && count > lastCount) {
+                        nonZeroScorelineDirection.incorrect = true;
+                    }
+                } else {
+                    if (count > lastCount) {
+                        nonZeroScorelineDirection.direction = "up";
+                    } else if (count < lastCount) {
+                        nonZeroScorelineDirection.direction = "down";
+                    }
+                }
+                lastCount = count;
+            });
+
+            const teamCodes = (match.teams || []).map(t => t.code || t.name);
+
+            const leftScores = scorelines.slice(0, (scorelines.length / 2));
+            const rightScores = scorelines.slice((scorelines.length / 2), scorelines.length);
+
+            console.log("analysis", { scorelines, leftScores, rightScores });
+            if (scorelines.every(([scoreline, count]) => count === scorelines[0][1])) {
+                // All the same
+                return "No effect";
+            }
+
+            if (leftScores.every(([s, c]) => c) && !rightScores.some(([s, c]) => c)) {
+                // ? ? ? - 0 0 0
+                // return `${teamCodes[0]} must win`;
+
+                if (leftScores.every(([s, c]) => c === leftScores[0][1])) {
+                    // X X X - 0 0 0
+                    return `${teamCodes[0]} must win`;
+                } else {
+                    // X Y Z - 0 0 0
+
+                    const differenceMap = {};
+                    leftScores.forEach(([c, s]) => {
+                        if (differenceMap[s]) {
+                            differenceMap[s].push(c);
+                        } else {
+                            differenceMap[s] = [c];
+                        }
+                    });
+                    // const differences = Object.entries(differenceMap);
+                    // const only = differences.find(([c, diffScorelines]) => diffScorelines.length === 1);
+
+                    return `${teamCodes[0]} must win, not locked`;
+                    // if (differences.length === 1) {
+                    //     const other = differences.find(([c, diffScorelines]) => diffScorelines.length !== 1);
+                    //     return `${teamCodes[0]} must win, ${JSON.stringify({ only, other })}`;
+                    // } else {
+                    //     return `${teamCodes[0]} must win, 3 different nums`;
+                    // }
+                }
+            }
+            if (rightScores.every(([s, c]) => c) && !leftScores.some(([s, c]) => c)) {
+                // 0 0 0 - ? ? ?
+                // return `${teamCodes[1]} must win`;
+
+                if (rightScores.every(([s, c]) => c === rightScores[0][1])) {
+                    // 0 0 0 - X X X
+                    return `${teamCodes[1]} must win`;
+                } else {
+                    // 0 0 0 - X Y Z
+                    return `${teamCodes[1]} must win, not locked`;
+                }
+            }
+            if (scorelines.some(([s, c]) => c === 0)) {
+                // at least one of the options is 0 - depends on an outcome
+
+                const allZeroes = scorelines.filter(([c, s]) => s === 0).length;
+                if (allZeroes === scorelines.length - 1) {
+                    const scoreline = scorelines.find(([c, s]) => s !== 0);
+                    if (scoreline[0].startsWith(scorelines[0][0].slice(0, 1))) {
+                        // left win
+                        return `${teamCodes[0]} must win ${scoreline[0]}`;
+                    } else {
+                        // right win
+                        return `${teamCodes[1]} must win ${scoreline[0].split("-").reverse().join("-")}`;
+                    }
+                }
+
+                let zeroGroups = 0;
+                let last = -1;
+
+                scorelines.forEach(([scoreline, count]) => {
+                    if (last === count) {
+                        // same as last
+                    } else if (count === 0) {
+                        zeroGroups++;
+                    }
+                    last = count;
+                });
+
+                console.log("analysis zero grouped", {
+                    zeroGroups,
+                    last
+                });
+
+                const validLeft = leftScores.filter(([c, s]) => s !== 0);
+                const validRight = rightScores.filter(([c, s]) => s !== 0);
+
+                if (validLeft.length === validRight.length) {
+                    if (validLeft.length === 1 && validLeft[0][0].split("-").reverse().join("-") !== validRight[0][0]) {
+                        const biggest = validLeft[0][0].split("-").map(e => parseInt(e)).reduce((a, c) => a + c, 0);
+                        return `Game must go to ${biggest} maps`;
+                    } else {
+                        // range of maps - same # per side. make sure it's the same positions
+                        let isValid = true;
+                        validLeft.forEach(([scoreline, count], i) => {
+                            const sameRight = validRight[validRight.length - 1 - i];
+                            if (scoreline.split("-").reverse().join("-") !== sameRight[0]) {
+                                isValid = false;
+                            }
+                        });
+
+                        if (isValid) {
+                            // scoreline is something like 0 X X - X X 0 or X X 0 - 0 X X
+                            const smallest = validLeft[0][0].split("-").map(e => parseInt(e)).reduce((a, c) => a + c, 0);
+                            const biggest = validLeft[validLeft.length - 1][0].split("-").map(e => parseInt(e)).reduce((a, c) => a + c, 0);
+                            return `Game must go to ${smallest}-${biggest} maps`;
+                        } else {
+                            return "~ Something in the middle";
+                        }
+                    }
+                } else {
+                    if (zeroGroups === 1) {
+                        // there is only one block of 0s
+                        // i.e. there is a cut-off of map wins
+                        if (scorelines[0][1] === 0) {
+                            // 0 ? ? - ? ? ?
+                            // starting from left side
+                            if (leftScores.every(([c, s]) => s === 0)) {
+                                // 0 0 0 - ? ? ? (more 0s on right side)
+                                // Right must win, AND
+                                return `${teamCodes[1]} must win ${scorelines.find(([s, c]) => c !== 0)[0].split("-").reverse().join("-")} or better`;
+                            } else {
+                                const zeroes = leftScores.filter(([c, s]) => s === 0).length;
+                                return `${teamCodes[1]} must win ${zeroes} map${zeroes === 1 ? "" : "s"}`;
+                            }
+                        }
+                        if (scorelines[scorelines.length - 1][1] === 0) {
+                            // ? ? ? - ? ? 0
+                            // starting from right side
+                            if (rightScores.every(([c, s]) => s === 0)) {
+                                // 0 0 0 - ? ? ? (more 0s on right side)
+                                // Left must win, AND
+                                return `${teamCodes[0]} must win ${[...scorelines].reverse().find(([s, c]) => c !== 0)[0]} or better`;
+                            } else {
+                                const zeroes = rightScores.filter(([c, s]) => s === 0).length;
+                                return `${teamCodes[0]} must win ${allZeroes} map${zeroes === 1 ? "" : "s"}`;
+                            }
+                        }
+
+                        // ? ? 0 - 0 ? ?  (unknown number of 0s or #s, just in the middle)
+                    } else {
+                        return "~ more than one group of 0s";
+                    }
+                }
+            } else {
+                if (leftScores.every(([s, c]) => c === leftScores[0][1]) && rightScores.every(([s, c]) => c === rightScores[0][1])) {
+                    // no 0s but all sides are better
+                    if (leftScores[0][1] > rightScores[0][1]) {
+                        return `Mixed but ${teamCodes[0]} win is better`;
+                    } else {
+                        return `Mixed but ${teamCodes[1]} win is better`;
+                    }
+                }
+
+                const differenceMap = {};
+                nonZeroScorelines.forEach(([c, s]) => {
+                    if (differenceMap[s]) {
+                        differenceMap[s].push(c);
+                    } else {
+                        differenceMap[s] = [c];
+                    }
+                });
+                const differences = Object.entries(differenceMap);
+
+                if (differences.length === 2) {
+                    const only = differences.find(([c, diffScorelines]) => diffScorelines.length === 1);
+                    if (only) {
+                        const other = differences.find(([c, diffScorelines]) => diffScorelines.length !== 1);
+                        return `Mixed but ${parseInt(other[0]) > parseInt(only[0]) ? "worse" : "better"} if ${only[1]}`;
+                    }
+                    if (nonZeroScorelineDirection.direction && !nonZeroScorelineDirection.incorrect) {
+                        return `Direction is ${nonZeroScorelineDirection.direction === "down" ? teamCodes[0] : teamCodes[1]}, ${differences}`;
+                    }
+                } else {
+                    if (nonZeroScorelineDirection.direction && !nonZeroScorelineDirection.incorrect) {
+                        return `Mixed but prefer ${nonZeroScorelineDirection.direction === "down" ? teamCodes[0] : teamCodes[1]} success`;
+                    }
+                }
+            }
+
+
+            return "Mixed effect";
         }
     },
     watch: {

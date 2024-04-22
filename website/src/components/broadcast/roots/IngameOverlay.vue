@@ -4,9 +4,11 @@
           <IngameTeam :key="team.id" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
                       :team="team"  :right="i === 1"
                       :active="noAnimation || shouldShowTeams" :score="scores[i]" :hide-scores="broadcast.hide_scores"
-                      :extend-icons="extendIcons"
+                      :extend-icons="extendIcons" :color-logo-holder="colorLogoHolder"
                       :width="teamWidth" :codes="useCodes" :event="broadcast.event" :auto-small="autoSmall"
                       :map-attack="attacks[i]" :use-dots="useDots" :first-to="match && match.first_to"
+                      :event-info="i === 0 ? eventData : null"
+                      :map-info="i === 1 ? mapInformation : null"
           />
           <!--   -->
           <Middle v-if="!basicMode" :active="shouldShowMiddle" :theme="broadcast?.event?.theme" :text="middleText"
@@ -167,7 +169,7 @@ export default {
         },
         broadcastMargin() {
             if (!this.broadcast) return { marginTop: "0px" };
-            return { marginTop: `${(this.broadcast.margin * 55)}px` };
+            return { marginTop: `${Math.floor(this.broadcast.margin * 55)}px` };
         },
         teamWidth() {
             if (!this.broadcast?.ingame_team_width) return null;
@@ -207,6 +209,33 @@ export default {
                     backgroundColor: color
                 };
             });
+        },
+        colorLogoHolder() {
+            return (this.broadcast?.broadcast_settings || []).includes("Color ingame team logo holder");
+        },
+        showEventData() {
+            return (this.broadcast?.broadcast_settings || []).includes("Show event details ingame");
+        },
+        eventData() {
+            if (!this.showEventData) return [];
+            return [
+                this.broadcast?.event?.name,
+                this.match.round || ""
+            ].filter(Boolean);
+        },
+        showMapInformation() {
+            return (this.broadcast?.broadcast_settings || []).includes("Show map information ingame");
+        },
+        mapInformation() {
+            if (!this.showMapInformation) return [];
+            /*
+            [
+                last map with winner,
+                current map with type,
+                next map or type
+            ]
+             */
+            return [];
         }
     },
     watch: {
@@ -304,6 +333,11 @@ export default {
 .top-overlay {
     position: relative;
     transition: margin-top .2s;
+    --team-height: 48px;
+    --side-margins: 43px;
+    --side-margins: 0px;
+    margin-left: var(--side-margins);
+    margin-right: var(--side-margins);
 }
 
 
@@ -340,6 +374,7 @@ export default {
 .ingame-fade-sponsors >>> .break-sponsor-logo {
     height: calc(100% - 1.5em) !important;
 }
+.ingame-overlay.basic >>> .small-overlay-text,
 .ingame-overlay.basic >>> .team-score,
 .ingame-overlay.basic >>> .attack-holder {
     display: none !important;

@@ -22,62 +22,7 @@
         <div class="container-fluid">
             <div class="bracket-controls w-100 flex-center mb-3 flex-column">
                 <div class="bracket flex-center flex-column mb-3" v-for="(bracket, bi) in brackets" :key="bi">
-                    <div class="columns">
-                        <div class="column" v-for="(column, ci) in bracket.columns" :key="'col-' + ci">
-                            <input class="header" v-model="column.header"/>
-                            <div class="game-area">
-                                <div class="game" :class="{'empty': game.empty}" v-for="(game, mi) in column.games"
-                                     :key="mi">
-                                    <div class="game-teams">
-                                        <div class="game-team" :class="{
-                                        'highlight': activeConnection,
-                                        'hover-active': highlightConnectionMatches(bi, ci, mi, 1),
-                                        'has-lose-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'lose',
-                                        'has-win-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'win'
-                                    }" @click="endConnection(bi, ci, mi, 1)">
-                                            {{ getReverseConnectionText(bi, ci, mi, 1) }}
-                                        </div>
-                                        <div class="match-number" v-if="!game.empty">{{ getMatchNum(bi,ci,mi) }}</div>
-                                        <div class="game-team" :class="{
-                                        'highlight': activeConnection,
-                                        'hover-active': highlightConnectionMatches(bi, ci, mi, 2),
-                                        'has-lose-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'lose',
-                                        'has-win-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'win'
-                                    }" @click="endConnection(bi, ci, mi, 2)">
-                                            {{ getReverseConnectionText(bi, ci, mi, 2) }}
-                                        </div>
-                                    </div>
-                                    <div class="game-buttons">
-                                        <div class="game-button remove" @click="column.games.splice(mi,1)"><i
-                                                class="fas fa-trash"></i></div>
-                                    </div>
-                                    <div class="connection-buttons">
-                                        <div class="connection-button"
-                                             :class="{
-                                            'active': activeConnectionMatches(bi, ci, mi, 'win') || getConnection(bi, ci, mi, 'win'),
-                                            'champion':getConnection(bi, ci, mi, 'win') === 'champion',
-                                         }"
-                                             @mouseenter="showConnection(bi, ci, mi, 'win')"
-                                             @mouseleave="hideConnection()"
-                                             @click="startConnection(bi, ci, mi, 'win')">
-                                            W
-                                        </div>
-                                        <div class="connection-button"
-                                             :class="{
-                                            'active': activeConnectionMatches(bi, ci, mi, 'lose') || getConnection(bi, ci, mi, 'lose'),
-                                            'eliminated':getConnection(bi, ci, mi, 'lose') === 'eliminated',
-                                         }"
-                                             @mouseenter="showConnection(bi, ci, mi, 'lose')"
-                                             @mouseleave="hideConnection()"
-                                             @click="startConnection(bi, ci, mi, 'lose')">
-                                            L
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="columns">
+                    <div class="columns my-2">
                         <div class="column col-buttons" v-for="(column, ci) in bracket.columns"
                              :key="'col-buttons-' + ci">
                             <div class="buttons flex-wrap flex-center">
@@ -90,6 +35,65 @@
                                 <b-button variant="danger" size="sm" @click="bracket.columns.splice(ci, 1)">
                                     <i class="fas fa-trash fa-fw"></i> Delete Column
                                 </b-button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="column" v-for="(column, ci) in bracket.columns" :key="'col-' + ci">
+                            <input class="mt-2 header" v-model="column.header"/>
+                            <div class="game-area">
+                                <div class="game" :class="{'empty': game.empty}" v-for="(game, mi) in column.games"
+                                     :key="mi">
+                                    <div class="game-teams">
+                                        <div class="game-team" :class="{
+                                        'highlight': activeConnection,
+                                        'hover-active': highlightConnectionMatches(bi, ci, mi, 1),
+                                        'has-lose-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'lose',
+                                        'has-win-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'win'
+                                    }"
+                                         @mouseup="endConnection(bi, ci, mi, 1)">
+                                            {{ getReverseConnectionText(bi, ci, mi, 1) }}
+                                        </div>
+                                        <div class="match-number" v-if="!game.empty">{{ getMatchNum(bi,ci,mi) }}</div>
+                                        <div class="game-team" :class="{
+                                        'highlight': activeConnection,
+                                        'hover-active': highlightConnectionMatches(bi, ci, mi, 2),
+                                        'has-lose-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'lose',
+                                        'has-win-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'win'
+                                    }"
+                                         @mouseup="endConnection(bi, ci, mi, 2)">
+                                            {{ getReverseConnectionText(bi, ci, mi, 2) }}
+                                        </div>
+                                    </div>
+                                    <div class="game-buttons">
+                                        <div class="game-button remove" @click="column.games.splice(mi,1)"><i
+                                            class="fas fa-trash"></i></div>
+                                    </div>
+                                    <div class="connection-buttons">
+                                        <div class="connection-button"
+                                             :class="{
+                                            'active': activeConnectionMatches(bi, ci, mi, 'win') || getConnection(bi, ci, mi, 'win'),
+                                            'champion':getConnection(bi, ci, mi, 'win') === 'champion',
+                                         }"
+                                             @mouseenter="showConnection(bi, ci, mi, 'win')"
+                                             @mouseleave="hideConnection()"
+                                             @mousedown="startConnection(bi, ci, mi, 'win')"
+                                        >
+                                            W
+                                        </div>
+                                        <div class="connection-button"
+                                             :class="{
+                                            'active': activeConnectionMatches(bi, ci, mi, 'lose') || getConnection(bi, ci, mi, 'lose'),
+                                            'eliminated':getConnection(bi, ci, mi, 'lose') === 'eliminated',
+                                         }"
+                                             @mouseenter="showConnection(bi, ci, mi, 'lose')"
+                                             @mouseleave="hideConnection()"
+                                             @mousedown="startConnection(bi, ci, mi, 'lose')"
+                                        >
+                                            L
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -206,6 +210,8 @@ export default {
         }
     },
     methods: {
+        handleDrag(dir, bracketNum, columnNum, gameNum) {
+        },
         startConnection(bracketNum, columnNum, gameNum, mode) {
             if (this.activeConnectionMatches(bracketNum, columnNum, gameNum, mode)) {
                 this.activeConnection = null;

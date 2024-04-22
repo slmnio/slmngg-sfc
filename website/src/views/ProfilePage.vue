@@ -32,11 +32,9 @@
             <b-form-group label-cols-lg="2" label-cols-sm="3" label-cols="12" class="image-form-group">
                 <template v-slot:label>
                     <b>Profile Picture</b>
-                    <span class="badge badge-pill badge-info ml-2">NEW <i class="fas fa-sparkles"></i>
-                </span>
                 </template>
                 <template v-slot:description>
-                    <span class="text-info"><b>New!</b> You can set your profile picture to a team or event you were a part of!<br>Once you've saved, you can check your player page <router-link
+                    <span class="text-muted">You can set your profile picture to a team or event you were a part of.<br>Once you've saved, you can check your player page <router-link
                             :to="url('player', { id: player?.id })">here</router-link>.</span>
                 </template>
                 <div class="hero-image profile-theme mr-2" :style="profileTheme"></div>

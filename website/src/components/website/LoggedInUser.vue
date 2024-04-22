@@ -8,8 +8,11 @@
         <b-dropdown-item variant="dark" :href="rootLinkExternal('/profile')" :to="rootLinkRouter('/profile')" active-class="active">Edit profile</b-dropdown-item>
         <b-dropdown-divider v-if="isProduction"></b-dropdown-divider>
         <b-dropdown-item v-if="isProduction" variant="dark" :href="rootLinkExternal('/dashboard')" :to="rootLinkRouter('/dashboard')" active-class="active">Dashboard</b-dropdown-item>
+        <b-dropdown-item v-if="isProduction && client?.key" variant="dark" target="_blank" :to="`/client/${client?.key}/admin`">Source overview <i class="fas fa-external-link fa-fw"></i></b-dropdown-item>
+        <b-dropdown-item v-if="isProduction && client?.key" variant="dark" target="_blank" :to="`/client/${client?.key}/tally-viewer`">Tally Viewer <i class="fas fa-external-link fa-fw"></i></b-dropdown-item>
+        <b-dropdown-divider v-if="isProduction"></b-dropdown-divider>
         <b-dropdown-item v-if="isProduction" variant="dark" v-b-modal.token-modal>Token</b-dropdown-item>
-        <b-dropdown-item v-if="isProduction" variant="dark" to="/login">Re-auth</b-dropdown-item>
+        <b-dropdown-item v-if="isProduction" variant="dark" to="/login">Re-authenticate</b-dropdown-item>
         <TokenModal />
     </b-nav-item-dropdown>
 </template>
@@ -21,6 +24,7 @@ import { isAuthenticated, isOnMainDomain } from "@/utils/auth";
 import { getMainDomain } from "@/utils/fetch";
 import { bg } from "@/utils/images";
 import TokenModal from "@/components/website/dashboard/TokenModal.vue";
+import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "LoggedInUser",
@@ -44,6 +48,11 @@ export default {
         isProduction() {
             if (!isAuthenticated(this.$root)) return false;
             return this.$root.authUser?.clients?.length;
+        },
+        client() {
+            return ReactiveRoot(this.playerID, {
+                clients: ReactiveThing("clients")
+            })?.clients;
         }
     },
     methods: {

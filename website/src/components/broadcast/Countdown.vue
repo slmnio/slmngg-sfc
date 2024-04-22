@@ -1,7 +1,9 @@
 <template>
-    <div class="countdown">
-        <span class="industry-align" v-html="text"></span>
-    </div>
+    <transition name="fade" mode="out-in">
+        <div class="countdown" :key="to">
+            <span class="industry-align" v-html="text"></span>
+        </div>
+    </transition>
 </template>
 
 <script>

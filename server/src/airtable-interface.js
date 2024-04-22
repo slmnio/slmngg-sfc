@@ -141,7 +141,7 @@ async function getAllTableData(tableName, options = {}) {
 
 function customUpdater(tableName, item) {
     if (tableName === "Broadcasts" && item.key) Cache.set(`broadcast-${item.key}`, item);
-    if (tableName === "Clients" && item.key) Cache.set(`client-${item.key}`, item);
+    if (tableName === "Clients" && item.key) Cache.set(`client-${item.key?.toLowerCase()}`, item);
     if (tableName === "Events" && item.subdomain) Cache.set(`subdomain-${item.subdomain}`, item);
     if (tableName === "News" && item.slug) Cache.set(`news-${item.slug}`, item);
 }

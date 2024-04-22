@@ -43,9 +43,9 @@ export default {
     },
     methods: {
         targetsMe(sceneName) {
-            const number = this.number || this.selfObserverNumber;
-            if (!number) return false;
-            return ["Obs", "Game"].some(str => sceneName.toLowerCase().includes(str.toLowerCase())) && sceneName.includes(number.toString());
+            const observerNumber = this.number || this.selfObserverNumber;
+            if (!observerNumber) return false;
+            return ["Obs", "Game"].some(str => sceneName.toLowerCase().includes(str.toLowerCase())) && sceneName.includes(observerNumber.toString());
         }
     },
     computed: {

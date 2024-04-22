@@ -237,7 +237,7 @@ export default {
             if (!this.nextMatch) slides = slides.filter(s => s !== "Matchup");
             if (!this.currentStage) slides = slides.filter(s => s !== "Standings");
             if (!this.bracket) slides = slides.filter(s => s !== "Bracket");
-            if (!this.virtualMatch) slides = slides.filter(s => s !== "Schedule"); // Only going to be 1 match atm so matchup will be fine
+            if (this.virtualMatch) slides = slides.filter(s => s !== "Schedule"); // Only going to be 1 match atm so matchup will be fine
             console.log(slides);
 
             // TODO: add stuff here that changes based on the countdown remaining

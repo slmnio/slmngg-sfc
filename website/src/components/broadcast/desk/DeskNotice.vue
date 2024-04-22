@@ -3,7 +3,15 @@
         <div class="alt" v-if="alt" :style="altTheme">
             <div class="industry-align">{{ alt }}</div>
         </div>
-        <div class="main">
+        <div class="main main-guests" v-if="guests?.length">
+            <div class="guest" v-for="guest in guests" :key="guest.id">
+                <div class="guest-name">{{ guest.name }}</div>
+                <div class="guest-full-name" v-if="showFullNames">{{ guest.full_name }}</div>
+                <div class="guest-pronouns" v-if="showPronouns">{{ guest.player?.pronouns }}</div>
+                <div class="guest-socials">{{ getTwitterHandle(guest) }}</div>
+            </div>
+        </div>
+        <div class="main" v-else>
             <div class="industry-align" v-html="nbr(main)"></div>
         </div>
     </div>
@@ -12,7 +20,7 @@
 <script>
 export default {
     name: "DeskNotice",
-    props: ["notice", "mainTheme", "altTheme", "right"],
+    props: ["notice", "mainTheme", "altTheme", "right", "guests", "showFullNames", "showPronouns"],
     computed: {
         parts() {
             return (this.notice || "").split("|");
@@ -29,6 +37,9 @@ export default {
         nbr(text) {
             if (!text) return "";
             return text.replace(/\\n/g, "<br>");
+        },
+        getTwitterHandle(guest) {
+            return (guest?.player?.socials || []).find(s => s?.type === "Twitter" && s?.approved)?.name || guest?.player?.twitter_handle?.[0];
         }
     }
 };
@@ -69,5 +80,16 @@ export default {
 .desk-notice.is-right .alt {
     left: auto;
     right: 10px;
+}
+.main-guests {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+.guest-full-name {
+    font-size: .75em;
+}
+.guest-socials {
+    font-size: .75em;
 }
 </style>

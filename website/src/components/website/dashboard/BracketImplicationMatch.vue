@@ -1,5 +1,5 @@
 <template>
-    <div class="bracket-implication flex-center flex-column">
+    <div class="bracket-implication flex-center flex-column" v-if="imp">
         <div class="relation">Match {{ relation }}</div>
         <div v-if="team" class="this-team">{{ team.name }}</div>
         <div v-if="imp.special" class="lower special flex-center flex-column">

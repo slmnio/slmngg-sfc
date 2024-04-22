@@ -3,13 +3,16 @@
         <h1 class="big mb-3">Teams</h1>
         <input type="text" class="form-control mb-3" placeholder="Start typing to filter" v-model="search">
         <h1><LoadingIcon v-if="!search && !sortedEvents.length"></LoadingIcon></h1>
-        <EventTeamsDisplay class="mb-4" v-for="eventID in sortedEvents" :key="eventID" :event-i-d="eventID" :search-text="searchEvents ? search : null"></EventTeamsDisplay>
-        <b-pagination @page-click="scrollToTop()" v-if="!searchEvents" v-model="page" :per-page="eventsPerPage" :total-rows="events.length" align="center"></b-pagination>
+
+        <EventTeamsDisplay class="mb-4" v-for="eventID in sortedEvents" :key="eventID" :event-i-d="eventID"
+                           :search-text="searchEvents ? search : null"></EventTeamsDisplay>
+        <b-pagination @page-click="scrollToTop()" v-if="!searchEvents" v-model="page" :per-page="eventsPerPage"
+                      :total-rows="events.length" align="center"></b-pagination>
     </div>
 </template>
 
 <script>
-import { ReactiveRoot } from "@/utils/reactive";
+import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { searchInCollection } from "@/utils/search";
 import LoadingIcon from "@/components/website/LoadingIcon";
 import { BPagination } from "bootstrap-vue";
@@ -44,7 +47,7 @@ export default {
                 return this.events.slice(this.eventsPerPage * (this.page - 1), this.eventsPerPage * this.page);
             }
 
-            // console.log(this.search, this.teamData);
+            console.log(this.search, this.teamData);
             if (!this.teamData?.length) return [];
 
             const teamSearchResults = searchInCollection(this.teamData, this.search, "name");
@@ -55,8 +58,8 @@ export default {
                 let existing = events.find(e => e.eventID === team.event);
                 if (!existing) {
                     existing = events[events.push({
-                        eventID: team.event,
-                        eventStart: team.eventStart,
+                        eventID: team.event?.[0],
+                        eventStart: team.event_date?.[0],
                         teams: []
                     }) - 1];
                 }
@@ -82,7 +85,9 @@ export default {
             //     }).filter(e => e.show_in_events && e.teams && e.teams.length !== 0);
         },
         teamData() {
-            return ReactiveRoot("special:teams")?.teams;
+            return ReactiveRoot("special:teams", {
+                teams: ReactiveArray("teams")
+            })?.teams;
         }
     },
     metaInfo() {

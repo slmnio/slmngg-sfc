@@ -1,5 +1,5 @@
 <template>
-    <div class="break-match flex-center" :class="{'expanded': expanded}" :data-center="centerShow">
+    <div class="break-match flex-center" :class="{'expanded': expanded, 'has-scores': hasScore}" :data-center="centerShow">
         <div class="match-next-details" v-if="!expanded">
             <transition name="fade" mode="out-in">
                 <span :key="match ? match.round : 'empty'">{{ hasFinished ? 'FINAL SCORE:' : 'UP NEXT:'}} {{ match && match.round }}</span>
@@ -39,6 +39,13 @@
                 <div v-if="centerShow === 'time'" class="center-time">{{ start }}</div>
                 <div v-if="centerShow === 'vs'" class="center-vs">vs</div>
             </div>
+            <div v-if="match" class="d-none hidden-extra-data center-scores flex-center">
+                <div class="center-score" :style="winCSS(0)" :class="{'win': scores[0] === match.first_to}"><span class="industry-align">{{ scores[0] }}</span></div>
+                <div class="center-dash">-</div>
+                <div class="center-score" :style="winCSS(1)" :class="{'win': scores[1] === match.first_to}"><span class="industry-align">{{ scores[1] }}</span></div>
+            </div>
+            <div v-if="match" class="d-none hidden-extra-data center-time">{{ start }}</div>
+            <div v-if="match" class="d-none hidden-extra-data center-vs">vs</div>
         </div>
 <!--        </transition-group>-->
 

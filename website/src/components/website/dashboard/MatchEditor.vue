@@ -4,20 +4,20 @@
 
         <b-form v-if="match" @submit="(e) => e.preventDefault()">
 <!--            <b-alert variant="danger" :show="!!errorMessage" dismissible @dismissed="() => this.errorMessage = null"><i class="fas fa-exclamation-circle fa-fw"></i> <b>Error</b>: {{ errorMessage }}</b-alert>-->
-            <div class="top px-2 d-flex align-items-center" v-if="!hideMatchExtras">
-                <b-form-checkbox :class="{'low-opacity': processing['special_event']}" class="opacity-changes flex-shrink-0 mr-3"
-                                 v-model="matchData.special_event" name="special-event-checkbox" @change="(checked) => sendMatchDataChange('special_event', checked)">
-                    Special Event
-                </b-form-checkbox>
-                <AdvancedDateEditor class="mr-3" :saved-time="match.start" :is-processing="processing['start']" @submit="(timeString) => setMatchStart(timeString)"></AdvancedDateEditor>
-                <div class="mid-label mr-3 text-nowrap">
-                    Custom Name
-                </div>
-                <b-form-input :class="{'low-opacity': processing['custom_name']}" class="opacity-changes"
-                              v-model="matchData.custom_name" @change="sendMatchDataChange('custom_name', matchData.custom_name)">
-                </b-form-input>
-                <b-button :disabled="processing['map']" class="ml-5 top-button flex-shrink-0" variant="success" @click="() => saveMapAndScores()"><i class="fas fa-save fa-fw"></i> Save all</b-button>
-                </div>
+<!--            <div class="top px-2 d-flex align-items-center" v-if="!hideMatchExtras">-->
+<!--                <b-form-checkbox :class="{'low-opacity': processing['special_event']}" class="opacity-changes flex-shrink-0 mr-3"-->
+<!--                                 v-model="matchData.special_event" name="special-event-checkbox" @change="(checked) => sendMatchDataChange('special_event', checked)">-->
+<!--                    Special Event-->
+<!--                </b-form-checkbox>-->
+<!--            </div>-->
+            <!--                <div class="mid-label mr-3 text-nowrap">-->
+            <!--                    Custom Name-->
+            <!--                </div>-->
+            <!--                <b-form-input :class="{'low-opacity': processing['custom_name']}" class="opacity-changes"-->
+            <!--                              v-model="matchData.custom_name" @change="sendMatchDataChange('custom_name', matchData.custom_name)">-->
+            <!--                </b-form-input>-->
+            <!--                <div class="spacer flex-grow-1"></div>-->
+            <!--                <b-button :disabled="processing['map']" class="ml-5 top-button flex-shrink-0" variant="success" @click="() => saveMapAndScores()"><i class="fas fa-save fa-fw"></i> Save all</b-button>-->
             <div class="teams-scores pt-2 px-2">
                 <div class="checkboxes">
                     <b-form-checkbox v-if="showRestrictCheckbox" class="mr-2" v-model="restrictToMapPool" id="map-pool-checkbox">Restrict to map pool</b-form-checkbox>
@@ -36,7 +36,7 @@
                     <b-button size="sm" @click="() => extraMaps++">
                         <i class="fas fa-fw fa-plus"></i> Add map
                     </b-button>
-                    <b-button v-if="hideMatchExtras" class="ml-2 top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save all</b-button>
+                    <b-button class="ml-2 top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save {{ hideMatchExtras ? 'all' : 'maps' }}</b-button>
                 </div>
             </div>
             <div class="maps-table-wrapper">
@@ -62,9 +62,7 @@
                                 Map
                             </div>
                             <div class="form-bottom">
-                                <b-form-select :options="getMapOptions(i)" v-if="mapChoices[i]"
-                                               v-model="mapChoices[i]"/>
-                                <b-form-select :options="getMapOptions(i)" v-else v-model="mapChoices[i]"/>
+                                <b-form-select class="no-choice" :options="getMapOptions(i)" :value="mapChoices[i] || null" @input="val => mapChoices[i] = val" />
                             </div>
                         </td>
                         <td class="form-stack">
@@ -111,6 +109,47 @@
                         </td>
                     </tr>
                 </table>
+            </div>
+            <div class="details-wrapper p-2 mt-3" v-if="!hideMatchExtras">
+                <div class="d-flex mb-2">
+                    <h3 class="mb-0">Match Details</h3>
+                    <div class="spacer flex-grow-1"></div>
+                    <AdvancedDateEditor :saved-time="match.start" :is-processing="processing['start']" @submit="(timeString) => setMatchStart(timeString)">Change date/time</AdvancedDateEditor>
+                    <b-button class="ml-2 top-button flex-shrink-0" :class="{'low-opacity': processing.details}" :disabled="processing.details"  variant="success" @click="() => saveMatchDetails()"><i class="fas fa-save fa-fw"></i> Save details</b-button>
+                </div>
+                <div class="match-details py-2">
+                    <b-form-group
+                        label="Special Event"
+                        description="Show this match with a single name and without teams."
+                        label-for="details-special-event"
+                        label-cols-lg="2"
+                        label-cols-md="3">
+                        <div class="d-flex">
+                            <b-form-checkbox id="details-special-event" class="mt-1" size="lg" v-model="matchData.special_event"></b-form-checkbox>
+                            <b-form-input id="details-custom-name" type="text" placeholder="Match custom name" v-model.trim="matchData.custom_name"></b-form-input>
+                        </div>
+                    </b-form-group>
+                    <b-form-group
+                        label="Forfeit"
+                        description="Show this match as a forfeit, optionally with an explanation."
+                        label-for="details-forfeit"
+                        label-cols-lg="2"
+                        label-cols-md="3">
+                        <div class="d-flex">
+                            <b-form-checkbox id="details-forfeit" class="mt-1" size="lg" v-model="matchData.forfeit"></b-form-checkbox>
+                            <b-form-input id="details-forfeit-reason" type="text" placeholder="Forfeit reason" v-model.trim="matchData.forfeit_reason"></b-form-input>
+                        </div>
+                    </b-form-group>
+                    <b-form-group
+                        label-for="details-vod"
+                        label="VOD"
+                        description="Long term storage, such as highlighted Twitch VODs or YouTube videos."
+                        label-cols-lg="2"
+                        label-cols-md="3">
+                        <b-form-input id="details-vod" type="url" placeholder="Long term storage URL, eg: https://www.twitch.tv/videos/642974687" v-model.trim="matchData.vod"></b-form-input>
+                        <b-form-input class="mt-1" id="details-vod-2" type="url" placeholder="Second part of VOD if needed" v-model.trim="matchData.vod_2"></b-form-input>
+                    </b-form-group>
+                </div>
             </div>
         </b-form>
     </div>
@@ -320,7 +359,11 @@ export default {
         matchData: {
             special_event: null,
             custom_name: null,
-            scores: []
+            scores: [],
+            forfeit: null,
+            forfeit_reason: null,
+            vod: null,
+            vod_2: null
         },
         draws: [],
         mapChoices: [],
@@ -346,7 +389,6 @@ export default {
             const groups = {};
             let mapType = null;
 
-            // console.log(this.broadcastData);
             if (this.broadcastData?.map_set) {
                 const maps = this.broadcastData?.map_set.split(",");
                 mapType = maps[mapIndex];
@@ -441,6 +483,10 @@ export default {
             }
 
             this.matchData.scores = this.scores;
+            this.matchData.custom_name = data.custom_name;
+            this.matchData.forfeit = data.forfeit;
+            this.matchData.forfeit_reason = data.forfeit_reason;
+            this.matchData.vod = data.vod;
 
             this.previousAutoData = {
                 draws: Object.assign([], this.draws),
@@ -466,6 +512,19 @@ export default {
             console.log(response);
             this.$set(this.processing, key, false);
             console.log("[processing]", key, "off");
+            return response;
+        },
+        async saveMatchDetails() {
+            this.$set(this.processing, "details", true);
+            const response = await updateMatchData(this.$root.auth, this.match, this.matchData);
+            console.log(response);
+            if (!response.error) {
+                this.$notyf.success({
+                    message: "Map details saved",
+                    duration: 3000
+                });
+            }
+            this.$set(this.processing, "details", false);
             return response;
         },
         async saveMapAndScores() {
@@ -513,6 +572,19 @@ export default {
             }
             return response;
         },
+        autoUpdateScore() {
+            if (this.teams?.length !== 2) return;
+            const score = [0, 0];
+            const teamIDs = this.teams.map(t => t.id);
+            this.winners.forEach((winnerID, idx) => {
+                if (teamIDs[0] === winnerID) {
+                    score[0]++;
+                } else {
+                    score[1]++;
+                }
+            });
+            this.$set(this.matchData, "scores", score);
+        },
         checkAutoWinner(i, val) {
             console.log("checkAutoWinner", { val, i }, this.score_1s[i], this.score_2s[i]);
 
@@ -526,6 +598,7 @@ export default {
                     if (this.autoLoserPicks && this.maps?.[i + 1]) {
                         this.$set(this.pickers, i + 1, this.teams[1].id);
                     }
+                    this.autoUpdateScore();
                 } else if (this.score_1s[i] < this.score_2s[i]) {
                     // set right winner
 
@@ -533,6 +606,7 @@ export default {
                     if (this.autoLoserPicks && this.maps?.[i + 1]) {
                         this.$set(this.pickers, i + 1, this.teams[0].id);
                     }
+                    this.autoUpdateScore();
                 }
             }
         },
@@ -632,5 +706,9 @@ export default {
 
     .map .number .fas {
         font-size: 0.8em;
+    }
+
+    ::placeholder {
+        color: rgba(0,0,0,0.4);
     }
 </style>

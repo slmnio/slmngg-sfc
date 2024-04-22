@@ -9,7 +9,7 @@
                     <div class="industry-align text-center">{{ _broadcast.event ? (_broadcast.event.short || _broadcast.event.name): '' }}</div>
                     <div class="industry-align text-center">{{ title || 'Player Auction' }}</div>
                 </div>
-                <div class="event-stats flex-center d-flex flex-column">
+                <div class="event-stats flex-center d-flex flex-column" :class="{'w-0': wideRight}">
                     <div>{{ autoSettings?.drafted }} / {{ autoSettings?.totalSlots }} {{ autoSettings?.drafted === 1 ? 'player' : 'players' }} signed</div>
                     <div>{{ autoSettings?.slotsRemaining }} {{ autoSettings?.slotsRemaining === 1 ? 'slot' : 'slots' }} remaining</div>
                     <div>{{ autoSettings?.undraftedPlayerCount }} {{ autoSettings?.undraftedPlayerCount === 1 ? 'player' : 'players' }} in the pool</div>
@@ -70,7 +70,7 @@
             </div>
 <!--            <div class="left-bottom flex-center">bottom</div>-->
         </div>
-        <div class="right flex-shrink-0 flex-center">
+        <div class="right flex-shrink-0 flex-center" :class="{'all-teams': wideRight}">
 <!--            <div class="team-list-holder" v-if="['teams', 'teams-1', 'teams-2'].includes(rightDisplay)" :key="rightDisplay">-->
 <!--                <transition-group tag="div" name="move" class="team-lists">-->
 <!--                    <TeamPlayerList v-for="team in displayTeams" :team="team" :key="team.id" :leading="leadingBid" :auction-settings="auctionSettings" />-->
@@ -98,6 +98,8 @@
                 <div :style="background" class="bidding-war" v-if="rightDisplay === 'bidding-war'" key="bidding-war">
                     <BiddingWar :teams="biddingWar" :leading="leadingBid" :auction-settings="auctionSettings"/>
                 </div>
+                <AuctionLeaderboard :players="signedPlayers" :style="background" class="leaderboard w-100 h-100 flex-center" v-if="rightDisplay === 'leaderboard'" key="leaderboard" />
+                <AuctionTeamsOverview :auction-settings="auctionSettings" :v-if="rightDisplay === 'teams-overview'" key="teams-overview" :teams="teams"  :style="background"  />
             </transition>
         </div>
     </div>
@@ -106,7 +108,7 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import TeamPlayerList from "./TeamPlayerList";
-import { cleanID, getRoleSVG, money } from "@/utils/content-utils";
+import { cleanID, getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
 import PlayerTeamDisplay from "./PlayerTeamDisplay";
 import { sortEvents } from "@/utils/sorts";
 import SignedTeamList from "@/components/broadcast/auction/SignedTeamList";
@@ -118,11 +120,13 @@ import { resizedImage } from "@/utils/images";
 import AuctionCountdown from "@/components/broadcast/auction/AuctionCountdown";
 import ContentThing from "@/components/website/ContentThing";
 import RecoloredHero from "@/components/broadcast/RecoloredHero";
+import AuctionLeaderboard from "@/components/broadcast/auction/AuctionLeaderboard.vue";
+import AuctionTeamsOverview from "@/components/broadcast/auction/AuctionTeamsOverview.vue";
 
 export default {
     name: "AuctionOverlay",
     props: ["broadcast", "category", "title", "showCaptainInfo"],
-    components: { RecoloredHero, TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar, AuctionCountdown, ContentThing },
+    components: { AuctionTeamsOverview, AuctionLeaderboard, RecoloredHero, TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar, AuctionCountdown, ContentThing },
     data: () => ({
         tick: 0,
         socketPlayer: null,
@@ -137,6 +141,9 @@ export default {
         auctionState: "NOT_CONNECTED"
     }),
     computed: {
+        wideRight() {
+            return this._broadcast?.auction_display === "All teams" && this.rightDisplay === "teams";
+        },
         autoSettings() {
             let totalSlots = 0;
             let drafted = 0;
@@ -304,6 +311,8 @@ export default {
         rightDisplay() {
             if (this.justSigned) return "sign-focus";
             if (this.biddingWar && !this.showCaptainInfo) return "bidding-war";
+            if (this._broadcast?.auction_display === "Leaderboard") return "leaderboard";
+            if (this._broadcast?.auction_display === "Team overview") return "teams-overview";
             if (this.highlightedTeam) return "team-focus";
             if (this.bids && this.biddingActive) {
                 if (this.showCaptainInfo) return "bid-focus";
@@ -341,11 +350,38 @@ export default {
 
             return teams;
         },
+        signedPlayers() {
+            const players = [];
+            (this.teams || []).forEach(team => {
+                (team.players || []).forEach(player => {
+                    if (player.auction_price) {
+                        players.push({
+                            ...player,
+                            _this_event_team: team
+                        });
+                    }
+                });
+            });
+            console.log(players);
+            return players.sort((a, b) => b.auction_price - a.auction_price);
+        },
         displayTeamRows() {
             if (!this.teams?.length) return [];
-            const perRow = 2;
-            const rowCount = (Math.ceil(this.teams.length / perRow));
+            const teams = this.teams.filter(team => {
+                const isFull = (team.players?.length >= (this.auctionSettings?.each_team || getAuctionMax()));
+                if (this._broadcast?.auction_display === "Not full teams") {
+                    return !isFull;
+                } else if (this._broadcast?.auction_display === "Full teams") {
+                    return isFull;
+                }
+                return true;
+            });
             const maxRows = 4;
+            const perRow = this._broadcast?.auction_display === "All teams" ? Math.ceil(teams.length / maxRows) : 2;
+
+            console.log({ teams: teams.length, maxRows, perRow });
+
+            const rowCount = (Math.ceil(teams.length / perRow));
             const rows = [...Array(rowCount).keys()];
             const start = this.tick % rowCount;
 
@@ -354,7 +390,7 @@ export default {
 
             let displayRows = rows.slice(start, start + maxRows);
 
-            if (this.teams.length <= perRow * maxRows) {
+            if (teams.length <= perRow * maxRows) {
                 displayRows = rows;
             }
 
@@ -376,8 +412,9 @@ export default {
                     teams: []
                 };
 
-                newRow.teams.push(this.teams[(row * 2)]);
-                if (this.teams[(row * 2) + 1]) newRow.teams.push(this.teams[(row * 2) + 1]);
+                for (let i = 0; i < perRow; i++) {
+                    if (teams[(row * perRow) + i]) newRow.teams.push(teams[(row * perRow) + i]);
+                }
                 _rows.push(newRow);
             });
 
@@ -485,7 +522,7 @@ export default {
         setInterval(() => {
             this.tick++;
             // if (this.tick >= 4) this.tick = 0;
-        }, 8000);
+        }, 6000);
     },
     sockets: {
         auction_welcome({ auctionID, ready, state, activePlayerID }) {
@@ -588,12 +625,21 @@ export default {
     .right {
         width: 600px;
         background-color: rgba(24,24,24);
+        transition: width 250ms;
+    }
+    .right.all-teams {
+        width: 900px;
     }
     .event-logo-holder  {
         width: 300px;
     }
     .event-stats {
         width: 350px;
+        overflow: hidden;
+        transition: width 250ms;
+    }
+    .event-stats.w-0 {
+        width: 0;
     }
     .logo-inner {
         width: 90%; height: 90%;
@@ -728,7 +774,7 @@ export default {
     }
 
     .team-player-list {
-        width: 100%;
+        width: calc(50% - 20px);
         height: 100%;
     }
 

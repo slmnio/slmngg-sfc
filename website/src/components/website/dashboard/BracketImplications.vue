@@ -1,5 +1,5 @@
 <template>
-    <div class="bracket-implications bg-dark p-2 d-flex" v-if="bracketImplications.length">
+    <div class="bracket-implications bg-dark p-2 d-flex flex-column" v-if="bracketImplications.length">
         <div class="bracket-i-b w-100" v-for="imps in bracketImplications" :key="imps.bracket.id">
             <div class="mb-1 text-center"><b><i class="fas fa-sitemap fa-fw mr-2"></i><router-link :to="url('event', match.event, { subPage: 'bracket' })">{{ imps.bracket.name }}</router-link></b></div>
             <div class="bracket-row">
@@ -44,6 +44,8 @@ export default {
                 try {
                     const { connections } = JSON.parse(bracket.bracket_layout);
                     const thisMatchNumber = bracket.ordered_matches.findIndex(match => match.id === this.match.id);
+                    console.log("bracket imp", connections, thisMatchNumber);
+
                     if (thisMatchNumber === -1) return null;
 
                     const matchConnections = {
@@ -51,12 +53,14 @@ export default {
                         lose: this.getMatchDetails(connections[thisMatchNumber + 1].lose, bracket.ordered_matches, connections)
                     };
 
+                    console.log("bracket imp", thisMatchNumber, matchConnections);
+
                     return {
                         bracket,
                         ...matchConnections
                     };
                 } catch (e) {
-                // console.error(e);
+                    console.error(e);
                     return null;
                 }
             }).filter(s => s);
@@ -99,13 +103,14 @@ export default {
                 const feederMatches = [];
                 // lookup to see feeder matches
                 Object.entries(connections).forEach(([matchNum, data]) => {
-                    if (data.win.includes(".") && parseInt(data.win.split(".")[0]) === otherMatchNum) {
+                    if (!matchNum || matchNum === "null") return;
+                    if (data.win?.includes(".") && parseInt(data.win?.split(".")[0]) === otherMatchNum) {
                         feederMatches.push({
                             ...matches[matchNum - 1],
                             feederTake: "Winner"
                         });
                     }
-                    if (data.lose.includes(".") && parseInt(data.lose.split(".")[0]) === otherMatchNum) {
+                    if (data.lose?.includes(".") && parseInt(data.lose?.split(".")[0]) === otherMatchNum) {
                         feederMatches.push({
                             ...matches[matchNum - 1],
                             feederTake: "Loser"
@@ -155,5 +160,10 @@ export default {
     }
     .bracket-details {
         white-space: pre-wrap;
+    }
+    .bracket-implications .bracket-i-b + .bracket-i-b {
+        margin-top: 1em;
+        padding-top: .75em;
+        border-top: 1px solid rgba(255,255,255,0.05)
     }
 </style>

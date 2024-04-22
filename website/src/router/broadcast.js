@@ -45,6 +45,16 @@ export default [
             interval: route.query.interval || route.query.headlineInterval
         })
     },
+    { path: "break-schedule", component: () => import("@/components/broadcast/break/BreakScheduleOverlay.vue") },
+    { path: "versus", component: () => import("@/components/broadcast/roots/VersusOverlay.vue") },
+    {
+        path: "winners",
+        component: () => import("@/components/broadcast/roots/WinnersOverlay.vue"),
+        props: route => ({
+            useConfetti: !!route.query.confetti
+        })
+    },
+    { path: "map-bump", component: () => import("@/components/broadcast/roots/MapBumpOverlay.vue") },
     { path: "break-bar", component: () => import("@/components/broadcast/break/BreakBarOverlay.vue") },
     {
         path: "break-text",
@@ -86,6 +96,9 @@ export default [
         })
     },
     { path: "hero-rosters", redirect: "hero-roster" },
+    { path: "boxed-hero-rosters", redirect: "boxed-roster" },
+    { path: "boxed-hero-roster", redirect: "boxed-roster" },
+    { path: "boxed-rosters", redirect: "boxed-roster" },
     {
         path: "hero-roster",
         component: () => import("@/components/broadcast/roots/HeroRosterOverlay.vue"),
@@ -94,6 +107,19 @@ export default [
             playerCount: route.query.count || route.query.players || route.query.playerCount,
             showRoles: !!route.query.role || !!route.query.roles || !!route.query.icons,
             showPronouns: !!route.query.pronouns
+        })
+    },
+    {
+        path: "boxed-roster",
+        component: () => import("@/components/broadcast/roots/BoxedHeroRosterOverlay.vue"),
+        props: route => ({
+            teamNum: route.query.team || route.query.teamNum,
+            playerCount: route.query.count || route.query.players || route.query.playerCount,
+            showRoles: !!route.query.role || !!route.query.roles || !!route.query.icons,
+            showPronouns: !!route.query.pronouns,
+            subtitle: route.query.subtitle,
+            alternate: route.query.alternate ? parseInt(route.query.alternate) : null,
+            showStaff: !!route.query.staff
         })
     },
     {
@@ -122,7 +148,13 @@ export default [
             stage: route.query.stage || route.query.group
         })
     },
-    { path: "thumbnail", component: () => import("@/components/broadcast/EventThumbnailCreator.vue") },
+    {
+        path: "thumbnail",
+        component: () => import("@/components/broadcast/EventThumbnailCreator.vue"),
+        props: route => ({
+            showSchedule: route.query.schedule
+        })
+    },
     {
         path: "draft",
         component: () => import("@/components/broadcast/roots/DraftOverlay.vue"),
@@ -162,6 +194,7 @@ export default [
             small: !!route.query.small
         })
     },
+    { path: "l-bar", component: () => import("@/components/broadcast/roots/LBarOverlay") },
     { path: "background", component: () => import("@/components/broadcast/BroadcastBackground.vue"), props: route => ({ index: route.query.index }) },
     { path: "sponsors", component: () => import("@/components/broadcast/roots/SponsorOverlay.vue") },
     { path: "maps", component: () => import("@/components/broadcast/roots/MapsOverlay.vue"), props: route => ({ autoTitle: route.query.auto }) },
@@ -171,7 +204,14 @@ export default [
     { path: "logos", component: () => import("@/components/broadcast/roots/LogoAdOverlay.vue") },
     { path: "staff", component: () => import("@/components/broadcast/roots/StaffOverlay.vue") },
     { path: "player-history", component: () => import("@/components/broadcast/PlayerHistory.vue"), props: route => ({ showMinor: route.query.minor }) },
-    { path: "overview", component: () => import("@/components/broadcast/roots/OverviewOverlay.vue"), props: route => ({ noMapVideos: (route.query.video === "false" || route.query.videos === "false") }) },
+    {
+        path: "overview",
+        component: () => import("@/components/broadcast/roots/OverviewOverlay.vue"),
+        props: route => ({
+            noMapVideos: (route.query.video === "false" || route.query.videos === "false"),
+            useLiveDesk: !!route.query.live
+        })
+    },
     { path: "media", component: () => import("@/components/broadcast/roots/MediaOverlay.vue") },
     {
         path: "music",
@@ -241,7 +281,14 @@ export default [
     { path: "tester", component: () => import("@/components/broadcast/roots/ThemeTransitionTester.vue") },
     { path: "admin", component: () => import("@/components/broadcast/roots/ClientOverview.vue") },
     { path: "syncer", component: () => import("@/components/broadcast/roots/SyncerOverlay.vue") },
-    { path: "tally-viewer", component: () => import("@/components/broadcast/roots/TallyViewer.vue") },
+    { path: "tally", redirect: "tally-viewer" },
+    {
+        path: "tally-viewer",
+        component: () => import("@/components/broadcast/roots/TallyViewer.vue"),
+        props: route => ({
+            customText: ["scene", "scenes", "text", "custom", "customText", "force"].reduce((prev, current) => prev || route.query[current], null)
+        })
+    },
     {
         path: "tally-dot",
         component: () => import("@/components/broadcast/roots/TallyDot.vue"),
@@ -271,6 +318,14 @@ export default [
     {
         path: "websocket-transmitter",
         component: () => import("@/components/broadcast/roots/WebsocketTransmitter.vue"),
+        props: route => ({
+            wsUrl: route.query.url || route.query.wsUrl || route.query.wsurl || route.query.wsURL || "ws://127.0.0.1:4455",
+            wsPassword: route.query.wsPassword || route.query.password || route.query.pw
+        })
+    },
+    {
+        path: "remote",
+        component: () => import("@/components/broadcast/roots/RemoteObsController.vue"),
         props: route => ({
             wsUrl: route.query.url || route.query.wsUrl || route.query.wsurl || route.query.wsURL || "ws://127.0.0.1:4455",
             wsPassword: route.query.wsPassword || route.query.password || route.query.pw

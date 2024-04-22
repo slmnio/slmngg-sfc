@@ -6,7 +6,7 @@ function tableUpdated(tableName, Cache) {
     if (tableName === "Matches") matchUpdate(Cache);
     if (tableName === "Broadcasts") broadcastUpdate(Cache);
     if (tableName === "Players") playerList(Cache);
-    if (tableName === "Teams") teamList(Cache);
+    if (["Teams", "Events"].includes(tableName)) teamList(Cache);
     if (tableName === "Events") publicEvents(Cache);
     // TODO: maybe add discord bots here?
 }

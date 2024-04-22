@@ -68,6 +68,30 @@ export default {
                 case "OMapWinrate":
                     stats.push("o_map_winrate_text");
                     break;
+                case "Points":
+                    stats.push("points");
+                    break;
+                case "MatchWins":
+                    stats.push("wins");
+                    break;
+                case "MatchDiffPoints":
+                    stats.push("diff_points");
+                    break;
+                case "MatchWinsPoints":
+                    stats.push("wins_points");
+                    break;
+                case "MatchesPoints":
+                    stats.push("matches_points");
+                    break;
+                case "Played":
+                    stats.push("played");
+                    break;
+                case "OPoints":
+                    stats.push("opponent_points");
+                    break;
+                case "OMatchWinsPoints":
+                    stats.push("opponent_points_wins");
+                    break;
                 default:
                     stats.push("empty");
                 }
@@ -81,11 +105,17 @@ export default {
         },
         teamStats() {
             return {
+                wins: this.team.standings.wins,
+                losses: this.team.standings.losses,
+                played: this.team.standings.wins + this.team.standings.losses,
                 matches: `${this.team.standings.wins}-${this.team.standings.losses}`,
                 diff: diffString(this.team.standings.wins - this.team.standings.losses),
                 maps: `${this.team.standings.map_wins}-${this.team.standings.map_losses}`,
                 map_diff: diffString(this.team.standings.map_wins - this.team.standings.map_losses),
-                // points: this.team.standings.points,
+                points: this.team.extra_points,
+                wins_points: this.team.standings.wins + (this.team.extra_points || 0),
+                diff_points: diffString(this.team.standings.wins - this.team.standings.losses + (this.team.extra_points || 0)),
+                matches_points: `${this.team.standings.wins + (this.team.extra_points > 0 ? this.team.extra_points : 0)}-${this.team.standings.losses + (this.team.extra_points < 0 ? this.team.extra_points : 0)}`,
                 rank: this.team.standings.rank,
                 tie_show_number: this.team.standings.tie_show_number,
                 winrate: this.team.standings.winrate,
@@ -97,7 +127,9 @@ export default {
                 omw: this.team.standings?.omw !== undefined ? Math.floor(this.team.standings.omw * 100) + "%" : "-",
                 empty: "-",
                 map_rounds: `${this.team.standings.map_round_wins}-${this.team.standings.map_round_losses}`,
-                map_rounds_diff: diffString(this.team.standings.map_round_wins - this.team.standings.map_round_losses)
+                map_rounds_diff: diffString(this.team.standings.map_round_wins - this.team.standings.map_round_losses),
+                opponent_points: this.team.standings.opponent_points,
+                opponent_points_wins: this.team.standings.opponent_points_wins
             };
         }
     },

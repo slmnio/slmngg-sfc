@@ -1,12 +1,12 @@
 <template>
     <transition v-if="useTransitions" mode="out-in" name="break-content" class="map-anim-holder">
         <div :key="autoKey" class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" :class="{'show-next-map': showNextMap && nextMap}">
-            <MapSegment class="map" v-for="map in maps" :key="map.id" :small="small"
+            <MapSegment class="map" v-for="map in maps" :key="map.id" :small="small" :drafted-style="draftedStyle"
                 :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
         </div>
     </transition>
     <div v-else class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" :class="{'show-next-map': showNextMap && nextMap}">
-        <MapSegment class="map" v-for="map in maps" :key="map.id" :small="small"
+        <MapSegment class="map" v-for="map in maps" :key="map.id" :small="small" :drafted-style="draftedStyle"
                     :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
     </div>
 </template>
@@ -20,7 +20,7 @@ import { getNewURL } from "@/utils/images";
 export default {
     name: "MapDisplay",
     components: { MapSegment },
-    props: ["broadcast", "animationActive", "useTransitions", "virtualMatch", "noMapVideos", "small"],
+    props: ["broadcast", "animationActive", "useTransitions", "virtualMatch", "noMapVideos", "small", "draftedStyle"],
     data: () => ({
         activeAudio: null,
         showNextMap: false,
@@ -95,6 +95,13 @@ export default {
                     if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: this.mapTypes && this.mapTypes[num], image: [{ url: DefaultMapImages[this.mapTypes[num]] }] } : {}) });
                 }
             }
+
+            let legitMapNum = 0;
+            maps.forEach(map => {
+                if (!map.banner) {
+                    map._number = ++legitMapNum;
+                }
+            });
             return maps;
         },
         likelyNeededMaps() {

@@ -121,7 +121,7 @@ const slmnggAttachments = {
     "Map Data": ["image", "big_image", "video", "audio"],
     "Maps": ["image", "big_image"],
     "Log Files": ["log_file"],
-    "Heroes": ["main_image", "recolor_base", "recolor_layers"],
+    "Heroes": ["main_image", "recolor_base", "recolor_layers", "alternate_set_image"],
     "Ad Reads": ["audio", "image"],
     "Tracks": ["file"],
     "Teams": ["icon", "images"],
@@ -210,7 +210,7 @@ function generateLimitedPlayers(longText) {
         parts.forEach(part => {
             let split = part.indexOf("=");
             let key = keyDeAirtable(part.slice(0, split));
-            let val = part.slice(split + 1);
+            let val = part.slice(split + 1).trim();
 
             if (!key || !val) return;
 

@@ -138,7 +138,7 @@ export default [
         path: "/client/:clientID",
         component: ClientApp,
         props: route => ({
-            client: route.params.clientID,
+            client: route.params.clientID.toLowerCase(),
             title: route.query.title,
             stingerText: route.query.stingerText,
             stingerThemeOverride: route.query.stingerThemeOverride || route.query.stingerTheme,

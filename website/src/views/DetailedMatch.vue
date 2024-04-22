@@ -248,6 +248,7 @@ export default {
             });
         },
         sortPlayers(players) {
+            if (!players?.length) return [];
             return players.sort((a, b) => {
                 if (a.role !== b.role) {
                     const order = ["Tank", "DPS", "Support"];
@@ -335,6 +336,7 @@ export default {
                     theme: ReactiveThing("theme")
                 }),
                 maps: ReactiveArray("maps", {
+                    map: ReactiveThing("map"),
                     winner: ReactiveThing("winner", {
                         theme: ReactiveThing("theme")
                     }),

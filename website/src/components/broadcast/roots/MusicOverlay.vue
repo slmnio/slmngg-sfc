@@ -137,7 +137,7 @@ export default {
             this.startNewSong(isActive);
         }
     },
-    beforeDestroy() {
+    beforeUnmount() {
         this.mainPlayer?.stop();
         this.crossfadePlayer?.stop();
     },

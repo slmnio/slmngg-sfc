@@ -209,7 +209,7 @@ export default {
             this.height = this.$el.offsetHeight;
         }
     },
-    beforeDestroy () {
+    beforeUnmount () {
         this.resizeObserver.unobserve(this.$el);
     }
 };

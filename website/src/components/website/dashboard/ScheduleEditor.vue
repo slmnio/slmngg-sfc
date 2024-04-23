@@ -80,7 +80,7 @@ export default {
     mounted() {
         console.log("schedule editor mount");
     },
-    beforeDestroy() {
+    beforeUnmount() {
         console.log("schedule editor destroy");
     }
 };

@@ -18,7 +18,7 @@ export default {
             minor: true
         }
     }),
-    beforeDestroy() {
+    beforeUnmount() {
         this.stopConfetti();
     },
     methods: {

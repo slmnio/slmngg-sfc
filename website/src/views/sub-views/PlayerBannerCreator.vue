@@ -179,7 +179,7 @@ export default {
             return null;
         }
     },
-    beforeDestroy() {
+    beforeUnmount() {
         if (this.$refs.canvas) {
             const context = this.$refs.canvas.getContext("2d");
             context.clearRect(0, 0, this.$refs.canvas.width, this.$refs.canvas.height);

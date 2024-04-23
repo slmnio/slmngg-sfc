@@ -402,7 +402,7 @@ export default {
             });
         }
     },
-    beforeDestroy() {
+    beforeUnmount() {
         Store.commit("setHighlightedTeam", null);
         Store.commit("setHighlightedMatch", null);
     },

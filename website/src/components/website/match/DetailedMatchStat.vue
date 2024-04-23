@@ -1,16 +1,18 @@
 <template>
     <div class="stat mb-2" v-if="shouldShow">
-        <div class="stat-a"><slot></slot></div>
+        <div class="stat-a">
+            <slot></slot>
+        </div>
         <div class="stat-b" v-if="raw" v-html="formattedTargetData"></div>
         <div class="" v-if="$slots.content">
             <slot name="content"></slot>
         </div>
         <div class="stat-b" v-else-if="time">{{ prettyDate(targetData) }}</div>
         <div class="stat-b" v-else-if="players">
-            <LinkedPlayers :players="targetData" :show-tally="showTally" />
+            <LinkedPlayers :players="targetData" :show-tally="showTally"/>
         </div>
         <div class="stat-b" v-else-if="externalLink">
-            <a class="ct-active" :href="targetData" target="_blank">{{ targetData.replace('https://', '') }}</a>
+            <a class="ct-active" :href="targetData" target="_blank">{{ targetData.replace("https://", "") }}</a>
         </div>
         <div class="stat-b" v-else-if="formattedTargetData">{{ formattedTargetData }}</div>
     </div>
@@ -19,6 +21,7 @@
 <script>
 import LinkedPlayers from "@/components/website/LinkedPlayers";
 import { formatTime } from "@/utils/content-utils";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "DetailedMatchStat",
@@ -26,7 +29,10 @@ export default {
     components: { LinkedPlayers },
     methods: {
         prettyDate(timeString) {
-            return formatTime(timeString, { tz: this.$store.state.timezone, use24HourTime: this.$store.state.use24HourTime });
+            return formatTime(timeString, {
+                tz: useSettingsStore().timezone,
+                use24HourTime: useSettingsStore().use24HourTime
+            });
         }
     },
     computed: {
@@ -45,15 +51,16 @@ export default {
 
 <style scoped>
 
-    .stat-a {
-        font-weight: bold;
-    }
-    .stat-b >>> a {
-        max-width: 100%;
-        white-space: nowrap;
-        overflow: hidden;
-        display: block;
-        text-overflow: ellipsis;
-    }
+.stat-a {
+    font-weight: bold;
+}
+
+.stat-b >>> a {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+    text-overflow: ellipsis;
+}
 
 </style>

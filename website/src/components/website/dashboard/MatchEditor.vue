@@ -165,6 +165,7 @@ import TeamPicker from "@/components/website/dashboard/TeamPicker";
 import MapScoreEditor from "@/components/website/dashboard/MapScoreEditor";
 import DashboardModule from "@/components/website/dashboard/DashboardModule.vue";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "MatchEditor",
@@ -426,7 +427,7 @@ export default {
         async setMatchStart(timeString) {
             const response = await this.sendMatchDataChange("start", timeString);
             if (!response.error) {
-                this.$notyf.success(`Set match start to: ${formatTime(timeString, { tz: this.$store.state.timezone, use24HourTime: this.$store.state.use24HourTime })}`);
+                this.$notyf.success(`Set match start to: ${formatTime(timeString, { tz: useSettingsStore().timezone, use24HourTime: useSettingsStore().use24HourTime })}`);
             }
         },
         setIfNew(key, index, value) {

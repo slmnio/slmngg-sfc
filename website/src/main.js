@@ -1,12 +1,16 @@
-import { createApp } from "vue";
-import GlobalApp from "./apps/GlobalApp";
+import { configureCompat, createApp } from "vue";
+import { createPinia } from "pinia";
+import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import store from "@/thing-store";
+
+
+import GlobalApp from "./apps/GlobalApp";
 import VueMeta from "vue-meta";
 import { io } from "socket.io-client";
-import {createBootstrap} from 'bootstrap-vue-next'
+import { createBootstrap } from "bootstrap-vue-next";
 // import "bootstrap-vue/dist/bootstrap-vue.css";
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue-next/dist/bootstrap-vue-next.css";
 
 import VueYoutubeEmbed from "vue-youtube-embed";
 import VueCookies from "vue-cookies";
@@ -17,11 +21,15 @@ import "notyf/notyf.min.css";
 import { getDataServerAddress } from "@/utils/fetch";
 import { ReactiveRoot } from "@/utils/reactive";
 import { authenticateWithToken, getAuthNext, setAuthNext } from "@/utils/auth";
-import {createRouter} from "@/router";
+import { createRouter } from "@/router";
 
 import AuthRoutes from "@/router/auth-redirects";
-const router = await createRouter();
 
+configureCompat({
+    COMPONENT_V_MODEL: false
+});
+
+const router = await createRouter();
 
 let subdomain = false;
 
@@ -66,7 +74,10 @@ const app = createApp({
         // this is mainly for development, probably won't stay
         colorControls: {
             schema: {
-                hue: 0, saturation: 0, overlay: 0, multiply: 0
+                hue: 0,
+                saturation: 0,
+                overlay: 0,
+                multiply: 0
             }
         }
     }),
@@ -82,7 +93,9 @@ const app = createApp({
                 const notes = JSON.parse(localStorage.getItem("draft-notes"));
                 this.$store.state.draft_notes = notes;
             }
-        } catch (e) { console.error("Draft notes local storage error", e); }
+        } catch (e) {
+            console.error("Draft notes local storage error", e);
+        }
 
         if (!this.auth.user) {
             const token = this.$cookies.get("token");
@@ -120,13 +133,17 @@ const app = createApp({
 });
 
 
-app.use(store)
+app.use(store);
+
+const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
+app.use(pinia);
 
 router.addRoute(AuthRoutes(app));
 
-app.use(router)
+app.use(router);
 
-app.use(createBootstrap()) // Important
+app.use(createBootstrap()); // Important
 
 app.use(VueMeta);
 app.use(VueYoutubeEmbed, { global: false });
@@ -168,7 +185,6 @@ app.component("v-style", {
 // TODO: add other domain support here
 
 
-
 let preloadAuthCheckRequired = false;
 let preloadAuthReturn = null;
 
@@ -183,7 +199,10 @@ router.beforeEach((to, from, next) => {
 
             if (app && !app.auth.user) {
                 setAuthNext(app?.$root, to.fullPath);
-                return router.push({ path: "/login", query: { return: to.fullPath } });
+                return router.push({
+                    path: "/login",
+                    query: { return: to.fullPath }
+                });
                 // TODO: to.fullPath can be used for return (set in localstorage or something  /redirect?to=)
             } else {
                 console.warn("Need to check if authenticated, but the app hasn't loaded yet.");

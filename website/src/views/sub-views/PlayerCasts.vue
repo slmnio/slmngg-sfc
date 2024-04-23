@@ -17,7 +17,7 @@
                     <tr v-for="partner in partners" :key="partner.caster.id">
                         <td><router-link :to="`/player/${partner.caster.id}/casts`">{{ partner.caster.name }}</router-link></td>
                         <td>{{ partner.casts }}</td>
-                        <td>{{ formatTime(partner.lastMatch.start, {format: "{day} {date-ordinal} {month} {year}", tz: $store.state.timezone, use24HourTime: $store.state.use24HourTime}) }} -
+                        <td>{{ formatTime(partner.lastMatch.start, {format: "{day} {date-ordinal} {month} {year}", tz: useSettingsStore().timezone, use24HourTime: useSettingsStore().use24HourTime}) }} -
                             <span v-if="partner.lastMatch?.event"><router-link :to="url('event', partner.lastMatch?.event)">{{ partner.lastMatch?.event?.name }}</router-link> - </span>
                             <router-link :to="url('match', partner.lastMatch)">{{ partner.lastMatch?.name}}</router-link></td>
                     </tr>
@@ -32,10 +32,11 @@ import Match from "@/components/website/match/Match";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
 import { formatTime, url } from "../../utils/content-utils";
+import { useSettingsStore } from "../../stores/settingsStore";
 
 export default {
     name: "PlayerCasts",
-    methods: { url, formatTime },
+    methods: { useSettingsStore, url, formatTime },
     props: ["player"],
     components: { Match },
     computed: {

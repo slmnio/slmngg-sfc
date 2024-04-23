@@ -41,6 +41,7 @@ import { formatTime, getAbbrev, getTimezone } from "@/utils/content-utils";
 import spacetime from "spacetime";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper.vue";
 import LoadingIcon from "@/components/website/LoadingIcon.vue";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "AdvancedDateEditor",
@@ -73,7 +74,7 @@ export default {
             return ref;
         },
         siteTimezone() {
-            return getTimezone(this.$store.state.timezone || "local");
+            return getTimezone(useSettingsStore().timezone || "local");
         },
         localTimezone() {
             return getTimezone("local");

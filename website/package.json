@@ -20,6 +20,8 @@
     "notyf": "^3.10.0",
     "obs-websocket-js": "^5.0.2",
     "opus-decoder": "^0.5.3",
+    "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^3.2.1",
     "socket.io-client": "^4.0.1",
     "spacetime": "^7.4.1",
     "spacetime-informal": "^0.6.1",

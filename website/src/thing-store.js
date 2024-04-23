@@ -1,4 +1,4 @@
-import { createStore } from 'vuex'
+import { createStore } from "vuex";
 import { cleanID } from "@/utils/content-utils";
 import { fetchThings } from "@/utils/fetch";
 
@@ -13,8 +13,6 @@ const store = createStore({
         highlighted_match: null,
         edit_in_site_timezone: false,
         match_highlights: [],
-        timezone: localStorage.getItem("timezone") || "local",
-        use24HourTime: localStorage.getItem("use24HourTime") === "true" || false,
         draft_notes: [],
         last_event_match_pages: [],
         dashboard_modules_active: [],
@@ -149,7 +147,7 @@ const store = createStore({
         subscribe: (state, data) => state.commit("subscribe", data),
         unsubscribe: (state, data) => state.commit("unsubscribe", data)
     }
-})
+});
 
 
 export default store;

@@ -67,6 +67,7 @@ import { cleanID, formatTime, getMatchContext, url } from "@/utils/content-utils
 import { resizedImageNoWrap } from "@/utils/images";
 import { isAuthenticated } from "@/utils/auth";
 import { canEditMatch } from "@/utils/client-action-permissions";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "Match",
@@ -143,8 +144,8 @@ export default {
         },
         date() {
             return formatTime(this.match.start, {
-                tz: this.$store.state.timezone,
-                use24HourTime: this.$store.state.use24HourTime
+                tz: useSettingsStore().timezone,
+                use24HourTime: useSettingsStore().use24HourTime
             });
         },
         theme() {

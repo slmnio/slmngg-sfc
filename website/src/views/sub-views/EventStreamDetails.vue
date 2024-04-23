@@ -22,8 +22,8 @@
                         <span class="d-inline-flex ml-auto">{{
                                 formatTime(nextMatch.start, {
                                     format: "{day-short} {date-ordinal} {month-short} {time}",
-                                    tz: $store.state.timezone,
-                                    use24HourTime: $store.state.use24HourTime
+                                    tz: useSettingsStore().timezone,
+                                    use24HourTime: useSettingsStore().use24HourTime
                                 })
                           }}</span>
                     </span>
@@ -42,10 +42,11 @@ import { formatTime, url } from "@/utils/content-utils";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "EventStreamDetails",
-    methods: { formatTime, url },
+    methods: { useSettingsStore, formatTime, url },
     components: { ThemeLogo },
     props: {
         event: {}

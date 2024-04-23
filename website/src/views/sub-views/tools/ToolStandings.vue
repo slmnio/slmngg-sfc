@@ -162,6 +162,11 @@
 
 <script>
 export default {
-    name: "ToolStandings"
+    name: "ToolStandings",
+    metaInfo() {
+        return {
+            title: "Standings"
+        };
+    }
 };
 </script>

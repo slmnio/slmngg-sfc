@@ -576,6 +576,11 @@ export default {
                 .toLocaleLowerCase()
                 .trim();
         }
+    },
+    metaInfo() {
+        return {
+            title: "Scene Collections"
+        };
     }
 };
 </script>

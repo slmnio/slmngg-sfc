@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <h1>BPL Overwatch Settings</h1>
+        <h1>Overwatch Settings Guide</h1>
 
         <SubPageNav class="my-2">
             <li class="nav-item ct-passive">
@@ -40,7 +40,7 @@ export default {
 
     metaInfo() {
         return {
-            title: "BPL Overwatch Settings"
+            title: "Overwatch Settings Guide"
         };
     }
 };

@@ -268,5 +268,14 @@ async function writeData(data) {
     res.data.value = encode(data);
     await res.save();
 }
+</script>
 
+<script>
+export default {
+    metaInfo() {
+        return {
+            title: "Overwatch Settings Switcher"
+        };
+    }
+}
 </script>

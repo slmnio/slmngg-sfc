@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <h1>BPL Observer Guide</h1>
+        <h1>Observer Guide</h1>
 
         <SubPageNav class="my-2">
             <li class="nav-item ct-passive">

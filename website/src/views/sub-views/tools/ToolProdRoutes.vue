@@ -738,6 +738,11 @@ export default {
                 };
             });
         }
+    },
+    metaInfo() {
+        return {
+            title: "Broadcast Routes"
+        };
     }
 };
 </script>

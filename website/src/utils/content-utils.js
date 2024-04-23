@@ -200,11 +200,6 @@ export function clarifyTeam(team) {
     return team.name;
 }
 
-export function pronounsFilter(pronouns) {
-    if (pronouns === "any") return "any pronouns";
-    return pronouns;
-}
-
 export function textSort(a, b) {
     if (a < b) return -1;
     if (a > b) return 1;

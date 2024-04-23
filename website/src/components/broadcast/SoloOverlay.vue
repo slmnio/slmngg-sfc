@@ -37,7 +37,7 @@
             </div>
             <div class="control-group" v-if="controlMode === 'set-team-1'">
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
-                <SoloTeamControlButton v-for="team in currentChunk" v-bind:key="team.id" :team="team"
+                <SoloTeamControlButton v-for="team in currentChunk" :key="team.id" :team="team"
                  :click="() => setTeam(0, team)"/>
                 <div class="spacer"></div>
                 <SoloControlButton color="#2cf22c" right rotate :click="() => nextPage()">Next</SoloControlButton>
@@ -45,7 +45,7 @@
 
             <div class="control-group" v-if="controlMode === 'set-team-2'">
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
-                <SoloTeamControlButton v-for="team in currentChunk" v-bind:key="team.id" :team="team"
+                <SoloTeamControlButton v-for="team in currentChunk" :key="team.id" :team="team"
                  :click="() => setTeam(1, team)"/>
                 <div class="spacer"></div>
                 <SoloControlButton color="#2cf22c" right rotate :click="() => nextPage()">Next</SoloControlButton>
@@ -55,7 +55,7 @@
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
                 <div class="spacer"></div>
 
-                <SoloControlButton v-bind:class="{'is-score': scores[0] === score}" class="score" v-for="score in [...scoreArray].reverse()" v-bind:key="'team-1-' + score"
+                <SoloControlButton v-bind:class="{'is-score': scores[0] === score}" class="score" v-for="score in [...scoreArray].reverse()" :key="'team-1-' + score"
                                    :click="() => setScore(0, score)">{{ score }}</SoloControlButton>
 
 
@@ -63,7 +63,7 @@
                 <SoloControlButton icon="fas fa-trophy" color="#f22cf2" :click="() => controlMode = 'set-first-to'">First<br>To {{ firstTo }}</SoloControlButton>
                 <SoloTeamControlButton noclick :team="teams[1]"/>
 
-                <SoloControlButton v-bind:class="{'is-score': scores[1] === score}" class="score" v-for="score in scoreArray" v-bind:key="'team-2-' + score"
+                <SoloControlButton v-bind:class="{'is-score': scores[1] === score}" class="score" v-for="score in scoreArray" :key="'team-2-' + score"
                                    :click="() => setScore(1, score)">{{ score }}</SoloControlButton>
 
                 <div class="spacer"></div>
@@ -75,7 +75,7 @@
                 <SoloControlButton icon="fas fa-trophy" color="#f22cf2" noclick>First<br>To</SoloControlButton>
 
 
-                <SoloControlButton v-bind:class="{'is-score': firstTo === num}" class="score" v-for="num in [1,2,3,4,5]" v-bind:key="'first-to' + num"
+                <SoloControlButton v-bind:class="{'is-score': firstTo === num}" class="score" v-for="num in [1,2,3,4,5]" :key="'first-to' + num"
                                    :click="() => setFirstTo(num)">{{ num }}</SoloControlButton>
 
 
@@ -137,7 +137,7 @@
                 <SoloControlButton left rotate :click="() => controlMode = 'set-maps'" color="#f0a02c">Maps</SoloControlButton>
                 <SoloControlButton noclick>Map {{ controllingMapNum + 1 }} <small>{{ maps[controllingMapNum]._type || maps[controllingMapNum].type || '' }}</small></SoloControlButton>
 
-                <SoloMapButton v-for="map in currentMapChunk" v-bind:key="map.id" :map="map"
+                <SoloMapButton v-for="map in currentMapChunk" :key="map.id" :map="map"
                                        :click="() => setMap(controllingMapNum, map)"/>
 
 

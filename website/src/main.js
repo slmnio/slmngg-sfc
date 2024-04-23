@@ -21,19 +21,17 @@ import { ReactiveRoot } from "@/utils/reactive";
 import { authenticateWithToken, getAuthNext, setAuthNext } from "@/utils/auth";
 import { createRouter } from "@/router";
 
-import AuthRoutes from "@/router/auth-redirects";
+import { getSubdomain } from "@/utils/get-subdomain";
 
 configureCompat({
-    MODE: 3,
+    MODE: 2,
     COMPONENT_V_MODEL: false,
     ATTR_FALSE_VALUE: false,
     WATCH_ARRAY: false,
     RENDER_FUNCTION: false,
 });
 
-const router = await createRouter();
-
-let subdomain = false;
+const {subdomain, subID} = await getSubdomain()
 
 
 const app = createApp({
@@ -134,6 +132,7 @@ const app = createApp({
     }
 });
 
+const { router } = await createRouter(app, subID, subdomain);
 
 app.use(store);
 
@@ -141,7 +140,6 @@ const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 app.use(pinia);
 
-router.addRoute(AuthRoutes(app));
 
 app.use(router);
 

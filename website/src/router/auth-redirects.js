@@ -1,5 +1,7 @@
 import { isOnMainDomain, setAuthNext } from "@/utils/auth";
 import { getMainDomain } from "@/utils/fetch";
+import ProfilePage from "@/views/ProfilePage.vue";
+import { h } from "vue";
 
 export default (app) => ([
     {
@@ -40,6 +42,7 @@ export default (app) => ([
                 .join("&");
 
             window.location.replace("https://discord.com/api/oauth2/authorize?" + stringParams);
-        }
+        },
+        component: () => h("div") // TODO something proper here
     }
 ]);

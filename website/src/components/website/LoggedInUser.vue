@@ -16,7 +16,6 @@
 
 <script>
 import { url } from "@/utils/content-utils.js";
-import { BDropdownDivider, BDropdownItem, BNavItemDropdown, VBModal } from "bootstrap-vue";
 import { isAuthenticated, isOnMainDomain } from "@/utils/auth";
 import { getMainDomain } from "@/utils/fetch";
 import { bg } from "@/utils/images";
@@ -24,12 +23,8 @@ import TokenModal from "@/components/website/dashboard/TokenModal.vue";
 
 export default {
     name: "LoggedInUser",
-    directives: { BModal: VBModal },
     components: {
-        TokenModal,
-        BDropdownItem,
-        BNavItemDropdown,
-        BDropdownDivider
+        TokenModal
     },
     computed: {
         user() {

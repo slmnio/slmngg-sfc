@@ -54,11 +54,10 @@
 import { authenticatedRequest } from "@/utils/dashboard";
 import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import LoadingIcon from "@/components/website/LoadingIcon";
-import { BButton } from "bootstrap-vue";
 
 export default {
     name: "TeamCams",
-    components: { LoadingIcon, BButton },
+    components: { LoadingIcon },
     data: () => ({
         hasCreatedLiveGuest: false
     }),

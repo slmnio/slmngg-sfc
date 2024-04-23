@@ -42,7 +42,6 @@ import Match from "@/components/website/match/Match";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
 import { formatTime, url } from "../../utils/content-utils";
-import { BFormCheckbox } from "bootstrap-vue";
 
 export default {
     name: "PlayerMatches",
@@ -51,7 +50,6 @@ export default {
         showPartners: false
     }),
     components: {
-        BFormCheckbox,
         Match
     },
     computed: {

@@ -11,13 +11,9 @@
 
 <script>
 import TeamMapStats from "@/components/website/match/TeamMapStats";
-import { VBTooltip } from "bootstrap-vue";
 
 export default {
     name: "MatchMapHistory",
-    directives: {
-        VBTooltip
-    },
     components: { TeamMapStats },
     props: ["data", "map", "showUnplayedMaps"],
     computed: {

@@ -10,12 +10,10 @@
 
 <script>
 import { managePred } from "@/utils/dashboard";
-import { BButton } from "bootstrap-vue";
 
 export default {
     name: "Predictions",
     props: ["client"],
-    components: { BButton },
     data: () => ({
         processing: false
     }),

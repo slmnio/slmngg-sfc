@@ -131,11 +131,10 @@
 
 <script>
 import Bracket from "@/components/website/bracket/Bracket.vue";
-import { BButton } from "bootstrap-vue";
 
 export default {
     name: "BracketCreator",
-    components: { Bracket, BButton },
+    components: { Bracket },
     data: () => ({
         brackets: [
             {

@@ -17,13 +17,8 @@
 </template>
 
 <script>
-import { BFormCheckboxGroup, BFormGroup } from "bootstrap-vue";
 export default {
     name: "TwitchAuthScopeSelector",
-    components: {
-        BFormGroup,
-        BFormCheckboxGroup
-    },
     data: () => ({
         selected: [], // Must be an array reference!
         options: [

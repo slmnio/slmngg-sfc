@@ -184,7 +184,6 @@
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { url } from "@/utils/content-utils";
-import { BFormGroup, BFormSelect } from "bootstrap-vue";
 import { sortMatches } from "@/utils/sorts";
 import { logoBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
@@ -316,9 +315,7 @@ export default {
         }
     },
     components: {
-        ThemeLogo,
-        BFormGroup,
-        BFormSelect
+        ThemeLogo
     },
     data: () => ({
         showTeams: true,

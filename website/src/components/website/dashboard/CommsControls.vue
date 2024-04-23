@@ -8,12 +8,10 @@
 </template>
 
 <script>
-import { BButton } from "bootstrap-vue";
 
 export default {
     name: "CommsControls",
     props: ["match"],
-    components: { BButton },
     data: () => ({
         enabledComms: null
     }),

@@ -15,12 +15,10 @@
 </template>
 
 <script>
-import { BButton } from "bootstrap-vue";
 import { updateBreakDisplay } from "@/utils/dashboard";
 
 export default {
     name: "BreakDisplayTab",
-    components: { BButton },
     props: { broadcast: Object },
     data: () => ({
         options: [

@@ -7,16 +7,12 @@
 
 <script>
 import { setObserverSetting } from "@/utils/dashboard";
-import { BButton } from "bootstrap-vue";
 
 export default {
     name: "ObserverSettingsButton",
     props: {
         setting: String,
         isOn: Boolean
-    },
-    components: {
-        BButton
     },
     data: () => ({
         processing: false

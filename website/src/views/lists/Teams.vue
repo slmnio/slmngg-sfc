@@ -15,15 +15,13 @@
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { searchInCollection } from "@/utils/search";
 import LoadingIcon from "@/components/website/LoadingIcon";
-import { BPagination } from "bootstrap-vue";
 import EventTeamsDisplay from "@/views/lists/EventTeamsDisplay.vue";
 
 export default {
     name: "Teams",
     components: {
         EventTeamsDisplay,
-        LoadingIcon,
-        BPagination
+        LoadingIcon
     },
     data: function() {
         return {

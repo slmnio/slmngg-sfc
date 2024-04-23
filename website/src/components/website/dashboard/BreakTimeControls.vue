@@ -57,7 +57,6 @@
 </template>
 
 <script>
-import { BButton, BFormInput } from "bootstrap-vue";
 import { updateBroadcastData } from "@/utils/dashboard";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";
 import Countdown from "@/components/broadcast/Countdown.vue";
@@ -66,9 +65,7 @@ export default {
     name: "BreakTimeControls",
     components: {
         Countdown,
-        AdvancedDateEditor,
-        BButton,
-        BFormInput
+        AdvancedDateEditor
     },
     props: {
         broadcast: {}

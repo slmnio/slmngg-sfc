@@ -31,19 +31,10 @@
 </template>
 
 <script>
-import { BButton, BFormCheckbox, BFormGroup, VBModal } from "bootstrap-vue";
 import { updateBreakAutomation } from "@/utils/dashboard";
 
 export default {
     name: "BreakAutomationTab",
-    components: {
-        BButton,
-        BFormCheckbox,
-        BFormGroup
-    },
-    directives: {
-        BModal: VBModal
-    },
     props: {
         broadcast: Object
     },

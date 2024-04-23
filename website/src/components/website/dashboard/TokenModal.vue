@@ -23,12 +23,9 @@
 
 
 <script>
-import { BButton, BModal, VBModal, BFormCheckbox } from "bootstrap-vue";
 
 export default {
     name: "TokenModal",
-    components: { BModal, BButton, BFormCheckbox },
-    directives: { BModal: VBModal },
     props: {
         broadcast: Object
     },

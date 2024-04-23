@@ -114,7 +114,6 @@
 <script>
 import { ReactiveArray } from "@/utils/reactive";
 import { BitCounter, sortTeamsIntoStandings } from "@/utils/scenarios";
-import { BFormCheckbox } from "bootstrap-vue";
 
 
 function generateScoreline(firstTo) {
@@ -130,7 +129,6 @@ function generateScoreline(firstTo) {
 export default {
     name: "EventScenarios2",
     props: ["event"],
-    components: { BFormCheckbox },
     data: () => ({
         activeMatchGroup: "null", // this works for now
         activeScenarioView: "all",

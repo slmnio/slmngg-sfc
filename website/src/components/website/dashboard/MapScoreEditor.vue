@@ -6,12 +6,10 @@
 </template>
 
 <script>
-import { BFormInput } from "bootstrap-vue";
 import { themeBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "MapScoreEditor",
-    components: { BFormInput },
     props: ["team", "score", "reverse"],
     model: {
         prop: "score",

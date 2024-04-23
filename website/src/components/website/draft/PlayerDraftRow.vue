@@ -35,7 +35,6 @@
 <script>
 import HeroIcon from "@/components/website/HeroIcon";
 import { getRoleSVG, url } from "@/utils/content-utils";
-import { BButton, BButtonGroup } from "bootstrap-vue";
 import store from "@/thing-store";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import PlayerDraftTeamInfo from "@/components/website/draft/PlayerDraftTeamInfo";
@@ -44,7 +43,7 @@ import { sortEvents } from "@/utils/sorts";
 export default {
     name: "PlayerDraftRow",
     props: ["player", "hasDraftData", "settings", "game"],
-    components: { PlayerDraftTeamInfo, HeroIcon, BButton, BButtonGroup },
+    components: { PlayerDraftTeamInfo, HeroIcon },
     data: () => ({
         customNote: ""
     }),

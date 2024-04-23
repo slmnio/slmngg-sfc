@@ -14,12 +14,10 @@
 </template>
 
 <script>
-import { BButton } from "bootstrap-vue";
 
 export default {
     name: "ClientOverview",
     props: ["client"],
-    components: { BButton },
     data: () => ({
         overlays: {},
         prodData: {

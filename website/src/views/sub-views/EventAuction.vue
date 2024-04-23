@@ -182,7 +182,6 @@ import { cleanID, dirtyID, getRoleSVG, money, url } from "@/utils/content-utils"
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import AuctionCountdown from "@/components/broadcast/auction/AuctionCountdown.vue";
 import AuctionBid from "@/components/website/AuctionBid.vue";
-import { VBTooltip } from "bootstrap-vue";
 import ContentThing from "@/components/website/ContentThing.vue";
 import { themeBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
@@ -190,7 +189,6 @@ import ThemeLogo from "@/components/website/ThemeLogo.vue";
 export default {
     name: "EventAuction",
     components: { ThemeLogo, ContentThing, AuctionBid, AuctionCountdown },
-    directives: { BTooltip: VBTooltip },
     props: {
         event: {}
     },

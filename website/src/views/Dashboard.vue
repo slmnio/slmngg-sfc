@@ -78,7 +78,6 @@ import { url } from "@/utils/content-utils";
 import BroadcastSwitcher from "@/components/website/dashboard/BroadcastSwitcher";
 import MatchThumbnail from "@/components/website/match/MatchThumbnail";
 import MatchEditor from "@/components/website/dashboard/MatchEditor";
-import { BButton } from "bootstrap-vue";
 import { updateAutomaticTitle } from "@/utils/dashboard";
 import Predictions from "@/components/website/dashboard/Predictions";
 import CommsControls from "@/components/website/dashboard/CommsControls";
@@ -97,7 +96,7 @@ import GFXController from "@/views/GFXController.vue";
 
 export default {
     name: "Dashboard",
-    components: { GFXController, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControls, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
+    components: { GFXController, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControls, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher },
     data: () => ({
         titleProcessing: false
     }),

@@ -15,12 +15,10 @@
 
 <script>
 import { startCommercial } from "@/utils/dashboard";
-import { BButton, BButtonGroup } from "bootstrap-vue";
 
 export default {
     name: "Commercials",
     props: ["client"],
-    components: { BButton, BButtonGroup },
     data: () => ({
         processing: false
     }),

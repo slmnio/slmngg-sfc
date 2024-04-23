@@ -60,12 +60,10 @@
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { createGuestObject, getGuestString } from "@/utils/content-utils";
-import { BButton, BFormInput, BFormInvalidFeedback } from "bootstrap-vue";
 import { updateBroadcastData } from "@/utils/dashboard";
 
 export default {
     name: "DeskEditor",
-    components: { BFormInvalidFeedback, BButton, BFormInput },
     props: {
         broadcast: {}
     },

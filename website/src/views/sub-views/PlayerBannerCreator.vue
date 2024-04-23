@@ -23,16 +23,12 @@
 <script>
 import { AllBanners } from "@/utils/banners";
 import { resizedImageNoWrap } from "@/utils/images";
-import { BAlert, BButton, BFormSelect } from "bootstrap-vue";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { getAssociatedThemeOptions } from "@/utils/content-utils";
 
 export default {
     name: "PlayerBannerCreator",
     props: ["player"],
-    components: {
-        BButton, BFormSelect, BAlert
-    },
     data: () => ({
         bannerID: 1,
         customThemeID: null,

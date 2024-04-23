@@ -30,7 +30,6 @@
 
 <script>
 import DashboardModalIcon from "@/components/website/dashboard/DashboardModalIcon.vue";
-import { BButton, BFormRadioGroup, BModal, VBModal, BButtonGroup } from "bootstrap-vue";
 import BreakDisplayTab from "@/components/website/dashboard/BreakDisplayTab.vue";
 import BreakAutomationTab from "@/components/website/dashboard/BreakAutomationTab.vue";
 import BreakTextTab from "@/components/website/dashboard/BreakTextTab.vue";
@@ -38,8 +37,7 @@ import BreakTimeControls from "@/components/website/dashboard/BreakTimeControls.
 
 export default {
     name: "BreakDisplayMultiModal",
-    components: { BreakTimeControls, BreakTextTab, BreakAutomationTab, BreakDisplayTab, BFormRadioGroup, BModal, BButton, DashboardModalIcon, BButtonGroup },
-    directives: { BModal: VBModal },
+    components: { BreakTimeControls, BreakTextTab, BreakAutomationTab, BreakDisplayTab, DashboardModalIcon },
     props: {
         broadcast: Object
     },

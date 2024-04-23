@@ -16,16 +16,10 @@
 </template>
 
 <script>
-import { BButton, BFormInput, BFormSelect } from "bootstrap-vue";
 import { updateBroadcastData } from "@/utils/dashboard";
 
 export default {
     name: "DeskTextEditor",
-    components: {
-        BFormSelect,
-        BFormInput,
-        BButton
-    },
     props: {
         broadcast: {}
     },

@@ -52,7 +52,6 @@
 </template>
 
 <script>
-import { BButton, BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BFormSelect } from "bootstrap-vue";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { updateProfileData } from "@/utils/dashboard";
 import { resizedImage } from "@/utils/images";
@@ -61,7 +60,6 @@ import { logoBackground } from "@/utils/theme-styles";
 
 export default {
     name: "ProfilePage",
-    components: { BForm, BFormGroup, BFormSelect, BButton, BFormInput, BFormInvalidFeedback },
     computed: {
         player() {
             if (!this.$root.auth.user?.airtableID) return {};

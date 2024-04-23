@@ -9,7 +9,6 @@
 
 <script>
 import { resolveEntireBracket } from "@/utils/dashboard";
-import { BButton } from "bootstrap-vue";
 import { canEditMatch } from "@/utils/client-action-permissions";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 
@@ -20,7 +19,6 @@ export default {
         verticalButton: Boolean,
         showButton: Boolean
     },
-    components: { BButton },
     data: () => ({
         isResolving: false
     }),

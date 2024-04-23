@@ -61,11 +61,10 @@
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { url } from "@/utils/content-utils";
 import ScheduleTime from "@/components/website/schedule/ScheduleTime";
-import { BButton, BButtonGroup } from "bootstrap-vue";
 
 export default {
     name: "ScheduleMatch",
-    components: { BButtonGroup, BButton, ScheduleTime, ThemeLogo },
+    components: { ScheduleTime, ThemeLogo },
     methods: { url },
     props: ["match", "customText", "leftTeam", "showEditorButton"],
     computed: {

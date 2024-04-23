@@ -30,14 +30,10 @@
 
 <script>
 import BroadcastDisplay from "@/components/website/dashboard/BroadcastDisplay";
-import { BButton, BModal, VBModal } from "bootstrap-vue";
 import { setActiveBroadcast } from "@/utils/dashboard";
 export default {
     name: "BroadcastSwitcher",
-    components: { BroadcastDisplay, BModal, BButton },
-    directives: {
-        BModal: VBModal
-    },
+    components: { BroadcastDisplay },
     props: ["broadcasts"],
     data: () => ({
         setting: false,

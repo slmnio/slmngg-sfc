@@ -71,7 +71,6 @@
 </template>
 
 <script>
-import { BButton, BButtonGroup, BFormCheckbox } from "bootstrap-vue";
 import {
     toggleFlipTeams,
     updateBroadcastData
@@ -88,10 +87,7 @@ export default {
     }),
     components: {
         BreakDisplayMultiModal,
-        ObserverSettingsModal,
-        BFormCheckbox,
-        BButtonGroup,
-        BButton
+        ObserverSettingsModal
     },
     computed: {
         broadcast() {

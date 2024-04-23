@@ -35,7 +35,6 @@
 
 <script>
 import { formatTime, url } from "@/utils/content-utils";
-import { BFormCheckbox } from "bootstrap-vue";
 import { setMatchOverlayState, updateBroadcastData } from "@/utils/dashboard";
 import { logoBackground } from "@/utils/theme-styles";
 import { resizedImage } from "@/utils/images";
@@ -43,9 +42,6 @@ import { resizedImage } from "@/utils/images";
 export default {
     name: "ScheduleEditorMatch",
     props: ["match", "isLiveMatch", "timezone"],
-    components: {
-        BFormCheckbox
-    },
     computed: {
         prettyDate() {
             if (!this.match.start) return;

@@ -26,12 +26,11 @@
 <script>
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 import MapDisplay from "@/components/website/match/MapDisplay";
-import { BFormCheckbox } from "bootstrap-vue";
 
 export default {
     name: "MatchVOD",
     props: ["match"],
-    components: { EmbeddedVideo, MapDisplay, BFormCheckbox },
+    components: { EmbeddedVideo, MapDisplay },
     data: () => ({
         useVOD2: false,
         showBannedMaps: false

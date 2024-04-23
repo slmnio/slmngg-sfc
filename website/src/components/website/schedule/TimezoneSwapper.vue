@@ -14,7 +14,6 @@
 <script>
 import spacetime from "spacetime";
 import informal from "spacetime-informal";
-import { BForm, BFormGroup, BFormSelect, BFormCheckbox } from "bootstrap-vue";
 
 function getAbbrev(timezone) {
     const display = informal.display(timezone);
@@ -32,12 +31,6 @@ function getOffset(timezone) {
 export default {
     name: "TimezoneSwapper",
     props: ["align", "inline"],
-    components: {
-        BForm,
-        BFormGroup,
-        BFormSelect,
-        BFormCheckbox
-    },
     computed: {
         siteTimezone: {
             set(tz) {

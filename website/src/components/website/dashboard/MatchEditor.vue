@@ -156,7 +156,6 @@
 </template>
 
 <script>
-import { BButton, BForm, BFormCheckbox, BFormGroup, BFormInput, BFormSelect } from "bootstrap-vue";
 import { updateMapData, updateMatchData } from "@/utils/dashboard";
 import ThemeLogo from "@/components/website/ThemeLogo";
 import ContentThing from "@/components/website/ContentThing";
@@ -171,7 +170,7 @@ export default {
     name: "MatchEditor",
     props: ["match", "hideMatchExtras"],
     // eslint-disable-next-line vue/no-unused-components
-    components: { AdvancedDateEditor, DashboardModule, MapScoreEditor, TeamPicker, ContentThing, ThemeLogo, BForm, BFormGroup, BFormCheckbox, BFormInput, BButton, BFormSelect },
+    components: { AdvancedDateEditor, DashboardModule, MapScoreEditor, TeamPicker, ContentThing, ThemeLogo },
     computed: {
         teams() {
             const dummy = { dummy: true };

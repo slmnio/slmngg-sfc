@@ -44,7 +44,6 @@
 import NotFoundPage from "@/views/NotFoundPage";
 import WebsiteNav from "@/components/website/WebsiteNav";
 import { ReactiveThing } from "@/utils/reactive";
-import "@/assets/bootstrap.css";
 import "@/assets/app.css";
 export default {
     name: "MinisiteWrapperApp",

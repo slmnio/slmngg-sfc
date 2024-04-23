@@ -14,7 +14,6 @@
 
 <script>
 import { logoBackground } from "@/utils/theme-styles";
-import { BFormGroup, BFormInput } from "bootstrap-vue";
 
 function deHex(hexString) {
     if (!hexString) return null;
@@ -49,7 +48,6 @@ function getOpacityAdjustment(color, inversionMode = "normal", multiplier, boost
 export default {
     name: "HeroColorControls",
     props: ["theme"],
-    components: { BFormInput, BFormGroup },
     data: () => ({
         colorControls: [
             {

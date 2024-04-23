@@ -37,7 +37,6 @@
 </template>
 
 <script>
-import { BButton, BFormCheckbox, BFormInput, BModal, VBModal } from "bootstrap-vue";
 import { formatTime, getAbbrev, getTimezone } from "@/utils/content-utils";
 import spacetime from "spacetime";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper.vue";
@@ -47,14 +46,7 @@ export default {
     name: "AdvancedDateEditor",
     components: {
         LoadingIcon,
-        TimezoneSwapper,
-        BButton,
-        BModal,
-        BFormInput,
-        BFormCheckbox
-    },
-    directives: {
-        BModal: VBModal
+        TimezoneSwapper
     },
     props: ["savedTime", "isProcessing"],
     data: () => ({

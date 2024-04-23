@@ -13,13 +13,11 @@
 </template>
 
 <script>
-import { BButton, BFormGroup, BFormInput } from "bootstrap-vue";
 import { updateBroadcastData } from "@/utils/dashboard";
 import { unescapeText } from "@/utils/content-utils";
 
 export default {
     name: "BreakTextTab",
-    components: { BFormGroup, BFormInput, BButton },
     props: { broadcast: Object },
     data: () => ({
         breakTitle: "",

@@ -21,7 +21,6 @@
 </template>
 
 <script>
-import { BButton, BModal, VBModal } from "bootstrap-vue";
 import ObserverSettingsButton from "@/components/website/dashboard/ObserverSettingsButton.vue";
 import DashboardModalIcon from "@/components/website/dashboard/DashboardModalIcon.vue";
 
@@ -32,12 +31,7 @@ export default {
     },
     components: {
         DashboardModalIcon,
-        ObserverSettingsButton,
-        BModal,
-        BButton
-    },
-    directives: {
-        BModal: VBModal
+        ObserverSettingsButton
     },
     data: () => ({
         settings: [

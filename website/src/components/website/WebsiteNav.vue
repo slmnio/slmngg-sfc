@@ -94,12 +94,6 @@
 </template>
 
 <script>
-import {
-    BCollapse, BModal,
-    BNavbar,
-    BNavbarNav,
-    BNavbarToggle, VBModal
-} from "bootstrap-vue";
 import NavLiveMatch from "@/components/website/NavLiveMatch";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import WebsiteNavBanner from "@/components/website/WebsiteNavBanner";
@@ -115,15 +109,7 @@ export default {
         TimezoneSwapper,
         LoggedInUser,
         WebsiteNavBanner,
-        BNavbar,
-        BNavbarToggle,
-        BCollapse,
-        BNavbarNav,
-        NavLiveMatch,
-        BModal
-    },
-    directives: {
-        BModal: VBModal
+        NavLiveMatch
     },
     props: ["minisite", "activeEventID"],
     data: () => ({

@@ -55,7 +55,6 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 import PlayerDraftRow from "@/components/website/draft/PlayerDraftRow";
 import store from "@/thing-store";
 import EventDraftHeaders from "@/components/website/draft/EventDraftHeaders";
-import { BFormCheckbox, BFormSelect } from "bootstrap-vue";
 import { url } from "@/utils/content-utils";
 
 
@@ -72,7 +71,7 @@ function getRoleString(sr) {
 export default {
     name: "EventDraft",
     props: ["event"],
-    components: { EventDraftHeaders, PlayerDraftRow, ContentThing, ThemeLogo, BFormCheckbox, BFormSelect },
+    components: { EventDraftHeaders, PlayerDraftRow, ContentThing, ThemeLogo },
     methods: {
         url,
         playerGroup(group) { return this.availablePlayers.filter(p => p.localNotes && p.localNotes.tag === group); },

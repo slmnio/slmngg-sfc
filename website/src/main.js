@@ -1,11 +1,13 @@
-import { createApp } from 'vue'
+import { createApp } from "vue";
 import GlobalApp from "./apps/GlobalApp";
 import store from "@/thing-store";
 import VueMeta from "vue-meta";
-import VueSocketIOExt from "vue-socket.io-extended";
 import { io } from "socket.io-client";
-import { VBTooltip } from "bootstrap-vue";
-import "bootstrap-vue/dist/bootstrap-vue.css";
+import {createBootstrap} from 'bootstrap-vue-next'
+// import "bootstrap-vue/dist/bootstrap-vue.css";
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
+
 import VueYoutubeEmbed from "vue-youtube-embed";
 import VueCookies from "vue-cookies";
 
@@ -124,6 +126,7 @@ router.addRoute(AuthRoutes(app));
 
 app.use(router)
 
+app.use(createBootstrap()) // Important
 
 app.use(VueMeta);
 app.use(VueYoutubeEmbed, { global: false });
@@ -145,7 +148,6 @@ store.subscribe((mutation, state) => {
     }
 });
 
-app.directive("b-tooltip", VBTooltip);
 
 const socket = io(getDataServerAddress(), { transports: ["websocket", "polling"] });
 

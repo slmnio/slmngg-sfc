@@ -34,12 +34,10 @@
     </div>
 </template>
 <script>
-import { BButton, BButtonGroup } from "bootstrap-vue";
 import { updateGfxIndex } from "@/utils/dashboard";
 
 export default {
     name: "GFXController",
-    components: { BButtonGroup, BButton },
     data: () => ({
         buttonCount: 6,
         processing: false

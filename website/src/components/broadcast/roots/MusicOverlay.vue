@@ -119,18 +119,24 @@ export default {
                 }
             }
         },
-        trackList(list) {
-            if (!list?.length) return console.log("list empty");
-            if (list.some(t => !t || t.__loading)) return console.log("some loading");
-            this.loadedTrackList = list;
-        },
-        loadedTrackList(list) {
-            if (!this.mainPlayer?.id && list.length) {
-                return this.start();
+        trackList: {
+            deep: true,
+            handler(list) {
+                if (!list?.length) return console.log("list empty");
+                if (list.some(t => !t || t.__loading)) return console.log("some loading");
+                this.loadedTrackList = list;
             }
-            if (!list.map(track => track.id).includes(this.mainPlayer.id)) {
-                // Song currently playing isn't in the newest list, skip
-                this.startCrossfade();
+        },
+        loadedTrackList: {
+            deep: true,
+            handler(list) {
+                if (!this.mainPlayer?.id && list.length) {
+                    return this.start();
+                }
+                if (!list.map(track => track.id).includes(this.mainPlayer.id)) {
+                    // Song currently playing isn't in the newest list, skip
+                    this.startCrossfade();
+                }
             }
         },
         active(isActive) {

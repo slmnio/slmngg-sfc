@@ -193,14 +193,17 @@ export default {
                 this.updateProfile(newPlayer);
             }
         },
-        heroes(newHeroes, oldHeroes) {
-            if (newHeroes.length && JSON.stringify(newHeroes) !== JSON.stringify(oldHeroes)) {
-                const favHero = this.profile.favourite_hero;
-                if (favHero) {
-                    this.profile.favourite_hero = null;
-                    requestAnimationFrame(() => {
-                        this.profile.favourite_hero = favHero;
-                    });
+        heroes: {
+            deep: true,
+            handler(newHeroes, oldHeroes) {
+                if (newHeroes.length && JSON.stringify(newHeroes) !== JSON.stringify(oldHeroes)) {
+                    const favHero = this.profile.favourite_hero;
+                    if (favHero) {
+                        this.profile.favourite_hero = null;
+                        requestAnimationFrame(() => {
+                            this.profile.favourite_hero = favHero;
+                        });
+                    }
                 }
             }
         },

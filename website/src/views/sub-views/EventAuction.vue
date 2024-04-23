@@ -472,6 +472,7 @@ export default {
         },
         teamsYouControl: {
             immediate: true,
+            deep: true,
             handler(teams) {
                 if (!teams?.length) {
                     this.actingTeamID = null;

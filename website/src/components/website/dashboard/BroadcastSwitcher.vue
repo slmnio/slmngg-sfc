@@ -71,10 +71,13 @@ export default {
         }
     },
     watch: {
-        broadcasts(newBroadcasts) {
-            if (!(this.attemptedFirst && newBroadcasts?.[0])) return;
-            if (newBroadcasts[0]?.id === this.attemptedFirst.id) {
-                this.setting = false;
+        broadcasts: {
+            deep: true,
+            handler(newBroadcasts) {
+                if (!(this.attemptedFirst && newBroadcasts?.[0])) return;
+                if (newBroadcasts[0]?.id === this.attemptedFirst.id) {
+                    this.setting = false;
+                }
             }
         },
         setting(isProcessing) {

@@ -24,7 +24,9 @@ import { createRouter } from "@/router";
 import AuthRoutes from "@/router/auth-redirects";
 
 configureCompat({
-    COMPONENT_V_MODEL: false
+    COMPONENT_V_MODEL: false,
+    ATTR_FALSE_VALUE: false,
+    WATCH_ARRAY: false
 });
 
 const router = await createRouter();

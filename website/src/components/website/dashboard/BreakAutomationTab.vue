@@ -83,13 +83,17 @@ export default {
     watch: {
         activeOptions: {
             immediate: true,
+            deep: true,
             handler(newOptions) {
                 this.resetOptions(newOptions);
             }
         },
-        selectedEndingOptions(options) {
-            if (options.length > 1) {
-                this.selectedEndingOptions = [options.pop()];
+        selectedEndingOptions: {
+            deep: true,
+            handler(options) {
+                if (options.length > 1) {
+                    this.selectedEndingOptions = [options.pop()];
+                }
             }
         }
     },

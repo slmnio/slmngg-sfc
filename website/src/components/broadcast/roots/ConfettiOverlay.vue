@@ -2,10 +2,7 @@
     <div></div>
 </template>
 <script>
-import VueConfetti from "vue-confetti";
 import { ReactiveRoot } from "@/utils/reactive";
-import Vue from "vue";
-Vue.use(VueConfetti);
 
 export default {
     props: ["themeId", "theme"],

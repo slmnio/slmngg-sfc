@@ -12,6 +12,7 @@ import "bootstrap-vue-next/dist/bootstrap-vue-next.css";
 import { createHead, VueHeadMixin } from "@unhead/vue";
 import VueYoutubeEmbed from "vue-youtube-embed";
 import VueCookies from "vue-cookies";
+import VueConfetti from "vue-confetti";
 
 import { Notyf } from "notyf";
 import "notyf/notyf.min.css";
@@ -153,6 +154,7 @@ app.mixin(VueHeadMixin)
 
 app.use(VueYoutubeEmbed, { global: false });
 app.use(VueCookies);
+app.use(VueConfetti) // TODO figure out a way to not do this globally
 
 app.config.globalProperties.$notyf = new Notyf({
     duration: 5000,

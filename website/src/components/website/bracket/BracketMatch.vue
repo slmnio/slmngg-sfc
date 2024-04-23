@@ -1,7 +1,7 @@
 <template>
     <router-link :to="url('match', this.match)" class="bracket-match no-link-style" v-if="!!match"
                  :class="{'hover': hover, 'forfeit': match && match.forfeit }"
-                 @mouseover.native="matchHover" @mouseleave.native="matchEmpty">
+                 @mouseover="matchHover" @mouseleave="matchEmpty">
         <div class="match-name d-none">{{ match && match.name }}</div>
         <div class="match-number" :class="{'lowlight': lowlight}" v-if="matchNumber">{{ matchNumber }}</div>
         <div class="match-extra-info">

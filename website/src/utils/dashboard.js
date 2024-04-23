@@ -33,31 +33,18 @@ export async function authenticatedRequest(auth, url, data) {
 }
 
 export async function setActiveBroadcast(auth, client, broadcast) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
-
     return await authenticatedRequest(auth, "actions/set-active-broadcast", {
         client: client.id || client, broadcast: broadcast.id || broadcast
     });
 }
 
 export async function updateProfileData(auth, profileData) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
     return await authenticatedRequest(auth, "actions/update-profile-data", {
         profileData
     });
 }
 
 export async function updateMatchData(auth, match, updatedData) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
     return await authenticatedRequest(auth, "actions/update-match-data", {
         matchID: match.id,
         updatedData
@@ -65,10 +52,6 @@ export async function updateMatchData(auth, match, updatedData) {
 }
 
 export async function managePred(auth, client, predictionAction, predictionType) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
     return await authenticatedRequest(auth, "actions/manage-prediction", {
         client: client.id || client,
         predictionAction,
@@ -78,10 +61,6 @@ export async function managePred(auth, client, predictionAction, predictionType)
 }
 
 export async function startCommercial(auth, client, commercialDuration) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
     return await authenticatedRequest(auth, "actions/start-commercial", {
         client: client.id || client,
         commercialDuration
@@ -89,20 +68,12 @@ export async function startCommercial(auth, client, commercialDuration) {
 }
 
 export async function updateAutomaticTitle(auth, client) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
     return await authenticatedRequest(auth, "actions/set-title", {
         client: client.id || client
     });
 }
 
 export async function updateMapData(auth, match, mapData) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
     return await authenticatedRequest(auth, "actions/update-map-data", {
         matchID: match.id,
         mapData
@@ -110,26 +81,14 @@ export async function updateMapData(auth, match, mapData) {
 }
 
 export async function toggleFlipTeams(auth) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
     return await authenticatedRequest(auth, "actions/toggle-flip-teams");
 }
 
 export async function updateBroadcastData(auth, data) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
     return await authenticatedRequest(auth, "actions/update-broadcast", data);
 }
 
 export async function setMatchOverlayState(auth, matchID, overlayType, state) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
     return await authenticatedRequest(auth, "actions/set-match-overlays", {
         match: matchID,
         overlayType,
@@ -138,62 +97,50 @@ export async function setMatchOverlayState(auth, matchID, overlayType, state) {
 }
 
 export async function resolveEntireBracket(auth, bracketID) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
     return await authenticatedRequest(auth, "actions/resolve-entire-bracket", {
         bracketID
     });
 }
 
 export async function setObserverSetting(auth, setting, value) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
     return await authenticatedRequest(auth, "actions/set-observer-setting", {
         setting, value
     });
 }
 
 export async function updateBreakAutomation(auth, options) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
     return await authenticatedRequest(auth, "actions/update-break-automation", {
         options
     });
 }
 
 export async function updateBreakDisplay(auth, option) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
     return await authenticatedRequest(auth, "actions/update-break-display", {
         option
     });
 }
 
 export async function updateGfxIndex(auth, gfxID, index) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
     return await authenticatedRequest(auth, "actions/update-gfx-index", {
         gfxID, index
     });
 }
 
 export async function setPlayerRelationships(auth, matchID, roles) {
-    if (!auth?.user) {
-        notyf.error("Not authenticated");
-        return { error: true, errorMessage: "Not authenticated" };
-    }
     return await authenticatedRequest(auth, "actions/set-player-relationships", {
         matchID, roles
+    });
+}
+
+export async function setEventGuild(auth, eventID, guildID) {
+    return await authenticatedRequest(auth, "actions/set-event-guild", {
+        eventID, guildID
+    });
+}
+
+export async function createEventDiscordItems(auth, eventID, guildID, teamSettings, runSettings, settings) {
+    return await authenticatedRequest(auth, "actions/create-event-discord-items", {
+        eventID, guildID, teamSettings, runSettings, settings
     });
 }
 

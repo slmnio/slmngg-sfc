@@ -16,5 +16,12 @@ export default [
     { path: "auction", component: () => import("@/views/sub-views/EventAuction.vue") },
     { path: "stream", redirect: "streams" },
     { path: "stream-details", redirect: "streams" },
-    { path: "streams", component: () => import("@/views/sub-views/EventStreamDetails.vue") }
+    { path: "streams", component: () => import("@/views/sub-views/EventStreamDetails.vue") },
+    {
+        path: "settings",
+        component: () => import("@/views/sub-views/EventSettings.vue"),
+        meta: {
+            requiresAuth: true
+        }
+    }
 ];

@@ -9,6 +9,7 @@ const meta = require("./meta.js");
 const routes = require("./routes.js");
 const images = require("./images.js");
 const discordAuth = require("./discord/auth.js");
+require("./discord/discord-data.js");
 const webAuction = require("./web_auction");
 
 /* The staff module should only run on the server, probably not your local machine. */
@@ -96,7 +97,7 @@ routes({ app, cors, Cache, io });
 discordAuth({ app, router: express.Router(), cors, Cache, io });
 
 meta({ app, cors, Cache });
-images({ app, cors, Cache, corsHandle });
+images.main({ app, cors, Cache, corsHandle });
 
 webAuction({ app, io });
 

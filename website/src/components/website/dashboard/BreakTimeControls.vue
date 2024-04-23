@@ -128,14 +128,4 @@ export default {
     font-size: 2em;
     line-height: 1;
 }
-
-.opacity-changes {
-    opacity: 1;
-    transition: opacity .3s ease;
-}
-.low-opacity {
-    opacity: 0.5;
-    pointer-events: none;
-    cursor: wait;
-}
 </style>

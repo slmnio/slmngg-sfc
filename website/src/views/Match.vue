@@ -190,7 +190,7 @@ export default {
         this.$emit("id_change", null);
         next();
     },
-    metaInfo() {
+    head() {
         return {
             title: this.match.name,
             link: [{ rel: "icon", href: resizedImageNoWrap(this.match?.event?.theme, ["small_logo", "default_logo"], "s-128") }]

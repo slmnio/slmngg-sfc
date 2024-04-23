@@ -23,7 +23,7 @@ export default {
             return this.broadcast.live_match[0];
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Overview | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

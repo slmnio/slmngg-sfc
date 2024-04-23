@@ -11,7 +11,7 @@ export default {
     name: "TweetOverlay",
     props: ["broadcast", "identifier"],
     components: { Tweet },
-    metaInfo() {
+    head() {
         return {
             title: `Tweet "${this.identifier}" | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

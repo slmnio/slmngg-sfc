@@ -17,7 +17,7 @@ export default {
             })(this.broadcast);
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Sponsors | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

@@ -10,7 +10,7 @@ export default {
             minor: true
         }
     }),
-    metaInfo() {
+    head() {
         return {
             title: `Empty Stinger | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

@@ -65,7 +65,7 @@ export default {
             return rows;
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Podcast | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

@@ -245,7 +245,7 @@ export default {
             this.$socket.client.emit("prod-join", this.client?.key);
         }
     },
-    metaInfo: () => ({
+    head: () => ({
         title: "Dashboard"
     })
 };

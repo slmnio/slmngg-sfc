@@ -75,7 +75,7 @@ export default {
             return video.url;
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Caster Background | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

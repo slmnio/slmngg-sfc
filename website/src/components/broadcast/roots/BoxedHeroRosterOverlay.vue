@@ -171,7 +171,7 @@ export default {
             console.log("animation active", a);
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Hero Roster #${this.teamNum || 1} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

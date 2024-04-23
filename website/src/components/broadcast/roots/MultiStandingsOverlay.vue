@@ -48,7 +48,7 @@ export default {
             return (this.blocks?.standings || []).filter(standings => this.stageCodes.some(code => standings.group === code || standings.key === code));
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Multi Standings ${this.stageCodes} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

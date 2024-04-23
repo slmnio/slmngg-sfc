@@ -64,7 +64,7 @@ export default {
             return this.events.filter(e => e.in_progress).sort(sortEvents);
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: "Events"
         };

@@ -216,7 +216,7 @@ export default {
             }
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Music (${this.role || ""}) | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

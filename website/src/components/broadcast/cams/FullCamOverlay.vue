@@ -35,7 +35,7 @@ export default {
             };
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Full Cam #${this.number} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

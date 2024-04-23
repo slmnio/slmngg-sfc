@@ -3,15 +3,13 @@ import { createPinia } from "pinia";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import store from "@/thing-store";
 
-
 import GlobalApp from "./apps/GlobalApp";
-import VueMeta from "vue-meta";
 import { io } from "socket.io-client";
 import { createBootstrap } from "bootstrap-vue-next";
-// import "bootstrap-vue/dist/bootstrap-vue.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue-next/dist/bootstrap-vue-next.css";
 
+import { createHead, VueHeadMixin } from "@unhead/vue";
 import VueYoutubeEmbed from "vue-youtube-embed";
 import VueCookies from "vue-cookies";
 
@@ -51,7 +49,7 @@ const app = createApp({
             this.highErrorRate = flags.includes("high_error_rate");
         }
     },
-    metaInfo: {
+    head: {
         // title: "SLMN.GG",
         titleTemplate: (chunk) => chunk ? `${chunk} | SLMN.GG` : "SLMN.GG"
         // link: [
@@ -145,7 +143,11 @@ app.use(router);
 
 app.use(createBootstrap()); // Important
 
-app.use(VueMeta);
+const head = createHead()
+app.use(head);
+app.mixin(VueHeadMixin)
+
+
 app.use(VueYoutubeEmbed, { global: false });
 app.use(VueCookies);
 

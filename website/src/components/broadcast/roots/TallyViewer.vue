@@ -131,7 +131,7 @@ export default {
         noBroadcastStyle: true,
         noStinger: true
     }),
-    metaInfo() {
+    head() {
         return {
             title: `Tally Viewer | ${this.client?.name || this.client?.key || ""}`
         };

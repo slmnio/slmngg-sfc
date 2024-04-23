@@ -37,7 +37,7 @@ export default {
             return themeBackground1(this.broadcast.event);
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Schedule${this.secondary ? " (Secondary)" : ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

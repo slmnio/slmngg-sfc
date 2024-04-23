@@ -261,7 +261,7 @@ export default {
             this.dummy = !this.dummy;
         }, 2500);
     },
-    metaInfo() {
+    head() {
         return {
             title: `Draft | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

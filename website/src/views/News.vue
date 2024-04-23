@@ -121,7 +121,7 @@ export default {
             return this.news?.embed ? getEmbedData(this.news.embed) : {};
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: [this.news?.headline, this.connection?.name].filter(t => t).join(" | "),
             link: [{ rel: "icon", href: resizedImageNoWrap(this.theme, ["small_logo", "default_logo"], "s-128") }]

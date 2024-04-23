@@ -173,7 +173,7 @@ export default {
             return (this.participationEvents).map(e => e.participation_points).filter(f => f).reduce((c, v) => c + v, 0);
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: this.player.name
         };

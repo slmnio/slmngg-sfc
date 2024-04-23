@@ -208,7 +208,7 @@ export default {
     //         this.activeScheduleNum = this.defaultScheduleNum;
     //     }
     // },
-    metaInfo() {
+    head() {
         return {
             title: "Schedule"
             // title: this.event?.name ? `Schedule | ${this.event?.name}` : "Schedule"

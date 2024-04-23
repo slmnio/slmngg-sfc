@@ -88,7 +88,7 @@ export default {
             })?.teams;
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: "Teams"
         };

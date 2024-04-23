@@ -56,7 +56,7 @@ export default {
             return `&${this.$root.defaults.camParams || "_"}&${this.params}`;
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Desk Cams | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

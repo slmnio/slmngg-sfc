@@ -287,7 +287,7 @@ export default {
             return team.theme;
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Ingame | ${this.match?.name || this.broadcast?.code || this.broadcast?.name || ""}`
         };

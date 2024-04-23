@@ -168,7 +168,7 @@ export default {
             this.runGroup(this.getActiveGroup());
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Ad Read | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

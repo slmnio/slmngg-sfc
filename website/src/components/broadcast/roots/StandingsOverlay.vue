@@ -48,7 +48,7 @@ export default {
             return this.standingsSettings?.short || this.standingsSettings?.title || this._stage;
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Standings ${this._stage || ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

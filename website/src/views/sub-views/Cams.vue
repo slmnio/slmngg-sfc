@@ -95,7 +95,7 @@ export default {
             this.createLiveGuest();
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: "Player Cams"
         };

@@ -50,7 +50,7 @@ export default {
             return "Map Set";
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Maps | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

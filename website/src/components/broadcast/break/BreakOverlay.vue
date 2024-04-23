@@ -320,7 +320,7 @@ export default {
             this.tick++;
         }, tickTime * 1000);
     },
-    metaInfo() {
+    head() {
         return {
             title: `Break ${this.secondary ? " (Secondary)" : ""}| ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

@@ -33,7 +33,7 @@ export default {
     components: {
         ThingTop, SubPageNav, Social
     },
-    metaInfo() {
+    head() {
         return {
             title: this.team.name,
             meta: [

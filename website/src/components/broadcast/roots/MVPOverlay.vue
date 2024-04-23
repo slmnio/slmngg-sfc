@@ -90,7 +90,7 @@ export default {
             }
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `MVP | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

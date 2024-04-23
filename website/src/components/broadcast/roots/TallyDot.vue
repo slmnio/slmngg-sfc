@@ -87,7 +87,7 @@ export default {
         noBroadcastStyle: true,
         noStinger: true
     }),
-    metaInfo() {
+    head() {
         return {
             title: `Tally Dot #${this.number} | ${this.client?.name || this.client?.key || ""}`
         };

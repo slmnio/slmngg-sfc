@@ -138,7 +138,7 @@ export default {
     methods: {
         logoBackground1
     },
-    metaInfo() {
+    head() {
         return {
             title: this.title
         };

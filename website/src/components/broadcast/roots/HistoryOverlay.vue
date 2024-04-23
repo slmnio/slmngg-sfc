@@ -72,7 +72,7 @@ export default {
             return resizedImage(team.theme, ["default_logo", "default_wordmark"], "h-250");
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `History | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

@@ -80,7 +80,7 @@ export default {
             };
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Event Thumbnail | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

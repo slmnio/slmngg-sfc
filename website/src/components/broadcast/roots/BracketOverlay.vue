@@ -88,7 +88,7 @@ export default {
             console.log("[set highlight] match", id);
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Bracket ${this.bracketKey || this.broadcast?.bracket_key || ""}${this.extended ? " (extended)" : ""}${this.small ? " (small)" : ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

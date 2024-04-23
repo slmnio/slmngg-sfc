@@ -85,7 +85,7 @@ export default {
             this.now = new Date();
         }, 1000);
     },
-    metaInfo() {
+    head() {
         return {
             title: `Clock | ${this.client?.name || this.broadcast?.code || this.broadcast?.name || ""}`
         };

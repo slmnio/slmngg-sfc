@@ -555,7 +555,7 @@ export default {
             this.stats = stats;
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Auction ${this.category || ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

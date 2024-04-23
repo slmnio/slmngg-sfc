@@ -63,7 +63,7 @@ export default {
             return staff;
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Staff | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

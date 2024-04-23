@@ -433,7 +433,7 @@ export default {
             return canEditMatch(this.$root.auth?.user, { event: this.match?.event, match: this.match });
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: this.match ? (this.match.custom_name || this.match.name) + " | Detailed view" : "Detailed match view",
             link: [{ rel: "icon", href: resizedImageNoWrap(this._theme, ["small_logo", "default_logo"], "s-128") }]

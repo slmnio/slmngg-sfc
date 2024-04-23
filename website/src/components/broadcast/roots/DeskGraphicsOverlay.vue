@@ -84,7 +84,7 @@ export default {
             }
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Desk Graphics | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

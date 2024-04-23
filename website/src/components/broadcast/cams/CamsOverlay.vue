@@ -72,7 +72,7 @@ export default {
             }
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Ingame Cams | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

@@ -9,7 +9,7 @@ export default {
     name: "StandingsOverlay",
     components: { GenericOverlay },
     props: ["broadcast", "title"],
-    metaInfo() {
+    head() {
         return {
             title: `Custom "${this.title}" | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

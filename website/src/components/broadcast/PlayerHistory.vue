@@ -73,7 +73,7 @@ export default {
             return events[0];
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Player History | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

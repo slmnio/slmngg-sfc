@@ -95,7 +95,7 @@ export default {
         if (this.emitTimeTimeout) clearInterval(this.emitTimeTimeout);
         this.emitTimeTimeout = setInterval(this.emitTimes, 500);
     },
-    metaInfo() {
+    head() {
         return {
             title: `Media | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

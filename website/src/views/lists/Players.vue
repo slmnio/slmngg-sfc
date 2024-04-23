@@ -59,7 +59,7 @@ export default {
             this.overrideMinCharacters = true;
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: "Players"
         };

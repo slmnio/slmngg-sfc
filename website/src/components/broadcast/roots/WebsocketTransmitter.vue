@@ -116,7 +116,7 @@ export default {
             this.connectWs();
         }, 1000);
     },
-    metaInfo() {
+    head() {
         return {
             title: `Websocket Transmitter | ${this.client?.name || this.client?.key || ""}`
         };

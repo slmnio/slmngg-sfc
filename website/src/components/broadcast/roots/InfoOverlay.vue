@@ -46,7 +46,7 @@ export default {
             return text.replace(/\\n/g, "<br>");
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Info "${this.title}" | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

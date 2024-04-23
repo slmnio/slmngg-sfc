@@ -118,7 +118,7 @@ export default {
         }
 
     },
-    metaInfo() {
+    head() {
         return {
             title: `Desk | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

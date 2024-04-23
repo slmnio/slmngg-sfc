@@ -35,7 +35,7 @@ export default {
             return base;
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Syncer | ${this.client?.name || this.broadcast?.code || this.broadcast?.name || ""}`
         };

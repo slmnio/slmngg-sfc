@@ -160,7 +160,7 @@ export default {
             return this.highlight_event.teams.find(team => (team.players || []).find(p => p.id === player.id) || (team.captains || []).find(p => p.id === player.id));
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Rosters | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

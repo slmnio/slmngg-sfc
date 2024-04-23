@@ -132,7 +132,7 @@ export default {
             this.connectWs();
         }, 1000);
     },
-    metaInfo() {
+    head() {
         return {
             title: `Tally Transmitter #${this.number} | ${this.client?.name || this.client?.key || ""}`
         };

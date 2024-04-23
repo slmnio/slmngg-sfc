@@ -1,12 +1,10 @@
 <template>
     <div class="container">
         <h1 class="big mb-3">Players</h1>
-        <div class="input-group my-3 mx-1">
-            <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon1">Search</span>
-            </div>
-            <input type="text" class="form-control" @keydown.enter="override" v-model="search" placeholder="Type a player's name here" aria-label="Player name" aria-describedby="basic-addon1">
-        </div>
+        <b-input-group prepend="Search" >
+            <b-form-input placeholder="Type a player's name here" type="text" @keydown.enter="override" v-model="search" />
+        </b-input-group>
+
         <h1><LoadingIcon v-if="!players.length"></LoadingIcon></h1>
 
         <div class="player-list">

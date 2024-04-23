@@ -1,4 +1,4 @@
-import { configureCompat, createApp } from "vue";
+import { configureCompat, createApp, h } from "vue";
 import { createPinia } from "pinia";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import store from "@/thing-store";
@@ -26,7 +26,8 @@ import AuthRoutes from "@/router/auth-redirects";
 configureCompat({
     COMPONENT_V_MODEL: false,
     ATTR_FALSE_VALUE: false,
-    WATCH_ARRAY: false
+    WATCH_ARRAY: false,
+    RENDER_FUNCTION: false
 });
 
 const router = await createRouter();
@@ -35,7 +36,7 @@ let subdomain = false;
 
 
 const app = createApp({
-    render: h => h(GlobalApp),
+    render: () => h(GlobalApp),
     sockets: {
         connect() {
             console.log("[socket]", "connected", this.$store.state.subscribed_ids.length);
@@ -180,8 +181,8 @@ app.config.productionTip = false;
 app.config.devtools = ["local", "staging"].includes(import.meta.env.VITE_DEPLOY_MODE);
 
 app.component("v-style", {
-    render: function (createElement) {
-        return createElement("style", this.$slots.default);
+    render: function () {
+        return h("style", this.$slots.default);
     }
 });
 

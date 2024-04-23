@@ -15,7 +15,7 @@ export default defineConfig({
             template: {
                 compilerOptions: {
                     compatConfig: {
-                        MODE: 2
+                        MODE: 3
                     }
                 }
             }
@@ -23,7 +23,6 @@ export default defineConfig({
         Components({
             resolvers: [BootstrapVueNextResolver()]
         })
-
     ],
     resolve: {
         alias: {

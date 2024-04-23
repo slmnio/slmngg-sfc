@@ -96,12 +96,12 @@ export default {
             return this.$refs.overlay?.noBroadcastStyle;
         },
         sendingProdData() {
-            const componentName = getComponentName(this.$router.currentRoute);
+            const componentName = getComponentName(this.$router.currentRoute.value);
             return {
                 clientName: this.clientName,
                 component: componentName,
-                path: this.$router.currentRoute.path,
-                fullPath: this.$router.currentRoute.fullPath,
+                path: this.$router.currentRoute.value.path,
+                fullPath: this.$router.currentRoute.value.fullPath,
                 active: this.isActive,
                 visible: this.isVisible,
                 data: {
@@ -138,7 +138,7 @@ export default {
         }
         if (this.broadcastKey) {
             console.log("loading with broadcastKey");
-            this.$socket.client.emit("prod-broadcast-join", this.broadcastKey);
+            // this.$socket.client.emit("prod-broadcast-join", this.broadcastKey); TODO: uncomment
         }
 
 

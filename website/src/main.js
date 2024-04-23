@@ -10,7 +10,6 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue-next/dist/bootstrap-vue-next.css";
 
 import { createHead, VueHeadMixin } from "@unhead/vue";
-import VueYoutubeEmbed from "vue-youtube-embed";
 import VueCookies from "vue-cookies";
 import VueConfetti from "vue-confetti";
 
@@ -25,6 +24,7 @@ import { createRouter } from "@/router";
 import AuthRoutes from "@/router/auth-redirects";
 
 configureCompat({
+    MODE: 3,
     COMPONENT_V_MODEL: false,
     ATTR_FALSE_VALUE: false,
     WATCH_ARRAY: false,
@@ -152,7 +152,6 @@ app.use(head);
 app.mixin(VueHeadMixin)
 
 
-app.use(VueYoutubeEmbed, { global: false });
 app.use(VueCookies);
 app.use(VueConfetti) // TODO figure out a way to not do this globally
 

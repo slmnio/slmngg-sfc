@@ -1,11 +1,11 @@
 <template>
     <div class="h-100 flex flex-center">
-        <Tweet :id="identifier"/>
+        <Tweet :tweet-id="identifier"/>
     </div>
 </template>
 
 <script>
-import { Tweet } from "vue-tweet-embed";
+import { Tweet } from "vue-tweet";
 
 export default {
     name: "TweetOverlay",

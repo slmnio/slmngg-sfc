@@ -28,7 +28,7 @@ configureCompat({
     COMPONENT_V_MODEL: false,
     ATTR_FALSE_VALUE: false,
     WATCH_ARRAY: false,
-    RENDER_FUNCTION: false
+    RENDER_FUNCTION: false,
 });
 
 const router = await createRouter();
@@ -177,8 +177,6 @@ const socket = io(getDataServerAddress(), { transports: ["websocket", "polling"]
 
 
 app.config.$socket = { client: socket };
-
-app.config.productionTip = false;
 
 app.config.devtools = ["local", "staging"].includes(import.meta.env.VITE_DEPLOY_MODE);
 

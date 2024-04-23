@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import marked from "marked";
+import { marked } from "marked";
 // const renderer = {};
 // renderer.image = (href, title, text) => {
 //     console.log("[image]", href, title, text);

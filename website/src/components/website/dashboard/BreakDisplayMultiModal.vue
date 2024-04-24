@@ -2,7 +2,7 @@
     <div class="break-display-modal">
         <div v-b-modal.break-display>
             <b-button-group>
-                <b-button size="sm" :class="{ active: broadcast?.countdown_end }" :variant="broadcast?.countdown_end ? 'primary' : ''"
+                <b-button size="sm" :class="{ active: broadcast?.countdown_end }" :variant="broadcast?.countdown_end ? 'primary' : 'secondary'"
                           @click="selectedTab = 'Countdown'">
                     <i class="fal fa-clock"></i>
                 </b-button>

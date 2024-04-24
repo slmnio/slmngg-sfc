@@ -77,7 +77,7 @@ export default {
 
             (this.relationships || []).forEach(rel => {
                 if (!["Producer", "Observer", "Replay Producer", "Observer Director", "Lobby Admin", "Tournament Admin", "Graphics Operator", "Stats Producer"].includes(rel.singular_name)) return;
-                matches = [...matches, ...rel.matches];
+                matches = [...matches, ...(rel.matches || [])];
             });
 
             return matches;

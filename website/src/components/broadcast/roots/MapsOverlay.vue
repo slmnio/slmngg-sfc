@@ -1,17 +1,17 @@
 <template>
     <GenericOverlay class="maps-overlay" v-if="match" :title="customTitle">
-        <MapDisplay :broadcast="broadcast" :animation-active="animationActive" :use-transitions="useTransitions" />
+        <BroadcastMapDisplay :broadcast="broadcast" :animation-active="animationActive" :use-transitions="useTransitions" />
     </GenericOverlay>
 </template>
 
 <script>
 import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import MapDisplay from "@/components/broadcast/BroadcastMapDisplay";
+import BroadcastMapDisplay from "@/components/broadcast/BroadcastMapDisplay";
 
 export default {
     name: "MapsOverlay",
-    components: { GenericOverlay, MapDisplay },
+    components: { GenericOverlay, BroadcastMapDisplay },
     props: ["broadcast", "title", "animationActive", "useTransitions"],
     computed: {
         match() {

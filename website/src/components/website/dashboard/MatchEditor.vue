@@ -292,7 +292,7 @@ export default {
             return data;
         },
         broadcastData() {
-            return this.broadcast || this.match?.event?.broadcasts;
+            return this.match?.event?.broadcasts;
         }
         // loadedFully() {
         //     const test = [

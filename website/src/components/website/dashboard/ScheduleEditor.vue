@@ -54,7 +54,7 @@ export default {
             return this.primarySchedule[0];
         },
         status() {
-            if (this.scheduled?.length === 0) {
+            if (this.schedule?.length === 0) {
                 return "No matches scheduled";
             }
             let scheduleStatus;

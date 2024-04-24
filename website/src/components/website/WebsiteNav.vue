@@ -221,7 +221,7 @@ export default {
         }
     },
     beforeUnmount () {
-        this.resizeObserver.unobserve(this.$el);
+        this.resizeObserver?.unobserve(this.$el);
     }
 };
 </script>

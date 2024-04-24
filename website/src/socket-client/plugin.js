@@ -1,13 +1,15 @@
-// import Observe from "./Observe";
 import GlobalEmitter from "./global-emitter";
 import createMixin from "./create-mixin";
-// import { isSocketIo } from "./utils";
-// import defaults from "./defaults";
+import { socket } from "@/socket";
 
-// eslint-disable-next-line import/prefer-default-export
-function install(Vue, socket, options) {
-    // Observe(socket, options);
-    Vue.mixin(createMixin(GlobalEmitter));
+function install(Vue) {
+    const emitter = (GlobalEmitter);
+    socket.onAny((...d) => {
+        // console.log("socket receive", d);
+        const event = d.shift();
+        emitter.emit(event, ...d);
+    });
+    Vue.mixin(createMixin(emitter));
     const strategies = Vue.config.optionMergeStrategies;
     strategies.sockets = strategies.methods;
 }

@@ -9,7 +9,7 @@ import { BootstrapVueNextResolver } from "unplugin-vue-components/resolvers";
 dns.setDefaultResultOrder("verbatim");
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
     plugins: [
         createVuePlugin({
             template: {
@@ -30,5 +30,8 @@ export default defineConfig({
             vue: "@vue/compat"
         },
         extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json", ".vue"]
+    },
+    define: {
+        __VUE_PROD_DEVTOOLS__: ["local", "staging"].includes(mode)
     }
-});
+}));

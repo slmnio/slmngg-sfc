@@ -4,7 +4,6 @@ import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import store from "@/thing-store";
 
 import GlobalApp from "./apps/GlobalApp";
-import { io } from "socket.io-client";
 import { createBootstrap } from "bootstrap-vue-next";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue-next/dist/bootstrap-vue-next.css";
@@ -21,36 +20,22 @@ import { ReactiveRoot } from "@/utils/reactive";
 import { authenticateWithToken, getAuthNext, setAuthNext } from "@/utils/auth";
 import { createRouter } from "@/router";
 
+import socketMixin from "@/socket-client";
 import { getSubdomain } from "@/utils/get-subdomain";
+import { useAuthStore } from "@/stores/authStore";
 
 configureCompat({
     MODE: 2,
     COMPONENT_V_MODEL: false,
     ATTR_FALSE_VALUE: false,
     WATCH_ARRAY: false,
-    RENDER_FUNCTION: false,
+    RENDER_FUNCTION: false
 });
 
-const {subdomain, subID} = await getSubdomain()
-
+const { subdomain, subID } = await getSubdomain();
 
 const app = createApp({
     render: () => h(GlobalApp),
-    sockets: {
-        connect() {
-            console.log("[socket]", "connected", this.$store.state.subscribed_ids.length);
-            this.$socket.client.emit("subscribe-multiple", this.$store.state.subscribed_ids);
-        },
-        data_update(d) {
-            // handled by vuex
-            console.log("[socket]", "data_update", d);
-        },
-        website_flags(flags) {
-            console.log("website_flags", flags);
-            this.isRebuilding = flags.includes("server_rebuilding");
-            this.highErrorRate = flags.includes("high_error_rate");
-        }
-    },
     head: {
         // title: "SLMN.GG",
         titleTemplate: (chunk) => chunk ? `${chunk} | SLMN.GG` : "SLMN.GG"
@@ -96,27 +81,6 @@ const app = createApp({
         } catch (e) {
             console.error("Draft notes local storage error", e);
         }
-
-        if (!this.auth.user) {
-            const token = this.$cookies.get("token");
-            if (token) {
-                // authenticate
-                await authenticateWithToken(this, token);
-            }
-        }
-
-        if (!this.auth.user && preloadAuthCheckRequired) {
-            console.warn("App loaded, recognising preload check is required and we're not authenticated. Sending to login");
-            preloadAuthCheckRequired = false;
-            if (preloadAuthReturn) setAuthNext(app, preloadAuthReturn);
-
-            this.$router.push({
-                path: "/login",
-                query: {
-                    return: getAuthNext(app, true)
-                }
-            });
-        }
     },
     computed: {
         minisiteEvent() {
@@ -140,18 +104,19 @@ const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 app.use(pinia);
 
+app.use(socketMixin);
 
 app.use(router);
 
 app.use(createBootstrap()); // Important
 
-const head = createHead()
+const head = createHead();
 app.use(head);
-app.mixin(VueHeadMixin)
+app.mixin(VueHeadMixin);
 
 
 app.use(VueCookies);
-app.use(VueConfetti) // TODO figure out a way to not do this globally
+app.use(VueConfetti); // TODO figure out a way to not do this globally
 
 app.config.globalProperties.$notyf = new Notyf({
     duration: 5000,
@@ -169,12 +134,6 @@ store.subscribe((mutation, state) => {
     }
 });
 
-
-const socket = io(getDataServerAddress(), { transports: ["websocket", "polling"] });
-
-
-app.config.$socket = { client: socket };
-
 app.config.devtools = ["local", "staging"].includes(import.meta.env.VITE_DEPLOY_MODE);
 
 app.component("v-style", {
@@ -187,32 +146,24 @@ app.component("v-style", {
 // TODO: add other domain support here
 
 
-let preloadAuthCheckRequired = false;
-let preloadAuthReturn = null;
+const preloadAuthCheckRequired = false;
+const preloadAuthReturn = null;
 
 // TODO: this doesn't really work very well nor work on the first run
 router.beforeEach((to, from, next) => {
+    const authStore = useAuthStore();
+
     try {
         // console.log("routerResolve", to, this, app);
-        if (to.meta.requiresAuth) {
+        if (to.meta.requiresAuth && !authStore.isAuthenticated) {
             // authenticating!
 
-            getAuthNext(app); // empty auth
+            authStore.setAuthNext(to.fullPath);
 
-            if (app && !app.auth.user) {
-                setAuthNext(app?.$root, to.fullPath);
-                return router.push({
-                    path: "/login",
-                    query: { return: to.fullPath }
-                });
-                // TODO: to.fullPath can be used for return (set in localstorage or something  /redirect?to=)
-            } else {
-                console.warn("Need to check if authenticated, but the app hasn't loaded yet.");
-                preloadAuthCheckRequired = true;
-                preloadAuthReturn = to.fullPath;
-                // console.log(document.cookie);
-                // return next({ path: "/login" });
-            }
+            return router.push({
+                path: "/login",
+                query: { return: to.fullPath }
+            });
         }
     } catch (e) {
         console.error("Vue navigation error", e);
@@ -222,4 +173,4 @@ router.beforeEach((to, from, next) => {
 });
 
 
-app.mount("#app");
+router.isReady().then(() => app.mount("#app"));

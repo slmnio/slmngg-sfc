@@ -26,6 +26,7 @@
     </div>
 </template>
 <script>
+import { socket } from "@/socket";
 import OBSWebSocket from "obs-websocket-js";
 
 export default {
@@ -55,7 +56,7 @@ export default {
 
     methods: {
         transmit() {
-            this.$socket.client.emit("obs_data_change", {
+            socket.emit("obs_data_change", {
                 clientName: this.client?.key,
                 previewScene: this.wsPreview,
                 programScene: this.wsProgram

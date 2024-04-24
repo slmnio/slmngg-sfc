@@ -1,6 +1,6 @@
 <template>
     <div class="container" v-if="user && user.name">
-        <h1 class="text-md-left text-center">SLMN.GG Dashboard</h1>
+        <h1 class="text-md-start text-center">SLMN.GG Dashboard</h1>
         <div class="client-broadcasts d-flex flex-wrap flex-column flex-md-row align-items-center" v-if="client && client.broadcast">
             <div class="wrapper mb-2">
                 <BroadcastSwitcher :broadcasts="client.broadcast" />
@@ -73,6 +73,7 @@
 </template>
 
 <script>
+import { socket } from "@/socket";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { url } from "@/utils/content-utils";
 import BroadcastSwitcher from "@/components/website/dashboard/BroadcastSwitcher";
@@ -242,7 +243,7 @@ export default {
             if (!this.client?.key) return;
             if (oldClient?.key === newClient?.key) return;
             console.log("prod-join", this.client?.key);
-            this.$socket.client.emit("prod-join", this.client?.key);
+            socket.emit("prod-join", this.client?.key);
         }
     },
     head: () => ({

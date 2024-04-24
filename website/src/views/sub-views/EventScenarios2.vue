@@ -42,15 +42,15 @@
 
 
         <table class="table-bordered text-light mb-3" v-if="counts && counts[0] && counts[0].positions">
-            <tr v-if="counts" class="font-weight-bold">
-                <th class="p-2 border-dark text-right" style="min-width: 8.5em">{{ showCountsAsPercentages ? `% of ${currentScenarioView.length} scenarios` : `/${currentScenarioView.length} scenarios`}}</th>
+            <tr v-if="counts" class="fw-bold">
+                <th class="p-2 border-dark text-end" style="min-width: 8.5em">{{ showCountsAsPercentages ? `% of ${currentScenarioView.length} scenarios` : `/${currentScenarioView.length} scenarios`}}</th>
                 <th class="p-2 border-dark" v-for="(x, i) in (counts[0].positions).slice(0, -1)" :key="i">
                     #{{ i + 1 }}
                 </th>
                 <th class="p-2 border-dark" v-b-tooltip:top="'Standings haven\'t converged into separate groups'">Incomplete</th>
             </tr>
             <tr v-for="team in counts" :key="team.code">
-                <td class="p-2 border-dark text-right font-weight-bold">{{ team.code }}</td>
+                <td class="p-2 border-dark text-end fw-bold">{{ team.code }}</td>
                 <td class="p-2 border-dark cell-num" v-for="(pos, posi) in team.positions" :key="posi"
                     @click="() => showWhen(team.code, posi)"
                     :class="{ 'bg-info selected': manualScenarioFilters.find((f) => f.team === team.code && f.position === posi ), 'bg-warning text-dark': pos !== 0 && pos === currentScenarioView.length, 'text-muted': pos === 0 }"
@@ -69,10 +69,10 @@
                 <th class="p-2 border-dark">Analysis</th>
             </tr>
             <tr v-for="match in matchCounts" :key="match.id">
-                <td class="p-2 border-dark font-weight-bold text-right">{{ match.teams?.[0]?.code }}</td>
+                <td class="p-2 border-dark fw-bold text-end">{{ match.teams?.[0]?.code }}</td>
                 <td class="p-2 border-dark text-center cell-num" @click="showMatchScoreline(match.id, scoreline)" :class="{'bg-info selected': scorelineFilterHas(match.id, scoreline), 'text-muted': count === 0}"
                     v-for="([scoreline, count]) in Object.entries(match.scorelines)" :key="scoreline">{{ count }}</td>
-                <td class="p-2 border-dark font-weight-bold text-left">{{ match.teams?.[1]?.code }}</td>
+                <td class="p-2 border-dark fw-bold text-start">{{ match.teams?.[1]?.code }}</td>
                 <td class="p-2 border-dark text-center" :class="{'text-muted': matchAnalysis(match) === 'No effect'}">{{ matchAnalysis(match) }} </td>
             </tr>
         </table>
@@ -596,7 +596,7 @@ export default {
             }
 
             console.log({
-                scenarios: scenarios, // .filter(s => s.sorts >= 4),
+                scenarios, // .filter(s => s.sorts >= 4),
                 possibleScenarios: scenarios.filter(s => !s.impossible),
                 incompleteScenarios: scenarios.filter(s => !s.impossible && s.standings.length !== s.teams.length)
             });
@@ -605,7 +605,7 @@ export default {
                 maxBits,
                 scenarioCount,
                 bitCounter,
-                scenarios: scenarios // .filter(s => s.sorts >= 4),
+                scenarios // .filter(s => s.sorts >= 4),
                 // possibleScenarios: scenarios.filter(s => !s.impossible),
                 // incompleteScenarios: scenarios.filter(s => s.standings.length !== s.teams.length),
                 // possiblencompleteScenarios: scenarios.filter(s => s.standings.length !== s.teams.length)

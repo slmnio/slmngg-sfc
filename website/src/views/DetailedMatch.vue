@@ -64,7 +64,7 @@
 <!--                        <PreviousMatch v-for="match in teamMatches(team)" :match="match" :team="team" :key="match.id" />-->
 <!--                    </div>-->
                     <div class="match-group d-flex flex-column" v-for="([groupKey, group]) in teamsMatchGroups" :key="groupKey">
-                        <div class="match-group-title mt-3 text-center font-weight-bold" v-if="groupKey && groupKey !== 'undefined'">{{ groupKey }}</div>
+                        <div class="match-group-title mt-3 text-center fw-bold" v-if="groupKey && groupKey !== 'undefined'">{{ groupKey }}</div>
                         <div class="match-group-teams w-100 d-flex">
                             <div class="team-prev-wrapper w-50" v-for="team in group.teams" :key="team.id">
                                 <div class="match-group" v-for="match in team.matches" :key="match.id">

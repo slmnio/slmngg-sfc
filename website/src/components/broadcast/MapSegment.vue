@@ -40,7 +40,7 @@
             </div>
 
             <div class="map-draft-top flex-center" v-if="draftedStyle" :class="{'complete': complete, 'next': map._next, 'draw': map.draw}" :style="winnerBG">
-                <div class="draft-map-data flex-grow-1 font-weight-bold">
+                <div class="draft-map-data flex-grow-1 fw-bold">
                     <div class="draft-map-type">{{ map.mode || map.type?.[0] }}</div>
                     <div class="draft-map-name">{{ name }}</div>
                 </div>

@@ -76,7 +76,7 @@
 
                         <span class="badge badge-pill bg-info">{{ team.wins }}-{{ team.losses }}</span>
                     </td>
-                    <td class="text-right">
+                    <td class="text-end">
                         <span class="badge" v-if="scenario.flags.includes('3-WAY-LAST')">3-way L</span>
                         <span class="badge" v-if="scenario.flags.includes('3-WAY-FIRST')">3-way F</span>
                         <i class="fas fa-info-circle" v-if="scenario.notes.length" :title="scenario.notes.join(', ')"></i>

@@ -21,6 +21,8 @@
 </template>
 
 <script>
+import { socket } from "@/socket";
+
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import StingerWrap from "@/components/broadcast/StingerWrap";
 import BroadcastBackground from "@/components/broadcast/BroadcastBackground.vue";
@@ -116,9 +118,9 @@ export default {
     },
     methods: {
         prodUpdate(data) {
-            if (this.$socket?.client) {
+            if (socket) {
                 this.lastProdData = data;
-                this.$socket.client.emit("prod-update", this.sendingProdData);
+                socket.emit("prod-update", this.sendingProdData);
             }
         }
     },
@@ -138,7 +140,7 @@ export default {
         }
         if (this.broadcastKey) {
             console.log("loading with broadcastKey");
-            // this.$socket.client.emit("prod-broadcast-join", this.broadcastKey); TODO: uncomment
+            // socket.emit("prod-broadcast-join", this.broadcastKey); TODO: uncomment
         }
 
 
@@ -179,7 +181,7 @@ export default {
             }
         },
         broadcastKey(newCode) {
-            this.$socket.client.emit("prod-broadcast-join", newCode);
+            socket.emit("prod-broadcast-join", newCode);
         }
     },
     beforeCreate () {
@@ -187,7 +189,7 @@ export default {
     },
     sockets: {
         connect() {
-            this.$socket.client.emit("prod-broadcast-join", this.broadcastKey);
+            socket.emit("prod-broadcast-join", this.broadcastKey);
         },
         send_prod_update() {
             this.prodUpdate();

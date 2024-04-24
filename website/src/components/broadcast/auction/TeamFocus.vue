@@ -1,7 +1,7 @@
 <template>
     <div class="team-focus p-3" v-if="team">
         <ThemeLogo :class="{'leading': isLeading }" class="top-logo w-100" :theme="team.theme"/>
-        <div class="title pt-3 font-weight-bold text-center">{{ team.name }}</div>
+        <div class="title pt-3 fw-bold text-center">{{ team.name }}</div>
 
         <div class="player-list">
             <div class="player" :class="{empty: player.empty, latest: player.latest}" v-for="player in players" :key="player.id"  :style="(player.latest ? teamBG : {})">
@@ -15,7 +15,7 @@
         </div>
 
         <MoneyBar class="team-focus-bar" :team="team" :auction-settings="auctionSettings"></MoneyBar>
-<!--        <div class="remaining font-weight-bold text-center">Remaining: {{ money(team.balance) }}</div>-->
+<!--        <div class="remaining fw-bold text-center">Remaining: {{ money(team.balance) }}</div>-->
     </div>
 </template>
 

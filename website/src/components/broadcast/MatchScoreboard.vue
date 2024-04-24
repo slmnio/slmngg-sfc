@@ -91,10 +91,12 @@ export default {
                     if (this.mapTypes[num]) {
                         maps.push({
                             dummy: true,
-                            ...(this.mapTypes ? {
-                                name: this.mapTypes && this.mapTypes[num],
-                                image: [{ url: DefaultMapImages[this.mapTypes[num]] }]
-                            } : {}),
+                            ...(this.mapTypes
+                                ? {
+                                    name: this.mapTypes && this.mapTypes[num],
+                                    image: [{ url: DefaultMapImages[this.mapTypes[num]] }]
+                                }
+                                : {}),
                             map: {
                                 type: this.mapTypes && this.mapTypes[num]
                             },

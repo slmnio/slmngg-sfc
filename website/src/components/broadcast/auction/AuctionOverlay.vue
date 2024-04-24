@@ -104,6 +104,7 @@
 </template>
 
 <script>
+import { socket } from "@/socket";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import TeamPlayerList from "./TeamPlayerList";
 import { cleanID, getRoleSVG, money } from "@/utils/content-utils";
@@ -459,7 +460,7 @@ export default {
         },
         sendToAuctionServer(event, data) {
             console.log("[socket]", "sending", event, data);
-            this.$socket.client.emit(event, {
+            socket.emit(event, {
                 auctionID: this.eventID,
                 ...data
             });
@@ -480,7 +481,7 @@ export default {
         }
     },
     mounted() {
-        this.$socket.client.emit("subscribe", "auction");
+        socket.emit("subscribe", "auction");
 
         setInterval(() => {
             this.tick++;

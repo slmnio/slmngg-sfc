@@ -42,72 +42,77 @@
             <div class="maps-table-wrapper">
                 <table class="teams-maps table table-bordered table-sm table-dark mt-2 mb-0 opacity-changes"
                        :class="{'low-opacity': processing['map']}">
-                    <tr class="map" v-for="(map, i) in maps" :key="i"
-                        :class="{'banned': banners[i], 'very-low-opacity': !map.dummy && !map._original_data_id}">
-                        <td class="form-stack number">
-                            <div class="form-top d-flex">
-                                <div>#</div>
-                                <div class="flex-grow-1 text-right">
-                                    <i class="fas fa-pen" v-b-tooltip="'Edits an existing map record'" v-if="existingMapIDs[i]"></i>
-                                    <i class="fas fa-plus" v-b-tooltip="'Creates a new map record'" v-if="!existingMapIDs[i]"></i>
+                    <tbody>
+                        <tr class="map" v-for="(map, i) in maps" :key="i"
+                            :class="{'banned': banners[i], 'very-low-opacity': !map.dummy && !map._original_data_id}">
+                            <td class="form-stack number">
+                                <div class="form-top d-flex">
+                                    <div>#</div>
+                                    <div class="flex-grow-1 text-end">
+                                        <i class="fas fa-pen" v-b-tooltip="'Edits an existing map record'"
+                                           v-if="existingMapIDs[i]"></i>
+                                        <i class="fas fa-plus" v-b-tooltip="'Creates a new map record'"
+                                           v-if="!existingMapIDs[i]"></i>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-button">
-                                <b-form-input type="number" class="map-number no-arrows" :min="1" :max="minMaps"
-                                              v-model.number="mapNumbers[i]"></b-form-input>
-                            </div>
-                        </td>
-                        <td class="map form-stack" style="width: 100%;">
-                            <div class="form-top">
-                                Map
-                            </div>
-                            <div class="form-bottom">
-                                <b-form-select class="no-choice" :options="getMapOptions(i)" :value="mapChoices[i] || null" @input="val => mapChoices[i] = val" />
-                            </div>
-                        </td>
-                        <td class="form-stack">
-                            <div class="form-top text-center">
-                                Map Score
-                            </div>
-                            <div class="form-bottom map-editors d-flex">
-                                <MapScoreEditor class="map-editor" v-model="score_1s[i]"
-                                                @input="(val) => checkAutoWinner(i, val)"
-                                                :team="teams[0]"></MapScoreEditor>
-                                <MapScoreEditor class="map-editor" v-model="score_2s[i]"
-                                                @input="(val) => checkAutoWinner(i, val)" :team="teams[1]"
-                                                :reverse="true"></MapScoreEditor>
-                            </div>
-                        </td>
-                        <td class="form-stack">
-                            <div class="form-top text-center">
-                                Draw
-                            </div>
-                            <div class="form-bottom d-flex">
-                                <b-form-checkbox button :button-variant="draws[i] ? 'primary' : 'light'"
-                                                 class="draw-checkbox" v-model="draws[i]">
-                                    <i v-if="draws[i]" class="fas fa-check fa-fw"></i>
-                                    <i v-else class="fas fa-fw fa-check hoverable"></i>
-                                </b-form-checkbox>
-                            </div>
-                        </td>
-                        <td class="form-stack number" v-if="!hideMatchExtras">
-                            <div class="form-top">Replay Code</div>
-                            <div class="form-button">
-                                <b-form-input type="text" v-model="replayCodes[i]"></b-form-input>
-                            </div>
-                        </td>
-                        <td v-if="showMapBanButtons">
-                            <TeamPicker title="Banned by" :teams="teams" v-model="banners[i]"></TeamPicker>
-                        </td>
-                        <td>
-                            <TeamPicker title="Picked by" :class="{ 'very-low-opacity': banners[i] }" :teams="teams"
-                                        v-model="pickers[i]"></TeamPicker>
-                        </td>
-                        <td>
-                            <TeamPicker title="Winner" :class="{ 'very-low-opacity': banners[i] }" :teams="teams"
-                                        v-model="winners[i]" @change="(val) => winnerSelected(i, val)"></TeamPicker>
-                        </td>
-                    </tr>
+                                <div class="form-button">
+                                    <b-form-input type="number" class="map-number no-arrows" :min="1" :max="minMaps"
+                                                  v-model.number="mapNumbers[i]"></b-form-input>
+                                </div>
+                            </td>
+                            <td class="map form-stack" style="width: 100%;">
+                                <div class="form-top">
+                                    Map
+                                </div>
+                                <div class="form-bottom">
+                                    <b-form-select class="no-choice" :options="getMapOptions(i)"
+                                                   :value="mapChoices[i] || null" @input="val => mapChoices[i] = val"/>
+                                </div>
+                            </td>
+                            <td class="form-stack">
+                                <div class="form-top text-center">
+                                    Map Score
+                                </div>
+                                <div class="form-bottom map-editors d-flex">
+                                    <MapScoreEditor class="map-editor" v-model="score_1s[i]"
+                                                    @input="(val) => checkAutoWinner(i, val)"
+                                                    :team="teams[0]"></MapScoreEditor>
+                                    <MapScoreEditor class="map-editor" v-model="score_2s[i]"
+                                                    @input="(val) => checkAutoWinner(i, val)" :team="teams[1]"
+                                                    :reverse="true"></MapScoreEditor>
+                                </div>
+                            </td>
+                            <td class="form-stack">
+                                <div class="form-top text-center">
+                                    Draw
+                                </div>
+                                <div class="form-bottom d-flex">
+                                    <b-form-checkbox button :button-variant="draws[i] ? 'primary' : 'light'"
+                                                     class="draw-checkbox" v-model="draws[i]">
+                                        <i v-if="draws[i]" class="fas fa-check fa-fw"></i>
+                                        <i v-else class="fas fa-fw fa-check hoverable"></i>
+                                    </b-form-checkbox>
+                                </div>
+                            </td>
+                            <td class="form-stack number" v-if="!hideMatchExtras">
+                                <div class="form-top">Replay Code</div>
+                                <div class="form-button">
+                                    <b-form-input type="text" v-model="replayCodes[i]"></b-form-input>
+                                </div>
+                            </td>
+                            <td v-if="showMapBanButtons">
+                                <TeamPicker title="Banned by" :teams="teams" v-model="banners[i]"></TeamPicker>
+                            </td>
+                            <td>
+                                <TeamPicker title="Picked by" :class="{ 'very-low-opacity': banners[i] }" :teams="teams"
+                                            v-model="pickers[i]"></TeamPicker>
+                            </td>
+                            <td>
+                                <TeamPicker title="Winner" :class="{ 'very-low-opacity': banners[i] }" :teams="teams"
+                                            v-model="winners[i]" @change="(val) => winnerSelected(i, val)"></TeamPicker>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
             <div class="details-wrapper p-2 mt-3" v-if="!hideMatchExtras">
@@ -700,7 +705,7 @@ export default {
         opacity: 0.5;
     }
 
-    .teams-scores >>> .custom-checkbox {
+    .teams-scores:deep(.form-check) {
         font-size: 16px !important;
     }
 

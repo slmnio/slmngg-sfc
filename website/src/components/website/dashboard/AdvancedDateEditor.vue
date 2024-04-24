@@ -22,12 +22,12 @@
             <div class="text-center mb-2">Editing in <b>{{ useSiteTimezone ? 'the site' : 'your local' }} timezone</b> ({{ timezoneName }})</div>
             <div class="flex-center text-center timezones">
                 <div class="group">
-                    <div class="top font-weight-bold" :class="{'text-muted': useSiteTimezone}">Local timezone</div>
+                    <div class="top fw-bold" :class="{'text-muted': useSiteTimezone}">Local timezone</div>
                     <div class="bottom">{{ localTimezone }}</div>
                     <div class="bottom">{{ formatTime(spaceTimeRef.toLocalDate(), { tz: localTimezone, use24HourTime: $store.state.use24HourTime }) }}</div>
                 </div>
                 <div class="group ml-3">
-                    <div class="top font-weight-bold" :class="{'text-muted': !useSiteTimezone}">Site timezone</div>
+                    <div class="top fw-bold" :class="{'text-muted': !useSiteTimezone}">Site timezone</div>
                     <div class="bottom">{{ siteTimezone }}</div>
                     <div class="bottom">{{ formatTime(spaceTimeRef.toLocalDate(), { tz: siteTimezone, use24HourTime: $store.state.use24HourTime }) }}</div>
                 </div>
@@ -69,7 +69,7 @@ export default {
             return ref.format("{year}-{iso-month}-{date-pad}T{hour-24-pad}:{minute-pad}:{second-pad}");
         },
         spaceTimeRef() {
-            const ref = spacetime(this.temporaryTime || this.safeSavedTime, this.useSiteTimezone ? this.siteTimezone : this.localTimezone); ;
+            const ref = spacetime(this.temporaryTime || this.safeSavedTime, this.useSiteTimezone ? this.siteTimezone : this.localTimezone);
             // console.log("ref", ref.tz, this.useSiteTimezone ? this.siteTimezone : this.localTimezone);
             return ref;
         },

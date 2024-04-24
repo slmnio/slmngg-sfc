@@ -14,7 +14,7 @@
 <!--            <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-light">Welcome to the new SLMN.GG!</a></b> Completely rewritten to be faster, cleaner and better. Please be patient with any teething problems from the big switch over.-->
 <!--        </WebsiteNavBanner>-->
         <WebsiteNavBanner v-if="siteMode === 'staging'" class="bg-warning text-dark">
-            <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-dark">Beta development version:</a></b> things may break. Use <a href="https://slmn.gg" class="text-dark font-weight-bold">slmn.gg</a> for the latest stable update.
+            <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-dark">Beta development version:</a></b> things may break. Use <a href="https://slmn.gg" class="text-dark fw-bold">slmn.gg</a> for the latest stable update.
         </WebsiteNavBanner>
         <WebsiteNavBanner v-if="siteMode === 'local'" class="text-light bg-primary">
             <i v-if="dataServerMode !== 'local'" class="fas fa-exclamation-triangle fa-fw mr-1"></i>
@@ -69,8 +69,8 @@
                 </b-navbar-nav>
 
                 <b-navbar-nav>
-                    <router-link class="nav-link" to="/login" v-if="!$root.auth.user && !$root.isRebuilding">Login</router-link>
-                    <LoggedInUser v-if="$root.auth.user"/>
+                    <router-link class="nav-link" to="/login" v-if="!user && !isRebuilding">Login</router-link>
+                    <LoggedInUser v-if="user"/>
                 </b-navbar-nav>
 
             </b-collapse>
@@ -94,6 +94,8 @@
 </template>
 
 <script>
+import { state } from "@/socket";
+import store from "@/thing-store";
 import NavLiveMatch from "@/components/website/NavLiveMatch";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import WebsiteNavBanner from "@/components/website/WebsiteNavBanner";
@@ -102,6 +104,14 @@ import LoggedInUser from "@/components/website/LoggedInUser";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 import { isAuthenticated } from "@/utils/auth";
 import { getMainDomain } from "@/utils/fetch";
+import { configureCompat } from "vue";
+import { mapState, mapWritableState } from "pinia";
+import { useAuthStore } from "@/stores/authStore";
+
+configureCompat({
+    MODE: 3
+});
+
 
 export default {
     name: "WebsiteNav",
@@ -118,6 +128,11 @@ export default {
         height: 0
     }),
     computed: {
+        ...mapWritableState(useAuthStore, ["user"]),
+        ...mapState(useAuthStore, ["isProduction"]),
+        isRebuilding() {
+            return store.getters.hasWebsiteFlag("server_rebuilding");
+        },
         liveMatches() {
             return ReactiveRoot("special:live-matches", {
                 matches: ReactiveArray("matches", {
@@ -165,15 +180,15 @@ export default {
             return resizedImageNoWrap(theme, ["small_logo", "default_logo"], "h-40");
         },
         showDisconnectedMessage() {
-            return this.pageNoLongerNew && this.$socket.disconnected;
+            return this.pageNoLongerNew && !state.connected;
         },
         showRebuildingMessage() {
             if (this.showDisconnectedMessage) return false;
-            return this.$root.isRebuilding;
+            return this.isRebuilding;
         },
         showHighErrorRateMessage() {
             if (this.showDisconnectedMessage || this.showRebuildingMessage) return false;
-            return this.$root.highErrorRate;
+            return store.getters.hasWebsiteFlag("high_error_rate");
         },
         minisiteSettings() {
             if (!this.minisite?.blocks) return null;
@@ -183,13 +198,9 @@ export default {
                 return null;
             }
         },
-        isProduction() {
-            if (!isAuthenticated(this.$root)) return false;
-            return this.$root.authUser?.clients?.length;
-        },
         productionClient() {
-            if (!isAuthenticated(this.$root)) return false;
-            return ReactiveRoot(this.$root.authUser?.clients?.[0]);
+            if (!this.isProduction) return false;
+            return ReactiveRoot(this.user.clients?.[0]);
         }
     },
     mounted() {
@@ -247,5 +258,26 @@ export default {
 }
 .website-nav >>> .dropdown-item {
     padding: 0.5rem 1.5rem;
+}
+.navbar[type="dark"] .navbar-nav .nav-link,
+.navbar[type="dark"] .navbar-nav .nav-text,
+.navbar[type="dark"] .navbar-nav .nav-item {
+    color: #ffffff80
+}
+.navbar[type="dark"] .navbar-nav .nav-link:focus,
+.navbar[type="dark"] .navbar-nav .nav-link:hover {
+    color: #ffffffbf
+}
+.navbar[type="dark"] .navbar-nav .nav-link.active,
+.navbar[type="dark"] .navbar-nav .nav-text.active,
+.navbar[type="dark"] .navbar-nav .nav-item.active {
+    color: #ffffff
+}
+
+.navbar-brand {
+    color: white;
+}
+.nav-link {
+    cursor: pointer;
 }
 </style>

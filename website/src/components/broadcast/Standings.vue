@@ -3,8 +3,8 @@
 <!--        <div>{{ event.name }} / {{ stage }} / {{ allMatches.length }} -> {{ stageMatches.length }} ({{ teams.length }} teams)</div>-->
         <h3 class="top-standings-name text-center d-md-none">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</h3>
         <div class="standings-header d-flex align-items-center">
-            <div class="team-name flex-grow-1 text-left d-none d-md-flex">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</div>
-            <div class="team-name team-code flex-grow-1 text-left d-md-none"></div>
+            <div class="team-name flex-grow-1 text-start d-none d-md-flex">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</div>
+            <div class="team-name team-code flex-grow-1 text-start d-md-none"></div>
             <div class="team-stats d-flex">
                 <div class="team-stat text-center" v-for="col in showColumns" :key="col" v-b-tooltip="getColumnText(col).title">
                     {{ getColumnText(col).header }}

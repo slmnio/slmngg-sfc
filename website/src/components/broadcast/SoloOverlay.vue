@@ -250,7 +250,7 @@ export default {
         setMap(index, map) {
             this.$set(this.maps, index, {
                 ...map,
-                map: map,
+                map,
                 big_image: map.big_image,
                 image: map.image,
                 name: [map.name] // this emulates the lookup from Airtable

@@ -34,7 +34,7 @@
         </div>
         <div class="spacer flex-grow-1"></div>
         <div class="area right-area">
-            <div class="group text-right">
+            <div class="group text-end">
                 <div class="group-top">Break match</div>
                 <div class="group-bottom">
                     <b-button size="sm" :variant="broadcast.show_live_match ? 'primary' : 'secondary'" :pressed="broadcast.show_live_match"
@@ -42,7 +42,7 @@
                               @click="() => setLiveMatchVisibility(!broadcast.show_live_match)">Show live match</b-button>
                 </div>
             </div>
-            <div class="group text-right">
+            <div class="group text-end">
                 <div class="group-top">Break Settings</div>
                 <div class="group-bottom">
                     <div class="fake-btn-group">
@@ -50,13 +50,13 @@
                     </div>
                 </div>
             </div>
-            <div class="group text-right">
+            <div class="group text-end">
                 <div class="group-top">Observers</div>
                 <div class="group-bottom">
                     <ObserverSettingsModal :broadcast="broadcast"/>
                 </div>
             </div>
-            <div class="group text-right">
+            <div class="group text-end">
                 <div class="group-top">Advertise</div>
                 <div class="group-bottom">
                     <b-form-checkbox :checked="broadcast.advertise" @change="(state) => advertiseBroadcast(state)"

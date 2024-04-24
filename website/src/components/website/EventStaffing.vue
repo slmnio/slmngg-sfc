@@ -56,7 +56,7 @@ export default {
             function addToStaff(playerObj, id, name, role, matchID) {
                 let player = staff.find(s => s.id === id);
                 if (!player) {
-                    staff.push({ id: id, name: name, roles: {}, matches: new Set(), user: { id, name }, player: playerObj });
+                    staff.push({ id, name, roles: {}, matches: new Set(), user: { id, name }, player: playerObj });
                     player = staff[staff.length - 1];
                 }
                 if (!player.roles[role]) {

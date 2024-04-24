@@ -6,9 +6,10 @@
 </template>
 
 <script>
+import { socket } from "@/socket";
 import { YoutubeVue3 } from "youtube-vue3";
 
-const youtubeRegexp = /https?:\/\/(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube(?:-nocookie)?\.com\S*[^\w\s-])([\w-]{11})(?=[^\w-]|$)(?![?=&+%\w.-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/ig
+const youtubeRegexp = /https?:\/\/(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube(?:-nocookie)?\.com\S*[^\w\s-])([\w-]{11})(?=[^\w-]|$)(?![?=&+%\w.-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/ig;
 
 /**
  * get id from url
@@ -16,22 +17,22 @@ const youtubeRegexp = /https?:\/\/(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube(?:-noc
  * @return {string}     id
  */
 export function getIdFromURL (url) {
-    let id = url.replace(youtubeRegexp, '$1')
+    let id = url.replace(youtubeRegexp, "$1");
 
-    if (id.includes(';')) {
-        const pieces = id.split(';')
+    if (id.includes(";")) {
+        const pieces = id.split(";");
 
-        if (pieces[1].includes('%')) {
-            const uriComponent = decodeURIComponent(pieces[1])
-            id = `http://youtube.com${uriComponent}`.replace(youtubeRegexp, '$1')
+        if (pieces[1].includes("%")) {
+            const uriComponent = decodeURIComponent(pieces[1]);
+            id = `http://youtube.com${uriComponent}`.replace(youtubeRegexp, "$1");
         } else {
-            id = pieces[0]
+            id = pieces[0];
         }
-    } else if (id.includes('#')) {
-        id = id.split('#')[0]
+    } else if (id.includes("#")) {
+        id = id.split("#")[0];
     }
 
-    return id
+    return id;
 }
 
 export default {
@@ -91,7 +92,7 @@ export default {
             this.ended = true;
         },
         emitTimes() {
-            this.$socket.client.emit("media_update", "time", {
+            socket.emit("media_update", "time", {
                 duration: this.player.getDuration(),
                 current: this.player.getCurrentTime()
             });
@@ -105,16 +106,16 @@ export default {
             console.log("play media", this.player);
             if (isActive && this.player) {
                 this.player.playVideo();
-                this.$socket.client.emit("media_update", "playing", true);
-                this.$socket.client.emit("media_update", "remaining", this.player.getDuration() - this.player.getCurrentTime());
+                socket.emit("media_update", "playing", true);
+                socket.emit("media_update", "remaining", this.player.getDuration() - this.player.getCurrentTime());
             }
         },
         prepared(isPrepared) {
-            this.$socket.client.emit("media_update", "prepared", isPrepared);
+            socket.emit("media_update", "prepared", isPrepared);
             console.log({ isPrepared });
         },
         ended(ended) {
-            this.$socket.client.emit("media_update", "ended", ended);
+            socket.emit("media_update", "ended", ended);
         }
     },
     mounted() {

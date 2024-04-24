@@ -1,36 +1,5 @@
 import { getDataServerAddress, getMainCookieDomain, getMainDomain } from "@/utils/fetch";
 
-export async function authenticateWithDiscord(app, code) {
-    if (!app || !code) return { error: true, errorMessage: "Empty authentication request" };
-
-    const authenticationRequest = await fetch(`${getDataServerAddress()}/auth/discord-login`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            code
-        })
-    }).then(res => res.json());
-
-    console.log("[Auth]", authenticationRequest);
-
-    if (authenticationRequest.error) {
-        console.warn("Authentication error:", authenticationRequest.for_a_developer);
-        return { error: true, errorMessage: authenticationRequest.message };
-    }
-
-    app.auth.token = authenticationRequest.token;
-    // const rootDomain = window.location.host.includes("slmn.gg") ? "slmn.gg" : window.location.hostname;
-    console.log("[auth] setting on domain", getMainCookieDomain());
-    app.$cookies.set("token", authenticationRequest.token, "3d", null, getMainCookieDomain());
-    app.$cookies.set("token", authenticationRequest.token, "3d", null, "." + getMainCookieDomain());
-    app.auth.user = authenticationRequest.user;
-
-    return {
-        error: false
-    };
-}
 
 export function isOnMainDomain() {
     return window.location.origin === getMainDomain();

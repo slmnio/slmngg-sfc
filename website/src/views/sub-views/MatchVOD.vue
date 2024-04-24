@@ -11,7 +11,6 @@
         <div class="embed embed-responsive embed-responsive-16by9" v-if="showNoVOD">
             <div class="no-embed-text flex-center">No VOD available for this match</div>
         </div>
-        <!--  TODO: add spoilers? -->
         <div class="maps-container mt-3 flex-column" v-if="match.maps">
             <div class="checkbox-holder flex-center justify-content-end" v-if="hasBannedMaps">
                 <b-form-checkbox v-model="showBannedMaps" switch> Show banned maps</b-form-checkbox>

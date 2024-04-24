@@ -35,8 +35,8 @@
         </table>
 
         <div class="w-100 d-flex flex-wrap justify-content-center">
-            <div class="flex-grow-1 text-left mb-3" v-if="compositionText">{{ compositionText }}</div>
-            <a v-if="useCalculator" class="btn btn-light text-dark font-weight-bold" target="_blank" :href="`https://slmn.io/calc?custom=${encodeURIComponent(dataString)}&category=${encodeURIComponent(category)}`">SLMN Calculator <i class="fas fa-chevron-right ml-2 fa-fw"></i></a>
+            <div class="flex-grow-1 text-start mb-3" v-if="compositionText">{{ compositionText }}</div>
+            <a v-if="useCalculator" class="btn btn-light text-dark fw-bold" target="_blank" :href="`https://slmn.io/calc?custom=${encodeURIComponent(dataString)}&category=${encodeURIComponent(category)}`">SLMN Calculator <i class="fas fa-chevron-right ml-2 fa-fw"></i></a>
         </div>
 
     </div>

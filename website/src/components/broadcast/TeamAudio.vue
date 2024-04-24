@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { socket } from "@/socket";
 import PCMPlayer from "@/utils/pcmplayer";
 import { OpusDecoderWebWorker } from "opus-decoder";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
@@ -105,7 +106,7 @@ export default {
         },
         audioSub(key) {
             if (!this.broadcastKey) return;
-            this.$socket.client.emit("audio_subscribe", {
+            socket.emit("audio_subscribe", {
                 taskKey: key || this.taskKey,
                 broadcastKey: this.broadcastKey
             });

@@ -448,18 +448,18 @@ export function getEmbedData(url) {
     if (url.endsWith(".pdf")) {
         return {
             service: "pdf",
-            url: url
+            url
         };
     }
 
     if (["mp4", "webm"].some(file => url.endsWith("." + file))) {
         return {
             service: "unknown-video",
-            url: url
+            url
         };
     }
 
-    return { service: "unknown", url: url };
+    return { service: "unknown", url };
 }
 
 

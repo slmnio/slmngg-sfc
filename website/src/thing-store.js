@@ -17,7 +17,8 @@ const store = createStore({
         last_event_match_pages: [],
         dashboard_modules_active: [],
 
-        data_update_buffer: []
+        data_update_buffer: [],
+        website_flags: []
     },
     mutations: {
         push(_store, { id, data }) {
@@ -129,6 +130,9 @@ const store = createStore({
         },
         setTimeEditTimezone(state, editInSiteTimezone) {
             state.edit_in_site_timezone = editInSiteTimezone;
+        },
+        setWebsiteFlags(state, flags) {
+            state.website_flags = flags;
         }
     },
     getters: {
@@ -141,7 +145,8 @@ const store = createStore({
         // highlightedMatch: (state, getters) => () => getters.thing(state.highlighted_match)
         highlightedMatch: state => () => state.highlighted_match,
         dashboardModuleIsVisible: state => (moduleName) => state.dashboard_modules_active.includes(moduleName),
-        editTimeInSiteTimezone: state => state.edit_in_site_timezone
+        editTimeInSiteTimezone: state => state.edit_in_site_timezone,
+        hasWebsiteFlag: state => flag => state.website_flags.includes(flag)
     },
     actions: {
         subscribe: (state, data) => state.commit("subscribe", data),

@@ -5,7 +5,7 @@
             <p class="mb-0" v-if="!automationIsActive && broadcastBreakDisplay">Break display is currently <b>{{ broadcastBreakDisplay }}</b>.</p>
         </div>
 
-        <b-form-group label="Break display rotation options" label-class="font-weight-bold">
+        <b-form-group label="Break display rotation options" label-class="fw-bold">
             <b-form-checkbox v-for="option in rotationOptions" :key="option.value" :value="option.value" v-model="selectedRotationOptions">
                     <span v-if="option.text === 'Matchup' && matchupText" class="text-muted">
                         {{ option.text }} (Won't show, {{ matchupText }})
@@ -14,7 +14,7 @@
             </b-form-checkbox>
         </b-form-group>
 
-        <b-form-group label="Ending break display (countdown 30 seconds or lower)" label-class="font-weight-bold">
+        <b-form-group label="Ending break display (countdown 30 seconds or lower)" label-class="fw-bold">
             <b-form-checkbox v-for="option in endingOptions" :key="option.value" :value="option.value" v-model="selectedEndingOptions">
                     <span v-if="option.text === 'Matchup' && matchupText" class="text-muted">
                         {{ option.text }} (Won't show, {{ matchupText }})

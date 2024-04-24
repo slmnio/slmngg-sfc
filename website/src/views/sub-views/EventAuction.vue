@@ -5,7 +5,7 @@
             <div class="admin-settings border-danger border p-2 rounded mb-2 d-flex align-items-center" v-if="isAdmin">
                 <button class="btn btn-info mr-1" @click="sendToAuctionServer('auction:admin_set_state', {'state': 'READY'})">Set state: READY</button>
                 <button class="btn btn-warning mr-1" @click="sendToAuctionServer('auction:admin_set_state', {'state': 'RESTRICTED'})">Set state: RESTRICTED</button>
-                <div class="btn-text text-right flex-grow-1">{{ auctionState }}</div>
+                <div class="btn-text text-end flex-grow-1">{{ auctionState }}</div>
             </div>
             <AuctionCountdown class="auction-countdown mb-2" web :style="themeBackground1(event)" show-time />
 
@@ -122,21 +122,25 @@
 
                 <h3 class="text-center mt-5">Auction Settings</h3>
                 <table class="table-dark table-bordered table-sm w-100 text-center">
-                    <tr>
-                        <td>Minimum increment: <b>{{ money(this.autoSettings.money.minimumBidIncrement) }}</b></td>
-                    </tr>
-                    <tr>
-                        <td>Maximum increment: <b>{{ money(this.autoSettings.money.maximumBidIncrement) }}</b></td>
-                    </tr>
-                    <tr v-if="auctionSettings?.time?.beforeFirstBids">
-                        <td>Pre-auction timer: <b>{{ auctionSettings?.time?.beforeFirstBids }} seconds</b></td>
-                    </tr>
-                    <tr v-if="auctionSettings?.time?.afterInitialBid">
-                        <td>Auction timer after first bid: <b>{{ auctionSettings?.time?.afterInitialBid }} seconds</b></td>
-                    </tr>
-                    <tr v-if="auctionSettings?.time?.afterSubsequentBids">
-                        <td>Auction timer after other bids: <b>{{ auctionSettings?.time?.afterSubsequentBids }} seconds</b></td>
-                    </tr>
+                    <tbody>
+                        <tr>
+                            <td>Minimum increment: <b>{{ money(this.autoSettings.money.minimumBidIncrement) }}</b></td>
+                        </tr>
+                        <tr>
+                            <td>Maximum increment: <b>{{ money(this.autoSettings.money.maximumBidIncrement) }}</b></td>
+                        </tr>
+                        <tr v-if="auctionSettings?.time?.beforeFirstBids">
+                            <td>Pre-auction timer: <b>{{ auctionSettings?.time?.beforeFirstBids }} seconds</b></td>
+                        </tr>
+                        <tr v-if="auctionSettings?.time?.afterInitialBid">
+                            <td>Auction timer after first bid: <b>{{ auctionSettings?.time?.afterInitialBid }}
+                                seconds</b></td>
+                        </tr>
+                        <tr v-if="auctionSettings?.time?.afterSubsequentBids">
+                            <td>Auction timer after other bids: <b>{{ auctionSettings?.time?.afterSubsequentBids }}
+                                seconds</b></td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
             <div class="col-8 players-section">
@@ -151,24 +155,34 @@
                 </div>
 
                 <table class="table table-bordered table-dark table-sm w-100">
-                    <tr class="player" v-for="(player, i) in undraftedPlayers" :key="player.id" :class="{'striped': i % 2 === 1, 'currently-active-player': activePlayer?.id === player.id}">
-                        <td class="player-name">
-                            <div class="player-info-box d-flex align-items-center">
-                                <div v-if="player.role" class="player-role" v-html="getRoleSVG(player.role)"></div>
-                                <router-link :to="url('player', player)">{{ player.name }}</router-link>
-                            </div>
-                            <div class="player-eligible-roles" :title="`Eligible for ${niceJoin(eligibleRoles(player.eligible_roles).map(r => r.role))}`" v-b-tooltip>
-                                <div class="role text-success" v-for="role in eligibleRoles(player.eligible_roles)" :key="role?.role" v-html="getRoleSVG(role?.role)"></div>
-                            </div>
-                        </td>
-                        <td class="draft-data">{{ player.draft_data }}</td>
-                        <td class="player-buttons-cell">
-                            <div class="buttons d-flex">
-                                <button class="btn btn-info btn-sm" v-if="isAdmin" :disabled="!adminTeamID" @click="() => askStarting(player)">force</button>
-                                <button class="btn btn-success btn-sm" :disabled="!canStartPlayer" @click="startPlayer(player)">start</button>
-                            </div>
-                        </td>
-                    </tr>
+                    <tbody>
+                        <tr class="player" v-for="(player, i) in undraftedPlayers" :key="player.id"
+                            :class="{'striped': i % 2 === 1, 'currently-active-player': activePlayer?.id === player.id}">
+                            <td class="player-name">
+                                <div class="player-info-box d-flex align-items-center">
+                                    <div v-if="player.role" class="player-role" v-html="getRoleSVG(player.role)"></div>
+                                    <router-link :to="url('player', player)">{{ player.name }}</router-link>
+                                </div>
+                                <div class="player-eligible-roles"
+                                     :title="`Eligible for ${niceJoin(eligibleRoles(player.eligible_roles).map(r => r.role))}`"
+                                     v-b-tooltip>
+                                    <div class="role text-success" v-for="role in eligibleRoles(player.eligible_roles)"
+                                         :key="role?.role" v-html="getRoleSVG(role?.role)"></div>
+                                </div>
+                            </td>
+                            <td class="draft-data">{{ player.draft_data }}</td>
+                            <td class="player-buttons-cell">
+                                <div class="buttons d-flex">
+                                    <button class="btn btn-info btn-sm" v-if="isAdmin" :disabled="!adminTeamID"
+                                            @click="() => askStarting(player)">force
+                                    </button>
+                                    <button class="btn btn-success btn-sm" :disabled="!canStartPlayer"
+                                            @click="startPlayer(player)">start
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -176,6 +190,7 @@
 </template>
 
 <script>
+import { socket } from "@/socket";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { isAuthenticated } from "@/utils/auth";
 import { cleanID, dirtyID, getRoleSVG, money, url } from "@/utils/content-utils";
@@ -430,7 +445,7 @@ export default {
         sendToAuctionServer(event, data) {
             // if (!isAuthenticated()) return console.error("Tried to send data while not authed", { event, data });
             console.log("[socket]", "sending", event, data);
-            this.$socket.client.emit(event, {
+            socket.emit(event, {
                 auctionID: this.eventID,
                 ...data,
                 _token: this.$root.auth.token

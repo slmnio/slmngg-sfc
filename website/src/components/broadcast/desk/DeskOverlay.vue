@@ -75,15 +75,17 @@ export default {
             return manualGuests;
         },
         guests() {
-            const guests = (!this.broadcast?.guests) ? [] : ReactiveArray("guests", {
-                player: ReactiveThing("player", {
-                    socials: ReactiveArray("socials")
-                }),
-                theme: ReactiveThing("theme"),
-                prediction_team: ReactiveThing("prediction_team", {
-                    theme: ReactiveThing("theme")
-                })
-            })(this.broadcast);
+            const guests = (!this.broadcast?.guests)
+                ? []
+                : ReactiveArray("guests", {
+                    player: ReactiveThing("player", {
+                        socials: ReactiveArray("socials")
+                    }),
+                    theme: ReactiveThing("theme"),
+                    prediction_team: ReactiveThing("prediction_team", {
+                        theme: ReactiveThing("theme")
+                    })
+                })(this.broadcast);
 
             return [
                 ...guests,

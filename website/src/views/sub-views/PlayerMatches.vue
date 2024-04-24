@@ -69,11 +69,13 @@ export default {
                     teams: ReactiveArray("teams", {
                         theme: ReactiveThing("theme")
                     }),
-                    ...(this.showPartners ? {
-                        player_relationships: ReactiveArray("player_relationships", {
-                            player: ReactiveThing("player")
-                        })
-                    } : {})
+                    ...(this.showPartners
+                        ? {
+                            player_relationships: ReactiveArray("player_relationships", {
+                                player: ReactiveThing("player")
+                            })
+                        }
+                        : {})
                 })
             })(this.player);
         },

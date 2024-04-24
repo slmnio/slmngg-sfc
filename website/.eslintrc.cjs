@@ -1,15 +1,14 @@
-{
-    "env": {
-        "es2021": true,
-        "node": true
-    },
+require("@rushstack/eslint-patch/modern-module-resolution");
+
+module.exports = {
+    root: true,
     "extends": [
-        "plugin:vue/essential",
-        "@vue/standard"
+        "plugin:vue/vue3-essential",
+        "eslint:recommended",
+        "@vue/eslint-config-standard"
     ],
-    "parserOptions": {
-        "ecmaVersion": 12,
-        "sourceType": "module"
+    parserOptions: {
+        ecmaVersion: "latest"
     },
     "rules": {
         "indent": [
@@ -36,4 +35,4 @@
         "space-before-function-paren": "off",
         "no-throw-literal": "off"
     }
-}
+};

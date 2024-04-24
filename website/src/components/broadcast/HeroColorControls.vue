@@ -3,7 +3,7 @@
         <div class="color" v-for="(color, i) in themeColors" :key="color">
             <div class="color-name"><span class="color-swatch" :style="{ backgroundColor: color }"></span> {{ color }} (b={{ getHexBrightness(color).toFixed(2) }})</div>
 
-            <b-form-group class="mb-0" :label="`${type} ${colorControls[i][type]}`" label-class="font-weight-bold text-right" label-cols="3" v-for="type in ['hue', 'overlay', 'multiply', 'saturation']" :key="type">
+            <b-form-group class="mb-0" :label="`${type} ${colorControls[i][type]}`" label-class="fw-bold text-end" label-cols="3" v-for="type in ['hue', 'overlay', 'multiply', 'saturation']" :key="type">
                 <b-form-input class="d-flex h-100" type="range" v-model="colorControls[i][type]" min="0" max="1" step="0.01"></b-form-input>
             </b-form-group>
         </div>

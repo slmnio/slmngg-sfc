@@ -6,7 +6,7 @@
                 <td><b-button @click="sendToOverlay(overlay.socket, 'reload')" size="sm" variant="dark"><i class="fa fa-fw fa-sync"></i></b-button></td>
                 <td><b-button size="sm" variant="dark" :href="overlay.fullPath" target="_blank"><i class="fa fa-fw fa-external-link"></i></b-button></td>
                 <td><span class="b-pad"><i class="fa fa-fw" :class="{'fa-eye': overlay.visible, 'fa-eye-slash': !overlay.visible}"></i></span></td>
-                <td><span class="b-pad font-weight-bold">{{ overlay.component }}</span></td>
+                <td><span class="b-pad fw-bold">{{ overlay.component }}</span></td>
                 <td><span class="b-pad">{{ decodeURIComponent(overlay.fullPath.replace(overlay.path, "")) }}</span></td>
             </tr>
         </table>
@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import { socket } from "@/socket";
 
 export default {
     name: "ClientOverview",
@@ -28,8 +29,8 @@ export default {
     }),
     methods: {
         sendToOverlay(socketID, event, data) {
-            if (this.$socket.client) {
-                this.$socket.client.emit("prod-send", {
+            if (socket) {
+                socket.emit("prod-send", {
                     socketID,
                     event,
                     data
@@ -53,7 +54,7 @@ export default {
     },
     mounted() {
         console.log("prod-join", this.client?.key);
-        if (this.$socket.client) this.$socket.client.emit("prod-overview-join", this.client?.key);
+        if (socket) socket.emit("prod-overview-join", this.client?.key);
     },
     sockets: {
         prod_update(data) {

@@ -82,7 +82,7 @@ export function ReactiveArray (key, structure) {
 
         const idsToResolve = [];
 
-        data = data.map(id => {
+        data = (data || []).map(id => {
             if (typeof id === "object" && id?.id && id.length === undefined) id = id.id;
             id = cleanID(id);
             if (!id) return {};

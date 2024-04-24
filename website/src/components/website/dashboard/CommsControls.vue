@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { socket } from "@/socket";
 
 export default {
     name: "CommsControls",
@@ -23,12 +24,12 @@ export default {
     },
     methods: {
         async enableComms(team) {
-            this.$socket.client.emit("prod_trigger", "comms_enable", {
-                team: team
+            socket.emit("prod_trigger", "comms_enable", {
+                team
             });
         },
         async disableComms() {
-            this.$socket.client.emit("prod_trigger", "comms_disable");
+            socket.emit("prod_trigger", "comms_disable");
         },
         teamName(i) {
             return this.teams?.[i]?.name || `Team ${i + 1}`;

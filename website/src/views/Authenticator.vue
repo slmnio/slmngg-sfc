@@ -11,7 +11,7 @@
 
 <script>
 import LoadingIcon from "@/components/website/LoadingIcon";
-import { authenticateWithDiscord, getAuthNext } from "@/utils/auth";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "Authenticator",
@@ -22,13 +22,15 @@ export default {
         errorMessage: null
     }),
     async mounted() {
-        const authResult = await authenticateWithDiscord(this.$root, this.code);
+        const authStore = useAuthStore();
+
+        const authResult = await authStore.authenticateWithDiscord(this.code);
         this.loading = false;
 
         if (authResult.error) {
-            this.errorMessage = authResult.errorMessage;
+            this.errorMessage = authResult?.errorMessage;
         } else {
-            const next = getAuthNext(this.$root);
+            const next = authStore.getAuthNext();
 
             if (next) {
                 if (next.startsWith("http")) {

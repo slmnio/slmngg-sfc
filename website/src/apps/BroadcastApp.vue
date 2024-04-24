@@ -140,7 +140,7 @@ export default {
         }
         if (this.broadcastKey) {
             console.log("loading with broadcastKey");
-            // socket.emit("prod-broadcast-join", this.broadcastKey); TODO: uncomment
+            socket.emit("prod-broadcast-join", this.broadcastKey);
         }
 
 

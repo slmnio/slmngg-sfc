@@ -3,14 +3,19 @@
         <template v-slot:header>{{ status }}</template>
 
         <table class="table table-bordered table-sm table-dark mb-0">
-            <tr>
-                <th colspan="2">Match</th>
-                <th>Start time</th>
-                <th>Show on overlays</th>
-                <th>Live Match</th>
-            </tr>
-            <ScheduleEditorMatch v-for="match in schedule" :match="match" :key="match.id"
-                                 :is-live-match="match._isLiveMatch" :timezone="broadcast.timezone || 'America/New_York'"></ScheduleEditorMatch>
+            <thead>
+                <tr>
+                    <th colspan="2">Match</th>
+                    <th>Start time</th>
+                    <th>Show on overlays</th>
+                    <th>Live Match</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ScheduleEditorMatch v-for="match in schedule" :match="match" :key="match.id"
+                                     :is-live-match="match._isLiveMatch"
+                                     :timezone="broadcast.timezone || 'America/New_York'"></ScheduleEditorMatch>
+            </tbody>
         </table>
     </DashboardModule>
 </template>

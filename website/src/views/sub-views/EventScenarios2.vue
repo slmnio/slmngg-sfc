@@ -42,71 +42,101 @@
 
 
         <table class="table-bordered text-light mb-3" v-if="counts && counts[0] && counts[0].positions">
-            <tr v-if="counts" class="fw-bold">
-                <th class="p-2 border-dark text-end" style="min-width: 8.5em">{{ showCountsAsPercentages ? `% of ${currentScenarioView.length} scenarios` : `/${currentScenarioView.length} scenarios`}}</th>
-                <th class="p-2 border-dark" v-for="(x, i) in (counts[0].positions).slice(0, -1)" :key="i">
-                    #{{ i + 1 }}
-                </th>
-                <th class="p-2 border-dark" v-b-tooltip:top="'Standings haven\'t converged into separate groups'">Incomplete</th>
-            </tr>
-            <tr v-for="team in counts" :key="team.code">
-                <td class="p-2 border-dark text-end fw-bold">{{ team.code }}</td>
-                <td class="p-2 border-dark cell-num" v-for="(pos, posi) in team.positions" :key="posi"
-                    @click="() => showWhen(team.code, posi)"
-                    :class="{ 'bg-info selected': manualScenarioFilters.find((f) => f.team === team.code && f.position === posi ), 'bg-warning text-dark': pos !== 0 && pos === currentScenarioView.length, 'text-muted': pos === 0 }"
-                >
-                    <span v-if="showCountsAsPercentages">{{ (pos / currentScenarioView.length) | perc }}</span>
-                    <span v-else>{{ pos }}</span>
-                </td>
-            </tr>
+            <thead>
+                <tr v-if="counts" class="fw-bold">
+                    <th class="p-2 border-dark text-end" style="min-width: 8.5em">
+                        {{ showCountsAsPercentages ? `% of ${currentScenarioView.length} scenarios` : `/${currentScenarioView.length} scenarios` }}
+                    </th>
+                    <th class="p-2 border-dark" v-for="(x, i) in (counts[0].positions).slice(0, -1)" :key="i">
+                        #{{ i + 1 }}
+                    </th>
+                    <th class="p-2 border-dark" v-b-tooltip:top="'Standings haven\'t converged into separate groups'">
+                        Incomplete
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="team in counts" :key="team.code">
+                    <td class="p-2 border-dark text-end fw-bold">{{ team.code }}</td>
+                    <td class="p-2 border-dark cell-num" v-for="(pos, posi) in team.positions" :key="posi"
+                        @click="() => showWhen(team.code, posi)"
+                        :class="{ 'bg-info selected': manualScenarioFilters.find((f) => f.team === team.code && f.position === posi ), 'bg-warning text-dark': pos !== 0 && pos === currentScenarioView.length, 'text-muted': pos === 0 }"
+                    >
+                        <span v-if="showCountsAsPercentages">{{ (pos / currentScenarioView.length) | perc }}</span>
+                        <span v-else>{{ pos }}</span>
+                    </td>
+                </tr>
+            </tbody>
         </table>
 
         <table class="table-bordered text-light mb-3 border-dark" v-if="scenarios">
-            <tr>
-                <th class="p-2 border-dark"></th>
-                <th class="p-2 border-dark text-center" :key="scoreline" v-for="([scoreline]) in Object.entries(matchCounts?.[0]?.scorelines)">{{ scoreline }}</th>
-                <th class="p-2 border-dark"></th>
-                <th class="p-2 border-dark">Analysis</th>
-            </tr>
-            <tr v-for="match in matchCounts" :key="match.id">
-                <td class="p-2 border-dark fw-bold text-end">{{ match.teams?.[0]?.code }}</td>
-                <td class="p-2 border-dark text-center cell-num" @click="showMatchScoreline(match.id, scoreline)" :class="{'bg-info selected': scorelineFilterHas(match.id, scoreline), 'text-muted': count === 0}"
-                    v-for="([scoreline, count]) in Object.entries(match.scorelines)" :key="scoreline">{{ count }}</td>
-                <td class="p-2 border-dark fw-bold text-start">{{ match.teams?.[1]?.code }}</td>
-                <td class="p-2 border-dark text-center" :class="{'text-muted': matchAnalysis(match) === 'No effect'}">{{ matchAnalysis(match) }} </td>
-            </tr>
+            <thead>
+                <tr>
+                    <th class="p-2 border-dark"></th>
+                    <th class="p-2 border-dark text-center" :key="scoreline"
+                        v-for="([scoreline]) in Object.entries(matchCounts?.[0]?.scorelines)">{{ scoreline }}
+                    </th>
+                    <th class="p-2 border-dark"></th>
+                    <th class="p-2 border-dark">Analysis</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="match in matchCounts" :key="match.id">
+                    <td class="p-2 border-dark fw-bold text-end">{{ match.teams?.[0]?.code }}</td>
+                    <td class="p-2 border-dark text-center cell-num" @click="showMatchScoreline(match.id, scoreline)"
+                        :class="{'bg-info selected': scorelineFilterHas(match.id, scoreline), 'text-muted': count === 0}"
+                        v-for="([scoreline, count]) in Object.entries(match.scorelines)" :key="scoreline">{{ count }}
+                    </td>
+                    <td class="p-2 border-dark fw-bold text-start">{{ match.teams?.[1]?.code }}</td>
+                    <td class="p-2 border-dark text-center"
+                        :class="{'text-muted': matchAnalysis(match) === 'No effect'}">{{ matchAnalysis(match) }}
+                    </td>
+                </tr>
+            </tbody>
         </table>
 
         <table class="table text-white" v-if="scenarios">
-            <tr class="sticky-top bg-dark">
-                <td>#</td>
-                <td class="text-center" v-for="match in incompleteMatches" :key="match.id">
-                    {{ match.teams.map(t => t.code).join(' vs ') }}
-                </td>
-                <td class="text-center">Standings</td>
-            </tr>
-            <tr v-for="(scenario, i) in currentScenarioView" :key="i">
-                <td>{{ scenario.i + 1 }}</td>
-                <td v-for="(match, mi) in (scenario.outcomes?.filter(m => !m.completed))" :key="mi">
-                    {{ match.scoreFirstWinner && match.scoreFirstWinner.join('-') }} {{ match.winner && match.winner.code }}
-                </td>
-<!--                <td>-->
-<!--                    not sorted-->
-<!--                    <ul>-->
-<!--                        <li class="text-nowrap" v-for="team in scenario.teams" :key="team.id">-->
-<!--                            {{ team.code }} ({{ team.wins }}-{{ team.losses }}) m({{ team.map_wins }}-{{ team.map_losses }})-->
-<!--                        </li>-->
-<!--                    </ul>-->
-<!--                </td>-->
-                <td class="text-nowrap">
-<!--                    first round of sorting (match wins)-->
-                    <ol class="mb-0 small">
-                        <li v-for="(g, gi) in scenario.standings?.standings" :key="gi">
-                            <div class="standings-entry" v-for="(team,ei) in g" :key="ei">{{ team.code?.padEnd(5, " ") }} {{ team.standings?.wins }}-{{ team.standings?.losses }} (m {{ team.standings?.map_wins.toString().padEnd(2, " ") }}-{{ team.standings?.map_losses.toString().padStart(2, " ") }}) ({{ sign(team.standings?.map_wins - team.standings?.map_losses)}})</div>
-                        </li>
-                    </ol>
-                </td>
-            </tr>
+            <thead>
+                <tr class="sticky-top bg-dark">
+                    <td>#</td>
+                    <td class="text-center" v-for="match in incompleteMatches" :key="match.id">
+                        {{ match.teams.map(t => t.code).join(" vs ") }}
+                    </td>
+                    <td class="text-center">Standings</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(scenario, i) in currentScenarioView" :key="i">
+                    <td>{{ scenario.i + 1 }}</td>
+                    <td v-for="(match, mi) in (scenario.outcomes?.filter(m => !m.completed))" :key="mi">
+                        {{ match.scoreFirstWinner && match.scoreFirstWinner.join("-") }}
+                        {{ match.winner && match.winner.code }}
+                    </td>
+                    <!--                <td>-->
+                    <!--                    not sorted-->
+                    <!--                    <ul>-->
+                    <!--                        <li class="text-nowrap" v-for="team in scenario.teams" :key="team.id">-->
+                    <!--                            {{ team.code }} ({{ team.wins }}-{{ team.losses }}) m({{ team.map_wins }}-{{ team.map_losses }})-->
+                    <!--                        </li>-->
+                    <!--                    </ul>-->
+                    <!--                </td>-->
+                    <td class="text-nowrap">
+                        <!--                    first round of sorting (match wins)-->
+                        <ol class="mb-0 small">
+                            <li v-for="(g, gi) in scenario.standings?.standings" :key="gi">
+                                <div class="standings-entry" v-for="(team,ei) in g" :key="ei">
+                                    {{ team.code?.padEnd(5, " ") }} {{ team.standings?.wins }}-{{
+                                        team.standings?.losses
+                                    }} (m {{
+                                        team.standings?.map_wins.toString().padEnd(2, " ")
+                                    }}-{{ team.standings?.map_losses.toString().padStart(2, " ") }})
+                                    ({{ sign(team.standings?.map_wins - team.standings?.map_losses) }})
+                                </div>
+                            </li>
+                        </ol>
+                    </td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </template>

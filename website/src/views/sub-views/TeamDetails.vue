@@ -3,27 +3,27 @@
         <h2>Team details</h2>
         <table class="table table-bordered table-dark table-sm">
             <thead>
-            <tr>
-                <th>Name</th>
-                <th>Pronouns</th>
-                <th>Pronunciation</th>
-                <th class="wide"><i class="fab fa-twitter fa-fw"></i> Twitter</th>
-                <th class="wide"><i class="fab fa-discord fa-fw"></i> Discord tag</th>
-                <th class="wide"><i class="fab fa-battle-net fa-fw"></i> Battletag</th>
-            </tr>
+                <tr>
+                    <th>Name</th>
+                    <th>Pronouns</th>
+                    <th>Pronunciation</th>
+                    <th class="wide"><i class="fab fa-twitter fa-fw"></i> Twitter</th>
+                    <th class="wide"><i class="fab fa-discord fa-fw"></i> Discord tag</th>
+                    <th class="wide"><i class="fab fa-battle-net fa-fw"></i> Battletag</th>
+                </tr>
             </thead>
             <tbody>
-            <tr v-for="player in people" :key="player.id">
-                <td class="wide">
-                    <span v-for="role in player.is" :key="role" v-b-tooltip="role" v-html="getRoleSVG(role)" class="mr-1"></span>
-                    <LinkedPlayers :players="[player]"/>
-                </td>
-                <td class="wide">{{ player.pronouns }}</td>
-                <td>{{ player.pronunciation }}</td>
-                <td class="wide"><TwitterLink :thing="player" /></td>
-                <td class="wide">{{ player.discord_tag }}</td>
-                <td class="wide">{{ player.battletag }}</td>
-            </tr>
+                <tr v-for="player in people" :key="player.id">
+                    <td class="wide">
+                        <span v-for="role in player.is" :key="role" v-b-tooltip="role" v-html="getRoleSVG(role)" class="mr-1"></span>
+                        <LinkedPlayers :players="[player]"/>
+                    </td>
+                    <td class="wide">{{ player.pronouns }}</td>
+                    <td>{{ player.pronunciation }}</td>
+                    <td class="wide"><TwitterLink :thing="player" /></td>
+                    <td class="wide">{{ player.discord_tag }}</td>
+                    <td class="wide">{{ player.battletag }}</td>
+                </tr>
             </tbody>
         </table>
     </div>

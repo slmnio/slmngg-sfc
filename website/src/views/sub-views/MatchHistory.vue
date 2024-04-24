@@ -19,7 +19,10 @@
                 </div>
                 <div>
                     <table class="w-100">
-                        <MatchMapHistory v-for="map in mapType.maps" :key="map.id" :data="_getTeamMapStats(map)" :map="map" :show-unplayed-maps="showUnplayedMaps" />
+                        <tbody>
+                            <MatchMapHistory v-for="map in mapType.maps" :key="map.id" :data="_getTeamMapStats(map)"
+                                             :map="map" :show-unplayed-maps="showUnplayedMaps"/>
+                        </tbody>
                     </table>
                 </div>
             </div>

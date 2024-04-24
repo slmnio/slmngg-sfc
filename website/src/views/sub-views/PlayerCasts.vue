@@ -9,18 +9,38 @@
             <div class="casting-partners mt-2" v-if="partners?.length">
                 <h2 id="partners">Casting Partners</h2>
                 <table class="table table-bordered table-dark table-sm">
-                    <tr>
-                        <th>Partner</th>
-                        <th>Casts together</th>
-                        <th>Last cast together</th>
-                    </tr>
-                    <tr v-for="partner in partners" :key="partner.caster.id">
-                        <td><router-link :to="`/player/${partner.caster.id}/casts`">{{ partner.caster.name }}</router-link></td>
-                        <td>{{ partner.casts }}</td>
-                        <td>{{ formatTime(partner.lastMatch.start, {format: "{day} {date-ordinal} {month} {year}", tz: useSettingsStore().timezone, use24HourTime: useSettingsStore().use24HourTime}) }} -
-                            <span v-if="partner.lastMatch?.event"><router-link :to="url('event', partner.lastMatch?.event)">{{ partner.lastMatch?.event?.name }}</router-link> - </span>
-                            <router-link :to="url('match', partner.lastMatch)">{{ partner.lastMatch?.name}}</router-link></td>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th>Partner</th>
+                            <th>Casts together</th>
+                            <th>Last cast together</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="partner in partners" :key="partner.caster.id">
+                            <td>
+                                <router-link :to="`/player/${partner.caster.id}/casts`">{{
+                                        partner.caster.name
+                                    }}
+                                </router-link>
+                            </td>
+                            <td>{{ partner.casts }}</td>
+                            <td>{{
+                                    formatTime(partner.lastMatch.start, {
+                                        format: "{day} {date-ordinal} {month} {year}",
+                                        tz: useSettingsStore().timezone,
+                                        use24HourTime: useSettingsStore().use24HourTime
+                                    })
+                                }} -
+                                <span v-if="partner.lastMatch?.event"><router-link
+                                    :to="url('event', partner.lastMatch?.event)">{{
+                                        partner.lastMatch?.event?.name
+                                    }}</router-link> - </span>
+                                <router-link :to="url('match', partner.lastMatch)">{{ partner.lastMatch?.name }}
+                                </router-link>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>

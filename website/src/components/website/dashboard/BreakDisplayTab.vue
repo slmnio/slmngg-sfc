@@ -62,7 +62,7 @@ export default {
             this.selected = option;
             this.processing = true;
             try {
-                const response = await updateBreakDisplay(this.$root.auth, this.selected);
+                const response = await updateBreakDisplay(this.selected);
                 if (!response.error) {
                     this.$notyf.success(`Break display set to ${this.selected}`);
                 }

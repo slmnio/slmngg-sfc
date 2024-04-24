@@ -210,8 +210,8 @@ import CopyTextButton from "@/components/website/CopyTextButton";
 import BracketImplications from "@/components/website/dashboard/BracketImplications.vue";
 import { getDataServerAddress } from "@/utils/fetch";
 import { canEditMatch } from "@/utils/client-action-permissions";
-import { isAuthenticated } from "@/utils/auth";
 import MatchHistory from "@/views/sub-views/MatchHistory.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "DetailedMatch",
@@ -429,8 +429,9 @@ export default {
             return Object.values(groups);
         },
         matchEditable() {
-            if (!isAuthenticated(this.$root)) return false;
-            return canEditMatch(this.$root.auth?.user, { event: this.match?.event, match: this.match });
+            const { isAuthenticated, user } = useAuthStore();
+            if (!isAuthenticated) return false;
+            return canEditMatch(user, { event: this.match?.event, match: this.match });
         }
     },
     head() {

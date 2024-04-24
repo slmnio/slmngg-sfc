@@ -99,7 +99,7 @@ export default {
     },
     methods: {
         async toggleFlipTeams(state) {
-            await toggleFlipTeams(this.$root.auth);
+            await toggleFlipTeams();
         },
         async advertiseBroadcast(state) {
             this.updateData.advertise = state;
@@ -122,7 +122,7 @@ export default {
             if (this.broadcastUpdateTimeout) clearTimeout(this.broadcastUpdateTimeout);
 
             // this.broadcastUpdateTimeout = setTimeout(async () => {
-            await updateBroadcastData(this.$root.auth, this.updateData);
+            await updateBroadcastData(this.updateData);
             this.updateData = {};
             // }, 500);
         }

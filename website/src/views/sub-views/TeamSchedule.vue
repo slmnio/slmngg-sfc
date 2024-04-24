@@ -12,6 +12,7 @@ import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
 import { canEditMatch } from "@/utils/client-action-permissions";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "TeamMatches",
@@ -36,7 +37,8 @@ export default {
             });
         },
         showEditorButton() {
-            return canEditMatch(this.$root.auth.user, { event: this.hydratedEvent });
+            const { user } = useAuthStore();
+            return canEditMatch(user, { event: this.hydratedEvent });
         }
     }
 };

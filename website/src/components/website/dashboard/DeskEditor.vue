@@ -112,7 +112,7 @@ export default {
             this.lastSavedData = this.saveData;
 
             try {
-                const response = await updateBroadcastData(this.$root.auth, {
+                const response = await updateBroadcastData({
                     manualGuests: this.saveData
                 });
                 if (!response.error) {

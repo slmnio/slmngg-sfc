@@ -93,7 +93,7 @@ export default {
         async setCountdownEnd(date) {
             this.processing = true;
             try {
-                await updateBroadcastData(this.$root.auth, {
+                await updateBroadcastData({
                     countdownEnd: date
                 });
             } catch (e) {

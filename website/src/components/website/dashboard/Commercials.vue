@@ -26,7 +26,7 @@ export default {
         async commercial(commercialDuration) {
             this.processing = true;
             try {
-                await startCommercial(this.$root.auth, "self", commercialDuration);
+                await startCommercial("self", commercialDuration);
             } finally {
                 this.processing = false;
             }

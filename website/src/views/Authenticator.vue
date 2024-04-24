@@ -1,6 +1,6 @@
 <template>
     <div class="container text-center" v-if="!errorMessage">
-        <h1 v-if="$root.auth.user">Hello {{ $root.authUser.name || $root.auth.user.name }}!</h1>
+        <h1 v-if="user">Hello {{ user?.name }}!</h1>
         <h1 v-else><LoadingIcon/> Authenticating</h1>
     </div>
     <div class="container text-center" v-else>
@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { mapState } from "pinia";
 import LoadingIcon from "@/components/website/LoadingIcon";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -21,6 +22,9 @@ export default {
         loading: true,
         errorMessage: null
     }),
+    computed: {
+        ...mapState(useAuthStore, ["user"])
+    },
     async mounted() {
         const authStore = useAuthStore();
 

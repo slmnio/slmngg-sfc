@@ -66,7 +66,7 @@ export default {
             this.setting = true;
             this.attemptedFirst = broadcast;
 
-            await setActiveBroadcast(this.$root.auth, "self", broadcast);
+            await setActiveBroadcast("self", broadcast);
             // this.setting = false;
         }
     },

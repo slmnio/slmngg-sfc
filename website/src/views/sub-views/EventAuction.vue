@@ -200,6 +200,7 @@ import AuctionBid from "@/components/website/AuctionBid.vue";
 import ContentThing from "@/components/website/ContentThing.vue";
 import { themeBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "EventAuction",
@@ -274,7 +275,8 @@ export default {
             return null;
         },
         isAdmin() {
-            return isEventStaffOrHasRole(this.$root.auth.user, { event: this.event, role: "Auction Admin", websiteRoles: ["Full broadcast permissions", "Can edit any auction"] });
+            const { user } = useAuthStore();
+            return isEventStaffOrHasRole(user, { event: this.event, role: "Auction Admin", websiteRoles: ["Full broadcast permissions", "Can edit any auction"] });
         },
         auctionSettings() {
             return this.eventSettings?.auction;
@@ -378,8 +380,9 @@ export default {
             return null;
         },
         teamsYouControl() {
-            if (!isAuthenticated(this.$root)) return [];
-            let userAirtableID = this.$root.auth.user?.airtableID;
+            const { isAuthenticated, user } = useAuthStore();
+            if (!isAuthenticated) return [];
+            let userAirtableID = user?.airtableID;
             if (!userAirtableID) return [];
             userAirtableID = "rec" + userAirtableID;
             return this.teams.filter(t =>
@@ -443,12 +446,13 @@ export default {
             return this.playerRoles(roles).filter(role => role.eligible);
         },
         sendToAuctionServer(event, data) {
-            // if (!isAuthenticated()) return console.error("Tried to send data while not authed", { event, data });
+            const { isAuthenticated, token } = useAuthStore();
+            if (!isAuthenticated) return console.error("Tried to send data while not authed", { event, data });
             console.log("[socket]", "sending", event, data);
             socket.emit(event, {
                 auctionID: this.eventID,
                 ...data,
-                _token: this.$root.auth.token
+                _token: token
             });
         },
         startPlayer(player) {

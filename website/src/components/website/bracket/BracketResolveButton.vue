@@ -11,6 +11,7 @@
 import { resolveEntireBracket } from "@/utils/dashboard";
 import { canEditMatch } from "@/utils/client-action-permissions";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "BracketResolveButton",
@@ -30,18 +31,20 @@ export default {
             });
         },
         showResolveButton() {
-            return canEditMatch(this.$root?.auth?.user, { event: this.hydratedEvent });
+            const { user } = useAuthStore();
+            return canEditMatch(user, { event: this.hydratedEvent });
         }
     },
     methods: {
         async clickResolveButton(bracket) {
-            if (!canEditMatch(this.$root?.auth?.user, { event: this.hydratedEvent })) {
+            const { user } = useAuthStore();
+            if (!canEditMatch(user, { event: this.hydratedEvent })) {
                 return this.$notyf.error("You don't have permission to resolve brackets");
             }
             this.isResolving = true;
             console.log(bracket);
             try {
-                const { data } = await resolveEntireBracket(this.$root.auth, bracket.id);
+                const { data } = await resolveEntireBracket(bracket.id);
                 console.log(data);
                 this.$notyf[data.hasError ? "error" : "success"](data.message);
             } finally {

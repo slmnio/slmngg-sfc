@@ -512,7 +512,7 @@ export default {
             const obj = {};
             obj[key] = val;
 
-            const response = await updateMatchData(this.$root.auth, this.match, obj);
+            const response = await updateMatchData(this.match, obj);
             // if (response.error) this.errorMessage = response.errorMessage;
             console.log(response);
             this.$set(this.processing, key, false);
@@ -521,7 +521,7 @@ export default {
         },
         async saveMatchDetails() {
             this.$set(this.processing, "details", true);
-            const response = await updateMatchData(this.$root.auth, this.match, this.matchData);
+            const response = await updateMatchData(this.match, this.matchData);
             console.log(response);
             if (!response.error) {
                 this.$notyf.success({
@@ -545,7 +545,7 @@ export default {
             if ((newScores[0] !== oldScores[0]) || (newScores[1] !== oldScores[1])) {
                 // scores are different
 
-                const response = await updateMatchData(this.$root.auth, this.match, {
+                const response = await updateMatchData(this.match, {
                     score_1: newScores[0],
                     score_2: newScores[1]
                 });
@@ -564,7 +564,7 @@ export default {
 
             await this.sendScoresIfDifferent();
 
-            const response = await updateMapData(this.$root.auth, this.match, this.editedMapData);
+            const response = await updateMapData(this.match, this.editedMapData);
             // if (response.error) this.errorMessage = response.errorMessage;
             console.log(response);
             this.$set(this.processing, "map", false);

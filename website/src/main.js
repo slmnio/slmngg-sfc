@@ -17,7 +17,6 @@ import "notyf/notyf.min.css";
 
 import { getDataServerAddress } from "@/utils/fetch";
 import { ReactiveRoot } from "@/utils/reactive";
-import { authenticateWithToken, getAuthNext, setAuthNext } from "@/utils/auth";
 import { createRouter } from "@/router";
 
 import socketMixin from "@/socket-client";
@@ -81,6 +80,12 @@ const app = createApp({
         } catch (e) {
             console.error("Draft notes local storage error", e);
         }
+
+        const auth = useAuthStore();
+        if (auth.token) {
+            console.log("Token in storage, authenticating");
+            auth.authenticateWithToken(auth.token);
+        }
     },
     computed: {
         minisiteEvent() {
@@ -134,8 +139,6 @@ store.subscribe((mutation, state) => {
     }
 });
 
-app.config.devtools = ["local", "staging"].includes(import.meta.env.VITE_DEPLOY_MODE);
-
 app.component("v-style", {
     render: function () {
         return h("style", this.$slots.default);
@@ -150,16 +153,22 @@ const preloadAuthCheckRequired = false;
 const preloadAuthReturn = null;
 
 // TODO: this doesn't really work very well nor work on the first run
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore();
 
     try {
         // console.log("routerResolve", to, this, app);
         if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-            // authenticating!
+            // page needs auth and auth is not finished
 
+            if (authStore.token) {
+                // token in storage - check with server
+                await authStore.authenticateWithToken(authStore.token);
+            }
+            if (authStore.user) return next();
+
+            // still no auth after that
             authStore.setAuthNext(to.fullPath);
-
             return router.push({
                 path: "/login",
                 query: { return: to.fullPath }

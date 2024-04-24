@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import MapDisplay from "@/components/broadcast/MapDisplay";
+import MapDisplay from "@/components/broadcast/BroadcastMapDisplay";
 import DeskMatch from "@/components/broadcast/desk/DeskMatch";
 export default {
     name: "OverviewOverlay",

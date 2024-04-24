@@ -18,7 +18,7 @@ import { DefaultMapImages, likelyNeededMaps } from "@/utils/content-utils";
 import { getNewURL } from "@/utils/images";
 
 export default {
-    name: "MapDisplay",
+    name: "BroadcastMapDisplay",
     components: { MapSegment },
     props: ["broadcast", "animationActive", "useTransitions", "virtualMatch", "noMapVideos", "small", "draftedStyle"],
     data: () => ({
@@ -284,25 +284,25 @@ export default {
         margin-right: 0;
     }
 
-    .map-display.show-next-map >>> .map.next-map {
+    .map-display.show-next-map:deep(.map.next-map) {
         flex-grow: 5;
     }
 
-    .map-display >>> .map-lower-name {
+    .map-display :deep(.map-lower-name) {
         transform: scale(1);
         transition: all 800ms ease;
         width: 100%;
         /*border: 1px solid red;*/
     }
-    .map-display >>> .map.next-map .map-lower-name {
+    .map-display :deep(.map.next-map .map-lower-name) {
         width: 39.8%;
         /*border: 1px solid lime;*/
     }
-    .map-display:not(.show-next-map) >>> .map .map-lower-name {
+    .map-display:not(.show-next-map) :deep(.map .map-lower-name) {
         width: 76.8%;
         /*transform: scale(0.75);*/
     }
-    .map-display.show-next-map >>> .map:not(.next-map) .map-lower-name {
+    .map-display.show-next-map :deep(.map:not(.next-map) .map-lower-name) {
         width: 100%;
         transform: scale(0.75);
     }

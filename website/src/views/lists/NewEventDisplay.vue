@@ -3,7 +3,7 @@
         <div class="event-block flex-center">
             <div class="event-block-logo bg-center" :style="blockLogo"></div>
         </div>
-        <div class="event-name">
+        <div class="event-name industry-align">
             {{ event.name }}
         </div>
     </a>
@@ -11,7 +11,7 @@
         <div class="event-block flex-center">
             <div class="event-block-logo bg-center" :style="blockLogo"></div>
         </div>
-        <div class="event-name">
+        <div class="event-name industry-align">
             {{ event.name }}
         </div>
     </router-link>
@@ -68,7 +68,7 @@ export default {
 .event-name {
     font-size: 1.2em;
     line-height: 1;
-    margin: 0 .25em .25em 0;
+    margin-right: .33em;
 }
 .event.team-display .event-name {
     font-weight: bold;

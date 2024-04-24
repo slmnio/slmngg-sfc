@@ -59,9 +59,9 @@
             <div class="group text-end">
                 <div class="group-top">Advertise</div>
                 <div class="group-bottom">
-                    <b-form-checkbox :checked="broadcast.advertise" @change="(state) => advertiseBroadcast(state)"
+                    <b-form-checkbox :checked="broadcast.advertise" @update:modelValue="(state) => advertiseBroadcast(state)"
                                      :disabled="updateData?.advertise !== undefined"
-                                     button size="sm" :button-variant="broadcast.advertise ? 'primary' : ''">
+                                     button size="sm" :button-variant="broadcast.advertise ? 'primary' : 'secondary'">
                         {{ broadcast.advertise ? "Advertising" : "Advertise" }}
                     </b-form-checkbox>
                 </div>

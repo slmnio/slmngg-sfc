@@ -127,7 +127,7 @@ export default {
             }
 
             try {
-                const response = await updateBroadcastData(this.$root.auth, data);
+                const response = await updateBroadcastData(data);
                 if (!response.error) {
                     this.$notyf.success("Updated desk display");
                 }

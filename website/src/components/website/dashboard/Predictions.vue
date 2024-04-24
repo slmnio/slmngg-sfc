@@ -21,7 +21,7 @@ export default {
         async createPred({ type }) {
             this.processing = true;
             try {
-                await managePred(this.$root.auth, "self", "create", type);
+                await managePred("self", "create", type);
             } finally {
                 this.processing = false;
             }
@@ -29,7 +29,7 @@ export default {
         async lockPred() {
             this.processing = true;
             try {
-                await managePred(this.$root.auth, "self", "lock");
+                await managePred("self", "lock");
             } finally {
                 this.processing = false;
             }
@@ -37,7 +37,7 @@ export default {
         async resolvePred() {
             this.processing = true;
             try {
-                await managePred(this.$root.auth, "self", "resolve");
+                await managePred("self", "resolve");
             } finally {
                 this.processing = false;
             }
@@ -45,7 +45,7 @@ export default {
         async cancelPred() {
             this.processing = true;
             try {
-                await managePred(this.$root.auth, "self", "cancel");
+                await managePred("self", "cancel");
             } finally {
                 this.processing = false;
             }

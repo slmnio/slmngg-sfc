@@ -42,6 +42,7 @@ import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 import { canEditMatch } from "@/utils/client-action-permissions";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "EventSchedule",
@@ -179,7 +180,8 @@ export default {
             }
         },
         showEditorButton() {
-            return canEditMatch(this.$root?.auth?.user, { event: this.event });
+            const { user } = useAuthStore();
+            return canEditMatch(user, { event: this.event });
         }
     },
     methods: {

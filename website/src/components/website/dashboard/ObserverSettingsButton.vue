@@ -21,7 +21,7 @@ export default {
         async setObserverSetting(setting, value) {
             this.processing = true;
             try {
-                await setObserverSetting(this.$root.auth, setting, value);
+                await setObserverSetting(setting, value);
             } finally {
                 this.processing = false;
             }

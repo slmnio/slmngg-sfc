@@ -65,12 +65,12 @@ export default {
     methods: {
         url,
         async setLiveMatch(state) {
-            await updateBroadcastData(this.$root.auth, {
+            await updateBroadcastData({
                 match: state ? this.match.id : null
             });
         },
         async setShow(overlayType, state) {
-            await setMatchOverlayState(this.$root.auth, this.match.id, overlayType, state);
+            await setMatchOverlayState(this.match.id, overlayType, state);
         },
         getTheme(team) {
             if (!team?.theme) return {};

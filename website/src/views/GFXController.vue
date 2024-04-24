@@ -55,7 +55,7 @@ export default {
         async setGfxIndex(id, num) {
             this.processing = true;
             try {
-                await updateGfxIndex(this.$root.auth, id, num);
+                await updateGfxIndex(id, num);
             } finally {
                 this.processing = false;
             }

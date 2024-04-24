@@ -101,7 +101,7 @@ export default {
         async saveOptions() {
             this.processing = true;
             try {
-                const response = await updateBreakAutomation(this.$root.auth, this.chosenOptions);
+                const response = await updateBreakAutomation(this.chosenOptions);
                 if (!response.error) {
                     this.$notyf.success("Break automation updated");
                 }

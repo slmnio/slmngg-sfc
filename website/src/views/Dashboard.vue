@@ -94,6 +94,7 @@ import DeskEditor from "@/components/website/dashboard/DeskEditor.vue";
 import DeskTextEditor from "@/components/website/dashboard/DeskTextEditor.vue";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import GFXController from "@/views/GFXController.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "Dashboard",
@@ -103,8 +104,9 @@ export default {
     }),
     computed: {
         user() {
-            if (!this.$root.auth.user?.airtableID) return {};
-            return ReactiveRoot(this.$root.auth.user.airtableID, {
+            const { user } = useAuthStore();
+            if (!user?.airtableID) return {};
+            return ReactiveRoot(user.airtableID, {
                 clients: ReactiveArray("clients", {
                     broadcast: ReactiveArray("broadcast", {
                         event: ReactiveThing("event", {
@@ -224,7 +226,7 @@ export default {
         async updateTitle() {
             this.titleProcessing = true;
             try {
-                const response = await updateAutomaticTitle(this.$root.auth, "self", "create");
+                const response = await updateAutomaticTitle("self", "create");
                 if (response.error) return; // handled by internal
                 this.$notyf.success({
                     message: response.data,

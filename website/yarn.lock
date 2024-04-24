@@ -167,10 +167,10 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.19.12.tgz#c57c8afbb4054a3ab8317591a0b7320360b444ae"
   integrity sha512-T1QyPSDCyMXaO3pzBkF96E8xMkiRYbUEZADd29SyPGabqxMViNoii+NcK7eWJAEoU6RZyEm5lVSIjTmcdoB9HA==
 
-"@eshaz/web-worker@1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@eshaz/web-worker/-/web-worker-1.2.0.tgz#a71c47e63c3325c227c619c217e3982578bde951"
-  integrity sha512-HWobmNKFZ8eARo39vEjkviTIISudgzrTyAqab9pOB/qNfnUPIUUMZv6+eEUUfXnkqWCLS3zreTn9YzaRvO8vIA==
+"@eshaz/web-worker@1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@eshaz/web-worker/-/web-worker-1.2.2.tgz#506ec07ab811c15a12799725a0d8b82289e3d937"
+  integrity sha512-WxXiHFmD9u/owrzempiDlBB1ZYqiLnm9s6aPc8AlFQalq2tKmqdmMr9GXOupDgzXtqnBipj8Un0gkIm7Sjf8mw==
 
 "@eslint-community/eslint-utils@^4.2.0", "@eslint-community/eslint-utils@^4.4.0":
   version "4.4.0"
@@ -668,12 +668,13 @@
   dependencies:
     vue-demi ">=0.14.7"
 
-"@wasm-audio-decoders/common@5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@wasm-audio-decoders/common/-/common-5.1.1.tgz#6b274ce20148a6b9a9f01298a1af83a8f268617b"
-  integrity sha512-XceP6g2l+ZJScMlwVEAQq2i4O0qtD21nXcG4HZbnAFglwngfTciB3HIgLYOlhKyAZ70t5gqoVspp3RNFfN0qbg==
+"@wasm-audio-decoders/common@9.0.5":
+  version "9.0.5"
+  resolved "https://registry.yarnpkg.com/@wasm-audio-decoders/common/-/common-9.0.5.tgz#d94d628f3cc0eb5a6e3702870cb621f0e8f1447c"
+  integrity sha512-b9JNh9sPAvn8PVIizNh9D60WkfQong/u9ea873H47u7zvVDLctxYIp2aZw9CQqXaQdk7JB3MoU5UHiseO40swg==
   dependencies:
-    "@eshaz/web-worker" "1.2.0"
+    "@eshaz/web-worker" "1.2.2"
+    simple-yenc "^1.0.4"
 
 acorn-jsx@^5.3.2:
   version "5.3.2"
@@ -1802,7 +1803,7 @@ hosted-git-info@^4.0.1:
   dependencies:
     lru-cache "^6.0.0"
 
-howler@^2.2.3:
+howler@^2.2.4:
   version "2.2.4"
   resolved "https://registry.yarnpkg.com/howler/-/howler-2.2.4.tgz#bd3df4a4f68a0118a51e4bd84a2bfc2e93e6e5a1"
   integrity sha512-iARIBPgcQrwtEr+tALF+rapJ8qSc+Set2GJQl7xT1MQzWaVkFebdJhR3alVlSiUf5U7nAANKuj3aWpwerocD5w==
@@ -2629,12 +2630,12 @@ optionator@^0.9.3:
     prelude-ls "^1.2.1"
     type-check "^0.4.0"
 
-opus-decoder@^0.5.3:
-  version "0.5.4"
-  resolved "https://registry.yarnpkg.com/opus-decoder/-/opus-decoder-0.5.4.tgz#a4880f506b9db5b9111bf865c48b2c9613b689c4"
-  integrity sha512-S64Sm4BfV+Ym/MQjE/zzQw5DaXjMesSElw7wIuXz/yJgeuUTlLHyiVp5cFD7kVqN1kSC2y4pbRDkvfQK+f3ByA==
+opus-decoder@^0.7.6:
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/opus-decoder/-/opus-decoder-0.7.6.tgz#b0ef413ff6654a655ae0ab8776572fe40ac9d037"
+  integrity sha512-5QYSl1YQYbSzWL7vM4dJoyrLC804xIvBFjfKTZZ6/z/EgmdFouOTT+8PDM2V18vzgnhRNPDuyB2aTfl/2hvMRA==
   dependencies:
-    "@wasm-audio-decoders/common" "5.1.1"
+    "@wasm-audio-decoders/common" "9.0.5"
 
 p-event@^4.1.0:
   version "4.2.0"
@@ -3022,6 +3023,11 @@ side-channel@^1.0.4:
     es-errors "^1.3.0"
     get-intrinsic "^1.2.4"
     object-inspect "^1.13.1"
+
+simple-yenc@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/simple-yenc/-/simple-yenc-1.0.4.tgz#52805f504ec03c0aafe3766eee901e4e6f352ead"
+  integrity sha512-5gvxpSd79e9a3V4QDYUqnqxeD4HGlhCakVpb6gMnDD7lexJggSBJRBO5h52y/iJrdXRilX9UCuDaIJhSWm5OWw==
 
 sister@^3.0.0:
   version "3.0.2"

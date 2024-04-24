@@ -33,6 +33,7 @@ module.exports = {
         "no-multiple-empty-lines": ["warn", { "max": 2 }],
         "no-trailing-spaces": ["warn"],
         "space-before-function-paren": "off",
-        "no-throw-literal": "off"
+        "no-throw-literal": "off",
+        "vue/multi-word-component-names": "off"
     }
 };

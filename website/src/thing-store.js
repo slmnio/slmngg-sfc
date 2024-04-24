@@ -1,3 +1,4 @@
+import { socket } from "@/socket";
 import { createStore } from "vuex";
 import { cleanID } from "@/utils/content-utils";
 import { fetchThings } from "@/utils/fetch";
@@ -51,14 +52,14 @@ const store = createStore({
             this.commit("clearRequestBuffer");
             return fetchThings(ids);
         },
-        SOCKET_DATA_UPDATE(state, [id, data]) {
-            // console.log("[store] [data_update]", data);
+        socketDataUpdate(state, { id, data }) {
+            console.log("[store] [data_update] commit->", data);
             // this.commit("push", { id, data });
             state.data_update_buffer.push({ id, data });
         },
         executeUpdateBuffer(state) {
             if (!state.data_update_buffer.length) return;
-            console.log("[store] [data_update]", state.data_update_buffer.length);
+            console.log("[store] [data_update] execute->", state.data_update_buffer.length);
             state.data_update_buffer.forEach(({ id, data }) => {
                 this.commit("push", { id, data });
             });
@@ -67,15 +68,13 @@ const store = createStore({
         subscribe(state, id) {
             if (!id) return;
             if (state.subscribed_ids.includes(id)) return;
-            // this._vm.$socket.client.emit("subscribe", id); TODO
-            // console.log("[socket]", "subscribed to", id);
+            socket.emit("subscribe", id);
             state.subscribed_ids.push(id);
         },
         unsubscribe(state, id) {
             if (!id) return;
             if (!state.subscribed_ids.includes(id)) return;
-            // this._vm.$socket.client.emit("unsubscribe", id);
-            // console.log("[socket]", "unsubscribed from", id);
+            socket.emit("unsubscribe", id);
             state.subscribed_ids.splice(this.state.subscribed_ids.indexOf(id), 1);
         },
 

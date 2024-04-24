@@ -22,3 +22,7 @@ socket.on("website_flags", (flags) => {
     console.log("website_flags", flags);
     store.commit("setWebsiteFlags", flags);
 });
+
+socket.on("data_update", (id, data) => {
+    store.commit("socketDataUpdate", { id, data });
+});

@@ -7,7 +7,7 @@
 <script>
 import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import MapDisplay from "@/components/broadcast/MapDisplay";
+import MapDisplay from "@/components/broadcast/BroadcastMapDisplay";
 
 export default {
     name: "MapsOverlay",

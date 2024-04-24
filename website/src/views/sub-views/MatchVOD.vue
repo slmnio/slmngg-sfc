@@ -8,7 +8,7 @@
             <div class="btn btn-dark btn-sm" @click="useVOD2 = false" v-if="useVOD2">Show part 1</div>
         </div>
 
-        <div class="embed embed-responsive embed-responsive-16by9" v-if="showNoVOD">
+        <div class="embed ratio ratio-16x9" v-if="showNoVOD">
             <div class="no-embed-text flex-center">No VOD available for this match</div>
         </div>
         <div class="maps-container mt-3 flex-column" v-if="match.maps">

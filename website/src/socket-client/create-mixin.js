@@ -30,14 +30,14 @@ export default (GlobalEmitter) => ({
             }
         });
     },
-    beforeDestroy() {
+    beforeUnmount() {
         const { sockets = {} } = this.$options;
 
         Object.keys(sockets).forEach((key) => {
             GlobalEmitter.removeListenersByLabel(this, key);
         });
     },
-    destroyed() {
+    unmounted() {
         delete this.$socket.$subscribe;
         delete this.$socket.$unsubscribe;
     }

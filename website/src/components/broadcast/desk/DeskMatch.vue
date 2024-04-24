@@ -86,7 +86,7 @@ import DeskTeamName from "@/components/broadcast/desk/DeskTeamName";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import DeskPrediction from "@/components/broadcast/desk/DeskPrediction";
-import MapDisplay from "@/components/broadcast/MapDisplay";
+import MapDisplay from "@/components/broadcast/BroadcastMapDisplay";
 import DeskInterview from "@/components/broadcast/desk/DeskInterview.vue";
 export default {
     name: "DeskMatch",

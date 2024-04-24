@@ -69,7 +69,7 @@ const renderer = {
                 console.log("clip html", html);
                 const url = getClipEmbed(getURL(html));
                 const caption = getAttribute("caption", html);
-                if (url) return `<div class="clip-holder"><div class="clip embed embed-responsive embed-responsive-16by9"><iframe src="${url}"></iframe></div>${caption ? `<div class="clip-caption">${caption}</div>` : ""}</div>`;
+                if (url) return `<div class="clip-holder"><div class="clip embed ratio ratio-16x9"><iframe src="${url}"></iframe></div>${caption ? `<div class="clip-caption">${caption}</div>` : ""}</div>`;
             } catch (e) { console.error("Clip rendering error", e); }
             return "<div class=\"clip clip-error\">An error prevented this clip from rendering</div>";
         }

@@ -264,6 +264,7 @@ export default {
                     if (this.restrictToMapPool && this.hasMapPool) {
                         return (this.match?.event?.map_pool || []).some(_m => _m === "rec" + map?.id || _m?.id === "rec" + map?.id);
                     }
+                    return true;
                 });
             }
 

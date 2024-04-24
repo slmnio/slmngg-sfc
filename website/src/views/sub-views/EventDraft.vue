@@ -25,22 +25,37 @@
             <div class="col-12 my-2" v-if="playerGroup('starred').length">
                 <h2>Starred players</h2>
                 <table class="table table-bordered bg-warning table-warning table-sm">
-                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
-                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('starred')" :player="player" :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    <thead>
+                        <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
+                    </thead>
+                    <tbody>
+                        <PlayerDraftRow :settings="settings" v-for="player in playerGroup('starred')" :player="player"
+                                        :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    </tbody>
                 </table>
             </div>
             <div class="col-12 my-2">
                 <h2>Available players</h2>
                 <table class="table table-bordered table-dark table-sm">
-                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
-                    <PlayerDraftRow :settings="settings" v-for="player in ungroupedPlayers" :player="player" :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    <thead>
+                        <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
+                    </thead>
+                    <tbody>
+                        <PlayerDraftRow :settings="settings" v-for="player in ungroupedPlayers" :player="player"
+                                        :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    </tbody>
                 </table>
             </div>
             <div class="col-12 my-2" v-if="playerGroup('ignored').length">
                 <h2>Ignored players</h2>
                 <table class="table table-bordered bg-danger table-danger text-white table-sm">
-                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
-                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('ignored')" :player="player" :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    <thead>
+                        <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
+                    </thead>
+                    <tbody>
+                        <PlayerDraftRow :settings="settings" v-for="player in playerGroup('ignored')" :player="player"
+                                        :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    </tbody>
                 </table>
             </div>
         </div>

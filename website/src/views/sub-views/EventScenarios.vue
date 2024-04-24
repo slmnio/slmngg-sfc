@@ -26,18 +26,22 @@
 
         <div class="d-flex">
             <table class="table table-dark table-sm w-auto mr-3" v-for="calc in calculations" :key="calc.title">
-                <tr>
-                    <th colspan="3" class="text-center">{{ calc.title }}</th>
-                </tr>
-                <tr>
-                    <th>Team</th>
-                    <th colspan="2">Scenarios (/{{ scenarios.length }})</th>
-                </tr>
-                <tr v-for="team in calc.counts" :key="team.code">
-                    <td>{{ team.code }}</td>
-                    <td>{{ team.num }}</td>
-                    <td>{{ team.perc | perc}}</td>
-                </tr>
+                <thead>
+                    <tr>
+                        <th colspan="3" class="text-center">{{ calc.title }}</th>
+                    </tr>
+                    <tr>
+                        <th>Team</th>
+                        <th colspan="2">Scenarios (/{{ scenarios.length }})</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="team in calc.counts" :key="team.code">
+                        <td>{{ team.code }}</td>
+                        <td>{{ team.num }}</td>
+                        <td>{{ perc(team.perc) }}</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
 
@@ -100,12 +104,6 @@ export default {
         activeMatchGroup: null,
         overrides: {}
     }),
-    filters: {
-        perc(num) {
-            if (isNaN(num)) return "-";
-            return (num * 100).toFixed(1) + "%";
-        }
-    },
     computed: {
         settings() {
             if (!this.event?.blocks) return null;
@@ -316,6 +314,10 @@ export default {
         }
     },
     methods: {
+        perc(num) {
+            if (isNaN(num)) return "-";
+            return (num * 100).toFixed(1) + "%";
+        },
         setOverride(index, num) {
             console.log("override", index, num);
             if (this.overrides[index] === num) {

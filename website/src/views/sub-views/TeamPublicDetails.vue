@@ -1,35 +1,55 @@
 <template>
     <div class="container team-public-details">
         <table class="table table-dark table-sm table-bordered">
-            <tr v-if="players.length || team?.staff?.length">
-                <th></th>
-                <th>Name</th>
-                <th>Discord Tag</th>
-                <th>Battletag</th>
-            </tr>
-            <tr v-for="player in players" :key="player.id">
-                <td class="role" :title="player.role" v-b-tooltip><RoleIcon class="flex-center" :role="player.role" /></td>
-                <td>
-                    <i v-if="player.is_captain" class="fas fa-fw fa-user-crown mr-1 text-warning" :title="'Captain' + (player.highlight_role ? ', ' + player.highlight_role : '')" v-b-tooltip></i>
-                    <i v-else-if="player.highlight_role" class="fas fa-fw fa-star mr-1 text-warning" :title="player.highlight_role" v-b-tooltip></i>
-                    <router-link v-if="player.id" :to="url('player', player)">{{ player?.name }}</router-link>
-                    <span v-else>{{ player?.name }}</span>
-                </td>
-                <td><CopyTextButton v-if="player?.discord_tag">{{ player?.discord_tag }}</CopyTextButton></td>
-                <td><CopyTextButton v-if="player?.battletag">{{ player?.battletag }}</CopyTextButton></td>
-            </tr>
-            <tr class="spacer" v-if="staff?.length">
-                <td colspan="4"></td>
-            </tr>
-            <tr v-for="staff in staff" :key="staff.id">
-                <td class="role" :title="staff.staff_role || 'Staff'" v-b-tooltip><RoleIcon class="flex-center" :role="staff.staff_role || 'Staff'" /></td>
-                <td>
-                    <i v-if="staff.highlight_role" class="fas fa-fw fa-star mr-1 text-warning" :title="staff.highlight_role" v-b-tooltip></i>
-                    {{ staff?.name }}
-                </td>
-                <td><CopyTextButton v-if="staff?.discord_tag">{{ staff?.discord_tag }}</CopyTextButton></td>
-                <td><CopyTextButton v-if="staff?.battletag">{{ staff?.battletag }}</CopyTextButton></td>
-            </tr>
+            <thead>
+                <tr v-if="players.length || team?.staff?.length">
+                    <th></th>
+                    <th>Name</th>
+                    <th>Discord Tag</th>
+                    <th>Battletag</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="player in players" :key="player.id">
+                    <td class="role" :title="player.role" v-b-tooltip>
+                        <RoleIcon class="flex-center" :role="player.role"/>
+                    </td>
+                    <td>
+                        <i v-if="player.is_captain" class="fas fa-fw fa-user-crown mr-1 text-warning"
+                           :title="'Captain' + (player.highlight_role ? ', ' + player.highlight_role : '')"
+                           v-b-tooltip></i>
+                        <i v-else-if="player.highlight_role" class="fas fa-fw fa-star mr-1 text-warning"
+                           :title="player.highlight_role" v-b-tooltip></i>
+                        <router-link v-if="player.id" :to="url('player', player)">{{ player?.name }}</router-link>
+                        <span v-else>{{ player?.name }}</span>
+                    </td>
+                    <td>
+                        <CopyTextButton v-if="player?.discord_tag">{{ player?.discord_tag }}</CopyTextButton>
+                    </td>
+                    <td>
+                        <CopyTextButton v-if="player?.battletag">{{ player?.battletag }}</CopyTextButton>
+                    </td>
+                </tr>
+                <tr class="spacer" v-if="staff?.length">
+                    <td colspan="4"></td>
+                </tr>
+                <tr v-for="staff in staff" :key="staff.id">
+                    <td class="role" :title="staff.staff_role || 'Staff'" v-b-tooltip>
+                        <RoleIcon class="flex-center" :role="staff.staff_role || 'Staff'"/>
+                    </td>
+                    <td>
+                        <i v-if="staff.highlight_role" class="fas fa-fw fa-star mr-1 text-warning"
+                           :title="staff.highlight_role" v-b-tooltip></i>
+                        {{ staff?.name }}
+                    </td>
+                    <td>
+                        <CopyTextButton v-if="staff?.discord_tag">{{ staff?.discord_tag }}</CopyTextButton>
+                    </td>
+                    <td>
+                        <CopyTextButton v-if="staff?.battletag">{{ staff?.battletag }}</CopyTextButton>
+                    </td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </template>

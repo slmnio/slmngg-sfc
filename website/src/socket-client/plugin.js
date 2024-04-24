@@ -4,10 +4,9 @@ import { socket } from "@/socket";
 
 function install(Vue) {
     const emitter = (GlobalEmitter);
-    socket.onAny((...d) => {
+    socket.onAny((eventName, data) => {
         // console.log("socket receive", d);
-        const event = d.shift();
-        emitter.emit(event, ...d);
+        emitter.emit(eventName, data);
     });
     Vue.mixin(createMixin(emitter));
     const strategies = Vue.config.optionMergeStrategies;

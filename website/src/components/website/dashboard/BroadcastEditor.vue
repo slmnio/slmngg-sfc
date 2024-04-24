@@ -26,7 +26,7 @@
                 <div class="group-bottom">
                     <b-form-checkbox :checked="broadcast.show_cams" @change="(state) => togglePlayerCams(state)"
                                      :disabled="updateData?.playerCams !== undefined"
-                                     button size="sm" :button-variant="broadcast.show_cams ? 'primary' : ''">
+                                     button size="sm" :button-variant="broadcast.show_cams ? 'primary' : 'secondary'">
                         Show Cams
                     </b-form-checkbox>
                 </div>

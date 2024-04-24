@@ -175,6 +175,7 @@ export default {
         padding: 10px 5px;
         line-height: 1;
         min-height: 120px;
+        height: 0;
 
         /* default */
         background-color: #333333;

@@ -229,7 +229,7 @@ export default {
             e.preventDefault();
 
             console.log("save", this.profile);
-            const response = await updateProfileData(this.auth, this.profile);
+            const response = await updateProfileData(this.profile);
 
             if (response.error) {
                 this.errorMessage = response.errorMessage;

@@ -4,12 +4,8 @@ import { useAuthStore } from "@/stores/authStore";
 
 const notyf = new Notyf({ duration: 5000, position: { x: "right", y: "top" }, dismissible: true });
 
-export async function authenticatedRequest(_, url, data) {
-    if (_) console.warn(url, "Passing auth to methods is deprecated. Remove references and use the pinia store.");
-
-    console.log(url, data);
+export async function authenticatedRequest(url, data) {
     const auth = useAuthStore();
-    console.log("authenticated request", auth.user);
 
     if (!auth?.user) {
         notyf.error("Not authenticated");
@@ -31,7 +27,7 @@ export async function authenticatedRequest(_, url, data) {
             notyf.error({ message: `Request error: ${error.message}` });
             console.error("Fetch error", error);
         });
-        console.log(request.error, notyf);
+        console.log(request);
         if (request.error) {
             notyf.error({
                 message: request.errorMessage
@@ -45,26 +41,26 @@ export async function authenticatedRequest(_, url, data) {
 }
 
 export async function setActiveBroadcast(client, broadcast) {
-    return await authenticatedRequest(null, "actions/set-active-broadcast", {
+    return await authenticatedRequest("actions/set-active-broadcast", {
         client: client.id || client, broadcast: broadcast.id || broadcast
     });
 }
 
-export async function updateProfileData(auth, profileData) {
-    return await authenticatedRequest(auth, "actions/update-profile-data", {
+export async function updateProfileData(profileData) {
+    return await authenticatedRequest("actions/update-profile-data", {
         profileData
     });
 }
 
 export async function updateMatchData(match, updatedData) {
-    return await authenticatedRequest(null, "actions/update-match-data", {
+    return await authenticatedRequest("actions/update-match-data", {
         matchID: match.id,
         updatedData
     });
 }
 
 export async function managePred(client, predictionAction, predictionType) {
-    return await authenticatedRequest(null, "actions/manage-prediction", {
+    return await authenticatedRequest("actions/manage-prediction", {
         client: client.id || client,
         predictionAction,
         predictionType,
@@ -73,35 +69,35 @@ export async function managePred(client, predictionAction, predictionType) {
 }
 
 export async function startCommercial(client, commercialDuration) {
-    return await authenticatedRequest(null, "actions/start-commercial", {
+    return await authenticatedRequest("actions/start-commercial", {
         client: client.id || client,
         commercialDuration
     });
 }
 
 export async function updateAutomaticTitle(client) {
-    return await authenticatedRequest(null, "actions/set-title", {
+    return await authenticatedRequest("actions/set-title", {
         client: client.id || client
     });
 }
 
 export async function updateMapData(match, mapData) {
-    return await authenticatedRequest(null, "actions/update-map-data", {
+    return await authenticatedRequest("actions/update-map-data", {
         matchID: match.id,
         mapData
     });
 }
 
 export async function toggleFlipTeams() {
-    return await authenticatedRequest(null, "actions/toggle-flip-teams");
+    return await authenticatedRequest("actions/toggle-flip-teams");
 }
 
 export async function updateBroadcastData(data) {
-    return await authenticatedRequest(null, "actions/update-broadcast", data);
+    return await authenticatedRequest("actions/update-broadcast", data);
 }
 
 export async function setMatchOverlayState(matchID, overlayType, state) {
-    return await authenticatedRequest(null, "actions/set-match-overlays", {
+    return await authenticatedRequest("actions/set-match-overlays", {
         match: matchID,
         overlayType,
         state
@@ -109,31 +105,31 @@ export async function setMatchOverlayState(matchID, overlayType, state) {
 }
 
 export async function resolveEntireBracket(bracketID) {
-    return await authenticatedRequest(null, "actions/resolve-entire-bracket", {
+    return await authenticatedRequest("actions/resolve-entire-bracket", {
         bracketID
     });
 }
 
 export async function setObserverSetting(setting, value) {
-    return await authenticatedRequest(null, "actions/set-observer-setting", {
+    return await authenticatedRequest("actions/set-observer-setting", {
         setting, value
     });
 }
 
 export async function updateBreakAutomation(options) {
-    return await authenticatedRequest(null, "actions/update-break-automation", {
+    return await authenticatedRequest("actions/update-break-automation", {
         options
     });
 }
 
 export async function updateBreakDisplay(option) {
-    return await authenticatedRequest(null, "actions/update-break-display", {
+    return await authenticatedRequest("actions/update-break-display", {
         option
     });
 }
 
 export async function updateGfxIndex(gfxID, index) {
-    return await authenticatedRequest(null, "actions/update-gfx-index", {
+    return await authenticatedRequest("actions/update-gfx-index", {
         gfxID, index
     });
 }

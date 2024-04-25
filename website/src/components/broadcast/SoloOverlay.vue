@@ -244,22 +244,23 @@ export default {
             if (["choose-map"].includes(this.controlMode) && this.currentMapChunk.length === 0) this.controlPage = 0;
         },
         setTeam(index, team) {
-            this.$set(this.teams, index, team);
+            this.teams[index] = team;
             this.controlMode = "default";
         },
         setMap(index, map) {
-            this.$set(this.maps, index, {
+            this.maps[index] = {
                 ...map,
                 map,
                 big_image: map.big_image,
                 image: map.image,
                 name: [map.name] // this emulates the lookup from Airtable
-            });
+            };
             console.log("setting map", map, this.maps[index]);
             this.controlMode = "set-maps"; // TODO: change to "set-map" so other things can be done with it
+            //                                         what does this even mean
         },
         setScore(index, score) {
-            this.$set(this.scores, index, score);
+            this.scores[index] = score;
         },
         setMiddle() {
             this.middle = this.tempMiddle.toUpperCase();
@@ -298,20 +299,20 @@ export default {
             const rotation = [null, "team-1", "team-2", "draw"];
             let current = this.mapWinners[num];
             if (current === undefined) {
-                this.$set(this.mapWinners, num, null);
+                this.mapWinners[num] = null;
                 current = null;
             }
 
             const index = rotation.indexOf(current);
             if (index === -1) {
                 console.warn("Unsure what map winner to toggle to", { num, current });
-                this.$set(this.mapWinners, num, null);
+                this.mapWinners[num] = null;
                 return;
             }
             if (index >= rotation.length - 1) {
-                this.$set(this.mapWinners, num, rotation[0]);
+                this.mapWinners[num] = rotation[0];
             } else {
-                this.$set(this.mapWinners, num, rotation[index + 1]);
+                this.mapWinners[num] = rotation[index + 1];
             }
             console.log(this.mapWinners[num]);
         }

@@ -322,11 +322,9 @@ export default {
             console.log("override", index, num);
             if (this.overrides[index] === num) {
                 // unset
-                // this.overrides[index] = null;
-                this.$set(this.overrides, index, null);
+                this.overrides[index] = null;
             } else {
-                // this.overrides[index] = num;
-                this.$set(this.overrides, index, num);
+                this.overrides[index] = num;
             }
         }
     }

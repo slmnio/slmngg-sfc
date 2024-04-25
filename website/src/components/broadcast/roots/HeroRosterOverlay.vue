@@ -89,7 +89,7 @@ export default {
         },
         handleWidth(i, w) {
             // console.log("width of index", i, w);
-            this.$set(this.widths, i, w);
+            this.widths[i] = w;
         },
         themeBackground1,
         getRoleSVG

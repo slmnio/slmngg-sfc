@@ -439,11 +439,11 @@ export default {
         setIfNew(key, index, value) {
             if (this.previousAutoData?.[key]?.[index] === value) return; // console.log(`Not updating ${key}[${index}] because ${value} is the same as last set`);
             // console.log(`Updating ${key}[${index}] to`, value);
-            this.$set(this[key], index, value);
+            this[key][index] = value;
         },
         emptyData(newID) {
             console.log("New match, emptying data", newID);
-            this.$set(this.processing, "map", true);
+            this.processing.map = true;
             this.draws = [];
             this.mapChoices = [];
             this.winners = [];
@@ -483,9 +483,9 @@ export default {
                     this.setIfNew("replayCodes", i, map.replay_code);
                     this.setIfNew("mapNumbers", i, map.number);
                 });
-                this.$set(this.processing, "map", false);
+                this.processing.map = false;
             } else {
-                this.$set(this.processing, "map", false);
+                this.processing.map = false;
             }
 
             this.matchData.scores = this.scores;
@@ -508,7 +508,7 @@ export default {
             };
         },
         async sendMatchDataChange(key, val) {
-            this.$set(this.processing, key, true); // set it processing while we work
+            this.processing[key] = true; // set it processing while we work
             console.log("[processing]", key, "on");
             const obj = {};
             obj[key] = val;
@@ -516,12 +516,12 @@ export default {
             const response = await updateMatchData(this.match, obj);
             // if (response.error) this.errorMessage = response.errorMessage;
             console.log(response);
-            this.$set(this.processing, key, false);
+            this.processing[key] = false;
             console.log("[processing]", key, "off");
             return response;
         },
         async saveMatchDetails() {
-            this.$set(this.processing, "details", true);
+            this.processing.details = true;
             const response = await updateMatchData(this.match, this.matchData);
             console.log(response);
             if (!response.error) {
@@ -530,7 +530,7 @@ export default {
                     duration: 3000
                 });
             }
-            this.$set(this.processing, "details", false);
+            this.processing.details = false;
             return response;
         },
         async saveMapAndScores() {
@@ -561,14 +561,14 @@ export default {
         },
         async sendMapDataChange() {
             console.log("map processing");
-            this.$set(this.processing, "map", true);
+            this.processing.map = true;
 
             await this.sendScoresIfDifferent();
 
             const response = await updateMapData(this.match, this.editedMapData);
             // if (response.error) this.errorMessage = response.errorMessage;
             console.log(response);
-            this.$set(this.processing, "map", false);
+            this.processing.map = false;
 
             if (!response.error) {
                 this.$notyf.success({
@@ -589,7 +589,7 @@ export default {
                     score[1]++;
                 }
             });
-            this.$set(this.matchData, "scores", score);
+            this.matchData.scores = score;
         },
         checkAutoWinner(i, val) {
             console.log("checkAutoWinner", { val, i }, this.score_1s[i], this.score_2s[i]);
@@ -600,17 +600,17 @@ export default {
                 if (this.score_1s[i] > this.score_2s[i]) {
                     // set left winner
 
-                    this.$set(this.winners, i, this.teams[0].id);
+                    this.winners[i] = this.teams[0].id;
                     if (this.autoLoserPicks && this.maps?.[i + 1]) {
-                        this.$set(this.pickers, i + 1, this.teams[1].id);
+                        this.pickers[i + 1] = this.teams[1].id;
                     }
                     this.autoUpdateScore();
                 } else if (this.score_1s[i] < this.score_2s[i]) {
                     // set right winner
 
-                    this.$set(this.winners, i, this.teams[1].id);
+                    this.winners[i] = this.teams[1].id;
                     if (this.autoLoserPicks && this.maps?.[i + 1]) {
-                        this.$set(this.pickers, i + 1, this.teams[0].id);
+                        this.pickers[i + 1] = this.teams[0].id;
                     }
                     this.autoUpdateScore();
                 }
@@ -625,7 +625,7 @@ export default {
                 const loserID = teamIDs.find(id => id !== teamID);
                 // console.log("loser", loserID);
                 if (!loserID) return console.warn("can't find a team", teamID, teamIDs, loserID);
-                this.$set(this.pickers, i + 1, loserID);
+                this.pickers[i + 1] = loserID;
             }
         }
     },

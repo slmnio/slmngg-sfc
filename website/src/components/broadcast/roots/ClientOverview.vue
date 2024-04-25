@@ -58,7 +58,7 @@ export default {
     },
     sockets: {
         prod_update(data) {
-            this.$set(this.overlays, data.socket, data);
+            this.overlays[data.socket] = data;
         },
         prod_disconnect(socketID) {
             this.$delete(this.overlays, socketID);

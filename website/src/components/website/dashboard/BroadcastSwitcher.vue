@@ -30,7 +30,7 @@
 
 <script>
 import BroadcastDisplay from "@/components/website/dashboard/BroadcastDisplay";
-import { setActiveBroadcast } from "@/utils/dashboard";
+import { authenticatedRequest, setActiveBroadcast } from "@/utils/dashboard";
 export default {
     name: "BroadcastSwitcher",
     components: { BroadcastDisplay },
@@ -66,7 +66,10 @@ export default {
             this.setting = true;
             this.attemptedFirst = broadcast;
 
-            await setActiveBroadcast("self", broadcast);
+            await authenticatedRequest("actions/set-active-broadcast", {
+                client: "self",
+                broadcast: broadcast.id || broadcast
+            });
             // this.setting = false;
         }
     },

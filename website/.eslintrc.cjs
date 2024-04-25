@@ -5,7 +5,7 @@ module.exports = {
     "extends": [
         "plugin:vue/vue3-essential",
         "eslint:recommended",
-        "@vue/eslint-config-standard"
+        "@vue/eslint-config-standard-with-typescript"
     ],
     parserOptions: {
         ecmaVersion: "latest"
@@ -15,6 +15,7 @@ module.exports = {
             "error",
             4
         ],
+        "@typescript-eslint/indent": "off",
         "linebreak-style": [
             "error",
             "unix"
@@ -23,10 +24,12 @@ module.exports = {
             "error",
             "double"
         ],
+        "@typescript-eslint/quotes": "off",
         "semi": [
             "error",
             "always"
         ],
+        "@typescript-eslint/semi": "off",
         "no-unused-vars": [
             "warn"
         ],
@@ -34,6 +37,9 @@ module.exports = {
         "no-trailing-spaces": ["warn"],
         "space-before-function-paren": "off",
         "no-throw-literal": "off",
-        "vue/multi-word-component-names": "off"
+        "vue/multi-word-component-names": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/space-before-function-paren": "off",
+        "@typescript-eslint/strict-boolean-expressions": "off"
     }
 };

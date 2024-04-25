@@ -1,77 +1,76 @@
-import {defineStore} from "pinia";
-import {computed, ref} from "vue";
-import {getDataServerAddress, getMainDomain} from "@/utils/fetch";
-import {ReactiveRoot} from "@/utils/reactive";
+import { defineStore } from "pinia";
+import { computed, ref } from "vue";
+import { getDataServerAddress, getMainDomain } from "@/utils/fetch";
+import { ReactiveRoot } from "@/utils/reactive";
 
-type Snowflake = string;
-type DiscordID = Snowflake;
-type CleanAirtableID = string;
-type DirtyAirtableID = `rec${CleanAirtableID}`;
-type AnyAirtableID = CleanAirtableID | DirtyAirtableID;
+export type Snowflake = string;
+export type DiscordID = Snowflake;
+export type CleanAirtableID = string;
+export type DirtyAirtableID = `rec${CleanAirtableID}`;
+export type AnyAirtableID = CleanAirtableID | DirtyAirtableID;
 
-type WebUserData = {
-    discordID: DiscordID;
-    airtableID: AnyAirtableID;
-    name: string;
-    avatar: string;
-    website_settings: string[];
+interface WebUserData {
+    discordID: DiscordID
+    airtableID: AnyAirtableID
+    name: string
+    avatar: string
+    website_settings: string[]
 }
 
-type Player = {
-    id: DirtyAirtableID;
-    name: string;
-    pronunciation?: string;
-    pronouns?: string;
-    role?: string;
-    verified?: boolean;
-    twitter_handle?: string[];
-    twitter_link?: string[];
-    website_settings?: string[];
-    battletag?: string;
-    discord_tag?: string;
-    discord_id?: DiscordID;
-    member_of?: DirtyAirtableID[];
-    event_staff?: DirtyAirtableID[];
-    team_staff?: DirtyAirtableID[];
-    casts?: DirtyAirtableID[];
-    casted_events?: DirtyAirtableID[];
-    socials?: DirtyAirtableID[];
-    news?: DirtyAirtableID[];
-    live_guests?: DirtyAirtableID[];
-    player_relationships?: DirtyAirtableID[];
-    clients?: DirtyAirtableID[];
-    teams?: DirtyAirtableID[];
-    favourite_hero?: DirtyAirtableID[];
-    highlighted_on?: DirtyAirtableID[];
+interface Player {
+    id: DirtyAirtableID
+    name: string
+    pronunciation?: string
+    pronouns?: string
+    role?: string
+    verified?: boolean
+    twitter_handle?: string[]
+    twitter_link?: string[]
+    website_settings?: string[]
+    battletag?: string
+    discord_tag?: string
+    discord_id?: DiscordID
+    member_of?: DirtyAirtableID[]
+    event_staff?: DirtyAirtableID[]
+    team_staff?: DirtyAirtableID[]
+    casts?: DirtyAirtableID[]
+    casted_events?: DirtyAirtableID[]
+    socials?: DirtyAirtableID[]
+    news?: DirtyAirtableID[]
+    live_guests?: DirtyAirtableID[]
+    player_relationships?: DirtyAirtableID[]
+    clients?: DirtyAirtableID[]
+    teams?: DirtyAirtableID[]
+    favourite_hero?: DirtyAirtableID[]
+    highlighted_on?: DirtyAirtableID[]
 }
-type Client = {
-    name: string;
-    key: string;
-    staff: DirtyAirtableID[];
-    broadcast: DirtyAirtableID[];
-    id: DirtyAirtableID;
+interface Client {
+    name: string
+    key: string
+    staff: DirtyAirtableID[]
+    broadcast: DirtyAirtableID[]
+    id: DirtyAirtableID
 }
 
 export const useAuthStore = defineStore("auth", () => {
-
     const token = ref<string | null>(null);
     const authNext = ref<string | null>(null);
     const user = ref<WebUserData | null>(null);
     const auth = computed(() => ({
         token: token.value,
         user: user.value
-    }))
+    }));
 
-    const player = computed<Player>(() => user.value ? ReactiveRoot(user.value.airtableID) : null)
-    const client = computed<Client>(() => player.value?.id ? ReactiveRoot(player.value.clients?.[0]) : null)
+    const player = computed<Player>(() => (user.value != null) ? ReactiveRoot(user.value.airtableID) : null);
+    const client = computed<Client>(() => player.value?.id ? ReactiveRoot(player.value.clients?.[0]) : null);
 
-    const isAuthenticated = computed(() => !!user.value);
+    const isAuthenticated = computed(() => !(user.value == null));
     const isProduction = computed(() => {
-        return !!player.value?.clients?.length
-    })
+        return !!player.value?.clients?.length;
+    });
 
     async function authenticateWithDiscord(code: string) {
-        if (!code) return {error: true, errorMessage: "Empty authentication request"};
+        if (!code) return { error: true, errorMessage: "Empty authentication request" };
 
         const authenticationRequest = await fetch(`${getDataServerAddress()}/auth/discord-login`, {
             method: "POST",
@@ -81,13 +80,13 @@ export const useAuthStore = defineStore("auth", () => {
             body: JSON.stringify({
                 code
             })
-        }).then(res => res.json());
+        }).then(async res => await res.json());
 
         console.log("[Auth]", authenticationRequest);
 
         if (authenticationRequest.error) {
             console.warn("Authentication error:", authenticationRequest.for_a_developer);
-            return {error: true, errorMessage: authenticationRequest.message};
+            return { error: true, errorMessage: authenticationRequest.message };
         }
         // TODO this should be cookies
         token.value = authenticationRequest.token;
@@ -118,7 +117,7 @@ export const useAuthStore = defineStore("auth", () => {
     }
 
     async function authenticateWithToken(newToken: string) {
-        if (!newToken) return {error: true, errorMessage: "Empty authentication request"};
+        if (!newToken) return { error: true, errorMessage: "Empty authentication request" };
         console.log("Authenticating with SLMN.GG token");
 
         const authenticationRequest = await fetch(`${getDataServerAddress()}/auth/login`, {
@@ -129,7 +128,7 @@ export const useAuthStore = defineStore("auth", () => {
             body: JSON.stringify({
                 token: newToken
             })
-        }).then(res => res.json());
+        }).then(async res => await res.json());
 
         console.log("[Auth]", authenticationRequest);
 
@@ -141,7 +140,7 @@ export const useAuthStore = defineStore("auth", () => {
                 token.value = null;
             }
 
-            return {error: true, errorMessage: authenticationRequest.message};
+            return { error: true, errorMessage: authenticationRequest.message };
         }
 
         user.value = authenticationRequest.user;
@@ -164,9 +163,7 @@ export const useAuthStore = defineStore("auth", () => {
         setAuthNext,
         getAuthNext,
         authenticateWithToken
-    }
-
-
+    };
 }, {
     persist: {
         paths: ["token"]

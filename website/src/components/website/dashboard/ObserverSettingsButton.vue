@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { setObserverSetting } from "@/utils/dashboard";
+import { authenticatedRequest, setObserverSetting } from "@/utils/dashboard";
 
 export default {
     name: "ObserverSettingsButton",
@@ -21,7 +21,10 @@ export default {
         async setObserverSetting(setting, value) {
             this.processing = true;
             try {
-                await setObserverSetting(setting, value);
+                await authenticatedRequest("actions/set-observer-setting", {
+                    setting,
+                    value
+                }, this.processing);
             } finally {
                 this.processing = false;
             }

@@ -161,7 +161,7 @@
 </template>
 
 <script>
-import { updateMapData, updateMatchData } from "@/utils/dashboard";
+import { authenticatedRequest, updateMapData, updateMatchData } from "@/utils/dashboard";
 import ThemeLogo from "@/components/website/ThemeLogo";
 import ContentThing from "@/components/website/ContentThing";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
@@ -534,7 +534,7 @@ export default {
             return response;
         },
         async saveMapAndScores() {
-            return this.sendMapDataChange(); // function changes scores if different
+            return await this.sendMapDataChange(); // function changes scores if different
         },
         async sendScoresIfDifferent() {
             const newScores = this.matchData?.scores;
@@ -546,9 +546,12 @@ export default {
             if ((newScores[0] !== oldScores[0]) || (newScores[1] !== oldScores[1])) {
                 // scores are different
 
-                const response = await updateMatchData(this.match, {
-                    score_1: newScores[0],
-                    score_2: newScores[1]
+                const response = await authenticatedRequest("actions/update-match-data", {
+                    matchID: this.match.id,
+                    updatedData: {
+                        score_1: newScores[0],
+                        score_2: newScores[1]
+                    }
                 });
 
                 if (!response.error) {

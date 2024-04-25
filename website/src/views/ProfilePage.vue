@@ -57,7 +57,7 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { updateProfileData } from "@/utils/dashboard";
+import { authenticatedRequest, updateProfileData } from "@/utils/dashboard";
 import { resizedImage } from "@/utils/images";
 import { cleanID, getAssociatedThemeOptions, url } from "@/utils/content-utils";
 import { logoBackground } from "@/utils/theme-styles";
@@ -229,7 +229,9 @@ export default {
             e.preventDefault();
 
             console.log("save", this.profile);
-            const response = await updateProfileData(this.profile);
+            const response = await authenticatedRequest("actions/update-profile-data", {
+                profileData: this.profile
+            });
 
             if (response.error) {
                 this.errorMessage = response.errorMessage;

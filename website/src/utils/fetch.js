@@ -4,6 +4,10 @@ import { cleanID } from "@/utils/content-utils";
 async function addToBuffer(id) {
     return store.commit("addToRequestBuffer", id);
 }
+
+/**
+ * @returns {string}
+ */
 export function getDataServerAddress() {
     // console.log("[data server address]", window.location.hostname, process.env.VITE_DATA_SERVER);
     // can override this with .env.development etc

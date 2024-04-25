@@ -1,9 +1,11 @@
 <template>
     <div class="desk-graphics-overlay" @click="fullscreenToggle()">
-        <BroadcastBackground class="pos-overlay bg" :broadcast="broadcast" />
-        <ThemeTransition :duration="400" :inner-delay="150" class="pos-overlay stinger-transition" :active="stingerActive" :theme="theme" :border-width="0" start="right" end="right">
+        <BroadcastBackground class="pos-overlay bg" :broadcast="broadcast"/>
+        <ThemeTransition :duration="400" :inner-delay="150" class="pos-overlay stinger-transition"
+                         :active="stingerActive" :theme="theme" :border-width="0" start="right" end="right">
             <div class="stinger w-100 h-100">
-                <theme-logo class="stinger-event-logo w-100 h-100" :theme="theme" logo-size="w-1920" border-width="0" icon-padding="200px" />
+                <theme-logo class="stinger-event-logo w-100 h-100" :theme="theme" logo-size="w-1920" border-width="0"
+                            icon-padding="200px"/>
             </div>
         </ThemeTransition>
         <div class="desk-graphics-display">
@@ -12,13 +14,18 @@
                      v-if="show === 'Sponsors'">
                     <Sponsors class="h-100 w-100" :sponsors="sponsors" size="h-1080" mode="out-in"></Sponsors>
                 </div>
-                <div class="desk-graphics-part desk-graphics-event-logo" key="Event Logo" v-if="show === 'Event Logo'">
-                    <theme-logo class="event-logo w-100 h-100" :theme="theme" logo-size="w-1080" border-width="0" icon-padding="200px" />
+                <div class="desk-graphics-part desk-graphics-event-logo" key="Event Logo" v-else-if="show === 'Event Logo'">
+                    <theme-logo class="event-logo w-100 h-100" :theme="theme" logo-size="w-1080" border-width="0"
+                                icon-padding="200px"/>
                 </div>
-                <div class="desk-graphics-part desk-graphics-teams" :key="'Teams' + matchKey" v-if="show === 'Teams' && liveMatch && liveMatch.teams">
-                    <ThemeTransition :starting-delay="500" :inner-delay="300" class="desk-graphic-team" v-for="(team, i) in liveMatch.teams" :key="team.id" :theme="team.theme"
-                                     :left="i === 0" :auto-start="true" :border="i === 0 ? 'left': 'right'" :border-width="20">
-                        <theme-logo class="dg-team-logo w-100 h-100" :theme="team.theme" logo-size="h-1080" border-width="0" icon-padding="25%" />
+                <div class="desk-graphics-part desk-graphics-teams" :key="'Teams' + matchKey"
+                     v-else-if="show === 'Teams' && liveMatch && liveMatch.teams">
+                    <ThemeTransition :starting-delay="500" :inner-delay="300" class="desk-graphic-team"
+                                     v-for="(team, i) in liveMatch.teams" :key="team.id" :theme="team.theme"
+                                     :left="i === 0" :auto-start="true" :border="i === 0 ? 'left': 'right'"
+                                     :border-width="20">
+                        <theme-logo class="dg-team-logo w-100 h-100" :theme="team.theme" logo-size="h-1080"
+                                    border-width="0" icon-padding="25%"/>
                     </ThemeTransition>
                 </div>
             </transition>
@@ -32,9 +39,15 @@ import Sponsors from "@/components/broadcast/Sponsors";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
 import ThemeLogo from "@/components/website/ThemeLogo";
+
 export default {
     name: "DeskGraphicsOverlay",
-    components: { ThemeTransition, Sponsors, BroadcastBackground, ThemeLogo },
+    components: {
+        ThemeTransition,
+        Sponsors,
+        BroadcastBackground,
+        ThemeLogo
+    },
     props: ["broadcast"],
     data: () => ({
         stingerActive: false

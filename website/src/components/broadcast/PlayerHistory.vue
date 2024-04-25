@@ -101,9 +101,6 @@ export default {
     flex-grow: 1;
     padding: 0 50px;
 }
-.teams-label {
-    float: top;
-}
 .teams-wrapper:deep(.player-team-display),
 .teams-wrapper:deep(.team-name) {
     width: 176px;

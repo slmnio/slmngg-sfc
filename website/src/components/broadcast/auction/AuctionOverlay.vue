@@ -86,16 +86,16 @@
                                         :auction-settings="auctionSettings"></TeamPlayerList>
                     </div>
                 </transition-group>
-                <div :style="background" class="team-focus h-100" v-if="rightDisplay === 'sign-focus'" key="signed-focus">
+                <div :style="background" class="team-focus h-100" v-else-if="rightDisplay === 'sign-focus'" key="signed-focus">
                     <SignedTeamList :team="signedTeam" :amount="signAmount" :signedPlayer="socketPlayerID" :auction-settings="auctionSettings" />
                 </div>
-                <div :style="background" class="bid-focus flex-center h-100 w-100" v-if="rightDisplay === 'bid-focus'" key="bid-focus">
+                <div :style="background" class="bid-focus flex-center h-100 w-100" v-else-if="rightDisplay === 'bid-focus'" key="bid-focus">
                     <BidFocus :teams="teams" :bids="bids" :auction-settings="auctionSettings" />
                 </div>
-                <div :style="background" class="team-focus" v-if="rightDisplay === 'team-focus'" key="team-focus">
+                <div :style="background" class="team-focus" v-else-if="rightDisplay === 'team-focus'" key="team-focus">
                     <TeamFocus :team="highlightedTeam" :auction-settings="auctionSettings" />
                 </div>
-                <div :style="background" class="bidding-war" v-if="rightDisplay === 'bidding-war'" key="bidding-war">
+                <div :style="background" class="bidding-war" v-else-if="rightDisplay === 'bidding-war'" key="bidding-war">
                     <BiddingWar :teams="biddingWar" :leading="leadingBid" :auction-settings="auctionSettings"/>
                 </div>
             </transition>

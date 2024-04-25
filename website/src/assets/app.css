@@ -86,6 +86,9 @@ a:not(.link-text), a:not(.link-text):hover {
 .dropdown-item.active, .dropdown-item:active {
     background-color: var(--theme);
 }
+.dropdown-item {
+    text-transform: uppercase;
+}
 
 /*.btn:hover:not(:disabled), .btn.hover:not(:disabled) {*/
 /*    background-color: #00a367 !important;*/

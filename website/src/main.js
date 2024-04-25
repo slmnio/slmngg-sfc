@@ -1,4 +1,4 @@
-import { configureCompat, createApp, h } from "vue";
+import { createApp, h } from "vue";
 import { createPinia } from "pinia";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import store from "@/thing-store";
@@ -22,14 +22,6 @@ import { createRouter } from "@/router";
 import socketMixin from "@/socket-client";
 import { getSubdomain } from "@/utils/get-subdomain";
 import { useAuthStore } from "@/stores/authStore";
-
-configureCompat({
-    MODE: 2,
-    COMPONENT_V_MODEL: false,
-    ATTR_FALSE_VALUE: false,
-    WATCH_ARRAY: false,
-    RENDER_FUNCTION: false
-});
 
 const { subdomain, subID } = await getSubdomain();
 

@@ -11,15 +11,7 @@ dns.setDefaultResultOrder("verbatim");
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
     plugins: [
-        createVuePlugin({
-            template: {
-                compilerOptions: {
-                    compatConfig: {
-                        MODE: 3
-                    }
-                }
-            }
-        }),
+        createVuePlugin(),
         Components({
             resolvers: [BootstrapVueNextResolver()]
         })
@@ -27,7 +19,6 @@ export default defineConfig(({ mode }) => ({
     resolve: {
         alias: {
             "@": fileURLToPath(new URL("./src", import.meta.url)),
-            vue: "@vue/compat"
         },
         extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json", ".vue"]
     },

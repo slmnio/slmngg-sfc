@@ -16,17 +16,12 @@
 
 <script>
 import { url } from "@/utils/content-utils.js";
-import { isAuthenticated, isOnMainDomain } from "@/utils/auth";
+import { isOnMainDomain } from "@/utils/auth";
 import { getMainDomain } from "@/utils/fetch";
 import { bg } from "@/utils/images";
 import TokenModal from "@/components/website/dashboard/TokenModal.vue";
-import { configureCompat } from "vue";
 import { mapState, mapWritableState } from "pinia";
 import { useAuthStore } from "@/stores/authStore";
-
-configureCompat({
-    MODE: 3
-});
 
 export default {
     name: "LoggedInUser",

@@ -104,13 +104,8 @@ import LoggedInUser from "@/components/website/LoggedInUser";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 import { isAuthenticated } from "@/utils/auth";
 import { getMainDomain } from "@/utils/fetch";
-import { configureCompat } from "vue";
 import { mapState, mapWritableState } from "pinia";
 import { useAuthStore } from "@/stores/authStore";
-
-configureCompat({
-    MODE: 3
-});
 
 
 export default {

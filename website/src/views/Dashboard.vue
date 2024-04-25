@@ -270,34 +270,34 @@ export default {
         border-bottom-width: 2px;
         border-bottom-style: solid;
     }
-    .bracket-viewer >>> .module-content .bracket {
+    .bracket-viewer:deep(.module-content .bracket) {
         padding: 10px 20px 0px 20px;
     }
-    .bracket-viewer >>> .module-content {
+    .bracket-viewer:deep(.module-content) {
         overflow-x: scroll;
     }
 
 
-    .bracket-viewer >>> .module-content::-webkit-scrollbar-track {
+    .bracket-viewer:deep(.module-content::-webkit-scrollbar-track) {
         border-radius: 4px;
         background-color: transparent;
     }
 
-    .bracket-viewer >>> .module-content::-webkit-scrollbar {
+    .bracket-viewer:deep(.module-content::-webkit-scrollbar) {
         width: 6px;
         height: 6px;
         background-color: transparent;
     }
 
-    .bracket-viewer >>> .module-content::-webkit-scrollbar-thumb {
+    .bracket-viewer:deep(.module-content::-webkit-scrollbar-thumb) {
         border-radius: 4px;
         -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
         background-color: #222;
         transition: background-color 300ms ease;
     }
 
-    .bracket-viewer >>> .module-content:hover::-webkit-scrollbar-thumb,
-    .bracket-viewer >>> .module-content:active::-webkit-scrollbar-thumb {
+    .bracket-viewer:deep(.module-content:hover::-webkit-scrollbar-thumb),
+    .bracket-viewer:deep(.module-content:active::-webkit-scrollbar-thumb) {
         background-color: #333;
     }
 

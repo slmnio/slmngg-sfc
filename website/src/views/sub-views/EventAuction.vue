@@ -664,7 +664,7 @@ export default {
         background-color: var(--primary);
     }
 
-    .currently-active-player >>> a,
+    .currently-active-player:deep(a),
     .currently-active-player .role {
         color: white !important;
     }

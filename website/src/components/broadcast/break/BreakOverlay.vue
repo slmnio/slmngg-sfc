@@ -565,7 +565,7 @@ export default {
         flex-direction: column;
     }
 
-    .break-title-inner >>> br {
+    .break-title-inner:deep(br) {
         margin-top: .25em !important;
         display: block;
         content: " ";
@@ -574,8 +574,8 @@ export default {
     .break-others-info {
         font-size: 12px;
     }
-    .break-others-info >>> .broadcast-match {font-size: 38px !important;width: 300px !important;}
-    .break-others-info >>> .broadcast {margin-bottom: 0.75em !important;}
+    .break-others-info:deep(.broadcast-match) {font-size: 38px !important;width: 300px !important;}
+    .break-others-info:deep(.broadcast) {margin-bottom: 0.75em !important;}
 
     .break-transition-top {
         height: 160px !important;

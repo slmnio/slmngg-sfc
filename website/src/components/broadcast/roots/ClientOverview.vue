@@ -78,7 +78,7 @@ export default {
     .b-pad {
         padding: 0 0.5rem;
     }
-    .overlay-minor >>> .btn {
+    .overlay-minor:deep(.btn) {
         padding: 1px 0.5rem;
         height: 26px;
     }

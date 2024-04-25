@@ -35,9 +35,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-    .iframe-overlay >>> .g-body {
-        /*padding: 0;*/
-    }
-</style>

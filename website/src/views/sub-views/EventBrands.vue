@@ -62,7 +62,7 @@ export default {
         height: 120px;
         width: 100%;
     }
-    .brand-logo >>> .icon {
+    .brand-logo:deep(.icon) {
         width: calc(100% - 36px) !important;
     }
     .theme-title {

@@ -55,7 +55,7 @@ export default {
     font-weight: bold;
 }
 
-.stat-b >>> a {
+.stat-b:deep(a) {
     max-width: 100%;
     white-space: nowrap;
     overflow: hidden;

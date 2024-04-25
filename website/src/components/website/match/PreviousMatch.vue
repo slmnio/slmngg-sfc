@@ -98,7 +98,7 @@ export default {
         flex-grow: 1;
         width: 100%;
     }
-    .prev-match-maps >>> .map-image {
+    .prev-match-maps:deep(.map-image) {
         padding-bottom: 100%;
     }
 

@@ -158,10 +158,10 @@ export default {
         background-color: #252525;
     }
 
-    .news-content >>> .markdown > p:first-child {
+    .news-content:deep(.markdown > p:first-child) {
         font-size: 1.15em !important;
     }
-    .news-content >>> img {
+    .news-content:deep(img) {
         width: 800px;
         margin: 10px auto;
         display: flex;
@@ -169,7 +169,7 @@ export default {
         max-width: 100%;
     }
 
-    .news-embed-container, .news-content, .news-content >>> img {
+    .news-embed-container, .news-content, .news-content:deep(img) {
         box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.5);
     }
 

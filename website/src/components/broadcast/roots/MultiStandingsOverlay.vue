@@ -57,7 +57,7 @@ export default {
 </script>
 
 <style scoped>
-    .standings >>> .team-name {
+    .standings:deep(.team-name) {
         color: inherit !important;
     }
     .all-standings-holder {
@@ -66,7 +66,7 @@ export default {
         align-items: flex-start;
         width: 100%;
     }
-    .standings >>> .standings-header .team-name {
+    .standings:deep(.standings-header .team-name) {
         margin-right: 1.5em;
     }
 </style>

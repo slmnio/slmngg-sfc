@@ -117,7 +117,7 @@ export default {
     margin-top: 21px;
 }
 
-.date-editor >>> .btn {
+.date-editor:deep(.btn) {
     width: 100%;
 }
 

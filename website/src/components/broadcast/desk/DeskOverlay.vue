@@ -220,7 +220,7 @@ export default {
     .caster.wide-feed {
         min-width: var(--caster-width)
     }
-    .caster.wide-feed >>> .caster-frame {
+    .caster.wide-feed:deep(.caster-frame) {
         --oversize: 1% !important;
     }
 

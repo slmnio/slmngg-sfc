@@ -156,11 +156,11 @@ export default {
         display: inline-flex;
         vertical-align: middle;
     }
-    .fake-btn-group div:not(:first-child) >>> .btn {
+    .fake-btn-group div:not(:first-child):deep(.btn) {
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
     }
-    .fake-btn-group div:not(:last-child) >>> .btn {
+    .fake-btn-group div:not(:last-child):deep(.btn) {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
     }

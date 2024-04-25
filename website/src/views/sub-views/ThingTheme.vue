@@ -249,7 +249,7 @@ export default {
         font-size: 24px;
         width: fit-content;
     }
-    .standings >>> .team-name {
+    .standings:deep(.team-name) {
         margin-right: 32px;
         min-width: 250px;
     }
@@ -272,7 +272,7 @@ export default {
     /*.recolored-hero {*/
     /*    width: 200px;*/
     /*}*/
-    /*.recolored-hero >>> .color-holder {*/
+    /*.recolored-hero:deep(.color-holder) {*/
     /*    height: 500px;*/
     /*}*/
 </style>

@@ -92,7 +92,7 @@ export default {
 </script>
 
 <style scoped>
-    table tr.schedule-editor-match:last-child >>> td {
+    table tr.schedule-editor-match:last-child:deep(td) {
         border-bottom: none;
     }
 </style>

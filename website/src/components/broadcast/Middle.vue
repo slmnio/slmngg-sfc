@@ -82,12 +82,12 @@ export default {
     line-height: 1.2em;
 }
 
-.centerer >>> .theme-transition-outer {
+.centerer:deep(.theme-transition-outer) {
     border-radius: 4px !important;
     overflow: hidden;
 }
-.centerer >>> .theme-transition.end-middle.tt-enter-to .theme-transition-inner,
-.centerer >>> .theme-transition.end-middle.tt-enter-to .theme-transition-outer {
+.centerer:deep(.theme-transition.end-middle.tt-enter-to .theme-transition-inner),
+.centerer:deep(.theme-transition.end-middle.tt-enter-to .theme-transition-outer) {
     clip-path: polygon(0% 0%, 0% 110%, 50% 110%, 50% 0, 50% 0, 50% 110%, 100% 110%, 100% 0%) !important;
     /* this is a hack to avoid a subpixel issue at the bottom of the box */
     /* could be to do with 0.5 margins having a .5px adjustment */

@@ -91,12 +91,12 @@ export default {
         border: none;
     }
 
-    .module-content >>> .table tr th:last-child,
-    .module-content >>> .table tr td:last-child {
+    .module-content:deep(.table tr th:last-child),
+    .module-content:deep(.table tr td:last-child) {
         border-right: none;
     }
-    .module-content >>> .table tr th:first-child,
-    .module-content >>> .table tr td:first-child {
+    .module-content:deep(.table tr th:first-child),
+    .module-content:deep(.table tr td:first-child) {
         border-left: none;
     }
 

@@ -100,30 +100,30 @@ export default {
 </script>
 
 <style scoped>
-    .markdown >>> img {
+    .markdown:deep(img) {
         cursor: pointer;
         transition: transform 150ms ease-in-out;
         transform: scale(1);
     }
-    .markdown >>> img:hover {
+    .markdown:deep(img:hover) {
         transform: scale(1.02);
     }
-    .markdown >>> p:last-child {
+    .markdown:deep(p:last-child) {
         margin-bottom: .5rem;
     }
-    .markdown >>> a {
+    .markdown:deep(a) {
         color: var(--theme-active, #66d9ff);
     }
-    .markdown >>> .clip-holder {
+    .markdown:deep(.clip-holder) {
         background-color: rgba(0,0,0,0.2);
         margin-bottom: 1em;
     }
-    .markdown >>> .clip.clip-error {
+    .markdown:deep(.clip.clip-error) {
         background-color: rgba(0,0,0,0.2);
         text-align: center;
         padding: 10px 20px;
     }
-    .markdown >>> .clip-caption {
+    .markdown:deep(.clip-caption) {
         padding: 10px 15px;
     }
 </style>

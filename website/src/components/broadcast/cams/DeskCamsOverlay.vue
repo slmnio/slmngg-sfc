@@ -65,14 +65,14 @@ export default {
 </script>
 
 <style scoped>
-    .team-cams >>> .team-cams-group {
+    .team-cams:deep(.team-cams-group) {
         margin: 10px;
         width: 100%;
     }
-    .team-cams >>> .team-cam {
+    .team-cams:deep(.team-cam) {
         height: 200px;
     }
-    .team-cams >>> .guest-name {
+    .team-cams:deep(.guest-name) {
         font-size: 24px;
     }
 </style>

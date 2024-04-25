@@ -29,7 +29,7 @@ export default {
 </script>
 
 <style scoped>
-    .bidding-war >>> .top-logo {
+    .bidding-war:deep(.top-logo) {
         height: 250px;
     }
     .team-focus {
@@ -37,25 +37,25 @@ export default {
         flex-shrink: 0;
         margin-top: 25px;
     }
-    .bidding-war >>> .title {
+    .bidding-war:deep(.title) {
         font-size: 40px;
         min-height: 120px;
         display: flex;
         justify-content: center;
         align-items: center;
     }
-    .bidding-war >>> .top-logo {
+    .bidding-war:deep(.top-logo) {
         transform: scale(0.9);
         transition: all .2s ease;
     }
-    .bidding-war >>> .top-logo.leading {
+    .bidding-war:deep(.top-logo.leading) {
         box-shadow: 0 0 0px 4px white;
         transform: scale(1);
     }
-    .bidding-war >>> .player {
+    .bidding-war:deep(.player) {
         font-size: 23px !important;
     }
-    .bidding-war >>> .player .player-role {
+    .bidding-war:deep(.player .player-role) {
         width: 30px;
         height: 20px;
         transform: translate(-8px, -2px);

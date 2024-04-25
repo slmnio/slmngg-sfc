@@ -86,7 +86,7 @@ export default {
         width: 400px;
     }
 
-    .broadcast-match >>> .match-next-details {
+    .broadcast-match:deep(.match-next-details) {
         display: none;
     }
 
@@ -101,7 +101,7 @@ export default {
     .broadcast {
         margin-bottom: 2.5em;
     }
-    .caster-names >>> a {
+    .caster-names:deep(a) {
         color: inherit;
     }
     .broadcast-details {

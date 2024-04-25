@@ -275,10 +275,10 @@ export default {
     .segment-next-match {
         min-width: 330px;
     }
-    .segment-next-match >>> .match-teams {
+    .segment-next-match:deep(.match-teams) {
         min-width: 410px;
     }
-    .segment-next-match >>> .break-match[data-center="vs"] .match-teams {
+    .segment-next-match:deep(.break-match[data-center="vs"] .match-teams) {
         min-width: 330px;
     }
 
@@ -286,14 +286,14 @@ export default {
         width: 420px;
         padding: 0;
     }
-    .segment-sponsors >>> .break-sponsors {
+    .segment-sponsors:deep(.break-sponsors) {
         padding: 0;
         height: 100%;
     }
-    .segment-sponsors >>> .sponsors-holder {
+    .segment-sponsors:deep(.sponsors-holder) {
         height: 100%;
     }
-    .segment-sponsors >>> .break-sponsor-logo {
+    .segment-sponsors:deep(.break-sponsor-logo) {
         width: calc(100% - 2em) !important;
     }
 
@@ -309,7 +309,7 @@ export default {
         padding: 0 1em;
         min-width: 500px;
     }
-    .segment-schedule >>> .break-match {
+    .segment-schedule:deep(.break-match) {
         font-size: 25px;
     }
 

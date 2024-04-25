@@ -124,7 +124,7 @@ export default {
 </script>
 
 <style scoped>
-    .content-row >>> .content-title {
+    .content-row:deep(.content-title) {
         color: var(--theme-ondark);
     }
 </style>

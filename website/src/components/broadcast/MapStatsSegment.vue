@@ -139,7 +139,7 @@ export default {
         margin-top: .5em;
     }
 
-    .map-segment >>> .map-bg {
+    .map-segment:deep(.map-bg) {
         transform: translate(0, -15%);
     }
 

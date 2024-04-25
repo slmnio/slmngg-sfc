@@ -178,8 +178,8 @@ export default {
 
 }
 
-.tt-enter-active.clip-slot >>> .clip-target,
-.tt-leave-active.clip-slot >>> .clip-target {
+.tt-enter-active.clip-slot:deep(.clip-target),
+.tt-leave-active.clip-slot:deep(.clip-target) {
     transition: clip-path var(--tt-duration, .75s) ease;
     transition-delay: var(--tt-clip-delay);
 }
@@ -193,8 +193,8 @@ export default {
     transition-delay: var(--tt-starting-inner-delay, 300ms) !important;
 }
 
-.tt-enter-to.clip-slot >>> .clip-target,
-.tt-leave-from.clip-slot >>> .clip-target,
+.tt-enter-to.clip-slot:deep(.clip-target),
+.tt-leave-from.clip-slot:deep(.clip-target),
 .tt-enter-to .theme-transition-outer,
 .tt-enter-to .theme-transition-inner,
 .tt-leave-from .theme-transition-outer,
@@ -203,8 +203,8 @@ export default {
     clip-path: polygon(-1% -1%, 101% -1%, 101% 101%, -1% 101%);
 }
 
-.theme-transition.start-right.tt-enter-from.clip-slot >>> .clip-target,
-.theme-transition.start-right.tt-leave-to.clip-slot >>> .clip-target,
+.theme-transition.start-right.tt-enter-from.clip-slot:deep(.clip-target),
+.theme-transition.start-right.tt-leave-to.clip-slot:deep(.clip-target),
 .theme-transition.start-right.tt-enter-from .theme-transition-inner,
 .theme-transition.start-right.tt-enter-from .theme-transition-outer,
 .theme-transition.end-left.tt-leave-to .theme-transition-outer,
@@ -213,8 +213,8 @@ export default {
     clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
 }
 
-.theme-transition.start-left.tt-enter-from.clip-slot >>> .clip-target,
-.theme-transition.start-left.tt-leave-to.clip-slot >>> .clip-target,
+.theme-transition.start-left.tt-enter-from.clip-slot:deep(.clip-target),
+.theme-transition.start-left.tt-leave-to.clip-slot:deep(.clip-target),
 .theme-transition.start-left.tt-enter-from .theme-transition-outer,
 .theme-transition.start-left.tt-enter-from .theme-transition-inner,
 .theme-transition.end-right.tt-leave-to .theme-transition-outer,
@@ -223,8 +223,8 @@ export default {
     clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%)
 }
 
-.theme-transition.end-middle.tt-enter-to.clip-slot >>> .clip-target,
-.theme-transition.end-middle.tt-leave-from.clip-slot >>> .clip-target,
+.theme-transition.end-middle.tt-enter-to.clip-slot:deep(.clip-target),
+.theme-transition.end-middle.tt-leave-from.clip-slot:deep(.clip-target),
 .theme-transition.end-middle.tt-enter-to .theme-transition-outer,
 .theme-transition.end-middle.tt-enter-to .theme-transition-inner,
 .theme-transition.start-middle.tt-leave-from .theme-transition-outer,
@@ -233,8 +233,8 @@ export default {
     clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 100% 100%, 100% 0%);
 }
 
-.theme-transition.end-middle.tt-enter-from.clip-slot >>> .clip-target,
-.theme-transition.end-middle.tt-leave-to.clip-slot >>> .clip-target,
+.theme-transition.end-middle.tt-enter-from.clip-slot:deep(.clip-target),
+.theme-transition.end-middle.tt-leave-to.clip-slot:deep(.clip-target),
 .theme-transition.end-middle.tt-enter-from .theme-transition-outer,
 .theme-transition.end-middle.tt-enter-from .theme-transition-inner,
 .theme-transition.start-middle.tt-leave-to .theme-transition-outer,

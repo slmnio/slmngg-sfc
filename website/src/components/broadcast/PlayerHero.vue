@@ -66,7 +66,7 @@ export default {
         height: 1em;
         width: 1em;
     }
-    .hero-icon >>> svg {
+    .hero-icon:deep(svg) {
         vertical-align: text-bottom;
     }
 

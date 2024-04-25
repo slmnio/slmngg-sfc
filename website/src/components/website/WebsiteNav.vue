@@ -256,7 +256,7 @@ export default {
 .live-matches-text {
     font-size: 1.5em;
 }
-.website-nav >>> .dropdown-item {
+.website-nav:deep(.dropdown-item) {
     padding: 0.5rem 1.5rem;
 }
 .navbar[type="dark"] .navbar-nav .nav-link,

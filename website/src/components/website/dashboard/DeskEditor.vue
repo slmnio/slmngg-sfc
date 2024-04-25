@@ -156,7 +156,7 @@ export default {
 </script>
 
 <style scoped>
-    .guest-row >>> .invalid-feedback {
+    .guest-row:deep(.invalid-feedback) {
         color: #ff6473;
     }
     ::placeholder {

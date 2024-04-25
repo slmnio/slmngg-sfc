@@ -54,7 +54,7 @@ export default {
         bottom: 5%;
         left: 5%;
     }
-    .lower-third-area >>> .lower-third-text {
+    .lower-third-area:deep(.lower-third-text) {
         font-size: 3em;
         padding: 0.25em .5em;
     }

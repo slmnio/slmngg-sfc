@@ -145,9 +145,9 @@ export default {
         border-bottom: 8px solid transparent;
     }
 
-    .mvp-overlay >>> .theme-transition,
-    .mvp-overlay >>> .theme-transition-outer,
-    .mvp-overlay >>> .theme-transition-inner {
+    .mvp-overlay:deep(.theme-transition),
+    .mvp-overlay:deep(.theme-transition-outer),
+    .mvp-overlay:deep(.theme-transition-inner) {
         width: auto !important;
         height: auto !important;
     }

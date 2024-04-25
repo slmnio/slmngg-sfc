@@ -357,24 +357,24 @@ export default {
     height: 80px;
 }
 
-.ingame-fade-sponsors >>> .sponsors-holder {
+.ingame-fade-sponsors:deep(.sponsors-holder) {
     height: 100% !important;
     width: 320px !important;
 }
 
-.ingame-fade-sponsors >>> .break-sponsor {
+.ingame-fade-sponsors:deep(.break-sponsor) {
     background-color: transparent !important;
 }
 
-.ingame-fade-sponsors >>> .break-sponsor-logo {
+.ingame-fade-sponsors:deep(.break-sponsor-logo) {
     height: calc(100% - 1.5em) !important;
 }
-.ingame-overlay.basic >>> .small-overlay-text,
-.ingame-overlay.basic >>> .team-score,
-.ingame-overlay.basic >>> .attack-holder {
+.ingame-overlay.basic:deep(.small-overlay-text),
+.ingame-overlay.basic:deep(.team-score),
+.ingame-overlay.basic:deep(.attack-holder) {
     display: none !important;
 }
-.ingame-overlay.basic >>> .ingame-team {
+.ingame-overlay.basic:deep(.ingame-team) {
     --team-expand: 0px !important;
 }
 </style>

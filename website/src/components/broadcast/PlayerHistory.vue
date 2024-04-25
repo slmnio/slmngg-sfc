@@ -82,7 +82,7 @@ export default {
 </script>
 
 <style scoped>
-.player-history-overlay >>> .generic-overlay-body {
+.player-history-overlay:deep(.generic-overlay-body) {
     padding: 0;
 }
 .career-wrapper {
@@ -104,8 +104,8 @@ export default {
 .teams-label {
     float: top;
 }
-.teams-wrapper >>> .player-team-display,
-.teams-wrapper >>> .team-name {
+.teams-wrapper:deep(.player-team-display),
+.teams-wrapper:deep(.team-name) {
     width: 176px;
 }
 .teams-wrapper .title {
@@ -120,7 +120,7 @@ export default {
     font-size: 1.2em;
     font-weight: bold;
 }
-.first-event >>> .event-name {
+.first-event:deep(.event-name) {
     margin: 0 0.3em 0 0  !important;
 }
 .player-teams {

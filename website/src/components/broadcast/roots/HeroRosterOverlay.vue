@@ -119,7 +119,7 @@ export default {
 </script>
 
 <style scoped>
-    .player >>> .color-holder {
+    .player:deep(.color-holder) {
         height: 100%;
         --over: 350%;
         width: calc(100% + var(--over));
@@ -135,12 +135,12 @@ export default {
         width: 100%;
     }
 
-    .player >>> .color-holder div,
-    .player >>> .color-holder canvas {
+    .player:deep(.color-holder div),
+    .player:deep(.color-holder canvas) {
         object-fit: contain !important;
     }
 
-    .player >>> .hero-image-base {
+    .player:deep(.hero-image-base) {
         background-size: contain !important;
     }
 
@@ -156,7 +156,7 @@ export default {
         font-size: 2em;
     }
 
-    .hero-roster-overlay >>> .g-body {
+    .hero-roster-overlay:deep(.g-body) {
         overflow: hidden;
         color: white;
     }

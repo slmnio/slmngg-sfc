@@ -93,38 +93,58 @@ export default {
 </script>
 
 <style scoped>
-    .desk-graphics-overlay {
-        width: 100vw;
-        height: 100vh;
-    }
-    .desk-graphics-display, .desk-graphics-part {
-        width: 100%;
-        height: 100%;
-    }
-    .pos-overlay {
-        width: 100vw;
-        height: 100vh;
-        position: absolute;
-        top: 0;
-        left: 0;
-    }
-    .bg { z-index: -1 }
-    .stinger-transition { z-index: 1000; }
+.desk-graphics-overlay {
+    width: 100vw;
+    height: 100vh;
+}
 
-    .desk-graphics-sponsors >>> .sponsors-holder { height: 100%; }
-    .desk-graphics-sponsors >>> .break-sponsor, .event-logo { background-color: transparent !important; }
-    .desk-graphics-sponsors >>> .break-sponsors { padding: 5% !important; }
+.desk-graphics-display, .desk-graphics-part {
+    width: 100%;
+    height: 100%;
+}
 
-    .stinger-event-logo {
-        animation: zoom 1.5s forwards;
-    }
+.pos-overlay {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 
-    @keyframes zoom {
-        0% { transform: scale(0.75); }
-        100% { transform: scale(1); }
-    }
+.bg {
+    z-index: -1
+}
 
-    .desk-graphics-teams {
-        display: flex;
+.stinger-transition {
+    z-index: 1000;
+}
+
+.desk-graphics-sponsors:deep(.sponsors-holder) {
+    height: 100%;
+}
+
+.desk-graphics-sponsors:deep(.break-sponsor), .event-logo {
+    background-color: transparent !important;
+}
+
+.desk-graphics-sponsors:deep(.break-sponsors) {
+    padding: 5% !important;
+}
+
+.stinger-event-logo {
+    animation: zoom 1.5s forwards;
+}
+
+@keyframes zoom {
+    0% {
+        transform: scale(0.75);
     }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.desk-graphics-teams {
+    display: flex;
+}
 </style>

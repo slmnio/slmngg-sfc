@@ -84,16 +84,16 @@ export default {
 </script>
 
 <style scoped>
-.btn-group >>> .btn-group-toggle:not(:first-child) .btn {
+.btn-group:deep(.btn-group-toggle:not(:first-child) .btn) {
     margin-left: -1px
 }
 
-.btn-group >>> .btn-group-toggle:not(:last-child):not(.dropdown-toggle) .btn {
+.btn-group:deep(.btn-group-toggle:not(:last-child):not(.dropdown-toggle) .btn) {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0
 }
 
-.btn-group >>> .btn-group-toggle:not(:first-child) .btn {
+.btn-group:deep(.btn-group-toggle:not(:first-child) .btn) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0
 }

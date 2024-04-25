@@ -57,7 +57,7 @@ export default {
 </script>
 
 <style scoped>
-    .standings >>> .team-name {
+    .standings:deep(.team-name) {
         color: inherit !important;
     }
 </style>

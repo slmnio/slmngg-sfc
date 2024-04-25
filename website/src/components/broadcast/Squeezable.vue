@@ -78,7 +78,7 @@ export default {
         flex-wrap: nowrap;
         overflow: hidden;
     }
-    .squeezable>*, .squeezable >>> > * {
+    .squeezable>*, .squeezable:deep(*) {
         width: fit-content;
         transform:
             scaleX(var(--content-scale, 1))

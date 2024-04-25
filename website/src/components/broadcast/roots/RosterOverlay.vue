@@ -243,7 +243,7 @@ export default {
     width: 1em;
     margin-right: .2em;
 }
-.player-role >>> i {
+.player-role:deep(i) {
      font-size: .75em;
  }
 

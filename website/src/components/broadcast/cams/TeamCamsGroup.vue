@@ -68,11 +68,11 @@ export default {
         margin: 0 2px;
         --caster-width: 375px;
     }
-    .guest >>> .caster-avatar {
+    .guest:deep(.caster-avatar) {
         transform: translate(0, 0);
     }
-    .guest >>> .caster-bg,
-    .guest >>> .caster-cam-wrapper {
+    .guest:deep(.caster-bg),
+    .guest:deep(.caster-cam-wrapper) {
         background-color: rgba(0,0,0,0.3)
     }
     .guest-name {

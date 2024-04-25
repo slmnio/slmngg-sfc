@@ -53,12 +53,12 @@ export default {
     padding-top: 60px;
 }
 
-.desk-match >>> .team-name,
-.desk-match >>> .match-vs,
-.desk-match >>> .team-logo-holder {
+.desk-match:deep(.team-name),
+.desk-match:deep(.match-vs),
+.desk-match:deep(.team-logo-holder) {
     height: 120px !important;
 }
-.part-map-display >>> .map-lower {
+.part-map-display:deep(.map-lower) {
     padding: 10px;
 }
 .part-desk-match.live-desk {

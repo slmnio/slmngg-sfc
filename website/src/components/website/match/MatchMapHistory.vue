@@ -25,7 +25,7 @@ export default {
 </script>
 
 <style scoped>
-    .team-map-stats:last-of-type >>> div {
+    .team-map-stats:last-of-type:deep(div)  {
         flex-direction: row-reverse;
     }
     .match-map-history.scheduled .map-name {

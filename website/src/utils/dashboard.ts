@@ -1,7 +1,6 @@
 import { getDataServerAddress } from "@/utils/fetch";
 import { Notyf } from "notyf";
 import { type AnyAirtableID, useAuthStore } from "@/stores/authStore";
-import { type MaybeRef, type MaybeRefOrGetter, toRef } from "vue";
 
 const notyf = new Notyf({ duration: 5000, position: { x: "right", y: "top" }, dismissible: true });
 
@@ -28,11 +27,20 @@ type RequestUrl = `actions/${ActionKey}`
 type NoRequestData = never
 type CreateLiveGuestData = NoRequestData
 
-interface ManagePredictionData {
+interface LockResolvePredictionData {
     predictionType: "match" | "map"
-    predictionAction: "create" | "lock" | "resolve" | "cancel"
+    predictionAction: "lock" | "resolve"
+}
+interface CreatePredictionData {
+    predictionAction: "create"
+    predictionType: "match" | "map"
     autoLockAfter: number
 }
+interface CancelPredictionData {
+    predictionAction: "cancel"
+}
+
+type ManagePredictionData = (CancelPredictionData | LockResolvePredictionData | CreatePredictionData)
 
 interface MultiMapWinData {
     teamNum: 1 | 2
@@ -44,8 +52,8 @@ interface ResolveEntireBracketData {
 }
 
 interface SetActiveBroadcastData {
-    broadcastID: AnyAirtableID
-    clientID: AnyAirtableID
+    broadcast: AnyAirtableID
+    client: AnyAirtableID
 }
 
 interface SetMatchOverlaysData {
@@ -56,18 +64,14 @@ interface SetMatchOverlaysData {
 
 interface SetObserverSettingData {
     setting: string
-    value: string
+    value: boolean | "toggle"
 }
 
-interface SetTitleData {
-    broadcastID: AnyAirtableID
-}
-
+type SetTitleData = NoRequestData;
 
 interface StartCommercialData {
     commercialDuration: 30 | 60 | 90 | 120 | 150 | 180
 }
-
 
 type ToggleFlipTeamsData = NoRequestData
 
@@ -156,35 +160,34 @@ interface UpdateProfileDataData {
         role?: "DPS" | "Support" | "Tank" | "Flex"
         favourite_hero?: AnyAirtableID
         profile_picture_theme?: AnyAirtableID
+        pronunciation?: string
     }
 }
 
 
 type ActionRequestData<U> =
     U extends "actions/create-live-guest" ? CreateLiveGuestData :
-        U extends "actions/manage-prediction" ? ManagePredictionData :
-            U extends "actions/multi-map-win" ? MultiMapWinData :
-                U extends "actions/resolve-entire-bracket" ? ResolveEntireBracketData :
-                    U extends "actions/set-active-broadcast" ? SetActiveBroadcastData :
-                        U extends "actions/set-match-overlays" ? SetMatchOverlaysData :
-                            U extends "actions/set-observer-setting" ? SetObserverSettingData :
-                                U extends "actions/set-title" ? SetTitleData :
-                                    U extends "actions/start-commercial" ? StartCommercialData :
-                                        U extends "actions/toggle-flip-teams" ? ToggleFlipTeamsData :
-                                            U extends "actions/update-break-automation" ? UpdateBreakAutomationData :
-                                                U extends "actions/update-break-display" ? UpdateBreakDisplayData :
-                                                    U extends "actions/update-broadcast" ? UpdateBroadcastData :
-                                                        U extends "actions/update-gfx-index" ? UpdateGfxIndexData :
-                                                            U extends "actions/update-map-data" ? UpdateMapDataData :
-                                                                U extends "actions/update-match-data" ? UpdateMatchDataData :
-                                                                    U extends "actions/update-profile-data" ? UpdateProfileDataData :
-                                                                        any;
+    U extends "actions/manage-prediction" ? ManagePredictionData :
+    U extends "actions/multi-map-win" ? MultiMapWinData :
+    U extends "actions/resolve-entire-bracket" ? ResolveEntireBracketData :
+    U extends "actions/set-active-broadcast" ? SetActiveBroadcastData :
+    U extends "actions/set-match-overlays" ? SetMatchOverlaysData :
+    U extends "actions/set-observer-setting" ? SetObserverSettingData :
+    U extends "actions/set-title" ? SetTitleData :
+    U extends "actions/start-commercial" ? StartCommercialData :
+    U extends "actions/toggle-flip-teams" ? ToggleFlipTeamsData :
+    U extends "actions/update-break-automation" ? UpdateBreakAutomationData :
+    U extends "actions/update-break-display" ? UpdateBreakDisplayData :
+    U extends "actions/update-broadcast" ? UpdateBroadcastData :
+    U extends "actions/update-gfx-index" ? UpdateGfxIndexData :
+    U extends "actions/update-map-data" ? UpdateMapDataData :
+    U extends "actions/update-match-data" ? UpdateMatchDataData :
+    U extends "actions/update-profile-data" ? UpdateProfileDataData :
+    any;
 
 
-export async function authenticatedRequest<U extends RequestUrl>(url: U, data: ActionRequestData<U>, processing?: MaybeRef<boolean>) {
+export async function authenticatedRequest<U extends RequestUrl>(url: U, data?: ActionRequestData<U>) {
     const auth = useAuthStore();
-    const processingRef = toRef(processing);
-    if (processingRef.value) processingRef.value = true;
 
     if ((auth?.user) == null) {
         notyf.error("Not authenticated");
@@ -201,8 +204,8 @@ export async function authenticatedRequest<U extends RequestUrl>(url: U, data: A
                 "Content-Type": "application/json",
                 Authentication: `Bearer ${token}`
             },
-            body: JSON.stringify(data)
-        }).then(async res => await res.json()).catch(error => {
+            body: JSON.stringify(data ?? {})
+        }).then(async res => await res.json()).catch((error: Error) => {
             notyf.error({ message: `Request error: ${error.message}` });
             console.error("Fetch error", error);
         });
@@ -213,104 +216,8 @@ export async function authenticatedRequest<U extends RequestUrl>(url: U, data: A
             });
         }
         return request;
-    } catch (e) {
+    } catch (e: any) {
         console.error(e);
         return { error: true, errorMessage: e.errorMessage };
-    } finally {
-        if (processingRef.value) processingRef.value = false;
     }
-}
-
-export async function setActiveBroadcast(client, broadcast) {
-    return await authenticatedRequest("actions/set-active-broadcast", {
-        client: client.id || client, broadcast: broadcast.id || broadcast
-    });
-}
-
-export async function updateProfileData(profileData) {
-    return await authenticatedRequest("actions/update-profile-data", {
-        profileData
-    });
-}
-
-export async function updateMatchData(match, updatedData) {
-    return await authenticatedRequest("actions/update-match-data", {
-        matchID: match.id,
-        updatedData
-    });
-}
-
-export async function managePred(client, predictionAction, predictionType) {
-    return await authenticatedRequest("actions/manage-prediction", {
-        client: client.id || client,
-        predictionAction,
-        predictionType,
-        autoLockAfter: predictionType === "map" ? 180 : 300
-    });
-}
-
-export async function startCommercial(client, commercialDuration) {
-    return await authenticatedRequest("actions/start-commercial", {
-        client: client.id || client,
-        commercialDuration
-    });
-}
-
-export async function updateAutomaticTitle(client) {
-    return await authenticatedRequest("actions/set-title", {
-        client: client.id || client
-    });
-}
-
-export async function updateMapData(match, mapData) {
-    return await authenticatedRequest("actions/update-map-data", {
-        matchID: match.id,
-        mapData
-    });
-}
-
-export async function toggleFlipTeams() {
-    return await authenticatedRequest("actions/toggle-flip-teams");
-}
-
-export async function updateBroadcastData(data) {
-    return await authenticatedRequest("actions/update-broadcast", data);
-}
-
-export async function setMatchOverlayState(matchID, overlayType, state) {
-    return await authenticatedRequest("actions/set-match-overlays", {
-        match: matchID,
-        overlayType,
-        state
-    });
-}
-
-export async function resolveEntireBracket(bracketID) {
-    return await authenticatedRequest("actions/resolve-entire-bracket", {
-        bracketID
-    });
-}
-
-export async function setObserverSetting(setting, value) {
-    return await authenticatedRequest("actions/set-observer-setting", {
-        setting, value
-    });
-}
-
-export async function updateBreakAutomation(options) {
-    return await authenticatedRequest("actions/update-break-automation", {
-        options
-    });
-}
-
-export async function updateBreakDisplay(option) {
-    return await authenticatedRequest("actions/update-break-display", {
-        option
-    });
-}
-
-export async function updateGfxIndex(gfxID, index) {
-    return await authenticatedRequest("actions/update-gfx-index", {
-        gfxID, index
-    });
 }

@@ -38,7 +38,7 @@
     </div>
 </template>
 <script>
-import { updateGfxIndex } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "GFXController",
@@ -59,7 +59,10 @@ export default {
         async setGfxIndex(id, num) {
             this.processing = true;
             try {
-                await updateGfxIndex(id, num);
+                await authenticatedRequest("actions/update-gfx-index", {
+                    gfxID: id,
+                    index: num
+                });
             } finally {
                 this.processing = false;
             }

@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { updateBreakDisplay } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "BreakDisplayTab",
@@ -62,7 +62,9 @@ export default {
             this.selected = option;
             this.processing = true;
             try {
-                const response = await updateBreakDisplay(this.selected);
+                const response = await authenticatedRequest("actions/update-break-display", {
+                    option: this.selected
+                });
                 if (!response.error) {
                     this.$notyf.success(`Break display set to ${this.selected}`);
                 }

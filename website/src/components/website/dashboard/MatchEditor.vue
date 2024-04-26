@@ -86,7 +86,7 @@
                                 <div class="form-top text-center">
                                     Draw
                                 </div>
-                                <div class="form-bottom d-flex">
+                                <div class="form-bottom d-flex draw-checkbox-wrapper">
                                     <b-form-checkbox button :button-variant="draws[i] ? 'primary' : 'light'"
                                                      class="draw-checkbox" v-model="draws[i]">
                                         <i v-if="draws[i]" class="fas fa-check fa-fw"></i>
@@ -161,7 +161,7 @@
 </template>
 
 <script>
-import { authenticatedRequest, updateMapData, updateMatchData } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 import ThemeLogo from "@/components/website/ThemeLogo";
 import ContentThing from "@/components/website/ContentThing";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
@@ -513,7 +513,10 @@ export default {
             const obj = {};
             obj[key] = val;
 
-            const response = await updateMatchData(this.match, obj);
+            const response = await authenticatedRequest("actions/update-match-data", {
+                matchID: this.match.id,
+                updatedData: obj
+            });
             // if (response.error) this.errorMessage = response.errorMessage;
             console.log(response);
             this.processing[key] = false;
@@ -522,7 +525,10 @@ export default {
         },
         async saveMatchDetails() {
             this.processing.details = true;
-            const response = await updateMatchData(this.match, this.matchData);
+            const response = await authenticatedRequest("actions/update-match-data", {
+                matchID: this.match.id,
+                updatedData: this.matchData
+            });
             console.log(response);
             if (!response.error) {
                 this.$notyf.success({
@@ -568,7 +574,10 @@ export default {
 
             await this.sendScoresIfDifferent();
 
-            const response = await updateMapData(this.match, this.editedMapData);
+            const response = await authenticatedRequest("actions/update-map-data", {
+                matchID: this.match.id,
+                mapData: this.editedMapData
+            });
             // if (response.error) this.errorMessage = response.errorMessage;
             console.log(response);
             this.processing.map = false;
@@ -719,5 +728,9 @@ export default {
 
     ::placeholder {
         color: rgba(0,0,0,0.4);
+    }
+
+    .draw-checkbox-wrapper:deep(.btn-light) {
+        color: rgba(0,0,0,0.25);
     }
 </style>

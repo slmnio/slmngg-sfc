@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { updateBroadcastData } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";
 import Countdown from "@/components/broadcast/Countdown.vue";
 
@@ -85,15 +85,15 @@ export default {
     methods: {
         async setManualCountdownEnd(dateString) {
             this.manualProcessing = true;
-            return this.setCountdownEnd((new Date(dateString)).getTime());
+            return await this.setCountdownEnd((new Date(dateString)).getTime());
         },
         async setCountdownFromNow(seconds) {
-            return this.setCountdownEnd(Date.now() + (seconds * 1000));
+            return await this.setCountdownEnd(Date.now() + (seconds * 1000));
         },
         async setCountdownEnd(date) {
             this.processing = true;
             try {
-                await updateBroadcastData({
+                await authenticatedRequest("actions/update-broadcast", {
                     countdownEnd: date
                 });
             } catch (e) {

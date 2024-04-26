@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { updateBroadcastData } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "DeskTextEditor",
@@ -127,7 +127,7 @@ export default {
             }
 
             try {
-                const response = await updateBroadcastData(data);
+                const response = await authenticatedRequest("actions/update-broadcast", data);
                 if (!response.error) {
                     this.$notyf.success("Updated desk display");
                 }

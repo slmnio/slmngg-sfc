@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { startCommercial } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "Commercials",
@@ -26,7 +26,9 @@ export default {
         async commercial(commercialDuration) {
             this.processing = true;
             try {
-                await startCommercial("self", commercialDuration);
+                await authenticatedRequest("actions/start-commercial", {
+                    commercialDuration
+                });
             } finally {
                 this.processing = false;
             }

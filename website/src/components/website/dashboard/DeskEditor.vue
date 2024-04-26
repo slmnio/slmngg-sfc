@@ -76,7 +76,7 @@
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { createGuestObject, getGuestString } from "@/utils/content-utils";
-import { updateBroadcastData } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "DeskEditor",
@@ -118,7 +118,7 @@ export default {
         },
         confirmRemoveGuest(i) {
             if (this.manualGuests?.[i]?.name) {
-                const okay = window.confirm(`Remove guest "${this.manualGuests?.[i]?.name}"?`) === true;
+                const okay = window.confirm(`Remove guest "${this.manualGuests?.[i]?.name}"?`);
                 if (!okay) return;
             }
             this.manualGuests.splice(i, 1);
@@ -128,7 +128,7 @@ export default {
             this.lastSavedData = this.saveData;
 
             try {
-                const response = await updateBroadcastData({
+                const response = await authenticatedRequest("actions/update-broadcast", {
                     manualGuests: this.saveData
                 });
                 if (!response.error) {

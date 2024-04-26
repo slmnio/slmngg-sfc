@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { updateBroadcastData } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 import { unescapeText } from "@/utils/content-utils";
 
 export default {
@@ -44,7 +44,7 @@ export default {
                     title: this.breakTitle
                 };
 
-                const response = await updateBroadcastData(data);
+                const response = await authenticatedRequest("actions/update-broadcast", data);
                 if (!response.error) {
                     this.$notyf.success(`Break title set to ${data.title}`);
                 }

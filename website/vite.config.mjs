@@ -24,5 +24,10 @@ export default defineConfig(({ mode }) => ({
     },
     define: {
         __VUE_PROD_DEVTOOLS__: ["local", "staging"].includes(mode)
+    },
+    esbuild: {
+        supported: {
+            "top-level-await": true
+        }
     }
 }));

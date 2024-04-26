@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { updateBreakAutomation } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "BreakAutomationTab",
@@ -101,7 +101,9 @@ export default {
         async saveOptions() {
             this.processing = true;
             try {
-                const response = await updateBreakAutomation(this.chosenOptions);
+                const response = await authenticatedRequest("actions/update-break-automation", {
+                    options: this.chosenOptions
+                });
                 if (!response.error) {
                     this.$notyf.success("Break automation updated");
                 }

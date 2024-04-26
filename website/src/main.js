@@ -93,7 +93,7 @@ const app = createApp({
     }
 });
 
-const { router } = await createRouter(app, subID, subdomain);
+const { router } = createRouter(app, subID, subdomain);
 
 app.use(store);
 

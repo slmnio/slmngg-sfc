@@ -1,4 +1,4 @@
-import {fetchThings} from "@/utils/fetch";
+import { fetchThings } from "@/utils/fetch";
 
 export async function getSubdomain() {
     const host = window.location.hostname;
@@ -9,7 +9,7 @@ export async function getSubdomain() {
 
     let subdomain: string | null = null;
 
-    for (const {r} of domains) {
+    for (const { r } of domains) {
         const result = host.match(r);
         if (result && result[1] && !["dev", "live"].includes(result[1])) {
             if (result[1].endsWith(".dev")) {
@@ -24,7 +24,7 @@ export async function getSubdomain() {
 
     if (!subdomain) {
         console.log("[subdomain]", "no subdomain, using default routes");
-        return {subdomain: null, subID: null}
+        return { subdomain: null, subID: null };
     }
 
 
@@ -34,7 +34,7 @@ export async function getSubdomain() {
 
     if (!data || !data[0] || !data[0].id) {
         console.log("[subdomain]", "no valid minisite");
-        return {subdomain: null, subID: null}
+        return { subdomain: null, subID: null };
     }
 
     let subID;
@@ -45,6 +45,5 @@ export async function getSubdomain() {
 
     return {
         subdomain, subID
-    }
-
+    };
 }

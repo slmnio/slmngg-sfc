@@ -71,10 +71,7 @@
 </template>
 
 <script>
-import {
-    toggleFlipTeams,
-    updateBroadcastData
-} from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 import ObserverSettingsModal from "@/components/website/dashboard/ObserverSettingsModal.vue";
 import BreakDisplayMultiModal from "@/components/website/dashboard/BreakDisplayMultiModal.vue";
 
@@ -99,30 +96,30 @@ export default {
     },
     methods: {
         async toggleFlipTeams(state) {
-            await toggleFlipTeams();
+            await authenticatedRequest("actions/toggle-flip-teams");
         },
         async advertiseBroadcast(state) {
             this.updateData.advertise = state;
-            return this.updateBroadcast();
+            return await this.updateBroadcast();
         },
         async togglePlayerCams(state) {
             this.updateData.playerCams = state;
-            return this.updateBroadcast();
+            return await this.updateBroadcast();
         },
         async setAttack(side) {
             const set = side === this.broadcast.map_attack ? null : side;
             this.updateData.mapAttack = set;
-            return this.updateBroadcast();
+            return await this.updateBroadcast();
         },
         async setLiveMatchVisibility(visible) {
             this.updateData.showLiveMatch = visible;
-            return this.updateBroadcast();
+            return await this.updateBroadcast();
         },
         async updateBroadcast() {
             if (this.broadcastUpdateTimeout) clearTimeout(this.broadcastUpdateTimeout);
 
             // this.broadcastUpdateTimeout = setTimeout(async () => {
-            await updateBroadcastData(this.updateData);
+            await authenticatedRequest("actions/update-broadcast", this.updateData);
             this.updateData = {};
             // }, 500);
         }

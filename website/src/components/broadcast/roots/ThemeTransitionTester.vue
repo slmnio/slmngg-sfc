@@ -2,14 +2,14 @@
     <div class="theme-transition-tester">
         <div class="lower-third-area flex-column">
             <div><ThemeTransition class="lower-third" :active="active" :theme="theme" start="left" end="left"
-                                  start-inner-full="true" :duration="500" :inner-delay="250" :trigger-duration="1000" :trigger="true">
+                                  start-inner-full :duration="500" :inner-delay="250" :trigger-duration="1000" :trigger="true">
                 <div class="lower-third-text">Signups open now! (inner start)</div>
             </ThemeTransition></div>
 
             <div><ThemeTransition class="lower-third" :active="active" :theme="theme">
                 <div class="lower-third-text">Signups open now! (R)</div>
             </ThemeTransition></div>
-            <div><ThemeTransition class="lower-third" :active="active" :theme="theme" left="true">
+            <div><ThemeTransition class="lower-third" :active="active" :theme="theme" left>
                 <div class="lower-third-text">Signups open now! (L)</div>
             </ThemeTransition></div>
             <div><ThemeTransition class="lower-third" :active="active" :theme="theme" start="middle" end="middle">

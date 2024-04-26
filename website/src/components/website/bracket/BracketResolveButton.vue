@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { resolveEntireBracket } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 import { canEditMatch } from "@/utils/client-action-permissions";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { useAuthStore } from "@/stores/authStore";
@@ -44,7 +44,9 @@ export default {
             this.isResolving = true;
             console.log(bracket);
             try {
-                const { data } = await resolveEntireBracket(bracket.id);
+                const { data } = await authenticatedRequest("actions/resolve-entire-bracket", {
+                    bracketID: bracket.id
+                });
                 console.log(data);
                 this.$notyf[data.hasError ? "error" : "success"](data.message);
             } finally {

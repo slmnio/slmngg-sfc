@@ -41,7 +41,7 @@
 
 <script>
 import { formatTime, url } from "@/utils/content-utils";
-import { setMatchOverlayState, updateBroadcastData } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 import { logoBackground } from "@/utils/theme-styles";
 import { resizedImage } from "@/utils/images";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -65,12 +65,16 @@ export default {
     methods: {
         url,
         async setLiveMatch(state) {
-            await updateBroadcastData({
+            await authenticatedRequest("actions/update-broadcast", {
                 match: state ? this.match.id : null
             });
         },
         async setShow(overlayType, state) {
-            await setMatchOverlayState(this.match.id, overlayType, state);
+            await authenticatedRequest("actions/set-match-overlays", {
+                match: this.match.id,
+                overlayType,
+                state
+            });
         },
         getTheme(team) {
             if (!team?.theme) return {};

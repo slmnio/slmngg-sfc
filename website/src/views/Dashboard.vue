@@ -79,7 +79,7 @@ import { url } from "@/utils/content-utils";
 import BroadcastSwitcher from "@/components/website/dashboard/BroadcastSwitcher";
 import MatchThumbnail from "@/components/website/match/MatchThumbnail";
 import MatchEditor from "@/components/website/dashboard/MatchEditor";
-import { updateAutomaticTitle } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 import Predictions from "@/components/website/dashboard/Predictions";
 import CommsControls from "@/components/website/dashboard/CommsControls";
 import Commercials from "@/components/website/dashboard/Commercials";
@@ -226,7 +226,7 @@ export default {
         async updateTitle() {
             this.titleProcessing = true;
             try {
-                const response = await updateAutomaticTitle("self", "create");
+                const response = await authenticatedRequest("actions/set-title");
                 if (response.error) return; // handled by internal
                 this.$notyf.success({
                     message: response.data,

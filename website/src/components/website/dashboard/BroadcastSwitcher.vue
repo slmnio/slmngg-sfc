@@ -30,7 +30,7 @@
 
 <script>
 import BroadcastDisplay from "@/components/website/dashboard/BroadcastDisplay";
-import { authenticatedRequest, setActiveBroadcast } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 export default {
     name: "BroadcastSwitcher",
     components: { BroadcastDisplay },

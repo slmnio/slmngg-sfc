@@ -40,6 +40,9 @@ module.exports = {
         "vue/multi-word-component-names": "off",
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/space-before-function-paren": "off",
-        "@typescript-eslint/strict-boolean-expressions": "off"
+        "@typescript-eslint/strict-boolean-expressions": "off",
+        "@typescript-eslint/return-await": "off",
+        "@typescript-eslint/restrict-template-expressions": "warn",
+        "vue/block-lang": "warn"
     }
 };

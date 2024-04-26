@@ -57,12 +57,11 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { authenticatedRequest, updateProfileData } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 import { resizedImage } from "@/utils/images";
 import { cleanID, getAssociatedThemeOptions, url } from "@/utils/content-utils";
 import { logoBackground } from "@/utils/theme-styles";
 import { mapWritableState } from "pinia";
-import { useSettingsStore } from "@/stores/settingsStore";
 import { useAuthStore } from "@/stores/authStore";
 
 export default {

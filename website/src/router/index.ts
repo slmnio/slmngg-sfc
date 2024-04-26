@@ -1,4 +1,4 @@
-import { createRouter as _createRouter, createWebHistory } from 'vue-router'
+import { createRouter as _createRouter, createWebHistory } from "vue-router";
 import defaultRoutes from "@/router/default";
 import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp.vue";
 import Event from "@/views/Event.vue";
@@ -6,12 +6,11 @@ import EventRoutes from "@/router/event";
 import SharedRoutes from "@/router/shared-routes";
 import NotFoundContent from "@/views/sub-views/NotFoundContent.vue";
 import AuthRedirects from "@/router/auth-redirects";
-import type {App} from "vue";
+import type { App } from "vue";
 
 
-export async function createRouter(app: App, subID?: string, subdomain?: string) {
-
-    console.log({subID, subdomain})
+export function createRouter(app: App, subID?: string, subdomain?: string) {
+    console.log({ subID, subdomain });
 
     if (!subdomain || !subID) {
         return {
@@ -19,7 +18,7 @@ export async function createRouter(app: App, subID?: string, subdomain?: string)
                 history: createWebHistory(import.meta.env.BASE_URL),
                 routes: [
                     ...defaultRoutes,
-                    ...AuthRedirects(app),
+                    ...AuthRedirects(app)
                 ]
             }),
             subdomain: null
@@ -47,7 +46,7 @@ export async function createRouter(app: App, subID?: string, subdomain?: string)
                         },
                         ...SharedRoutes,
                         ...AuthRedirects(app),
-                        { path: '/:pathMatch(.*)*', component: NotFoundContent }
+                        { path: "/:pathMatch(.*)*", component: NotFoundContent }
                     ]
                 }
             ]

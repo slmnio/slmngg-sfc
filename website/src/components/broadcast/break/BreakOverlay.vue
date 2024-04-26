@@ -135,7 +135,7 @@ export default {
         },
         nextMatch() {
             if (this.virtualMatch) return this.virtualMatch;
-            if (!this.broadcast || !this.broadcast.live_match || !this.broadcast.show_live_match) return null;
+            if (!this.broadcast?.live_match || !this.broadcast.show_live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -144,7 +144,7 @@ export default {
         },
         fullSchedule() {
             if (this.virtualMatch) return [this.virtualMatch];
-            if (!this.broadcast || !this.broadcast.schedule) return null;
+            if (!this.broadcast?.schedule) return null;
             return ReactiveArray("schedule", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -152,13 +152,13 @@ export default {
             })(this.broadcast).sort(sortMatches);
         },
         schedule() {
-            if (!this.broadcast || !this.broadcast.schedule || !this.fullSchedule) return null;
+            if (!this.broadcast?.schedule || !this.fullSchedule) return null;
             return this.fullSchedule.filter(m => {
                 return this.secondary ? m.show_on_secondary_overlays : m.show_on_overlays;
             }).sort(sortMatches);
         },
         event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
+            if (!this.broadcast?.event) return null;
             const event = ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
@@ -182,19 +182,19 @@ export default {
             return event;
         },
         sponsorThemes() {
-            if (!this.broadcast || !this.broadcast.sponsors) return null;
+            if (!this.broadcast?.sponsors) return null;
             return ReactiveArray("sponsors", {
                 theme: ReactiveThing("theme")
             })(this.broadcast);
         },
         eventBorder() {
-            if (!this.event || !this.event.theme) return null;
+            if (!this.event?.theme) return null;
             return {
                 borderColor: this.event.theme.color_theme
             };
         },
         breakDisplay() {
-            if (!this.broadcast || !this.broadcast.break_display) return null;
+            if (!this.broadcast?.break_display) return null;
             return this.broadcast.break_display;
         },
         bracketKey() {

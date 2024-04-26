@@ -51,8 +51,8 @@
 import Match from "@/components/website/match/Match";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
-import { formatTime, url } from "../../utils/content-utils";
-import { useSettingsStore } from "../../stores/settingsStore";
+import { formatTime, url } from "@/utils/content-utils";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "PlayerCasts",

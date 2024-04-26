@@ -26,7 +26,7 @@ export default {
             return this.broadcast?.broadcast_settings?.includes("Disable team cams");
         },
         match() {
-            if (!this.broadcast || !this.broadcast.live_match) return null;
+            if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -37,7 +37,7 @@ export default {
             return this.broadcast?.cams_relay_prefix;
         },
         teams() {
-            if (!this.match || !this.match.teams || !this.match.teams.every(t => {
+            if (!this.match?.teams?.every(t => {
                 if (t.theme === undefined && t.has_theme === 0) return true;
                 return t.theme && !t.theme.__loading && t.theme.id;
             })) return [];

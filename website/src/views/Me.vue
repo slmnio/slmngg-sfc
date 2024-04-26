@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { isAuthenticated } from "@/utils/auth"; import LoadingIcon from "@/components/website/LoadingIcon";
+import LoadingIcon from "@/components/website/LoadingIcon";
 import { useAuthStore } from "@/stores/authStore";
 
 export default {

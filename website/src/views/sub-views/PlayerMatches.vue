@@ -61,7 +61,7 @@
 import Match from "@/components/website/match/Match";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
-import { formatTime, url } from "../../utils/content-utils";
+import { formatTime, url } from "@/utils/content-utils";
 
 export default {
     name: "PlayerMatches",
@@ -148,9 +148,11 @@ export default {
             });
             Object.entries(groups).forEach(([key, val]) => {
                 if (val.items.length === 0) {
+                    // TODO: no-dynamic-delete fix
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete groups[key];
                 }
-                if (groups[key] && groups[key].items) groups[key].items = groups[key].items.sort((a, b) => sortMatches(a.item, b.item));
+                if (groups[key]?.items) groups[key].items = groups[key].items.sort((a, b) => sortMatches(a.item, b.item));
             });
             return groups;
         }

@@ -62,7 +62,7 @@
                         @click="() => showWhen(team.code, posi)"
                         :class="{ 'bg-info selected': manualScenarioFilters.find((f) => f.team === team.code && f.position === posi ), 'bg-warning text-dark': pos !== 0 && pos === currentScenarioView.length, 'text-muted': pos === 0 }"
                     >
-                        <span v-if="showCountsAsPercentages">{{ (pos / currentScenarioView.length) | perc }}</span>
+                        <span v-if="showCountsAsPercentages">{{ perc(pos / currentScenarioView.length) }}</span>
                         <span v-else>{{ pos }}</span>
                     </td>
                 </tr>
@@ -404,7 +404,7 @@ export default {
             try {
                 if (this.matchGroupData?.sort) return this.matchGroupData.sort;
                 const sorters = this.blocks.standingsSort;
-                if (sorters && sorters.length) {
+                if (sorters?.length) {
                     const sorter = sorters.find(s => s.group === this.activeMatchGroup);
                     return sorter?.sort;
                 }
@@ -642,15 +642,11 @@ export default {
             };
         }
     },
-    filters: {
+    methods: {
         perc(x) {
-            // console.log(this);
             if (isNaN(x)) return "-";
             return (x * 100).toFixed(1) + "%";
-            // console.log(x, this.currentScenarioView.length);
-        }
-    },
-    methods: {
+        },
         sign(num) {
             if (num > 0) return "+" + num;
             return num;

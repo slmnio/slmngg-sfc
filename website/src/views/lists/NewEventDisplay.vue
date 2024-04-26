@@ -28,7 +28,7 @@ export default {
     data: () => ({ useRawTag: false }),
     computed: {
         blockTheme() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 backgroundColor: this.event.theme.color_logo_background || this.event.theme.color_theme,
                 borderColor: this.event.theme.color_logo_accent || this.event.theme.color_text_on_theme,
@@ -36,7 +36,7 @@ export default {
             };
         },
         blockLogo() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return resizedImage(this.event.theme, ["default_logo"], "h-50");
         }
     }

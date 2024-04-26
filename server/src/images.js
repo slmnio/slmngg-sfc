@@ -144,10 +144,10 @@ async function fullGetURL(attachment, sizeText, sizeData) {
     return await getImage(filename, sizeText);
 }
 
-module.exports = ({ app, cors, Cache, corsHandle }) => {
+module.exports = ({ app, cors, Cache }) => {
 
-    ensureFolder("").then(r => console.log("[images] images folder ensured"));
-    ensureFolder("orig").then(r => console.log("[images] orig folder ensured"));
+    ensureFolder("").then(() => console.log("[images] images folder ensured"));
+    ensureFolder("orig").then(() => console.log("[images] orig folder ensured"));
 
     async function handleImageRequests(req, res) {
 

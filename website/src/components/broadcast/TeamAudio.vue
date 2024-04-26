@@ -97,9 +97,13 @@ export default {
                 if (Date.now() - time > 10000) {
                     console.log("garbage collecting", user);
                     this.players[user].destroy();
+                    // TODO: fix these
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete this.players[user];
                     this.decoders[user].free();
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete this.decoders[user];
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete this.lastPacketTime[user];
                 }
             }

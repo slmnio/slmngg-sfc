@@ -188,7 +188,6 @@ export default {
                             // console.log("match pred lost");
                             scenario.impossible = true;
                         }
-                    } else {
                     }
                     match.winner = match.teams[bits[mi]];
                     match.loser = match.teams[+!bits[mi]];
@@ -310,6 +309,7 @@ export default {
                         counts: sortedCounts
                     };
                 }
+                return null;
             });
         }
     },

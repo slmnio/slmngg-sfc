@@ -260,8 +260,7 @@ export default {
         playerTeams() {
             if (!this.player?.member_of) return [];
             return this.player.member_of.filter(t => {
-                if (!t) return;
-                if (!t.event) return;
+                if (!t?.event) return false;
                 if (t.minor_team) return false;
                 if (!t.ranking_sort) return false;
                 return true;

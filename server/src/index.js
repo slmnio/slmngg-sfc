@@ -203,10 +203,10 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("tally_change", ({ clientName, state, number, data }) => {
+    socket.on("tally_change", ({ clientName, state, data }) => {
         clientName = clientName.toLowerCase();
-        console.log("[tally]", clientName, state, number, data);
-        socket.to(`prod:client-${clientName}`).emit("tally_change", { state, number });
+        console.log("[tally]", clientName, state, data);
+        socket.to(`prod:client-${clientName}`).emit("tally_change", { state });
     });
 
     socket.on("media_update", (status, value) => {

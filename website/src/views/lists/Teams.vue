@@ -69,6 +69,7 @@ export default {
                 }
                 if (a.eventStart) return -1;
                 if (b.eventStart) return 1;
+                return 0;
             }).reverse()?.map(e => e.eventID);
 
             // return this.events

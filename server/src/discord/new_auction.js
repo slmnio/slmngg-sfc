@@ -465,7 +465,7 @@ client.on("messageCreate", async message => {
         }
     ];
     let c = commands.find(c => c.aliases.some(a => a.toLowerCase() === command.toLowerCase()));
-    if (c) c.execute(args, message);
+    if (c) await c.execute(args, message);
 });
 
 module.exports = (_io) => {

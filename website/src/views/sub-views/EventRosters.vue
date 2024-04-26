@@ -18,7 +18,7 @@ export default {
     components: { ContentRow, ContentThing },
     computed: {
         teams() {
-            if (!this.event || !this.event.teams) return [];
+            if (!this.event?.teams) return [];
             return ReactiveArray("teams", {
                 theme: ReactiveThing("theme"),
                 players: ReactiveArray("players")

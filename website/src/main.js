@@ -16,7 +16,6 @@ import { Notyf } from "notyf";
 import "notyf/notyf.min.css";
 
 import { getDataServerAddress } from "@/utils/fetch";
-import { ReactiveRoot } from "@/utils/reactive";
 import { createRouter } from "@/router";
 
 import socketMixin from "@/socket-client";
@@ -76,7 +75,7 @@ const app = createApp({
         const auth = useAuthStore();
         if (auth.token) {
             console.log("Token in storage, authenticating");
-            auth.authenticateWithToken(auth.token);
+            await auth.authenticateWithToken(auth.token);
         }
     },
     computed: {
@@ -85,10 +84,6 @@ const app = createApp({
         },
         version() {
             return import.meta.env?.VITE_SLMNGG_VERSION;
-        },
-        authUser() {
-            if (!this.auth.user?.airtableID) return null;
-            return ReactiveRoot(this.auth.user.airtableID);
         }
     }
 });
@@ -137,14 +132,6 @@ app.component("v-style", {
     }
 });
 
-
-// TODO: add other domain support here
-
-
-const preloadAuthCheckRequired = false;
-const preloadAuthReturn = null;
-
-// TODO: this doesn't really work very well nor work on the first run
 router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore();
 

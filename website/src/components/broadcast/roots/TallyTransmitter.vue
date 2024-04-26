@@ -63,8 +63,7 @@ export default {
         transmit() {
             socket.emit("tally_change", {
                 clientName: this.observer,
-                state: this.state,
-                number: this.number
+                state: this.state
             });
         },
         async connectWs() {

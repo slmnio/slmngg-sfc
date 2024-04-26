@@ -1,4 +1,4 @@
-import { getDataServerAddress, getMainCookieDomain, getMainDomain } from "@/utils/fetch";
+import { getDataServerAddress, getMainDomain } from "@/utils/fetch";
 
 
 export function isOnMainDomain() {

@@ -2,7 +2,7 @@
     <div class="broadcast-preview flex-center flex-column" v-if="broadcast.stream_link">
         <div class="broadcast-frame-holder ratio ratio-16x9">
             <iframe v-if="broadcast.stream_preview && delayedEnough" class="broadcast-frame"
-                    :src="broadcast.stream_preview" frameborder="0"></iframe>
+                    :src="broadcast.stream_preview"></iframe>
         </div>
         <div class="broadcast-link" v-html="link"></div>
     </div>

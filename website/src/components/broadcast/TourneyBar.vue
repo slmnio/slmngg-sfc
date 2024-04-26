@@ -27,8 +27,8 @@ export default {
     computed: {
         _theme() {
             if (this.theme) return this.theme;
-            if (this.event && this.event.theme) return this.event.theme;
-            if (this.broadcast && this.broadcast.event && this.broadcast.event.theme) return this.broadcast.event.theme;
+            if (this.event?.theme) return this.event.theme;
+            if (this.broadcast?.event?.theme) return this.broadcast.event.theme;
             return null;
         },
         gradient() {

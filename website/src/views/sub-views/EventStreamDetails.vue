@@ -74,7 +74,7 @@ export default {
                     codes.add(match.stream_code);
                 }
             });
-            return [...codes.values()].filter(code => !["Off", "Total"].includes(code)).sort();
+            return [...codes.values()].filter(code => !["Off", "Total"].includes(code)).sort((a, b) => a.localeCompare(b));
         },
         teams() {
             return ReactiveArray("teams", {
@@ -125,6 +125,8 @@ export default {
                 if ((a.counts.A || 0) < (b.counts.A || 0)) return 1;
                 if ((a.counts.B || 0) > (b.counts.B || 0)) return -1;
                 if ((a.counts.B || 0) < (b.counts.B || 0)) return 1;
+
+                return 0;
             });
         }
     }

@@ -37,7 +37,7 @@ export default {
     }),
     computed: {
         event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
+            if (!this.broadcast?.event) return null;
             return ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme")
             });
@@ -52,29 +52,29 @@ export default {
             })?.schedule || []).filter(m => m.show_on_overlays);
         },
         eventIcon() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return resizedImage(this.event.theme, ["default_wordmark", "default_logo", "small_logo"], "orig");
         },
         thumbnailBackground() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 backgroundColor: this.event.theme.color_logo_background
             };
         },
         gradient() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 backgroundImage: `linear-gradient(0deg, ${this.event.theme.color_logo_accent},transparent)`
             };
         },
         lowerBar() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 backgroundColor: this.event.theme.color_alt
             };
         },
         textColor() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 color: this.event.theme.color_text_on_logo_background || this.event.theme.color_text_on_theme
             };

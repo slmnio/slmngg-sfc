@@ -138,7 +138,7 @@ export default {
             return [this.match.score_1, this.match.score_2];
         },
         scoreText() {
-            if (this.scores && this.scores.some(s => !!s)) return this.scores.join("-");
+            if (this.scores?.some(s => !!s)) return this.scores.join("-");
             return "vs";
         },
         centerBorder() {

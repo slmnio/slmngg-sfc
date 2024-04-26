@@ -25,7 +25,7 @@
                                     <div class="player-role-holder player-icon-holder flex-center" v-if="player.role">
                                         <div class="player-role" v-html="getRoleSVG(player.role)"></div>
                                     </div>
-                                    <div :is="player.limited ? 'div' : 'router-link'" class="ct-active" :to="url('player', player)">{{ player.name }} </div>
+                                    <component :is="player.limited ? 'div' : 'router-link'" class="ct-active" :to="url('player', player)">{{ player.name }} </component>
                                     <span v-if="showCastingInfo && player.pronouns" class="player-pronouns ml-1 badge rounded-pill bg-light text-dark" :data-pronoun="player.pronouns">{{ player.pronouns }}</span></div>
                                 <div class="player-info player-pronounce" v-if="showCastingInfo"><i class="fas fa-w fa-lips player-icon-holder"></i> {{ player.pronunciation }}</div>
                                 <div class="player-info player-dtag" v-if="showPlayerInfo">
@@ -179,7 +179,7 @@
                     <stat :match="match" data="replay_codes" :raw="true" :format="(t) => t[0].replace(/\n/g, '<br>')">Replay codes</stat>
                     <stat :match="match">
                         Match Thumbnails
-                        <template v-slot:content class="d-inline">
+                        <template v-slot:content>
                             <a class="ct-active" :href="matchThumbnailURL(match, 720)"  rel="nofollow" target="_blank">720p</a>,
                             <a class="ct-active" :href="matchThumbnailURL(match, 1080)"  rel="nofollow" target="_blank">1080p</a>
                         </template>
@@ -254,6 +254,7 @@ export default {
                     const order = ["Tank", "DPS", "Support"];
                     return order.indexOf(a.role) - order.indexOf(b.role);
                 }
+                return 0;
             });
         },
         teamMatchGroups(team) {

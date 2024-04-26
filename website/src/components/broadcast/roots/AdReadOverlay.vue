@@ -81,7 +81,7 @@ export default {
             this.localData = {};
         });
 
-        this.localData = JSON.parse(localStorage.getItem("ad-reads") || "{}");
+        this.localData = JSON.parse(localStorage.getItem("ad-reads") ?? "{}");
     },
     watch: {
         active(isActive) {

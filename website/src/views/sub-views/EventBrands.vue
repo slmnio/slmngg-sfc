@@ -21,8 +21,7 @@ export default {
     components: { ThemeLogo },
     computed: {
         groupedTeams() {
-            if (!this.event || !this.event.teams) return null;
-            if (!this.event?.teams.some(team => team.team_category)) return null;
+            if (!(this.event?.teams?.some(team => team.team_category))) return null;
             const categories = [];
             this.event.teams.forEach(team => {
                 let categoryName = team.team_category;

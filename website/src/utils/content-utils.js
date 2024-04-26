@@ -96,9 +96,7 @@ export function multiImage(theme, keys, minSize = 30, useResizer = true) {
 
 export function getMatchContext(match) {
     const text = [];
-    let out = "";
-
-    out = (match?.event?.short || match?.event?.name || "");
+    const out = (match?.event?.short || match?.event?.name || "");
 
     // sub_event: round
     // week_text: round

@@ -40,9 +40,18 @@ module.exports = {
         "vue/multi-word-component-names": "off",
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/space-before-function-paren": "off",
-        "@typescript-eslint/strict-boolean-expressions": "off",
         "@typescript-eslint/return-await": "off",
-        "@typescript-eslint/restrict-template-expressions": "warn",
-        "vue/block-lang": "warn"
+
+        // useful if we ts-ify everything, but not now
+        "@typescript-eslint/strict-boolean-expressions": "off",
+        "@typescript-eslint/restrict-template-expressions": "off",
+        "@typescript-eslint/restrict-plus-operands": "off",
+        "@typescript-eslint/promise-function-async": "off",
+        "vue/block-lang": "off",
+
+        // good to go through eventually
+        "@typescript-eslint/no-floating-promises": "off",
+        "@typescript-eslint/no-misused-promises": "off",
+        "@typescript-eslint/no-implied-eval": "off",
     }
 };

@@ -65,19 +65,19 @@ export default {
     }),
     computed: {
         matches() {
-            if (!this.bracket || !this.bracket.ordered_matches) return [];
+            if (!this.bracket?.ordered_matches) return [];
             return this.bracket.ordered_matches;
         },
         layout() {
-            if (!this.bracket || !this.bracket.bracket_layout) return null;
+            if (!this.bracket?.bracket_layout) return null;
             return JSON.parse(this.bracket.bracket_layout);
         },
         brackets() {
-            if (!this.layout || !this.layout.brackets) return null;
+            if (!this.layout?.brackets) return null;
             return this.layout.brackets;
         },
         connections() {
-            if (!this.layout || !this.layout.connections) return null;
+            if (!this.layout?.connections) return null;
             return this.layout.connections;
         },
         bracketCols() {
@@ -420,10 +420,6 @@ export default {
     beforeUnmount() {
         Store.commit("setHighlightedTeam", null);
         Store.commit("setHighlightedMatch", null);
-    },
-    beforeUpdate() {
-        // console.log("[bracket rerender]");
-        // this.createConnections();
     },
     watch: {
         layout: {

@@ -59,7 +59,7 @@ export default {
     },
     computed: {
         match() {
-            if (!this.broadcast || !this.broadcast.live_match) return null;
+            if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
@@ -123,6 +123,7 @@ export default {
                     const order = ["DPS", "Tank", "Support"];
                     return order.indexOf(a.role) - order.indexOf(b.role);
                 }
+                return 0;
             });
         },
         titleStyle() {

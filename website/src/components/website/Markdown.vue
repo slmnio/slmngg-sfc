@@ -13,7 +13,7 @@ function getAttribute(attribute, html) {
     const r = new RegExp(`${attribute}="([^"]*)"`);
     const results = html.match(r);
     // console.log(html, results);
-    if (results && results[1]) return results[1];
+    if (results?.[1]) return results[1];
     return null;
 }
 

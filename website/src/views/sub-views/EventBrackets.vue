@@ -23,7 +23,7 @@ export default {
     props: ["event"],
     computed: {
         brackets() {
-            if (!this.event || !this.event.brackets) return [];
+            if (!this.event?.brackets) return [];
             return (ReactiveArray("brackets", {
                 ordered_matches: ReactiveArray("ordered_matches", {
                     teams: ReactiveArray("teams", {

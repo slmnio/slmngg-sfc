@@ -24,7 +24,7 @@ export function getIdFromURL (url) {
 
         if (pieces[1].includes("%")) {
             const uriComponent = decodeURIComponent(pieces[1]);
-            id = `http://youtube.com${uriComponent}`.replace(youtubeRegexp, "$1");
+            id = `https://youtube.com${uriComponent}`.replace(youtubeRegexp, "$1");
         } else {
             id = pieces[0];
         }

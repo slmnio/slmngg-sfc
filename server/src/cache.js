@@ -21,7 +21,7 @@ const emitter = new EventEmitter();
 function getAntiLeakIDs() {
     if (process.env.DISABLE_ANTILEAK === "true") return []; // don't hide anything on local
     let ids = [];
-    hiddenEvents.forEach((val, key) => {
+    hiddenEvents.forEach((val) => {
         if (val?.length) val.forEach(id => ids.push(id));
     });
     return ids;

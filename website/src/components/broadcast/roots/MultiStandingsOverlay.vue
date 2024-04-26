@@ -26,7 +26,7 @@ export default {
     props: ["broadcast", "title", "stageCodes", "showColumns", "useCodes", "full"],
     computed: {
         event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
+            if (!this.broadcast?.event) return null;
             return ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
@@ -35,7 +35,7 @@ export default {
             });
         },
         blocks() {
-            if (!this.event || !this.event.blocks) return null;
+            if (!this.event?.blocks) return null;
             try {
                 const blocks = JSON.parse(this.event.blocks);
                 return blocks || null;

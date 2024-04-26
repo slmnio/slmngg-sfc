@@ -81,6 +81,7 @@ export default {
                 // return 1;
                 if (a.highlight_role && !b.highlight_role) return -1;
                 if (b.highlight_role && !a.highlight_role) return 1;
+                return 0;
             });
         },
         staff() {
@@ -90,6 +91,7 @@ export default {
                 if ((a.is_captain || a.highlight_role) === (b.is_captain || b.highlight_role)) return 0;
                 if ((a.is_captain || a.highlight_role)) return -1;
                 if ((b.is_captain || b.highlight_role)) return 1;
+                return 0;
             });
         }
     },

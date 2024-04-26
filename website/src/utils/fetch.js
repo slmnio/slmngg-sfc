@@ -144,10 +144,6 @@ export async function getThings(ids) {
     return ids.map(id => getThing(id));
 }
 
-export async function getAndWait(id) {
-
-}
-
 export function getMainDomain(subdomain) {
     try {
         if (subdomain) {

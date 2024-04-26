@@ -191,7 +191,7 @@ export default {
                             const draftData = JSON.parse(player.draft_data);
                             let extraSRtext = "";
 
-                            if (ow && ow.ratings && player.role) {
+                            if (ow?.ratings && player.role) {
                                 const sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
                                 if (draftData.sr.role && sr) player.sr_err = sr - draftData.sr.role;
                                 if (sr) extraSRtext += ` Live SR on role: ${sr} ${player.sr_err && `(${player.sr_err})`}.`;
@@ -201,7 +201,7 @@ export default {
                             return { ...player, rating: { level: draftData.sr.role, note: `${getRoleString(draftData.sr)}${extraSRtext}` } };
                         }
 
-                        if (ow && ow.ratings && player.role) {
+                        if (ow?.ratings && player.role) {
                             let sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
                             if (sr) return { ...player, rating: { level: sr, note: "Pulled from their Battletag" } };
                             sr = Math.floor(ow.ratings.reduce((p, c) => p + c.level, 0) / ow.ratings.length);
@@ -218,7 +218,7 @@ export default {
 
                 return player;
             }).map(player => {
-                if (player.notes && player.notes.includes("#split#")) {
+                if (player.notes?.includes("#split#")) {
                     player.notes = player.notes.split("#split#").map(e => e.replace(/\|/g, "\n").trim()).join("\n");
                 }
                 if (player.draft_data && player.draft_data.slice(0, 1) === "{") {

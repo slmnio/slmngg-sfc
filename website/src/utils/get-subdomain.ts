@@ -11,7 +11,7 @@ export async function getSubdomain() {
 
     for (const { r } of domains) {
         const result = host.match(r);
-        if (result && result[1] && !["dev", "live"].includes(result[1])) {
+        if (result?.[1] && !["dev", "live"].includes(result[1])) {
             if (result[1].endsWith(".dev")) {
                 result[1] = result[1].slice(0, -4);
             }
@@ -32,14 +32,12 @@ export async function getSubdomain() {
 
     const data = await fetchThings([`subdomain-${subdomain}`]);
 
-    if (!data || !data[0] || !data[0].id) {
+    if (!data?.[0]?.id) {
         console.log("[subdomain]", "no valid minisite");
         return { subdomain: null, subID: null };
     }
 
-    let subID;
-
-    subID = data[0]._original_data_id || data[0].id;
+    const subID = data[0]._original_data_id || data[0].id;
 
     console.log("[subID]", subID);
 

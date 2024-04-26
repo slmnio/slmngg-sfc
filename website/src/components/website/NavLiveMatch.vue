@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { url } from "../../utils/content-utils";
+import { url } from "@/utils/content-utils";
 import MatchThumbnail from "@/components/website/match/MatchThumbnail";
 
 export default {

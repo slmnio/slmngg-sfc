@@ -136,7 +136,7 @@ export default {
     },
     computed: {
         event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
+            if (!this.broadcast?.event) return null;
             return ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
@@ -170,7 +170,7 @@ export default {
             return logoBackground(this.event.theme);
         },
         accentColor() {
-            if (!this.event || !this.event.theme) return null;
+            if (!this.event?.theme) return null;
             return this.event.theme.color_theme;
         },
         availablePlayers() {
@@ -195,7 +195,7 @@ export default {
 
                 try {
                     const ow = JSON.parse(player.overwatch_data);
-                    if (ow && ow.ratings && player.role) {
+                    if (ow?.ratings && player.role) {
                         let sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
                         if (sr) return { ...player, rating: { level: sr, note: "Pulled from their Battletag" } };
                         sr = Math.floor(ow.ratings.reduce((p, c) => p + c.level, 0) / ow.ratings.length);

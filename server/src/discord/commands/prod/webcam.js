@@ -1,7 +1,6 @@
 const {
     SlashCommandBuilder,
     userMention,
-    CommandInteraction,
     EmbedBuilder
 } = require("discord.js");
 
@@ -22,7 +21,7 @@ module.exports = {
         .setDescription("Get a webcam link for a user"),
     /**
      *
-     * @param {CommandInteraction} interaction
+     * @param {import("discord.js").CommandInteraction} interaction
      * @returns {Promise<void>}
      */
     async execute(interaction) {

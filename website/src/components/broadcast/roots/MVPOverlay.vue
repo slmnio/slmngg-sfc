@@ -84,7 +84,7 @@ export default {
         mvpTeam: {
             deep: true,
             handler(team) {
-                if (team && team?.theme) {
+                if (team?.theme) {
                     this.$parent.updateTheme(team.theme);
                 }
             }

@@ -93,12 +93,12 @@ export default {
                             dummy: true,
                             ...(this.mapTypes
                                 ? {
-                                    name: this.mapTypes && this.mapTypes[num],
+                                    name: this.mapTypes?.[num],
                                     image: [{ url: DefaultMapImages[this.mapTypes[num]] }]
                                 }
                                 : {}),
                             map: {
-                                type: this.mapTypes && this.mapTypes[num]
+                                type: this.mapTypes?.[num]
                             },
                             showNumbers: false
                         });

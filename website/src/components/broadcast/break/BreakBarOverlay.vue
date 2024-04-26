@@ -95,7 +95,7 @@ export default {
     components: { Countdown, BreakMatch, Sponsors, Bracket },
     computed: {
         event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
+            if (!this.broadcast?.event) return null;
             return ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
@@ -111,24 +111,24 @@ export default {
             });
         },
         eventLogoBackground() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 backgroundColor: this.event.theme.color_logo_background,
                 borderColor: this.event.theme.color_logo_accent
             };
         },
         segments() {
-            if (!this.broadcast || !this.broadcast.bar_options) return [];
+            if (!this.broadcast?.bar_options) return [];
             return this.broadcast.bar_options;
         },
         eventCSS() {
-            if (!this.event || !this.event.theme) return null;
+            if (!this.event?.theme) return null;
             return {
                 "--event": this.event.theme.color_theme
             };
         },
         nextMatch() {
-            if (!this.broadcast || !this.broadcast.live_match || !this.broadcast.show_live_match) return null;
+            if (!this.broadcast?.live_match || !this.broadcast.show_live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -136,7 +136,7 @@ export default {
             });
         },
         schedule() {
-            if (!this.broadcast || !this.broadcast.schedule) return null;
+            if (!this.broadcast?.schedule) return null;
             return ReactiveArray("schedule", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -146,11 +146,11 @@ export default {
             }).sort(sortMatches);
         },
         themeColor() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return themeBackground1(this.event);
         },
         sponsorThemes() {
-            if (!this.broadcast || !this.broadcast.sponsors) return null;
+            if (!this.broadcast?.sponsors) return null;
             return ReactiveArray("sponsors", {
                 theme: ReactiveThing("theme")
             })(this.broadcast);

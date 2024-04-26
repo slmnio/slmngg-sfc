@@ -104,7 +104,7 @@ export default {
             return clamp(380 / ((teams?.length || 0) + 1.2), 16, 46) + "px";
         },
         allMatches() {
-            if (!this.event || !this.event.matches) return [];
+            if (!this.event?.matches) return [];
             return ReactiveArray("matches", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -113,12 +113,12 @@ export default {
             })(this.event);
         },
         stageMatches() {
-            if (!this.allMatches || !this.allMatches.length || !this.stage) return [];
+            if (!this.allMatches?.length || !this.stage) return [];
             if (!this.stage) return this.allMatches;
             return this.allMatches.filter(match => match.match_group && match.match_group.toLowerCase() === this.stage.toLowerCase());
         },
         blocks() {
-            if (!this.event || !this.event.blocks) return null;
+            if (!this.event?.blocks) return null;
             try {
                 const blocks = JSON.parse(this.event.blocks);
                 return blocks || null;
@@ -151,7 +151,7 @@ export default {
 
             const teamMap = new Map();
             this.stageMatches.forEach(match => {
-                match.teams && match.teams.forEach(team => {
+                match.teams?.forEach(team => {
                     teamMap.set(team.id, team);
                 });
             });
@@ -199,7 +199,7 @@ export default {
                 // }
 
 
-                if (this.settings && this.settings.points) team.standings.points = 0;
+                if (this.settings?.points) team.standings.points = 0;
                 // get matches here
                 this.stageMatches.forEach(match => {
                     if (!match.teams) return;
@@ -213,9 +213,7 @@ export default {
                     team.standings.played++;
                     if (team.standings.matches) team.standings.matches.played++;
 
-                    if (match.maps) {
-
-                    } else {
+                    if (!match.maps) {
                         team.standings.maps_played += match.score_1 + match.score_2;
                     }
 
@@ -234,8 +232,10 @@ export default {
                         });
                     }
 
-                    if (this.settings && this.settings.points) team.standings.points += (this.settings.points.map_wins * team.standings.map_wins);
-                    if (this.settings && this.settings.points) team.standings.points += (this.settings.points.map_losses * team.standings.map_losses);
+                    if (this.settings?.points) {
+                        team.standings.points += (this.settings.points.map_wins * team.standings.map_wins);
+                        team.standings.points += (this.settings.points.map_losses * team.standings.map_losses);
+                    }
 
                     const winIndex = match.score_1 === match.first_to ? 0 : 1;
                     const winner = match.teams[winIndex];
@@ -244,13 +244,13 @@ export default {
 
                     if (winner.id === team.id) {
                         team.standings.wins++;
-                        if (this.settings && this.settings.points) team.standings.points += this.settings.points.wins;
+                        if (this.settings?.points) team.standings.points += this.settings.points.wins;
 
                         // update win/loss h2h against opponent
                         team.standings.h2h[opponent.id]++;
                     } else {
                         team.standings.losses++;
-                        if (this.settings && this.settings.points) team.standings.points += this.settings.points.losses;
+                        if (this.settings?.points) team.standings.points += this.settings.points.losses;
                         team.standings.h2h[opponent.id]--;
                     }
                     if (!team.standings.h2h_maps[opponent.id]) team.standings.h2h_maps[opponent.id] = 0;

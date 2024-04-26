@@ -41,7 +41,7 @@ export default {
         lower() {
             if (this.isLive) return "score";
             console.log(this.scores, this.scores.some(s => !!s));
-            if (this.scores && this.scores.some(s => !!s)) return "score";
+            if (this.scores?.some(s => !!s)) return "score";
             return "time";
         },
         scoreText() {

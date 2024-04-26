@@ -40,7 +40,7 @@ export default {
         },
         background() {
             if (this.empty) return { backgroundColor: "transparent" };
-            if (this.team && this.team.id) return logoBackground1(this.team);
+            if (this.team?.id) return logoBackground1(this.team);
             return {};
         },
         teamLogo() {

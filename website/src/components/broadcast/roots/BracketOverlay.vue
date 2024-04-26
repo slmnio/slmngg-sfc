@@ -20,7 +20,7 @@ export default {
     props: ["broadcast", "title", "bracketKey", "extended", "scale", "small", "forceBracket"],
     computed: {
         event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
+            if (!this.broadcast?.event) return null;
             return ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme"),
                 brackets: ReactiveArray("brackets", {

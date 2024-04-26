@@ -80,7 +80,7 @@ export default {
             return 0;
         },
         matches() {
-            if (!this.event || !this.event.matches) return [];
+            if (!this.event?.matches) return [];
             return ReactiveArray("matches", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")

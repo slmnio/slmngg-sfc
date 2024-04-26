@@ -1,6 +1,5 @@
 import { isOnMainDomain, setAuthNext } from "@/utils/auth";
 import { getMainDomain } from "@/utils/fetch";
-import ProfilePage from "@/views/ProfilePage.vue";
 import { h } from "vue";
 
 export default (app) => ([

@@ -15,17 +15,17 @@ export default {
     methods: { url },
     computed: {
         teamLogo() {
-            if (!this.team || !this.team.theme) return {};
+            if (!this.team?.theme) return {};
             return resizedImage(this.team.theme, ["default_wordmark", "default_logo"], "w-1000");
         },
         teamBG() {
-            if (!this.team || !this.team.theme) return {};
+            if (!this.team?.theme) return {};
             return {
                 backgroundColor: this.team.theme.color_logo_background || this.team.theme.color_theme
             };
         },
         teamText() {
-            if (!this.team || !this.team.theme) return {};
+            if (!this.team?.theme) return {};
             return {
                 color: this.team.theme.color_text_on_logo_background || this.team.theme.color_text_on_theme
             };

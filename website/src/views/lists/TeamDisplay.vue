@@ -20,11 +20,11 @@ export default {
     },
     computed: {
         teamTheme() {
-            if (!this.team || !this.team.theme) return {};
+            if (!this.team?.theme) return {};
             return logoBackground1(this.team);
         },
         logo() {
-            if (!this.team || !this.team.theme) return {};
+            if (!this.team?.theme) return {};
             return resizedImage(this.team.theme, ["small_logo", "default_logo"], "h-50");
         }
     }

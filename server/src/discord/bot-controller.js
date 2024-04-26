@@ -104,7 +104,7 @@ async function checkBroadcast(id, broadcast) {
 if (!process.env.DISCORD_RUN_VOICE_BOTS) {
     console.log("Discord voice bots won't run because DISCORD_RUN_VOICE_BOTS is not set.");
 } else {
-    onUpdate(async(id, { newData, oldData }) => {
+    onUpdate(async(id, { newData }) => {
         setTimeout(async () => {
             if (id === "Broadcasts") {
                 broadcastIDs = newData.ids.map(id => cleanID(id));

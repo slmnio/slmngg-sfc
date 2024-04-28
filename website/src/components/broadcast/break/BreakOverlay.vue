@@ -1,19 +1,22 @@
 <template>
     <div class="break-overlay">
         <div class="break-center">
-            <ThemeTransition class="break-transition-top w-100 h-100" :theme="event && event.theme" :active="animationActive" one-color start="middle" end="middle">
+            <ThemeTransition class="break-transition-top w-100 h-100" :theme="event && event.theme"
+                             :active="animationActive" one-color start="middle" end="middle">
                 <div class="break-top event-theme-border flex-center overlay--bg px-4" :style="eventBorder">
                     <Squeezable align="middle" :disabled="(overlayTitle).includes('\\n')" class="w-100 flex-center">
                         <transition name="fade" mode="out-in">
                             <span class="industry-align" :class="{'has-br': (overlayTitle).includes('\\n') }"
                                   :key="overlayTitle" v-html="nbr(overlayTitle)"></span>
                         </transition>
-                        <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News" :interval="headlineInterval"
+                        <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News"
+                                        :interval="headlineInterval"
                                         :borderCSS="eventBorder"/>
                     </Squeezable>
                 </div>
             </ThemeTransition>
-            <ThemeTransition class="break-transition-main w-100 h-100" :theme="event && event.theme" :active="animationActive" one-color start="middle" end="middle" :starting-delay="100">
+            <ThemeTransition class="break-transition-main w-100 h-100" :theme="event && event.theme"
+                             :active="animationActive" one-color start="middle" end="middle" :starting-delay="100">
                 <div class="break-main event-theme-border overlay--bg" :style="eventBorder">
                     <div class="break-col break-left-col">
                         <transition name="anim-break-next">
@@ -35,24 +38,24 @@
                             <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match"
                                         :expanded="true" :key="match.id" :theme-color="themeColor"/>
                         </transition-group>
-                        <div class="break-col break-standings" v-if="automatedShow === 'Standings'"
+                        <div class="break-col break-standings" v-else-if="automatedShow === 'Standings'"
                              :key="`Standings-${currentStage || ''}`">
                             <Standings :event="event" :stage="currentStage"/>
                         </div>
-                        <div class="break-col break-image" v-if="automatedShow === 'Image'"
+                        <div class="break-col break-image" v-else-if="automatedShow === 'Image'"
                              :key="`image-${breakImageURL}`">
                             <div v-if="breakImageURL" class="break-image-inner" :style="breakImage"></div>
                             <ThemeLogo v-else class="break-image-inner break-image-default" :theme="event.theme"
                                        icon-padding="10%" border-width="0" logo-size="h-500"/>
                         </div>
-                        <div class="break-col break-title" v-if="automatedShow === 'Title'"
+                        <div class="break-col break-title" v-else-if="automatedShow === 'Title'"
                              :key="`title-${breakContentTitle}`">
                             <div :style="themeBG" class="break-title-inner" v-html="breakContentTitle"></div>
                         </div>
-                        <Bracket class="break-col break-bracket" v-if="automatedShow === 'Bracket'"
+                        <Bracket class="break-col break-bracket" v-else-if="automatedShow === 'Bracket'"
                                  :key="`Bracket-${bracket && bracket.key}`" :event="event" :bracket="bracket"
                                  use-overlay-scale small :scale="0.85"/>
-                        <div class="break-col break-others" v-if="automatedShow === 'Other Streams'"
+                        <div class="break-col break-others" v-else-if="automatedShow === 'Other Streams'"
                              key="Other-Streams">
                             <div class="broadcast-previews-title">
                                 {{ broadcasts.length === 1 ? broadcasts[0].name : "Other broadcasts" }}
@@ -61,25 +64,28 @@
                                 <BroadcastPreview v-for="other in broadcasts" :key="other.id" :broadcast="other"/>
                             </div>
                         </div>
-                        <div class="break-col break-others-info" v-if="automatedShow === 'Other Info'" key="Other-Info">
+                        <div class="break-col break-others-info" v-else-if="automatedShow === 'Other Info'"
+                             key="Other-Info">
                             <OtherBroadcasts :starting-broadcast="broadcast"/>
                         </div>
-                        <BreakStaffList class="break-col break-staff-list" v-if="automatedShow === 'Staff'" key="Staff"
+                        <BreakStaffList class="break-col break-staff-list" v-else-if="automatedShow === 'Staff'"
+                                        key="Staff"
                                         :matches="fullSchedule"/>
-                        <BreakMatchup class="break-col break-matchup" v-if="automatedShow === 'Matchup'"
+                        <BreakMatchup class="break-col break-matchup" v-else-if="automatedShow === 'Matchup'"
                                       :key="`Matchup-${nextMatch ? nextMatch.id : ''}`" :match="nextMatch"/>
                     </transition>
                 </div>
             </ThemeTransition>
         </div>
         <div class="break-preload">
-            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />
-            <Standings :event="event" :stage="currentStage" />
+            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true"
+                        :key="match.id" :theme-color="themeColor"/>
+            <Standings :event="event" :stage="currentStage"/>
             <div class="break-image-inner" :style="breakImage"></div>
-            <Bracket class="break-col break-bracket" :event="event" :bracket="bracket" use-overlay-scale />
-            <BreakMatchup class="break-col break-matchup" :match="nextMatch" />
+            <Bracket class="break-col break-bracket" :event="event" :bracket="bracket" use-overlay-scale/>
+            <BreakMatchup class="break-col break-matchup" :match="nextMatch"/>
             <BreakStaffList class="break-col break-staff-list" :matches="fullSchedule"/>
-            <OtherBroadcasts :starting-broadcast="broadcast" />
+            <OtherBroadcasts :starting-broadcast="broadcast"/>
         </div>
     </div>
 </template>
@@ -108,7 +114,21 @@ const tickTime = 25;
 export default {
     name: "BreakOverlay",
     props: ["broadcast", "title", "animationActive", "secondary", "headlineInterval", "virtualMatch", "customBreakAutomation"],
-    components: { Squeezable, OtherBroadcasts, ThemeLogo, BreakMatchup, BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown, ThemeTransition },
+    components: {
+        Squeezable,
+        OtherBroadcasts,
+        ThemeLogo,
+        BreakMatchup,
+        BreakStaffList,
+        BreakHeadlines,
+        BroadcastPreview,
+        Bracket,
+        Standings,
+        BreakMatch,
+        Sponsors,
+        Countdown,
+        ThemeTransition
+    },
     data: () => ({
         tick: 0,
         lastCountdownTick: 0
@@ -330,260 +350,313 @@ export default {
 
 <style scoped>
 
-    .event-theme-border {
-        border-bottom: 8px solid transparent;
-    }
+.event-theme-border {
+    border-bottom: 8px solid transparent;
+}
 
-    .break-overlay {
-        position: absolute;
-        overflow: hidden;
+.break-overlay {
+    position: absolute;
+    overflow: hidden;
 
-        height: 100%;
-        width: 100%;
-        color: white;
-        padding: 120px 180px;
+    height: 100%;
+    width: 100%;
+    color: white;
+    padding: 120px 180px;
 
-        font-family: "SLMN-Industry", "Industry", sans-serif;
-    }
+    font-family: "SLMN-Industry", "Industry", sans-serif;
+}
 
-    span.industry-align {
-        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
-        --translate-y: -0.0925em;
-    }
+span.industry-align {
+    transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
+    --translate-y: -0.0925em;
+}
 
-    .break-center {
-        width: 100%; height: 100%;
-        box-sizing: border-box;
+.break-center {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
 
-        display: flex;
-        flex-direction: column;
-    }
+    display: flex;
+    flex-direction: column;
+}
 
-    .break-top {
-        height: 160px;
-        width: 100%;
-        background-color: #222;
-        font-size: 96px;
-        font-weight: bold;
-        text-transform: uppercase;
-        flex-shrink: 0;
-        line-height: 1;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-    }
-    .break-top .has-br {
-        font-size: 0.75em;
-    }
+.break-top {
+    height: 160px;
+    width: 100%;
+    background-color: #222;
+    font-size: 96px;
+    font-weight: bold;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    line-height: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
 
-    .break-main {
-        width: 100%;
-        background-color: #222;
-        /*margin-top: 80px;*/
-        flex-grow: 1;
+.break-top .has-br {
+    font-size: 0.75em;
+}
 
-        /*height: 0;*/
-        display: flex;
+.break-main {
+    width: 100%;
+    background-color: #222;
+    /*margin-top: 80px;*/
+    flex-grow: 1;
 
-        height: 100%;
-        margin-top: 0;
-    }
-    .break-col {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        width: 100%; height: 100%;
-        padding: 20px;
-    }
-    .break-left-col {
-        width: 480px;
-        flex-shrink: 0;
-        border-right: 1px solid white;
-        padding: 5px 20px;
-    }
-    .break-schedule {
-        flex-grow: 1;
-        box-sizing: border-box;
-        /*justify-content: space-evenly;*/
-        overflow: hidden;
-        /*background-color: rgba(0,0,0,0.2);*/
-    }
-    .break-next {
-        width: 100%;
-        padding: 20px;
-        /*padding: 10px 0 15px 0px;*/
-    }
-    .break-schedule, .break-matchup, .break-standings {
-        padding: 20px 40px;
-    }
+    /*height: 0;*/
+    display: flex;
 
-    .break-countdown {
-        font-size: 156px;
-        font-weight: bold;
-        flex-grow: 1;
-        height: 0;
-        letter-spacing: -5px;
-    }
+    height: 100%;
+    margin-top: 0;
+}
 
+.break-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+}
 
-    .break-next, .break-countdown, .break-sponsors {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+.break-left-col {
+    width: 480px;
+    flex-shrink: 0;
+    border-right: 1px solid white;
+    padding: 5px 20px;
+}
 
-    .anim-break-next-enter-active, .anim-break-next-leave-active {
-        transition: all .5s ease;
-        overflow: hidden;
-    }
-    .anim-break-next-enter-from, .anim-break-next-leave-to {
-        max-height: 0;
-        opacity: 0;
-        padding: 0 20px;
-    }
-    .anim-break-next-enter-to, .anim-break-next-leave-from {
-        max-height: 200px;
-        opacity: 1;
-    }
+.break-schedule {
+    flex-grow: 1;
+    box-sizing: border-box;
+    /*justify-content: space-evenly;*/
+    overflow: hidden;
+    /*background-color: rgba(0,0,0,0.2);*/
+}
 
-    .a--match-enter-active, .a--match-leave-active, .a--match-move { transition: all .5s ease; overflow: hidden; }
-    .a--match-enter-from, .a--match-leave-to { max-height: 0; padding: 0 !important; }
-    .a--match-enter-to, .a--match-leave-from { max-height: 180px; }
+.break-next {
+    width: 100%;
+    padding: 20px;
+    /*padding: 10px 0 15px 0px;*/
+}
 
-    .break-content {
-        display: flex;
-        box-sizing: content-box;
-        width: 100%;
-        height: 100%;
-    }
+.break-schedule, .break-matchup, .break-standings {
+    padding: 20px 40px;
+}
 
-    .break-standings {
-        /*background-color: rgba(0,0,0,0.2);*/
-        overflow: hidden;
-    }
-
-    /*.break-content-enter-active, .break-content-leave-active { transition: all .5s ease-in-out; overflow: hidden }*/
-    /*.break-content-enter-from, .break-content-leave-to { max-height: 0; padding: 0 40px; }*/
-    /*.break-content-enter-to, .break-content-leave-from { max-height: 100%; }*/
-
-    .break-content-enter-active, .break-content-leave-active { transition: all .35s ease; overflow: hidden }
-    .break-content-enter-from { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); }
-    .break-content-leave-to { clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); }
-    .break-content-enter-to, .break-content-leave-from { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+.break-countdown {
+    font-size: 156px;
+    font-weight: bold;
+    flex-grow: 1;
+    height: 0;
+    letter-spacing: -5px;
+}
 
 
-    .break-image {
-        /*background-color: rgba(0,0,0,0.2);*/
-        padding: 40px;
-    }
-    .break-image-inner {
-        width: 100%;
-        height: 100%;
-        /*background-size: contain;*/
-        background-size: 1040px;
-        background-position: center;
-        background-repeat: no-repeat;
-    }
+.break-next, .break-countdown, .break-sponsors {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-    .break-preload {
-        opacity: 0;
-        max-width: 0px;
-        max-height: 0px;
-        overflow: hidden;
-    }
+.anim-break-next-enter-active, .anim-break-next-leave-active {
+    transition: all .5s ease;
+    overflow: hidden;
+}
 
-    .break-bracket {
-        /*zoom: 0.85;*/
-        overflow: hidden;
-        flex-wrap: nowrap;
-    }
+.anim-break-next-enter-from, .anim-break-next-leave-to {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 20px;
+}
 
-    .countdown-text {
-        text-transform: uppercase;
-        font-size: 36px;
-        font-weight: bold;
-        height: 90px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transform: translateY(30px);
-    }
-    .break-others {
-        /*padding: 40px;*/ /* this should be set but the animation is worse */
-    }
-    .broadcast-previews {
-        display: flex;
-        width: 100%;
-        height: 100%;
-        justify-content: center;
-        align-items: center;
-    }
-    .broadcast-preview:first-of-type { margin-left: 0; }
-    .broadcast-preview:last-of-type { margin-right: 0; }
+.anim-break-next-enter-to, .anim-break-next-leave-from {
+    max-height: 200px;
+    opacity: 1;
+}
 
-    .broadcast-previews-title {
-        text-transform: uppercase;
-        font-weight: bold;
-        font-size: 60px;
-        line-height: 1;
-    }
-    .broadcast-mid-split-enter-active {
-        overflow: hidden;
-        max-width: 100%;
-        transition: all 800ms ease;
-    }
-    .broadcast-mid-split-leave-active {
-        overflow: hidden;
-        max-width: 100%;
-        transition: opacity 0s;
-    }
-    .broadcast-mid-split-enter-from {
-        /*clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);*/
-        /*clip-path: polygon(0% 0%, 0% 100%, 0% 100%, 0% 0, 100% 0, 100% 100%, 100% 100%, 100% 0%);*/
-        clip-path: polygon(50% 0, 50% 100%, 50% 100%, 50% 0%, 50% 0%, 50% 100%, 50% 100%, 50% 0);
-    }
-    .broadcast-mid-split-enter-to {
-        /*clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);*/
-        /*clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 100% 100%, 100% 0%); */
-        clip-path: polygon(0% 0, 0% 100%, 50% 100%, 50% 0%, 50% 0%, 50% 100%, 100% 100%, 100% 0);
-    }
+.a--match-enter-active, .a--match-leave-active, .a--match-move {
+    transition: all .5s ease;
+    overflow: hidden;
+}
 
-    .broadcast-mid-split-leave-to {
-        opacity: 0;
-    }
-    .break-title-inner {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 5.75em;
-        line-height: 1.1em;
-        padding: 0 .2em;
-        flex-direction: column;
-    }
+.a--match-enter-from, .a--match-leave-to {
+    max-height: 0;
+    padding: 0 !important;
+}
 
-    .break-title-inner:deep(br) {
-        margin-top: .25em !important;
-        display: block;
-        content: " ";
-    }
+.a--match-enter-to, .a--match-leave-from {
+    max-height: 180px;
+}
 
-    .break-others-info {
-        font-size: 12px;
-    }
-    .break-others-info:deep(.broadcast-match) {font-size: 38px !important;width: 300px !important;}
-    .break-others-info:deep(.broadcast) {margin-bottom: 0.75em !important;}
+.break-content {
+    display: flex;
+    box-sizing: content-box;
+    width: 100%;
+    height: 100%;
+}
 
-    .break-transition-top {
-        height: 160px !important;
-    }
+.break-standings {
+    /*background-color: rgba(0,0,0,0.2);*/
+    overflow: hidden;
+}
 
-    .break-transition-main {
-        height: 0 !important;
-        flex-grow: 1;
-        margin-top: 80px !important;
-    }
+/*.break-content-enter-active, .break-content-leave-active { transition: all .5s ease-in-out; overflow: hidden }*/
+/*.break-content-enter-from, .break-content-leave-to { max-height: 0; padding: 0 40px; }*/
+/*.break-content-enter-to, .break-content-leave-from { max-height: 100%; }*/
+
+.break-content-enter-active, .break-content-leave-active {
+    transition: all .35s ease;
+    overflow: hidden
+}
+
+.break-content-enter-from {
+    clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+}
+
+.break-content-leave-to {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+}
+
+.break-content-enter-to, .break-content-leave-from {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+
+.break-image {
+    /*background-color: rgba(0,0,0,0.2);*/
+    padding: 40px;
+}
+
+.break-image-inner {
+    width: 100%;
+    height: 100%;
+    /*background-size: contain;*/
+    background-size: 1040px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.break-preload {
+    opacity: 0;
+    max-width: 0px;
+    max-height: 0px;
+    overflow: hidden;
+}
+
+.break-bracket {
+    /*zoom: 0.85;*/
+    overflow: hidden;
+    flex-wrap: nowrap;
+}
+
+.countdown-text {
+    text-transform: uppercase;
+    font-size: 36px;
+    font-weight: bold;
+    height: 90px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translateY(30px);
+}
+
+.break-others {
+    /*padding: 40px;*/ /* this should be set but the animation is worse */
+}
+
+.broadcast-previews {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.broadcast-preview:first-of-type {
+    margin-left: 0;
+}
+
+.broadcast-preview:last-of-type {
+    margin-right: 0;
+}
+
+.broadcast-previews-title {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 60px;
+    line-height: 1;
+}
+
+.broadcast-mid-split-enter-active {
+    overflow: hidden;
+    max-width: 100%;
+    transition: all 800ms ease;
+}
+
+.broadcast-mid-split-leave-active {
+    overflow: hidden;
+    max-width: 100%;
+    transition: opacity 0s;
+}
+
+.broadcast-mid-split-enter-from {
+    /*clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);*/
+    /*clip-path: polygon(0% 0%, 0% 100%, 0% 100%, 0% 0, 100% 0, 100% 100%, 100% 100%, 100% 0%);*/
+    clip-path: polygon(50% 0, 50% 100%, 50% 100%, 50% 0%, 50% 0%, 50% 100%, 50% 100%, 50% 0);
+}
+
+.broadcast-mid-split-enter-to {
+    /*clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);*/
+    /*clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 100% 100%, 100% 0%); */
+    clip-path: polygon(0% 0, 0% 100%, 50% 100%, 50% 0%, 50% 0%, 50% 100%, 100% 100%, 100% 0);
+}
+
+.broadcast-mid-split-leave-to {
+    opacity: 0;
+}
+
+.break-title-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 5.75em;
+    line-height: 1.1em;
+    padding: 0 .2em;
+    flex-direction: column;
+}
+
+.break-title-inner:deep(br) {
+    margin-top: .25em !important;
+    display: block;
+    content: " ";
+}
+
+.break-others-info {
+    font-size: 12px;
+}
+
+.break-others-info:deep(.broadcast-match) {
+    font-size: 38px !important;
+    width: 300px !important;
+}
+
+.break-others-info:deep(.broadcast) {
+    margin-bottom: 0.75em !important;
+}
+
+.break-transition-top {
+    height: 160px !important;
+}
+
+.break-transition-main {
+    height: 0 !important;
+    flex-grow: 1;
+    margin-top: 80px !important;
+}
 </style>

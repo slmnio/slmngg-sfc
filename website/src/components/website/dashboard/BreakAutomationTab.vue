@@ -1,26 +1,36 @@
 <template>
     <div class="break-automation-tab">
         <div class="mb-3">
-            <p class="mb-0">Automation is currently <b :class="automationIsActive ? 'text-success' : 'text-danger'">{{ automationIsActive ? 'active' : 'inactive' }}</b>.</p>
-            <p class="mb-0" v-if="!automationIsActive && broadcastBreakDisplay">Break display is currently <b>{{ broadcastBreakDisplay }}</b>.</p>
+            <p class="mb-0">Automation is currently <b :class="automationIsActive ? 'text-success' : 'text-danger'">{{
+                    automationIsActive ? "active" : "inactive"
+                }}</b>.</p>
+            <p class="mb-0" v-if="!automationIsActive && broadcastBreakDisplay">Break display is currently
+                <b>{{ broadcastBreakDisplay }}</b>.</p>
         </div>
 
         <b-form-group label="Break display rotation options" label-class="fw-bold">
-            <b-form-checkbox v-for="option in rotationOptions" :key="option.value" :value="option.value" v-model="selectedRotationOptions">
+            <b-form-checkbox-group v-model="selectedRotationOptions" v-slot="{ariaDescribedby}" stacked>
+                <b-form-checkbox v-for="option in rotationOptions" :key="option.value" :value="option.value"
+                                 :aria-describedby="ariaDescribedby">
                     <span v-if="option.text === 'Matchup' && matchupText" class="text-muted">
                         {{ option.text }} (Won't show, {{ matchupText }})
                     </span>
-                <span v-else>{{ option.text }}</span>
-            </b-form-checkbox>
+                    <span v-else>{{ option.text }}</span>
+                </b-form-checkbox>
+            </b-form-checkbox-group>
+
         </b-form-group>
 
         <b-form-group label="Ending break display (countdown 30 seconds or lower)" label-class="fw-bold">
-            <b-form-checkbox v-for="option in endingOptions" :key="option.value" :value="option.value" v-model="selectedEndingOptions">
+            <b-form-checkbox-group v-model="selectedEndingOptions" v-slot="{ariaDescribedby}" stacked>
+                <b-form-checkbox v-for="option in endingOptions" :key="option.value" :value="option.value"
+                                 :aria-describedby="ariaDescribedby">
                     <span v-if="option.text === 'Matchup' && matchupText" class="text-muted">
                         {{ option.text }} (Won't show, {{ matchupText }})
                     </span>
-                <span v-else>{{ option.text }}</span>
-            </b-form-checkbox>
+                    <span v-else>{{ option.text }}</span>
+                </b-form-checkbox>
+            </b-form-checkbox-group>
         </b-form-group>
 
         <div class="d-flex">
@@ -41,19 +51,49 @@ export default {
     data: () => ({
         processing: false,
         rotationOptions: [
-            { text: "Schedule", value: "use: Schedule" },
-            { text: "Standings", value: "use: Standings" },
-            { text: "Bracket", value: "use: Bracket" },
-            { text: "Matchup", value: "use: Matchup" },
-            { text: "Image", value: "use: Image" },
-            { text: "Event Staff", value: "use: Staff" },
-            { text: "Title", value: "use: Title" },
-            { text: "Other Broadcast Matches", value: "use: Other Info" }
+            {
+                text: "Schedule",
+                value: "use: Schedule"
+            },
+            {
+                text: "Standings",
+                value: "use: Standings"
+            },
+            {
+                text: "Bracket",
+                value: "use: Bracket"
+            },
+            {
+                text: "Matchup",
+                value: "use: Matchup"
+            },
+            {
+                text: "Image",
+                value: "use: Image"
+            },
+            {
+                text: "Event Staff",
+                value: "use: Staff"
+            },
+            {
+                text: "Title",
+                value: "use: Title"
+            },
+            {
+                text: "Other Broadcast Matches",
+                value: "use: Other Info"
+            }
         ],
         selectedRotationOptions: [],
         endingOptions: [
-            { value: "setting: Always do 30s Matchup", text: "Matchup" },
-            { value: "setting: Always do 30s Schedule", text: "Schedule" }
+            {
+                value: "setting: Always do 30s Matchup",
+                text: "Matchup"
+            },
+            {
+                value: "setting: Always do 30s Schedule",
+                text: "Schedule"
+            }
         ],
         selectedEndingOptions: []
     }),

@@ -2,6 +2,27 @@ import spacetime from "spacetime";
 import informal from "spacetime-informal";
 import { sortEvents, sortTeams } from "@/utils/sorts";
 
+import assault from "@/assets/default-map-images/assault.png";
+import escort from "@/assets/default-map-images/escort.png";
+import hybrid from "@/assets/default-map-images/hybrid.png";
+import control from "@/assets/default-map-images/control.png";
+import push from "@/assets/default-map-images/push.png";
+import spike from "@/assets/default-map-images/spike.png";
+import spikeRush from "@/assets/default-map-images/spike_rush.png";
+import valDeathmatch from "@/assets/default-map-images/val_deathmatch.png";
+import slayer from "@/assets/default-map-images/slayer.png";
+import strongholds from "@/assets/default-map-images/strongholds.png";
+import ctf from "@/assets/default-map-images/ctf.png";
+import oddball from "@/assets/default-map-images/oddball.png";
+import flashpoint from "@/assets/default-map-images/flashpoint.png";
+
+import hybridIcon from "@/assets/map-type-icons/hybrid.png";
+import escortIcon from "@/assets/map-type-icons/escort.png";
+import controlIcon from "@/assets/map-type-icons/control.png";
+import pushIcon from "@/assets/map-type-icons/push.png";
+import assaultIcon from "@/assets/map-type-icons/assault.png";
+import flashpointIcon from "@/assets/map-type-icons/flashpoint.png";
+
 export function getImage (i) {
     // console.log(i);
     if (!i) return null;
@@ -230,28 +251,28 @@ export function likelyNeededMaps(match) {
 }
 
 export const DefaultMapImages = {
-    Assault: "https://cdn.discordapp.com/attachments/855517740914573342/868231135224819743/44684849494984.png",
-    Escort: "https://cdn.discordapp.com/attachments/855517740914573342/868231132444000276/484444884949494949494948421651615641.png",
-    Hybrid: "https://cdn.discordapp.com/attachments/855517740914573342/868231133765201950/448489494949849494949494949494949.png",
-    Control: "https://cdn.discordapp.com/attachments/855517740914573342/868230457622396928/63541654456789487695.png",
-    Push: "https://cdn.discordapp.com/attachments/855517740914573342/969692510249177098/puuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuush.png",
-    Spike: "https://cdn.discordapp.com/attachments/880305022716481639/883811894463447110/newspikeplant.png",
-    SpikeRush: "https://cdn.discordapp.com/attachments/880305022716481639/883809271198924840/spikerush_default.png",
-    ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png",
-    Slayer: "https://media.discordapp.net/attachments/855517740914573342/913747752729595904/slayer.png",
-    Strongholds: "https://media.discordapp.net/attachments/855517740914573342/913747753086107668/strongholds.png",
-    CTF: "https://media.discordapp.net/attachments/855517740914573342/913747753392304158/ctf.png",
-    Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png",
-    Flashpoint: "https://cdn.discordapp.com/attachments/855515391225102336/1145463994581254154/flashpoint.png"
+    Assault: assault,
+    Escort: escort,
+    Hybrid: hybrid,
+    Control: control,
+    Push: push,
+    Spike: spike,
+    SpikeRush: spikeRush,
+    ValDeathmatch: valDeathmatch,
+    Slayer: slayer,
+    Strongholds: strongholds,
+    CTF: ctf,
+    Oddball: oddball,
+    Flashpoint: flashpoint
 };
 
 export const MapTypeIcons = {
-    Hybrid: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907303867088896/180.png",
-    Escort: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907343893336097/180.png",
-    Control: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907374708903946/180.png",
-    Push: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908279537717392/Push.png",
-    Assault: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908385250934904/assault.png",
-    Flashpoint: "https://media.slmn.io/flashpoint-crop.png"
+    Hybrid: hybridIcon,
+    Escort: escortIcon,
+    Control: controlIcon,
+    Push: pushIcon,
+    Assault: assaultIcon,
+    Flashpoint: flashpointIcon
 };
 
 export function getTeamsMapStats(teams, requestMatch, requestMap, filters) {

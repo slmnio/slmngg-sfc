@@ -19,16 +19,16 @@
         </td>
         <td>{{ prettyDate }}</td>
         <td>
-            <div class="btn-group">
-                <b-form-checkbox :checked="match.show_on_overlays" @change="(state) => setShow('primary', state)"
-                                 button size="sm" :button-variant="match.show_on_overlays ? 'primary' : 'secondary'">Primary
+            <b-form-checkbox-group buttons>
+                <b-form-checkbox v-model="showPrimary" button size="sm"
+                                 :button-variant="showPrimary ? 'primary' : 'secondary'">
+                    Primary
                 </b-form-checkbox>
-                <b-form-checkbox :checked="match.show_on_secondary_overlays"
-                                 @change="(state) => setShow('secondary', state)"
-                                 button size="sm" :button-variant="match.show_on_secondary_overlays ? 'primary' : 'secondary'">
+                <b-form-checkbox v-model="showSecondary" button size="sm"
+                                 :button-variant="showSecondary ? 'primary' : 'secondary'">
                     Secondary
                 </b-form-checkbox>
-            </div>
+            </b-form-checkbox-group>
         </td>
         <td>
             <b-form-checkbox :checked="this.isLiveMatch" @change="(state) => setLiveMatch(state)"
@@ -60,6 +60,22 @@ export default {
         },
         teams() {
             return this.match?.teams || [];
+        },
+        showPrimary: {
+            get() {
+                return this.match.show_on_overlays;
+            },
+            set(state) {
+                this.setShow("primary", state);
+            }
+        },
+        showSecondary: {
+            get() {
+                return this.match.show_on_secondary_overlays;
+            },
+            set(state) {
+                this.setShow("secondary", state);
+            }
         }
     },
     methods: {
@@ -88,20 +104,6 @@ export default {
 </script>
 
 <style scoped>
-.btn-group:deep(.btn-group-toggle:not(:first-child) .btn) {
-    margin-left: -1px
-}
-
-.btn-group:deep(.btn-group-toggle:not(:last-child):not(.dropdown-toggle) .btn) {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0
-}
-
-.btn-group:deep(.btn-group-toggle:not(:first-child) .btn) {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0
-}
-
 .box {
     background-color: rgba(255, 255, 255, 0.2);
     width: 34px;

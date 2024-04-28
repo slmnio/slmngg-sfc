@@ -152,6 +152,7 @@ export const useAuthStore = defineStore("auth", () => {
 
     return {
         token,
+        authNext,
         user,
         auth,
         player,
@@ -166,6 +167,6 @@ export const useAuthStore = defineStore("auth", () => {
     };
 }, {
     persist: {
-        paths: ["token"]
+        paths: ["token", "authNext"]
     }
 });

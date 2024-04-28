@@ -102,7 +102,6 @@ import WebsiteNavBanner from "@/components/website/WebsiteNavBanner";
 import { resizedImageNoWrap } from "@/utils/images";
 import LoggedInUser from "@/components/website/LoggedInUser";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
-import { isAuthenticated } from "@/utils/auth";
 import { getMainDomain } from "@/utils/fetch";
 import { mapState, mapWritableState } from "pinia";
 import { useAuthStore } from "@/stores/authStore";
@@ -124,7 +123,7 @@ export default {
     }),
     computed: {
         ...mapWritableState(useAuthStore, ["user"]),
-        ...mapState(useAuthStore, ["isProduction"]),
+        ...mapState(useAuthStore, ["isProduction", "isAuthenticated"]),
         isRebuilding() {
             return store.getters.hasWebsiteFlag("server_rebuilding");
         },
@@ -207,7 +206,6 @@ export default {
         this.resizeObserver.observe(this.$el);
     },
     methods: {
-        isAuthenticated,
         slmnggURL(page) {
             return `${this.slmnggDomain}/${page}`;
         },

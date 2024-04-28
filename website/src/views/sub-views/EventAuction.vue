@@ -192,7 +192,6 @@
 <script>
 import { socket } from "@/socket";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { isAuthenticated } from "@/utils/auth";
 import { cleanID, dirtyID, getRoleSVG, money, url } from "@/utils/content-utils";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import AuctionCountdown from "@/components/broadcast/auction/AuctionCountdown.vue";
@@ -416,7 +415,6 @@ export default {
     },
     methods: {
         themeBackground1,
-        isAuthenticated,
         money,
         getRoleSVG,
         url,

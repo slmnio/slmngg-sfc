@@ -1,6 +1,6 @@
-import { isOnMainDomain, setAuthNext } from "@/utils/auth";
-import { getMainDomain } from "@/utils/fetch";
+import { getMainDomain, isOnMainDomain } from "@/utils/fetch";
 import { h } from "vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default (app) => ([
     {
@@ -26,7 +26,8 @@ export default (app) => ([
                 return window.location.replace(getMainDomain() + `/login?return=${encodeURIComponent((to.query?.return?.includes("http") ? "" : window.location.origin) + (to.query.return || from.fullPath))}`);
             }
 
-            setAuthNext(app?.$root, to.query.return || from.fullPath);
+            const authStore = useAuthStore();
+            authStore.setAuthNext(to.query.return || from.fullPath);
 
             const params = {
                 client_id: import.meta.env.VITE_DISCORD_CLIENT_ID,

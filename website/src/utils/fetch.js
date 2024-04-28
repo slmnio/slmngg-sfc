@@ -162,6 +162,10 @@ export function getMainDomain(subdomain) {
     }
 }
 
+export function isOnMainDomain() {
+    return window.location.origin === getMainDomain();
+}
+
 export function getMainCookieDomain(subdomain) {
     // cookies don't care about origins, only hostnames (no ports, no protocols)
     try {

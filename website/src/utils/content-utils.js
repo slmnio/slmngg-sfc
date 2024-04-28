@@ -462,6 +462,8 @@ export function getEmbedData(url) {
 
 
 export function unescapeText(text) {
+    if (!text) return "";
+
     return text
         .replaceAll("&amp;", "&")
         .replaceAll("&lt;", "<")

@@ -12,7 +12,6 @@ const store = createStore({
 
         highlighted_team: null,
         highlighted_match: null,
-        edit_in_site_timezone: false,
         match_highlights: [],
         draft_notes: [],
         last_event_match_pages: [],
@@ -84,14 +83,6 @@ const store = createStore({
         setHighlightedMatch(state, matchID) {
             state.highlighted_match = matchID;
         },
-        setTimezone(state, timezone) {
-            localStorage.setItem("timezone", timezone);
-            state.timezone = timezone;
-        },
-        setUse24HourTime(state, use24HourTime) {
-            localStorage.setItem("use24HourTime", use24HourTime);
-            state.use24HourTime = use24HourTime;
-        },
         setHighlights(state, matchHighlights) {
             state.match_highlights = matchHighlights;
         },
@@ -127,9 +118,6 @@ const store = createStore({
                 if (!visible) state.last_event_match_pages.splice(index, 1);
             }
         },
-        setTimeEditTimezone(state, editInSiteTimezone) {
-            state.edit_in_site_timezone = editInSiteTimezone;
-        },
         setWebsiteFlags(state, flags) {
             state.website_flags = flags;
         }
@@ -144,7 +132,6 @@ const store = createStore({
         // highlightedMatch: (state, getters) => () => getters.thing(state.highlighted_match)
         highlightedMatch: state => () => state.highlighted_match,
         dashboardModuleIsVisible: state => (moduleName) => state.dashboard_modules_active.includes(moduleName),
-        editTimeInSiteTimezone: state => state.edit_in_site_timezone,
         hasWebsiteFlag: state => flag => state.website_flags.includes(flag)
     },
     actions: {

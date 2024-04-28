@@ -6,7 +6,7 @@
                           @click="selectedTab = 'Countdown'">
                     <i class="fal fa-clock"></i>
                 </b-button>
-                <b-button size="sm" :class="{ active: automationIsActive }" :variant="automationIsActive ? 'primary' : ''">
+                <b-button size="sm" :class="{ active: automationIsActive }" :variant="automationIsActive ? 'primary' : 'secondary'">
                     <DashboardModalIcon/>
                     {{ autoText }}
                 </b-button>

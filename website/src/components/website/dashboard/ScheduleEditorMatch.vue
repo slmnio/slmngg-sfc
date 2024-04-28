@@ -21,18 +21,18 @@
         <td>
             <div class="btn-group">
                 <b-form-checkbox :checked="match.show_on_overlays" @change="(state) => setShow('primary', state)"
-                                 button size="sm" :button-variant="match.show_on_overlays ? 'primary' : ''">Primary
+                                 button size="sm" :button-variant="match.show_on_overlays ? 'primary' : 'secondary'">Primary
                 </b-form-checkbox>
                 <b-form-checkbox :checked="match.show_on_secondary_overlays"
                                  @change="(state) => setShow('secondary', state)"
-                                 button size="sm" :button-variant="match.show_on_secondary_overlays ? 'primary' : ''">
+                                 button size="sm" :button-variant="match.show_on_secondary_overlays ? 'primary' : 'secondary'">
                     Secondary
                 </b-form-checkbox>
             </div>
         </td>
         <td>
             <b-form-checkbox :checked="this.isLiveMatch" @change="(state) => setLiveMatch(state)"
-                             button size="sm" :button-variant="this.isLiveMatch ? 'primary' : ''">
+                             button size="sm" :button-variant="this.isLiveMatch ? 'primary' : 'secondary'">
                 Live Match
             </b-form-checkbox>
         </td>

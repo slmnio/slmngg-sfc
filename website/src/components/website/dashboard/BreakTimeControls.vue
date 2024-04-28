@@ -48,7 +48,7 @@
                 </div>
             </div>
             <div class="flex-shrink-0">
-                <b-button class="label-padding" :variant="customDuration ? 'primary' : ''" @click="setCountdownFromNow(customDuration)" :disabled="!customDuration">
+                <b-button class="label-padding" :variant="customDuration ? 'primary' : 'secondary'" @click="setCountdownFromNow(customDuration)" :disabled="!customDuration">
                     <i class="fal fa-clock mr-1"></i> Set time
                 </b-button>
             </div>

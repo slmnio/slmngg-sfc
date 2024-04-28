@@ -5,7 +5,7 @@
                 <div class="group-top">Flip Teams</div>
                 <div class="group-bottom">
                     <b-form-checkbox :checked="match.flip_teams" @change="(state) => toggleFlipTeams(state)"
-                                     button size="sm" :button-variant="match.flip_teams ? 'primary' : ''">
+                                     button size="sm" :button-variant="match.flip_teams ? 'primary' : 'secondary'">
                         Flip Teams
                     </b-form-checkbox>
                 </div>

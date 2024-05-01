@@ -42,8 +42,6 @@ function setup(_io) {
 }
 
 async function broadcast(room, command, ...data) {
-    // TODO: get the socket.io server here
-    // socket to (room).emit(command, ...data)
     io.to(room).emit(command, ...data);
 }
 

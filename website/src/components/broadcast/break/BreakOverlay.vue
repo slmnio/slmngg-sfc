@@ -260,9 +260,6 @@ export default {
             if (!this.virtualMatch) slides = slides.filter(s => s !== "Schedule"); // Only going to be 1 match atm so matchup will be fine
             console.log(slides);
 
-            // TODO: add stuff here that changes based on the countdown remaining
-
-
             if (slides?.includes("Schedule") && this.countdownEnd && this.lastCountdownTick <= 30) {
                 return "Schedule";
             }

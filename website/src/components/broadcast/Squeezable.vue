@@ -32,9 +32,7 @@ export default {
     methods: {
         updateWidth(isAfterTick) {
             const big = this.$refs.big;
-            // TODO: fix this - vue3 thing?
-            // eslint-disable-next-line vue/require-slots-as-functions
-            const small = this.$slots.default?.[0]?.elm;
+            const small = this.$slots.default?.()?.[0]?.elm;
             // console.log({ big, small });
 
             if (!big?.getBoundingClientRect || !small?.getBoundingClientRect) return;

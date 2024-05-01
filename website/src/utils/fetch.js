@@ -39,7 +39,6 @@ export async function fetchThing (id) {
     }
     return addToBuffer(id);
 
-    // eslint-disable-next-line no-unreachable
     // try {
     //     id = cleanID(id);
     //

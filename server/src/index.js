@@ -109,13 +109,11 @@ function cleanID(id) {
 
 let connected = 0;
 
-// eslint-disable-next-line no-unused-vars
 io.on("connection", (socket) => {
     console.log(`[socket] on site: ${++connected}`);
 
     socket.on("subscribe", (id) => {
         id = cleanID(id);
-        // console.log("joined", id);
         socket.join(id);
     });
     socket.on("unsubscribe", (id) => {

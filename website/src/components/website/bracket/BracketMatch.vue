@@ -210,7 +210,6 @@ export default {
 
             const clarifyDate = diffFromNow <= 0 || diffFromNow >= 1000 * 60 * 60 * 24 * 7;
 
-            // eslint-disable-next-line no-unreachable
             const format = "{day-short}[D] {hour}[M]{ampm}"
                 .replace("[M]", time.minute() === 0 ? "" : ":{minute-pad}")
                 .replace("[D]", clarifyDate ? " {date-ordinal} {month-short}" : "");

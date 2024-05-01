@@ -18,7 +18,7 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 import { url } from "@/utils/content-utils";
 
 function diffString(val) {
-    if (val === 0) return "±0"; // TODO: update to special char
+    if (val === 0) return "±0";
     if (val > 0) return `+${val}`;
     return val;
 }

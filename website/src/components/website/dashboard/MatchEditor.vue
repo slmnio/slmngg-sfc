@@ -162,21 +162,18 @@
 
 <script>
 import { authenticatedRequest } from "@/utils/dashboard";
-import ThemeLogo from "@/components/website/ThemeLogo";
 import ContentThing from "@/components/website/ContentThing";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { cleanID, formatTime, textSort } from "@/utils/content-utils";
 import TeamPicker from "@/components/website/dashboard/TeamPicker";
 import MapScoreEditor from "@/components/website/dashboard/MapScoreEditor";
-import DashboardModule from "@/components/website/dashboard/DashboardModule.vue";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";
 import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "MatchEditor",
     props: ["match", "hideMatchExtras"],
-    // eslint-disable-next-line vue/no-unused-components
-    components: { AdvancedDateEditor, DashboardModule, MapScoreEditor, TeamPicker, ContentThing, ThemeLogo },
+    components: { AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
     computed: {
         teams() {
             const dummy = { dummy: true };

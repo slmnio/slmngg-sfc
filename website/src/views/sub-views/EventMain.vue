@@ -27,7 +27,6 @@ export default {
     name: "EventMain",
     props: ["event"],
     components: {
-        // eslint-disable-next-line vue/no-unused-components
         ContentThing, ContentRow, News
     },
     computed: {

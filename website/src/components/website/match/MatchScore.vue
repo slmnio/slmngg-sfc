@@ -38,7 +38,6 @@ export default {
             return this.scores;
         },
         pointColor() {
-            // eslint-disable-next-line no-unused-vars
             if (!this.match?.event?.theme?.color_theme) return {};
             return {
                 backgroundColor: this.match.event.theme.color_theme,

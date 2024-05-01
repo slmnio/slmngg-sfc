@@ -23,10 +23,8 @@ const store = createStore({
     mutations: {
         push(_store, { id, data }) {
             data = JSON.parse(JSON.stringify({ ...data, id: cleanID(id), _original_data_id: cleanID(data.id), __stored: true }));
-            // if ()
 
             const index = this.state.thing_map[id] || -1;
-            // console.log(">update", id, this.state.things, index);
             if (index !== -1) {
                 this.state.things.splice(index, 1, data);
                 return this.state.things[index];
@@ -35,9 +33,6 @@ const store = createStore({
                 this.state.thing_map[id] = this.state.things.length - 1;
                 return this.state.things[this.state.things.length - 1];
             }
-
-            // this.state.things.set(id, data);
-            // TODO: setup socket.io handler here for "data_UPDATE"
         },
         addToRequestBuffer(state, id) {
             state.request_buffer.push(id);

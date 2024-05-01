@@ -113,8 +113,6 @@ export default {
             return local.format("time");
         },
         hasScore() {
-            // return false;
-            // eslint-disable-next-line no-unreachable
             if (!this.match) return false;
             if (this.match.live) return true;
             return this.scores.some(t => !!t);

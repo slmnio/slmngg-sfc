@@ -103,38 +103,37 @@ export default {
         },
         mainPlayerRelationships(useMatches = false) {
             if (!this.player?.player_relationships) return {};
-            const groups = {};
+            const groups = new Map();
 
             this.player.player_relationships.forEach(rel => {
-                if (!groups[rel.singular_name]) {
-                    groups[rel.singular_name] = {
+                if (!groups.has(rel.singular_name)) {
+                    groups.set(rel.singular_name, {
                         meta: {
                             player_text: rel.player_text,
                             plural_name: rel.plural_name,
                             singular_name: rel.singular_name
                         },
                         items: []
-                    };
+                    });
                 }
 
-                groups[rel.singular_name].items = groups[rel.singular_name].items.concat([
+                groups.get(rel.singular_name).items = groups.get(rel.singular_name).items.concat([
                     ...(rel.events && useMatches ? rel.events.map(e => ({ item: e, type: "event" })) : []),
                     ...(rel.teams && useMatches ? rel.teams.map(e => ({ item: e, type: "team" })) : []),
                     ...(rel.matches && !useMatches ? rel.matches.map(e => ({ item: e, type: "match" })) : [])
                 ]);
             });
 
-            Object.entries(groups).forEach(([key, val]) => {
+            for (const group of groups) {
+                const [key, val] = group;
                 if (val.items.length === 0) {
-                    // TODO: no-dynamic-delete fix
-                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                    delete groups[key];
+                    groups.delete(key);
                 } else {
                     val.items.sort((a, b) => sortEvents(a.item, b.item));
                 }
-            });
+            }
 
-            return groups;
+            return Object.fromEntries(groups);
         }
     },
     methods: {

@@ -6,7 +6,7 @@
   "scripts": {
     "serve-server": "nodemon src/index.js",
     "register-commands": "node src/discord/register-slash-commands.js",
-    "lint": "eslint --ext .js,.ts --ignore-path .gitignore --ignore-pattern \"_deprecated/*\" --fix src --quiet",
+    "lint": "eslint --ext .js,.ts --ignore-path .gitignore --ignore-pattern \"**/_deprecated/*\" --fix src --quiet",
     "build": "echo \"No build stage for server - skipping\""
   },
   "repository": "git+https://github.com/slmnio/slmngg-server.git",

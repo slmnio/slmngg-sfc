@@ -458,11 +458,11 @@ let airtableteams = [];
 
 async function updateAirtableTeams() {
     airtableteams = await getGGTeams();
-    return;
-    airtableteams = await airtable.bpl("Captains").select({
-        maxRecords: 100,
-        view: "Teams",
-    }).all();
+    // return;
+    // airtableteams = await airtable.bpl("Captains").select({
+    //     maxRecords: 100,
+    //     view: "Teams",
+    // }).all();
 }
 
 // TODO: UNCOMMENT
@@ -474,9 +474,7 @@ async function getTeam(bidder) {
 
     return teams.map(t => {
 
-        if (typeof t.bidders === "object") {
-
-        } else {
+        if (typeof t.bidders !== "object") {
             if (t.bidders) {
                 t.bidders = t.bidders.split(",");
             } else if (t.control_ids) {
@@ -485,6 +483,7 @@ async function getTeam(bidder) {
                 t.bidders = [];
             }
         }
+
         return t;
     }).find(team => team.bidders.includes(bidder.id) || team.discord_tag === bidder.tag);
 }

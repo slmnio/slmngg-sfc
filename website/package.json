@@ -6,7 +6,7 @@
     "dev": "vite --port 8080 --host",
     "build": "vite build",
     "serve": "vite preview --port 8080",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
+    "lint": "eslint --ext .js,.ts,.vue --ignore-path .gitignore --fix src",
     "build-stage": "vite build --mode staging",
     "serve-website": "yarn dev"
   },

@@ -397,7 +397,7 @@ client.on("messageCreate", async message => {
         {
             aliases: [".team"],
             execute: async (args, message) => {
-                if (Auction.activePlayer) { try { await message.delete(); } catch (e) { } return; }
+                if (Auction.activePlayer) { try { await message.delete(); } catch (e) { /* ignore */ } return; }
 
                 let team = await Auction.getTeam(message.author, true);
                 if (!team) return message.reply(red({title: "Can't find a team that you can control.", footer: { text: "+ ratio" }}));
@@ -413,8 +413,8 @@ client.on("messageCreate", async message => {
         {
             aliases: [".start"],
             execute: async (args, message) => {
-                if (!Auction.startingAllowed) { try { await message.delete(); } catch (e) { } return; }
-                if (Auction.activePlayer) { try { await message.delete(); } catch (e) { } return; }
+                if (!Auction.startingAllowed) { try { await message.delete(); } catch (e) { /* ignore */ } return; }
+                if (Auction.activePlayer) { try { await message.delete(); } catch (e) { /* ignore */ } return; }
 
                 if (!args[0]) return message.reply(red({title: "usage: `.start <name>` eg `.start joshen`"}));
                 await Auction.channel.sendTyping();
@@ -436,7 +436,7 @@ client.on("messageCreate", async message => {
         {
             aliases: [".bid", ".b"],
             execute: async (args, message) => {
-                if (!Auction.activePlayer) { try { await message.delete(); } catch (e) { } return; }
+                if (!Auction.activePlayer) { try { await message.delete(); } catch (e) { /* ignore */ } return; }
                 let team = await Auction.getTeam(message.author);
                 if (!team) return;
                 if ((team.get("Players") || []).length >= getAuctionMax()) return message.reply(red({title: "You're at your maximum player count."}));

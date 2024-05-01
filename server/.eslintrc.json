@@ -28,6 +28,7 @@
         "no-unused-vars": [
             "warn"
         ],
-        "no-multiple-empty-lines": ["warn", { "max": 2 }]
+        "no-multiple-empty-lines": ["warn", { "max": 2 }],
+        "no-useless-escape": ["warn"]
     }
 }

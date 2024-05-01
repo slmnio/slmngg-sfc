@@ -1,6 +1,6 @@
 const Airtable = require("airtable");
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
-const Cache = require("./cache.js");
+const Cache = require("../cache.js");
 const slmngg = airtable.base(process.env.AIRTABLE_APP);
 const ora = require("ora");
 const chalk = require("chalk");
@@ -168,8 +168,8 @@ async function processTableData(tableName, data, linkRecords = false) {
     customTableUpdate(tableName, Cache);
 }
 
-const customTableUpdate = require("./custom-datasets");
-const { log } = require("./discord/slmngg-log");
+const customTableUpdate = require("../custom-datasets.js");
+const { log } = require("../discord/slmngg-log.js");
 
 function registerUpdater(tableName, options) {
     let pollRate = 5000;

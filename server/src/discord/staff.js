@@ -1,3 +1,4 @@
+/* eslint-disable */
 /* BPL Staff Automation */
 
 const client = require("./client.js");

@@ -1,6 +1,6 @@
-const client = require("./client.js");
+const client = require("../discord/client.js");
 const Cache = require("../cache.js");
-const { update, select } = require("../airtable-interface.js");
+const { update, select } = require("./airtable-interface.js");
 const Discord = require("discord.js");
 
 let io;

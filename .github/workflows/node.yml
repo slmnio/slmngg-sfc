@@ -14,26 +14,23 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.20.2, 20.x]
+        folder: [website, server]
 
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
+    - run: cd ${{ matrix.folder }}
+    - name: Use Node.js 18.20.2
       uses: actions/setup-node@v3
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: 18.20.2
         cache: 'yarn'
 
-    - name: "web: install"
+    - name: "${{ matrix.folder }}: install"
       run: yarn install --immutable --immutable-cache --check-cache
-    - name: "web: lint"
+      working-directory: ./${{ matrix.folder }}
+    - name: "${{ matrix.folder }}: lint"
       run: yarn lint
-    - name: "web: build"
+      working-directory: ./${{ matrix.folder }}
+    - name: "${{ matrix.folder }}: build"
       run: yarn build
-      
-    - name: "server: install"
-      working-directory: ./server
-      run: yarn install --immutable --immutable-cache --check-cache
-    - name: "server: lint"
-      working-directory: ./server
-      run: yarn lint
+      working-directory: ./${{ matrix.folder }}

@@ -128,7 +128,7 @@ store.subscribe((mutation, state) => {
 
 app.component("v-style", {
     render: function () {
-        return h("style", this.$slots.default);
+        return h("style", this.$slots.default());
     }
 });
 

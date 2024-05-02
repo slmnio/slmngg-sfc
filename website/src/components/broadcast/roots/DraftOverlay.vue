@@ -7,7 +7,7 @@
                 <!--<div class="player" v-for="player in availablePlayers" :key="player.id">
                     {{ player.name }}
                 </div>-->
-                <transition-group class="players-transition" name="draftable">
+                <transition-group class="players-transition" name="draftable" tag="div">
                     <DraftPlayer :style="draftPlayerStyle" v-for="player in availablePlayers" :key="player.id"
                                  :player="player" :theme="event.theme" :show-icon="icons" :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
                 </transition-group>
@@ -21,7 +21,7 @@
                                 {{ staff.name }}
                             </div>
                         </div>
-                        <transition-group name="player" class="team-players">
+                        <transition-group name="player" class="team-players" tag="div">
                             <DraftPlayer class="drafted-player" v-for="player in insertDummies(team.players)" :key="player.id"
                                          :player="player" :theme="event.theme" :show-icon="icons" :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
                         </transition-group>

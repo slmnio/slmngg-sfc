@@ -2,7 +2,7 @@
     <div class="l-bar-overlay">
         <div class="left-bar flex-center flex-column text-center">
             <div class="countdown-group flex-center flex-column" :style="themeColor">
-                <transition name="fade" mode="out-in" class="countdown-text">
+                <transition name="fade" mode="out-in" class="countdown-text" tag="div">
                     <span :key="countdownText" class="industry-align">
                         {{ countdownText }}
                     </span>
@@ -23,7 +23,7 @@
             <ThemeLogo :theme="broadcast?.event?.theme" class="event-logo w-100 h-100" icon-padding="75px" logo-size="w-500" border-width="0"/>
         </div>
         <div class="lower-bar overlay--bg title flex-center text-center">
-            <transition name="fade" mode="out-in" class="">
+            <transition name="fade" mode="out-in">
                         <span class="title-text" v-html="nbr(title || broadcast.title)" :key="title || broadcast.title"
                               :class="{'has-br': (title || broadcast.title || '').includes('\\n')}"></span>
             </transition>

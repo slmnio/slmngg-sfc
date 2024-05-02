@@ -37,7 +37,7 @@
                 <ThemeTransition class="break-transition-main h-100" :theme="event && event.theme" :active="animationActive" one-color start="top" end="bottom" :starting-delay="350" :inner-delay="150" :duration="500">
                     <div class="break-main event-theme-border overlay--bg" :style="eventBorder">
                         <transition name="break-content" mode="out-in">
-                            <transition-group class="break-col break-schedule" name="a--match"
+                            <transition-group class="break-col break-schedule" name="a--match" tag="div"
                                               v-if="automatedShow === 'Schedule'" key="Schedule">
                                 <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match"
                                             :expanded="true" :key="match.id" :theme-color="themeColor"/>

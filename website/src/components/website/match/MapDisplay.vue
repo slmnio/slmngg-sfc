@@ -1,7 +1,7 @@
 <template>
     <div :class="`map ${mapClass} ${condensed ? 'condensed' : ''} ${banned ? 'is-banned' : ''}`" v-if="showBannedMaps ? true : !banned">
         <div class="map-image default-thing" :style="imageCSS">
-            <div class="map-color-overlay draw" v-if="map.draw"></div>
+            <div class="map-color-overlay draw" v-if="map?.draw"></div>
             <div class="map-color-overlay banned" v-if="banned"></div>
             <div class="map-color-overlay winner" v-if="winner" :style="logoBackground1(winner)"></div>
 
@@ -9,17 +9,17 @@
             <div class="map-insert-number" v-if="number && !condensed && !banned">{{ number }}</div>
 
             <div class="map-insert-text" v-if="banned && !condensed">BANNED</div>
-            <div class="map-insert-text" v-if="map.draw && complete && !condensed">DRAW</div>
+            <div class="map-insert-text" v-if="map?.draw && complete && !condensed">DRAW</div>
             <div class="map-insert-text" v-if="!complete && !condensed && !winner && mapClass === 'tiebreaker'">TIEBREAKER</div>
             <div class="map-insert-text" v-if="!complete && !condensed && !winner && mapClass === 'extra'">IF REQUIRED</div>
         </div>
         <div class="map-lower-text map-name">{{ name || '--' }}</div>
         <div class="map-lower-text map-scores" v-if="scores">{{ scores }}</div>
         <div class="map-lower-text map-pick" v-if="!condensed && (banText || pickText)">{{ banText || pickText  || '' }}</div>
-        <div class="map-lower-text map-replay-code" v-if="!condensed && map.replay_code">
+        <div class="map-lower-text map-replay-code" v-if="!condensed && map?.replay_code">
              <i class="fas fa-history fa-fw" v-b-tooltip="'Replay Code'"></i> <CopyTextButton>{{ map.replay_code }}</CopyTextButton>
         </div>
-        <div class="map-self-pick" v-if="showSelfPicks && map.picker && map.picker?.id === self?.id">
+        <div class="map-self-pick" v-if="showSelfPicks && map.picker?.id === self?.id">
             {{ self.code }} PICK
         </div>
     </div>
@@ -46,16 +46,16 @@ export default {
             return this.map?.number || this.i + 1;
         },
         winner() {
-            return this.getTeamFromID(this.map.winner);
+            return this.getTeamFromID(this.map?.winner);
         },
         banned() {
-            return this.map.banned || this.banned_by;
+            return this.map?.banned || this.banned_by;
         },
         banned_by() {
-            return this.getTeamFromID(this.map.banner);
+            return this.getTeamFromID(this.map?.banner);
         },
         picked_by() {
-            return this.getTeamFromID(this.map.picker);
+            return this.getTeamFromID(this.map?.picker);
         },
         imageCSS() {
             let mapTheme = { color: "#ffffff" };
@@ -69,7 +69,7 @@ export default {
         },
         complete() {
             if (!this.match) return false;
-            return [this.match.score_1, this.match.score_2].some(s => s === this.match.first_to);
+            return [this.match?.score_1, this.match?.score_2].some(s => s === this.match.first_to);
         },
         name() {
             console.log(this.map);
@@ -79,7 +79,7 @@ export default {
             } catch (e) { return ""; }
         },
         scores() {
-            if (this.map.score_1 == null || this.map.score_2 == null) return null;
+            if (this.map?.score_1 == null || this.map?.score_2 == null) return null;
             return [this.map.score_1, this.map.score_2].join(" - ");
         },
         pickText() {

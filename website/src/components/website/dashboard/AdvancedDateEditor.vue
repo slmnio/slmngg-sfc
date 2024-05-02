@@ -4,7 +4,7 @@
             <b-button v-b-modal.date-editor-modal :disabled="isProcessing">
                 <LoadingIcon v-if="isProcessing" />
                 <i v-else class="fas fa-fw fa-calendar-alt"></i>
-                <span v-if="$slots.default" class="ml-1"><slot></slot></span>
+                <span v-if="$slots.default?.()" class="ml-1"><slot></slot></span>
             </b-button>
         </div>
 

@@ -1,5 +1,5 @@
 <template>
-    <transition name="tt" mode="out-in" :duration="calculatedDuration"
+    <transition name="tt" mode="out-in" :duration="calculatedDuration" tag="div"
         @after-enter="() => entered = true" @before-leave="() => entered = false" @before-enter="() => entered = false">
         <div v-show="isActive" :key="transitionKey || 'transition'" :data-key="transitionKey ?? 'transition'" class="theme-transition" :style="animDurations"
              :class="{ ...directionClasses, ...borderClasses, 'start-inner-full': startInnerFull, 'active': isActive, 'entered': entered, 'clear-after-entered': clearStyleAfterEntered, 'use-fit-content': useFitContent, 'clip-slot': clipSlot }">

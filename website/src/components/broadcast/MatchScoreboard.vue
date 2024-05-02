@@ -149,7 +149,7 @@ export default {
 }
 
 .scoreboard-team {
-    width: 400px;
+    width: 500px;
     margin-right: .5em
 }
 
@@ -159,6 +159,7 @@ export default {
     text-transform: uppercase;
     margin-left: .2em;
     margin-right: .3em;
+    font-weight: bold;
 }
 
 .map,
@@ -188,8 +189,8 @@ export default {
     margin-left: .25em;
 }
 
-.map-score:not(.map-won) {
-    font-weight: 400;
+.map-score.map-won {
+    font-weight: bold;
 }
 
 .match-score {

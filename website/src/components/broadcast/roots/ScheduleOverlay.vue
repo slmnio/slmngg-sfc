@@ -1,6 +1,6 @@
 <template>
     <GenericOverlay :title="title || 'Schedule'" class="schedule-overlay" :top="top" :broadcast="broadcast">
-        <transition-group class="break-col break-schedule" name="a--match">
+        <transition-group class="break-col break-schedule" name="a--match" tag="div">
             <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />
         </transition-group>
     </GenericOverlay>

@@ -3,14 +3,14 @@
         <div class="top-holder">
             <TourneyBar :left="broadcast.event && broadcast.event.short" :right="broadcast.subtitle" :event="broadcast.event" />
         </div>
-        <transition-group class="casters flex-center" name="anim-talent">
+        <transition-group class="casters flex-center" tag="div" name="anim-talent">
             <Caster v-for="(caster, i) in casters" :key="caster.manual ? caster.name : caster.id" :guest="caster" :color="getColor(i)"
                     :event="event" :disable-video="shouldDisableCasterVideo" :class="{'wide-feed': caster.wide_feed}"
                     :show-pronouns="showPronouns" :pronouns-on-newline="pronounsOnNewline" />
         </transition-group>
-        <transition tag="div" class="lower-holder flex-center" mode="out-in" name="break-content">
+        <transition tag="div" mode="out-in" name="break-content">
             <DeskMatch :broadcast="broadcast" class="w-100" :_match="liveMatch" :theme-color="themeColor" :guests="guests" v-if="liveMatch && !useScoreboard" key="desk-match" />
-            <MatchScoreboard :active="animationActive" class="scoreboard" v-if="liveMatch && useScoreboard" :match="liveMatch" :broadcast="broadcast" key="scoreboard" :animate-on-mount="true" />
+            <MatchScoreboard :active="animationActive" class="scoreboard" v-else-if="liveMatch && useScoreboard" :match="liveMatch" :broadcast="broadcast" key="scoreboard" :animate-on-mount="true" />
         </transition>
 
         <div class="preload">

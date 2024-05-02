@@ -15,6 +15,7 @@ import strongholds from "@/assets/default-map-images/strongholds.png";
 import ctf from "@/assets/default-map-images/ctf.png";
 import oddball from "@/assets/default-map-images/oddball.png";
 import flashpoint from "@/assets/default-map-images/flashpoint.png";
+import clash from "@/assets/default-map-images/clash.png";
 
 import hybridIcon from "@/assets/map-type-icons/hybrid.png";
 import escortIcon from "@/assets/map-type-icons/escort.png";
@@ -22,6 +23,7 @@ import controlIcon from "@/assets/map-type-icons/control.png";
 import pushIcon from "@/assets/map-type-icons/push.png";
 import assaultIcon from "@/assets/map-type-icons/assault.png";
 import flashpointIcon from "@/assets/map-type-icons/flashpoint.png";
+import clashIcon from "@/assets/map-type-icons/clash.png";
 
 export function getImage (i) {
     // console.log(i);
@@ -263,8 +265,8 @@ export const DefaultMapImages = {
     Strongholds: strongholds,
     CTF: ctf,
     Oddball: oddball,
-    Flashpoint: flashpoint
-    // Clash: "https://media.slmn.io/maps/Clash.png"
+    Flashpoint: flashpoint,
+    Clash: clash
 };
 
 export const MapTypeIcons = {
@@ -273,8 +275,8 @@ export const MapTypeIcons = {
     Control: controlIcon,
     Push: pushIcon,
     Assault: assaultIcon,
-    Flashpoint: flashpointIcon
-    // Clash: "https://media.slmn.io/maps/Clash-Icon.png"
+    Flashpoint: flashpointIcon,
+    Clash: clashIcon
 };
 
 export function getTeamsMapStats(teams, requestMatch, requestMap, filters) {

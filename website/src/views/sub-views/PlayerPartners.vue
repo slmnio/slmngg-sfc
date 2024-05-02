@@ -26,14 +26,12 @@
     </div>
 </template>
 <script>
-import { BFormSelect } from "bootstrap-vue";
 import { formatTime, url } from "@/utils/content-utils";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "PlayerPartners",
     props: ["player"],
     methods: { url, formatTime },
-    components: { BFormSelect },
     data: () => ({
         chosenPartnerType: null
     }),
@@ -93,7 +91,7 @@ export default {
             const addPartner = (id, player, match) => {
                 if (!player?.name || id === this.player.id) return;
                 if (!partners.has(id)) {
-                    partners.set(id, { player: player, matches: 0, lastMatch: match });
+                    partners.set(id, { player, matches: 0, lastMatch: match });
                 }
                 const data = partners.get(id);
                 data.matches++;

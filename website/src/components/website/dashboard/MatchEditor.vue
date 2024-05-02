@@ -318,7 +318,7 @@ export default {
                     this.emptyData(newMatch?.id);
                 }
                 if (JSON.stringify(newMatch) === JSON.stringify(oldMatch)) {
-                    console.log("No change in data", newMatch);
+                    // console.log("No change in data", newMatch);
                     return;
                 }
                 this.updateMatchData(newMatch);

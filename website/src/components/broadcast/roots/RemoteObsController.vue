@@ -91,7 +91,7 @@ export default {
         //     this.connectWs();
         // }, 1000);
     },
-    beforeDestroy() {
+    beforeUnmount() {
         if (this.connectInterval) clearInterval(this.connectInterval);
     },
     metaInfo() {

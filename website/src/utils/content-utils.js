@@ -263,7 +263,7 @@ export const DefaultMapImages = {
     Strongholds: strongholds,
     CTF: ctf,
     Oddball: oddball,
-    Flashpoint: flashpoint,
+    Flashpoint: flashpoint
     // Clash: "https://media.slmn.io/maps/Clash.png"
 };
 
@@ -273,7 +273,7 @@ export const MapTypeIcons = {
     Control: controlIcon,
     Push: pushIcon,
     Assault: assaultIcon,
-    Flashpoint: flashpointIcon,
+    Flashpoint: flashpointIcon
     // Clash: "https://media.slmn.io/maps/Clash-Icon.png"
 };
 

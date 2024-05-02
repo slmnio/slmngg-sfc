@@ -67,7 +67,7 @@
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { url, cleanID } from "@/utils/content-utils";
 import ScheduleTime from "@/components/website/schedule/ScheduleTime";
-import { adjustMatchBroadcast } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 
 export default {
@@ -90,9 +90,13 @@ export default {
             // - broadcastID
             // - matchID
 
-            this.$set(this.processing, "match_broadcast", true);
-            const response = await adjustMatchBroadcast(this.$root.auth, mode, this.selectedBroadcast.id, this.match.id);
-            this.$set(this.processing, "match_broadcast", false);
+            this.processing.match_broadcast = true;
+            const response = await authenticatedRequest("actions/adjust-match-broadcast", {
+                mode,
+                broadcastID: this.selectedBroadcast.id,
+                matchID: this.match.id
+            });
+            this.processing.match_broadcast = false;
 
             if (response.error) {
                 console.error(":(", response.error);

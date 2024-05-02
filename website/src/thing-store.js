@@ -47,13 +47,13 @@ const store = createStore({
             return fetchThings(ids);
         },
         socketDataUpdate(state, { id, data }) {
-            console.log("[store] [data_update] commit->", data);
+            // console.log("[store] [data_update] commit->", data);
             // this.commit("push", { id, data });
             state.data_update_buffer.push({ id, data });
         },
         executeUpdateBuffer(state) {
             if (!state.data_update_buffer.length) return;
-            console.log("[store] [data_update] execute->", state.data_update_buffer.length);
+            // console.log("[store] [data_update] execute->", state.data_update_buffer.length);
             state.data_update_buffer.forEach(({ id, data }) => {
                 this.commit("push", { id, data });
             });

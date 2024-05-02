@@ -101,6 +101,7 @@ export default {
             const p = players.map(player => {
                 return this.decoratedMemberList.find(member => {
                     if (player.id === member.airtableID || player.discord_id === member.id) return member;
+                    return false;
                 });
             }).filter(p => !!p);
             console.log("sorted member list", p);

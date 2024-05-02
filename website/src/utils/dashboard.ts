@@ -20,7 +20,9 @@ type ActionKey = "create-live-guest" |
     "update-gfx-index" |
     "update-map-data" |
     "update-match-data" |
-    "update-profile-data"
+    "update-profile-data" |
+    "set-player-relationships" |
+    "adjust-match-broadcast"
 
 type RequestUrl = `actions/${ActionKey}`
 
@@ -164,6 +166,22 @@ interface UpdateProfileDataData {
     }
 }
 
+interface SetPlayerRelationshipsData {
+    matchID: AnyAirtableID
+    roles: Array<{
+        [singular_name: string]: {
+            selected: AnyAirtableID[]
+            /** @deprecated **/ count: number
+        }
+    }>
+}
+
+interface AdjustMatchBroadcastData {
+    mode: "add" | "remove"
+    broadcastID: AnyAirtableID
+    matchID: AnyAirtableID
+}
+
 
 type ActionRequestData<U> =
     U extends "actions/create-live-guest" ? CreateLiveGuestData :
@@ -183,6 +201,8 @@ type ActionRequestData<U> =
     U extends "actions/update-map-data" ? UpdateMapDataData :
     U extends "actions/update-match-data" ? UpdateMatchDataData :
     U extends "actions/update-profile-data" ? UpdateProfileDataData :
+    U extends "actions/set-player-relationships" ? SetPlayerRelationshipsData :
+    U extends "actions/adjust-match-broadcast" ? AdjustMatchBroadcastData :
     any;
 
 

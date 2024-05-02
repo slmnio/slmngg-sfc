@@ -135,6 +135,7 @@ export default {
                 } else if (rel.singular_name.includes("Stats")) {
                     return ["Stats"].some(str => sceneName.includes(str.toLowerCase()));
                 }
+                return false;
             });
         }
 

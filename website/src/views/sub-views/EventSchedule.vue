@@ -42,7 +42,6 @@
 
 <script>
 import { ReactiveArray, ReactiveThing, ReactiveRoot } from "@/utils/reactive";
-import { isAuthenticated } from "@/utils/auth";
 import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 import { canEditMatch, isEventStaffOrHasRole } from "@/utils/client-action-permissions";
@@ -50,7 +49,7 @@ import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "EventSchedule",
-    components: { TimezoneSwapper, ScheduleMatch, BFormSelect, BFormGroup },
+    components: { TimezoneSwapper, ScheduleMatch },
     props: ["event"],
     data: () => ({
         showAll: false,

@@ -421,7 +421,7 @@ export default {
     }
     .break-left-col {
         flex-shrink: 0;
-        //border-right: 1px solid rgba(255,255,255,0.2);
+        /* border-right: 1px solid rgba(255,255,255,0.2); */
         padding: 5px 20px;
     }
 

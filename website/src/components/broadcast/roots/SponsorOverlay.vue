@@ -17,7 +17,7 @@ export default {
             })(this.broadcast);
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Sponsors | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -29,7 +29,7 @@ export default {
     .sponsor-overlay {
         padding: 0;
     }
-    .sponsor-overlay >>> .sponsors-holder {
+    .sponsor-overlay:deep(.sponsors-holder) {
         height: 100vh;
     }
 </style>

@@ -2,7 +2,7 @@
     <div class="hero-card d-flex flex-column flex-center" v-if="hero">
         <div class="hero-top h-100 flex-center flex-column">
             <div class="hero-card-title d-flex flex-column flex-center">Favorite Hero</div>
-            <div class="hero-name py-2 d-flex flex-row text-center flex-center font-weight-bold">
+            <div class="hero-name py-2 d-flex flex-row text-center flex-center fw-bold">
                 <span v-if="roleIcon" class="hero-icon" v-html="roleIcon"></span>
                 <span class="hero-real-name">{{ heroName }}</span>
             </div>
@@ -66,7 +66,7 @@ export default {
         height: 1em;
         width: 1em;
     }
-    .hero-icon >>> svg {
+    .hero-icon:deep(svg) {
         vertical-align: text-bottom;
     }
 

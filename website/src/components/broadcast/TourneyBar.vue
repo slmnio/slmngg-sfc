@@ -1,6 +1,6 @@
 <template>
     <div class="tourney-bar" :style="gradient" :class="{'small-bar': !(left && right) }">
-        <div class="bar-text flex-center bar-text-left">
+        <div class="bar-text flex-center bar-text-start">
             <transition name="fade" mode="out-in">
                 <span :key="left" v-if="left && right">{{ left }}</span>
             </transition>
@@ -10,7 +10,7 @@
                 <div class="bar-logo-holder bg-center h-100 w-100" :key="_theme && _theme.id" :style="logo"></div>
 <!--            </transition>-->
         </div>
-        <div class="bar-text flex-center bar-text-right">
+        <div class="bar-text flex-center bar-text-end">
             <transition name="fade" mode="out-in">
                 <span :key="right" v-if="left && right">{{ right }}</span>
             </transition>
@@ -27,8 +27,8 @@ export default {
     computed: {
         _theme() {
             if (this.theme) return this.theme;
-            if (this.event && this.event.theme) return this.event.theme;
-            if (this.broadcast && this.broadcast.event && this.broadcast.event.theme) return this.broadcast.event.theme;
+            if (this.event?.theme) return this.event.theme;
+            if (this.broadcast?.event?.theme) return this.broadcast.event.theme;
             return null;
         },
         gradient() {

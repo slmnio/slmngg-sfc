@@ -32,7 +32,7 @@ export default {
     methods: {
         updateWidth(isAfterTick) {
             const big = this.$refs.big;
-            const small = this.$slots.default?.[0]?.elm;
+            const small = this.$slots.default?.()?.[0]?.elm;
             // console.log({ big, small });
 
             if (!big?.getBoundingClientRect || !small?.getBoundingClientRect) return;
@@ -78,7 +78,7 @@ export default {
         flex-wrap: nowrap;
         overflow: hidden;
     }
-    .squeezable>*, .squeezable >>> > * {
+    .squeezable>*, .squeezable:deep(*) {
         width: fit-content;
         transform:
             scaleX(var(--content-scale, 1))

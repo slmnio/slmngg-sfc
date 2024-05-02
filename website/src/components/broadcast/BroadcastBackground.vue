@@ -37,7 +37,7 @@ export default {
             return types[0];
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Background${this.index ? ` #${this.index}` : ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

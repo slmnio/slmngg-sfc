@@ -13,13 +13,11 @@
 </template>
 
 <script>
-import { BButton, BFormGroup, BFormInput } from "bootstrap-vue";
-import { updateBroadcastData } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 import { unescapeText } from "@/utils/content-utils";
 
 export default {
     name: "BreakTextTab",
-    components: { BFormGroup, BFormInput, BButton },
     props: { broadcast: Object },
     data: () => ({
         breakTitle: "",
@@ -46,7 +44,7 @@ export default {
                     title: this.breakTitle
                 };
 
-                const response = await updateBroadcastData(this.$root.auth, data);
+                const response = await authenticatedRequest("actions/update-broadcast", data);
                 if (!response.error) {
                     this.$notyf.success(`Break title set to ${data.title}`);
                 }

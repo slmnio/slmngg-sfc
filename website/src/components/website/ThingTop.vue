@@ -8,7 +8,7 @@
                 <div class="thing-name d-flex flex-column">
                     <h3 class="subtitle m-0" v-if="type === 'team' && thing.subtitle">{{ thing.subtitle }}</h3>
 
-                    <div class="series-title font-weight-bold" v-if="type === 'event' && thing.series_name && thing.series_subtitle">
+                    <div class="series-title fw-bold" v-if="type === 'event' && thing.series_name && thing.series_subtitle">
                         {{ thing.series_name }}
                     </div>
                     <div class="series-subtitle" v-if="type === 'event' && thing.series_name && thing.series_subtitle">
@@ -19,7 +19,7 @@
 
 
                 <div class="thing-lower" v-if="thing.event">
-                    <span>{{ thing.type_description || 'from'}} </span>
+                    <span>{{ thing.type_description || 'from'}}&nbsp;</span>
                     <router-link class="ct-active" :to="url('event', thing.event)">{{ thing.event.name }}</router-link>
                 </div>
 

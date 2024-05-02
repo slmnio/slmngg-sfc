@@ -8,7 +8,6 @@
 <script>
 import WebsiteNav from "@/components/website/WebsiteNav";
 import NotFoundContent from "@/views/sub-views/NotFoundContent";
-import "@/assets/bootstrap.css";
 import "@/assets/app.css";
 
 export default {

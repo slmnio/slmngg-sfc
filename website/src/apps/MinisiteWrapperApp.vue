@@ -6,7 +6,7 @@
                 body.minisite {
                     background-color: {{ theme.color_body }};
                     color: {{ theme.color_text_on_body }};
-                    {{/* Having an empty string (eg --theme-passive: ; ) won't trigger the fallbacks below  */}}
+                    /* Having an empty string (eg --theme-passive: ; ) won't trigger the fallbacks below */
                     {{ theme.color_website_passive && `--theme-passive: ${theme.color_website_passive};` }}
                     {{ theme.color_website_active && `--theme-active: ${theme.color_website_active};` }}
                     {{ theme.color_website_dark && `--theme-dark: ${theme.color_website_dark};` }}
@@ -44,7 +44,6 @@
 import NotFoundPage from "@/views/NotFoundPage";
 import WebsiteNav from "@/components/website/WebsiteNav";
 import { ReactiveThing } from "@/utils/reactive";
-import "@/assets/bootstrap.css";
 import "@/assets/app.css";
 export default {
     name: "MinisiteWrapperApp",

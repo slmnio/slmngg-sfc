@@ -335,10 +335,10 @@ export default {
     .ingame-team-anim-enter-active, .ingame-team-anim-leave-active {
         transition: all .5s cubic-bezier(0, 0, 0.55, 1);
     }
-    .ingame-team-anim-enter-to, .ingame-team-anim-leave {
+    .ingame-team-anim-enter-to, .ingame-team-anim-leave-from {
         max-width: 700px;
     }
-    .ingame-team-anim-enter, .ingame-team-anim-leave-to {
+    .ingame-team-anim-enter-from, .ingame-team-anim-leave-to {
         max-width: 0;
     }
 
@@ -372,8 +372,8 @@ export default {
     /*}*/
 
     .score-enter-active, .score-leave-active { overflow: hidden; transition: max-width .3s; }
-    .score-enter-to, .score-leave { max-width: var(--team-height); }
-    .score-enter, .score-leave-to { max-width: 0; }
+    .score-enter-to, .score-leave-from { max-width: var(--team-height); }
+    .score-enter-from, .score-leave-to { max-width: 0; }
 
     .ingame-team.default-thing {
         background-color: #373737;
@@ -424,16 +424,16 @@ export default {
         transition: all 200ms ease .2s;
         overflow: hidden;
     }
-    .slide-enter, .slide-leave-to {
+    .slide-enter-from, .slide-leave-to {
         width: 0;
     }
-    .slide-enter-to, .slide-leave {
+    .slide-enter-to, .slide-leave-from {
         width: var(--team-height);
     }
     .attack-enter-active, .attack-leave-active { transition: all 200ms ease; }
 
-    .attack-enter { clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); }
-    .attack-enter-to, .attack-leave { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+    .attack-enter-from { clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); }
+    .attack-enter-to, .attack-leave-from { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
     .attack-leave-to { clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); }
 
     .dot {
@@ -476,7 +476,7 @@ export default {
     .fly-in-enter-active {
         transition: all .75s ease 1.5s;
     }
-    .fly-in-enter {
+    .fly-in-enter-from {
         transform: translate(0, -40px);
     }
     .fly-in-enter-to {

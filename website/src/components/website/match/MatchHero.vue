@@ -21,7 +21,7 @@ export default {
     props: ["match"],
     computed: {
         eventStyle() {
-            if (!this.match.event || !this.match.event.theme) return {};
+            if (!this.match.event?.theme) return {};
             return {
                 backgroundColor: this.match.event.theme.color_logo_background || this.match.event.theme.color_theme,
                 color: this.match.event.theme.color_text_on_logo_background || this.match.event.theme.color_text_on_theme,
@@ -29,7 +29,7 @@ export default {
             };
         },
         eventLogo() {
-            if (!this.match.event || !this.match.event.theme) return {};
+            if (!this.match.event?.theme) return {};
             return {
                 backgroundImage: image(this.match.event.theme, "default_logo")
             };

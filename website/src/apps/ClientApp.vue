@@ -4,8 +4,10 @@
 </template>
 
 <script>
+import { socket } from "@/socket";
 import BroadcastApp from "@/apps/BroadcastApp";
 import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+
 export default {
     name: "ClientApp",
     components: { BroadcastApp },
@@ -22,11 +24,11 @@ export default {
     },
     mounted() {
         console.log("prod-join", this.client);
-        this.$socket.client.emit("prod-join", this.client);
+        socket.emit("prod-join", this.client);
     },
     sockets: {
         connect() {
-            this.$socket.client.emit("prod-join", this.client);
+            socket.emit("prod-join", this.client);
         }
     }
 };

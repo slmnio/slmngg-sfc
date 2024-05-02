@@ -107,14 +107,12 @@ export default {
             return [];
         },
         start() {
-            if (!this.match || !this.match.start) return null;
+            if (!this.match?.start) return null;
             const utc = spacetime(this.match.start);
             const local = utc.goto(this.timezone || "America/New_York");
             return local.format("time");
         },
         hasScore() {
-            // return false;
-            // eslint-disable-next-line no-unreachable
             if (!this.match) return false;
             if (this.match.live) return true;
             return this.scores.some(t => !!t);
@@ -148,7 +146,7 @@ export default {
     },
     methods: {
         teamLogo(team) {
-            if (!team || !team.theme) return {};
+            if (!team?.theme) return {};
             return {
                 ...resizedImage(team.theme, ["small_logo", "default_logo"], "h-100")
             };

@@ -9,6 +9,7 @@
 <script>
 import MatchThumbnail from "@/components/website/match/MatchThumbnail";
 import { formatTime, getMatchContext, url } from "@/utils/content-utils";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "UpcomingMatch",
@@ -19,8 +20,8 @@ export default {
             if (!this.match.start) return null;
             return formatTime(this.match.start, {
                 format: "{day-short} {date-ordinal} {month-short} {time} {tz}",
-                tz: this.$store.state.timezone,
-                use24HourTime: this.$store.state.use24HourTime
+                tz: useSettingsStore().timezone,
+                use24HourTime: useSettingsStore().use24HourTime
             });
         }
     },

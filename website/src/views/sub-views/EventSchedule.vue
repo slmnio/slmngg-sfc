@@ -1,7 +1,7 @@
 <template>
     <div class="event-schedule container">
 
-        <div class="d-none d-sm-flex flex-column align-items-end gap-1 w-100 justify-content-end timezone-swapper-holder">
+        <div class="d-sm-flex w-100 justify-content-end timezone-swapper-holder d-none">
             <TimezoneSwapper :inline="true" />
             <b-form-group label-cols="auto" label-size="sm" label="Broadcast" v-if="showBroadcastSettings">
                 <b-form-select v-if="eventBroadcasts?.length" :options="eventBroadcasts" v-model="selectedBroadcastID" size="sm" class="w-auto"/>
@@ -46,7 +46,7 @@ import { isAuthenticated } from "@/utils/auth";
 import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 import { canEditMatch, isEventStaffOrHasRole } from "@/utils/client-action-permissions";
-import { BFormSelect, BFormGroup } from "bootstrap-vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "EventSchedule",
@@ -85,7 +85,7 @@ export default {
             return 0;
         },
         matches() {
-            if (!this.event || !this.event.matches) return [];
+            if (!this.event?.matches) return [];
             return ReactiveArray("matches", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -185,7 +185,8 @@ export default {
             }
         },
         showEditorButton() {
-            return canEditMatch(this.$root?.auth?.user, { event: this.event });
+            const { user } = useAuthStore();
+            return canEditMatch(user, { event: this.event });
         },
         _event() {
             return ReactiveRoot(this.event?.id, {
@@ -203,8 +204,9 @@ export default {
             return (this._event?.broadcasts || []).find(b => b.id === this.selectedBroadcastID);
         },
         showBroadcastSettings() {
-            if (!isAuthenticated(this.$root)) return false;
-            return isEventStaffOrHasRole(this.$root.auth.user, {
+            const { isAuthenticated } = useAuthStore();
+            if (isAuthenticated) return false;
+            return isEventStaffOrHasRole({
                 event: this.event,
                 role: "Broadcast Manager",
                 websiteRoles: ["Can edit any match", "Can edit any event", "Full broadcast permissions"]
@@ -249,7 +251,7 @@ export default {
     //         this.activeScheduleNum = this.defaultScheduleNum;
     //     }
     // },
-    metaInfo() {
+    head() {
         return {
             title: "Schedule"
             // title: this.event?.name ? `Schedule | ${this.event?.name}` : "Schedule"

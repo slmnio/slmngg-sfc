@@ -5,7 +5,7 @@
                 <div class="group-top">Flip Teams</div>
                 <div class="group-bottom">
                     <b-form-checkbox :checked="match.flip_teams" @change="(state) => toggleFlipTeams(state)"
-                                     button size="sm" :button-variant="match.flip_teams ? 'primary' : ''">
+                                     button size="sm" :button-variant="match.flip_teams ? 'primary' : 'secondary'">
                         Flip Teams
                     </b-form-checkbox>
                 </div>
@@ -26,7 +26,7 @@
                 <div class="group-bottom">
                     <b-form-checkbox :checked="broadcast.show_cams" @change="(state) => togglePlayerCams(state)"
                                      :disabled="updateData?.playerCams !== undefined"
-                                     button size="sm" :button-variant="broadcast.show_cams ? 'primary' : ''">
+                                     button size="sm" :button-variant="broadcast.show_cams ? 'primary' : 'secondary'">
                         Show Cams
                     </b-form-checkbox>
                 </div>
@@ -34,7 +34,7 @@
         </div>
         <div class="spacer flex-grow-1"></div>
         <div class="area right-area">
-            <div class="group text-right">
+            <div class="group text-end">
                 <div class="group-top">Break match</div>
                 <div class="group-bottom">
                     <b-button size="sm" :variant="broadcast.show_live_match ? 'primary' : 'secondary'" :pressed="broadcast.show_live_match"
@@ -42,7 +42,7 @@
                               @click="() => setLiveMatchVisibility(!broadcast.show_live_match)">Show live match</b-button>
                 </div>
             </div>
-            <div class="group text-right">
+            <div class="group text-end">
                 <div class="group-top">Break Settings</div>
                 <div class="group-bottom">
                     <div class="fake-btn-group">
@@ -50,18 +50,18 @@
                     </div>
                 </div>
             </div>
-            <div class="group text-right">
+            <div class="group text-end">
                 <div class="group-top">Observers</div>
                 <div class="group-bottom">
                     <ObserverSettingsModal :broadcast="broadcast"/>
                 </div>
             </div>
-            <div class="group text-right">
+            <div class="group text-end">
                 <div class="group-top">Advertise</div>
                 <div class="group-bottom">
-                    <b-form-checkbox :checked="broadcast.advertise" @change="(state) => advertiseBroadcast(state)"
+                    <b-form-checkbox :checked="broadcast.advertise" @update:modelValue="(state) => advertiseBroadcast(state)"
                                      :disabled="updateData?.advertise !== undefined"
-                                     button size="sm" :button-variant="broadcast.advertise ? 'primary' : ''">
+                                     button size="sm" :button-variant="broadcast.advertise ? 'primary' : 'secondary'">
                         {{ broadcast.advertise ? "Advertising" : "Advertise" }}
                     </b-form-checkbox>
                 </div>
@@ -71,11 +71,7 @@
 </template>
 
 <script>
-import { BButton, BButtonGroup, BFormCheckbox } from "bootstrap-vue";
-import {
-    toggleFlipTeams,
-    updateBroadcastData
-} from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 import ObserverSettingsModal from "@/components/website/dashboard/ObserverSettingsModal.vue";
 import BreakDisplayMultiModal from "@/components/website/dashboard/BreakDisplayMultiModal.vue";
 
@@ -88,10 +84,7 @@ export default {
     }),
     components: {
         BreakDisplayMultiModal,
-        ObserverSettingsModal,
-        BFormCheckbox,
-        BButtonGroup,
-        BButton
+        ObserverSettingsModal
     },
     computed: {
         broadcast() {
@@ -103,30 +96,30 @@ export default {
     },
     methods: {
         async toggleFlipTeams(state) {
-            await toggleFlipTeams(this.$root.auth);
+            await authenticatedRequest("actions/toggle-flip-teams");
         },
         async advertiseBroadcast(state) {
             this.updateData.advertise = state;
-            return this.updateBroadcast();
+            return await this.updateBroadcast();
         },
         async togglePlayerCams(state) {
             this.updateData.playerCams = state;
-            return this.updateBroadcast();
+            return await this.updateBroadcast();
         },
         async setAttack(side) {
             const set = side === this.broadcast.map_attack ? null : side;
             this.updateData.mapAttack = set;
-            return this.updateBroadcast();
+            return await this.updateBroadcast();
         },
         async setLiveMatchVisibility(visible) {
             this.updateData.showLiveMatch = visible;
-            return this.updateBroadcast();
+            return await this.updateBroadcast();
         },
         async updateBroadcast() {
             if (this.broadcastUpdateTimeout) clearTimeout(this.broadcastUpdateTimeout);
 
             // this.broadcastUpdateTimeout = setTimeout(async () => {
-            await updateBroadcastData(this.$root.auth, this.updateData);
+            await authenticatedRequest("actions/update-broadcast", this.updateData);
             this.updateData = {};
             // }, 500);
         }
@@ -160,11 +153,11 @@ export default {
         display: inline-flex;
         vertical-align: middle;
     }
-    .fake-btn-group div:not(:first-child) >>> .btn {
+    .fake-btn-group div:not(:first-child):deep(.btn) {
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
     }
-    .fake-btn-group div:not(:last-child) >>> .btn {
+    .fake-btn-group div:not(:last-child):deep(.btn) {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
     }

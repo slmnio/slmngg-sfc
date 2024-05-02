@@ -4,7 +4,7 @@
         <div class="team-row d-flex flex-row">
             <div class="team-logo bg-center" :style="resizedImage(team.theme, ['default_logo', 'small_logo'], 'w-100')"></div>
             <div class="team-amount">{{ money(amount) }}</div>
-            <div class="team-name text-right flex-grow-1">(has {{ money(team.balance) }})</div>
+            <div class="team-name text-end flex-grow-1">(has {{ money(team.balance) }})</div>
         </div>
     </div>
 </template>

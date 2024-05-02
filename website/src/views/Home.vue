@@ -32,7 +32,7 @@ export default {
             return this.events.length || "many" + (this.eventSeries.length.toString().slice(0, 0));
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: "Home"
         };

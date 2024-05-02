@@ -36,10 +36,6 @@ export default {
                 })
             });
         },
-        activeTeam() {
-            if (!this.match?.teams?.length || this.activeTeamIndex === null) return;
-            return this.match.teams[(this.activeTeamIndex - 1)];
-        },
         teamWidth() {
             return `${this.broadcast?.ingame_team_width || 690}px`;
         },

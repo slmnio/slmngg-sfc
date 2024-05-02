@@ -28,16 +28,10 @@ export default {
             return url;
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Iframe "${this.title}" | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
     }
 };
 </script>
-
-<style scoped>
-    .iframe-overlay >>> .g-body {
-        /*padding: 0;*/
-    }
-</style>

@@ -4,7 +4,7 @@
             <div class="team-code">
                 <div class="industry-align">{{ highlightTeam.code }}</div>
             </div>
-            <div class="team-name flex-grow-1 text-right font-weight-bold">
+            <div class="team-name flex-grow-1 text-end fw-bold">
                 <div class="industry-align">{{ highlightTeam.name }}</div>
             </div>
         </div>
@@ -23,7 +23,7 @@
                     </div>
                     <div class="sister-text ml-1">
                         <div class="industry-align">Sister team</div>
-                        <div class="industry-align font-weight-bold">{{ sister.name }}</div>
+                        <div class="industry-align fw-bold">{{ sister.name }}</div>
                     </div>
                 </div>
                 <div class="designers mb-3 px-2 py-3 text-center" :style="teamBG" v-if="designers">
@@ -124,7 +124,7 @@ export default {
             if (this.logoI >= this.bigLogos.length) this.logoI = 0;
         }, 8000);
     },
-    metaInfo() {
+    head() {
         return {
             title: `Branding | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

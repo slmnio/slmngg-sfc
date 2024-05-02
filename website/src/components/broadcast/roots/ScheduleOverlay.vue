@@ -23,7 +23,7 @@ export default {
                 return this.matches;
             }
 
-            if (!this.broadcast || !this.broadcast.schedule) return null;
+            if (!this.broadcast?.schedule) return null;
             return ReactiveArray("schedule", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -37,7 +37,7 @@ export default {
             return themeBackground1(this.broadcast.event);
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Schedule${this.secondary ? " (Secondary)" : ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

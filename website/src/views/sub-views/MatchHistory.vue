@@ -19,7 +19,10 @@
                 </div>
                 <div>
                     <table class="w-100">
-                        <MatchMapHistory v-for="map in mapType.maps" :key="map.id" :data="_getTeamMapStats(map)" :map="map" :show-unplayed-maps="showUnplayedMaps" />
+                        <tbody>
+                            <MatchMapHistory v-for="map in mapType.maps" :key="map.id" :data="_getTeamMapStats(map)"
+                                             :map="map" :show-unplayed-maps="showUnplayedMaps"/>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -39,12 +42,11 @@ import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { getTeamsMapStats } from "@/utils/content-utils";
 import MatchMapHistory from "@/components/website/match/MatchMapHistory";
 import MapDisplay from "@/components/website/match/MapDisplay";
-import { BFormCheckbox } from "bootstrap-vue";
 
 export default {
     name: "MatchHistory",
     props: ["match", "hideMapDisplay"],
-    components: { MapDisplay, MatchMapHistory, BFormCheckbox },
+    components: { MapDisplay, MatchMapHistory },
     data: () => ({
         filterSubEvent: false,
         filterMatchGroup: true,

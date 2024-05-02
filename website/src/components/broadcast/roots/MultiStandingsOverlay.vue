@@ -26,7 +26,7 @@ export default {
     props: ["broadcast", "title", "stageCodes", "showColumns", "useCodes", "full"],
     computed: {
         event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
+            if (!this.broadcast?.event) return null;
             return ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
@@ -35,7 +35,7 @@ export default {
             });
         },
         blocks() {
-            if (!this.event || !this.event.blocks) return null;
+            if (!this.event?.blocks) return null;
             try {
                 const blocks = JSON.parse(this.event.blocks);
                 return blocks || null;
@@ -48,7 +48,7 @@ export default {
             return (this.blocks?.standings || []).filter(standings => this.stageCodes.some(code => standings.group === code || standings.key === code));
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Multi Standings ${this.stageCodes} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -57,7 +57,7 @@ export default {
 </script>
 
 <style scoped>
-    .standings >>> .team-name {
+    .standings:deep(.team-name) {
         color: inherit !important;
     }
     .all-standings-holder {
@@ -66,7 +66,7 @@ export default {
         align-items: flex-start;
         width: 100%;
     }
-    .standings >>> .standings-header .team-name {
+    .standings:deep(.standings-header .team-name) {
         margin-right: 1.5em;
     }
 </style>

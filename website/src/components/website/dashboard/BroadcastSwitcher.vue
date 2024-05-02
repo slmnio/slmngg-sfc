@@ -1,24 +1,29 @@
 <template>
     <div class="broadcast-switcher">
         <div v-b-modal.broadcast-switcher>
-            <BroadcastDisplay :broadcast="activeBroadcast" />
+            <BroadcastDisplay :broadcast="activeBroadcast"/>
         </div>
 
-        <b-modal ref="broadcast-switcher" id="broadcast-switcher" title="Broadcast Switcher" hide-footer>
+        <b-modal ref="broadcast-switcher" id="broadcast-switcher" title="Broadcast Switcher">
             <div class="broadcasts flex-center flex-column">
-                <BroadcastDisplay class="broadcast" :class="{'active-broadcast': activeBroadcast.id === broadcast.id}" :disabled="activeBroadcast.id === broadcast.id || setting" v-for="broadcast in broadcastGroups.active" :broadcast="broadcast" :key="broadcast.id" :set-method="switchBroadcast" />
+                <BroadcastDisplay class="broadcast" :class="{'active-broadcast': activeBroadcast.id === broadcast.id}"
+                                  :disabled="activeBroadcast.id === broadcast.id || setting"
+                                  v-for="broadcast in broadcastGroups.active" :broadcast="broadcast" :key="broadcast.id"
+                                  @click="switchBroadcast(broadcast)"/>
                 <b-button class="broadcasts-text inactive" v-if="broadcastGroups.inactive.length"
                           :variant="showInactive ? 'primary' : 'secondary'" :class="{'active': showInactive}"
-                          @click="showInactive = !showInactive">Show inactive broadcasts ({{ broadcastGroups.inactive.length }})</b-button>
+                          @click="showInactive = !showInactive">Show inactive broadcasts
+                    ({{ broadcastGroups.inactive.length }})
+                </b-button>
                 <div class="inactive-broadcasts" v-if="showInactive">
                     <BroadcastDisplay class="broadcast"
                                       :disabled="activeBroadcast.id === broadcast.id || setting"
                                       v-for="broadcast in broadcastGroups.inactive" :broadcast="broadcast"
-                                      :key="broadcast.id" :set-method="switchBroadcast"/>
+                                      :key="broadcast.id" @click="switchBroadcast(broadcast)"/>
                 </div>
             </div>
 
-            <template v-slot:modal-footer>
+            <template #footer>
                 <div class="w-100 flex-center text-center">
                     Changing your broadcast will completely change your show's graphics.<br>
                     Make sure that you are not streaming and ready for these graphics to change.
@@ -30,14 +35,11 @@
 
 <script>
 import BroadcastDisplay from "@/components/website/dashboard/BroadcastDisplay";
-import { BButton, BModal, VBModal } from "bootstrap-vue";
-import { setActiveBroadcast } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
+
 export default {
     name: "BroadcastSwitcher",
-    components: { BroadcastDisplay, BModal, BButton },
-    directives: {
-        BModal: VBModal
-    },
+    components: { BroadcastDisplay },
     props: ["broadcasts"],
     data: () => ({
         setting: false,
@@ -70,15 +72,21 @@ export default {
             this.setting = true;
             this.attemptedFirst = broadcast;
 
-            await setActiveBroadcast(this.$root.auth, "self", broadcast);
-            // this.setting = false;
+            await authenticatedRequest("actions/set-active-broadcast", {
+                client: "self",
+                broadcast: broadcast.id || broadcast
+            });
+            this.setting = false;
         }
     },
     watch: {
-        broadcasts(newBroadcasts) {
-            if (!(this.attemptedFirst && newBroadcasts?.[0])) return;
-            if (newBroadcasts[0]?.id === this.attemptedFirst.id) {
-                this.setting = false;
+        broadcasts: {
+            deep: true,
+            handler(newBroadcasts) {
+                if (!(this.attemptedFirst && newBroadcasts?.[0])) return;
+                if (newBroadcasts[0]?.id === this.attemptedFirst.id) {
+                    this.setting = false;
+                }
             }
         },
         setting(isProcessing) {
@@ -91,17 +99,17 @@ export default {
 </script>
 
 <style scoped>
-    .broadcasts .broadcast {
-        margin: 0.25em 0;
-        cursor: pointer;
-    }
+.broadcasts .broadcast {
+    margin: 0.25em 0;
+    cursor: pointer;
+}
 
-    .inactive-broadcasts .broadcast {
-        font-size: 12px;
-        width: 18.75em;
-    }
+.inactive-broadcasts .broadcast {
+    font-size: 12px;
+    width: 18.75em;
+}
 
-    .broadcasts-text.inactive {
-        margin: .5em 0;
-    }
+.broadcasts-text.inactive {
+    margin: .5em 0;
+}
 </style>

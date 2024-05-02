@@ -3,17 +3,24 @@
         <!-- Table: staff vs roles, counts of staff in that role -->
         <table class="table table-sm table-dark table-hover table-bordered">
             <thead>
-                <th class="px-2">Staff</th>
-                <th class="px-2" v-for="role in roles" :key="role">{{ role }}</th>
-                <th v-b-tooltip="'Number of matches listed as staff'">Total</th>
+                <tr>
+                    <th class="px-2">Staff</th>
+                    <th class="px-2" v-for="role in roles" :key="role">{{ role }}</th>
+                    <th><span v-b-tooltip="'Number of matches listed as staff'">Total</span></th>
+                </tr>
             </thead>
-            <tr v-for="staff in appearances" :key="staff.id">
-                <td><LinkedPlayers :players="[staff.user]" /></td>
-                <td v-for="role in roles" :key="role" :class="{'ct-active': staff.listed_roles.indexOf(role) !== -1}">
-                    {{ staff.roles[role] || '-' }}
-                </td>
-                <td>{{ staff.matches.size }}</td>
-            </tr>
+            <tbody>
+                <tr v-for="staff in appearances" :key="staff.id">
+                    <td>
+                        <LinkedPlayers :players="[staff.user]"/>
+                    </td>
+                    <td v-for="role in roles" :key="role"
+                        :class="{'ct-active': staff.listed_roles.indexOf(role) !== -1}">
+                        {{ staff.roles[role] || "-" }}
+                    </td>
+                    <td>{{ staff.matches.size }}</td>
+                </tr>
+            </tbody>
         </table>
 
         <CopyTextButton :no-icon="true" class="btn btn-dark" style="white-space: pre" :content="credits">Copy full event credits</CopyTextButton>
@@ -56,7 +63,7 @@ export default {
             function addToStaff(playerObj, id, name, role, matchID) {
                 let player = staff.find(s => s.id === id);
                 if (!player) {
-                    staff.push({ id: id, name: name, roles: {}, matches: new Set(), user: { id, name }, player: playerObj });
+                    staff.push({ id, name, roles: {}, matches: new Set(), user: { id, name }, player: playerObj });
                     player = staff[staff.length - 1];
                 }
                 if (!player.roles[role]) {

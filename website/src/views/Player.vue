@@ -9,7 +9,7 @@
                         <div class="player-name">
                             {{ player.name }}
                             <i class="fas fa-badge-check mr-3" v-if="player.verified"></i>
-                            <span class="mini-label pronouns-display ml-1" v-if="player.pronouns">{{ player.pronouns | pronounsFilter }}</span>
+                            <span class="mini-label pronouns-display ml-1" v-if="player.pronouns">{{ player.pronouns === 'any' ? 'any pronouns' : player.pronouns }}</span>
                             <!--                        <router-link class="no-link-style d-inline" :to="subLink('participation')">-->
                             <!--                            <span class="mini-label participation-points" v-if="participationPoints">{{ participationPoints }} pts</span>-->
                             <!--                        </router-link>-->
@@ -55,7 +55,7 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import Social from "@/components/website/Social";
 import SubPageNav from "@/components/website/SubPageNav";
-import { pronounsFilter, url } from "@/utils/content-utils";
+import { url } from "@/utils/content-utils";
 // import { sortEvents } from "@/utils/sorts";
 import { bg, resizedImage } from "@/utils/images";
 import { logoBackground } from "@/utils/theme-styles";
@@ -174,13 +174,10 @@ export default {
             return (this.participationEvents).map(e => e.participation_points).filter(f => f).reduce((c, v) => c + v, 0);
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: this.player.name
         };
-    },
-    filters: {
-        pronounsFilter
     }
 };
 

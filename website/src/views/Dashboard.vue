@@ -1,6 +1,6 @@
 <template>
     <div class="container" v-if="user && user.name">
-        <h1 class="text-md-left text-center">SLMN.GG Dashboard</h1>
+        <h1 class="text-md-start text-center">SLMN.GG Dashboard</h1>
         <div class="client-broadcasts d-flex flex-wrap flex-column flex-md-row align-items-center" v-if="client && client.broadcast">
             <div class="wrapper mb-2">
                 <BroadcastSwitcher :broadcasts="client.broadcast" />
@@ -76,13 +76,13 @@
 </template>
 
 <script>
+import { socket } from "@/socket";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { url } from "@/utils/content-utils";
 import BroadcastSwitcher from "@/components/website/dashboard/BroadcastSwitcher";
 import MatchThumbnail from "@/components/website/match/MatchThumbnail";
 import MatchEditor from "@/components/website/dashboard/MatchEditor";
-import { BButton } from "bootstrap-vue";
-import { updateAutomaticTitle } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 import Predictions from "@/components/website/dashboard/Predictions";
 import CommsControls from "@/components/website/dashboard/CommsControls";
 import Commercials from "@/components/website/dashboard/Commercials";
@@ -98,17 +98,19 @@ import DeskTextEditor from "@/components/website/dashboard/DeskTextEditor.vue";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import GFXController from "@/views/GFXController.vue";
 import BroadcastRoles from "@/components/website/dashboard/BroadcastRoles.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "Dashboard",
-    components: { GFXController, BroadcastRoles, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControls, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher, BButton },
+    components: { GFXController, BroadcastRoles, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControls, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher },
     data: () => ({
         titleProcessing: false
     }),
     computed: {
         user() {
-            if (!this.$root.auth.user?.airtableID) return {};
-            return ReactiveRoot(this.$root.auth.user.airtableID, {
+            const { user } = useAuthStore();
+            if (!user?.airtableID) return {};
+            return ReactiveRoot(user.airtableID, {
                 clients: ReactiveArray("clients", {
                     broadcast: ReactiveArray("broadcast", {
                         event: ReactiveThing("event", {
@@ -228,7 +230,7 @@ export default {
         async updateTitle() {
             this.titleProcessing = true;
             try {
-                const response = await updateAutomaticTitle(this.$root.auth, "self", "create");
+                const response = await authenticatedRequest("actions/set-title");
                 if (response.error) return; // handled by internal
                 this.$notyf.success({
                     message: response.data,
@@ -247,10 +249,10 @@ export default {
             if (!this.client?.key) return;
             if (oldClient?.key === newClient?.key) return;
             console.log("prod-join", this.client?.key);
-            this.$socket.client.emit("prod-join", this.client?.key);
+            socket.emit("prod-join", this.client?.key);
         }
     },
-    metaInfo: () => ({
+    head: () => ({
         title: "Dashboard"
     })
 };
@@ -272,34 +274,34 @@ export default {
         border-bottom-width: 2px;
         border-bottom-style: solid;
     }
-    .bracket-viewer >>> .module-content .bracket {
+    .bracket-viewer:deep(.module-content .bracket) {
         padding: 10px 20px 0px 20px;
     }
-    .bracket-viewer >>> .module-content {
+    .bracket-viewer:deep(.module-content) {
         overflow-x: scroll;
     }
 
 
-    .bracket-viewer >>> .module-content::-webkit-scrollbar-track {
+    .bracket-viewer:deep(.module-content::-webkit-scrollbar-track) {
         border-radius: 4px;
         background-color: transparent;
     }
 
-    .bracket-viewer >>> .module-content::-webkit-scrollbar {
+    .bracket-viewer:deep(.module-content::-webkit-scrollbar) {
         width: 6px;
         height: 6px;
         background-color: transparent;
     }
 
-    .bracket-viewer >>> .module-content::-webkit-scrollbar-thumb {
+    .bracket-viewer:deep(.module-content::-webkit-scrollbar-thumb) {
         border-radius: 4px;
         -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
         background-color: #222;
         transition: background-color 300ms ease;
     }
 
-    .bracket-viewer >>> .module-content:hover::-webkit-scrollbar-thumb,
-    .bracket-viewer >>> .module-content:active::-webkit-scrollbar-thumb {
+    .bracket-viewer:deep(.module-content:hover::-webkit-scrollbar-thumb),
+    .bracket-viewer:deep(.module-content:active::-webkit-scrollbar-thumb) {
         background-color: #333;
     }
 

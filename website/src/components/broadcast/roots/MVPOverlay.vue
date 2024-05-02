@@ -84,13 +84,13 @@ export default {
         mvpTeam: {
             deep: true,
             handler(team) {
-                if (team && team?.theme) {
+                if (team?.theme) {
                     this.$parent.updateTheme(team.theme);
                 }
             }
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `MVP | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -145,15 +145,15 @@ export default {
         border-bottom: 8px solid transparent;
     }
 
-    .mvp-overlay >>> .theme-transition,
-    .mvp-overlay >>> .theme-transition-outer,
-    .mvp-overlay >>> .theme-transition-inner {
+    .mvp-overlay:deep(.theme-transition),
+    .mvp-overlay:deep(.theme-transition-outer),
+    .mvp-overlay:deep(.theme-transition-inner) {
         width: auto !important;
         height: auto !important;
     }
 
     .hero-move-enter-active { transition: all .5s; transform: translate(0%, 0%); transition-delay: 500ms; }
     .hero-move-leave-active { transition: none; }
-    .hero-move-enter, .hero-move-leave-to { transform: translate(100%, 0%) }
-    .hero-move-enter-to, .hero-move-leave { transform: translate(0%, 0%) }
+    .hero-move-enter-from, .hero-move-leave-to { transform: translate(100%, 0%) }
+    .hero-move-enter-to, .hero-move-leave-from { transform: translate(0%, 0%) }
 </style>

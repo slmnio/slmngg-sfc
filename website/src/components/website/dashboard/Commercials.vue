@@ -14,13 +14,11 @@
 </template>
 
 <script>
-import { startCommercial } from "@/utils/dashboard";
-import { BButton, BButtonGroup } from "bootstrap-vue";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "Commercials",
     props: ["client"],
-    components: { BButton, BButtonGroup },
     data: () => ({
         processing: false
     }),
@@ -28,7 +26,9 @@ export default {
         async commercial(commercialDuration) {
             this.processing = true;
             try {
-                await startCommercial(this.$root.auth, "self", commercialDuration);
+                await authenticatedRequest("actions/start-commercial", {
+                    commercialDuration
+                });
             } finally {
                 this.processing = false;
             }

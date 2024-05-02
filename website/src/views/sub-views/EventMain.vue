@@ -27,35 +27,11 @@ export default {
     name: "EventMain",
     props: ["event"],
     components: {
-        // eslint-disable-next-line vue/no-unused-components
         ContentThing, ContentRow, News
     },
     computed: {
-        playerRelationshipGroups() {
-            if (this.useStaffPage) return [];
-            if (!this.event?.player_relationships) return [];
-            const groups = {};
-
-            this.event.player_relationships.forEach(rel => {
-                if (!groups[rel.singular_name]) {
-                    groups[rel.singular_name] = {
-                        meta: {
-                            player_text: rel.player_text,
-                            plural_name: rel.plural_name,
-                            singular_name: rel.singular_name
-                        },
-                        items: []
-                    };
-                }
-                groups[rel.singular_name].items = groups[rel.singular_name].items.concat(rel.player);
-            });
-
-            if (groups[undefined]) return [];
-
-            return Object.values(groups);
-        },
         groupedTeams() {
-            if (!this.event || !this.event.teams) return null;
+            if (!this.event?.teams) return null;
             if (!this.event?.teams.some(team => team.team_category)) return null;
             const categories = [];
             this.event.teams.forEach(team => {
@@ -124,7 +100,7 @@ export default {
 </script>
 
 <style scoped>
-    .content-row >>> .content-title {
+    .content-row:deep(.content-title) {
         color: var(--theme-ondark);
     }
 </style>

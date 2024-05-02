@@ -11,13 +11,9 @@
 
 <script>
 import TeamMapStats from "@/components/website/match/TeamMapStats";
-import { VBTooltip } from "bootstrap-vue";
 
 export default {
     name: "MatchMapHistory",
-    directives: {
-        VBTooltip
-    },
     components: { TeamMapStats },
     props: ["data", "map", "showUnplayedMaps"],
     computed: {
@@ -29,7 +25,7 @@ export default {
 </script>
 
 <style scoped>
-    .team-map-stats:last-of-type >>> div {
+    .team-map-stats:last-of-type:deep(div)  {
         flex-direction: row-reverse;
     }
     .match-map-history.scheduled .map-name {

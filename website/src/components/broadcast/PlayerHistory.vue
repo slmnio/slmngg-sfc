@@ -58,8 +58,8 @@ export default {
         playerTeams() {
             if (!this.player?.member_of) return [];
             return this.player.member_of.filter(t => {
-                if (!t) return;
-                if (!t.event) return;
+                if (!t) return false;
+                if (!t.event) return false;
                 if (!this.showMinor && t.minor_team) return false;
                 // if (!t.ranking_sort) return false;
                 return true;
@@ -73,7 +73,7 @@ export default {
             return events[0];
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Player History | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -82,7 +82,7 @@ export default {
 </script>
 
 <style scoped>
-.player-history-overlay >>> .generic-overlay-body {
+.player-history-overlay:deep(.generic-overlay-body) {
     padding: 0;
 }
 .career-wrapper {
@@ -101,11 +101,8 @@ export default {
     flex-grow: 1;
     padding: 0 50px;
 }
-.teams-label {
-    float: top;
-}
-.teams-wrapper >>> .player-team-display,
-.teams-wrapper >>> .team-name {
+.teams-wrapper:deep(.player-team-display),
+.teams-wrapper:deep(.team-name) {
     width: 176px;
 }
 .teams-wrapper .title {
@@ -120,7 +117,7 @@ export default {
     font-size: 1.2em;
     font-weight: bold;
 }
-.first-event >>> .event-name {
+.first-event:deep(.event-name) {
     margin: 0 0.3em 0 0  !important;
 }
 .player-teams {

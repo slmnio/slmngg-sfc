@@ -154,7 +154,7 @@ export default {
     .fly-down-enter-active {
         transition: 1s ease;
     }
-    .fly-down-enter,
+    .fly-down-enter-from,
     .fly-down-leave-to {
         transform: translate(0, -232px);
     }

@@ -1,7 +1,7 @@
 <template>
     <router-link :to="url('match', this.match)" class="bracket-match no-link-style" v-if="!!match"
                  :class="{'hover': hover, 'forfeit': match && match.forfeit }"
-                 @mouseover.native="matchHover" @mouseleave.native="matchEmpty">
+                 @mouseover="matchHover" @mouseleave="matchEmpty">
         <div class="match-name d-none">{{ match && match.name }}</div>
         <div class="match-number" :class="{'lowlight': lowlight}" v-if="matchNumber">{{ matchNumber }}</div>
         <div class="match-extra-info">
@@ -210,7 +210,6 @@ export default {
 
             const clarifyDate = diffFromNow <= 0 || diffFromNow >= 1000 * 60 * 60 * 24 * 7;
 
-            // eslint-disable-next-line no-unreachable
             const format = "{day-short}[D] {hour}[M]{ampm}"
                 .replace("[M]", time.minute() === 0 ? "" : ":{minute-pad}")
                 .replace("[D]", clarifyDate ? " {date-ordinal} {month-short}" : "");

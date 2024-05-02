@@ -48,7 +48,7 @@ export default {
             return this.match?.teams ? this.match.teams.length === 0 : true;
         },
         eventBackground() {
-            if (!this.match || !this.match.event || !this.match.event.theme) return { backgroundColor: "#333" };
+            if (!this.match?.event?.theme) return { backgroundColor: "#333" };
 
             return {
                 backgroundColor: this.match.event.theme.color_logo_background || this.match.event.theme.color_theme,
@@ -60,7 +60,7 @@ export default {
             return { height: this.stripeHeight };
         },
         eventBorder() {
-            if (!this.match || !this.match.event || !this.match.event.theme) return { backgroundColor: "#333" };
+            if (!this.match?.event?.theme) return { backgroundColor: "#333" };
             if (this.noTeams) {
                 return {
                     backgroundColor: this.match.event.theme.color_logo_accent || this.match.event.theme.color_accent || this.match.event.theme.color_theme
@@ -81,7 +81,7 @@ export default {
     },
     methods: {
         teamBackground(team) {
-            if (!team || !team.theme) return {};
+            if (!team?.theme) return {};
             return {
                 backgroundColor: team.theme.color_logo_background || team.theme.color_theme,
                 borderColor: team.theme.color_logo_accent || team.theme.color_accent,
@@ -89,7 +89,7 @@ export default {
             };
         },
         logo(team, minSize = 120) {
-            if (!team || !team.theme) return {};
+            if (!team?.theme) return {};
             return resizedImage(team.theme, ["small_logo", "default_logo"], `h-${minSize}`);
         }
     }

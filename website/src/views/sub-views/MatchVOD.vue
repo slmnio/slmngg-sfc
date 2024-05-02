@@ -8,10 +8,9 @@
             <div class="btn btn-dark btn-sm" @click="useVOD2 = false" v-if="useVOD2">Show part 1</div>
         </div>
 
-        <div class="embed embed-responsive embed-responsive-16by9" v-if="showNoVOD">
+        <div class="embed ratio ratio-16x9" v-if="showNoVOD">
             <div class="no-embed-text flex-center">No VOD available for this match</div>
         </div>
-        <!--  TODO: add spoilers? -->
         <div class="maps-container mt-3 flex-column" v-if="match.maps">
             <div class="checkbox-holder flex-center justify-content-end" v-if="hasBannedMaps">
                 <b-form-checkbox v-model="showBannedMaps" switch> Show banned maps</b-form-checkbox>
@@ -26,12 +25,11 @@
 <script>
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 import MapDisplay from "@/components/website/match/MapDisplay";
-import { BFormCheckbox } from "bootstrap-vue";
 
 export default {
     name: "MatchVOD",
     props: ["match"],
-    components: { EmbeddedVideo, MapDisplay, BFormCheckbox },
+    components: { EmbeddedVideo, MapDisplay },
     data: () => ({
         useVOD2: false,
         showBannedMaps: false

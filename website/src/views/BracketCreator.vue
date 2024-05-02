@@ -131,11 +131,10 @@
 
 <script>
 import Bracket from "@/components/website/bracket/Bracket.vue";
-import { BButton } from "bootstrap-vue";
 
 export default {
     name: "BracketCreator",
-    components: { Bracket, BButton },
+    components: { Bracket },
     data: () => ({
         brackets: [
             {
@@ -232,7 +231,7 @@ export default {
                 this.activeConnection.gameNum,
                 this.activeConnection.mode
             ].join("-");
-            this.$set(this.connections, key, { bracketNum, columnNum, gameNum, position });
+            this.connections[key] = { bracketNum, columnNum, gameNum, position };
             this.activeConnection = null;
         },
         endConnectionSpecial(special) {
@@ -243,7 +242,7 @@ export default {
                 this.activeConnection.gameNum,
                 this.activeConnection.mode
             ].join("-");
-            this.$set(this.connections, key, special);
+            this.connections[key] = special;
             this.activeConnection = null;
         },
         setAllEliminations() {
@@ -252,7 +251,7 @@ export default {
                     column.games.forEach((game, gi) => {
                         const connection = this.getConnection(bi, ci, gi, "lose");
                         if (!connection) {
-                            this.$set(this.connections, [bi, ci, gi, "lose"].join("-"), "eliminated");
+                            this.connections[[bi, ci, gi, "lose"].join("-")] = "eliminated";
                         }
                     });
                 });

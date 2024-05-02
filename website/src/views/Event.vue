@@ -48,7 +48,7 @@ export default {
     components: {
         ThingTop, SubPageNav, Social
     },
-    metaInfo() {
+    head() {
         return {
             title: this.event.name,
             meta: [

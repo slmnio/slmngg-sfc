@@ -18,7 +18,7 @@ export default {
             return this.image ? getNewURL(this.image, "w-1920") : this.url;
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Image "${this.title}" | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

@@ -75,15 +75,17 @@ export default {
             return manualGuests;
         },
         guests() {
-            const guests = (!this.broadcast?.guests) ? [] : ReactiveArray("guests", {
-                player: ReactiveThing("player", {
-                    socials: ReactiveArray("socials")
-                }),
-                theme: ReactiveThing("theme"),
-                prediction_team: ReactiveThing("prediction_team", {
-                    theme: ReactiveThing("theme")
-                })
-            })(this.broadcast);
+            const guests = (!this.broadcast?.guests)
+                ? []
+                : ReactiveArray("guests", {
+                    player: ReactiveThing("player", {
+                        socials: ReactiveArray("socials")
+                    }),
+                    theme: ReactiveThing("theme"),
+                    prediction_team: ReactiveThing("prediction_team", {
+                        theme: ReactiveThing("theme")
+                    })
+                })(this.broadcast);
 
             return [
                 ...guests,
@@ -118,7 +120,7 @@ export default {
         }
 
     },
-    metaInfo() {
+    head() {
         return {
             title: `Desk | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -157,14 +159,14 @@ export default {
     .anim-talent-leave-active {
         transition: all .3s ease, opacity .2s ease;
     }
-    .anim-talent-enter, .anim-talent-leave-to {
+    .anim-talent-enter-from, .anim-talent-leave-to {
         /* hide */
         max-width: 0;
         min-width: 0 !important;
         opacity: 0;
         padding: 0 0;
     }
-    .anim-talent-enter-to, .anim-talent-leave {
+    .anim-talent-enter-to, .anim-talent-leave-from {
         /* show */
         opacity: 1;
     }
@@ -218,7 +220,7 @@ export default {
     .caster.wide-feed {
         min-width: var(--caster-width)
     }
-    .caster.wide-feed >>> .caster-frame {
+    .caster.wide-feed:deep(.caster-frame) {
         --oversize: 1% !important;
     }
 

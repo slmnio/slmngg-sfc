@@ -10,7 +10,7 @@
                                             :is-on="settingIsOn(setting)"/>
                 </div>
             </div>
-            <template v-slot:modal-footer>
+            <template #footer>
                 <div class="w-100 flex-center text-center">
                     These settings will change instantly once you click them.<br>
                     Make sure that your show is ready for these graphics to appear.
@@ -21,7 +21,6 @@
 </template>
 
 <script>
-import { BButton, BModal, VBModal } from "bootstrap-vue";
 import ObserverSettingsButton from "@/components/website/dashboard/ObserverSettingsButton.vue";
 import DashboardModalIcon from "@/components/website/dashboard/DashboardModalIcon.vue";
 
@@ -32,12 +31,7 @@ export default {
     },
     components: {
         DashboardModalIcon,
-        ObserverSettingsButton,
-        BModal,
-        BButton
-    },
-    directives: {
-        BModal: VBModal
+        ObserverSettingsButton
     },
     data: () => ({
         settings: [

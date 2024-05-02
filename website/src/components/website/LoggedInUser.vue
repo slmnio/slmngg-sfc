@@ -19,40 +19,26 @@
 
 <script>
 import { url } from "@/utils/content-utils.js";
-import { BDropdownDivider, BDropdownItem, BNavItemDropdown, VBModal } from "bootstrap-vue";
-import { isAuthenticated, isOnMainDomain } from "@/utils/auth";
-import { getMainDomain } from "@/utils/fetch";
+import { getMainDomain, isOnMainDomain } from "@/utils/fetch";
 import { bg } from "@/utils/images";
 import TokenModal from "@/components/website/dashboard/TokenModal.vue";
-import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { mapState, mapWritableState } from "pinia";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "LoggedInUser",
-    directives: { BModal: VBModal },
     components: {
-        TokenModal,
-        BDropdownItem,
-        BNavItemDropdown,
-        BDropdownDivider
+        TokenModal
     },
     computed: {
-        user() {
-            return this.$root.auth.user;
-        },
+        ...mapWritableState(useAuthStore, ["user"]),
+        ...mapWritableState(useAuthStore, ["client"]),
+        ...mapState(useAuthStore, ["isProduction"]),
         playerID() {
             return this.user?.airtableID;
         },
         avatar() {
             return bg(this.user.avatar);
-        },
-        isProduction() {
-            if (!isAuthenticated(this.$root)) return false;
-            return this.$root.authUser?.clients?.length;
-        },
-        client() {
-            return ReactiveRoot(this.playerID, {
-                clients: ReactiveThing("clients")
-            })?.clients;
         }
     },
     methods: {
@@ -86,7 +72,11 @@ export default {
         background-position: center;
         margin: -0.5rem 0.5rem -0.5rem 0;
     }
-    .logged-in-user >>> .dropdown-toggle {
+    .logged-in-user:deep(.btn) {
+        color: #ffffff80;
+        text-transform: uppercase;
+    }
+    .logged-in-user:deep(.dropdown-toggle) {
         display: flex;
         justify-content: center;
         align-items: center;

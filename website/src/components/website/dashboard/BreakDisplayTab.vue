@@ -15,12 +15,10 @@
 </template>
 
 <script>
-import { BButton } from "bootstrap-vue";
-import { updateBreakDisplay } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "BreakDisplayTab",
-    components: { BButton },
     props: { broadcast: Object },
     data: () => ({
         options: [
@@ -50,9 +48,12 @@ export default {
                 this.resetOption(newOption);
             }
         },
-        selectedEndingOptions(options) {
-            if (options.length > 1) {
-                this.selectedEndingOptions = [options.pop()];
+        selectedEndingOptions: {
+            deep: true,
+            handler(options) {
+                if (options.length > 1) {
+                    this.selectedEndingOptions = [options.pop()];
+                }
             }
         }
     },
@@ -61,7 +62,9 @@ export default {
             this.selected = option;
             this.processing = true;
             try {
-                const response = await updateBreakDisplay(this.$root.auth, this.selected);
+                const response = await authenticatedRequest("actions/update-break-display", {
+                    option: this.selected
+                });
                 if (!response.error) {
                     this.$notyf.success(`Break display set to ${this.selected}`);
                 }

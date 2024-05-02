@@ -18,7 +18,7 @@ import { DefaultMapImages, likelyNeededMaps } from "@/utils/content-utils";
 import { getNewURL } from "@/utils/images";
 
 export default {
-    name: "MapDisplay",
+    name: "BroadcastMapDisplay",
     components: { MapSegment },
     props: ["broadcast", "animationActive", "useTransitions", "virtualMatch", "noMapVideos", "small", "draftedStyle"],
     data: () => ({
@@ -69,8 +69,7 @@ export default {
             let maps = [...(this.match?.maps || [])].filter(m => m.map);
 
             console.log("maps 75", maps);
-            if (this.showBannedMaps) {
-            } else {
+            if (!this.showBannedMaps) {
                 maps = maps.filter(m => !(m.banner || m.banned));
 
                 if (this.match?.first_to) {
@@ -92,7 +91,7 @@ export default {
             if (dummyMapCount > 0) {
                 for (let i = 0; i < dummyMapCount; i++) {
                     const num = initialMapCount + i;
-                    if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: this.mapTypes && this.mapTypes[num], image: [{ url: DefaultMapImages[this.mapTypes[num]] }] } : {}) });
+                    if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: this.mapTypes?.[num], image: [{ url: DefaultMapImages[this.mapTypes[num]] }] } : {}) });
                 }
             }
 
@@ -194,7 +193,7 @@ export default {
             this.audioStatus = "playing";
             await audio.play();
             return await new Promise((resolve, reject) => {
-                audio.addEventListener("ended", async () => {
+                audio.addEventListener("ended", () => {
                     this.activeAudio = null;
                     resolve();
                 });
@@ -284,32 +283,32 @@ export default {
         margin-right: 0;
     }
 
-    .map-display.show-next-map >>> .map.next-map {
+    .map-display.show-next-map:deep(.map.next-map) {
         flex-grow: 5;
     }
 
-    .map-display >>> .map-lower-name {
+    .map-display :deep(.map-lower-name) {
         transform: scale(1);
         transition: all 800ms ease;
         width: 100%;
         /*border: 1px solid red;*/
     }
-    .map-display >>> .map.next-map .map-lower-name {
+    .map-display :deep(.map.next-map .map-lower-name) {
         width: 39.8%;
         /*border: 1px solid lime;*/
     }
-    .map-display:not(.show-next-map) >>> .map .map-lower-name {
+    .map-display:not(.show-next-map) :deep(.map .map-lower-name) {
         width: 76.8%;
         /*transform: scale(0.75);*/
     }
-    .map-display.show-next-map >>> .map:not(.next-map) .map-lower-name {
+    .map-display.show-next-map :deep(.map:not(.next-map) .map-lower-name) {
         width: 100%;
         transform: scale(0.75);
     }
     .break-content-enter-active, .break-content-leave-active { transition: all .35s ease; overflow: hidden }
-    .break-content-enter { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); }
+    .break-content-enter-from { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); }
     .break-content-leave-to { clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); }
-    .break-content-enter-to, .break-content-leave { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+    .break-content-enter-to, .break-content-leave-from { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
 
     .map-anim-holder {
         position: relative;

@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import marked from "marked";
+import { marked } from "marked";
 // const renderer = {};
 // renderer.image = (href, title, text) => {
 //     console.log("[image]", href, title, text);
@@ -13,7 +13,7 @@ function getAttribute(attribute, html) {
     const r = new RegExp(`${attribute}="([^"]*)"`);
     const results = html.match(r);
     // console.log(html, results);
-    if (results && results[1]) return results[1];
+    if (results?.[1]) return results[1];
     return null;
 }
 
@@ -69,7 +69,7 @@ const renderer = {
                 console.log("clip html", html);
                 const url = getClipEmbed(getURL(html));
                 const caption = getAttribute("caption", html);
-                if (url) return `<div class="clip-holder"><div class="clip embed embed-responsive embed-responsive-16by9"><iframe src="${url}"></iframe></div>${caption ? `<div class="clip-caption">${caption}</div>` : ""}</div>`;
+                if (url) return `<div class="clip-holder"><div class="clip embed ratio ratio-16x9"><iframe src="${url}"></iframe></div>${caption ? `<div class="clip-caption">${caption}</div>` : ""}</div>`;
             } catch (e) { console.error("Clip rendering error", e); }
             return "<div class=\"clip clip-error\">An error prevented this clip from rendering</div>";
         }
@@ -100,30 +100,30 @@ export default {
 </script>
 
 <style scoped>
-    .markdown >>> img {
+    .markdown:deep(img) {
         cursor: pointer;
         transition: transform 150ms ease-in-out;
         transform: scale(1);
     }
-    .markdown >>> img:hover {
+    .markdown:deep(img:hover) {
         transform: scale(1.02);
     }
-    .markdown >>> p:last-child {
+    .markdown:deep(p:last-child) {
         margin-bottom: .5rem;
     }
-    .markdown >>> a {
+    .markdown:deep(a) {
         color: var(--theme-active, #66d9ff);
     }
-    .markdown >>> .clip-holder {
+    .markdown:deep(.clip-holder) {
         background-color: rgba(0,0,0,0.2);
         margin-bottom: 1em;
     }
-    .markdown >>> .clip.clip-error {
+    .markdown:deep(.clip.clip-error) {
         background-color: rgba(0,0,0,0.2);
         text-align: center;
         padding: 10px 20px;
     }
-    .markdown >>> .clip-caption {
+    .markdown:deep(.clip-caption) {
         padding: 10px 15px;
     }
 </style>

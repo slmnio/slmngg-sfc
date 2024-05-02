@@ -66,8 +66,7 @@ export default {
 
             let maps = [...(this.match?.maps || [])].filter(m => m.map);
 
-            if (this.showBannedMaps) {
-            } else {
+            if (!this.showBannedMaps) {
                 maps = maps.filter(m => !(m.banner || m.banned));
 
                 if (this.match?.first_to) {
@@ -89,7 +88,7 @@ export default {
             if (dummyMapCount > 0) {
                 for (let i = 0; i < dummyMapCount; i++) {
                     const num = initialMapCount + i;
-                    if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: this.mapTypes && this.mapTypes[num], image: [{ url: DefaultMapImages[this.mapTypes[num]] }] } : {}) });
+                    if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: this.mapTypes?.[num], image: [{ url: DefaultMapImages[this.mapTypes[num]] }] } : {}) });
                 }
             }
 
@@ -211,7 +210,7 @@ export default {
             this.audioStatus = "playing";
             await audio.play();
             return await new Promise((resolve, reject) => {
-                audio.addEventListener("ended", async () => {
+                audio.addEventListener("ended", () => {
                     this.activeAudio = null;
                     resolve();
                 });
@@ -376,7 +375,7 @@ export default {
         clip-path: polygon(-1% -1%, 101% -1%, 101% 101%, -1% 101%);
     }
 
-    .swipe-right-enter {
+    .swipe-right-enter-from {
         /* closed left */
         clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
     }

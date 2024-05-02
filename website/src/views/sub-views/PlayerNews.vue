@@ -20,7 +20,7 @@ export default {
     },
     computed: {
         news() {
-            if (!this.player || !this.player.news) return [];
+            if (!this.player?.news) return [];
             return ReactiveArray("news", {
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")

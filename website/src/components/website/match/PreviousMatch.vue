@@ -44,7 +44,7 @@ export default {
             return "L";
         },
         scoreline() {
-            const scores = [this.match.score_1, this.match.score_2].sort().reverse();
+            const scores = [this.match.score_1, this.match.score_2].sort((a, b) => a - b).reverse();
             if (this.resultLetter === "L") {
                 scores.reverse();
             }
@@ -98,7 +98,7 @@ export default {
         flex-grow: 1;
         width: 100%;
     }
-    .prev-match-maps >>> .map-image {
+    .prev-match-maps:deep(.map-image) {
         padding-bottom: 100%;
     }
 

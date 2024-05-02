@@ -17,6 +17,45 @@
                     />
                 </div>
             </div>
+
+            <b-form-checkbox v-model="showPartners">Show production partners (will load more data)</b-form-checkbox>
+            <div class="casting-partners mt-2" v-if="showPartners && partners?.length">
+                <h2 id="partners">Production Partners</h2>
+                <table class="table table-bordered table-dark table-sm">
+                    <thead>
+                        <tr>
+                            <th>Partner</th>
+                            <th>Matches together</th>
+                            <th>Last match together</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="partner in partners" :key="partner.player.id">
+                            <td>
+                                <router-link :to="`/player/${partner.player.id}/matches`">{{
+                                        partner.player.name
+                                    }}
+                                </router-link>
+                            </td>
+                            <td>{{ partner.matches }}</td>
+                            <td>{{
+                                    formatTime(partner.lastMatch.start, {
+                                        format: "{day} {date-ordinal} {month} {year}",
+                                        tz: $store.state.timezone,
+                                        use24HourTime: $store.state.use24HourTime
+                                    })
+                                }} -
+                                <span v-if="partner.lastMatch?.event"><router-link
+                                    :to="url('event', partner.lastMatch?.event)">{{
+                                        partner.lastMatch?.event?.name
+                                    }}</router-link> - </span>
+                                <router-link :to="url('match', partner.lastMatch)">{{ partner.lastMatch?.name }}
+                                </router-link>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </template>
@@ -53,11 +92,13 @@ export default {
                     teams: ReactiveArray("teams", {
                         theme: ReactiveThing("theme")
                     }),
-                    ...(this.showPartners ? {
-                        player_relationships: ReactiveArray("player_relationships", {
-                            player: ReactiveThing("player")
-                        })
-                    } : {})
+                    ...(this.showPartners
+                        ? {
+                            player_relationships: ReactiveArray("player_relationships", {
+                                player: ReactiveThing("player")
+                            })
+                        }
+                        : {})
                 })
             })(this.player);
         },
@@ -110,9 +151,11 @@ export default {
             });
             Object.entries(groups).forEach(([key, val]) => {
                 if (val.items.length === 0) {
+                    // TODO: no-dynamic-delete fix
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete groups[key];
                 }
-                if (groups[key] && groups[key].items) groups[key].items = groups[key].items.sort((a, b) => sortMatches(a.item, b.item));
+                if (groups[key]?.items) groups[key].items = groups[key].items.sort((a, b) => sortMatches(a.item, b.item));
             });
             return groups;
         }

@@ -81,7 +81,7 @@ export default {
             this.localData = {};
         });
 
-        this.localData = JSON.parse(localStorage.getItem("ad-reads") || "{}");
+        this.localData = JSON.parse(localStorage.getItem("ad-reads") ?? "{}");
     },
     watch: {
         active(isActive) {
@@ -168,7 +168,7 @@ export default {
             this.runGroup(this.getActiveGroup());
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Ad Read | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

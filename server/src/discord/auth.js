@@ -15,7 +15,7 @@ function getRequestingDomain(origin) {
     return "https://dev.slmn.gg";
 }
 
-module.exports = ({ app, router, cors, Cache, io }) => {
+module.exports = ({ app, router, cors, Cache }) => {
     if (!discordEnvSet()) {
         const tempAuthApp = router;
         tempAuthApp.options("/*", cors());

@@ -76,13 +76,15 @@ export default {
                     if (this.mapTypes[num]) {
                         maps.push({
                             dummy: true,
-                            ...(this.mapTypes ? {
-                                map: {
-                                    name: this.mapTypes && this.mapTypes[num],
-                                    type: this.mapTypes && this.mapTypes[num],
-                                    image: [{ url: DefaultMapImages[this.mapTypes[num]] }]
+                            ...(this.mapTypes
+                                ? {
+                                    map: {
+                                        name: this.mapTypes?.[num],
+                                        type: this.mapTypes?.[num],
+                                        image: [{ url: DefaultMapImages[this.mapTypes[num]] }]
+                                    }
                                 }
-                            } : {})
+                                : {})
                         });
                     }
                 }

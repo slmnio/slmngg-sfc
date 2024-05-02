@@ -21,6 +21,8 @@
 </template>
 
 <script>
+import { socket } from "@/socket";
+
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import StingerWrap from "@/components/broadcast/StingerWrap";
 import BroadcastBackground from "@/components/broadcast/BroadcastBackground.vue";
@@ -96,12 +98,12 @@ export default {
             return this.$refs.overlay?.noBroadcastStyle;
         },
         sendingProdData() {
-            const componentName = getComponentName(this.$router.currentRoute);
+            const componentName = getComponentName(this.$router.currentRoute.value);
             return {
                 clientName: this.clientName,
                 component: componentName,
-                path: this.$router.currentRoute.path,
-                fullPath: this.$router.currentRoute.fullPath,
+                path: this.$router.currentRoute.value.path,
+                fullPath: this.$router.currentRoute.value.fullPath,
                 active: this.isActive,
                 visible: this.isVisible,
                 data: {
@@ -116,9 +118,9 @@ export default {
     },
     methods: {
         prodUpdate(data) {
-            if (this.$socket?.client) {
+            if (socket) {
                 this.lastProdData = data;
-                this.$socket.client.emit("prod-update", this.sendingProdData);
+                socket.emit("prod-update", this.sendingProdData);
             }
         }
     },
@@ -138,7 +140,7 @@ export default {
         }
         if (this.broadcastKey) {
             console.log("loading with broadcastKey");
-            this.$socket.client.emit("prod-broadcast-join", this.broadcastKey);
+            socket.emit("prod-broadcast-join", this.broadcastKey);
         }
 
 
@@ -179,7 +181,7 @@ export default {
             }
         },
         broadcastKey(newCode) {
-            this.$socket.client.emit("prod-broadcast-join", newCode);
+            socket.emit("prod-broadcast-join", newCode);
         }
     },
     beforeCreate () {
@@ -187,7 +189,7 @@ export default {
     },
     sockets: {
         connect() {
-            this.$socket.client.emit("prod-broadcast-join", this.broadcastKey);
+            socket.emit("prod-broadcast-join", this.broadcastKey);
         },
         send_prod_update() {
             this.prodUpdate();

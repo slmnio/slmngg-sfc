@@ -69,7 +69,7 @@ export default {
         },
         match() {
             if (this.virtualMatch) return this.virtualMatch;
-            if (!this.broadcast || !this.broadcast.live_match) return null;
+            if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
@@ -160,7 +160,7 @@ export default {
             return this.highlight_event.teams.find(team => (team.players || []).find(p => p.id === player.id) || (team.captains || []).find(p => p.id === player.id));
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Rosters | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -243,7 +243,7 @@ export default {
     width: 1em;
     margin-right: .2em;
 }
-.player-role >>> i {
+.player-role:deep(i) {
      font-size: .75em;
  }
 

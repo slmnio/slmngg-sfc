@@ -51,7 +51,7 @@ export default {
         padding-bottom: 15px;
         position: relative;
     }
-    .map-button >>> div.text {
+    .map-button:deep(div.text) {
         background-color: rgba(0,0,0,0.8);
         padding: 3px 8px;
     }

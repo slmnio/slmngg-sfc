@@ -11,7 +11,7 @@
                 </div>
                 <div class="col-12 col-md-3">
                     <ul class="match-sub-nav list-group mb-2" v-if="sidebarItems.length > 1"> <!-- only because it'd be the only one -->
-                        <router-link v-if="sidebarItems.includes('vod')" class="list-group-item ct-passive" exact active-class="active ct-active" :to="subLink('')">VOD</router-link>
+                        <router-link v-if="sidebarItems.includes('vod')" class="list-group-item ct-passive" exact-active-class="active ct-active" :to="subLink('')">VOD</router-link>
                         <router-link v-if="sidebarItems.includes('head-to-head')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('history')">Head to head</router-link>
                         <router-link v-if="sidebarItems.includes('editor')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('editor')">Match editor</router-link>
                     </ul>
@@ -65,8 +65,9 @@ import MatchScore from "@/components/website/match/MatchScore";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
 import { cleanID, formatTime, getMatchContext, url } from "@/utils/content-utils";
 import { resizedImageNoWrap } from "@/utils/images";
-import { isAuthenticated } from "@/utils/auth";
 import { canEditMatch } from "@/utils/client-action-permissions";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "Match",
@@ -110,7 +111,7 @@ export default {
             });
         },
         eventStyle() {
-            if (!this.match.event || !this.match.event.theme) return {};
+            if (!this.match.event?.theme) return {};
             return {
                 backgroundColor: this.match.event.theme.color_logo_background || this.match.event.theme.color_theme,
                 color: this.match.event.theme.color_text_on_logo_background || this.match.event.theme.color_text_on_theme
@@ -143,8 +144,8 @@ export default {
         },
         date() {
             return formatTime(this.match.start, {
-                tz: this.$store.state.timezone,
-                use24HourTime: this.$store.state.use24HourTime
+                tz: useSettingsStore().timezone,
+                use24HourTime: useSettingsStore().use24HourTime
             });
         },
         theme() {
@@ -155,9 +156,9 @@ export default {
             return this.match?.event?.map_pool;
         },
         showEditor() {
-            if (!isAuthenticated(this.$root)) return false;
-            // TODO: Make sure user is an admin or has perms here
-            return canEditMatch(this.$root.auth?.user, { event: this.match?.event, match: this.match });
+            const { isAuthenticated, user } = useAuthStore();
+            if (!isAuthenticated) return false;
+            return canEditMatch(user, { event: this.match?.event, match: this.match });
         },
         sidebarItems() {
             const items = ["vod"];
@@ -189,7 +190,7 @@ export default {
         this.$emit("id_change", null);
         next();
     },
-    metaInfo() {
+    head() {
         return {
             title: this.match.name,
             link: [{ rel: "icon", href: resizedImageNoWrap(this.match?.event?.theme, ["small_logo", "default_logo"], "s-128") }]
@@ -243,6 +244,7 @@ export default {
         padding: 0.5em .75em;
         text-decoration: none;
         border-radius: 0;
+        border: none;
     }
 
     .match-sub-nav .list-group-item.active {

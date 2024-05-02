@@ -25,7 +25,7 @@
                                     <div class="player-role-holder player-icon-holder flex-center" v-if="player.role">
                                         <div class="player-role" v-html="getRoleSVG(player.role)"></div>
                                     </div>
-                                    <div :is="player.limited ? 'div' : 'router-link'" class="ct-active" :to="url('player', player)">{{ player.name }} </div>
+                                    <component :is="player.limited ? 'div' : 'router-link'" class="ct-active" :to="url('player', player)">{{ player.name }} </component>
                                     <span v-if="showCastingInfo && player.pronouns" class="player-pronouns ml-1 badge rounded-pill bg-light text-dark" :data-pronoun="player.pronouns">{{ player.pronouns }}</span></div>
                                 <div class="player-info player-pronounce" v-if="showCastingInfo"><i class="fas fa-w fa-lips player-icon-holder"></i> {{ player.pronunciation }}</div>
                                 <div class="player-info player-dtag" v-if="showPlayerInfo">
@@ -64,7 +64,7 @@
 <!--                        <PreviousMatch v-for="match in teamMatches(team)" :match="match" :team="team" :key="match.id" />-->
 <!--                    </div>-->
                     <div class="match-group d-flex flex-column" v-for="([groupKey, group]) in teamsMatchGroups" :key="groupKey">
-                        <div class="match-group-title mt-3 text-center font-weight-bold" v-if="groupKey && groupKey !== 'undefined'">{{ groupKey }}</div>
+                        <div class="match-group-title mt-3 text-center fw-bold" v-if="groupKey && groupKey !== 'undefined'">{{ groupKey }}</div>
                         <div class="match-group-teams w-100 d-flex">
                             <div class="team-prev-wrapper w-50" v-for="team in group.teams" :key="team.id">
                                 <div class="match-group" v-for="match in team.matches" :key="match.id">
@@ -179,7 +179,7 @@
                     <stat :match="match" data="replay_codes" :raw="true" :format="(t) => t[0].replace(/\n/g, '<br>')">Replay codes</stat>
                     <stat :match="match">
                         Match Thumbnails
-                        <template v-slot:content class="d-inline">
+                        <template v-slot:content>
                             <a class="ct-active" :href="matchThumbnailURL(match, 720)"  rel="nofollow" target="_blank">720p</a>,
                             <a class="ct-active" :href="matchThumbnailURL(match, 1080)"  rel="nofollow" target="_blank">1080p</a>
                         </template>
@@ -210,8 +210,8 @@ import CopyTextButton from "@/components/website/CopyTextButton";
 import BracketImplications from "@/components/website/dashboard/BracketImplications.vue";
 import { getDataServerAddress } from "@/utils/fetch";
 import { canEditMatch } from "@/utils/client-action-permissions";
-import { isAuthenticated } from "@/utils/auth";
 import MatchHistory from "@/views/sub-views/MatchHistory.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "DetailedMatch",
@@ -254,6 +254,7 @@ export default {
                     const order = ["Tank", "DPS", "Support"];
                     return order.indexOf(a.role) - order.indexOf(b.role);
                 }
+                return 0;
             });
         },
         teamMatchGroups(team) {
@@ -430,11 +431,12 @@ export default {
             return Object.values(groups);
         },
         matchEditable() {
-            if (!isAuthenticated(this.$root)) return false;
-            return canEditMatch(this.$root.auth?.user, { event: this.match?.event, match: this.match });
+            const { isAuthenticated, user } = useAuthStore();
+            if (!isAuthenticated) return false;
+            return canEditMatch(user, { event: this.match?.event, match: this.match });
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: this.match ? (this.match.custom_name || this.match.name) + " | Detailed view" : "Detailed match view",
             link: [{ rel: "icon", href: resizedImageNoWrap(this._theme, ["small_logo", "default_logo"], "s-128") }]

@@ -4,39 +4,39 @@
 
 
         <table class="table table-bordered table-dark table-sm">
-            <thead>
-            <tr v-if="category">
-                <th class="text-center" :colspan="hasFeederEvents ? 6 : 5">{{ category }}</th>
-            </tr>
-            <tr>
-                <th v-if="hasFeederEvents" v-b-tooltip="'Feeder event eligibility'"><i class="far fa-star"></i></th>
-                <th>Name</th>
-                <th>Battletag</th>
-                <th>Tank SR</th>
-                <th>DPS SR</th>
-                <th>Support SR</th>
-            </tr>
+                <thead>
+                <tr v-if="category">
+                    <th class="text-center" :colspan="hasFeederEvents ? 6 : 5">{{ category }}</th>
+                </tr>
+                <tr>
+                    <th v-if="hasFeederEvents" v-b-tooltip="'Feeder event eligibility'"><i class="far fa-star"></i></th>
+                    <th>Name</th>
+                    <th>Battletag</th>
+                    <th>Tank SR</th>
+                    <th>DPS SR</th>
+                    <th>Support SR</th>
+                </tr>
             </thead>
             <tbody>
-            <tr v-for="player in players" :key="player.id">
-                <td v-if="hasFeederEvents" v-b-tooltip="player.feederEligible ? 'Played in feeder events' : 'Did not play in feeder events'">
-                    <i class="fas fa-star" v-if="player.feederEligible"></i>
-                </td>
-                <td>
-                    <span v-if="isCaptain(player)" v-html="getRoleSVG('Captain')" class="mr-1" v-b-tooltip="'Captain'"></span>
-                    <LinkedPlayers :players="[player]"/>
-                </td>
-                <td>{{ player.battletag }}</td>
-                <td>{{ player.composition_tank_sr }}</td>
-                <td>{{ player.composition_dps_sr }}</td>
-                <td>{{ player.composition_support_sr }}</td>
-            </tr>
+                <tr v-for="player in players" :key="player.id">
+                    <td v-if="hasFeederEvents" v-b-tooltip="player.feederEligible ? 'Played in feeder events' : 'Did not play in feeder events'">
+                        <i class="fas fa-star" v-if="player.feederEligible"></i>
+                    </td>
+                    <td>
+                        <span v-if="isCaptain(player)" v-html="getRoleSVG('Captain')" class="mr-1" v-b-tooltip="'Captain'"></span>
+                        <LinkedPlayers :players="[player]"/>
+                    </td>
+                    <td>{{ player.battletag }}</td>
+                    <td>{{ player.composition_tank_sr }}</td>
+                    <td>{{ player.composition_dps_sr }}</td>
+                    <td>{{ player.composition_support_sr }}</td>
+                </tr>
             </tbody>
         </table>
 
         <div class="w-100 d-flex flex-wrap justify-content-center">
-            <div class="flex-grow-1 text-left mb-3" v-if="compositionText">{{ compositionText }}</div>
-            <a v-if="useCalculator" class="btn btn-light text-dark font-weight-bold" target="_blank" :href="`https://slmn.io/calc?custom=${encodeURIComponent(dataString)}&category=${encodeURIComponent(category)}`">SLMN Calculator <i class="fas fa-chevron-right ml-2 fa-fw"></i></a>
+            <div class="flex-grow-1 text-start mb-3" v-if="compositionText">{{ compositionText }}</div>
+            <a v-if="useCalculator" class="btn btn-light text-dark fw-bold" target="_blank" :href="`https://slmn.io/calc?custom=${encodeURIComponent(dataString)}&category=${encodeURIComponent(category)}`">SLMN Calculator <i class="fas fa-chevron-right ml-2 fa-fw"></i></a>
         </div>
 
     </div>

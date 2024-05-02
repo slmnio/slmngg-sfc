@@ -13,14 +13,10 @@
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { VBTooltip } from "bootstrap-vue";
 export default {
     name: "TeamMapStats",
     components: { ThemeLogo },
     props: ["data", "showUnplayedMaps"],
-    directives: {
-        VBTooltip
-    },
     computed: {
         stats() {
             return this.data.stats;

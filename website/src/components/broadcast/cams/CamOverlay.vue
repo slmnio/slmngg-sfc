@@ -76,7 +76,7 @@ export default {
             return `${this.broadcast?.cams_relay_prefix}${this.number}`;
         },
         match() {
-            if (!this.broadcast || !this.broadcast.live_match) return null;
+            if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -84,7 +84,7 @@ export default {
             });
         },
         teams() {
-            if (!this.match || !this.match.teams || !this.match.teams.every(t => {
+            if (!this.match?.teams?.every(t => {
                 if (t.theme === undefined && t.has_theme === 0) return true;
                 return t.theme && !t.theme.__loading && t.theme.id;
             })) return [];
@@ -138,7 +138,7 @@ export default {
     methods: {
         logoBackground1
     },
-    metaInfo() {
+    head() {
         return {
             title: this.title
         };
@@ -158,7 +158,7 @@ export default {
         overflow: hidden;
         border-bottom: 6px solid transparent;
     }
-    .guest >>> .caster-cam-wrapper {
+    .guest:deep(.caster-cam-wrapper) {
         height: 100%;
         width: 100%;
     }
@@ -175,11 +175,11 @@ export default {
     .guest {
         --caster-width: 300px;
     }
-    .guest >>> .caster-avatar {
+    .guest:deep(.caster-avatar) {
         transform: translate(0, 0);
     }
-    .guest >>> .caster-bg,
-    .guest >>> .caster-cam-wrapper {
+    .guest:deep(.caster-bg),
+    .guest:deep(.caster-cam-wrapper) {
         background-color: rgba(0,0,0,0)
     }
 
@@ -194,13 +194,13 @@ export default {
         border-radius: 0;
         --caster-width: 100vw;
     }
-    .guest.full >>> .caster-cam-wrapper {
+    .guest.full:deep(.caster-cam-wrapper) {
         transform: none;
         height: 100%;
         width: 100%;
     }
 
-    .guest-name-holder >>> .icon-holder {
+    .guest-name-holder:deep(.icon-holder) {
         width: 80px;
         height: 60px;
     }

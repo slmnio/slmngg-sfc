@@ -1,9 +1,9 @@
 <template>
     <div class="signed-team-list p-3" v-if="team">
         <ThemeLogo class="top-logo w-100" :theme="team.theme"/>
-        <div class="signed-title pt-4 font-weight-bold text-center">SIGNED TO</div>
-        <div class="signed-team pt-3 font-weight-bold text-center">{{ team.name }}</div>
-        <div class="signed-amount pt-1 font-weight-bold text-center">for {{ money(amount) }}</div>
+        <div class="signed-title pt-4 fw-bold text-center">SIGNED TO</div>
+        <div class="signed-team pt-3 fw-bold text-center">{{ team.name }}</div>
+        <div class="signed-amount pt-1 fw-bold text-center">for {{ money(amount) }}</div>
 
         <div class="player-list">
             <div class="player" :class="{empty: player.empty, latest: player.latest}" v-for="player in players" :key="player.id"  :style="(player.latest ? teamBG : {})">
@@ -15,7 +15,7 @@
             </div>
         </div>
         <MoneyBar class="team-focus-bar" :team="team" :auction-settings="auctionSettings"></MoneyBar>
-<!--        <div class="remaining font-weight-bold text-center">Remaining: {{ money(team.balance) }}</div>-->
+<!--        <div class="remaining fw-bold text-center">Remaining: {{ money(team.balance) }}</div>-->
     </div>
 </template>
 

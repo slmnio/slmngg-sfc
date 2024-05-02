@@ -7,26 +7,28 @@
 
         <b-form class="mt-4 opacity-changes" @submit="onSubmit" :class="{'low-opacity': submitting || isRestricted }">
 
-            <b-form-group label="Name" label-cols-lg="2" label-cols-sm="3" label-cols="12">
+            <b-form-group class="form-group" label="Name" label-cols-lg="2" label-cols-sm="3" label-cols="12">
                 <div class="fake-input" v-b-tooltip.bottom="'To change your player name, send a message to #slmngg-requests or send in a ModMail.'">{{ player.name }}</div>
             </b-form-group>
-            <b-form-group label="Battletag" label-cols-lg="2" label-cols-sm="3" label-cols="12">
+            <b-form-group class="form-group" label="Battletag" label-cols-lg="2" label-cols-sm="3" label-cols="12">
                 <div class="fake-input" v-b-tooltip.bottom="'To change your Battletag, send a message to #slmngg-requests or send in a ModMail.'">{{ player.battletag }}</div>
             </b-form-group>
-            <b-form-group label="Pronouns" label-cols-lg="2" label-cols-sm="3" label-cols="12">
+            <b-form-group class="form-group" label="Pronouns" label-cols-lg="2" label-cols-sm="3" label-cols="12">
                 <b-form-select :options="pronouns" v-model="profile.pronouns"/>
             </b-form-group>
-            <b-form-group label="Pronunciation" label-cols-lg="2" label-cols-sm="3" label-cols="12">
+            <b-form-group class="form-group" label="Pronunciation" label-cols-lg="2" label-cols-sm="3" label-cols="12">
                 <b-form-input v-model="profile.pronunciation" :state="profile.pronunciation && profile.pronunciation.length > 100 ? false : null "/>
                 <b-form-invalid-feedback>Please keep your pronunciation to less than 100 characters.</b-form-invalid-feedback>
             </b-form-group>
             <hr>
-            <b-form-group label="Overwatch Role" label-cols-lg="2" label-cols-sm="3" label-cols="12">
+            <b-form-group class="form-group" label="Overwatch Role" label-cols-lg="2" label-cols-sm="3" label-cols="12">
                 <b-form-select :options="roles" v-model="profile.role"/>
             </b-form-group>
             <b-form-group label="Favourite Hero" label-cols-lg="2" label-cols-sm="3" label-cols="12" class="image-form-group">
-                <div class="hero-image mr-2" :style="heroImage"></div>
-                <b-form-select :options="heroes" v-model="profile.favourite_hero" :disabled="heroes.length === 0" />
+                <div class="w-100 d-flex gap-2">
+                    <div class="hero-image" :style="heroImage"></div>
+                    <b-form-select :options="heroes" v-model="profile.favourite_hero" :disabled="heroes.length === 0"/>
+                </div>
             </b-form-group>
             <hr>
             <b-form-group label-cols-lg="2" label-cols-sm="3" label-cols="12" class="image-form-group">
@@ -34,11 +36,13 @@
                     <b>Profile Picture</b>
                 </template>
                 <template v-slot:description>
-                    <span class="text-muted">You can set your profile picture to a team or event you were a part of.<br>Once you've saved, you can check your player page <router-link
+                    <span class="text-white">You can set your profile picture to a team or event you were a part of.<br>Once you've saved, you can check your player page <router-link
                             :to="url('player', { id: player?.id })">here</router-link>.</span>
                 </template>
-                <div class="hero-image profile-theme mr-2" :style="profileTheme"></div>
-                <b-form-select :options="themesForProfile" v-model="profile.profile_picture_theme"></b-form-select>
+                <div class="w-100 d-flex gap-2">
+                    <div class="hero-image profile-theme" :style="profileTheme"></div>
+                    <b-form-select :options="themesForProfile" v-model="profile.profile_picture_theme"></b-form-select>
+                </div>
             </b-form-group>
             <div>
                 <b-button type="submit" variant="success">
@@ -52,20 +56,21 @@
 </template>
 
 <script>
-import { BButton, BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BFormSelect } from "bootstrap-vue";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { updateProfileData } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 import { resizedImage } from "@/utils/images";
 import { cleanID, getAssociatedThemeOptions, url } from "@/utils/content-utils";
 import { logoBackground } from "@/utils/theme-styles";
+import { mapWritableState } from "pinia";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "ProfilePage",
-    components: { BForm, BFormGroup, BFormSelect, BButton, BFormInput, BFormInvalidFeedback },
     computed: {
+        ...mapWritableState(useAuthStore, ["auth"]),
         player() {
-            if (!this.$root.auth.user?.airtableID) return {};
-            return ReactiveRoot(this.$root.auth.user.airtableID, {
+            if (!this.auth.user?.airtableID) return {};
+            return ReactiveRoot(this.auth.user.airtableID, {
                 member_of: ReactiveArray("member_of", {
                     theme: ReactiveThing("theme")
                 }),
@@ -195,14 +200,17 @@ export default {
                 this.updateProfile(newPlayer);
             }
         },
-        heroes(newHeroes, oldHeroes) {
-            if (newHeroes.length && JSON.stringify(newHeroes) !== JSON.stringify(oldHeroes)) {
-                const favHero = this.profile.favourite_hero;
-                if (favHero) {
-                    this.profile.favourite_hero = null;
-                    requestAnimationFrame(() => {
-                        this.profile.favourite_hero = favHero;
-                    });
+        heroes: {
+            deep: true,
+            handler(newHeroes, oldHeroes) {
+                if (newHeroes.length && JSON.stringify(newHeroes) !== JSON.stringify(oldHeroes)) {
+                    const favHero = this.profile.favourite_hero;
+                    if (favHero) {
+                        this.profile.favourite_hero = null;
+                        requestAnimationFrame(() => {
+                            this.profile.favourite_hero = favHero;
+                        });
+                    }
                 }
             }
         },
@@ -220,7 +228,9 @@ export default {
             e.preventDefault();
 
             console.log("save", this.profile);
-            const response = await updateProfileData(this.$root.auth, this.profile);
+            const response = await authenticatedRequest("actions/update-profile-data", {
+                profileData: this.profile
+            });
 
             if (response.error) {
                 this.errorMessage = response.errorMessage;
@@ -300,15 +310,14 @@ export default {
     hr {
         border-color: rgba(255,255,255,0.1);
     }
-    .image-form-group >>> .col {
-        display: flex;
-        flex-wrap: wrap;
+    .form-group {
+        margin-bottom: 0.5em;
     }
-    .image-form-group >>> .custom-select {
+    .image-form-group:deep(.custom-select) {
         width: auto;
         flex-grow: 1;
     }
-    .image-form-group >>> small {
+    .image-form-group:deep(small) {
         width: 100%;
     }
 </style>

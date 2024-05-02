@@ -16,16 +16,10 @@
 </template>
 
 <script>
-import { BButton, BFormInput, BFormSelect } from "bootstrap-vue";
-import { updateBroadcastData } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "DeskTextEditor",
-    components: {
-        BFormSelect,
-        BFormInput,
-        BButton
-    },
     props: {
         broadcast: {}
     },
@@ -133,7 +127,7 @@ export default {
             }
 
             try {
-                const response = await updateBroadcastData(this.$root.auth, data);
+                const response = await authenticatedRequest("actions/update-broadcast", data);
                 if (!response.error) {
                     this.$notyf.success("Updated desk display");
                 }

@@ -26,18 +26,22 @@
 
         <div class="d-flex">
             <table class="table table-dark table-sm w-auto mr-3" v-for="calc in calculations" :key="calc.title">
-                <tr>
-                    <th colspan="3" class="text-center">{{ calc.title }}</th>
-                </tr>
-                <tr>
-                    <th>Team</th>
-                    <th colspan="2">Scenarios (/{{ scenarios.length }})</th>
-                </tr>
-                <tr v-for="team in calc.counts" :key="team.code">
-                    <td>{{ team.code }}</td>
-                    <td>{{ team.num }}</td>
-                    <td>{{ team.perc | perc}}</td>
-                </tr>
+                <thead>
+                    <tr>
+                        <th colspan="3" class="text-center">{{ calc.title }}</th>
+                    </tr>
+                    <tr>
+                        <th>Team</th>
+                        <th colspan="2">Scenarios (/{{ scenarios.length }})</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="team in calc.counts" :key="team.code">
+                        <td>{{ team.code }}</td>
+                        <td>{{ team.num }}</td>
+                        <td>{{ perc(team.perc) }}</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
 
@@ -76,7 +80,7 @@
 
                         <span class="badge badge-pill bg-info">{{ team.wins }}-{{ team.losses }}</span>
                     </td>
-                    <td class="text-right">
+                    <td class="text-end">
                         <span class="badge" v-if="scenario.flags.includes('3-WAY-LAST')">3-way L</span>
                         <span class="badge" v-if="scenario.flags.includes('3-WAY-FIRST')">3-way F</span>
                         <i class="fas fa-info-circle" v-if="scenario.notes.length" :title="scenario.notes.join(', ')"></i>
@@ -100,12 +104,6 @@ export default {
         activeMatchGroup: null,
         overrides: {}
     }),
-    filters: {
-        perc(num) {
-            if (isNaN(num)) return "-";
-            return (num * 100).toFixed(1) + "%";
-        }
-    },
     computed: {
         settings() {
             if (!this.event?.blocks) return null;
@@ -190,7 +188,6 @@ export default {
                             // console.log("match pred lost");
                             scenario.impossible = true;
                         }
-                    } else {
                     }
                     match.winner = match.teams[bits[mi]];
                     match.loser = match.teams[+!bits[mi]];
@@ -312,19 +309,22 @@ export default {
                         counts: sortedCounts
                     };
                 }
+                return null;
             });
         }
     },
     methods: {
+        perc(num) {
+            if (isNaN(num)) return "-";
+            return (num * 100).toFixed(1) + "%";
+        },
         setOverride(index, num) {
             console.log("override", index, num);
             if (this.overrides[index] === num) {
                 // unset
-                // this.overrides[index] = null;
-                this.$set(this.overrides, index, null);
+                this.overrides[index] = null;
             } else {
-                // this.overrides[index] = num;
-                this.$set(this.overrides, index, num);
+                this.overrides[index] = num;
             }
         }
     }

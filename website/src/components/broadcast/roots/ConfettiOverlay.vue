@@ -2,10 +2,7 @@
     <div></div>
 </template>
 <script>
-import VueConfetti from "vue-confetti";
 import { ReactiveRoot } from "@/utils/reactive";
-import Vue from "vue";
-Vue.use(VueConfetti);
 
 export default {
     props: ["themeId", "theme"],
@@ -18,7 +15,7 @@ export default {
             minor: true
         }
     }),
-    beforeDestroy() {
+    beforeUnmount() {
         this.stopConfetti();
     },
     methods: {
@@ -79,7 +76,7 @@ export default {
             );
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Confetti | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

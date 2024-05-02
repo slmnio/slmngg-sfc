@@ -1,11 +1,9 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import { socket } from "@/socket";
+import { createStore } from "vuex";
 import { cleanID } from "@/utils/content-utils";
 import { fetchThings } from "@/utils/fetch";
 
-Vue.use(Vuex);
-
-export default new Vuex.Store({
+const store = createStore({
     state: {
         things: [],
         thing_map: {},
@@ -14,23 +12,19 @@ export default new Vuex.Store({
 
         highlighted_team: null,
         highlighted_match: null,
-        edit_in_site_timezone: false,
         match_highlights: [],
-        timezone: localStorage.getItem("timezone") || "local",
-        use24HourTime: localStorage.getItem("use24HourTime") === "true" || false,
         draft_notes: [],
         last_event_match_pages: [],
         dashboard_modules_active: [],
 
-        data_update_buffer: []
+        data_update_buffer: [],
+        website_flags: []
     },
     mutations: {
         push(_store, { id, data }) {
             data = JSON.parse(JSON.stringify({ ...data, id: cleanID(id), _original_data_id: cleanID(data.id), __stored: true }));
-            // if ()
 
             const index = this.state.thing_map[id] || -1;
-            // console.log(">update", id, this.state.things, index);
             if (index !== -1) {
                 this.state.things.splice(index, 1, data);
                 return this.state.things[index];
@@ -39,9 +33,6 @@ export default new Vuex.Store({
                 this.state.thing_map[id] = this.state.things.length - 1;
                 return this.state.things[this.state.things.length - 1];
             }
-
-            // this.state.things.set(id, data);
-            // TODO: setup socket.io handler here for "data_UPDATE"
         },
         addToRequestBuffer(state, id) {
             state.request_buffer.push(id);
@@ -55,14 +46,14 @@ export default new Vuex.Store({
             this.commit("clearRequestBuffer");
             return fetchThings(ids);
         },
-        SOCKET_DATA_UPDATE(state, [id, data]) {
-            // console.log("[store] [data_update]", data);
+        socketDataUpdate(state, { id, data }) {
+            console.log("[store] [data_update] commit->", data);
             // this.commit("push", { id, data });
             state.data_update_buffer.push({ id, data });
         },
         executeUpdateBuffer(state) {
             if (!state.data_update_buffer.length) return;
-            console.log("[store] [data_update]", state.data_update_buffer.length);
+            console.log("[store] [data_update] execute->", state.data_update_buffer.length);
             state.data_update_buffer.forEach(({ id, data }) => {
                 this.commit("push", { id, data });
             });
@@ -71,15 +62,13 @@ export default new Vuex.Store({
         subscribe(state, id) {
             if (!id) return;
             if (state.subscribed_ids.includes(id)) return;
-            this._vm.$socket.client.emit("subscribe", id);
-            // console.log("[socket]", "subscribed to", id);
+            socket.emit("subscribe", id);
             state.subscribed_ids.push(id);
         },
         unsubscribe(state, id) {
             if (!id) return;
             if (!state.subscribed_ids.includes(id)) return;
-            this._vm.$socket.client.emit("unsubscribe", id);
-            // console.log("[socket]", "unsubscribed from", id);
+            socket.emit("unsubscribe", id);
             state.subscribed_ids.splice(this.state.subscribed_ids.indexOf(id), 1);
         },
 
@@ -88,14 +77,6 @@ export default new Vuex.Store({
         },
         setHighlightedMatch(state, matchID) {
             state.highlighted_match = matchID;
-        },
-        setTimezone(state, timezone) {
-            localStorage.setItem("timezone", timezone);
-            state.timezone = timezone;
-        },
-        setUse24HourTime(state, use24HourTime) {
-            localStorage.setItem("use24HourTime", use24HourTime);
-            state.use24HourTime = use24HourTime;
         },
         setHighlights(state, matchHighlights) {
             state.match_highlights = matchHighlights;
@@ -132,8 +113,8 @@ export default new Vuex.Store({
                 if (!visible) state.last_event_match_pages.splice(index, 1);
             }
         },
-        setTimeEditTimezone(state, editInSiteTimezone) {
-            state.edit_in_site_timezone = editInSiteTimezone;
+        setWebsiteFlags(state, flags) {
+            state.website_flags = flags;
         }
     },
     getters: {
@@ -146,10 +127,14 @@ export default new Vuex.Store({
         // highlightedMatch: (state, getters) => () => getters.thing(state.highlighted_match)
         highlightedMatch: state => () => state.highlighted_match,
         dashboardModuleIsVisible: state => (moduleName) => state.dashboard_modules_active.includes(moduleName),
-        editTimeInSiteTimezone: state => state.edit_in_site_timezone
+        hasWebsiteFlag: state => flag => state.website_flags.includes(flag)
     },
     actions: {
         subscribe: (state, data) => state.commit("subscribe", data),
         unsubscribe: (state, data) => state.commit("unsubscribe", data)
     }
 });
+
+
+export default store;
+

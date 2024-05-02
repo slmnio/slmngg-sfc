@@ -36,7 +36,7 @@
             </li>
         </ul>
         <h3>Cam Link</h3>
-        <div v-if="this.$root.auth.user">
+        <div v-if="user">
             <p v-if="this.camId">
                 <b-button variant="success" class="link-text" :href="camLink">Open Cam <i class="fas fa-fw fa-external-link"></i></b-button>
             </p>
@@ -50,19 +50,20 @@
 </template>
 
 <script>
-
+import { mapState } from "pinia";
 import { authenticatedRequest } from "@/utils/dashboard";
 import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import LoadingIcon from "@/components/website/LoadingIcon";
-import { BButton } from "bootstrap-vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "TeamCams",
-    components: { LoadingIcon, BButton },
+    components: { LoadingIcon },
     data: () => ({
         hasCreatedLiveGuest: false
     }),
     computed: {
+        ...mapState(useAuthStore, ["user"]),
         camId() {
             return this.playerWithCams.live_guests?.cam_code ?? this.playerWithCams.live_guests?.discord_id;
         },
@@ -70,19 +71,22 @@ export default {
             return `https://cams.prod.slmn.gg/?push=${this.camId}&webcam&cb=0&nmb=0&hideaudio=1`;
         },
         playerWithCams() {
-            return ReactiveRoot(this.$root.auth?.user?.airtableID, {
+            const { user } = useAuthStore();
+            if (!user?.airtableID) return {};
+            return ReactiveRoot(user.airtableID, {
                 live_guests: ReactiveThing("live_guests")
             });
         },
         isAuthed() {
-            return this.$root.auth.user;
+            return useAuthStore().isAuthenticated;
         }
     },
     methods: {
         async createLiveGuest() {
-            if (this.$root.auth?.user && !this.hasCreatedLiveGuest) {
+            const { user } = useAuthStore();
+            if (user && !this.hasCreatedLiveGuest) {
                 console.log("Creating live guest");
-                await authenticatedRequest(this.$root.auth, "actions/create-live-guest", {});
+                await authenticatedRequest("actions/create-live-guest", {});
                 this.hasCreatedLiveGuest = true;
             }
         },
@@ -96,7 +100,7 @@ export default {
             this.createLiveGuest();
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: "Player Cams"
         };

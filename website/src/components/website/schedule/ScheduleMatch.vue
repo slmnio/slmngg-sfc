@@ -67,13 +67,13 @@
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { url, cleanID } from "@/utils/content-utils";
 import ScheduleTime from "@/components/website/schedule/ScheduleTime";
-import { BButton, BButtonGroup } from "bootstrap-vue";
 import { adjustMatchBroadcast } from "@/utils/dashboard";
+
 
 export default {
     name: "ScheduleMatch",
-    props: ["match", "customText", "leftTeam", "canEditMatches", "canEditBroadcasts", "selectedBroadcast"],
-    components: { BButtonGroup, BButton, ScheduleTime, ThemeLogo },
+    components: { ScheduleTime, ThemeLogo },
+    props: ["match", "customText", "leftTeam", "canEditMatches", "canEditBroadcasts", "selectedBroadcast", "showEditorButton"],
     data: () => ({
         processing: {
             match_broadcast: false

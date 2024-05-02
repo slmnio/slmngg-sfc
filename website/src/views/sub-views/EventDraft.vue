@@ -25,22 +25,37 @@
             <div class="col-12 my-2" v-if="playerGroup('starred').length">
                 <h2>Starred players</h2>
                 <table class="table table-bordered bg-warning table-warning table-sm">
-                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
-                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('starred')" :player="player" :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    <thead>
+                        <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
+                    </thead>
+                    <tbody>
+                        <PlayerDraftRow :settings="settings" v-for="player in playerGroup('starred')" :player="player"
+                                        :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    </tbody>
                 </table>
             </div>
             <div class="col-12 my-2">
                 <h2>Available players</h2>
                 <table class="table table-bordered table-dark table-sm">
-                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
-                    <PlayerDraftRow :settings="settings" v-for="player in ungroupedPlayers" :player="player" :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    <thead>
+                        <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
+                    </thead>
+                    <tbody>
+                        <PlayerDraftRow :settings="settings" v-for="player in ungroupedPlayers" :player="player"
+                                        :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    </tbody>
                 </table>
             </div>
             <div class="col-12 my-2" v-if="playerGroup('ignored').length">
                 <h2>Ignored players</h2>
                 <table class="table table-bordered bg-danger table-danger text-white table-sm">
-                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
-                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('ignored')" :player="player" :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    <thead>
+                        <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
+                    </thead>
+                    <tbody>
+                        <PlayerDraftRow :settings="settings" v-for="player in playerGroup('ignored')" :player="player"
+                                        :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -51,11 +66,9 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import ThemeLogo from "@/components/website/ThemeLogo";
 import ContentThing from "@/components/website/ContentThing";
-import "bootstrap-vue/dist/bootstrap-vue.css";
 import PlayerDraftRow from "@/components/website/draft/PlayerDraftRow";
 import store from "@/thing-store";
 import EventDraftHeaders from "@/components/website/draft/EventDraftHeaders";
-import { BFormCheckbox, BFormSelect } from "bootstrap-vue";
 import { url } from "@/utils/content-utils";
 
 
@@ -72,7 +85,7 @@ function getRoleString(sr) {
 export default {
     name: "EventDraft",
     props: ["event"],
-    components: { EventDraftHeaders, PlayerDraftRow, ContentThing, ThemeLogo, BFormCheckbox, BFormSelect },
+    components: { EventDraftHeaders, PlayerDraftRow, ContentThing, ThemeLogo },
     methods: {
         url,
         playerGroup(group) { return this.availablePlayers.filter(p => p.localNotes && p.localNotes.tag === group); },
@@ -178,7 +191,7 @@ export default {
                             const draftData = JSON.parse(player.draft_data);
                             let extraSRtext = "";
 
-                            if (ow && ow.ratings && player.role) {
+                            if (ow?.ratings && player.role) {
                                 const sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
                                 if (draftData.sr.role && sr) player.sr_err = sr - draftData.sr.role;
                                 if (sr) extraSRtext += ` Live SR on role: ${sr} ${player.sr_err && `(${player.sr_err})`}.`;
@@ -188,7 +201,7 @@ export default {
                             return { ...player, rating: { level: draftData.sr.role, note: `${getRoleString(draftData.sr)}${extraSRtext}` } };
                         }
 
-                        if (ow && ow.ratings && player.role) {
+                        if (ow?.ratings && player.role) {
                             let sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
                             if (sr) return { ...player, rating: { level: sr, note: "Pulled from their Battletag" } };
                             sr = Math.floor(ow.ratings.reduce((p, c) => p + c.level, 0) / ow.ratings.length);
@@ -205,7 +218,7 @@ export default {
 
                 return player;
             }).map(player => {
-                if (player.notes && player.notes.includes("#split#")) {
+                if (player.notes?.includes("#split#")) {
                     player.notes = player.notes.split("#split#").map(e => e.replace(/\|/g, "\n").trim()).join("\n");
                 }
                 if (player.draft_data && player.draft_data.slice(0, 1) === "{") {

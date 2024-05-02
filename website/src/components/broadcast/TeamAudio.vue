@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { socket } from "@/socket";
 import PCMPlayer from "@/utils/pcmplayer";
 import { OpusDecoderWebWorker } from "opus-decoder";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
@@ -115,16 +116,20 @@ export default {
                 if (Date.now() - time > 10000) {
                     console.log("garbage collecting", user);
                     this.players[user].destroy();
+                    // TODO: fix these
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete this.players[user];
                     this.decoders[user].free();
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete this.decoders[user];
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete this.lastPacketTime[user];
                 }
             }
         },
         audioSub(key) {
             if (!this.broadcastKey) return;
-            this.$socket.client.emit("audio_subscribe", {
+            socket.emit("audio_subscribe", {
                 taskKey: key || this.taskKey,
                 broadcastKey: this.broadcastKey
             });

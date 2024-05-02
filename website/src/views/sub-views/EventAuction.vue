@@ -5,17 +5,17 @@
             <div class="admin-settings border-danger border p-2 rounded mb-2 d-flex align-items-center" v-if="isAdmin">
                 <button class="btn btn-info mr-1" @click="sendToAuctionServer('auction:admin_set_state', {'state': 'READY'})">Set state: READY</button>
                 <button class="btn btn-warning mr-1" @click="sendToAuctionServer('auction:admin_set_state', {'state': 'RESTRICTED'})">Set state: RESTRICTED</button>
-                <div class="btn-text text-right flex-grow-1">{{ auctionState }}</div>
+                <div class="btn-text text-end flex-grow-1">{{ auctionState }}</div>
             </div>
             <AuctionCountdown class="auction-countdown mb-2" web :style="themeBackground1(event)" show-time />
 
             <div class="action-row d-flex mb-3">
                 <div class="active-player col-7">
                     <div class="last-started" v-if="lastStartedTeam && ['PRE_AUCTION', 'IN_ACTION'].includes(auctionState)">
-                        <div class="badge badge-pill badge-secondary">Started by</div> <ThemeLogo :theme="lastStartedTeam?.theme" border-width="3px" icon-padding="4px" /> <router-link class="no-link-style" :to="url('team', lastStartedTeam)" target="_blank">{{ lastStartedTeam?.name || '&nbsp;' }}</router-link>
+                        <div class="badge badge-pill bg-secondary">Started by</div> <ThemeLogo :theme="lastStartedTeam?.theme" border-width="3px" icon-padding="4px" /> <router-link class="no-link-style" :to="url('team', lastStartedTeam)" target="_blank">{{ lastStartedTeam?.name || '&nbsp;' }}</router-link>
                     </div>
                     <div class="last-started" v-if="nextTeamToStart && ['READY', 'POST_AUCTION', 'RESTRICTED'].includes(auctionState)">
-                        <div class="badge badge-pill badge-primary">Next to start</div> <ThemeLogo :theme="nextTeamToStart?.theme" border-width="3px" icon-padding="4px" /> <router-link class="no-link-style" :to="url('team', nextTeamToStart)" target="_blank">{{ nextTeamToStart?.name || ' ' }}</router-link>
+                        <div class="badge badge-pill bg-primary">Next to start</div> <ThemeLogo :theme="nextTeamToStart?.theme" border-width="3px" icon-padding="4px" /> <router-link class="no-link-style" :to="url('team', nextTeamToStart)" target="_blank">{{ nextTeamToStart?.name || ' ' }}</router-link>
                     </div>
                     <div class="player-name" v-if="activePlayer">
                         <router-link class="no-link-style" :to="url('player', activePlayer)" target="_blank">{{ activePlayer?.name || '&nbsp;' }}</router-link>
@@ -92,9 +92,9 @@
                             <div class="text player-count ml-2">({{ auctionSettings.each_team - (team.players?.length || 0) }} to draft)</div>
                         </div>
                     </div>
-                    <div class="ml-2 badge badge-pill badge-secondary" v-if="lastStartedTeam?.id === team?.id">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>
-                    <div class="ml-2 badge badge-pill badge-primary" v-if="nextTeamToStart?.id === team?.id">Next to start</div>
-                    <div class="ml-2 badge badge-pill badge-info" v-if="actingTeam?.id === team?.id">Acting as this team</div>
+                    <div class="ml-2 badge badge-pill bg-secondary" v-if="lastStartedTeam?.id === team?.id">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>
+                    <div class="ml-2 badge badge-pill bg-primary" v-if="nextTeamToStart?.id === team?.id">Next to start</div>
+                    <div class="ml-2 badge badge-pill bg-info" v-if="actingTeam?.id === team?.id">Acting as this team</div>
                     <ul>
                         <li v-for="player in team.players" :key="player.id">
                             <router-link :to="url('player', player)" target="_blank">{{ player?.name }}</router-link>
@@ -110,8 +110,8 @@
                             <div class="text money">{{ money(team.balance) }} left over</div>
                         </div>
                     </div>
-                    <div class="ml-2 badge badge-pill badge-secondary" v-if="lastStartedTeam?.id === team?.id">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>
-                    <div class="ml-2 badge badge-pill badge-info" v-if="actingTeam?.id === team?.id">Acting as this team</div>
+                    <div class="ml-2 badge badge-pill bg-secondary" v-if="lastStartedTeam?.id === team?.id">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>
+                    <div class="ml-2 badge badge-pill bg-info" v-if="actingTeam?.id === team?.id">Acting as this team</div>
                     <ul>
                         <li v-for="player in team.players" :key="player.id">
                             <router-link :to="url('player', player)" target="_blank">{{ player?.name }}</router-link>
@@ -122,21 +122,25 @@
 
                 <h3 class="text-center mt-5">Auction Settings</h3>
                 <table class="table-dark table-bordered table-sm w-100 text-center">
-                    <tr>
-                        <td>Minimum increment: <b>{{ money(this.autoSettings.money.minimumBidIncrement) }}</b></td>
-                    </tr>
-                    <tr>
-                        <td>Maximum increment: <b>{{ money(this.autoSettings.money.maximumBidIncrement) }}</b></td>
-                    </tr>
-                    <tr v-if="auctionSettings?.time?.beforeFirstBids">
-                        <td>Pre-auction timer: <b>{{ auctionSettings?.time?.beforeFirstBids }} seconds</b></td>
-                    </tr>
-                    <tr v-if="auctionSettings?.time?.afterInitialBid">
-                        <td>Auction timer after first bid: <b>{{ auctionSettings?.time?.afterInitialBid }} seconds</b></td>
-                    </tr>
-                    <tr v-if="auctionSettings?.time?.afterSubsequentBids">
-                        <td>Auction timer after other bids: <b>{{ auctionSettings?.time?.afterSubsequentBids }} seconds</b></td>
-                    </tr>
+                    <tbody>
+                        <tr>
+                            <td>Minimum increment: <b>{{ money(this.autoSettings.money.minimumBidIncrement) }}</b></td>
+                        </tr>
+                        <tr>
+                            <td>Maximum increment: <b>{{ money(this.autoSettings.money.maximumBidIncrement) }}</b></td>
+                        </tr>
+                        <tr v-if="auctionSettings?.time?.beforeFirstBids">
+                            <td>Pre-auction timer: <b>{{ auctionSettings?.time?.beforeFirstBids }} seconds</b></td>
+                        </tr>
+                        <tr v-if="auctionSettings?.time?.afterInitialBid">
+                            <td>Auction timer after first bid: <b>{{ auctionSettings?.time?.afterInitialBid }}
+                                seconds</b></td>
+                        </tr>
+                        <tr v-if="auctionSettings?.time?.afterSubsequentBids">
+                            <td>Auction timer after other bids: <b>{{ auctionSettings?.time?.afterSubsequentBids }}
+                                seconds</b></td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
             <div class="col-8 players-section">
@@ -151,24 +155,34 @@
                 </div>
 
                 <table class="table table-bordered table-dark table-sm w-100">
-                    <tr class="player" v-for="(player, i) in undraftedPlayers" :key="player.id" :class="{'striped': i % 2 === 1, 'currently-active-player': activePlayer?.id === player.id}">
-                        <td class="player-name">
-                            <div class="player-info-box d-flex align-items-center">
-                                <div v-if="player.role" class="player-role" v-html="getRoleSVG(player.role)"></div>
-                                <router-link :to="url('player', player)">{{ player.name }}</router-link>
-                            </div>
-                            <div class="player-eligible-roles" :title="`Eligible for ${niceJoin(eligibleRoles(player.eligible_roles).map(r => r.role))}`" v-b-tooltip>
-                                <div class="role text-success" v-for="role in eligibleRoles(player.eligible_roles)" :key="role?.role" v-html="getRoleSVG(role?.role)"></div>
-                            </div>
-                        </td>
-                        <td class="draft-data">{{ player.draft_data }}</td>
-                        <td class="player-buttons-cell">
-                            <div class="buttons d-flex">
-                                <button class="btn btn-info btn-sm" v-if="isAdmin" :disabled="!adminTeamID" @click="() => askStarting(player)">force</button>
-                                <button class="btn btn-success btn-sm" :disabled="!canStartPlayer" @click="startPlayer(player)">start</button>
-                            </div>
-                        </td>
-                    </tr>
+                    <tbody>
+                        <tr class="player" v-for="(player, i) in undraftedPlayers" :key="player.id"
+                            :class="{'striped': i % 2 === 1, 'currently-active-player': activePlayer?.id === player.id}">
+                            <td class="player-name">
+                                <div class="player-info-box d-flex align-items-center">
+                                    <div v-if="player.role" class="player-role" v-html="getRoleSVG(player.role)"></div>
+                                    <router-link :to="url('player', player)">{{ player.name }}</router-link>
+                                </div>
+                                <div class="player-eligible-roles"
+                                     :title="`Eligible for ${niceJoin(eligibleRoles(player.eligible_roles).map(r => r.role))}`"
+                                     v-b-tooltip>
+                                    <div class="role text-success" v-for="role in eligibleRoles(player.eligible_roles)"
+                                         :key="role?.role" v-html="getRoleSVG(role?.role)"></div>
+                                </div>
+                            </td>
+                            <td class="draft-data">{{ player.draft_data }}</td>
+                            <td class="player-buttons-cell">
+                                <div class="buttons d-flex">
+                                    <button class="btn btn-info btn-sm" v-if="isAdmin" :disabled="!adminTeamID"
+                                            @click="() => askStarting(player)">force
+                                    </button>
+                                    <button class="btn btn-success btn-sm" :disabled="!canStartPlayer"
+                                            @click="startPlayer(player)">start
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -176,21 +190,20 @@
 </template>
 
 <script>
+import { socket } from "@/socket";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { isAuthenticated } from "@/utils/auth";
 import { cleanID, dirtyID, getRoleSVG, money, url } from "@/utils/content-utils";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import AuctionCountdown from "@/components/broadcast/auction/AuctionCountdown.vue";
 import AuctionBid from "@/components/website/AuctionBid.vue";
-import { VBTooltip } from "bootstrap-vue";
 import ContentThing from "@/components/website/ContentThing.vue";
 import { themeBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "EventAuction",
     components: { ThemeLogo, ContentThing, AuctionBid, AuctionCountdown },
-    directives: { BTooltip: VBTooltip },
     props: {
         event: {}
     },
@@ -261,7 +274,8 @@ export default {
             return null;
         },
         isAdmin() {
-            return isEventStaffOrHasRole(this.$root.auth.user, { event: this.event, role: "Auction Admin", websiteRoles: ["Full broadcast permissions", "Can edit any auction"] });
+            const { user } = useAuthStore();
+            return isEventStaffOrHasRole(user, { event: this.event, role: "Auction Admin", websiteRoles: ["Full broadcast permissions", "Can edit any auction"] });
         },
         auctionSettings() {
             return this.eventSettings?.auction;
@@ -365,8 +379,9 @@ export default {
             return null;
         },
         teamsYouControl() {
-            if (!isAuthenticated(this.$root)) return [];
-            let userAirtableID = this.$root.auth.user?.airtableID;
+            const { isAuthenticated, user } = useAuthStore();
+            if (!isAuthenticated) return [];
+            let userAirtableID = user?.airtableID;
             if (!userAirtableID) return [];
             userAirtableID = "rec" + userAirtableID;
             return this.teams.filter(t =>
@@ -400,7 +415,6 @@ export default {
     },
     methods: {
         themeBackground1,
-        isAuthenticated,
         money,
         getRoleSVG,
         url,
@@ -430,12 +444,13 @@ export default {
             return this.playerRoles(roles).filter(role => role.eligible);
         },
         sendToAuctionServer(event, data) {
-            // if (!isAuthenticated()) return console.error("Tried to send data while not authed", { event, data });
+            const { isAuthenticated, token } = useAuthStore();
+            if (!isAuthenticated) return console.error("Tried to send data while not authed", { event, data });
             console.log("[socket]", "sending", event, data);
-            this.$socket.client.emit(event, {
+            socket.emit(event, {
                 auctionID: this.eventID,
                 ...data,
-                _token: this.$root.auth.token
+                _token: token
             });
         },
         startPlayer(player) {
@@ -474,6 +489,7 @@ export default {
         },
         teamsYouControl: {
             immediate: true,
+            deep: true,
             handler(teams) {
                 if (!teams?.length) {
                     this.actingTeamID = null;
@@ -646,7 +662,7 @@ export default {
         background-color: var(--primary);
     }
 
-    .currently-active-player >>> a,
+    .currently-active-player:deep(a),
     .currently-active-player .role {
         color: white !important;
     }

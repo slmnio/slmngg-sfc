@@ -2,7 +2,7 @@
     <div class="timezone-swapper" :class="{'align-left': align === 'left'}">
         <b-form :inline="inline">
             <b-form-group label-size="sm" label="Timezone" :label-cols-sm="inline ? 3 : 12">
-                <b-form-select id="available-timezone-select" :options="availableTimezones" v-model="siteTimezone" size="sm" />
+                <b-form-select id="available-timezone-select" :options="availableTimezones" v-model="timezone" size="sm" />
             </b-form-group>
             <b-form-checkbox v-if="!inline" size="sm" switch v-model="use24HourTime">
                 Use 24-hour time
@@ -14,7 +14,8 @@
 <script>
 import spacetime from "spacetime";
 import informal from "spacetime-informal";
-import { BForm, BFormGroup, BFormSelect, BFormCheckbox } from "bootstrap-vue";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { mapWritableState } from "pinia";
 
 function getAbbrev(timezone) {
     const display = informal.display(timezone);
@@ -32,29 +33,8 @@ function getOffset(timezone) {
 export default {
     name: "TimezoneSwapper",
     props: ["align", "inline"],
-    components: {
-        BForm,
-        BFormGroup,
-        BFormSelect,
-        BFormCheckbox
-    },
     computed: {
-        siteTimezone: {
-            set(tz) {
-                this.$store.commit("setTimezone", tz);
-            },
-            get() {
-                return this.$store.state.timezone || "local";
-            }
-        },
-        use24HourTime: {
-            set(value) {
-                this.$store.commit("setUse24HourTime", value);
-            },
-            get() {
-                return this.$store.state.use24HourTime;
-            }
-        },
+        ...mapWritableState(useSettingsStore, ["timezone", "use24HourTime"]),
         availableTimezones() {
             const timezones = ["America/New_York", "America/Los_Angeles", "Europe/London", "Europe/Berlin"];
 

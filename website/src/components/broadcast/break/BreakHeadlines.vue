@@ -87,7 +87,7 @@ export default {
     .headline-leave-to {
         transform: translate(0, -2em);
     }
-    .headline-enter {
+    .headline-enter-from {
         transform: translate(0, 2em);
     }
 </style>

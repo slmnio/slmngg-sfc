@@ -139,7 +139,7 @@
                     <!--</editor-fold>-->
                 </tr>
                 <tr class="totals">
-                    <td colspan="2" class="text-right">Total ({{ totals.all.played }} matches)</td>
+                    <td colspan="2" class="text-end">Total ({{ totals.all.played }} matches)</td>
 
                     <td class="num new-category">{{ totals.regular_season.wins }}</td>
                     <td class="num">{{ totals.regular_season.losses }}</td>
@@ -158,7 +158,7 @@
                     <td class="winrate">{{ totals.all.winrate }}</td>
                 </tr>
                 <tr class="totals">
-                    <td colspan="2" class="text-right">Total ({{ totals.all.maps.played }} maps)</td>
+                    <td colspan="2" class="text-end">Total ({{ totals.all.maps.played }} maps)</td>
 
                     <td class="num new-category">{{ totals.regular_season.maps.wins }}</td>
                     <td class="num">{{ totals.regular_season.maps.losses }}</td>
@@ -184,7 +184,6 @@
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { url } from "@/utils/content-utils";
-import { BFormGroup, BFormSelect } from "bootstrap-vue";
 import { sortMatches } from "@/utils/sorts";
 import { logoBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
@@ -316,9 +315,7 @@ export default {
         }
     },
     components: {
-        ThemeLogo,
-        BFormGroup,
-        BFormSelect
+        ThemeLogo
     },
     data: () => ({
         showTeams: true,
@@ -332,15 +329,17 @@ export default {
             ];
         },
         showedTeams() {
-            return this.showTeams ? this.teams.filter(team => {
-                if (this.tierFilter === "All") return true;
-                if (!team.event?.tier) return false;
-                const tierFilterIndex = tiers.indexOf(this.tierFilter.replace("+", ""));
-                const eventTierIndex = tiers.indexOf(team.event?.tier);
+            return this.showTeams
+                ? this.teams.filter(team => {
+                    if (this.tierFilter === "All") return true;
+                    if (!team.event?.tier) return false;
+                    const tierFilterIndex = tiers.indexOf(this.tierFilter.replace("+", ""));
+                    const eventTierIndex = tiers.indexOf(team.event?.tier);
 
-                console.log({ tierFilterIndex, eventTierIndex, tier: team.event?.tier, event: team.event?.name });
-                return eventTierIndex <= tierFilterIndex;
-            }) : [];
+                    console.log({ tierFilterIndex, eventTierIndex, tier: team.event?.tier, event: team.event?.name });
+                    return eventTierIndex <= tierFilterIndex;
+                })
+                : [];
         },
         teams() {
             if (!this.player?.member_of?.length) return [];

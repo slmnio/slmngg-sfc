@@ -42,72 +42,77 @@
             <div class="maps-table-wrapper">
                 <table class="teams-maps table table-bordered table-sm table-dark mt-2 mb-0 opacity-changes"
                        :class="{'low-opacity': processing['map']}">
-                    <tr class="map" v-for="(map, i) in maps" :key="i"
-                        :class="{'banned': banners[i], 'very-low-opacity': !map.dummy && !map._original_data_id}">
-                        <td class="form-stack number">
-                            <div class="form-top d-flex">
-                                <div>#</div>
-                                <div class="flex-grow-1 text-right">
-                                    <i class="fas fa-pen" v-b-tooltip="'Edits an existing map record'" v-if="existingMapIDs[i]"></i>
-                                    <i class="fas fa-plus" v-b-tooltip="'Creates a new map record'" v-if="!existingMapIDs[i]"></i>
+                    <tbody>
+                        <tr class="map" v-for="(map, i) in maps" :key="i"
+                            :class="{'banned': banners[i], 'very-low-opacity': !map.dummy && !map._original_data_id}">
+                            <td class="form-stack number">
+                                <div class="form-top d-flex">
+                                    <div>#</div>
+                                    <div class="flex-grow-1 text-end">
+                                        <i class="fas fa-pen" v-b-tooltip="'Edits an existing map record'"
+                                           v-if="existingMapIDs[i]"></i>
+                                        <i class="fas fa-plus" v-b-tooltip="'Creates a new map record'"
+                                           v-if="!existingMapIDs[i]"></i>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-button">
-                                <b-form-input type="number" class="map-number no-arrows" :min="1" :max="minMaps"
-                                              v-model.number="mapNumbers[i]"></b-form-input>
-                            </div>
-                        </td>
-                        <td class="map form-stack" style="width: 100%;">
-                            <div class="form-top">
-                                Map
-                            </div>
-                            <div class="form-bottom">
-                                <b-form-select class="no-choice" :options="getMapOptions(i)" :value="mapChoices[i] || null" @input="val => mapChoices[i] = val" />
-                            </div>
-                        </td>
-                        <td class="form-stack">
-                            <div class="form-top text-center">
-                                Map Score
-                            </div>
-                            <div class="form-bottom map-editors d-flex">
-                                <MapScoreEditor class="map-editor" v-model="score_1s[i]"
-                                                @input="(val) => checkAutoWinner(i, val)"
-                                                :team="teams[0]"></MapScoreEditor>
-                                <MapScoreEditor class="map-editor" v-model="score_2s[i]"
-                                                @input="(val) => checkAutoWinner(i, val)" :team="teams[1]"
-                                                :reverse="true"></MapScoreEditor>
-                            </div>
-                        </td>
-                        <td class="form-stack">
-                            <div class="form-top text-center">
-                                Draw
-                            </div>
-                            <div class="form-bottom d-flex">
-                                <b-form-checkbox button :button-variant="draws[i] ? 'primary' : 'light'"
-                                                 class="draw-checkbox" v-model="draws[i]">
-                                    <i v-if="draws[i]" class="fas fa-check fa-fw"></i>
-                                    <i v-else class="fas fa-fw fa-check hoverable"></i>
-                                </b-form-checkbox>
-                            </div>
-                        </td>
-                        <td class="form-stack number" v-if="!hideMatchExtras">
-                            <div class="form-top">Replay Code</div>
-                            <div class="form-button">
-                                <b-form-input type="text" v-model="replayCodes[i]"></b-form-input>
-                            </div>
-                        </td>
-                        <td v-if="showMapBanButtons">
-                            <TeamPicker title="Banned by" :teams="teams" v-model="banners[i]"></TeamPicker>
-                        </td>
-                        <td>
-                            <TeamPicker title="Picked by" :class="{ 'very-low-opacity': banners[i] }" :teams="teams"
-                                        v-model="pickers[i]"></TeamPicker>
-                        </td>
-                        <td>
-                            <TeamPicker title="Winner" :class="{ 'very-low-opacity': banners[i] }" :teams="teams"
-                                        v-model="winners[i]" @change="(val) => winnerSelected(i, val)"></TeamPicker>
-                        </td>
-                    </tr>
+                                <div class="form-button">
+                                    <b-form-input type="number" class="map-number no-arrows" :min="1" :max="minMaps"
+                                                  v-model.number="mapNumbers[i]"></b-form-input>
+                                </div>
+                            </td>
+                            <td class="map form-stack" style="width: 100%;">
+                                <div class="form-top">
+                                    Map
+                                </div>
+                                <div class="form-bottom">
+                                    <b-form-select class="no-choice" :options="getMapOptions(i)"
+                                                   :value="mapChoices[i] || null" @input="val => mapChoices[i] = val"/>
+                                </div>
+                            </td>
+                            <td class="form-stack">
+                                <div class="form-top text-center">
+                                    Map Score
+                                </div>
+                                <div class="form-bottom map-editors d-flex">
+                                    <MapScoreEditor class="map-editor" v-model="score_1s[i]"
+                                                    @input="(val) => checkAutoWinner(i, val)"
+                                                    :team="teams[0]"></MapScoreEditor>
+                                    <MapScoreEditor class="map-editor" v-model="score_2s[i]"
+                                                    @input="(val) => checkAutoWinner(i, val)" :team="teams[1]"
+                                                    :reverse="true"></MapScoreEditor>
+                                </div>
+                            </td>
+                            <td class="form-stack">
+                                <div class="form-top text-center">
+                                    Draw
+                                </div>
+                                <div class="form-bottom d-flex draw-checkbox-wrapper">
+                                    <b-form-checkbox button :button-variant="draws[i] ? 'primary' : 'light'"
+                                                     class="draw-checkbox" v-model="draws[i]">
+                                        <i v-if="draws[i]" class="fas fa-check fa-fw"></i>
+                                        <i v-else class="fas fa-fw fa-check hoverable"></i>
+                                    </b-form-checkbox>
+                                </div>
+                            </td>
+                            <td class="form-stack number" v-if="!hideMatchExtras">
+                                <div class="form-top">Replay Code</div>
+                                <div class="form-button">
+                                    <b-form-input type="text" v-model="replayCodes[i]"></b-form-input>
+                                </div>
+                            </td>
+                            <td v-if="showMapBanButtons">
+                                <TeamPicker title="Banned by" :teams="teams" v-model="banners[i]"></TeamPicker>
+                            </td>
+                            <td>
+                                <TeamPicker title="Picked by" :class="{ 'very-low-opacity': banners[i] }" :teams="teams"
+                                            v-model="pickers[i]"></TeamPicker>
+                            </td>
+                            <td>
+                                <TeamPicker title="Winner" :class="{ 'very-low-opacity': banners[i] }" :teams="teams"
+                                            v-model="winners[i]" @change="(val) => winnerSelected(i, val)"></TeamPicker>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
             <div class="details-wrapper p-2 mt-3" v-if="!hideMatchExtras">
@@ -156,22 +161,19 @@
 </template>
 
 <script>
-import { BButton, BForm, BFormCheckbox, BFormGroup, BFormInput, BFormSelect } from "bootstrap-vue";
-import { updateMapData, updateMatchData } from "@/utils/dashboard";
-import ThemeLogo from "@/components/website/ThemeLogo";
+import { authenticatedRequest } from "@/utils/dashboard";
 import ContentThing from "@/components/website/ContentThing";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { cleanID, formatTime, textSort } from "@/utils/content-utils";
 import TeamPicker from "@/components/website/dashboard/TeamPicker";
 import MapScoreEditor from "@/components/website/dashboard/MapScoreEditor";
-import DashboardModule from "@/components/website/dashboard/DashboardModule.vue";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "MatchEditor",
     props: ["match", "hideMatchExtras"],
-    // eslint-disable-next-line vue/no-unused-components
-    components: { AdvancedDateEditor, DashboardModule, MapScoreEditor, TeamPicker, ContentThing, ThemeLogo, BForm, BFormGroup, BFormCheckbox, BFormInput, BButton, BFormSelect },
+    components: { AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
     computed: {
         teams() {
             const dummy = { dummy: true };
@@ -259,6 +261,7 @@ export default {
                     if (this.restrictToMapPool && this.hasMapPool) {
                         return (this.match?.event?.map_pool || []).some(_m => _m === "rec" + map?.id || _m?.id === "rec" + map?.id);
                     }
+                    return true;
                 });
             }
 
@@ -287,7 +290,7 @@ export default {
             return data;
         },
         broadcastData() {
-            return this.broadcast || this.match?.event?.broadcasts;
+            return this.match?.event?.broadcasts;
         }
         // loadedFully() {
         //     const test = [
@@ -427,17 +430,17 @@ export default {
         async setMatchStart(timeString) {
             const response = await this.sendMatchDataChange("start", timeString);
             if (!response.error) {
-                this.$notyf.success(`Set match start to: ${formatTime(timeString, { tz: this.$store.state.timezone, use24HourTime: this.$store.state.use24HourTime })}`);
+                this.$notyf.success(`Set match start to: ${formatTime(timeString, { tz: useSettingsStore().timezone, use24HourTime: useSettingsStore().use24HourTime })}`);
             }
         },
         setIfNew(key, index, value) {
             if (this.previousAutoData?.[key]?.[index] === value) return; // console.log(`Not updating ${key}[${index}] because ${value} is the same as last set`);
             // console.log(`Updating ${key}[${index}] to`, value);
-            this.$set(this[key], index, value);
+            this[key][index] = value;
         },
         emptyData(newID) {
             console.log("New match, emptying data", newID);
-            this.$set(this.processing, "map", true);
+            this.processing.map = true;
             this.draws = [];
             this.mapChoices = [];
             this.winners = [];
@@ -477,9 +480,9 @@ export default {
                     this.setIfNew("replayCodes", i, map.replay_code);
                     this.setIfNew("mapNumbers", i, map.number);
                 });
-                this.$set(this.processing, "map", false);
+                this.processing.map = false;
             } else {
-                this.$set(this.processing, "map", false);
+                this.processing.map = false;
             }
 
             this.matchData.scores = this.scores;
@@ -502,21 +505,27 @@ export default {
             };
         },
         async sendMatchDataChange(key, val) {
-            this.$set(this.processing, key, true); // set it processing while we work
+            this.processing[key] = true; // set it processing while we work
             console.log("[processing]", key, "on");
             const obj = {};
             obj[key] = val;
 
-            const response = await updateMatchData(this.$root.auth, this.match, obj);
+            const response = await authenticatedRequest("actions/update-match-data", {
+                matchID: this.match.id,
+                updatedData: obj
+            });
             // if (response.error) this.errorMessage = response.errorMessage;
             console.log(response);
-            this.$set(this.processing, key, false);
+            this.processing[key] = false;
             console.log("[processing]", key, "off");
             return response;
         },
         async saveMatchDetails() {
-            this.$set(this.processing, "details", true);
-            const response = await updateMatchData(this.$root.auth, this.match, this.matchData);
+            this.processing.details = true;
+            const response = await authenticatedRequest("actions/update-match-data", {
+                matchID: this.match.id,
+                updatedData: this.matchData
+            });
             console.log(response);
             if (!response.error) {
                 this.$notyf.success({
@@ -524,11 +533,11 @@ export default {
                     duration: 3000
                 });
             }
-            this.$set(this.processing, "details", false);
+            this.processing.details = false;
             return response;
         },
         async saveMapAndScores() {
-            return this.sendMapDataChange(); // function changes scores if different
+            return await this.sendMapDataChange(); // function changes scores if different
         },
         async sendScoresIfDifferent() {
             const newScores = this.matchData?.scores;
@@ -540,9 +549,12 @@ export default {
             if ((newScores[0] !== oldScores[0]) || (newScores[1] !== oldScores[1])) {
                 // scores are different
 
-                const response = await updateMatchData(this.$root.auth, this.match, {
-                    score_1: newScores[0],
-                    score_2: newScores[1]
+                const response = await authenticatedRequest("actions/update-match-data", {
+                    matchID: this.match.id,
+                    updatedData: {
+                        score_1: newScores[0],
+                        score_2: newScores[1]
+                    }
                 });
 
                 if (!response.error) {
@@ -555,14 +567,17 @@ export default {
         },
         async sendMapDataChange() {
             console.log("map processing");
-            this.$set(this.processing, "map", true);
+            this.processing.map = true;
 
             await this.sendScoresIfDifferent();
 
-            const response = await updateMapData(this.$root.auth, this.match, this.editedMapData);
+            const response = await authenticatedRequest("actions/update-map-data", {
+                matchID: this.match.id,
+                mapData: this.editedMapData
+            });
             // if (response.error) this.errorMessage = response.errorMessage;
             console.log(response);
-            this.$set(this.processing, "map", false);
+            this.processing.map = false;
 
             if (!response.error) {
                 this.$notyf.success({
@@ -583,7 +598,7 @@ export default {
                     score[1]++;
                 }
             });
-            this.$set(this.matchData, "scores", score);
+            this.matchData.scores = score;
         },
         checkAutoWinner(i, val) {
             console.log("checkAutoWinner", { val, i }, this.score_1s[i], this.score_2s[i]);
@@ -594,17 +609,17 @@ export default {
                 if (this.score_1s[i] > this.score_2s[i]) {
                     // set left winner
 
-                    this.$set(this.winners, i, this.teams[0].id);
+                    this.winners[i] = this.teams[0].id;
                     if (this.autoLoserPicks && this.maps?.[i + 1]) {
-                        this.$set(this.pickers, i + 1, this.teams[1].id);
+                        this.pickers[i + 1] = this.teams[1].id;
                     }
                     this.autoUpdateScore();
                 } else if (this.score_1s[i] < this.score_2s[i]) {
                     // set right winner
 
-                    this.$set(this.winners, i, this.teams[1].id);
+                    this.winners[i] = this.teams[1].id;
                     if (this.autoLoserPicks && this.maps?.[i + 1]) {
-                        this.$set(this.pickers, i + 1, this.teams[0].id);
+                        this.pickers[i + 1] = this.teams[0].id;
                     }
                     this.autoUpdateScore();
                 }
@@ -619,7 +634,7 @@ export default {
                 const loserID = teamIDs.find(id => id !== teamID);
                 // console.log("loser", loserID);
                 if (!loserID) return console.warn("can't find a team", teamID, teamIDs, loserID);
-                this.$set(this.pickers, i + 1, loserID);
+                this.pickers[i + 1] = loserID;
             }
         }
     },
@@ -700,7 +715,7 @@ export default {
         opacity: 0.5;
     }
 
-    .teams-scores >>> .custom-checkbox {
+    .teams-scores:deep(.form-check) {
         font-size: 16px !important;
     }
 
@@ -710,5 +725,9 @@ export default {
 
     ::placeholder {
         color: rgba(0,0,0,0.4);
+    }
+
+    .draw-checkbox-wrapper:deep(.btn-light) {
+        color: rgba(0,0,0,0.25);
     }
 </style>

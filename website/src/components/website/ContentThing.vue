@@ -24,7 +24,7 @@
 
 <script>
 import { url } from "@/utils/content-utils";
-import { resizedImage } from "@/utils/images";
+import { resizedImage, resizedImageNoWrap } from "@/utils/images";
 import LoadingIcon from "@/components/website/LoadingIcon";
 
 export default {
@@ -60,13 +60,13 @@ export default {
             return this.thing.__loading || !this.thing || !this.thing.id;
         },
         logo () {
-            if (!this.theme || !this.theme.default_logo) return null;
+            if (!this.theme?.default_logo) return null;
             return resizedImage(this.theme, ["small_logo", "default_logo"], "s-120");
         },
         headshot () {
             if (!this.thing) return null;
             return {
-                backgroundImage: `url(${resizedImage(this.thing, "headshot", 100) || resizedImage(this.theme, "default_logo", 100)})`,
+                backgroundImage: `url(${resizedImageNoWrap(this.thing, "headshot", 100) ?? resizedImageNoWrap(this.theme, "default_logo", 100)})`,
                 backgroundColor: this.theme.color_accent || this.theme.color_alt
             };
         },

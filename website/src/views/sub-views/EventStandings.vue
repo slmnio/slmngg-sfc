@@ -50,14 +50,14 @@ export default {
         font-size: 24px;
         width: fit-content;
     }
-    .standings >>> .standings-team {
+    .standings:deep(.standings-team) {
         padding: 4px 0;
     }
-    .standings >>> .team-name {
+    .standings:deep(.team-name) {
         margin-right: 32px;
         min-width: 250px;
     }
-    .standings >>> .team-name.team-code {
+    .standings:deep(.team-name.team-code) {
         margin-right: 32px;
         min-width: 50px;
     }

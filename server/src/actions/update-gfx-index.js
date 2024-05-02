@@ -6,6 +6,7 @@ module.exports = {
     /***
      * @param {AnyAirtableID} gfxID
      * @param {number} index
+     * @param {ClientData} client
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern
@@ -26,7 +27,7 @@ module.exports = {
         newArray[index] = gfxID;
         newArray[replacingIndex] = replacingId;
 
-        this.helpers.updateRecord("Broadcasts", broadcast, {
+        await this.helpers.updateRecord("Broadcasts", broadcast, {
             "GFX": newArray.map(id => dirtyID(id))
         });
     }

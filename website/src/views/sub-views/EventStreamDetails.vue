@@ -2,37 +2,52 @@
     <div class="event-stream-details container">
         <h3>Stream Details</h3>
         <table class="table-dark table-bordered table table-sm">
-            <tr>
-                <th>Team</th>
-                <th>Next match</th>
-                <th v-for="code in distinctStreamCodes" :key="code">{{ code }}</th>
-                <th class="bg-primary text-white">On</th>
-                <th class="bg-danger text-white">Off</th>
-                <th class="bg-secondary text-white">Total</th>
-            </tr>
-            <tr v-for="({ team, counts, nextMatch }) in teamCounts" :key="team.id">
-                <td class="team">
-                    <ThemeLogo :theme="team.theme" logo-size="w-50" class="team-logo" border-width="3px" icon-padding="4px" />
-                    <router-link :to="url('team', team)">{{ team.name }}</router-link>
-                </td>
-                <td>
+            <thead>
+                <tr>
+                    <th>Team</th>
+                    <th>Next match</th>
+                    <th v-for="code in distinctStreamCodes" :key="code">{{ code }}</th>
+                    <th class="bg-primary text-white">On</th>
+                    <th class="bg-danger text-white">Off</th>
+                    <th class="bg-secondary text-white">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="({ team, counts, nextMatch }) in teamCounts" :key="team.id">
+                    <td class="team">
+                        <ThemeLogo :theme="team.theme" logo-size="w-50" class="team-logo" border-width="3px"
+                                   icon-padding="4px"/>
+                        <router-link :to="url('team', team)">{{ team.name }}</router-link>
+                    </td>
+                    <td>
                     <span class="d-flex" v-if="nextMatch">
-                        <ThemeLogo :theme="nextMatch.opponent.theme" logo-size="w-50" class="team-logo" border-width="3px" icon-padding="4px" />
+                        <ThemeLogo :theme="nextMatch.opponent.theme" logo-size="w-50" class="team-logo"
+                                   border-width="3px" icon-padding="4px"/>
                         <router-link :to="url('detailed', nextMatch)">vs {{ nextMatch.opponent.name }}</router-link>
                         <span class="d-inline-flex ml-auto">{{
                                 formatTime(nextMatch.start, {
                                     format: "{day-short} {date-ordinal} {month-short} {time}",
-                                    tz: $store.state.timezone,
-                                    use24HourTime: $store.state.use24HourTime
+                                    tz: useSettingsStore().timezone,
+                                    use24HourTime: useSettingsStore().use24HourTime
                                 })
-                          }}</span>
+                            }}</span>
                     </span>
-                </td>
-                <td class="count" v-for="code in distinctStreamCodes" :key="code" :class="{'low-opacity': !counts[code]}">{{ counts[code] || 0 }}</td>
-                <td class="count" :class="{'low-opacity': !counts.Streamed }">{{ counts.Streamed || 0 }}</td>
-                <td class="count" :class="{'low-opacity': !counts.Off, 'bg-danger': counts.Off === counts.Total && counts.Off > 0}">{{ counts.Off || 0 }}</td>
-                <td class="count" :class="{'low-opacity': !counts.Total}">{{ counts.Total || 0 }}</td>
-            </tr>
+                    </td>
+                    <td class="count" v-for="code in distinctStreamCodes" :key="code">
+                        <span :class="{'low-opacity': !counts[code]}">{{ counts[code] || 0 }}</span>
+                    </td>
+                    <td class="count">
+                        <span :class="{'low-opacity': !counts.Streamed}">{{ counts.Streamed || 0 }}</span>
+                    </td>
+                    <td class="count"
+                        :class="{'bg-danger': counts.Off === counts.Total && counts.Off > 0}">
+                        <span :class="{'low-opacity': !counts.Off}">{{ counts.Off || 0 }}</span>
+                    </td>
+                    <td class="count">
+                        <span :class="{'low-opacity': !counts.Total}">{{ counts.Total || 0 }}</span>
+                    </td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </template>
@@ -42,10 +57,11 @@ import { formatTime, url } from "@/utils/content-utils";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "EventStreamDetails",
-    methods: { formatTime, url },
+    methods: { useSettingsStore, formatTime, url },
     components: { ThemeLogo },
     props: {
         event: {}
@@ -58,7 +74,7 @@ export default {
                     codes.add(match.stream_code);
                 }
             });
-            return [...codes.values()].filter(code => !["Off", "Total"].includes(code)).sort();
+            return [...codes.values()].filter(code => !["Off", "Total"].includes(code)).sort((a, b) => a.localeCompare(b));
         },
         teams() {
             return ReactiveArray("teams", {
@@ -109,6 +125,8 @@ export default {
                 if ((a.counts.A || 0) < (b.counts.A || 0)) return 1;
                 if ((a.counts.B || 0) > (b.counts.B || 0)) return -1;
                 if ((a.counts.B || 0) < (b.counts.B || 0)) return 1;
+
+                return 0;
             });
         }
     }

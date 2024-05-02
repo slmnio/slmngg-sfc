@@ -1,30 +1,39 @@
 <template>
-    <div class="bracket row flex-column" :style="winVars" :class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
+    <div class="bracket row flex-column" :style="winVars"
+         :class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
         <div class="connections" ref="connections-holder">
-            <div class="connection" v-for="bug in connectionBugs" :key="bug.key" :data-key="bug.key" :class="connectionBugClass(bug)" :style="bug.style"
-                :data-column-num="bug.column">
-                <div class="c-top"    v-if="['normal'].includes(bug.type)"></div>
+            <div class="connection" v-for="bug in connectionBugs" :key="bug.key" :data-key="bug.key"
+                 :class="connectionBugClass(bug)" :style="bug.style"
+                 :data-column-num="bug.column">
+                <div class="c-top" v-if="['normal'].includes(bug.type)"></div>
                 <div class="c-middle" v-if="['normal', 'loser-drops'].includes(bug.type)"></div>
                 <div class="c-bottom" v-if="['normal', 'loser-drops'].includes(bug.type)"></div>
                 <div class="c-arrow c-arrow-line" v-if="['arrow', 'arrow-number'].includes(bug.type)"></div>
                 <div class="c-arrow c-arrow-head" v-if="['arrow', 'arrow-number'].includes(bug.type)"></div>
-                <div class="c-text"   v-if="['loser-drops', 'arrow-number'].includes(bug.type)" :title="bug.title">{{ bug.text }}</div>
+                <div class="c-text" v-if="['loser-drops', 'arrow-number'].includes(bug.type)" :title="bug.title">
+                    {{ bug.text }}
+                </div>
             </div>
         </div>
         <v-style>
             .bracket {
-                --bracket-columns: {{ bracketCols || 0 }};
+            --bracket-columns: {{ bracketCols || 0 }};
             }
             .bracket .connections {
-                --b-width: {{ connectionWidth }}px !important;
+            --b-width: {{ connectionWidth }}px !important;
             }
         </v-style>
         <div class="internal-bracket d-flex" v-for="(_bracket, i) in brackets" :key="i">
-            <div class="column" v-for="(column, ci) in _bracket.columns" :key="ci" :class="{'gap-right': column.gapRight}">
-                <div class="header text-center mb-3" :style="logoBackground1(event)" v-if="showHeaders && column.header">{{ column.header }}</div>
+            <div class="column" v-for="(column, ci) in _bracket.columns" :key="ci"
+                 :class="{'gap-right': column.gapRight}">
+                <div class="header text-center mb-3" :style="logoBackground1(event)"
+                     v-if="showHeaders && column.header">{{ column.header }}
+                </div>
                 <div class="column-matches flex-grow-1">
-                    <BracketMatch v-for="matchNum in column.games" :key="matchNum" :ref="`match-${matchNum}`" :custom-timezone="customTimezone"
-                                  :show-times="bracket.show_times" :show-broadcasts="bracket.show_broadcasts" :match="getMatch(matchNum)"/>
+                    <BracketMatch v-for="matchNum in column.games" :key="matchNum" :ref="`match-${matchNum}`"
+                                  :custom-timezone="customTimezone"
+                                  :show-times="bracket.show_times" :show-broadcasts="bracket.show_broadcasts"
+                                  :match="getMatch(matchNum)"/>
                 </div>
             </div>
         </div>
@@ -56,19 +65,19 @@ export default {
     }),
     computed: {
         matches() {
-            if (!this.bracket || !this.bracket.ordered_matches) return [];
+            if (!this.bracket?.ordered_matches) return [];
             return this.bracket.ordered_matches;
         },
         layout() {
-            if (!this.bracket || !this.bracket.bracket_layout) return null;
+            if (!this.bracket?.bracket_layout) return null;
             return JSON.parse(this.bracket.bracket_layout);
         },
         brackets() {
-            if (!this.layout || !this.layout.brackets) return null;
+            if (!this.layout?.brackets) return null;
             return this.layout.brackets;
         },
         connections() {
-            if (!this.layout || !this.layout.connections) return null;
+            if (!this.layout?.connections) return null;
             return this.layout.connections;
         },
         bracketCols() {
@@ -219,10 +228,16 @@ export default {
             };
             Object.entries(this.connections).forEach(([_n, connection]) => {
                 if (connection.win && Math.floor(connection.win) === parseInt(num)) {
-                    feederMatches[connection.win.split(".").pop()] = { ...this.getConnectionMatch(_n), _m: "Winner" };
+                    feederMatches[connection.win.split(".").pop()] = {
+                        ...this.getConnectionMatch(_n),
+                        _m: "Winner"
+                    };
                 }
                 if (connection.lose && Math.floor(connection.lose) === parseInt(num)) {
-                    feederMatches[connection.lose.split(".").pop()] = { ...this.getConnectionMatch(_n), _m: "Loser" };
+                    feederMatches[connection.lose.split(".").pop()] = {
+                        ...this.getConnectionMatch(_n),
+                        _m: "Loser"
+                    };
                 }
             });
             // console.log(`feeder matches n=${num}`, feederMatches);
@@ -402,13 +417,9 @@ export default {
             });
         }
     },
-    beforeDestroy() {
+    beforeUnmount() {
         Store.commit("setHighlightedTeam", null);
         Store.commit("setHighlightedMatch", null);
-    },
-    beforeUpdate() {
-        // console.log("[bracket rerender]");
-        // this.createConnections();
     },
     watch: {
         layout: {
@@ -434,167 +445,190 @@ export default {
 </script>
 
 <style scoped>
-    .bracket {
-        position: relative;
-    }
-    .column {
-        --column-width: 12.5em;
-        --margin-width: 1em;
-        width: var(--column-width);
-        margin: 0 var(--margin-width);
-        display: flex;
-        flex-direction: column;
-    }
-    .column.gap-right {
-        --gap-width: 4em;
-        margin-right: calc((2 * var(--margin-width)) + var(--gap-width));
-    }
-    .column-matches {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
+.bracket {
+    position: relative;
+}
 
-    .internal-bracket {
-        padding: 0 6px;
-    }
+.column {
+    --column-width: 12.5em;
+    --margin-width: 1em;
+    width: var(--column-width);
+    margin: 0 var(--margin-width);
+    display: flex;
+    flex-direction: column;
+}
 
-    .internal-bracket + .internal-bracket {
-        margin-top: 1.5em;
-    }
+.column.gap-right {
+    --gap-width: 4em;
+    margin-right: calc((2 * var(--margin-width)) + var(--gap-width));
+}
 
+.column-matches {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
-    .bracket.small >>> .inner .short {
-        display: initial;
-        font-size: 1.75em;
-    }
-    .bracket.small >>> .inner .text,
-    .bracket.small >>> .match-number,
-    .bracket.small >>> .match-extra-info {
-        display: none
-    }
-    .bracket >>> .connection {
-        /*background-color: rgba(255,0,0,0.25);*/
-        position: absolute;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        transition: opacity 150ms ease, border-color 150ms ease, background-color 150ms ease;
-        overflow: hidden;
-    }
-    /*.bracket >>> .connection.dir-up { background-color: rgba(255,255,0,0.25); }*/
-    /*.bracket >>> .connection.dir-down { background-color: rgba(0, 255,255,0.25); }*/
-    .connections {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-    }
+.internal-bracket {
+    padding: 0 6px;
+}
+
+.internal-bracket + .internal-bracket {
+    margin-top: 1.5em;
+}
 
 
-    .bracket {
-        z-index: 2;
-    }
-    .connections {
-        z-index: 1;
-    }
+.bracket.small:deep(.inner .short) {
+    display: initial;
+    font-size: 1.75em;
+}
 
-    .bracket >>> .connections {
-        --b-width: 2px;
-        --b-color: rgba(255,255,255,0.75);
-        --b-curve: 4px;
-    }
-    .bracket >>> .connection.dir-down .c-top { border-top-right-radius: var(--b-curve); }
-    .bracket >>> .connection.dir-down .c-bottom { border-bottom-left-radius: var(--b-curve); }
-    .bracket >>> .connection.dir-up .c-top { border-top-left-radius: var(--b-curve); }
-    .bracket >>> .connection.dir-up .c-bottom { border-bottom-right-radius: var(--b-curve); }
+.bracket.small:deep(.inner .text),
+.bracket.small:deep(.match-number),
+.bracket.small:deep(.match-extra-info) {
+    display: none
+}
 
-    .bracket >>> .connection.bug-lowlight {
-        opacity: 0.2;
-    }
-    .bracket >>> .connection.bug-highlight {
-        --b-color: rgba(255,255,255,1);
-    }
+.bracket:deep(.connection) {
+    /*background-color: rgba(255,0,0,0.25);*/
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 150ms ease, border-color 150ms ease, background-color 150ms ease;
+    overflow: hidden;
+}
 
-    .bracket >>> .connection .c-top {
-        width: calc(50% + var(--b-width));
-        height: 32px;
-        margin-right: 50%;
-        border-top: var(--b-width) solid var(--b-color);
-        border-right: var(--b-width) solid var(--b-color);
-    }
+/*.bracket:deep(.connection.dir-up){ background-color: rgba(255,255,0,0.25); }*/
+/*.bracket:deep(.connection.dir-down){ background-color: rgba(0, 255,255,0.25); }*/
+.connections {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
 
-    .bracket >>> .connection .c-middle {
-        width: var(--b-width);
-        background-color: var(--b-color);
-        flex-grow: 1;
-    }
 
-    .bracket >>> .connection .c-bottom {
-        width: calc(50% + var(--b-width));
-        height: 32px;
-        margin-left: 50%;
-        border-bottom: var(--b-width) solid var(--b-color);
-        border-left: var(--b-width) solid var(--b-color);
-    }
+.bracket {
+    z-index: 2;
+}
 
-    .bracket >>> .connection.dir-up .c-top {
-        margin-right: 0;
-        margin-left: 50%;
-        border: none;
-        border-top: var(--b-width) solid var(--b-color);
-        border-left: var(--b-width) solid var(--b-color);
-    }
-    .bracket >>> .connection.dir-up .c-bottom {
-        margin-left: 0;
-        margin-right: 50%;
-        border: none;
-        border-bottom: var(--b-width) solid var(--b-color);
-        border-right: var(--b-width) solid var(--b-color);
-    }
+.connections {
+    z-index: 1;
+}
 
-    .bracket >>> .connection.dir-loser-drops .c-bottom {
-        margin-left: 0;
-        width: 100%;
-        border-bottom-left-radius: var(--b-curve);
-    }
-    .bracket >>> .c-text {
-        position: absolute;
-        font-size: 0.8em;
-        width: 100%;
-        text-align: center;
-        margin-bottom: .2em;
-        margin-left: var(--b-width);
-        color: var(--b-color);
-    }
-    .bracket >>> .connection.style-arrow,
-    .bracket >>> .connection.style-arrow-number {
-        align-items: flex-start;
-        --b-arrow-length: 75%;
-    }
+.bracket:deep(.connections ) {
+    --b-width: 2px;
+    --b-color: rgba(255, 255, 255, 0.75);
+    --b-curve: 4px;
+}
 
-    .bracket >>> .c-arrow.c-arrow-line {
-        height: var(--b-width);
-        width: var(--b-arrow-length);
-        background-color: var(--b-color);
-    }
+.bracket:deep(.connection.dir-down .c-top ) {
+    border-top-right-radius: var(--b-curve);
+}
 
-    .bracket >>> .c-arrow.c-arrow-head {
-        --b-arrow-size: calc(min(var(--b-width) * 4, 40%));
-        border-top: var(--b-width) solid var(--b-color);
-        border-right: var(--b-width) solid var(--b-color);
-        width: var(--b-arrow-size);
-        height: var(--b-arrow-size);
-        transform: rotate(45deg);
-        position: absolute;
-        right: calc(100% - var(--b-arrow-length));
-    }
+.bracket:deep(.connection.dir-down .c-bottom ) {
+    border-bottom-left-radius: var(--b-curve);
+}
 
-    .bracket >>> .connection.style-arrow .c-text,
-    .bracket >>> .connection.style-arrow-number .c-text {
-        width: var(--b-arrow-length);
-        margin-left: 0;
-        bottom: 50%;
-    }
+.bracket:deep(.connection.dir-up .c-top ) {
+    border-top-left-radius: var(--b-curve);
+}
+
+.bracket:deep(.connection.dir-up .c-bottom ) {
+    border-bottom-right-radius: var(--b-curve);
+}
+
+.bracket:deep(.connection.bug-lowlight ) {
+    opacity: 0.2;
+}
+
+.bracket:deep(.connection.bug-highlight ) {
+    --b-color: rgba(255, 255, 255, 1);
+}
+
+.bracket:deep(.connection .c-top ) {
+    width: calc(50% + var(--b-width));
+    height: 32px;
+    margin-right: 50%;
+    border-top: var(--b-width) solid var(--b-color);
+    border-right: var(--b-width) solid var(--b-color);
+}
+
+.bracket:deep(.connection .c-middle ) {
+    width: var(--b-width);
+    background-color: var(--b-color);
+    flex-grow: 1;
+}
+
+.bracket:deep(.connection .c-bottom ) {
+    width: calc(50% + var(--b-width));
+    height: 32px;
+    margin-left: 50%;
+    border-bottom: var(--b-width) solid var(--b-color);
+    border-left: var(--b-width) solid var(--b-color);
+}
+
+.bracket:deep(.connection.dir-up .c-top ) {
+    margin-right: 0;
+    margin-left: 50%;
+    border: none;
+    border-top: var(--b-width) solid var(--b-color);
+    border-left: var(--b-width) solid var(--b-color);
+}
+
+.bracket:deep(.connection.dir-up .c-bottom ) {
+    margin-left: 0;
+    margin-right: 50%;
+    border: none;
+    border-bottom: var(--b-width) solid var(--b-color);
+    border-right: var(--b-width) solid var(--b-color);
+}
+
+.bracket:deep(.connection.dir-loser-drops .c-bottom ) {
+    margin-left: 0;
+    width: 100%;
+    border-bottom-left-radius: var(--b-curve);
+}
+
+.bracket:deep(.c-text ) {
+    position: absolute;
+    font-size: 0.8em;
+    width: 100%;
+    text-align: center;
+    margin-bottom: .2em;
+    margin-left: var(--b-width);
+    color: var(--b-color);
+}
+
+.bracket:deep(.connection.style-arrow),
+.bracket:deep(.connection.style-arrow-number ) {
+    align-items: flex-start;
+    --b-arrow-length: 75%;
+}
+
+.bracket:deep(.c-arrow.c-arrow-line ) {
+    height: var(--b-width);
+    width: var(--b-arrow-length);
+    background-color: var(--b-color);
+}
+
+.bracket:deep(.c-arrow.c-arrow-head ) {
+    --b-arrow-size: calc(min(var(--b-width) * 4, 40%));
+    border-top: var(--b-width) solid var(--b-color);
+    border-right: var(--b-width) solid var(--b-color);
+    width: var(--b-arrow-size);
+    height: var(--b-arrow-size);
+    transform: rotate(45deg);
+    position: absolute;
+    right: calc(100% - var(--b-arrow-length));
+}
+
+.bracket:deep(.connection.style-arrow .c-text),
+.bracket:deep(.connection.style-arrow-number .c-text ) {
+    width: var(--b-arrow-length);
+    margin-left: 0;
+    bottom: 50%;
+}
 </style>

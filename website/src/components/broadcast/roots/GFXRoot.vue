@@ -20,12 +20,11 @@ import BracketOverlay from "@/components/broadcast/roots/BracketOverlay.vue";
 import ImageOverlay from "@/components/broadcast/roots/ImageOverlay.vue";
 import IframeOverlay from "@/components/broadcast/roots/IframeOverlay.vue";
 import StandingsOverlay from "@/components/broadcast/roots/StandingsOverlay.vue";
-import TweetOverlay from "@/components/broadcast/roots/TweetOverlay.vue";
 import TextOverlay from "@/components/broadcast/roots/TextOverlay.vue";
 
 export default {
     name: "GFXRoot",
-    components: { TextOverlay, TweetOverlay, StandingsOverlay, IframeOverlay, ImageOverlay, BracketOverlay, ScheduleOverlay },
+    components: { TextOverlay, StandingsOverlay, IframeOverlay, ImageOverlay, BracketOverlay, ScheduleOverlay },
     props: {
         index: Number,
         broadcast: Object,

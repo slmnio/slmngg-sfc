@@ -48,7 +48,7 @@
                 </div>
             </div>
             <div class="flex-shrink-0">
-                <b-button class="label-padding" :variant="customDuration ? 'primary' : ''" @click="setCountdownFromNow(customDuration)" :disabled="!customDuration">
+                <b-button class="label-padding" :variant="customDuration ? 'primary' : 'secondary'" @click="setCountdownFromNow(customDuration)" :disabled="!customDuration">
                     <i class="fal fa-clock mr-1"></i> Set time
                 </b-button>
             </div>
@@ -57,8 +57,7 @@
 </template>
 
 <script>
-import { BButton, BFormInput } from "bootstrap-vue";
-import { updateBroadcastData } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";
 import Countdown from "@/components/broadcast/Countdown.vue";
 
@@ -66,9 +65,7 @@ export default {
     name: "BreakTimeControls",
     components: {
         Countdown,
-        AdvancedDateEditor,
-        BButton,
-        BFormInput
+        AdvancedDateEditor
     },
     props: {
         broadcast: {}
@@ -88,15 +85,15 @@ export default {
     methods: {
         async setManualCountdownEnd(dateString) {
             this.manualProcessing = true;
-            return this.setCountdownEnd((new Date(dateString)).getTime());
+            return await this.setCountdownEnd((new Date(dateString)).getTime());
         },
         async setCountdownFromNow(seconds) {
-            return this.setCountdownEnd(Date.now() + (seconds * 1000));
+            return await this.setCountdownEnd(Date.now() + (seconds * 1000));
         },
         async setCountdownEnd(date) {
             this.processing = true;
             try {
-                await updateBroadcastData(this.$root.auth, {
+                await authenticatedRequest("actions/update-broadcast", {
                     countdownEnd: date
                 });
             } catch (e) {
@@ -120,7 +117,7 @@ export default {
     margin-top: 21px;
 }
 
-.date-editor >>> .btn {
+.date-editor:deep(.btn) {
     width: 100%;
 }
 

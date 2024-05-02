@@ -46,7 +46,7 @@ export default {
         },
         fullSchedule() {
             if (this.virtualMatch) return [this.virtualMatch];
-            if (!this.broadcast || !this.broadcast.schedule) return null;
+            if (!this.broadcast?.schedule) return null;
             return ReactiveArray("schedule", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -54,7 +54,7 @@ export default {
             })(this.broadcast).sort(sortMatches);
         },
         schedule() {
-            if (!this.broadcast || !this.broadcast.schedule || !this.fullSchedule) return null;
+            if (!this.broadcast?.schedule || !this.fullSchedule) return null;
             return this.fullSchedule.filter(m => m.show_on_overlays).sort(sortMatches);
         }
     },
@@ -109,12 +109,12 @@ export default {
         overflow: hidden;
     }
 
-    .a--match-enter, .a--match-leave-to {
+    .a--match-enter-from, .a--match-leave-to {
         max-height: 0;
         padding: 0 !important;
     }
 
-    .a--match-enter-to, .a--match-leave {
+    .a--match-enter-to, .a--match-leave-from {
         max-height: 230px;
     }
 </style>

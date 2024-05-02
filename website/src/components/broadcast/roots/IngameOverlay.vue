@@ -35,7 +35,7 @@ export default {
     }),
     computed: {
         match() {
-            if (!this.broadcast || !this.broadcast.live_match) return null;
+            if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
@@ -50,7 +50,7 @@ export default {
         },
         teams() {
             console.warn("Teams", this.match?.teams);
-            if (!this.match || !this.match.teams || !this.match.teams.every(t => {
+            if (!this.match?.teams?.every(t => {
                 if (t.theme === undefined && t.has_theme === 0) return true;
                 return t.theme && !t.theme.__loading && t.theme.id;
             })) {
@@ -287,7 +287,7 @@ export default {
             return team.theme;
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Ingame | ${this.match?.name || this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -344,10 +344,10 @@ export default {
 .itah-enter-active, .itah-leave-active {
     transition: all .5s ease-in-out;
 }
-.itah-enter-to, .itah-leave {
+.itah-enter-to, .itah-leave-from {
     max-width: 700px;
 }
-.itah-enter, .itah-leave-to {
+.itah-enter-from, .itah-leave-to {
     max-width: 0;
 }
 
@@ -362,24 +362,24 @@ export default {
     height: 80px;
 }
 
-.ingame-fade-sponsors >>> .sponsors-holder {
+.ingame-fade-sponsors:deep(.sponsors-holder) {
     height: 100% !important;
     width: 320px !important;
 }
 
-.ingame-fade-sponsors >>> .break-sponsor {
+.ingame-fade-sponsors:deep(.break-sponsor) {
     background-color: transparent !important;
 }
 
-.ingame-fade-sponsors >>> .break-sponsor-logo {
+.ingame-fade-sponsors:deep(.break-sponsor-logo) {
     height: calc(100% - 1.5em) !important;
 }
-.ingame-overlay.basic >>> .small-overlay-text,
-.ingame-overlay.basic >>> .team-score,
-.ingame-overlay.basic >>> .attack-holder {
+.ingame-overlay.basic:deep(.small-overlay-text),
+.ingame-overlay.basic:deep(.team-score),
+.ingame-overlay.basic:deep(.attack-holder) {
     display: none !important;
 }
-.ingame-overlay.basic >>> .ingame-team {
+.ingame-overlay.basic:deep(.ingame-team) {
     --team-expand: 0px !important;
 }
 </style>

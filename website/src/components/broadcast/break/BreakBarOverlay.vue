@@ -95,7 +95,7 @@ export default {
     components: { Countdown, BreakMatch, Sponsors, Bracket },
     computed: {
         event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
+            if (!this.broadcast?.event) return null;
             return ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
@@ -111,24 +111,24 @@ export default {
             });
         },
         eventLogoBackground() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 backgroundColor: this.event.theme.color_logo_background,
                 borderColor: this.event.theme.color_logo_accent
             };
         },
         segments() {
-            if (!this.broadcast || !this.broadcast.bar_options) return [];
+            if (!this.broadcast?.bar_options) return [];
             return this.broadcast.bar_options;
         },
         eventCSS() {
-            if (!this.event || !this.event.theme) return null;
+            if (!this.event?.theme) return null;
             return {
                 "--event": this.event.theme.color_theme
             };
         },
         nextMatch() {
-            if (!this.broadcast || !this.broadcast.live_match || !this.broadcast.show_live_match) return null;
+            if (!this.broadcast?.live_match || !this.broadcast.show_live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -136,7 +136,7 @@ export default {
             });
         },
         schedule() {
-            if (!this.broadcast || !this.broadcast.schedule) return null;
+            if (!this.broadcast?.schedule) return null;
             return ReactiveArray("schedule", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -146,11 +146,11 @@ export default {
             }).sort(sortMatches);
         },
         themeColor() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return themeBackground1(this.event);
         },
         sponsorThemes() {
-            if (!this.broadcast || !this.broadcast.sponsors) return null;
+            if (!this.broadcast?.sponsors) return null;
             return ReactiveArray("sponsors", {
                 theme: ReactiveThing("theme")
             })(this.broadcast);
@@ -187,7 +187,7 @@ export default {
             return text.replace(/\\n/g, "<br>");
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Break Bar | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -275,10 +275,10 @@ export default {
     .segment-next-match {
         min-width: 330px;
     }
-    .segment-next-match >>> .match-teams {
+    .segment-next-match:deep(.match-teams) {
         min-width: 410px;
     }
-    .segment-next-match >>> .break-match[data-center="vs"] .match-teams {
+    .segment-next-match:deep(.break-match[data-center="vs"] .match-teams) {
         min-width: 330px;
     }
 
@@ -286,14 +286,14 @@ export default {
         width: 420px;
         padding: 0;
     }
-    .segment-sponsors >>> .break-sponsors {
+    .segment-sponsors:deep(.break-sponsors) {
         padding: 0;
         height: 100%;
     }
-    .segment-sponsors >>> .sponsors-holder {
+    .segment-sponsors:deep(.sponsors-holder) {
         height: 100%;
     }
-    .segment-sponsors >>> .break-sponsor-logo {
+    .segment-sponsors:deep(.break-sponsor-logo) {
         width: calc(100% - 2em) !important;
     }
 
@@ -309,14 +309,14 @@ export default {
         padding: 0 1em;
         min-width: 500px;
     }
-    .segment-schedule >>> .break-match {
+    .segment-schedule:deep(.break-match) {
         font-size: 25px;
     }
 
     .seg-enter-active { transition: max-width 2000ms ease; }
     .seg-leave-active { transition: max-width 500ms ease; }
-    .seg-enter, .seg-leave-to { max-width: 0; }
-    .seg-enter-to, .seg-leave { max-width: 100%; }
+    .seg-enter-from, .seg-leave-to { max-width: 0; }
+    .seg-enter-to, .seg-leave-from { max-width: 100%; }
 
     .break-preload {
         opacity: 0;

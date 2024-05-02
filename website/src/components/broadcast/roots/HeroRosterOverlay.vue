@@ -35,7 +35,7 @@ export default {
     }),
     computed: {
         match() {
-            if (!this.broadcast || !this.broadcast.live_match) return null;
+            if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
@@ -89,7 +89,7 @@ export default {
         },
         handleWidth(i, w) {
             // console.log("width of index", i, w);
-            this.$set(this.widths, i, w);
+            this.widths[i] = w;
         },
         themeBackground1,
         getRoleSVG
@@ -110,7 +110,7 @@ export default {
             console.log("animation active", a);
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Hero Roster #${this.teamNum || 1} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -119,7 +119,7 @@ export default {
 </script>
 
 <style scoped>
-    .player >>> .color-holder {
+    .player:deep(.color-holder) {
         height: 100%;
         --over: 350%;
         width: calc(100% + var(--over));
@@ -135,12 +135,12 @@ export default {
         width: 100%;
     }
 
-    .player >>> .color-holder div,
-    .player >>> .color-holder canvas {
+    .player:deep(.color-holder div),
+    .player:deep(.color-holder canvas) {
         object-fit: contain !important;
     }
 
-    .player >>> .hero-image-base {
+    .player:deep(.hero-image-base) {
         background-size: contain !important;
     }
 
@@ -156,7 +156,7 @@ export default {
         font-size: 2em;
     }
 
-    .hero-roster-overlay >>> .g-body {
+    .hero-roster-overlay:deep(.g-body) {
         overflow: hidden;
         color: white;
     }

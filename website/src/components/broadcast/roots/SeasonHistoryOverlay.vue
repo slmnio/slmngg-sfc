@@ -37,7 +37,7 @@ export default {
             });
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Season History | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -46,7 +46,7 @@ export default {
 </script>
 
 <style scoped>
-    /*.season-history-overlay >>> .team-season-history:last-child {*/
+    /*.season-history-overlay:deep(.team-season-history:last-child) {*/
     /*    flex-direction: column-reverse !important;*/
     /*}*/
     .team-wrapper {

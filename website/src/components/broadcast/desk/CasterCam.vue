@@ -161,11 +161,11 @@ export default {
         max-width: 100%;
         transition: all 400ms var(--originalCurve) 250ms !important;
     }
-    .mid-split-enter, .mid-split-leave-to {
+    .mid-split-enter-from, .mid-split-leave-to {
         /*clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);*/
         clip-path: polygon(0% 0%, 0% 100%, 0% 100%, 0% 0, 100% 0, 100% 100%, 100% 100%, 100% 0%);
     }
-    .mid-split-enter-to, .mid-split-leave {
+    .mid-split-enter-to, .mid-split-leave-from {
         /*clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);*/
         clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 100% 100%, 100% 0%);
     }

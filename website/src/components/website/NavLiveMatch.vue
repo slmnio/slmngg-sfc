@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { url } from "../../utils/content-utils";
+import { url } from "@/utils/content-utils";
 import MatchThumbnail from "@/components/website/match/MatchThumbnail";
 
 export default {
@@ -41,7 +41,7 @@ export default {
         height: 50px !important;
         margin-bottom: 5px;
     }
-    .live-thumbnail >>> .match-thumbnail-logo {
+    .live-thumbnail:deep(.match-thumbnail-logo) {
         width: calc(100% - 8px) !important;
         height: calc(100% - 8px) !important;
     }

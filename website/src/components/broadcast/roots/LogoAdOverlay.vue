@@ -30,7 +30,7 @@ export default {
     methods: {
         resizedImage
     },
-    metaInfo() {
+    head() {
         return {
             title: `Logos | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

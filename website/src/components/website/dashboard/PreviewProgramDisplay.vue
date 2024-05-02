@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import { socket } from "@/socket";
+
 export default {
     name: "PreviewProgramDisplay",
     props: {
@@ -38,7 +40,7 @@ export default {
             if (this.broadcast?.key) {
                 if (this.broadcastKey === this.broadcast.key) return;
 
-                this.$socket.client.emit("prod-broadcast-join", this.broadcast.key);
+                socket.emit("prod-broadcast-join", this.broadcast.key);
             }
 
             this.broadcastKey = this.broadcast.key;

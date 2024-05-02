@@ -19,7 +19,7 @@ export default {
         displayScores() {
             if (this.match.first_to === 1 && this.match.valorant) {
                 const valorantData = Object.fromEntries(this.match.valorant.split("|").map(section => section.split(":")));
-                if (valorantData && valorantData.rounds) {
+                if (valorantData?.rounds) {
                     const score = [0, 0];
                     valorantData.rounds.toLowerCase().trim()
                         .split(",")
@@ -38,8 +38,7 @@ export default {
             return this.scores;
         },
         pointColor() {
-            // eslint-disable-next-line no-unused-vars
-            try { const e = this.match.event.theme.color_theme; } catch (e) { return {}; }
+            if (!this.match?.event?.theme?.color_theme) return {};
             return {
                 backgroundColor: this.match.event.theme.color_theme,
                 color: this.match.event.theme.color_text_on_theme

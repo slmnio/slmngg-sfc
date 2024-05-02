@@ -46,9 +46,8 @@ export default {
     components: { ThemeLogo },
     props: ["client", "scene", "customText"],
     sockets: {
-        tally_change({ state, number }) {
+        tally_change({ state }) {
             this.state = state;
-            this.number = number;
         },
         prod_preview_program_change(data) {
             console.log(data);
@@ -163,7 +162,7 @@ export default {
         noBroadcastStyle: true,
         noStinger: true
     }),
-    metaInfo() {
+    head() {
         return {
             title: `Tally Viewer | ${this.client?.name || this.client?.key || ""}`
         };

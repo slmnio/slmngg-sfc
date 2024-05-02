@@ -76,10 +76,10 @@ export default {
         left: 0;
     }
 
-    .spon-anim-enter, .spon-anim-leave-to {
+    .spon-anim-enter-from, .spon-anim-leave-to {
         opacity: 0;
     }
-    .spon-anim-enter-to, .spon-anim-leave {
+    .spon-anim-enter-to, .spon-anim-leave-from {
         opacity: 1;
     }
 

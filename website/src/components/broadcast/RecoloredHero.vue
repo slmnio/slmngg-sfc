@@ -202,7 +202,7 @@ export default {
             const colors = this.themeColors;
 
             const payload = {
-                colors: colors,
+                colors,
                 images: [this.mainImage?.backgroundImage, ...this.layers]
             };
             // muffling stops some colours mix down properly on changes, not sure why

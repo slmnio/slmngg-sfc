@@ -4,7 +4,7 @@
             <div class="team-logo-holder flex-center" :style="bg(soloTeamTheme)">
                 <div class="team-logo bg-center" :style="logo(soloTeamTheme)"></div>
             </div>
-            <div class="solo-team-name font-weight-bold" v-if="soloTeamTheme.team?.name">
+            <div class="solo-team-name fw-bold" v-if="soloTeamTheme.team?.name">
                 {{ soloTeamTheme.team?.name }}
             </div>
         </div>

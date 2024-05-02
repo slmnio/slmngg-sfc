@@ -15,7 +15,7 @@ export default {
     props: ["broadcast", "title", "stage"],
     computed: {
         event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
+            if (!this.broadcast?.event) return null;
             return ReactiveRoot(this.broadcast?.event?.id, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
@@ -33,7 +33,7 @@ export default {
             return (this.stage || this.broadcast?.current_stage || this.liveMatch?.match_group || "").toLowerCase();
         },
         blocks() {
-            if (!this.event || !this.event.blocks) return null;
+            if (!this.event?.blocks) return null;
             try {
                 const blocks = JSON.parse(this.event.blocks);
                 return blocks || null;
@@ -48,7 +48,7 @@ export default {
             return this.standingsSettings?.short || this.standingsSettings?.title || this._stage;
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Standings ${this._stage || ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -57,7 +57,7 @@ export default {
 </script>
 
 <style scoped>
-    .standings >>> .team-name {
+    .standings:deep(.team-name) {
         color: inherit !important;
     }
 </style>

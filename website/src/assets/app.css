@@ -345,3 +345,6 @@ input.no-arrows[type=number] {
 .text-right {
     text-align: right !important;
 }
+.btn-block {
+    display: block;
+}

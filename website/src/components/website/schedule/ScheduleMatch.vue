@@ -47,14 +47,13 @@
             </div>
         </div>
 
-        <div class="buttons flex-center ml-2 gap-1" v-if="canEditMatches || canEditBroadcasts">
+        <div class="buttons flex-center ml-2" v-if="canEditMatches || canEditBroadcasts">
             <b-button-group class="gap-2">
                 <b-button class="text-white" size="sm" :to="url('match', this.match, { subPage: 'editor' })" v-if="canEditMatches">
                     <i class="fas fa-pencil"></i>
                 </b-button>
                 <b-button v-if="canEditBroadcasts"
                           @click="matchBroadcastAdjust(isOnSelectedBroadcast ? 'remove' : 'add')"
-                          v-b-tooltip.right="`${isOnSelectedBroadcast ? 'Remove match from' : 'Add match to'} ${this.selectedBroadcast?.name}`"
                           class="text-white opacity-changes" :class="{'low-opacity': processing['match_broadcast']}" size="sm" :variant="isOnSelectedBroadcast ? 'primary' : 'secondary'">
                     <i class="fas" :class="isOnSelectedBroadcast ? 'fa-minus' : 'fa-plus'"></i>
                 </b-button>

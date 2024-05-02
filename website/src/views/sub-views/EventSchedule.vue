@@ -1,7 +1,7 @@
 <template>
     <div class="event-schedule container">
 
-        <div class="d-sm-flex w-100 justify-content-end timezone-swapper-holder d-none">
+        <div class="d-sm-flex w-100 timezone-swapper-holder flex-column align-items-end gap-1 d-none">
             <TimezoneSwapper :inline="true" />
             <b-form-group label-cols="auto" label-size="sm" label="Broadcast" v-if="showBroadcastSettings">
                 <b-form-select v-if="eventBroadcasts?.length" :options="eventBroadcasts" v-model="selectedBroadcastID" size="sm" class="w-auto"/>
@@ -203,9 +203,9 @@ export default {
             return (this._event?.broadcasts || []).find(b => b.id === this.selectedBroadcastID);
         },
         showBroadcastSettings() {
-            const { isAuthenticated } = useAuthStore();
-            if (isAuthenticated) return false;
-            return isEventStaffOrHasRole({
+            const { isAuthenticated, user } = useAuthStore();
+            if (!isAuthenticated) return false;
+            return isEventStaffOrHasRole(user, {
                 event: this.event,
                 role: "Broadcast Manager",
                 websiteRoles: ["Can edit any match", "Can edit any event", "Full broadcast permissions"]

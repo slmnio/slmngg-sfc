@@ -2,7 +2,7 @@
     <div class="detailed-match container">
         <div class="main-content row">
             <div class="center-holder col-12 col-md-9 mb-4">
-                <div class="maps-holder mt-1" v-if="match.maps && showMatchMaps">
+                <div class="maps-holder mt-2" v-if="match.maps && showMatchMaps">
                     <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="_theme" :key="map.id" :show-banned-maps="showMapBans"/>
                 </div>
 
@@ -11,7 +11,7 @@
                     This is a special event and doesn't have team information.
                 </div>
 
-                <div class="team-holder f-row mb-2">
+                <div class="team-holder f-row">
                     <div class="team f-col w-50 mt-2" v-for="team in match.teams" :key="team.id">
                         <div :style="theme(team)" class="team-header flex-center f-col default-thing">
                             <div class="team-code">{{ team.code }}</div>
@@ -38,7 +38,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="team-holder f-row mb-2" v-if="showManagers">
+                <div class="team-holder f-row" v-if="showManagers">
                     <div class="team f-col w-50" v-for="team in match.teams" :key="team.id">
                         <div class="team-players team-managers f-col p-1">
                             <div class="team-player" v-for="player in getTeamStaff(team)" :key="player.id">
@@ -64,7 +64,7 @@
 <!--                        <PreviousMatch v-for="match in teamMatches(team)" :match="match" :team="team" :key="match.id" />-->
 <!--                    </div>-->
                     <div class="match-group d-flex flex-column" v-for="([groupKey, group]) in teamsMatchGroups" :key="groupKey">
-                        <div class="match-group-title mt-3 text-center fw-bold" v-if="groupKey && groupKey !== 'undefined'">{{ groupKey }}</div>
+                        <div class="match-group-title mt-2 text-center fw-bold" v-if="groupKey && groupKey !== 'undefined'">{{ groupKey }}</div>
                         <div class="match-group-teams w-100 d-flex">
                             <div class="team-prev-wrapper w-50" v-for="team in group.teams" :key="team.id">
                                 <div class="match-group" v-for="match in team.matches" :key="match.id">
@@ -80,19 +80,19 @@
                     <MatchHistory :match="match" :hide-map-display="true" />
                 </div>
 
-                <bracket-implications class="bracket-implications mt-3" :match="match" link-to-detailed-match
+                <bracket-implications class="bracket-implications mt-2" :match="match" link-to-detailed-match
                                       v-if="showImplications && match.brackets"></bracket-implications>
 
-                <div class="show-notes mt-3" v-if="showShowNotes && match.show_notes">
+                <div class="show-notes mt-2" v-if="showShowNotes && match.show_notes">
                     <h2>Show notes</h2>
                     <Markdown :markdown="match.show_notes"/>
                 </div>
             </div>
             <div class="right-holder col-12 col-md-3">
                 <router-link v-if="match.event" :to="url('event', match.event)">
-                    <ThemeLogo class="top-right-logo mb-3" logo-size="w-200" :theme="_theme" border-width="8"/>
+                    <ThemeLogo class="top-right-logo mb-2" logo-size="w-200" :theme="_theme" border-width="8"/>
                 </router-link>
-                <div class="info-block">
+                <div class="info-block gap-2 d-flex flex-column mb-2 mt-2">
 
                     <router-link :to="`/match/${match.id}`" class="btn btn-block border-transparent btn-primary text-dark-low"
                     :style="theme(match.event)">
@@ -105,28 +105,28 @@
                         Match editor
                     </router-link>
 
-                    <div :class="`mt-3 btn btn-block btn-${showRosters ? 'light' : 'secondary'} mb-2`" v-on:click="showRosters = !showRosters">
+                    <div :class="`mt-2 btn btn-block btn-${showRosters ? 'light' : 'secondary'}`" v-on:click="showRosters = !showRosters">
                         <i class="fa-fw fas fa-users"></i> Rosters
                     </div>
-                    <div :class="`mb-3 btn btn-block btn-${showManagers ? 'light' : 'secondary'} mb-2`"
+                    <div :class="`mb-2 btn btn-block btn-${showManagers ? 'light' : 'secondary'}`"
                          v-on:click="showManagers = !showManagers">
                         <i class="fa-fw fas fa-user-tie"></i>
                         Team staff
                     </div>
-                    <div :class="`btn btn-block btn-${showCastingInfo ? 'light' : 'secondary'} mb-2`" v-if="showRosters || showManagers"
+                    <div :class="`btn btn-block btn-${showCastingInfo ? 'light' : 'secondary'}`" v-if="showRosters || showManagers"
                          v-on:click="showCastingInfo = !showCastingInfo">
                         <i class="fa-fw fas fa-headset"></i>
                         Casting info
                     </div>
-                    <div :class="`mb-3 btn btn-block btn-${showPlayerInfo ? 'light' : 'secondary'} mb-2`" v-if="showRosters || showManagers"
+                    <div :class="`mb-2 btn btn-block btn-${showPlayerInfo ? 'light' : 'secondary'}`" v-if="showRosters || showManagers"
                          v-on:click="showPlayerInfo = !showPlayerInfo">
                         <i class="fa-fw far fa-id-card"></i>
                         Contacts
                     </div>
-                    <div v-if="match.maps" :class="`btn btn-block btn-${showMatchMaps ? 'light' : 'secondary'} mb-2`" v-on:click="showMatchMaps = !showMatchMaps">
+                    <div v-if="match.maps" :class="`btn btn-block btn-${showMatchMaps ? 'light' : 'secondary'}`" v-on:click="showMatchMaps = !showMatchMaps">
                         <i class="fa-fw fas fa-map"></i> Match maps
                     </div>
-                    <div v-if="match.maps && showMatchMaps" :class="`btn btn-block mb-3 btn-${showMapBans ? 'light' : 'secondary'} mb-2`" v-on:click="showMapBans = !showMapBans">
+                    <div v-if="match.maps && showMatchMaps" :class="`btn btn-block mb-2 btn-${showMapBans ? 'light' : 'secondary'}`" v-on:click="showMapBans = !showMapBans">
                         <i class="fa-fw fas fa-ban"></i> Show map bans
                     </div>
                     <div :class="`btn btn-block btn-${showMapStats ? 'light' : 'secondary'}`" v-on:click="showMapStats = !showMapStats">
@@ -135,24 +135,24 @@
                     <div v-if="match.brackets" :class="`btn btn-block btn-${showImplications ? 'light' : 'secondary'}`" v-on:click="showImplications = !showImplications">
                         <i class="fa-fw fas fa-sitemap"></i> Bracket implications
                     </div>
-                    <div :class="`btn btn-block btn-${showMatchHistory ? 'light' : 'secondary'} mb-2`"
+                    <div :class="`btn btn-block btn-${showMatchHistory ? 'light' : 'secondary'}`"
                          v-on:click="showMatchHistory = !showMatchHistory">
                         <i class="fa-fw fas fa-history"></i>
                         Match history
                     </div>
-                    <div :class="`btn btn-block btn-${showNonEventMatches ? 'light' : 'secondary'} mb-2`"
+                    <div :class="`btn btn-block btn-${showNonEventMatches ? 'light' : 'secondary'}`"
                          title="Show/hide past matches that aren't from this match's event"
                          v-if="showMatchHistory"
                          v-on:click="showNonEventMatches = !showNonEventMatches">
                         <i class="fa-fw far fa-calendar-alt"></i>
                         Show non-event matches
                     </div>
-                    <div v-if="match.show_notes" :class="`btn btn-block btn-${showShowNotes ? 'light' : 'secondary'} mb-2`"
+                    <div v-if="match.show_notes" :class="`btn btn-block btn-${showShowNotes ? 'light' : 'secondary'}`"
                          v-on:click="showShowNotes = !showShowNotes">
                         <i class="fa-fw far fa-file-video"></i>
                         Show notes
                     </div>
-<!--                    <div :class="`btn btn-block btn-${showVod ? 'light' : 'secondary'} mb-2`" v-if="match.vod"-->
+<!--                    <div :class="`btn btn-block btn-${showVod ? 'light' : 'secondary'}`" v-if="match.vod"-->
 <!--                         v-on:click="showVod = !showVod">-->
 <!--                        <i class="fa-fw far fa-desktop-alt"></i> Toggle VOD-->
 <!--                    </div>-->
@@ -167,7 +167,7 @@
                 <div class="info-block">
                     <stat :match="match" data="custom_name">Custom match name</stat>
                     <stat :match="match" data="match_number">Match number</stat>
-                    <stat :match="match" data="casters" :players="true">Casters</stat>
+                    <stat :match="match" data="casters" :players="true">{{ match?.casters?.length === 1 ? 'Caster' : 'Casters'}}</stat>
                     <stat :match="match" data="sub_event">Sub Event</stat>
                     <stat :match="match" data="start" :time="true">Scheduled start time</stat>
                     <stat :match="match" data="vod" :external-link="true">VOD Link</stat>

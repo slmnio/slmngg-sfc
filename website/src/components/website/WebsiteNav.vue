@@ -146,7 +146,7 @@ export default {
             return import.meta.env.VITE_DEPLOY_MODE || import.meta.env.NODE_ENV;
         },
         dataServerMode() {
-            const dataServerURL = new URL(import.meta.env.VITE_DATA_SERVER);
+            const dataServerURL = new URL(import.meta.env.VITE_DATA_SERVER || "http://localhost");
             return ["localhost", "127.0.0.1"].includes(dataServerURL.hostname) ? "local" : "remote";
         },
         navbarEvents() {

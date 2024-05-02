@@ -19,6 +19,11 @@ export default (app) => ([
         beforeEnter(to, from, next) {
             const mainDomain = getMainDomain(null);
 
+            if (!import.meta.env.VITE_DISCORD_CLIENT_ID) {
+                alert("Discord client ID is not set - login is not possible");
+                return next();
+            }
+
             console.log("ZOOM DISCORD TIME", mainDomain, from.fullPath, to.query.return, to, from);
 
             if (!isOnMainDomain()) {

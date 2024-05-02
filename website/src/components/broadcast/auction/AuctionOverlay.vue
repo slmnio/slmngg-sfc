@@ -80,7 +80,7 @@
 <!--                <TeamPlayerList v-for="team in displayTeams" :team="team" :key="team.id" :leading="leadingBid" :auction-settings="auctionSettings" />-->
 <!--            </div>-->
             <transition name="fade-left" mode="out-in">
-                <transition-group  :style="background" tag="div" v-if="['teams-1', 'teams-2', 'teams'].includes(rightDisplay)" name="move" class="team-rows-holder">
+                <transition-group  :style="background" tag="div" v-if="rightDisplay === 'teams-1' || rightDisplay === 'teams-2' || rightDisplay === 'teams'" name="move" class="team-rows-holder">
                     <div class="team-row" v-for="row in displayTeamRows" :key="row.i">
                         <TeamPlayerList v-for="team in row.teams" :team="team" :key="team.id"
                                         :auction-settings="auctionSettings"></TeamPlayerList>
@@ -98,8 +98,8 @@
                 <div :style="background" class="bidding-war" v-else-if="rightDisplay === 'bidding-war'" key="bidding-war">
                     <BiddingWar :teams="biddingWar" :leading="leadingBid" :auction-settings="auctionSettings"/>
                 </div>
-                <AuctionLeaderboard :players="signedPlayers" :style="background" class="leaderboard w-100 h-100 flex-center" v-if="rightDisplay === 'leaderboard'" key="leaderboard" />
-                <AuctionTeamsOverview :auction-settings="auctionSettings" :v-if="rightDisplay === 'teams-overview'" key="teams-overview" :teams="teams"  :style="background"  />
+                <AuctionLeaderboard :players="signedPlayers" :style="background" class="leaderboard w-100 h-100 flex-center" v-else-if="rightDisplay === 'leaderboard'" key="leaderboard" />
+                <AuctionTeamsOverview :auction-settings="auctionSettings" :v-else-if="rightDisplay === 'teams-overview'" key="teams-overview" :teams="teams"  :style="background"  />
             </transition>
         </div>
     </div>

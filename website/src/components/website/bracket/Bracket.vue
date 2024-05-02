@@ -456,6 +456,7 @@ export default {
     margin: 0 var(--margin-width);
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
 }
 
 .column.gap-right {

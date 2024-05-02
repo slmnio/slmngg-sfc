@@ -12,7 +12,7 @@
                 </b-button>
             </b-button-group>
         </div>
-        <b-modal ref="modal" id="break-display" title="Break display settings">
+        <b-modal ref="modal" id="break-display" title="Break display settings" :hide-footer="selectedTab !== 'Display'">
             <b-form-radio-group class="w-100 mb-3" v-model="selectedTab" :options="tabs" buttons button-variant="outline-primary" />
             <BreakTimeControls :broadcast="broadcast" v-if="selectedTab === 'Countdown'" />
             <BreakTextTab :broadcast="broadcast" v-if="selectedTab === 'Text'" />

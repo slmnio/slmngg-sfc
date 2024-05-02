@@ -94,6 +94,7 @@ export default {
     }
     .content-thing:hover {
         color: inherit;
+        text-decoration: underline;
     }
 
     .icon-internal {

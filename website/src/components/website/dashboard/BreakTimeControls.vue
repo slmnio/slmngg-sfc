@@ -109,7 +109,7 @@ export default {
 
 <style scoped>
 .label {
-    margin-bottom: .15em;
+    margin-bottom: .25em;
     height: 19px;
 }
 

@@ -5,13 +5,26 @@
         <b-button class="mt-2" variant="danger" @click="reloadAll"><i class="fas fa-redo fa-fw"></i> Reload all sources</b-button>
 
         <table class="my-3">
-            <tr v-for="overlay in sortedOverlays" :key="overlay.socket" :class="{ 'overlay-minor': overlay.minor || overlay.forHumans, 'overlay-for-humans': overlay.forHumans, 'overlay-active bg-danger': overlay.active }">
-                <td><b-button @click="sendToOverlay(overlay.socket, 'reload')" size="sm" variant="dark"><i class="fa fa-fw fa-sync"></i></b-button></td>
-                <td><b-button size="sm" variant="dark" :href="overlay.fullPath" target="_blank"><i class="fa fa-fw fa-external-link"></i></b-button></td>
-                <td><span class="b-pad"><i class="fa fa-fw" :class="{'fa-eye': overlay.visible, 'fa-eye-slash': !overlay.visible}"></i></span></td>
-                <td><span class="b-pad fw-bold">{{ overlay.component }}</span></td>
-                <td><span class="b-pad">{{ decodeURIComponent(overlay.fullPath.replace(overlay.path, "")) }}</span></td>
-            </tr>
+            <tbody>
+                <tr v-for="overlay in sortedOverlays" :key="overlay.socket"
+                    :class="{ 'overlay-minor': overlay.minor || overlay.forHumans, 'overlay-for-humans': overlay.forHumans, 'overlay-active bg-danger': overlay.active }">
+                    <td>
+                        <b-button @click="sendToOverlay(overlay.socket, 'reload')" size="sm" variant="dark"><i class="fa fa-fw fa-sync"></i></b-button>
+                    </td>
+                    <td>
+                        <b-button size="sm" variant="dark" :href="overlay.fullPath" target="_blank"><i class="fa fa-fw fa-external-link"></i></b-button>
+                    </td>
+                    <td>
+                        <span class="b-pad"><i class="fa fa-fw" :class="{'fa-eye': overlay.visible, 'fa-eye-slash': !overlay.visible}"></i></span>
+                    </td>
+                    <td>
+                        <span class="b-pad fw-bold">{{ overlay.component }}</span>
+                    </td>
+                    <td>
+                        <span class="b-pad">{{ decodeURIComponent(overlay.fullPath.replace(overlay.path, "")) }}</span>
+                    </td>
+                </tr>
+            </tbody>
         </table>
 
         <div class="remote-obs-data">

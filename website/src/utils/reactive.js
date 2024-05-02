@@ -2,7 +2,7 @@ import store from "../thing-store";
 import { queueThings, resolveThing } from "@/utils/fetch";
 import { cleanID } from "@/utils/content-utils";
 
-export function ReactiveRoot (id, structure) {
+export function ReactiveRoot(id, structure) {
     // console.log("[reactive-root]", id);
     id = cleanID(id);
     const data = store.getters.thing(id);

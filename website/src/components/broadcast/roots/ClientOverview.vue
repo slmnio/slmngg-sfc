@@ -16,8 +16,8 @@
 
         <div class="remote-obs-data">
             <div class="d-flex">
-                <b-button @click="$socket.client.emit('prod_trigger', 'request_obs_remote_control_update')">Request update</b-button>
-                <div class="ml-2 p-2 font-weight-bold">Remote OBS control</div>
+                <b-button @click="requestUpdate">Request update</b-button>
+                <div class="ml-2 p-2 fw-bold">Remote OBS control</div>
             </div>
 
             <div class="d-flex" v-if="remoteObsData">
@@ -54,6 +54,9 @@ export default {
 
         remoteObsData: null
     }),
+    meta: {
+        noStinger: true
+    },
     methods: {
         sendToOverlay(socketID, event, data) {
             if (socket) {
@@ -67,9 +70,12 @@ export default {
         reloadAll() {
             if (!confirm("Are you sure you want to reload all client sources?")) return;
             this.sortedOverlays.forEach(overlay => {
-                if (overlay.socket === this.$socket.client.id) return;
+                if (overlay.socket === socket.id) return;
                 this.sendToOverlay(overlay.socket, "reload");
             });
+        },
+        requestUpdate() {
+            if (socket) socket.emit("prod_trigger", "request_obs_remote_control_update");
         }
     },
     computed: {

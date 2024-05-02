@@ -3,7 +3,9 @@
         <div class="broadcast-app" :class="broadcastClass">
             <!--        <div style="font-size: 5em; color: black">{{ $root.activeScene }}</div>-->
             <router-view id="overlay" :class="bodyClass" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active"
-                         :animation-active="animationActive" :full="full" @prodUpdate="(x) => prodUpdate(x)" ref="overlay"/>
+                         :animation-active="animationActive" :full="full" @prodUpdate="(x) => prodUpdate(x)" v-slot="{ Component }">
+                <component ref="overlay" :is="Component" />
+            </router-view>
 
             <BroadcastBackground class="force-background" v-if="backgroundIndex" :broadcast="broadcast" :index="backgroundIndex" />
 
@@ -90,7 +92,7 @@ export default {
             return this.noAnimation || (this.broadcast?.broadcast_settings || []).includes("No animations");
         },
         useBuiltInStingers() {
-            // console.log("use", this.noStinger, this.broadcast?.broadcast_settings);
+            console.log("use", this.noStinger, this.broadcast?.broadcast_settings, this.$refs.overlay);
             if (this.noStinger || this.$refs.overlay?.noStinger) return false;
             return (this.broadcast?.broadcast_settings || []).includes("Use built-in stingers");
         },

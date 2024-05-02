@@ -12,6 +12,7 @@
 </template>
 <script>
 import OBSWebSocket from "obs-websocket-js";
+import { socket } from "@/socket";
 
 function jsonify(str) {
     try {
@@ -64,7 +65,7 @@ export default {
                 }
             ]);
             console.log("Sending remote data");
-            this.$socket.client.emit("prod_trigger", "obs_remote_data", {
+            socket.emit("prod_trigger", "obs_remote_data", {
                 results: results.map(r => r.responseData)
             });
         }

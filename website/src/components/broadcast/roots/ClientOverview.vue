@@ -101,7 +101,8 @@ export default {
             this.$delete(this.overlays, socketID);
         },
         obs_remote_data(data) {
-            const [scenes, inputs] = data?.[0]?.results;
+            if (!data?.[0]?.results) return;
+            const [scenes, inputs] = data[0].results;
             console.log(scenes, inputs);
             this.remoteObsData = {
                 scenes: scenes.scenes,

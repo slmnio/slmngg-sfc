@@ -620,15 +620,15 @@
     "@vue/compiler-dom" "3.4.25"
     "@vue/shared" "3.4.25"
 
+"@vue/devtools-api@^6.0.0-beta.11", "@vue/devtools-api@^6.5.1":
+  version "6.6.1"
+  resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.6.1.tgz#7c14346383751d9f6ad4bea0963245b30220ef83"
+  integrity sha512-LgPscpE3Vs0x96PzSSB4IGVSZXZBZHpfxs+ZA1d+VEPwHdOXowy/Y2CsvCAIFrf+ssVU1pD1jidj505EpUnfbA==
+
 "@vue/devtools-api@^6.5.0":
   version "6.5.1"
   resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.5.1.tgz#7f71f31e40973eeee65b9a64382b13593fdbd697"
   integrity sha512-+KpckaAQyfbvshdDW5xQylLni1asvNSGme1JFs8I1+/H5pHEhqUKMEQD/qn3Nx5+/nycBq11qAEi8lk+LXI2dA==
-
-"@vue/devtools-api@^6.5.1":
-  version "6.6.1"
-  resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.6.1.tgz#7c14346383751d9f6ad4bea0963245b30220ef83"
-  integrity sha512-LgPscpE3Vs0x96PzSSB4IGVSZXZBZHpfxs+ZA1d+VEPwHdOXowy/Y2CsvCAIFrf+ssVU1pD1jidj505EpUnfbA==
 
 "@vue/eslint-config-standard-with-typescript@^8.0.0":
   version "8.0.0"
@@ -3586,14 +3586,7 @@ vue-router@^4.3.2:
   dependencies:
     "@vue/devtools-api" "^6.5.1"
 
-vue-tweet@^2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/vue-tweet/-/vue-tweet-2.2.1.tgz#5c0f4d41a691ae6ee14a66f215ea5cb61536bd76"
-  integrity sha512-THNkiKk3MDD7bMIBrImlJRRhGpofFm9yBgs3GnVkSqroUj27A8KoUeGBpo71Xnz3SoHdZuohfc1MPlRc4DPraQ==
-  dependencies:
-    vue "^3.4.21"
-
-vue@^3.2.31, vue@^3.4.21:
+vue@^3.2.31:
   version "3.4.24"
   resolved "https://registry.yarnpkg.com/vue/-/vue-3.4.24.tgz#f269549939a6c092480f018aa0bd886ba64f4c6f"
   integrity sha512-NPdx7dLGyHmKHGRRU5bMRYVE+rechR+KDU5R2tSTNG36PuMwbfAJ+amEvOAw7BPfZp5sQulNELSLm5YUkau+Sg==

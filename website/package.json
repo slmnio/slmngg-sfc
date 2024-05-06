@@ -31,7 +31,6 @@
     "vue-confetti": "^2.3.0",
     "vue-cookies": "^1.8.4",
     "vue-router": "^4.3.2",
-    "vue-tweet": "^2.2.1",
     "vuex": "^4.1.0",
     "youtube-vue3": "^0.1.15"
   },

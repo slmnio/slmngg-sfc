@@ -7,7 +7,7 @@
 
         <div class="d-flex">
             <div class="w-100"></div>
-            <b-button variant="success" :disabled="processing" @click="saveOptions">Save</b-button>
+            <b-button variant="success" :disabled="processing || titleProcessing" @click="saveOptions">Save</b-button>
         </div>
     </div>
 </template>
@@ -18,7 +18,7 @@ import { unescapeText } from "@/utils/content-utils";
 
 export default {
     name: "BreakTextTab",
-    props: { broadcast: Object },
+    props: { broadcast: Object, titleProcessing: Boolean },
     data: () => ({
         breakTitle: "",
         processing: false

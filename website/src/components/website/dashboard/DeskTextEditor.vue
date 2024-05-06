@@ -1,7 +1,7 @@
 <template>
-    <div class="desk-text-editor p-2">
+    <div class="desk-text-editor p-2 gap-3 d-flex flex-column">
         <div class="d-flex gap-2">
-            <b-button v-b-tooltip="'Set prefix to the team names & scores'" class="flex-shrink-0" :disabled="processing || chosenDisplayOption?.hasText === false" @click="autoSetPrefixText()">Team scores</b-button>
+            <b-button class="flex-shrink-0" :disabled="processing || chosenDisplayOption?.hasText === false" @click="autoSetPrefixText()">Team scores</b-button>
             <b-form-input class="opacity-changes disabled-low-opacity" :disabled="chosenDisplayOption?.hasText === false"
                           @keydown.ctrl.enter="saveData({mode: 'show'})"
                           type="text" v-model="deskTextPrefix" placeholder="Text prefix"/>
@@ -11,6 +11,13 @@
             <b-form-select class="w-auto" :options="displayOptions" v-model="chosenDisplayOption"></b-form-select>
             <b-button @click="saveData({ mode: 'show'})" class="flex-shrink-0" :disabled="processing" :variant="!dataDeskMode ? 'primary' : 'secondary'"><i class="fas fa-fw fa-eye"></i> Show</b-button>
             <b-button @click="saveData({ mode: 'hide'})" class="flex-shrink-0" :disabled="processing" :variant="!dataDeskMode ? 'secondary' : 'primary'"><i class="fas fa-eye-slash"></i> Hide</b-button>
+        </div>
+        <div class="d-flex gap-2 align-items-center justify-content-center flex-wrap">
+            <b-button v-for="option in noTextDisplayOptions" :key="option?.text" :disabled="processing"
+                      :variant="broadcast?.desk_display === option?.text ? 'primary' : 'secondary'"
+                      @click="chosenDisplayOption = option?.value; saveData({ mode: 'show' })">
+                {{ option?.text }}
+            </b-button>
         </div>
     </div>
 </template>
@@ -161,6 +168,9 @@ export default {
                 this.deskTextPrefix,
                 this.deskText
             ].filter(Boolean).join("|");
+        },
+        noTextDisplayOptions() {
+            return this.displayOptions.filter(option => !option?.value?.hasText);
         }
     },
     watch: {

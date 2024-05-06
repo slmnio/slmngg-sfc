@@ -1,7 +1,13 @@
 <template>
     <div class="observer-settings-modal">
-        <div v-b-modal.observer-settings >
-            <b-button size="sm" :variant="hasSettingOn ? 'primary' : 'secondary'" :class="{'active': hasSettingOn}"><DashboardModalIcon/> {{ autoText }}</b-button>
+        <div v-b-modal.observer-settings>
+            <b-button class="quick-button" :variant="hasSettingOn ? 'primary' : 'secondary'">
+                <div class="icon-stack">
+                    <i class="fas fa-eye"></i>
+                    <i class="fas fa-fw fa-sliders-h top-describer-button"></i>
+                    <div class="icon-text" :style="{ fontSize: autoText.includes('&') ? '0.4em' : ''}">{{ autoText }}</div>
+                </div>
+            </b-button>
         </div>
         <b-modal ref="observer-settings" id="observer-settings" title="Observer Settings">
             <div class="w-100 flex-center">
@@ -23,6 +29,7 @@
 <script>
 import ObserverSettingsButton from "@/components/website/dashboard/ObserverSettingsButton.vue";
 import DashboardModalIcon from "@/components/website/dashboard/DashboardModalIcon.vue";
+import Squeezable from "@/components/broadcast/Squeezable.vue";
 
 export default {
     name: "ObserverSettingsModal",
@@ -30,7 +37,7 @@ export default {
         broadcast: Object
     },
     components: {
-        DashboardModalIcon,
+        Squeezable,
         ObserverSettingsButton
     },
     data: () => ({
@@ -52,7 +59,7 @@ export default {
             if (this.liveSettings.includes("Show overlay")) on.push(this.liveSettings.includes("Use basic overlay") ? "basic overlay" : "overlay");
             if (this.liveSettings.includes("Show syncer")) on.push("syncer");
             if (on[0]) on[0] = on[0].slice(0, 1).toUpperCase() + on[0].slice(1);
-            return `${on.join(" & ")} on`;
+            return `${on.join(" & ")}`;
         },
         settingsGroups() {
             const disruptive = ["Show overlay", "Show syncer"];

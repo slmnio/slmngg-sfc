@@ -53,7 +53,6 @@
 </template>
 
 <script>
-import DashboardModalIcon from "@/components/website/dashboard/DashboardModalIcon.vue";
 import BreakDisplayTab from "@/components/website/dashboard/BreakDisplayTab.vue";
 import BreakAutomationTab from "@/components/website/dashboard/BreakAutomationTab.vue";
 import BreakTextTab from "@/components/website/dashboard/BreakTextTab.vue";
@@ -63,7 +62,7 @@ import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "BreakDisplayMultiModal",
-    components: { Squeezable, BreakTimeControls, BreakTextTab, BreakAutomationTab, BreakDisplayTab, DashboardModalIcon },
+    components: { Squeezable, BreakTimeControls, BreakTextTab, BreakAutomationTab, BreakDisplayTab },
     props: {
         broadcast: Object
     },

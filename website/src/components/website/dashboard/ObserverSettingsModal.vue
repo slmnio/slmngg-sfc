@@ -28,8 +28,6 @@
 
 <script>
 import ObserverSettingsButton from "@/components/website/dashboard/ObserverSettingsButton.vue";
-import DashboardModalIcon from "@/components/website/dashboard/DashboardModalIcon.vue";
-import Squeezable from "@/components/broadcast/Squeezable.vue";
 
 export default {
     name: "ObserverSettingsModal",
@@ -37,7 +35,6 @@ export default {
         broadcast: Object
     },
     components: {
-        Squeezable,
         ObserverSettingsButton
     },
     data: () => ({

@@ -18,15 +18,15 @@
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { logoBackground } from "@/utils/theme-styles";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
+import { useStatusStore } from "@/stores/statusStore";
+import { mapState } from "pinia";
+
 export default {
     name: "StingerWrap",
     props: ["theme", "active", "waitBeforeAnimOut", "shouldUse", "text"],
     components: { ThemeLogo, ThemeTransition },
     data: () => ({
-        showStinger: null,
-        customTheme: null,
-        customText: null,
-        hideText: false
+        showStinger: null
     }),
     watch: {
         active(isActive) {
@@ -39,28 +39,16 @@ export default {
         }
     },
     computed: {
+        ...mapState(useStatusStore, ["customStingerTheme", "customStingerText", "stingerHideText"]),
         useTheme() {
-            return this.customTheme || this.theme;
+            return this.customStingerTheme || this.theme;
         },
         bg() {
             return logoBackground(this.useTheme);
         },
         stingerText() {
-            if (this.hideText) return;
-            return this.customText || this.text;
-        }
-    },
-    methods: {
-        updateTheme(theme) {
-            this.customTheme = theme;
-            console.log("custom stinger theme", theme);
-        },
-        updateText(text) {
-            this.customText = text;
-            console.log("custom stinger text", text);
-        },
-        setTextVisibility(visibility) {
-            this.hideText = !visibility;
+            if (this.stingerHideText) return;
+            return this.customStingerText || this.text;
         }
     }
 };

@@ -25,6 +25,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import { themeBackground1 } from "@/utils/theme-styles";
 import { getRoleSVG } from "@/utils/content-utils";
+import { useStatusStore } from "@/stores/statusStore";
 
 export default {
     name: "HeroRosterOverlay",
@@ -98,8 +99,7 @@ export default {
         team: {
             deep: true,
             handler(team) {
-                console.log("team change", this.$parent);
-                this.$parent.updateTheme(team?.theme);
+                useStatusStore().customStingerTheme = team?.theme;
                 // this.$emit("stinger_theme_change", team.theme);
             }
         },

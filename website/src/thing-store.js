@@ -13,9 +13,7 @@ const store = createStore({
         highlighted_team: null,
         highlighted_match: null,
         match_highlights: [],
-        draft_notes: [],
         last_event_match_pages: [],
-        dashboard_modules_active: [],
 
         data_update_buffer: [],
         website_flags: []
@@ -81,18 +79,6 @@ const store = createStore({
         setHighlights(state, matchHighlights) {
             state.match_highlights = matchHighlights;
         },
-        setPlayerDraftNotes(state, { playerID, tag, notes }) {
-            const index = state.draft_notes.findIndex(n => n.player_id === playerID);
-            // console.log(playerID, tag, notes, index);
-            if (index === -1) {
-                return state.draft_notes.push({ player_id: playerID, tag, notes });
-            }
-            const data = {};
-            if (tag !== undefined) data.tag = tag;
-            if (notes !== undefined) data.notes = notes;
-            // console.log({ ...state.draft_notes[index], ...data });
-            state.draft_notes.splice(index, 1, { ...state.draft_notes[index], ...data });
-        },
         setEventMatchPage(state, { eventID, matchPage }) {
             if (!eventID) return;
             if (!matchPage) return;
@@ -100,18 +86,6 @@ const store = createStore({
             const index = state.last_event_match_pages.findIndex(x => x.eventID === eventID);
             if (index === -1) return state.last_event_match_pages.push(item);
             state.last_event_match_pages.splice(index, 1, item);
-        },
-        setDashboardModuleVisibility(state, { visible, moduleName }) {
-            if (!moduleName) return;
-            const index = state.dashboard_modules_active.indexOf(moduleName);
-
-            if (index === -1) {
-                // not set
-                if (visible) state.dashboard_modules_active.push(moduleName);
-            } else {
-                // set
-                if (!visible) state.last_event_match_pages.splice(index, 1);
-            }
         },
         setWebsiteFlags(state, flags) {
             state.website_flags = flags;
@@ -122,11 +96,9 @@ const store = createStore({
         thing: (state) => (id) => state.things[state.thing_map[id]],
         isHighlighted: state => (id) => state.highlighted_team === id,
         getHighlight: state => (matchID) => state.match_highlights.find(match => match.id === matchID),
-        getNotes: state => (playerID) => state.draft_notes.find(notes => notes.player_id === playerID),
         getLastMatchPage: state => (eventID) => state.last_event_match_pages.find(x => x.eventID === eventID),
         // highlightedMatch: (state, getters) => () => getters.thing(state.highlighted_match)
         highlightedMatch: state => () => state.highlighted_match,
-        dashboardModuleIsVisible: state => (moduleName) => state.dashboard_modules_active.includes(moduleName),
         hasWebsiteFlag: state => flag => state.website_flags.includes(flag)
     },
     actions: {

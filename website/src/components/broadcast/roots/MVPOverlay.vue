@@ -32,6 +32,7 @@ import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { themeBackground1 } from "@/utils/theme-styles";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
+import { useStatusStore } from "@/stores/statusStore";
 
 export default {
     name: "MVPOverlay",
@@ -85,7 +86,7 @@ export default {
             deep: true,
             handler(team) {
                 if (team?.theme) {
-                    this.$parent.updateTheme(team.theme);
+                    useStatusStore().customStingerTheme = team?.theme;
                 }
             }
         }

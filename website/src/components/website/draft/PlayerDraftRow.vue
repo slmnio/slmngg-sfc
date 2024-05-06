@@ -1,11 +1,11 @@
 <template>
     <tr :key="player.id">
         <td class="draft--name"><router-link :to="url('player', player)">{{ player.name }} <i class="fas fa-badge-check" v-if="player.verified"></i></router-link></td>
-        <td class="draft--highest-rank" v-if="game === 'Valorant'">{{ player._draftData && player._draftData.highest_rank }}</td>
-        <td class="draft--current-rank" v-if="game === 'Valorant'">{{ player._draftData && player._draftData.current_rank }}</td>
-        <td class="draft--sr" v-if="game === 'Overwatch' && player.rating" v-b-tooltip.top="player.rating.note">{{ player.rating.level }}</td>
+        <td class="draft--highest-rank" v-if="game === 'Valorant'">{{ player?._draftData.highest_rank }}</td>
+        <td class="draft--current-rank" v-if="game === 'Valorant'">{{ player?._draftData.current_rank }}</td>
+        <td class="draft--sr" v-if="game === 'Overwatch' && player.rating"><span v-b-tooltip.top="player.rating.note">{{ player.rating.level }}</span></td>
         <td v-else-if="game === 'Overwatch'"></td>
-        <td class="draft--role" v-if="game === 'Overwatch'" v-b-tooltip.top="extendedRole">
+        <td class="draft--role" v-if="game === 'Overwatch'" v-b-tooltip.top="extendedRole || ''">
             <div class="player-role flex-center" v-html="getSVG(player.role)"></div>
         </td>
         <td class="draft--heroes" v-if="hasDraftData && settings.heroes">
@@ -16,17 +16,17 @@
         <td v-if="settings.slmn_events">
             <PlayerDraftTeamInfo v-for="team in teams" :team="team" :key="team.id"/>
         </td>
-        <td v-if="hasDraftData && settings.info_for_captains" class="info-for-captains">{{  player.info_for_captains }}</td>
+        <td v-if="hasDraftData && settings.info_for_captains" class="info-for-captains">{{ player.info_for_captains }}</td>
         <td v-if="settings.custom_notes">
             <div class="custom-note" @click="doNote">
-                {{ (notes && notes.notes) || '--' }}
+                {{ (notes?.notes) || '--' }}
             </div>
         </td>
         <td class="draft--controls">
             <b-button-group>
-                <b-button size="sm" v-b-tooltip.left="'Set note'" variant="primary" class="text-dark" @click="doNote()"><i class="fas fa-fw fa-user-edit"></i></b-button>
-                <b-button size="sm" v-b-tooltip.left="tag === 'starred' ? 'Unstar' : 'Star'" variant="warning" @click="setNote('starred')"><i class="fas fa-fw fa-star"></i></b-button>
-                <b-button size="sm" v-b-tooltip.right="tag === 'ignored' ? 'Unignore' : 'Ignore'" variant="danger" @click="setNote('ignored')"><i class="fas fa-fw fa-ban"></i></b-button>
+                <b-button v-if="settings.custom_notes" size="sm" v-b-tooltip.left="'Set note'" variant="primary" class="text-dark" @click="doNote()"><i class="fas fa-fw fa-user-edit"></i></b-button>
+                <b-button size="sm" v-b-tooltip.left="notes?.tag === 'starred' ? 'Unstar' : 'Star'" variant="warning" @click="setNote('starred')"><i class="fas fa-fw fa-star"></i></b-button>
+                <b-button size="sm" v-b-tooltip.right="notes?.tag === 'ignored' ? 'Unignore' : 'Ignore'" variant="danger" @click="setNote('ignored')"><i class="fas fa-fw fa-ban"></i></b-button>
             </b-button-group>
         </td>
     </tr>
@@ -35,18 +35,16 @@
 <script>
 import HeroIcon from "@/components/website/HeroIcon";
 import { getRoleSVG, url } from "@/utils/content-utils";
-import store from "@/thing-store";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import PlayerDraftTeamInfo from "@/components/website/draft/PlayerDraftTeamInfo";
 import { sortEvents } from "@/utils/sorts";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { mapWritableState } from "pinia";
 
 export default {
     name: "PlayerDraftRow",
     props: ["player", "hasDraftData", "settings", "game"],
     components: { PlayerDraftTeamInfo, HeroIcon },
-    data: () => ({
-        customNote: ""
-    }),
     methods: {
         url,
         getSVG: getRoleSVG,
@@ -58,16 +56,24 @@ export default {
         setNote(tag, note) {
             console.log(tag, note, this.tag);
             if (this.tag === tag) tag = null;
-            store.commit("setPlayerDraftNotes", { playerID: this.player.id, tag, notes: note });
+            this.notes = { tag, notes: note };
         },
         doNote() {
             const text = prompt(`Set ${this.player.name}'s custom note`, this.notes?.notes);
-            this.setNote(undefined, text);
+            this.notes = { tag: undefined, notes: text };
         }
     },
     computed: {
-        notes() {
-            return store.getters.getNotes(this.player.id);
+        ...mapWritableState(useSettingsStore, ["draftNotes"]),
+        notes: {
+            get() {
+                if (!this.player?.id) return null;
+                return this.draftNotes?.[this.player.id];
+            },
+            set(note) {
+                if (!this.player?.id) return;
+                this.draftNotes[this.player.id] = note;
+            }
         },
         tag() {
             return this.notes?.tag;
@@ -130,7 +136,7 @@ a { font-weight: bold; }
     color: black !important;
 }
 .table-danger a {
-    color: white !important;
+    color: black !important;
 }
 .draft-buttons {
     white-space: nowrap;

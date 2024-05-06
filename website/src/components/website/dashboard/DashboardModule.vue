@@ -19,6 +19,9 @@
 </template>
 
 <script>
+import { useSettingsStore } from "@/stores/settingsStore";
+import { mapWritableState } from "pinia";
+
 export default {
     name: "DashboardModule",
     props: {
@@ -29,11 +32,32 @@ export default {
         noContentBorder: Boolean
     },
     data: () => ({
-        showDropdown: false,
         loadDropdown: false,
         contentHeight: 0
     }),
     computed: {
+        ...mapWritableState(useSettingsStore, ["openDashboardModules"]),
+        showDropdown: {
+            get() {
+                const visible = this.openDashboardModules?.[this.title];
+                if (visible !== undefined) {
+                    return visible;
+                }
+                return this.startOpened;
+            },
+            set(visible) {
+                this.openDashboardModules[this.title] = visible;
+
+                this.loadDropdown = true;
+
+                this.$nextTick(() => {
+                    this.setHeight();
+                    setTimeout(() => {
+                        this.setHeight();
+                    }, 250);
+                });
+            }
+        },
         moduleContentCSS() {
             if (this.contentHeight <= 50) return {};
             return {
@@ -49,24 +73,7 @@ export default {
         }
     },
     created() {
-        const storeData = this.$store.getters.dashboardModuleIsVisible(this.title);
-        if (storeData !== undefined) this.showDropdown = storeData;
-
-        if (this.startOpened) this.showDropdown = true;
         this.loadDropdown = this.showDropdown;
-    },
-    watch: {
-        showDropdown(isVisible) {
-            this.$store.commit("setDashboardModuleVisibility", { moduleName: this.title, visible: isVisible });
-            this.loadDropdown = true;
-
-            this.$nextTick(() => {
-                this.setHeight();
-                setTimeout(() => {
-                    this.setHeight();
-                }, 250);
-            });
-        }
     }
 };
 </script>

@@ -42,6 +42,7 @@ import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import { autoRecord, getRoleSVG } from "@/utils/content-utils";
 import { bg, resizedAttachment, resizedImage } from "@/utils/images";
+import { useStatusStore } from "@/stores/statusStore";
 
 function niceJoin(array, and = "and") {
     if (array.length > 1) {
@@ -164,7 +165,7 @@ export default {
             deep: true,
             handler(team) {
                 // console.log("team change", this.$parent);
-                this.$parent.updateTheme(team?.theme);
+                useStatusStore().customStingerTheme = team?.theme;
                 // this.$emit("stinger_theme_change", team.theme);
             }
         },

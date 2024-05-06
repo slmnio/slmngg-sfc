@@ -13,11 +13,11 @@
             </div>
             <div class="col-12 my-2 settings">
                 <h2>Settings</h2>
+                <b-form-checkbox v-if="draftTeams && draftTeams.length" v-model="settings.show_rosters">Show event team rosters</b-form-checkbox>
                 <b-form-checkbox v-if="game === 'Overwatch'" :title="'Show where each player placed in SLMN.GG events. Takes a while to load every player\'s data.'" v-model="settings.slmn_events">Show SLMN event results (takes a while to load)</b-form-checkbox>
-                <b-form-checkbox v-if="game === 'Overwatch'" :title="'Show what the players selected as their \'best heroes\''" v-model="settings.heroes">Show heroes</b-form-checkbox>
-                <b-form-checkbox :title="'Show what the players wrote for their \'info for captains\''" v-model="settings.info_for_captains">Show player's info for captains</b-form-checkbox>
+                <b-form-checkbox v-if="game === 'Overwatch'" :title="'Show what the players selected as their \'best heroes\''" v-model="settings.heroes">Show player heroes</b-form-checkbox>
+                <b-form-checkbox :title="'Show what the players wrote for their \'info for captains\''" v-model="settings.info_for_captains">Show player info for captains</b-form-checkbox>
                 <b-form-checkbox :title="'Show the notes you\'ve written for players. Will save to your browser.'" v-model="settings.custom_notes">Show your player notes</b-form-checkbox>
-                <b-form-checkbox v-if="draftTeams && draftTeams.length" v-model="settings.show_rosters">Show team rosters</b-form-checkbox>
                 <div v-if="game === 'Overwatch'" class="w-25 mt-1">
                     <b-form-select v-model="filters.selected" :options="filters.options"></b-form-select>
                 </div>
@@ -48,7 +48,7 @@
             </div>
             <div class="col-12 my-2" v-if="playerGroup('ignored').length">
                 <h2>Ignored players</h2>
-                <table class="table table-bordered bg-danger table-danger text-white table-sm">
+                <table class="table table-bordered table-danger text-white table-sm">
                     <thead>
                         <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
                     </thead>
@@ -70,6 +70,8 @@ import PlayerDraftRow from "@/components/website/draft/PlayerDraftRow";
 import store from "@/thing-store";
 import EventDraftHeaders from "@/components/website/draft/EventDraftHeaders";
 import { url } from "@/utils/content-utils";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { mapState } from "pinia";
 
 
 function getRoleString(sr) {
@@ -139,7 +141,7 @@ export default {
         },
         filters: {
             options: [
-                { value: null, text: "Show all" },
+                { value: null, text: "Filter players by role" },
                 { value: "DPS", text: "DPS only" },
                 { value: "Tank", text: "Tank only" },
                 { value: "Support", text: "Support only" }
@@ -148,6 +150,7 @@ export default {
         }
     }),
     computed: {
+        ...mapState(useSettingsStore, ["draftNotes"]),
         _event() {
             if (!this.event) return null;
             return ReactiveRoot(this.event.id, {
@@ -233,7 +236,7 @@ export default {
                     player.info_for_captains = player.draft_data;
                 }
 
-                player.localNotes = store.getters.getNotes(player.id);
+                player.localNotes = this.draftNotes?.[player.id];
 
 
                 return player;

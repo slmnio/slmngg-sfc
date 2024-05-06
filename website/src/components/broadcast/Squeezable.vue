@@ -32,8 +32,8 @@ export default {
     methods: {
         updateWidth(isAfterTick) {
             const big = this.$refs.big;
-            const small = this.$slots.default?.()?.[0]?.elm;
-            // console.log({ big, small });
+            const small = this.$slots.default?.()?.[0]?.el || big?.__vnode?.children?.[0]?.children?.[0]?.el || big?.__vnode?.children?.[0]?.el;
+            console.log({ big, small });
 
             if (!big?.getBoundingClientRect || !small?.getBoundingClientRect) return;
 
@@ -41,7 +41,7 @@ export default {
             const contentSize = small.getBoundingClientRect().width;
             const contentScale = boxSize / contentSize;
             // console.log(contentScale, this.contentScale);
-            this.contentScale = contentScale * this.contentScale;
+            this.contentScale = contentScale * this.allowedContentScale;
             if (isNaN(this.contentScale) || this.contentScale === Infinity) {
                 this.contentScale = 1;
             }

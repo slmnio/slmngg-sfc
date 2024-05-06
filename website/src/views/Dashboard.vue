@@ -37,7 +37,7 @@
         <DashboardModule class="mb-2" title="Desk Display" icon-class="far fa-comment-alt-dots">
             <DeskTextEditor :broadcast="broadcast" />
         </DashboardModule>
-        <DashboardModule class="mb-2" title="GFX" icon-class="fas fa-palette">
+        <DashboardModule class="mb-2" title="GFX" icon-class="fas fa-palette" v-if="broadcast?.gfx?.length">
             <GFXController :broadcast="broadcast" :client="client"/>
         </DashboardModule>
         <DashboardModule title="Bracket Implications" icon-class="fas fa-sitemap" class="broadcast-bracket-editor mb-2" v-if="bracketCount">

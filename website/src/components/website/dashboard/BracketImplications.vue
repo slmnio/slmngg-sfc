@@ -41,6 +41,7 @@ export default {
         },
         bracketImplications() {
             return this.bracketsIncludingMatch.filter(bracket => !bracket.hide_implications).map(bracket => {
+                if (!bracket?.bracket_layout) return null;
                 try {
                     const { connections } = JSON.parse(bracket.bracket_layout);
                     const thisMatchNumber = bracket.ordered_matches.findIndex(match => match.id === this.match.id);
@@ -63,7 +64,7 @@ export default {
                     console.error(e);
                     return null;
                 }
-            }).filter(s => s);
+            }).filter(Boolean);
         },
         matchWinner() {
             if (!(this.match.first_to && [this.match.score_1, this.match.score_2].some(s => s === this.match.first_to))) return null;

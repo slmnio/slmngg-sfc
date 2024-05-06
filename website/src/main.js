@@ -28,10 +28,10 @@ const app = createApp({
     render: () => h(GlobalApp),
     head: {
         // title: "SLMN.GG",
-        titleTemplate: (chunk) => chunk ? `${chunk} | SLMN.GG` : "SLMN.GG"
-        // link: [
-        //     { rel: "icon", href: "https://slmn.io/slmn-new.png" }
-        // ]
+        titleTemplate: (chunk) => chunk ? `${chunk} | SLMN.GG` : "SLMN.GG",
+        link: [
+            { rel: "icon", href: "/favicon.ico", key: "favicon" }
+        ]
     },
     data: () => ({
         interval: null,
@@ -62,15 +62,6 @@ const app = createApp({
 
         setInterval(() => this.$store.commit("executeRequestBuffer"), 100);
         setInterval(() => this.$store.commit("executeUpdateBuffer"), 50);
-
-        try {
-            if (localStorage.getItem("draft-notes")) {
-                const notes = JSON.parse(localStorage.getItem("draft-notes"));
-                this.$store.state.draft_notes = notes;
-            }
-        } catch (e) {
-            console.error("Draft notes local storage error", e);
-        }
 
         const auth = useAuthStore();
         if (auth.token) {
@@ -117,13 +108,6 @@ app.config.globalProperties.$notyf = new Notyf({
         y: "top"
     },
     dismissible: true
-});
-
-store.subscribe((mutation, state) => {
-    if (mutation.type === "setPlayerDraftNotes") {
-        // store to localstorage
-        localStorage.setItem("draft-notes", JSON.stringify(state.draft_notes));
-    }
 });
 
 app.component("v-style", {

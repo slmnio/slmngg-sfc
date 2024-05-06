@@ -7,7 +7,7 @@
               <router-link v-else class="ct-active" :to="`/client/${player.clients[0].key}/tally-viewer`"><i class="fas fa-tv" title="Tally"></i></router-link>
             </span>
         </span>
-            <span v-for="i in parseInt(commas)" :key="i" :style="{order: (i*2)-1}">, </span>
+            <span v-for="i in commas" :key="i" :style="{order: (i*2)-1}">, </span>
             <span v-if="and" :style="{order: (players.length - 1) * 2 - 1}"> & </span>
     </span>
     <span v-else>

@@ -66,7 +66,7 @@
                                 </div>
                                 <div class="form-bottom">
                                     <b-form-select class="no-choice" :options="getMapOptions(i)"
-                                                   :value="mapChoices[i] || null" @input="val => mapChoices[i] = val"/>
+                                                   v-model="mapChoices[i]"/>
                                 </div>
                             </td>
                             <td class="form-stack">

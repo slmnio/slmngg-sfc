@@ -89,7 +89,7 @@
                         <ContentThing class="team-display d-inline-flex" type="team" :text="team.name" :theme="team.theme" :show-logo="true" :thing="team" />
                         <div class="d-flex team-help-text flex-wrap align-items-center">
                             <div class="text money">{{ money(team.balance) }}</div>
-                            <div class="text player-count ml-2">({{ auctionSettings.each_team - (team.players?.length || 0) }} to draft)</div>
+                            <div class="text player-count ml-2">({{ auctionSettings?.each_team - (team.players?.length || 0) }} to draft)</div>
                         </div>
                     </div>
                     <div class="ml-2 badge badge-pill bg-secondary" v-if="lastStartedTeam?.id === team?.id">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>

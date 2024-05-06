@@ -13,12 +13,13 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { bg } from "@/utils/images";
+import { bg, getNewURL } from "@/utils/images";
 
 function mapCheck(map, search) {
     if (!map.name) return false;
     if (map.name.toLowerCase() === search) return true;
     if (map.name.indexOf(" ") !== -1 && map.name.split(" ")[0].toLowerCase() === search) return true;
+    if (map.name.toLowerCase().includes(search.toLowerCase())) return true;
 }
 
 export default {
@@ -72,7 +73,7 @@ export default {
         mapVideo(map) {
             const video = map?.video?.[0];
             if (!video) return null;
-            return video.url;
+            return getNewURL(video, "orig");
         }
     },
     head() {

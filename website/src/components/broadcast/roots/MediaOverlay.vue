@@ -1,6 +1,6 @@
 <template>
     <div class="media-overlay" style="height: 100vh; width: 100vw;">
-        <yt-player class="player" v-if="media" :videoid="videoId" :player-vars="playerVars" width="100%" height="100%"
+        <yt-player ref="youtube" class="player" v-if="media" :videoid="videoId" :player-vars="playerVars" width="100%" height="100%"
                    @ready="playerReady" @playing="playerPlaying" @ended="playerEnded" :class="{'black-out': ended }" />
     </div>
 </template>
@@ -66,19 +66,19 @@ export default {
             if (this.prepared) return;
             console.log("prep2, active:", this.animationActive);
 
-            this.player.pauseVideo();
-            this.player.setVolume(100);
-            this.player.unMute();
-            this.player.seekTo(0);
+            this.$refs.youtube.player.pauseVideo();
+            this.$refs.youtube.player.setVolume(100);
+            this.$refs.youtube.player.unMute();
+            this.$refs.youtube.player.seekTo(0);
 
-            this.player.addEventListener("timeupdate", (d) => {
+            this.$refs.youtube.player.addEventListener("timeupdate", (d) => {
                 console.log("timeupdate", { d });
             });
 
             this.prepared = true;
         },
         playerReady(e) {
-            this.player = e.target;
+            this.$refs.youtube.player = e.target;
             console.log("player ready", e);
             this.preparePlayer();
         },
@@ -91,10 +91,10 @@ export default {
         playerEnded() {
             this.ended = true;
         },
-        emitTimes() {
+        async emitTimes() {
             socket.emit("media_update", "time", {
-                duration: this.player.getDuration(),
-                current: this.player.getCurrentTime()
+                duration: await this.$refs.youtube?.player?.getDuration(),
+                current: await this.$refs.youtube?.player?.getCurrentTime()
             });
         }
     },
@@ -102,12 +102,12 @@ export default {
         videoId(newMedia) {
             this.prepared = false;
         },
-        animationActive(isActive) {
-            console.log("play media", this.player);
-            if (isActive && this.player) {
-                this.player.playVideo();
+        async animationActive(isActive) {
+            if (isActive && this.$refs.youtube.player) {
+                this.$refs.youtube.player.playVideo();
+                const remaining = await this.$refs.youtube?.player?.getDuration() - await this.$refs.youtube?.player?.getCurrentTime();
                 socket.emit("media_update", "playing", true);
-                socket.emit("media_update", "remaining", this.player.getDuration() - this.player.getCurrentTime());
+                socket.emit("media_update", "remaining", remaining);
             }
         },
         prepared(isPrepared) {

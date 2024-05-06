@@ -84,7 +84,7 @@ a:not(.link-text), a:not(.link-text):hover {
     color: var(--theme);
 }
 .dropdown-item.active, .dropdown-item:active {
-    background-color: var(--theme);
+    background-color: var(--blue);
 }
 .dropdown-item {
     text-transform: uppercase;
@@ -347,4 +347,7 @@ input.no-arrows[type=number] {
 }
 .btn-block {
     display: block;
+}
+.text-muted {
+    color: #6c757d !important;
 }

@@ -99,7 +99,7 @@
                     <BiddingWar :teams="biddingWar" :leading="leadingBid" :auction-settings="auctionSettings"/>
                 </div>
                 <AuctionLeaderboard :players="signedPlayers" :style="background" class="leaderboard w-100 h-100 flex-center" v-else-if="rightDisplay === 'leaderboard'" key="leaderboard" />
-                <AuctionTeamsOverview :auction-settings="auctionSettings" :v-else-if="rightDisplay === 'teams-overview'" key="teams-overview" :teams="teams"  :style="background"  />
+                <AuctionTeamsOverview :auction-settings="auctionSettings" v-else-if="rightDisplay === 'teams-overview'" key="teams-overview" :teams="teams"  :style="background"  />
             </transition>
         </div>
     </div>
@@ -149,7 +149,7 @@ export default {
             let totalSlots = 0;
             let drafted = 0;
             let slotsRemaining = 0;
-            const playersEachTeam = this.auctionSettings.each_team ?? 7;
+            const playersEachTeam = this.auctionSettings?.each_team ?? 7;
 
             (this.teams || []).forEach(team => {
                 totalSlots += playersEachTeam;

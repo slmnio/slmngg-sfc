@@ -1,6 +1,6 @@
 <template>
     <div class="branding-overlay w-100 h-100 position-absolute p-4">
-        <div class="row row-top mb-4" v-if="highlightTeam">
+        <div class="branding-row row-top mb-4 d-flex" v-if="highlightTeam">
             <div class="team-code">
                 <div class="industry-align">{{ highlightTeam.code }}</div>
             </div>
@@ -8,7 +8,7 @@
                 <div class="industry-align">{{ highlightTeam.name }}</div>
             </div>
         </div>
-        <div class="row flex-grow-1">
+        <div class="branding-row flex-grow-1">
             <div class="left w-75 px-2">
                 <div class="big-logo w-100 h-100 flex-center" :style="teamBG">
                     <transition name="fade" mode="out-in">
@@ -139,7 +139,8 @@ export default {
         display: flex;
         flex-direction: column;
     }
-    .row {
+    .branding-row {
+        display: flex;
         margin: 0;
     }
     .row-top {

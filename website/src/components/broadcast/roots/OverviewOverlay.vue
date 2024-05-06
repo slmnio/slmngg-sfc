@@ -4,17 +4,17 @@
             <DeskMatch class="desk-match w-100" :matchID="matchID" :_match="virtualMatch" :broadcast="useLiveDesk ? broadcast : null" />
         </div>
         <div class="part part-map-display flex-grow-1">
-            <MapDisplay :broadcast="broadcast" use-transitions="true" :virtual-match="virtualMatch" :no-map-videos="noMapVideos" />
+            <BroadcastMapDisplay :broadcast="broadcast" use-transitions="true" :virtual-match="virtualMatch" :no-map-videos="noMapVideos" />
         </div>
     </div>
 </template>
 
 <script>
-import MapDisplay from "@/components/broadcast/BroadcastMapDisplay";
+import BroadcastMapDisplay from "@/components/broadcast/BroadcastMapDisplay";
 import DeskMatch from "@/components/broadcast/desk/DeskMatch";
 export default {
     name: "OverviewOverlay",
-    components: { DeskMatch, MapDisplay },
+    components: { DeskMatch, BroadcastMapDisplay },
     props: ["broadcast", "virtualMatch", "noMapVideos", "useLiveDesk"],
     computed: {
         matchID() {

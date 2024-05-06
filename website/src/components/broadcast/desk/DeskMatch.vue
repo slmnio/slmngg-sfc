@@ -65,11 +65,11 @@
                                         :event="broadcast.event"/>
                     </div>
                     <div class="match-middle-maps flex-center" v-else-if="middleMode === 'Maps'" key="Maps">
-                        <MapDisplay :small="true" :broadcast="broadcast" no-map-videos="true"/>
+                        <BroadcastMapDisplay :small="true" :broadcast="broadcast" no-map-videos="true"/>
                     </div>
                     <div class="match-middle-drafted-maps flex-center" v-else-if="middleMode === 'Drafted Maps'"
                          key="Drafted Maps">
-                        <MapDisplay :small="true" :broadcast="broadcast" :drafted-style="true"/>
+                        <BroadcastMapDisplay :small="true" :broadcast="broadcast" :drafted-style="true"/>
                     </div>
                     <div class="match-middle-interview flex-center flex-column" v-else-if="middleMode === 'Interview'"
                          key="Interview">
@@ -94,7 +94,7 @@ import DeskTeamName from "@/components/broadcast/desk/DeskTeamName";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import DeskPrediction from "@/components/broadcast/desk/DeskPrediction";
-import MapDisplay from "@/components/broadcast/BroadcastMapDisplay";
+import BroadcastMapDisplay from "@/components/broadcast/BroadcastMapDisplay";
 import DeskInterview from "@/components/broadcast/desk/DeskInterview.vue";
 
 export default {
@@ -105,7 +105,7 @@ export default {
         DeskTeam,
         DeskNotice,
         DeskTeamName,
-        MapDisplay
+        BroadcastMapDisplay
     },
     props: ["_match", "themeColor", "matchID", "broadcast", "guests", "forceMode"],
     computed: {

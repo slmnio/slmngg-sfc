@@ -193,7 +193,7 @@ export default {
     head() {
         return {
             title: this.match.name,
-            link: [{ rel: "icon", href: resizedImageNoWrap(this.match?.event?.theme, ["small_logo", "default_logo"], "s-128") }]
+            link: [{ rel: "icon", key: "favicon", href: resizedImageNoWrap(this.match?.event?.theme, ["small_logo", "default_logo"], "s-128") }]
         };
     }
 };

@@ -41,7 +41,7 @@ export default {
                 { name: "og:description", content: "test description" },
                 { name: "og:title", content: this.team.name }
             ],
-            link: [{ rel: "icon", href: resizedImageNoWrap(this.team.theme, ["small_logo", "default_logo"], "s-128") }]
+            link: [{ rel: "icon", key: "favicon", href: resizedImageNoWrap(this.team.theme, ["small_logo", "default_logo"], "s-128") }]
         };
     },
     methods: {

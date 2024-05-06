@@ -52,6 +52,11 @@ export default {
                 return a.position - b.position;
             });
         }
+    },
+    head() {
+        return {
+            title: "Brands"
+        };
     }
 };
 </script>

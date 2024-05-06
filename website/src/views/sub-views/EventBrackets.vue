@@ -34,6 +34,11 @@ export default {
             })(this.event)).filter(e => !e?.hide_bracket);
             // return this.event.brackets;
         }
+    },
+    head() {
+        return {
+            title: "Brackets"
+        };
     }
 };
 </script>

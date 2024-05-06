@@ -50,13 +50,8 @@ export default {
     },
     head() {
         return {
-            title: this.event.name,
-            meta: [
-                { name: "description", content: "test description" },
-                { name: "og:description", content: "test description" },
-                { name: "og:title", content: this.event.name }
-            ],
-            link: [{ rel: "icon", href: resizedImageNoWrap(this.event.theme, ["small_logo", "default_logo"], "s-128") }]
+            titleTemplate: (chunk) => chunk ? `${chunk} | ${this.event.name} | SLMN.GG` : `${this.event.name} | SLMN.GG`,
+            link: [{ rel: "icon", href: resizedImageNoWrap(this.event.theme, ["small_logo", "default_logo"], "s-128"), key: "favicon" }]
         };
     },
     computed: {

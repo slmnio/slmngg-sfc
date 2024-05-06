@@ -439,7 +439,7 @@ export default {
     head() {
         return {
             title: this.match ? (this.match.custom_name || this.match.name) + " | Detailed view" : "Detailed match view",
-            link: [{ rel: "icon", href: resizedImageNoWrap(this._theme, ["small_logo", "default_logo"], "s-128") }]
+            link: [{ rel: "icon", key: "favicon", href: resizedImageNoWrap(this._theme, ["small_logo", "default_logo"], "s-128") }]
         };
     }
 };

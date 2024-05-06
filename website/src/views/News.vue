@@ -124,7 +124,7 @@ export default {
     head() {
         return {
             title: [this.news?.headline, this.connection?.name].filter(t => t).join(" | "),
-            link: [{ rel: "icon", href: resizedImageNoWrap(this.theme, ["small_logo", "default_logo"], "s-128") }]
+            link: [{ rel: "icon", key: "favicon", href: resizedImageNoWrap(this.theme, ["small_logo", "default_logo"], "s-128") }]
         };
     }
 };

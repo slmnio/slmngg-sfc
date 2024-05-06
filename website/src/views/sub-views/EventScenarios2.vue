@@ -41,7 +41,7 @@
         </div>
 
 
-        <table class="table-bordered text-light mb-3" v-if="counts && counts[0] && counts[0].positions">
+        <table class="table table-bordered text-light mb-3 table-dark w-auto" v-if="counts && counts[0] && counts[0].positions">
             <thead>
                 <tr v-if="counts" class="fw-bold">
                     <th class="p-2 border-dark text-end" style="min-width: 8.5em">
@@ -50,7 +50,7 @@
                     <th class="p-2 border-dark" v-for="(x, i) in (counts[0].positions).slice(0, -1)" :key="i">
                         #{{ i + 1 }}
                     </th>
-                    <th class="p-2 border-dark" v-b-tooltip:top="'Standings haven\'t converged into separate groups'">
+                    <th class="p-2 border-dark">
                         Incomplete
                     </th>
                 </tr>
@@ -69,7 +69,7 @@
             </tbody>
         </table>
 
-        <table class="table-bordered text-light mb-3 border-dark" v-if="scenarios">
+        <table class="table table-bordered text-light mb-3 border-dark table-dark w-auto" v-if="scenarios">
             <thead>
                 <tr>
                     <th class="p-2 border-dark"></th>
@@ -95,7 +95,7 @@
             </tbody>
         </table>
 
-        <table class="table text-white" v-if="scenarios">
+        <table class="table text-white table-dark" v-if="scenarios">
             <thead>
                 <tr class="sticky-top bg-dark">
                     <td>#</td>
@@ -398,7 +398,7 @@ export default {
             return Object.values(matchMap);
         },
         matchGroupData() {
-            return (this.blocks?.standings || [])?.find(s => [s.group, s.key, s.title].map(e => e.toLowerCase()).includes(this.activeMatchGroup.toLowerCase()));
+            return (this.blocks?.standings || [])?.find(s => [s.group, s.key, s.title].map(e => e?.toLowerCase()).includes(this.activeMatchGroup?.toLowerCase()));
         },
         sortingMethods() {
             try {
@@ -427,8 +427,9 @@ export default {
             const scenarios = [];
 
 
-            if (scenarioCount > 2 ** 12) {
-                console.warn({ error: "too many computations required", scenarioCount });
+            const scenarioMax = 2 ** 13;
+            if (scenarioCount > scenarioMax) {
+                console.warn({ error: "too many computations required", scenarioCount, max: scenarioMax });
                 return [];
             }
 
@@ -706,7 +707,7 @@ export default {
             const leftScores = scorelines.slice(0, (scorelines.length / 2));
             const rightScores = scorelines.slice((scorelines.length / 2), scorelines.length);
 
-            console.log("analysis", { scorelines, leftScores, rightScores });
+            // console.log("analysis", { scorelines, leftScores, rightScores });
             if (scorelines.every(([scoreline, count]) => count === scorelines[0][1])) {
                 // All the same
                 return "No effect";

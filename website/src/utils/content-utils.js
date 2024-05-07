@@ -17,12 +17,12 @@ import oddball from "@/assets/default-map-images/oddball.png";
 import flashpoint from "@/assets/default-map-images/flashpoint.png";
 import clash from "@/assets/default-map-images/clash.png";
 
-import hybridIcon from "@/assets/map-type-icons/hybrid.png";
-import escortIcon from "@/assets/map-type-icons/escort.png";
-import controlIcon from "@/assets/map-type-icons/control.png";
-import pushIcon from "@/assets/map-type-icons/push.png";
-import assaultIcon from "@/assets/map-type-icons/assault.png";
-import flashpointIcon from "@/assets/map-type-icons/flashpoint.png";
+import hybridIcon from "@/assets/map-type-icons/hybrid.svg";
+import escortIcon from "@/assets/map-type-icons/escort.svg";
+import controlIcon from "@/assets/map-type-icons/control.svg";
+import pushIcon from "@/assets/map-type-icons/push.svg";
+import assaultIcon from "@/assets/map-type-icons/assault.svg";
+import flashpointIcon from "@/assets/map-type-icons/flashpoint.svg";
 import clashIcon from "@/assets/map-type-icons/clash.png";
 
 export function getImage (i) {

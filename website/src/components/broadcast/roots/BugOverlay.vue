@@ -1,7 +1,17 @@
 <template>
     <div class="bug-overlay">
         <div class="bug-holder" :style="broadcastMargin">
-            <ThemeTransition :theme="theme" :active="animationActive" start="right" end="right" :border-width="6" border="right" :duration="400" :inner-delay="200" use-fit-content :starting-delay="250">
+            <ThemeTransition
+                :theme="theme"
+                :active="animationActive"
+                start="right"
+                end="right"
+                :border-width="6"
+                border="right"
+                :duration="400"
+                :inner-delay="200"
+                use-fit-content
+                :starting-delay="250">
                 <div class="bug" :class="{'small': small}">
                     <div class="bug-logo bg-center" :style="eventLogo"></div>
                     <div class="bug-text" :class="{'has-br': title.includes('\\n')}">
@@ -13,8 +23,6 @@
     </div>
 </template>
 <script>
-import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { logoBackground } from "@/utils/theme-styles";
 import { resizedImage } from "@/utils/images";
 import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
 
@@ -23,17 +31,8 @@ export default {
     components: { ThemeTransition },
     props: ["broadcast", "title", "animationActive", "small"],
     computed: {
-        highlightTeam() {
-            if (!this.broadcast?.highlight_team?.length) return null;
-            return ReactiveRoot(this.broadcast.highlight_team[0], {
-                theme: ReactiveThing("theme")
-            });
-        },
         theme() {
             return this.broadcast.event?.theme;
-        },
-        teamBG() {
-            return logoBackground(this.theme);
         },
         eventLogo() {
             if (!this.broadcast?.event?.theme) return {};

@@ -1,16 +1,16 @@
 <template>
     <div class="desk-interview d-flex">
-        <div class="solo-team-theme team-theme h-100 flex-center flex-column" v-if="soloTeamTheme">
+        <div v-if="soloTeamTheme" class="solo-team-theme team-theme h-100 flex-center flex-column">
             <div class="team-logo-holder flex-center" :style="bg(soloTeamTheme)">
                 <div class="team-logo bg-center" :style="logo(soloTeamTheme)"></div>
             </div>
-            <div class="solo-team-name font-weight-bold" v-if="soloTeamTheme.team?.name">
+            <div v-if="soloTeamTheme.team?.name" class="solo-team-name fw-bold">
                 {{ soloTeamTheme.team?.name }}
             </div>
         </div>
         <div class="guests d-flex">
-            <div class="guest flex-center" v-for="guest in interviewGuests" :key="guest.id">
-                <div class="guest-team team-theme" v-if="!soloTeamTheme && guest.theme?.team?.name">
+            <div v-for="guest in interviewGuests" :key="guest.id" class="guest flex-center">
+                <div v-if="!soloTeamTheme && guest.theme?.team?.name" class="guest-team team-theme">
                     <div class="team-logo-holder flex-center" :style="bg(guest.theme)">
                         <div class="team-logo bg-center" :style="logo(guest.theme)"></div>
                     </div>
@@ -18,7 +18,7 @@
                 <div class="guest-text flex-center flex-column">
                     <div class="guest-name">{{ guest.name || guest.player?.name }}</div>
                     <div class="guest-pronouns">{{ guest.player?.pronouns || guest.subtitle }}</div>
-                    <div class="guest-team-name" v-if="!soloTeamTheme && guest.theme?.team?.name">
+                    <div v-if="!soloTeamTheme && guest.theme?.team?.name" class="guest-team-name">
                         {{ guest.theme.team.name }}
                     </div>
                 </div>

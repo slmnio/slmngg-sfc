@@ -1,14 +1,14 @@
 <template>
     <SoloControlButton class="map-button" :click="() => click()" :style="bg" :noclick="noclick">
-        <div class="top flex-center" v-if="topText">
+        <div v-if="topText" class="top flex-center">
             <div class="text top-text">{{ topText }}</div>
         </div>
 
-        <div class="selection-box" v-if="!noclick">
+        <div v-if="!noclick" class="selection-box">
             <div class="box empty" :class="{'active': !current}">
                 No winner
             </div>
-            <div class="box team" v-for="(team, i) in teams" :key="team?.id" :class="{'active': current === `team-${i+1}`}">
+            <div v-for="(team, i) in teams" :key="team?.id" class="box team" :class="{'active': current === `team-${i+1}`}">
                 <div class="team-code w-100" :style="themeBackground1(team)">{{ team?.code }}</div>
             </div>
             <div class="box draw" :class="{'active': current === 'draw'}">
@@ -25,7 +25,6 @@ import { themeBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "SoloMapToggleButton",
-    methods: { themeBackground1 },
     components: { SoloControlButton },
     props: ["map", "click", "topText", "noclick", "current", "teams"],
     computed: {
@@ -37,7 +36,8 @@ export default {
         text() {
             return this.current;
         }
-    }
+    },
+    methods: { themeBackground1 }
 };
 </script>
 
@@ -51,7 +51,7 @@ export default {
         padding-bottom: 15px;
         position: relative;
     }
-    .map-button >>> div.text {
+    .map-button:deep(div.text) {
         background-color: rgba(0,0,0,0.8);
         padding: 3px 8px;
     }

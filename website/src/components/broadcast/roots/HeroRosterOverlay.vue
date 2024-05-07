@@ -1,17 +1,28 @@
 <template>
-    <GenericOverlay class="hero-roster-overlay" :title="title || (team && team.name) || 'Roster'" :title-style="titleStyle" :custom-theme="team && team.theme" :accent-color="team && team.theme && team.theme.color_theme">
+    <GenericOverlay
+        class="hero-roster-overlay"
+        :title="title || (team && team.name) || 'Roster'"
+        :title-style="titleStyle"
+        :custom-theme="team && team.theme"
+        :accent-color="team && team.theme && team.theme.color_theme">
         <div class="flex-center h-100 w-100 flex-column">
             <div class="players h-100 d-flex flex-center">
-                <div class="player h-100" v-for="(player, i) in players" :key="player.id" :class="{'has-role-icon': showRoles}" :data-image-width="widths[i]" :style="{flexGrow: widths[i], zIndex: animationActive ? Math.max(...widths) - widths[i] : 1}">
-                    <RecoloredHero @recolor_width="(w) => handleWidth(i, w)" class="h-100" :hero="player.favourite_hero" :theme="team.theme"></RecoloredHero>
+                <div
+                    v-for="(player, i) in players"
+                    :key="player.id"
+                    class="player h-100"
+                    :class="{'has-role-icon': showRoles}"
+                    :data-image-width="widths[i]"
+                    :style="{flexGrow: widths[i], zIndex: animationActive ? Math.max(...widths) - widths[i] : 1}">
+                    <RecoloredHero class="h-100" :hero="player.favourite_hero" :theme="team.theme" @recolor_width="(w) => handleWidth(i, w)" />
                 </div>
             </div>
             <div class="player-names flex-center w-100 mt-4 justify-content-around" :class="{'has-role-icon': showRoles}">
-                <div class="player-name-holder" v-for="player in players" :key="player.id">
+                <div v-for="player in players" :key="player.id" class="player-name-holder">
                     <div class="player-name flex-center text-center">
                         <span class="player-name-internal">{{ player.name }}</span>
                         <span v-if="showRoles" class="player-role" v-html="getRoleSVG(player.role)"></span>
-                        <span :style="themeBackground1(team)" v-if="showPronouns" class="player-pronouns">{{ player.pronouns }}</span>
+                        <span v-if="showPronouns" :style="themeBackground1(team)" class="player-pronouns">{{ player.pronouns }}</span>
                     </div>
                 </div>
             </div>
@@ -25,17 +36,18 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import { themeBackground1 } from "@/utils/theme-styles";
 import { getRoleSVG } from "@/utils/content-utils";
+import { useStatusStore } from "@/stores/statusStore";
 
 export default {
     name: "HeroRosterOverlay",
-    props: ["broadcast", "title", "playerCount", "teamNum", "showRoles", "showPronouns", "active", "animationActive"],
     components: { RecoloredHero, GenericOverlay },
+    props: ["broadcast", "title", "playerCount", "teamNum", "showRoles", "showPronouns", "active", "animationActive"],
     data: () => ({
         widths: []
     }),
     computed: {
         match() {
-            if (!this.broadcast || !this.broadcast.live_match) return null;
+            if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
@@ -89,7 +101,7 @@ export default {
         },
         handleWidth(i, w) {
             // console.log("width of index", i, w);
-            this.$set(this.widths, i, w);
+            this.widths[i] = w;
         },
         themeBackground1,
         getRoleSVG
@@ -98,8 +110,7 @@ export default {
         team: {
             deep: true,
             handler(team) {
-                console.log("team change", this.$parent);
-                this.$parent.updateTheme(team?.theme);
+                useStatusStore().customStingerTheme = team?.theme;
                 // this.$emit("stinger_theme_change", team.theme);
             }
         },
@@ -110,7 +121,7 @@ export default {
             console.log("animation active", a);
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Hero Roster #${this.teamNum || 1} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -119,7 +130,7 @@ export default {
 </script>
 
 <style scoped>
-    .player >>> .color-holder {
+    .player:deep(.color-holder) {
         height: 100%;
         --over: 350%;
         width: calc(100% + var(--over));
@@ -135,12 +146,12 @@ export default {
         width: 100%;
     }
 
-    .player >>> .color-holder div,
-    .player >>> .color-holder canvas {
+    .player:deep(.color-holder div),
+    .player:deep(.color-holder canvas) {
         object-fit: contain !important;
     }
 
-    .player >>> .hero-image-base {
+    .player:deep(.hero-image-base) {
         background-size: contain !important;
     }
 
@@ -156,7 +167,7 @@ export default {
         font-size: 2em;
     }
 
-    .hero-roster-overlay >>> .g-body {
+    .hero-roster-overlay:deep(.g-body) {
         overflow: hidden;
         color: white;
     }

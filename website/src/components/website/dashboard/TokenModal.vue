@@ -1,5 +1,10 @@
 <template>
-    <b-modal hide-footer id="token-modal" title="SLMN.gg Token" ref="modal" @show="reset()">
+    <b-modal
+        id="token-modal"
+        ref="modal"
+        hide-footer
+        title="SLMN.gg Token"
+        @show="reset()">
         <p>Your <b>SLMN.GG token</b> is used to identify you and perform requests on the site.</p>
         <p>You can use the token in our Companion module to make full use of the buttons.</p>
 
@@ -10,25 +15,33 @@
             I will keep my token safe
         </b-form-checkbox>
 
-        <b-button v-if="token" class="mt-3" @click="copyToken" :disabled="!hasAccepted">
-            <i :class="`fas fa-fw ${recentlyCopied ? 'fa-clipboard-check' : 'fa-copy'}`"></i> Copy token
-        </b-button>
-        <p class="mt-3" v-else>
-            <i class="fas fa-exclamation-triangle mr-2"></i> You are not logged in.
-        </p>
-
-
+        <div class="buttons d-flex mt-3 gap-2">
+            <b-button v-if="token" :disabled="!hasAccepted" variant="primary" @click="copyToken">
+                <i :class="`fas fa-fw ${recentlyCopied ? 'fa-clipboard-check' : 'fa-copy'}`"></i> Copy token
+            </b-button>
+            <p v-else>
+                <i class="fas fa-exclamation-triangle mr-2"></i> You are not logged in.
+            </p>
+            <b-button
+                v-b-modal.token-modal
+                href="http://localhost:8000/connections"
+                variant="dark"
+                class="text-white"
+                target="_blank">
+                <i class="fas fa-computer-speaker mr-2"></i>
+                Companion
+                <i class="ml-2 fas fa-external-link"></i>
+            </b-button>
+        </div>
     </b-modal>
 </template>
 
-
 <script>
-import { BButton, BModal, VBModal, BFormCheckbox } from "bootstrap-vue";
+import { mapState } from "pinia";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "TokenModal",
-    components: { BModal, BButton, BFormCheckbox },
-    directives: { BModal: VBModal },
     props: {
         broadcast: Object
     },
@@ -37,9 +50,7 @@ export default {
         recentlyCopied: false
     }),
     computed: {
-        token() {
-            return this.$root.auth.token;
-        }
+        ...mapState(useAuthStore, ["token"])
     },
     methods: {
         reset() {
@@ -50,11 +61,15 @@ export default {
             navigator.clipboard.writeText(this.token);
             this.recentlyCopied = true;
             setTimeout(() => {
-                this.$refs.modal?.hide();
+                this.recentlyCopied = false;
             }, 500);
         }
     }
 };
 
 </script>
-
+<style scoped>
+    .buttons {
+        justify-content: space-between;
+    }
+</style>

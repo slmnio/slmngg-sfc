@@ -1,20 +1,20 @@
 <template>
     <div class="versus-overlay d-flex flex-column">
         <transition name="fly-down">
-            <div class="top-logo-holder flex-center" v-if="animationActive">
+            <div v-if="animationActive" class="top-logo-holder flex-center">
                 <div class="logo bg-center" :style="eventLogo"></div>
             </div>
         </transition>
         <transition name="fly-sides">
-            <div class="versus-block-holder flex-center" v-if="animationActive">
-                <div class="team" v-for="team in teams" :key="team.id" :style="getTeamStyle(team)">
+            <div v-if="animationActive" class="versus-block-holder flex-center">
+                <div v-for="team in teams" :key="team.id" class="team" :style="getTeamStyle(team)">
                     <div class="team-logo bg-center" :style="getTeamLogo(team)"></div>
                     <div class="team-text-box">
                         <div class="team-text">{{ team.name }}</div>
                     </div>
                 </div>
                 <transition name="slide-out">
-                    <div class="vs slant" v-if="animationActive">
+                    <div v-if="animationActive" class="vs slant">
                         <div class="reverse-slant">{{ versusText }}</div>
                     </div>
                 </transition>
@@ -154,7 +154,7 @@ export default {
     .fly-down-enter-active {
         transition: 1s ease;
     }
-    .fly-down-enter,
+    .fly-down-enter-from,
     .fly-down-leave-to {
         transform: translate(0, -232px);
     }

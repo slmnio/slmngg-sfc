@@ -1,4 +1,3 @@
-const fetch = require("node-fetch");
 const { updateRecord,
     createRecord
 } = require("./action-utils/action-utils");
@@ -21,7 +20,7 @@ function niceJoin(array) {
     return array[0];
 }
 
-module.exports = ({ app, cors, Cache, io }) => {
+module.exports = ({ app, Cache, io }) => {
     app.get("/redirect", async (req, res) => {
         try {
             let redirects = await Promise.all(((await Cache.get("Redirects"))?.ids || []).map(id => Cache.get(id)));
@@ -142,7 +141,7 @@ module.exports = ({ app, cors, Cache, io }) => {
         if (!broadcast.event) return { "error": true, "message": "No event is linked to this stream." };
         let event = await Cache.get(cleanID(broadcast.event[0]));
 
-        let url = "";
+        let url;
 
         if (event.subdomain) {
             url = `https://${event.subdomain}.slmn.gg/`;

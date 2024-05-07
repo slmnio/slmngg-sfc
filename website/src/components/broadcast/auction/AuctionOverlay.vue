@@ -23,34 +23,46 @@
                 <div class="player-info-holder w-100 flex-center flex-column position-relative">
                     <AuctionCountdown v-if="player" />
                     <transition name="color-block-fade">
-                        <div class="color-block" v-if="blockColorCSS" :style="blockColorCSS"></div>
+                        <div v-if="blockColorCSS" class="color-block" :style="blockColorCSS"></div>
                     </transition>
                     <transition name="fade-right">
-                        <RecoloredHero v-if="!showCaptainInfo && player && player.favourite_hero" :theme="heroColor" :hero="player.favourite_hero"></RecoloredHero>
+                        <RecoloredHero v-if="!showCaptainInfo && player && player.favourite_hero" :theme="heroColor" :hero="player.favourite_hero" />
                     </transition>
                     <transition name="fade-right">
-                        <div class="player-info" v-if="player">
+                        <div v-if="player" class="player-info">
                             <div class="player-name">{{ player.name }}</div>
                             <div class="player-extras">
-                                <div class="player-role" v-if="player.role && !player.eligible_roles" v-html="getRoleSVG(player.role)"></div>
+                                <div v-if="player.role && !player.eligible_roles" class="player-role" v-html="getRoleSVG(player.role)"></div>
                                 <div class="player-eligible-roles d-flex">
-                                    <div class="role" v-for="role in playerRoles(player?.eligible_roles)" :class="{'ineligible': !role.eligible, 'eligible': role.eligible, 'primary': role.role === player.role}"
-                                         :key="role?.role" v-html="getRoleSVG(role?.role)"></div>
+                                    <div
+                                        v-for="role in playerRoles(player?.eligible_roles)"
+                                        :key="role?.role"
+                                        class="role"
+                                        :class="{'ineligible': !role.eligible, 'eligible': role.eligible, 'primary': role.role === player.role}"
+                                        v-html="getRoleSVG(role?.role)"></div>
                                 </div>
-                                <div class="accolades" v-if="accolades.length">
-                                    <ContentThing :thing="accolade" type="event" :link-to="accolade.event"
-                                                  :theme="accolade.event && accolade.event.theme"
-                                                  v-for="accolade in accolades"
-                                                  :key="accolade.id" :show-logo="true" :text="accolade.player_text"/>
+                                <div v-if="accolades.length" class="accolades">
+                                    <ContentThing
+                                        v-for="accolade in accolades"
+                                        :key="accolade.id"
+                                        :thing="accolade"
+                                        type="event"
+                                        :link-to="accolade.event"
+                                        :theme="accolade.event && accolade.event.theme"
+                                        :show-logo="true"
+                                        :text="accolade.player_text" />
                                 </div>
-                                <div class="player-captain-info" v-if="showCaptainInfo">
+                                <div v-if="showCaptainInfo" class="player-captain-info">
                                     {{ player.pronouns }}
                                     <br>
                                     {{ player.draft_data }}
                                 </div>
-                                <div class="player-teams d-flex flex-wrap flex-center" v-for="group in groupedTeams"
-                                     :key="group.group" :class="`group-${group.group}`">
-                                    <PlayerTeamDisplay :team="team" v-for="team in group.teams" :key="team.id"/>
+                                <div
+                                    v-for="group in groupedTeams"
+                                    :key="group.group"
+                                    class="player-teams d-flex flex-wrap flex-center"
+                                    :class="`group-${group.group}`">
+                                    <PlayerTeamDisplay v-for="team in group.teams" :key="team.id" :team="team" />
                                 </div>
                             </div>
                         </div>
@@ -58,8 +70,11 @@
                 </div>
                 <div class="bids flex-column-reverse d-flex justify-content-end" :class="{ 'has-bids': (player || bids.length) }">
                     <transition-group name="fade-down">
-                        <div class="bid d-flex align-content-center" v-for="(bid, i) in bids" :key="i"
-                             :style="getTheme(bid.teamID)">
+                        <div
+                            v-for="(bid, i) in bids"
+                            :key="i"
+                            class="bid d-flex align-content-center"
+                            :style="getTheme(bid.teamID)">
                             <div class="team-logo flex-center">
                                 <div class="logo-inner bg-center" :style="getLogo(bid.teamID)"></div>
                             </div>
@@ -68,44 +83,63 @@
                     </transition-group>
                 </div>
             </div>
-<!--            <div class="left-bottom flex-center">bottom</div>-->
+            <!--            <div class="left-bottom flex-center">bottom</div>-->
         </div>
         <div class="right flex-shrink-0 flex-center" :class="{'all-teams': wideRight}">
-<!--            <div class="team-list-holder" v-if="['teams', 'teams-1', 'teams-2'].includes(rightDisplay)" :key="rightDisplay">-->
-<!--                <transition-group tag="div" name="move" class="team-lists">-->
-<!--                    <TeamPlayerList v-for="team in displayTeams" :team="team" :key="team.id" :leading="leadingBid" :auction-settings="auctionSettings" />-->
-<!--                </transition-group>-->
-<!--            </div>-->
-<!--            <div class="team-lists" v-if="['teams', 'teams-1', 'teams-2'].includes(rightDisplay)">-->
-<!--                <TeamPlayerList v-for="team in displayTeams" :team="team" :key="team.id" :leading="leadingBid" :auction-settings="auctionSettings" />-->
-<!--            </div>-->
+            <!--            <div class="team-list-holder" v-if="['teams', 'teams-1', 'teams-2'].includes(rightDisplay)" :key="rightDisplay">-->
+            <!--                <transition-group tag="div" name="move" class="team-lists">-->
+            <!--                    <TeamPlayerList v-for="team in displayTeams" :team="team" :key="team.id" :leading="leadingBid" :auction-settings="auctionSettings" />-->
+            <!--                </transition-group>-->
+            <!--            </div>-->
+            <!--            <div class="team-lists" v-if="['teams', 'teams-1', 'teams-2'].includes(rightDisplay)">-->
+            <!--                <TeamPlayerList v-for="team in displayTeams" :team="team" :key="team.id" :leading="leadingBid" :auction-settings="auctionSettings" />-->
+            <!--            </div>-->
             <transition name="fade-left" mode="out-in">
-                <transition-group  :style="background" tag="div" v-if="['teams-1', 'teams-2', 'teams'].includes(rightDisplay)" name="move" class="team-rows-holder">
-                    <div class="team-row" v-for="row in displayTeamRows" :key="row.i">
-                        <TeamPlayerList v-for="team in row.teams" :team="team" :key="team.id"
-                                        :auction-settings="auctionSettings"></TeamPlayerList>
+                <transition-group
+                    v-if="rightDisplay === 'teams-1' || rightDisplay === 'teams-2' || rightDisplay === 'teams'"
+                    :style="background"
+                    tag="div"
+                    name="move"
+                    class="team-rows-holder">
+                    <div v-for="row in displayTeamRows" :key="row.i" class="team-row">
+                        <TeamPlayerList
+                            v-for="team in row.teams"
+                            :key="team.id"
+                            :team="team"
+                            :auction-settings="auctionSettings" />
                     </div>
                 </transition-group>
-                <div :style="background" class="team-focus h-100" v-if="rightDisplay === 'sign-focus'" key="signed-focus">
-                    <SignedTeamList :team="signedTeam" :amount="signAmount" :signedPlayer="socketPlayerID" :auction-settings="auctionSettings" />
+                <div v-else-if="rightDisplay === 'sign-focus'" key="signed-focus" :style="background" class="team-focus h-100">
+                    <SignedTeamList :team="signedTeam" :amount="signAmount" :signed-player="socketPlayerID" :auction-settings="auctionSettings" />
                 </div>
-                <div :style="background" class="bid-focus flex-center h-100 w-100" v-if="rightDisplay === 'bid-focus'" key="bid-focus">
+                <div v-else-if="rightDisplay === 'bid-focus'" key="bid-focus" :style="background" class="bid-focus flex-center h-100 w-100">
                     <BidFocus :teams="teams" :bids="bids" :auction-settings="auctionSettings" />
                 </div>
-                <div :style="background" class="team-focus" v-if="rightDisplay === 'team-focus'" key="team-focus">
+                <div v-else-if="rightDisplay === 'team-focus'" key="team-focus" :style="background" class="team-focus">
                     <TeamFocus :team="highlightedTeam" :auction-settings="auctionSettings" />
                 </div>
-                <div :style="background" class="bidding-war" v-if="rightDisplay === 'bidding-war'" key="bidding-war">
-                    <BiddingWar :teams="biddingWar" :leading="leadingBid" :auction-settings="auctionSettings"/>
+                <div v-else-if="rightDisplay === 'bidding-war'" key="bidding-war" :style="background" class="bidding-war">
+                    <BiddingWar :teams="biddingWar" :leading="leadingBid" :auction-settings="auctionSettings" />
                 </div>
-                <AuctionLeaderboard :players="signedPlayers" :style="background" class="leaderboard w-100 h-100 flex-center" v-if="rightDisplay === 'leaderboard'" key="leaderboard" />
-                <AuctionTeamsOverview :auction-settings="auctionSettings" :v-if="rightDisplay === 'teams-overview'" key="teams-overview" :teams="teams"  :style="background"  />
+                <AuctionLeaderboard
+                    v-else-if="rightDisplay === 'leaderboard'"
+                    key="leaderboard"
+                    :players="signedPlayers"
+                    :style="background"
+                    class="leaderboard w-100 h-100 flex-center" />
+                <AuctionTeamsOverview
+                    v-else-if="rightDisplay === 'teams-overview'"
+                    key="teams-overview"
+                    :auction-settings="auctionSettings"
+                    :teams="teams"
+                    :style="background" />
             </transition>
         </div>
     </div>
 </template>
 
 <script>
+import { socket } from "@/socket";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import TeamPlayerList from "./TeamPlayerList";
 import { cleanID, getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
@@ -125,8 +159,8 @@ import AuctionTeamsOverview from "@/components/broadcast/auction/AuctionTeamsOve
 
 export default {
     name: "AuctionOverlay",
-    props: ["broadcast", "category", "title", "showCaptainInfo"],
     components: { AuctionTeamsOverview, AuctionLeaderboard, RecoloredHero, TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar, AuctionCountdown, ContentThing },
+    props: ["broadcast", "category", "title", "showCaptainInfo"],
     data: () => ({
         tick: 0,
         socketPlayer: null,
@@ -148,7 +182,7 @@ export default {
             let totalSlots = 0;
             let drafted = 0;
             let slotsRemaining = 0;
-            const playersEachTeam = this.auctionSettings.each_team ?? 7;
+            const playersEachTeam = this.auctionSettings?.each_team ?? 7;
 
             (this.teams || []).forEach(team => {
                 totalSlots += playersEachTeam;
@@ -266,8 +300,7 @@ export default {
         playerTeams() {
             if (!this.player?.member_of) return [];
             return this.player.member_of.filter(t => {
-                if (!t) return;
-                if (!t.event) return;
+                if (!t?.event) return false;
                 if (t.minor_team) return false;
                 if (!t.ranking_sort) return false;
                 return true;
@@ -466,23 +499,6 @@ export default {
             return this.teams.find(t => t.id === this.justSignedTeamID);
         }
     },
-    watch: {
-        broadcastPlayerID() {
-            if (!this.socketPlayer) return;
-            if (this.broadcastPlayerID !== null && this.broadcastPlayerID === this.socketPlayer.id) {
-                this.socketPlayer = null;
-            }
-        },
-        eventID: {
-            immediate: true,
-            handler(eventID) {
-                console.log("eventID", eventID, this._broadcast);
-                if (!eventID) return;
-                console.log("Socket client subscribing", `auction:${eventID}`);
-                this.sendToAuctionServer("auction:subscribe");
-            }
-        }
-    },
     methods: {
         themeBackground1,
         money,
@@ -496,7 +512,7 @@ export default {
         },
         sendToAuctionServer(event, data) {
             console.log("[socket]", "sending", event, data);
-            this.$socket.client.emit(event, {
+            socket.emit(event, {
                 auctionID: this.eventID,
                 ...data
             });
@@ -516,13 +532,22 @@ export default {
             return output;
         }
     },
-    mounted() {
-        this.$socket.client.emit("subscribe", "auction");
-
-        setInterval(() => {
-            this.tick++;
-            // if (this.tick >= 4) this.tick = 0;
-        }, 6000);
+    watch: {
+        broadcastPlayerID() {
+            if (!this.socketPlayer) return;
+            if (this.broadcastPlayerID !== null && this.broadcastPlayerID === this.socketPlayer.id) {
+                this.socketPlayer = null;
+            }
+        },
+        eventID: {
+            immediate: true,
+            handler(eventID) {
+                console.log("eventID", eventID, this._broadcast);
+                if (!eventID) return;
+                console.log("Socket client subscribing", `auction:${eventID}`);
+                this.sendToAuctionServer("auction:subscribe");
+            }
+        }
     },
     sockets: {
         auction_welcome({ auctionID, ready, state, activePlayerID }) {
@@ -592,7 +617,15 @@ export default {
             this.stats = stats;
         }
     },
-    metaInfo() {
+    mounted() {
+        socket.emit("subscribe", "auction");
+
+        setInterval(() => {
+            this.tick++;
+            // if (this.tick >= 4) this.tick = 0;
+        }, 6000);
+    },
+    head() {
         return {
             title: `Auction ${this.category || ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -702,10 +735,10 @@ export default {
     .scroll-enter-active, .scroll-leave-active {
         transition: all 500ms ease;
     }
-    .scroll-enter { transform: translate(0%, 100%) }
+    .scroll-enter-from { transform: translate(0%, 100%) }
     .scroll-leave-to { transform: translate(0%, -100%) }
     .scroll-enter-to,
-    .scroll-leave {
+    .scroll-leave-from {
         transform: translate(0,0)
     }
 
@@ -713,7 +746,7 @@ export default {
     .fade-scroll-enter-active, .fade-scroll-leave-active {
         transition: all 500ms ease;
     }
-    .fade-scroll-enter {
+    .fade-scroll-enter-from {
         opacity: 0;
         transform: translate(0, 30px)
     }
@@ -722,7 +755,7 @@ export default {
         transform: translate(0, -30px)
     }
     .fade-scroll-enter-to,
-    .fade-scroll-leave {
+    .fade-scroll-leave-from {
         transform: translate(0, 0%)
     }
 
@@ -750,7 +783,7 @@ export default {
     /*.move-leave-active:nth-of-type(2) {*/
     /*    right: 0;*/
     /*}*/
-    .move-enter {
+    .move-enter-from {
         transform: translate(0, 105%);
     }
     .team-list-holder, .team-rows-holder {
@@ -783,7 +816,7 @@ export default {
     .fade-right-leave-active {
         transition: opacity 500ms ease, transform 500ms ease;
     }
-    .fade-right-enter, .fade-right-leave-to {
+    .fade-right-enter-from, .fade-right-leave-to {
         transform: translate(-100%, 0);
         opacity: 0;
     }
@@ -792,7 +825,7 @@ export default {
     .fade-left-leave-active {
         transition: opacity 500ms ease, transform 500ms ease;
     }
-    .fade-left-enter, .fade-left-leave-to {
+    .fade-left-enter-from, .fade-left-leave-to {
         transform: translate(100%, 0);
         opacity: 0;
     }
@@ -800,7 +833,7 @@ export default {
     .fade-up-leave-active {
         transition: opacity 500ms ease, transform 500ms ease;
     }
-    .fade-up-enter, .fade-up-leave-to {
+    .fade-up-enter-from, .fade-up-leave-to {
         transform: translate(0, 100%);
         opacity: 0;
     }
@@ -808,11 +841,11 @@ export default {
     .fade-down-leave-active {
         transition: opacity 500ms ease, transform 500ms ease;
     }
-    .fade-down-enter, .fade-down-leave-to {
+    .fade-down-enter-from, .fade-down-leave-to {
         transform: translate(0, -100%);
         opacity: 0;
     }
-    .fade-down-leave, .fade-down-enter-to {
+    .fade-down-leave-from, .fade-down-enter-to {
         transform: translate(0, 0);
         opacity: 1;
     }
@@ -914,8 +947,8 @@ export default {
         opacity: 0.5;
     }
     .color-block-fade-enter-active, .color-block-fade-leave-active { transition: opacity 750ms ease; }
-    .color-block-fade-enter, .color-block-fade-leave-to { opacity: 0; }
-    .color-block-fade-enter-to, .color-block-fade-leave { opacity: 0.5; }
+    .color-block-fade-enter-from, .color-block-fade-leave-to { opacity: 0; }
+    .color-block-fade-enter-to, .color-block-fade-leave-from { opacity: 0.5; }
 
 
     .player-extras {

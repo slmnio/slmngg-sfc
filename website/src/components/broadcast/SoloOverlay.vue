@@ -3,97 +3,132 @@
         <div class="solo-part solo--ingame">
             <div class="solo-pixel-info">200px</div>
             <transition-group name="fade" mode="out-in">
-                <IngameTeam :key="`${team.name}-${i}`" v-for="(team, i) in teams" :color-logo-holder="colorLogoHolder"
-                            :team="team" :right="i === 1" :score="scores[i]" :active="true"/>
+                <IngameTeam
+                    v-for="(team, i) in teams"
+                    :key="`${team.name}-${i}`"
+                    :color-logo-holder="colorLogoHolder"
+                    :team="team"
+                    :right="i === 1"
+                    :score="scores[i]"
+                    :active="true" />
             </transition-group>
             <!--  :score="scores[i]" :hideScores="broadcast.hide_scores"
                         :width="teamWidth" :codes="codes" -->
 
             <transition name="mid" mode="out-in">
-                <Middle v-if="autoMiddle" :text="autoMiddle" :key="autoMiddle" :active="true" :tiny="true" />
+                <Middle
+                    v-if="autoMiddle"
+                    :key="autoMiddle"
+                    :text="autoMiddle"
+                    :active="true"
+                    :tiny="true" />
             </transition>
         </div>
 
 
         <div class="solo-part solo--controls">
             <div class="solo-pixel-info">200px / {{ controlMode }}</div>
-<!--            <div class="solo-pixel-info d-flex">{{ controlMode }}</div>-->
-            <div class="control-group" v-if="controlMode === 'default'">
+            <!--            <div class="solo-pixel-info d-flex">{{ controlMode }}</div>-->
+            <div v-if="controlMode === 'default'" class="control-group">
                 <SoloControlButton noclick left rotate>SLMN.GG</SoloControlButton>
                 <SoloControlButton icon="fas fa-exchange" color="#f22cf2" :click="() => flipTeams()">Flip teams</SoloControlButton>
                 <SoloControlButton icon="fas fa-users" :color="teams[0] && teams[0].id ? '#2cd1f2' : ''" :click="() => controlMode = 'set-team-1'">Set Team 1</SoloControlButton>
                 <SoloControlButton icon="far fa-users" :color="teams[1] && teams[1].id ? '#2cd1f2' : ''" :click="() => controlMode = 'set-team-2'">Set Team 2</SoloControlButton>
                 <SoloControlButton icon="fas fa-align-center" :color="middle ? '#2cd1f2' : ''" :click="() => controlMode = 'set-middle'">Middle</SoloControlButton>
                 <SoloControlButton icon="fas fa-medal" color="#f22cf2" :click="() => controlMode = 'set-scores'">Scores</SoloControlButton>
-                <SoloControlButton icon="fas fa-map-marked-alt" color="#f22cf2" :click="() => controlMode = 'set-maps'" v-if="showModule('overview')">Maps & Winners</SoloControlButton>
+                <SoloControlButton v-if="showModule('overview')" icon="fas fa-map-marked-alt" color="#f22cf2" :click="() => controlMode = 'set-maps'">Maps & Winners</SoloControlButton>
                 <SoloControlButton v-if="showModule('break')" :color="!breakEnd ? '#f22cf2' : '#2cd1f2'" icon="far fa-snooze" :click="() => controlMode = 'set-break'">Break</SoloControlButton>
 
 
                 <div class="spacer"></div>
-<!--                <SoloControlButton icon="fas fa-wrench" color="#f22cf2" :click="() => controlMode = 'set-options'">Match Options</SoloControlButton>-->
+                <!--                <SoloControlButton icon="fas fa-wrench" color="#f22cf2" :click="() => controlMode = 'set-options'">Match Options</SoloControlButton>-->
                 <SoloControlButton icon="fas fa-border-outer" :color="showGuides ? '#2cd1f2' : ''" :click="() => showGuides = !showGuides" style="font-size: 2.75em">{{ showGuides ? 'Hide' : 'Show' }} guides</SoloControlButton>
                 <SoloControlButton icon="fas fa-desktop" noclick style="font-size: 2.75em">Overlay height: {{ pageHeight }}<small>px</small></SoloControlButton>
                 <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
             </div>
-            <div class="control-group" v-if="controlMode === 'set-team-1'">
+            <div v-if="controlMode === 'set-team-1'" class="control-group">
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
-                <SoloTeamControlButton v-for="team in currentChunk" v-bind:key="team.id" :team="team"
-                 :click="() => setTeam(0, team)"/>
+                <SoloTeamControlButton
+                    v-for="team in currentChunk"
+                    :key="team.id"
+                    :team="team"
+                    :click="() => setTeam(0, team)" />
                 <div class="spacer"></div>
                 <SoloControlButton color="#2cf22c" right rotate :click="() => nextPage()">Next</SoloControlButton>
             </div>
 
-            <div class="control-group" v-if="controlMode === 'set-team-2'">
+            <div v-if="controlMode === 'set-team-2'" class="control-group">
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
-                <SoloTeamControlButton v-for="team in currentChunk" v-bind:key="team.id" :team="team"
-                 :click="() => setTeam(1, team)"/>
+                <SoloTeamControlButton
+                    v-for="team in currentChunk"
+                    :key="team.id"
+                    :team="team"
+                    :click="() => setTeam(1, team)" />
                 <div class="spacer"></div>
                 <SoloControlButton color="#2cf22c" right rotate :click="() => nextPage()">Next</SoloControlButton>
             </div>
 
-            <div class="control-group" v-if="controlMode === 'set-scores'">
+            <div v-if="controlMode === 'set-scores'" class="control-group">
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
                 <div class="spacer"></div>
 
-                <SoloControlButton v-bind:class="{'is-score': scores[0] === score}" class="score" v-for="score in [...scoreArray].reverse()" v-bind:key="'team-1-' + score"
-                                   :click="() => setScore(0, score)">{{ score }}</SoloControlButton>
+                <SoloControlButton
+                    v-for="score in [...scoreArray].reverse()"
+                    :key="'team-1-' + score"
+                    :class="{'is-score': scores[0] === score}"
+                    class="score"
+                    :click="() => setScore(0, score)">
+                    {{ score }}
+                </SoloControlButton>
 
 
-                <SoloTeamControlButton noclick :team="teams[0]"/>
+                <SoloTeamControlButton noclick :team="teams[0]" />
                 <SoloControlButton icon="fas fa-trophy" color="#f22cf2" :click="() => controlMode = 'set-first-to'">First<br>To {{ firstTo }}</SoloControlButton>
-                <SoloTeamControlButton noclick :team="teams[1]"/>
+                <SoloTeamControlButton noclick :team="teams[1]" />
 
-                <SoloControlButton v-bind:class="{'is-score': scores[1] === score}" class="score" v-for="score in scoreArray" v-bind:key="'team-2-' + score"
-                                   :click="() => setScore(1, score)">{{ score }}</SoloControlButton>
+                <SoloControlButton
+                    v-for="score in scoreArray"
+                    :key="'team-2-' + score"
+                    :class="{'is-score': scores[1] === score}"
+                    class="score"
+                    :click="() => setScore(1, score)">
+                    {{ score }}
+                </SoloControlButton>
 
                 <div class="spacer"></div>
                 <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
             </div>
 
-            <div class="control-group" v-if="controlMode === 'set-first-to'">
+            <div v-if="controlMode === 'set-first-to'" class="control-group">
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
                 <SoloControlButton icon="fas fa-trophy" color="#f22cf2" noclick>First<br>To</SoloControlButton>
 
 
-                <SoloControlButton v-bind:class="{'is-score': firstTo === num}" class="score" v-for="num in [1,2,3,4,5]" v-bind:key="'first-to' + num"
-                                   :click="() => setFirstTo(num)">{{ num }}</SoloControlButton>
+                <SoloControlButton
+                    v-for="num in [1,2,3,4,5]"
+                    :key="'first-to' + num"
+                    :class="{'is-score': firstTo === num}"
+                    class="score"
+                    :click="() => setFirstTo(num)">
+                    {{ num }}
+                </SoloControlButton>
 
 
                 <div class="spacer"></div>
                 <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
             </div>
 
-            <div class="control-group" v-if="controlMode === 'set-middle'">
+            <div v-if="controlMode === 'set-middle'" class="control-group">
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
 
                 <div class="solo-input-wrapper flex-center w-100">
-                    <input type="text" v-model="tempMiddle" class="solo-text-input" @keydown.enter="() => setMiddle()">
+                    <input v-model="tempMiddle" type="text" class="solo-text-input" @keydown.enter="() => setMiddle()">
                 </div>
                 <SoloControlButton color="#f22cf2" :click="() => setMiddle()">Set</SoloControlButton>
                 <div class="spacer"></div>
                 <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
             </div>
-            <div class="control-group" v-if="controlMode === 'set-options'">
+            <div v-if="controlMode === 'set-options'" class="control-group">
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
 
                 <SoloControlButton icon="fas fa-stopwatch" :click="() => controlMode = 'set-first-to'">First to</SoloControlButton>
@@ -101,29 +136,40 @@
                 <div class="spacer"></div>
                 <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
             </div>
-            <div class="control-group" v-if="controlMode === 'set-maps'">
+            <div v-if="controlMode === 'set-maps'" class="control-group">
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
 
-                <SoloMapButton v-for="num in mapNums" :key="num" :click="() => chooseMap(num)" :noclick="num !== 0 && !maps[Math.max(0,num - 1)]?.name"
-                               :map="maps[num]" :top-text="`Map ${num + 1}`" :team-gel="mapWinners[num] === 'team-1' ? teams[0]?.theme : (mapWinners[num] === 'team-2'? teams[1]?.theme : null)"></SoloMapButton>
+                <SoloMapButton
+                    v-for="num in mapNums"
+                    :key="num"
+                    :click="() => chooseMap(num)"
+                    :noclick="num !== 0 && !maps[Math.max(0,num - 1)]?.name"
+                    :map="maps[num]"
+                    :top-text="`Map ${num + 1}`"
+                    :team-gel="mapWinners[num] === 'team-1' ? teams[0]?.theme : (mapWinners[num] === 'team-2'? teams[1]?.theme : null)" />
 
                 <div class="spacer"></div>
                 <SoloControlButton icon="fas fa-trophy" style="font-size: 2.5em" color="#f17a2c" :click="() => controlMode = 'set-map-winners'">Set Winners</SoloControlButton>
                 <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
             </div>
-            <div class="control-group" v-if="controlMode === 'set-map-winners'">
+            <div v-if="controlMode === 'set-map-winners'" class="control-group">
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
 
-                <SoloMapToggleButton v-for="num in mapNums" :key="num" :click="() => toggleMapWinner(num)"
-                                     :teams="teams" :map="maps[num]" :noclick="num !== 0 && !maps[Math.max(0,num - 1)]?.name"
-                                     :top-text="maps[num]?.short_name || `Map ${num + 1}`" :current="mapWinners[num]">
-                </SoloMapToggleButton>
+                <SoloMapToggleButton
+                    v-for="num in mapNums"
+                    :key="num"
+                    :click="() => toggleMapWinner(num)"
+                    :teams="teams"
+                    :map="maps[num]"
+                    :noclick="num !== 0 && !maps[Math.max(0,num - 1)]?.name"
+                    :top-text="maps[num]?.short_name || `Map ${num + 1}`"
+                    :current="mapWinners[num]" />
 
                 <div class="spacer"></div>
                 <SoloControlButton icon="fas fa-map-marked-alt" style="font-size: 2.5em" :click="() => controlMode = 'set-maps'">Set<br>Maps</SoloControlButton>
                 <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
             </div>
-            <div class="control-group" v-if="controlMode === 'set-map'">
+            <div v-if="controlMode === 'set-map'" class="control-group">
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
 
                 <SoloControlButton noclick>Map {{ controllingMapNum + 1 }} <small>{{ maps[controllingMapNum]._type || maps[controllingMapNum].type || '' }}</small></SoloControlButton>
@@ -133,18 +179,21 @@
                 <SoloControlButton noclick right rotate>SLMN.GG</SoloControlButton>
             </div>
 
-            <div class="control-group" v-if="controlMode === 'choose-map'">
+            <div v-if="controlMode === 'choose-map'" class="control-group">
                 <SoloControlButton left rotate :click="() => controlMode = 'set-maps'" color="#f0a02c">Maps</SoloControlButton>
                 <SoloControlButton noclick>Map {{ controllingMapNum + 1 }} <small>{{ maps[controllingMapNum]._type || maps[controllingMapNum].type || '' }}</small></SoloControlButton>
 
-                <SoloMapButton v-for="map in currentMapChunk" v-bind:key="map.id" :map="map"
-                                       :click="() => setMap(controllingMapNum, map)"/>
+                <SoloMapButton
+                    v-for="map in currentMapChunk"
+                    :key="map.id"
+                    :map="map"
+                    :click="() => setMap(controllingMapNum, map)" />
 
 
                 <div class="spacer"></div>
                 <SoloControlButton color="#2cf22c" right rotate :click="() => nextPage()">Next</SoloControlButton>
             </div>
-            <div class="control-group" v-if="controlMode === 'set-break'">
+            <div v-if="controlMode === 'set-break'" class="control-group">
                 <SoloControlButton left rotate :click="() => controlMode = 'default'">Menu</SoloControlButton>
 
                 <SoloControlButton icon="fas fa-stopwatch" :click="() => setBreak(1)">1:00</SoloControlButton>
@@ -160,22 +209,34 @@
         </div>
 
 
-        <div class="solo-part solo--desk flex-center" v-if="showModule('desk')">
+        <div v-if="showModule('desk')" class="solo-part solo--desk flex-center">
             <div class="solo-pixel-info">200px</div>
             <DeskMatch class="w-100" :_match="virtualMatch" />
         </div>
 
-        <div class="solo-part solo--rosters" v-if="showModule('rosters')">
+        <div v-if="showModule('rosters')" class="solo-part solo--rosters">
             <div class="solo-pixel-info">1080px</div>
-            <RosterOverlay :virtual-match="virtualMatch" :broadcast="broadcast" :client="client" :title="title" :animation-active="true"
-                           :show-roles="rosterOptions.includes('roles')" :sort="rosterOptions.includes('sort')" :show-badges="rosterOptions.includes('badges')" />
+            <RosterOverlay
+                :virtual-match="virtualMatch"
+                :broadcast="broadcast"
+                :client="client"
+                :title="title"
+                :animation-active="true"
+                :show-roles="rosterOptions.includes('roles')"
+                :sort="rosterOptions.includes('sort')"
+                :show-badges="rosterOptions.includes('badges')" />
         </div>
-        <div class="solo-part solo--break" v-if="showModule('break')">
+        <div v-if="showModule('break')" class="solo-part solo--break">
             <div class="solo-pixel-info">1080px</div>
-            <BreakOverlay :virtual-match="virtualMatch" :broadcast="broadcast" :client="client" :title="title" :animation-active="true"
-                          :custom-break-automation="breakAutomation"/>
+            <BreakOverlay
+                :virtual-match="virtualMatch"
+                :broadcast="broadcast"
+                :client="client"
+                :title="title"
+                :animation-active="true"
+                :custom-break-automation="breakAutomation" />
         </div>
-        <div class="solo-part solo--overview" v-if="showModule('overview')">
+        <div v-if="showModule('overview')" class="solo-part solo--overview">
             <div class="solo-pixel-info">1080px</div>
             <OverviewOverlay :broadcast="broadcast" :virtual-match="virtualMatch" :no-map-videos="!showMapVideos" />
         </div>
@@ -200,7 +261,6 @@ import SoloMapToggleButton from "@/components/broadcast/SoloMapToggleButton.vue"
 
 export default {
     name: "SoloOverlay",
-    props: ["broadcast", "client", "title", "modules", "rosterOptions", "showMapVideos"],
     components: {
         SoloMapToggleButton,
         SoloMapButton,
@@ -213,6 +273,7 @@ export default {
         DeskMatch,
         Middle
     },
+    props: ["broadcast", "client", "title", "modules", "rosterOptions", "showMapVideos"],
     data: () => ({
         controlMode: "default",
         controlPage: 0,
@@ -233,94 +294,6 @@ export default {
 
         noStinger: true
     }),
-    methods: {
-        flipTeams() {
-            this.teams = this.teams.reverse();
-            this.scores = this.scores.reverse();
-        },
-        nextPage() {
-            this.controlPage++;
-            if (["set-team-1", "set-team-2"].includes(this.controlMode) && this.currentChunk.length === 0) this.controlPage = 0;
-            if (["choose-map"].includes(this.controlMode) && this.currentMapChunk.length === 0) this.controlPage = 0;
-        },
-        setTeam(index, team) {
-            this.$set(this.teams, index, team);
-            this.controlMode = "default";
-        },
-        setMap(index, map) {
-            this.$set(this.maps, index, {
-                ...map,
-                map: map,
-                big_image: map.big_image,
-                image: map.image,
-                name: [map.name] // this emulates the lookup from Airtable
-            });
-            console.log("setting map", map, this.maps[index]);
-            this.controlMode = "set-maps"; // TODO: change to "set-map" so other things can be done with it
-        },
-        setScore(index, score) {
-            this.$set(this.scores, index, score);
-        },
-        setMiddle() {
-            this.middle = this.tempMiddle.toUpperCase();
-            this.controlMode = "default";
-        },
-        showModule(module) {
-            return (this.modules || []).includes(module);
-        },
-        setBreak(minutes) {
-            if (minutes) {
-                this.breakEnd = new Date(new Date()).getTime() + (minutes * 1000 * 60);
-            } else {
-                this.breakEnd = null;
-            }
-            this.controlMode = "default";
-        },
-        chooseMap(num) {
-            this.controllingMapNum = num;
-            this.controlPage = 0;
-            this.controlMode = "choose-map";
-            if (!this.maps[num]) {
-                this.maps[num] = {
-                    map: null,
-                    winner: null,
-                    _type: this.mapTypes[num]
-                };
-            }
-            console.log(this.chunkedMaps, this.currentMapChunk);
-        },
-        setFirstTo(num) {
-            this.firstTo = num;
-            this.controlMode = "set-scores";
-        },
-        toggleMapWinner(num) {
-            console.log("toggle winner", num);
-            const rotation = [null, "team-1", "team-2", "draw"];
-            let current = this.mapWinners[num];
-            if (current === undefined) {
-                this.$set(this.mapWinners, num, null);
-                current = null;
-            }
-
-            const index = rotation.indexOf(current);
-            if (index === -1) {
-                console.warn("Unsure what map winner to toggle to", { num, current });
-                this.$set(this.mapWinners, num, null);
-                return;
-            }
-            if (index >= rotation.length - 1) {
-                this.$set(this.mapWinners, num, rotation[0]);
-            } else {
-                this.$set(this.mapWinners, num, rotation[index + 1]);
-            }
-            console.log(this.mapWinners[num]);
-        }
-    },
-    watch: {
-        controlMode(newMode) {
-            this.controlPage = 0;
-        }
-    },
     computed: {
         autoMiddle() {
             if (!this.middle && !this.firstTo) return null;
@@ -467,6 +440,95 @@ export default {
         },
         colorLogoHolder() {
             return (this.broadcast?.broadcast_settings || []).includes("Color ingame team logo holder");
+        }
+    },
+    methods: {
+        flipTeams() {
+            this.teams = this.teams.reverse();
+            this.scores = this.scores.reverse();
+        },
+        nextPage() {
+            this.controlPage++;
+            if (["set-team-1", "set-team-2"].includes(this.controlMode) && this.currentChunk.length === 0) this.controlPage = 0;
+            if (["choose-map"].includes(this.controlMode) && this.currentMapChunk.length === 0) this.controlPage = 0;
+        },
+        setTeam(index, team) {
+            this.teams[index] = team;
+            this.controlMode = "default";
+        },
+        setMap(index, map) {
+            this.maps[index] = {
+                ...map,
+                map,
+                big_image: map.big_image,
+                image: map.image,
+                name: [map.name] // this emulates the lookup from Airtable
+            };
+            console.log("setting map", map, this.maps[index]);
+            this.controlMode = "set-maps"; // TODO: change to "set-map" so other things can be done with it
+            //                                         what does this even mean
+        },
+        setScore(index, score) {
+            this.scores[index] = score;
+        },
+        setMiddle() {
+            this.middle = this.tempMiddle.toUpperCase();
+            this.controlMode = "default";
+        },
+        showModule(module) {
+            return (this.modules || []).includes(module);
+        },
+        setBreak(minutes) {
+            if (minutes) {
+                this.breakEnd = new Date(new Date()).getTime() + (minutes * 1000 * 60);
+            } else {
+                this.breakEnd = null;
+            }
+            this.controlMode = "default";
+        },
+        chooseMap(num) {
+            this.controllingMapNum = num;
+            this.controlPage = 0;
+            this.controlMode = "choose-map";
+            if (!this.maps[num]) {
+                this.maps[num] = {
+                    map: null,
+                    winner: null,
+                    _type: this.mapTypes[num]
+                };
+            }
+            console.log(this.chunkedMaps, this.currentMapChunk);
+        },
+        setFirstTo(num) {
+            this.firstTo = num;
+            this.controlMode = "set-scores";
+        },
+        toggleMapWinner(num) {
+            console.log("toggle winner", num);
+            const rotation = [null, "team-1", "team-2", "draw"];
+            let current = this.mapWinners[num];
+            if (current === undefined) {
+                this.mapWinners[num] = null;
+                current = null;
+            }
+
+            const index = rotation.indexOf(current);
+            if (index === -1) {
+                console.warn("Unsure what map winner to toggle to", { num, current });
+                this.mapWinners[num] = null;
+                return;
+            }
+            if (index >= rotation.length - 1) {
+                this.mapWinners[num] = rotation[0];
+            } else {
+                this.mapWinners[num] = rotation[index + 1];
+            }
+            console.log(this.mapWinners[num]);
+        }
+    },
+    watch: {
+        controlMode(newMode) {
+            this.controlPage = 0;
         }
     }
 };

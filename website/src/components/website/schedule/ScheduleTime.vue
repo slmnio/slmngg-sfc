@@ -1,13 +1,14 @@
 <template>
     <div class="schedule-time">
         <div v-if="customText" class="custom-text mt-1">{{ customText }}</div>
-        <div class="top" v-if="top">{{ top }}</div>
-        <div class="bottom" v-if="bottom">{{ bottom }}</div>
+        <div v-if="top" class="top">{{ top }}</div>
+        <div v-if="bottom" class="bottom">{{ bottom }}</div>
     </div>
 </template>
 
 <script>
 import { formatTime } from "@/utils/content-utils";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "ScheduleTime",
@@ -21,15 +22,15 @@ export default {
         top() {
             return this.time && formatTime(this.time, {
                 format: "{date} {month-short} {year-short-prev-only}",
-                tz: this.$store.state.timezone,
-                use24HourTime: this.$store.state.use24HourTime
+                tz: useSettingsStore().timezone,
+                use24HourTime: useSettingsStore().use24HourTime
             });
         },
         bottom() {
             return !this.noTimes && this.time && formatTime(this.time, {
                 format: "{time} {tz}",
-                tz: this.$store.state.timezone,
-                use24HourTime: this.$store.state.use24HourTime
+                tz: useSettingsStore().timezone,
+                use24HourTime: useSettingsStore().use24HourTime
             });
         }
     }

@@ -1,56 +1,71 @@
 <template>
     <div class="event-schedule container">
-
-        <div class="d-none d-sm-flex flex-column align-items-end gap-1 w-100 justify-content-end timezone-swapper-holder">
+        <div class="d-sm-flex w-100 timezone-swapper-holder flex-column align-items-end gap-1 d-none">
             <TimezoneSwapper :inline="true" />
-            <b-form-group label-cols="auto" label-size="sm" label="Broadcast" v-if="showBroadcastSettings">
-                <b-form-select v-if="eventBroadcasts?.length" :options="eventBroadcasts" v-model="selectedBroadcastID" size="sm" class="w-auto"/>
+            <b-form-group v-if="showBroadcastSettings" label-cols="auto" label-size="sm" label="Broadcast">
+                <b-form-select
+                    v-if="eventBroadcasts?.length"
+                    v-model="selectedBroadcastID"
+                    :options="eventBroadcasts"
+                    size="sm"
+                    class="w-auto" />
             </b-form-group>
         </div>
 
         <div class="schedule-top mb-2">
             <h2 class="text-center">Schedule</h2>
-            <ul class="schedule-group-holder nav justify-content-center" v-if="pagedMatches.length > 1">
-                <li class="nav-item schedule-group" v-for="(pm) in pagedMatches" :key="pm.num"
+            <ul v-if="pagedMatches.length > 1" class="schedule-group-holder nav justify-content-center">
+                <li
+                    v-for="(pm) in pagedMatches"
+                    :key="pm.num"
+                    class="nav-item schedule-group"
                     :class="{ 'active': activeScheduleGroup.num === pm.num, 'ct-active': activeScheduleGroup.num === pm.num, 'ct-passive': activeScheduleGroup.num !== pm.num }">
-                    <a @click="activeScheduleNum = pm.num" class="nav-link no-link-style">{{ pm.text }}</a>
+                    <a class="nav-link no-link-style" @click="activeScheduleNum = pm.num">{{ pm.text }}</a>
                 </li>
 
-                <li class="nav-item schedule-group nav-link no-link-style" @click="showAll = true"
-                    :class="{'active ct-active': showAll === true, 'ct-passive': showAll !== true }">
+                <li
+                    class="nav-item schedule-group nav-link no-link-style"
+                    :class="{'active ct-active': showAll === true, 'ct-passive': showAll !== true }"
+                    @click="showAll = true">
                     <b>All matches</b>
                 </li>
             </ul>
         </div>
 
-        <div class="schedule-filter flex-center text-center mb-2" v-if="showAll">
-            <div class="btn btn-sm mx-2" @click="hideCompleted = !hideCompleted" :class="{'btn-light': hideCompleted, 'btn-dark': !hideCompleted}">
+        <div v-if="showAll" class="schedule-filter flex-center text-center mb-2">
+            <div class="btn btn-sm mx-2" :class="{'btn-light': hideCompleted, 'btn-dark': !hideCompleted}" @click="hideCompleted = !hideCompleted">
                 Hide completed matches
             </div>
-            <div class="btn btn-sm mx-2" @click="hideNoVods = !hideNoVods" :class="{'btn-light': hideNoVods, 'btn-dark': !hideNoVods}">
+            <div class="btn btn-sm mx-2" :class="{'btn-light': hideNoVods, 'btn-dark': !hideNoVods}" @click="hideNoVods = !hideNoVods">
                 Hide matches without VODs
             </div>
         </div>
 
-        <div class="schedule-matches mt-3" v-if="activeScheduleGroup">
-            <ScheduleMatch v-for="(match, i) in groupMatches" :key="match.id" :match="match"
-                           :class="i > 0 && getMatchClass(match, groupMatches[i-1])" :custom-text="showAll && match.match_group ? match.match_group : null"
-                           :can-edit-matches="showEditorButton" :can-edit-broadcasts="showBroadcastSettings" :selectedBroadcast="selectedBroadcast" />
+        <div v-if="activeScheduleGroup" class="schedule-matches mt-3">
+            <ScheduleMatch
+                v-for="(match, i) in groupMatches"
+                :key="match.id"
+                :match="match"
+                :class="i > 0 && getMatchClass(match, groupMatches[i-1])"
+                :custom-text="showAll && match.match_group ? match.match_group : null"
+                :can-edit-matches="showEditorButton"
+                :can-edit-broadcasts="showBroadcastSettings"
+                :selected-broadcast="selectedBroadcast" />
         </div>
     </div>
 </template>
 
 <script>
 import { ReactiveArray, ReactiveThing, ReactiveRoot } from "@/utils/reactive";
-import { isAuthenticated } from "@/utils/auth";
 import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 import { canEditMatch, isEventStaffOrHasRole } from "@/utils/client-action-permissions";
-import { BFormSelect, BFormGroup } from "bootstrap-vue";
+import { useAuthStore } from "@/stores/authStore";
+import { useStatusStore } from "@/stores/statusStore";
 
 export default {
     name: "EventSchedule",
-    components: { TimezoneSwapper, ScheduleMatch, BFormSelect, BFormGroup },
+    components: { TimezoneSwapper, ScheduleMatch },
     props: ["event"],
     data: () => ({
         showAll: false,
@@ -85,7 +100,7 @@ export default {
             return 0;
         },
         matches() {
-            if (!this.event || !this.event.matches) return [];
+            if (!this.event?.matches) return [];
             return ReactiveArray("matches", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -172,20 +187,22 @@ export default {
                 this.hideCompleted = false;
                 this.hideNoVods = false;
 
-                this.$store.commit("setEventMatchPage", {
-                    eventID: this.event.id,
-                    matchPage: newNum
-                });
+                const statusStore = useStatusStore();
+
+                statusStore.lastEventMatchPages[this.event.id] = newNum;
             },
             get() {
-                const lastPage = this.$store.getters.getLastMatchPage(this.event.id);
-                if (!lastPage) return this.defaultScheduleNum;
+                const statusStore = useStatusStore();
+
+                const lastPage = statusStore.lastEventMatchPages[this.event.id];
+                if (lastPage === undefined) return this.defaultScheduleNum;
                 // if (lastPage.matchPage > this.pagedMatches.length) return this.defaultScheduleNum;
-                return lastPage.matchPage;
+                return lastPage;
             }
         },
         showEditorButton() {
-            return canEditMatch(this.$root?.auth?.user, { event: this.event });
+            const { user } = useAuthStore();
+            return canEditMatch(user, { event: this.event });
         },
         _event() {
             return ReactiveRoot(this.event?.id, {
@@ -203,8 +220,9 @@ export default {
             return (this._event?.broadcasts || []).find(b => b.id === this.selectedBroadcastID);
         },
         showBroadcastSettings() {
-            if (!isAuthenticated(this.$root)) return false;
-            return isEventStaffOrHasRole(this.$root.auth.user, {
+            const { isAuthenticated, user } = useAuthStore();
+            if (!isAuthenticated) return false;
+            return isEventStaffOrHasRole(user, {
                 event: this.event,
                 role: "Broadcast Manager",
                 websiteRoles: ["Can edit any match", "Can edit any event", "Full broadcast permissions"]
@@ -249,7 +267,7 @@ export default {
     //         this.activeScheduleNum = this.defaultScheduleNum;
     //     }
     // },
-    metaInfo() {
+    head() {
         return {
             title: "Schedule"
             // title: this.event?.name ? `Schedule | ${this.event?.name}` : "Schedule"

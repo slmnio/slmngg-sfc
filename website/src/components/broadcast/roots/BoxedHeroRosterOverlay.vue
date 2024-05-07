@@ -6,25 +6,38 @@
             </div>
             <div class="team-text">
                 <div class="team-name">{{ team?.name }}</div>
-                <div class="team-subtitle" v-if="decoratedSubtitle">{{ decoratedSubtitle }}</div>
+                <div v-if="decoratedSubtitle" class="team-subtitle">{{ decoratedSubtitle }}</div>
             </div>
         </div>
 
-        <div class="staff-wrapper" v-if="showStaff">
-            <div class="staff manager" v-if="managers">{{ managers }}</div>
-            <div class="staff coach" v-if="coaches">{{ coaches }}</div>
+        <div v-if="showStaff" class="staff-wrapper">
+            <div v-if="managers" class="staff manager">{{ managers }}</div>
+            <div v-if="coaches" class="staff coach">{{ coaches }}</div>
         </div>
         <div class="player-wrapper">
             <div class="players h-100 d-flex flex-center">
-                <div class="player h-100" v-for="player in players" :key="player.id" :class="{'has-role-icon': showRoles}">
-                    <div class="alternate bg-center hero h-100 w-100" v-if="alternate" :style="alternateHeroBG(player.favourite_hero, alternate)"></div>
-                    <RecoloredHero v-else class="hero" :hero="player.favourite_hero" :theme="team.theme"></RecoloredHero>
+                <div
+                    v-for="player in players"
+                    :key="player.id"
+                    class="player h-100"
+                    :class="{'has-role-icon': showRoles}">
+                    <div
+                        v-if="alternate"
+                        class="alternate bg-center hero h-100 w-100"
+                        :style="alternateHeroBG(player.favourite_hero, alternate)"></div>
+                    <RecoloredHero
+                        v-else
+                        class="hero"
+                        :hero="player.favourite_hero"
+                        :theme="team.theme" />
                     <div class="player-name-holder" :style="themeBackground1(team)">
                         <div class="player-name flex-center text-center">
                             <span class="player-name-internal">{{ player.name }}</span>
                             <span v-if="showRoles" class="player-role" v-html="getRoleSVG(player.role)"></span>
-                            <span :style="themeBackground1(team)" v-if="showPronouns"
-                                  class="player-pronouns">{{ player.pronouns }}</span>
+                            <span
+                                v-if="showPronouns"
+                                :style="themeBackground1(team)"
+                                class="player-pronouns">{{ player.pronouns }}</span>
                         </div>
                     </div>
                 </div>
@@ -39,6 +52,7 @@ import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import { autoRecord, getRoleSVG } from "@/utils/content-utils";
 import { bg, resizedAttachment, resizedImage } from "@/utils/images";
+import { useStatusStore } from "@/stores/statusStore";
 
 function niceJoin(array, and = "and") {
     if (array.length > 1) {
@@ -50,13 +64,13 @@ function niceJoin(array, and = "and") {
 
 export default {
     name: "BoxedHeroRosterOverlay",
-    props: ["broadcast", "title", "playerCount", "teamNum", "showRoles", "showPronouns", "active", "animationActive", "subtitle", "alternate", "showStaff"],
     components: {
         RecoloredHero
     },
+    props: ["broadcast", "title", "playerCount", "teamNum", "showRoles", "showPronouns", "active", "animationActive", "subtitle", "alternate", "showStaff"],
     computed: {
         match() {
-            if (!this.broadcast || !this.broadcast.live_match) return null;
+            if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
@@ -120,6 +134,7 @@ export default {
                     const order = ["DPS", "Tank", "Support"];
                     return order.indexOf(a.role) - order.indexOf(b.role);
                 }
+                return 0;
             });
         },
         titleStyle() {
@@ -160,7 +175,7 @@ export default {
             deep: true,
             handler(team) {
                 // console.log("team change", this.$parent);
-                this.$parent.updateTheme(team?.theme);
+                useStatusStore().customStingerTheme = team?.theme;
                 // this.$emit("stinger_theme_change", team.theme);
             }
         },
@@ -171,7 +186,7 @@ export default {
             console.log("animation active", a);
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Hero Roster #${this.teamNum || 1} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -180,7 +195,7 @@ export default {
 </script>
 
 <style scoped>
-.player >>> .color-holder {
+.player:deep(.color-holder) {
     height: 100%;
     --over: 350%;
     width: calc(100% + var(--over));
@@ -196,12 +211,12 @@ export default {
     gap: 6px;
 }
 
-.player >>> .color-holder div,
-.player >>> .color-holder canvas {
+.player:deep(.color-holder div),
+.player:deep(.color-holder canvas) {
     object-fit: contain !important;
 }
 
-.player >>> .hero-image-base {
+.player:deep(.hero-image-base) {
     background-size: contain !important;
 }
 
@@ -219,7 +234,7 @@ export default {
     font-size: 2em;
 }
 
-.hero-roster-overlay >>> .g-body {
+.hero-roster-overlay:deep(.g-body) {
     overflow: hidden;
     color: white;
 }
@@ -295,14 +310,17 @@ export default {
     display: flex;
     flex-direction: column;
 }
+
 .player, .player-name-holder {
-    background-color: rgba(0,0,0,0.25);
+    background-color: rgba(0, 0, 0, 0.25);
     color: white;
 }
+
 .team-logo {
     width: 80%;
     height: 90%;
 }
+
 .staff-wrapper {
     font-size: 1.5em;
     font-weight: bold;

@@ -6,12 +6,17 @@
             <div class="event-icon-holder flex-center">
                 <div class="event-icon bg-center" :style="eventIcon"></div>
             </div>
-            <div class="schedule-holder d-flex" v-if="showSchedule" :class="{'has-title': !!title}">
-                <div class="match d-flex" v-for="match in schedule" :key="match.id">
-                    <ThemeLogo icon-padding="32px" class="team" :theme="team.theme" v-for="team in match.teams" :key="team.id" />
+            <div v-if="showSchedule" class="schedule-holder d-flex" :class="{'has-title': !!title}">
+                <div v-for="match in schedule" :key="match.id" class="match d-flex">
+                    <ThemeLogo
+                        v-for="team in match.teams"
+                        :key="team.id"
+                        icon-padding="32px"
+                        class="team"
+                        :theme="team.theme" />
                 </div>
             </div>
-            <div class="title" v-if="title" :style="textColor" contenteditable="true">{{ title }}</div>
+            <div v-if="title" class="title" :style="textColor" contenteditable="true">{{ title }}</div>
         </div>
 
         <div class="event-gradient position-absolute w-100 h-100" :style="gradient">
@@ -37,7 +42,7 @@ export default {
     }),
     computed: {
         event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
+            if (!this.broadcast?.event) return null;
             return ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme")
             });
@@ -52,35 +57,35 @@ export default {
             })?.schedule || []).filter(m => m.show_on_overlays);
         },
         eventIcon() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return resizedImage(this.event.theme, ["default_wordmark", "default_logo", "small_logo"], "orig");
         },
         thumbnailBackground() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 backgroundColor: this.event.theme.color_logo_background
             };
         },
         gradient() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 backgroundImage: `linear-gradient(0deg, ${this.event.theme.color_logo_accent},transparent)`
             };
         },
         lowerBar() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 backgroundColor: this.event.theme.color_alt
             };
         },
         textColor() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 color: this.event.theme.color_text_on_logo_background || this.event.theme.color_text_on_theme
             };
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Event Thumbnail | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

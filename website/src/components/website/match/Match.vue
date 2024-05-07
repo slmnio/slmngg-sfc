@@ -13,11 +13,10 @@ import { getMatchContext, url } from "@/utils/content-utils";
 
 export default {
     name: "Match",
-    props: ["id", "hydratedMatch"],
     components: {
         MatchThumbnail
     },
-    methods: { url },
+    props: ["id", "hydratedMatch"],
     computed: {
         match() {
             return this.hydratedMatch || ReactiveRoot(this.id, {
@@ -36,7 +35,8 @@ export default {
             }
             return getMatchContext(this.match);
         }
-    }
+    },
+    methods: { url }
 };
 </script>
 

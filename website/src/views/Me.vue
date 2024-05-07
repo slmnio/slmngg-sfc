@@ -5,15 +5,26 @@
 </template>
 
 <script>
-import { isAuthenticated } from "@/utils/auth";
 import LoadingIcon from "@/components/website/LoadingIcon";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "Me",
     components: { LoadingIcon },
     props: ["subPage"],
     computed: {
-        auth() { return this.$root.auth; }
+        auth() {
+            return useAuthStore().auth;
+        }
+    },
+    methods: {
+        check() {
+            const { isAuthenticated, user } = useAuthStore();
+            if (!isAuthenticated) return console.warn("Not authenticated");
+            const playerID = user?.airtableID;
+            if (!playerID) return console.warn("No player ID to redirect to");
+            return this.$router.replace({ path: `/player/${playerID}/${this.subPage || ""}` });
+        }
     },
     watch: {
         auth: {
@@ -22,14 +33,6 @@ export default {
                 console.log("auth change");
                 this.check();
             }
-        }
-    },
-    methods: {
-        check() {
-            if (!isAuthenticated(this.$root)) return console.warn("Not authenticated");
-            const playerID = this.$root.auth?.user?.airtableID;
-            if (!playerID) return console.warn("No player ID to redirect to");
-            return this.$router.replace({ path: `/player/${playerID}/${this.subPage || ""}` });
         }
     },
     beforeMount() {

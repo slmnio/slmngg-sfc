@@ -1,8 +1,8 @@
 <template>
-    <div class="upcoming-matches" v-if="matches && matches.length">
+    <div v-if="matches && matches.length" class="upcoming-matches">
         <h1>Upcoming Matches</h1>
         <div class="matches-holder row">
-            <UpcomingMatch v-for="match in matches" :key="match.id" :match="match"/>
+            <UpcomingMatch v-for="match in matches" :key="match.id" :match="match" />
         </div>
     </div>
 </template>

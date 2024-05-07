@@ -109,13 +109,11 @@ function cleanID(id) {
 
 let connected = 0;
 
-// eslint-disable-next-line no-unused-vars
 io.on("connection", (socket) => {
     console.log(`[socket] on site: ${++connected}`);
 
     socket.on("subscribe", (id) => {
         id = cleanID(id);
-        // console.log("joined", id);
         socket.join(id);
     });
     socket.on("unsubscribe", (id) => {
@@ -206,10 +204,10 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("tally_change", ({ clientName, state, number, data }) => {
+    socket.on("tally_change", ({ clientName, state, data }) => {
         clientName = clientName.toLowerCase();
-        console.log("[tally]", clientName, state, number, data);
-        socket.to(`prod:client-${clientName}`).emit("tally_change", { state, number });
+        console.log("[tally]", clientName, state, data);
+        socket.to(`prod:client-${clientName}`).emit("tally_change", { state });
     });
 
     socket.on("media_update", (status, value) => {

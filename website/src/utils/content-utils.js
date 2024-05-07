@@ -2,6 +2,29 @@ import spacetime from "spacetime";
 import informal from "spacetime-informal";
 import { sortEvents, sortTeams } from "@/utils/sorts";
 
+import assault from "@/assets/default-map-images/assault.png";
+import escort from "@/assets/default-map-images/escort.png";
+import hybrid from "@/assets/default-map-images/hybrid.png";
+import control from "@/assets/default-map-images/control.png";
+import push from "@/assets/default-map-images/push.png";
+import spike from "@/assets/default-map-images/spike.png";
+import spikeRush from "@/assets/default-map-images/spike_rush.png";
+import valDeathmatch from "@/assets/default-map-images/val_deathmatch.png";
+import slayer from "@/assets/default-map-images/slayer.png";
+import strongholds from "@/assets/default-map-images/strongholds.png";
+import ctf from "@/assets/default-map-images/ctf.png";
+import oddball from "@/assets/default-map-images/oddball.png";
+import flashpoint from "@/assets/default-map-images/flashpoint.png";
+import clash from "@/assets/default-map-images/clash.png";
+
+import hybridIcon from "@/assets/map-type-icons/hybrid.svg";
+import escortIcon from "@/assets/map-type-icons/escort.svg";
+import controlIcon from "@/assets/map-type-icons/control.svg";
+import pushIcon from "@/assets/map-type-icons/push.svg";
+import assaultIcon from "@/assets/map-type-icons/assault.svg";
+import flashpointIcon from "@/assets/map-type-icons/flashpoint.svg";
+import clashIcon from "@/assets/map-type-icons/clash.png";
+
 export function getImage (i) {
     // console.log(i);
     if (!i) return null;
@@ -96,9 +119,7 @@ export function multiImage(theme, keys, minSize = 30, useResizer = true) {
 
 export function getMatchContext(match) {
     const text = [];
-    let out = "";
-
-    out = (match?.event?.short || match?.event?.name || "");
+    const out = (match?.event?.short || match?.event?.name || "");
 
     // sub_event: round
     // week_text: round
@@ -200,11 +221,6 @@ export function clarifyTeam(team) {
     return team.name;
 }
 
-export function pronounsFilter(pronouns) {
-    if (pronouns === "any") return "any pronouns";
-    return pronouns;
-}
-
 export function textSort(a, b) {
     if (a < b) return -1;
     if (a > b) return 1;
@@ -237,30 +253,30 @@ export function likelyNeededMaps(match) {
 }
 
 export const DefaultMapImages = {
-    Assault: "https://media.slmn.io/maps/Assault.png",
-    Escort: "https://media.slmn.io/maps/Escort.png",
-    Hybrid: "https://media.slmn.io/maps/Hybrid.png",
-    Control: "https://media.slmn.io/maps/Control.png",
-    Push: "https://media.slmn.io/maps/Push.png",
-    Flashpoint: "https://media.slmn.io/maps/Flashpoint.png",
-    Clash: "https://media.slmn.io/maps/Clash.png"
-    // Spike: "https://cdn.discordapp.com/attachments/880305022716481639/883811894463447110/newspikeplant.png",
-    // SpikeRush: "https://cdn.discordapp.com/attachments/880305022716481639/883809271198924840/spikerush_default.png",
-    // ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png",
-    // Slayer: "https://media.discordapp.net/attachments/855517740914573342/913747752729595904/slayer.png",
-    // Strongholds: "https://media.discordapp.net/attachments/855517740914573342/913747753086107668/strongholds.png",
-    // CTF: "https://media.discordapp.net/attachments/855517740914573342/913747753392304158/ctf.png",
-    // Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png"
+    Assault: assault,
+    Escort: escort,
+    Hybrid: hybrid,
+    Control: control,
+    Push: push,
+    Spike: spike,
+    SpikeRush: spikeRush,
+    ValDeathmatch: valDeathmatch,
+    Slayer: slayer,
+    Strongholds: strongholds,
+    CTF: ctf,
+    Oddball: oddball,
+    Flashpoint: flashpoint,
+    Clash: clash
 };
 
 export const MapTypeIcons = {
-    Hybrid: "https://media.slmn.io/maps/Hybrid-Icon.png",
-    Escort: "https://media.slmn.io/maps/Escort-Icon.png",
-    Control: "https://media.slmn.io/maps/Control-Icon.png",
-    Push: "https://media.slmn.io/maps/Push-Icon.png",
-    Assault: "https://media.slmn.io/maps/Assault-Icon.png",
-    Flashpoint: "https://media.slmn.io/maps/Flashpoint-Icon.png",
-    Clash: "https://media.slmn.io/maps/Clash-Icon.png"
+    Hybrid: hybridIcon,
+    Escort: escortIcon,
+    Control: controlIcon,
+    Push: pushIcon,
+    Assault: assaultIcon,
+    Flashpoint: flashpointIcon,
+    Clash: clashIcon
 };
 
 export function getTeamsMapStats(teams, requestMatch, requestMap, filters) {
@@ -455,22 +471,24 @@ export function getEmbedData(url) {
     if (url.endsWith(".pdf")) {
         return {
             service: "pdf",
-            url: url
+            url
         };
     }
 
     if (["mp4", "webm"].some(file => url.endsWith("." + file))) {
         return {
             service: "unknown-video",
-            url: url
+            url
         };
     }
 
-    return { service: "unknown", url: url };
+    return { service: "unknown", url };
 }
 
 
 export function unescapeText(text) {
+    if (!text) return "";
+
     return text
         .replaceAll("&amp;", "&")
         .replaceAll("&lt;", "<")

@@ -1,7 +1,5 @@
-const { handle } = require("express/lib/router");
-
 class EventHandler {
-    constructor(props) {
+    constructor() {
         this.fns = [];
     }
     dispatch(eventName, data) {
@@ -15,7 +13,7 @@ class EventHandler {
 }
 
 class DistributedEventHandler {
-    constructor(props) {
+    constructor() {
         this.handlers = {};
     }
     dispatch(handlerName, eventName, data) {

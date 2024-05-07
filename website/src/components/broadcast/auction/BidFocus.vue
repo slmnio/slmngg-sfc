@@ -1,6 +1,12 @@
 <template>
     <div class="bid-focus-grid">
-        <BidFocusTeam class="team" v-for="team in teams" :key="team.id" :team="team" :leading="leadingBid" :auction-settings="auctionSettings" />
+        <BidFocusTeam
+            v-for="team in teams"
+            :key="team.id"
+            class="team"
+            :team="team"
+            :leading="leadingBid"
+            :auction-settings="auctionSettings" />
     </div>
 </template>
 
@@ -9,8 +15,8 @@ import BidFocusTeam from "./BidFocusTeam";
 
 export default {
     name: "BidFocus",
-    props: ["teams", "bids", "auctionSettings"],
     components: { BidFocusTeam },
+    props: ["teams", "bids", "auctionSettings"],
     computed: {
         leadingBid() {
             if (!this.bids) return null;

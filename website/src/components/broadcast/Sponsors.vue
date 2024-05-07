@@ -1,10 +1,11 @@
 <template>
     <div class="break-sponsors">
-
         <div class="sponsors-holder">
-            <transition class="sponsors" name="spon-anim" :mode="mode || 'in-out'">
-                <div class="break-sponsor flex-center" :style="bg(activeSponsor)"
-                     :key="activeSponsor ? activeSponsor.id : 'empty'">
+            <transition class="sponsors" tag="div" name="spon-anim" :mode="mode || 'in-out'">
+                <div
+                    :key="activeSponsor ? activeSponsor.id : 'empty'"
+                    class="break-sponsor flex-center"
+                    :style="bg(activeSponsor)">
                     <div class="break-sponsor-logo bg-center" :style="logo(activeSponsor)"></div>
                 </div>
             </transition>
@@ -76,10 +77,10 @@ export default {
         left: 0;
     }
 
-    .spon-anim-enter, .spon-anim-leave-to {
+    .spon-anim-enter-from, .spon-anim-leave-to {
         opacity: 0;
     }
-    .spon-anim-enter-to, .spon-anim-leave {
+    .spon-anim-enter-to, .spon-anim-leave-from {
         opacity: 1;
     }
 

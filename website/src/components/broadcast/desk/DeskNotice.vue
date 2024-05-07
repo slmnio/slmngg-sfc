@@ -1,17 +1,17 @@
 <template>
     <div class="desk-notice" :style="mainTheme" :class="{'has-alt': !!alt, 'is-right': right}">
-        <div class="alt" v-if="alt" :style="altTheme">
+        <div v-if="alt" class="alt" :style="altTheme">
             <div class="industry-align">{{ alt }}</div>
         </div>
-        <div class="main main-guests" v-if="guests?.length">
-            <div class="guest" v-for="guest in guests" :key="guest.id">
+        <div v-if="guests?.length" class="main main-guests">
+            <div v-for="guest in guests" :key="guest.id" class="guest">
                 <div class="guest-name">{{ guest.name }}</div>
-                <div class="guest-full-name" v-if="showFullNames">{{ guest.full_name }}</div>
-                <div class="guest-pronouns" v-if="showPronouns">{{ guest.player?.pronouns }}</div>
+                <div v-if="showFullNames" class="guest-full-name">{{ guest.full_name }}</div>
+                <div v-if="showPronouns" class="guest-pronouns">{{ guest.player?.pronouns }}</div>
                 <div class="guest-socials">{{ getTwitterHandle(guest) }}</div>
             </div>
         </div>
-        <div class="main" v-else>
+        <div v-else class="main">
             <div class="industry-align" v-html="nbr(main)"></div>
         </div>
     </div>

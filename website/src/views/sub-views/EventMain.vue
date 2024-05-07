@@ -1,20 +1,31 @@
 <template>
     <div class="container">
-        <ContentRow :title="group.name" v-for="group in groupedTeams" :key="group.name">
-            <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in group.teams" :key="team.id" :show-logo="true"></ContentThing>
+        <ContentRow v-for="group in groupedTeams" :key="group.name" :title="group.name">
+            <ContentThing
+                v-for="team in group.teams"
+                :key="team.id"
+                :thing="team"
+                type="team"
+                :theme="team.theme"
+                :show-logo="true" />
         </ContentRow>
-        <ContentRow title="Teams" v-if="event.teams && event.teams.length && !groupedTeams">
-            <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in event.teams" :key="team.id" :show-logo="true"></ContentThing>
+        <ContentRow v-if="event.teams && event.teams.length && !groupedTeams" title="Teams">
+            <ContentThing
+                v-for="team in event.teams"
+                :key="team.id"
+                :thing="team"
+                type="team"
+                :theme="team.theme"
+                :show-logo="true" />
         </ContentRow>
         <div class="news mt-3">
-            <div class="news-category" v-for="([categoryName, category]) in Object.entries(newsCategories)" :key="categoryName">
+            <div v-for="([categoryName, category]) in Object.entries(newsCategories)" :key="categoryName" class="news-category">
                 <h2>{{ categoryName }}</h2>
                 <div class="row">
-                    <News class="ct-passive col-6 col-md-4 col-lg-3 mb-3" v-for="item in category" :item="item" :key="item.id" />
+                    <News v-for="item in category" :key="item.id" class="ct-passive col-6 col-md-4 col-lg-3 mb-3" :item="item" />
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -25,37 +36,13 @@ import News from "@/components/website/news/News";
 
 export default {
     name: "EventMain",
-    props: ["event"],
     components: {
-        // eslint-disable-next-line vue/no-unused-components
         ContentThing, ContentRow, News
     },
+    props: ["event"],
     computed: {
-        playerRelationshipGroups() {
-            if (this.useStaffPage) return [];
-            if (!this.event?.player_relationships) return [];
-            const groups = {};
-
-            this.event.player_relationships.forEach(rel => {
-                if (!groups[rel.singular_name]) {
-                    groups[rel.singular_name] = {
-                        meta: {
-                            player_text: rel.player_text,
-                            plural_name: rel.plural_name,
-                            singular_name: rel.singular_name
-                        },
-                        items: []
-                    };
-                }
-                groups[rel.singular_name].items = groups[rel.singular_name].items.concat(rel.player);
-            });
-
-            if (groups[undefined]) return [];
-
-            return Object.values(groups);
-        },
         groupedTeams() {
-            if (!this.event || !this.event.teams) return null;
+            if (!this.event?.teams) return null;
             if (!this.event?.teams.some(team => team.team_category)) return null;
             const categories = [];
             this.event.teams.forEach(team => {
@@ -124,7 +111,7 @@ export default {
 </script>
 
 <style scoped>
-    .content-row >>> .content-title {
+    .content-row:deep(.content-title) {
         color: var(--theme-ondark);
     }
 </style>

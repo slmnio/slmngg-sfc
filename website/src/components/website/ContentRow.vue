@@ -1,6 +1,6 @@
 <template>
     <div class="content-row d-flex">
-        <div class="content-title font-weight-bold" v-if="title">{{ title }}</div>
+        <div v-if="title" class="content-title fw-bold">{{ title }}</div>
         <div class="content-item-list">
             <slot></slot>
         </div>

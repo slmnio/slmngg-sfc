@@ -1,11 +1,12 @@
 <template>
-    <div class="season-history-match"
-         :class="{'live': isLive, 'home-win': homeTeamWon, 'home-lose': homeTeamWon === false}">
-        <ThemeLogo class="opponent-logo" :theme="opponent && opponent.theme" icon-padding="25"/>
-        <div class="status status--upcoming" v-if="lower === 'time'">
-            <ScheduleTime :time="match.start" no-times :custom-timezone="timezone"/>
+    <div
+        class="season-history-match"
+        :class="{'live': isLive, 'home-win': homeTeamWon, 'home-lose': homeTeamWon === false}">
+        <ThemeLogo class="opponent-logo" :theme="opponent && opponent.theme" icon-padding="25" />
+        <div v-if="lower === 'time'" class="status status--upcoming">
+            <ScheduleTime :time="match.start" no-times :custom-timezone="timezone" />
         </div>
-        <div class="status status--score" v-if="lower === 'score'">
+        <div v-if="lower === 'score'" class="status status--score">
             {{ scoreText }}
         </div>
     </div>
@@ -41,7 +42,7 @@ export default {
         lower() {
             if (this.isLive) return "score";
             console.log(this.scores, this.scores.some(s => !!s));
-            if (this.scores && this.scores.some(s => !!s)) return "score";
+            if (this.scores?.some(s => !!s)) return "score";
             return "time";
         },
         scoreText() {

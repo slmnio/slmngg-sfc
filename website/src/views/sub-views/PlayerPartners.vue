@@ -2,38 +2,46 @@
     <div class="container player-partners">
         <h2 id="partners">Partners</h2>
 
-        <b-form-select class="w-auto mb-1" :options="partnerTypes" v-model="chosenPartnerType"></b-form-select>
+        <b-form-select v-model="chosenPartnerType" class="w-auto mb-1" :options="partnerTypes" />
 
-        <div class="d-flex gap-2 mb-2" v-if="chosenPartnerType">
+        <div v-if="chosenPartnerType" class="d-flex gap-2 mb-2">
             <div>{{ source?.length }} match{{ source?.length === 1 ? '' : 'es' }}</div>
             <div>•</div>
             <div>{{ partners?.length }} partner{{ partners?.length === 1 ? '' : 's' }}</div>
         </div>
-        <table class="table table-bordered table-dark table-sm" v-if="chosenPartnerType">
-            <tr>
-                <th>Partner</th>
-                <th>Matches together</th>
-                <th>Last match together</th>
-            </tr>
-            <tr v-for="partner in partners" :key="partner.player.id">
-                <td><router-link :to="`/player/${partner.player.id}/partners`">{{ partner.player.name }}</router-link></td>
-                <td>{{ partner.matches }}</td>
-                <td>{{ formatTime(partner.lastMatch.start, {format: "{day} {date-ordinal} {month} {year}", tz: $store.state.timezone, use24HourTime: $store.state.use24HourTime}) }} -
-                    <span v-if="partner.lastMatch?.event"><router-link :to="url('event', partner.lastMatch?.event)">{{ partner.lastMatch?.event?.name || '...' }}</router-link> - </span>
-                    <router-link :to="url('match', partner.lastMatch)">{{ partner.lastMatch?.name || '...' }}</router-link></td>
-            </tr>
+        <table v-if="chosenPartnerType" class="table table-bordered table-dark table-sm">
+            <thead>
+                <tr>
+                    <th>Partner</th>
+                    <th>Matches together</th>
+                    <th>Last match together</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="partner in partners" :key="partner.player.id">
+                    <td>
+                        <router-link :to="`/player/${partner.player.id}/partners`">{{ partner.player.name }}</router-link>
+                    </td>
+                    <td>{{ partner.matches }}</td>
+                    <td>
+                        {{ formatTime(partner.lastMatch.start, { format: "{day} {date-ordinal} {month} {year}", tz: useSettingsStore().timezone, use24HourTime: useSettingsStore().use24HourTime }) }} -
+                        <span v-if="partner.lastMatch?.event">
+                            <router-link :to="url('event', partner.lastMatch?.event)">{{ partner.lastMatch?.event?.name || "..." }}</router-link> -
+                        </span>
+                        <router-link :to="url('match', partner.lastMatch)">{{ partner.lastMatch?.name || "..." }}</router-link>
+                    </td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </template>
 <script>
-import { BFormSelect } from "bootstrap-vue";
 import { formatTime, url } from "@/utils/content-utils";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
+import { useSettingsStore } from "@/stores/settingsStore";
 export default {
     name: "PlayerPartners",
     props: ["player"],
-    methods: { url, formatTime },
-    components: { BFormSelect },
     data: () => ({
         chosenPartnerType: null
     }),
@@ -93,7 +101,7 @@ export default {
             const addPartner = (id, player, match) => {
                 if (!player?.name || id === this.player.id) return;
                 if (!partners.has(id)) {
-                    partners.set(id, { player: player, matches: 0, lastMatch: match });
+                    partners.set(id, { player, matches: 0, lastMatch: match });
                 }
                 const data = partners.get(id);
                 data.matches++;
@@ -125,7 +133,8 @@ export default {
                 return new Date(b.lastMatch?.start) - new Date(a.lastMatch?.start);
             });
         }
-    }
+    },
+    methods: { useSettingsStore, url, formatTime }
 };
 </script>
 <style scoped>

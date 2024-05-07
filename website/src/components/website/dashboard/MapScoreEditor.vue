@@ -1,22 +1,27 @@
 <template>
     <div class="map-score-editor d-flex" :class="{'flex-row-reverse': reverse}">
         <div class="team-slice" :style="teamSliceBackground"></div>
-        <b-form-input class="score-input no-arrows" autocomplete="off" :value="score" @input="(n) => this.$emit('input', parseInt(n))" type="number" min="0" step="1"></b-form-input>
+        <b-form-input
+            class="score-input no-arrows"
+            autocomplete="off"
+            :value="score"
+            type="number"
+            min="0"
+            step="1"
+            @input="(n) => this.$emit('input', parseInt(n))" />
     </div>
 </template>
 
 <script>
-import { BFormInput } from "bootstrap-vue";
 import { themeBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "MapScoreEditor",
-    components: { BFormInput },
-    props: ["team", "score", "reverse"],
     model: {
         prop: "score",
         event: "input"
     },
+    props: ["team", "score", "reverse"],
     computed: {
         teamSliceBackground() {
             return themeBackground1(this.team);

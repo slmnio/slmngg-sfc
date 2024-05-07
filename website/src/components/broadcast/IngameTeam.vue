@@ -1,65 +1,81 @@
 <template>
-<!--    <transition name="ingame-team-anim">-->
-        <ThemeTransition class="ingame-team-holder" v-if="loaded" :class="{'right': right, 'left': !right}" :duration="500"
-                         :key="`${team.id}-${right ? '1':'0'}`" :transitionKey="`${team.id}-${right ? '1':'0'}`" :use-fit-content="true"
-                         :active="active" :theme="_theme" :start="right ? 'left' : 'right'" :end="right ? 'right' : 'left'" clip-slot :clip-delay="500">
-            <div class="ingame-team default-thing clip-target" :style="style" :key="team.id" :class="{ 'extend-map-icon': extendIcons && mapAttack }">
-                <div class="texture-holder position-absolute w-100 h-100" v-if="texture">
-                    <div class="ingame-texture">
-                        <img :src="texture" alt="">
-                    </div>
+    <!--    <transition name="ingame-team-anim">-->
+    <ThemeTransition
+        v-if="loaded"
+        :key="`${team.id}-${right ? '1':'0'}`"
+        class="ingame-team-holder"
+        :class="{'right': right, 'left': !right}"
+        :duration="500"
+        :transition-key="`${team.id}-${right ? '1':'0'}`"
+        :use-fit-content="true"
+        :active="active"
+        :theme="_theme"
+        :start="right ? 'left' : 'right'"
+        :end="right ? 'right' : 'left'"
+        clip-slot
+        :clip-delay="500">
+        <div :key="team.id" class="ingame-team default-thing clip-target" :style="style" :class="{ 'extend-map-icon': extendIcons && mapAttack }">
+            <div v-if="texture" class="texture-holder position-absolute w-100 h-100">
+                <div class="ingame-texture">
+                    <img :src="texture" alt="">
                 </div>
-                <div class="flex-center team-small-text" v-if="smallText">
-                    <transition name="fade" mode="out-in">
-                        <span :key="smallText" v-if="smallText">
+            </div>
+            <div v-if="smallText" class="flex-center team-small-text">
+                <transition name="fade" mode="out-in">
+                    <span v-if="smallText" :key="smallText">
                         {{ smallText }}
-                        </span>
-                    </transition>
-                </div>
-                <Squeezable class="flex-center team-name" :align="right ? 'left' : 'right'">
-                    <span class="industry-align team-sub-name" v-if="!codes">{{ team.name }}</span>
-                    <span class="industry-align team-sub-subtitle" v-if="!codes && team.subtitle">{{ team.subtitle }}</span>
-                    <span class="industry-align team-sub-code" v-if="codes">{{ team.code }}</span>
-                </Squeezable>
-                <div class="flex-center team-logo-holder flex-center" v-if="teamLogo" :style="colorLogoHolder ? logoBackground(_theme) : {}" :data-clh="colorLogoHolder">
-                    <div class="team-logo bg-center" :style="teamLogo"></div>
-                </div>
-                <transition name="score">
-                    <div class="flex-center team-score" v-if="!hideScores && !useDots">
-                        <transition name="fade" mode="out-in">
-                            <span class="industry-align" :key="score || '0'">{{ score || '0' }}</span>
-                        </transition>
-                    </div>
-                </transition>
-                <transition name="score">
-                    <div class="flex-center team-dots" v-if="!hideScores && useDots">
-                        <div class="dot" v-for="(dot, i) in dots" :class="{'active': dot.active}" :key="i" :style="dot.active ? teamSlice : {}"></div>
-                    </div>
-                </transition>
-                <div class="team-alt-slice" :style="teamSlice"></div>
-                <transition name="slide" mode="out-in">
-                    <div class="attack-holder" v-if="mapAttack">
-                        <transition name="attack" mode="out-in">
-                            <div class="attack" :key="mapAttack" :class="`icon-${mapAttack}`"></div>
-                        </transition>
-                    </div>
-                </transition>
-                <transition name="fly-in">
-                    <div class="event-info" v-if="active && eventInfo?.length">
-                        <squeezable>
-                            <div class="event-info-text">
-                                <div class="text" v-for="(item, i) in eventInfo" :key="item" :style="{order: i * 2}">
-                                    {{ item }}
-                                </div>
-                                <div class="dash" v-for="(item, i) in eventInfo" :key="i" :style="{order: (i * 2) + 1}">
-                                    -
-                                </div>
-                            </div>
-                        </squeezable>
-                    </div>
+                    </span>
                 </transition>
             </div>
-        </ThemeTransition>
+            <Squeezable class="flex-center team-name" :align="right ? 'left' : 'right'">
+                <span v-if="!codes" class="industry-align team-sub-name">{{ team.name }}</span>
+                <span v-if="!codes && team.subtitle" class="industry-align team-sub-subtitle">{{ team.subtitle }}</span>
+                <span v-if="codes" class="industry-align team-sub-code">{{ team.code }}</span>
+            </Squeezable>
+            <div v-if="teamLogo" class="flex-center team-logo-holder flex-center" :style="colorLogoHolder ? logoBackground(_theme) : {}" :data-clh="colorLogoHolder">
+                <div class="team-logo bg-center" :style="teamLogo"></div>
+            </div>
+            <transition name="score">
+                <div v-if="!hideScores && !useDots" class="flex-center team-score">
+                    <transition name="fade" mode="out-in">
+                        <span :key="score || '0'" class="industry-align">{{ score || '0' }}</span>
+                    </transition>
+                </div>
+            </transition>
+            <transition name="score">
+                <div v-if="!hideScores && useDots" class="flex-center team-dots">
+                    <div
+                        v-for="(dot, i) in dots"
+                        :key="i"
+                        class="dot"
+                        :class="{'active': dot.active}"
+                        :style="dot.active ? teamSlice : {}"></div>
+                </div>
+            </transition>
+            <div class="team-alt-slice" :style="teamSlice"></div>
+            <transition name="slide" mode="out-in">
+                <div v-if="mapAttack" class="attack-holder">
+                    <transition name="attack" mode="out-in">
+                        <div :key="mapAttack" class="attack" :class="`icon-${mapAttack}`"></div>
+                    </transition>
+                </div>
+            </transition>
+            <transition name="fly-in">
+                <div v-if="active && eventInfo?.length" class="event-info">
+                    <squeezable>
+                        <div class="event-info-text">
+                            <div v-for="(item, i) in eventInfo" :key="item" class="text" :style="{order: i * 2}">
+                                {{ item }}
+                            </div>
+                            <div v-for="(item, i) in eventInfo" :key="i" class="dash" :style="{order: (i * 2) + 1}">
+                                -
+                            </div>
+                        </div>
+                    </squeezable>
+                </div>
+            </transition>
+        </div>
+    </ThemeTransition>
 <!--    </transition>-->
 </template>
 
@@ -82,18 +98,6 @@ export default {
         },
         show: true
     }),
-    methods: {
-        logoBackground,
-        async loadSVG(url) {
-            console.log("Load SVG", url);
-            this.textureData.loading = true;
-            this.textureData.url = url;
-            const data = await fetch(url).then(res => res.text());
-            // console.log(data);
-            this.textureData.svg = data;
-            this.textureData.loading = false;
-        }
-    },
     computed: {
         dots() {
             const _dots = [];
@@ -179,6 +183,18 @@ export default {
         teamWidthCSS() {
             if (!this.teamWidth) return {};
             return { width: `calc(${this.teamWidth}px + var(--team-expand, 0px) - var(--side-margins, 0px))` };
+        }
+    },
+    methods: {
+        logoBackground,
+        async loadSVG(url) {
+            console.log("Load SVG", url);
+            this.textureData.loading = true;
+            this.textureData.url = url;
+            const data = await fetch(url).then(res => res.text());
+            // console.log(data);
+            this.textureData.svg = data;
+            this.textureData.loading = false;
         }
     }, //,
     // watch: {
@@ -335,10 +351,10 @@ export default {
     .ingame-team-anim-enter-active, .ingame-team-anim-leave-active {
         transition: all .5s cubic-bezier(0, 0, 0.55, 1);
     }
-    .ingame-team-anim-enter-to, .ingame-team-anim-leave {
+    .ingame-team-anim-enter-to, .ingame-team-anim-leave-from {
         max-width: 700px;
     }
-    .ingame-team-anim-enter, .ingame-team-anim-leave-to {
+    .ingame-team-anim-enter-from, .ingame-team-anim-leave-to {
         max-width: 0;
     }
 
@@ -372,8 +388,8 @@ export default {
     /*}*/
 
     .score-enter-active, .score-leave-active { overflow: hidden; transition: max-width .3s; }
-    .score-enter-to, .score-leave { max-width: var(--team-height); }
-    .score-enter, .score-leave-to { max-width: 0; }
+    .score-enter-to, .score-leave-from { max-width: var(--team-height); }
+    .score-enter-from, .score-leave-to { max-width: 0; }
 
     .ingame-team.default-thing {
         background-color: #373737;
@@ -424,16 +440,16 @@ export default {
         transition: all 200ms ease .2s;
         overflow: hidden;
     }
-    .slide-enter, .slide-leave-to {
+    .slide-enter-from, .slide-leave-to {
         width: 0;
     }
-    .slide-enter-to, .slide-leave {
+    .slide-enter-to, .slide-leave-from {
         width: var(--team-height);
     }
     .attack-enter-active, .attack-leave-active { transition: all 200ms ease; }
 
-    .attack-enter { clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); }
-    .attack-enter-to, .attack-leave { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+    .attack-enter-from { clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); }
+    .attack-enter-to, .attack-leave-from { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
     .attack-leave-to { clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); }
 
     .dot {
@@ -476,7 +492,7 @@ export default {
     .fly-in-enter-active {
         transition: all .75s ease 1.5s;
     }
-    .fly-in-enter {
+    .fly-in-enter-from {
         transform: translate(0, -40px);
     }
     .fly-in-enter-to {

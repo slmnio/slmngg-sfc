@@ -1,13 +1,18 @@
 <template>
-    <a v-if="social.approved" :href="social.url" class="social-link" target="_blank" :title="social.name">
+    <a
+        v-if="social.approved"
+        :href="social.url"
+        class="social-link"
+        target="_blank"
+        :title="social.name">
         <i :class="icon"></i>
     </a>
 </template>
 
 <script>
 export default {
-    props: ["social"],
     name: "Social",
+    props: ["social"],
     computed: {
         icon() {
             return {

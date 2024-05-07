@@ -77,9 +77,9 @@ export default [
         path: "multi-standings",
         component: () => import("@/components/broadcast/roots/MultiStandingsOverlay.vue"),
         props: route => ({
-            stageCodes: (route.query.stage || route.query.group || route.query.stages || route.query.groups || "").split(",").filter(t => t),
+            stageCodes: (route.query.stage || route.query.group || route.query.stages || route.query.groups || "").split(",").filter(Boolean),
             useCodes: !!route.query.codes,
-            showColumns: (route.query.columns || route.query.show || "").split(",").filter(t => t)
+            showColumns: (route.query.columns || route.query.show || "").split(",").filter(Boolean)
         })
     },
     { path: "multistandings", redirect: "multi-standings" },

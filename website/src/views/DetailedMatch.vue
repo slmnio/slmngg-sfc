@@ -2,160 +2,189 @@
     <div class="detailed-match container">
         <div class="main-content row">
             <div class="center-holder col-12 col-md-9 mb-4">
-                <div class="maps-holder mt-1" v-if="match.maps && showMatchMaps">
-                    <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="_theme" :key="map.id" :show-banned-maps="showMapBans"/>
+                <div v-if="match.maps && showMatchMaps" class="maps-holder mt-2">
+                    <MapDisplay
+                        v-for="(map, i) in match.maps"
+                        :key="map.id"
+                        :i="i"
+                        :map="map"
+                        :match="match"
+                        :theme="_theme"
+                        :show-banned-maps="showMapBans" />
                 </div>
 
-                <div class="special-event-notice" v-if="match.special_event">
+                <div v-if="match.special_event" class="special-event-notice">
                     <h2>Special event</h2>
                     This is a special event and doesn't have team information.
                 </div>
 
-                <div class="team-holder f-row mb-2">
-                    <div class="team f-col w-50 mt-2" v-for="team in match.teams" :key="team.id">
+                <div class="team-holder f-row">
+                    <div v-for="team in match.teams" :key="team.id" class="team f-col w-50 mt-2">
                         <div :style="theme(team)" class="team-header flex-center f-col default-thing">
                             <div class="team-code">{{ team.code }}</div>
                             <div class="team-overlay-text">{{ team.small_overlay_text }}</div>
                             <div class="team-logo bg-center" :style="icon(team)"></div>
                             <router-link :to="url('team', team, match.event)" class="team-name">{{ team.name }}</router-link>
                         </div>
-                        <div class="team-players f-col p-1" v-if="showRosters">
-                            <div class="team-player" v-for="player in sortPlayers(showLimitedPlayers(team) ? team.limited_players : team.players)" :key="player.id">
+                        <div v-if="showRosters" class="team-players f-col p-1">
+                            <div v-for="player in sortPlayers(showLimitedPlayers(team) ? team.limited_players : team.players)" :key="player.id" class="team-player">
                                 <div class="player-info player-name flex-center">
-                                    <div class="player-role-holder player-icon-holder flex-center" v-if="player.role">
+                                    <div v-if="player.role" class="player-role-holder player-icon-holder flex-center">
                                         <div class="player-role" v-html="getRoleSVG(player.role)"></div>
                                     </div>
-                                    <div :is="player.limited ? 'div' : 'router-link'" class="ct-active" :to="url('player', player)">{{ player.name }} </div>
-                                    <span v-if="showCastingInfo && player.pronouns" class="player-pronouns ml-1 badge rounded-pill bg-light text-dark" :data-pronoun="player.pronouns">{{ player.pronouns }}</span></div>
-                                <div class="player-info player-pronounce" v-if="showCastingInfo"><i class="fas fa-w fa-lips player-icon-holder"></i> {{ player.pronunciation }}</div>
-                                <div class="player-info player-dtag" v-if="showPlayerInfo">
-                                    <i class="fab fa-fw fa-discord player-icon-holder"></i> <CopyTextButton>{{player.discord_tag}}</CopyTextButton>
+                                    <component :is="player.limited ? 'div' : 'router-link'" class="ct-active" :to="url('player', player)">{{ player.name }} </component>
+                                    <span v-if="showCastingInfo && player.pronouns" class="player-pronouns ml-1 badge rounded-pill bg-light text-dark" :data-pronoun="player.pronouns">{{ player.pronouns }}</span>
                                 </div>
-                                <div class="player-info player-btag" v-if="showPlayerInfo">
-                                    <i class="fab fa-fw fa-battle-net player-icon-holder"></i> <CopyTextButton>{{player.battletag}}</CopyTextButton>
+                                <div v-if="showCastingInfo" class="player-info player-pronounce"><i class="fas fa-w fa-lips player-icon-holder"></i> {{ player.pronunciation }}</div>
+                                <div v-if="showPlayerInfo" class="player-info player-dtag">
+                                    <i class="fab fa-fw fa-discord player-icon-holder"></i> <CopyTextButton>{{ player.discord_tag }}</CopyTextButton>
+                                </div>
+                                <div v-if="showPlayerInfo" class="player-info player-btag">
+                                    <i class="fab fa-fw fa-battle-net player-icon-holder"></i> <CopyTextButton>{{ player.battletag }}</CopyTextButton>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="team-holder f-row mb-2" v-if="showManagers">
-                    <div class="team f-col w-50" v-for="team in match.teams" :key="team.id">
+                <div v-if="showManagers" class="team-holder f-row">
+                    <div v-for="team in match.teams" :key="team.id" class="team f-col w-50">
                         <div class="team-players team-managers f-col p-1">
-                            <div class="team-player" v-for="player in getTeamStaff(team)" :key="player.id">
+                            <div v-for="player in getTeamStaff(team)" :key="player.id" class="team-player">
                                 <div class="player-info player-name flex-center">
                                     <div class="player-role-holder player-icon-holder">
-                                        <div v-for="role in player.is" :key="role" class="player-role" v-html="getRoleSVG(role)" v-b-tooltip="role"></div>
-                                        <div v-if="!player.is.length" class="player-role" v-html="getRoleSVG('Staff')" v-b-tooltip="'Team staff'"></div>
+                                        <div
+                                            v-for="role in player.is"
+                                            :key="role"
+                                            v-b-tooltip="role"
+                                            class="player-role"
+                                            v-html="getRoleSVG(role)"></div>
+                                        <div v-if="!player.is.length" v-b-tooltip="'Team staff'" class="player-role" v-html="getRoleSVG('Staff')"></div>
                                     </div>
-                                    <router-link class="ct-active" :to="url('player', player)">{{ player.name }} <i class="fas fa-badge-check fa-fw" title="REAL" v-if="player.verified"></i></router-link>
+                                    <router-link class="ct-active" :to="url('player', player)">{{ player.name }} <i v-if="player.verified" class="fas fa-badge-check fa-fw" title="REAL"></i></router-link>
                                 </div>
-                                <div class="player-info player-dtag" v-if="showPlayerInfo && player.discord_tag">
-                                    <i class="fab fa-fw fa-discord player-icon-holder"></i> <CopyTextButton>{{player.discord_tag}}</CopyTextButton>
+                                <div v-if="showPlayerInfo && player.discord_tag" class="player-info player-dtag">
+                                    <i class="fab fa-fw fa-discord player-icon-holder"></i> <CopyTextButton>{{ player.discord_tag }}</CopyTextButton>
                                 </div>
-                                <div class="player-info player-btag" v-if="showPlayerInfo && player.battletag">
-                                    <i class="fab fa-fw fa-battle-net player-icon-holder"></i> <CopyTextButton>{{player.battletag}}</CopyTextButton>
+                                <div v-if="showPlayerInfo && player.battletag" class="player-info player-btag">
+                                    <i class="fab fa-fw fa-battle-net player-icon-holder"></i> <CopyTextButton>{{ player.battletag }}</CopyTextButton>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="prev-matches-holder d-flex mt-2 flex-column" v-if="showMatchHistory">
-<!--                    <div class="team-prev-wrapper w-50" v-for="team in match.teams" :key="team.id">-->
-<!--                        <PreviousMatch v-for="match in teamMatches(team)" :match="match" :team="team" :key="match.id" />-->
-<!--                    </div>-->
-                    <div class="match-group d-flex flex-column" v-for="([groupKey, group]) in teamsMatchGroups" :key="groupKey">
-                        <div class="match-group-title mt-3 text-center font-weight-bold" v-if="groupKey && groupKey !== 'undefined'">{{ groupKey }}</div>
+                <div v-if="showMatchHistory" class="prev-matches-holder d-flex mt-2 flex-column">
+                    <!--                    <div class="team-prev-wrapper w-50" v-for="team in match.teams" :key="team.id">-->
+                    <!--                        <PreviousMatch v-for="match in teamMatches(team)" :match="match" :team="team" :key="match.id" />-->
+                    <!--                    </div>-->
+                    <div v-for="([groupKey, group]) in teamsMatchGroups" :key="groupKey" class="match-group d-flex flex-column">
+                        <div v-if="groupKey && groupKey !== 'undefined'" class="match-group-title mt-2 text-center fw-bold">{{ groupKey }}</div>
                         <div class="match-group-teams w-100 d-flex">
-                            <div class="team-prev-wrapper w-50" v-for="team in group.teams" :key="team.id">
-                                <div class="match-group" v-for="match in team.matches" :key="match.id">
-                                    <PreviousMatch :match="match" :key="match.id" :team="team" :show-self-picks="true" />
+                            <div v-for="team in group.teams" :key="team.id" class="team-prev-wrapper w-50">
+                                <div v-for="match in team.matches" :key="match.id" class="match-group">
+                                    <PreviousMatch :key="match.id" :match="match" :team="team" :show-self-picks="true" />
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="map-stats mt-4" v-if="showMapStats">
+                <div v-if="showMapStats" class="map-stats mt-4">
                     <h2>Map stats</h2>
                     <MatchHistory :match="match" :hide-map-display="true" />
                 </div>
 
-                <bracket-implications class="bracket-implications mt-3" :match="match" link-to-detailed-match
-                                      v-if="showImplications && match.brackets"></bracket-implications>
+                <bracket-implications
+                    v-if="showImplications && match.brackets"
+                    class="bracket-implications mt-2"
+                    :match="match"
+                    link-to-detailed-match />
 
-                <div class="show-notes mt-3" v-if="showShowNotes && match.show_notes">
+                <div v-if="showShowNotes && match.show_notes" class="show-notes mt-2">
                     <h2>Show notes</h2>
-                    <Markdown :markdown="match.show_notes"/>
+                    <Markdown :markdown="match.show_notes" />
                 </div>
             </div>
             <div class="right-holder col-12 col-md-3">
                 <router-link v-if="match.event" :to="url('event', match.event)">
-                    <ThemeLogo class="top-right-logo mb-3" logo-size="w-200" :theme="_theme" border-width="8"/>
+                    <ThemeLogo class="top-right-logo mb-2" logo-size="w-200" :theme="_theme" border-width="8" />
                 </router-link>
-                <div class="info-block">
-
-                    <router-link :to="`/match/${match.id}`" class="btn btn-block border-transparent btn-primary text-dark-low"
-                    :style="theme(match.event)">
+                <div class="info-block gap-2 d-flex flex-column mb-2 mt-2">
+                    <router-link
+                        :to="`/match/${match.id}`"
+                        class="btn btn-block border-transparent btn-primary text-dark-low"
+                        :style="theme(match.event)">
                         <i class="fa-fw fas fa-external-link"></i>
                         See match page
                     </router-link>
-                    <router-link :to="`/match/${match.id}/editor`" v-if="matchEditable" class="btn btn-block border-transparent btn-primary text-dark-low"
-                    :style="theme(match.event)">
+                    <router-link
+                        v-if="matchEditable"
+                        :to="`/match/${match.id}/editor`"
+                        class="btn btn-block border-transparent btn-primary text-dark-low"
+                        :style="theme(match.event)">
                         <i class="fa-fw fas fa-pencil"></i>
                         Match editor
                     </router-link>
 
-                    <div :class="`mt-3 btn btn-block btn-${showRosters ? 'light' : 'secondary'} mb-2`" v-on:click="showRosters = !showRosters">
+                    <div :class="`mt-2 btn btn-block btn-${showRosters ? 'light' : 'secondary'}`" @click="showRosters = !showRosters">
                         <i class="fa-fw fas fa-users"></i> Rosters
                     </div>
-                    <div :class="`mb-3 btn btn-block btn-${showManagers ? 'light' : 'secondary'} mb-2`"
-                         v-on:click="showManagers = !showManagers">
+                    <div
+                        :class="`mb-2 btn btn-block btn-${showManagers ? 'light' : 'secondary'}`"
+                        @click="showManagers = !showManagers">
                         <i class="fa-fw fas fa-user-tie"></i>
                         Team staff
                     </div>
-                    <div :class="`btn btn-block btn-${showCastingInfo ? 'light' : 'secondary'} mb-2`" v-if="showRosters || showManagers"
-                         v-on:click="showCastingInfo = !showCastingInfo">
+                    <div
+                        v-if="showRosters || showManagers"
+                        :class="`btn btn-block btn-${showCastingInfo ? 'light' : 'secondary'}`"
+                        @click="showCastingInfo = !showCastingInfo">
                         <i class="fa-fw fas fa-headset"></i>
                         Casting info
                     </div>
-                    <div :class="`mb-3 btn btn-block btn-${showPlayerInfo ? 'light' : 'secondary'} mb-2`" v-if="showRosters || showManagers"
-                         v-on:click="showPlayerInfo = !showPlayerInfo">
+                    <div
+                        v-if="showRosters || showManagers"
+                        :class="`mb-2 btn btn-block btn-${showPlayerInfo ? 'light' : 'secondary'}`"
+                        @click="showPlayerInfo = !showPlayerInfo">
                         <i class="fa-fw far fa-id-card"></i>
                         Contacts
                     </div>
-                    <div v-if="match.maps" :class="`btn btn-block btn-${showMatchMaps ? 'light' : 'secondary'} mb-2`" v-on:click="showMatchMaps = !showMatchMaps">
+                    <div v-if="match.maps" :class="`btn btn-block btn-${showMatchMaps ? 'light' : 'secondary'}`" @click="showMatchMaps = !showMatchMaps">
                         <i class="fa-fw fas fa-map"></i> Match maps
                     </div>
-                    <div v-if="match.maps && showMatchMaps" :class="`btn btn-block mb-3 btn-${showMapBans ? 'light' : 'secondary'} mb-2`" v-on:click="showMapBans = !showMapBans">
+                    <div v-if="match.maps && showMatchMaps" :class="`btn btn-block mb-2 btn-${showMapBans ? 'light' : 'secondary'}`" @click="showMapBans = !showMapBans">
                         <i class="fa-fw fas fa-ban"></i> Show map bans
                     </div>
-                    <div :class="`btn btn-block btn-${showMapStats ? 'light' : 'secondary'}`" v-on:click="showMapStats = !showMapStats">
+                    <div :class="`btn btn-block btn-${showMapStats ? 'light' : 'secondary'}`" @click="showMapStats = !showMapStats">
                         <i class="fa-fw fas fa-abacus"></i> Map stats
                     </div>
-                    <div v-if="match.brackets" :class="`btn btn-block btn-${showImplications ? 'light' : 'secondary'}`" v-on:click="showImplications = !showImplications">
+                    <div v-if="match.brackets" :class="`btn btn-block btn-${showImplications ? 'light' : 'secondary'}`" @click="showImplications = !showImplications">
                         <i class="fa-fw fas fa-sitemap"></i> Bracket implications
                     </div>
-                    <div :class="`btn btn-block btn-${showMatchHistory ? 'light' : 'secondary'} mb-2`"
-                         v-on:click="showMatchHistory = !showMatchHistory">
+                    <div
+                        :class="`btn btn-block btn-${showMatchHistory ? 'light' : 'secondary'}`"
+                        @click="showMatchHistory = !showMatchHistory">
                         <i class="fa-fw fas fa-history"></i>
                         Match history
                     </div>
-                    <div :class="`btn btn-block btn-${showNonEventMatches ? 'light' : 'secondary'} mb-2`"
-                         title="Show/hide past matches that aren't from this match's event"
-                         v-if="showMatchHistory"
-                         v-on:click="showNonEventMatches = !showNonEventMatches">
+                    <div
+                        v-if="showMatchHistory"
+                        :class="`btn btn-block btn-${showNonEventMatches ? 'light' : 'secondary'}`"
+                        title="Show/hide past matches that aren't from this match's event"
+                        @click="showNonEventMatches = !showNonEventMatches">
                         <i class="fa-fw far fa-calendar-alt"></i>
                         Show non-event matches
                     </div>
-                    <div v-if="match.show_notes" :class="`btn btn-block btn-${showShowNotes ? 'light' : 'secondary'} mb-2`"
-                         v-on:click="showShowNotes = !showShowNotes">
+                    <div
+                        v-if="match.show_notes"
+                        :class="`btn btn-block btn-${showShowNotes ? 'light' : 'secondary'}`"
+                        @click="showShowNotes = !showShowNotes">
                         <i class="fa-fw far fa-file-video"></i>
                         Show notes
                     </div>
-<!--                    <div :class="`btn btn-block btn-${showVod ? 'light' : 'secondary'} mb-2`" v-if="match.vod"-->
-<!--                         v-on:click="showVod = !showVod">-->
-<!--                        <i class="fa-fw far fa-desktop-alt"></i> Toggle VOD-->
-<!--                    </div>-->
+                    <!--                    <div :class="`btn btn-block btn-${showVod ? 'light' : 'secondary'}`" v-if="match.vod"-->
+                    <!--                         v-on:click="showVod = !showVod">-->
+                    <!--                        <i class="fa-fw far fa-desktop-alt"></i> Toggle VOD-->
+                    <!--                    </div>-->
                     <!--
                     <div :class="`btn btn-block btn-secondary`" v-if="!mapData"
                          v-on:click="loadMapData(match.id)">
@@ -167,26 +196,31 @@
                 <div class="info-block">
                     <stat :match="match" data="custom_name">Custom match name</stat>
                     <stat :match="match" data="match_number">Match number</stat>
-                    <stat :match="match" data="casters" :players="true">Casters</stat>
+                    <stat :match="match" data="casters" :players="true">{{ match?.casters?.length === 1 ? 'Caster' : 'Casters' }}</stat>
                     <stat :match="match" data="sub_event">Sub Event</stat>
                     <stat :match="match" data="start" :time="true">Scheduled start time</stat>
                     <stat :match="match" data="vod" :external-link="true">VOD Link</stat>
                     <stat :match="match" data="clean_feed" :external-link="true">Clean Feed</stat>
                     <stat :match="match" data="first_to">First to</stat>
-                    <stat :override="relGroup.items" v-for="relGroup in playerRelationshipGroups" :key="relGroup.meta.singular_name" :players="true" :show-tally="relGroup.meta.singular_name === 'Observer'">
+                    <stat
+                        v-for="relGroup in playerRelationshipGroups"
+                        :key="relGroup.meta.singular_name"
+                        :override="relGroup.items"
+                        :players="true"
+                        :show-tally="relGroup.meta.singular_name === 'Observer'">
                         {{ relGroup.items.length === 1 ? relGroup.meta.singular_name : relGroup.meta.plural_name }}
                     </stat>
                     <stat :match="match" data="replay_codes" :raw="true" :format="(t) => t[0].replace(/\n/g, '<br>')">Replay codes</stat>
                     <stat :match="match">
                         Match Thumbnails
-                        <template v-slot:content class="d-inline">
-                            <a class="ct-active" :href="matchThumbnailURL(match, 720)"  rel="nofollow" target="_blank">720p</a>,
-                            <a class="ct-active" :href="matchThumbnailURL(match, 1080)"  rel="nofollow" target="_blank">1080p</a>
+                        <template #content>
+                            <a class="ct-active" :href="matchThumbnailURL(match, 720)" rel="nofollow" target="_blank">720p</a>,
+                            <a class="ct-active" :href="matchThumbnailURL(match, 1080)" rel="nofollow" target="_blank">1080p</a>
                         </template>
                     </stat>
                     <stat v-if="credits">
                         Credits
-                        <template v-slot:content>
+                        <template #content>
                             <CopyTextButton style="white-space: pre" :content="credits">Copy credits</CopyTextButton>
                         </template>
                     </stat>
@@ -210,8 +244,8 @@ import CopyTextButton from "@/components/website/CopyTextButton";
 import BracketImplications from "@/components/website/dashboard/BracketImplications.vue";
 import { getDataServerAddress } from "@/utils/fetch";
 import { canEditMatch } from "@/utils/client-action-permissions";
-import { isAuthenticated } from "@/utils/auth";
 import MatchHistory from "@/views/sub-views/MatchHistory.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "DetailedMatch",
@@ -232,79 +266,6 @@ export default {
         showManagers: false,
         showImplications: true
     }),
-    methods: {
-        url,
-        icon(team) {
-            return resizedImage(team.theme, ["default_logo", "small_logo"], "h-60");
-        },
-        theme(team) {
-            return logoBackground1(team);
-        },
-        getRoleSVG,
-        teamMatches(team) {
-            if (this.showNonEventMatches) return team?.matches || [];
-            return (team?.matches || []).filter(m => {
-                return m.event?.id === this.match?.event?.id;
-            });
-        },
-        sortPlayers(players) {
-            if (!players?.length) return [];
-            return players.sort((a, b) => {
-                if (a.role !== b.role) {
-                    const order = ["Tank", "DPS", "Support"];
-                    return order.indexOf(a.role) - order.indexOf(b.role);
-                }
-            });
-        },
-        teamMatchGroups(team) {
-            const matches = this.teamMatches(team);
-            const groups = {};
-            matches.forEach(match => {
-                if (!groups[match.sub_event]) {
-                    groups[match.sub_event] = {
-                        items: [],
-                        earliest: null
-                    };
-                }
-                const group = groups[match.sub_event];
-                group.items.push(match);
-
-                if (group.earliest < match.start) group.earliest = match.start;
-            });
-            return Object.entries(groups).sort(([aSubEvent, aData], [bSubEvent, bData]) => {
-                return bData.earliest - aData.earliest;
-            });
-        },
-        getTeamStaff(team) {
-            const people = [
-                ...(team.owners || []),
-                ...(team.captains || []),
-                ...(team.staff || [])
-            ].filter((person, position, array) => array.findIndex(p => p.id === person.id) === position);
-            console.log({ people });
-            return people.map(person => {
-                const roles = [];
-
-                if ((team.owners || []).find(x => x.id === person.id)) roles.push("Owner");
-                if ((team.captains || []).find(x => x.id === person.id)) roles.push("Captain");
-                if ((team.staff || []).find(x => x.id === person.id) && person.staff_role) {
-                    roles.push(person.staff_role);
-                }
-
-                return {
-                    ...person,
-                    is: roles
-                };
-            });
-        },
-        showLimitedPlayers(team) {
-            return ((team.players || [])?.length === 0) && (team.limited_players || []).length !== 0;
-        },
-        matchThumbnailURL(match, size) {
-            const dataServerURL = getDataServerAddress();
-            return `${dataServerURL}/match.png?id=${match.id}&size=${size || "720"}&padding=30`;
-        }
-    },
     computed: {
         match () {
             return ReactiveRoot(this.id, {
@@ -430,14 +391,89 @@ export default {
             return Object.values(groups);
         },
         matchEditable() {
-            if (!isAuthenticated(this.$root)) return false;
-            return canEditMatch(this.$root.auth?.user, { event: this.match?.event, match: this.match });
+            const { isAuthenticated, user } = useAuthStore();
+            if (!isAuthenticated) return false;
+            return canEditMatch(user, { event: this.match?.event, match: this.match });
         }
     },
-    metaInfo() {
+    methods: {
+        url,
+        icon(team) {
+            return resizedImage(team.theme, ["default_logo", "small_logo"], "h-60");
+        },
+        theme(team) {
+            return logoBackground1(team);
+        },
+        getRoleSVG,
+        teamMatches(team) {
+            if (this.showNonEventMatches) return team?.matches || [];
+            return (team?.matches || []).filter(m => {
+                return m.event?.id === this.match?.event?.id;
+            });
+        },
+        sortPlayers(players) {
+            if (!players?.length) return [];
+            return players.sort((a, b) => {
+                if (a.role !== b.role) {
+                    const order = ["Tank", "DPS", "Support"];
+                    return order.indexOf(a.role) - order.indexOf(b.role);
+                }
+                return 0;
+            });
+        },
+        teamMatchGroups(team) {
+            const matches = this.teamMatches(team);
+            const groups = {};
+            matches.forEach(match => {
+                if (!groups[match.sub_event]) {
+                    groups[match.sub_event] = {
+                        items: [],
+                        earliest: null
+                    };
+                }
+                const group = groups[match.sub_event];
+                group.items.push(match);
+
+                if (group.earliest < match.start) group.earliest = match.start;
+            });
+            return Object.entries(groups).sort(([aSubEvent, aData], [bSubEvent, bData]) => {
+                return bData.earliest - aData.earliest;
+            });
+        },
+        getTeamStaff(team) {
+            const people = [
+                ...(team.owners || []),
+                ...(team.captains || []),
+                ...(team.staff || [])
+            ].filter((person, position, array) => array.findIndex(p => p.id === person.id) === position);
+            console.log({ people });
+            return people.map(person => {
+                const roles = [];
+
+                if ((team.owners || []).find(x => x.id === person.id)) roles.push("Owner");
+                if ((team.captains || []).find(x => x.id === person.id)) roles.push("Captain");
+                if ((team.staff || []).find(x => x.id === person.id) && person.staff_role) {
+                    roles.push(person.staff_role);
+                }
+
+                return {
+                    ...person,
+                    is: roles
+                };
+            });
+        },
+        showLimitedPlayers(team) {
+            return ((team.players || [])?.length === 0) && (team.limited_players || []).length !== 0;
+        },
+        matchThumbnailURL(match, size) {
+            const dataServerURL = getDataServerAddress();
+            return `${dataServerURL}/match.png?id=${match.id}&size=${size || "720"}&padding=30`;
+        }
+    },
+    head() {
         return {
             title: this.match ? (this.match.custom_name || this.match.name) + " | Detailed view" : "Detailed match view",
-            link: [{ rel: "icon", href: resizedImageNoWrap(this._theme, ["small_logo", "default_logo"], "s-128") }]
+            link: [{ rel: "icon", key: "favicon", href: resizedImageNoWrap(this._theme, ["small_logo", "default_logo"], "s-128") }]
         };
     }
 };

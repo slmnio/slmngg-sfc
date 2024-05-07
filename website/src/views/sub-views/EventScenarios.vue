@@ -1,12 +1,11 @@
 <template>
     <div class="container">
-
         <h2 class="text-center mb-3">Foldy Sheet</h2>
 
-        <div class="n-nav mb-2" v-if="_matchGroups">
-            <select name="match-group-selector" id="match-group-selector" v-model="activeMatchGroup">
+        <div v-if="_matchGroups" class="n-nav mb-2">
+            <select id="match-group-selector" v-model="activeMatchGroup" name="match-group-selector">
                 <option selected disabled value="null">Select a group</option>
-                <option v-for="group in _matchGroups" :value="group" :key="group">{{ group }}</option>
+                <option v-for="group in _matchGroups" :key="group" :value="group">{{ group }}</option>
             </select>
         </div>
 
@@ -18,70 +17,78 @@
                 <li>You can choose live scenarios (any remaining possible scenario) or all scenarios (all possible scenarios from the start of the tournament).</li>
                 <li>You can click on matchups to override the winner and force new calculations. You can click on the match title to reset.</li>
             </ul>
-
         </div>
 
-        <div class="btn btn-dark mb-3" v-if="showAll" @click="showAll = false">Show live scenarios</div>
-        <div class="btn btn-dark mb-3" v-if="!showAll" @click="showAll = true">Show all scenarios</div>
+        <div v-if="showAll" class="btn btn-dark mb-3" @click="showAll = false">Show live scenarios</div>
+        <div v-if="!showAll" class="btn btn-dark mb-3" @click="showAll = true">Show all scenarios</div>
 
         <div class="d-flex">
-            <table class="table table-dark table-sm w-auto mr-3" v-for="calc in calculations" :key="calc.title">
-                <tr>
-                    <th colspan="3" class="text-center">{{ calc.title }}</th>
-                </tr>
-                <tr>
-                    <th>Team</th>
-                    <th colspan="2">Scenarios (/{{ scenarios.length }})</th>
-                </tr>
-                <tr v-for="team in calc.counts" :key="team.code">
-                    <td>{{ team.code }}</td>
-                    <td>{{ team.num }}</td>
-                    <td>{{ team.perc | perc}}</td>
-                </tr>
+            <table v-for="calc in calculations" :key="calc.title" class="table table-dark table-sm w-auto mr-3">
+                <thead>
+                    <tr>
+                        <th colspan="3" class="text-center">{{ calc.title }}</th>
+                    </tr>
+                    <tr>
+                        <th>Team</th>
+                        <th colspan="2">Scenarios (/{{ scenarios.length }})</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="team in calc.counts" :key="team.code">
+                        <td>{{ team.code }}</td>
+                        <td>{{ team.num }}</td>
+                        <td>{{ perc(team.perc) }}</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
 
         <div class="padder">
             <table class="table table-dark table-hover table-sm">
                 <thead>
-                <tr>
-                    <th></th>
-                    <th :colspan="scenarioMatches.length" class="text-center">Matchups</th>
-                    <th :colspan="scenarioTeams.length" class="text-center">Placement</th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <td class="text-center">#</td>
-                    <td v-for="(match, i) in scenarioMatches" :key="`m-${i}`" :class="{ 'locked': match.completed }"
-                        @click="setOverride(i, null)">
-                        {{ match.teams.map((t, ti) => overrides[i] === ti ? `[${t}]` : t).join(" vs ") }}
-                    </td>
-                    <td v-for="(team, ti) in scenarioTeams" :key="`t2-${ti}`" class="text-center">
-                        #{{ ti+1 }}
-                    </td>
-                    <td class="text-center">Info</td>
-                </tr>
+                    <tr>
+                        <th></th>
+                        <th :colspan="scenarioMatches.length" class="text-center">Matchups</th>
+                        <th :colspan="scenarioTeams.length" class="text-center">Placement</th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td class="text-center">#</td>
+                        <td
+                            v-for="(match, i) in scenarioMatches"
+                            :key="`m-${i}`"
+                            :class="{ 'locked': match.completed }"
+                            @click="setOverride(i, null)">
+                            {{ match.teams.map((t, ti) => overrides[i] === ti ? `[${t}]` : t).join(" vs ") }}
+                        </td>
+                        <td v-for="(team, ti) in scenarioTeams" :key="`t2-${ti}`" class="text-center">
+                            #{{ ti+1 }}
+                        </td>
+                        <td class="text-center">Info</td>
+                    </tr>
                 </thead>
 
                 <tbody>
-                <tr v-for="(scenario, i) in scenarios" :key="`scenario-${i}`" :class="{'impossible': scenario.impossible, 'tie-l': scenario.flags.includes('3-WAY-LAST'), 'tie-f': scenario.flags.includes('3-WAY-FIRST')}">
-                    <td class="text-center">{{ scenario.i + 1 }}</td>
-                    <td v-for="(winner, wi) in scenario.winners" :key="`w-${wi}`"
-                        :class="{ 'locked': scenarioMatches[wi].completed && !scenario.impossible, 'overridden': overrides[wi] === scenario.bits[wi] }"
-                        @click="setOverride(wi, scenario.bits[wi])">
-                        {{ winner }}
-                    </td>
-                    <td v-for="(team, ti) in scenario.standings" :key="`t-${ti}`" class="no-wrap">
-                        {{ team.code }}
+                    <tr v-for="(scenario, i) in scenarios" :key="`scenario-${i}`" :class="{'impossible': scenario.impossible, 'tie-l': scenario.flags.includes('3-WAY-LAST'), 'tie-f': scenario.flags.includes('3-WAY-FIRST')}">
+                        <td class="text-center">{{ scenario.i + 1 }}</td>
+                        <td
+                            v-for="(winner, wi) in scenario.winners"
+                            :key="`w-${wi}`"
+                            :class="{ 'locked': scenarioMatches[wi].completed && !scenario.impossible, 'overridden': overrides[wi] === scenario.bits[wi] }"
+                            @click="setOverride(wi, scenario.bits[wi])">
+                            {{ winner }}
+                        </td>
+                        <td v-for="(team, ti) in scenario.standings" :key="`t-${ti}`" class="no-wrap">
+                            {{ team.code }}
 
-                        <span class="badge badge-pill bg-info">{{ team.wins }}-{{ team.losses }}</span>
-                    </td>
-                    <td class="text-right">
-                        <span class="badge" v-if="scenario.flags.includes('3-WAY-LAST')">3-way L</span>
-                        <span class="badge" v-if="scenario.flags.includes('3-WAY-FIRST')">3-way F</span>
-                        <i class="fas fa-info-circle" v-if="scenario.notes.length" :title="scenario.notes.join(', ')"></i>
-                    </td>
-                </tr>
+                            <span class="badge badge-pill bg-info">{{ team.wins }}-{{ team.losses }}</span>
+                        </td>
+                        <td class="text-end">
+                            <span v-if="scenario.flags.includes('3-WAY-LAST')" class="badge">3-way L</span>
+                            <span v-if="scenario.flags.includes('3-WAY-FIRST')" class="badge">3-way F</span>
+                            <i v-if="scenario.notes.length" class="fas fa-info-circle" :title="scenario.notes.join(', ')"></i>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -100,12 +107,6 @@ export default {
         activeMatchGroup: null,
         overrides: {}
     }),
-    filters: {
-        perc(num) {
-            if (isNaN(num)) return "-";
-            return (num * 100).toFixed(1) + "%";
-        }
-    },
     computed: {
         settings() {
             if (!this.event?.blocks) return null;
@@ -190,7 +191,6 @@ export default {
                             // console.log("match pred lost");
                             scenario.impossible = true;
                         }
-                    } else {
                     }
                     match.winner = match.teams[bits[mi]];
                     match.loser = match.teams[+!bits[mi]];
@@ -312,19 +312,22 @@ export default {
                         counts: sortedCounts
                     };
                 }
+                return null;
             });
         }
     },
     methods: {
+        perc(num) {
+            if (isNaN(num)) return "-";
+            return (num * 100).toFixed(1) + "%";
+        },
         setOverride(index, num) {
             console.log("override", index, num);
             if (this.overrides[index] === num) {
                 // unset
-                // this.overrides[index] = null;
-                this.$set(this.overrides, index, null);
+                this.overrides[index] = null;
             } else {
-                // this.overrides[index] = num;
-                this.$set(this.overrides, index, num);
+                this.overrides[index] = num;
             }
         }
     }

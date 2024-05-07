@@ -4,109 +4,151 @@
 
 
         <div class="form-inline mb-2">
-<!--            <select name="" id="" v-model="activeScenarioView" class="mr-2 form-control">-->
-<!--                <option value="all" selected>All</option>-->
-<!--                <option value="possible">Possible</option>-->
-<!--                <option value="incomplete">Incomplete</option>-->
-<!--            </select>-->
+            <!--            <select name="" id="" v-model="activeScenarioView" class="mr-2 form-control">-->
+            <!--                <option value="all" selected>All</option>-->
+            <!--                <option value="possible">Possible</option>-->
+            <!--                <option value="incomplete">Incomplete</option>-->
+            <!--            </select>-->
 
-<!--            <BFormCheckbox class="mr-3" v-model="showOnlyPossible">Show only possible</BFormCheckbox>-->
-            <BFormCheckbox class="mr-3" v-model="showOnlyIncomplete">Show only incomplete</BFormCheckbox>
-            <BFormCheckbox class="mr-3" v-model="showCountsAsPercentages">Show counts as percentages</BFormCheckbox>
+            <!--            <BFormCheckbox class="mr-3" v-model="showOnlyPossible">Show only possible</BFormCheckbox>-->
+            <BFormCheckbox v-model="showOnlyIncomplete" class="mr-3">Show only incomplete</BFormCheckbox>
+            <BFormCheckbox v-model="showCountsAsPercentages" class="mr-3">Show counts as percentages</BFormCheckbox>
 
-<!--            <div class="btn btn-secondary" v-if="showCountsAsPercentages" @click="showCountsAsPercentages = false">View as numbers</div>-->
-<!--            <div class="btn btn-secondary" v-if="!showCountsAsPercentages" @click="showCountsAsPercentages = true">View as percentages</div>-->
+            <!--            <div class="btn btn-secondary" v-if="showCountsAsPercentages" @click="showCountsAsPercentages = false">View as numbers</div>-->
+            <!--            <div class="btn btn-secondary" v-if="!showCountsAsPercentages" @click="showCountsAsPercentages = true">View as percentages</div>-->
         </div>
-<!--        <div>-->
-<!--            matches: {{ matches?.length }} / scenario matches: {{ scenarioMatches?.length }} / for scenarios: {{ matchesForScenarios?.length }} / with outcomes: {{ scenarioMatchesWithOutcomes?.length }} <br>-->
-<!--        </div>-->
-<!--        <div v-if="scenarios" class="mb-2">-->
-<!--            {{ currentScenarioView && currentScenarioView.length }} in view ~ {{ scenarios.scenarios && scenarios.scenarios.length }} / {{ scenarios.scenarioCount }}-->
-<!--&lt;!&ndash;            {{ scenarios.maxBits }}&ndash;&gt;-->
-<!--&lt;!&ndash;            {{ scenarios.bitCounter }}&ndash;&gt;-->
-<!--&lt;!&ndash;            {{ scenarios.bits }}&ndash;&gt;-->
-<!--             -&#45;&#45; {{ matchesForHistorical.length }} historical matches added-->
-<!--        </div>-->
-        <div class="mb-2" v-if="sortingMethods">
+        <!--        <div>-->
+        <!--            matches: {{ matches?.length }} / scenario matches: {{ scenarioMatches?.length }} / for scenarios: {{ matchesForScenarios?.length }} / with outcomes: {{ scenarioMatchesWithOutcomes?.length }} <br>-->
+        <!--        </div>-->
+        <!--        <div v-if="scenarios" class="mb-2">-->
+        <!--            {{ currentScenarioView && currentScenarioView.length }} in view ~ {{ scenarios.scenarios && scenarios.scenarios.length }} / {{ scenarios.scenarioCount }}-->
+        <!--&lt;!&ndash;            {{ scenarios.maxBits }}&ndash;&gt;-->
+        <!--&lt;!&ndash;            {{ scenarios.bitCounter }}&ndash;&gt;-->
+        <!--&lt;!&ndash;            {{ scenarios.bits }}&ndash;&gt;-->
+        <!--             -&#45;&#45; {{ matchesForHistorical.length }} historical matches added-->
+        <!--        </div>-->
+        <div v-if="sortingMethods" class="mb-2">
             Sorting methods: {{ sortingMethods.join(' / ') }}
         </div>
 
 
-        <div class="n-nav mb-3 d-flex" v-if="matchGroups">
-            <select name="match-group-selector" id="match-group-selector" v-model="activeMatchGroup">
+        <div v-if="matchGroups" class="n-nav mb-3 d-flex">
+            <select id="match-group-selector" v-model="activeMatchGroup" name="match-group-selector">
                 <option selected disabled value="null">Select a group</option>
-                <option v-for="group in matchGroups" :value="group" :key="group">{{ group }}</option>
+                <option v-for="group in matchGroups" :key="group" :value="group">{{ group }}</option>
             </select>
-            <div class="ml-2" v-if="activeMatchGroup">{{ matches?.length }} {{ matches?.length === 1 ? "match" : "matches"}}, {{ incompleteMatches?.length }} to play</div>
+            <div v-if="activeMatchGroup" class="ml-2">{{ matches?.length }} {{ matches?.length === 1 ? "match" : "matches" }}, {{ incompleteMatches?.length }} to play</div>
         </div>
 
 
-        <table class="table-bordered text-light mb-3" v-if="counts && counts[0] && counts[0].positions">
-            <tr v-if="counts" class="font-weight-bold">
-                <th class="p-2 border-dark text-right" style="min-width: 8.5em">{{ showCountsAsPercentages ? `% of ${currentScenarioView.length} scenarios` : `/${currentScenarioView.length} scenarios`}}</th>
-                <th class="p-2 border-dark" v-for="(x, i) in (counts[0].positions).slice(0, -1)" :key="i">
-                    #{{ i + 1 }}
-                </th>
-                <th class="p-2 border-dark" v-b-tooltip:top="'Standings haven\'t converged into separate groups'">Incomplete</th>
-            </tr>
-            <tr v-for="team in counts" :key="team.code">
-                <td class="p-2 border-dark text-right font-weight-bold">{{ team.code }}</td>
-                <td class="p-2 border-dark cell-num" v-for="(pos, posi) in team.positions" :key="posi"
-                    @click="() => showWhen(team.code, posi)"
-                    :class="{ 'bg-info selected': manualScenarioFilters.find((f) => f.team === team.code && f.position === posi ), 'bg-warning text-dark': pos !== 0 && pos === currentScenarioView.length, 'text-muted': pos === 0 }"
-                >
-                    <span v-if="showCountsAsPercentages">{{ (pos / currentScenarioView.length) | perc }}</span>
-                    <span v-else>{{ pos }}</span>
-                </td>
-            </tr>
+        <table v-if="counts && counts[0] && counts[0].positions" class="table table-bordered text-light mb-3 table-dark w-auto">
+            <thead>
+                <tr v-if="counts" class="fw-bold">
+                    <th class="p-2 border-dark text-end" style="min-width: 8.5em">
+                        {{ showCountsAsPercentages ? `% of ${currentScenarioView.length} scenarios` : `/${currentScenarioView.length} scenarios` }}
+                    </th>
+                    <th v-for="(x, i) in (counts[0].positions).slice(0, -1)" :key="i" class="p-2 border-dark">
+                        #{{ i + 1 }}
+                    </th>
+                    <th class="p-2 border-dark">
+                        Incomplete
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="team in counts" :key="team.code">
+                    <td class="p-2 border-dark text-end fw-bold">{{ team.code }}</td>
+                    <td
+                        v-for="(pos, posi) in team.positions"
+                        :key="posi"
+                        class="p-2 border-dark cell-num"
+                        :class="{ 'bg-info selected': manualScenarioFilters.find((f) => f.team === team.code && f.position === posi ), 'bg-warning text-dark': pos !== 0 && pos === currentScenarioView.length, 'text-muted': pos === 0 }"
+                        @click="() => showWhen(team.code, posi)"
+                    >
+                        <span v-if="showCountsAsPercentages">{{ perc(pos / currentScenarioView.length) }}</span>
+                        <span v-else>{{ pos }}</span>
+                    </td>
+                </tr>
+            </tbody>
         </table>
 
-        <table class="table-bordered text-light mb-3 border-dark" v-if="scenarios">
-            <tr>
-                <th class="p-2 border-dark"></th>
-                <th class="p-2 border-dark text-center" :key="scoreline" v-for="([scoreline]) in Object.entries(matchCounts?.[0]?.scorelines)">{{ scoreline }}</th>
-                <th class="p-2 border-dark"></th>
-                <th class="p-2 border-dark">Analysis</th>
-            </tr>
-            <tr v-for="match in matchCounts" :key="match.id">
-                <td class="p-2 border-dark font-weight-bold text-right">{{ match.teams?.[0]?.code }}</td>
-                <td class="p-2 border-dark text-center cell-num" @click="showMatchScoreline(match.id, scoreline)" :class="{'bg-info selected': scorelineFilterHas(match.id, scoreline), 'text-muted': count === 0}"
-                    v-for="([scoreline, count]) in Object.entries(match.scorelines)" :key="scoreline">{{ count }}</td>
-                <td class="p-2 border-dark font-weight-bold text-left">{{ match.teams?.[1]?.code }}</td>
-                <td class="p-2 border-dark text-center" :class="{'text-muted': matchAnalysis(match) === 'No effect'}">{{ matchAnalysis(match) }} </td>
-            </tr>
+        <table v-if="scenarios" class="table table-bordered text-light mb-3 border-dark table-dark w-auto">
+            <thead>
+                <tr>
+                    <th class="p-2 border-dark"></th>
+                    <th
+                        v-for="([scoreline]) in Object.entries(matchCounts?.[0]?.scorelines)"
+                        :key="scoreline"
+                        class="p-2 border-dark text-center">
+                        {{ scoreline }}
+                    </th>
+                    <th class="p-2 border-dark"></th>
+                    <th class="p-2 border-dark">Analysis</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="match in matchCounts" :key="match.id">
+                    <td class="p-2 border-dark fw-bold text-end">{{ match.teams?.[0]?.code }}</td>
+                    <td
+                        v-for="([scoreline, count]) in Object.entries(match.scorelines)"
+                        :key="scoreline"
+                        class="p-2 border-dark text-center cell-num"
+                        :class="{'bg-info selected': scorelineFilterHas(match.id, scoreline), 'text-muted': count === 0}"
+                        @click="showMatchScoreline(match.id, scoreline)">
+                        {{ count }}
+                    </td>
+                    <td class="p-2 border-dark fw-bold text-start">{{ match.teams?.[1]?.code }}</td>
+                    <td
+                        class="p-2 border-dark text-center"
+                        :class="{'text-muted': matchAnalysis(match) === 'No effect'}">
+                        {{ matchAnalysis(match) }}
+                    </td>
+                </tr>
+            </tbody>
         </table>
 
-        <table class="table text-white" v-if="scenarios">
-            <tr class="sticky-top bg-dark">
-                <td>#</td>
-                <td class="text-center" v-for="match in incompleteMatches" :key="match.id">
-                    {{ match.teams.map(t => t.code).join(' vs ') }}
-                </td>
-                <td class="text-center">Standings</td>
-            </tr>
-            <tr v-for="(scenario, i) in currentScenarioView" :key="i">
-                <td>{{ scenario.i + 1 }}</td>
-                <td v-for="(match, mi) in (scenario.outcomes?.filter(m => !m.completed))" :key="mi">
-                    {{ match.scoreFirstWinner && match.scoreFirstWinner.join('-') }} {{ match.winner && match.winner.code }}
-                </td>
-<!--                <td>-->
-<!--                    not sorted-->
-<!--                    <ul>-->
-<!--                        <li class="text-nowrap" v-for="team in scenario.teams" :key="team.id">-->
-<!--                            {{ team.code }} ({{ team.wins }}-{{ team.losses }}) m({{ team.map_wins }}-{{ team.map_losses }})-->
-<!--                        </li>-->
-<!--                    </ul>-->
-<!--                </td>-->
-                <td class="text-nowrap">
-<!--                    first round of sorting (match wins)-->
-                    <ol class="mb-0 small">
-                        <li v-for="(g, gi) in scenario.standings?.standings" :key="gi">
-                            <div class="standings-entry" v-for="(team,ei) in g" :key="ei">{{ team.code?.padEnd(5, " ") }} {{ team.standings?.wins }}-{{ team.standings?.losses }} (m {{ team.standings?.map_wins.toString().padEnd(2, " ") }}-{{ team.standings?.map_losses.toString().padStart(2, " ") }}) ({{ sign(team.standings?.map_wins - team.standings?.map_losses)}})</div>
-                        </li>
-                    </ol>
-                </td>
-            </tr>
+        <table v-if="scenarios" class="table text-white table-dark">
+            <thead>
+                <tr class="sticky-top bg-dark">
+                    <td>#</td>
+                    <td v-for="match in incompleteMatches" :key="match.id" class="text-center">
+                        {{ match.teams.map(t => t.code).join(" vs ") }}
+                    </td>
+                    <td class="text-center">Standings</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(scenario, i) in currentScenarioView" :key="i">
+                    <td>{{ scenario.i + 1 }}</td>
+                    <td v-for="(match, mi) in (scenario.outcomes?.filter(m => !m.completed))" :key="mi">
+                        {{ match.scoreFirstWinner && match.scoreFirstWinner.join("-") }}
+                        {{ match.winner && match.winner.code }}
+                    </td>
+                    <!--                <td>-->
+                    <!--                    not sorted-->
+                    <!--                    <ul>-->
+                    <!--                        <li class="text-nowrap" v-for="team in scenario.teams" :key="team.id">-->
+                    <!--                            {{ team.code }} ({{ team.wins }}-{{ team.losses }}) m({{ team.map_wins }}-{{ team.map_losses }})-->
+                    <!--                        </li>-->
+                    <!--                    </ul>-->
+                    <!--                </td>-->
+                    <td class="text-nowrap">
+                        <!--                    first round of sorting (match wins)-->
+                        <ol class="mb-0 small">
+                            <li v-for="(g, gi) in scenario.standings?.standings" :key="gi">
+                                <div v-for="(team,ei) in g" :key="ei" class="standings-entry">
+                                    {{ team.code?.padEnd(5, " ") }} {{ team.standings?.wins }}-{{
+                                        team.standings?.losses
+                                    }} (m {{
+                                        team.standings?.map_wins.toString().padEnd(2, " ")
+                                    }}-{{ team.standings?.map_losses.toString().padStart(2, " ") }})
+                                    ({{ sign(team.standings?.map_wins - team.standings?.map_losses) }})
+                                </div>
+                            </li>
+                        </ol>
+                    </td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </template>
@@ -114,7 +156,6 @@
 <script>
 import { ReactiveArray } from "@/utils/reactive";
 import { BitCounter, sortTeamsIntoStandings } from "@/utils/scenarios";
-import { BFormCheckbox } from "bootstrap-vue";
 
 
 function generateScoreline(firstTo) {
@@ -130,7 +171,6 @@ function generateScoreline(firstTo) {
 export default {
     name: "EventScenarios2",
     props: ["event"],
-    components: { BFormCheckbox },
     data: () => ({
         activeMatchGroup: "null", // this works for now
         activeScenarioView: "all",
@@ -370,13 +410,13 @@ export default {
             return Object.values(matchMap);
         },
         matchGroupData() {
-            return (this.blocks?.standings || [])?.find(s => [s.group, s.key, s.title].map(e => e.toLowerCase()).includes(this.activeMatchGroup.toLowerCase()));
+            return (this.blocks?.standings || [])?.find(s => [s.group, s.key, s.title].map(e => e?.toLowerCase()).includes(this.activeMatchGroup?.toLowerCase()));
         },
         sortingMethods() {
             try {
                 if (this.matchGroupData?.sort) return this.matchGroupData.sort;
                 const sorters = this.blocks.standingsSort;
-                if (sorters && sorters.length) {
+                if (sorters?.length) {
                     const sorter = sorters.find(s => s.group === this.activeMatchGroup);
                     return sorter?.sort;
                 }
@@ -399,8 +439,9 @@ export default {
             const scenarios = [];
 
 
-            if (scenarioCount > 2 ** 12) {
-                console.warn({ error: "too many computations required", scenarioCount });
+            const scenarioMax = 2 ** 13;
+            if (scenarioCount > scenarioMax) {
+                console.warn({ error: "too many computations required", scenarioCount, max: scenarioMax });
                 return [];
             }
 
@@ -598,7 +639,7 @@ export default {
             }
 
             console.log({
-                scenarios: scenarios, // .filter(s => s.sorts >= 4),
+                scenarios, // .filter(s => s.sorts >= 4),
                 possibleScenarios: scenarios.filter(s => !s.impossible),
                 incompleteScenarios: scenarios.filter(s => !s.impossible && s.standings.length !== s.teams.length)
             });
@@ -607,22 +648,18 @@ export default {
                 maxBits,
                 scenarioCount,
                 bitCounter,
-                scenarios: scenarios // .filter(s => s.sorts >= 4),
+                scenarios // .filter(s => s.sorts >= 4),
                 // possibleScenarios: scenarios.filter(s => !s.impossible),
                 // incompleteScenarios: scenarios.filter(s => s.standings.length !== s.teams.length),
                 // possiblencompleteScenarios: scenarios.filter(s => s.standings.length !== s.teams.length)
             };
         }
     },
-    filters: {
+    methods: {
         perc(x) {
-            // console.log(this);
             if (isNaN(x)) return "-";
             return (x * 100).toFixed(1) + "%";
-            // console.log(x, this.currentScenarioView.length);
-        }
-    },
-    methods: {
+        },
         sign(num) {
             if (num > 0) return "+" + num;
             return num;
@@ -682,7 +719,7 @@ export default {
             const leftScores = scorelines.slice(0, (scorelines.length / 2));
             const rightScores = scorelines.slice((scorelines.length / 2), scorelines.length);
 
-            console.log("analysis", { scorelines, leftScores, rightScores });
+            // console.log("analysis", { scorelines, leftScores, rightScores });
             if (scorelines.every(([scoreline, count]) => count === scorelines[0][1])) {
                 // All the same
                 return "No effect";

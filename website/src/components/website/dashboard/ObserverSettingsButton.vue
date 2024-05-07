@@ -1,22 +1,21 @@
 <template>
-    <b-button @click="() => setObserverSetting(setting, !isOn)" :class="{'active': isOn}"
-              :variant="isOn ? 'primary' : 'secondary'" :disabled="processing">
+    <b-button
+        :class="{'active': isOn}"
+        :variant="isOn ? 'primary' : 'secondary'"
+        :disabled="processing"
+        @click="() => setObserverSetting(setting, !isOn)">
         {{ setting }}
     </b-button>
 </template>
 
 <script>
-import { setObserverSetting } from "@/utils/dashboard";
-import { BButton } from "bootstrap-vue";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "ObserverSettingsButton",
     props: {
         setting: String,
         isOn: Boolean
-    },
-    components: {
-        BButton
     },
     data: () => ({
         processing: false
@@ -25,7 +24,10 @@ export default {
         async setObserverSetting(setting, value) {
             this.processing = true;
             try {
-                await setObserverSetting(this.$root.auth, setting, value);
+                await authenticatedRequest("actions/set-observer-setting", {
+                    setting,
+                    value
+                });
             } finally {
                 this.processing = false;
             }

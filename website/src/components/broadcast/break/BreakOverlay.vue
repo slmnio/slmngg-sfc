@@ -1,90 +1,166 @@
 <template>
     <div class="break-overlay">
         <div class="break-center">
-            <ThemeTransition class="break-transition-top w-100 h-100" :theme="event && event.theme" :active="animationActive" one-color start="middle" end="middle" :duration="500" :starting-delay="0">
+            <ThemeTransition
+                class="break-transition-top w-100 h-100"
+                :theme="event && event.theme"
+                :active="animationActive"
+                one-color
+                start="middle"
+                end="middle"
+                :duration="500"
+                :starting-delay="0">
                 <div class="break-top event-theme-border flex-center overlay--bg px-4" :style="eventBorder">
                     <Squeezable align="middle" :disabled="(overlayTitle).includes('\\n')" class="w-100 flex-center">
                         <transition name="fade" mode="out-in">
-                            <span class="industry-align" :class="{'has-br': (overlayTitle).includes('\\n') }"
-                                  :key="overlayTitle" v-html="nbr(overlayTitle)"></span>
+                            <span
+                                :key="overlayTitle"
+                                class="industry-align"
+                                :class="{'has-br': (overlayTitle).includes('\\n') }"
+                                v-html="nbr(overlayTitle)"></span>
                         </transition>
-                        <BreakHeadlines v-if="broadcast.use_headlines" :headlines="headlines" title="News" :interval="headlineInterval"
-                                        :borderCSS="eventBorder"/>
+                        <BreakHeadlines
+                            v-if="broadcast.use_headlines"
+                            :headlines="headlines"
+                            title="News"
+                            :interval="headlineInterval"
+                            :border-c-s-s="eventBorder" />
                     </Squeezable>
                 </div>
             </ThemeTransition>
             <div class="break-area w-100 h-100 d-flex">
-                <ThemeTransition class="break-transition-left h-100" :theme="event && event.theme" :active="animationActive" one-color start="top" end="bottom" :starting-delay="350" :inner-delay="150" :duration="500">
+                <ThemeTransition
+                    class="break-transition-left h-100"
+                    :theme="event && event.theme"
+                    :active="animationActive"
+                    one-color
+                    start="top"
+                    end="bottom"
+                    :starting-delay="350"
+                    :inner-delay="150"
+                    :duration="500">
                     <div class="break-main event-theme-border overlay--bg" :style="eventBorder">
                         <div class="break-col break-left-col">
                             <transition name="anim-break-next">
-                                <div class="break-next" v-if="nextMatch">
-                                    <BreakMatch :match="nextMatch" :expanded="false" :theme-color="themeColor"/>
+                                <div v-if="nextMatch" class="break-next">
+                                    <BreakMatch :match="nextMatch" :expanded="false" :theme-color="themeColor" />
                                 </div>
                             </transition>
                             <transition name="anim-break-next">
                                 <!-- TODO: make this mirror the actual countdown, handling the not-starting-on-zero thing -->
-                                <div class="countdown-text" v-if="!countdownEnd && !nextMatch">Current time</div>
+                                <div v-if="!countdownEnd && !nextMatch" class="countdown-text">Current time</div>
                             </transition>
-                            <Countdown class="break-countdown" :to="countdownEnd" :timezone="broadcast.timezone"
-                                       :update="(e) => countdownTick(e)"/>
-                            <Sponsors class="break-sponsors" :sponsors="sponsorThemes"/>
+                            <Countdown
+                                class="break-countdown"
+                                :to="countdownEnd"
+                                :timezone="broadcast.timezone"
+                                :update="(e) => countdownTick(e)" />
+                            <Sponsors class="break-sponsors" :sponsors="sponsorThemes" />
                         </div>
                     </div>
                 </ThemeTransition>
-                <ThemeTransition class="break-transition-main h-100" :theme="event && event.theme" :active="animationActive" one-color start="top" end="bottom" :starting-delay="350" :inner-delay="150" :duration="500">
+                <ThemeTransition
+                    class="break-transition-main h-100"
+                    :theme="event && event.theme"
+                    :active="animationActive"
+                    one-color
+                    start="top"
+                    end="bottom"
+                    :starting-delay="350"
+                    :inner-delay="150"
+                    :duration="500">
                     <div class="break-main event-theme-border overlay--bg" :style="eventBorder">
                         <transition name="break-content" mode="out-in">
-                            <transition-group class="break-col break-schedule" name="a--match"
-                                              v-if="automatedShow === 'Schedule'" key="Schedule">
-                                <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match"
-                                            :expanded="true" :key="match.id" :theme-color="themeColor"/>
+                            <transition-group
+                                v-if="automatedShow === 'Schedule'"
+                                key="Schedule"
+                                class="break-col break-schedule"
+                                name="a--match"
+                                tag="div">
+                                <BreakMatch
+                                    v-for="match in schedule"
+                                    :key="match.id"
+                                    :timezone="broadcast.timezone"
+                                    :match="match"
+                                    :expanded="true"
+                                    :theme-color="themeColor" />
                             </transition-group>
-                            <div class="break-col break-standings" v-if="automatedShow === 'Standings'"
-                                 :key="`Standings-${currentStage || ''}`">
-                                <Standings :event="event" :stage="currentStage"/>
+                            <div
+                                v-else-if="automatedShow === 'Standings'"
+                                :key="`Standings-${currentStage || ''}`"
+                                class="break-col break-standings">
+                                <Standings :event="event" :stage="currentStage" />
                             </div>
-                            <div class="break-col break-image" v-if="automatedShow === 'Image'"
-                                 :key="`image-${breakImageURL}`">
+                            <div
+                                v-else-if="automatedShow === 'Image'"
+                                :key="`image-${breakImageURL}`"
+                                class="break-col break-image">
                                 <div v-if="breakImageURL" class="break-image-inner" :style="breakImage"></div>
-                                <ThemeLogo v-else class="break-image-inner break-image-default" :theme="event.theme"
-                                           icon-padding="10%" border-width="0" logo-size="h-500"/>
+                                <ThemeLogo
+                                    v-else
+                                    class="break-image-inner break-image-default"
+                                    :theme="event.theme"
+                                    icon-padding="10%"
+                                    border-width="0"
+                                    logo-size="h-500" />
                             </div>
-                            <div class="break-col break-title" v-if="automatedShow === 'Title'"
-                                 :key="`title-${breakContentTitle}`">
+                            <div
+                                v-else-if="automatedShow === 'Title'"
+                                :key="`title-${breakContentTitle}`"
+                                class="break-col break-title">
                                 <div :style="themeBG" class="break-title-inner" v-html="breakContentTitle"></div>
                             </div>
-                            <Bracket class="break-col break-bracket" v-if="automatedShow === 'Bracket'"
-                                     :key="`Bracket-${bracket && bracket.key}`" :event="event" :bracket="bracket"
-                                     use-overlay-scale small :scale="0.85"/>
-                            <div class="break-col break-others" v-if="automatedShow === 'Other Streams'"
-                                 key="Other-Streams">
+                            <Bracket
+                                v-else-if="automatedShow === 'Bracket'"
+                                :key="`Bracket-${bracket && bracket.key}`"
+                                class="break-col break-bracket"
+                                :event="event"
+                                :bracket="bracket"
+                                use-overlay-scale
+                                small
+                                :scale="0.85" />
+                            <div
+                                v-else-if="automatedShow === 'Other Streams'"
+                                key="Other-Streams"
+                                class="break-col break-others">
                                 <div class="broadcast-previews-title">
                                     {{ broadcasts.length === 1 ? broadcasts[0].name : "Other broadcasts" }}
                                 </div>
                                 <div class="broadcast-previews">
-                                    <BroadcastPreview v-for="other in broadcasts" :key="other.id" :broadcast="other"/>
+                                    <BroadcastPreview v-for="other in broadcasts" :key="other.id" :broadcast="other" />
                                 </div>
                             </div>
-                            <div class="break-col break-others-info" v-if="automatedShow === 'Other Info'" key="Other-Info">
-                                <OtherBroadcasts :starting-broadcast="broadcast"/>
+                            <div v-else-if="automatedShow === 'Other Info'" key="Other-Info" class="break-col break-others-info">
+                                <OtherBroadcasts :starting-broadcast="broadcast" />
                             </div>
-                            <BreakStaffList class="break-col break-staff-list" v-if="automatedShow === 'Staff'" key="Staff"
-                                            :matches="fullSchedule"/>
-                            <BreakMatchup class="break-col break-matchup" v-if="automatedShow === 'Matchup'"
-                                          :key="`Matchup-${nextMatch ? nextMatch.id : ''}`" :match="nextMatch"/>
+                            <BreakStaffList
+                                v-else-if="automatedShow === 'Staff'"
+                                key="Staff"
+                                class="break-col break-staff-list"
+                                :matches="fullSchedule" />
+                            <BreakMatchup
+                                v-else-if="automatedShow === 'Matchup'"
+                                :key="`Matchup-${nextMatch ? nextMatch.id : ''}`"
+                                class="break-col break-matchup"
+                                :match="nextMatch" />
                         </transition>
                     </div>
                 </ThemeTransition>
             </div>
         </div>
         <div class="break-preload">
-            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />
+            <BreakMatch
+                v-for="match in schedule"
+                :key="match.id"
+                :timezone="broadcast.timezone"
+                :match="match"
+                :expanded="true"
+                :theme-color="themeColor" />
             <Standings :event="event" :stage="currentStage" />
             <div class="break-image-inner" :style="breakImage"></div>
             <Bracket class="break-col break-bracket" :event="event" :bracket="bracket" use-overlay-scale />
             <BreakMatchup class="break-col break-matchup" :match="nextMatch" />
-            <BreakStaffList class="break-col break-staff-list" :matches="fullSchedule"/>
+            <BreakStaffList class="break-col break-staff-list" :matches="fullSchedule" />
             <OtherBroadcasts :starting-broadcast="broadcast" />
         </div>
     </div>
@@ -113,22 +189,26 @@ const tickTime = 25;
 
 export default {
     name: "BreakOverlay",
+    components: {
+        Squeezable,
+        OtherBroadcasts,
+        ThemeLogo,
+        BreakMatchup,
+        BreakStaffList,
+        BreakHeadlines,
+        BroadcastPreview,
+        Bracket,
+        Standings,
+        BreakMatch,
+        Sponsors,
+        Countdown,
+        ThemeTransition
+    },
     props: ["broadcast", "title", "animationActive", "secondary", "headlineInterval", "virtualMatch", "customBreakAutomation"],
-    components: { Squeezable, OtherBroadcasts, ThemeLogo, BreakMatchup, BreakStaffList, BreakHeadlines, BroadcastPreview, Bracket, Standings, BreakMatch, Sponsors, Countdown, ThemeTransition },
     data: () => ({
         tick: 0,
         lastCountdownTick: 0
     }),
-    methods: {
-        nbr(text) {
-            if (!text) return "";
-            return text.replace(/\\n/g, "<br>");
-        },
-        countdownTick(x) {
-            this.lastCountdownTick = x;
-        },
-        resizedImage
-    },
     computed: {
         broadcasts() {
             return this.broadcast?.other_broadcasts || [];
@@ -141,7 +221,7 @@ export default {
         },
         nextMatch() {
             if (this.virtualMatch) return this.virtualMatch;
-            if (!this.broadcast || !this.broadcast.live_match || !this.broadcast.show_live_match) return null;
+            if (!this.broadcast?.live_match || !this.broadcast.show_live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -150,7 +230,7 @@ export default {
         },
         fullSchedule() {
             if (this.virtualMatch) return [this.virtualMatch];
-            if (!this.broadcast || !this.broadcast.schedule) return null;
+            if (!this.broadcast?.schedule) return null;
             return ReactiveArray("schedule", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -158,13 +238,13 @@ export default {
             })(this.broadcast).sort(sortMatches);
         },
         schedule() {
-            if (!this.broadcast || !this.broadcast.schedule || !this.fullSchedule) return null;
+            if (!this.broadcast?.schedule || !this.fullSchedule) return null;
             return this.fullSchedule.filter(m => {
                 return this.secondary ? m.show_on_secondary_overlays : m.show_on_overlays;
             }).sort(sortMatches);
         },
         event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
+            if (!this.broadcast?.event) return null;
             const event = ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
@@ -188,19 +268,19 @@ export default {
             return event;
         },
         sponsorThemes() {
-            if (!this.broadcast || !this.broadcast.sponsors) return null;
+            if (!this.broadcast?.sponsors) return null;
             return ReactiveArray("sponsors", {
                 theme: ReactiveThing("theme")
             })(this.broadcast);
         },
         eventBorder() {
-            if (!this.event || !this.event.theme) return null;
+            if (!this.event?.theme) return null;
             return {
                 borderColor: this.event.theme.color_theme
             };
         },
         breakDisplay() {
-            if (!this.broadcast || !this.broadcast.break_display) return null;
+            if (!this.broadcast?.break_display) return null;
             return this.broadcast.break_display;
         },
         bracketKey() {
@@ -245,9 +325,6 @@ export default {
             if (!this.bracket) slides = slides.filter(s => s !== "Bracket");
             if (this.virtualMatch) slides = slides.filter(s => s !== "Schedule"); // Only going to be 1 match atm so matchup will be fine
             console.log(slides);
-
-            // TODO: add stuff here that changes based on the countdown remaining
-
 
             if (slides?.includes("Schedule") && this.countdownEnd && this.lastCountdownTick <= 30) {
                 return "Schedule";
@@ -309,6 +386,16 @@ export default {
             return themeBackground1(this.event);
         }
     },
+    methods: {
+        nbr(text) {
+            if (!text) return "";
+            return text.replace(/\\n/g, "<br>");
+        },
+        countdownTick(x) {
+            this.lastCountdownTick = x;
+        },
+        resizedImage
+    },
     watch: {
         broadcast() {
             if (this.broadcast) {
@@ -326,7 +413,7 @@ export default {
             this.tick++;
         }, tickTime * 1000);
     },
-    metaInfo() {
+    head() {
         return {
             title: `Break ${this.secondary ? " (Secondary)" : ""}| ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -358,7 +445,8 @@ export default {
     }
 
     .break-center {
-        width: 100%; height: 100%;
+        width: 100%;
+        height: 100%;
         box-sizing: border-box;
 
         display: flex;
@@ -378,6 +466,7 @@ export default {
         display: flex;
         flex-direction: column;
     }
+
     .break-top .has-br {
         font-size: 0.75em;
     }
@@ -405,7 +494,7 @@ export default {
     }
     .break-left-col {
         flex-shrink: 0;
-        //border-right: 1px solid rgba(255,255,255,0.2);
+        /* border-right: 1px solid rgba(255,255,255,0.2); */
         padding: 5px 20px;
     }
 
@@ -448,19 +537,31 @@ export default {
         transition: all .5s ease;
         overflow: hidden;
     }
-    .anim-break-next-enter, .anim-break-next-leave-to {
+
+    .anim-break-next-enter-from, .anim-break-next-leave-to {
         max-height: 0;
         opacity: 0;
         padding: 0 20px;
     }
-    .anim-break-next-enter-to, .anim-break-next-leave {
+
+    .anim-break-next-enter-to, .anim-break-next-leave-from {
         max-height: 240px;
         opacity: 1;
     }
 
-    .a--match-enter-active, .a--match-leave-active, .a--match-move { transition: all .5s ease; overflow: hidden; }
-    .a--match-enter, .a--match-leave-to { max-height: 0; padding: 0 !important; }
-    .a--match-enter-to, .a--match-leave { max-height: 180px; }
+    .a--match-enter-active, .a--match-leave-active, .a--match-move {
+        transition: all .5s ease;
+        overflow: hidden;
+    }
+
+    .a--match-enter-from, .a--match-leave-to {
+        max-height: 0;
+        padding: 0 !important;
+    }
+
+    .a--match-enter-to, .a--match-leave-from {
+        max-height: 180px;
+    }
 
     .break-content {
         display: flex;
@@ -475,19 +576,32 @@ export default {
     }
 
     /*.break-content-enter-active, .break-content-leave-active { transition: all .5s ease-in-out; overflow: hidden }*/
-    /*.break-content-enter, .break-content-leave-to { max-height: 0; padding: 0 40px; }*/
-    /*.break-content-enter-to, .break-content-leave { max-height: 100%; }*/
+    /*.break-content-enter-from, .break-content-leave-to { max-height: 0; padding: 0 40px; }*/
+    /*.break-content-enter-to, .break-content-leave-from { max-height: 100%; }*/
 
-    .break-content-enter-active, .break-content-leave-active { transition: all .35s ease; overflow: hidden }
-    .break-content-enter { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); }
-    .break-content-leave-to { clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); }
-    .break-content-enter-to, .break-content-leave { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+    .break-content-enter-active, .break-content-leave-active {
+        transition: all .35s ease;
+        overflow: hidden
+    }
+
+    .break-content-enter-from {
+        clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+    }
+
+    .break-content-leave-to {
+        clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+    }
+
+    .break-content-enter-to, .break-content-leave-from {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+    }
 
 
     .break-image {
         /*background-color: rgba(0,0,0,0.2);*/
         padding: 40px;
     }
+
     .break-image-inner {
         width: 100%;
         height: 100%;
@@ -520,9 +634,11 @@ export default {
         align-items: center;
         transform: translateY(30px);
     }
+
     .break-others {
         /*padding: 40px;*/ /* this should be set but the animation is worse */
     }
+
     .broadcast-previews {
         display: flex;
         width: 100%;
@@ -530,8 +646,14 @@ export default {
         justify-content: center;
         align-items: center;
     }
-    .broadcast-preview:first-of-type { margin-left: 0; }
-    .broadcast-preview:last-of-type { margin-right: 0; }
+
+    .broadcast-preview:first-of-type {
+        margin-left: 0;
+    }
+
+    .broadcast-preview:last-of-type {
+        margin-right: 0;
+    }
 
     .broadcast-previews-title {
         text-transform: uppercase;
@@ -539,21 +661,25 @@ export default {
         font-size: 60px;
         line-height: 1;
     }
+
     .broadcast-mid-split-enter-active {
         overflow: hidden;
         max-width: 100%;
         transition: all 800ms ease;
     }
+
     .broadcast-mid-split-leave-active {
         overflow: hidden;
         max-width: 100%;
         transition: opacity 0s;
     }
-    .broadcast-mid-split-enter {
+
+    .broadcast-mid-split-enter-from {
         /*clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);*/
         /*clip-path: polygon(0% 0%, 0% 100%, 0% 100%, 0% 0, 100% 0, 100% 100%, 100% 100%, 100% 0%);*/
         clip-path: polygon(50% 0, 50% 100%, 50% 100%, 50% 0%, 50% 0%, 50% 100%, 50% 100%, 50% 0);
     }
+
     .broadcast-mid-split-enter-to {
         /*clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);*/
         /*clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 100% 100%, 100% 0%); */
@@ -563,6 +689,7 @@ export default {
     .broadcast-mid-split-leave-to {
         opacity: 0;
     }
+
     .break-title-inner {
         width: 100%;
         height: 100%;
@@ -575,7 +702,7 @@ export default {
         flex-direction: column;
     }
 
-    .break-title-inner >>> br {
+    .break-title-inner:deep(br) {
         margin-top: .25em !important;
         display: block;
         content: " ";
@@ -584,17 +711,24 @@ export default {
     .break-others-info {
         font-size: 12px;
     }
-    .break-others-info >>> .broadcast-match {font-size: 38px !important;width: 300px !important;}
-    .break-others-info >>> .broadcast {margin-bottom: 0.75em !important;}
+
+    .break-others-info:deep(.broadcast-match) {
+        font-size: 38px !important;
+        width: 300px !important;
+    }
+
+    .break-others-info:deep(.broadcast) {
+        margin-bottom: 0.75em !important;
+    }
 
     .break-transition-top {
         height: 160px !important;
     }
-    .break-area {
-        margin-top: 60px;
-        gap: 40px;
-    }
-    .break-transition-main {
-        flex-grow: 1;
-    }
+.break-area {
+    margin-top: 60px;
+    gap: 40px;
+}
+.break-transition-main {
+    flex-grow: 1;
+}
 </style>

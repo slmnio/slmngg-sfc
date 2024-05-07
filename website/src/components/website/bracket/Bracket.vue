@@ -109,7 +109,7 @@ export default {
             };
         },
         highlightedTeam() {
-            return useStatusStore().highlightedTeam || this.broadcastHighlightTeam || null;
+            return (useStatusStore().highlightedTeam ?? this.broadcastHighlightTeam) || null;
         },
         highlightedMatch() {
             return this.getOrderedMatchNum(useStatusStore().highlightedMatch);

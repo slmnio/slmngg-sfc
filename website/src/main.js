@@ -9,7 +9,6 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue-next/dist/bootstrap-vue-next.css";
 
 import { createHead, VueHeadMixin } from "@unhead/vue";
-import VueCookies from "vue-cookies";
 import VueConfetti from "vue-confetti";
 
 import { Notyf } from "notyf";
@@ -97,8 +96,6 @@ const head = createHead();
 app.use(head);
 app.mixin(VueHeadMixin);
 
-
-app.use(VueCookies);
 app.use(VueConfetti); // TODO figure out a way to not do this globally
 
 app.config.globalProperties.$notyf = new Notyf({

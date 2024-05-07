@@ -2,7 +2,12 @@
     <div class="container">
         <h2 class="text-center mb-3">Team matches</h2>
         <div class="w-100">
-            <ScheduleMatch v-for="match in matches" :match="match" :key="match.id" :left-team="team" :show-editor-button="showEditorButton" />
+            <ScheduleMatch
+                v-for="match in matches"
+                :key="match.id"
+                :match="match"
+                :left-team="team"
+                :show-editor-button="showEditorButton" />
         </div>
     </div>
 </template>
@@ -16,10 +21,10 @@ import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "TeamMatches",
-    props: ["team"],
     components: {
         ScheduleMatch
     },
+    props: ["team"],
     computed: {
         matches() {
             if (!this.team?.matches?.length) return [];

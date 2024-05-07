@@ -1,8 +1,8 @@
 <template>
     <div class="schedule-time">
         <div v-if="customText" class="custom-text mt-1">{{ customText }}</div>
-        <div class="top" v-if="top">{{ top }}</div>
-        <div class="bottom" v-if="bottom">{{ bottom }}</div>
+        <div v-if="top" class="top">{{ top }}</div>
+        <div v-if="bottom" class="bottom">{{ bottom }}</div>
     </div>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay class="maps-overlay" v-if="match" :title="customTitle">
+    <GenericOverlay v-if="match" class="maps-overlay" :title="customTitle">
         <BroadcastMapDisplay :broadcast="broadcast" :animation-active="animationActive" :use-transitions="useTransitions" />
     </GenericOverlay>
 </template>

@@ -1,6 +1,11 @@
 <template>
     <GenericOverlay :title="title || stageTitle || 'Standings'">
-        <Standings class="standings" :event="event" :stage="_stage" :tie-text="standingsSettings && standingsSettings.tieText" use-auto-font-size />
+        <Standings
+            class="standings"
+            :event="event"
+            :stage="_stage"
+            :tie-text="standingsSettings && standingsSettings.tieText"
+            use-auto-font-size />
     </GenericOverlay>
 </template>
 

@@ -1,7 +1,17 @@
 <template>
     <div class="bug-overlay">
         <div class="bug-holder" :style="broadcastMargin">
-            <ThemeTransition :theme="theme" :active="animationActive" start="right" end="right" :border-width="6" border="right" :duration="400" :inner-delay="200" use-fit-content :starting-delay="250">
+            <ThemeTransition
+                :theme="theme"
+                :active="animationActive"
+                start="right"
+                end="right"
+                :border-width="6"
+                border="right"
+                :duration="400"
+                :inner-delay="200"
+                use-fit-content
+                :starting-delay="250">
                 <div class="bug" :class="{'small': small}">
                     <div class="bug-logo bg-center" :style="eventLogo"></div>
                     <div class="bug-text" :class="{'has-br': title.includes('\\n')}">

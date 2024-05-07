@@ -1,13 +1,37 @@
 <template>
-    <transition v-if="useTransitions" mode="out-in" name="break-content" class="map-anim-holder" tag="div">
+    <transition
+
+        v-if="useTransitions"
+        mode="out-in"
+        name="break-content"
+        class="map-anim-holder"
+        tag="div">
         <div :key="autoKey" class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" :class="{'show-next-map': showNextMap && nextMap}">
-            <MapSegment class="map" v-for="map in maps" :key="map.id" :small="small" :drafted-style="draftedStyle"
-                :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
+            <MapSegment
+                v-for="map in maps"
+                :key="map.id"
+                class="map"
+                :small="small"
+                :drafted-style="draftedStyle"
+                :map="map"
+                :show-map-video="showMapVideos"
+                :broadcast="broadcast"
+                :first-to="match && match.first_to"
+                :use-shorter-names="useShorterMapNames" />
         </div>
     </transition>
     <div v-else class="map-display d-flex w-100 h-100" :style="{'--total-maps': maps && maps.length }" :class="{'show-next-map': showNextMap && nextMap}">
-        <MapSegment class="map" v-for="map in maps" :key="map.id" :small="small" :drafted-style="draftedStyle"
-                    :map="map" :show-map-video="showMapVideos" :broadcast="broadcast" :first-to="match && match.first_to" :use-shorter-names="useShorterMapNames"></MapSegment>
+        <MapSegment
+            v-for="map in maps"
+            :key="map.id"
+            class="map"
+            :small="small"
+            :drafted-style="draftedStyle"
+            :map="map"
+            :show-map-video="showMapVideos"
+            :broadcast="broadcast"
+            :first-to="match && match.first_to"
+            :use-shorter-names="useShorterMapNames" />
     </div>
 </template>
 
@@ -148,16 +172,6 @@ export default {
             return this.$root?.activeScene?.name?.toLowerCase().includes("maps");
         }
     },
-    sockets: {
-        map_music() {
-            console.log("Map Music trigger");
-            this.playAudio();
-        },
-        fade_map_music() {
-            console.log("Fade Map Music trigger");
-            this.fadeOutAudio(0, 5);
-        }
-    },
     methods: {
         playAudio() {
             if (this.nextMap?.map?.audio) {
@@ -270,6 +284,16 @@ export default {
         },
         audioStatus(is, was) {
             console.log({ was, is });
+        }
+    },
+    sockets: {
+        map_music() {
+            console.log("Map Music trigger");
+            this.playAudio();
+        },
+        fade_map_music() {
+            console.log("Fade Map Music trigger");
+            this.fadeOutAudio(0, 5);
         }
     }
 };

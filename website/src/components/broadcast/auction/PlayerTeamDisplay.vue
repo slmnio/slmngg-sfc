@@ -1,6 +1,6 @@
 <template>
     <div class="player-team-display d-flex flex-column" :style="teamBG">
-        <div class="team-name flex-center text-center fw-bold" v-if="showName">{{ team.name }}</div>
+        <div v-if="showName" class="team-name flex-center text-center fw-bold">{{ team.name }}</div>
         <div class="team-full-box d-flex">
             <div class="team-logo box flex-center">
                 <div class="team-logo-inner bg-center" :style="teamLogo"></div>

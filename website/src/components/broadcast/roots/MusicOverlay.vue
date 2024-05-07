@@ -4,25 +4,25 @@
             <div v-if="mainPlayer && showTitle && visible" class="song-title industry-align overlay--text-on-bg">
                 <i class="fas fa-music song-icon"></i>
                 <transition name="song" mode="out-in">
-                    <span class="song-text" :key="mainPlayer.title">
+                    <span :key="mainPlayer.title" class="song-text">
                         {{ mainPlayer.title }}
-<!--                        [{{ "▓".repeat(Math.ceil((mainPlayer.currentTime / mainPlayer.duration) * 5)) }}{{ "░".repeat(5 - Math.ceil((mainPlayer.currentTime / mainPlayer.duration) * 5)) }}]-->
+                        <!--                        [{{ "▓".repeat(Math.ceil((mainPlayer.currentTime / mainPlayer.duration) * 5)) }}{{ "░".repeat(5 - Math.ceil((mainPlayer.currentTime / mainPlayer.duration) * 5)) }}]-->
                     </span>
                 </transition>
             </div>
         </transition>
-<!--        <ol style="margin-top: 3em">-->
-<!--            <b>trackList</b>-->
-<!--            <li v-for="track in trackList" :key="track && track.id">{{ track && track.title }}</li>-->
-<!--        </ol>-->
-<!--        <ol style="-->
-<!--    margin-top: 3em;-->
-<!--    position: absolute;-->
-<!--    right: 3em;-->
-<!--    top: 0;">-->
-<!--            <b>loadedTrackList</b>-->
-<!--            <li v-for="track in loadedTrackList" :key="track && track.id">{{ track && track.title }}</li>-->
-<!--        </ol>-->
+        <!--        <ol style="margin-top: 3em">-->
+        <!--            <b>trackList</b>-->
+        <!--            <li v-for="track in trackList" :key="track && track.id">{{ track && track.title }}</li>-->
+        <!--        </ol>-->
+        <!--        <ol style="-->
+        <!--    margin-top: 3em;-->
+        <!--    position: absolute;-->
+        <!--    right: 3em;-->
+        <!--    top: 0;">-->
+        <!--            <b>loadedTrackList</b>-->
+        <!--            <li v-for="track in loadedTrackList" :key="track && track.id">{{ track && track.title }}</li>-->
+        <!--        </ol>-->
     </div>
 </template>
 
@@ -109,44 +109,6 @@ export default {
         //     return !this.trackList?.some(t => t && t.__loading);
         // }
     },
-    watch: {
-        mainPlayer: {
-            deep: true,
-            handler(p) {
-                if (this.loopSongs) return;
-                if (p.duration - p.currentTime < this.crossfadeDuration && p.loaded) {
-                    this.startCrossfade();
-                }
-            }
-        },
-        trackList: {
-            deep: true,
-            handler(list) {
-                if (!list?.length) return console.log("list empty");
-                if (list.some(t => !t || t.__loading)) return console.log("some loading");
-                this.loadedTrackList = list;
-            }
-        },
-        loadedTrackList: {
-            deep: true,
-            handler(list) {
-                if (!this.mainPlayer?.id && list.length) {
-                    return this.start();
-                }
-                if (!list.map(track => track.id).includes(this.mainPlayer.id)) {
-                    // Song currently playing isn't in the newest list, skip
-                    this.startCrossfade();
-                }
-            }
-        },
-        active(isActive) {
-            this.startNewSong(isActive);
-        }
-    },
-    beforeUnmount() {
-        this.mainPlayer?.stop();
-        this.crossfadePlayer?.stop();
-    },
     methods: {
         getNextTrack() {
             if (this.unplayedTracks.length === 0) {
@@ -222,10 +184,39 @@ export default {
             }
         }
     },
-    head() {
-        return {
-            title: `Music (${this.role || ""}) | ${this.broadcast?.code || this.broadcast?.name || ""}`
-        };
+    watch: {
+        mainPlayer: {
+            deep: true,
+            handler(p) {
+                if (this.loopSongs) return;
+                if (p.duration - p.currentTime < this.crossfadeDuration && p.loaded) {
+                    this.startCrossfade();
+                }
+            }
+        },
+        trackList: {
+            deep: true,
+            handler(list) {
+                if (!list?.length) return console.log("list empty");
+                if (list.some(t => !t || t.__loading)) return console.log("some loading");
+                this.loadedTrackList = list;
+            }
+        },
+        loadedTrackList: {
+            deep: true,
+            handler(list) {
+                if (!this.mainPlayer?.id && list.length) {
+                    return this.start();
+                }
+                if (!list.map(track => track.id).includes(this.mainPlayer.id)) {
+                    // Song currently playing isn't in the newest list, skip
+                    this.startCrossfade();
+                }
+            }
+        },
+        active(isActive) {
+            this.startNewSong(isActive);
+        }
     },
     sockets: {
         skip_song([group]) {
@@ -234,6 +225,15 @@ export default {
                 this.startNewSong(true);
             }
         }
+    },
+    beforeUnmount() {
+        this.mainPlayer?.stop();
+        this.crossfadePlayer?.stop();
+    },
+    head() {
+        return {
+            title: `Music (${this.role || ""}) | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 

@@ -4,8 +4,13 @@
             <div class="group">
                 <div class="group-top">Flip Teams</div>
                 <div class="group-bottom">
-                    <b-button class="quick-button" :checked="match.flip_teams" @click="toggleFlipTeams"
-                              button :variant="match.flip_teams ? 'primary' : 'secondary'" :disabled="processing.flipTeams">
+                    <b-button
+                        class="quick-button"
+                        :checked="match.flip_teams"
+                        button
+                        :variant="match.flip_teams ? 'primary' : 'secondary'"
+                        :disabled="processing.flipTeams"
+                        @click="toggleFlipTeams">
                         <i class="fas fa-exchange"></i>
                     </b-button>
                 </div>
@@ -14,25 +19,38 @@
                 <div class="group-top">Attacker Side</div>
                 <div class="group-bottom">
                     <b-button-group>
-                        <BDropdown right split class="quick-button" @click="autoAttack" variant="secondary"
-                                   :disabled="updateData?.mapAttack !== undefined"
-                                   :split-variant="{other: 'secondary', 'Left': 'primary', 'Right': 'danger', 'Both': 'warning'}[broadcast.map_attack || 'other']">
+                        <BDropdown
+                            right
+                            split
+                            class="quick-button"
+                            variant="secondary"
+                            :disabled="updateData?.mapAttack !== undefined"
+                            :split-variant="{other: 'secondary', 'Left': 'primary', 'Right': 'danger', 'Both': 'warning'}[broadcast.map_attack || 'other']"
+                            @click="autoAttack">
                             <template #button-content>
                                 <div class="icon-stack">
                                     <i class="fa-fw" :class="sword(broadcast?.map_attack)"></i>
-                                    <div class="icon-text industry-align" v-if="broadcast.map_attack">
+                                    <div v-if="broadcast.map_attack" class="icon-text industry-align">
                                         {{ broadcast.map_attack }}
                                     </div>
                                 </div>
                             </template>
-                            <b-dropdown-item-button size="sm" v-for="side in ['Left', 'Right', 'Both']" :key="side"
-                                                    :active="side === broadcast.map_attack"
-                                      :disabled="updateData?.mapAttack !== undefined"
-                                      @click="() => setAttack(side)"><i class="fa-fw" :class="sword(side)"></i> {{ side }}</b-dropdown-item-button>
-                            <b-dropdown-item-button size="sm"
-                                                    :active="!broadcast.map_attack"
-                                      :disabled="updateData?.mapAttack !== undefined"
-                                      @click="() => setAttack(null)"><i class="fa-fw" :class="sword(null)"></i> None</b-dropdown-item-button>
+                            <b-dropdown-item-button
+                                v-for="side in ['Left', 'Right', 'Both']"
+                                :key="side"
+                                size="sm"
+                                :active="side === broadcast.map_attack"
+                                :disabled="updateData?.mapAttack !== undefined"
+                                @click="() => setAttack(side)">
+                                <i class="fa-fw" :class="sword(side)"></i> {{ side }}
+                            </b-dropdown-item-button>
+                            <b-dropdown-item-button
+                                size="sm"
+                                :active="!broadcast.map_attack"
+                                :disabled="updateData?.mapAttack !== undefined"
+                                @click="() => setAttack(null)">
+                                <i class="fa-fw" :class="sword(null)"></i> None
+                            </b-dropdown-item-button>
                         </BDropdown>
                     </b-button-group>
                 </div>
@@ -41,11 +59,21 @@
                 <div class="group-top">Map Win</div>
                 <div class="group-bottom">
                     <b-button-group>
-                        <b-button class="quick-button" :disabled="mapWinButtonsDisabled " v-for="(team, i) in mapWinButtonsTeams"
-                                  :key="team?.id" @click="mapWin((match?.flip_teams ? +!i : i)+1)">
+                        <b-button
+                            v-for="(team, i) in mapWinButtonsTeams"
+                            :key="team?.id"
+                            class="quick-button"
+                            :disabled="mapWinButtonsDisabled "
+                            @click="mapWin((match?.flip_teams ? +!i : i)+1)">
                             <div class="icon-stack">
-                                <ThemeLogo v-if="team?.theme" logo-size="w-50" :theme="team?.theme" border-width="0" class="team-icon" icon-padding="0" />
-                                <div class="icon-text industry-align" v-if="team" :class="{'icon-text-code': !!team.code }">
+                                <ThemeLogo
+                                    v-if="team?.theme"
+                                    logo-size="w-50"
+                                    :theme="team?.theme"
+                                    border-width="0"
+                                    class="team-icon"
+                                    icon-padding="0" />
+                                <div v-if="team" class="icon-text industry-align" :class="{'icon-text-code': !!team.code }">
                                     {{ team?.code || team?.name }}
                                 </div>
                             </div>
@@ -53,24 +81,28 @@
                     </b-button-group>
                 </div>
             </div>
-<!--            <div class="group">-->
-<!--                <div class="group-top">Player Cams</div>-->
-<!--                <div class="group-bottom">-->
-<!--                    <b-form-checkbox :checked="broadcast.show_cams" @change="(state) => togglePlayerCams(state)"-->
-<!--                                     :disabled="updateData?.playerCams !== undefined"-->
-<!--                                     button size="sm" :button-variant="broadcast.show_cams ? 'primary' : 'secondary'">-->
-<!--                        Show Cams-->
-<!--                    </b-form-checkbox>-->
-<!--                </div>-->
-<!--            </div>-->
+            <!--            <div class="group">-->
+            <!--                <div class="group-top">Player Cams</div>-->
+            <!--                <div class="group-bottom">-->
+            <!--                    <b-form-checkbox :checked="broadcast.show_cams" @change="(state) => togglePlayerCams(state)"-->
+            <!--                                     :disabled="updateData?.playerCams !== undefined"-->
+            <!--                                     button size="sm" :button-variant="broadcast.show_cams ? 'primary' : 'secondary'">-->
+            <!--                        Show Cams-->
+            <!--                    </b-form-checkbox>-->
+            <!--                </div>-->
+            <!--            </div>-->
         </div>
         <div class="spacer flex-grow-1"></div>
         <div class="area right-area">
             <div class="group text-end">
                 <div class="group-top">Break match</div>
                 <div class="group-bottom">
-                    <b-button class="quick-button" :variant="broadcast.show_live_match ? 'primary' : 'secondary'" :pressed="broadcast.show_live_match"
-                              :disabled="updateData?.showLiveMatch !== undefined" @click="() => setLiveMatchVisibility(!broadcast.show_live_match)">
+                    <b-button
+                        class="quick-button"
+                        :variant="broadcast.show_live_match ? 'primary' : 'secondary'"
+                        :pressed="broadcast.show_live_match"
+                        :disabled="updateData?.showLiveMatch !== undefined"
+                        @click="() => setLiveMatchVisibility(!broadcast.show_live_match)">
                         <i class="fas fa-signal-stream"></i>
                     </b-button>
                 </div>
@@ -91,14 +123,14 @@
                 <div class="group-top">Break Settings</div>
                 <div class="group-bottom">
                     <div class="fake-btn-group">
-                        <BreakDisplayMultiModal :broadcast="broadcast"/>
+                        <BreakDisplayMultiModal :broadcast="broadcast" />
                     </div>
                 </div>
             </div>
             <div class="group text-end">
                 <div class="group-top">Observers</div>
                 <div class="group-bottom">
-                    <ObserverSettingsModal :broadcast="broadcast"/>
+                    <ObserverSettingsModal :broadcast="broadcast" />
                 </div>
             </div>
         </div>
@@ -113,6 +145,11 @@ import ThemeLogo from "@/components/website/ThemeLogo.vue";
 
 export default {
     name: "BroadcastEditor",
+    components: {
+        ThemeLogo,
+        BreakDisplayMultiModal,
+        ObserverSettingsModal
+    },
     props: ["client"],
     data: () => ({
         updateData: { },
@@ -121,11 +158,6 @@ export default {
 
         }
     }),
-    components: {
-        ThemeLogo,
-        BreakDisplayMultiModal,
-        ObserverSettingsModal
-    },
     computed: {
         broadcast() {
             return this.client.broadcast?.[0] || {};

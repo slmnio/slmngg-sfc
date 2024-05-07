@@ -1,23 +1,45 @@
 <template>
     <div class="generic-overlay flex-center flex-column" :class="{'full': full}">
-        <TourneyBar class="st4-top" v-if="top === 'st4'" :broadcast="broadcast" left="Schedule" :right="title"/>
-        <div class="g-title-wrapper" v-if="!hideTitle">
-            <theme-transition :theme="theme" :active="$root.animationActive" one-color end="middle"  :duration="500" :inner-delay="150">
+        <TourneyBar
+            v-if="top === 'st4'"
+            class="st4-top"
+            :broadcast="broadcast"
+            left="Schedule"
+            :right="title" />
+        <div v-if="!hideTitle" class="g-title-wrapper">
+            <theme-transition
+                :theme="theme"
+                :active="$root.animationActive"
+                one-color
+                end="middle"
+                :duration="500"
+                :inner-delay="150">
                 <div class="generic-overlay-title g-title overlay--bg flex-center" :style="{borderColor: _accentColor, ...(titleStyle || {})}">
                     <Squeezable align="middle" :disabled="(title || '').includes('\\n')" class="w-100 flex-center industry-align">
                         <transition name="fade" mode="out-in">
-                            <div class="title-text" :key="title" :class="{'has-br': title?.includes('\\n') }"
-                                  v-html="nbr(title)"></div>
+                            <div
+                                :key="title"
+                                class="title-text"
+                                :class="{'has-br': title?.includes('\\n') }"
+                                v-html="nbr(title)"></div>
                         </transition>
                     </Squeezable>
                 </div>
             </theme-transition>
         </div>
         <div class="g-body-wrapper">
-                <div v-if="noBottomAnimate" class="generic-overlay-body g-body overlay--bg flex-center" :style="bodyStyle">
-                    <slot></slot>
-                </div>
-            <theme-transition v-else :active="$root.animationActive" one-color :theme="theme" :starting-delay="100" end="middle" :duration="500" :inner-delay="150">
+            <div v-if="noBottomAnimate" class="generic-overlay-body g-body overlay--bg flex-center" :style="bodyStyle">
+                <slot></slot>
+            </div>
+            <theme-transition
+                v-else
+                :active="$root.animationActive"
+                one-color
+                :theme="theme"
+                :starting-delay="100"
+                end="middle"
+                :duration="500"
+                :inner-delay="150">
                 <div class="generic-overlay-body g-body overlay--bg flex-center" :style="bodyStyle">
                     <slot></slot>
                 </div>
@@ -34,12 +56,6 @@ export default {
     name: "GenericOverlay",
     components: { Squeezable, ThemeTransition, TourneyBar },
     props: ["title", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "titleStyle", "customTheme", "full", "hideTitle"],
-    methods: {
-        nbr(text) {
-            if (!text) return "";
-            return text.replace(/\\n/g, "<br>");
-        }
-    },
     computed: {
         theme() {
             return this.customTheme || this.$root?.broadcast?.event?.theme;
@@ -58,6 +74,12 @@ export default {
                 css.padding = "0";
             }
             return css;
+        }
+    },
+    methods: {
+        nbr(text) {
+            if (!text) return "";
+            return text.replace(/\\n/g, "<br>");
         }
     }
 };

@@ -1,10 +1,18 @@
 <template>
     <div class="cams-overlay">
         <transition name="slide-in">
-            <div class="team-cams" v-show="showCams">
-                <TeamCamsGroup :style="{ order: match.flip_teams ? +!ti : ti }" v-for="(team, ti) in teams" :key="team.id"
-                               :team="team" :guests="guests[ti]" :params="camParams" :event="broadcast && broadcast.event"
-                               :relay-prefix="relayPrefix" :ti="match.flip_teams ? +!ti : ti" :disable-cams="disable" />
+            <div v-show="showCams" class="team-cams">
+                <TeamCamsGroup
+                    v-for="(team, ti) in teams"
+                    :key="team.id"
+                    :style="{ order: match.flip_teams ? +!ti : ti }"
+                    :team="team"
+                    :guests="guests[ti]"
+                    :params="camParams"
+                    :event="broadcast && broadcast.event"
+                    :relay-prefix="relayPrefix"
+                    :ti="match.flip_teams ? +!ti : ti"
+                    :disable-cams="disable" />
             </div>
         </transition>
     </div>
@@ -16,8 +24,8 @@ import TeamCamsGroup from "@/components/broadcast/cams/TeamCamsGroup";
 
 export default {
     name: "CamsOverlay",
-    props: ["broadcast", "params"],
     components: { TeamCamsGroup },
+    props: ["broadcast", "params"],
     data: () => ({
         showCams: false
     }),
@@ -60,16 +68,16 @@ export default {
             return this.broadcast?.show_cams;
         }
     },
-    sockets: {
-        toggle_cams() {
-            this.showCams = !this.showCams;
-        }
-    },
     watch: {
         broadcastShowCams(show) {
             if (show !== this.showCams) {
                 this.showCams = show;
             }
+        }
+    },
+    sockets: {
+        toggle_cams() {
+            this.showCams = !this.showCams;
         }
     },
     head() {

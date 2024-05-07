@@ -3,7 +3,7 @@
         <div v-for="group in groupedTeams" :key="group.name">
             <h2>{{ group.name }}</h2>
             <div class="row">
-                <router-link :to="`/team/${team.id}/theme`" class="brand no-link-style ct-passive text-center col-xl-2 col-md-3 col-sm-6 mb-3" v-for="team in group.teams" :key="team.id">
+                <router-link v-for="team in group.teams" :key="team.id" :to="`/team/${team.id}/theme`" class="brand no-link-style ct-passive text-center col-xl-2 col-md-3 col-sm-6 mb-3">
                     <ThemeLogo class="brand-logo" :theme="team.theme" logo-size="w-200" border-width="6" />
                     <div class="theme-title py-1">{{ team.name }}</div>
                 </router-link>
@@ -17,8 +17,8 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 
 export default {
     name: "EventBrands",
-    props: ["event"],
     components: { ThemeLogo },
+    props: ["event"],
     computed: {
         groupedTeams() {
             if (!(this.event?.teams?.some(team => team.team_category))) return null;

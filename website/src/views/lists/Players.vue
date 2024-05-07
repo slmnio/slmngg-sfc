@@ -1,15 +1,20 @@
 <template>
     <div class="container">
         <h1 class="big mb-3">Players</h1>
-        <b-input-group prepend="Search" >
-            <b-form-input placeholder="Type a player's name here" type="text" @keydown.enter="override" v-model="search" />
+        <b-input-group prepend="Search">
+            <b-form-input v-model="search" placeholder="Type a player's name here" type="text" @keydown.enter="override" />
         </b-input-group>
 
-        <h1><LoadingIcon v-if="!players.length"></LoadingIcon></h1>
+        <h1><LoadingIcon v-if="!players.length" /></h1>
 
         <div class="player-list">
-            <div class="search-helper default-thing" v-if="search && search.length < minCharacters && !overrideMinCharacters">Use {{ minCharacters }} or more characters to search</div>
-            <ContentThing v-for="player in filteredPlayers" :key="player.id" :text="player.name" :thing="player" type="player" />
+            <div v-if="search && search.length < minCharacters && !overrideMinCharacters" class="search-helper default-thing">Use {{ minCharacters }} or more characters to search</div>
+            <ContentThing
+                v-for="player in filteredPlayers"
+                :key="player.id"
+                :text="player.name"
+                :thing="player"
+                type="player" />
         </div>
     </div>
 </template>
@@ -47,14 +52,14 @@ export default {
             return searchInCollection(this.players, this.search, "name");
         }
     },
-    watch: {
-        search() {
-            if (!this.search) this.overrideMinCharacters = false;
-        }
-    },
     methods: {
         override() {
             this.overrideMinCharacters = true;
+        }
+    },
+    watch: {
+        search() {
+            if (!this.search) this.overrideMinCharacters = false;
         }
     },
     head() {

@@ -2,11 +2,11 @@
     <div class="remote-obs-controller">
         <div class="box">
             <h2>SLMN.GG OBS Remote Controller</h2>
-            <p>Websocket URL: {{ wsUrl || 'n/a'  }}</p>
+            <p>Websocket URL: {{ wsUrl || 'n/a' }}</p>
             <p>Websocket Password: {{ wsPassword || 'n/a' }}</p>
             <p>status: {{ isConnected ? "Connected" : "Not connected" }}</p>
             <p v-if="obsError">Error: {{ obsError }}</p>
-            <pre class="text-info" v-if="latestData">{{ JSON.stringify(latestData, null, 2) }}</pre>
+            <pre v-if="latestData" class="text-info">{{ JSON.stringify(latestData, null, 2) }}</pre>
         </div>
     </div>
 </template>
@@ -70,6 +70,25 @@ export default {
             });
         }
     },
+    sockets: {
+        async obs_remote_control(socketData) {
+            const { request, data } = jsonify(socketData);
+            console.log("prod trigger data", request, data);
+            if (this.isConnected && this.obsWs) {
+                this.latestData = { request, data };
+
+                if (data?.sceneName && data?.sceneItemName) {
+                    const { sceneItemId } = await this.obsWs.call("GetSceneItemId", { sceneName: data.sceneName, sourceName: data.sceneItemName });
+                    data.sceneItemId = sceneItemId;
+                }
+
+                this.obsWs.call(request, data);
+            }
+        },
+        request_obs_remote_control_update() {
+            this.sendOBSData();
+        }
+    },
     async mounted() {
         this.obsWs = new OBSWebSocket();
 
@@ -99,25 +118,6 @@ export default {
         return {
             title: `Remote Controller | ${this.client?.name || this.client?.key || ""}`
         };
-    },
-    sockets: {
-        async obs_remote_control(socketData) {
-            const { request, data } = jsonify(socketData);
-            console.log("prod trigger data", request, data);
-            if (this.isConnected && this.obsWs) {
-                this.latestData = { request, data };
-
-                if (data?.sceneName && data?.sceneItemName) {
-                    const { sceneItemId } = await this.obsWs.call("GetSceneItemId", { sceneName: data.sceneName, sourceName: data.sceneItemName });
-                    data.sceneItemId = sceneItemId;
-                }
-
-                this.obsWs.call(request, data);
-            }
-        },
-        request_obs_remote_control_update() {
-            this.sendOBSData();
-        }
     }
 };
 </script>

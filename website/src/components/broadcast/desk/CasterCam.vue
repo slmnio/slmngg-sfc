@@ -1,12 +1,17 @@
 <template>
     <div class="caster-cam-wrapper flex-center">
-        <iframe v-if="manualCamera ? useCam : (useCam || extendedIframeUse)" v-show="manualCamera || extendedIframeVisible" allow="autoplay;camera;microphone;fullscreen;picture-in-picture;display-capture;" :src="src" class="caster-frame"></iframe>
+        <iframe
+            v-if="manualCamera ? useCam : (useCam || extendedIframeUse)"
+            v-show="manualCamera || extendedIframeVisible"
+            allow="autoplay;camera;microphone;fullscreen;picture-in-picture;display-capture;"
+            :src="src"
+            class="caster-frame"></iframe>
         <transition name="mid-split">
-<!--            <slot v-if="useCam ? !apiVisible : true">-->
-                <div v-if="useCam ? !cameraIsOn : true" class="caster-bg flex-center" :style="{backgroundColor: color}">
-                    <div v-if="avatar" class="caster-avatar" :class="{'event-fallback': avatar.eventFallback}" :style="avatar"></div>
-                </div>
-<!--            </slot>-->
+            <!--            <slot v-if="useCam ? !apiVisible : true">-->
+            <div v-if="useCam ? !cameraIsOn : true" class="caster-bg flex-center" :style="{backgroundColor: color}">
+                <div v-if="avatar" class="caster-avatar" :class="{'event-fallback': avatar.eventFallback}" :style="avatar"></div>
+            </div>
+            <!--            </slot>-->
         </transition>
     </div>
 </template>
@@ -75,6 +80,14 @@ export default {
             return bg(this.guest.avatar);
         }
     },
+    methods: {
+        slowDisableCam() {
+            this.apiVisible = false;
+            setTimeout(() => {
+                this.extendedIframeUse = false;
+            }, 700);
+        }
+    },
     watch: {
         useCam(newCam, oldCam) {
             console.log({ newCam, oldCam });
@@ -87,14 +100,6 @@ export default {
         cameraIsOn(isVisible) {
             this.$emit("cam_visible", isVisible);
             console.log("cam_visible", isVisible);
-        }
-    },
-    methods: {
-        slowDisableCam() {
-            this.apiVisible = false;
-            setTimeout(() => {
-                this.extendedIframeUse = false;
-            }, 700);
         }
     },
     mounted() {

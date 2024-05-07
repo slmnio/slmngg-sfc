@@ -1,30 +1,35 @@
 <template>
-    <div class="standings" v-if="standings && standings.standings && standings.standings.length" :style="useAutoFontSize ? { 'fontSize': autoFontSize} : {}">
-<!--        <div>{{ event.name }} / {{ stage }} / {{ allMatches.length }} -> {{ stageMatches.length }} ({{ teams.length }} teams)</div>-->
+    <div v-if="standings && standings.standings && standings.standings.length" class="standings" :style="useAutoFontSize ? { 'fontSize': autoFontSize} : {}">
+        <!--        <div>{{ event.name }} / {{ stage }} / {{ allMatches.length }} -> {{ stageMatches.length }} ({{ teams.length }} teams)</div>-->
         <h3 class="top-standings-name text-center d-md-none">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</h3>
         <div class="standings-header d-flex align-items-center">
             <div class="team-name flex-grow-1 text-start d-none d-md-flex">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</div>
             <div class="team-name team-code flex-grow-1 text-start d-md-none"></div>
             <div class="team-stats d-flex">
-                <div class="team-stat text-center" v-for="col in showColumns" :key="col" v-b-tooltip="getColumnText(col).title">
+                <div v-for="col in showColumns" :key="col" v-b-tooltip="getColumnText(col).title" class="team-stat text-center">
                     {{ getColumnText(col).header }}
                 </div>
-<!--                <div class="team-stat text-center">Matches</div>-->
-<!--                <div class="team-stat text-center">Maps</div>-->
-<!--                <div class="team-stat text-center">Map Diff</div>-->
-<!--                <div v-if="useOMW" class="team-stat text-center d-none d-md-block" v-b-tooltip:top="'Opponent Match Winrate'">OMW</div>-->
-<!--                <div class="team-stat text-center">Points</div>-->
+                <!--                <div class="team-stat text-center">Matches</div>-->
+                <!--                <div class="team-stat text-center">Maps</div>-->
+                <!--                <div class="team-stat text-center">Map Diff</div>-->
+                <!--                <div v-if="useOMW" class="team-stat text-center d-none d-md-block" v-b-tooltip:top="'Opponent Match Winrate'">OMW</div>-->
+                <!--                <div class="team-stat text-center">Points</div>-->
             </div>
         </div>
         <div class="teams">
-            <div class="team-group" v-for="(group, i) in standings.standings" :key="i">
-                <div class="team" v-for="team in group" :key="team.id">
-                    <StandingsTeam :team="team" :tie-text="tieText" :showColumns="showColumns" icon-size="w-60" :use-codes="useCodes" />
+            <div v-for="(group, i) in standings.standings" :key="i" class="team-group">
+                <div v-for="team in group" :key="team.id" class="team">
+                    <StandingsTeam
+                        :team="team"
+                        :tie-text="tieText"
+                        :show-columns="showColumns"
+                        icon-size="w-60"
+                        :use-codes="useCodes" />
                 </div>
             </div>
         </div>
-        <div class="warnings flex-center flex-column mt-2 mx-2" v-if="standings && standings.warnings.length">
-            <div class="warning bg-warning text-dark p-1 px-2 mb-1" v-for="warn in standings.warnings" :key="warn">{{ warn }}</div>
+        <div v-if="standings && standings.warnings.length" class="warnings flex-center flex-column mt-2 mx-2">
+            <div v-for="warn in standings.warnings" :key="warn" class="warning bg-warning text-dark p-1 px-2 mb-1">{{ warn }}</div>
         </div>
     </div>
 </template>
@@ -46,6 +51,7 @@ function avg(arr) {
 
 export default {
     name: "Standings",
+    components: { StandingsTeam },
     props: {
         event: Object,
         stage: String,
@@ -55,43 +61,6 @@ export default {
         useCodes: Boolean,
         overrideShowColumns: Array,
         useAutoFontSize: Boolean
-    },
-    components: { StandingsTeam },
-    methods: {
-        getColumnText(col) {
-            /* eslint-disable quote-props */
-            return ({
-                "MatchWinrate": { header: "W%", title: "Match winrate" },
-                "MapWinrate": { header: "MW%", title: "Map winrate" },
-                "OMatchWinrate": { header: "OW%", title: "Opponents' match winrate" },
-                "OMapWinrate": { header: "OMW%", title: "Opponents' map winrate" },
-                "Matches": { header: "Matches", title: "Matches won and lost" },
-                "MatchDiff": { header: "Match Diff", title: "Matches won - matches lost" },
-                "Maps": { header: "Maps", title: "Maps won and lost" },
-                "MapDiff": { header: "Map Diff", title: "Maps won - maps lost" },
-                "ValorantRounds": { header: "RW-RL", title: "Rounds won - rounds lost" },
-                "ValorantRoundDiff": { header: "ΔR", title: "Round diff" },
-                "Points": { header: "Points", title: "Team points" },
-                "MatchWins": { header: "Wins", title: "Match wins" },
-                "MatchLosses": { header: "Losses", title: "Match losses" },
-                "MatchDiffPoints": { header: "Match diff", title: "Matches won and lost (+ team points)" },
-                "MatchWinsPoints": { header: "Points", title: "Match wins + team points" },
-                "MatchesPoints": { header: "Summit Sorting", title: "Matches won - matches lost + team points" },
-                "Played": { header: "Played", title: "Matches played" },
-                "OPoints": { header: "Opp Pts", title: "Opponent points" },
-                "OMatchWinsPoints": { header: "Opp Pts", title: "Opponent points + match wins" }
-            })[col] || {
-                header: "-", title: col
-            };
-
-
-            /* eslint-enable quote-props */
-        },
-        hasColumns(...cols) {
-            // TODO: needs to be either shown columns or has columns? feel like it's getting a little tangled
-            console.log("cols", cols, this.showColumns);
-            return this.showColumns.some(col => cols.includes(col));
-        }
     },
     computed: {
         autoFontSize() {
@@ -382,6 +351,42 @@ export default {
             //
             //
             // return teams;
+        }
+    },
+    methods: {
+        getColumnText(col) {
+            /* eslint-disable quote-props */
+            return ({
+                "MatchWinrate": { header: "W%", title: "Match winrate" },
+                "MapWinrate": { header: "MW%", title: "Map winrate" },
+                "OMatchWinrate": { header: "OW%", title: "Opponents' match winrate" },
+                "OMapWinrate": { header: "OMW%", title: "Opponents' map winrate" },
+                "Matches": { header: "Matches", title: "Matches won and lost" },
+                "MatchDiff": { header: "Match Diff", title: "Matches won - matches lost" },
+                "Maps": { header: "Maps", title: "Maps won and lost" },
+                "MapDiff": { header: "Map Diff", title: "Maps won - maps lost" },
+                "ValorantRounds": { header: "RW-RL", title: "Rounds won - rounds lost" },
+                "ValorantRoundDiff": { header: "ΔR", title: "Round diff" },
+                "Points": { header: "Points", title: "Team points" },
+                "MatchWins": { header: "Wins", title: "Match wins" },
+                "MatchLosses": { header: "Losses", title: "Match losses" },
+                "MatchDiffPoints": { header: "Match diff", title: "Matches won and lost (+ team points)" },
+                "MatchWinsPoints": { header: "Points", title: "Match wins + team points" },
+                "MatchesPoints": { header: "Summit Sorting", title: "Matches won - matches lost + team points" },
+                "Played": { header: "Played", title: "Matches played" },
+                "OPoints": { header: "Opp Pts", title: "Opponent points" },
+                "OMatchWinsPoints": { header: "Opp Pts", title: "Opponent points + match wins" }
+            })[col] || {
+                header: "-", title: col
+            };
+
+
+            /* eslint-enable quote-props */
+        },
+        hasColumns(...cols) {
+            // TODO: needs to be either shown columns or has columns? feel like it's getting a little tangled
+            console.log("cols", cols, this.showColumns);
+            return this.showColumns.some(col => cols.includes(col));
         }
     }
 };

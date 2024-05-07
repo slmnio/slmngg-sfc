@@ -12,21 +12,33 @@
                 <tr v-for="(role) in roles" :key="role">
                     <td class="w-25">{{ role }}</td>
                     <td>
-                        <linked-players v-if="rolePlayers(role)?.length" :players="rolePlayers(role)"/>
+                        <linked-players v-if="rolePlayers(role)?.length" :players="rolePlayers(role)" />
                     </td>
                     <td class="w-100">
-                        <b-form-select class="role-selectable opacity-changes" size="sm" :key="i"
-                                       v-for="i of formData[role]?.count" v-model="formData[role].selected[i-1]"
-                                       :class="{'low-opacity': clientsLoading}"
-                                       :options="clientOptions"
-                                       @keydown.delete="() => $set(formData[role].selected, i-1, null)"></b-form-select>
+                        <b-form-select
+                            v-for="i of formData[role]?.count"
+                            :key="i"
+                            v-model="formData[role].selected[i-1]"
+                            class="role-selectable opacity-changes"
+                            size="sm"
+                            :class="{'low-opacity': clientsLoading}"
+                            :options="clientOptions"
+                            @keydown.delete="() => $set(formData[role].selected, i-1, null)" />
                     </td>
                     <td style="width: 2em">
-                        <b-button class="role-selectable" size="sm" variant="success" @click="formData[role].count++"><i
-                            class="fa fa-plus"></i></b-button>
-                        <b-button class="role-selectable" size="sm" variant="danger" :key="i"
-                                  v-for="i of Math.max(0, (formData[role]?.count || 0) - 1)"
-                                  @click="removeRow(role, i)"><i class="fa fa-minus"></i></b-button>
+                        <b-button class="role-selectable" size="sm" variant="success" @click="formData[role].count++">
+                            <i
+                                class="fa fa-plus"></i>
+                        </b-button>
+                        <b-button
+                            v-for="i of Math.max(0, (formData[role]?.count || 0) - 1)"
+                            :key="i"
+                            class="role-selectable"
+                            size="sm"
+                            variant="danger"
+                            @click="removeRow(role, i)">
+                            <i class="fa fa-minus"></i>
+                        </b-button>
                     </td>
                 </tr>
             </tbody>
@@ -35,8 +47,12 @@
             <b-button variant="secondary" @click="resetFromServer">
                 <i class="fas fa-fw fa-redo"></i> Reset
             </b-button>
-            <b-button variant="success" @click="saveToCurrentMatch" :disabled="processing"
-                      class="opacity-changes" :class="{'low-opacity': processing}">
+            <b-button
+                variant="success"
+                :disabled="processing"
+                class="opacity-changes"
+                :class="{'low-opacity': processing}"
+                @click="saveToCurrentMatch">
                 <i class="fas fa-fw" :class="{'fa-save': !processing, 'fa-pulse fa-spinner': processing}"></i> Save to current match
             </b-button>
         </div>

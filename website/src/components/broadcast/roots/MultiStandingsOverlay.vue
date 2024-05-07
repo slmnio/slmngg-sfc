@@ -1,9 +1,14 @@
 <template>
     <GenericOverlay class="multi-standings-overlay" :title="title || 'Standings'" :full="full">
         <div class="all-standings-holder">
-            <div class="standings-holder" v-for="standings in standingsGroups" :key="standings.title">
-                <Standings :event="event" :stage="standings.group" :use-codes="useCodes" :override-show-columns="showColumns"
-                           :tie-text="standings && standings.tieText" :title="standings.short || standings.title"></Standings>
+            <div v-for="standings in standingsGroups" :key="standings.title" class="standings-holder">
+                <Standings
+                    :event="event"
+                    :stage="standings.group"
+                    :use-codes="useCodes"
+                    :override-show-columns="showColumns"
+                    :tie-text="standings && standings.tieText"
+                    :title="standings.short || standings.title" />
 
                 <!--            event: Object,-->
                 <!--            stage: String,-->

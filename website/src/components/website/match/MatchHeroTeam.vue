@@ -1,5 +1,5 @@
 <template>
-    <div class="match-hero-team flex-center default-thing" :style="teamBG" v-if="team">
+    <div v-if="team" class="match-hero-team flex-center default-thing" :style="teamBG">
         <div class="team-logo" :style="teamLogo"></div>
         <router-link :to="url('team', team)" :style="teamText" class="team-name no-link-style">{{ team.name }}</router-link>
     </div>
@@ -12,7 +12,6 @@ import { resizedImage } from "@/utils/images";
 export default {
     name: "MatchHeroTeam",
     props: ["team"],
-    methods: { url },
     computed: {
         teamLogo() {
             if (!this.team?.theme) return {};
@@ -30,7 +29,8 @@ export default {
                 color: this.team.theme.color_text_on_logo_background || this.team.theme.color_text_on_theme
             };
         }
-    }
+    },
+    methods: { url }
 };
 </script>
 

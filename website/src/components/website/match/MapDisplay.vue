@@ -1,25 +1,25 @@
 <template>
-    <div :class="`map ${mapClass} ${condensed ? 'condensed' : ''} ${banned ? 'is-banned' : ''}`" v-if="showBannedMaps ? true : !banned">
+    <div v-if="showBannedMaps ? true : !banned" :class="`map ${mapClass} ${condensed ? 'condensed' : ''} ${banned ? 'is-banned' : ''}`">
         <div class="map-image default-thing" :style="imageCSS">
-            <div class="map-color-overlay draw" v-if="map?.draw"></div>
-            <div class="map-color-overlay banned" v-if="banned"></div>
-            <div class="map-color-overlay winner" v-if="winner" :style="logoBackground1(winner)"></div>
+            <div v-if="map?.draw" class="map-color-overlay draw"></div>
+            <div v-if="banned" class="map-color-overlay banned"></div>
+            <div v-if="winner" class="map-color-overlay winner" :style="logoBackground1(winner)"></div>
 
-            <div class="map-winner-image bg-center" v-if="winner" :style="resizedImage(winner.theme, ['default_logo', 'small_logo'], 'h-90')"></div>
-            <div class="map-insert-number" v-if="number && !condensed && !banned">{{ number }}</div>
+            <div v-if="winner" class="map-winner-image bg-center" :style="resizedImage(winner.theme, ['default_logo', 'small_logo'], 'h-90')"></div>
+            <div v-if="number && !condensed && !banned" class="map-insert-number">{{ number }}</div>
 
-            <div class="map-insert-text" v-if="banned && !condensed">BANNED</div>
-            <div class="map-insert-text" v-if="map?.draw && complete && !condensed">DRAW</div>
-            <div class="map-insert-text" v-if="!complete && !condensed && !winner && mapClass === 'tiebreaker'">TIEBREAKER</div>
-            <div class="map-insert-text" v-if="!complete && !condensed && !winner && mapClass === 'extra'">IF REQUIRED</div>
+            <div v-if="banned && !condensed" class="map-insert-text">BANNED</div>
+            <div v-if="map?.draw && complete && !condensed" class="map-insert-text">DRAW</div>
+            <div v-if="!complete && !condensed && !winner && mapClass === 'tiebreaker'" class="map-insert-text">TIEBREAKER</div>
+            <div v-if="!complete && !condensed && !winner && mapClass === 'extra'" class="map-insert-text">IF REQUIRED</div>
         </div>
         <div class="map-lower-text map-name">{{ name || '--' }}</div>
-        <div class="map-lower-text map-scores" v-if="scores">{{ scores }}</div>
-        <div class="map-lower-text map-pick" v-if="!condensed && (banText || pickText)">{{ banText || pickText  || '' }}</div>
-        <div class="map-lower-text map-replay-code" v-if="!condensed && map?.replay_code">
-             <i class="fas fa-history fa-fw" v-b-tooltip="'Replay Code'"></i> <CopyTextButton>{{ map.replay_code }}</CopyTextButton>
+        <div v-if="scores" class="map-lower-text map-scores">{{ scores }}</div>
+        <div v-if="!condensed && (banText || pickText)" class="map-lower-text map-pick">{{ banText || pickText || '' }}</div>
+        <div v-if="!condensed && map?.replay_code" class="map-lower-text map-replay-code">
+            <i v-b-tooltip="'Replay Code'" class="fas fa-history fa-fw"></i> <CopyTextButton>{{ map.replay_code }}</CopyTextButton>
         </div>
-        <div class="map-self-pick" v-if="showSelfPicks && map.picker?.id === self?.id">
+        <div v-if="showSelfPicks && map.picker?.id === self?.id" class="map-self-pick">
             {{ self.code }} PICK
         </div>
     </div>

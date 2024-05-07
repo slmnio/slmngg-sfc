@@ -1,23 +1,45 @@
 <template>
-  <div class="ingame-overlay" :class="{'basic': basicMode}">
-      <div class="top-overlay" :style="broadcastMargin">
-          <IngameTeam :key="team.id" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
-                      :team="team"  :right="i === 1"
-                      :active="noAnimation || shouldShowTeams" :score="scores[i]" :hide-scores="broadcast.hide_scores"
-                      :extend-icons="extendIcons" :color-logo-holder="colorLogoHolder"
-                      :width="teamWidth" :codes="useCodes" :event="broadcast.event" :auto-small="autoSmall"
-                      :map-attack="attacks[i]" :use-dots="useDots" :first-to="match && match.first_to"
-                      :event-info="i === 0 ? eventData : null"
-                      :map-info="i === 1 ? mapInformation : null"
-          />
-          <!--   -->
-          <Middle v-if="!basicMode" :active="shouldShowMiddle" :theme="broadcast?.event?.theme" :text="middleText"
-                  :tiny="broadcast.margin === 0" :borders="middleBorders" />
-      </div>
-      <transition name="fade" mode="out-in">
-          <Sponsors v-if="showFadeSponsors && !basicMode" class="ingame-fade-sponsors" :sponsors="fadeSponsors" mode="out-in" :speed="sponsorFadeSpeed" />
-      </transition>
-  </div>
+    <div class="ingame-overlay" :class="{'basic': basicMode}">
+        <div class="top-overlay" :style="broadcastMargin">
+            <IngameTeam
+                v-for="(team, i) in teams"
+                :key="team.id"
+                :theme="getAltTheme(team, i)"
+                :team="team"
+                :right="i === 1"
+                :active="noAnimation || shouldShowTeams"
+                :score="scores[i]"
+                :hide-scores="broadcast.hide_scores"
+                :extend-icons="extendIcons"
+                :color-logo-holder="colorLogoHolder"
+                :width="teamWidth"
+                :codes="useCodes"
+                :event="broadcast.event"
+                :auto-small="autoSmall"
+                :map-attack="attacks[i]"
+                :use-dots="useDots"
+                :first-to="match && match.first_to"
+                :event-info="i === 0 ? eventData : null"
+                :map-info="i === 1 ? mapInformation : null"
+            />
+            <!--   -->
+            <Middle
+                v-if="!basicMode"
+                :active="shouldShowMiddle"
+                :theme="broadcast?.event?.theme"
+                :text="middleText"
+                :tiny="broadcast.margin === 0"
+                :borders="middleBorders" />
+        </div>
+        <transition name="fade" mode="out-in">
+            <Sponsors
+                v-if="showFadeSponsors && !basicMode"
+                class="ingame-fade-sponsors"
+                :sponsors="fadeSponsors"
+                mode="out-in"
+                :speed="sponsorFadeSpeed" />
+        </transition>
+    </div>
 </template>
 
 <script>
@@ -28,8 +50,8 @@ import Sponsors from "@/components/broadcast/Sponsors";
 
 export default {
     name: "IngameOverlay",
-    props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed", "noAnimation", "basicMode"],
     components: { IngameTeam, Middle, Sponsors },
+    props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed", "noAnimation", "basicMode"],
     data: () => ({
         flippingTeams: false
     }),
@@ -238,28 +260,6 @@ export default {
             return [];
         }
     },
-    watch: {
-        broadcast() {
-            if (this.broadcast) {
-                document.body.dataset.broadcast = this.broadcast.key;
-            }
-        },
-        flipTeams: {
-            handler(newValue) {
-                console.log("flip teams now", newValue);
-                this.flippingTeams = true;
-                setTimeout(() => {
-                    this.flippingTeams = false;
-                    console.log("flip teams now", this.flippingTeams);
-                }, 1500);
-            }
-        },
-        shouldShowTeams: {
-            handler(val) {
-                console.log("should show teams", val);
-            }
-        }
-    },
     methods: {
         getAltTheme(team, i) {
             console.log({ team, i });
@@ -285,6 +285,28 @@ export default {
             }
 
             return team.theme;
+        }
+    },
+    watch: {
+        broadcast() {
+            if (this.broadcast) {
+                document.body.dataset.broadcast = this.broadcast.key;
+            }
+        },
+        flipTeams: {
+            handler(newValue) {
+                console.log("flip teams now", newValue);
+                this.flippingTeams = true;
+                setTimeout(() => {
+                    this.flippingTeams = false;
+                    console.log("flip teams now", this.flippingTeams);
+                }, 1500);
+            }
+        },
+        shouldShowTeams: {
+            handler(val) {
+                console.log("should show teams", val);
+            }
         }
     },
     head() {

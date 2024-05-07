@@ -1,5 +1,5 @@
 <template>
-    <div class="role-icon" v-if="role && roleSVG" v-html="roleSVG"></div>
+    <div v-if="role && roleSVG" class="role-icon" v-html="roleSVG"></div>
 </template>
 
 <script>

@@ -1,7 +1,7 @@
 <template>
-  <div id="slmngg-app">
-    <router-view />
-  </div>
+    <div id="slmngg-app">
+        <router-view />
+    </div>
 </template>
 
 <style scoped>

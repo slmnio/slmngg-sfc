@@ -1,7 +1,7 @@
 <template>
     <div class="overview-overlay">
         <div class="part part-desk-match" :class="{'live-desk flex-center': useLiveDesk}">
-            <DeskMatch class="desk-match w-100" :matchID="matchID" :_match="virtualMatch" :broadcast="useLiveDesk ? broadcast : null" />
+            <DeskMatch class="desk-match w-100" :match-i-d="matchID" :_match="virtualMatch" :broadcast="useLiveDesk ? broadcast : null" />
         </div>
         <div class="part part-map-display flex-grow-1">
             <BroadcastMapDisplay :broadcast="broadcast" use-transitions="true" :virtual-match="virtualMatch" :no-map-videos="noMapVideos" />

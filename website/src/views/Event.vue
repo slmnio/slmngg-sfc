@@ -1,34 +1,34 @@
 <template>
     <div v-if="event">
-        <ThingTop :thing="event" type="event" :themeURL="subLink('theme')"></ThingTop>
+        <ThingTop :thing="event" type="event" :theme-u-r-l="subLink('theme')" />
 
         <SubPageNav class="my-2">
             <li class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
-<!--            <li class="nav-item"><router-link class="nav-link" :to="subLink('rosters')">Rosters</router-link></li>-->
-            <li class="nav-item ct-passive" v-if="event.matches"><router-link class="nav-link" :to="subLink('schedule')">Schedule</router-link></li>
-            <li class="nav-item ct-passive" v-if="brackets?.length"><router-link class="nav-link" :to="subLink('bracket')">{{ event.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link></li>
-            <li class="nav-item ct-passive" v-if="showStandings"><router-link class="nav-link" :to="subLink('standings')">Standings</router-link></li>
-            <li class="nav-item ct-passive" v-if="showFoldy"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
-            <li class="nav-item ct-passive" v-if="showDraft"><router-link class="nav-link" :to="subLink('draft')">Draft</router-link></li>
-            <li class="nav-item ct-passive" v-if="showAuction"><router-link class="nav-link" :to="subLink('auction')">Auction</router-link></li>
-            <li class="nav-item ct-passive" v-if="showStaff"><router-link class="nav-link" :to="subLink('staff')">Staff</router-link></li>
-            <li class="nav-item ct-passive" v-if="event.theme"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
-            <li class="nav-item ct-passive" v-if="event.about"><router-link class="nav-link" :to="subLink('about')">About</router-link></li>
-<!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
+            <!--            <li class="nav-item"><router-link class="nav-link" :to="subLink('rosters')">Rosters</router-link></li>-->
+            <li v-if="event.matches" class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('schedule')">Schedule</router-link></li>
+            <li v-if="brackets?.length" class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('bracket')">{{ event.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link></li>
+            <li v-if="showStandings" class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('standings')">Standings</router-link></li>
+            <li v-if="showFoldy" class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('scenarios')">Foldy Sheet</router-link></li>
+            <li v-if="showDraft" class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('draft')">Draft</router-link></li>
+            <li v-if="showAuction" class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('auction')">Auction</router-link></li>
+            <li v-if="showStaff" class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('staff')">Staff</router-link></li>
+            <li v-if="event.theme" class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
+            <li v-if="event.about" class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('about')">About</router-link></li>
+            <!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
 
 
-            <ul class="socials d-flex" v-if="event.socials">
+            <ul v-if="event.socials" class="socials d-flex">
                 <li class="nav-item">
-                    <Social class="ct-active" :social="social" v-for="social in event.socials" :key="social.id"/>
+                    <Social v-for="social in event.socials" :key="social.id" class="ct-active" :social="social" />
                 </li>
             </ul>
 
-            <li class="nav-item mx-2 minisite-prompt default-thing" v-if="shouldShowMinisitePrompt" :style="themeBackground1(event)">
+            <li v-if="shouldShowMinisitePrompt" class="nav-item mx-2 minisite-prompt default-thing" :style="themeBackground1(event)">
                 <a :href="minisiteLink" class="nav-link no-link-style themed">See this page on the <b>{{ subdomain }}</b> minisite <i class="fas fa-chevron-right fa-fw ml-1"></i></a>
             </li>
         </SubPageNav>
 
-        <router-view :event="event"></router-view>
+        <router-view :event="event" />
     </div>
 </template>
 
@@ -44,16 +44,14 @@ import { cleanID } from "@/utils/content-utils";
 
 export default {
     name: "Event",
-    props: ["id", "isMinisite"],
     components: {
         ThingTop, SubPageNav, Social
     },
-    head() {
-        return {
-            titleTemplate: (chunk) => chunk ? `${chunk} | ${this.event.name} | SLMN.GG` : `${this.event.name} | SLMN.GG`,
-            link: [{ rel: "icon", href: resizedImageNoWrap(this.event.theme, ["small_logo", "default_logo"], "s-128"), key: "favicon" }]
-        };
+    beforeRouteLeave(to, from, next) {
+        this.$emit("id_change", null);
+        next();
     },
+    props: ["id", "isMinisite"],
     computed: {
         event() {
             return ReactiveRoot(this.isMinisite ? this.$root.minisiteEvent.id : this.id, {
@@ -145,8 +143,14 @@ export default {
             }
         }
     },
-    mounted() {
-        console.log("[event mount]", this.id, this.event, this.$root.minisiteEvent);
+    methods: {
+        subLink(page) {
+            if (this.isMinisite) {
+                return `/${page}`;
+            }
+            return `/event/${this.event.id}/${page}`;
+        },
+        themeBackground1
     },
     watch: {
         id: {
@@ -157,18 +161,14 @@ export default {
             immediate: true
         }
     },
-    methods: {
-        subLink(page) {
-            if (this.isMinisite) {
-                return `/${page}`;
-            }
-            return `/event/${this.event.id}/${page}`;
-        },
-        themeBackground1
+    mounted() {
+        console.log("[event mount]", this.id, this.event, this.$root.minisiteEvent);
     },
-    beforeRouteLeave(to, from, next) {
-        this.$emit("id_change", null);
-        next();
+    head() {
+        return {
+            titleTemplate: (chunk) => chunk ? `${chunk} | ${this.event.name} | SLMN.GG` : `${this.event.name} | SLMN.GG`,
+            link: [{ rel: "icon", href: resizedImageNoWrap(this.event.theme, ["small_logo", "default_logo"], "s-128"), key: "favicon" }]
+        };
     }
 };
 

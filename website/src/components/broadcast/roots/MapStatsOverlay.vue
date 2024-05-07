@@ -1,7 +1,13 @@
 <template>
     <GenericOverlay class="map-stats-overlay" :title="title || 'Map Stats'">
         <div class="maps d-flex w-100 h-100">
-            <MapStatsSegment :match="match" :broadcast="broadcast" class="map w-100" :map="map" v-for="map in displayMapSlots" :key="map.id"/>
+            <MapStatsSegment
+                v-for="map in displayMapSlots"
+                :key="map.id"
+                :match="match"
+                :broadcast="broadcast"
+                class="map w-100"
+                :map="map" />
         </div>
     </GenericOverlay>
 </template>

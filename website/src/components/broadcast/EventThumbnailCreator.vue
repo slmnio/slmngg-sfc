@@ -6,12 +6,17 @@
             <div class="event-icon-holder flex-center">
                 <div class="event-icon bg-center" :style="eventIcon"></div>
             </div>
-            <div class="schedule-holder d-flex" v-if="showSchedule" :class="{'has-title': !!title}">
-                <div class="match d-flex" v-for="match in schedule" :key="match.id">
-                    <ThemeLogo icon-padding="32px" class="team" :theme="team.theme" v-for="team in match.teams" :key="team.id" />
+            <div v-if="showSchedule" class="schedule-holder d-flex" :class="{'has-title': !!title}">
+                <div v-for="match in schedule" :key="match.id" class="match d-flex">
+                    <ThemeLogo
+                        v-for="team in match.teams"
+                        :key="team.id"
+                        icon-padding="32px"
+                        class="team"
+                        :theme="team.theme" />
                 </div>
             </div>
-            <div class="title" v-if="title" :style="textColor" contenteditable="true">{{ title }}</div>
+            <div v-if="title" class="title" :style="textColor" contenteditable="true">{{ title }}</div>
         </div>
 
         <div class="event-gradient position-absolute w-100 h-100" :style="gradient">

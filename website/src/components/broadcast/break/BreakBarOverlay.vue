@@ -1,27 +1,26 @@
 <template>
     <div class="break-bar-overlay" :style="eventCSS">
+        <!--        <div class="upper-bar">-->
+        <!--            <transition name="seg" mode="out-in">-->
+        <!--                <div class="segment-wrapper" v-if="showBigSegment('Bracket')" :key="'Bracket'">-->
+        <!--                    <div class="overlay&#45;&#45;bg bar-segment segment-bracket">-->
+        <!--                        <Bracket class="segment-bracket-inner" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.6" />-->
+        <!--                    </div>-->
+        <!--                </div>-->
 
-<!--        <div class="upper-bar">-->
-<!--            <transition name="seg" mode="out-in">-->
-<!--                <div class="segment-wrapper" v-if="showBigSegment('Bracket')" :key="'Bracket'">-->
-<!--                    <div class="overlay&#45;&#45;bg bar-segment segment-bracket">-->
-<!--                        <Bracket class="segment-bracket-inner" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.6" />-->
-<!--                    </div>-->
-<!--                </div>-->
-
-<!--                <div class="segment-wrapper" v-if="showBigSegment('Schedule')" :key="'Schedule'">-->
-<!--                    <div class="overlay&#45;&#45;bg bar-segment segment-schedule flex-column">-->
-<!--                        <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </transition>-->
-<!--        </div>-->
+        <!--                <div class="segment-wrapper" v-if="showBigSegment('Schedule')" :key="'Schedule'">-->
+        <!--                    <div class="overlay&#45;&#45;bg bar-segment segment-schedule flex-column">-->
+        <!--                        <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </transition>-->
+        <!--        </div>-->
 
 
         <div class="lower-bar">
             <!--            <transition-group name="seg" is="div" class="break-bar" :style="eventCSS">-->
             <transition name="seg">
-                <div class="segment-wrapper" v-if="showSegment('Sponsors') && sponsorThemes" :key="'Sponsors'">
+                <div v-if="showSegment('Sponsors') && sponsorThemes" :key="'Sponsors'" class="segment-wrapper">
                     <div class="overlay--bg bar-segment segment-sponsors">
                         <Sponsors class="break-sponsors" :sponsors="sponsorThemes" />
                     </div>
@@ -31,22 +30,24 @@
             <div class="segment-wrapper segment-spacer flex-grow-1"></div>
 
             <transition name="seg">
-                <div class="segment-wrapper" v-if="showSegment('Title') && (title || (broadcast && broadcast.title))" :key="'Title-' + (title || broadcast.title)">
+                <div v-if="showSegment('Title') && (title || (broadcast && broadcast.title))" :key="'Title-' + (title || broadcast.title)" class="segment-wrapper">
                     <div class="overlay--bg bar-segment segment-title">
-                        <span class="segment-text" v-html="nbr(title || broadcast.title)"
-                        :class="{'has-br': (title || broadcast.title || '').includes('\\n')}"></span>
+                        <span
+                            class="segment-text"
+                            :class="{'has-br': (title || broadcast.title || '').includes('\\n')}"
+                            v-html="nbr(title || broadcast.title)"></span>
                     </div>
                 </div>
             </transition>
             <transition name="seg">
-                <div class="segment-wrapper" v-if="showSegment('Next match') && nextMatch" :key="'Next match'">
+                <div v-if="showSegment('Next match') && nextMatch" :key="'Next match'" class="segment-wrapper">
                     <div class="overlay--bg bar-segment segment-next-match">
                         <BreakMatch :match="nextMatch" :expanded="false" :theme-color="themeColor" />
                     </div>
                 </div>
             </transition>
             <transition name="seg">
-                <div class="segment-wrapper" v-if="showSegment('Countdown')" :key="'Countdown'">
+                <div v-if="showSegment('Countdown')" :key="'Countdown'" class="segment-wrapper">
                     <div class="overlay--bg bar-segment segment-countdown flex-center flex-column">
                         <div class="segment-title">
                             <span class="industry-align">
@@ -54,17 +55,18 @@
                             </span>
                         </div>
                         <div class="segment-text">
-                            <Countdown :timezone="broadcast.timezone" :to="broadcast.countdown_end"/>
+                            <Countdown :timezone="broadcast.timezone" :to="broadcast.countdown_end" />
                         </div>
                     </div>
                 </div>
             </transition>
 
             <transition name="seg">
-                <div class="segment-wrapper" v-if="showSegment('Event logo') && event && event.theme" :key="'Event logo'">
+                <div v-if="showSegment('Event logo') && event && event.theme" :key="'Event logo'" class="segment-wrapper">
                     <div class="overlay--bg bar-segment segment-event-logo p-2" :style="eventLogoBackground">
-                        <div :style="resizedImage(event.theme, ['default_logo'], 'h-200')"
-                             class="segment-image bg-center w-100 h-100"></div>
+                        <div
+                            :style="resizedImage(event.theme, ['default_logo'], 'h-200')"
+                            class="segment-image bg-center w-100 h-100"></div>
                     </div>
                 </div>
             </transition>
@@ -72,10 +74,21 @@
         </div>
 
         <div class="break-preload">
-            <Bracket class="segment-bracket-inner" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.6" />
-            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />
+            <Bracket
+                class="segment-bracket-inner"
+                :event="event"
+                :bracket="bracket"
+                use-overlay-scale
+                small
+                :scale="0.6" />
+            <BreakMatch
+                v-for="match in schedule"
+                :key="match.id"
+                :timezone="broadcast.timezone"
+                :match="match"
+                :expanded="true"
+                :theme-color="themeColor" />
         </div>
-
     </div>
 </template>
 
@@ -91,8 +104,8 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "BreakBarOverlay",
-    props: ["broadcast", "title"],
     components: { Countdown, BreakMatch, Sponsors, Bracket },
+    props: ["broadcast", "title"],
     computed: {
         event() {
             if (!this.broadcast?.event) return null;
@@ -167,13 +180,6 @@ export default {
             return "BACK IN";
         }
     },
-    watch: {
-        broadcast() {
-            if (this.broadcast) {
-                document.body.dataset.broadcast = this.broadcast.key;
-            }
-        }
-    },
     methods: {
         showSegment(segmentName) {
             return this.segments.indexOf(segmentName) !== -1;
@@ -185,6 +191,13 @@ export default {
         nbr(text) {
             if (!text) return "";
             return text.replace(/\\n/g, "<br>");
+        }
+    },
+    watch: {
+        broadcast() {
+            if (this.broadcast) {
+                document.body.dataset.broadcast = this.broadcast.key;
+            }
         }
     },
     head() {

@@ -2,12 +2,22 @@
     <StingerWrap :theme="stingerThemeOverride && overrideTheme || broadcast.event && broadcast.event.theme" :active="active" :should-use="useBuiltInStingers" :text="stingerText">
         <div class="broadcast-app" :class="broadcastClass">
             <!--        <div style="font-size: 5em; color: black">{{ $root.activeScene }}</div>-->
-            <router-view id="overlay" :class="bodyClass" :broadcast="broadcast" :client="client" :title="title" :top="top" :active="active"
-                         :animation-active="animationActive" :full="full" @prodUpdate="(x) => prodUpdate(x)" v-slot="{ Component }">
-                <component ref="overlay" :is="Component" />
+            <router-view
+                id="overlay"
+                v-slot="{ Component }"
+                :class="bodyClass"
+                :broadcast="broadcast"
+                :client="client"
+                :title="title"
+                :top="top"
+                :active="active"
+                :animation-active="animationActive"
+                :full="full"
+                @prod-update="(x) => prodUpdate(x)">
+                <component :is="Component" ref="overlay" />
             </router-view>
 
-            <BroadcastBackground class="force-background" v-if="backgroundIndex" :broadcast="broadcast" :index="backgroundIndex" />
+            <BroadcastBackground v-if="backgroundIndex" class="force-background" :broadcast="broadcast" :index="backgroundIndex" />
 
             <v-style v-if="broadcast && broadcast.event && !noBroadcastStyle">
                 {{ broadcast.event.broadcast_css }}
@@ -40,11 +50,11 @@ function getComponentName(route) {
 
 export default {
     name: "BroadcastApp",
-    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass", "full", "clientName", "backgroundIndex", "stingerText", "stingerThemeOverride"],
     components: {
         BroadcastBackground,
         StingerWrap
     },
+    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass", "full", "clientName", "backgroundIndex", "stingerText", "stingerThemeOverride"],
     data: () => ({
         active: false,
         animationActive: true,
@@ -126,33 +136,6 @@ export default {
             }
         }
     },
-    mounted () {
-        console.log("overlay app mounted", this.id);
-        this.prodUpdate();
-
-        if (this.haltAnimations) {
-            this.active = true;
-        } else {
-            window.addEventListener("obsSourceActiveChanged", (e) => {
-                this.active = e.detail.active;
-            });
-            document.body.addEventListener("click", () => {
-                this.active = !this.active;
-            });
-        }
-        if (this.broadcastKey) {
-            console.log("loading with broadcastKey");
-            socket.emit("prod-broadcast-join", this.broadcastKey);
-        }
-
-
-        window.addEventListener("obsSourceActiveChanged", (e) => {
-            this.isActive = e.detail.active;
-        });
-        window.addEventListener("obsSourceVisibleChanged", (e) => {
-            this.isVisible = e.detail.visible;
-        });
-    },
     watch: {
         active(isActive) {
             if (this.haltAnimations) return;
@@ -186,9 +169,6 @@ export default {
             socket.emit("prod-broadcast-join", newCode);
         }
     },
-    beforeCreate () {
-        document.body.className = "overlay";
-    },
     sockets: {
         connect() {
             socket.emit("prod-broadcast-join", this.broadcastKey);
@@ -199,6 +179,36 @@ export default {
         prod_button_reload() {
             document.location.reload();
         }
+    },
+    mounted () {
+        console.log("overlay app mounted", this.id);
+        this.prodUpdate();
+
+        if (this.haltAnimations) {
+            this.active = true;
+        } else {
+            window.addEventListener("obsSourceActiveChanged", (e) => {
+                this.active = e.detail.active;
+            });
+            document.body.addEventListener("click", () => {
+                this.active = !this.active;
+            });
+        }
+        if (this.broadcastKey) {
+            console.log("loading with broadcastKey");
+            socket.emit("prod-broadcast-join", this.broadcastKey);
+        }
+
+
+        window.addEventListener("obsSourceActiveChanged", (e) => {
+            this.isActive = e.detail.active;
+        });
+        window.addEventListener("obsSourceVisibleChanged", (e) => {
+            this.isVisible = e.detail.visible;
+        });
+    },
+    beforeCreate () {
+        document.body.className = "overlay";
     }
 };
 </script>

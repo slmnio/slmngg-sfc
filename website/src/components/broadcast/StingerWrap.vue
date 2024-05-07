@@ -1,15 +1,36 @@
 <template>
     <div class="stinger-wrap" :class="{'s-active': active, 's-show': showStinger}">
-        <theme-transition class="stinger-transition" start="left" end="left" :active="active && shouldUse" :theme="useTheme" :start-inner-full="true" :trigger="true"
-                          :starting-inner-delay="150" :trigger-duration="800" :duration="300" :inner-delay="200">
+        <theme-transition
+            class="stinger-transition"
+            start="left"
+            end="left"
+            :active="active && shouldUse"
+            :theme="useTheme"
+            :start-inner-full="true"
+            :trigger="true"
+            :starting-inner-delay="150"
+            :trigger-duration="800"
+            :duration="300"
+            :inner-delay="200">
             <div class="stinger flex-center" :style="bg" :class="{'stinging': active || showStinger, 'has-text': !!stingerText}">
-                <theme-logo class="w-100 h-100" :theme="useTheme" logo-size="h-1080" border-width="0" :icon-padding="!!stingerText ? '50px' : '200px'" />
-                <div class="text" v-if="stingerText">{{ stingerText }}</div>
+                <theme-logo
+                    class="w-100 h-100"
+                    :theme="useTheme"
+                    logo-size="h-1080"
+                    border-width="0"
+                    :icon-padding="!!stingerText ? '50px' : '200px'" />
+                <div v-if="stingerText" class="text">{{ stingerText }}</div>
             </div>
         </theme-transition>
         <slot></slot>
         <div class="preload">
-            <theme-logo v-if="useTheme" class="w-100 h-100" :theme="useTheme" logo-size="h-1080" border-width="0" icon-padding="200px" />
+            <theme-logo
+                v-if="useTheme"
+                class="w-100 h-100"
+                :theme="useTheme"
+                logo-size="h-1080"
+                border-width="0"
+                icon-padding="200px" />
         </div>
     </div>
 </template>
@@ -23,21 +44,11 @@ import { mapState } from "pinia";
 
 export default {
     name: "StingerWrap",
-    props: ["theme", "active", "waitBeforeAnimOut", "shouldUse", "text"],
     components: { ThemeLogo, ThemeTransition },
+    props: ["theme", "active", "waitBeforeAnimOut", "shouldUse", "text"],
     data: () => ({
         showStinger: null
     }),
-    watch: {
-        active(isActive) {
-            if (!this.shouldUse) return null;
-
-            this.showStinger = isActive;
-            setTimeout(() => {
-                this.showStinger = false;
-            }, this.waitBeforeAnimOut || 500);
-        }
-    },
     computed: {
         ...mapState(useStatusStore, ["customStingerTheme", "customStingerText", "stingerHideText"]),
         useTheme() {
@@ -49,6 +60,16 @@ export default {
         stingerText() {
             if (this.stingerHideText) return;
             return this.customStingerText || this.text;
+        }
+    },
+    watch: {
+        active(isActive) {
+            if (!this.shouldUse) return null;
+
+            this.showStinger = isActive;
+            setTimeout(() => {
+                this.showStinger = false;
+            }, this.waitBeforeAnimOut || 500);
         }
     }
 };

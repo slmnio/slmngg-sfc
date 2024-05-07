@@ -1,5 +1,5 @@
 <template>
-    <Sponsors class="sponsor-overlay" :sponsors="sponsorThemes"/>
+    <Sponsors class="sponsor-overlay" :sponsors="sponsorThemes" />
 </template>
 
 <script>

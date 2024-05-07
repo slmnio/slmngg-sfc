@@ -1,14 +1,29 @@
 <template>
-    <div class="overlay ingame-comms-overlay" v-if="match && match.teams">
+    <div v-if="match && match.teams" class="overlay ingame-comms-overlay">
         <div class="teams" :class="{'flip': match.flip_teams}" :style="{ marginTop: topOffset }">
-            <div class="team" v-for="(team, i) in match.teams" :key="team.id" :style="{ width: teamWidth }" :class="{'left': match.flip_teams ? i === 1 : i === 0}">
-                <ThemeTransition class="listen-in-holder" :duration="250" :theme="team.theme" use-fit-content
-                                 :active="(activeTeamIndex - 1) === i"
-                                 :start="match.flip_teams ? i === 1 : i === 0 ? 'left' : 'right'"
-                                 :end="match.flip_teams ? i === 1 : i === 0 ? 'right' : 'left'">
+            <div
+                v-for="(team, i) in match.teams"
+                :key="team.id"
+                class="team"
+                :style="{ width: teamWidth }"
+                :class="{'left': match.flip_teams ? i === 1 : i === 0}">
+                <ThemeTransition
+                    class="listen-in-holder"
+                    :duration="250"
+                    :theme="team.theme"
+                    use-fit-content
+                    :active="(activeTeamIndex - 1) === i"
+                    :start="match.flip_teams ? i === 1 : i === 0 ? 'left' : 'right'"
+                    :end="match.flip_teams ? i === 1 : i === 0 ? 'right' : 'left'">
                     <ListenInBug :text="listenInText" :team="team" />
                 </ThemeTransition>
-                <TeamAudio :always-unmuted="forceTeam && activeTeamIndex === i" :team="team" :broadcast="broadcast" :task-key="`team${i+1}`" :ref="`team${i+1}`" :buffer="buffer" />
+                <TeamAudio
+                    :ref="`team${i+1}`"
+                    :always-unmuted="forceTeam && activeTeamIndex === i"
+                    :team="team"
+                    :broadcast="broadcast"
+                    :task-key="`team${i+1}`"
+                    :buffer="buffer" />
             </div>
         </div>
     </div>
@@ -22,8 +37,8 @@ import ThemeTransition from "@/components/broadcast/ThemeTransition";
 
 export default {
     name: "IngameCommsOverlay",
-    props: ["broadcast", "listenInText", "buffer", "forceTeam"],
     components: { ListenInBug, TeamAudio, ThemeTransition },
+    props: ["broadcast", "listenInText", "buffer", "forceTeam"],
     data: () => ({
         socketActiveTeamIndex: null,
         noStinger: true

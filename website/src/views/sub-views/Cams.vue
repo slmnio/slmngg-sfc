@@ -4,12 +4,13 @@
         <p>
             If you're reading this, we're streaming your game today! We have some cool stuff on our streams, including
             player cams. It's really fun to see everyone's faces in clutch (or funny) moments - you can see <a
-            href="https://user-images.githubusercontent.com/15251071/145502107-e5088225-1c0a-4c49-9768-8aa8f8070904.mp4">this
-            video</a>
+                href="https://user-images.githubusercontent.com/15251071/145502107-e5088225-1c0a-4c49-9768-8aa8f8070904.mp4">this
+                video</a>
             for some of the best moments we've captured.
         </p>
         <h3>How does it work?</h3>
-        <p> We're using a skinned version of vdo.ninja for low latency video streaming. Below is a link that
+        <p>
+            We're using a skinned version of vdo.ninja for low latency video streaming. Below is a link that
             you can use to share your webcam/phone camera. We'll match it up with the 5 players in the lobby
             and show your camera when we're spectating you, or between maps with both teams showing.
         </p>
@@ -29,7 +30,7 @@
             <li>
                 Video streaming is complicated, and sometimes uses more resources than it should. If you are worried
                 about frame drops, or don't have a particularly powerful PC, <strong>you can use these links on a phone or other
-                device</strong> and it will still work!
+                    device</strong> and it will still work!
             </li>
             <li>
                 You <strong>must be 16+</strong> to use a webcam on a broadcast.
@@ -40,12 +41,11 @@
             <p v-if="this.camId">
                 <b-button variant="success" class="link-text" :href="camLink">Open Cam <i class="fas fa-fw fa-external-link"></i></b-button>
             </p>
-            <p v-else><LoadingIcon/> Finding your camera</p>
+            <p v-else><LoadingIcon /> Finding your camera</p>
         </div>
         <p v-else>
-           <b-button variant="secondary" @click="login"><i class="fas fa-fw fa-lock"></i> Login to see your cam link</b-button>
+            <b-button variant="secondary" @click="login"><i class="fas fa-fw fa-lock"></i> Login to see your cam link</b-button>
         </p>
-
     </div>
 </template>
 

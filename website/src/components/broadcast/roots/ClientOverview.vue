@@ -6,10 +6,12 @@
 
         <table class="my-3">
             <tbody>
-                <tr v-for="overlay in sortedOverlays" :key="overlay.socket"
+                <tr
+                    v-for="overlay in sortedOverlays"
+                    :key="overlay.socket"
                     :class="{ 'overlay-minor': overlay.minor || overlay.forHumans, 'overlay-for-humans': overlay.forHumans, 'overlay-active bg-danger': overlay.active }">
                     <td>
-                        <b-button @click="sendToOverlay(overlay.socket, 'reload')" size="sm" variant="dark"><i class="fa fa-fw fa-sync"></i></b-button>
+                        <b-button size="sm" variant="dark" @click="sendToOverlay(overlay.socket, 'reload')"><i class="fa fa-fw fa-sync"></i></b-button>
                     </td>
                     <td>
                         <b-button size="sm" variant="dark" :href="overlay.fullPath" target="_blank"><i class="fa fa-fw fa-external-link"></i></b-button>
@@ -33,7 +35,7 @@
                 <div class="ml-2 p-2 fw-bold">Remote OBS control</div>
             </div>
 
-            <div class="d-flex" v-if="remoteObsData">
+            <div v-if="remoteObsData" class="d-flex">
                 <div class="p-2">
                     <b>Scenes</b>
                     <ul>
@@ -70,6 +72,20 @@ export default {
     meta: {
         noStinger: true
     },
+    computed: {
+        sortedOverlays() {
+            const sortKeys = ["forHumans", "minor", "component"];
+            return Object.values(this.overlays).sort((a, b) => {
+                for (const key of sortKeys) {
+                    if (a[key] && !b[key]) return 1;
+                    if (!a[key] && b[key]) return -1;
+                    if (a[key] > b[key]) return 1;
+                    if (a[key] < b[key]) return -1;
+                }
+                return 0;
+            });
+        }
+    },
     methods: {
         sendToOverlay(socketID, event, data) {
             if (socket) {
@@ -91,27 +107,6 @@ export default {
             if (socket) socket.emit("prod_trigger", "request_obs_remote_control_update");
         }
     },
-    computed: {
-        sortedOverlays() {
-            const sortKeys = ["forHumans", "minor", "component"];
-            return Object.values(this.overlays).sort((a, b) => {
-                for (const key of sortKeys) {
-                    if (a[key] && !b[key]) return 1;
-                    if (!a[key] && b[key]) return -1;
-                    if (a[key] > b[key]) return 1;
-                    if (a[key] < b[key]) return -1;
-                }
-                return 0;
-            });
-        }
-    },
-    mounted() {
-        console.log("prod-join", this.client?.key);
-        if (socket) {
-            socket.emit("prod-overview-join", this.client?.key);
-            socket.emit("prod_trigger", "request_obs_remote_control_update");
-        }
-    },
     sockets: {
         prod_update(data) {
             this.overlays[data.socket] = data;
@@ -127,6 +122,13 @@ export default {
                 scenes: scenes.scenes,
                 inputs: inputs.inputs
             };
+        }
+    },
+    mounted() {
+        console.log("prod-join", this.client?.key);
+        if (socket) {
+            socket.emit("prod-overview-join", this.client?.key);
+            socket.emit("prod_trigger", "request_obs_remote_control_update");
         }
     }
 

@@ -1,10 +1,15 @@
 <template>
     <div class="syncer-overlay">
         <transition name="fade">
-            <IngameOverlay id="overlay" :broadcast="broadcast" v-if="showOverlay" :animation-active="true" :basic-mode="useBasicOverlay" />
+            <IngameOverlay
+                v-if="showOverlay"
+                id="overlay"
+                :broadcast="broadcast"
+                :animation-active="true"
+                :basic-mode="useBasicOverlay" />
         </transition>
         <transition name="fade">
-            <iframe class="w-100 h-100 position-absolute border-0" :src="syncerURL" v-show="showSyncer"/>
+            <iframe v-show="showSyncer" class="w-100 h-100 position-absolute border-0" :src="syncerURL"></iframe>
         </transition>
     </div>
 </template>

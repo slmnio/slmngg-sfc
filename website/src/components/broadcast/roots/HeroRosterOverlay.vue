@@ -1,17 +1,28 @@
 <template>
-    <GenericOverlay class="hero-roster-overlay" :title="title || (team && team.name) || 'Roster'" :title-style="titleStyle" :custom-theme="team && team.theme" :accent-color="team && team.theme && team.theme.color_theme">
+    <GenericOverlay
+        class="hero-roster-overlay"
+        :title="title || (team && team.name) || 'Roster'"
+        :title-style="titleStyle"
+        :custom-theme="team && team.theme"
+        :accent-color="team && team.theme && team.theme.color_theme">
         <div class="flex-center h-100 w-100 flex-column">
             <div class="players h-100 d-flex flex-center">
-                <div class="player h-100" v-for="(player, i) in players" :key="player.id" :class="{'has-role-icon': showRoles}" :data-image-width="widths[i]" :style="{flexGrow: widths[i], zIndex: animationActive ? Math.max(...widths) - widths[i] : 1}">
-                    <RecoloredHero @recolor_width="(w) => handleWidth(i, w)" class="h-100" :hero="player.favourite_hero" :theme="team.theme"></RecoloredHero>
+                <div
+                    v-for="(player, i) in players"
+                    :key="player.id"
+                    class="player h-100"
+                    :class="{'has-role-icon': showRoles}"
+                    :data-image-width="widths[i]"
+                    :style="{flexGrow: widths[i], zIndex: animationActive ? Math.max(...widths) - widths[i] : 1}">
+                    <RecoloredHero class="h-100" :hero="player.favourite_hero" :theme="team.theme" @recolor_width="(w) => handleWidth(i, w)" />
                 </div>
             </div>
             <div class="player-names flex-center w-100 mt-4 justify-content-around" :class="{'has-role-icon': showRoles}">
-                <div class="player-name-holder" v-for="player in players" :key="player.id">
+                <div v-for="player in players" :key="player.id" class="player-name-holder">
                     <div class="player-name flex-center text-center">
                         <span class="player-name-internal">{{ player.name }}</span>
                         <span v-if="showRoles" class="player-role" v-html="getRoleSVG(player.role)"></span>
-                        <span :style="themeBackground1(team)" v-if="showPronouns" class="player-pronouns">{{ player.pronouns }}</span>
+                        <span v-if="showPronouns" :style="themeBackground1(team)" class="player-pronouns">{{ player.pronouns }}</span>
                     </div>
                 </div>
             </div>
@@ -29,8 +40,8 @@ import { useStatusStore } from "@/stores/statusStore";
 
 export default {
     name: "HeroRosterOverlay",
-    props: ["broadcast", "title", "playerCount", "teamNum", "showRoles", "showPronouns", "active", "animationActive"],
     components: { RecoloredHero, GenericOverlay },
+    props: ["broadcast", "title", "playerCount", "teamNum", "showRoles", "showPronouns", "active", "animationActive"],
     data: () => ({
         widths: []
     }),

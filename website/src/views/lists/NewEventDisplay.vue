@@ -24,7 +24,6 @@ import { resizedImage } from "@/utils/images";
 export default {
     name: "NewEventDisplay",
     props: ["event"],
-    methods: { url },
     data: () => ({ useRawTag: false }),
     computed: {
         blockTheme() {
@@ -39,7 +38,8 @@ export default {
             if (!this.event?.theme) return {};
             return resizedImage(this.event.theme, ["default_logo"], "h-50");
         }
-    }
+    },
+    methods: { url }
 };
 </script>
 

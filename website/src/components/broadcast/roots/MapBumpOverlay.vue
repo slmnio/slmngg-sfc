@@ -1,8 +1,8 @@
 <template>
     <div class="map-bump-overlay">
         <transition name="swipe-right">
-            <div class="overlay-container" v-if="animationActive && nextMap">
-                <div class="last-map" v-if="mostRecentMap">
+            <div v-if="animationActive && nextMap" class="overlay-container">
+                <div v-if="mostRecentMap" class="last-map">
                     <div class="title flex-center">PREVIOUSLY</div>
                     <div class="content map-holder">
                         <div class="map-image" :style="mostRecentMapBG"></div>
@@ -158,17 +158,6 @@ export default {
             return this.$root?.activeScene?.name?.toLowerCase().includes("map");
         }
     },
-
-    sockets: {
-        map_music() {
-            console.log("Map Music trigger");
-            this.playAudio();
-        },
-        fade_map_music() {
-            console.log("Fade Map Music trigger");
-            this.fadeOutAudio(0, 5);
-        }
-    },
     methods: {
         winnerBG(map) {
             return logoBackground1(map.winner);
@@ -284,6 +273,17 @@ export default {
                 console.log("Animation reset - stopping audio");
                 this.stopAudio();
             }
+        }
+    },
+
+    sockets: {
+        map_music() {
+            console.log("Map Music trigger");
+            this.playAudio();
+        },
+        fade_map_music() {
+            console.log("Fade Map Music trigger");
+            this.fadeOutAudio(0, 5);
         }
     }
 };

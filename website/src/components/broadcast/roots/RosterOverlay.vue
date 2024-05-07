@@ -1,8 +1,20 @@
 <template>
-    <GenericOverlay class="roster-overlay" :title="title || 'Rosters'" body-color="transparent !important" no-bottom="true" no-bottom-animate="true">
-        <div class="team" v-for="(team, i) in teams" :key="team.id">
-            <ThemeTransition :border-width="0" :theme="team.theme" :active="animationActive" :left="i === 0"
-            :startingDelay="200" :inner-delay="200" :duration="600" :one-color="true">
+    <GenericOverlay
+        class="roster-overlay"
+        :title="title || 'Rosters'"
+        body-color="transparent !important"
+        no-bottom="true"
+        no-bottom-animate="true">
+        <div v-for="(team, i) in teams" :key="team.id" class="team">
+            <ThemeTransition
+                :border-width="0"
+                :theme="team.theme"
+                :active="animationActive"
+                :left="i === 0"
+                :starting-delay="200"
+                :inner-delay="200"
+                :duration="600"
+                :one-color="true">
                 <div class="team-inner" :style="{ borderColor: accentColor }">
                     <div class="team-top flex-center" :style="themeColor(team)">
                         <div class="team-name flex-center">{{ team.name }}</div>
@@ -12,34 +24,44 @@
                     </div>
                     <div class="team-roster-holder flex-center flex-column overlay--bg w-100" :style="{ fontSize: rosterFontSize(team) }">
                         <div class="team-roster flex-center flex-column">
-                            <div class="player" v-for="player in teamPlayerGroups(team)[0]"
-                                 :key="player.id">
-                                <div class="player-role flex-center" v-if="showRoles && player.role"
-                                     v-html="getRoleSVG(player.role)"></div>
+                            <div
+                                v-for="player in teamPlayerGroups(team)[0]"
+                                :key="player.id"
+                                class="player">
+                                <div
+                                    v-if="showRoles && player.role"
+                                    class="player-role flex-center"
+                                    v-html="getRoleSVG(player.role)"></div>
                                 <span class="player-name">{{ player.name }}</span>
-                                <div class="player-badge" v-if="showBadges && getHighlightEventTeam(player)">
+                                <div v-if="showBadges && getHighlightEventTeam(player)" class="player-badge">
                                     <ThemeLogo class="badge-logo" :theme="getHighlightEventTeam(player) && getHighlightEventTeam(player).theme" icon-padding="0.2em" logo-size="w-100" />
                                 </div>
                             </div>
                         </div>
-                        <div class="team-roster team-sub-roster flex-center flex-column" v-if="teamPlayerGroups(team)[1] && teamPlayerGroups(team)[1].length">
-                            <div class="player" v-for="player in teamPlayerGroups(team)[1]"
-                                 :key="player.id">
-                                <div class="player-role flex-center" v-if="showRoles && player.role"
-                                     v-html="getRoleSVG(player.role)"></div>
+                        <div v-if="teamPlayerGroups(team)[1] && teamPlayerGroups(team)[1].length" class="team-roster team-sub-roster flex-center flex-column">
+                            <div
+                                v-for="player in teamPlayerGroups(team)[1]"
+                                :key="player.id"
+                                class="player">
+                                <div
+                                    v-if="showRoles && player.role"
+                                    class="player-role flex-center"
+                                    v-html="getRoleSVG(player.role)"></div>
                                 <span class="player-name">{{ player.name }}</span>
-                                <div class="player-badge" v-if="showBadges && getHighlightEventTeam(player)">
+                                <div v-if="showBadges && getHighlightEventTeam(player)" class="player-badge">
                                     <ThemeLogo class="badge-logo" :theme="getHighlightEventTeam(player) && getHighlightEventTeam(player).theme" icon-padding="0.2em" logo-size="w-100" />
                                 </div>
                             </div>
                         </div>
-                        <div class="team-roster team-staff-roster flex-center flex-column" v-if="showStaff">
+                        <div v-if="showStaff" class="team-roster team-staff-roster flex-center flex-column">
                             <div class="staff-text d-none">Staff</div>
-                            <div class="player" v-for="player in getTeamStaff(team)"
-                                 :key="player.id">
-                                <div class="player-role flex-center" v-if="player.staff_role || player.role" v-html="getRoleSVG(player.staff_role || player.role)"></div>
+                            <div
+                                v-for="player in getTeamStaff(team)"
+                                :key="player.id"
+                                class="player">
+                                <div v-if="player.staff_role || player.role" class="player-role flex-center" v-html="getRoleSVG(player.staff_role || player.role)"></div>
                                 <span class="player-name">{{ player.name }}</span>
-                                <div class="player-badge" v-if="showBadges && getHighlightEventTeam(player)">
+                                <div v-if="showBadges && getHighlightEventTeam(player)" class="player-badge">
                                     <ThemeLogo class="badge-logo" :theme="getHighlightEventTeam(player) && getHighlightEventTeam(player).theme" icon-padding="0.2em" logo-size="w-100" />
                                 </div>
                             </div>

@@ -18,7 +18,6 @@ import { resizedImage } from "@/utils/images";
 export default {
     name: "BidFocusTeam",
     props: ["team", "leading", "auctionSettings"],
-    methods: { money },
     computed: {
         teamBG() {
             return logoBackground1(this.team);
@@ -43,7 +42,8 @@ export default {
                 color: "#ffff"
             };
         }
-    }
+    },
+    methods: { money }
 };
 </script>
 

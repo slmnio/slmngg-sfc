@@ -1,13 +1,22 @@
 <template>
     <div class="container">
         <h1 class="big mb-3">Teams</h1>
-        <input type="text" class="form-control mb-3" placeholder="Start typing to filter" v-model="search">
-        <h1><LoadingIcon v-if="!search && !sortedEvents.length"></LoadingIcon></h1>
+        <input v-model="search" type="text" class="form-control mb-3" placeholder="Start typing to filter">
+        <h1><LoadingIcon v-if="!search && !sortedEvents.length" /></h1>
 
-        <EventTeamsDisplay class="mb-4" v-for="eventID in sortedEvents" :key="eventID" :event-i-d="eventID"
-                           :search-text="searchEvents ? search : null"></EventTeamsDisplay>
-        <b-pagination @page-click="scrollToTop()" v-if="!searchEvents" v-model="page" :per-page="eventsPerPage"
-                      :total-rows="events.length" align="center"></b-pagination>
+        <EventTeamsDisplay
+            v-for="eventID in sortedEvents"
+            :key="eventID"
+            class="mb-4"
+            :event-i-d="eventID"
+            :search-text="searchEvents ? search : null" />
+        <b-pagination
+            v-if="!searchEvents"
+            v-model="page"
+            :per-page="eventsPerPage"
+            :total-rows="events.length"
+            align="center"
+            @page-click="scrollToTop()" />
     </div>
 </template>
 
@@ -89,11 +98,6 @@ export default {
             })?.teams;
         }
     },
-    head() {
-        return {
-            title: "Teams"
-        };
-    },
     methods: {
         scrollToTop() {
             window.scrollTo({
@@ -101,6 +105,11 @@ export default {
                 behavior: "instant"
             });
         }
+    },
+    head() {
+        return {
+            title: "Teams"
+        };
     }
 };
 </script>

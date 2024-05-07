@@ -1,6 +1,6 @@
 <template>
     <div class="full-cam-overlay" :class="{'show-name': showName, 'show-socials': showSocials}" :style="defaultStyles">
-        <Caster class="full-cam-caster w-100 h-100" v-if="cam" :guest="cam" :event="event"></Caster>
+        <Caster v-if="cam" class="full-cam-caster w-100 h-100" :guest="cam" :event="event" />
     </div>
 </template>
 
@@ -10,8 +10,8 @@ import Caster from "@/components/broadcast/desk/Caster";
 
 export default {
     name: "FullCamOverlay",
-    props: ["broadcast", "number", "showName", "showSocials"],
     components: { Caster },
+    props: ["broadcast", "number", "showName", "showSocials"],
     computed: {
         cams() {
             if (!this.broadcast?.full_cams) return [];

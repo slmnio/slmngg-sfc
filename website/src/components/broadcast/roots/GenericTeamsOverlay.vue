@@ -1,9 +1,17 @@
 <template>
     <GenericOverlay :title="title" body-color="transparent !important" no-bottom="true" no-bottom-animate="true">
-        <ThemeTransition class="team w-100 h-100" v-for="(team, i) in teams" :key="team.id" :border-width="0"
-                         :theme="team.theme" :active="animationActive === undefined ? $root.animationActive : animationActive" :left="i === 0"
-                         :startingDelay="200" :inner-delay="200" :duration="600" :one-color="true">
-
+        <ThemeTransition
+            v-for="(team, i) in teams"
+            :key="team.id"
+            class="team w-100 h-100"
+            :border-width="0"
+            :theme="team.theme"
+            :active="animationActive === undefined ? $root.animationActive : animationActive"
+            :left="i === 0"
+            :starting-delay="200"
+            :inner-delay="200"
+            :duration="600"
+            :one-color="true">
             <div class="team-inner">
                 <slot name="full" :team="team">
                     <slot name="top" :team="team">

@@ -1,7 +1,7 @@
 <template>
     <div id="app">
-        <WebsiteNav/>
-        <NotFoundContent/>
+        <WebsiteNav />
+        <NotFoundContent />
     </div>
 </template>
 

@@ -1,28 +1,41 @@
 <template>
     <div class="match-scoreboard w-100">
         <transition name="scoreboard-fade">
-            <div class="scoreboard-row scoreboard-header" v-if="shouldAnimate">
+            <div v-if="shouldAnimate" class="scoreboard-row scoreboard-header">
                 <div class="scoreboard-team blank"></div>
-                <div class="map flex-center map-type bg-center" v-for="map in maps" :key="map.id"
-                     :style="bg(mapTypeIcon(map))"></div>
+                <div
+                    v-for="map in maps"
+                    :key="map.id"
+                    class="map flex-center map-type bg-center"
+                    :style="bg(mapTypeIcon(map))"></div>
             </div>
         </transition>
-        <ThemeTransition class="scoreboard-team-transition" :active="shouldAnimate" v-for="(team, ti) in match.teams"
-                         :key="team.id" :theme="team?.theme" :border-width="6" border="x">
+        <ThemeTransition
+            v-for="(team, ti) in match.teams"
+            :key="team.id"
+            class="scoreboard-team-transition"
+            :active="shouldAnimate"
+            :theme="team?.theme"
+            :border-width="6"
+            border="x">
             <div class="scoreboard-row team-row">
                 <div class="scoreboard-team" :style="logoBackground1(team)">
-                    <ThemeLogo class="team-logo" :theme="team?.theme" border-width="0px" logo-size=""/>
+                    <ThemeLogo class="team-logo" :theme="team?.theme" border-width="0px" logo-size="" />
                     <Squeezable class="team-name flex-center" align="center">
                         <div class="industry-align">{{ team.name }}</div>
                     </Squeezable>
                 </div>
                 <!-- :style="cleanID(map.winner?.[0]) === team.id ? themeBackground1(team) : {}" -->
-                <div class="map flex-center map-score" v-for="map in maps" :key="map.id"
-                     :class="{ 'map-won': cleanID(map.winner?.[0]) === team.id }">
+                <div
+                    v-for="map in maps"
+                    :key="map.id"
+                    class="map flex-center map-score"
+                    :class="{ 'map-won': cleanID(map.winner?.[0]) === team.id }">
                     <div class="industry-align">{{ !map.showNumbers ? "-" : (map[`score_${ti + 1}`] || 0) }}</div>
                 </div>
-                <div class="match-score flex-center"
-                     :style="match[`score_${ti + 1}`] === match.first_to ? themeBackground1(team) : {}">
+                <div
+                    class="match-score flex-center"
+                    :style="match[`score_${ti + 1}`] === match.first_to ? themeBackground1(team) : {}">
                     <div class="industry-align">{{ match[`score_${ti + 1}`] || 0 }}</div>
                 </div>
             </div>
@@ -45,18 +58,6 @@ export default {
         ThemeTransition,
         Squeezable,
         ThemeLogo
-    },
-    methods: {
-        themeBackground1,
-        logoBackground1,
-        cleanID,
-        bg,
-        mapTypeIcon(map) {
-            if (map.map?.type) return MapTypeIcons[map.map.type];
-            if (!this.mapTypes) return null;
-            const mapIndex = this.maps.indexOf(map);
-            return MapTypeIcons[this.mapTypes[mapIndex]];
-        }
     },
     props: ["match", "active", "broadcast", "animateOnMount"],
     data: () => ({
@@ -110,6 +111,18 @@ export default {
         mapTypes() {
             if (!this.broadcast?.map_set) return [];
             return this.broadcast.map_set.split(",");
+        }
+    },
+    methods: {
+        themeBackground1,
+        logoBackground1,
+        cleanID,
+        bg,
+        mapTypeIcon(map) {
+            if (map.map?.type) return MapTypeIcons[map.map.type];
+            if (!this.mapTypes) return null;
+            const mapIndex = this.maps.indexOf(map);
+            return MapTypeIcons[this.mapTypes[mapIndex]];
         }
     },
     beforeMount() {

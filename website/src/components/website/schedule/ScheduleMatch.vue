@@ -1,25 +1,31 @@
 <template>
-    <div class="match-wrapper my-2" v-if="loaded" :class="{ 'bg-danger' : !loaded }">
+    <div v-if="loaded" class="match-wrapper my-2" :class="{ 'bg-danger' : !loaded }">
         <div class="match" :class="{'special-event': match.special_event}">
             <div class="match-left match-details flex-center flex-column text-center">
-                <div class="match-detail" v-for="detail in details" :key="detail.short" v-b-tooltip="detail.long">
+                <div v-for="detail in details" :key="detail.short" v-b-tooltip="detail.long" class="match-detail">
                     {{ detail.short }}
                 </div>
             </div>
 
-            <router-link :to="url('match', this.match)" v-if="match.special_event"
-                         class="match-special-event-name flex-center text-center ct-passive link-text">
+            <router-link
+                v-if="match.special_event"
+                :to="url('match', this.match)"
+                class="match-special-event-name flex-center text-center ct-passive link-text">
                 {{ match.custom_name }}
             </router-link>
 
-            <div v-for="(team, i) in swappedTeams"
-                 :key="team.id" :style="{order: i*2}"
-                 class="match-team flex-grow-1 d-flex align-items-center justify-content-end"
-                 :class="{'right': i === 1}">
-
+            <div
+                v-for="(team, i) in swappedTeams"
+                :key="team.id"
+                :style="{order: i*2}"
+                class="match-team flex-grow-1 d-flex align-items-center justify-content-end"
+                :class="{'right': i === 1}">
                 <div v-if="team.dummy" class="team-name team-name--spacer d-none d-lg-flex">{{ team.text }}</div>
-                <router-link v-else-if="!team.dummy" :to="url('team', team)"
-                             class="team-name d-none d-lg-flex ct-passive">{{ team.name }}
+                <router-link
+                    v-else-if="!team.dummy"
+                    :to="url('team', team)"
+                    class="team-name d-none d-lg-flex ct-passive">
+                    {{ team.name }}
                 </router-link>
 
 
@@ -29,32 +35,43 @@
                 </router-link>
 
 
-                <ThemeLogo v-if="team && !team.dummy" :theme="team.theme" border-width="4" class="team-logo"
-                           icon-padding="4" logo-size="w-60"/>
-                <div class="team-logo team-logo--spacer" v-else></div>
+                <ThemeLogo
+                    v-if="team && !team.dummy"
+                    :theme="team.theme"
+                    border-width="4"
+                    class="team-logo"
+                    icon-padding="4"
+                    logo-size="w-60" />
+                <div v-else class="team-logo team-logo--spacer"></div>
             </div>
 
-            <router-link :to="url('match', this.match)" class="match-center match-vs flex-center text-center ct-passive"
-                         v-if="!match.special_event">
-                <div class="scores-wrap" v-if="scores.some(s => s)">
+            <router-link
+                v-if="!match.special_event"
+                :to="url('match', this.match)"
+                class="match-center match-vs flex-center text-center ct-passive">
+                <div v-if="scores.some(s => s)" class="scores-wrap">
                     <div class="scores">{{ scores[0] }} - {{ scores[1] }}</div>
-                    <div class="scores-forfeit" v-if="match.forfeit">Forfeit</div>
+                    <div v-if="match.forfeit" class="scores-forfeit">Forfeit</div>
                 </div>
-                <div class="vs ct-passive" v-else>vs</div>
+                <div v-else class="vs ct-passive">vs</div>
             </router-link>
             <div class="match-right match-time flex-center">
-                <ScheduleTime :time="match.start" :custom-text="timeCustomText"/>
+                <ScheduleTime :time="match.start" :custom-text="timeCustomText" />
             </div>
         </div>
 
-        <div class="buttons flex-center ml-2" v-if="canEditMatches || canEditBroadcasts">
+        <div v-if="canEditMatches || canEditBroadcasts" class="buttons flex-center ml-2">
             <b-button-group class="gap-2">
-                <b-button class="text-white" size="sm" :to="url('match', this.match, { subPage: 'editor' })" v-if="canEditMatches">
+                <b-button v-if="canEditMatches" class="text-white" size="sm" :to="url('match', this.match, { subPage: 'editor' })">
                     <i class="fas fa-pencil"></i>
                 </b-button>
-                <b-button v-if="canEditBroadcasts"
-                          @click="matchBroadcastAdjust(isOnSelectedBroadcast ? 'remove' : 'add')"
-                          class="text-white opacity-changes" :class="{'low-opacity': processing['match_broadcast']}" size="sm" :variant="isOnSelectedBroadcast ? 'primary' : 'secondary'">
+                <b-button
+                    v-if="canEditBroadcasts"
+                    class="text-white opacity-changes"
+                    :class="{'low-opacity': processing['match_broadcast']}"
+                    size="sm"
+                    :variant="isOnSelectedBroadcast ? 'primary' : 'secondary'"
+                    @click="matchBroadcastAdjust(isOnSelectedBroadcast ? 'remove' : 'add')">
                     <i class="fas" :class="isOnSelectedBroadcast ? 'fa-minus' : 'fa-plus'"></i>
                 </b-button>
             </b-button-group>
@@ -78,30 +95,6 @@ export default {
             match_broadcast: false
         }
     }),
-    methods: {
-        url,
-        async matchBroadcastAdjust(mode) {
-            if (this.processing.match_broadcast) return;
-            if (!this.selectedBroadcast?.id) return this.$notyf.error("No broadcast selected!!! D:");
-
-            // SEND TO AIRTABLE:
-            // - mode ('add' or 'remove')
-            // - broadcastID
-            // - matchID
-
-            this.processing.match_broadcast = true;
-            const response = await authenticatedRequest("actions/adjust-match-broadcast", {
-                mode,
-                broadcastID: this.selectedBroadcast.id,
-                matchID: this.match.id
-            });
-            this.processing.match_broadcast = false;
-
-            if (response.error) {
-                console.error(":(", response.error);
-            }
-        }
-    },
     computed: {
         shouldSwapTeams() {
             if (!this.leftTeam?.id) return false;
@@ -194,6 +187,30 @@ export default {
         isOnSelectedBroadcast() {
             console.log(this.match?.scheduled_broadcast, this.selectedBroadcast);
             return (this.match?.scheduled_broadcast || [])?.map(cleanID).includes(this.selectedBroadcast?.id);
+        }
+    },
+    methods: {
+        url,
+        async matchBroadcastAdjust(mode) {
+            if (this.processing.match_broadcast) return;
+            if (!this.selectedBroadcast?.id) return this.$notyf.error("No broadcast selected!!! D:");
+
+            // SEND TO AIRTABLE:
+            // - mode ('add' or 'remove')
+            // - broadcastID
+            // - matchID
+
+            this.processing.match_broadcast = true;
+            const response = await authenticatedRequest("actions/adjust-match-broadcast", {
+                mode,
+                broadcastID: this.selectedBroadcast.id,
+                matchID: this.match.id
+            });
+            this.processing.match_broadcast = false;
+
+            if (response.error) {
+                console.error(":(", response.error);
+            }
         }
     }
 };

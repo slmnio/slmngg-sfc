@@ -1,13 +1,13 @@
 <template>
-    <div class="container" v-if="user && user.name">
+    <div v-if="user && user.name" class="container">
         <h1 class="text-md-start text-center">SLMN.GG Dashboard</h1>
-        <div class="client-broadcasts d-flex flex-wrap flex-column flex-md-row align-items-center" v-if="client && client.broadcast">
+        <div v-if="client && client.broadcast" class="client-broadcasts d-flex flex-wrap flex-column flex-md-row align-items-center">
             <div class="wrapper mb-2">
                 <BroadcastSwitcher :broadcasts="client.broadcast" />
                 <router-link v-if="liveMatch" :to="url('detailed', liveMatch)">
-                    <MatchThumbnail class="mini-thumbnail" :match="liveMatch" stripe-height="2px"/>
+                    <MatchThumbnail class="mini-thumbnail" :match="liveMatch" stripe-height="2px" />
                 </router-link>
-                <div class="match-thumbnail-ghost default-thing mini-thumbnail" v-if="!liveMatch"></div>
+                <div v-if="!liveMatch" class="match-thumbnail-ghost default-thing mini-thumbnail"></div>
                 <!--                <router-link class="text-white flex-center d-flex ml-2 no-link-style" :to="`/match/${liveMatch?.id}/editor`"><i class="fas fa-pencil"></i></router-link>-->
                 <router-link v-if="broadcast?.event" :to="url('event', broadcast.event)">
                     <ThemeLogo class="event-thumbnail" :theme="broadcast?.event?.theme" logo-size="s-100" border-width="2px" />
@@ -15,62 +15,97 @@
             </div>
             <div class="spacer flex-grow-1"></div>
             <div class="wrapper">
-                <PreviewProgramDisplay :broadcast="broadcast"/>
+                <PreviewProgramDisplay :broadcast="broadcast" />
             </div>
             <div class="wrapper mb-2">
                 <div class="clocks d-flex">
-                    <DashboardClock title="Local"/>
-                    <DashboardClock title="Broadcast" :timezone="broadcast.timezone || 'America/New_York'"/>
+                    <DashboardClock title="Local" />
+                    <DashboardClock title="Broadcast" :timezone="broadcast.timezone || 'America/New_York'" />
                 </div>
             </div>
         </div>
-        <div class="broadcast-editor mb-2" v-if="client && client.broadcast">
-            <BroadcastEditor :client="client"/>
+        <div v-if="client && client.broadcast" class="broadcast-editor mb-2">
+            <BroadcastEditor :client="client" />
         </div>
-        <DashboardModule title="Match Editor" icon-class="fas fa-pennant" class="broadcast-match-editor mb-2" v-if="liveMatch?.id" start-opened>
-            <MatchEditor :hide-match-extras="true" :match="liveMatch"></MatchEditor>
+        <DashboardModule
+            v-if="liveMatch?.id"
+            title="Match Editor"
+            icon-class="fas fa-pennant"
+            class="broadcast-match-editor mb-2"
+            start-opened>
+            <MatchEditor :hide-match-extras="true" :match="liveMatch" />
         </DashboardModule>
         <DashboardModule title="Desk Guests" icon-class="fas fa-users" class="desk-editor mb-2">
-            <template v-slot:header v-if="deskGuestSource">Desk guests pulled from: {{ deskGuestSource }}</template>
+            <template v-if="deskGuestSource" #header>Desk guests pulled from: {{ deskGuestSource }}</template>
             <DeskEditor :broadcast="broadcast" />
         </DashboardModule>
         <DashboardModule class="mb-2" title="Desk Display" icon-class="far fa-comment-alt-dots">
             <DeskTextEditor :broadcast="broadcast" />
         </DashboardModule>
-        <DashboardModule class="mb-2" title="GFX" icon-class="fas fa-palette" v-if="broadcast?.gfx?.length">
-            <GFXController :broadcast="broadcast" :client="client"/>
+        <DashboardModule v-if="broadcast?.gfx?.length" class="mb-2" title="GFX" icon-class="fas fa-palette">
+            <GFXController :broadcast="broadcast" :client="client" />
         </DashboardModule>
-        <DashboardModule title="Bracket Implications" icon-class="fas fa-sitemap" class="broadcast-bracket-editor mb-2" v-if="bracketCount">
+        <DashboardModule v-if="bracketCount" title="Bracket Implications" icon-class="fas fa-sitemap" class="broadcast-bracket-editor mb-2">
             <BracketImplications :match="liveMatch" link-to-detailed-match show-resolve-button />
         </DashboardModule>
-        <DashboardModule class="bracket-viewer mb-2" icon-class="fas fa-sitemap" :title="bracketCount === 1 ? 'Bracket' : 'Brackets'" v-if="bracketCount">
-            <Bracket :scale="0.75" v-for="bracket in bracketData" :event="liveMatch.event" :bracket="bracket" :key="bracket.id"></Bracket>
+        <DashboardModule v-if="bracketCount" class="bracket-viewer mb-2" icon-class="fas fa-sitemap" :title="bracketCount === 1 ? 'Bracket' : 'Brackets'">
+            <Bracket
+                v-for="bracket in bracketData"
+                :key="bracket.id"
+                :scale="0.75"
+                :event="liveMatch.event"
+                :bracket="bracket" />
         </DashboardModule>
-        <ScheduleEditor class="broadcast-schedule-editor mb-2" :broadcast="broadcast"></ScheduleEditor>
-        <DashboardModule class="mb-2" title="Broadcast Roles" icon-class="fas fa-users-class" v-if="liveMatch">
-            <BroadcastRoles :broadcast="broadcast" :liveMatch="liveMatch" />
+        <ScheduleEditor class="broadcast-schedule-editor mb-2" :broadcast="broadcast" />
+        <DashboardModule v-if="liveMatch" class="mb-2" title="Broadcast Roles" icon-class="fas fa-users-class">
+            <BroadcastRoles :broadcast="broadcast" :live-match="liveMatch" />
         </DashboardModule>
-        <DashboardModule class="mb-2" title="Twitch Controls" icon-class="fas fa-wrench" content-class="p-2" v-if="broadcast && broadcast.channel">
-            <template v-slot:header v-if="streamLink">{{ streamLink }}</template>
-            <Predictions v-if="liveMatch" :client="client"/>
+        <DashboardModule
+            v-if="broadcast && broadcast.channel"
+            class="mb-2"
+            title="Twitch Controls"
+            icon-class="fas fa-wrench"
+            content-class="p-2">
+            <template v-if="streamLink" #header>{{ streamLink }}</template>
+            <Predictions v-if="liveMatch" :client="client" />
             <Commercials v-if="hasPermission('Full broadcast permissions')" :client="client" />
             <div class="mt-2">
-                <b-button variant="secondary" @click="updateTitle" :disabled="titleProcessing || !liveMatch || !broadcast?.title_format" :title="`Title will be set to: '${parsedTitle}'`" v-b-tooltip.top>
+                <b-button
+                    v-b-tooltip.top
+                    variant="secondary"
+                    :disabled="titleProcessing || !liveMatch || !broadcast?.title_format"
+                    :title="`Title will be set to: '${parsedTitle}'`"
+                    @click="updateTitle">
                     <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title<span v-if="titleAutomated"> (automated) <i class="fas fa-sparkles"></i></span>
                 </b-button>
-                <b-button class="ml-2 no-link-style d-inline-block" variant="outline-secondary" v-if="streamLink" :href="`https://${streamLink}`" target="_blank">
+                <b-button
+                    v-if="streamLink"
+                    class="ml-2 no-link-style d-inline-block"
+                    variant="outline-secondary"
+                    :href="`https://${streamLink}`"
+                    target="_blank">
                     Stream <i class="fas fa-fw fa-external-link"></i>
                 </b-button>
-                <b-button class="ml-2 no-link-style d-inline-block" variant="outline-secondary" v-if="streamLink" :href="`https://${streamLink}/chat`" target="_blank">
+                <b-button
+                    v-if="streamLink"
+                    class="ml-2 no-link-style d-inline-block"
+                    variant="outline-secondary"
+                    :href="`https://${streamLink}/chat`"
+                    target="_blank">
                     <i class="fab mr-1 fa-twitch"></i> Chat <i class="fas fa-fw fa-external-link"></i>
                 </b-button>
-                <b-button class="ml-2 no-link-style d-inline-block" variant="outline-secondary" v-if="twitchChannelName" :href="`https://dashboard.twitch.tv/u/${twitchChannelName}`" target="_blank">
+                <b-button
+                    v-if="twitchChannelName"
+                    class="ml-2 no-link-style d-inline-block"
+                    variant="outline-secondary"
+                    :href="`https://dashboard.twitch.tv/u/${twitchChannelName}`"
+                    target="_blank">
                     <i class="fab mr-1 fa-twitch"></i> Dashboard <i class="fas fa-fw fa-external-link"></i>
                 </b-button>
             </div>
         </DashboardModule>
-        <DashboardModule class="mb-2" v-if="useTeamComms" icon-class="fas fa-microphone" title="Team Comms Listen-In">
-            <CommsControls :match="liveMatch"/>
+        <DashboardModule v-if="useTeamComms" class="mb-2" icon-class="fas fa-microphone" title="Team Comms Listen-In">
+            <CommsControls :match="liveMatch" />
         </DashboardModule>
     </div>
 </template>

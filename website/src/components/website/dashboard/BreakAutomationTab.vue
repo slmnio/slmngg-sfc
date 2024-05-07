@@ -1,30 +1,39 @@
 <template>
     <div class="break-automation-tab">
         <div class="mb-3">
-            <p class="mb-0">Automation is currently <b :class="automationIsActive ? 'text-success' : 'text-danger'">{{
+            <p class="mb-0">
+                Automation is currently <b :class="automationIsActive ? 'text-success' : 'text-danger'">{{
                     automationIsActive ? "active" : "inactive"
-                }}</b>.</p>
-            <p class="mb-0" v-if="!automationIsActive && broadcastBreakDisplay">Break display is currently
-                <b>{{ broadcastBreakDisplay }}</b>.</p>
+                }}</b>.
+            </p>
+            <p v-if="!automationIsActive && broadcastBreakDisplay" class="mb-0">
+                Break display is currently
+                <b>{{ broadcastBreakDisplay }}</b>.
+            </p>
         </div>
 
         <b-form-group label="Break display rotation options" label-class="fw-bold">
-            <b-form-checkbox-group v-model="selectedRotationOptions" v-slot="{ariaDescribedby}" stacked>
-                <b-form-checkbox v-for="option in rotationOptions" :key="option.value" :value="option.value"
-                                 :aria-describedby="ariaDescribedby">
+            <b-form-checkbox-group v-slot="{ariaDescribedby}" v-model="selectedRotationOptions" stacked>
+                <b-form-checkbox
+                    v-for="option in rotationOptions"
+                    :key="option.value"
+                    :value="option.value"
+                    :aria-describedby="ariaDescribedby">
                     <span v-if="option.text === 'Matchup' && matchupText" class="text-muted">
                         {{ option.text }} (Won't show, {{ matchupText }})
                     </span>
                     <span v-else>{{ option.text }}</span>
                 </b-form-checkbox>
             </b-form-checkbox-group>
-
         </b-form-group>
 
         <b-form-group label="Ending break display (countdown 30 seconds or lower)" label-class="fw-bold">
-            <b-form-checkbox-group v-model="selectedEndingOptions" v-slot="{ariaDescribedby}" stacked>
-                <b-form-checkbox v-for="option in endingOptions" :key="option.value" :value="option.value"
-                                 :aria-describedby="ariaDescribedby">
+            <b-form-checkbox-group v-slot="{ariaDescribedby}" v-model="selectedEndingOptions" stacked>
+                <b-form-checkbox
+                    v-for="option in endingOptions"
+                    :key="option.value"
+                    :value="option.value"
+                    :aria-describedby="ariaDescribedby">
                     <span v-if="option.text === 'Matchup' && matchupText" class="text-muted">
                         {{ option.text }} (Won't show, {{ matchupText }})
                     </span>
@@ -120,23 +129,6 @@ export default {
             return null;
         }
     },
-    watch: {
-        activeOptions: {
-            immediate: true,
-            deep: true,
-            handler(newOptions) {
-                this.resetOptions(newOptions);
-            }
-        },
-        selectedEndingOptions: {
-            deep: true,
-            handler(options) {
-                if (options.length > 1) {
-                    this.selectedEndingOptions = [options.pop()];
-                }
-            }
-        }
-    },
     methods: {
         async saveOptions() {
             this.processing = true;
@@ -163,6 +155,23 @@ export default {
                     this.selectedEndingOptions.push(option);
                 }
             });
+        }
+    },
+    watch: {
+        activeOptions: {
+            immediate: true,
+            deep: true,
+            handler(newOptions) {
+                this.resetOptions(newOptions);
+            }
+        },
+        selectedEndingOptions: {
+            deep: true,
+            handler(options) {
+                if (options.length > 1) {
+                    this.selectedEndingOptions = [options.pop()];
+                }
+            }
         }
     }
 };

@@ -1,9 +1,8 @@
 <template>
     <div class="container">
-
         <div class="settings mb-3">
             <b-form-group label="Tier filter" label-cols="4" label-cols-lg="2">
-                <b-form-select class="w-auto" :options="tierFilterOptions" v-model="tierFilter"/>
+                <b-form-select v-model="tierFilter" class="w-auto" :options="tierFilterOptions" />
             </b-form-group>
         </div>
 
@@ -36,22 +35,22 @@
                     <th class="num new-category total-category">W</th>
                     <th class="num">L</th>
                     <th class="winrate-text">W%</th>
-<!--                    <th>F</th>-->
+                    <!--                    <th>F</th>-->
                 </tr>
             </thead>
             <tbody>
-                <tr class="team" v-for="team in showedTeams" :key="team.id">
+                <tr v-for="team in showedTeams" :key="team.id" class="team">
                     <td :style="eventStyle(team)">
                         <div v-if="team.event">
                             <router-link class="d-flex align-items-center no-link-style" :to="url('event', team.event)">
-                                <ThemeLogo :theme="team.event.theme" border-width="0" logo-size="s-76" class="logo"></ThemeLogo>
+                                <ThemeLogo :theme="team.event.theme" border-width="0" logo-size="s-76" class="logo" />
                                 <div class="p-1 event-name"><b>{{ team.event && (team.event.short || team.event.name) }}</b></div>
                             </router-link>
                         </div>
                     </td>
                     <td :style="teamStyle(team)">
                         <router-link class="d-flex align-items-center no-link-style" :to="url('team', team)">
-                            <ThemeLogo :theme="team.theme" border-width="0" logo-size="s-76" class="logo"></ThemeLogo>
+                            <ThemeLogo :theme="team.theme" border-width="0" logo-size="s-76" class="logo" />
                             <div class="p-1 team-name"><b>{{ team.name }}</b></div>
                         </router-link>
                     </td>
@@ -110,32 +109,32 @@
 
                     <!--<editor-fold desc="old debug">-->
                     <!--                    <td class="px-2" :class="{'text-muted': team.stats.regular_season.length === 0}">-->
-<!--                        {{ team.stats.regular_season.length }} Regular season matches<br>-->
-<!--                        {{ getWLP(team.stats.regular_season, team) }}-->
-<!--                        <ul>-->
-<!--                            <li v-for="item in team.stats.regular_season" :key="item.id">-->
-<!--                                <router-link :to="url('match', item)">{{ item.name }}</router-link>-->
-<!--                            </li>-->
-<!--                        </ul>-->
-<!--                    </td>-->
-<!--                    <td class="px-2" :class="{'text-muted': team.stats.playoffs.length === 0}">-->
-<!--                        {{ team.stats.playoffs.length }} Playoffs matches<br>-->
-<!--                        {{ getWLP(team.stats.playoffs, team) }}-->
-<!--                        <ul>-->
-<!--                            <li v-for="item in team.stats.playoffs" :key="item.id">-->
-<!--                                <router-link :to="url('match', item)">{{ item.name }}</router-link>-->
-<!--                            </li>-->
-<!--                        </ul>-->
-<!--                    </td>-->
-<!--                    <td class="px-2" :class="{'text-muted': team.stats.others.length === 0}">-->
-<!--                        {{ team.stats.others.length }} Uncategorised matches<br>-->
-<!--                        {{ getWLP(team.stats.others, team) }}-->
-<!--                        <ul>-->
-<!--                            <li v-for="item in team.stats.others" :key="item.id">-->
-<!--                                <router-link :to="url('match', item)">{{ item.name }}</router-link>-->
-<!--                            </li>-->
-<!--                        </ul>-->
-<!--                    </td>-->
+                    <!--                        {{ team.stats.regular_season.length }} Regular season matches<br>-->
+                    <!--                        {{ getWLP(team.stats.regular_season, team) }}-->
+                    <!--                        <ul>-->
+                    <!--                            <li v-for="item in team.stats.regular_season" :key="item.id">-->
+                    <!--                                <router-link :to="url('match', item)">{{ item.name }}</router-link>-->
+                    <!--                            </li>-->
+                    <!--                        </ul>-->
+                    <!--                    </td>-->
+                    <!--                    <td class="px-2" :class="{'text-muted': team.stats.playoffs.length === 0}">-->
+                    <!--                        {{ team.stats.playoffs.length }} Playoffs matches<br>-->
+                    <!--                        {{ getWLP(team.stats.playoffs, team) }}-->
+                    <!--                        <ul>-->
+                    <!--                            <li v-for="item in team.stats.playoffs" :key="item.id">-->
+                    <!--                                <router-link :to="url('match', item)">{{ item.name }}</router-link>-->
+                    <!--                            </li>-->
+                    <!--                        </ul>-->
+                    <!--                    </td>-->
+                    <!--                    <td class="px-2" :class="{'text-muted': team.stats.others.length === 0}">-->
+                    <!--                        {{ team.stats.others.length }} Uncategorised matches<br>-->
+                    <!--                        {{ getWLP(team.stats.others, team) }}-->
+                    <!--                        <ul>-->
+                    <!--                            <li v-for="item in team.stats.others" :key="item.id">-->
+                    <!--                                <router-link :to="url('match', item)">{{ item.name }}</router-link>-->
+                    <!--                            </li>-->
+                    <!--                        </ul>-->
+                    <!--                    </td>-->
                     <!--</editor-fold>-->
                 </tr>
                 <tr class="totals">
@@ -296,27 +295,10 @@ const tiers = ["S Tier", "A Tier", "B Tier", "C Tier", "Unranked"];
 
 export default {
     name: "PlayerMatchStats",
-    props: ["player"],
-    methods: {
-        url,
-        eventStyle(team) {
-            if (!team?.event?.theme) return {};
-            return {
-                ...logoBackground1(team.event),
-                borderColor: null
-            };
-        },
-        teamStyle(team) {
-            if (!team?.theme) return {};
-            return {
-                ...logoBackground1(team),
-                borderColor: null
-            };
-        }
-    },
     components: {
         ThemeLogo
     },
+    props: ["player"],
     data: () => ({
         showTeams: true,
         tierFilter: "A Tier+"
@@ -444,6 +426,23 @@ export default {
             });
 
             return totalStats;
+        }
+    },
+    methods: {
+        url,
+        eventStyle(team) {
+            if (!team?.event?.theme) return {};
+            return {
+                ...logoBackground1(team.event),
+                borderColor: null
+            };
+        },
+        teamStyle(team) {
+            if (!team?.theme) return {};
+            return {
+                ...logoBackground1(team),
+                borderColor: null
+            };
         }
     }
 };

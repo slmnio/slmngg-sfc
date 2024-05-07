@@ -3,15 +3,20 @@
         <div class="module-header bg-dark p-2 d-flex flex-center" @click="() => showDropdown = !showDropdown">
             <div class="text">
                 <i class="fa-fw" :class="iconClass"></i>
-                <b class="ml-2" v-if="title">{{ title }}</b>
-                <span class="slot-dot" v-if="$slots.header"> • </span>
+                <b v-if="title" class="ml-2">{{ title }}</b>
+                <span v-if="$slots.header" class="slot-dot"> • </span>
                 <slot name="header"></slot>
             </div>
             <div class="spacer flex-grow-1"></div>
             <i class="fa fa-fw fa-chevron-left" :class="{ 'rotate': showDropdown }"></i>
         </div>
         <transition name="clip-swipe-down">
-            <div class="module-content bg-dark" :class="(contentClass || '') + (noContentBorder ? ' no-border' : '')" :style="moduleContentCSS" v-show="showDropdown" ref="content">
+            <div
+                v-show="showDropdown"
+                ref="content"
+                class="module-content bg-dark"
+                :class="(contentClass || '') + (noContentBorder ? ' no-border' : '')"
+                :style="moduleContentCSS">
                 <slot v-if="loadDropdown"></slot>
             </div>
         </transition>

@@ -2,11 +2,14 @@
     <div class="break-display-tab">
         <div class="flex-center">
             <div class="buttons d-inline-flex flex-column">
-                <b-button class="mb-1" v-for="option in options" :key="option.value"
-                          @click="setOption(option.value)"
-                          :disabled="processing && (selected === option.value)"
-                          :class="{ 'active': selected === option.value }"
-                          :variant="selected === option.value && !processing ? 'primary' : 'secondary'">
+                <b-button
+                    v-for="option in options"
+                    :key="option.value"
+                    class="mb-1"
+                    :disabled="processing && (selected === option.value)"
+                    :class="{ 'active': selected === option.value }"
+                    :variant="selected === option.value && !processing ? 'primary' : 'secondary'"
+                    @click="setOption(option.value)">
                     {{ option.text }}
                 </b-button>
             </div>
@@ -41,22 +44,6 @@ export default {
             return this.broadcast?.break_display;
         }
     },
-    watch: {
-        activeOption: {
-            immediate: true,
-            handler(newOption) {
-                this.resetOption(newOption);
-            }
-        },
-        selectedEndingOptions: {
-            deep: true,
-            handler(options) {
-                if (options.length > 1) {
-                    this.selectedEndingOptions = [options.pop()];
-                }
-            }
-        }
-    },
     methods: {
         async setOption(option) {
             this.selected = option;
@@ -74,6 +61,22 @@ export default {
         },
         resetOption(option) {
             this.selected = option;
+        }
+    },
+    watch: {
+        activeOption: {
+            immediate: true,
+            handler(newOption) {
+                this.resetOption(newOption);
+            }
+        },
+        selectedEndingOptions: {
+            deep: true,
+            handler(options) {
+                if (options.length > 1) {
+                    this.selectedEndingOptions = [options.pop()];
+                }
+            }
         }
     }
 };

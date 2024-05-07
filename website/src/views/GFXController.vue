@@ -19,10 +19,14 @@
                     <td>{{ gfx.title }}</td>
                     <td class="button-matrix">
                         <b-button-group>
-                            <b-button size="sm" v-for="num in buttonNumbers" :key="num"
-                                      :disabled="processing"
-                                      @click="setGfxIndex(gfx.id, num)"
-                                      :pressed="i === num" :variant="i === num ? 'primary' : 'secondary'">
+                            <b-button
+                                v-for="num in buttonNumbers"
+                                :key="num"
+                                size="sm"
+                                :disabled="processing"
+                                :pressed="i === num"
+                                :variant="i === num ? 'primary' : 'secondary'"
+                                @click="setGfxIndex(gfx.id, num)">
                                 {{ num + 1 }}
                             </b-button>
                         </b-button-group>
@@ -42,6 +46,10 @@ import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "GFXController",
+    props: {
+        broadcast: {},
+        client: {}
+    },
     data: () => ({
         buttonCount: 6,
         processing: false
@@ -50,10 +58,6 @@ export default {
         buttonNumbers() {
             return Array.from(Array(this.buttonCount).keys());
         }
-    },
-    props: {
-        broadcast: {},
-        client: {}
     },
     methods: {
         async setGfxIndex(id, num) {

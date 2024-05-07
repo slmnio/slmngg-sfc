@@ -1,18 +1,18 @@
 <template>
     <div class="website-nav">
-
-        <WebsiteNavBanner class="bg-danger" v-if="showDisconnectedMessage">
+        <WebsiteNavBanner v-if="showDisconnectedMessage" class="bg-danger">
             <i class="fas fa-wifi-slash fa-fw mr-1"></i> <b>No connection to the data server.</b> Don't refresh, we're trying to reconnect...
         </WebsiteNavBanner>
-        <WebsiteNavBanner class="bg-warning text-dark" v-if="showHighErrorRateMessage">
+        <WebsiteNavBanner v-if="showHighErrorRateMessage" class="bg-warning text-dark">
             <i class="fas fa-exclamation-triangle fa-fw mr-1"></i> <b>Data server errors.</b> We are having some errors requesting data from our upstream provider. Some data maybe inaccurate, incomplete or inaccessible.
         </WebsiteNavBanner>
-        <WebsiteNavBanner class="bg-warning text-dark" v-if="showRebuildingMessage">
-            <i class="fas fa-spinner fa-pulse fa-fw mr-1"></i> <b>Server rebuilding</b>: The server is rebuilding its data store. Some pages might not be accessible.</WebsiteNavBanner>
+        <WebsiteNavBanner v-if="showRebuildingMessage" class="bg-warning text-dark">
+            <i class="fas fa-spinner fa-pulse fa-fw mr-1"></i> <b>Server rebuilding</b>: The server is rebuilding its data store. Some pages might not be accessible.
+        </WebsiteNavBanner>
 
-<!--        <WebsiteNavBanner v-if="siteMode === 'live' || siteMode === 'production'" class="bg-primary text-white">-->
-<!--            <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-light">Welcome to the new SLMN.GG!</a></b> Completely rewritten to be faster, cleaner and better. Please be patient with any teething problems from the big switch over.-->
-<!--        </WebsiteNavBanner>-->
+        <!--        <WebsiteNavBanner v-if="siteMode === 'live' || siteMode === 'production'" class="bg-primary text-white">-->
+        <!--            <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-light">Welcome to the new SLMN.GG!</a></b> Completely rewritten to be faster, cleaner and better. Please be patient with any teething problems from the big switch over.-->
+        <!--        </WebsiteNavBanner>-->
         <WebsiteNavBanner v-if="siteMode === 'staging'" class="bg-warning text-dark">
             <b><a href="https://github.com/slmnio/slmngg-sfc" class="text-dark">Beta development version:</a></b> things may break. Use <a href="https://slmn.gg" class="text-dark fw-bold">slmn.gg</a> for the latest stable update.
         </WebsiteNavBanner>
@@ -20,17 +20,16 @@
             <i v-if="dataServerMode !== 'local'" class="fas fa-exclamation-triangle fa-fw mr-1"></i>
             SLMN.GG is running in local development mode<strong v-if="dataServerMode !== 'local'"> but not using a local data server</strong>.
         </WebsiteNavBanner>
-<!--       example: <WebsiteNavBanner class="bg-success" v-if="$socket.connected">Connected to the data server for live data updates!</WebsiteNavBanner>-->
+        <!--       example: <WebsiteNavBanner class="bg-success" v-if="$socket.connected">Connected to the data server for live data updates!</WebsiteNavBanner>-->
 
         <b-navbar toggleable="lg" type="dark">
             <router-link class="navbar-brand " to="/">
                 <img v-if="minisiteIcon" :src="minisiteIcon" alt="" class="navbar-image d-inline-block align-top mr-2">
-                <span class="d-lg-inline d-none">{{ minisite ? (minisite.navbar_name || minisite.series_name || minisite.name) : "SLMN.GG"}}</span>
-                <span class="d-inline d-lg-none">{{ minisite ? (minisite.short || minisite.series_name || minisite.name) : "SLMN.GG"}}</span>
-
+                <span class="d-lg-inline d-none">{{ minisite ? (minisite.navbar_name || minisite.series_name || minisite.name) : "SLMN.GG" }}</span>
+                <span class="d-inline d-lg-none">{{ minisite ? (minisite.short || minisite.series_name || minisite.name) : "SLMN.GG" }}</span>
             </router-link>
 
-            <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+            <b-navbar-toggle target="nav-collapse" />
 
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav v-if="!minisite">
@@ -40,24 +39,30 @@
                     <router-link v-if="isAuthenticated" active-class="active" class="nav-link" to="/profile">Profile</router-link>
                     <router-link v-if="isProduction" active-class="active" class="nav-link" to="/dashboard">Dashboard</router-link>
                     <a v-if="productionClient?.key" target="_blank" class="nav-link" :href="`//dev.slmn.gg/client/${productionClient?.key}/tally-viewer`">Tally <i class="far fa-external-link ml-1"></i></a>
-<!--                    <router-link active-class="active" class="nav-link" to="/news">News</router-link>-->
+                    <!--                    <router-link active-class="active" class="nav-link" to="/news">News</router-link>-->
                 </b-navbar-nav>
                 <b-navbar-nav v-if="minisite" class="flex-wrap">
-                    <router-link active-class="active" v-if="minisite.matches" class="nav-link" to="/schedule">Schedule</router-link>
-                    <router-link active-class="active" v-if="minisite.brackets" class="nav-link" to="/bracket">{{ minisite.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link>
-                    <router-link active-class="active" v-if="minisiteSettings && minisiteSettings.standings" class="nav-link" to="/standings">Standings</router-link>
-                    <div class="nav-divider" v-if="navbarEvents.length"></div>
+                    <router-link v-if="minisite.matches" active-class="active" class="nav-link" to="/schedule">Schedule</router-link>
+                    <router-link v-if="minisite.brackets" active-class="active" class="nav-link" to="/bracket">{{ minisite.brackets.length === 1 ? 'Bracket' : 'Brackets' }}</router-link>
+                    <router-link v-if="minisiteSettings && minisiteSettings.standings" active-class="active" class="nav-link" to="/standings">Standings</router-link>
+                    <div v-if="navbarEvents.length" class="nav-divider"></div>
 
-                    <router-link v-for="event in navbarEvents" :key="event.id"
-                                 active-class="active" :class="{'active': event._original_data_id === activeEventID }"
-                                 class="nav-link" :to="event._link" :exact="event.__id === minisite.__id">
-                        {{ event.navbar_short || event.short || event.series_subtitle || event.name }}</router-link>
-<!--                    <router-link :to="'/'" v-if="minisite.navbar_short" active-class="active" exact class="nav-link">{{ minisite.navbar_short }}</router-link>-->
+                    <router-link
+                        v-for="event in navbarEvents"
+                        :key="event.id"
+                        active-class="active"
+                        :class="{'active': event._original_data_id === activeEventID }"
+                        class="nav-link"
+                        :to="event._link"
+                        :exact="event.__id === minisite.__id">
+                        {{ event.navbar_short || event.short || event.series_subtitle || event.name }}
+                    </router-link>
+                    <!--                    <router-link :to="'/'" v-if="minisite.navbar_short" active-class="active" exact class="nav-link">{{ minisite.navbar_short }}</router-link>-->
                 </b-navbar-nav>
-                <b-navbar-nav class="flex-grow-1"></b-navbar-nav>
+                <b-navbar-nav class="flex-grow-1" />
 
                 <b-navbar-nav>
-                    <div class="nav-link" v-b-modal.timezone-swapper-modal>Timezone</div>
+                    <div v-b-modal.timezone-swapper-modal class="nav-link">Timezone</div>
                     <a target="_blank" class="nav-link" href="https://slmn.statuspage.io/?utm_source=slmngg_nav">Status</a>
                 </b-navbar-nav>
 
@@ -69,25 +74,24 @@
                 </b-navbar-nav>
 
                 <b-navbar-nav>
-                    <router-link class="nav-link" to="/login" v-if="!user && !isRebuilding">Login</router-link>
-                    <LoggedInUser v-if="user"/>
+                    <router-link v-if="!user && !isRebuilding" class="nav-link" to="/login">Login</router-link>
+                    <LoggedInUser v-if="user" />
                 </b-navbar-nav>
-
             </b-collapse>
         </b-navbar>
 
-        <div class="live-matches flex-wrap flex-center" v-if="liveMatches.length">
+        <div v-if="liveMatches.length" class="live-matches flex-wrap flex-center">
             <div class="live-matches-text">🔴 LIVE</div>
-            <NavLiveMatch v-for="match in liveMatches" :match="match" :key="match.id" />
+            <NavLiveMatch v-for="match in liveMatches" :key="match.id" :match="match" />
         </div>
 
-        <b-modal ref="timezone-swapper-modal" id="timezone-swapper-modal" title="Timezone swapper" hide-footer>
+        <b-modal id="timezone-swapper-modal" ref="timezone-swapper-modal" title="Timezone swapper" hide-footer>
             <p>Change your timezone for dates and times across SLMN.GG:</p>
             <TimezoneSwapper align="left" />
         </b-modal>
         <v-style>
             .notyf {
-                margin-top: {{ height }}px !important;
+            margin-top: {{ height }}px !important;
             }
         </v-style>
     </div>
@@ -197,14 +201,6 @@ export default {
             return ReactiveRoot(this.user.clients?.[0]);
         }
     },
-    mounted() {
-        setTimeout(() => {
-            // ignore if the socket is disconnected for the first 3 seconds of loading
-            this.pageNoLongerNew = true;
-        }, 3000);
-        this.resizeObserver = new ResizeObserver(this.onResize);
-        this.resizeObserver.observe(this.$el);
-    },
     methods: {
         slmnggURL(page) {
             return `${this.slmnggDomain}/${page}`;
@@ -212,6 +208,14 @@ export default {
         onResize() {
             this.height = this.$el.offsetHeight;
         }
+    },
+    mounted() {
+        setTimeout(() => {
+            // ignore if the socket is disconnected for the first 3 seconds of loading
+            this.pageNoLongerNew = true;
+        }, 3000);
+        this.resizeObserver = new ResizeObserver(this.onResize);
+        this.resizeObserver.observe(this.$el);
     },
     beforeUnmount () {
         this.resizeObserver?.unobserve(this.$el);

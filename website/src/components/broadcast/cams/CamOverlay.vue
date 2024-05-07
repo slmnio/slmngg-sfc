@@ -1,22 +1,39 @@
 <template>
     <div class="cam-overlay">
-        <div class="guest" :class="{ full }" v-if="shouldShowCam" v-show="alwaysShowBox || childCameraIsOn" :style="theme">
-            <CasterCam class="team-cam" :guest="activeGuest" :extra-params="camParams" :disable-video="false"
-                       :event="broadcast && broadcast.event" :relay-prefix="relayPrefix" :team="activeTeam"
-             @cam_visible="(isVisible) => childCameraIsOn = isVisible"/>
+        <div
+            v-if="shouldShowCam"
+            v-show="alwaysShowBox || childCameraIsOn"
+            class="guest"
+            :class="{ full }"
+            :style="theme">
+            <CasterCam
+                class="team-cam"
+                :guest="activeGuest"
+                :extra-params="camParams"
+                :disable-video="false"
+                :event="broadcast && broadcast.event"
+                :relay-prefix="relayPrefix"
+                :team="activeTeam"
+                @cam_visible="(isVisible) => childCameraIsOn = isVisible" />
         </div>
-        <div class="guest-name-holder" v-if="shouldShowName">
-            <div class="team-logo-holder" v-if="activeTeam">
-                <ThemeLogo class="top-theme-logo" :theme="activeTeam.theme" border-width="4" icon-padding="6"></ThemeLogo>
+        <div v-if="shouldShowName" class="guest-name-holder">
+            <div v-if="activeTeam" class="team-logo-holder">
+                <ThemeLogo class="top-theme-logo" :theme="activeTeam.theme" border-width="4" icon-padding="6" />
             </div>
             <div class="guest-name">
                 <span class="industry-align">{{ name }}</span>
             </div>
         </div>
-        <div class="team-shield-holder d-flex flex-center" v-if="showShield && activeTeam">
+        <div v-if="showShield && activeTeam" class="team-shield-holder d-flex flex-center">
             <div class="team-shield" :style="logoBackground1(activeTeam)">
                 <div class="shield-triangle"></div>
-                <ThemeLogo small="true" logo-size="w-50" icon-padding="2px" border-width="0" class="shield-logo" :theme="activeTeam.theme"></ThemeLogo>
+                <ThemeLogo
+                    small="true"
+                    logo-size="w-50"
+                    icon-padding="2px"
+                    border-width="0"
+                    class="shield-logo"
+                    :theme="activeTeam.theme" />
             </div>
         </div>
     </div>
@@ -30,8 +47,8 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 
 export default {
     name: "CamOverlay",
-    props: ["broadcast", "params", "number", "full", "alwaysShow", "relay", "client", "alwaysShowBox"],
     components: { CasterCam, ThemeLogo },
+    props: ["broadcast", "params", "number", "full", "alwaysShow", "relay", "client", "alwaysShowBox"],
     data: () => ({
         childCameraIsOn: false
     }),

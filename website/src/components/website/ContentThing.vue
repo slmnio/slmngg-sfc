@@ -1,25 +1,31 @@
 <template>
-    <component :is="noLink ? 'div' : 'router-link'" :to="noLink ? null : this.overrideURL || url(this.type, this.linkTo || this.thing, this.linkOptions || {})" class="link content-thing default-thing" :style="bgStyle" :class="{ 'has-headshot' : showHeadshot && headshot }">
-      <span class="link-headshot" v-if="showHeadshot">
-        <span class="headshot" :style="headshot"></span>
-      </span>
+    <component
+        :is="noLink ? 'div' : 'router-link'"
+        :to="noLink ? null : this.overrideURL || url(this.type, this.linkTo || this.thing, this.linkOptions || {})"
+        class="link content-thing default-thing"
+        :style="bgStyle"
+        :class="{ 'has-headshot' : showHeadshot && headshot }">
+        <span v-if="showHeadshot" class="link-headshot">
+            <span class="headshot" :style="headshot"></span>
+        </span>
         <span class="link-text">
-          <span
-              class="icon-internal bg-center icon-internal-left"
-              :style="logo"
-              v-if="shouldShowLogo && !logoRight"></span>
+            <span
+                v-if="shouldShowLogo && !logoRight"
+                class="icon-internal bg-center icon-internal-left"
+                :style="logo"></span>
 
-        <span class="name" v-if="text !== ''">{{ text || thing.name }}</span>
+            <span v-if="text !== ''" class="name">{{ text || thing.name }}</span>
 
-        <i class="fas fa-badge-check fa-fw" title="REAL" v-if="thing.verified"></i>
+            <i v-if="thing.verified" class="fas fa-badge-check fa-fw" title="REAL"></i>
 
-        <LoadingIcon v-if="loading"/>
+            <LoadingIcon v-if="loading" />
 
-        <span
-            class="icon-internal bg-center icon-internal-right"
-            :style="logo"
-            v-if="shouldShowLogo && logoRight"></span>
-        </span></component>
+            <span
+                v-if="shouldShowLogo && logoRight"
+                class="icon-internal bg-center icon-internal-right"
+                :style="logo"></span>
+        </span>
+    </component>
 </template>
 
 <script>
@@ -29,11 +35,8 @@ import LoadingIcon from "@/components/website/LoadingIcon";
 
 export default {
     name: "ContentThing",
-    props: ["theme", "thing", "showLogo", "type", "text", "logoRight", "linkTo", "showHeadshot", "overrideURL", "noLink", "linkOptions"],
     components: { LoadingIcon },
-    methods: {
-        url
-    },
+    props: ["theme", "thing", "showLogo", "type", "text", "logoRight", "linkTo", "showHeadshot", "overrideURL", "noLink", "linkOptions"],
     computed: {
         shouldShowLogo() {
             /*
@@ -78,6 +81,9 @@ export default {
                 color: this.theme.color_text_on_logo_background || this.theme.color_text_on_theme
             };
         }
+    },
+    methods: {
+        url
     }
 };
 </script>

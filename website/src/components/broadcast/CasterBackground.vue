@@ -1,10 +1,15 @@
 <template>
     <div class="caster-background">
         <transition name="map-fade" mode="in-out">
-            <div class="map w-100 h-100" :key="mapToShow.id" v-if="mapToShow">
+            <div v-if="mapToShow" :key="mapToShow.id" class="map w-100 h-100">
                 <div class="map-image w-100 h-100" :style="mapImage(mapToShow)">
-                    <video class="map-video w-100 h-100" v-if="useVideo && mapVideo(mapToShow)" :src="mapVideo(mapToShow)"
-                           autoplay muted loop></video>
+                    <video
+                        v-if="useVideo && mapVideo(mapToShow)"
+                        class="map-video w-100 h-100"
+                        :src="mapVideo(mapToShow)"
+                        autoplay
+                        muted
+                        loop></video>
                 </div>
             </div>
         </transition>

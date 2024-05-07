@@ -2,28 +2,46 @@
     <div class="draft-overlay">
         <div class="draft d-flex w-100 h-100">
             <div class="available-players">
-                <ThemeLogo v-if="event && event.theme" class="event-logo" :theme="event.theme" border-width="6px" logo-size="w-500" icon-padding="24px"></ThemeLogo>
+                <ThemeLogo
+                    v-if="event && event.theme"
+                    class="event-logo"
+                    :theme="event.theme"
+                    border-width="6px"
+                    logo-size="w-500"
+                    icon-padding="24px" />
                 <div class="title" :style="background">DRAFTABLE PLAYERS</div>
                 <!--<div class="player" v-for="player in availablePlayers" :key="player.id">
                     {{ player.name }}
                 </div>-->
                 <transition-group class="players-transition" name="draftable" tag="div">
-                    <DraftPlayer :style="draftPlayerStyle" v-for="player in availablePlayers" :key="player.id"
-                                 :player="player" :theme="event.theme" :show-icon="icons" :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
+                    <DraftPlayer
+                        v-for="player in availablePlayers"
+                        :key="player.id"
+                        :style="draftPlayerStyle"
+                        :player="player"
+                        :theme="event.theme"
+                        :show-icon="icons"
+                        :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
                 </transition-group>
             </div>
             <div class="teams d-flex">
-                <div class="team-row" v-for="(row, rowI) in draftRows" :key="rowI">
-                    <div class="team flex-grow-1" v-for="team in row" :key="team.id">
-                        <DraftTeam class="team-top" :class="{'team-bottom-border': !showStaff}" :show-logo="showLogos" :team="team"></DraftTeam>
-                        <div class="team-staff-list default-thing" v-if="showStaff" :style="logoBackground1(team)">
-                            <div class="team-staff" v-for="staff in getTeamStaff(team)" :key="staff.id">
+                <div v-for="(row, rowI) in draftRows" :key="rowI" class="team-row">
+                    <div v-for="team in row" :key="team.id" class="team flex-grow-1">
+                        <DraftTeam class="team-top" :class="{'team-bottom-border': !showStaff}" :show-logo="showLogos" :team="team" />
+                        <div v-if="showStaff" class="team-staff-list default-thing" :style="logoBackground1(team)">
+                            <div v-for="staff in getTeamStaff(team)" :key="staff.id" class="team-staff">
                                 {{ staff.name }}
                             </div>
                         </div>
                         <transition-group name="player" class="team-players" tag="div">
-                            <DraftPlayer class="drafted-player" v-for="player in insertDummies(team.players)" :key="player.id"
-                                         :player="player" :theme="event.theme" :show-icon="icons" :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
+                            <DraftPlayer
+                                v-for="player in insertDummies(team.players)"
+                                :key="player.id"
+                                class="drafted-player"
+                                :player="player"
+                                :theme="event.theme"
+                                :show-icon="icons"
+                                :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
                         </transition-group>
                     </div>
                 </div>
@@ -48,92 +66,6 @@ export default {
     data: () => ({
         dummy: false
     }),
-    methods: {
-        insertDummies(players = []) {
-            if (!this.eachTeam) return players;
-            const dummyRecord = { dummy: true };
-            const dummiedPlayers = [];
-
-            const nonSortedPlayers = players.filter(p => !p.draft_position);
-            const sortedPlayers = players.filter(p => p.draft_position);
-            for (let i = 1; i <= this.eachTeam; i++) {
-                const playerAtIndex = sortedPlayers.find(p => p.draft_position === i);
-                if (playerAtIndex) {
-                    dummiedPlayers.push({ ...playerAtIndex, forceIndex: true });
-                } else {
-                    if (nonSortedPlayers.length) {
-                        dummiedPlayers.push(nonSortedPlayers.shift());
-                    } else {
-                        dummiedPlayers.push({ ...dummyRecord, id: `dummy-${i}`, name: i });
-                    }
-                }
-            }
-            nonSortedPlayers.forEach(p => dummiedPlayers.push(p));
-            // return this.team.players;
-            return dummiedPlayers;
-        },
-        logoBackground1,
-        getTeamStaff(team) {
-            const staff = [];
-            if (team.captains) {
-                team.captains.forEach(person => {
-                    console.log(staff, person);
-                    if (!staff.find(s => s.id === person.id)) staff.push(person);
-                });
-            }
-            if (team.staff) {
-                team.staff.forEach(person => {
-                    if (!staff.find(s => s.id === person.id)) staff.push(person);
-                });
-            }
-            console.log(staff, team);
-            return staff;
-        },
-        fixData(rank) {
-            return (rank || "").replace("Plat ", "Platinum ").replace("Immortal+", "Immortal");
-        },
-        sortRankingSystem(ranks, aRank, bRank) {
-            aRank = this.fixData(aRank).trim().split(" ");
-            bRank = this.fixData(bRank).trim().split(" ");
-
-            // lowest in system: [0] -> [1] -> ... -> highest in system
-            let diff = ranks.indexOf(bRank[0]) - ranks.indexOf(aRank[0]);
-            // console.log(aRank, bRank, diff);
-
-            if (diff === 0 && aRank.length === 2 && bRank.length === 2) {
-                // lowest in rank:  1 -> 2 -> 3  :highest in rank
-                diff = parseInt(bRank[1]) - parseInt(aRank[1]);
-            }
-            return diff;
-        },
-        sortValorant(a, b) {
-            const ranks = [
-                "Unranked",
-                "Iron",
-                "Bronze",
-                "Silver",
-                "Gold",
-                "Platinum",
-                "Diamond",
-                "Immortal",
-                "Ascendant",
-                "Radiant"
-            ];
-            // sort by highest, then break with current
-            if (!a._draftData || !b._draftData) return 0;
-
-            let diff = this.sortRankingSystem(ranks, a._draftData.highest_rank, b._draftData.highest_rank);
-            if (diff === 0) {
-                diff = this.sortRankingSystem(ranks, a._draftData.current_rank, b._draftData.current_rank);
-            }
-            // console.log(a.name, b.name, diff);
-            return diff;
-        },
-        getHighlightEventTeam(player) {
-            if (!this.highlight_event?.teams?.length) return null;
-            return this.highlight_event.teams.find(team => (team.players || []).find(p => p.id === player.id) || (team.captains || []).find(p => p.id === player.id));
-        }
-    },
     computed: {
         event() {
             if (!this.broadcast?.event) return null;
@@ -254,6 +186,92 @@ export default {
             return {
                 width: `calc(100% / ${this.columns} - 4px)`
             };
+        }
+    },
+    methods: {
+        insertDummies(players = []) {
+            if (!this.eachTeam) return players;
+            const dummyRecord = { dummy: true };
+            const dummiedPlayers = [];
+
+            const nonSortedPlayers = players.filter(p => !p.draft_position);
+            const sortedPlayers = players.filter(p => p.draft_position);
+            for (let i = 1; i <= this.eachTeam; i++) {
+                const playerAtIndex = sortedPlayers.find(p => p.draft_position === i);
+                if (playerAtIndex) {
+                    dummiedPlayers.push({ ...playerAtIndex, forceIndex: true });
+                } else {
+                    if (nonSortedPlayers.length) {
+                        dummiedPlayers.push(nonSortedPlayers.shift());
+                    } else {
+                        dummiedPlayers.push({ ...dummyRecord, id: `dummy-${i}`, name: i });
+                    }
+                }
+            }
+            nonSortedPlayers.forEach(p => dummiedPlayers.push(p));
+            // return this.team.players;
+            return dummiedPlayers;
+        },
+        logoBackground1,
+        getTeamStaff(team) {
+            const staff = [];
+            if (team.captains) {
+                team.captains.forEach(person => {
+                    console.log(staff, person);
+                    if (!staff.find(s => s.id === person.id)) staff.push(person);
+                });
+            }
+            if (team.staff) {
+                team.staff.forEach(person => {
+                    if (!staff.find(s => s.id === person.id)) staff.push(person);
+                });
+            }
+            console.log(staff, team);
+            return staff;
+        },
+        fixData(rank) {
+            return (rank || "").replace("Plat ", "Platinum ").replace("Immortal+", "Immortal");
+        },
+        sortRankingSystem(ranks, aRank, bRank) {
+            aRank = this.fixData(aRank).trim().split(" ");
+            bRank = this.fixData(bRank).trim().split(" ");
+
+            // lowest in system: [0] -> [1] -> ... -> highest in system
+            let diff = ranks.indexOf(bRank[0]) - ranks.indexOf(aRank[0]);
+            // console.log(aRank, bRank, diff);
+
+            if (diff === 0 && aRank.length === 2 && bRank.length === 2) {
+                // lowest in rank:  1 -> 2 -> 3  :highest in rank
+                diff = parseInt(bRank[1]) - parseInt(aRank[1]);
+            }
+            return diff;
+        },
+        sortValorant(a, b) {
+            const ranks = [
+                "Unranked",
+                "Iron",
+                "Bronze",
+                "Silver",
+                "Gold",
+                "Platinum",
+                "Diamond",
+                "Immortal",
+                "Ascendant",
+                "Radiant"
+            ];
+            // sort by highest, then break with current
+            if (!a._draftData || !b._draftData) return 0;
+
+            let diff = this.sortRankingSystem(ranks, a._draftData.highest_rank, b._draftData.highest_rank);
+            if (diff === 0) {
+                diff = this.sortRankingSystem(ranks, a._draftData.current_rank, b._draftData.current_rank);
+            }
+            // console.log(a.name, b.name, diff);
+            return diff;
+        },
+        getHighlightEventTeam(player) {
+            if (!this.highlight_event?.teams?.length) return null;
+            return this.highlight_event.teams.find(team => (team.players || []).find(p => p.id === player.id) || (team.captains || []).find(p => p.id === player.id));
         }
     },
     mounted() {

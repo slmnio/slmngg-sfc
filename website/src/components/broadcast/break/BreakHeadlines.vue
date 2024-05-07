@@ -4,7 +4,7 @@
             <div class="title"><span class="industry-align">{{ title }}</span></div>
             <div class="headline">
                 <transition name="headline">
-                    <div class="industry-align headline-text" v-if="headline && headline.text" :key="headline.text">{{ headline.text }}</div>
+                    <div v-if="headline && headline.text" :key="headline.text" class="industry-align headline-text">{{ headline.text }}</div>
                 </transition>
             </div>
         </div>
@@ -19,10 +19,6 @@ export default {
         headlineIndex: 0,
         nextInterval: 4000
     }),
-    mounted() {
-        // this.nextHeadline();
-        setInterval(this.nextHeadline, this.interval || 6000);
-    },
     computed: {
         headline() {
             if (!this.headlines) return null;
@@ -42,6 +38,10 @@ export default {
             }
             */
         }
+    },
+    mounted() {
+        // this.nextHeadline();
+        setInterval(this.nextHeadline, this.interval || 6000);
     }
 };
 </script>

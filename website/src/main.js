@@ -24,14 +24,6 @@ import { useAuthStore } from "@/stores/authStore";
 const { subdomain, subID } = await getSubdomain();
 
 const app = createApp({
-    render: () => h(GlobalApp),
-    head: {
-        // title: "SLMN.GG",
-        titleTemplate: (chunk) => chunk ? `${chunk} | SLMN.GG` : "SLMN.GG",
-        link: [
-            { rel: "icon", href: "/favicon.ico", key: "favicon" }
-        ]
-    },
     data: () => ({
         interval: null,
         isRebuilding: false,
@@ -55,6 +47,14 @@ const app = createApp({
             }
         }
     }),
+    computed: {
+        minisiteEvent() {
+            return this.$store.getters.thing(`subdomain-${subdomain}`);
+        },
+        version() {
+            return import.meta.env?.VITE_SLMNGG_VERSION;
+        }
+    },
     async mounted() {
         console.log("[app]", "data server", getDataServerAddress());
 
@@ -68,13 +68,13 @@ const app = createApp({
             await auth.authenticateWithToken(auth.token);
         }
     },
-    computed: {
-        minisiteEvent() {
-            return this.$store.getters.thing(`subdomain-${subdomain}`);
-        },
-        version() {
-            return import.meta.env?.VITE_SLMNGG_VERSION;
-        }
+    render: () => h(GlobalApp),
+    head: {
+        // title: "SLMN.GG",
+        titleTemplate: (chunk) => chunk ? `${chunk} | SLMN.GG` : "SLMN.GG",
+        link: [
+            { rel: "icon", href: "/favicon.ico", key: "favicon" }
+        ]
     }
 });
 
@@ -107,7 +107,7 @@ app.config.globalProperties.$notyf = new Notyf({
     dismissible: true
 });
 
-app.component("v-style", {
+app.component("VStyle", {
     render: function () {
         return h("style", this.$slots.default());
     }

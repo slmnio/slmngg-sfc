@@ -1,7 +1,7 @@
 <template>
     <div id="app">
-        <WebsiteNav/>
-        <router-view class="my-3 slmngg-page"/>
+        <WebsiteNav />
+        <router-view class="my-3 slmngg-page" />
     </div>
 </template>
 

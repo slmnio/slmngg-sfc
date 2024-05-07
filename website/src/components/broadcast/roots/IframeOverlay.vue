@@ -1,6 +1,6 @@
 <template>
-    <iframe class="w-100 h-100 border-0" v-if="extended" :src="processedURL"></iframe>
-    <GenericOverlay class="iframe-overlay" v-else-if="!extended" :title="title">
+    <iframe v-if="extended" class="w-100 h-100 border-0" :src="processedURL"></iframe>
+    <GenericOverlay v-else-if="!extended" class="iframe-overlay" :title="title">
         <iframe class="w-100 h-100 border-0" :src="processedURL"></iframe>
     </GenericOverlay>
 </template>
@@ -9,8 +9,8 @@
 import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 export default {
     name: "IframeOverlay",
-    props: ["broadcast", "title", "url", "extended"],
     components: { GenericOverlay },
+    props: ["broadcast", "title", "url", "extended"],
     computed: {
         processedURL() {
             const url = this.url;

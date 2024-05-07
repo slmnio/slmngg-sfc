@@ -1,20 +1,20 @@
 <template>
     <GenericOverlay class="player-history-overlay" :title="customTitle">
         <div class="career-wrapper d-flex flex-center">
-            <div class="hero-segment d-flex flex-column flex-center" v-if="hero">
+            <div v-if="hero" class="hero-segment d-flex flex-column flex-center">
                 <div class="hero-card h-100 d-flex flex-column">
-                    <PlayerHero class="h-100" :hero="hero"></PlayerHero>
+                    <PlayerHero class="h-100" :hero="hero" />
                 </div>
             </div>
             <div class="teams-wrapper flex-column flex-center">
-                <div class="first-event d-flex flex-center mb-3" v-if="firstEvent">
+                <div v-if="firstEvent" class="first-event d-flex flex-center mb-3">
                     <div class="first-event-text mr-3">First event</div>
-                    <NewEventDisplay :event="firstEvent"/>
+                    <NewEventDisplay :event="firstEvent" />
                 </div>
 
                 <div class="title d-flex flex-column text-center mb-2">Team History</div>
                 <div class="player-teams d-flex flex-wrap flex-center">
-                    <PlayerTeamDisplay :team="team" v-for="team in playerTeams" :key="team.id" :showName="true"/>
+                    <PlayerTeamDisplay v-for="team in playerTeams" :key="team.id" :team="team" :show-name="true" />
                 </div>
             </div>
         </div>

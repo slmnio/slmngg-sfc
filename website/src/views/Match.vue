@@ -1,7 +1,7 @@
 <template>
-    <div id="match" v-if="match">
+    <div v-if="match" id="match">
         <MatchHero :match="match" />
-        <div class="container mt-3 text-center" v-if="match.special_event ? [match.score_1, match.score_2].some(x => x) : true">
+        <div v-if="match.special_event ? [match.score_1, match.score_2].some(x => x) : true" class="container mt-3 text-center">
             <MatchScore :match="match" />
         </div>
         <div class="container mt-3 large-container">
@@ -10,7 +10,8 @@
                     <router-view :match="match" />
                 </div>
                 <div class="col-12 col-md-3">
-                    <ul class="match-sub-nav list-group mb-2" v-if="sidebarItems.length > 1"> <!-- only because it'd be the only one -->
+                    <ul v-if="sidebarItems.length > 1" class="match-sub-nav list-group mb-2">
+                        <!-- only because it'd be the only one -->
                         <router-link v-if="sidebarItems.includes('vod')" class="list-group-item ct-passive" exact-active-class="active ct-active" :to="subLink('')">VOD</router-link>
                         <router-link v-if="sidebarItems.includes('head-to-head')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('history')">Head to head</router-link>
                         <router-link v-if="sidebarItems.includes('editor')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('editor')">Match editor</router-link>
@@ -26,9 +27,11 @@
                         </thead>
                         <tbody>
                             <tr v-if="match.start"><td colspan="2">{{ date }}</td></tr>
-                            <tr v-if="match.event && match.event.name"><td colspan="2" class="default-thing" :style="eventStyle">
-                                <b><router-link :to="url('event', match.event)" class="match-event-link">{{ match.event.name }}</router-link></b>
-                            </td></tr>
+                            <tr v-if="match.event && match.event.name">
+                                <td colspan="2" class="default-thing" :style="eventStyle">
+                                    <b><router-link :to="url('event', match.event)" class="match-event-link">{{ match.event.name }}</router-link></b>
+                                </td>
+                            </tr>
                             <tr v-if="match.forfeit"><td colspan="2"><b><i>Match was forfeited</i></b><span v-if="match.forfeit_reason"><br>{{ match.forfeit_reason }}</span></td></tr>
                             <tr v-if="lowerText"><td colspan="2">{{ lowerText }}</td></tr>
                             <tr v-if="match.first_to">
@@ -40,7 +43,7 @@
                             </tr>
                             <tr v-for="group in playerRelationshipGroups" :key="group.meta.singular_name">
                                 <td>{{ group.items.length === 1 ? group.meta.singular_name : group.meta.plural_name }}</td>
-                                <td><LinkedPlayers :players="group.items"/></td>
+                                <td><LinkedPlayers :players="group.items" /></td>
                             </tr>
                             <tr v-if="match.mvp">
                                 <td>MVP</td>
@@ -71,14 +74,12 @@ import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "Match",
-    props: ["id"],
     components: { MatchHero, MatchScore, LinkedPlayers },
-    methods: {
-        subLink(subLinkURL) {
-            return `/match/${this.match.id}/${subLinkURL}`;
-        },
-        url
+    beforeRouteLeave(to, from, next) {
+        this.$emit("id_change", null);
+        next();
     },
+    props: ["id"],
     computed: {
         match() {
             return ReactiveRoot(this.id, {
@@ -177,6 +178,12 @@ export default {
             return this.match?.event?.id;
         }
     },
+    methods: {
+        subLink(subLinkURL) {
+            return `/match/${this.match.id}/${subLinkURL}`;
+        },
+        url
+    },
     watch: {
         eventID: {
             handler(id) {
@@ -185,10 +192,6 @@ export default {
             },
             immediate: true
         }
-    },
-    beforeRouteLeave(to, from, next) {
-        this.$emit("id_change", null);
-        next();
     },
     head() {
         return {

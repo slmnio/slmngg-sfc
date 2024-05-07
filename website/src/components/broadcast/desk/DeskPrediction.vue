@@ -5,7 +5,7 @@
         </div>
         <div class="desk-pred-holder">
             <transition name="pred-reveal">
-                <div class="desk-prediction flex-center" :style="theme" :key="autoKey">
+                <div :key="autoKey" class="desk-prediction flex-center" :style="theme">
                     <div class="team" :class="{'event': !hasPredicted}" :style="logo"></div>
                 </div>
             </transition>

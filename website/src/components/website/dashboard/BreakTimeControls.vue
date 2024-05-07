@@ -7,9 +7,11 @@
             <div class="flex-grow-1 d-flex gap-3">
                 <div class="stack">
                     <div class="label small text-muted">Manual end point</div>
-                    <AdvancedDateEditor class="date-editor" :saved-time="broadcast.countdown_end"
-                                        :is-processing="manualProcessing"
-                                        @submit="(timeString) => setManualCountdownEnd(timeString)"></AdvancedDateEditor>
+                    <AdvancedDateEditor
+                        class="date-editor"
+                        :saved-time="broadcast.countdown_end"
+                        :is-processing="manualProcessing"
+                        @submit="(timeString) => setManualCountdownEnd(timeString)" />
                 </div>
                 <div class="stack">
                     <div class="label small text-muted">Quick buttons</div>
@@ -21,7 +23,7 @@
                 </div>
             </div>
             <div>
-                <b-button class="label-padding" :variant="broadcast.countdown_end ? 'danger' : ''" @click="setCountdownEnd(null)" :disabled="!broadcast.countdown_end">
+                <b-button class="label-padding" :variant="broadcast.countdown_end ? 'danger' : ''" :disabled="!broadcast.countdown_end" @click="setCountdownEnd(null)">
                     <i class="fal fa-times mr-1"></i>
                     Clear
                 </b-button>
@@ -32,23 +34,37 @@
                 <div class="d-flex gap-1">
                     <div class="digit w-100">
                         <div class="label small text-muted">Hours</div>
-                        <b-form-input type="number" placeholder="h" min="0" step="1"
-                                      v-model.number="hours"></b-form-input>
+                        <b-form-input
+                            v-model.number="hours"
+                            type="number"
+                            placeholder="h"
+                            min="0"
+                            step="1" />
                     </div>
                     <div class="digit w-100">
                         <div class="label small text-muted">Minutes</div>
-                        <b-form-input type="number" placeholder="mm" min="0" step="1" max="59"
-                                      v-model.number="minutes"></b-form-input>
+                        <b-form-input
+                            v-model.number="minutes"
+                            type="number"
+                            placeholder="mm"
+                            min="0"
+                            step="1"
+                            max="59" />
                     </div>
                     <div class="digit w-100">
                         <div class="label small text-muted">Seconds</div>
-                        <b-form-input type="number" placeholder="mm" min="0" step="1" max="59"
-                                      v-model.number="seconds"></b-form-input>
+                        <b-form-input
+                            v-model.number="seconds"
+                            type="number"
+                            placeholder="mm"
+                            min="0"
+                            step="1"
+                            max="59" />
                     </div>
                 </div>
             </div>
             <div class="flex-shrink-0">
-                <b-button class="label-padding" :variant="customDuration ? 'primary' : 'secondary'" @click="setCountdownFromNow(customDuration)" :disabled="!customDuration">
+                <b-button class="label-padding" :variant="customDuration ? 'primary' : 'secondary'" :disabled="!customDuration" @click="setCountdownFromNow(customDuration)">
                     <i class="fal fa-clock mr-1"></i> Set time
                 </b-button>
             </div>

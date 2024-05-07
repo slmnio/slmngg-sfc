@@ -15,8 +15,13 @@
             <tbody>
                 <tr v-for="player in people" :key="player.id">
                     <td class="wide">
-                        <span v-for="role in player.is" :key="role" v-b-tooltip="role" v-html="getRoleSVG(role)" class="mr-1"></span>
-                        <LinkedPlayers :players="[player]"/>
+                        <span
+                            v-for="role in player.is"
+                            :key="role"
+                            v-b-tooltip="role"
+                            class="mr-1"
+                            v-html="getRoleSVG(role)"></span>
+                        <LinkedPlayers :players="[player]" />
                     </td>
                     <td class="wide">{{ player.pronouns }}</td>
                     <td>{{ player.pronunciation }}</td>
@@ -37,8 +42,8 @@ import { getRoleSVG } from "@/utils/content-utils";
 
 export default {
     name: "TeamDetails",
-    props: ["team"],
     components: { LinkedPlayers, TwitterLink },
+    props: ["team"],
     computed: {
         _team() {
             if (!this.team) return [];

@@ -1,6 +1,11 @@
 <template>
     <div class="p-2">
-        <b-button class="mr-1" v-for="(team, i) in teams" :key="team.id" :variant="enabledComms === i+1 ? 'primary' : 'secondary'" @click="() => enableComms(i+1)">
+        <b-button
+            v-for="(team, i) in teams"
+            :key="team.id"
+            class="mr-1"
+            :variant="enabledComms === i+1 ? 'primary' : 'secondary'"
+            @click="() => enableComms(i+1)">
             <i class="fas fa-fw mr-1 fa-microphone"></i>{{ team?.name || `Team ${i+1}` }} Comms
         </b-button>
         <b-button class="mr-1 text-light" variant="outline-secondary" @click="disableComms"><i class="fas mr-1 fa-microphone-slash"></i>Disable Comms</b-button>

@@ -1,7 +1,7 @@
 <template>
-    <router-link active-class="active" class="live-match-link" :to="url('match', match)" v-if="shouldShow">
-        <MatchThumbnail class="live-thumbnail" :match="match"/>
-<!--        <span>🔴 LIVE: {{ eventText }} {{ match.round || match.name }}</span>-->
+    <router-link v-if="shouldShow" active-class="active" class="live-match-link" :to="url('match', match)">
+        <MatchThumbnail class="live-thumbnail" :match="match" />
+        <!--        <span>🔴 LIVE: {{ eventText }} {{ match.round || match.name }}</span>-->
     </router-link>
 </template>
 
@@ -13,9 +13,6 @@ export default {
     name: "NavLiveMatch",
     components: { MatchThumbnail },
     props: ["match"],
-    methods: {
-        url
-    },
     computed: {
         eventText() {
             if (!this.match.event) return null;
@@ -30,6 +27,9 @@ export default {
             return true;
             // return this.match.live;
         }
+    },
+    methods: {
+        url
     }
 };
 </script>

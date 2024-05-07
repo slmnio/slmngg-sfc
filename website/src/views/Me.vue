@@ -17,15 +17,6 @@ export default {
             return useAuthStore().auth;
         }
     },
-    watch: {
-        auth: {
-            deep: true,
-            handler() {
-                console.log("auth change");
-                this.check();
-            }
-        }
-    },
     methods: {
         check() {
             const { isAuthenticated, user } = useAuthStore();
@@ -33,6 +24,15 @@ export default {
             const playerID = user?.airtableID;
             if (!playerID) return console.warn("No player ID to redirect to");
             return this.$router.replace({ path: `/player/${playerID}/${this.subPage || ""}` });
+        }
+    },
+    watch: {
+        auth: {
+            deep: true,
+            handler() {
+                console.log("auth change");
+                this.check();
+            }
         }
     },
     beforeMount() {

@@ -1,8 +1,13 @@
 <template>
     <div class="container event-rosters">
-
-        <ContentRow :title="team.name" v-for="team in teams" :key="team.id">
-            <ContentThing :thing="player" type="player" :theme="team.theme" v-for="player in (team.showLimitedPlayers ? team.limited_players : team.players)" :key="player.id" :no-link="team.showLimitedPlayers"></ContentThing>
+        <ContentRow v-for="team in teams" :key="team.id" :title="team.name">
+            <ContentThing
+                v-for="player in (team.showLimitedPlayers ? team.limited_players : team.players)"
+                :key="player.id"
+                :thing="player"
+                type="player"
+                :theme="team.theme"
+                :no-link="team.showLimitedPlayers" />
         </ContentRow>
     </div>
 </template>
@@ -14,8 +19,8 @@ import ContentThing from "@/components/website/ContentThing";
 
 export default {
     name: "EventRosters",
-    props: ["event"],
     components: { ContentRow, ContentThing },
+    props: ["event"],
     computed: {
         teams() {
             if (!this.event?.teams) return [];

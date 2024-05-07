@@ -1,7 +1,13 @@
 <template>
     <GenericOverlay :title="title || 'Schedule'" class="schedule-overlay" :top="top" :broadcast="broadcast">
         <transition-group class="break-col break-schedule" name="a--match" tag="div">
-            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />
+            <BreakMatch
+                v-for="match in schedule"
+                :key="match.id"
+                :timezone="broadcast.timezone"
+                :match="match"
+                :expanded="true"
+                :theme-color="themeColor" />
         </transition-group>
     </GenericOverlay>
 </template>
@@ -15,8 +21,8 @@ import { themeBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "ScheduleOverlay",
-    props: ["broadcast", "title", "top", "secondary", "matches"],
     components: { GenericOverlay, BreakMatch },
+    props: ["broadcast", "title", "top", "secondary", "matches"],
     computed: {
         schedule() {
             if (this.matches?.every(m => m.id)) {

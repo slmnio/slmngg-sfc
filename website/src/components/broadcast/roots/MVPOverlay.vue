@@ -3,23 +3,33 @@
         <div v-if="mvp">
             <div class="text-container">
                 <div class="title-holder">
-                    <ThemeTransition start="right" :theme="themeBackground" :active="animationActive" :starting-delay="100" :duration="500">
+                    <ThemeTransition
+                        start="right"
+                        :theme="themeBackground"
+                        :active="animationActive"
+                        :starting-delay="100"
+                        :duration="500">
                         <div class="title" :style="borderColor">{{ title || 'MVP' }}</div>
                     </ThemeTransition>
                 </div>
 
                 <div class="text-holder">
-                    <ThemeTransition start="right" :theme="themeBackground" :active="animationActive" :startingDelay="400" :duration="300">
+                    <ThemeTransition
+                        start="right"
+                        :theme="themeBackground"
+                        :active="animationActive"
+                        :starting-delay="400"
+                        :duration="300">
                         <div class="player-name-holder" :style="themeBackground">
-                            <ThemeLogo icon-padding="20%" border-width="0" :theme="mvpTeam && mvpTeam.theme" class="player-team-logo"></ThemeLogo>
+                            <ThemeLogo icon-padding="20%" border-width="0" :theme="mvpTeam && mvpTeam.theme" class="player-team-logo" />
                             <div class="player-name">{{ mvp.name }}</div>
                         </div>
                     </ThemeTransition>
                 </div>
             </div>
             <transition name="hero-move">
-                <div class="hero-container" v-show="animationActive && mvpTeam && mvpTeam.theme">
-                    <recolored-hero class="hero" v-if="mvpTeam && mvpTeam.theme" :theme="mvpTeam.theme" :hero="hero"></recolored-hero>
+                <div v-show="animationActive && mvpTeam && mvpTeam.theme" class="hero-container">
+                    <recolored-hero v-if="mvpTeam && mvpTeam.theme" class="hero" :theme="mvpTeam.theme" :hero="hero" />
                 </div>
             </transition>
         </div>

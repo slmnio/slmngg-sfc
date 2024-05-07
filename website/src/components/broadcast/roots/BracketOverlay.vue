@@ -1,11 +1,28 @@
 <template>
-    <GenericOverlay class="bracket-overlay" v-if="!extended" :title="title || 'Bracket'">
-        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :scale="scale" :small="small"
-                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" :custom-timezone="broadcastTimezone" />
+    <GenericOverlay v-if="!extended" class="bracket-overlay" :title="title || 'Bracket'">
+        <Bracket
+            class="bracket"
+            :event="event"
+            :bracket="bracket"
+            use-overlay-scale
+            :scale="scale"
+            :small="small"
+            :broadcast-highlight-match="highlightMatch"
+            :broadcast-highlight-team="highlightTeam"
+            :custom-timezone="broadcastTimezone" />
     </GenericOverlay>
-    <div class="bracket-overlay bracket-extended" :style="zoom" v-else>
-        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :scale="scale" :small="small"
-                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" :extended="extended" :custom-timezone="broadcastTimezone" />
+    <div v-else class="bracket-overlay bracket-extended" :style="zoom">
+        <Bracket
+            class="bracket"
+            :event="event"
+            :bracket="bracket"
+            use-overlay-scale
+            :scale="scale"
+            :small="small"
+            :broadcast-highlight-match="highlightMatch"
+            :broadcast-highlight-team="highlightTeam"
+            :extended="extended"
+            :custom-timezone="broadcastTimezone" />
     </div>
 </template>
 

@@ -4,17 +4,45 @@
             <TourneyBar :left="broadcast.event && broadcast.event.short" :right="broadcast.subtitle" :event="broadcast.event" />
         </div>
         <transition-group class="casters flex-center" tag="div" name="anim-talent">
-            <Caster v-for="(caster, i) in casters" :key="caster.manual ? caster.name : caster.id" :guest="caster" :color="getColor(i)"
-                    :event="event" :disable-video="shouldDisableCasterVideo" :class="{'wide-feed': caster.wide_feed}"
-                    :show-pronouns="showPronouns" :pronouns-on-newline="pronounsOnNewline" />
+            <Caster
+                v-for="(caster, i) in casters"
+                :key="caster.manual ? caster.name : caster.id"
+                :guest="caster"
+                :color="getColor(i)"
+                :event="event"
+                :disable-video="shouldDisableCasterVideo"
+                :class="{'wide-feed': caster.wide_feed}"
+                :show-pronouns="showPronouns"
+                :pronouns-on-newline="pronounsOnNewline" />
         </transition-group>
         <transition tag="div" mode="out-in" name="break-content">
-            <DeskMatch :broadcast="broadcast" class="w-100" :_match="liveMatch" :theme-color="themeColor" :guests="guests" v-if="liveMatch && !useScoreboard" key="desk-match" />
-            <MatchScoreboard :active="animationActive" class="scoreboard" v-else-if="liveMatch && useScoreboard" :match="liveMatch" :broadcast="broadcast" key="scoreboard" :animate-on-mount="true" />
+            <DeskMatch
+                v-if="liveMatch && !useScoreboard"
+                key="desk-match"
+                :broadcast="broadcast"
+                class="w-100"
+                :_match="liveMatch"
+                :theme-color="themeColor"
+                :guests="guests" />
+            <MatchScoreboard
+                v-else-if="liveMatch && useScoreboard"
+                key="scoreboard"
+                :active="animationActive"
+                class="scoreboard"
+                :match="liveMatch"
+                :broadcast="broadcast"
+                :animate-on-mount="true" />
         </transition>
 
         <div class="preload">
-            <DeskMatch class="w-100" :broadcast="broadcast" :_match="liveMatch" :theme-color="themeColor" v-if="liveMatch" force-mode="Maps" key="desk-match" />
+            <DeskMatch
+                v-if="liveMatch"
+                key="desk-match"
+                class="w-100"
+                :broadcast="broadcast"
+                :_match="liveMatch"
+                :theme-color="themeColor"
+                force-mode="Maps" />
         </div>
     </div>
 </template>
@@ -32,12 +60,6 @@ export default {
     name: "DeskOverlay",
     components: { MatchScoreboard, DeskMatch, Caster, TourneyBar },
     props: ["broadcast", "group", "disableCasters", "animationActive"],
-    methods: {
-        getColor(index) {
-            if (!this.deskColors?.length) return this.broadcast?.event?.theme?.color_logo_background || this.broadcast?.event?.theme?.color_theme;
-            return this.deskColors[index % this.deskColors.length];
-        }
-    },
     computed: {
         event() {
             return this.broadcast?.event;
@@ -119,6 +141,12 @@ export default {
             return (this.broadcast?.desk_display) === "Scoreboard";
         }
 
+    },
+    methods: {
+        getColor(index) {
+            if (!this.deskColors?.length) return this.broadcast?.event?.theme?.color_logo_background || this.broadcast?.event?.theme?.color_theme;
+            return this.deskColors[index % this.deskColors.length];
+        }
     },
     head() {
         return {

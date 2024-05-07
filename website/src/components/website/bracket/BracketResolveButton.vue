@@ -1,9 +1,19 @@
 <template>
-    <b-button v-if="showResolveButton && bracket && isResolving" disabled class="resolve-button" :class="{'vertical': verticalButton}"
-              variant="success"><i class="fas fa-magic fa-fw fa-spin"></i> Resolving Bracket...
+    <b-button
+        v-if="showResolveButton && bracket && isResolving"
+        disabled
+        class="resolve-button"
+        :class="{'vertical': verticalButton}"
+        variant="success">
+        <i class="fas fa-magic fa-fw fa-spin"></i> Resolving Bracket...
     </b-button>
-    <b-button v-else-if="showResolveButton && bracket && !isResolving" @click="clickResolveButton(bracket)"
-              class="resolve-button" :class="{'vertical': verticalButton}" variant="success"><i class="fas fa-magic fa-fw"></i> Resolve Bracket
+    <b-button
+        v-else-if="showResolveButton && bracket && !isResolving"
+        class="resolve-button"
+        :class="{'vertical': verticalButton}"
+        variant="success"
+        @click="clickResolveButton(bracket)">
+        <i class="fas fa-magic fa-fw"></i> Resolve Bracket
     </b-button>
 </template>
 

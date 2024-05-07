@@ -1,10 +1,22 @@
 <template>
     <div class="hero-color-controls">
-        <div class="color" v-for="(color, i) in themeColors" :key="color">
+        <div v-for="(color, i) in themeColors" :key="color" class="color">
             <div class="color-name"><span class="color-swatch" :style="{ backgroundColor: color }"></span> {{ color }} (b={{ getHexBrightness(color).toFixed(2) }})</div>
 
-            <b-form-group class="mb-0" :label="`${type} ${colorControls[i][type]}`" label-class="fw-bold text-end" label-cols="3" v-for="type in ['hue', 'overlay', 'multiply', 'saturation']" :key="type">
-                <b-form-input class="d-flex h-100" type="range" v-model="colorControls[i][type]" min="0" max="1" step="0.01"></b-form-input>
+            <b-form-group
+                v-for="type in ['hue', 'overlay', 'multiply', 'saturation']"
+                :key="type"
+                class="mb-0"
+                :label="`${type} ${colorControls[i][type]}`"
+                label-class="fw-bold text-end"
+                label-cols="3">
+                <b-form-input
+                    v-model="colorControls[i][type]"
+                    class="d-flex h-100"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01" />
             </b-form-group>
         </div>
 
@@ -73,6 +85,15 @@ export default {
             ];
         }
     },
+    methods: {
+        updateToRoot(controls) {
+            controls.forEach((control, i) => {
+                if (!this.themeColors?.[i]) return;
+                this.$root.colorControls[this.themeColors[i]] = control;
+            });
+        },
+        getHexBrightness
+    },
     watch: {
         colorControls: {
             deep: true,
@@ -92,15 +113,6 @@ export default {
                 this.updateToRoot(this.colorControls);
             }
         }
-    },
-    methods: {
-        updateToRoot(controls) {
-            controls.forEach((control, i) => {
-                if (!this.themeColors?.[i]) return;
-                this.$root.colorControls[this.themeColors[i]] = control;
-            });
-        },
-        getHexBrightness
     },
     mounted() {
         this.updateToRoot(this.colorControls);

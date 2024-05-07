@@ -1,7 +1,7 @@
 <template>
     <div class="logo-overlay h-100 w-100">
         <div class="logo-container h-100 w-100">
-            <div class="logo h-100 flex-center" v-for="sponsor in sponsors" :key="sponsor.id">
+            <div v-for="sponsor in sponsors" :key="sponsor.id" class="logo h-100 flex-center">
                 <div class="logo-inner bg-center" :style="resizedImage(sponsor, ['default_wordmark', 'default_logo'], 'orig')"></div>
             </div>
         </div>

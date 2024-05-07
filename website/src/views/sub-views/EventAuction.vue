@@ -1,8 +1,8 @@
 <template>
     <div class="container event-auction">
         <div class="auction-section">
-            <div class="bar bg-danger text-white text-center mb-2 p-2 rounded" v-if="pageNoLongerNew && auctionState === 'NOT_CONNECTED'">Not connected to auction server</div>
-            <div class="admin-settings border-danger border p-2 rounded mb-2 d-flex align-items-center" v-if="isAdmin">
+            <div v-if="pageNoLongerNew && auctionState === 'NOT_CONNECTED'" class="bar bg-danger text-white text-center mb-2 p-2 rounded">Not connected to auction server</div>
+            <div v-if="isAdmin" class="admin-settings border-danger border p-2 rounded mb-2 d-flex align-items-center">
                 <button class="btn btn-info mr-1" @click="sendToAuctionServer('auction:admin_set_state', {'state': 'READY'})">Set state: READY</button>
                 <button class="btn btn-warning mr-1" @click="sendToAuctionServer('auction:admin_set_state', {'state': 'RESTRICTED'})">Set state: RESTRICTED</button>
                 <div class="btn-text text-end flex-grow-1">{{ auctionState }}</div>
@@ -11,27 +11,44 @@
 
             <div class="action-row d-flex mb-3">
                 <div class="active-player col-7">
-                    <div class="last-started" v-if="lastStartedTeam && ['PRE_AUCTION', 'IN_ACTION'].includes(auctionState)">
+                    <div v-if="lastStartedTeam && ['PRE_AUCTION', 'IN_ACTION'].includes(auctionState)" class="last-started">
                         <div class="badge badge-pill bg-secondary">Started by</div> <ThemeLogo :theme="lastStartedTeam?.theme" border-width="3px" icon-padding="4px" /> <router-link class="no-link-style" :to="url('team', lastStartedTeam)" target="_blank">{{ lastStartedTeam?.name || '&nbsp;' }}</router-link>
                     </div>
-                    <div class="last-started" v-if="nextTeamToStart && ['READY', 'POST_AUCTION', 'RESTRICTED'].includes(auctionState)">
+                    <div v-if="nextTeamToStart && ['READY', 'POST_AUCTION', 'RESTRICTED'].includes(auctionState)" class="last-started">
                         <div class="badge badge-pill bg-primary">Next to start</div> <ThemeLogo :theme="nextTeamToStart?.theme" border-width="3px" icon-padding="4px" /> <router-link class="no-link-style" :to="url('team', nextTeamToStart)" target="_blank">{{ nextTeamToStart?.name || ' ' }}</router-link>
                     </div>
-                    <div class="player-name" v-if="activePlayer">
+                    <div v-if="activePlayer" class="player-name">
                         <router-link class="no-link-style" :to="url('player', activePlayer)" target="_blank">{{ activePlayer?.name || '&nbsp;' }}</router-link>
-                        <div class="player-role" v-if="activePlayer?.role" v-html="getRoleSVG(activePlayer.role)" v-b-tooltip :title="`Main role: ${activePlayer.role}`"></div>
+                        <div
+                            v-if="activePlayer?.role"
+                            v-b-tooltip
+                            class="player-role"
+                            :title="`Main role: ${activePlayer.role}`"
+                            v-html="getRoleSVG(activePlayer.role)"></div>
                     </div>
-<!--                    <h3 class="player-signed">SIGNED TO</h3>-->
+                    <!--                    <h3 class="player-signed">SIGNED TO</h3>-->
                     <div class="player-roles d-flex mb-1">
-                        <div class="role" v-for="role in playerRoles(activePlayer?.eligible_roles)" :class="{'text-danger': !role.eligible, 'text-success': role.eligible}"
-                             :key="role?.role" v-html="getRoleSVG(role?.role)" :title="role.eligible ? `Eligible for ${role.role}` : `Not eligible for ${role.role}`" v-b-tooltip
+                        <div
+                            v-for="role in playerRoles(activePlayer?.eligible_roles)"
+                            :key="role?.role"
+                            v-b-tooltip
+                            class="role"
+                            :class="{'text-danger': !role.eligible, 'text-success': role.eligible}"
+                            :title="role.eligible ? `Eligible for ${role.role}` : `Not eligible for ${role.role}`"
+                            v-html="getRoleSVG(role?.role)"
                         ></div>
                     </div>
                     <div class="player-info">{{ activePlayer?.draft_data }}</div>
                 </div>
                 <div class="bids col-5">
                     <div class="bid-list d-flex flex-column-reverse">
-                        <AuctionBid v-bind="bid" class="bid" v-for="(bid, i) in topBids" :key="i" :winning="i === topBids.length - 1" :won="(i === topBids.length - 1) && auctionState === 'POST_AUCTION'" />
+                        <AuctionBid
+                            v-for="(bid, i) in topBids"
+                            v-bind="bid"
+                            :key="i"
+                            class="bid"
+                            :winning="i === topBids.length - 1"
+                            :won="(i === topBids.length - 1) && auctionState === 'POST_AUCTION'" />
                     </div>
                 </div>
             </div>
@@ -52,28 +69,45 @@
                     </div>
                     <div class="d-flex buttons">
                         <div class="d-flex buttons">
-                            <button class="btn btn-success btn-lg text-nowrap"
-                                    @click="sendBid((leadingBid?.amount ?? 0) + autoSettings.money.minimumBidIncrement)"
-                                    :disabled="!canBid">+ {{ money(autoSettings.money.minimumBidIncrement) }}
+                            <button
+                                class="btn btn-success btn-lg text-nowrap"
+                                :disabled="!canBid"
+                                @click="sendBid((leadingBid?.amount ?? 0) + autoSettings.money.minimumBidIncrement)">
+                                + {{ money(autoSettings.money.minimumBidIncrement) }}
                             </button>
-                            <button class="btn btn-success btn-lg text-nowrap" v-if="autoSettings.money.minimumBidIncrement < 5"
-                                    @click="sendBid((leadingBid?.amount ?? 0) + 5)" :disabled="!canBid">+ {{ money(5) }}
+                            <button
+                                v-if="autoSettings.money.minimumBidIncrement < 5"
+                                class="btn btn-success btn-lg text-nowrap"
+                                :disabled="!canBid"
+                                @click="sendBid((leadingBid?.amount ?? 0) + 5)">
+                                + {{ money(5) }}
                             </button>
-                            <button class="btn btn-success btn-lg text-nowrap" v-if="autoSettings.money.minimumBidIncrement < 10"
-                                    @click="sendBid((leadingBid?.amount ?? 0) + 10)" :disabled="!canBid">+ {{
+                            <button
+                                v-if="autoSettings.money.minimumBidIncrement < 10"
+                                class="btn btn-success btn-lg text-nowrap"
+                                :disabled="!canBid"
+                                @click="sendBid((leadingBid?.amount ?? 0) + 10)">
+                                + {{
                                     money(10)
                                 }}
                             </button>
                         </div>
                         <div class="flex-center">
                             <div class="button-group bid-input-group">
-                                <input type="number" class="bid-amount-input" v-model.number="customBidAmount"
-                                       :min="leadingBid ? leadingBid?.amount + autoSettings.money.minimumBidIncrement : 1"
-                                       :max="leadingBid ? leadingBid?.amount + autoSettings.money.maximumBidIncrement : 200"
-                                       @keydown.enter="sendBid(customBidAmount)"
-                                />
-                                <button class="btn btn-success btn-lg" @click="sendBid(customBidAmount)"
-                                        :disabled="customBidError || !canBid" :data-tooltip="customBidError">Bid
+                                <input
+                                    v-model.number="customBidAmount"
+                                    type="number"
+                                    class="bid-amount-input"
+                                    :min="leadingBid ? leadingBid?.amount + autoSettings.money.minimumBidIncrement : 1"
+                                    :max="leadingBid ? leadingBid?.amount + autoSettings.money.maximumBidIncrement : 200"
+                                    @keydown.enter="sendBid(customBidAmount)"
+                                >
+                                <button
+                                    class="btn btn-success btn-lg"
+                                    :disabled="customBidError || !canBid"
+                                    :data-tooltip="customBidError"
+                                    @click="sendBid(customBidAmount)">
+                                    Bid
                                 </button>
                             </div>
                         </div>
@@ -83,18 +117,24 @@
         </div>
         <div class="row mt-5">
             <div class="col-4 teams-section">
-                <h3 class="text-center" v-if="groupedTeams.active.length">Active teams</h3>
-                <div class="team-group" v-for="team in groupedTeams.active" :key="team.id">
+                <h3 v-if="groupedTeams.active.length" class="text-center">Active teams</h3>
+                <div v-for="team in groupedTeams.active" :key="team.id" class="team-group">
                     <div class="d-flex">
-                        <ContentThing class="team-display d-inline-flex" type="team" :text="team.name" :theme="team.theme" :show-logo="true" :thing="team" />
+                        <ContentThing
+                            class="team-display d-inline-flex"
+                            type="team"
+                            :text="team.name"
+                            :theme="team.theme"
+                            :show-logo="true"
+                            :thing="team" />
                         <div class="d-flex team-help-text flex-wrap align-items-center">
                             <div class="text money">{{ money(team.balance) }}</div>
                             <div class="text player-count ml-2">({{ auctionSettings?.each_team - (team.players?.length || 0) }} to draft)</div>
                         </div>
                     </div>
-                    <div class="ml-2 badge badge-pill bg-secondary" v-if="lastStartedTeam?.id === team?.id">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>
-                    <div class="ml-2 badge badge-pill bg-primary" v-if="nextTeamToStart?.id === team?.id">Next to start</div>
-                    <div class="ml-2 badge badge-pill bg-info" v-if="actingTeam?.id === team?.id">Acting as this team</div>
+                    <div v-if="lastStartedTeam?.id === team?.id" class="ml-2 badge badge-pill bg-secondary">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>
+                    <div v-if="nextTeamToStart?.id === team?.id" class="ml-2 badge badge-pill bg-primary">Next to start</div>
+                    <div v-if="actingTeam?.id === team?.id" class="ml-2 badge badge-pill bg-info">Acting as this team</div>
                     <ul>
                         <li v-for="player in team.players" :key="player.id">
                             <router-link :to="url('player', player)" target="_blank">{{ player?.name }}</router-link>
@@ -102,16 +142,22 @@
                         </li>
                     </ul>
                 </div>
-                <h3 class="text-center" v-if="groupedTeams.finished.length">Completed Teams</h3>
-                <div class="team-group" v-for="team in groupedTeams.finished" :key="team.id">
+                <h3 v-if="groupedTeams.finished.length" class="text-center">Completed Teams</h3>
+                <div v-for="team in groupedTeams.finished" :key="team.id" class="team-group">
                     <div class="d-flex">
-                        <ContentThing class="team-display d-inline-flex" type="team" :text="team.name" :theme="team.theme" :show-logo="true" :thing="team" />
+                        <ContentThing
+                            class="team-display d-inline-flex"
+                            type="team"
+                            :text="team.name"
+                            :theme="team.theme"
+                            :show-logo="true"
+                            :thing="team" />
                         <div class="d-flex team-help-text align-items-center">
                             <div class="text money">{{ money(team.balance) }} left over</div>
                         </div>
                     </div>
-                    <div class="ml-2 badge badge-pill bg-secondary" v-if="lastStartedTeam?.id === team?.id">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>
-                    <div class="ml-2 badge badge-pill bg-info" v-if="actingTeam?.id === team?.id">Acting as this team</div>
+                    <div v-if="lastStartedTeam?.id === team?.id" class="ml-2 badge badge-pill bg-secondary">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>
+                    <div v-if="actingTeam?.id === team?.id" class="ml-2 badge badge-pill bg-info">Acting as this team</div>
                     <ul>
                         <li v-for="player in team.players" :key="player.id">
                             <router-link :to="url('player', player)" target="_blank">{{ player?.name }}</router-link>
@@ -133,12 +179,16 @@
                             <td>Pre-auction timer: <b>{{ auctionSettings?.time?.beforeFirstBids }} seconds</b></td>
                         </tr>
                         <tr v-if="auctionSettings?.time?.afterInitialBid">
-                            <td>Auction timer after first bid: <b>{{ auctionSettings?.time?.afterInitialBid }}
-                                seconds</b></td>
+                            <td>
+                                Auction timer after first bid: <b>{{ auctionSettings?.time?.afterInitialBid }}
+                                    seconds</b>
+                            </td>
                         </tr>
                         <tr v-if="auctionSettings?.time?.afterSubsequentBids">
-                            <td>Auction timer after other bids: <b>{{ auctionSettings?.time?.afterSubsequentBids }}
-                                seconds</b></td>
+                            <td>
+                                Auction timer after other bids: <b>{{ auctionSettings?.time?.afterSubsequentBids }}
+                                    seconds</b>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -146,7 +196,7 @@
             <div class="col-8 players-section">
                 <h3 class="text-center">Players</h3>
 
-                <div class="admin-only mb-2" v-if="isAdmin">
+                <div v-if="isAdmin" class="admin-only mb-2">
                     <div class="text-center">Admin force team</div>
                     <select v-model="adminTeamID" class="w-100">
                         <option :value="null" disabled>Choose a team to control</option>
@@ -156,28 +206,42 @@
 
                 <table class="table table-bordered table-dark table-sm w-100">
                     <tbody>
-                        <tr class="player" v-for="(player, i) in undraftedPlayers" :key="player.id"
+                        <tr
+                            v-for="(player, i) in undraftedPlayers"
+                            :key="player.id"
+                            class="player"
                             :class="{'striped': i % 2 === 1, 'currently-active-player': activePlayer?.id === player.id}">
                             <td class="player-name">
                                 <div class="player-info-box d-flex align-items-center">
                                     <div v-if="player.role" class="player-role" v-html="getRoleSVG(player.role)"></div>
                                     <router-link :to="url('player', player)">{{ player.name }}</router-link>
                                 </div>
-                                <div class="player-eligible-roles"
-                                     :title="`Eligible for ${niceJoin(eligibleRoles(player.eligible_roles).map(r => r.role))}`"
-                                     v-b-tooltip>
-                                    <div class="role text-success" v-for="role in eligibleRoles(player.eligible_roles)"
-                                         :key="role?.role" v-html="getRoleSVG(role?.role)"></div>
+                                <div
+                                    v-b-tooltip
+                                    class="player-eligible-roles"
+                                    :title="`Eligible for ${niceJoin(eligibleRoles(player.eligible_roles).map(r => r.role))}`">
+                                    <div
+                                        v-for="role in eligibleRoles(player.eligible_roles)"
+                                        :key="role?.role"
+                                        class="role text-success"
+                                        v-html="getRoleSVG(role?.role)"></div>
                                 </div>
                             </td>
                             <td class="draft-data">{{ player.draft_data }}</td>
                             <td class="player-buttons-cell">
                                 <div class="buttons d-flex">
-                                    <button class="btn btn-info btn-sm" v-if="isAdmin" :disabled="!adminTeamID"
-                                            @click="() => askStarting(player)">force
+                                    <button
+                                        v-if="isAdmin"
+                                        class="btn btn-info btn-sm"
+                                        :disabled="!adminTeamID"
+                                        @click="() => askStarting(player)">
+                                        force
                                     </button>
-                                    <button class="btn btn-success btn-sm" :disabled="!canStartPlayer"
-                                            @click="startPlayer(player)">start
+                                    <button
+                                        class="btn btn-success btn-sm"
+                                        :disabled="!canStartPlayer"
+                                        @click="startPlayer(player)">
+                                        start
                                     </button>
                                 </div>
                             </td>
@@ -344,6 +408,7 @@ export default {
             };
             if (!this.teams?.length) return groups;
             (this.teams || []).forEach(team => {
+                // eslint-disable-next-line no-constant-binary-expression
                 if (team.players?.length === this.auctionSettings?.each_team ?? 7) {
                     // Finished
                     groups.finished.push(team);
@@ -473,11 +538,6 @@ export default {
             this.sendToAuctionServer("auction:bid", { teamID: this.actingTeam.id, amount: bidAmount });
         }
     },
-    mounted() {
-        setTimeout(() => {
-            this.pageNoLongerNew = true;
-        }, 3000);
-    },
     watch: {
         eventID: {
             immediate: true,
@@ -547,6 +607,11 @@ export default {
             console.log("auction_bids", bids);
             this.bids = bids;
         }
+    },
+    mounted() {
+        setTimeout(() => {
+            this.pageNoLongerNew = true;
+        }, 3000);
     }
 };
 </script>

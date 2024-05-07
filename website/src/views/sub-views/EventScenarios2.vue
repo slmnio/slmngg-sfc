@@ -4,50 +4,50 @@
 
 
         <div class="form-inline mb-2">
-<!--            <select name="" id="" v-model="activeScenarioView" class="mr-2 form-control">-->
-<!--                <option value="all" selected>All</option>-->
-<!--                <option value="possible">Possible</option>-->
-<!--                <option value="incomplete">Incomplete</option>-->
-<!--            </select>-->
+            <!--            <select name="" id="" v-model="activeScenarioView" class="mr-2 form-control">-->
+            <!--                <option value="all" selected>All</option>-->
+            <!--                <option value="possible">Possible</option>-->
+            <!--                <option value="incomplete">Incomplete</option>-->
+            <!--            </select>-->
 
-<!--            <BFormCheckbox class="mr-3" v-model="showOnlyPossible">Show only possible</BFormCheckbox>-->
-            <BFormCheckbox class="mr-3" v-model="showOnlyIncomplete">Show only incomplete</BFormCheckbox>
-            <BFormCheckbox class="mr-3" v-model="showCountsAsPercentages">Show counts as percentages</BFormCheckbox>
+            <!--            <BFormCheckbox class="mr-3" v-model="showOnlyPossible">Show only possible</BFormCheckbox>-->
+            <BFormCheckbox v-model="showOnlyIncomplete" class="mr-3">Show only incomplete</BFormCheckbox>
+            <BFormCheckbox v-model="showCountsAsPercentages" class="mr-3">Show counts as percentages</BFormCheckbox>
 
-<!--            <div class="btn btn-secondary" v-if="showCountsAsPercentages" @click="showCountsAsPercentages = false">View as numbers</div>-->
-<!--            <div class="btn btn-secondary" v-if="!showCountsAsPercentages" @click="showCountsAsPercentages = true">View as percentages</div>-->
+            <!--            <div class="btn btn-secondary" v-if="showCountsAsPercentages" @click="showCountsAsPercentages = false">View as numbers</div>-->
+            <!--            <div class="btn btn-secondary" v-if="!showCountsAsPercentages" @click="showCountsAsPercentages = true">View as percentages</div>-->
         </div>
-<!--        <div>-->
-<!--            matches: {{ matches?.length }} / scenario matches: {{ scenarioMatches?.length }} / for scenarios: {{ matchesForScenarios?.length }} / with outcomes: {{ scenarioMatchesWithOutcomes?.length }} <br>-->
-<!--        </div>-->
-<!--        <div v-if="scenarios" class="mb-2">-->
-<!--            {{ currentScenarioView && currentScenarioView.length }} in view ~ {{ scenarios.scenarios && scenarios.scenarios.length }} / {{ scenarios.scenarioCount }}-->
-<!--&lt;!&ndash;            {{ scenarios.maxBits }}&ndash;&gt;-->
-<!--&lt;!&ndash;            {{ scenarios.bitCounter }}&ndash;&gt;-->
-<!--&lt;!&ndash;            {{ scenarios.bits }}&ndash;&gt;-->
-<!--             -&#45;&#45; {{ matchesForHistorical.length }} historical matches added-->
-<!--        </div>-->
-        <div class="mb-2" v-if="sortingMethods">
+        <!--        <div>-->
+        <!--            matches: {{ matches?.length }} / scenario matches: {{ scenarioMatches?.length }} / for scenarios: {{ matchesForScenarios?.length }} / with outcomes: {{ scenarioMatchesWithOutcomes?.length }} <br>-->
+        <!--        </div>-->
+        <!--        <div v-if="scenarios" class="mb-2">-->
+        <!--            {{ currentScenarioView && currentScenarioView.length }} in view ~ {{ scenarios.scenarios && scenarios.scenarios.length }} / {{ scenarios.scenarioCount }}-->
+        <!--&lt;!&ndash;            {{ scenarios.maxBits }}&ndash;&gt;-->
+        <!--&lt;!&ndash;            {{ scenarios.bitCounter }}&ndash;&gt;-->
+        <!--&lt;!&ndash;            {{ scenarios.bits }}&ndash;&gt;-->
+        <!--             -&#45;&#45; {{ matchesForHistorical.length }} historical matches added-->
+        <!--        </div>-->
+        <div v-if="sortingMethods" class="mb-2">
             Sorting methods: {{ sortingMethods.join(' / ') }}
         </div>
 
 
-        <div class="n-nav mb-3 d-flex" v-if="matchGroups">
-            <select name="match-group-selector" id="match-group-selector" v-model="activeMatchGroup">
+        <div v-if="matchGroups" class="n-nav mb-3 d-flex">
+            <select id="match-group-selector" v-model="activeMatchGroup" name="match-group-selector">
                 <option selected disabled value="null">Select a group</option>
-                <option v-for="group in matchGroups" :value="group" :key="group">{{ group }}</option>
+                <option v-for="group in matchGroups" :key="group" :value="group">{{ group }}</option>
             </select>
-            <div class="ml-2" v-if="activeMatchGroup">{{ matches?.length }} {{ matches?.length === 1 ? "match" : "matches"}}, {{ incompleteMatches?.length }} to play</div>
+            <div v-if="activeMatchGroup" class="ml-2">{{ matches?.length }} {{ matches?.length === 1 ? "match" : "matches" }}, {{ incompleteMatches?.length }} to play</div>
         </div>
 
 
-        <table class="table table-bordered text-light mb-3 table-dark w-auto" v-if="counts && counts[0] && counts[0].positions">
+        <table v-if="counts && counts[0] && counts[0].positions" class="table table-bordered text-light mb-3 table-dark w-auto">
             <thead>
                 <tr v-if="counts" class="fw-bold">
                     <th class="p-2 border-dark text-end" style="min-width: 8.5em">
                         {{ showCountsAsPercentages ? `% of ${currentScenarioView.length} scenarios` : `/${currentScenarioView.length} scenarios` }}
                     </th>
-                    <th class="p-2 border-dark" v-for="(x, i) in (counts[0].positions).slice(0, -1)" :key="i">
+                    <th v-for="(x, i) in (counts[0].positions).slice(0, -1)" :key="i" class="p-2 border-dark">
                         #{{ i + 1 }}
                     </th>
                     <th class="p-2 border-dark">
@@ -58,9 +58,12 @@
             <tbody>
                 <tr v-for="team in counts" :key="team.code">
                     <td class="p-2 border-dark text-end fw-bold">{{ team.code }}</td>
-                    <td class="p-2 border-dark cell-num" v-for="(pos, posi) in team.positions" :key="posi"
-                        @click="() => showWhen(team.code, posi)"
+                    <td
+                        v-for="(pos, posi) in team.positions"
+                        :key="posi"
+                        class="p-2 border-dark cell-num"
                         :class="{ 'bg-info selected': manualScenarioFilters.find((f) => f.team === team.code && f.position === posi ), 'bg-warning text-dark': pos !== 0 && pos === currentScenarioView.length, 'text-muted': pos === 0 }"
+                        @click="() => showWhen(team.code, posi)"
                     >
                         <span v-if="showCountsAsPercentages">{{ perc(pos / currentScenarioView.length) }}</span>
                         <span v-else>{{ pos }}</span>
@@ -69,12 +72,15 @@
             </tbody>
         </table>
 
-        <table class="table table-bordered text-light mb-3 border-dark table-dark w-auto" v-if="scenarios">
+        <table v-if="scenarios" class="table table-bordered text-light mb-3 border-dark table-dark w-auto">
             <thead>
                 <tr>
                     <th class="p-2 border-dark"></th>
-                    <th class="p-2 border-dark text-center" :key="scoreline"
-                        v-for="([scoreline]) in Object.entries(matchCounts?.[0]?.scorelines)">{{ scoreline }}
+                    <th
+                        v-for="([scoreline]) in Object.entries(matchCounts?.[0]?.scorelines)"
+                        :key="scoreline"
+                        class="p-2 border-dark text-center">
+                        {{ scoreline }}
                     </th>
                     <th class="p-2 border-dark"></th>
                     <th class="p-2 border-dark">Analysis</th>
@@ -83,23 +89,29 @@
             <tbody>
                 <tr v-for="match in matchCounts" :key="match.id">
                     <td class="p-2 border-dark fw-bold text-end">{{ match.teams?.[0]?.code }}</td>
-                    <td class="p-2 border-dark text-center cell-num" @click="showMatchScoreline(match.id, scoreline)"
+                    <td
+                        v-for="([scoreline, count]) in Object.entries(match.scorelines)"
+                        :key="scoreline"
+                        class="p-2 border-dark text-center cell-num"
                         :class="{'bg-info selected': scorelineFilterHas(match.id, scoreline), 'text-muted': count === 0}"
-                        v-for="([scoreline, count]) in Object.entries(match.scorelines)" :key="scoreline">{{ count }}
+                        @click="showMatchScoreline(match.id, scoreline)">
+                        {{ count }}
                     </td>
                     <td class="p-2 border-dark fw-bold text-start">{{ match.teams?.[1]?.code }}</td>
-                    <td class="p-2 border-dark text-center"
-                        :class="{'text-muted': matchAnalysis(match) === 'No effect'}">{{ matchAnalysis(match) }}
+                    <td
+                        class="p-2 border-dark text-center"
+                        :class="{'text-muted': matchAnalysis(match) === 'No effect'}">
+                        {{ matchAnalysis(match) }}
                     </td>
                 </tr>
             </tbody>
         </table>
 
-        <table class="table text-white table-dark" v-if="scenarios">
+        <table v-if="scenarios" class="table text-white table-dark">
             <thead>
                 <tr class="sticky-top bg-dark">
                     <td>#</td>
-                    <td class="text-center" v-for="match in incompleteMatches" :key="match.id">
+                    <td v-for="match in incompleteMatches" :key="match.id" class="text-center">
                         {{ match.teams.map(t => t.code).join(" vs ") }}
                     </td>
                     <td class="text-center">Standings</td>
@@ -124,7 +136,7 @@
                         <!--                    first round of sorting (match wins)-->
                         <ol class="mb-0 small">
                             <li v-for="(g, gi) in scenario.standings?.standings" :key="gi">
-                                <div class="standings-entry" v-for="(team,ei) in g" :key="ei">
+                                <div v-for="(team,ei) in g" :key="ei" class="standings-entry">
                                     {{ team.code?.padEnd(5, " ") }} {{ team.standings?.wins }}-{{
                                         team.standings?.losses
                                     }} (m {{

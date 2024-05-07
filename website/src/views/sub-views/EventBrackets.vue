@@ -1,6 +1,6 @@
 <template>
     <div class="event-brackets container-fluid">
-        <div class="bracket-wrapper" v-for="bracket in brackets" :key="bracket.id">
+        <div v-for="bracket in brackets" :key="bracket.id" class="bracket-wrapper">
             <div class="container position-relative">
                 <h1 class="bracket-name mb-3">{{ bracket.name }}</h1>
                 <BracketResolveButton class="resolve-button" :bracket="bracket" />

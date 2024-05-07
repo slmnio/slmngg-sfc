@@ -1,13 +1,13 @@
 <template>
     <div class="container">
         <h1 class="big">Events</h1>
-        <h1 v-if="!events.length"><LoadingIcon></LoadingIcon></h1>
+        <h1 v-if="!events.length"><LoadingIcon /></h1>
 
         <div v-if="inProgressEvents.length">
             <h2>In progress</h2>
             <div class="series-events row mb-4">
-                <div class="col-12 col-sm-6 col-md-4 col-xl-3 event-pad" v-for="event in inProgressEvents" :key="event.id">
-                    <NewEventDisplay :event="event"/>
+                <div v-for="event in inProgressEvents" :key="event.id" class="col-12 col-sm-6 col-md-4 col-xl-3 event-pad">
+                    <NewEventDisplay :event="event" />
                 </div>
             </div>
             <hr>
@@ -16,15 +16,15 @@
         <div v-for="series in eventSeries" :key="series.id">
             <h2>{{ series.name }}</h2>
             <div class="series-events row">
-                <div class="col-12 col-sm-6 col-md-4 col-xl-3 event-pad" v-for="event in series.events" :key="event.id">
-                    <NewEventDisplay :event="event"/>
+                <div v-for="event in series.events" :key="event.id" class="col-12 col-sm-6 col-md-4 col-xl-3 event-pad">
+                    <NewEventDisplay :event="event" />
                 </div>
             </div>
         </div>
         <h2 v-if="otherEvents && otherEvents.length">Other events</h2>
         <div class="series-events row">
-            <div class="col-12 col-sm-6 col-md-4 col-xl-3 event-pad" v-for="event in otherEvents" :key="event.id">
-                <NewEventDisplay :event="event"/>
+            <div v-for="event in otherEvents" :key="event.id" class="col-12 col-sm-6 col-md-4 col-xl-3 event-pad">
+                <NewEventDisplay :event="event" />
             </div>
         </div>
     </div>

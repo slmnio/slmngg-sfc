@@ -1,5 +1,5 @@
 <template>
-    <div class="preview-program-display flex-center mb-2" v-if="producerPreviewScene">
+    <div v-if="producerPreviewScene" class="preview-program-display flex-center mb-2">
         <div class="display preview bg-dark px-2 mx-1">
             <div class="title">Preview</div>
             <div class="scene">{{ producerPreviewScene }}</div>
@@ -24,17 +24,6 @@ export default {
         producerProgramScene: null,
         broadcastKey: null
     }),
-    sockets: {
-        prod_preview_program_change(data) {
-            if (data?.emitSource !== "broadcast") return; // only use broadcast data
-            if ((!this.broadcast?.key) || data?.broadcastKey !== this.broadcast?.key) return; // only use this broadcast
-
-            console.log(data, this.broadcast.key);
-            this.producerClientKey = data.clientSource;
-            this.producerPreviewScene = data.previewScene;
-            this.producerProgramScene = data.programScene;
-        }
-    },
     methods: {
         tryJoin() {
             if (this.broadcast?.key) {
@@ -52,6 +41,17 @@ export default {
             handler() {
                 this.tryJoin();
             }
+        }
+    },
+    sockets: {
+        prod_preview_program_change(data) {
+            if (data?.emitSource !== "broadcast") return; // only use broadcast data
+            if ((!this.broadcast?.key) || data?.broadcastKey !== this.broadcast?.key) return; // only use this broadcast
+
+            console.log(data, this.broadcast.key);
+            this.producerClientKey = data.clientSource;
+            this.producerPreviewScene = data.previewScene;
+            this.producerProgramScene = data.programScene;
         }
     },
     mounted() {

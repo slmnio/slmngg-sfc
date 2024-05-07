@@ -1,7 +1,12 @@
 <template>
     <GenericTeamsOverlay class="history-overlay" :broadcast="broadcast" :title="title || 'Match History'" :match-schema="matchSchema">
-        <template v-slot:team-content="{ team }">
-            <TeamMatchHistory class="team-roster flex-center flex-column overlay--bg w-100" :team="team" :match="match" :max="max"  :reverse="reverse" />
+        <template #team-content="{ team }">
+            <TeamMatchHistory
+                class="team-roster flex-center flex-column overlay--bg w-100"
+                :team="team"
+                :match="match"
+                :max="max"
+                :reverse="reverse" />
         </template>
     </GenericTeamsOverlay>
 </template>
@@ -14,11 +19,11 @@ import GenericTeamsOverlay from "@/components/broadcast/roots/GenericTeamsOverla
 
 export default {
     name: "HistoryOverlay",
-    props: ["broadcast", "title", "max", "reverse"],
     components: {
         GenericTeamsOverlay,
         TeamMatchHistory
     },
+    props: ["broadcast", "title", "max", "reverse"],
     data: () => ({
         matchSchema: {
             teams: ReactiveArray("teams", {

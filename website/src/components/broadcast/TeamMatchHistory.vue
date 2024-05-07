@@ -1,6 +1,11 @@
 <template>
     <div class="team-match-history w-100" :style="{fontSize: this.fontSize + 'px'}">
-        <MatchHistory class="match" v-for="match in matches" :key="match.id" :match="match" :this-team="team" />
+        <MatchHistory
+            v-for="match in matches"
+            :key="match.id"
+            class="match"
+            :match="match"
+            :this-team="team" />
     </div>
 </template>
 
@@ -10,10 +15,10 @@ import { sortMatches } from "@/utils/sorts";
 
 export default {
     name: "TeamMatchHistory",
-    props: ["team", "match", "max", "reverse"],
     components: {
         MatchHistory
     },
+    props: ["team", "match", "max", "reverse"],
     computed: {
         matches() {
             if (!this.team?.matches) return [];

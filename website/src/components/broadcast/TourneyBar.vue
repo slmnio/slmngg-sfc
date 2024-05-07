@@ -2,17 +2,17 @@
     <div class="tourney-bar" :style="gradient" :class="{'small-bar': !(left && right) }">
         <div class="bar-text flex-center bar-text-start">
             <transition name="fade" mode="out-in">
-                <span :key="left" v-if="left && right">{{ left }}</span>
+                <span v-if="left && right" :key="left">{{ left }}</span>
             </transition>
         </div>
         <div class="bar-logo flex-center">
-<!--            <transition name="fade" mode="out-in">-->
-                <div class="bar-logo-holder bg-center h-100 w-100" :key="_theme && _theme.id" :style="logo"></div>
-<!--            </transition>-->
+            <!--            <transition name="fade" mode="out-in">-->
+            <div :key="_theme && _theme.id" class="bar-logo-holder bg-center h-100 w-100" :style="logo"></div>
+            <!--            </transition>-->
         </div>
         <div class="bar-text flex-center bar-text-end">
             <transition name="fade" mode="out-in">
-                <span :key="right" v-if="left && right">{{ right }}</span>
+                <span v-if="left && right" :key="right">{{ right }}</span>
             </transition>
         </div>
     </div>

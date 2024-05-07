@@ -1,25 +1,36 @@
 <template>
     <div class="broadcast-switcher">
         <div v-b-modal.broadcast-switcher>
-            <BroadcastDisplay :broadcast="activeBroadcast"/>
+            <BroadcastDisplay :broadcast="activeBroadcast" />
         </div>
 
-        <b-modal ref="broadcast-switcher" id="broadcast-switcher" title="Broadcast Switcher">
+        <b-modal id="broadcast-switcher" ref="broadcast-switcher" title="Broadcast Switcher">
             <div class="broadcasts flex-center flex-column">
-                <BroadcastDisplay class="broadcast" :class="{'active-broadcast': activeBroadcast.id === broadcast.id}"
-                                  :disabled="activeBroadcast.id === broadcast.id || setting"
-                                  v-for="broadcast in broadcastGroups.active" :broadcast="broadcast" :key="broadcast.id"
-                                  @click="switchBroadcast(broadcast)"/>
-                <b-button class="broadcasts-text inactive" v-if="broadcastGroups.inactive.length"
-                          :variant="showInactive ? 'primary' : 'secondary'" :class="{'active': showInactive}"
-                          @click="showInactive = !showInactive">Show inactive broadcasts
+                <BroadcastDisplay
+                    v-for="broadcast in broadcastGroups.active"
+                    :key="broadcast.id"
+                    class="broadcast"
+                    :class="{'active-broadcast': activeBroadcast.id === broadcast.id}"
+                    :disabled="activeBroadcast.id === broadcast.id || setting"
+                    :broadcast="broadcast"
+                    @click="switchBroadcast(broadcast)" />
+                <b-button
+                    v-if="broadcastGroups.inactive.length"
+                    class="broadcasts-text inactive"
+                    :variant="showInactive ? 'primary' : 'secondary'"
+                    :class="{'active': showInactive}"
+                    @click="showInactive = !showInactive">
+                    Show inactive broadcasts
                     ({{ broadcastGroups.inactive.length }})
                 </b-button>
-                <div class="inactive-broadcasts" v-if="showInactive">
-                    <BroadcastDisplay class="broadcast"
-                                      :disabled="activeBroadcast.id === broadcast.id || setting"
-                                      v-for="broadcast in broadcastGroups.inactive" :broadcast="broadcast"
-                                      :key="broadcast.id" @click="switchBroadcast(broadcast)"/>
+                <div v-if="showInactive" class="inactive-broadcasts">
+                    <BroadcastDisplay
+                        v-for="broadcast in broadcastGroups.inactive"
+                        :key="broadcast.id"
+                        class="broadcast"
+                        :disabled="activeBroadcast.id === broadcast.id || setting"
+                        :broadcast="broadcast"
+                        @click="switchBroadcast(broadcast)" />
                 </div>
             </div>
 

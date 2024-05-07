@@ -9,15 +9,20 @@
         </div>
 
         <b-modal id="date-editor-modal" @ok="$emit('submit', airtableSafeDate)">
-            <template v-slot:modal-title>Time editor</template>
+            <template #modal-title>Time editor</template>
 
             <div class="d-flex mb-3 flex-center">
-                <TimezoneSwapper align="left"></TimezoneSwapper>
+                <TimezoneSwapper align="left" />
             </div>
-            <b-form-checkbox class="mb-3" switch v-model="editTimeInSiteTimezone" name="use-site-timezone">
+            <b-form-checkbox v-model="editTimeInSiteTimezone" class="mb-3" switch name="use-site-timezone">
                 Use site timezone to edit?
             </b-form-checkbox>
-            <b-form-input class="mb-2" name="datetime-editor" type="datetime-local" :value="temporaryTime || safeSavedTime" @change="(val) => temporaryTime = val"></b-form-input>
+            <b-form-input
+                class="mb-2"
+                name="datetime-editor"
+                type="datetime-local"
+                :value="temporaryTime || safeSavedTime"
+                @change="(val) => temporaryTime = val" />
 
             <div class="text-center mb-2">Editing in <b>{{ editTimeInSiteTimezone ? 'the site' : 'your local' }} timezone</b> ({{ timezoneName }})</div>
             <div class="flex-center text-center timezones">

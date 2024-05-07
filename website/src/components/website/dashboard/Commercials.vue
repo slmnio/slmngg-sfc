@@ -9,7 +9,6 @@
             <b-button :disabled="processing" @click="commercial(150)">2m30s</b-button>
             <b-button :disabled="processing" @click="commercial(180)">3m</b-button>
         </b-button-group>
-
     </div>
 </template>
 

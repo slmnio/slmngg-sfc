@@ -12,7 +12,6 @@
             <b-button :disabled="processing" class="text-light" variant="outline-secondary" @click="lockPred"><i class="fas fa-fw fa-lock mr-1"></i>Lock</b-button>
             <b-button :disabled="processing" variant="danger" @click="cancelPred"><i class="fas fa-fw fa-times-hexagon mr-1"></i>Cancel</b-button>
         </b-button-group>
-
     </div>
 </template>
 

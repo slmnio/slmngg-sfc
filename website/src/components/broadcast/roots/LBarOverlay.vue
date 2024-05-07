@@ -8,24 +8,36 @@
                     </span>
                 </transition>
                 <div class="countdown-timer">
-                    <Countdown :timezone="broadcast?.timezone" :to="broadcast?.countdown_end"/>
+                    <Countdown :timezone="broadcast?.timezone" :to="broadcast?.countdown_end" />
                 </div>
             </div>
             <div class="schedule flex-grow-1 flex-center flex-column">
-                <BreakMatch v-for="match in schedule" :timezone="broadcast?.timezone" :match="match"
-                            :expanded="false" :key="match.id" :theme-color="themeColor" />
+                <BreakMatch
+                    v-for="match in schedule"
+                    :key="match.id"
+                    :timezone="broadcast?.timezone"
+                    :match="match"
+                    :expanded="false"
+                    :theme-color="themeColor" />
             </div>
         </div>
         <div class="content">
-
         </div>
         <div class="bottom-left-bar">
-            <ThemeLogo :theme="broadcast?.event?.theme" class="event-logo w-100 h-100" icon-padding="75px" logo-size="w-500" border-width="0"/>
+            <ThemeLogo
+                :theme="broadcast?.event?.theme"
+                class="event-logo w-100 h-100"
+                icon-padding="75px"
+                logo-size="w-500"
+                border-width="0" />
         </div>
         <div class="lower-bar overlay--bg title flex-center text-center">
             <transition name="fade" mode="out-in">
-                        <span class="title-text" v-html="nbr(title || broadcast.title)" :key="title || broadcast.title"
-                              :class="{'has-br': (title || broadcast.title || '').includes('\\n')}"></span>
+                <span
+                    :key="title || broadcast.title"
+                    class="title-text"
+                    :class="{'has-br': (title || broadcast.title || '').includes('\\n')}"
+                    v-html="nbr(title || broadcast.title)"></span>
             </transition>
         </div>
     </div>

@@ -11,15 +11,20 @@
             </thead>
             <tbody>
                 <tr v-for="player in players" :key="player.id">
-                    <td class="role" :title="player.role" v-b-tooltip>
-                        <RoleIcon class="flex-center" :role="player.role"/>
+                    <td v-b-tooltip class="role" :title="player.role">
+                        <RoleIcon class="flex-center" :role="player.role" />
                     </td>
                     <td>
-                        <i v-if="player.is_captain" class="fas fa-fw fa-user-crown mr-1 text-warning"
-                           :title="'Captain' + (player.highlight_role ? ', ' + player.highlight_role : '')"
-                           v-b-tooltip></i>
-                        <i v-else-if="player.highlight_role" class="fas fa-fw fa-star mr-1 text-warning"
-                           :title="player.highlight_role" v-b-tooltip></i>
+                        <i
+                            v-if="player.is_captain"
+                            v-b-tooltip
+                            class="fas fa-fw fa-user-crown mr-1 text-warning"
+                            :title="'Captain' + (player.highlight_role ? ', ' + player.highlight_role : '')"></i>
+                        <i
+                            v-else-if="player.highlight_role"
+                            v-b-tooltip
+                            class="fas fa-fw fa-star mr-1 text-warning"
+                            :title="player.highlight_role"></i>
                         <router-link v-if="player.id" :to="url('player', player)">{{ player?.name }}</router-link>
                         <span v-else>{{ player?.name }}</span>
                     </td>
@@ -30,16 +35,19 @@
                         <CopyTextButton v-if="player?.battletag">{{ player?.battletag }}</CopyTextButton>
                     </td>
                 </tr>
-                <tr class="spacer" v-if="staff?.length">
+                <tr v-if="staff?.length" class="spacer">
                     <td colspan="4"></td>
                 </tr>
                 <tr v-for="staff in staff" :key="staff.id">
-                    <td class="role" :title="staff.staff_role || 'Staff'" v-b-tooltip>
-                        <RoleIcon class="flex-center" :role="staff.staff_role || 'Staff'"/>
+                    <td v-b-tooltip class="role" :title="staff.staff_role || 'Staff'">
+                        <RoleIcon class="flex-center" :role="staff.staff_role || 'Staff'" />
                     </td>
                     <td>
-                        <i v-if="staff.highlight_role" class="fas fa-fw fa-star mr-1 text-warning"
-                           :title="staff.highlight_role" v-b-tooltip></i>
+                        <i
+                            v-if="staff.highlight_role"
+                            v-b-tooltip
+                            class="fas fa-fw fa-star mr-1 text-warning"
+                            :title="staff.highlight_role"></i>
                         {{ staff?.name }}
                     </td>
                     <td>

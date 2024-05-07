@@ -1,11 +1,21 @@
 <template>
-    <div class="centerer" :class="{'tiny': tiny}" >
-        <ThemeTransition :one-color="true" start="middle" end="middle" :theme="theme" :active="!!active"
-                         :duration="400" :starting-delay="500" :inner-delay="300" :leaving-delay="0"
-                         class="middle-holder flex-center" :use-fit-content="true" :clear-style-after-entered="true">
+    <div class="centerer" :class="{'tiny': tiny}">
+        <ThemeTransition
+            :one-color="true"
+            start="middle"
+            end="middle"
+            :theme="theme"
+            :active="!!active"
+            :duration="400"
+            :starting-delay="500"
+            :inner-delay="300"
+            :leaving-delay="0"
+            class="middle-holder flex-center"
+            :use-fit-content="true"
+            :clear-style-after-entered="true">
             <div class="middle" :style="middleBorderStyle">
                 <transition name="fade" mode="out-in">
-                    <div class="industry-align" :key="text">{{ text }}</div>
+                    <div :key="text" class="industry-align">{{ text }}</div>
                 </transition>
             </div>
         </ThemeTransition>

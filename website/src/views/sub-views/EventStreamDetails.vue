@@ -15,31 +15,40 @@
             <tbody>
                 <tr v-for="({ team, counts, nextMatch }) in teamCounts" :key="team.id">
                     <td class="team">
-                        <ThemeLogo :theme="team.theme" logo-size="w-50" class="team-logo" border-width="3px"
-                                   icon-padding="4px"/>
+                        <ThemeLogo
+                            :theme="team.theme"
+                            logo-size="w-50"
+                            class="team-logo"
+                            border-width="3px"
+                            icon-padding="4px" />
                         <router-link :to="url('team', team)">{{ team.name }}</router-link>
                     </td>
                     <td>
-                    <span class="d-flex" v-if="nextMatch">
-                        <ThemeLogo :theme="nextMatch.opponent.theme" logo-size="w-50" class="team-logo"
-                                   border-width="3px" icon-padding="4px"/>
-                        <router-link :to="url('detailed', nextMatch)">vs {{ nextMatch.opponent.name }}</router-link>
-                        <span class="d-inline-flex ml-auto">{{
+                        <span v-if="nextMatch" class="d-flex">
+                            <ThemeLogo
+                                :theme="nextMatch.opponent.theme"
+                                logo-size="w-50"
+                                class="team-logo"
+                                border-width="3px"
+                                icon-padding="4px" />
+                            <router-link :to="url('detailed', nextMatch)">vs {{ nextMatch.opponent.name }}</router-link>
+                            <span class="d-inline-flex ml-auto">{{
                                 formatTime(nextMatch.start, {
                                     format: "{day-short} {date-ordinal} {month-short} {time}",
                                     tz: useSettingsStore().timezone,
                                     use24HourTime: useSettingsStore().use24HourTime
                                 })
                             }}</span>
-                    </span>
+                        </span>
                     </td>
-                    <td class="count" v-for="code in distinctStreamCodes" :key="code">
+                    <td v-for="code in distinctStreamCodes" :key="code" class="count">
                         <span :class="{'low-opacity': !counts[code]}">{{ counts[code] || 0 }}</span>
                     </td>
                     <td class="count">
                         <span :class="{'low-opacity': !counts.Streamed}">{{ counts.Streamed || 0 }}</span>
                     </td>
-                    <td class="count"
+                    <td
+                        class="count"
                         :class="{'bg-danger': counts.Off === counts.Total && counts.Off > 0}">
                         <span :class="{'low-opacity': !counts.Off}">{{ counts.Off || 0 }}</span>
                     </td>
@@ -61,7 +70,6 @@ import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "EventStreamDetails",
-    methods: { useSettingsStore, formatTime, url },
     components: { ThemeLogo },
     props: {
         event: {}
@@ -129,7 +137,8 @@ export default {
                 return 0;
             });
         }
-    }
+    },
+    methods: { useSettingsStore, formatTime, url }
 };
 </script>
 

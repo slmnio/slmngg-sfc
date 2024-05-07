@@ -1,8 +1,8 @@
 <template>
     <SoloControlButton class="map-button" :click="() => click()" :noclick="noclick" :class="{'has-gel': !!teamGel}">
         <div class="bg" :style="bg"></div>
-        <div class="team-gel" v-if="teamGel" :style="teamGelBG"></div>
-        <div class="top flex-center" v-if="topText">
+        <div v-if="teamGel" class="team-gel" :style="teamGelBG"></div>
+        <div v-if="topText" class="top flex-center">
             <div class="text top-text">{{ topText }}</div>
         </div>
         <div class="text">{{ text }}</div>

@@ -4,27 +4,27 @@
             <div class="top d-flex flex-wrap">
                 <div class="player-left">
                     <div class="player-top d-flex">
-                        <div class="player-icon profile-picture-theme bg-center default-thing" v-if="profilePictureTheme?.backgroundImage" :style="profilePictureTheme"></div>
+                        <div v-if="profilePictureTheme?.backgroundImage" class="player-icon profile-picture-theme bg-center default-thing" :style="profilePictureTheme"></div>
                         <!--                    <div class="player-icon bg-center default-thing" v-else-if="player.overwatch_icon" :style="bg(player.overwatch_icon)"></div>-->
                         <div class="player-name">
                             {{ player.name }}
-                            <i class="fas fa-badge-check mr-3" v-if="player.verified"></i>
-                            <span class="mini-label pronouns-display ml-1" v-if="player.pronouns">{{ player.pronouns === 'any' ? 'any pronouns' : player.pronouns }}</span>
+                            <i v-if="player.verified" class="fas fa-badge-check mr-3"></i>
+                            <span v-if="player.pronouns" class="mini-label pronouns-display ml-1">{{ player.pronouns === 'any' ? 'any pronouns' : player.pronouns }}</span>
                             <!--                        <router-link class="no-link-style d-inline" :to="subLink('participation')">-->
                             <!--                            <span class="mini-label participation-points" v-if="participationPoints">{{ participationPoints }} pts</span>-->
                             <!--                        </router-link>-->
                         </div>
                     </div>
-                    <div class="player-socials" v-if="player.socials" :style="{ marginLeft: profilePictureTheme?.backgroundImage ? '84px' : '16px'}">
-                        <Social class="ct-active" :social="social" v-for="social in player.socials" :key="social.id"/>
+                    <div v-if="player.socials" class="player-socials" :style="{ marginLeft: profilePictureTheme?.backgroundImage ? '84px' : '16px'}">
+                        <Social v-for="social in player.socials" :key="social.id" class="ct-active" :social="social" />
                     </div>
                 </div>
                 <div class="spacer flex-grow-1"></div>
-                <div class="trophy-cabinet d-flex" v-if="trophies?.length">
-                    <div class="trophy flex-center flex-column justify-content-start" v-for="trophy in trophies" :key="trophy.id">
-                        <div class="trophy-team-icon" :title="`${trophy.trophy_tier} Winner`" v-b-tooltip>
-                            <i class="fas fa-trophy-alt" v-if="trophy.trophy_tier === 'Championship'"></i>
-                            <i class="fas fa-medal" v-if="trophy.trophy_tier === 'Tournament'"></i>
+                <div v-if="trophies?.length" class="trophy-cabinet d-flex">
+                    <div v-for="trophy in trophies" :key="trophy.id" class="trophy flex-center flex-column justify-content-start">
+                        <div v-b-tooltip class="trophy-team-icon" :title="`${trophy.trophy_tier} Winner`">
+                            <i v-if="trophy.trophy_tier === 'Championship'" class="fas fa-trophy-alt"></i>
+                            <i v-if="trophy.trophy_tier === 'Tournament'" class="fas fa-medal"></i>
                         </div>
                         <router-link :to="url('team', trophy.team)">
                             <theme-logo logo-size="s-100" :theme="trophy.team.theme" class="trophy-team-logo" border-width="6px" />
@@ -38,16 +38,16 @@
         </div>
         <SubPageNav>
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
-            <li class="nav-item" v-if="player.casts"><router-link class="nav-link" :to="subLink('casts')">Casts</router-link></li>
-            <li class="nav-item" v-if="player.news"><router-link class="nav-link" :to="subLink('news')">News</router-link></li>
-            <li class="nav-item" v-if="player.brands_designed"><router-link class="nav-link" :to="subLink('brands')">Brands</router-link></li>
-            <li class="nav-item" v-if="hasMatchPlayerRelationships"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
-            <li class="nav-item" v-if="player.casts || hasMatchPlayerRelationships"><router-link class="nav-link" :to="subLink('partners')">Partners</router-link></li>
-            <li class="nav-item" v-if="player.member_of && player.member_of.some(t => t.matches)"><router-link class="nav-link" :to="subLink('played-matches')">Played Match VODs</router-link></li>
-            <li class="nav-item" v-if="player.member_of && player.member_of.some(t => t.matches)"><router-link class="nav-link" :to="subLink('match-stats')">Match Stats</router-link></li>
+            <li v-if="player.casts" class="nav-item"><router-link class="nav-link" :to="subLink('casts')">Casts</router-link></li>
+            <li v-if="player.news" class="nav-item"><router-link class="nav-link" :to="subLink('news')">News</router-link></li>
+            <li v-if="player.brands_designed" class="nav-item"><router-link class="nav-link" :to="subLink('brands')">Brands</router-link></li>
+            <li v-if="hasMatchPlayerRelationships" class="nav-item"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
+            <li v-if="player.casts || hasMatchPlayerRelationships" class="nav-item"><router-link class="nav-link" :to="subLink('partners')">Partners</router-link></li>
+            <li v-if="player.member_of && player.member_of.some(t => t.matches)" class="nav-item"><router-link class="nav-link" :to="subLink('played-matches')">Played Match VODs</router-link></li>
+            <li v-if="player.member_of && player.member_of.some(t => t.matches)" class="nav-item"><router-link class="nav-link" :to="subLink('match-stats')">Match Stats</router-link></li>
             <li class="nav-item"><router-link class="nav-link" :to="subLink('banner')">Banner Creator</router-link></li>
         </SubPageNav>
-        <router-view :player="{...player, participationEvents, participationPoints }"></router-view>
+        <router-view :player="{...player, participationEvents, participationPoints }" />
     </div>
 </template>
 
@@ -64,21 +64,12 @@ import { sortEvents } from "@/utils/sorts";
 
 export default {
     name: "Player",
-    props: ["id"],
     components: {
         ThemeLogo,
         Social,
         SubPageNav
     },
-    methods: {
-        url,
-        logoBackground,
-        resizedImage,
-        bg,
-        subLink(page) {
-            return `/player/${this.player.id}/${page}`;
-        }
-    },
+    props: ["id"],
     computed: {
         player () {
             return ReactiveRoot(this.id, {
@@ -172,6 +163,15 @@ export default {
         },
         participationPoints() {
             return (this.participationEvents).map(e => e.participation_points).filter(f => f).reduce((c, v) => c + v, 0);
+        }
+    },
+    methods: {
+        url,
+        logoBackground,
+        resizedImage,
+        bg,
+        subLink(page) {
+            return `/player/${this.player.id}/${page}`;
         }
     },
     head() {

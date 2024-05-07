@@ -1,5 +1,5 @@
 <template>
-    <ConfettiOverlay v-if="winner" :theme="winner?.theme"/>
+    <ConfettiOverlay v-if="winner" :theme="winner?.theme" />
 </template>
 
 <script>
@@ -9,9 +9,9 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { useStatusStore } from "@/stores/statusStore";
 
 export default {
+    name: "ChampionsOverlay",
     components: { ConfettiOverlay },
     props: ["broadcast", "stingerText"],
-    name: "ChampionsOverlay",
     data: () => ({
         confettiStarted: false,
         prodData: {

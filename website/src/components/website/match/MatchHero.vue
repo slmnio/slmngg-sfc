@@ -1,11 +1,11 @@
 <template>
     <div class="match-hero" :class="{'special-event': match.special_event}">
-        <div class="match-hero-event flex-center default-thing-border-bg" v-if="match.event && !$root.minisiteEvent && !match.special_event" :style="eventStyle"></div>
-        <div class="match-hero-teams" v-if="!match.special_event">
-            <MatchHeroTeam class="team" v-for="team in match.teams" :key="team.id" :team="team" />
-            <div class="match-hero-event-logo" v-if="match.event" :style="eventLogo"></div>
+        <div v-if="match.event && !$root.minisiteEvent && !match.special_event" class="match-hero-event flex-center default-thing-border-bg" :style="eventStyle"></div>
+        <div v-if="!match.special_event" class="match-hero-teams">
+            <MatchHeroTeam v-for="team in match.teams" :key="team.id" class="team" :team="team" />
+            <div v-if="match.event" class="match-hero-event-logo" :style="eventLogo"></div>
         </div>
-        <div class="match-hero-text flex-grow-1 flex-center text-center" v-if="match.special_event" :style="eventStyle">
+        <div v-if="match.special_event" class="match-hero-text flex-grow-1 flex-center text-center" :style="eventStyle">
             {{ match.custom_name }}
         </div>
     </div>

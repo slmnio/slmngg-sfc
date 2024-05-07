@@ -1,7 +1,17 @@
 <template>
     <div class="media-overlay" style="height: 100vh; width: 100vw;">
-        <yt-player ref="youtube" class="player" v-if="media" :videoid="videoId" :player-vars="playerVars" width="100%" height="100%"
-                   @ready="playerReady" @playing="playerPlaying" @ended="playerEnded" :class="{'black-out': ended }" />
+        <yt-player
+            v-if="media"
+            ref="youtube"
+            class="player"
+            :videoid="videoId"
+            :player-vars="playerVars"
+            width="100%"
+            height="100%"
+            :class="{'black-out': ended }"
+            @ready="playerReady"
+            @playing="playerPlaying"
+            @ended="playerEnded" />
     </div>
 </template>
 
@@ -37,8 +47,8 @@ export function getIdFromURL (url) {
 
 export default {
     name: "MediaOverlay",
-    props: ["broadcast", "active", "animationActive"],
     components: { "yt-player": YoutubeVue3 },
+    props: ["broadcast", "active", "animationActive"],
     data: () => ({
         player: null,
         playerVars: {

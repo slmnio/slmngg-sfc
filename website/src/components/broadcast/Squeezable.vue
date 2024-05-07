@@ -1,5 +1,5 @@
 <template>
-    <div class="squeezable" @click="updateWidth()" ref="big" :style="{'--content-scale': allowedContentScale, '--content-transform-origin': (align || 'left')}">
+    <div ref="big" class="squeezable" :style="{'--content-scale': allowedContentScale, '--content-transform-origin': (align || 'left')}" @click="updateWidth()">
         <slot ref="small"></slot>
     </div>
 </template>

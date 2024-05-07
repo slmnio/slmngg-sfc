@@ -1,23 +1,23 @@
 <template>
     <div class="other-broadcasts w-100">
-        <div class="broadcast" v-for="broadcast in broadcasts" :key="broadcast.id">
+        <div v-for="broadcast in broadcasts" :key="broadcast.id" class="broadcast">
             <div class="broadcast-top d-flex">
                 <div class="broadcast-name flex-grow-1">{{ broadcast.relative_name || broadcast.name }}</div>
-                <div class="broadcast-link" v-if="broadcast._stream_link">
-                    <i class="fab fa-twitch" v-if="broadcast._stream_link.includes('twitch.tv')"></i>
+                <div v-if="broadcast._stream_link" class="broadcast-link">
+                    <i v-if="broadcast._stream_link.includes('twitch.tv')" class="fab fa-twitch"></i>
                     {{ (broadcast._stream_link).replace("twitch.tv/", "/") }}
                 </div>
             </div>
             <div class="broadcast-main d-flex">
                 <BreakMatch class="broadcast-match" :match="broadcast.live_match" :live="true" :theme-color="themeColor" />
                 <div class="broadcast-details">
-<!--                    <div class="details">-->
-<!--                        <span class="detail" v-if="broadcast.live_match.sub_event">{{ broadcast.live_match.sub_event}}</span>-->
-<!--                        <span class="detail" v-if="broadcast.live_match.round">{{ broadcast.live_match.round}} </span>-->
-<!--                        <span class="detail" v-if="broadcast.live_match.first_to">First to {{ broadcast.live_match.first_to}} </span>-->
-<!--                    </div>-->
-                    <div class="casters" v-if="broadcast.live_match && broadcast.live_match.casters">
-                        Casters: <LinkedPlayers class="caster-names" :players="broadcast.live_match.casters"/>
+                    <!--                    <div class="details">-->
+                    <!--                        <span class="detail" v-if="broadcast.live_match.sub_event">{{ broadcast.live_match.sub_event}}</span>-->
+                    <!--                        <span class="detail" v-if="broadcast.live_match.round">{{ broadcast.live_match.round}} </span>-->
+                    <!--                        <span class="detail" v-if="broadcast.live_match.first_to">First to {{ broadcast.live_match.first_to}} </span>-->
+                    <!--                    </div>-->
+                    <div v-if="broadcast.live_match && broadcast.live_match.casters" class="casters">
+                        Casters: <LinkedPlayers class="caster-names" :players="broadcast.live_match.casters" />
                     </div>
                 </div>
             </div>

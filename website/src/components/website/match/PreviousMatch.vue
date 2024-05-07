@@ -1,15 +1,21 @@
 <template>
     <div class="prev-match">
-        <div class="prev-match-date" v-if="match.round || match.sub_event">{{ match.round || match.sub_event }}</div>
-        <div class="prev-match-date" v-else-if="match.start">{{ goodDate }}</div>
+        <div v-if="match.round || match.sub_event" class="prev-match-date">{{ match.round || match.sub_event }}</div>
+        <div v-else-if="match.start" class="prev-match-date">{{ goodDate }}</div>
         <div class="prev-match-result">{{ resultLetter }}</div>
         <router-link :to="url('detailed', match)" class="prev-match-vs ct-active">vs</router-link>
         <div class="prev-match-opponent default-thing flex-center flex-shrink-0" :style="teamTheme(opponent)"><div class="prev-match-opponent-logo bg-center" :style="largeIcon(opponent)"></div></div>
         <div class="prev-match-maps d-none d-lg-flex">
-            <MapDisplay class="map"
+            <MapDisplay
                 v-for="map in (match.maps || []).filter(map => map.draw || map.winner)"
-                :key="map.id" :map="map" :theme="team.theme"
-                :match="match" condensed="true" :showSelfPicks="showSelfPicks" :self="team"></MapDisplay>
+                :key="map.id"
+                class="map"
+                :map="map"
+                :theme="team.theme"
+                :match="match"
+                condensed="true"
+                :show-self-picks="showSelfPicks"
+                :self="team" />
         </div>
         <div class="prev-match-maps scoreline d-flex d-lg-none">
             {{ scoreline }}
@@ -25,8 +31,8 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "PreviousMatch",
-    props: ["match", "team", "showSelfPicks"],
     components: { MapDisplay },
+    props: ["match", "team", "showSelfPicks"],
     computed: {
         winner() {
             if (!this.match?.first_to) return null;

@@ -3,13 +3,12 @@
         <div class="color-holder">
             <div class="hero-image-base" :style="mainImage || fallbackImage" :class="{ 'fallback-image': !mainImage && fallbackImage }"></div>
 
-            <div :class="`color color-${i+1}`" v-for="(layer, i) in layers" :key="layer.id">
-                <canvas :class="`adjustment-layer hue-layer target-color-${i+1}`" :ref="`hue-color-${i+1}`"></canvas>
-                <canvas :class="`adjustment-layer overlay-layer target-color-${i+1}`" :ref="`overlay-color-${i+1}`"></canvas>
-                <canvas :style="{ opacity: getOpacityAdjustment(themeColors[i], false, 1, -0.5, 0, 0.5) }" :class="`adjustment-layer multiply-layer target-color-${i+1}`" :ref="`multiply-color-${i+1}`"></canvas>
-                <canvas :class="`adjustment-layer saturation-layer target-color-${i+1}`" :ref="`saturation-color-${i+1}`"></canvas>
+            <div v-for="(layer, i) in layers" :key="layer.id" :class="`color color-${i+1}`">
+                <canvas :ref="`hue-color-${i+1}`" :class="`adjustment-layer hue-layer target-color-${i+1}`"></canvas>
+                <canvas :ref="`overlay-color-${i+1}`" :class="`adjustment-layer overlay-layer target-color-${i+1}`"></canvas>
+                <canvas :ref="`multiply-color-${i+1}`" :style="{ opacity: getOpacityAdjustment(themeColors[i], false, 1, -0.5, 0, 0.5) }" :class="`adjustment-layer multiply-layer target-color-${i+1}`"></canvas>
+                <canvas :ref="`saturation-color-${i+1}`" :class="`adjustment-layer saturation-layer target-color-${i+1}`"></canvas>
             </div>
-
         </div>
     </div>
 </template>
@@ -127,23 +126,6 @@ export default {
             ];
         }
     },
-    mounted() {
-        this.colorImageTheme();
-    },
-    watch: {
-        themeColors: {
-            deep: true,
-            handler() {
-                this.colorImageTheme();
-            }
-        },
-        hero: {
-            deep: true,
-            handler() {
-                this.colorImageTheme();
-            }
-        }
-    },
     methods: {
         getOpacityAdjustment,
         async recolor(imageURL, color, number) {
@@ -218,6 +200,23 @@ export default {
             console.log("[recolor]", "complete");
             this.$emit("recolor_complete");
         }
+    },
+    watch: {
+        themeColors: {
+            deep: true,
+            handler() {
+                this.colorImageTheme();
+            }
+        },
+        hero: {
+            deep: true,
+            handler() {
+                this.colorImageTheme();
+            }
+        }
+    },
+    mounted() {
+        this.colorImageTheme();
     }
 };
 </script>

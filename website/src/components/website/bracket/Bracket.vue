@@ -1,16 +1,23 @@
 <template>
-    <div class="bracket row flex-column" :style="winVars"
-         :class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
-        <div class="connections" ref="connections-holder">
-            <div class="connection" v-for="bug in connectionBugs" :key="bug.key" :data-key="bug.key"
-                 :class="connectionBugClass(bug)" :style="bug.style"
-                 :data-column-num="bug.column">
-                <div class="c-top" v-if="['normal'].includes(bug.type)"></div>
-                <div class="c-middle" v-if="['normal', 'loser-drops'].includes(bug.type)"></div>
-                <div class="c-bottom" v-if="['normal', 'loser-drops'].includes(bug.type)"></div>
-                <div class="c-arrow c-arrow-line" v-if="['arrow', 'arrow-number'].includes(bug.type)"></div>
-                <div class="c-arrow c-arrow-head" v-if="['arrow', 'arrow-number'].includes(bug.type)"></div>
-                <div class="c-text" v-if="['loser-drops', 'arrow-number'].includes(bug.type)" :title="bug.title">
+    <div
+        class="bracket row flex-column"
+        :style="winVars"
+        :class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
+        <div ref="connections-holder" class="connections">
+            <div
+                v-for="bug in connectionBugs"
+                :key="bug.key"
+                class="connection"
+                :data-key="bug.key"
+                :class="connectionBugClass(bug)"
+                :style="bug.style"
+                :data-column-num="bug.column">
+                <div v-if="['normal'].includes(bug.type)" class="c-top"></div>
+                <div v-if="['normal', 'loser-drops'].includes(bug.type)" class="c-middle"></div>
+                <div v-if="['normal', 'loser-drops'].includes(bug.type)" class="c-bottom"></div>
+                <div v-if="['arrow', 'arrow-number'].includes(bug.type)" class="c-arrow c-arrow-line"></div>
+                <div v-if="['arrow', 'arrow-number'].includes(bug.type)" class="c-arrow c-arrow-head"></div>
+                <div v-if="['loser-drops', 'arrow-number'].includes(bug.type)" class="c-text" :title="bug.title">
                     {{ bug.text }}
                 </div>
             </div>
@@ -23,17 +30,27 @@
             --b-width: {{ connectionWidth }}px !important;
             }
         </v-style>
-        <div class="internal-bracket d-flex" v-for="(_bracket, i) in brackets" :key="i">
-            <div class="column" v-for="(column, ci) in _bracket.columns" :key="ci"
-                 :class="{'gap-right': column.gapRight}">
-                <div class="header text-center mb-3" :style="logoBackground1(event)"
-                     v-if="showHeaders && column.header">{{ column.header }}
+        <div v-for="(_bracket, i) in brackets" :key="i" class="internal-bracket d-flex">
+            <div
+                v-for="(column, ci) in _bracket.columns"
+                :key="ci"
+                class="column"
+                :class="{'gap-right': column.gapRight}">
+                <div
+                    v-if="showHeaders && column.header"
+                    class="header text-center mb-3"
+                    :style="logoBackground1(event)">
+                    {{ column.header }}
                 </div>
                 <div class="column-matches flex-grow-1">
-                    <BracketMatch v-for="matchNum in column.games" :key="matchNum" :ref="`match-${matchNum}`"
-                                  :custom-timezone="customTimezone"
-                                  :show-times="bracket.show_times" :show-broadcasts="bracket.show_broadcasts"
-                                  :match="getMatch(matchNum)"/>
+                    <BracketMatch
+                        v-for="matchNum in column.games"
+                        :key="matchNum"
+                        :ref="`match-${matchNum}`"
+                        :custom-timezone="customTimezone"
+                        :show-times="bracket.show_times"
+                        :show-broadcasts="bracket.show_broadcasts"
+                        :match="getMatch(matchNum)" />
                 </div>
             </div>
         </div>
@@ -417,11 +434,6 @@ export default {
             });
         }
     },
-    beforeUnmount() {
-        const statusStore = useStatusStore();
-        statusStore.highlightedTeam = null;
-        statusStore.highlightedMatch = null;
-    },
     watch: {
         layout: {
             deep: true,
@@ -437,6 +449,11 @@ export default {
                 this.$nextTick(() => this.createConnections());
             }
         }
+    },
+    beforeUnmount() {
+        const statusStore = useStatusStore();
+        statusStore.highlightedTeam = null;
+        statusStore.highlightedMatch = null;
     },
     mounted() {
         // console.log("[bracket mounted]");

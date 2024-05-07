@@ -6,7 +6,7 @@
             </div>
             <div class="broadcast-name">{{ broadcast.name }}</div>
         </template>
-        <LoadingIcon v-else/>
+        <LoadingIcon v-else />
     </b-button>
 </template>
 

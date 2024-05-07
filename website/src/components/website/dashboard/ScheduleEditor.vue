@@ -1,6 +1,6 @@
 <template>
     <DashboardModule class="schedule-editor" title="Schedule" icon-class="fas fa-calendar-alt">
-        <template v-slot:header>{{ status }}</template>
+        <template #header>{{ status }}</template>
 
         <table class="table table-bordered table-sm table-dark mb-0 border-no-top">
             <thead>
@@ -12,9 +12,12 @@
                 </tr>
             </thead>
             <tbody>
-                <ScheduleEditorMatch v-for="match in schedule" :match="match" :key="match.id"
-                                     :is-live-match="match._isLiveMatch"
-                                     :timezone="broadcast.timezone || 'America/New_York'"></ScheduleEditorMatch>
+                <ScheduleEditorMatch
+                    v-for="match in schedule"
+                    :key="match.id"
+                    :match="match"
+                    :is-live-match="match._isLiveMatch"
+                    :timezone="broadcast.timezone || 'America/New_York'" />
             </tbody>
         </table>
     </DashboardModule>

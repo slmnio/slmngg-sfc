@@ -5,12 +5,15 @@
             <div class="lower-text">
                 <div class="break-text">
                     <transition name="fade" mode="out-in">
-                            <span class="industry-align" :class="{'has-br': (overlayTitle).includes('\\n') }"
-                                  :key="overlayTitle" v-html="nbr(overlayTitle)"></span>
+                        <span
+                            :key="overlayTitle"
+                            class="industry-align"
+                            :class="{'has-br': (overlayTitle).includes('\\n') }"
+                            v-html="nbr(overlayTitle)"></span>
                     </transition>
                 </div>
                 <transition name="fade" mode="out-in">
-                    <Countdown :to="broadcast.countdown_end" :key="broadcast.countdown_end" />
+                    <Countdown :key="broadcast.countdown_end" :to="broadcast.countdown_end" />
                 </transition>
             </div>
         </div>
@@ -18,8 +21,12 @@
             <div class="schedule-title">Schedule</div>
             <div class="schedule">
                 <transition-group name="a--match">
-                    <ScheduleTextItem class="schedule-item" v-for="match in schedule" :key="match.id" :match="match"
-                                      :broadcast="broadcast"/>
+                    <ScheduleTextItem
+                        v-for="match in schedule"
+                        :key="match.id"
+                        class="schedule-item"
+                        :match="match"
+                        :broadcast="broadcast" />
                 </transition-group>
             </div>
         </div>

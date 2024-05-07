@@ -1,6 +1,5 @@
 <template>
     <div class="team-audio-overlay">
-
     </div>
 </template>
 

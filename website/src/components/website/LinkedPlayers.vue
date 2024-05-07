@@ -1,14 +1,14 @@
 <template>
-    <span class="linked-players" v-if="html">
-        <span class="linked-player" v-for="(player, i) in players" :key="player.id" :style="{order: i*2}">
+    <span v-if="html" class="linked-players">
+        <span v-for="(player, i) in players" :key="player.id" class="linked-player" :style="{order: i*2}">
             <router-link class="ct-active" :to="url('player', player)">{{ player.name }}<span v-if="player.verified">&nbsp;<i class="fas fa-badge-check" title="REAL"></i></span></router-link>
             <span v-if="showTally && player.clients && player.clients.length > 0">
-              <a v-if="$root.minisiteEvent" class="ct-active" :href="`//dev.slmn.gg/client/${player.clients[0].key}/tally-viewer`"><i class="fas fa-tv" title="Tally"></i></a>
-              <router-link v-else class="ct-active" :to="`/client/${player.clients[0].key}/tally-viewer`"><i class="fas fa-tv" title="Tally"></i></router-link>
+                <a v-if="$root.minisiteEvent" class="ct-active" :href="`//dev.slmn.gg/client/${player.clients[0].key}/tally-viewer`"><i class="fas fa-tv" title="Tally"></i></a>
+                <router-link v-else class="ct-active" :to="`/client/${player.clients[0].key}/tally-viewer`"><i class="fas fa-tv" title="Tally"></i></router-link>
             </span>
         </span>
-            <span v-for="i in commas" :key="i" :style="{order: (i*2)-1}">, </span>
-            <span v-if="and" :style="{order: (players.length - 1) * 2 - 1}"> & </span>
+        <span v-for="i in commas" :key="i" :style="{order: (i*2)-1}">, </span>
+        <span v-if="and" :style="{order: (players.length - 1) * 2 - 1}"> & </span>
     </span>
     <span v-else>
         <LoadingIcon />
@@ -20,6 +20,7 @@ import LoadingIcon from "@/components/website/LoadingIcon";
 import { url } from "@/utils/content-utils";
 export default {
     name: "LinkedPlayers",
+    components: { LoadingIcon },
     props: {
         players: {
             type: Array,
@@ -30,8 +31,6 @@ export default {
             default: false
         }
     },
-    methods: { url },
-    components: { LoadingIcon },
     computed: {
         html() {
             if (!this.players || this.players.some(p => !p.id)) return null;
@@ -44,7 +43,8 @@ export default {
         and() {
             return this.players.length >= 2;
         }
-    }
+    },
+    methods: { url }
 };
 </script>
 

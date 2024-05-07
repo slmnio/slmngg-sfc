@@ -1,6 +1,6 @@
 <template>
     <router-link :to="url('match', match)" class="match no-link-style col-4 col-md-3 col-lg-2">
-        <MatchThumbnail :match="match"></MatchThumbnail>
+        <MatchThumbnail :match="match" />
         <div class="match-context match-small mt-2">{{ match.name }}<br>{{ getMatchContext(match) }}</div>
         <div class="match-time match-small">{{ date }}</div>
     </router-link>
@@ -13,8 +13,8 @@ import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "UpcomingMatch",
-    props: ["match"],
     components: { MatchThumbnail },
+    props: ["match"],
     computed: {
         date() {
             if (!this.match.start) return null;

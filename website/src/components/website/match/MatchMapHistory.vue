@@ -2,10 +2,14 @@
     <tr class="match-map-history" :class="{ 'scheduled': isScheduled }">
         <td class="map-name" style="width: 200px">
             {{ map.name }}
-            <i class="fa fa-fw fa-check" v-b-tooltip.top="'Scheduled for this match'" v-if="isScheduled"></i>
+            <i v-if="isScheduled" v-b-tooltip.top="'Scheduled for this match'" class="fa fa-fw fa-check"></i>
         </td>
-        <TeamMapStats class="map-team-stats" v-for="(data, ti) in data.stats" :show-unplayed-maps="showUnplayedMaps"
-                      :key="ti" :data="data"/>
+        <TeamMapStats
+            v-for="(data, ti) in data.stats"
+            :key="ti"
+            class="map-team-stats"
+            :show-unplayed-maps="showUnplayedMaps"
+            :data="data" />
     </tr>
 </template>
 

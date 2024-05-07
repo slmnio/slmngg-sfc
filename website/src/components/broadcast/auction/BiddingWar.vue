@@ -1,7 +1,13 @@
 <template>
     <div class="bidding-war d-flex">
         <div class="bidding-war-text">BIDDING WAR</div>
-        <TeamFocus class="team-focus" v-for="team in filledTeams" :team="team" :key="team.id" :leading="leading" :auction-settings="auctionSettings" />
+        <TeamFocus
+            v-for="team in filledTeams"
+            :key="team.id"
+            class="team-focus"
+            :team="team"
+            :leading="leading"
+            :auction-settings="auctionSettings" />
     </div>
 </template>
 

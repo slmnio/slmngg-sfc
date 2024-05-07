@@ -1,20 +1,20 @@
 <template>
     <tr :key="player.id">
-        <td class="draft--name"><router-link :to="url('player', player)">{{ player.name }} <i class="fas fa-badge-check" v-if="player.verified"></i></router-link></td>
-        <td class="draft--highest-rank" v-if="game === 'Valorant'">{{ player?._draftData.highest_rank }}</td>
-        <td class="draft--current-rank" v-if="game === 'Valorant'">{{ player?._draftData.current_rank }}</td>
-        <td class="draft--sr" v-if="game === 'Overwatch' && player.rating"><span v-b-tooltip.top="player.rating.note">{{ player.rating.level }}</span></td>
+        <td class="draft--name"><router-link :to="url('player', player)">{{ player.name }} <i v-if="player.verified" class="fas fa-badge-check"></i></router-link></td>
+        <td v-if="game === 'Valorant'" class="draft--highest-rank">{{ player?._draftData.highest_rank }}</td>
+        <td v-if="game === 'Valorant'" class="draft--current-rank">{{ player?._draftData.current_rank }}</td>
+        <td v-if="game === 'Overwatch' && player.rating" class="draft--sr"><span v-b-tooltip.top="player.rating.note">{{ player.rating.level }}</span></td>
         <td v-else-if="game === 'Overwatch'"></td>
-        <td class="draft--role" v-if="game === 'Overwatch'" v-b-tooltip.top="extendedRole || ''">
+        <td v-if="game === 'Overwatch'" v-b-tooltip.top="extendedRole || ''" class="draft--role">
             <div class="player-role flex-center" v-html="getSVG(player.role)"></div>
         </td>
-        <td class="draft--heroes" v-if="hasDraftData && settings.heroes">
-            <div class="player-heroes" v-if="player.heroes" v-b-tooltip.hover.top="player.heroes && player.heroes.join(', ')">
-                <HeroIcon v-for="hero in player.heroes" :hero="hero" :key="hero" />
+        <td v-if="hasDraftData && settings.heroes" class="draft--heroes">
+            <div v-if="player.heroes" v-b-tooltip.hover.top="player.heroes && player.heroes.join(', ')" class="player-heroes">
+                <HeroIcon v-for="hero in player.heroes" :key="hero" :hero="hero" />
             </div>
         </td>
         <td v-if="settings.slmn_events">
-            <PlayerDraftTeamInfo v-for="team in teams" :team="team" :key="team.id"/>
+            <PlayerDraftTeamInfo v-for="team in teams" :key="team.id" :team="team" />
         </td>
         <td v-if="hasDraftData && settings.info_for_captains" class="info-for-captains">{{ player.info_for_captains }}</td>
         <td v-if="settings.custom_notes">
@@ -24,9 +24,17 @@
         </td>
         <td class="draft--controls">
             <b-button-group>
-                <b-button v-if="settings.custom_notes" size="sm" v-b-tooltip.left="'Set note'" variant="primary" class="text-dark" @click="doNote()"><i class="fas fa-fw fa-user-edit"></i></b-button>
-                <b-button size="sm" v-b-tooltip.left="notes?.tag === 'starred' ? 'Unstar' : 'Star'" variant="warning" @click="setNote('starred')"><i class="fas fa-fw fa-star"></i></b-button>
-                <b-button size="sm" v-b-tooltip.right="notes?.tag === 'ignored' ? 'Unignore' : 'Ignore'" variant="danger" @click="setNote('ignored')"><i class="fas fa-fw fa-ban"></i></b-button>
+                <b-button
+                    v-if="settings.custom_notes"
+                    v-b-tooltip.left="'Set note'"
+                    size="sm"
+                    variant="primary"
+                    class="text-dark"
+                    @click="doNote()">
+                    <i class="fas fa-fw fa-user-edit"></i>
+                </b-button>
+                <b-button v-b-tooltip.left="notes?.tag === 'starred' ? 'Unstar' : 'Star'" size="sm" variant="warning" @click="setNote('starred')"><i class="fas fa-fw fa-star"></i></b-button>
+                <b-button v-b-tooltip.right="notes?.tag === 'ignored' ? 'Unignore' : 'Ignore'" size="sm" variant="danger" @click="setNote('ignored')"><i class="fas fa-fw fa-ban"></i></b-button>
             </b-button-group>
         </td>
     </tr>
@@ -43,8 +51,8 @@ import { mapWritableState } from "pinia";
 
 export default {
     name: "PlayerDraftRow",
-    props: ["player", "hasDraftData", "settings", "game"],
     components: { PlayerDraftTeamInfo, HeroIcon },
+    props: ["player", "hasDraftData", "settings", "game"],
     methods: {
         url,
         getSVG: getRoleSVG,

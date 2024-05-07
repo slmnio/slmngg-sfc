@@ -9,7 +9,7 @@
         <div v-if="isConnected">
             <i class="fas fa-check-circle"></i> Connected
         </div>
-        <div class="text-center" v-else>
+        <div v-else class="text-center">
             <div>
                 <i class="fas fa-wifi-slash"></i> Not Connected
             </div>

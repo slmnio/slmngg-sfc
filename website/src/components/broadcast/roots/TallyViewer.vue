@@ -1,6 +1,8 @@
 <template>
-    <div class="tally-block" :class="{ preview: state === 'preview', active: state === 'active' }"
-         @click="showProducerInfo = !showProducerInfo">
+    <div
+        class="tally-block"
+        :class="{ preview: state === 'preview', active: state === 'active' }"
+        @click="showProducerInfo = !showProducerInfo">
         <div class="d-flex flex-column align-items-center">
             <div class="state">
                 {{ state.toLocaleUpperCase() }}
@@ -17,16 +19,21 @@
             </div>
         </div>
         <div class="tally-overlay">
-            <div class="team-info" v-if="liveMatch && teams">
-                <div class="team" v-for="(team, i) in teams" :key="team.id" :style="{order: (2 * i) + 1}">
+            <div v-if="liveMatch && teams" class="team-info">
+                <div v-for="(team, i) in teams" :key="team.id" class="team" :style="{order: (2 * i) + 1}">
                     <div class="team-name">{{ team.name }}</div>
-                    <ThemeLogo class="team-logo" :theme="team.theme" border-width=".3em" icon-padding="1em" logo-size="w-200"  />
+                    <ThemeLogo
+                        class="team-logo"
+                        :theme="team.theme"
+                        border-width=".3em"
+                        icon-padding="1em"
+                        logo-size="w-200" />
                     <div class="team-score">{{ scores[i] }}</div>
                 </div>
                 <div class="first-to">{{ liveMatch.first_to ? `FT${liveMatch.first_to}` : 'vs' }}</div>
             </div>
             <div class="spacer h-100"></div>
-            <div class="prod-info" v-if="producer">
+            <div v-if="producer" class="prod-info">
                 <div class="prod-name flex-center">Producer: {{ producer.name }}</div>
                 <div class="prod-scenes">
                     <div class="prod-preview">{{ producerPreviewScene }}</div>
@@ -45,25 +52,18 @@ export default {
     name: "TallyViewer",
     components: { ThemeLogo },
     props: ["client", "scene", "customText"],
-    sockets: {
-        tally_change({ state }) {
-            this.state = state;
-        },
-        prod_preview_program_change(data) {
-            console.log(data);
-            this.producerClientKey = data.clientSource;
-            this.producerPreviewScene = data.previewScene;
-            this.producerProgramScene = data.programScene;
+    data: () => ({
+        state: "inactive",
+        number: null,
+        wakeLock: null,
+        producerClientKey: null,
+        producerPreviewScene: null,
+        producerProgramScene: null,
+        showProducerInfo: true,
 
-            if (this.targetsMe(this.producerProgramScene)) {
-                this.state = "active";
-            } else if (this.targetsMe(this.producerPreviewScene)) {
-                this.state = "preview";
-            } else {
-                this.state = "inactive";
-            }
-        }
-    },
+        noBroadcastStyle: true,
+        noStinger: true
+    }),
     computed: {
         producer() {
             if (!this.producerClientKey) return null;
@@ -140,6 +140,25 @@ export default {
         }
 
     },
+    sockets: {
+        tally_change({ state }) {
+            this.state = state;
+        },
+        prod_preview_program_change(data) {
+            console.log(data);
+            this.producerClientKey = data.clientSource;
+            this.producerPreviewScene = data.previewScene;
+            this.producerProgramScene = data.programScene;
+
+            if (this.targetsMe(this.producerProgramScene)) {
+                this.state = "active";
+            } else if (this.targetsMe(this.producerPreviewScene)) {
+                this.state = "preview";
+            } else {
+                this.state = "inactive";
+            }
+        }
+    },
     async mounted() {
         if ("wakeLock" in navigator) {
             // screen will stay on in supported browsers
@@ -151,18 +170,6 @@ export default {
             });
         }
     },
-    data: () => ({
-        state: "inactive",
-        number: null,
-        wakeLock: null,
-        producerClientKey: null,
-        producerPreviewScene: null,
-        producerProgramScene: null,
-        showProducerInfo: true,
-
-        noBroadcastStyle: true,
-        noStinger: true
-    }),
     head() {
         return {
             title: `Tally Viewer | ${this.client?.name || this.client?.key || ""}`

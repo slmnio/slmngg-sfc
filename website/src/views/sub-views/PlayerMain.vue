@@ -2,34 +2,75 @@
     <div>
         <div class="container">
             <ContentRow v-if="accolades" class="accolades">
-                <ContentThing :thing="accolade" type="event" :link-to="accolade.event" :theme="accolade.event && accolade.event.theme" v-for="accolade in accolades"
-                              :key="accolade.id" :show-logo="true" :text="accolade.player_text" />
+                <ContentThing
+                    v-for="accolade in accolades"
+                    :key="accolade.id"
+                    :thing="accolade"
+                    type="event"
+                    :link-to="accolade.event"
+                    :theme="accolade.event && accolade.event.theme"
+                    :show-logo="true"
+                    :text="accolade.player_text" />
             </ContentRow>
-            <ContentRow title="Owner of" v-if="ownedTeams">
-                <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in ownedTeams"
-                              :text="clarifyTeam(team)" :key="team.id" :show-logo="true" />
+            <ContentRow v-if="ownedTeams" title="Owner of">
+                <ContentThing
+                    v-for="team in ownedTeams"
+                    :key="team.id"
+                    :thing="team"
+                    type="team"
+                    :theme="team.theme"
+                    :text="clarifyTeam(team)"
+                    :show-logo="true" />
             </ContentRow>
-            <ContentRow title="Captain of" v-if="captainedTeams">
-                <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in captainedTeams"
-                              :text="clarifyTeam(team)" :key="team.id" :show-logo="true" />
+            <ContentRow v-if="captainedTeams" title="Captain of">
+                <ContentThing
+                    v-for="team in captainedTeams"
+                    :key="team.id"
+                    :thing="team"
+                    type="team"
+                    :theme="team.theme"
+                    :text="clarifyTeam(team)"
+                    :show-logo="true" />
             </ContentRow>
-            <ContentRow title="Team staff for" v-if="teamStaff">
-              <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teamStaff"
-                            :text="clarifyTeam(team)" :key="team.id" :show-logo="true" />
+            <ContentRow v-if="teamStaff" title="Team staff for">
+                <ContentThing
+                    v-for="team in teamStaff"
+                    :key="team.id"
+                    :thing="team"
+                    type="team"
+                    :theme="team.theme"
+                    :text="clarifyTeam(team)"
+                    :show-logo="true" />
             </ContentRow>
-            <ContentRow title="Player for" v-if="teams">
-                <ContentThing :thing="team" type="team" :theme="team.theme" v-for="team in teams"
-                              :text="clarifyTeam(team)" :key="team.id" :show-logo="true" />
+            <ContentRow v-if="teams" title="Player for">
+                <ContentThing
+                    v-for="team in teams"
+                    :key="team.id"
+                    :thing="team"
+                    type="team"
+                    :theme="team.theme"
+                    :text="clarifyTeam(team)"
+                    :show-logo="true" />
             </ContentRow>
-            <ContentRow title="Event staff for" v-if="eventStaff">
-                <ContentThing :thing="event" type="event" :theme="event.theme" v-for="event in eventStaff"
-                              :key="event.id" :show-logo="true" />
+            <ContentRow v-if="eventStaff" title="Event staff for">
+                <ContentThing
+                    v-for="event in eventStaff"
+                    :key="event.id"
+                    :thing="event"
+                    type="event"
+                    :theme="event.theme"
+                    :show-logo="true" />
             </ContentRow>
-            <ContentRow title="Caster for" v-if="castedEvents">
-                <ContentThing :thing="event" type="event" :theme="event.theme" v-for="event in castedEvents"
-                              :key="event.id" :show-logo="true" />
+            <ContentRow v-if="castedEvents" title="Caster for">
+                <ContentThing
+                    v-for="event in castedEvents"
+                    :key="event.id"
+                    :thing="event"
+                    type="event"
+                    :theme="event.theme"
+                    :show-logo="true" />
             </ContentRow>
-            <ContentRow :title="group.meta.player_text" v-for="group in mainPlayerRelationships" :key="group.meta.singular_name">
+            <ContentRow v-for="group in mainPlayerRelationships" :key="group.meta.singular_name" :title="group.meta.player_text">
                 <ContentThing
                     v-for="item in group.items"
                     :key="item.item.id"
@@ -49,12 +90,12 @@ import { sortTeams, sortEvents } from "@/utils/sorts";
 import { clarifyTeam } from "@/utils/content-utils";
 
 export default {
-    props: ["player"],
     name: "PlayerMain",
     components: {
         ContentRow,
         ContentThing
     },
+    props: ["player"],
     computed: {
         accolades() {
             if (!this.player) return [];

@@ -2,14 +2,14 @@
     <div class="container player-partners">
         <h2 id="partners">Partners</h2>
 
-        <b-form-select class="w-auto mb-1" :options="partnerTypes" v-model="chosenPartnerType"></b-form-select>
+        <b-form-select v-model="chosenPartnerType" class="w-auto mb-1" :options="partnerTypes" />
 
-        <div class="d-flex gap-2 mb-2" v-if="chosenPartnerType">
+        <div v-if="chosenPartnerType" class="d-flex gap-2 mb-2">
             <div>{{ source?.length }} match{{ source?.length === 1 ? '' : 'es' }}</div>
             <div>•</div>
             <div>{{ partners?.length }} partner{{ partners?.length === 1 ? '' : 's' }}</div>
         </div>
-        <table class="table table-bordered table-dark table-sm" v-if="chosenPartnerType">
+        <table v-if="chosenPartnerType" class="table table-bordered table-dark table-sm">
             <thead>
                 <tr>
                     <th>Partner</th>
@@ -20,7 +20,7 @@
             <tbody>
                 <tr v-for="partner in partners" :key="partner.player.id">
                     <td>
-                        <router-link :to="`/player/${partner.player.id}/partners`">{{partner.player.name}}</router-link>
+                        <router-link :to="`/player/${partner.player.id}/partners`">{{ partner.player.name }}</router-link>
                     </td>
                     <td>{{ partner.matches }}</td>
                     <td>
@@ -42,7 +42,6 @@ import { useSettingsStore } from "@/stores/settingsStore";
 export default {
     name: "PlayerPartners",
     props: ["player"],
-    methods: { useSettingsStore, url, formatTime },
     data: () => ({
         chosenPartnerType: null
     }),
@@ -134,7 +133,8 @@ export default {
                 return new Date(b.lastMatch?.start) - new Date(a.lastMatch?.start);
             });
         }
-    }
+    },
+    methods: { useSettingsStore, url, formatTime }
 };
 </script>
 <style scoped>

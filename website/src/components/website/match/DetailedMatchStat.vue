@@ -1,20 +1,20 @@
 <template>
-    <div class="stat mb-2" v-if="shouldShow">
+    <div v-if="shouldShow" class="stat mb-2">
         <div class="stat-a">
             <slot></slot>
         </div>
-        <div class="stat-b" v-if="raw" v-html="formattedTargetData"></div>
-        <div class="" v-if="$slots.content">
+        <div v-if="raw" class="stat-b" v-html="formattedTargetData"></div>
+        <div v-if="$slots.content" class="">
             <slot name="content"></slot>
         </div>
-        <div class="stat-b" v-else-if="time">{{ prettyDate(targetData) }}</div>
-        <div class="stat-b" v-else-if="players">
-            <LinkedPlayers :players="targetData" :show-tally="showTally"/>
+        <div v-else-if="time" class="stat-b">{{ prettyDate(targetData) }}</div>
+        <div v-else-if="players" class="stat-b">
+            <LinkedPlayers :players="targetData" :show-tally="showTally" />
         </div>
-        <div class="stat-b" v-else-if="externalLink">
+        <div v-else-if="externalLink" class="stat-b">
             <a class="ct-active" :href="targetData" target="_blank">{{ targetData.replace("https://", "") }}</a>
         </div>
-        <div class="stat-b" v-else-if="formattedTargetData">{{ formattedTargetData }}</div>
+        <div v-else-if="formattedTargetData" class="stat-b">{{ formattedTargetData }}</div>
     </div>
 </template>
 
@@ -25,16 +25,8 @@ import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "DetailedMatchStat",
-    props: ["match", "data", "override", "format", "raw", "time", "players", "externalLink", "showTally"],
     components: { LinkedPlayers },
-    methods: {
-        prettyDate(timeString) {
-            return formatTime(timeString, {
-                tz: useSettingsStore().timezone,
-                use24HourTime: useSettingsStore().use24HourTime
-            });
-        }
-    },
+    props: ["match", "data", "override", "format", "raw", "time", "players", "externalLink", "showTally"],
     computed: {
         targetData() {
             return this.override || this.match[this.data];
@@ -44,6 +36,14 @@ export default {
         },
         formattedTargetData() {
             return this.format ? this.format(this.targetData) : this.targetData;
+        }
+    },
+    methods: {
+        prettyDate(timeString) {
+            return formatTime(timeString, {
+                tz: useSettingsStore().timezone,
+                use24HourTime: useSettingsStore().use24HourTime
+            });
         }
     }
 };

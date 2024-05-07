@@ -1,8 +1,15 @@
 <template>
     <GenericOverlay class="season-history-overlay" :title="title || 'Season History'">
         <div class="team-wrapper flex-center flex-column w-100 h-100">
-            <TeamSeasonHistory class="team-season-history" v-for="team in teams" :key="team.id" :show-headers="showHeaders" :match-count="matchCount"
-                               :team="team" :live-match="match" :timezone="broadcast.timezone || 'America/New_York'" />
+            <TeamSeasonHistory
+                v-for="team in teams"
+                :key="team.id"
+                class="team-season-history"
+                :show-headers="showHeaders"
+                :match-count="matchCount"
+                :team="team"
+                :live-match="match"
+                :timezone="broadcast.timezone || 'America/New_York'" />
         </div>
     </GenericOverlay>
 </template>
@@ -13,8 +20,8 @@ import TeamSeasonHistory from "@/components/broadcast/TeamSeasonHistory";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "SeasonHistoryOverlay",
-    props: ["broadcast", "title", "showHeaders", "matchCount"],
     components: { TeamSeasonHistory, GenericOverlay },
+    props: ["broadcast", "title", "showHeaders", "matchCount"],
     computed: {
         teams() {
             return this.match?.teams || [];

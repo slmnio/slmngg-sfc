@@ -2,9 +2,9 @@
     <div class="timezone-swapper" :class="{'align-left': align === 'left'}">
         <b-form :inline="inline">
             <b-form-group label-size="sm" label="Timezone" :label-cols-sm="inline ? 3 : 12">
-                <b-form-select id="available-timezone-select" :options="availableTimezones" v-model="timezone" size="sm" />
+                <b-form-select id="available-timezone-select" v-model="timezone" :options="availableTimezones" size="sm" />
             </b-form-group>
-            <b-form-checkbox v-if="!inline" size="sm" switch v-model="use24HourTime">
+            <b-form-checkbox v-if="!inline" v-model="use24HourTime" size="sm" switch>
                 Use 24-hour time
             </b-form-checkbox>
         </b-form>

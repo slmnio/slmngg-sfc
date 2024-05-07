@@ -2,10 +2,15 @@
     <td class="team-map-stats" :class="{'has-played': stats.played > 0}">
         <div class="d-flex flex-grow-1 w-100">
             <!--        <div class="stat team">{{ team.code }}</div>-->
-            <ThemeLogo logo-size="w-50" class="team-icon" :theme="team.theme" border-width="4" icon-padding="4" />
+            <ThemeLogo
+                logo-size="w-50"
+                class="team-icon"
+                :theme="team.theme"
+                border-width="4"
+                icon-padding="4" />
             <div class="stat scoreline">{{ scoreline }}</div>
-            <div class="stat unplayed" v-if="showUnplayedMaps && stats.unplayed">Unplayed: {{ stats.unplayed }}</div>
-            <div class="stat recent" v-if="stats.played_recently"><i class="far fa-clock fa-fw" v-b-tooltip.top="'Played in their last match'"></i></div>
+            <div v-if="showUnplayedMaps && stats.unplayed" class="stat unplayed">Unplayed: {{ stats.unplayed }}</div>
+            <div v-if="stats.played_recently" class="stat recent"><i v-b-tooltip.top="'Played in their last match'" class="far fa-clock fa-fw"></i></div>
             <!--        <div class="stat played">{{ stats.played }}</div>-->
         </div>
     </td>

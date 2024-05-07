@@ -1,8 +1,19 @@
 <template>
-    <transition name="tt" mode="out-in" :duration="calculatedDuration" tag="div"
-        @after-enter="() => entered = true" @before-leave="() => entered = false" @before-enter="() => entered = false">
-        <div v-show="isActive" :key="transitionKey || 'transition'" :data-key="transitionKey ?? 'transition'" class="theme-transition" :style="animDurations"
-             :class="{ ...directionClasses, ...borderClasses, 'start-inner-full': startInnerFull, 'active': isActive, 'entered': entered, 'clear-after-entered': clearStyleAfterEntered, 'use-fit-content': useFitContent, 'clip-slot': clipSlot }">
+    <transition
+        name="tt"
+        mode="out-in"
+        :duration="calculatedDuration"
+        tag="div"
+        @after-enter="() => entered = true"
+        @before-leave="() => entered = false"
+        @before-enter="() => entered = false">
+        <div
+            v-show="isActive"
+            :key="transitionKey || 'transition'"
+            :data-key="transitionKey ?? 'transition'"
+            class="theme-transition"
+            :style="animDurations"
+            :class="{ ...directionClasses, ...borderClasses, 'start-inner-full': startInnerFull, 'active': isActive, 'entered': entered, 'clear-after-entered': clearStyleAfterEntered, 'use-fit-content': useFitContent, 'clip-slot': clipSlot }">
             <div class="theme-transition-outer" :style="outerStyle">
                 <div class="theme-transition-inner" :style="innerStyle" :class="innerClass">
                     <slot></slot>
@@ -122,13 +133,6 @@ export default {
             return {};
         }
     },
-    mounted() {
-        if (this.autoStart) {
-            requestAnimationFrame(() => {
-                this.manuallyActive = true;
-            });
-        }
-    },
     watch: {
         active(isActive) {
             console.log("theme watching active", isActive);
@@ -141,6 +145,13 @@ export default {
                     this.manuallyActive = false;
                 }, this.triggerDuration || 500);
             }
+        }
+    },
+    mounted() {
+        if (this.autoStart) {
+            requestAnimationFrame(() => {
+                this.manuallyActive = true;
+            });
         }
     }
 };

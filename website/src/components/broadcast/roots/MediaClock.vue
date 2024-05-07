@@ -1,11 +1,11 @@
 <template>
     <div class="media-clock flex-center" :class="{'last-seconds': lastSeconds, 'not-prepared': !prepared, 'not-playing': !playing }">
-<!--        <ul>-->
-<!--            <li>prep: {{ prepared }}</li>-->
-<!--            <li>play: {{ playing }}</li>-->
-<!--            <li>time: {{ time }}</li>-->
-<!--            <li>last {{ lastSecondsHighlight }} secs: {{ lastSeconds }}</li>-->
-<!--        </ul>-->
+        <!--        <ul>-->
+        <!--            <li>prep: {{ prepared }}</li>-->
+        <!--            <li>play: {{ playing }}</li>-->
+        <!--            <li>time: {{ time }}</li>-->
+        <!--            <li>last {{ lastSecondsHighlight }} secs: {{ lastSeconds }}</li>-->
+        <!--        </ul>-->
         <div class="top-text">
             <div class="industry-align">
                 {{ prepared && !playing ? "MEDIA READY" : timeNow }}

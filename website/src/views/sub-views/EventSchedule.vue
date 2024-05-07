@@ -1,41 +1,56 @@
 <template>
     <div class="event-schedule container">
-
         <div class="d-sm-flex w-100 timezone-swapper-holder flex-column align-items-end gap-1 d-none">
             <TimezoneSwapper :inline="true" />
-            <b-form-group label-cols="auto" label-size="sm" label="Broadcast" v-if="showBroadcastSettings">
-                <b-form-select v-if="eventBroadcasts?.length" :options="eventBroadcasts" v-model="selectedBroadcastID" size="sm" class="w-auto"/>
+            <b-form-group v-if="showBroadcastSettings" label-cols="auto" label-size="sm" label="Broadcast">
+                <b-form-select
+                    v-if="eventBroadcasts?.length"
+                    v-model="selectedBroadcastID"
+                    :options="eventBroadcasts"
+                    size="sm"
+                    class="w-auto" />
             </b-form-group>
         </div>
 
         <div class="schedule-top mb-2">
             <h2 class="text-center">Schedule</h2>
-            <ul class="schedule-group-holder nav justify-content-center" v-if="pagedMatches.length > 1">
-                <li class="nav-item schedule-group" v-for="(pm) in pagedMatches" :key="pm.num"
+            <ul v-if="pagedMatches.length > 1" class="schedule-group-holder nav justify-content-center">
+                <li
+                    v-for="(pm) in pagedMatches"
+                    :key="pm.num"
+                    class="nav-item schedule-group"
                     :class="{ 'active': activeScheduleGroup.num === pm.num, 'ct-active': activeScheduleGroup.num === pm.num, 'ct-passive': activeScheduleGroup.num !== pm.num }">
-                    <a @click="activeScheduleNum = pm.num" class="nav-link no-link-style">{{ pm.text }}</a>
+                    <a class="nav-link no-link-style" @click="activeScheduleNum = pm.num">{{ pm.text }}</a>
                 </li>
 
-                <li class="nav-item schedule-group nav-link no-link-style" @click="showAll = true"
-                    :class="{'active ct-active': showAll === true, 'ct-passive': showAll !== true }">
+                <li
+                    class="nav-item schedule-group nav-link no-link-style"
+                    :class="{'active ct-active': showAll === true, 'ct-passive': showAll !== true }"
+                    @click="showAll = true">
                     <b>All matches</b>
                 </li>
             </ul>
         </div>
 
-        <div class="schedule-filter flex-center text-center mb-2" v-if="showAll">
-            <div class="btn btn-sm mx-2" @click="hideCompleted = !hideCompleted" :class="{'btn-light': hideCompleted, 'btn-dark': !hideCompleted}">
+        <div v-if="showAll" class="schedule-filter flex-center text-center mb-2">
+            <div class="btn btn-sm mx-2" :class="{'btn-light': hideCompleted, 'btn-dark': !hideCompleted}" @click="hideCompleted = !hideCompleted">
                 Hide completed matches
             </div>
-            <div class="btn btn-sm mx-2" @click="hideNoVods = !hideNoVods" :class="{'btn-light': hideNoVods, 'btn-dark': !hideNoVods}">
+            <div class="btn btn-sm mx-2" :class="{'btn-light': hideNoVods, 'btn-dark': !hideNoVods}" @click="hideNoVods = !hideNoVods">
                 Hide matches without VODs
             </div>
         </div>
 
-        <div class="schedule-matches mt-3" v-if="activeScheduleGroup">
-            <ScheduleMatch v-for="(match, i) in groupMatches" :key="match.id" :match="match"
-                           :class="i > 0 && getMatchClass(match, groupMatches[i-1])" :custom-text="showAll && match.match_group ? match.match_group : null"
-                           :can-edit-matches="showEditorButton" :can-edit-broadcasts="showBroadcastSettings" :selectedBroadcast="selectedBroadcast" />
+        <div v-if="activeScheduleGroup" class="schedule-matches mt-3">
+            <ScheduleMatch
+                v-for="(match, i) in groupMatches"
+                :key="match.id"
+                :match="match"
+                :class="i > 0 && getMatchClass(match, groupMatches[i-1])"
+                :custom-text="showAll && match.match_group ? match.match_group : null"
+                :can-edit-matches="showEditorButton"
+                :can-edit-broadcasts="showBroadcastSettings"
+                :selected-broadcast="selectedBroadcast" />
         </div>
     </div>
 </template>

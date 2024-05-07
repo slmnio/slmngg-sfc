@@ -1,9 +1,16 @@
 <template>
     <GenericOverlay class="desk-cams-overlay" :title="title || 'Player Cams'">
         <div class="team-cams flex-center w-100 flex-column">
-            <TeamCamsGroup v-for="(team, ti) in teams" :key="team.id"
-                           :team="team" :guests="guests[ti]" :params="camParams" :event="broadcast && broadcast.event"
-            :relay-prefix="relayPrefix" :ti="ti" :disable-cams="disable"/>
+            <TeamCamsGroup
+                v-for="(team, ti) in teams"
+                :key="team.id"
+                :team="team"
+                :guests="guests[ti]"
+                :params="camParams"
+                :event="broadcast && broadcast.event"
+                :relay-prefix="relayPrefix"
+                :ti="ti"
+                :disable-cams="disable" />
         </div>
     </GenericOverlay>
 </template>
@@ -15,10 +22,10 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "DeskCamsOverlay",
-    props: ["title", "broadcast", "params"],
     components: {
         GenericOverlay, TeamCamsGroup
     },
+    props: ["title", "broadcast", "params"],
     computed: {
         disable() {
             return this.broadcast?.broadcast_settings?.includes("Disable team cams");

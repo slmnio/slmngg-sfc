@@ -1,6 +1,9 @@
 <template>
-    <b-button @click="() => setObserverSetting(setting, !isOn)" :class="{'active': isOn}"
-              :variant="isOn ? 'primary' : 'secondary'" :disabled="processing">
+    <b-button
+        :class="{'active': isOn}"
+        :variant="isOn ? 'primary' : 'secondary'"
+        :disabled="processing"
+        @click="() => setObserverSetting(setting, !isOn)">
         {{ setting }}
     </b-button>
 </template>

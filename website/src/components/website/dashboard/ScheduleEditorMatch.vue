@@ -2,13 +2,21 @@
     <tr class="schedule-editor-match">
         <td class="boxes-cell">
             <div class="boxes d-flex">
-                <router-link v-if="teams && teams[0]" :to="url('team', teams[0])" class="box"
-                             :style="getTheme(teams[0])" v-b-tooltip="teams[0].name"></router-link>
+                <router-link
+                    v-if="teams && teams[0]"
+                    v-b-tooltip="teams[0].name"
+                    :to="url('team', teams[0])"
+                    class="box"
+                    :style="getTheme(teams[0])" />
                 <div v-else class="box">
                     <i class="fas fa-question fa-fw"></i>
                 </div>
-                <router-link v-if="teams && teams[1]" :to="url('team', teams[1])" class="box"
-                             :style="getTheme(teams[1])" v-b-tooltip="teams[1].name"></router-link>
+                <router-link
+                    v-if="teams && teams[1]"
+                    v-b-tooltip="teams[1].name"
+                    :to="url('team', teams[1])"
+                    class="box"
+                    :style="getTheme(teams[1])" />
                 <div v-else class="box">
                     <i class="fas fa-question fa-fw"></i>
                 </div>
@@ -20,19 +28,29 @@
         <td>{{ prettyDate }}</td>
         <td>
             <b-form-checkbox-group buttons>
-                <b-form-checkbox v-model="showPrimary" button size="sm"
-                                 :button-variant="showPrimary ? 'primary' : 'secondary'">
+                <b-form-checkbox
+                    v-model="showPrimary"
+                    button
+                    size="sm"
+                    :button-variant="showPrimary ? 'primary' : 'secondary'">
                     Primary
                 </b-form-checkbox>
-                <b-form-checkbox v-model="showSecondary" button size="sm"
-                                 :button-variant="showSecondary ? 'primary' : 'secondary'">
+                <b-form-checkbox
+                    v-model="showSecondary"
+                    button
+                    size="sm"
+                    :button-variant="showSecondary ? 'primary' : 'secondary'">
                     Secondary
                 </b-form-checkbox>
             </b-form-checkbox-group>
         </td>
         <td>
-            <b-form-checkbox :checked="this.isLiveMatch" @change="(state) => setLiveMatch(state)"
-                             button size="sm" :button-variant="this.isLiveMatch ? 'primary' : 'secondary'">
+            <b-form-checkbox
+                :checked="this.isLiveMatch"
+                button
+                size="sm"
+                :button-variant="this.isLiveMatch ? 'primary' : 'secondary'"
+                @change="(state) => setLiveMatch(state)">
                 Live Match
             </b-form-checkbox>
         </td>

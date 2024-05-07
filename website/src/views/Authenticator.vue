@@ -1,9 +1,9 @@
 <template>
-    <div class="container text-center" v-if="!errorMessage">
+    <div v-if="!errorMessage" class="container text-center">
         <h1 v-if="user">Hello {{ user?.name }}!</h1>
-        <h1 v-else><LoadingIcon/> Authenticating</h1>
+        <h1 v-else><LoadingIcon /> Authenticating</h1>
     </div>
-    <div class="container text-center" v-else>
+    <div v-else class="container text-center">
         <h1>Authentication error</h1>
         <h3>{{ errorMessage }}</h3>
     </div>

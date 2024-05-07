@@ -9,11 +9,15 @@
                 </div>
             </b-button>
         </div>
-        <b-modal ref="observer-settings" id="observer-settings" title="Observer Settings">
+        <b-modal id="observer-settings" ref="observer-settings" title="Observer Settings">
             <div class="w-100 flex-center">
                 <div class="d-inline-flex flex-column">
-                    <ObserverSettingsButton class="mb-2" v-for="setting in settings" :key="setting" :setting="setting"
-                                            :is-on="settingIsOn(setting)"/>
+                    <ObserverSettingsButton
+                        v-for="setting in settings"
+                        :key="setting"
+                        class="mb-2"
+                        :setting="setting"
+                        :is-on="settingIsOn(setting)" />
                 </div>
             </div>
             <template #footer>
@@ -31,11 +35,11 @@ import ObserverSettingsButton from "@/components/website/dashboard/ObserverSetti
 
 export default {
     name: "ObserverSettingsModal",
-    props: {
-        broadcast: Object
-    },
     components: {
         ObserverSettingsButton
+    },
+    props: {
+        broadcast: Object
     },
     data: () => ({
         settings: [

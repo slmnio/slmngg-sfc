@@ -1,8 +1,13 @@
 <template>
     <div class="podcast-overlay">
-        <div class="podcast-row" v-for="(row, i) in rowsOfGuests(rows || 2)" :key="i">
+        <div v-for="(row, i) in rowsOfGuests(rows || 2)" :key="i" class="podcast-row">
             <transition-group class="casters flex-center w-100" name="anim-talent" tag="div">
-                <Caster v-for="caster in row" :key="caster.id" :color="getColor(caster.i)" :guest="caster" :disable-video="shouldDisablePodcastVideo" />
+                <Caster
+                    v-for="caster in row"
+                    :key="caster.id"
+                    :color="getColor(caster.i)"
+                    :guest="caster"
+                    :disable-video="shouldDisablePodcastVideo" />
             </transition-group>
         </div>
         <v-style>{{ autoWidth }}</v-style>
@@ -15,8 +20,8 @@ import Caster from "@/components/broadcast/desk/Caster";
 
 export default {
     name: "PodcastOverlay",
-    props: ["broadcast", "rows"],
     components: { Caster },
+    props: ["broadcast", "rows"],
     computed: {
         shouldDisablePodcastVideo() {
             if (!this.broadcast?.broadcast_settings) return true;

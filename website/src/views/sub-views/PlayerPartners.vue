@@ -24,7 +24,7 @@
                     </td>
                     <td>{{ partner.matches }}</td>
                     <td>
-                        {{ formatTime(partner.lastMatch.start, { format: "{day} {date-ordinal} {month} {year}", tz: $store.state.timezone, use24HourTime: $store.state.use24HourTime }) }} -
+                        {{ formatTime(partner.lastMatch.start, { format: "{day} {date-ordinal} {month} {year}", tz: useSettingsStore().timezone, use24HourTime: useSettingsStore().use24HourTime }) }} -
                         <span v-if="partner.lastMatch?.event">
                             <router-link :to="url('event', partner.lastMatch?.event)">{{ partner.lastMatch?.event?.name || "..." }}</router-link> -
                         </span>
@@ -38,10 +38,11 @@
 <script>
 import { formatTime, url } from "@/utils/content-utils";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
+import { useSettingsStore } from "@/stores/settingsStore";
 export default {
     name: "PlayerPartners",
     props: ["player"],
-    methods: { url, formatTime },
+    methods: { useSettingsStore, url, formatTime },
     data: () => ({
         chosenPartnerType: null
     }),

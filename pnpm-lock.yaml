@@ -135,6 +135,9 @@ importers:
       typescript:
         specifier: ^5.4.5
         version: 5.4.5
+      universal-cookie:
+        specifier: ^7.1.4
+        version: 7.1.4
       vue:
         specifier: ^3.4.25
         version: 3.4.27(typescript@5.4.5)
@@ -597,6 +600,9 @@ packages:
 
   '@types/cookie@0.4.1':
     resolution: {integrity: sha512-XW/Aa8APYr6jSVVA1y/DEIZX0/GMKLEVekNG727R8cs56ahETkRAy/3DR7+fJyh7oUgGwNQaRfXCun0+KbWY7Q==}
+
+  '@types/cookie@0.6.0':
+    resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
 
   '@types/cors@2.8.17':
     resolution: {integrity: sha512-8CGDvrBj1zgo2qE+oS3pOCyYNqCPryMWY2bGfwA0dcfopWGgxs+78df0Rs3rc9THP4JkOhLsAa+15VdpAqkcUA==}
@@ -2470,6 +2476,9 @@ packages:
   unhead@1.9.10:
     resolution: {integrity: sha512-Y3w+j1x1YFig2YuE+W2sER+SciRR7MQktYRHNqvZJ0iUNCCJTS8Z/SdSMUEeuFV28daXeASlR3fy7Ry3O2indg==}
 
+  universal-cookie@7.1.4:
+    resolution: {integrity: sha512-Q+DVJsdykStWRMtXr2Pdj3EF98qZHUH/fXv/gwFz/unyToy1Ek1w5GsWt53Pf38tT8Gbcy5QNsj61Xe9TggP4g==}
+
   unpipe@1.0.0:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
     engines: {node: '>= 0.8'}
@@ -3076,6 +3085,8 @@ snapshots:
       tslib: 2.6.2
 
   '@types/cookie@0.4.1': {}
+
+  '@types/cookie@0.6.0': {}
 
   '@types/cors@2.8.17':
     dependencies:
@@ -5196,6 +5207,11 @@ snapshots:
       '@unhead/schema': 1.9.10
       '@unhead/shared': 1.9.10
       hookable: 5.5.3
+
+  universal-cookie@7.1.4:
+    dependencies:
+      '@types/cookie': 0.6.0
+      cookie: 0.6.0
 
   unpipe@1.0.0: {}
 

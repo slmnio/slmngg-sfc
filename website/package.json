@@ -26,6 +26,7 @@
     "spacetime-informal": "^0.6.1",
     "timesync": "^1.0.11",
     "typescript": "^5.4.5",
+    "universal-cookie": "^7.1.4",
     "vue": "^3.4.25",
     "vue-confetti": "^2.3.0",
     "vue-router": "^4.3.2",

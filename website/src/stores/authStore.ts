@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { getDataServerAddress, getMainDomain } from "@/utils/fetch";
 import { ReactiveRoot } from "@/utils/reactive";
+import Cookies from "universal-cookie";
 
 export type Snowflake = string;
 export type DiscordID = Snowflake;
@@ -52,6 +53,8 @@ interface Client {
     id: DirtyAirtableID
 }
 
+const cookies = new Cookies(null);
+
 export const useAuthStore = defineStore("auth", () => {
     const token = ref<string | null>(null);
     const authNext = ref<string | null>(null);
@@ -88,7 +91,6 @@ export const useAuthStore = defineStore("auth", () => {
             console.warn("Authentication error:", authenticationRequest.for_a_developer);
             return { error: true, errorMessage: authenticationRequest.message };
         }
-        // TODO this should be cookies
         token.value = authenticationRequest.token;
         user.value = authenticationRequest.user;
 
@@ -167,6 +169,16 @@ export const useAuthStore = defineStore("auth", () => {
     };
 }, {
     persist: {
-        paths: ["token", "authNext"]
+        paths: ["token", "authNext"],
+        storage: {
+            getItem(key) {
+                return cookies.get(key, {
+                    doNotParse: true
+                });
+            },
+            setItem(key, value) {
+                cookies.set(key, value);
+            },
+        }
     }
 });

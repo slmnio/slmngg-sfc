@@ -10,8 +10,6 @@ const store = createStore({
         subscribed_ids: [],
         request_buffer: [],
 
-        last_event_match_pages: [],
-
         data_update_buffer: [],
         website_flags: []
     },
@@ -66,14 +64,6 @@ const store = createStore({
             socket.emit("unsubscribe", id);
             state.subscribed_ids.splice(this.state.subscribed_ids.indexOf(id), 1);
         },
-        setEventMatchPage(state, { eventID, matchPage }) {
-            if (!eventID) return;
-            if (!matchPage) return;
-            const item = { eventID, matchPage };
-            const index = state.last_event_match_pages.findIndex(x => x.eventID === eventID);
-            if (index === -1) return state.last_event_match_pages.push(item);
-            state.last_event_match_pages.splice(index, 1, item);
-        },
         setWebsiteFlags(state, flags) {
             state.website_flags = flags;
         }
@@ -81,8 +71,6 @@ const store = createStore({
     getters: {
         things: state => state.things,
         thing: (state) => (id) => state.things[state.thing_map[id]],
-        getLastMatchPage: state => (eventID) => state.last_event_match_pages.find(x => x.eventID === eventID),
-        // highlightedMatch: (state, getters) => () => getters.thing(state.highlighted_match)
         hasWebsiteFlag: state => flag => state.website_flags.includes(flag)
     },
     actions: {

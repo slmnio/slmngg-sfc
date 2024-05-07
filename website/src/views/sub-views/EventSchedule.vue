@@ -46,6 +46,7 @@ import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 import { canEditMatch, isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import { useAuthStore } from "@/stores/authStore";
+import { useStatusStore } from "@/stores/statusStore";
 
 export default {
     name: "EventSchedule",
@@ -171,16 +172,17 @@ export default {
                 this.hideCompleted = false;
                 this.hideNoVods = false;
 
-                this.$store.commit("setEventMatchPage", {
-                    eventID: this.event.id,
-                    matchPage: newNum
-                });
+                const statusStore = useStatusStore();
+
+                statusStore.lastEventMatchPages[this.event.id] = newNum;
             },
             get() {
-                const lastPage = this.$store.getters.getLastMatchPage(this.event.id);
-                if (!lastPage) return this.defaultScheduleNum;
+                const statusStore = useStatusStore();
+
+                const lastPage = statusStore.lastEventMatchPages[this.event.id];
+                if (lastPage === undefined) return this.defaultScheduleNum;
                 // if (lastPage.matchPage > this.pagedMatches.length) return this.defaultScheduleNum;
-                return lastPage.matchPage;
+                return lastPage;
             }
         },
         showEditorButton() {

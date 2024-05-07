@@ -10,6 +10,8 @@ export const useStatusStore = defineStore("status", () => {
     const highlightedMatch = ref<string | null>(null);
     const matchHighlights = ref([]);
 
+    const lastEventMatchPages = ref<Record<string, string>>({});
+
 
     return {
         customStingerText,
@@ -17,6 +19,7 @@ export const useStatusStore = defineStore("status", () => {
         stingerHideText,
         highlightedTeam,
         highlightedMatch,
-        matchHighlights
+        matchHighlights,
+        lastEventMatchPages
     };
 });

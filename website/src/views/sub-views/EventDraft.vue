@@ -125,49 +125,6 @@ export default {
             selected: null
         }
     }),
-    methods: {
-        url,
-        playerGroup(group) { return this.availablePlayers.filter(p => p.localNotes && p.localNotes.tag === group); },
-        fixData(rank) {
-            return (rank || "").replace("Plat ", "Platinum ").replace("Immortal+", "Immortal");
-        },
-        sortRankingSystem(ranks, aRank, bRank) {
-            aRank = this.fixData(aRank).trim().split(" ");
-            bRank = this.fixData(bRank).trim().split(" ");
-
-            // lowest in system: [0] -> [1] -> ... -> highest in system
-            let diff = ranks.indexOf(bRank[0]) - ranks.indexOf(aRank[0]);
-            // console.log(aRank, bRank, diff);
-
-            if (diff === 0 && aRank.length === 2 && bRank.length === 2) {
-                // lowest in rank:  1 -> 2 -> 3  :highest in rank
-                diff = parseInt(bRank[1]) - parseInt(aRank[1]);
-            }
-            return diff;
-        },
-        sortValorant(a, b) {
-            const ranks = [
-                "Unranked",
-                "Iron",
-                "Bronze",
-                "Silver",
-                "Gold",
-                "Platinum",
-                "Diamond",
-                "Immortal",
-                "Radiant"
-            ];
-            // sort by highest, then break with current
-            if (!a._draftData || !b._draftData) return 0;
-
-            let diff = this.sortRankingSystem(ranks, a._draftData.highest_rank, b._draftData.highest_rank);
-            if (diff === 0) {
-                diff = this.sortRankingSystem(ranks, a._draftData.current_rank, b._draftData.current_rank);
-            }
-            // console.log(a.name, b.name, diff);
-            return diff;
-        }
-    },
     computed: {
         ...mapState(useSettingsStore, ["draftNotes"]),
         _event() {
@@ -284,6 +241,49 @@ export default {
 
         ungroupedPlayers() {
             return this.availablePlayers.filter(p => p.localNotes ? !p.localNotes.tag : true);
+        }
+    },
+    methods: {
+        url,
+        playerGroup(group) { return this.availablePlayers.filter(p => p.localNotes && p.localNotes.tag === group); },
+        fixData(rank) {
+            return (rank || "").replace("Plat ", "Platinum ").replace("Immortal+", "Immortal");
+        },
+        sortRankingSystem(ranks, aRank, bRank) {
+            aRank = this.fixData(aRank).trim().split(" ");
+            bRank = this.fixData(bRank).trim().split(" ");
+
+            // lowest in system: [0] -> [1] -> ... -> highest in system
+            let diff = ranks.indexOf(bRank[0]) - ranks.indexOf(aRank[0]);
+            // console.log(aRank, bRank, diff);
+
+            if (diff === 0 && aRank.length === 2 && bRank.length === 2) {
+                // lowest in rank:  1 -> 2 -> 3  :highest in rank
+                diff = parseInt(bRank[1]) - parseInt(aRank[1]);
+            }
+            return diff;
+        },
+        sortValorant(a, b) {
+            const ranks = [
+                "Unranked",
+                "Iron",
+                "Bronze",
+                "Silver",
+                "Gold",
+                "Platinum",
+                "Diamond",
+                "Immortal",
+                "Radiant"
+            ];
+            // sort by highest, then break with current
+            if (!a._draftData || !b._draftData) return 0;
+
+            let diff = this.sortRankingSystem(ranks, a._draftData.highest_rank, b._draftData.highest_rank);
+            if (diff === 0) {
+                diff = this.sortRankingSystem(ranks, a._draftData.current_rank, b._draftData.current_rank);
+            }
+            // console.log(a.name, b.name, diff);
+            return diff;
         }
     }
 };

@@ -68,7 +68,7 @@ export default [
             "@typescript-eslint/restrict-template-expressions": "off",
             "@typescript-eslint/restrict-plus-operands": "off",
             "@typescript-eslint/promise-function-async": "off",
-            " @typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-explicit-any": "off",
             "vue/block-lang": "off",
 
             // good to go through eventually

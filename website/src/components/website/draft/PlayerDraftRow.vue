@@ -53,24 +53,6 @@ export default {
     name: "PlayerDraftRow",
     components: { PlayerDraftTeamInfo, HeroIcon },
     props: ["player", "hasDraftData", "settings", "game"],
-    methods: {
-        url,
-        getSVG: getRoleSVG,
-        getHeroIcons(heroes) {
-            if (!heroes) return "";
-            console.log(heroes);
-            return heroes.map(hero => `https://media.slmn.io/heroes/${hero}_icon_pink.png`).map(url => `<img class="hero-icon" src="${url}">`).join("");
-        },
-        setNote(tag, note) {
-            console.log(tag, note, this.tag);
-            if (this.tag === tag) tag = null;
-            this.notes = { tag, notes: note };
-        },
-        doNote() {
-            const text = prompt(`Set ${this.player.name}'s custom note`, this.notes?.notes);
-            this.notes = { tag: undefined, notes: text };
-        }
-    },
     computed: {
         ...mapWritableState(useSettingsStore, ["draftNotes"]),
         notes: {
@@ -106,6 +88,24 @@ export default {
                 const draftData = JSON.parse(this.player.draft_data);
                 return draftData.role;
             } catch (e) { return null; }
+        }
+    },
+    methods: {
+        url,
+        getSVG: getRoleSVG,
+        getHeroIcons(heroes) {
+            if (!heroes) return "";
+            console.log(heroes);
+            return heroes.map(hero => `https://media.slmn.io/heroes/${hero}_icon_pink.png`).map(url => `<img class="hero-icon" src="${url}">`).join("");
+        },
+        setNote(tag, note) {
+            console.log(tag, note, this.tag);
+            if (this.tag === tag) tag = null;
+            this.notes = { tag, notes: note };
+        },
+        doNote() {
+            const text = prompt(`Set ${this.player.name}'s custom note`, this.notes?.notes);
+            this.notes = { tag: undefined, notes: text };
         }
     }
 };

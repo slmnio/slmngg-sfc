@@ -6,10 +6,17 @@ export const useStatusStore = defineStore("status", () => {
     const customStingerText = ref(null);
     const stingerHideText = ref(false);
 
+    const highlightedTeam = ref<string | null>(null);
+    const highlightedMatch = ref<string | null>(null);
+    const matchHighlights = ref([]);
+
 
     return {
         customStingerText,
         customStingerTheme,
-        stingerHideText
+        stingerHideText,
+        highlightedTeam,
+        highlightedMatch,
+        matchHighlights
     };
 });

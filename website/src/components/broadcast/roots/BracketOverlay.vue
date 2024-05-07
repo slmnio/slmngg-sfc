@@ -14,6 +14,7 @@ import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import Bracket from "@/components/website/bracket/Bracket";
 import { cleanID } from "@/utils/content-utils";
+import { useStatusStore } from "@/stores/statusStore";
 export default {
     name: "BracketOverlay",
     components: { Bracket, GenericOverlay },
@@ -79,12 +80,12 @@ export default {
     watch: {
         highlightTeam(team) {
             const id = cleanID(team?.id || team?.[0]);
-            this.$store.commit("setHighlightedTeam", id);
+            useStatusStore().highlightedTeam = id;
             console.log("[set highlight] team", id);
         },
         highlightMatch(match) {
             const id = cleanID(match?.id || match?.[0]);
-            this.$store.commit("setHighlightedMatch", id);
+            useStatusStore().highlightedMatch = id;
             console.log("[set highlight] match", id);
         }
     },

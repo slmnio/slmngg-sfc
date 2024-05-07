@@ -43,7 +43,7 @@
 <script>
 import BracketMatch from "@/components/website/bracket/BracketMatch";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
-import Store from "@/thing-store";
+import { useStatusStore } from "@/stores/statusStore";
 
 export default {
     name: "Bracket",
@@ -109,10 +109,10 @@ export default {
             };
         },
         highlightedTeam() {
-            return this.$store.state.highlighted_team || this.broadcastHighlightTeam || null;
+            return useStatusStore().highlightedTeam || this.broadcastHighlightTeam || null;
         },
         highlightedMatch() {
-            return this.getOrderedMatchNum(this.$store.getters.highlightedMatch());
+            return this.getOrderedMatchNum(useStatusStore().highlightedMatch);
         },
         connectionsToHighlight() {
             // If a team is highlighted: highlight their path
@@ -418,8 +418,9 @@ export default {
         }
     },
     beforeUnmount() {
-        Store.commit("setHighlightedTeam", null);
-        Store.commit("setHighlightedMatch", null);
+        const statusStore = useStatusStore();
+        statusStore.highlightedTeam = null;
+        statusStore.highlightedMatch = null;
     },
     watch: {
         layout: {

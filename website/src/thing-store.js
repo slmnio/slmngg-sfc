@@ -10,9 +10,6 @@ const store = createStore({
         subscribed_ids: [],
         request_buffer: [],
 
-        highlighted_team: null,
-        highlighted_match: null,
-        match_highlights: [],
         last_event_match_pages: [],
 
         data_update_buffer: [],
@@ -69,16 +66,6 @@ const store = createStore({
             socket.emit("unsubscribe", id);
             state.subscribed_ids.splice(this.state.subscribed_ids.indexOf(id), 1);
         },
-
-        setHighlightedTeam(state, teamID) {
-            state.highlighted_team = teamID;
-        },
-        setHighlightedMatch(state, matchID) {
-            state.highlighted_match = matchID;
-        },
-        setHighlights(state, matchHighlights) {
-            state.match_highlights = matchHighlights;
-        },
         setEventMatchPage(state, { eventID, matchPage }) {
             if (!eventID) return;
             if (!matchPage) return;
@@ -94,11 +81,8 @@ const store = createStore({
     getters: {
         things: state => state.things,
         thing: (state) => (id) => state.things[state.thing_map[id]],
-        isHighlighted: state => (id) => state.highlighted_team === id,
-        getHighlight: state => (matchID) => state.match_highlights.find(match => match.id === matchID),
         getLastMatchPage: state => (eventID) => state.last_event_match_pages.find(x => x.eventID === eventID),
         // highlightedMatch: (state, getters) => () => getters.thing(state.highlighted_match)
-        highlightedMatch: state => () => state.highlighted_match,
         hasWebsiteFlag: state => flag => state.website_flags.includes(flag)
     },
     actions: {

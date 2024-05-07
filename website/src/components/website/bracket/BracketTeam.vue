@@ -19,24 +19,24 @@
 
 <script>
 import { logoBackground1 } from "@/utils/theme-styles";
-import Store from "@/thing-store";
 import { resizedImage } from "@/utils/images";
+import { useStatusStore } from "@/stores/statusStore";
 
 export default {
     name: "BracketTeam",
     props: ["team", "text", "empty", "score", "win", "short"],
     methods: {
-        highlight() { Store.commit("setHighlightedTeam", this.team?.id || null); },
-        unHighlight() { Store.commit("setHighlightedTeam", null); }
+        highlight() { useStatusStore().highlightedTeam = this.team?.id || null; },
+        unHighlight() { useStatusStore().highlightedTeam = null; }
     },
     computed: {
         highlighted() {
             if (!this.team) return false;
-            return Store.getters.isHighlighted(this.team.id);
+            return useStatusStore().highlightedTeam === this.team.id;
         },
         lowlighted() {
             if (this.highlighted) return false;
-            return !!Store.state.highlighted_team;
+            return useStatusStore().highlightedTeam !== null;
         },
         background() {
             if (this.empty) return { backgroundColor: "transparent" };

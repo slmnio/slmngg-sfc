@@ -46,8 +46,9 @@
 <script>
 import BracketTeam from "@/components/website/bracket/BracketTeam";
 import { url } from "@/utils/content-utils";
-import store from "@/thing-store";
 import spacetime from "spacetime";
+import { useStatusStore } from "@/stores/statusStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "BracketMatch",
@@ -78,13 +79,13 @@ export default {
             // });
 
             // store.commit("setHighlights", cons); // disable this for now
-            store.commit("setHighlightedMatch", this.match.id);
+            useStatusStore().highlightedMatch = this.match.id;
         },
         matchEmpty() {
             this.hover = false;
             // console.log(this.match, "empty");
-            store.commit("setHighlights", []);
-            store.commit("setHighlightedMatch", null);
+            useStatusStore().matchHighlights = [];
+            useStatusStore().highlightedMatch = null;
         },
         generateDummies(dummy, match) {
             // "1" and "2" come from the dot notation (eg "winner": "7.2")
@@ -195,10 +196,10 @@ export default {
             return [];
         },
         matchHighlight() {
-            return store.getters.getHighlight(this.match.id);
+            return useStatusStore().matchHighlights.find(match => match.id === this.match.id);
         },
         lowlight() {
-            return !!store.state.highlighted_team;
+            return !!useStatusStore().highlightedTeam;
         },
         friendlyStartTime() {
             if (!this.match.start) return null;
@@ -217,7 +218,7 @@ export default {
             return time.format(format);
         },
         activeTimezone() {
-            const stz = this.customTimezone || store.state.timezone;
+            const stz = this.customTimezone || useSettingsStore().timezone;
             if (!stz || stz === "local") return spacetime.now().timezone().name;
             return stz;
         }

@@ -28,7 +28,7 @@ jobs:
       with:
         node-version: 18.20.2
         cache: 'pnpm'
-        cache-dependency-path: ./${{ matrix.folder }}/pnpm-lock.yaml
+        cache-dependency-path: ./pnpm-lock.yaml
 
     - name: "${{ matrix.folder }}: install"
       run: pnpm install

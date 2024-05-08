@@ -36,7 +36,7 @@ module.exports = {
                 console.error("Airtable error", response.error);
                 throw "Airtable error";
             }
-            return deAirtable(response.fields);
+            return deAirtable(response[0].fields);
         }
     }
 };

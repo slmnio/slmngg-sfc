@@ -9,6 +9,14 @@ export default [
     ...tseslint.configs.recommended,
     ...pluginVue.configs["flat/strongly-recommended"],
     {
+        ignores: [
+            "server/src/_deprecated/**/*",
+            "website/dist/**/*",
+            "website/components.d.ts",
+            "website/vite.config.mjs"
+        ]
+    },
+    {
         plugins: {
             'typescript-eslint': tseslint.plugin,
         },
@@ -20,6 +28,9 @@ export default [
                 sourceType: 'module',
             },
         },
+        files: [
+            "website/**/*",
+        ]
     },
     {
         files: [
@@ -36,9 +47,6 @@ export default [
         languageOptions: {
             ecmaVersion: "latest",
         }
-    },
-    {
-        ignores: ["server/src/_deprecated/**/*", "website/dist/**/*"],
     },
     {
         files: ["server/**/*.js"],

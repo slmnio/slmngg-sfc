@@ -1,8 +1,8 @@
 <template>
     <div class="container">
         <b-form-group label="Client">
-            <b-form-input @update="updateClient" v-model="client"/>
-            <template v-slot:description>
+            <b-form-input v-model="client" @update="updateClient" />
+            <template #description>
                 Clients identify production staff and will dynamically change your setup to whichever broadcast you're
                 working on.<br>
                 <b>Use this if you're creating a setup that will work for any broadcast.</b>
@@ -11,9 +11,9 @@
 
         <div class="text-center font-bold">or</div>
 
-        <b-form-group label="Broadcast" >
-            <b-form-input v-model="broadcast" :disabled="!(client === '' || !client)"/>
-            <template v-slot:description>
+        <b-form-group label="Broadcast">
+            <b-form-input v-model="broadcast" :disabled="!(client === '' || !client)" />
+            <template #description>
                 Broadcast keys are locked to specific broadcasts and won't update if you work on a different
                 broadcast.<br>
                 <b>Use this if you're creating a setup for a one-off broadcast.</b>
@@ -21,21 +21,24 @@
         </b-form-group>
 
         <b-form-group label="Profile Type">
-            <b-form-select :options="jsons.map((_json) => ({value: _json, text: _json.name}))" v-model="selectedJSON"
-                           :disabled="client === '' && broadcast === ''"/>
+            <b-form-select
+                v-model="selectedJSON"
+                :options="jsons.map((_json) => ({value: _json, text: _json.name}))"
+                :disabled="client === '' && broadcast === ''" />
         </b-form-group>
 
-        <b-form-group label="Keybinds" v-if="selectedJSON && selectedJSON.name === 'Observing'">
-            <b-form-select :options="observingKeybinds.map((keybind) => ({value: keybind, text: keybind.name}))"
-                           v-model="selectedKeybinds"/>
+        <b-form-group v-if="selectedJSON && selectedJSON.name === 'Observing'" label="Keybinds">
+            <b-form-select
+                v-model="selectedKeybinds"
+                :options="observingKeybinds.map((keybind) => ({value: keybind, text: keybind.name}))" />
         </b-form-group>
 
-        <div class="d-flex gap-2" v-if="selectedJSON && selectedJSON.name === 'Observing' && selectedKeybinds">
-            <div v-for="i in 6" :style="{backgroundColor: '#2563eb', opacity: i === 6 ? '0.7': '1'}" class="keybind">
-                {{selectedKeybinds.keys[i - 1]}}
+        <div v-if="selectedJSON && selectedJSON.name === 'Observing' && selectedKeybinds" class="d-flex gap-2">
+            <div v-for="i in 6" :key="i" :style="{backgroundColor: '#2563eb', opacity: i === 6 ? '0.7': '1'}" class="keybind">
+                {{ selectedKeybinds.keys[i - 1] }}
             </div>
-            <div v-for="i in 6" :style="{backgroundColor: '#ef4444', opacity: i === 6 ? '0.7': '1'}" class="keybind">
-                {{selectedKeybinds.keys[i + 5]}}
+            <div v-for="i in 6" :key="i" :style="{backgroundColor: '#ef4444', opacity: i === 6 ? '0.7': '1'}" class="keybind">
+                {{ selectedKeybinds.keys[i + 5] }}
             </div>
         </div>
 
@@ -45,11 +48,13 @@
             <div v-for="(row, i) in customisation">
                 <div class="d-flex gap-3 align-items-center">
                     <b-form-group label="Scene Type">
-                        <b-form-select :options="customScenes.map((scene) => ({value: scene, text: scene.name}))"
-                                       v-model="customisation[i].scene"/>
+                        <b-form-select
+                            v-model="customisation[i].scene"
+                            :options="customScenes.map((scene) => ({value: scene, text: scene.name}))" />
                     </b-form-group>
 
-                    <b-form-group label="​"> <!-- There's a zero-width space here so that all the form groups align -->
+                    <b-form-group label="​">
+                        <!-- There's a zero-width space here so that all the form groups align -->
                         <b-form-checkbox v-model="customisation[i].withStinger">
                             {{ row.scene?.url && !row.scene.url?.includes('slmn.gg') ? 'Extra stinger' : 'Stinger' }}
                         </b-form-checkbox>
@@ -61,16 +66,17 @@
 
                     <b-form-group label="Background">
                         <b-form-select
-                            :options="['Desk', 'Break', null].map((bg) => ({value: bg, text: bg ? `${bg} background` : 'No background'}))"
-                            v-model="customisation[i].background"/>
+                            v-model="customisation[i].background"
+                            :options="['Desk', 'Break', null].map((bg) => ({value: bg, text: bg ? `${bg} background` : 'No background'}))" />
                     </b-form-group>
                     <b-form-group label="Music">
                         <b-form-select
-                            :options="['Desk', 'Break', null].map((bg) => ({value: bg, text: bg ? `${bg} music` : 'No music'}))"
-                            v-model="customisation[i].music"/>
+                            v-model="customisation[i].music"
+                            :options="['Desk', 'Break', null].map((bg) => ({value: bg, text: bg ? `${bg} music` : 'No music'}))" />
                     </b-form-group>
 
-                    <b-form-group label="​"> <!-- There's a zero-width space here so that all the form groups align -->
+                    <b-form-group label="​">
+                        <!-- There's a zero-width space here so that all the form groups align -->
                         <b-button @click="customisation.splice(i, 1)">Remove Scene</b-button>
                     </b-form-group>
                 </div>
@@ -83,21 +89,27 @@
 
             <div>
                 <b-form-group :label="`${customGFXcount} GFX scenes to add`">
-                    <b-form-input id="range-1" v-model="customGFXcount" type="range" min="0" max="12" value="0"></b-form-input>
+                    <b-form-input
+                        id="range-1"
+                        v-model="customGFXcount"
+                        type="range"
+                        min="0"
+                        max="12"
+                        value="0" />
                 </b-form-group>
             </div>
-
         </div>
 
-        <div v-if="output"
-             class="p-6 rounded-lg cursor-not-allowed select-none bg-slate-800 text-white overflow-x-scroll">
+        <div
+            v-if="output"
+            class="p-6 rounded-lg cursor-not-allowed select-none bg-slate-800 text-white overflow-x-scroll">
             <ul>
                 <li v-for="scene in JSON.parse(output)?.scene_order">{{ scene?.name }}</li>
             </ul>
         </div>
 
 
-        <b-button v-on:click="dl" :disabled="!output" variant="success">
+        <b-button :disabled="!output" variant="success" @click="dl">
             Download JSON {{ versionName ? `(${versionName})` : "" }}
         </b-button>
     </div>
@@ -295,9 +307,6 @@ export default {
         customisation: [],
         customGFXcount: 3
     }),
-    async mounted() {
-        this.selectedKeybinds = this.observingKeybinds[0];
-    },
     computed: {
         output() {
             if (!this.json) return;
@@ -577,7 +586,10 @@ export default {
                 .trim();
         }
     },
-    metaInfo() {
+    async mounted() {
+        this.selectedKeybinds = this.observingKeybinds[0];
+    },
+    head() {
         return {
             title: "Scene Collections"
         };

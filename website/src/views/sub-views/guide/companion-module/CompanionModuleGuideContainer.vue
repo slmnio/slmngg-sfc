@@ -5,10 +5,8 @@
             <li class="nav-item ct-passive">
                 <router-link class="nav-link" to="/learn/guides/companion-module">Intro</router-link>
             </li>
-
         </SubPageNav>
-        <router-view/>
-
+        <router-view />
     </div>
 </template>
 
@@ -19,7 +17,7 @@ export default {
     name: "CompanionModuleGuide",
     components: { SubPageNav },
 
-    metaInfo() {
+    head() {
         return {
             title: "Companion Module Guide"
         };

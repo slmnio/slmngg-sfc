@@ -21,7 +21,7 @@ const emitter = new EventEmitter();
 function getAntiLeakIDs() {
     if (process.env.DISABLE_ANTILEAK === "true") return []; // don't hide anything on local
     let ids = [];
-    hiddenEvents.forEach((val, key) => {
+    hiddenEvents.forEach((val) => {
         if (val?.length) val.forEach(id => ids.push(id));
     });
     return ids;
@@ -42,8 +42,6 @@ function setup(_io) {
 }
 
 async function broadcast(room, command, ...data) {
-    // TODO: get the socket.io server here
-    // socket to (room).emit(command, ...data)
     io.to(room).emit(command, ...data);
 }
 

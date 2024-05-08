@@ -28,14 +28,9 @@
             to have a separate observer account that you can use to configure these settings. <br>
         </p>
     </div>
-
 </template>
 <script>
-import { BButton } from "bootstrap-vue";
 export default {
-    components: {
-        BButton
-    },
     name: "OverwatchSettingsGuideIntro"
 };
 </script>

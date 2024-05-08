@@ -8,8 +8,6 @@
             <router-link to="/learn/guides/ow-settings">a separate guide for this</router-link>
             .
         </p>
-
-
     </div>
 </template>
 <script>

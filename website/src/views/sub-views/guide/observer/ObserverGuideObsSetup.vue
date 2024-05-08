@@ -25,7 +25,8 @@
 
         <ul>
             <li><strong>Service</strong>: Custom</li>
-            <li><strong>Server</strong>:
+            <li>
+                <strong>Server</strong>:
                 <ul>
                     <li>Use the <strong><code>/srt</code></strong> command in Discord to generate a URL</li>
                     <li>Your producer will tell you which region to use</li>
@@ -90,7 +91,7 @@
                     Leave the rest as default.
                 </p>
             </b-tab>
-            <b-tab title="TODO Other"></b-tab>
+            <b-tab title="TODO Other" />
         </b-tabs>
 
         <h4>Video</h4>
@@ -116,14 +117,8 @@
 </template>
 
 <script>
-import { BAlert, BTab, BTabs } from "bootstrap-vue";
 
 export default {
-    name: "GuideObsSetup",
-    components: {
-        BTabs,
-        BTab,
-        BAlert
-    }
+    name: "GuideObsSetup"
 };
 </script>

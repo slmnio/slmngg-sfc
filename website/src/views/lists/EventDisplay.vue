@@ -21,7 +21,6 @@ import { logoBackground1 } from "@/utils/theme-styles";
 export default {
     name: "EventDisplay",
     props: ["event"],
-    methods: { url },
     computed: {
         blockTheme() {
             if (!this.event?.theme) return {};
@@ -35,7 +34,8 @@ export default {
             if (!this.event.start_date) return "";
             return spacetime(this.event.start_date).format("{month} {year}");
         }
-    }
+    },
+    methods: { url }
 };
 </script>
 

@@ -44,7 +44,7 @@ export default {
 </script>
 
 <style scoped>
-    .match-teams >>> .no-wrap {
+    .match-teams:deep(.no-wrap) {
         white-space: nowrap;
     }
 </style>

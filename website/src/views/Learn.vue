@@ -50,8 +50,6 @@
                 <a href="https://borpa.business">List of active SRT feeds</a>
             </li>
         </ul>
-
-
     </div>
 </template>
 <script lang="ts">

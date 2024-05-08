@@ -2,11 +2,14 @@
     <div class="break-display-tab">
         <div class="flex-center">
             <div class="buttons d-inline-flex flex-column">
-                <b-button class="mb-1" v-for="option in options" :key="option.value"
-                          @click="setOption(option.value)"
-                          :disabled="processing && (selected === option.value)"
-                          :class="{ 'active': selected === option.value }"
-                          :variant="selected === option.value && !processing ? 'primary' : 'secondary'">
+                <b-button
+                    v-for="option in options"
+                    :key="option.value"
+                    class="mb-1"
+                    :disabled="processing && (selected === option.value)"
+                    :class="{ 'active': selected === option.value }"
+                    :variant="selected === option.value && !processing ? 'primary' : 'secondary'"
+                    @click="setOption(option.value)">
                     {{ option.text }}
                 </b-button>
             </div>
@@ -15,12 +18,10 @@
 </template>
 
 <script>
-import { BButton } from "bootstrap-vue";
-import { updateBreakDisplay } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "BreakDisplayTab",
-    components: { BButton },
     props: { broadcast: Object },
     data: () => ({
         options: [
@@ -43,25 +44,14 @@ export default {
             return this.broadcast?.break_display;
         }
     },
-    watch: {
-        activeOption: {
-            immediate: true,
-            handler(newOption) {
-                this.resetOption(newOption);
-            }
-        },
-        selectedEndingOptions(options) {
-            if (options.length > 1) {
-                this.selectedEndingOptions = [options.pop()];
-            }
-        }
-    },
     methods: {
         async setOption(option) {
             this.selected = option;
             this.processing = true;
             try {
-                const response = await updateBreakDisplay(this.$root.auth, this.selected);
+                const response = await authenticatedRequest("actions/update-break-display", {
+                    option: this.selected
+                });
                 if (!response.error) {
                     this.$notyf.success(`Break display set to ${this.selected}`);
                 }
@@ -71,6 +61,22 @@ export default {
         },
         resetOption(option) {
             this.selected = option;
+        }
+    },
+    watch: {
+        activeOption: {
+            immediate: true,
+            handler(newOption) {
+                this.resetOption(newOption);
+            }
+        },
+        selectedEndingOptions: {
+            deep: true,
+            handler(options) {
+                if (options.length > 1) {
+                    this.selectedEndingOptions = [options.pop()];
+                }
+            }
         }
     }
 };

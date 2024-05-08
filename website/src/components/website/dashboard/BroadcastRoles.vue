@@ -1,34 +1,58 @@
 <template>
     <div class="broadcast-roles">
         <table class="table table-bordered table-sm table-dark mb-0 border-no-top" style="table-layout: auto">
-            <tr>
-                <th>Role</th>
-                <th class="text-nowrap">Assigned staff</th>
-                <th colspan="2">Clients</th>
-            </tr>
-            <tr v-for="(role) in roles" :key="role">
-                <td class="w-25">{{ role }}</td>
-                <td>
-                    <linked-players v-if="rolePlayers(role)?.length" :players="rolePlayers(role)"/>
-                </td>
-                <td class="w-100">
-                    <b-form-select class="role-selectable opacity-changes" size="sm" :key="i" v-for="i of formData[role]?.count" v-model="formData[role].selected[i-1]"
-                                   :class="{'low-opacity': clientsLoading}"
-                                   :options="clientOptions" @keydown.native.delete="() => $set(formData[role].selected, i-1, null)"></b-form-select>
-                </td>
-                <td style="width: 2em">
-                    <b-button class="role-selectable" size="sm" variant="success" @click="formData[role].count++"><i class="fa fa-plus"></i></b-button>
-                    <b-button class="role-selectable" size="sm" variant="danger"  :key="i" v-for="i of Math.max(0, (formData[role]?.count || 0) - 1)"
-                              @click="removeRow(role, i)"><i class="fa fa-minus"></i></b-button>
-                </td>
-            </tr>
+            <thead>
+                <tr>
+                    <th>Role</th>
+                    <th class="text-nowrap">Assigned staff</th>
+                    <th colspan="2">Clients</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(role) in roles" :key="role">
+                    <td class="w-25">{{ role }}</td>
+                    <td>
+                        <linked-players v-if="rolePlayers(role)?.length" :players="rolePlayers(role)" />
+                    </td>
+                    <td class="w-100">
+                        <b-form-select
+                            v-for="i of formData[role]?.count"
+                            :key="i"
+                            v-model="formData[role].selected[i-1]"
+                            class="role-selectable opacity-changes"
+                            size="sm"
+                            :class="{'low-opacity': clientsLoading}"
+                            :options="clientOptions"
+                            @keydown.delete="() => $set(formData[role].selected, i-1, null)" />
+                    </td>
+                    <td style="width: 2em">
+                        <b-button class="role-selectable" size="sm" variant="success" @click="formData[role].count++">
+                            <i
+                                class="fa fa-plus"></i>
+                        </b-button>
+                        <b-button
+                            v-for="i of Math.max(0, (formData[role]?.count || 0) - 1)"
+                            :key="i"
+                            class="role-selectable"
+                            size="sm"
+                            variant="danger"
+                            @click="removeRow(role, i)">
+                            <i class="fa fa-minus"></i>
+                        </b-button>
+                    </td>
+                </tr>
+            </tbody>
         </table>
         <div class="d-flex justify-content-end p-2 gap-2">
             <b-button variant="secondary" @click="resetFromServer">
                 <i class="fas fa-fw fa-redo"></i> Reset
             </b-button>
-            <b-button variant="success" @click="saveToCurrentMatch" :disabled="processing"
-                      class="opacity-changes" :class="{'low-opacity': processing}">
+            <b-button
+                variant="success"
+                :disabled="processing"
+                class="opacity-changes"
+                :class="{'low-opacity': processing}"
+                @click="saveToCurrentMatch">
                 <i class="fas fa-fw" :class="{'fa-save': !processing, 'fa-pulse fa-spinner': processing}"></i> Save to current match
             </b-button>
         </div>
@@ -36,13 +60,12 @@
 </template>
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { BButton, BFormSelect } from "bootstrap-vue";
-import { setPlayerRelationships } from "@/utils/dashboard";
 import LinkedPlayers from "@/components/website/LinkedPlayers.vue";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "BroadcastRoles",
-    components: { LinkedPlayers, BButton, BFormSelect },
+    components: { LinkedPlayers },
     props: {
         broadcast: {},
         liveMatch: {}
@@ -99,7 +122,11 @@ export default {
         async saveToCurrentMatch() {
             this.processing = true;
             try {
-                const response = await setPlayerRelationships(this.$root.auth, this.liveMatch.id, this.formData);
+                console.log("form data", this.formData);
+                const response = await authenticatedRequest("actions/set-player-relationships", {
+                    matchID: this.liveMatch.id,
+                    roles: this.formData
+                });
                 if (!response.error) {
                     const { added } = response.data;
                     this.$notyf.success(`${added.length} relationship${added.length === 1 ? "" : "s"} added`);
@@ -131,10 +158,10 @@ export default {
         },
         clearFormData() {
             this.roles.forEach(role => {
-                this.$set(this.formData, role, {
+                this.formData[role] = {
                     count: this.defaultRoleCount[role] || 1,
                     selected: []
-                });
+                };
             });
         }
     },

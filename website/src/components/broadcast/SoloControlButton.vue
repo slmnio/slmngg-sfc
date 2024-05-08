@@ -1,6 +1,6 @@
 <template>
-    <div class="control-button d-flex flex-column" v-bind:class="elClass" @click="() => click && !noclick && click()" :style="css">
-        <span class="icon" v-if="icon"><i :class="icon"></i></span>
+    <div class="control-button d-flex flex-column" :class="elClass" :style="css" @click="() => click && !noclick && click()">
+        <span v-if="icon" class="icon"><i :class="icon"></i></span>
         <span class="slot"><slot></slot></span>
     </div>
 </template>

@@ -21,7 +21,7 @@
 
         <p>
             Okay, this one is really up to you. Check out this <a
-            href="https://youtu.be/54lkPoLOmok?t=50">Broadcast.gg Tutorial</a> for what the options do.
+                href="https://youtu.be/54lkPoLOmok?t=50">Broadcast.gg Tutorial</a> for what the options do.
         </p>
 
         <h4>Lobby Shortcuts</h4>
@@ -42,11 +42,9 @@
 </template>
 <script>
 import defaultCrosshair from "@/assets/guide/default_crosshair.png";
-import { BAlert } from "bootstrap-vue";
 
 export default {
     name: "OverwatchSettingsGuideControls",
-    components: { BAlert },
     data: () => ({
         defaultCrosshair
     })

@@ -2,7 +2,7 @@
     <div class="leaderboard w-100 h-100 flex-center flex-column">
         <h1 style="font-size: 3em; margin-bottom: .5em;">Top 20 Leaderboard</h1>
         <div class="player-leaderboard">
-            <div class="leaderboard-player d-flex justify-content-between" v-for="(p, i) in (players || []).slice(0,20)" :key="p.id">
+            <div v-for="(p, i) in (players || []).slice(0,20)" :key="p.id" class="leaderboard-player d-flex justify-content-between">
                 <div class="num">{{ i + 1 }}</div>
                 <div class="icon">
                     <role-icon :role="p.role" />
@@ -25,8 +25,8 @@ import RoleIcon from "@/components/website/RoleIcon.vue";
 export default {
     name: "AuctionLeaderboard",
     components: { RoleIcon, ThemeLogo },
-    methods: { money },
-    props: ["players"]
+    props: ["players"],
+    methods: { money }
 };
 </script>
 

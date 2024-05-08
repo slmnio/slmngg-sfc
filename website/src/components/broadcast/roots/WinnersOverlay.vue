@@ -1,8 +1,8 @@
 <template>
     <div class="winners-overlay flex-center">
-        <ConfettiOverlay v-if="useConfetti && winner" :theme="winner?.theme" ref="confetti" />
+        <ConfettiOverlay v-if="useConfetti && winner" ref="confetti" :theme="winner?.theme" />
         <div class="winners-overlay-container flex-center">
-            <div class="winner-box flex-center" v-if="winner">
+            <div v-if="winner" class="winner-box flex-center">
                 <div class="winner-logo-holder flex-center" :style="teamStyle">
                     <div class="winner-logo bg-center" :style="teamLogo"></div>
                 </div>
@@ -12,11 +12,11 @@
                 <div class="winners-text industry-align">{{ title || "Winners" }}</div>
             </div>
             <div class="roster-box flex-center flex-column">
-                <div class="roster-row players flex-center" v-if="teamRoster?.players?.length">
-                    <div class="player" :key="player" v-for="player in teamRoster.players">{{ player }}</div>
+                <div v-if="teamRoster?.players?.length" class="roster-row players flex-center">
+                    <div v-for="player in teamRoster.players" :key="player" class="player">{{ player }}</div>
                 </div>
-                <div class="roster-row staff flex-center" v-if="teamRoster?.staff?.length">
-                    <div class="player" :key="player" v-for="player in teamRoster.staff">{{ player }}</div>
+                <div v-if="teamRoster?.staff?.length" class="roster-row staff flex-center">
+                    <div v-for="player in teamRoster.staff" :key="player" class="player">{{ player }}</div>
                 </div>
             </div>
         </div>

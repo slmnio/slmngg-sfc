@@ -1,46 +1,81 @@
 <template>
     <div class="container">
         <div class="row">
-            <div class="col-12 my-2 small-rosters" v-if="settings.show_rosters">
+            <div v-if="settings.show_rosters" class="col-12 my-2 small-rosters">
                 <h2>Rosters</h2>
-                <div class="team my-2 d-flex" v-for="team in draftTeams" :key="team.id">
+                <div v-for="team in draftTeams" :key="team.id" class="team my-2 d-flex">
                     <ThemeLogo class="team-logo" :theme="team.theme" border-width="6" />
                     <div class="team-roster d-flex">
-                        <ContentThing v-for="player in team.players" :key="player.id"
-                                      :theme="team.theme" :text="player.text" :thing="player" type="player" />
+                        <ContentThing
+                            v-for="player in team.players"
+                            :key="player.id"
+                            :theme="team.theme"
+                            :text="player.text"
+                            :thing="player"
+                            type="player" />
                     </div>
                 </div>
             </div>
             <div class="col-12 my-2 settings">
                 <h2>Settings</h2>
-                <b-form-checkbox v-if="game === 'Overwatch'" :title="'Show where each player placed in SLMN.GG events. Takes a while to load every player\'s data.'" v-model="settings.slmn_events">Show SLMN event results (takes a while to load)</b-form-checkbox>
-                <b-form-checkbox v-if="game === 'Overwatch'" :title="'Show what the players selected as their \'best heroes\''" v-model="settings.heroes">Show heroes</b-form-checkbox>
-                <b-form-checkbox :title="'Show what the players wrote for their \'info for captains\''" v-model="settings.info_for_captains">Show player's info for captains</b-form-checkbox>
-                <b-form-checkbox :title="'Show the notes you\'ve written for players. Will save to your browser.'" v-model="settings.custom_notes">Show your player notes</b-form-checkbox>
-                <b-form-checkbox v-if="draftTeams && draftTeams.length" v-model="settings.show_rosters">Show team rosters</b-form-checkbox>
+                <b-form-checkbox v-if="draftTeams && draftTeams.length" v-model="settings.show_rosters">Show event team rosters</b-form-checkbox>
+                <b-form-checkbox v-if="game === 'Overwatch'" v-model="settings.slmn_events" :title="'Show where each player placed in SLMN.GG events. Takes a while to load every player\'s data.'">Show SLMN event results (takes a while to load)</b-form-checkbox>
+                <b-form-checkbox v-if="game === 'Overwatch'" v-model="settings.heroes" :title="'Show what the players selected as their \'best heroes\''">Show player heroes</b-form-checkbox>
+                <b-form-checkbox v-model="settings.info_for_captains" :title="'Show what the players wrote for their \'info for captains\''">Show player info for captains</b-form-checkbox>
+                <b-form-checkbox v-model="settings.custom_notes" :title="'Show the notes you\'ve written for players. Will save to your browser.'">Show your player notes</b-form-checkbox>
                 <div v-if="game === 'Overwatch'" class="w-25 mt-1">
-                    <b-form-select v-model="filters.selected" :options="filters.options"></b-form-select>
+                    <b-form-select v-model="filters.selected" :options="filters.options" />
                 </div>
             </div>
-            <div class="col-12 my-2" v-if="playerGroup('starred').length">
+            <div v-if="playerGroup('starred').length" class="col-12 my-2">
                 <h2>Starred players</h2>
                 <table class="table table-bordered bg-warning table-warning table-sm">
-                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
-                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('starred')" :player="player" :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    <thead>
+                        <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game" />
+                    </thead>
+                    <tbody>
+                        <PlayerDraftRow
+                            v-for="player in playerGroup('starred')"
+                            :key="player.id"
+                            :settings="settings"
+                            :player="player"
+                            :has-draft-data="hasDraftData"
+                            :game="game" />
+                    </tbody>
                 </table>
             </div>
             <div class="col-12 my-2">
                 <h2>Available players</h2>
                 <table class="table table-bordered table-dark table-sm">
-                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
-                    <PlayerDraftRow :settings="settings" v-for="player in ungroupedPlayers" :player="player" :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                    <thead>
+                        <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game" />
+                    </thead>
+                    <tbody>
+                        <PlayerDraftRow
+                            v-for="player in ungroupedPlayers"
+                            :key="player.id"
+                            :settings="settings"
+                            :player="player"
+                            :has-draft-data="hasDraftData"
+                            :game="game" />
+                    </tbody>
                 </table>
             </div>
-            <div class="col-12 my-2" v-if="playerGroup('ignored').length">
+            <div v-if="playerGroup('ignored').length" class="col-12 my-2">
                 <h2>Ignored players</h2>
-                <table class="table table-bordered bg-danger table-danger text-white table-sm">
-                    <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game"/>
-                    <PlayerDraftRow :settings="settings" v-for="player in playerGroup('ignored')" :player="player" :key="player.id" :has-draft-data="hasDraftData" :game="game"/>
+                <table class="table table-bordered table-danger text-white table-sm">
+                    <thead>
+                        <EventDraftHeaders :has-draft-data="hasDraftData" :settings="settings" :game="game" />
+                    </thead>
+                    <tbody>
+                        <PlayerDraftRow
+                            v-for="player in playerGroup('ignored')"
+                            :key="player.id"
+                            :settings="settings"
+                            :player="player"
+                            :has-draft-data="hasDraftData"
+                            :game="game" />
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -49,14 +84,13 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import ThemeLogo from "@/components/website/ThemeLogo.vue";
-import ContentThing from "@/components/website/ContentThing.vue";
-import "bootstrap-vue/dist/bootstrap-vue.css";
-import PlayerDraftRow from "@/components/website/draft/PlayerDraftRow.vue";
-import store from "@/thing-store";
-import EventDraftHeaders from "@/components/website/draft/EventDraftHeaders.vue";
-import { BFormCheckbox, BFormSelect } from "bootstrap-vue";
+import ThemeLogo from "@/components/website/ThemeLogo";
+import ContentThing from "@/components/website/ContentThing";
+import PlayerDraftRow from "@/components/website/draft/PlayerDraftRow";
+import EventDraftHeaders from "@/components/website/draft/EventDraftHeaders";
 import { url } from "@/utils/content-utils";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { mapState } from "pinia";
 
 
 function getRoleString(sr) {
@@ -71,51 +105,8 @@ function getRoleString(sr) {
 
 export default {
     name: "EventDraft",
+    components: { EventDraftHeaders, PlayerDraftRow, ContentThing, ThemeLogo },
     props: ["event"],
-    components: { EventDraftHeaders, PlayerDraftRow, ContentThing, ThemeLogo, BFormCheckbox, BFormSelect },
-    methods: {
-        url,
-        playerGroup(group) { return this.availablePlayers.filter(p => p.localNotes && p.localNotes.tag === group); },
-        fixData(rank) {
-            return (rank || "").replace("Plat ", "Platinum ").replace("Immortal+", "Immortal");
-        },
-        sortRankingSystem(ranks, aRank, bRank) {
-            aRank = this.fixData(aRank).trim().split(" ");
-            bRank = this.fixData(bRank).trim().split(" ");
-
-            // lowest in system: [0] -> [1] -> ... -> highest in system
-            let diff = ranks.indexOf(bRank[0]) - ranks.indexOf(aRank[0]);
-            // console.log(aRank, bRank, diff);
-
-            if (diff === 0 && aRank.length === 2 && bRank.length === 2) {
-                // lowest in rank:  1 -> 2 -> 3  :highest in rank
-                diff = parseInt(bRank[1]) - parseInt(aRank[1]);
-            }
-            return diff;
-        },
-        sortValorant(a, b) {
-            const ranks = [
-                "Unranked",
-                "Iron",
-                "Bronze",
-                "Silver",
-                "Gold",
-                "Platinum",
-                "Diamond",
-                "Immortal",
-                "Radiant"
-            ];
-            // sort by highest, then break with current
-            if (!a._draftData || !b._draftData) return 0;
-
-            let diff = this.sortRankingSystem(ranks, a._draftData.highest_rank, b._draftData.highest_rank);
-            if (diff === 0) {
-                diff = this.sortRankingSystem(ranks, a._draftData.current_rank, b._draftData.current_rank);
-            }
-            // console.log(a.name, b.name, diff);
-            return diff;
-        }
-    },
     data: () => ({
         settings: {
             heroes: false,
@@ -126,7 +117,7 @@ export default {
         },
         filters: {
             options: [
-                { value: null, text: "Show all" },
+                { value: null, text: "Filter players by role" },
                 { value: "DPS", text: "DPS only" },
                 { value: "Tank", text: "Tank only" },
                 { value: "Support", text: "Support only" }
@@ -135,6 +126,7 @@ export default {
         }
     }),
     computed: {
+        ...mapState(useSettingsStore, ["draftNotes"]),
         _event() {
             if (!this.event) return null;
             return ReactiveRoot(this.event.id, {
@@ -178,7 +170,7 @@ export default {
                             const draftData = JSON.parse(player.draft_data);
                             let extraSRtext = "";
 
-                            if (ow && ow.ratings && player.role) {
+                            if (ow?.ratings && player.role) {
                                 const sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
                                 if (draftData.sr.role && sr) player.sr_err = sr - draftData.sr.role;
                                 if (sr) extraSRtext += ` Live SR on role: ${sr} ${player.sr_err && `(${player.sr_err})`}.`;
@@ -188,7 +180,7 @@ export default {
                             return { ...player, rating: { level: draftData.sr.role, note: `${getRoleString(draftData.sr)}${extraSRtext}` } };
                         }
 
-                        if (ow && ow.ratings && player.role) {
+                        if (ow?.ratings && player.role) {
                             let sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
                             if (sr) return { ...player, rating: { level: sr, note: "Pulled from their Battletag" } };
                             sr = Math.floor(ow.ratings.reduce((p, c) => p + c.level, 0) / ow.ratings.length);
@@ -205,7 +197,7 @@ export default {
 
                 return player;
             }).map(player => {
-                if (player.notes && player.notes.includes("#split#")) {
+                if (player.notes?.includes("#split#")) {
                     player.notes = player.notes.split("#split#").map(e => e.replace(/\|/g, "\n").trim()).join("\n");
                 }
                 if (player.draft_data && player.draft_data.slice(0, 1) === "{") {
@@ -220,7 +212,7 @@ export default {
                     player.info_for_captains = player.draft_data;
                 }
 
-                player.localNotes = store.getters.getNotes(player.id);
+                player.localNotes = this.draftNotes?.[player.id];
 
 
                 return player;
@@ -249,6 +241,49 @@ export default {
 
         ungroupedPlayers() {
             return this.availablePlayers.filter(p => p.localNotes ? !p.localNotes.tag : true);
+        }
+    },
+    methods: {
+        url,
+        playerGroup(group) { return this.availablePlayers.filter(p => p.localNotes && p.localNotes.tag === group); },
+        fixData(rank) {
+            return (rank || "").replace("Plat ", "Platinum ").replace("Immortal+", "Immortal");
+        },
+        sortRankingSystem(ranks, aRank, bRank) {
+            aRank = this.fixData(aRank).trim().split(" ");
+            bRank = this.fixData(bRank).trim().split(" ");
+
+            // lowest in system: [0] -> [1] -> ... -> highest in system
+            let diff = ranks.indexOf(bRank[0]) - ranks.indexOf(aRank[0]);
+            // console.log(aRank, bRank, diff);
+
+            if (diff === 0 && aRank.length === 2 && bRank.length === 2) {
+                // lowest in rank:  1 -> 2 -> 3  :highest in rank
+                diff = parseInt(bRank[1]) - parseInt(aRank[1]);
+            }
+            return diff;
+        },
+        sortValorant(a, b) {
+            const ranks = [
+                "Unranked",
+                "Iron",
+                "Bronze",
+                "Silver",
+                "Gold",
+                "Platinum",
+                "Diamond",
+                "Immortal",
+                "Radiant"
+            ];
+            // sort by highest, then break with current
+            if (!a._draftData || !b._draftData) return 0;
+
+            let diff = this.sortRankingSystem(ranks, a._draftData.highest_rank, b._draftData.highest_rank);
+            if (diff === 0) {
+                diff = this.sortRankingSystem(ranks, a._draftData.current_rank, b._draftData.current_rank);
+            }
+            // console.log(a.name, b.name, diff);
+            return diff;
         }
     }
 };

@@ -35,8 +35,6 @@ async function load(expressApp, cors, Cache, io) {
     actionApp.options("/*", cors());
     actions = (await loadActions(path.join(__dirname, "..", "actions"))) || [];
 
-    let ioFunctions = [];
-
     /**
      *
      * @type {(ActionManager)[]}

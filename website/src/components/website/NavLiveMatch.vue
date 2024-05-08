@@ -1,21 +1,18 @@
 <template>
-    <router-link active-class="active" class="live-match-link" :to="url('match', match)" v-if="shouldShow">
-        <MatchThumbnail class="live-thumbnail" :match="match"/>
-<!--        <span>🔴 LIVE: {{ eventText }} {{ match.round || match.name }}</span>-->
+    <router-link v-if="shouldShow" active-class="active" class="live-match-link" :to="url('match', match)">
+        <MatchThumbnail class="live-thumbnail" :match="match" />
+        <!--        <span>🔴 LIVE: {{ eventText }} {{ match.round || match.name }}</span>-->
     </router-link>
 </template>
 
 <script>
-import { url } from "../../utils/content-utils";
+import { url } from "@/utils/content-utils";
 import MatchThumbnail from "@/components/website/match/MatchThumbnail";
 
 export default {
     name: "NavLiveMatch",
     components: { MatchThumbnail },
     props: ["match"],
-    methods: {
-        url
-    },
     computed: {
         eventText() {
             if (!this.match.event) return null;
@@ -30,6 +27,9 @@ export default {
             return true;
             // return this.match.live;
         }
+    },
+    methods: {
+        url
     }
 };
 </script>
@@ -41,7 +41,7 @@ export default {
         height: 50px !important;
         margin-bottom: 5px;
     }
-    .live-thumbnail >>> .match-thumbnail-logo {
+    .live-thumbnail:deep(.match-thumbnail-logo) {
         width: calc(100% - 8px) !important;
         height: calc(100% - 8px) !important;
     }

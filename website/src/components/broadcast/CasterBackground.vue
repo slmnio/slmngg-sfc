@@ -1,10 +1,15 @@
 <template>
     <div class="caster-background">
         <transition name="map-fade" mode="in-out">
-            <div class="map w-100 h-100" :key="mapToShow.id" v-if="mapToShow">
+            <div v-if="mapToShow" :key="mapToShow.id" class="map w-100 h-100">
                 <div class="map-image w-100 h-100" :style="mapImage(mapToShow)">
-                    <video class="map-video w-100 h-100" v-if="useVideo && mapVideo(mapToShow)" :src="mapVideo(mapToShow)"
-                           autoplay muted loop></video>
+                    <video
+                        v-if="useVideo && mapVideo(mapToShow)"
+                        class="map-video w-100 h-100"
+                        :src="mapVideo(mapToShow)"
+                        autoplay
+                        muted
+                        loop></video>
                 </div>
             </div>
         </transition>
@@ -13,12 +18,13 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { bg } from "@/utils/images";
+import { bg, getNewURL } from "@/utils/images";
 
 function mapCheck(map, search) {
     if (!map.name) return false;
     if (map.name.toLowerCase() === search) return true;
     if (map.name.indexOf(" ") !== -1 && map.name.split(" ")[0].toLowerCase() === search) return true;
+    if (map.name.toLowerCase().includes(search.toLowerCase())) return true;
 }
 
 export default {
@@ -72,10 +78,10 @@ export default {
         mapVideo(map) {
             const video = map?.video?.[0];
             if (!video) return null;
-            return video.url;
+            return getNewURL(video, "orig");
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Caster Background | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -105,6 +111,6 @@ export default {
 
 
     .map-fade-enter-active, .map-fade-leave-active { transition: opacity 250ms ease 2s; }
-    .map-fade-enter, .map-fade-leave-to { opacity: 0; }
-    .map-fade-enter-to, .map-fade-leave { opacity: 1; }
+    .map-fade-enter-from, .map-fade-leave-to { opacity: 0; }
+    .map-fade-enter-to, .map-fade-leave-from { opacity: 1; }
 </style>

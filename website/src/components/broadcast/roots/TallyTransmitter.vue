@@ -1,4 +1,5 @@
 <script>
+import { socket } from "@/socket";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import OBSWebSocket from "obs-websocket-js";
 
@@ -60,10 +61,9 @@ export default {
 
     methods: {
         transmit() {
-            this.$socket.client.emit("tally_change", {
+            socket.emit("tally_change", {
                 clientName: this.observer,
-                state: this.state,
-                number: this.number
+                state: this.state
             });
         },
         async connectWs() {
@@ -132,7 +132,7 @@ export default {
             this.connectWs();
         }, 1000);
     },
-    metaInfo() {
+    head() {
         return {
             title: `Tally Transmitter #${this.number} | ${this.client?.name || this.client?.key || ""}`
         };

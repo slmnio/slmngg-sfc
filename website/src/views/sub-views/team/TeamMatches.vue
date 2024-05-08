@@ -11,10 +11,10 @@ import Match from "@/components/website/match/Match.vue";
 
 export default {
     name: "TeamMatches",
-    props: ["team"],
     components: {
         Match
     },
+    props: ["team"],
     computed: {
         matches() {
             return this.team.matches;

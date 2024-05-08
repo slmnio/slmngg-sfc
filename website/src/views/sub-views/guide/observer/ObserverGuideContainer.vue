@@ -19,7 +19,7 @@
                 <router-link class="nav-link" to="/learn/guides/observing/ow-settings">5. Overwatch Settings</router-link>
             </li>
         </SubPageNav>
-        <router-view/>
+        <router-view />
     </div>
 </template>
 <script>
@@ -32,7 +32,7 @@ export default {
         SubPageNav
     },
 
-    metaInfo() {
+    head() {
         return {
             title: "Observer Guide"
         };

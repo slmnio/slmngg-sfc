@@ -2,30 +2,42 @@
     <div class="l-bar-overlay">
         <div class="left-bar flex-center flex-column text-center">
             <div class="countdown-group flex-center flex-column" :style="themeColor">
-                <transition name="fade" mode="out-in" class="countdown-text">
+                <transition name="fade" mode="out-in" class="countdown-text" tag="div">
                     <span :key="countdownText" class="industry-align">
                         {{ countdownText }}
                     </span>
                 </transition>
                 <div class="countdown-timer">
-                    <Countdown :timezone="broadcast?.timezone" :to="broadcast?.countdown_end"/>
+                    <Countdown :timezone="broadcast?.timezone" :to="broadcast?.countdown_end" />
                 </div>
             </div>
             <div class="schedule flex-grow-1 flex-center flex-column">
-                <BreakMatch v-for="match in schedule" :timezone="broadcast?.timezone" :match="match"
-                            :expanded="false" :key="match.id" :theme-color="themeColor" />
+                <BreakMatch
+                    v-for="match in schedule"
+                    :key="match.id"
+                    :timezone="broadcast?.timezone"
+                    :match="match"
+                    :expanded="false"
+                    :theme-color="themeColor" />
             </div>
         </div>
         <div class="content">
-
         </div>
         <div class="bottom-left-bar">
-            <ThemeLogo :theme="broadcast?.event?.theme" class="event-logo w-100 h-100" icon-padding="75px" logo-size="w-500" border-width="0"/>
+            <ThemeLogo
+                :theme="broadcast?.event?.theme"
+                class="event-logo w-100 h-100"
+                icon-padding="75px"
+                logo-size="w-500"
+                border-width="0" />
         </div>
         <div class="lower-bar overlay--bg title flex-center text-center">
-            <transition name="fade" mode="out-in" class="">
-                        <span class="title-text" v-html="nbr(title || broadcast.title)" :key="title || broadcast.title"
-                              :class="{'has-br': (title || broadcast.title || '').includes('\\n')}"></span>
+            <transition name="fade" mode="out-in">
+                <span
+                    :key="title || broadcast.title"
+                    class="title-text"
+                    :class="{'has-br': (title || broadcast.title || '').includes('\\n')}"
+                    v-html="nbr(title || broadcast.title)"></span>
             </transition>
         </div>
     </div>
@@ -51,7 +63,7 @@ export default {
     computed: {
         fullSchedule() {
             if (this.virtualMatch) return [this.virtualMatch];
-            if (!this.broadcast || !this.broadcast.schedule) return null;
+            if (!this.broadcast?.schedule) return null;
             return ReactiveArray("schedule", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -59,7 +71,7 @@ export default {
             })(this.broadcast).sort(sortMatches);
         },
         schedule() {
-            if (!this.broadcast || !this.broadcast.schedule || !this.fullSchedule) return null;
+            if (!this.broadcast?.schedule || !this.fullSchedule) return null;
             return this.fullSchedule.filter(m => {
                 return this.secondary ? m.show_on_secondary_overlays : m.show_on_overlays;
             }).sort(sortMatches);

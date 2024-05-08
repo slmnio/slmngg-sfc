@@ -13,7 +13,7 @@
 
         <p>
             It's also necessary to understand <a target="_blank" href="https://en.wikipedia.org/wiki/Query_string">query
-            strings</a> when you want to change settings on these overlays.
+                strings</a> when you want to change settings on these overlays.
         </p>
 
         <p>
@@ -35,8 +35,9 @@
                 - BPL Season 4 broadcast - bracket key "4b" (B League) - shown in extended view
             </li>
             <li>
-                <a href="https://dev.slmn.gg/broadcast/gene/rosters?roles=true&sort=true&split=5&background=1"
-                   target="_blank">https://dev.slmn.gg/broadcast/gene/rosters?roles=true&sort=true&split=5&background=1</a>
+                <a
+                    href="https://dev.slmn.gg/broadcast/gene/rosters?roles=true&sort=true&split=5&background=1"
+                    target="_blank">https://dev.slmn.gg/broadcast/gene/rosters?roles=true&sort=true&split=5&background=1</a>
                 - Generation Esports broadcast - showing the rosters page - with role icons, sorted players and a split
                 after the first 5 players, with the background shown behind the overlay.
             </li>
@@ -48,16 +49,18 @@
             Available to all broadcast routes:
             <ul>
                 <li><code>title</code>: String - top title for the generic overlay format</li>
-                <li><code>noAnimate|dontAnimate|noAnimation</code>: Boolean - don't use animation or OBS active
+                <li>
+                    <code>noAnimate|dontAnimate|noAnimation</code>: Boolean - don't use animation or OBS active
                     detection when transitioning
                 </li>
-                <li><code>background</code>: Number - show a background behind the overlay, with the number choosing
+                <li>
+                    <code>background</code>: Number - show a background behind the overlay, with the number choosing
                     which background. Usually 1, but others may be listed on the broadcast.
                 </li>
             </ul>
         </p>
-        <b-input-group prepend="Search" >
-            <b-form-input value="" placeholder="Search for routes..." type="text" v-model="search"/>
+        <b-input-group prepend="Search">
+            <b-form-input v-model="search" value="" placeholder="Search for routes..." type="text" />
         </b-input-group>
 
 
@@ -76,20 +79,14 @@
                     </ul>
                 </li>
             </ul>
-
         </div>
     </div>
 </template>
 
 <script>
-import { BFormInput, BInputGroup } from "bootstrap-vue";
 
 export default {
     name: "ToolProdRoutes",
-    components: {
-        BFormInput,
-        BInputGroup
-    },
     data: () => ({
         groups: [
             {
@@ -739,7 +736,7 @@ export default {
             });
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: "Broadcast Routes"
         };

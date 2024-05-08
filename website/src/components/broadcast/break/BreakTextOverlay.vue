@@ -1,7 +1,7 @@
 <template>
     <div class="break-text-overlay flex-center text-center">
         <div class="event-logo bg-center" :style="eventLogo"></div>
-        <div class="break-text" v-html="nbr(title)"></div>
+        <div class="break-text overlay--text-on-bg" v-html="nbr(title)"></div>
     </div>
 </template>
 

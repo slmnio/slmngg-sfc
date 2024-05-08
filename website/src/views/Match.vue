@@ -1,7 +1,7 @@
 <template>
-    <div id="match" v-if="match">
+    <div v-if="match" id="match">
         <MatchHero :match="match" />
-        <div class="container mt-3 text-center" v-if="match.special_event ? [match.score_1, match.score_2].some(x => x) : true">
+        <div v-if="match.special_event ? [match.score_1, match.score_2].some(x => x) : true" class="container mt-3 text-center">
             <MatchScore :match="match" />
         </div>
         <div class="container mt-3 large-container">
@@ -10,8 +10,9 @@
                     <router-view :match="match" />
                 </div>
                 <div class="col-12 col-md-3">
-                    <ul class="match-sub-nav list-group mb-2" v-if="sidebarItems.length > 1"> <!-- only because it'd be the only one -->
-                        <router-link v-if="sidebarItems.includes('vod')" class="list-group-item ct-passive" exact active-class="active ct-active" :to="subLink('')">VOD</router-link>
+                    <ul v-if="sidebarItems.length > 1" class="match-sub-nav list-group mb-2">
+                        <!-- only because it'd be the only one -->
+                        <router-link v-if="sidebarItems.includes('vod')" class="list-group-item ct-passive" exact-active-class="active ct-active" :to="subLink('')">VOD</router-link>
                         <router-link v-if="sidebarItems.includes('head-to-head')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('history')">Head to head</router-link>
                         <router-link v-if="sidebarItems.includes('editor')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('editor')">Match editor</router-link>
                     </ul>
@@ -26,9 +27,11 @@
                         </thead>
                         <tbody>
                             <tr v-if="match.start"><td colspan="2">{{ date }}</td></tr>
-                            <tr v-if="match.event && match.event.name"><td colspan="2" class="default-thing" :style="eventStyle">
-                                <b><router-link :to="url('event', match.event)" class="match-event-link">{{ match.event.name }}</router-link></b>
-                            </td></tr>
+                            <tr v-if="match.event && match.event.name">
+                                <td colspan="2" class="default-thing" :style="eventStyle">
+                                    <b><router-link :to="url('event', match.event)" class="match-event-link">{{ match.event.name }}</router-link></b>
+                                </td>
+                            </tr>
                             <tr v-if="match.forfeit"><td colspan="2"><b><i>Match was forfeited</i></b><span v-if="match.forfeit_reason"><br>{{ match.forfeit_reason }}</span></td></tr>
                             <tr v-if="lowerText"><td colspan="2">{{ lowerText }}</td></tr>
                             <tr v-if="match.first_to">
@@ -40,7 +43,7 @@
                             </tr>
                             <tr v-for="group in playerRelationshipGroups" :key="group.meta.singular_name">
                                 <td>{{ group.items.length === 1 ? group.meta.singular_name : group.meta.plural_name }}</td>
-                                <td><LinkedPlayers :players="group.items"/></td>
+                                <td><LinkedPlayers :players="group.items" /></td>
                             </tr>
                             <tr v-if="match.mvp">
                                 <td>MVP</td>
@@ -65,19 +68,18 @@ import MatchScore from "@/components/website/match/MatchScore";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
 import { cleanID, formatTime, getMatchContext, url } from "@/utils/content-utils";
 import { resizedImageNoWrap } from "@/utils/images";
-import { isAuthenticated } from "@/utils/auth";
 import { canEditMatch } from "@/utils/client-action-permissions";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "Match",
-    props: ["id"],
     components: { MatchHero, MatchScore, LinkedPlayers },
-    methods: {
-        subLink(subLinkURL) {
-            return `/match/${this.match.id}/${subLinkURL}`;
-        },
-        url
+    beforeRouteLeave(to, from, next) {
+        this.$emit("id_change", null);
+        next();
     },
+    props: ["id"],
     computed: {
         match() {
             return ReactiveRoot(this.id, {
@@ -110,7 +112,7 @@ export default {
             });
         },
         eventStyle() {
-            if (!this.match.event || !this.match.event.theme) return {};
+            if (!this.match.event?.theme) return {};
             return {
                 backgroundColor: this.match.event.theme.color_logo_background || this.match.event.theme.color_theme,
                 color: this.match.event.theme.color_text_on_logo_background || this.match.event.theme.color_text_on_theme
@@ -143,8 +145,8 @@ export default {
         },
         date() {
             return formatTime(this.match.start, {
-                tz: this.$store.state.timezone,
-                use24HourTime: this.$store.state.use24HourTime
+                tz: useSettingsStore().timezone,
+                use24HourTime: useSettingsStore().use24HourTime
             });
         },
         theme() {
@@ -155,9 +157,9 @@ export default {
             return this.match?.event?.map_pool;
         },
         showEditor() {
-            if (!isAuthenticated(this.$root)) return false;
-            // TODO: Make sure user is an admin or has perms here
-            return canEditMatch(this.$root.auth?.user, { event: this.match?.event, match: this.match });
+            const { isAuthenticated, user } = useAuthStore();
+            if (!isAuthenticated) return false;
+            return canEditMatch(user, { event: this.match?.event, match: this.match });
         },
         sidebarItems() {
             const items = ["vod"];
@@ -176,6 +178,12 @@ export default {
             return this.match?.event?.id;
         }
     },
+    methods: {
+        subLink(subLinkURL) {
+            return `/match/${this.match.id}/${subLinkURL}`;
+        },
+        url
+    },
     watch: {
         eventID: {
             handler(id) {
@@ -185,14 +193,10 @@ export default {
             immediate: true
         }
     },
-    beforeRouteLeave(to, from, next) {
-        this.$emit("id_change", null);
-        next();
-    },
-    metaInfo() {
+    head() {
         return {
             title: this.match.name,
-            link: [{ rel: "icon", href: resizedImageNoWrap(this.match?.event?.theme, ["small_logo", "default_logo"], "s-128") }]
+            link: [{ rel: "icon", key: "favicon", href: resizedImageNoWrap(this.match?.event?.theme, ["small_logo", "default_logo"], "s-128") }]
         };
     }
 };
@@ -243,6 +247,7 @@ export default {
         padding: 0.5em .75em;
         text-decoration: none;
         border-radius: 0;
+        border: none;
     }
 
     .match-sub-nav .list-group-item.active {

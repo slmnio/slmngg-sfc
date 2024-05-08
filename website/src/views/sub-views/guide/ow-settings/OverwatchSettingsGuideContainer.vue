@@ -25,7 +25,7 @@
                 <router-link class="nav-link" to="/learn/guides/ow-settings/a11y">Accessibility</router-link>
             </li>
         </SubPageNav>
-        <router-view/>
+        <router-view />
     </div>
 </template>
 <script>
@@ -38,7 +38,7 @@ export default {
         SubPageNav
     },
 
-    metaInfo() {
+    head() {
         return {
             title: "Overwatch Settings Guide"
         };

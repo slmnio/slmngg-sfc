@@ -1,6 +1,6 @@
 <template>
-    <div class="container" v-if="event">
-        <Markdown class="about" :markdown="event.about"/>
+    <div v-if="event" class="container">
+        <Markdown class="about" :markdown="event.about" />
     </div>
 </template>
 

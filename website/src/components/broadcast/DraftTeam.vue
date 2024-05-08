@@ -1,6 +1,6 @@
 <template>
     <div class="draft-team-top default-thing" :style="background">
-        <div class="team-logo-holder flex-center" v-if="showLogo">
+        <div v-if="showLogo" class="team-logo-holder flex-center">
             <div class="team-logo bg-center" :style="logo"></div>
         </div>
         <div class="team-name-holder" :class="{'no-top': !showLogo }">

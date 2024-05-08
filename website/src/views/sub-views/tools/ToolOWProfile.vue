@@ -29,7 +29,7 @@
             <p>
                 Select Documents › Overwatch › Settings › Settings_v0.ini
             </p>
-            <b-button @click="loadSettings" variant="primary">Load Settings</b-button>
+            <b-button variant="primary" @click="loadSettings">Load Settings</b-button>
         </div>
         <div v-else-if="appStatus === 'loaded'">
             <b-form-group label="Preset">
@@ -38,8 +38,8 @@
                     :options="[...presetOptions.map((presetOption) => ({ text: presetOption.name, value: presetOption.id })), { text: `Restore Backup${!hasValidBackup ? ' (Unavailable)' : ''}`, value: 'restore', disabled: !hasValidBackup}]"
                     buttons
                     stacked
-                ></b-form-radio-group>
-                <template v-slot:description>
+                />
+                <template #description>
                     <template v-if="action === 'bpl'">
                         Only sets Broadcast Margins, disables Overlays like the FPS Counter, and sets Volume levels.
                     </template>
@@ -53,7 +53,7 @@
                 </template>
             </b-form-group>
 
-            <b-button @click="executeAction" variant="primary">Apply</b-button>
+            <b-button variant="primary" @click="executeAction">Apply</b-button>
         </div>
         <div
             v-else-if="['applying', 'done'].includes(appStatus)"
@@ -64,14 +64,12 @@
             </ul>
         </div>
     </div>
-
 </template>
 <script setup>
 import { useFileSystemAccess, useLocalStorage } from "@vueuse/core";
 import { encode, parse } from "ini";
 import { computed, ref } from "vue";
 import { merge } from "lodash";
-import { BAlert, BButton, BFormGroup, BFormRadioGroup } from "bootstrap-vue";
 
 const settings = {
     bpl: {
@@ -272,10 +270,10 @@ async function writeData(data) {
 
 <script>
 export default {
-    metaInfo() {
+    head() {
         return {
             title: "Overwatch Settings Switcher"
         };
     }
-}
+};
 </script>

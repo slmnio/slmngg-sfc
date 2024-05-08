@@ -6,19 +6,19 @@
         <h1 class="news-headline">{{ news.headline }}</h1>
         <div class="content" :class="{'pdf-embedded': embedData.service === 'pdf' }">
             <div class="news-line">
-            <span v-if="newsLine && newsLine.author">
-                {{  newsLine.ahead }} <router-link :to="url('player', news.author)">{{ news.author.name }}<i class="fas fa-badge-check fa-fw" style="margin-left: .5ex" title="REAL" v-if="news.author.verified"></i></router-link>{{ newsLine.after ? ", " + newsLine.after : "" }}
-            </span>
+                <span v-if="newsLine && newsLine.author">
+                    {{ newsLine.ahead }} <router-link :to="url('player', news.author)">{{ news.author.name }}<i v-if="news.author.verified" class="fas fa-badge-check fa-fw" style="margin-left: .5ex" title="REAL"></i></router-link>{{ newsLine.after ? ", " + newsLine.after : "" }}
+                </span>
                 <span v-if="newsLine && !newsLine.author">from {{ newsLine.text }}</span>
                 <!--            <div class="news-author" v-if="news.author_name">by <router-link :to="url('player', news.author)">{{ news.author.name }}<i class="fas fa-badge-check fa-fw" style="margin-left: .5ex" title="REAL" v-if="news.author.verified"></i></router-link><span v-if="news.author_role">, {{ news.author_role }}</span></div>-->
                 <!--            <div class="news-author" v-if="!news.author_name">from <span v-if="news.author_role">{{ news.author_role }}, </span>{{ connection && connection[1] ? (connection[1].series_name || connection[1].name) : '' }}</div>-->
                 <!--            <div class="news-date" v-if="news.released || news.updated">{{ news.updated ? `updated ${prettyDate(news.updated)}` : prettyDate(news.released) }}</div>-->
             </div>
-            <div class="post-link-holder my-3" v-if="news.redirect_url">
+            <div v-if="news.redirect_url" class="post-link-holder my-3">
                 <a class="post-link p-2" :href="news.redirect_url" :style="themeBackground(theme)">See this post's link <i class="fa fa-chevron-right fa-fw"></i></a>
             </div>
-            <EmbeddedVideo class="news-embed-container" :src="news.embed" v-if="news.embed"/>
-            <div class="news-content" v-if="news.content">
+            <EmbeddedVideo v-if="news.embed" class="news-embed-container" :src="news.embed" />
+            <div v-if="news.content" class="news-content">
                 <Markdown :markdown="news.content" />
             </div>
         </div>
@@ -39,15 +39,6 @@ export default {
     name: "News",
     components: { EmbeddedVideo, Markdown, NewsHeader, OptionalLink },
     props: ["slug"],
-    methods: {
-        url,
-        themeBackground,
-        prettyDate(date) {
-            date = new Date(date);
-
-            return `${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][date.getDay()]} ${date.getDate()} ${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][date.getMonth()]} ${date.getFullYear()}`;
-        }
-    },
     computed: {
         news() {
             return ReactiveRoot(`news-${this.slug}`, {
@@ -121,10 +112,19 @@ export default {
             return this.news?.embed ? getEmbedData(this.news.embed) : {};
         }
     },
-    metaInfo() {
+    methods: {
+        url,
+        themeBackground,
+        prettyDate(date) {
+            date = new Date(date);
+
+            return `${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][date.getDay()]} ${date.getDate()} ${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][date.getMonth()]} ${date.getFullYear()}`;
+        }
+    },
+    head() {
         return {
             title: [this.news?.headline, this.connection?.name].filter(t => t).join(" | "),
-            link: [{ rel: "icon", href: resizedImageNoWrap(this.theme, ["small_logo", "default_logo"], "s-128") }]
+            link: [{ rel: "icon", key: "favicon", href: resizedImageNoWrap(this.theme, ["small_logo", "default_logo"], "s-128") }]
         };
     }
 };
@@ -158,10 +158,10 @@ export default {
         background-color: #252525;
     }
 
-    .news-content >>> .markdown > p:first-child {
+    .news-content:deep(.markdown > p:first-child) {
         font-size: 1.15em !important;
     }
-    .news-content >>> img {
+    .news-content:deep(img) {
         width: 800px;
         margin: 10px auto;
         display: flex;
@@ -169,7 +169,7 @@ export default {
         max-width: 100%;
     }
 
-    .news-embed-container, .news-content, .news-content >>> img {
+    .news-embed-container, .news-content, .news-content:deep(img) {
         box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.5);
     }
 

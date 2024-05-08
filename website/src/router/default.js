@@ -150,7 +150,7 @@ export default [
         }),
         children: BroadcastRoutes
     },
-    { path: "*", component: NotFoundPage }
+    { path: "/:pathMatch(.*)*", component: NotFoundPage }
     // {
     //     path: "/redirect",
     //     beforeEnter: (to, from, next) => {

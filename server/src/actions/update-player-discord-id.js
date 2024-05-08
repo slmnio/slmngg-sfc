@@ -1,9 +1,6 @@
 const { canUpdateUserDetails } = require("../action-utils/action-permissions");
 const { log } = require("../discord/slmngg-log");
-const {
-    User,
-    userMention
-} = require("discord.js");
+const { userMention } = require("discord.js");
 const Cache = require("../cache");
 const { cleanID } = require("../action-utils/action-utils");
 
@@ -12,7 +9,7 @@ module.exports = {
     requiredParams: ["discordData", "slmnggId"],
     auth: ["user"],
     /***
-     * @param {User} discordData
+     * @param {import("discord.js").User} discordData
      * @param {string} slmnggId
      * @param {UserData} user
      * @returns {Promise<string>}
@@ -34,7 +31,7 @@ module.exports = {
             "Discord Tag": discordData.username
         });
 
-        log(`[Profile] ${user.airtable.name} ${userMention(user.discord.id)} ${cleanID(user.airtable.id)} is linking Discord account for ${userMention(discordData.id)} ${discordData.id} to ${targetUser.name} ${cleanID(targetUser.id)} https://slmn.gg/player/${cleanID(targetUser.id)}`);
+        await log(`[Profile] ${user.airtable.name} ${userMention(user.discord.id)} ${cleanID(user.airtable.id)} is linking Discord account for ${userMention(discordData.id)} ${discordData.id} to ${targetUser.name} ${cleanID(targetUser.id)} https://slmn.gg/player/${cleanID(targetUser.id)}`);
 
         if (response?.error) {
             console.error("Airtable error", response.error);

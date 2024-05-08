@@ -1,45 +1,45 @@
 <template>
     <div class="branding-overlay w-100 h-100 position-absolute p-4">
-        <div class="row row-top mb-4" v-if="highlightTeam">
+        <div v-if="highlightTeam" class="branding-row row-top mb-4 d-flex">
             <div class="team-code">
                 <div class="industry-align">{{ highlightTeam.code }}</div>
             </div>
-            <div class="team-name flex-grow-1 text-right font-weight-bold">
+            <div class="team-name flex-grow-1 text-end fw-bold">
                 <div class="industry-align">{{ highlightTeam.name }}</div>
             </div>
         </div>
-        <div class="row flex-grow-1">
+        <div class="branding-row flex-grow-1">
             <div class="left w-75 px-2">
                 <div class="big-logo w-100 h-100 flex-center" :style="teamBG">
                     <transition name="fade" mode="out-in">
-                        <div class="logo-inner bg-center" :style="focusedLogoCSS" :key="focusedLogoCSS.backgroundImage"></div>
+                        <div :key="focusedLogoCSS.backgroundImage" class="logo-inner bg-center" :style="focusedLogoCSS"></div>
                     </transition>
                 </div>
             </div>
             <div class="right w-25 px-2 d-flex flex-column">
-                <div class="sister mb-3 text-uppercase d-flex align-items-center" v-if="sister" :style="logoBackground1(sister)">
+                <div v-if="sister" class="sister mb-3 text-uppercase d-flex align-items-center" :style="logoBackground1(sister)">
                     <div class="sister-logo flex-center mx-2">
                         <div class="logo-inner bg-center" :style="resizedImage(sister.theme, ['default_logo', 'default_wordmark', 'small_logo'], 'h-100')"></div>
                     </div>
                     <div class="sister-text ml-1">
                         <div class="industry-align">Sister team</div>
-                        <div class="industry-align font-weight-bold">{{ sister.name }}</div>
+                        <div class="industry-align fw-bold">{{ sister.name }}</div>
                     </div>
                 </div>
-                <div class="designers mb-3 px-2 py-3 text-center" :style="teamBG" v-if="designers">
+                <div v-if="designers" class="designers mb-3 px-2 py-3 text-center" :style="teamBG">
                     <div class="industry-align">Designed by: {{ designers }}</div>
                 </div>
                 <div class="logos flex-grow-1 d-flex flex-column mb-3">
-                    <div class="logo-holder w-100 flex-grow-1 my-2 flex-center" v-for="logo in logos" :key="logo.key" :style="teamBG">
+                    <div v-for="logo in logos" :key="logo.key" class="logo-holder w-100 flex-grow-1 my-2 flex-center" :style="teamBG">
                         <div class="logo-inner bg-center" :style="bg(resizedAttachment(logo?.item, 'orig'))"></div>
                     </div>
                 </div>
                 <div class="colors d-flex">
-                    <div class="swatch flex-grow-1 h-100 mx-2" v-for="color in colors" :key="color.value" :style="{ backgroundColor: color.value }"></div>
+                    <div v-for="color in colors" :key="color.value" class="swatch flex-grow-1 h-100 mx-2" :style="{ backgroundColor: color.value }"></div>
                 </div>
             </div>
         </div>
-        <div class="event-logo-holder position-absolute d-none flex-center" v-if="broadcast.event && broadcast.event?.theme">
+        <div v-if="broadcast.event && broadcast.event?.theme" class="event-logo-holder position-absolute d-none flex-center">
             <div class="logo-inner bg-center w-100 h-100" :style="resizedImage(broadcast.event.theme, ['default_logo'], 'orig')"></div>
         </div>
     </div>
@@ -57,7 +57,6 @@ function cleanKey(key) {
 export default {
     name: "BrandingOverlay",
     props: ["broadcast"],
-    methods: { resizedAttachment, logoBackground1, resizedImage, bg },
     data: () => ({
         logoI: 0
     }),
@@ -118,13 +117,14 @@ export default {
             return bg(resizedAttachment(this.bigLogos[this.logoI]?.item));
         }
     },
+    methods: { resizedAttachment, logoBackground1, resizedImage, bg },
     mounted() {
         setInterval(() => {
             this.logoI++;
             if (this.logoI >= this.bigLogos.length) this.logoI = 0;
         }, 8000);
     },
-    metaInfo() {
+    head() {
         return {
             title: `Branding | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -139,7 +139,8 @@ export default {
         display: flex;
         flex-direction: column;
     }
-    .row {
+    .branding-row {
+        display: flex;
         margin: 0;
     }
     .row-top {

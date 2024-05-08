@@ -1,14 +1,14 @@
 <template>
-    <div class="draft-player" v-if="player && !player.dummy" :style="background" :data-player-id="player && player.id || 'empty'">
+    <div v-if="player && !player.dummy" class="draft-player" :style="background" :data-player-id="player && player.id || 'empty'">
         <Squeezable class="player-name">
             <div>{{ player.name }}</div>
         </Squeezable>
-        <div class="player-role flex-center" v-if="showIcon" v-html="getSVG(player.role)"></div>
-        <div class="player-badge" v-if="badge">
+        <div v-if="showIcon" class="player-role flex-center" v-html="getSVG(player.role)"></div>
+        <div v-if="badge" class="player-badge">
             <ThemeLogo class="badge-logo" :theme="badge && badge.theme" icon-padding="0.2em" logo-size="w-50" />
         </div>
     </div>
-    <div class="draft-player dummy" v-else :style="background">
+    <div v-else class="draft-player dummy" :style="background">
         <div class="player-name">dummy</div>
     </div>
 </template>

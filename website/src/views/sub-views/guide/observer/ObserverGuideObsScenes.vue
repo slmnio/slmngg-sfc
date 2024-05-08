@@ -49,19 +49,11 @@
         <p>
             At this point you can test out streaming to our server. You can stream to it at any time if you need to test your connection.
         </p>
-
     </div>
 </template>
 
 <script>
-import { BAlert, BTab, BTabs } from "bootstrap-vue";
-
 export default {
     name: "GuideObsSetup",
-    components: {
-        BTabs,
-        BTab,
-        BAlert
-    }
 };
 </script>

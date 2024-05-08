@@ -1,6 +1,4 @@
 const { canUpdateUserDetails } = require("../action-utils/action-permissions");
-const { log } = require("../discord/slmngg-log");
-const { User } = require("discord.js");
 const Cache = require("../cache");
 
 module.exports = {
@@ -8,7 +6,7 @@ module.exports = {
     requiredParams: ["discordData"],
     auth: ["user"],
     /***
-     * @param {User} discordData
+     * @param {import("discord.js").User} discordData
      * @param {UserData} user
      * @returns {Promise<UserData[]>}
      */

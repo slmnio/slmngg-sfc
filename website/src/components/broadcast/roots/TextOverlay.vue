@@ -1,6 +1,6 @@
 <template>
     <GenericOverlay :title="title">
-        <Markdown class="overlay-markdown w-100 h-100" :markdown="markdown"></Markdown>
+        <Markdown class="overlay-markdown w-100 h-100" :markdown="markdown" />
     </GenericOverlay>
 </template>
 
@@ -10,7 +10,7 @@ import Markdown from "@/components/website/Markdown.vue";
 
 export default {
     name: "TextOverlay",
-    props: ["broadcast", "title", "markdown", "extended"],
-    components: { Markdown, GenericOverlay }
+    components: { Markdown, GenericOverlay },
+    props: ["broadcast", "title", "markdown", "extended"]
 };
 </script>

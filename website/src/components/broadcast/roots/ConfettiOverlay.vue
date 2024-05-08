@@ -2,14 +2,11 @@
     <div></div>
 </template>
 <script>
-import VueConfetti from "vue-confetti";
 import { ReactiveRoot } from "@/utils/reactive";
-import Vue from "vue";
-Vue.use(VueConfetti);
 
 export default {
-    props: ["themeId", "theme"],
     name: "ConfettiOverlay",
+    props: ["themeId", "theme"],
     data: () => ({
         confettiStarted: false,
         confettiDisabled: false,
@@ -18,8 +15,21 @@ export default {
             minor: true
         }
     }),
-    beforeDestroy() {
-        this.stopConfetti();
+    computed: {
+        themeData() {
+            return this.theme || ReactiveRoot(this.themeId);
+        },
+        confettiColors() {
+            return Array.from(new Set(
+                [
+                    this.themeData?.color_theme,
+                    this.themeData?.color_logo_background,
+                    this.themeData?.color_logo_accent,
+                    this.themeData?.color_accent,
+                    this.themeData?.color_alt
+                ].filter(Boolean))
+            );
+        }
     },
     methods: {
         startOrUpdateConfetti() {
@@ -63,27 +73,6 @@ export default {
             deep: true
         }
     },
-    computed: {
-        themeData() {
-            return this.theme || ReactiveRoot(this.themeId);
-        },
-        confettiColors() {
-            return Array.from(new Set(
-                [
-                    this.themeData?.color_theme,
-                    this.themeData?.color_logo_background,
-                    this.themeData?.color_logo_accent,
-                    this.themeData?.color_accent,
-                    this.themeData?.color_alt
-                ].filter(Boolean))
-            );
-        }
-    },
-    metaInfo() {
-        return {
-            title: `Confetti | ${this.broadcast?.code || this.broadcast?.name || ""}`
-        };
-    },
     sockets: {
         stop_confetti() {
             console.log("confetti stop");
@@ -95,6 +84,14 @@ export default {
         enable_confetti() {
             this.confettiDisabled = false;
         }
+    },
+    beforeUnmount() {
+        this.stopConfetti();
+    },
+    head() {
+        return {
+            title: `Confetti | ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
     }
 };
 </script>

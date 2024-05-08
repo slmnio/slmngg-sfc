@@ -1,6 +1,6 @@
 <template>
     <transition name="fade" mode="out-in">
-        <div class="countdown" :key="to">
+        <div :key="to" class="countdown">
             <span class="industry-align" v-html="text"></span>
         </div>
     </transition>
@@ -12,9 +12,6 @@ import spacetime from "spacetime";
 export default {
     name: "Countdown",
     props: ["to", "timezone", "update"],
-    mounted() {
-        setInterval(this.tick, 1000);
-    },
     data: () => ({
         now: new Date(),
         startingCountdown: null
@@ -59,8 +56,12 @@ export default {
         to(newTo) {
             this.startingCountdown = this.diff;
         }
+    },
+    mounted() {
+        setInterval(this.tick, 1000);
     }
 };
+
 </script>
 
 <style scoped>

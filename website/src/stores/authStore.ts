@@ -53,7 +53,9 @@ interface Client {
     id: DirtyAirtableID
 }
 
-const cookies = new Cookies(null);
+const cookies = new Cookies(null, {
+    path: "/",
+});
 
 export const useAuthStore = defineStore("auth", () => {
     const token = ref<string | null>(null);

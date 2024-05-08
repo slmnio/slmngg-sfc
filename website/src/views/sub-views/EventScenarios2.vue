@@ -56,7 +56,7 @@
                     <th class="p-2 border-dark incomplete-border">
                         Range
                     </th>
-                    <th v-for="calc in settings?.calculate" class="p-2 border-dark">
+                    <th v-for="calc in settings?.calculate" :key="JSON.stringify(calc)" class="p-2 border-dark">
                         {{ Object.entries(calc)?.[0]?.join(": ") }}
                     </th>
                 </tr>
@@ -89,7 +89,7 @@
                         {{ analyseIncompletePositions(team.positions.slice(0, -1), team.incompletePositions) }}
                     </td>
 
-                    <td v-for="calc in settings?.calculate" class="p-2 border-dark text-center" :class="{'text-muted': !locked(calc, team)}">
+                    <td v-for="calc in settings?.calculate" :key="JSON.stringify(calc)" class="p-2 border-dark text-center" :class="{'text-muted': !locked(calc, team)}">
                         <span v-if="locked(calc, team)"><i class="fas fa-check-circle"></i></span>
                     </td>
                 </tr>

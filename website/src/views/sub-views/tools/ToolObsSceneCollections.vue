@@ -3,9 +3,11 @@
         <b-form-group label="Client">
             <b-form-input v-model="client" @update="updateClient" />
             <template #description>
-                Clients identify production staff and will dynamically change your setup to whichever broadcast you're
-                working on.<br>
-                <b>Use this if you're creating a setup that will work for any broadcast.</b>
+                <span class="text-white">
+                    Clients identify production staff and will dynamically change your setup to whichever broadcast you're
+                    working on.<br>
+                    <b>Use this if you're creating a setup that will work for any broadcast.</b>
+                </span>
             </template>
         </b-form-group>
 
@@ -14,9 +16,11 @@
         <b-form-group label="Broadcast">
             <b-form-input v-model="broadcast" :disabled="!(client === '' || !client)" />
             <template #description>
-                Broadcast keys are locked to specific broadcasts and won't update if you work on a different
-                broadcast.<br>
-                <b>Use this if you're creating a setup for a one-off broadcast.</b>
+                <span class="text-white">
+                    Broadcast keys are locked to specific broadcasts and won't update if you work on a different
+                    broadcast.<br>
+                    <b>Use this if you're creating a setup for a one-off broadcast.</b>
+                </span>
             </template>
         </b-form-group>
 
@@ -45,7 +49,7 @@
         <div v-if="selectedJSON?.customizable">
             <h2 class="text-lg bold">Customisation</h2>
 
-            <div v-for="(row, i) in customisation">
+            <div v-for="(row, i) in customisation" :key="i">
                 <div class="d-flex gap-3 align-items-center">
                     <b-form-group label="Scene Type">
                         <b-form-select
@@ -79,7 +83,7 @@
                     <!-- eslint-disable-next-line no-irregular-whitespace -->
                     <b-form-group label="​">
                         <!-- There's a zero-width space here so that all the form groups align -->
-                        <b-button @click="customisation.splice(i, 1)">Remove Scene</b-button>
+                        <b-button variant="danger" @click="customisation.splice(i, 1)">Remove Scene</b-button>
                     </b-form-group>
                 </div>
             </div>
@@ -106,7 +110,7 @@
             v-if="output"
             class="p-6 rounded-lg cursor-not-allowed select-none bg-slate-800 text-white overflow-x-scroll">
             <ul>
-                <li v-for="scene in JSON.parse(output)?.scene_order">{{ scene?.name }}</li>
+                <li v-for="(scene, i) in JSON.parse(output)?.scene_order" :key="i">{{ scene?.name }}</li>
             </ul>
         </div>
 

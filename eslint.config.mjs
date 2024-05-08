@@ -9,7 +9,36 @@ export default [
     ...tseslint.configs.recommended,
     ...pluginVue.configs["flat/strongly-recommended"],
     {
-        ignores: ["server/src/_deprecated/*"]
+        plugins: {
+            'typescript-eslint': tseslint.plugin,
+        },
+        languageOptions: {
+            parserOptions: {
+                parser: tseslint.parser,
+                project: 'website/tsconfig.json',
+                extraFileExtensions: ['.vue'],
+                sourceType: 'module',
+            },
+        },
+    },
+    {
+        files: [
+            "**/*.vue",
+            "**/*.js",
+            "**/*.jsx",
+            "**/*.cjs",
+            "**/*.mjs",
+            "**/*.ts",
+            "**/*.tsx",
+            "**/*.cts",
+            "**/*.mts"
+        ],
+        languageOptions: {
+            ecmaVersion: "latest",
+        }
+    },
+    {
+        ignores: ["server/src/_deprecated/**/*", "website/dist/**/*"],
     },
     {
         files: ["server/**/*.js"],
@@ -139,7 +168,6 @@ export default [
                     "head",
                 ]
             }]
-
         },
         languageOptions: {
             ecmaVersion: "latest"

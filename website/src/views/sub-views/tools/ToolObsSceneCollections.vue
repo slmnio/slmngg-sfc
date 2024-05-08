@@ -53,6 +53,7 @@
                             :options="customScenes.map((scene) => ({value: scene, text: scene.name}))" />
                     </b-form-group>
 
+                    <!-- eslint-disable-next-line no-irregular-whitespace -->
                     <b-form-group label="​">
                         <!-- There's a zero-width space here so that all the form groups align -->
                         <b-form-checkbox v-model="customisation[i].withStinger">
@@ -75,6 +76,7 @@
                             :options="['Desk', 'Break', null].map((bg) => ({value: bg, text: bg ? `${bg} music` : 'No music'}))" />
                     </b-form-group>
 
+                    <!-- eslint-disable-next-line no-irregular-whitespace -->
                     <b-form-group label="​">
                         <!-- There's a zero-width space here so that all the form groups align -->
                         <b-button @click="customisation.splice(i, 1)">Remove Scene</b-button>
@@ -116,7 +118,6 @@
 </template>
 
 <script>
-import { BButton, BButtonGroup, BFormCheckbox, BFormGroup, BFormInput, BFormSelect } from "bootstrap-vue";
 
 import obs from "./collections/obs.json";
 import prod from "./collections/prod.json";
@@ -213,14 +214,6 @@ const globalCustomisationDefault = {
 
 export default {
     name: "ToolsObsSceneCollections",
-    components: {
-        BButton,
-        BButtonGroup,
-        BFormInput,
-        BFormGroup,
-        BFormSelect,
-        BFormCheckbox
-    },
     data: () => ({
         client: "",
         broadcast: "",

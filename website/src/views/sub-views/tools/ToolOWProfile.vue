@@ -65,11 +65,13 @@
         </div>
     </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { useFileSystemAccess, useLocalStorage } from "@vueuse/core";
 import { encode, parse } from "ini";
 import { computed, ref } from "vue";
 import { merge } from "lodash";
+import { useHead } from "@unhead/vue";
+
 
 const settings = {
     bpl: {
@@ -144,8 +146,8 @@ const settings = {
 };
 
 function getMergedSettings(
-    currentSettings,
-    settingsName
+    currentSettings: object,
+    settingsName: "bpl" | "bplOpinionated"
 ) {
     const mergedData = merge(currentSettings, settings[settingsName]);
     return {
@@ -191,9 +193,9 @@ const wasOverwritten = computed(() => {
     return settingsData.value.WasOverwritten?.["1"]?.Value == 1;
 });
 
-const logMessages = ref([]);
+const logMessages = ref<string[]>([]);
 
-async function waitFor(ms) {
+async function waitFor(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -225,7 +227,7 @@ async function executeAction() {
         logMessages.value.push("Merging settings...");
         const newData = getMergedSettings(
             settingsData.value,
-            action.value
+            action.value as "bpl" | "bplOpinionated"
         );
         await waitFor(500);
 
@@ -261,19 +263,13 @@ const hasValidBackup = computed(() => {
     return Object.keys(backup.value).length > 0;
 });
 
-async function writeData(data) {
+async function writeData(data: object) {
     if (!res.data.value) return;
     res.data.value = encode(data);
     await res.save();
 }
-</script>
 
-<script>
-export default {
-    head() {
-        return {
-            title: "Overwatch Settings Switcher"
-        };
-    }
-};
+useHead({
+    title: "Overwatch Settings Switcher"
+});
 </script>

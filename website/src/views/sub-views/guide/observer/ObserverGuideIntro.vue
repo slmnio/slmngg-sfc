@@ -8,7 +8,7 @@
         <h3>Good Internet</h3>
         <p>
             You need a <strong>good quality internet connection</strong> to stream your gameplay. If you have <strong>less than 10mbps upload</strong>, you
-            aren't going to be able to stream at high quality. If you're not sure about that, <a v-b-toggle="'speedtest'" href="#">take a speedtest</a v-b-toggle> and send it to
+            aren't going to be able to stream at high quality. If you're not sure about that, <a v-b-toggle="'speedtest'" href="#">take a speedtest</a> and send it to
             production staff.
         </p>
 

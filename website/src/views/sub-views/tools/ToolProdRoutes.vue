@@ -60,7 +60,7 @@
             </ul>
         </p>
         <b-input-group prepend="Search">
-            <b-form-input v-model="search" value="" placeholder="Search for routes..." type="text" />
+            <b-form-input v-model="search" placeholder="Search for routes..." type="text" />
         </b-input-group>
 
 

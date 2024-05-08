@@ -13,6 +13,7 @@ export function createRouter(app: App, subID?: string, subdomain?: string) {
     console.log({ subID, subdomain });
 
     if (!subdomain || !subID) {
+        console.log("No minisite, using default routes");
         return {
             router: _createRouter({
                 history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,6 +26,7 @@ export function createRouter(app: App, subID?: string, subdomain?: string) {
         };
     }
 
+    console.log("Using minisite routes for", subdomain, "with ID", subID);
     return {
         router: _createRouter({
             history: createWebHistory(import.meta.env.BASE_URL),

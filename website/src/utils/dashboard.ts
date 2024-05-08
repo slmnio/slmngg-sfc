@@ -22,7 +22,8 @@ type ActionKey = "create-live-guest" |
     "update-match-data" |
     "update-profile-data" |
     "set-player-relationships" |
-    "adjust-match-broadcast"
+    "adjust-match-broadcast" |
+    "calculate-scenarios"
 
 type RequestUrl = `actions/${ActionKey}`
 
@@ -182,6 +183,11 @@ interface AdjustMatchBroadcastData {
     matchID: AnyAirtableID
 }
 
+interface CalculateScenariosData {
+    eventID: AnyAirtableID
+    group: string
+}
+
 
 type ActionRequestData<U> =
     U extends "actions/create-live-guest" ? CreateLiveGuestData :
@@ -203,6 +209,7 @@ type ActionRequestData<U> =
     U extends "actions/update-profile-data" ? UpdateProfileDataData :
     U extends "actions/set-player-relationships" ? SetPlayerRelationshipsData :
     U extends "actions/adjust-match-broadcast" ? AdjustMatchBroadcastData :
+    U extends "actions/calculate-scenarios" ? CalculateScenariosData :
     any;
 
 

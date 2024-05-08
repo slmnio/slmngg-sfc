@@ -25,6 +25,7 @@ import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { searchInCollection } from "@/utils/search";
 import LoadingIcon from "@/components/website/LoadingIcon";
 import EventTeamsDisplay from "@/views/lists/EventTeamsDisplay.vue";
+import { useRouteQuery } from "@vueuse/router";
 
 export default {
     name: "Teams",
@@ -35,7 +36,7 @@ export default {
     data: function() {
         return {
             search: null,
-            page: 1,
+            page: useRouteQuery("page", "1", { transform: Number }),
             eventsPerPage: 10
         };
     },

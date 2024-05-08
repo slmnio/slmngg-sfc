@@ -25,8 +25,8 @@
 
                 <li
                     class="nav-item schedule-group nav-link no-link-style"
-                    :class="{'active ct-active': showAll === true, 'ct-passive': showAll !== true }"
-                    @click="showAll = true">
+                    :class="{'active ct-active': activeScheduleNum === 'all', 'ct-passive': activeScheduleNum !== 'all' }"
+                    @click="activeScheduleNum = 'all'">
                     <b>All matches</b>
                 </li>
             </ul>
@@ -61,19 +61,23 @@ import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 import { canEditMatch, isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import { useAuthStore } from "@/stores/authStore";
-import { useStatusStore } from "@/stores/statusStore";
+import { useRouteQuery } from "@vueuse/router";
+
 
 export default {
     name: "EventSchedule",
     components: { TimezoneSwapper, ScheduleMatch },
     props: ["event"],
     data: () => ({
-        showAll: false,
+        activeScheduleNum: useRouteQuery("page", undefined, { transform: val => val === "all" ? val : parseInt(val), mode: "replace" }),
         hideCompleted: false,
         hideNoVods: false,
         selectedBroadcastID: null
     }),
     computed: {
+        showAll() {
+            return this.activeScheduleNum === "all";
+        },
         defaultScheduleNum() {
             const filtered = this.pagedMatches.filter(page => {
                 const allMatchesComplete = page.matches.every(m => m.special_event || [m.score_1, m.score_2].includes(m.first_to));
@@ -98,6 +102,10 @@ export default {
             }
 
             return 0;
+        },
+        activeScheduleNumWithDefault() {
+            if (this.activeScheduleNum) return this.activeScheduleNum;
+            return this.defaultScheduleNum;
         },
         matches() {
             if (!this.event?.matches) return [];
@@ -142,7 +150,7 @@ export default {
                 };
             }
 
-            let group = this.pagedMatches.find(group => group.num === this.activeScheduleNum);
+            let group = this.pagedMatches.find(group => group.num === this.activeScheduleNumWithDefault);
             if (!group || group.matches.length === 0) {
                 // this is where to set the default
                 // TODO: make the default page show the next incomplete match
@@ -180,25 +188,6 @@ export default {
 
                 return 0;
             });
-        },
-        activeScheduleNum: {
-            set(newNum) {
-                this.showAll = false;
-                this.hideCompleted = false;
-                this.hideNoVods = false;
-
-                const statusStore = useStatusStore();
-
-                statusStore.lastEventMatchPages[this.event.id] = newNum;
-            },
-            get() {
-                const statusStore = useStatusStore();
-
-                const lastPage = statusStore.lastEventMatchPages[this.event.id];
-                if (lastPage === undefined) return this.defaultScheduleNum;
-                // if (lastPage.matchPage > this.pagedMatches.length) return this.defaultScheduleNum;
-                return lastPage;
-            }
         },
         showEditorButton() {
             const { user } = useAuthStore();
@@ -255,18 +244,6 @@ export default {
             }
         }
     },
-    // watch: {
-    //     defaultScheduleNum(newNum, oldNum) {
-    //         if (oldNum !== newNum && !this.activeScheduleNum) {
-    //             this.activeScheduleNum = newNum;
-    //         }
-    //     }
-    // },
-    // mounted() {
-    //     if (this.defaultScheduleNum && !this.activeScheduleNum) {
-    //         this.activeScheduleNum = this.defaultScheduleNum;
-    //     }
-    // },
     head() {
         return {
             title: "Schedule"

@@ -35,6 +35,7 @@ export function createRouter(app: App, subID?: string, subdomain?: string) {
                     path: "/",
                     component: MinisiteWrapperApp,
                     children: [
+                        ...SharedRoutes,
                         {
                             path: "/",
                             component: Event,
@@ -46,7 +47,6 @@ export function createRouter(app: App, subID?: string, subdomain?: string) {
                                 };
                             }
                         },
-                        ...SharedRoutes,
                         ...AuthRedirects(app),
                         { path: "/:pathMatch(.*)*", component: NotFoundContent }
                     ]

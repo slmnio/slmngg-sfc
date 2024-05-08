@@ -1,8 +1,10 @@
 export default [
     { path: "", component: () => import("@/views/sub-views/EventMain.vue") },
     { path: "rosters", component: () => import("@/views/sub-views/EventRosters.vue") },
-    { path: "bracket", alias: "brackets", component: () => import("@/views/sub-views/EventBrackets.vue") },
-    { path: "schedule", alias: "matches", component: () => import("@/views/sub-views/EventSchedule.vue") },
+    { path: "bracket", name: "event-bracket", alias: "brackets", component: () => import("@/views/sub-views/EventBrackets.vue") },
+    { path: "brackets", redirect: { name: "event-schedule" } },
+    { path: "schedule", name: "event-schedule", component: () => import("@/views/sub-views/EventSchedule.vue") },
+    { path: "matches", redirect: { name: "event-schedule" } },
     // { path: "scenarios", component: EventScenarios },
     { path: "scenarios", component: () => import("@/views/sub-views/EventScenarios2.vue") },
     { path: "draft", component: () => import("@/views/sub-views/EventDraft.vue") },
@@ -12,5 +14,6 @@ export default [
     { path: "theme", component: () => import("@/views/sub-views/ThingTheme.vue") },
     { path: "brands", component: () => import("@/views/sub-views/EventBrands.vue") },
     { path: "auction", component: () => import("@/views/sub-views/EventAuction.vue") },
-    { path: "streams", alias: ["stream", "stream-details"], component: () => import("@/views/sub-views/EventStreamDetails.vue") }
+    { path: "streams", name: "event-streams", component: () => import("@/views/sub-views/EventStreamDetails.vue") },
+    { path: "stream", alias: ["stream-details"], redirect: { name: "event-streams" } },
 ];

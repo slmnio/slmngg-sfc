@@ -61,7 +61,7 @@ export default [
                 component: Learn
             },
             {
-                path: "/learn/guides/observing",
+                path: "/learn/guides/observing-tech",
                 component: () => import("@/views/sub-views/guide/observer/ObserverGuideContainer.vue"),
                 children: [
                     { path: "", component: () => import("@/views/sub-views/guide/observer/ObserverGuideIntro.vue") },

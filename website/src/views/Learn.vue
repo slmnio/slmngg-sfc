@@ -10,7 +10,7 @@
 
         <ul>
             <li>
-                <router-link to="/learn/guides/observing">Observer Guide</router-link>
+                <router-link to="/learn/guides/observing-tech">Observer Tech Guide</router-link>
             </li>
             <li>
                 <router-link to="/learn/guides/ow-settings">Overwatch Settings Guide</router-link>

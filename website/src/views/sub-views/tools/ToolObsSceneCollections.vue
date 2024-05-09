@@ -127,6 +127,8 @@ import obs from "./collections/obs.json";
 import prod from "./collections/prod.json";
 import timelessProd from "./collections/timeless_prod.json";
 import prodBeta from "./collections/24.0 prod.json";
+import { useAuthStore } from "@/stores/authStore";
+import { mapState } from "pinia";
 
 const OBS = {
     scene: {
@@ -305,6 +307,7 @@ export default {
         customGFXcount: 3
     }),
     computed: {
+        ...mapState(useAuthStore, {authClient: "client"}),
         output() {
             if (!this.json) return;
             let jsonText = this.json;
@@ -581,6 +584,16 @@ export default {
                 .replace(/[^a-zA-Z0-9-_]/g, "")
                 .toLocaleLowerCase()
                 .trim();
+        }
+    },
+    watch: {
+        authClient: {
+            immediate: true,
+            handler(client) {
+                if (client) {
+                    this.client = client.key;
+                }
+            }
         }
     },
     async mounted() {

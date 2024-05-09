@@ -55,6 +55,7 @@ interface Client {
 
 const cookies = new Cookies(null, {
     path: "/",
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30)
 });
 
 export const useAuthStore = defineStore("auth", () => {

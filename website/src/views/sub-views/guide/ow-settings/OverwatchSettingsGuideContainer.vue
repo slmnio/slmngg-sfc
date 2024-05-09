@@ -7,6 +7,9 @@
                 <router-link class="nav-link" to="/learn/guides/ow-settings">Intro</router-link>
             </li>
             <li class="nav-item ct-passive">
+                <router-link class="nav-link" to="/learn/guides/ow-settings/tool"><i class="fa fa-sparkles mr-1"></i> Automatic Settings Tool</router-link>
+            </li>
+            <li class="nav-item ct-passive">
                 <router-link class="nav-link" to="/learn/guides/ow-settings/video">Video</router-link>
             </li>
             <li class="nav-item ct-passive">

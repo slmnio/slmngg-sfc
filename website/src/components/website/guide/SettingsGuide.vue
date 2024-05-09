@@ -4,7 +4,7 @@
         <div v-for="tab in tabs" :key="tab.title" class="mb-2">
             <h3>{{ tab.title }} Tab</h3>
 
-            <b-alert v-if="tab.alert" variant="warning" show>
+            <b-alert v-if="tab.alert" variant="warning" :model-value="true">
                 {{ tab.alert }}
             </b-alert>
 

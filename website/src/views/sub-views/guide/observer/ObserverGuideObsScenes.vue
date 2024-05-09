@@ -44,7 +44,7 @@
             If you see black bars, you may need to adjust the <strong>Overwatch source</strong> settings or change your <strong>Overwatch resolution</strong>.
         </p>
 
-        <b-alert show>You should be able to <strong>see Overwatch's audio levels</strong> for the source in the <strong>OBS Audio Mixer</strong>.</b-alert>
+        <b-alert :model-value="true">You should be able to <strong>see Overwatch's audio levels</strong> for the source in the <strong>OBS Audio Mixer</strong>.</b-alert>
 
         <p>
             At this point you can test out streaming to our server. You can stream to it at any time if you need to test your connection.

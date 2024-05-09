@@ -8,7 +8,7 @@
             OBS
             installed, make sure it's up to date.
         </p>
-        <b-alert show variant="warning">
+        <b-alert :model-value="true" variant="warning">
             Do not use Streamlabs Desktop or OBS.Live.
         </b-alert>
         <h3>
@@ -19,7 +19,7 @@
             <strong>File > Settings</strong>.
         </p>
 
-        <b-alert show>Go to each of the tabs below and change the settings mentioned here.</b-alert>
+        <b-alert :model-value="true">Go to each of the tabs below and change the settings mentioned here.</b-alert>
 
         <h4>Stream</h4>
 

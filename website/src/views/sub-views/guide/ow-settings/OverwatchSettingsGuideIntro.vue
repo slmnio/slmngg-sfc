@@ -9,17 +9,9 @@
         <h3><i class="fa fa-file mx-1"></i> File Settings</h3>
 
         <p>
-            These settings are stored in a file on your computer and are kept between accounts.
+            These settings are stored in a file on your computer and are kept between accounts. Most of these
+            can be set automatically by using our <i class="fa fa-sparkles mx-1"></i> Automatic Settings Tool. <br>
         </p>
-
-        <h4><i class="fa fa-sparkles mx-1"></i> Automatic Settings</h4>
-        <p>
-            We have a tool that can automatically load the file-based
-            settings for you. It'll also automatically backup your current settings which you can restore at any time by
-            visiting the tool again. Automatic settings are marked with <i class="fa fa-sparkles mx-1"></i>. <br>
-            <a href="/tools/ow-settings" target="_blank">Automatic Settings Tool</a>
-        </p>
-
 
         <h3><i class="fa fa-user mx-1"></i> Account Settings</h3>
 

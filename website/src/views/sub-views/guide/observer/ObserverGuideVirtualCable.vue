@@ -22,7 +22,7 @@
                 administrator</strong>.
         </p>
 
-        <b-alert show variant="warning">
+        <b-alert :model-value="true" variant="warning">
             You <strong>must restart</strong> your computer after installing the Virtual Audio Cable.
         </b-alert>
 
@@ -33,7 +33,7 @@
             We now need to route Overwatch's audio to the Virtual Audio Cable.
         </p>
 
-        <b-alert show variant="warning">
+        <b-alert :model-value="true" variant="warning">
             Open Overwatch before starting this section, so it shows in these menus.
         </b-alert>
         <b-tabs content-class="mt-3">
@@ -67,7 +67,7 @@
             </b-tab>
         </b-tabs>
 
-        <b-alert show variant="info">
+        <b-alert :model-value="true" variant="info">
             You should now no longer hear Overwatch through your speakers or headphones.
             If you do, double-check the settings above.
         </b-alert>
@@ -107,7 +107,7 @@
 
         <img :src="soundControlStep2" :height="300">
 
-        <b-alert class="mt-2" show variant="info">You should now be able to hear Overwatch again!</b-alert>
+        <b-alert class="mt-2" :model-value="true" variant="info">You should now be able to hear Overwatch again!</b-alert>
     </div>
 </template>
 <script>

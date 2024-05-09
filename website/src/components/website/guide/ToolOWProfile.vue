@@ -1,45 +1,38 @@
 <template>
-    <div class="container">
-        <h2>Overwatch Settings</h2>
-        <p>
-            You'll need some specific Overwatch settings to make sure our stream looks consistent and professional.
-            This tool can automatically load some of the settings for you.
-        </p>
-
-        <h3>Automatic Overwatch Settings</h3>
-        <div
-            v-if="!res.isSupported.value"
-        >
-            <b-alert show variant="warning">
-                <h4 class="alert-heading">Unsupported browser!</h4>
-                <p>
-                    Unfortunately, your browser doesn't support this feature! Try using Chrome instead (or a browser
-                    based on it
-                    like Edge).
-                </p>
-            </b-alert>
-
-            <p>Try using Chrome instead (or a browser based on it like Edge)</p>
-        </div>
-        <div v-else-if="appStatus === 'idle'">
-            <b-alert show variant="warning">
-                Overwatch <strong>must be fully closed</strong> during this! Make sure Battle.net is showing "Play"
-                instead of "Playing Now".
-            </b-alert>
+    <div
+        v-if="!res.isSupported.value"
+    >
+        <b-alert :model-value="true" variant="warning">
+            <h4 class="alert-heading">Unsupported browser!</h4>
             <p>
-                Select Documents › Overwatch › Settings › Settings_v0.ini
+                Unfortunately, your browser doesn't support this feature! Try using Chrome instead (or a browser
+                based on it
+                like Edge).
             </p>
-            <b-button variant="primary" @click="loadSettings">Load Settings</b-button>
-        </div>
-        <div v-else-if="appStatus === 'loaded'">
-            <b-form-group label="Preset">
-                <b-form-radio-group
-                    v-model="action"
-                    :options="[...presetOptions.map((presetOption) => ({ text: presetOption.name, value: presetOption.id })), { text: `Restore Backup${!hasValidBackup ? ' (Unavailable)' : ''}`, value: 'restore', disabled: !hasValidBackup}]"
-                    buttons
-                    stacked
-                />
-                <template #description>
+        </b-alert>
+
+        <p>Try using Chrome instead (or a browser based on it like Edge)</p>
+    </div>
+    <div v-else-if="appStatus === 'idle'">
+        <b-alert :model-value="true" variant="warning">
+            Overwatch <strong>must be fully closed</strong> during this! Make sure Battle.net is showing "Play"
+            instead of "Playing Now".
+        </b-alert>
+        <p>
+            Select Documents › Overwatch › Settings › Settings_v0.ini
+        </p>
+        <b-button variant="primary" @click="loadSettings">Load Settings</b-button>
+    </div>
+    <div v-else-if="appStatus === 'loaded'">
+        <b-form-group label="Preset">
+            <b-form-radio-group
+                v-model="action"
+                :options="[...presetOptions.map((presetOption) => ({ text: presetOption.name, value: presetOption.id })), { text: `Restore Backup${!hasValidBackup ? ' (Unavailable)' : ''}`, value: 'restore', disabled: !hasValidBackup}]"
+                buttons
+                stacked
+            />
+            <template #description>
+                <span class="text-white">
                     <template v-if="action === 'bpl'">
                         Only sets Broadcast Margins, disables Overlays like the FPS Counter, and sets Volume levels.
                     </template>
@@ -50,19 +43,19 @@
                     <template v-else-if="action === 'restore'">
                         Restores the backup you made when applying settings.
                     </template>
-                </template>
-            </b-form-group>
+                </span>
+            </template>
+        </b-form-group>
 
-            <b-button variant="primary" @click="executeAction">Apply</b-button>
-        </div>
-        <div
-            v-else-if="['applying', 'done'].includes(appStatus)"
-        >
-            <h1 class="font-semibold">Applying Settings</h1>
-            <ul>
-                <li v-for="message in logMessages" :key="message">{{ message }}</li>
-            </ul>
-        </div>
+        <b-button variant="primary" @click="executeAction">Apply</b-button>
+    </div>
+    <div
+        v-else-if="['applying', 'done'].includes(appStatus)"
+    >
+        <h1 class="font-semibold">Applying Settings</h1>
+        <ul>
+            <li v-for="message in logMessages" :key="message">{{ message }}</li>
+        </ul>
     </div>
 </template>
 <script setup lang="ts">

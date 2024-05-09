@@ -34,7 +34,7 @@
             <i class="fa-fw fas fa-save"></i> Save
         </b-button>
 
-        <b-alert class="mt-4" variant="info" show>
+        <b-alert class="mt-4" variant="info" :model-value="true">
             This is a beta feature. It is known to <b>not work</b> with iOS browsers. Desktop Chrome and Firefox should work.<br>
             Send bugs and feature requests to <b>#slmngg-requests</b>.
         </b-alert>

@@ -13,7 +13,7 @@
 
 
         <h3>Suggested Controls</h3>
-        <b-alert variant="warning" show>
+        <b-alert variant="warning" :model-value="true">
             All of this is personal preference, these are just some of the suggested keybinds that work for us.
         </b-alert>
 

@@ -76,6 +76,7 @@ export default [
                 component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideContainer.vue"),
                 children: [
                     { path: "", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideIntro.vue") },
+                    { path: "tool", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideTool.vue") },
                     { path: "video", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideVideo.vue") },
                     { path: "sound", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideSound.vue") },
                     { path: "controls", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideControls.vue") },
@@ -97,7 +98,7 @@ export default [
             },
             {
                 path: "/tools/ow-settings",
-                component: () => import("@/views/sub-views/tools/ToolOWProfile.vue")
+                component: () => import("@/views/sub-views/tools/ToolOWProfileShell.vue")
             },
             {
                 path: "/tools/broadcast-routes",

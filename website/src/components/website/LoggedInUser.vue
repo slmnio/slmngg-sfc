@@ -38,9 +38,7 @@ export default {
         TokenModal
     },
     computed: {
-        ...mapWritableState(useAuthStore, ["user"]),
-        ...mapWritableState(useAuthStore, ["client"]),
-        ...mapState(useAuthStore, ["isProduction"]),
+        ...mapState(useAuthStore, ["isProduction", "user", "client"]),
         playerID() {
             return this.user?.airtableID;
         },

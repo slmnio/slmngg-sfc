@@ -4,7 +4,7 @@
             <div class="event-logo flex-center">
                 <div class="event-logo-inner bg-center" :style="logo"></div>
             </div>
-            <div class="broadcast-name">{{ broadcast.name }}</div>
+            <div class="broadcast-name text-left">{{ broadcast.name }}</div>
         </template>
         <LoadingIcon v-else />
     </b-button>

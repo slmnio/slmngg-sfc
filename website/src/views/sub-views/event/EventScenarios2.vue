@@ -11,8 +11,8 @@
             <!--            </select>-->
 
             <!--            <BFormCheckbox class="mr-3" v-model="showOnlyPossible">Show only possible</BFormCheckbox>-->
-            <BFormCheckbox v-model="showOnlyIncomplete" class="mr-3">Show only incomplete</BFormCheckbox>
-            <BFormCheckbox v-model="showCountsAsPercentages" class="mr-3">Show counts as percentages</BFormCheckbox>
+            <BFormCheckbox v-model="showOnlyIncomplete">Show only incomplete</BFormCheckbox>
+            <BFormCheckbox v-model="showCountsAsPercentages">Show counts as percentages</BFormCheckbox>
 
             <!--            <div class="btn btn-secondary" v-if="showCountsAsPercentages" @click="showCountsAsPercentages = false">View as numbers</div>-->
             <!--            <div class="btn btn-secondary" v-if="!showCountsAsPercentages" @click="showCountsAsPercentages = true">View as percentages</div>-->
@@ -50,8 +50,14 @@
                     <th v-for="(x, i) in (counts[0].positions).slice(0, -1)" :key="i" class="p-2 border-dark">
                         #{{ i + 1 }}
                     </th>
-                    <th class="p-2 border-dark">
+                    <th class="p-2 border-dark incomplete-border" colspan="2">
                         Incomplete
+                    </th>
+                    <th class="p-2 border-dark incomplete-border">
+                        Range
+                    </th>
+                    <th v-for="calc in settings?.calculate" :key="JSON.stringify(calc)" class="p-2 border-dark">
+                        {{ Object.entries(calc)?.[0]?.join(": ") }}
                     </th>
                 </tr>
             </thead>
@@ -62,11 +68,29 @@
                         v-for="(pos, posi) in team.positions"
                         :key="posi"
                         class="p-2 border-dark cell-num"
-                        :class="{ 'bg-info selected': manualScenarioFilters.find((f) => f.team === team.code && f.position === posi ), 'bg-warning text-dark': pos !== 0 && pos === currentScenarioView.length, 'text-muted': pos === 0 }"
+                        :class="{
+                            'bg-info selected': manualScenarioFilters.find((f) => f.team === team.code && f.position === posi),
+                            'bg-warning text-dark': pos !== 0 && pos === currentScenarioView.length,
+                            'text-muted': pos === 0,
+                            'incomplete': pos !== 0 && posi === team.positions?.length - 1,
+                            'incomplete-border': posi === team.positions?.length - 1
+                        }"
                         @click="() => showWhen(team.code, posi)"
                     >
                         <span v-if="showCountsAsPercentages">{{ perc(pos / currentScenarioView.length) }}</span>
                         <span v-else>{{ pos }}</span>
+                    </td>
+                    <td class="p-2 border-dark text-info" :class="{'incomplete': team.incompletePositions?.length}">
+                        <div v-if="team.incompletePositions?.length">
+                            {{ analyseIncompletePositions(team.incompletePositions) }}
+                        </div>
+                    </td>
+                    <td class="p-2 border-dark incomplete-border" :class="{'text-warning': analyseIncompletePositions(team.positions.slice(0, -1), team.incompletePositions)?.includes('only') }">
+                        {{ analyseIncompletePositions(team.positions.slice(0, -1), team.incompletePositions) }}
+                    </td>
+
+                    <td v-for="calc in settings?.calculate" :key="JSON.stringify(calc)" class="p-2 border-dark text-center" :class="{'text-muted': !locked(calc, team)}">
+                        <span v-if="locked(calc, team)"><i class="fas fa-check-circle"></i></span>
                     </td>
                 </tr>
             </tbody>
@@ -351,7 +375,11 @@ export default {
                 });
             });
             if (teams.some(t => !t.id || !t.code)) return [];
-            return teams;
+            return teams.sort((a, b) => {
+                if (a.code > b.code) return 1;
+                if (a.code < b.code) return -1;
+                return 0;
+            });
         },
         counts() {
             let teams = JSON.parse(JSON.stringify(this.scenarioTeams));
@@ -373,7 +401,44 @@ export default {
                 // console.log("scenario", scenario);
                 if (scenario.standings?.standings.length !== scenario.teams.length) {
                     // add to end
-                    teams.forEach(t => t.positions[teams.length]++);
+                    console.log("incomplete scenario in count", scenario.i, scenario);
+                    teams.forEach(t => {
+                        // if the team is not in a tie, and nothing above it is in a tie, this position can't change.
+                        let standingsIndex = 0;
+                        let foundTeam = false;
+
+                        let teamCount = 0;
+
+                        while (!foundTeam && standingsIndex <= scenario.standings?.standings.length) {
+                            const standingsGroup = scenario.standings?.standings[standingsIndex];
+
+                            if (standingsGroup?.length === 1 && standingsGroup?.[0]?.id === t.id) {
+                                // single team group, and is this team
+                                t.positions[teamCount]++;
+                                console.log(scenario.i + 1, "Setting position", teamCount + 1, "for team", t.code, t.id, "since it is not in a tied group");
+                                foundTeam = true;
+                            } else if (standingsGroup?.length > 1 && standingsGroup.some(_t => _t.id === t.id)) {
+                                // team is in here, in a tied group
+                                console.log(scenario.i + 1, "Found team", t.id, t.code, "in tied group with", standingsGroup?.length, "teams", "Position could be", (teamCount + 1), " -> ", (teamCount + standingsGroup?.length - 1 + 1));
+
+                                if (!t.incompletePositions) {
+                                    t.incompletePositions = [];
+                                }
+                                for (let i = teamCount; i < teamCount + (standingsGroup?.length); i++) {
+                                    console.log(scenario.i + 1, t.id, t.code, "adding incomplete position", i);
+                                    t.incompletePositions[i] = (t.incompletePositions[i] || 0) + 1;
+                                }
+                                console.log(scenario.i + 1, t.incompletePositions, teamCount, standingsGroup?.length - 1);
+                            }
+
+                            teamCount += standingsGroup?.length || 0;
+                            standingsIndex++;
+                        }
+
+                        if (!foundTeam) {
+                            t.positions[teams.length]++;
+                        }
+                    });
                 } else {
                     scenario.standings?.standings.forEach((standing, i) => {
                         // console.log(standing, i, standing[0], teamMap[standing[0].code], teams[teamMap[standing[0].code]].positions[i]);
@@ -656,6 +721,61 @@ export default {
         }
     },
     methods: {
+        locked(calc, team) {
+            console.log("locked", calc, team);
+            const incomplete = team.positions[team.positions.length - 1];
+
+
+            let invalidated = false;
+            let standingIndex = 0;
+            while (!invalidated && standingIndex < (team.positions.length - 1)) {
+                if (calc.top) {
+                    // if a position has a count, and that position # is HIGHER than calc.top (top 2, has count on #3)
+                    // invalidate
+
+                    console.log(team.code, calc, team.positions, team.incompletePositions, team.positions[standingIndex], team.incompletePositions?.[standingIndex]);
+                    if (team.positions[standingIndex] || team.incompletePositions?.[standingIndex]) {
+                        // there is counts here
+                        if (standingIndex > (calc.top - 1)) {
+                            console.log("Team", team, "has scenarios where they are", standingIndex + 1, "therefore not locked for", calc);
+                            invalidated = true;
+                        }
+                    }
+                } else if (calc.bottom) {
+                    // if a position has a count, and that position # is LOWER than calc.bottom (bottom 2, has count on #5 on a 16 team standings)
+
+                    if (team.positions[standingIndex] || team.incompletePositions?.[standingIndex]) {
+                        // there is counts here
+                        // in a 10 team standings
+                        // bottom: 2 means 9 or 10
+                        // so 8 or higher is invalid
+
+                        // REMINDER team.positions.length is one higher since last is incomplete
+                        if (standingIndex < ((team.positions.length - 1) - calc.bottom)) {
+                            console.log("Team", team, "has scenarios where they are", standingIndex + 1, "therefore not locked for", calc);
+                            invalidated = true;
+                        } else {
+                            console.warn({ standingIndex, bottom: calc.bottom }, "Team", team, "has scenarios where they are", standingIndex + 1, "therefore not locked for", calc);
+                        }
+                    }
+                }
+                standingIndex++;
+            }
+
+            return !invalidated;
+        },
+        analyseIncompletePositions(pos, altPositions) {
+            if (!pos) return "no positions";
+            let start;
+            let end;
+            pos.forEach((count, i) => {
+                count = count || altPositions?.[i];
+                if (count && !start) start = i;
+                if (count) end = i;
+            });
+            if (start === end) return `#${start + 1} only`;
+            return `#${start + 1} to #${end + 1}`;
+        },
         perc(x) {
             if (isNaN(x)) return "-";
             return (x * 100).toFixed(1) + "%";
@@ -926,5 +1046,11 @@ export default {
         white-space: pre;
         font-family: monospace;
         line-height: 1;
+    }
+    td.incomplete {
+        background: rgb(23 162 184 / 25%);
+    }
+    .incomplete-border {
+        border-left-width: 3px;
     }
 </style>

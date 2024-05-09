@@ -35,30 +35,49 @@
 <div id="app">
     <table>
         <tr>
+            <th></th>
+            <th colspan="4">Full request</th>
+            <th colspan="3">Changes request</th>
+            <th></th>
+        </tr>
+        <tr>
             <th>Table</th>
-            <th>Last request</th>
-            <th>Status</th>
-            <th>Req type</th>
             <th>Time</th>
+            <th>Status</th>
+            <th>Items</th>
+            <th>Rate</th>
+            <th>Time</th>
+            <th>Status</th>
             <th>Items</th>
             <th title="Airtable request count">#</th>
         </tr>
         <tr v-for="table in requests">
             <th style="text-align: left">{{ table.tableName }}</th>
-            <td :class="{'active-time': table.request?.status === 'active'}" style="font-family: monospace">{{ time(Math.floor((now - new Date(table.lastRequest)) / 1000)) }}</td>
-            <td :class="table.request?.status">{{ table.request?.status }}</td>
-            <td>{{ table.request?.type }}</td>
-            <td :class="{'active-time': table.request?.status === 'active'}" style="font-family: monospace">{{ table.request?.duration ? (table.request.duration / 1000).toFixed(1) + 's' : null}}</td>
-            <td>{{ table.request?.itemCount != null ? `${table.request.itemCount} item${table.request.itemCount === 1 ? '' : 's'}` : null}}</td>
-            <td style="font-family: monospace">{{ table.airtableRequestCount }}</td>
-            <td style="font-family: monospace" v-if="table.request?.type === 'all' && table.request?.status === 'finished'">
-                <span>{{ ((table.request.duration / 1000) / table.airtableRequestCount).toFixed(2) }} s/r</span>
+
+            <td :class="{'active-time': table.fullRequest?.status === 'active'}" style="font-family: monospace">{{ time(Math.floor((now - new Date(table.lastFullRequest)) / 1000)) }}</td>
+            <td :class="table.fullRequest?.status">{{ table.fullRequest?.status }}</td>
+            <td>{{ table.fullRequest?.itemCount != null ? `${table.fullRequest.itemCount} item${table.fullRequest.itemCount === 1 ? '': 's'}` : null}}</td>
+            <td style="font-family: monospace">
+                <span v-if="table.fullRequest?.type === 'all' && table.fullRequest?.status === 'finished'">{{ ((table.fullRequest.duration / 1000) / table.airtableRequestCount).toFixed(2) }} s/r</span>
             </td>
-            <td><span v-if="table.lastError">
-                {{ time(Math.floor((now - new Date(table.lastError?.date)) / 1000)) }}
-                {{ table.lastError
-                 }}
-            </span></td>
+
+
+            <td :class="{'active-time': table.changesRequest?.status === 'active'}" style="font-family: monospace">{{ time(Math.floor((now - new Date(table.lastChangesRequest)) / 1000)) }}</td>
+            <td :class="table.changesRequest?.status">{{ table.changesRequest?.status }}</td>
+            <td>{{ table.changesRequest?.itemCount != null ? `${table.changesRequest.itemCount} item${table.changesRequest.itemCount === 1 ? '': 's'}` : null}}</td>
+
+<!--            <td :class="{'active-time': table.request?.status === 'active'}" style="font-family: monospace">{{ time(Math.floor((now - new Date(table.lastRequest)) / 1000)) }}</td>-->
+<!--            <td :class="{'active-time': table.request?.status === 'active'}" style="font-family: monospace">{{ time(Math.floor((now - new Date(table.lastFullRequest)) / 1000)) }}</td>-->
+<!--            <td :class="table.request?.status">{{ table.request?.status }}</td>-->
+<!--            <td>{{ table.request?.type }}</td>-->
+<!--            <td :class="{'active-time': table.request?.status === 'active'}" style="font-family: monospace">{{ table.request?.duration ? (table.request.duration / 1000).toFixed(1) + 's' : null}}</td>-->
+
+            <td style="font-family: monospace">{{ table.airtableRequestCount }}</td>
+
+<!--            <td><span v-if="table.lastError">-->
+<!--                {{ time(Math.floor((now - new Date(table.lastError?.date)) / 1000)) }}-->
+<!--                {{ table.lastError }}-->
+<!--            </span></td>-->
         </tr>
     </table>
 </div>

@@ -75,6 +75,7 @@ export default [
     { path: "standings", component: () => import("@/components/broadcast/roots/StandingsOverlay.vue"), props: route => ({ stage: route.query.stage || route.query.group }) },
     {
         path: "multi-standings",
+        alias: "multistandings",
         component: () => import("@/components/broadcast/roots/MultiStandingsOverlay.vue"),
         props: route => ({
             stageCodes: (route.query.stage || route.query.group || route.query.stages || route.query.groups || "").split(",").filter(Boolean),
@@ -82,10 +83,9 @@ export default [
             showColumns: (route.query.columns || route.query.show || "").split(",").filter(Boolean)
         })
     },
-    { path: "multistandings", redirect: "multi-standings" },
-    { path: "roster", redirect: "rosters" },
     {
         path: "rosters",
+        alias: "roster",
         component: () => import("@/components/broadcast/roots/RosterOverlay.vue"),
         props: route => ({
             showRoles: route.query.roles,
@@ -95,12 +95,9 @@ export default [
             splitPlayers: route.query.split ? parseInt(route.query.split) : null
         })
     },
-    { path: "hero-rosters", redirect: "hero-roster" },
-    { path: "boxed-hero-rosters", redirect: "boxed-roster" },
-    { path: "boxed-hero-roster", redirect: "boxed-roster" },
-    { path: "boxed-rosters", redirect: "boxed-roster" },
     {
         path: "hero-roster",
+        alias: "hero-rosters",
         component: () => import("@/components/broadcast/roots/HeroRosterOverlay.vue"),
         props: route => ({
             teamNum: route.query.team || route.query.teamNum,
@@ -111,6 +108,7 @@ export default [
     },
     {
         path: "boxed-roster",
+        alias: ["boxed-hero-roster", "boxed-hero-rosters", "boxed-rosters"],
         component: () => import("@/components/broadcast/roots/BoxedHeroRosterOverlay.vue"),
         props: route => ({
             teamNum: route.query.team || route.query.teamNum,
@@ -167,7 +165,6 @@ export default [
             eachTeam: route.query.eachTeam || route.query.players
         })
     },
-    { path: "casters", redirect: "desk" },
     {
         path: "caster-bg",
         component: () => import("@/components/broadcast/CasterBackground.vue"),
@@ -178,6 +175,7 @@ export default [
     },
     {
         path: "desk",
+        alias: "casters",
         component: () => import("@/components/broadcast/desk/DeskOverlay.vue"),
         props: route => ({
             group: "casters",
@@ -225,8 +223,7 @@ export default [
         })
     },
     { path: "desk-graphics", component: () => import("@/components/broadcast/roots/DeskGraphicsOverlay.vue") },
-    { path: "stinger", component: () => import("@/components/broadcast/roots/EmptyStingerOverlay.vue") },
-    { path: "empty", redirect: "stinger" },
+    { path: "stinger", alias: "empty", component: () => import("@/components/broadcast/roots/EmptyStingerOverlay.vue") },
     { path: "broadcasts", component: () => import("@/components/broadcast/roots/OtherBroadcastsOverlay.vue") },
     { path: "mvp", component: () => import("@/components/broadcast/roots/MVPOverlay.vue") },
     {
@@ -281,9 +278,10 @@ export default [
     { path: "tester", component: () => import("@/components/broadcast/roots/ThemeTransitionTester.vue") },
     { path: "admin", component: () => import("@/components/broadcast/roots/ClientOverview.vue") },
     { path: "syncer", component: () => import("@/components/broadcast/roots/SyncerOverlay.vue") },
-    { path: "tally", redirect: "tally-viewer" },
+    { path: "tally", redirect: { name: "tally-viewer" } },
     {
         path: "tally-viewer",
+        name: "tally-viewer",
         component: () => import("@/components/broadcast/roots/TallyViewer.vue"),
         props: route => ({
             customText: ["scene", "scenes", "text", "custom", "customText", "force"].reduce((prev, current) => prev || route.query[current], null)
@@ -291,15 +289,12 @@ export default [
     },
     {
         path: "tally-dot",
+        alias: "dot",
         component: () => import("@/components/broadcast/roots/TallyDot.vue"),
         props: route => ({
             number: parseInt(route.query.number || route.query.number || "1"),
             align: route.query.align || (route.query.left ? "left" : "") || (route.query.right ? "right" : "") || "right"
         })
-    },
-    {
-        path: "dot",
-        redirect: "tally-dot"
     },
     {
         path: "quad",

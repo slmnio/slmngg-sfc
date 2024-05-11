@@ -9,6 +9,7 @@
                 :match-count="matchCount"
                 :team="team"
                 :live-match="match"
+                :stage="stage"
                 :timezone="broadcast.timezone || 'America/New_York'" />
         </div>
     </GenericOverlay>
@@ -21,7 +22,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "SeasonHistoryOverlay",
     components: { TeamSeasonHistory, GenericOverlay },
-    props: ["broadcast", "title", "showHeaders", "matchCount"],
+    props: ["broadcast", "title", "showHeaders", "matchCount", "stage"],
     computed: {
         teams() {
             return this.match?.teams || [];

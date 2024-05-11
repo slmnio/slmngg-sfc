@@ -2,8 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const {
     updateRecord,
-    createRecord,
-    getSelfClient
+    createRecord
 } = require("./action-utils");
 
 const Cache = require("../cache.js");

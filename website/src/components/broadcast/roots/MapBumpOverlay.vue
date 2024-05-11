@@ -1,8 +1,8 @@
 <template>
     <div class="map-bump-overlay">
         <transition name="swipe-right">
-            <div class="overlay-container" v-if="animationActive && nextMap">
-                <div class="last-map" v-if="mostRecentMap">
+            <div v-if="animationActive && nextMap" class="overlay-container">
+                <div v-if="mostRecentMap" class="last-map">
                     <div class="title flex-center">PREVIOUSLY</div>
                     <div class="content map-holder">
                         <div class="map-image" :style="mostRecentMapBG"></div>
@@ -66,8 +66,7 @@ export default {
 
             let maps = [...(this.match?.maps || [])].filter(m => m.map);
 
-            if (this.showBannedMaps) {
-            } else {
+            if (!this.showBannedMaps) {
                 maps = maps.filter(m => !(m.banner || m.banned));
 
                 if (this.match?.first_to) {
@@ -89,7 +88,7 @@ export default {
             if (dummyMapCount > 0) {
                 for (let i = 0; i < dummyMapCount; i++) {
                     const num = initialMapCount + i;
-                    if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: this.mapTypes && this.mapTypes[num], image: [{ url: DefaultMapImages[this.mapTypes[num]] }] } : {}) });
+                    if (this.mapTypes[num]) maps.push({ dummy: true, ...(this.mapTypes ? { name: this.mapTypes?.[num], image: [{ url: DefaultMapImages[this.mapTypes[num]] }] } : {}) });
                 }
             }
 
@@ -159,17 +158,6 @@ export default {
             return this.$root?.activeScene?.name?.toLowerCase().includes("map");
         }
     },
-
-    sockets: {
-        map_music() {
-            console.log("Map Music trigger");
-            this.playAudio();
-        },
-        fade_map_music() {
-            console.log("Fade Map Music trigger");
-            this.fadeOutAudio(0, 5);
-        }
-    },
     methods: {
         winnerBG(map) {
             return logoBackground1(map.winner);
@@ -211,7 +199,7 @@ export default {
             this.audioStatus = "playing";
             await audio.play();
             return await new Promise((resolve, reject) => {
-                audio.addEventListener("ended", async () => {
+                audio.addEventListener("ended", () => {
                     this.activeAudio = null;
                     resolve();
                 });
@@ -285,6 +273,17 @@ export default {
                 console.log("Animation reset - stopping audio");
                 this.stopAudio();
             }
+        }
+    },
+
+    sockets: {
+        map_music() {
+            console.log("Map Music trigger");
+            this.playAudio();
+        },
+        fade_map_music() {
+            console.log("Fade Map Music trigger");
+            this.fadeOutAudio(0, 5);
         }
     }
 };
@@ -376,7 +375,7 @@ export default {
         clip-path: polygon(-1% -1%, 101% -1%, 101% 101%, -1% 101%);
     }
 
-    .swipe-right-enter {
+    .swipe-right-enter-from {
         /* closed left */
         clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
     }

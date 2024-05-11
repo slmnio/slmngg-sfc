@@ -1,198 +1,31 @@
-import Vue from "vue";
-import GlobalApp from "./apps/GlobalApp";
+import { createApp, h } from "vue";
+import { createPinia } from "pinia";
+import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import store from "@/thing-store";
-import Vuex from "vuex";
-import VueMeta from "vue-meta";
-import VueRouter from "vue-router";
-import VueSocketIOExt from "vue-socket.io-extended";
-import { io } from "socket.io-client";
-import { VBTooltip } from "bootstrap-vue";
-import "bootstrap-vue/dist/bootstrap-vue.css";
-import VueYoutubeEmbed from "vue-youtube-embed";
-import VueCookies from "vue-cookies";
+
+import GlobalApp from "./apps/GlobalApp";
+import { createBootstrap } from "bootstrap-vue-next";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue-next/dist/bootstrap-vue-next.css";
+
+import { createHead, VueHeadMixin } from "@unhead/vue";
+import VueConfetti from "vue-confetti";
 
 import { Notyf } from "notyf";
 import "notyf/notyf.min.css";
 
-import defaultRoutes from "@/router/default";
-import { fetchThings, getDataServerAddress, getMainDomain } from "@/utils/fetch";
-import EventRoutes from "@/router/event";
+import { getDataServerAddress } from "@/utils/fetch";
+import { createRouter } from "@/router";
 
-import Event from "@/views/Event";
-import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp";
-import SharedRoutes from "@/router/shared-routes";
-import AuthRoutes from "@/router/auth-redirects";
-import { ReactiveRoot } from "@/utils/reactive";
-import { authenticateWithToken, getAuthNext, setAuthNext } from "@/utils/auth";
-import NotFoundContent from "@/views/sub-views/NotFoundContent";
+import socketMixin from "@/socket-client";
+import { getSubdomain } from "@/utils/get-subdomain";
+import { useAuthStore } from "@/stores/authStore";
 
-// eslint-disable-next-line prefer-const
-let app;
+const { subdomain, subID } = await getSubdomain();
 
-Vue.use(Vuex);
-Vue.use(VueMeta);
-Vue.use(VueRouter);
-Vue.use(VueYoutubeEmbed, { global: false });
-Vue.use(VueCookies);
-
-Vue.prototype.$notyf = new Notyf({
-    duration: 5000,
-    position: {
-        x: "right",
-        y: "top"
-    },
-    dismissible: true
-});
-
-store.subscribe((mutation, state) => {
-    if (mutation.type === "setPlayerDraftNotes") {
-        // store to localstorage
-        localStorage.setItem("draft-notes", JSON.stringify(state.draft_notes));
-    }
-});
-
-Vue.directive("b-tooltip", VBTooltip);
-
-const socket = io(getDataServerAddress(), { transports: ["websocket", "polling"] });
-
-Vue.use(VueSocketIOExt, socket, { store });
-
-Vue.config.productionTip = false;
-
-Vue.config.devtools = ["local", "staging"].includes(import.meta.env.VITE_DEPLOY_MODE);
-
-Vue.component("v-style", {
-    render: function (createElement) {
-        return createElement("style", this.$slots.default);
-    }
-});
-
-const host = window.location.hostname;
-const domains = ["slmn.gg", "localslmn", "localhost"].map(d => ({
-    main: d,
-    r: new RegExp(`(?:^|(.*)\\.)${d.replace(".", "\\.")}(?:$|\\n)`)
-}));
-let subdomain = null;
-const mainDomain = getMainDomain(subdomain);
-let routes = [];
-let subID;
-
-domains.forEach(({ main, r }) => {
-    const result = host.match(r);
-    if (result && result[1] && !["dev", "live"].includes(result[1])) {
-        if (result[1].endsWith(".dev")) {
-            result[1] = result[1].slice(0, -4);
-        }
-        if (result[1].endsWith(".live")) {
-            result[1] = result[1].slice(0, -5);
-        }
-        subdomain = result[1];
-    }
-});
-
-// TODO: add other domain support here
-
-if (subdomain) {
-    // verify event from subdomain
-    console.log("[subdomain]", subdomain);
-    routes = [
-        ...AuthRoutes(app, mainDomain),
-        {
-            path: "/",
-            component: MinisiteWrapperApp,
-            children: [
-                {
-                    path: "/",
-                    component: Event,
-                    children: EventRoutes,
-                    props: (route) => {
-                        return {
-                            id: subID,
-                            isMinisite: true
-                        };
-                    }
-                },
-                ...SharedRoutes,
-                { path: "*", component: NotFoundContent }
-            ]
-        }
-    ];
-} else {
-    // default slmn.gg
-    console.log("[subdomain]", "default routes applied");
-    routes = [
-        ...defaultRoutes,
-        ...AuthRoutes(app, mainDomain)
-    ];
-}
-
-const router = new VueRouter({
-    mode: "history",
-    base: import.meta.env.BASE_URL,
-    routes
-});
-
-let preloadAuthCheckRequired = false;
-let preloadAuthReturn = null;
-
-// TODO: this doesn't really work very well nor work on the first run
-router.beforeEach((to, from, next) => {
-    try {
-        // console.log("routerResolve", to, this, app);
-        if (to.meta.requiresAuth) {
-            // authenticating!
-
-            getAuthNext(app); // empty auth
-
-            if (app && !app.auth.user) {
-                setAuthNext(app?.$root, to.fullPath);
-                return router.push({ path: "/login", query: { return: to.fullPath } });
-                // TODO: to.fullPath can be used for return (set in localstorage or something  /redirect?to=)
-            } else {
-                console.warn("Need to check if authenticated, but the app hasn't loaded yet.");
-                preloadAuthCheckRequired = true;
-                preloadAuthReturn = to.fullPath;
-                // console.log(document.cookie);
-                // return next({ path: "/login" });
-            }
-        }
-    } catch (e) {
-        console.error("Vue navigation error", e);
-    }
-
-    next();
-});
-
-
-app = new Vue({
-    router,
-    render: h => h(GlobalApp),
-    store,
-    sockets: {
-        connect() {
-            console.log("[socket]", "connected", this.$store.state.subscribed_ids.length);
-            this.$socket.client.emit("subscribe-multiple", this.$store.state.subscribed_ids);
-        },
-        data_update(d) {
-            // handled by vuex
-            console.log("[socket]", "data_update", d);
-        },
-        website_flags(flags) {
-            console.log("website_flags", flags);
-            this.isRebuilding = flags.includes("server_rebuilding");
-            this.highErrorRate = flags.includes("high_error_rate");
-        }
-    },
-    metaInfo: {
-        // title: "SLMN.GG",
-        titleTemplate: (chunk) => chunk ? `${chunk} | SLMN.GG` : "SLMN.GG"
-        // link: [
-        //     { rel: "icon", href: "https://slmn.io/slmn-new.png" }
-        // ]
-    },
+const app = createApp({
     data: () => ({
         interval: null,
-        minisiteEventStatus: subdomain ? "loading" : null,
         isRebuilding: false,
         animationActive: true,
         activeScene: null,
@@ -207,85 +40,106 @@ app = new Vue({
         // this is mainly for development, probably won't stay
         colorControls: {
             schema: {
-                hue: 0, saturation: 0, overlay: 0, multiply: 0
+                hue: 0,
+                saturation: 0,
+                overlay: 0,
+                multiply: 0
             }
         }
     }),
-    async mounted() {
-        console.log("[app]", "subdomain", subdomain);
-        console.log("[app]", "data server", getDataServerAddress());
-        if (subdomain) {
-            this.loadMinisite(subdomain);
-        }
-
-        setInterval(() => app.$store.commit("executeRequestBuffer"), 100);
-        setInterval(() => app.$store.commit("executeUpdateBuffer"), 50);
-
-        try {
-            if (localStorage.getItem("draft-notes")) {
-                const notes = JSON.parse(localStorage.getItem("draft-notes"));
-                this.$store.state.draft_notes = notes;
-            }
-        } catch (e) { console.error("Draft notes local storage error", e); }
-
-        if (!this.auth.user) {
-            const token = this.$cookies.get("token");
-            if (token) {
-                // authenticate
-                await authenticateWithToken(this, token);
-            }
-        }
-
-        if (!this.auth.user && preloadAuthCheckRequired) {
-            console.warn("App loaded, recognising preload check is required and we're not authenticated. Sending to login");
-            preloadAuthCheckRequired = false;
-            if (preloadAuthReturn) setAuthNext(app, preloadAuthReturn);
-
-            this.$router.push({
-                path: "/login",
-                query: {
-                    return: getAuthNext(app, true)
-                }
-            });
-        }
-    },
     computed: {
         minisiteEvent() {
             return this.$store.getters.thing(`subdomain-${subdomain}`);
         },
         version() {
             return import.meta.env?.VITE_SLMNGG_VERSION;
-        },
-        authUser() {
-            if (!this.auth.user?.airtableID) return null;
-            return ReactiveRoot(this.auth.user.airtableID);
         }
     },
-    methods: {
-        async loadMinisite(subdomain) {
-            // get and verify
-            const data = await fetchThings([`subdomain-${subdomain}`]);
-            if (!data || !data[0] || !data[0].id) {
-                // !! no valid minisite
-                this.minisiteEventStatus = "failed";
-            } else {
-                // add minisite routes
-                this.minisiteEventStatus = "success";
-                subID = data[0]._original_data_id || data[0].id;
-                store.dispatch("subscribe", subID);
-                store.dispatch("subscribe", `subdomain-${subdomain}`);
-                console.log("[subID]", subID);
-                this.$router.addRoute("default", {
-                    path: "/",
-                    component: Event,
-                    children: EventRoutes,
-                    props: route => ({ id: data[0].id })
-                });
-                // EventRoutes.forEach(route => {
-                //     this.$router.addRoute("event", route);
-                // });
-                // console.log("[route]", this.$router.getRoutes());
-            }
+    async mounted() {
+        console.log("[app]", "data server", getDataServerAddress());
+
+
+        setInterval(() => this.$store.commit("executeRequestBuffer"), 100);
+        setInterval(() => this.$store.commit("executeUpdateBuffer"), 50);
+
+        const auth = useAuthStore();
+        if (auth.token) {
+            console.log("Token in storage, authenticating");
+            await auth.authenticateWithToken(auth.token);
         }
+    },
+    render: () => h(GlobalApp),
+    head: {
+        // title: "SLMN.GG",
+        titleTemplate: (chunk) => chunk ? `${chunk} | SLMN.GG` : "SLMN.GG",
+        link: [
+            { rel: "icon", href: "/favicon.ico", key: "favicon" }
+        ]
     }
-}).$mount("#app");
+});
+
+const { router } = createRouter(app, subID, subdomain);
+
+app.use(store);
+
+const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
+app.use(pinia);
+
+app.use(socketMixin);
+
+app.use(router);
+
+app.use(createBootstrap()); // Important
+
+const head = createHead();
+app.use(head);
+app.mixin(VueHeadMixin);
+
+app.use(VueConfetti); // TODO figure out a way to not do this globally
+
+app.config.globalProperties.$notyf = new Notyf({
+    duration: 5000,
+    position: {
+        x: "right",
+        y: "top"
+    },
+    dismissible: true
+});
+
+app.component("VStyle", {
+    render: function () {
+        return h("style", this.$slots.default());
+    }
+});
+
+router.beforeEach(async (to, from, next) => {
+    const authStore = useAuthStore();
+
+    try {
+        // console.log("routerResolve", to, this, app);
+        if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+            // page needs auth and auth is not finished
+
+            if (authStore.token) {
+                // token in storage - check with server
+                await authStore.authenticateWithToken(authStore.token);
+            }
+            if (authStore.user) return next();
+
+            // still no auth after that
+            authStore.setAuthNext(to.fullPath);
+            return router.push({
+                path: "/login",
+                query: { return: to.fullPath }
+            });
+        }
+    } catch (e) {
+        console.error("Vue navigation error", e);
+    }
+
+    next();
+});
+
+
+router.isReady().then(() => app.mount("#app"));

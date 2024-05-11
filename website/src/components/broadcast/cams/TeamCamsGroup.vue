@@ -4,9 +4,15 @@
             <div class="industry-align">{{ team.name }}</div>
         </div>
         <div class="team-guests d-flex">
-            <div class="guest" v-for="(guest, gi) in _guests" :key="guest.id">
-                <CasterCam class="team-cam" :guest="guest" :extra-params="params" :event="event"
-                 :relay-prefix="relayPrefix + getNumber(ti, gi)" :disable-video="disableCams" :team="team"/>
+            <div v-for="(guest, gi) in _guests" :key="guest.id" class="guest">
+                <CasterCam
+                    class="team-cam"
+                    :guest="guest"
+                    :extra-params="params"
+                    :event="event"
+                    :relay-prefix="relayPrefix + getNumber(ti, gi)"
+                    :disable-video="disableCams"
+                    :team="team" />
                 <div class="guest-name">{{ guest.name }}</div>
             </div>
         </div>
@@ -68,11 +74,11 @@ export default {
         margin: 0 2px;
         --caster-width: 375px;
     }
-    .guest >>> .caster-avatar {
+    .guest:deep(.caster-avatar) {
         transform: translate(0, 0);
     }
-    .guest >>> .caster-bg,
-    .guest >>> .caster-cam-wrapper {
+    .guest:deep(.caster-bg),
+    .guest:deep(.caster-cam-wrapper) {
         background-color: rgba(0,0,0,0.3)
     }
     .guest-name {

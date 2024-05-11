@@ -1,11 +1,21 @@
 <template>
-    <div class="centerer" :class="{'tiny': tiny}" >
-        <ThemeTransition :one-color="true" start="middle" end="middle" :theme="theme" :active="!!active"
-                         :duration="400" :starting-delay="500" :inner-delay="300" :leaving-delay="0"
-                         class="middle-holder flex-center" :use-fit-content="true" :clear-style-after-entered="true">
+    <div class="centerer" :class="{'tiny': tiny}">
+        <ThemeTransition
+            :one-color="true"
+            start="middle"
+            end="middle"
+            :theme="theme"
+            :active="!!active"
+            :duration="400"
+            :starting-delay="500"
+            :inner-delay="300"
+            :leaving-delay="0"
+            class="middle-holder flex-center"
+            :use-fit-content="true"
+            :clear-style-after-entered="true">
             <div class="middle" :style="middleBorderStyle">
                 <transition name="fade" mode="out-in">
-                    <div class="industry-align" :key="text">{{ text }}</div>
+                    <div :key="text" class="industry-align">{{ text }}</div>
                 </transition>
             </div>
         </ThemeTransition>
@@ -69,8 +79,8 @@ export default {
 .mid-enter-active,
 .mid-enter-active .middle-holder { transition: all .5s ease-in-out .25s; }
 
-.mid-enter-to .middle-holder, .mid-leave .middle-holder { width: 450px; }
-.mid-enter .middle-holder, .mid-leave-to .middle-holder { width: 0; }
+.mid-enter-to .middle-holder, .mid-leave-from .middle-holder { width: 450px; }
+.mid-enter-from .middle-holder, .mid-leave-to .middle-holder { width: 0; }
 
 
 .centerer.tiny {
@@ -82,12 +92,12 @@ export default {
     line-height: 1.2em;
 }
 
-.centerer >>> .theme-transition-outer {
+.centerer:deep(.theme-transition-outer) {
     border-radius: 4px !important;
     overflow: hidden;
 }
-.centerer >>> .theme-transition.end-middle.tt-enter-to .theme-transition-inner,
-.centerer >>> .theme-transition.end-middle.tt-enter-to .theme-transition-outer {
+.centerer:deep(.theme-transition.end-middle.tt-enter-to .theme-transition-inner),
+.centerer:deep(.theme-transition.end-middle.tt-enter-to .theme-transition-outer) {
     clip-path: polygon(0% 0%, 0% 110%, 50% 110%, 50% 0, 50% 0, 50% 110%, 100% 110%, 100% 0%) !important;
     /* this is a hack to avoid a subpixel issue at the bottom of the box */
     /* could be to do with 0.5 margins having a .5px adjustment */

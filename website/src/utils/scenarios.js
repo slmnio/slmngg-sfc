@@ -334,7 +334,6 @@ export function sortIntoGroups(i, sortFunction, standings, maxInGroup) {
         }
         group.sort(sortFunction);
         const comparisonTeam = group[0];
-        inner:
         for (const [teamIndex, team] of group.entries()) {
             if (comparisonTeam.id !== team.id) {
                 const comparison = sortFunction(team, comparisonTeam);

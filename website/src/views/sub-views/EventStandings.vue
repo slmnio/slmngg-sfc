@@ -1,7 +1,14 @@
 <template>
     <div class="container event-standings align-items-center d-flex flex-column">
-        <Standings class="standings my-2" v-for="standing in standings" :key="standing.title"
-                   :event="event" :stage="standing.group" :title="standing.title" :tie-text="standing.tieText" show-map-diff />
+        <Standings
+            v-for="standing in standings"
+            :key="standing.title"
+            class="standings my-2"
+            :event="event"
+            :stage="standing.group"
+            :title="standing.title"
+            :tie-text="standing.tieText"
+            show-map-diff />
     </div>
 </template>
 
@@ -50,14 +57,14 @@ export default {
         font-size: 24px;
         width: fit-content;
     }
-    .standings >>> .standings-team {
+    .standings:deep(.standings-team) {
         padding: 4px 0;
     }
-    .standings >>> .team-name {
+    .standings:deep(.team-name) {
         margin-right: 32px;
         min-width: 250px;
     }
-    .standings >>> .team-name.team-code {
+    .standings:deep(.team-name.team-code) {
         margin-right: 32px;
         min-width: 50px;
     }

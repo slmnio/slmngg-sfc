@@ -3,56 +3,62 @@
         <div v-if="mapVideo" class="map-bg map-video w-100 h-100 bg-center" :class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground">
             <video :src="mapVideo" autoplay muted loop></video>
         </div>
+
         <div v-else class="map-bg w-100 h-100 bg-center" :class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground"></div>
         <div class="map-gel w-100 h-100 position-absolute" :style="winnerBG"></div>
-        <div class="map-gel w-100 h-100 position-absolute draw-gel" v-if="map && map.draw"></div>
-        <div class="map-gel w-100 h-100 position-absolute ban-gel flex-center" v-if="map && map.banner"></div>
-        <div class="map-gel w-100 h-100 position-absolute upcoming-gel flex-center" v-if="draftedStyle && !complete && !map._next"></div>
+        <div v-if="map && map.draw" class="map-gel w-100 h-100 position-absolute draw-gel"></div>
+        <div v-if="map && map.banner" class="map-gel w-100 h-100 position-absolute ban-gel flex-center"></div>
+        <div v-if="draftedStyle && !complete && !map._next" class="map-gel w-100 h-100 position-absolute upcoming-gel flex-center"></div>
         <div class="map-main d-flex flex-column h-100 w-100 position-absolute">
             <div v-if="!small">
-                <div class="map-upper flex-center" :style="accent" v-if="map.picker || map.banner">
-                    <ThemeLogo class="pick-ban-team" :theme="pickBanTheme" border-width="4px" logo-size="w-100"
-                               icon-padding="2"/>
-                    <div class="pick-ban-text" :style="pickBanBorder">{{
+                <div v-if="map.picker || map.banner" class="map-upper flex-center" :style="accent">
+                    <ThemeLogo
+                        class="pick-ban-team"
+                        :theme="pickBanTheme"
+                        border-width="4px"
+                        logo-size="w-100"
+                        icon-padding="2" />
+                    <div class="pick-ban-text" :style="pickBanBorder">
+                        {{
                             map.banner ? "Ban" : (map.picker ? "Pick" : "")
                         }}
                     </div>
                 </div>
-                <div class="map-upper-spacer" v-else></div>
+                <div v-else class="map-upper-spacer"></div>
             </div>
-            <div class="map-top flex-grow-1 h-100 w-100 flex-center flex-column" v-if="!draftedStyle">
-                <div class="map-logo-holder w-100 h-50 flex-center" v-if="winnerBG">
+            <div v-if="!draftedStyle" class="map-top flex-grow-1 h-100 w-100 flex-center flex-column">
+                <div v-if="winnerBG" class="map-logo-holder w-100 h-50 flex-center">
                     <div class="map-logo bg-center" :style="winnerLogo"></div>
                 </div>
-                <div class="gel-text" v-if="map && map.draw">DRAW</div>
-                <div class="ban-icon-holder" v-if="map.banner">
+                <div v-if="map && map.draw" class="gel-text">DRAW</div>
+                <div v-if="map.banner" class="ban-icon-holder">
                     <i class="ban-icon fas fa-ban"></i>
                 </div>
-                <div class="map-score flex-center" v-if="showMapScores && (map.score_1 || map.score_2)">
+                <div v-if="showMapScores && (map.score_1 || map.score_2)" class="map-score flex-center">
                     <div class="map-score">{{ map.score_1 }}</div>
                     <div class="map-dash">-</div>
                     <div class="map-score">{{ map.score_2 }}</div>
                 </div>
             </div>
-            <div class="map-lower flex-center flex-column" v-if="!draftedStyle" :style="accent">
+            <div v-if="!draftedStyle" class="map-lower flex-center flex-column" :style="accent">
                 <div class="map-lower-name flex-center"><span class="industry-align">{{ name }}</span></div>
-                <div class="map-lower-type" v-if="type"><span class="industry-align">{{ type }}</span></div>
+                <div v-if="type" class="map-lower-type"><span class="industry-align">{{ type }}</span></div>
             </div>
 
-            <div class="map-draft-top flex-center" v-if="draftedStyle" :class="{'complete': complete, 'next': map._next, 'draw': map.draw}" :style="winnerBG">
-                <div class="draft-map-data flex-grow-1 font-weight-bold">
+            <div v-if="draftedStyle" class="map-draft-top flex-center" :class="{'complete': complete, 'next': map._next, 'draw': map.draw}" :style="winnerBG">
+                <div class="draft-map-data flex-grow-1 fw-bold">
                     <div class="draft-map-type">{{ map.mode || map.type?.[0] }}</div>
                     <div class="draft-map-name">{{ name }}</div>
                 </div>
                 <div class="draft-map-status">
-                    <div class="status-complete flex-center flex-column" v-if="complete">
+                    <div v-if="complete" class="status-complete flex-center flex-column">
                         <div class="team-logo" :style="winnerLogo"></div>
-                        <div class="map-score text-nowrap" v-if="map.score_1 || map.score_2">{{ teamLeadingScoresText }}</div>
+                        <div v-if="map.score_1 || map.score_2" class="map-score text-nowrap">{{ teamLeadingScoresText }}</div>
                     </div>
-                    <div class="status-up-next text-center flex-center" v-else-if="map._next">
+                    <div v-else-if="map._next" class="status-up-next text-center flex-center">
                         <div class="text">UP NEXT</div>
                     </div>
-                    <div class="status-up-later text-center flex-center" v-else>
+                    <div v-else class="status-up-later text-center flex-center">
                         <div class="text">MAP {{ map._number }}</div>
                     </div>
                 </div>
@@ -69,10 +75,10 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 
 export default {
     name: "MapSegment",
-    props: ["broadcast", "map", "accentColor", "showMapVideo", "firstTo", "useShorterNames", "small", "draftedStyle"],
     components: {
         ThemeLogo
     },
+    props: ["broadcast", "map", "accentColor", "showMapVideo", "firstTo", "useShorterNames", "small", "draftedStyle"],
     computed: {
         complete() {
             return this.map.winner || this.map.draw;
@@ -175,6 +181,7 @@ export default {
         padding: 10px 5px;
         line-height: 1;
         min-height: 120px;
+        height: 0;
 
         /* default */
         background-color: #333333;

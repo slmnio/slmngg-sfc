@@ -145,10 +145,10 @@ async function fullGetURL(attachment, sizeText, sizeData) {
 }
 
 module.exports = {
-    main: ({ app, cors, Cache, corsHandle }) => {
+    main: ({ app, cors, Cache, }) => {
 
-        ensureFolder("").then(r => console.log("[images] images folder ensured"));
-        ensureFolder("orig").then(r => console.log("[images] orig folder ensured"));
+    ensureFolder("").then(() => console.log("[images] images folder ensured"));
+    ensureFolder("orig").then(() => console.log("[images] orig folder ensured"));
 
         async function handleImageRequests(req, res) {
 
@@ -273,7 +273,7 @@ module.exports = {
                 let logo = await Cache.getAttachment(theme.default_logo?.[0]?.id);
 
                 if (!logo) return res.status(400).send("No logo to use");
-                let themeColor = theme.color_logo_background || theme.color_theme || "#222222";
+                let themeColor = (theme.color_logo_background || theme.color_theme || "#222222").trim();
 
                 // background: logo background
                 // centered logo
@@ -300,6 +300,7 @@ module.exports = {
                     background: themeColor
                 }).toBuffer();
 
+                res.header("Content-Type", "image/png");
 
                 let compositeThemeImage = sharp({
                     create: {
@@ -314,7 +315,6 @@ module.exports = {
                 compositeThemeImage.clone().png().toBuffer()
                     .then(data => {
                         console.log("[image|theme]", `theme processed @${size} in ${Date.now() - t}ms`);
-                        // res.header("Content-Type", "image/png");
                         res.end(data);
                     });
 
@@ -323,7 +323,7 @@ module.exports = {
             } catch (e) {
                 console.error("Theme image error", e);
             }
-            // res.status(400).send("An error occurred");
+            res.status(400).send("An error occurred");
 
 
             // sharp(filePath)
@@ -370,11 +370,11 @@ module.exports = {
                         background: "#222222"
                     }});
 
-                    let logos = await Promise.all(teams.map(async team => {
-                        const logo = await Cache.getAttachment(team.theme?.default_logo?.[0]?.id);
-                        if (!logo) return null;
-                        let filePath = await fullGetURL(logo, "orig", null);
-                        let themeColor = team.theme.color_logo_background || team.theme.color_theme || "#222222";
+                let logos = await Promise.all(teams.map(async team => {
+                    const logo = await Cache.getAttachment(team.theme?.default_logo?.[0]?.id);
+                    if (!logo) return null;
+                    let filePath = await fullGetURL(logo, "orig", null);
+                    let themeColor = (team.theme.color_logo_background || team.theme.color_theme || "#222222").trim();
 
                         let resizedLogo = await sharp(filePath).resize({
                             width: halfWidth - padding,

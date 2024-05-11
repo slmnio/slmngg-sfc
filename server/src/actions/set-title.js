@@ -57,7 +57,7 @@ module.exports = {
             "Overwatch": "Overwatch 2",
             "Valorant": "VALORANT",
             "League of Legends": "League of Legends",
-            "F1": "F1 22"
+            "F1": "F1 23"
         };
 
         if (event.game && gameMap[event.game]) {

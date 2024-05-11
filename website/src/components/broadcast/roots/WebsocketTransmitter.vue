@@ -9,7 +9,7 @@
         <div v-if="isConnected">
             <i class="fas fa-check-circle"></i> Connected
         </div>
-        <div class="text-center" v-else>
+        <div v-else class="text-center">
             <div>
                 <i class="fas fa-wifi-slash"></i> Not Connected
             </div>
@@ -26,6 +26,7 @@
     </div>
 </template>
 <script>
+import { socket } from "@/socket";
 import OBSWebSocket from "obs-websocket-js";
 
 export default {
@@ -55,7 +56,7 @@ export default {
 
     methods: {
         transmit() {
-            this.$socket.client.emit("obs_data_change", {
+            socket.emit("obs_data_change", {
                 clientName: this.client?.key,
                 previewScene: this.wsPreview,
                 programScene: this.wsProgram
@@ -116,7 +117,7 @@ export default {
             this.connectWs();
         }, 1000);
     },
-    metaInfo() {
+    head() {
         return {
             title: `Websocket Transmitter | ${this.client?.name || this.client?.key || ""}`
         };

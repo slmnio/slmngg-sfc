@@ -2,7 +2,7 @@
     <div class="team-name-holder d-flex align-items-center">
         <div class="team-name flex-center w-100" :style="bg">
             <span class="industry-align team-sub-name">{{ team.name }}</span>
-            <span class="industry-align d-none small-overlay-text" v-if="smallText">({{ smallText }})</span>
+            <span v-if="smallText" class="industry-align d-none small-overlay-text">({{ smallText }})</span>
         </div>
     </div>
 </template>

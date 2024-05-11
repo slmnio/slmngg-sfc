@@ -1,27 +1,26 @@
 <template>
     <div class="break-bar-overlay" :style="eventCSS">
+        <!--        <div class="upper-bar">-->
+        <!--            <transition name="seg" mode="out-in">-->
+        <!--                <div class="segment-wrapper" v-if="showBigSegment('Bracket')" :key="'Bracket'">-->
+        <!--                    <div class="overlay&#45;&#45;bg bar-segment segment-bracket">-->
+        <!--                        <Bracket class="segment-bracket-inner" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.6" />-->
+        <!--                    </div>-->
+        <!--                </div>-->
 
-<!--        <div class="upper-bar">-->
-<!--            <transition name="seg" mode="out-in">-->
-<!--                <div class="segment-wrapper" v-if="showBigSegment('Bracket')" :key="'Bracket'">-->
-<!--                    <div class="overlay&#45;&#45;bg bar-segment segment-bracket">-->
-<!--                        <Bracket class="segment-bracket-inner" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.6" />-->
-<!--                    </div>-->
-<!--                </div>-->
-
-<!--                <div class="segment-wrapper" v-if="showBigSegment('Schedule')" :key="'Schedule'">-->
-<!--                    <div class="overlay&#45;&#45;bg bar-segment segment-schedule flex-column">-->
-<!--                        <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </transition>-->
-<!--        </div>-->
+        <!--                <div class="segment-wrapper" v-if="showBigSegment('Schedule')" :key="'Schedule'">-->
+        <!--                    <div class="overlay&#45;&#45;bg bar-segment segment-schedule flex-column">-->
+        <!--                        <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </transition>-->
+        <!--        </div>-->
 
 
         <div class="lower-bar">
             <!--            <transition-group name="seg" is="div" class="break-bar" :style="eventCSS">-->
             <transition name="seg">
-                <div class="segment-wrapper" v-if="showSegment('Sponsors') && sponsorThemes" :key="'Sponsors'">
+                <div v-if="showSegment('Sponsors') && sponsorThemes" :key="'Sponsors'" class="segment-wrapper">
                     <div class="overlay--bg bar-segment segment-sponsors">
                         <Sponsors class="break-sponsors" :sponsors="sponsorThemes" />
                     </div>
@@ -31,22 +30,24 @@
             <div class="segment-wrapper segment-spacer flex-grow-1"></div>
 
             <transition name="seg">
-                <div class="segment-wrapper" v-if="showSegment('Title') && (title || (broadcast && broadcast.title))" :key="'Title-' + (title || broadcast.title)">
+                <div v-if="showSegment('Title') && (title || (broadcast && broadcast.title))" :key="'Title-' + (title || broadcast.title)" class="segment-wrapper">
                     <div class="overlay--bg bar-segment segment-title">
-                        <span class="segment-text" v-html="nbr(title || broadcast.title)"
-                        :class="{'has-br': (title || broadcast.title || '').includes('\\n')}"></span>
+                        <span
+                            class="segment-text"
+                            :class="{'has-br': (title || broadcast.title || '').includes('\\n')}"
+                            v-html="nbr(title || broadcast.title)"></span>
                     </div>
                 </div>
             </transition>
             <transition name="seg">
-                <div class="segment-wrapper" v-if="showSegment('Next match') && nextMatch" :key="'Next match'">
+                <div v-if="showSegment('Next match') && nextMatch" :key="'Next match'" class="segment-wrapper">
                     <div class="overlay--bg bar-segment segment-next-match">
                         <BreakMatch :match="nextMatch" :expanded="false" :theme-color="themeColor" />
                     </div>
                 </div>
             </transition>
             <transition name="seg">
-                <div class="segment-wrapper" v-if="showSegment('Countdown')" :key="'Countdown'">
+                <div v-if="showSegment('Countdown')" :key="'Countdown'" class="segment-wrapper">
                     <div class="overlay--bg bar-segment segment-countdown flex-center flex-column">
                         <div class="segment-title">
                             <span class="industry-align">
@@ -54,17 +55,18 @@
                             </span>
                         </div>
                         <div class="segment-text">
-                            <Countdown :timezone="broadcast.timezone" :to="broadcast.countdown_end"/>
+                            <Countdown :timezone="broadcast.timezone" :to="broadcast.countdown_end" />
                         </div>
                     </div>
                 </div>
             </transition>
 
             <transition name="seg">
-                <div class="segment-wrapper" v-if="showSegment('Event logo') && event && event.theme" :key="'Event logo'">
+                <div v-if="showSegment('Event logo') && event && event.theme" :key="'Event logo'" class="segment-wrapper">
                     <div class="overlay--bg bar-segment segment-event-logo p-2" :style="eventLogoBackground">
-                        <div :style="resizedImage(event.theme, ['default_logo'], 'h-200')"
-                             class="segment-image bg-center w-100 h-100"></div>
+                        <div
+                            :style="resizedImage(event.theme, ['default_logo'], 'h-200')"
+                            class="segment-image bg-center w-100 h-100"></div>
                     </div>
                 </div>
             </transition>
@@ -72,10 +74,21 @@
         </div>
 
         <div class="break-preload">
-            <Bracket class="segment-bracket-inner" :event="event" :bracket="bracket" use-overlay-scale small :scale="0.6" />
-            <BreakMatch v-for="match in schedule" :timezone="broadcast.timezone" :match="match" :expanded="true" :key="match.id" :theme-color="themeColor" />
+            <Bracket
+                class="segment-bracket-inner"
+                :event="event"
+                :bracket="bracket"
+                use-overlay-scale
+                small
+                :scale="0.6" />
+            <BreakMatch
+                v-for="match in schedule"
+                :key="match.id"
+                :timezone="broadcast.timezone"
+                :match="match"
+                :expanded="true"
+                :theme-color="themeColor" />
         </div>
-
     </div>
 </template>
 
@@ -91,11 +104,11 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "BreakBarOverlay",
-    props: ["broadcast", "title"],
     components: { Countdown, BreakMatch, Sponsors, Bracket },
+    props: ["broadcast", "title"],
     computed: {
         event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
+            if (!this.broadcast?.event) return null;
             return ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
@@ -111,24 +124,24 @@ export default {
             });
         },
         eventLogoBackground() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 backgroundColor: this.event.theme.color_logo_background,
                 borderColor: this.event.theme.color_logo_accent
             };
         },
         segments() {
-            if (!this.broadcast || !this.broadcast.bar_options) return [];
+            if (!this.broadcast?.bar_options) return [];
             return this.broadcast.bar_options;
         },
         eventCSS() {
-            if (!this.event || !this.event.theme) return null;
+            if (!this.event?.theme) return null;
             return {
                 "--event": this.event.theme.color_theme
             };
         },
         nextMatch() {
-            if (!this.broadcast || !this.broadcast.live_match || !this.broadcast.show_live_match) return null;
+            if (!this.broadcast?.live_match || !this.broadcast.show_live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -136,7 +149,7 @@ export default {
             });
         },
         schedule() {
-            if (!this.broadcast || !this.broadcast.schedule) return null;
+            if (!this.broadcast?.schedule) return null;
             return ReactiveArray("schedule", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -146,11 +159,11 @@ export default {
             }).sort(sortMatches);
         },
         themeColor() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return themeBackground1(this.event);
         },
         sponsorThemes() {
-            if (!this.broadcast || !this.broadcast.sponsors) return null;
+            if (!this.broadcast?.sponsors) return null;
             return ReactiveArray("sponsors", {
                 theme: ReactiveThing("theme")
             })(this.broadcast);
@@ -167,13 +180,6 @@ export default {
             return "BACK IN";
         }
     },
-    watch: {
-        broadcast() {
-            if (this.broadcast) {
-                document.body.dataset.broadcast = this.broadcast.key;
-            }
-        }
-    },
     methods: {
         showSegment(segmentName) {
             return this.segments.indexOf(segmentName) !== -1;
@@ -187,7 +193,14 @@ export default {
             return text.replace(/\\n/g, "<br>");
         }
     },
-    metaInfo() {
+    watch: {
+        broadcast() {
+            if (this.broadcast) {
+                document.body.dataset.broadcast = this.broadcast.key;
+            }
+        }
+    },
+    head() {
         return {
             title: `Break Bar | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -275,10 +288,10 @@ export default {
     .segment-next-match {
         min-width: 330px;
     }
-    .segment-next-match >>> .match-teams {
+    .segment-next-match:deep(.match-teams) {
         min-width: 410px;
     }
-    .segment-next-match >>> .break-match[data-center="vs"] .match-teams {
+    .segment-next-match:deep(.break-match[data-center="vs"] .match-teams) {
         min-width: 330px;
     }
 
@@ -286,14 +299,14 @@ export default {
         width: 420px;
         padding: 0;
     }
-    .segment-sponsors >>> .break-sponsors {
+    .segment-sponsors:deep(.break-sponsors) {
         padding: 0;
         height: 100%;
     }
-    .segment-sponsors >>> .sponsors-holder {
+    .segment-sponsors:deep(.sponsors-holder) {
         height: 100%;
     }
-    .segment-sponsors >>> .break-sponsor-logo {
+    .segment-sponsors:deep(.break-sponsor-logo) {
         width: calc(100% - 2em) !important;
     }
 
@@ -309,14 +322,14 @@ export default {
         padding: 0 1em;
         min-width: 500px;
     }
-    .segment-schedule >>> .break-match {
+    .segment-schedule:deep(.break-match) {
         font-size: 25px;
     }
 
     .seg-enter-active { transition: max-width 2000ms ease; }
     .seg-leave-active { transition: max-width 500ms ease; }
-    .seg-enter, .seg-leave-to { max-width: 0; }
-    .seg-enter-to, .seg-leave { max-width: 100%; }
+    .seg-enter-from, .seg-leave-to { max-width: 0; }
+    .seg-enter-to, .seg-leave-from { max-width: 100%; }
 
     .break-preload {
         opacity: 0;

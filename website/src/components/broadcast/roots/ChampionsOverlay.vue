@@ -1,27 +1,23 @@
 <template>
-    <ConfettiOverlay v-if="winner" :theme="winner?.theme"/>
+    <ConfettiOverlay v-if="winner" :theme="winner?.theme" />
 </template>
 
 <script>
 
 import ConfettiOverlay from "@/components/broadcast/roots/ConfettiOverlay.vue";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { useStatusStore } from "@/stores/statusStore";
 
 export default {
+    name: "ChampionsOverlay",
     components: { ConfettiOverlay },
     props: ["broadcast", "stingerText"],
-    name: "ChampionsOverlay",
     data: () => ({
         confettiStarted: false,
         prodData: {
             minor: true
         }
     }),
-    mounted() {
-        console.log(this.stingerText);
-        this.$parent.updateText();
-        this.$parent.setTextVisibility(this.stingerTextVal);
-    },
     computed: {
         stingerTextVal() {
             return this.winner ? (this.stingerText || "Winners") : null;
@@ -43,15 +39,17 @@ export default {
     watch: {
         winner: {
             deep: true,
+            immediate: true,
             handler(winner) {
                 console.log("winner", winner);
-                this.$parent.updateTheme(winner?.theme);
-                this.$parent.updateText(this.winner ? (this.stingerText || "Winners") : null);
-                this.$parent.setTextVisibility(this.stingerTextVal);
+                const statusStore = useStatusStore();
+                statusStore.customStingerTheme = winner?.theme;
+                statusStore.customStingerText = this.winner ? (this.stingerText || "Winners") : null;
+                statusStore.stingerHideText = !this.stingerTextVal;
             }
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Champions | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

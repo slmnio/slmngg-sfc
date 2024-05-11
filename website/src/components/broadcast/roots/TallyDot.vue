@@ -7,7 +7,7 @@
             <div class="text d-flex">
                 <span class="name">{{ observerName || '' }}</span>
                 <span class="team-cams mx-3">
-                    <span class="team" v-for="team in teamCams" :key="team">{{ team.slice(-1) }}</span>
+                    <span v-for="team in teamCams" :key="team" class="team">{{ team.slice(-1) }}</span>
                 </span>
             </div>
         </div>
@@ -20,34 +20,16 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "TallyDot",
     props: ["client", "number", "align"],
-    sockets: {
-        tally_change({ state, number }) {
-            this.state = state;
-            this.number = number;
-        },
-        prod_preview_program_change(data) {
-            console.log(data);
-            this.producerClientKey = data.clientSource;
-            this.producerPreviewScene = data.previewScene;
-            this.producerProgramScene = data.programScene;
+    data: () => ({
+        state: "inactive",
+        wakeLock: null,
+        producerClientKey: null,
+        producerPreviewScene: null,
+        producerProgramScene: null,
 
-
-            if (this.targetsMe(this.producerProgramScene)) {
-                this.state = "active";
-            } else if (this.targetsMe(this.producerPreviewScene)) {
-                this.state = "preview";
-            } else {
-                this.state = "inactive";
-            }
-        }
-    },
-    methods: {
-        targetsMe(sceneName) {
-            const observerNumber = this.number || this.selfObserverNumber;
-            if (!observerNumber) return false;
-            return ["Obs", "Game"].some(str => sceneName.toLowerCase().includes(str.toLowerCase())) && sceneName.includes(observerNumber.toString());
-        }
-    },
+        noBroadcastStyle: true,
+        noStinger: true
+    }),
     computed: {
         producer() {
             if (!this.producerClientKey) return null;
@@ -77,17 +59,34 @@ export default {
             return this.observer?.player?.clients?.cams || [];
         }
     },
-    data: () => ({
-        state: "inactive",
-        wakeLock: null,
-        producerClientKey: null,
-        producerPreviewScene: null,
-        producerProgramScene: null,
+    methods: {
+        targetsMe(sceneName) {
+            const observerNumber = this.number || this.selfObserverNumber;
+            if (!observerNumber) return false;
+            return ["Obs", "Game"].some(str => sceneName.toLowerCase().includes(str.toLowerCase())) && sceneName.includes(observerNumber.toString());
+        }
+    },
+    sockets: {
+        tally_change({ state }) {
+            this.state = state;
+        },
+        prod_preview_program_change(data) {
+            console.log(data);
+            this.producerClientKey = data.clientSource;
+            this.producerPreviewScene = data.previewScene;
+            this.producerProgramScene = data.programScene;
 
-        noBroadcastStyle: true,
-        noStinger: true
-    }),
-    metaInfo() {
+
+            if (this.targetsMe(this.producerProgramScene)) {
+                this.state = "active";
+            } else if (this.targetsMe(this.producerPreviewScene)) {
+                this.state = "preview";
+            } else {
+                this.state = "inactive";
+            }
+        }
+    },
+    head() {
         return {
             title: `Tally Dot #${this.number} | ${this.client?.name || this.client?.key || ""}`
         };

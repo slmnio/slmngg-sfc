@@ -1,8 +1,8 @@
 <template>
     <div class="event">
-        <EventDisplay class="team-display" :event="event"/>
+        <EventDisplay class="team-display" :event="event" />
         <div class="event-teams d-flex row">
-            <div class="team col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2 tight-col" v-for="team in teams" :key="team.id">
+            <div v-for="team in teams" :key="team.id" class="team col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2 tight-col">
                 <TeamDisplay :team="team" />
             </div>
         </div>

@@ -1,26 +1,24 @@
 <template>
     <div class="break-text-tab">
         <b-form-group label="Break title" label-for="input-1" description="Use {auto} for dynamic starting/BRB/thanks text">
-            <b-form-input id="input-1" v-model="breakTitle" @keydown.ctrl.enter="saveOptions"></b-form-input>
+            <b-form-input id="input-1" v-model="breakTitle" @keydown.ctrl.enter="saveOptions" />
         </b-form-group>
 
 
         <div class="d-flex">
             <div class="w-100"></div>
-            <b-button variant="success" :disabled="processing" @click="saveOptions">Save</b-button>
+            <b-button variant="success" :disabled="processing || titleProcessing" @click="saveOptions">Save</b-button>
         </div>
     </div>
 </template>
 
 <script>
-import { BButton, BFormGroup, BFormInput } from "bootstrap-vue";
-import { updateBroadcastData } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 import { unescapeText } from "@/utils/content-utils";
 
 export default {
     name: "BreakTextTab",
-    components: { BFormGroup, BFormInput, BButton },
-    props: { broadcast: Object },
+    props: { broadcast: Object, titleProcessing: Boolean },
     data: () => ({
         breakTitle: "",
         processing: false
@@ -28,14 +26,6 @@ export default {
     computed: {
         broadcastBreakTitle() {
             return unescapeText(this.broadcast?.title);
-        }
-    },
-    watch: {
-        broadcastBreakTitle: {
-            immediate: true,
-            handler(newTitle) {
-                this.breakTitle = newTitle;
-            }
         }
     },
     methods: {
@@ -46,12 +36,20 @@ export default {
                     title: this.breakTitle
                 };
 
-                const response = await updateBroadcastData(this.$root.auth, data);
+                const response = await authenticatedRequest("actions/update-broadcast", data);
                 if (!response.error) {
                     this.$notyf.success(`Break title set to ${data.title}`);
                 }
             } finally {
                 this.processing = false;
+            }
+        }
+    },
+    watch: {
+        broadcastBreakTitle: {
+            immediate: true,
+            handler(newTitle) {
+                this.breakTitle = newTitle;
             }
         }
     }

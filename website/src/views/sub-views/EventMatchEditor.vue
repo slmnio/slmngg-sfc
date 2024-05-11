@@ -1,6 +1,6 @@
 <template>
     <div class="event-match-editor">
-        <MatchEditor class="mt-2" :match="match"/>
+        <MatchEditor class="mt-2" :match="match" />
         <BracketImplications class="dark-border mt-4" :match="match" show-resolve-button />
     </div>
 </template>
@@ -11,8 +11,8 @@ import BracketImplications from "@/components/website/dashboard/BracketImplicati
 
 export default {
     name: "EventMatchEditor",
-    props: ["match"],
-    components: { BracketImplications, MatchEditor }
+    components: { BracketImplications, MatchEditor },
+    props: ["match"]
 };
 </script>
 

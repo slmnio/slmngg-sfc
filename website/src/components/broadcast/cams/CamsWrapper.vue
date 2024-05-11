@@ -6,7 +6,7 @@
             :title="title"
             :params="stringify(paramsWithDefaults)"
             :client="client"
-        ></router-view>
+        />
     </div>
 </template>
 

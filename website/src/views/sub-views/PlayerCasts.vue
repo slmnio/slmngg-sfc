@@ -2,8 +2,8 @@
     <div>
         <div class="container">
             <div class="row">
-                <div class="cast-match col-12 col-sm-6 col-md-4 col-lg-3 mb-3" v-for="match in casts" :key="match.id">
-                    <Match :hydrated-match="match"/>
+                <div v-for="match in casts" :key="match.id" class="cast-match col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                    <Match :hydrated-match="match" />
                 </div>
             </div>
         </div>
@@ -18,9 +18,8 @@ import { formatTime, url } from "@/utils/content-utils";
 
 export default {
     name: "PlayerCasts",
-    methods: { url, formatTime },
-    props: ["player"],
     components: { Match },
+    props: ["player"],
     computed: {
         casts() {
             if (!this.player?.casts) return [];
@@ -33,7 +32,8 @@ export default {
                 })
             })(this.player).sort(sortMatches);
         }
-    }
+    },
+    methods: { url, formatTime }
 };
 </script>
 

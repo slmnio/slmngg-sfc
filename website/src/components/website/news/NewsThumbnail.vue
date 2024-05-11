@@ -1,10 +1,10 @@
 <template>
     <div class="news-thumbnail default-thing" :style="border">
         <div class="icons">
-            <i class="fa-fw fas fa-external-link" v-if="item.redirect_url"></i>
+            <i v-if="item.redirect_url" class="fa-fw fas fa-external-link"></i>
         </div>
-        <div class="news-custom-thumbnail w-100 bg-center" v-if="customThumbnail" :style="customThumbnail"></div>
-        <div class="news-generated-thumbnail w-100 flex-center" v-else :style="{ backgroundColor: generatedThumbnail.backgroundColor }">
+        <div v-if="customThumbnail" class="news-custom-thumbnail w-100 bg-center" :style="customThumbnail"></div>
+        <div v-else class="news-generated-thumbnail w-100 flex-center" :style="{ backgroundColor: generatedThumbnail.backgroundColor }">
             <div class="news-generated-thumbnail-logo bg-center" :style="{backgroundImage: generatedThumbnail.backgroundImage}"></div>
         </div>
     </div>

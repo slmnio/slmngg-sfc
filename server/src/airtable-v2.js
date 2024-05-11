@@ -49,25 +49,26 @@ class TableManager {
     constructor(tableName) {
         this.tableName = tableName;
         this.timerStart = null;
-        this.request = null;
+        this.fullRequest = null;
+        this.changesRequest = null;
         this.lastError = null;
         this.airtableRequestCount = 0;
     }
 
     async fullTableLoad() {
-        this.request = {
+        this.fullRequest = {
             type: "all",
             status: "active",
             start: this.startTimer(),
         };
-        this.lastRequest = this.request.start;
+        this.lastFullRequest = this.fullRequest.start;
 
         try {
             const data = await slmngg(this.tableName).select().all();
 
-            this.request.status = "finished";
-            this.request.duration = this.endTimer();
-            this.request.itemCount = data.length;
+            this.fullRequest.status = "finished";
+            this.fullRequest.duration = this.endTimer();
+            this.fullRequest.itemCount = data.length;
 
             await this.processData(data);
 
@@ -80,9 +81,9 @@ class TableManager {
             customTableUpdate(this.tableName, Cache);
 
         } catch (e) {
-            this.request.status = "errored";
-            this.request.duration = this.endTimer();
-            this.request.error = e;
+            this.fullRequest.status = "errored";
+            this.fullRequest.duration = this.endTimer();
+            this.fullRequest.error = e;
             if (this.lastError?.timeout) clearTimeout(this.lastError.timeout);
             this.lastError = {
                 ...e,
@@ -103,27 +104,27 @@ class TableManager {
     }
 
     async getTableUpdates() {
-        this.request = {
+        this.changesRequest = {
             type: "changes",
             status: "active",
             start: this.startTimer(),
         };
         try {
             const data = await slmngg(this.tableName).select({
-                filterByFormula: `{Modified} > "${this.lastRequest.toISOString().slice(0, 19)}"`
+                filterByFormula: `{Modified} > "${(this.getLatestRequest(false)).toISOString().slice(0, 19)}"`
             }).all();
 
-            this.lastRequest = this.request.start;
+            this.lastChangesRequest = this.changesRequest.start;
 
-            this.request.status = "finished";
-            this.request.duration = this.endTimer();
-            this.request.itemCount = data.length;
+            this.changesRequest.status = "finished";
+            this.changesRequest.duration = this.endTimer();
+            this.changesRequest.itemCount = data.length;
 
             return this.processData(data);
         } catch (e) {
-            this.request.status = "errored";
-            this.request.duration = this.endTimer();
-            this.request.error = e;
+            this.changesRequest.status = "errored";
+            this.changesRequest.duration = this.endTimer();
+            this.changesRequest.error = e;
             if (this.lastError?.timeout) clearTimeout(this.lastError.timeout);
             this.lastError = {
                 ...e,
@@ -162,6 +163,14 @@ class TableManager {
     endTimer() {
         return (new Date()) - this.timerStart;
     }
+
+    getLatestRequest(forFullRequest) {
+        if (forFullRequest) {
+            return this.lastFullRequest || this.lastChangesRequest;
+        } else {
+            return this.lastChangesRequest || this.lastFullRequest;
+        }
+    }
 }
 
 function time(secs) {
@@ -177,7 +186,7 @@ class AirtableManager {
         this.tableNames = ["Maps", "Players", "Teams", "Matches", "Themes", "Live Guests", "Redirects", "Broadcasts", "Clients", "Channels", "Discord Bots", "Events", "GFX", "Event Series",  "Ad Reads", "Ad Read Groups", "News", "Socials", "Accolades", "Player Relationships", "Brackets", "Headlines", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles"];
         // this.tableNames = ["Redirects", "Broadcasts", "Clients", "Channels", "Discord Bots", "Players", "Live Guests"];
         this.tables = this.tableNames.map(tableName => new TableManager(tableName));
-        this.availableRequests = 5;
+        this.availableRequests = 4;
         this.websiteFlags = ["server_rebuilding"];
         this.lastRequestRate = 0;
         this.requestRatePeriod = 60;
@@ -203,15 +212,18 @@ class AirtableManager {
             for (const table of iterator) {
                 console.log(`[Load] Full load [${table.tableName}] started`);
                 await table.fullTableLoad();
-                console.log(`[Load] Full load [${table.tableName}] finished (${(table.request.duration / 1000).toFixed(1)}s, ${table.request.itemCount} items)`);
+                console.log(`[Load] Full load [${table.tableName}] finished (${(table.fullRequest.duration / 1000).toFixed(1)}s, ${table.fullRequest.itemCount} items)`);
             }
         }));
 
         this.removeWebsiteFlag("server_rebuilding");
         if (process.env.IS_SLMNGG_MAIN_SERVER) log(`SLMN.GG has finished rebuilding in ${time(Math.floor((new Date() - new Date(fullLoadStart)) / 1000))}.`);
 
-        for (let i = 0; i < this.availableRequests; i++) {
+        for (let i = 0; i < 2; i++) {
             this.startNextOldestTable();
+        }
+        for (let i = 0; i < 2; i++) {
+            this.startNextOldestTable(true);
         }
     }
 
@@ -237,21 +249,25 @@ class AirtableManager {
         this.ioServer.emit("website_flags", this.websiteFlags);
     }
 
-    startNextOldestTable() {
-        let table = this.getOldestTable();
-        if (!table) return wait(2000).then(() => this.startNextOldestTable());
+    startNextOldestTable(fullLoad) {
+        let table = this.getOldestTable(fullLoad);
+        if (!table) return wait(2000).then(() => this.startNextOldestTable(fullLoad));
         // const diff = new Date() - table.lastRequest;
         // console.log(`[Load] Starting update of old table [${table.tableName}] (${Math.floor(diff / 1000)}s old)`);
-        table.getTableUpdates().then(() => this.startNextOldestTable());
+        (fullLoad ? table.fullTableLoad() : table.getTableUpdates()).then(() => this.startNextOldestTable(fullLoad));
     }
 
-    getOldestTable() {
+    getOldestTable(fullLoad) {
         return this.tables.filter(table => {
-            if (table.request?.status === "active") return false;
-            const latestRequestDiff = new Date() - table.lastRequest;
-            return latestRequestDiff >= 5000; // only show tables over Xs old
+            if (fullLoad && table.fullRequest?.status === "active") return false;
+
+            if (fullLoad && ["Maps"].includes(table.tableName)) return false;
+
+            if (!fullLoad && table.changesRequest?.status === "active") return false;
+            const latestRequestDiff = new Date() - table.getLatestRequest(fullLoad);
+            return latestRequestDiff >= 7000; // only show tables over Xs old
         }).sort((a, b) => {
-            const [aDate, bDate] = [a,b].map(x => x.lastRequest);
+            const [aDate, bDate] = [a,b].map(x => x.getLatestRequest(fullLoad));
             if (aDate > bDate) return 1;
             if (aDate < bDate) return -1;
         })?.[0];
@@ -260,8 +276,10 @@ class AirtableManager {
     getStatusData() {
         return this.tables.map(table => ({
             tableName: table.tableName,
-            lastRequest: table.lastRequest,
-            request: table.request,
+            lastChangesRequest: table.lastChangesRequest,
+            lastFullRequest: table.lastFullRequest,
+            changesRequest: table.changesRequest,
+            fullRequest: table.fullRequest,
             airtableRequestCount: table.airtableRequestCount,
             lastError: table.lastError
         }));

@@ -1,14 +1,14 @@
 <template>
     <div class="auction-teams-overview w-100 h-100 flex-center">
         <h1 style="font-size: 2em;margin-bottom: .5em;">Teams Overview</h1>
-        <div class="team w-100" v-for="team in teams" :key="team.id">
+        <div v-for="team in teams" :key="team.id" class="team w-100">
             <ThemeLogo :theme="team?.theme" class="theme-logo" border-width="4px" />
             <div class="balance flex-center">
                 <money-bar :auction-settings="auctionSettings" :team="team" />
             </div>
             <div class="players flex flex-center">
-                <div class="player flex-center" v-for="p in paddedPlayers(team.players)" :key="p.id">
-                    <role-icon :role="p.role"></role-icon>
+                <div v-for="p in paddedPlayers(team.players)" :key="p.id" class="player flex-center">
+                    <role-icon :role="p.role" />
                 </div>
             </div>
         </div>
@@ -23,6 +23,7 @@ import MoneyBar from "@/components/broadcast/auction/MoneyBar.vue";
 
 export default {
     name: "AuctionTeamsOverview",
+    components: { MoneyBar, ThemeLogo, RoleIcon },
     props: ["teams", "auctionSettings"],
     methods: {
         money,
@@ -36,8 +37,7 @@ export default {
                 ...(Array(fill).fill({ empty: true }))
             ];
         }
-    },
-    components: { MoneyBar, ThemeLogo, RoleIcon }
+    }
 };
 </script>
 

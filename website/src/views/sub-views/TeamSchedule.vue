@@ -2,7 +2,12 @@
     <div class="container">
         <h2 class="text-center mb-3">Team matches</h2>
         <div class="w-100">
-            <ScheduleMatch v-for="match in matches" :match="match" :key="match.id" :left-team="team" :show-editor-button="showEditorButton" />
+            <ScheduleMatch
+                v-for="match in matches"
+                :key="match.id"
+                :match="match"
+                :left-team="team"
+                :show-editor-button="showEditorButton" />
         </div>
     </div>
 </template>
@@ -12,13 +17,14 @@ import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
 import { canEditMatch } from "@/utils/client-action-permissions";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "TeamMatches",
-    props: ["team"],
     components: {
         ScheduleMatch
     },
+    props: ["team"],
     computed: {
         matches() {
             if (!this.team?.matches?.length) return [];
@@ -36,7 +42,8 @@ export default {
             });
         },
         showEditorButton() {
-            return canEditMatch(this.$root.auth.user, { event: this.hydratedEvent });
+            const { user } = useAuthStore();
+            return canEditMatch(user, { event: this.hydratedEvent });
         }
     }
 };

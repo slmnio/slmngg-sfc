@@ -1,22 +1,39 @@
 <template>
     <div class="cam-overlay">
-        <div class="guest" :class="{ full }" v-if="shouldShowCam" v-show="alwaysShowBox || childCameraIsOn" :style="theme">
-            <CasterCam class="team-cam" :guest="activeGuest" :extra-params="camParams" :disable-video="false"
-                       :event="broadcast && broadcast.event" :relay-prefix="relayPrefix" :team="activeTeam"
-             @cam_visible="(isVisible) => childCameraIsOn = isVisible"/>
+        <div
+            v-if="shouldShowCam"
+            v-show="alwaysShowBox || childCameraIsOn"
+            class="guest"
+            :class="{ full }"
+            :style="theme">
+            <CasterCam
+                class="team-cam"
+                :guest="activeGuest"
+                :extra-params="camParams"
+                :disable-video="false"
+                :event="broadcast && broadcast.event"
+                :relay-prefix="relayPrefix"
+                :team="activeTeam"
+                @cam_visible="(isVisible) => childCameraIsOn = isVisible" />
         </div>
-        <div class="guest-name-holder" v-if="shouldShowName">
-            <div class="team-logo-holder" v-if="activeTeam">
-                <ThemeLogo class="top-theme-logo" :theme="activeTeam.theme" border-width="4" icon-padding="6"></ThemeLogo>
+        <div v-if="shouldShowName" class="guest-name-holder">
+            <div v-if="activeTeam" class="team-logo-holder">
+                <ThemeLogo class="top-theme-logo" :theme="activeTeam.theme" border-width="4" icon-padding="6" />
             </div>
             <div class="guest-name">
                 <span class="industry-align">{{ name }}</span>
             </div>
         </div>
-        <div class="team-shield-holder d-flex flex-center" v-if="showShield && activeTeam">
+        <div v-if="showShield && activeTeam" class="team-shield-holder d-flex flex-center">
             <div class="team-shield" :style="logoBackground1(activeTeam)">
                 <div class="shield-triangle"></div>
-                <ThemeLogo small="true" logo-size="w-50" icon-padding="2px" border-width="0" class="shield-logo" :theme="activeTeam.theme"></ThemeLogo>
+                <ThemeLogo
+                    small="true"
+                    logo-size="w-50"
+                    icon-padding="2px"
+                    border-width="0"
+                    class="shield-logo"
+                    :theme="activeTeam.theme" />
             </div>
         </div>
     </div>
@@ -30,8 +47,8 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 
 export default {
     name: "CamOverlay",
-    props: ["broadcast", "params", "number", "full", "alwaysShow", "relay", "client", "alwaysShowBox"],
     components: { CasterCam, ThemeLogo },
+    props: ["broadcast", "params", "number", "full", "alwaysShow", "relay", "client", "alwaysShowBox"],
     data: () => ({
         childCameraIsOn: false
     }),
@@ -76,7 +93,7 @@ export default {
             return `${this.broadcast?.cams_relay_prefix}${this.number}`;
         },
         match() {
-            if (!this.broadcast || !this.broadcast.live_match) return null;
+            if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -84,7 +101,7 @@ export default {
             });
         },
         teams() {
-            if (!this.match || !this.match.teams || !this.match.teams.every(t => {
+            if (!this.match?.teams?.every(t => {
                 if (t.theme === undefined && t.has_theme === 0) return true;
                 return t.theme && !t.theme.__loading && t.theme.id;
             })) return [];
@@ -138,7 +155,7 @@ export default {
     methods: {
         logoBackground1
     },
-    metaInfo() {
+    head() {
         return {
             title: this.title
         };
@@ -158,7 +175,7 @@ export default {
         overflow: hidden;
         border-bottom: 6px solid transparent;
     }
-    .guest >>> .caster-cam-wrapper {
+    .guest:deep(.caster-cam-wrapper) {
         height: 100%;
         width: 100%;
     }
@@ -175,11 +192,11 @@ export default {
     .guest {
         --caster-width: 300px;
     }
-    .guest >>> .caster-avatar {
+    .guest:deep(.caster-avatar) {
         transform: translate(0, 0);
     }
-    .guest >>> .caster-bg,
-    .guest >>> .caster-cam-wrapper {
+    .guest:deep(.caster-bg),
+    .guest:deep(.caster-cam-wrapper) {
         background-color: rgba(0,0,0,0)
     }
 
@@ -194,13 +211,13 @@ export default {
         border-radius: 0;
         --caster-width: 100vw;
     }
-    .guest.full >>> .caster-cam-wrapper {
+    .guest.full:deep(.caster-cam-wrapper) {
         transform: none;
         height: 100%;
         width: 100%;
     }
 
-    .guest-name-holder >>> .icon-holder {
+    .guest-name-holder:deep(.icon-holder) {
         width: 80px;
         height: 60px;
     }

@@ -1,13 +1,22 @@
 <template>
     <div class="container">
         <h1 class="big mb-3">Teams</h1>
-        <input type="text" class="form-control mb-3" placeholder="Start typing to filter" v-model="search">
-        <h1><LoadingIcon v-if="!search && !sortedEvents.length"></LoadingIcon></h1>
+        <input v-model="search" type="text" class="form-control mb-3" placeholder="Start typing to filter">
+        <h1><LoadingIcon v-if="!search && !sortedEvents.length" /></h1>
 
-        <EventTeamsDisplay class="mb-4" v-for="eventID in sortedEvents" :key="eventID" :event-i-d="eventID"
-                           :search-text="searchEvents ? search : null"></EventTeamsDisplay>
-        <b-pagination @page-click="scrollToTop()" v-if="!searchEvents" v-model="page" :per-page="eventsPerPage"
-                      :total-rows="events.length" align="center"></b-pagination>
+        <EventTeamsDisplay
+            v-for="eventID in sortedEvents"
+            :key="eventID"
+            class="mb-4"
+            :event-i-d="eventID"
+            :search-text="searchEvents ? search : null" />
+        <b-pagination
+            v-if="!searchEvents"
+            v-model="page"
+            :per-page="eventsPerPage"
+            :total-rows="events.length"
+            align="center"
+            @page-click="scrollToTop()" />
     </div>
 </template>
 
@@ -15,20 +24,19 @@
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { searchInCollection } from "@/utils/search";
 import LoadingIcon from "@/components/website/LoadingIcon";
-import { BPagination } from "bootstrap-vue";
 import EventTeamsDisplay from "@/views/lists/EventTeamsDisplay.vue";
+import { useRouteQuery } from "@vueuse/router";
 
 export default {
     name: "Teams",
     components: {
         EventTeamsDisplay,
-        LoadingIcon,
-        BPagination
+        LoadingIcon
     },
     data: function() {
         return {
             search: null,
-            page: 1,
+            page: useRouteQuery("page", "1", { transform: Number }),
             eventsPerPage: 10
         };
     },
@@ -71,6 +79,7 @@ export default {
                 }
                 if (a.eventStart) return -1;
                 if (b.eventStart) return 1;
+                return 0;
             }).reverse()?.map(e => e.eventID);
 
             // return this.events
@@ -90,11 +99,6 @@ export default {
             })?.teams;
         }
     },
-    metaInfo() {
-        return {
-            title: "Teams"
-        };
-    },
     methods: {
         scrollToTop() {
             window.scrollTo({
@@ -102,6 +106,11 @@ export default {
                 behavior: "instant"
             });
         }
+    },
+    head() {
+        return {
+            title: "Teams"
+        };
     }
 };
 </script>

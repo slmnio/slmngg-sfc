@@ -1,14 +1,15 @@
 <template>
     <div class="player-audio" @click="isMuted = !isMuted">
-        <div class="member-list" v-if="!isMuted">
-            <div class="member" v-for="member in sortedMemberList" :key="member.id" :class="{'speaking': member.speaking}">
-<!--                {{ member.airtable && member.airtable.name }} {{ member.name }} {{ member.id }} {{ member.speaking }}-->
+        <div v-if="!isMuted" class="member-list">
+            <div v-for="member in sortedMemberList" :key="member.id" class="member" :class="{'speaking': member.speaking}">
+                <!--                {{ member.airtable && member.airtable.name }} {{ member.name }} {{ member.id }} {{ member.speaking }}-->
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import { socket } from "@/socket";
 import PCMPlayer from "@/utils/pcmplayer";
 import { OpusDecoderWebWorker } from "opus-decoder";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
@@ -17,48 +18,6 @@ import { cleanID } from "@/utils/content-utils";
 export default {
     name: "TeamAudio",
     props: ["broadcast", "taskKey", "buffer", "alwaysUnmuted", "team"],
-    sockets: {
-        async audio(room, { data, user }) {
-            if (room !== this.roomKey) return;
-            setTimeout(async () => {
-                if (this.muted) return;
-                this.lastPacketTime[user] = Date.now();
-
-                if (!this.players[user]) {
-                    this.players[user] = new PCMPlayer({
-                        encoding: "32bitFloat",
-                        channels: 2,
-                        sampleRate: 48000,
-                        flushingTime: 1000
-                    });
-                }
-
-                if (!this.decoders[user]) {
-                    this.decoders[user] = new OpusDecoderWebWorker({ channels: 2 });
-                }
-
-                await this.decoders[user].ready;
-
-                const { channelData, samplesDecoded } = await this.decoders[user].decodeFrame(data);
-                if (channelData) {
-                    this.players[user].feed({ channelData, length: samplesDecoded });
-                }
-            }, this.buffer || 0);
-        },
-        audio_member_list(room, memberList) {
-            if (room !== this.roomKey) return;
-            setTimeout(() => {
-                this.memberList = memberList;
-            }, this.buffer || 0);
-        },
-        audio_job_status(room, status) {
-            if (room !== this.roomKey) return;
-            setTimeout(() => {
-                console.log("status", this.taskKey, status);
-                this.status = status;
-            }, this.buffer || 0);
-        }
-    },
     data: () => ({
         noStinger: true,
         players: {},
@@ -100,6 +59,7 @@ export default {
             const p = players.map(player => {
                 return this.decoratedMemberList.find(member => {
                     if (player.id === member.airtableID || player.discord_id === member.id) return member;
+                    return false;
                 });
             }).filter(p => !!p);
             console.log("sorted member list", p);
@@ -115,16 +75,20 @@ export default {
                 if (Date.now() - time > 10000) {
                     console.log("garbage collecting", user);
                     this.players[user].destroy();
+                    // TODO: fix these
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete this.players[user];
                     this.decoders[user].free();
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete this.decoders[user];
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete this.lastPacketTime[user];
                 }
             }
         },
         audioSub(key) {
             if (!this.broadcastKey) return;
-            this.$socket.client.emit("audio_subscribe", {
+            socket.emit("audio_subscribe", {
                 taskKey: key || this.taskKey,
                 broadcastKey: this.broadcastKey
             });
@@ -142,6 +106,48 @@ export default {
         },
         broadcastKey() {
             this.audioSub();
+        }
+    },
+    sockets: {
+        async audio(room, { data, user }) {
+            if (room !== this.roomKey) return;
+            setTimeout(async () => {
+                if (this.muted) return;
+                this.lastPacketTime[user] = Date.now();
+
+                if (!this.players[user]) {
+                    this.players[user] = new PCMPlayer({
+                        encoding: "32bitFloat",
+                        channels: 2,
+                        sampleRate: 48000,
+                        flushingTime: 1000
+                    });
+                }
+
+                if (!this.decoders[user]) {
+                    this.decoders[user] = new OpusDecoderWebWorker({ channels: 2 });
+                }
+
+                await this.decoders[user].ready;
+
+                const { channelData, samplesDecoded } = await this.decoders[user].decodeFrame(data);
+                if (channelData) {
+                    this.players[user].feed({ channelData, length: samplesDecoded });
+                }
+            }, this.buffer || 0);
+        },
+        audio_member_list(room, memberList) {
+            if (room !== this.roomKey) return;
+            setTimeout(() => {
+                this.memberList = memberList;
+            }, this.buffer || 0);
+        },
+        audio_job_status(room, status) {
+            if (room !== this.roomKey) return;
+            setTimeout(() => {
+                console.log("status", this.taskKey, status);
+                this.status = status;
+            }, this.buffer || 0);
         }
     },
     mounted() {

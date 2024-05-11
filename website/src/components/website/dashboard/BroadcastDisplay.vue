@@ -1,11 +1,13 @@
 <template>
-    <div class="broadcast-display default-thing" :style="style" @click="handleClick">
-        <LoadingIcon v-if="!broadcast"/>
-        <div class="event-logo flex-center" v-if="broadcast">
-            <div class="event-logo-inner bg-center" :style="logo"></div>
-        </div>
-        <div class="broadcast-name" v-if="broadcast">{{ broadcast.name }}</div>
-    </div>
+    <b-button squared class="broadcast-display default-thing" :disabled :style="style">
+        <template v-if="broadcast">
+            <div class="event-logo flex-center">
+                <div class="event-logo-inner bg-center" :style="logo"></div>
+            </div>
+            <div class="broadcast-name text-left">{{ broadcast.name }}</div>
+        </template>
+        <LoadingIcon v-else />
+    </b-button>
 </template>
 
 <script>
@@ -15,7 +17,7 @@ import { resizedImage } from "@/utils/images";
 export default {
     name: "BroadcastDisplay",
     components: { LoadingIcon },
-    props: ["broadcast", "setMethod"],
+    props: ["broadcast", "disabled"],
     computed: {
         theme() {
             return this.broadcast?.theme_override ?? this.broadcast?.event?.theme;
@@ -27,13 +29,6 @@ export default {
         logo() {
             if (!this.theme) return {};
             return resizedImage(this.theme, ["default_logo"], "h-50");
-        }
-    },
-    methods: {
-        handleClick() {
-            if (this.setMethod) {
-                this.setMethod(this.broadcast);
-            }
         }
     }
 };
@@ -48,10 +43,7 @@ export default {
         align-items: center;
         background-color: #555;
         min-height: 3em;
-    }
-    .broadcast-display[disabled] {
-        pointer-events: none;
-        opacity: 0.6;
+        border: none;
     }
 
     .event-logo {

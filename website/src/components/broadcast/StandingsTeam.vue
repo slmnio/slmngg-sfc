@@ -79,6 +79,9 @@ export default {
                 case "MatchWins":
                     stats.push("wins");
                     break;
+                case "MatchLosses":
+                    stats.push("losses");
+                    break;
                 case "MatchDiffPoints":
                     stats.push("diff_points");
                     break;

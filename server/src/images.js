@@ -1,9 +1,10 @@
-const sharp = require("sharp");
-const fp = require("fs/promises");
-const fs = require("fs");
-const path = require("path");
-const https = require("https");
-const { cleanID } = require("./action-utils/action-utils");
+import sharp from "sharp";
+import fp from "node:fs/promises";
+import fs from "node:fs";
+import path from "node:path";
+import https from "node:https";
+import { cleanID } from "./action-utils/action-utils.js";
+
 
 const heldPromises = [];
 function getHeldPromise(parts) {
@@ -22,7 +23,7 @@ async function heldPromise(parts, promise) {
 }
 
 function getPath(filename, size) {
-    return path.join(__dirname, "..", "images", size, filename);
+    return path.join(import.meta.dirname, "..", "images", size, filename);
 }
 
 async function getImage(filename, size) {
@@ -144,7 +145,7 @@ async function fullGetURL(attachment, sizeText, sizeData) {
     return await getImage(filename, sizeText);
 }
 
-module.exports = ({ app, cors, Cache }) => {
+export default ({ app, cors, Cache }) => {
 
     ensureFolder("").then(() => console.log("[images] images folder ensured"));
     ensureFolder("orig").then(() => console.log("[images] orig folder ensured"));

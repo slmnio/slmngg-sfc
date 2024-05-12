@@ -1,19 +1,14 @@
-const {
-    SlashCommandBuilder,
-    userMention,
-    EmbedBuilder
-} = require("discord.js");
+import { EmbedBuilder, SlashCommandBuilder, userMention } from "discord.js";
+import * as Cache from "../../../cache.js";
+import { getInternalManager } from "../../../action-utils/action-manager.js";
 
-const Cache = require("../../../cache.js");
-
-const { getInternalManager } = require("../../../action-utils/action-manager");
 
 function generateWebcamLink(code) {
     if (code.includes("http")) return code.replace("view=", "push=");
     return `https://cams.prod.slmn.gg/?push=${code}&webcam&cb=0&nmb=0&hideaudio=1`;
 }
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName("webcam")
         .addUserOption(option => option.setName("user").setDescription("The user to show the webcam of"))

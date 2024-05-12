@@ -1,11 +1,11 @@
-const fs = require("node:fs");
-const path = require("node:path");
-const { Collection, Events } = require("discord.js");
-
-const client = require("./client.js");
+import fs from "node:fs";
+import path from "node:path";
+import { Collection, Events } from "discord.js";
+import client from "./client.js";
+import { pathToFileURL } from "node:url";
 
 client.commands = new Collection();
-const foldersPath = path.join(__dirname, "commands");
+const foldersPath = path.join(import.meta.dirname, "commands");
 const commandFolders = fs.readdirSync(foldersPath);
 
 console.log("[slash] loading slash commands");
@@ -14,7 +14,7 @@ for (const folder of commandFolders) {
     const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(".js"));
     for (const file of commandFiles) {
         const filePath = path.join(commandsPath, file);
-        const command = require(filePath);
+        const { default: command } = await import(pathToFileURL(filePath));
         // Set a new item in the Collection with the key as the command name and the value as the exported module
         if ("data" in command && "execute" in command) {
             console.log(" /", command.data.name);

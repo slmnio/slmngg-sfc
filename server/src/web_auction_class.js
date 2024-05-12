@@ -1,10 +1,8 @@
-const Cache = require("./cache");
-const { cleanID, dirtyID,
-    updateRecord
-} = require("./action-utils/action-utils");
-const { isEventStaffOrHasRole } = require("./action-utils/action-permissions");
+import * as Cache from "./cache.js";
+import { cleanID, dirtyID, updateRecord } from "./action-utils/action-utils.js";
+import { isEventStaffOrHasRole } from "./action-utils/action-permissions.js";
 
-module.exports = class Auction {
+export default class Auction {
     constructor(eventData, io, auctionData) {
         this.io = io;
         this.id = cleanID(eventData?.id);

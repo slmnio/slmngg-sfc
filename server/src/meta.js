@@ -1,4 +1,4 @@
-require("dotenv").config();
+import "dotenv/config";
 function cleanID(id) {
     if (!id) return null;
     if (typeof id !== "string") return id.id || null; // no real id oops
@@ -65,7 +65,7 @@ function niceJoin(array) {
     return array[0];
 }
 
-module.exports = ({ app, Cache }) => {
+export default ({ app, Cache }) => {
 
     async function subArrayNames(ids) {
         if (!ids?.length) return [];

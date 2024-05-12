@@ -1,16 +1,11 @@
-const fs = require("fs/promises");
-const path = require("path");
-const express = require("express");
-const bodyParser = require("body-parser");
+import fs from "node:fs/promises";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+import express from "express";
+import bodyParser from "body-parser";
+import { getSelfClient } from "./action-utils.js";
 
-const { getSelfClient } = require("./action-utils");
-
-const {
-    HTTPActionManager,
-    SocketActionManager,
-    Action,
-    InternalActionManager
-} = require("./action-manager-models");
+import { Action, HTTPActionManager, InternalActionManager, SocketActionManager } from "./action-manager-models.js";
 
 let actions = [];
 
@@ -24,16 +19,16 @@ async function loadActions(directory) {
     const files = (await fs.readdir(directory)).filter(file => file.endsWith(".js"));
     console.log(`[actions] loading ${files.length} actions`);
     console.log(files.map(filename => ` + ${filename}`).join("\n"));
-    return files.map(file => require(path.join(directory, file)));
+    return await Promise.all(files.map(file => import(pathToFileURL(path.join(directory, file)))));
 }
 
 let managers = {};
 
-async function load(expressApp, cors, Cache, io) {
+export async function load(expressApp, cors, Cache, io) {
     const actionApp = express.Router();
     actionApp.use(bodyParser.json());
     actionApp.options("/*", cors());
-    actions = (await loadActions(path.join(__dirname, "..", "actions"))) || [];
+    actions = (await loadActions(path.join(import.meta.dirname, "..", "actions"))) || [];
 
     /**
      *
@@ -101,13 +96,9 @@ async function load(expressApp, cors, Cache, io) {
     managers.socket.finalSetup(io);
 }
 
-
-module.exports = {
-    load,
-    /**
-     * @returns {InternalActionManager}
-     */
-    getInternalManager() {
-        return managers?.internal;
-    }
-};
+/**
+ * @returns {InternalActionManager}
+ */
+export function getInternalManager() {
+    return managers?.internal;
+}

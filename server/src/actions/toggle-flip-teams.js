@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     key: "toggle-flip-teams",
     auth: ["client"],
     /***

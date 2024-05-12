@@ -1,8 +1,7 @@
-const { getValidHeroes,
-    dirtyID,
-    cleanID
-} = require("../action-utils/action-utils");
-module.exports = {
+import { cleanID, dirtyID, getValidHeroes } from "../action-utils/action-utils.js";
+
+
+export default {
     key: "update-profile-data",
     requiredParams: ["profileData"],
     auth: ["user"],

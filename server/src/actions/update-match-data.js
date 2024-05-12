@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     key: "update-match-data",
     requiredParams: ["matchID", "updatedData"],
     auth: ["user"],

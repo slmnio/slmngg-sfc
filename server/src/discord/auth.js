@@ -1,6 +1,7 @@
-const bodyParser = require("body-parser");
-const fetch = require("node-fetch");
-const { updateRecord } = require("../action-utils/action-utils");
+import bodyParser from "body-parser";
+import fetch from "node-fetch";
+import { updateRecord } from "../action-utils/action-utils.js";
+
 
 function discordEnvSet() {
     return ["DISCORD_CLIENT_ID", "DISCORD_CLIENT_SECRET"].every(key => !!process.env[key])
@@ -15,7 +16,7 @@ function getRequestingDomain(origin) {
     return "https://dev.slmn.gg";
 }
 
-module.exports = ({ app, router, cors, Cache }) => {
+export default ({ app, router, cors, Cache }) => {
     if (!discordEnvSet()) {
         const tempAuthApp = router;
         tempAuthApp.options("/*", cors());

@@ -1,5 +1,6 @@
-const { cleanID, dirtyID } = require("../action-utils/action-utils");
-module.exports = {
+import { cleanID, dirtyID } from "../action-utils/action-utils.js";
+
+export default {
     key: "update-gfx-index",
     auth: ["client"],
     requiredParams: ["gfxID", "index"],

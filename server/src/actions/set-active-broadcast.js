@@ -1,6 +1,6 @@
-const { dirtyID } = require("../action-utils/action-utils");
+import { dirtyID } from "../action-utils/action-utils.js";
 
-module.exports = {
+export default {
     key: "set-active-broadcast",
     requiredParams: ["client", "broadcast"],
     auth: ["user", "client"],

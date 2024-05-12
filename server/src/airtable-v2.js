@@ -2,6 +2,8 @@ import Airtable from "airtable";
 import * as Cache from "./cache.js";
 import customTableUpdate from "./custom-datasets.js";
 import { log } from "./discord/slmngg-log.js";
+import { h3Router } from "./index.js";
+import { defineEventHandler, fromNodeMiddleware } from "h3";
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
 const slmngg = airtable.base(process.env.AIRTABLE_APP);
 
@@ -320,21 +322,20 @@ export async function select(table, filter) {
 }
 
 /**
- * @param {Express} web
  * @param {import("socket.io").Server} io
  */
 export function setup({
-    web,
     io
 }) {
     const manager = new AirtableManager();
 
-    web.get("/api/requests", async (req, res) => {
-        res.json(manager.getStatusData());
-    });
-    web.get("/requests", async (req, res) => {
+    h3Router.get("/api/requests", defineEventHandler(async () => {
+        return manager.getStatusData();
+    }));
+
+    h3Router.get("/requests", fromNodeMiddleware(async (req, res) => {
         res.sendFile(import.meta.dirname + "/request.html");
-    });
+    }));
 
     return manager.main(io);
 }

@@ -1,6 +1,16 @@
 import { createRecord, updateRecord } from "./action-utils/action-utils.js";
 import { exchangeCode, getTokenInfo, StaticAuthProvider } from "@twurple/auth";
+import crypto from "node:crypto";
 import { ApiClient } from "@twurple/api";
+import { h3Router } from "./index.js";
+import {
+    createError,
+    defineEventHandler,
+    getQuery,
+    getRouterParams,
+    sendRedirect,
+    setResponseHeaders,
+} from "h3";
 
 
 function cleanID(id) {
@@ -18,18 +28,18 @@ function niceJoin(array) {
     return array[0];
 }
 
-export default ({ app, Cache, io }) => {
-    app.get("/redirect", async (req, res) => {
+export default ({ Cache, io }) => {
+    h3Router.get("/redirect", defineEventHandler(async (event) => {
         try {
             let redirects = await Promise.all(((await Cache.get("Redirects"))?.ids || []).map(id => Cache.get(id)));
 
-            let subdomain = req.query.subdomain || null;
-            let path = req.query.path;
+            let {subdomain, path} = getQuery(event);
+
             if (!path.startsWith("/")) path = "/" + path;
             path = path.trim().toLowerCase();
 
 
-            if (!redirects?.length) return res.send({ redirect: null, warn: "no redirects loaded" });
+            if (!redirects?.length) return { redirect: null, warn: "no redirects loaded" };
 
             let redirect = redirects.find(r => {
                 if (!r.active) return false;
@@ -45,17 +55,20 @@ export default ({ app, Cache, io }) => {
             });
 
             if (!redirect) {
-                return res.send({ redirect: null });
+                return { redirect: null };
             }
 
-            res.send({
+            return {
                 redirect
-            });
+            };
         } catch (e) {
             console.error(e);
-            return res.send({ redirect: null, warn: "error occurred" });
+            throw createError({
+                status: 500,
+                message: "An error occurred"
+            });
         }
-    });
+    }));
 
     async function getBroadcast(streamURL) {
         let broadcasts = (await Cache.get("Broadcasts"))?.ids;
@@ -79,33 +92,35 @@ export default ({ app, Cache, io }) => {
         return { "error": false, data: live_match};
     }
 
-    app.get("/casters", async (req, res) => {
+    h3Router.get("/casters", defineEventHandler(async (event) => {
         try {
-            if (!req.query.stream) return res.send("The 'stream' query is required.");
+            const { stream } = getQuery(event);
+            if (!stream) return "The 'stream' query is required.";
 
-            let live_match = await getLiveMatch(req.query.stream);
-            if (live_match.error) return res.send(live_match.message);
+            let live_match = await getLiveMatch(stream);
+            if (live_match.error) return live_match.message;
             live_match = live_match.data;
 
-            if (!live_match.casters || live_match.casters.length === 0) return res.send("No casters are linked to this match.");
+            if (!live_match.casters || live_match.casters.length === 0) return "No casters are linked to this match.";
             let casters = (await Promise.all(live_match.casters.map(id => Cache.get(cleanID(id))))).map(caster => caster.name + (caster.twitter_link?.length ? ": " + caster.twitter_link[0].replace("https://", "").toLowerCase() + " ": ""));
-            return res.send(`Your casters for this match are ${niceJoin(casters)}`);
+            return `Your casters for this match are ${niceJoin(casters)}`;
 
         } catch (e) {
             console.error(e);
-            return res.send("An error occurred loading data");
+            return "An error occurred loading data";
         }
-    });
+    }));
 
-    app.get("/production", async (req, res) => {
+    h3Router.get("/production", defineEventHandler(async (event) => {
         try {
-            if (!req.query.stream) return res.send("The 'stream' query is required.");
+            const { stream } = getQuery(event);
+            if (!stream) return "The 'stream' query is required.";
 
-            let live_match = await getLiveMatch(req.query.stream);
-            if (live_match.error) return res.send(live_match.message);
+            let live_match = await getLiveMatch(stream);
+            if (live_match.error) return live_match.message;
             live_match = live_match.data;
 
-            if (!live_match.player_relationships || live_match.player_relationships.length === 0) return res.send("No staff are linked to this match.");
+            if (!live_match.player_relationships || live_match.player_relationships.length === 0) return "No staff are linked to this match.";
             let player_relationships = (await Promise.all(live_match.player_relationships.map(id => Cache.get(cleanID(id)))));
 
             let groups = {};
@@ -118,18 +133,18 @@ export default ({ app, Cache, io }) => {
                 groups[rel.singular_name].items.push(rel.player_name[0]);
             });
 
-            return res.send("Your production staff for this match are: " + Object.entries(groups).map(([groupName, group]) => {
+            return "Your production staff for this match are: " + Object.entries(groups).map(([groupName, group]) => {
                 if (group.items.length > 1) {
                     return `${group.plural_name}: ${niceJoin(group.items)}`;
                 }
                 return `${group.singular_name}: ${group.items[0]}`;
-            }).join(" / "));
+            }).join(" / ");
 
         } catch (e) {
             console.error(e);
-            return res.send("An error occurred loading data");
+            return "An error occurred loading data";
         }
-    });
+    }));
 
     async function getEventURL(streamURL) {
         let broadcast = await getBroadcast(streamURL);
@@ -149,27 +164,28 @@ export default ({ app, Cache, io }) => {
         return { "error": false, data: url };
     }
 
-    app.get("/link", async (req, res) => {
+    h3Router.get("/link", defineEventHandler(async (event) => {
         try {
-            if (!req.query.stream) return res.send("The 'stream' query is required.");
-            // if (!req.query.to) return res.send("The 'to' query is required.");
-            let url = await getEventURL(req.query.stream);
-            if (url.error) return res.send(url.message);
+            const { stream, to } = getQuery(event);
+            if (!stream) return "The 'stream' query is required.";
+            let url = await getEventURL(stream);
+            if (url.error) return url.message;
             url = url.data;
 
-            res.send(`${url}${req.query.to || ""}`);
+            return `${url}${to || ""}`;
         } catch (e) {
             console.error(e);
-            return res.send("An error occurred loading data");
+            return "An error occurred loading data";
         }
-    });
+    }));
 
-    app.get("/trigger", async (req, res) => {
-        console.log(req.query.client, req.query.event, `prod:client-${req.query.client}`);
-        if (!req.query?.event || !req.query?.client) return res.send("event and client are required.");
-        io.to(`prod:client-${req.query.client}`).emit(req.query.event, "go");
-        return res.send(":) ok bet");
-    });
+    h3Router.get("/trigger", defineEventHandler(async (h3Event) => {
+        const { client, event } = getQuery(h3Event);
+        console.log(client, event, `prod:client-${client}`);
+        if (!event || !client) throw createError({ status: 400, message: "The 'client' and 'event' queries are required." });
+        io.to(`prod:client-${client}`).emit(event, "go");
+        return ":) ok bet";
+    }));
 
     function getdtz(time) {
         return [
@@ -272,103 +288,105 @@ export default ({ app, Cache, io }) => {
         return cal.join("\n");
     }
 
-    app.get("/ical", async (req, res) => {
-        try {
-            if (!req.query.event) return res.status(400).send("The 'event' query is required");
-            let event = await Cache.get(req.query.event);
-            if (!event || event.__tableName !== "Events") return res.status(400).send("Unknown event");
+    h3Router.get("/ical", defineEventHandler(async (h3Event) => {
+        const { event: eventId } = getQuery(h3Event);
+        if (!eventId) throw createError({ status: 400, message: "The 'event' query is required." });
+        let event = await Cache.get(eventId);
+        if (!event || event.__tableName !== "Events") throw createError({ status: 404, message: "Unknown event" });
 
-            let ical = await generateCal(event);
-            if (!ical) return res.status(400).send("No matches scheduled");
+        let ical = await generateCal(event);
+        if (!ical) throw createError({ status: 404, message: "No matches scheduled" });
 
-            return res.header("Content-Type", "text/calendar").send(ical);
-        } catch (e) {
-            console.error(e);
-            return res.status(500).send(e.message);
-        }
-    });
+        setResponseHeaders(h3Event, { "Content-Type": "text/calendar" });
+
+        return ical;
+    }));
 
     let states = {};
 
-    function createState() {
-        // return a uuid without a library
-        let uuid = "";
-        for (let i = 0; i < 32; i++) {
-            uuid += Math.floor(Math.random() * 16).toString(16);
-        }
-        return uuid;
-    }
     const TwitchEnvSet = ["TWITCH_REDIRECT_URI", "TWITCH_CLIENT_ID", "TWITCH_CLIENT_SECRET"].every(key => !!process.env[key]);
     if (!TwitchEnvSet) {
         console.error("Twitch authentication on the server is disabled. Set TWITCH_ keys in server/.env to enable it.");
     }
 
-    app.get("/twitch_auth/:scopes", (req, res) => {
-        if (!TwitchEnvSet) return res.status(503).send({ error: true, message: "Twitch authentication is disabled on the server." });
-        let state = createState();
-        states[state] = req.params.scopes;
-        res.redirect(`https://id.twitch.tv/oauth2/authorize?client_id=${process.env.TWITCH_CLIENT_ID}&redirect_uri=${process.env.TWITCH_REDIRECT_URI}&response_type=code&scope=${req.params.scopes}&force_verify=true&state=${state}`);
-    });
+    h3Router.get("/twitch_auth/:scopes", defineEventHandler((event) => {
+        // TODO set error: true
+        if (!TwitchEnvSet) throw createError({
+            status: 503,
+            message: "Twitch authentication is disabled on the server."
+        });
+        let state = crypto.randomUUID();
+        const { scopes } = getRouterParams(event);
+        states[state] = scopes.scopes;
+        return sendRedirect(
+            event,
+            `https://id.twitch.tv/oauth2/authorize?client_id=${process.env.TWITCH_CLIENT_ID}&redirect_uri=${process.env.TWITCH_REDIRECT_URI}&response_type=code&scope=${scopes}&force_verify=true&state=${state}`
+        );
+    }));
 
 
-    app.get("/twitch_callback", async(req, res) => {
-        if (!TwitchEnvSet) return res.status(503).send({ error: true, message: "Twitch authentication is disabled on the server." });
-        try {
-            const token = await exchangeCode(process.env.TWITCH_CLIENT_ID, process.env.TWITCH_CLIENT_SECRET, req.query.code, process.env.TWITCH_REDIRECT_URI);
-            const tokenInfo = await getTokenInfo(token.accessToken, process.env.TWITCH_CLIENT_ID);
+    h3Router.get("/twitch_callback", defineEventHandler(async (event) => {
+        // TODO set error: true
+        if (!TwitchEnvSet) throw createError({
+            status: 503,
+            message: "Twitch authentication is disabled on the server."
+        });
 
-            // let scopes = states[req.query.state];
-            // if (scopes) delete states[req.query.state];
+        const { code } = getQuery(event);
+        const token = await exchangeCode(process.env.TWITCH_CLIENT_ID, process.env.TWITCH_CLIENT_SECRET, code, process.env.TWITCH_REDIRECT_URI);
+        const tokenInfo = await getTokenInfo(token.accessToken, process.env.TWITCH_CLIENT_ID);
 
-            let streamKey = null;
-            if (tokenInfo.scopes.includes("channel:read:stream_key")) {
-                try {
-                    const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, token.accessToken);
-                    const api = new ApiClient({authProvider});
-                    streamKey = await api.streams.getStreamKey(tokenInfo.userId);
-                } catch (e) {
-                    console.error("[Twitch Auth] error getting stream key", e);
-                }
+        // let scopes = states[req.query.state];
+        // if (scopes) delete states[req.query.state];
+
+        let streamKey = null;
+        if (tokenInfo.scopes.includes("channel:read:stream_key")) {
+            try {
+                const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, token.accessToken);
+                const api = new ApiClient({authProvider});
+                streamKey = await api.streams.getStreamKey(tokenInfo.userId);
+            } catch (e) {
+                console.error("[Twitch Auth] error getting stream key", e);
             }
-
-            // get or create channel in table
-
-            const existingChannel = await Cache.auth.getChannelByID(tokenInfo.userId);
-
-            // console.log(existingChannel);
-
-            let airtableResponse;
-            // store into channels table with tokens + scopes
-
-            if (existingChannel) {
-                airtableResponse = await updateRecord(Cache, "Channels", existingChannel, {
-                    "Twitch Refresh Token": token.refreshToken,
-                    "Twitch Scopes": tokenInfo.scopes.join(" "),
-                    "Channel ID": tokenInfo.userId,
-                    "Name": tokenInfo.userName,
-                    "Stream Key": streamKey || undefined
-                });
-
-            } else {
-                airtableResponse = await createRecord(Cache, "Channels", [{
-                    "Twitch Refresh Token": token.refreshToken,
-                    "Twitch Scopes": tokenInfo.scopes.join(" "),
-                    "Channel ID": tokenInfo.userId,
-                    "Name": tokenInfo.userName,
-                    "Stream Key": streamKey || undefined
-                }]);
-            }
-
-            // console.log(airtableResponse);
-
-            if (airtableResponse.error) {
-                return res.status(400).send({ error: true, errorMessage: airtableResponse.errorMessage });
-            }
-            return res.send("poggers thanks");
-        } catch (e) {
-            console.error("[Twitch Auth] error", e);
-            res.status(400).send({ error: true, errorMessage: e.message });
         }
-    });
+
+        // get or create channel in table
+
+        const existingChannel = await Cache.auth.getChannelByID(tokenInfo.userId);
+
+        // console.log(existingChannel);
+
+        let airtableResponse;
+        // store into channels table with tokens + scopes
+
+        if (existingChannel) {
+            airtableResponse = await updateRecord(Cache, "Channels", existingChannel, {
+                "Twitch Refresh Token": token.refreshToken,
+                "Twitch Scopes": tokenInfo.scopes.join(" "),
+                "Channel ID": tokenInfo.userId,
+                "Name": tokenInfo.userName,
+                "Stream Key": streamKey || undefined
+            });
+
+        } else {
+            airtableResponse = await createRecord(Cache, "Channels", [{
+                "Twitch Refresh Token": token.refreshToken,
+                "Twitch Scopes": tokenInfo.scopes.join(" "),
+                "Channel ID": tokenInfo.userId,
+                "Name": tokenInfo.userName,
+                "Stream Key": streamKey || undefined
+            }]);
+        }
+
+        // console.log(airtableResponse);
+
+        if (airtableResponse.error) {
+            throw createError({
+                status: 400,
+                message: airtableResponse.errorMessage
+            });
+        }
+        return "poggers thanks";
+    }));
 
 };

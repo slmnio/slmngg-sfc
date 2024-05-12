@@ -1,11 +1,25 @@
 import "dotenv/config";
-import express from "express";
-import bodyParser from "body-parser";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
-const app = express();
+import {
+    createApp,
+    createError,
+    createRouter,
+    defineEventHandler,
+    handleCors,
+    toNodeListener
+} from "h3";
+export const h3App = createApp();
+export const h3Router = createRouter();
+h3App.use(defineEventHandler(async (event) => {
+    handleCors(event, {
+        origin: "*"
+    });
+}));
+
+
 const port = 8901;
-const http = createServer(app);
+const http = createServer(toNodeListener(h3App));
 
 import cors from "cors";
 import meta from "./meta.js";
@@ -20,7 +34,9 @@ if (staffKeysRequired.every(key => process.env[key])) {
     await import("./discord/staff.js");
 }
 
+
 let domains = (process.env.CORS_VALID_DOMAINS || "slmn.gg,localhost").split(/, */g).map(d => new RegExp(`(?:^|.*\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
+console.log(domains);
 
 function corsHandle(origin, callback) {
     if (!origin) return callback(null);
@@ -43,6 +59,7 @@ function corsHandle(origin, callback) {
 
 const localCors =  () => cors({ origin: corsHandle });
 
+
 const io = new Server(http, {cors: { origin: corsHandle,  credentials: true}, allowEIO3: true});
 
 // const auction = require("./discord/new_auction.js")({
@@ -52,31 +69,34 @@ const io = new Server(http, {cors: { origin: corsHandle,  credentials: true}, al
 //     test: ["hi"]
 // });
 
+
 const Cache = (await import("./cache.js")).setup(io);
-(await import("./airtable-v2.js")).setup({ web: app, io });
+import("./airtable-v2.js").then(a => a.setup({ io }));
 (await import("./discord/bot-controller.js")).setup(io);
 import * as actions from "./action-utils/action-manager.js";
-actions.load(app, localCors, Cache, io);
+actions.load(localCors, Cache, io);
 
-await import("./discord/slash-commands.js");
-await import("./automation-manager.js");
+import("./discord/slash-commands.js");
+import("./automation-manager.js");
 
-app.use(bodyParser.urlencoded({ extended: true }));
+// TODO CORS
+h3Router.get("/", defineEventHandler(() => {
+    return "[slmngg-server] pee pee poo poo";
+}));
 
-app.get("/", async (req, res) => {
-    res.send("[slmngg-server] pee pee poo poo");
-});
+// TODO CORS
 
-
-app.get("/thing/:id", cors({ origin: corsHandle}), async (req, res) => {
-    let id = req.params.id;
+h3Router.get("/thing/:id", defineEventHandler(async (event) => {
+    const id = event.context.params.id;
     let data = await Cache.get(id);
-    if (!data) return res.status(404).send({ error: true, message: "Unknown ID"});
+    if (!data) throw createError({status: 404, message: "Unknown ID", }); // TODO error: true
     console.log("[thing request]", id);
-    res.end(JSON.stringify(data));
-});
-app.get("/things/:ids", cors({ origin: corsHandle}), async (req, res) => {
-    let ids = req.params.ids.split(",");
+    return data;
+}));
+
+// TODO CORS
+h3Router.get("/things/:ids", defineEventHandler(async (event) => {
+    let ids = event.context.params.ids.split(",");
     let promises = ids.map(async id => await Cache.get(id));
     let data = await Promise.all(promises);
 
@@ -90,17 +110,17 @@ app.get("/things/:ids", cors({ origin: corsHandle}), async (req, res) => {
 
     data = [...data, ...themes].filter(d => d != null);
     // if (!data) return res.status(404).send({ error: true, message: "Unknown ID"});
-    res.end(JSON.stringify(data));
-});
+    return data;
+}));
 
-routes({ app, cors, Cache, io });
+routes({ cors, Cache, io });
 
-discordAuth({ app, router: express.Router(), cors, Cache, io });
+discordAuth({ cors, Cache, io });
 
-meta({ app, cors, Cache });
-images({ app, cors, Cache, corsHandle });
+meta({ cors, Cache });
+images({ cors, Cache, corsHandle });
 
-webAuction({ app, io });
+webAuction({ io });
 
 function cleanID(id) {
     if (!id) return null;
@@ -223,6 +243,7 @@ io.on("connection", (socket) => {
     });
 });
 
+h3App.use(h3Router);
 http.listen(port, () => {
     console.log(`[slmngg-server] live on port ${port}`);
 });

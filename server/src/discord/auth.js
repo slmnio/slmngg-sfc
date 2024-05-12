@@ -1,6 +1,16 @@
-import bodyParser from "body-parser";
 import fetch from "node-fetch";
 import { updateRecord } from "../action-utils/action-utils.js";
+import {
+    createError,
+    createRouter,
+    defineEventHandler,
+    getQuery,
+    getRequestHeader,
+    handleCors,
+    readBody,
+    useBase
+} from "h3";
+import { h3App } from "../index.js";
 
 
 function discordEnvSet() {
@@ -16,33 +26,48 @@ function getRequestingDomain(origin) {
     return "https://dev.slmn.gg";
 }
 
-export default ({ app, router, cors, Cache }) => {
+export default ({ cors, Cache }) => {
+
+    const authRouter = createRouter();
+    authRouter.use("/**", defineEventHandler(async (event) => {
+        handleCors(event, {
+            origin: "*"
+        });
+    }));
+    // tempAuthApp.options("/*", cors()); TODO CORS
+
+
     if (!discordEnvSet()) {
-        const tempAuthApp = router;
-        tempAuthApp.options("/*", cors());
-        tempAuthApp.post("/*", cors(), (req, res) => res.status(503).send({ error: true, message: "Discord authentication is disabled" }));
-        app.use("/auth", tempAuthApp);
+        // TODO Options for CORS
+        authRouter.post("/*", defineEventHandler(async (event) => {
+            throw createError({
+                status: 503,
+                message: "Discord authentication is disabled",
+            });
+        }));
+        h3App.use("/auth", useBase("/auth", authRouter.handler));
 
         return console.warn("Discord authentication on the server is disabled. Set DISCORD_ keys in server/.env to enable it.");
     }
 
-    const authApp = router;
-    authApp.use(bodyParser.json());
 
-    authApp.options("/*", cors());
-
-    authApp.post("/discord-login", cors(), async (req, res) => {
+    // TODO CORS
+    // TODO Options for CORS
+    authRouter.post("/discord-login", defineEventHandler(async (event) => {
         // console.log("[auth] attempt", req.body);
-        const code = req.body?.code;
-        if (!code) return res.status(400).send({ error: true, message: "No code sent to SLMN.GG server for Discord auth" });
+        const { code } = getQuery(event);
+        if (!code) throw createError({ status: 400, message: "No code sent to SLMN.GG server for Discord auth" }); // TODO error: true
 
-        let tokens = await getToken(code, getRequestingDomain(req.headers?.origin));
+        const origin = getRequestHeader(event, "origin");
+        let tokens = await getToken(code, getRequestingDomain(origin));
 
         if (tokens.error) {
-            return res.send({
-                error: true,
+            throw createError({
+                status: 401,
                 message: "Discord authentication error",
-                for_a_developer: tokens.error_description
+                data: {
+                    forADeveloper: tokens.error_description
+                }
             });
         }
 
@@ -50,18 +75,22 @@ export default ({ app, router, cors, Cache }) => {
         // console.log("user", user);
 
         if (!user.discord) {
-            return res.send({
-                error: true,
+            throw createError({
+                status: 401,
                 message: "No Discord details",
-                for_a_developer: "Couldn't fetch Discord account details"
+                data: {
+                    forADeveloper: "Couldn't fetch Discord account details"
+                }
             });
         }
         if (!user.airtable) {
             console.log(`[Auth] No SLMN.GG profile for ${user.discord.id} ${user.discord.username}#${user.discord.discriminator}`);
-            return res.send({
-                error: true,
+            throw createError({
+                status: 404,
                 message: "No SLMN.GG profile found",
-                for_a_developer: "Couldn't fetch Airtable account details"
+                data: {
+                    forADeveloper: "Couldn't fetch Airtable account details"
+                }
             });
         }
 
@@ -74,34 +103,41 @@ export default ({ app, router, cors, Cache }) => {
 
         console.log(`[login] Successful auth & login by ${user.airtable.name} ${user.airtable.id}`);
 
-        return res.send({
+        return {
             error: false,
             token: localToken,
             user: cleanUser(user)
-        });
+        };
 
         // res.status(501).send({ error: true, });
-    });
+    }));
 
 
-    authApp.post("/login", cors(), async (req, res) => {
-        const token = req.body?.token;
-        if (!token) return res.status(400).send({ error: true, message: "No token sent to SLMN.GG server for Discord auth" });
+    authRouter.post("/login", defineEventHandler(async (event) => {
+        const body = await readBody(event);
+        const token = body?.token;
+        if (!token) throw createError({ status: 400, message: "No token sent to SLMN.GG server for Discord auth" }); // TODO error: true
 
         let userData = await Cache.auth.getData(token);
-        if (!userData?.user) return res.status(404).send({ error: true, message: "Unknown token", for_a_developer: "No data associated with that token" });
+        if (!userData?.user) throw createError({
+            status: 404,
+            message: "Unknown token",
+            data: {
+                for_a_developer: "No data associated with that token"
+            }
+        });
 
 
         console.log(`[login] Successful token login by ${userData.user.airtable.name} ${userData.user.airtable.id}`);
 
-        return res.send({
+        return {
             error: false,
             user: cleanUser(userData.user)
-        });
-    });
+        };
+    }));
 
+    h3App.use("/auth", useBase("/auth", authRouter.handler));
 
-    app.use("/auth", authApp);
 
     async function getToken(code, origin) {
 

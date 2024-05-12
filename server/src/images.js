@@ -4,6 +4,8 @@ import fs from "node:fs";
 import path from "node:path";
 import https from "node:https";
 import { cleanID } from "./action-utils/action-utils.js";
+import { h3Router } from "./index.js";
+import { fromNodeMiddleware } from "h3";
 
 
 const heldPromises = [];
@@ -145,7 +147,7 @@ async function fullGetURL(attachment, sizeText, sizeData) {
     return await getImage(filename, sizeText);
 }
 
-export default ({ app, cors, Cache }) => {
+export default ({ cors, Cache }) => {
 
     ensureFolder("").then(() => console.log("[images] images folder ensured"));
     ensureFolder("orig").then(() => console.log("[images] orig folder ensured"));
@@ -254,8 +256,9 @@ export default ({ app, cors, Cache }) => {
         }
         res.status(400).send("An error occurred");
     }
-    app.get("/image", cors(), handleImageRequests);
-    app.get("/image.:fileFormat", cors(), handleImageRequests); // ignoring requested file format here
+
+    h3Router.get("/images", fromNodeMiddleware(handleImageRequests));
+    h3Router.get("/image.:fileFormat", fromNodeMiddleware(handleImageRequests));
 
     async function handleThemeRequests(req, res) {
         try {
@@ -332,8 +335,9 @@ export default ({ app, cors, Cache }) => {
         //     .then(data => res.end(data));
 
     }
-    app.get("/theme", handleThemeRequests);
-    app.get("/theme.:fileFormat", handleThemeRequests);
+    h3Router.get("/theme", fromNodeMiddleware(handleThemeRequests));
+    h3Router.get("/theme.:fileFormat", fromNodeMiddleware(handleThemeRequests));
+
 
     async function handleMatchRequests(req, res) {
         try {
@@ -463,7 +467,7 @@ export default ({ app, cors, Cache }) => {
         }
         res.status(400).send("An error occurred");
     }
-    app.get("/match", handleMatchRequests);
-    app.get("/match.:fileFormat", handleMatchRequests);
+    h3Router.get("/match", fromNodeMiddleware(handleMatchRequests));
+    h3Router.get("/match.:fileFormat", fromNodeMiddleware(handleMatchRequests));
 
 };

@@ -24,10 +24,7 @@ async function loadActions(directory) {
 
 let managers = {};
 
-export async function load(expressApp, cors, Cache, io) {
-    const actionApp = express.Router();
-    actionApp.use(bodyParser.json());
-    actionApp.options("/*", cors());
+export async function load(cors, Cache, io) {
     actions = (await loadActions(path.join(import.meta.dirname, "..", "actions"))) || [];
 
     /**
@@ -92,7 +89,7 @@ export async function load(expressApp, cors, Cache, io) {
     });
 
     // EXPORT NOW
-    managers.http.finalSetup(expressApp);
+    managers.http.finalSetup();
     managers.socket.finalSetup(io);
 }
 

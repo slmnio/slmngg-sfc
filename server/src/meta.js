@@ -1,4 +1,6 @@
 import "dotenv/config";
+import { h3Router } from "./index.js";
+import { createError, defineEventHandler, getQuery, getRouterParams } from "h3";
 function cleanID(id) {
     if (!id) return null;
     if (typeof id !== "string") return id.id || null; // no real id oops
@@ -65,7 +67,7 @@ function niceJoin(array) {
     return array[0];
 }
 
-export default ({ app, Cache }) => {
+export default ({ Cache }) => {
 
     async function subArrayNames(ids) {
         if (!ids?.length) return [];
@@ -378,71 +380,90 @@ export default ({ app, Cache }) => {
         };
     }
 
-    app.get("/meta/:path?", async (req, res) => {
+    h3Router.get("/meta/:path?", defineEventHandler(async (h3Event) => {
 
         /*
         *  need to detect whether it's a standard slmn.gg/ (or equivalent) request
         *    or a subdomain.slmn.gg request
         * */
 
-        try {
-            if (!req.params.path && !req.query.domain) {
-                return res.status(400).send({ error: true, message: "no path or domain included" });
-            }
+        const { path } = getRouterParams(h3Event);
+        let { domain } = getQuery(h3Event);
 
-            let domain = req.query.domain;
-            if (["slmn.gg", "dev.slmn.gg", "localhost"].includes(domain)) domain = null;
+        if (!path && !domain) {
+            // TODO: error: true
+            throw createError({
+                status: 400,
+                message: "no path or domain included"
+            });
+        }
 
-            if (domain) {
+        if (["slmn.gg", "dev.slmn.gg", "localhost"].includes(domain)) domain = null;
+
+        if (domain) {
             // domain = SUBDOMAIN.SLMN.GG
-                let subdomain = domain.split(".")[0];
+            let subdomain = domain.split(".")[0];
 
-                let redirect = await getRedirect(req.params.path, subdomain);
-                if (redirect) return res.send(redirect);
+            let redirect = await getRedirect(path, subdomain);
+            if (redirect) return redirect;
 
-                let event = await Cache.get(`subdomain-${subdomain}`);
+            let event = await Cache.get(`subdomain-${subdomain}`);
 
-                if (event && event.name && !isDefaultDomain(domain)) {
+            if (event && event.name && !isDefaultDomain(domain)) {
                 // console.log(event);
 
-                    // return if okay
-                    const path = req.params.path || "";
-                    let parts = path.split("/");
+                // return if okay
+                let parts = path.split("/");
 
-                    let route = eventRoutes.find(r => (typeof r.url === "object" ? r.url.includes(parts[0]) : r.url === parts[0]));
-                    if (!route) route = routes.find(r => (typeof r.url === "object" ? r.url.includes(parts[0]) : r.url === parts[0]));
+                let route = eventRoutes.find(r => (typeof r.url === "object" ? r.url.includes(parts[0]) : r.url === parts[0]));
+                if (!route) route = routes.find(r => (typeof r.url === "object" ? r.url.includes(parts[0]) : r.url === parts[0]));
 
-                    if (route) {
-                        let data = await route.handle({ event, path, parts });
-                        if (!data) return res.status(500).send({ error: true, message: "router handler error" });
-                        return res.send(data);
-                    }
-                    return res.status(500).send({ error: true, message: "no event router handler found" });
+                if (route) {
+                    let data = await route.handle({ event, path, parts });
+                    if (!data) throw createError({
+                        status: 500,
+                        message: "router handler error"
+                    });
+                    return data;
+                }
+                throw createError({
+                    status: 500,
+                    message: "no event router handler found"
+                });
 
-                } else {
-                    if (!req.params.path) return res.status(400).send({ error: true, message: "couldn't find event and no path is provided." });
+            } else {
+                if (!path) {
+                    throw createError({
+                        status: 400,
+                        message: "couldn't find event and no path is provided."
+                    });
                 }
             }
-
-            // standard slmn.gg/event
-
-            let redirect = await getRedirect(req.params.path);
-            if (redirect) return res.send(redirect);
-
-            const path = req.params.path || "";
-            let parts = path.split("/");
-
-            const route = routes.find(r => (typeof r.url === "object" ? r.url.includes(parts[0]) : r.url === parts[0]));
-
-            if (route) {
-                let data = await route.handle({ path, parts });
-                if (!data) return res.status(500).send({ error: true, message: "router handler error" });
-                return res.send(data);
-            }
-            return res.status(500).send({ error: true, message: "no router handler found" });
-        } catch (e) {
-            console.error(e);
-            return res.send({ error: true, message: "error occurred" });
         }
-    });
+
+        // standard slmn.gg/event
+
+        let redirect = await getRedirect(path);
+        if (redirect) return redirect;
+
+        let parts = path.split("/");
+
+        const route = routes.find(r => (typeof r.url === "object" ? r.url.includes(parts[0]) : r.url === parts[0]));
+
+        if (route) {
+            let data = await route.handle({ path, parts });
+            // TODO error: true
+            if (!data) throw createError({
+                status: 500,
+                message: "router handler error"
+            });
+            return data;
+        }
+        // TODO error: true
+        throw createError({
+            status: 500,
+            message: "no router handler found"
+        });
+
+    }));
 };

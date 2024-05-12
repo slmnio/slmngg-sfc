@@ -4,6 +4,8 @@ import { createRecord, updateRecord } from "./action-utils.js";
 
 import * as Cache from "../cache.js";
 import * as permissions from "./action-permissions.js";
+import { createError, createRouter, defineEventHandler, getRequestHeader, readBody, useBase } from "h3";
+import { h3App } from "../index.js";
 
 function cleanID(id) {
     // console.log(">id", id);
@@ -107,9 +109,8 @@ export class HTTPActionManager extends ActionManager {
     }
 
     _setup(args) {
-        this.app = express.Router();
-        this.app.use(bodyParser.json());
-        this.app.options("/*", args.cors());
+        this.app = createRouter();
+        // this.app.options("/*", args.cors()); TODO CORS
     }
 
     /**
@@ -121,52 +122,59 @@ export class HTTPActionManager extends ActionManager {
     async register(action, registerFunction) {
         await super.register(action, registerFunction);
 
-        this.app.post(`/${action.key}`, this.cors(), async (req, res) => {
-            let args = req.body;
-            let token = this.getToken(req);
+        this.app.post(`/${action.key}`, defineEventHandler(async (event) => {
+            let args = await readBody(event);
+            let token = this.getToken(event);
 
             registerFunction({
                 token: token,
                 args: args,
                 error: (errorCode, errorMessage) => {
                     console.error(`[actions] Error in pre-processing for action [${action.key}]`);
-                    res.status(errorCode).send({
-                        error: true,
-                        errorMessage
+                    // TODO error: true
+                    throw createError({
+                        status: errorCode,
+                        message: errorMessage
                     });
                 },
                 execute: (params, auth) => action.execute(params, auth, {
-                    success: (data) => res.send({
+                    success: (data) => ({
                         error: false,
-                        data
+                        ...data
                     }),
                     error: (errorCode, errorMessage) => {
                         console.error(`[actions] Error during execution in action [${action.key}]`, {
                             errorCode,
                             errorMessage
                         });
-                        res.status(errorCode).send({
-                            error: true,
-                            errorMessage
+                        // TODO error: true
+                        throw createError({
+                            status: errorCode,
+                            message: errorMessage
                         });
                     }
                 })
             }).catch(e => {
                 console.error("[actions] Manager register error", e);
-                if (!res.headersSent) {
-                    res.status(500).send({
-                        error: true,
-                        errorMessage: "Error executing the action"
-                    });
-                }
+                // TODO uncomment
+                // if (!res.headersSent) {
+                //     res.status(500).send({
+                //         error: true,
+                //         errorMessage: "Error executing the action"
+                //     });
+                // }
             });
-        });
+        }));
     }
 
-    getToken(req) {
+    /**
+     * @param {import("h3").H3Event<import("h3").EventHandlerRequest>} event
+     * @returns {string|null}
+     */
+    getToken(event) {
         let token;
 
-        let header = req.headers.authentication;
+        let header = getRequestHeader(event, "authentication");
         if (!header || !header.startsWith("Bearer ")) return null;
 
         token = header.slice(("Bearer ").length);
@@ -175,8 +183,8 @@ export class HTTPActionManager extends ActionManager {
         return token;
     }
 
-    finalSetup(expressApp) {
-        expressApp.use("/actions", this.app);
+    finalSetup() {
+        h3App.use("/actions", useBase("/actions", this.app.handler));
     }
 
 }

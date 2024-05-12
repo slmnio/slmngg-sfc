@@ -1,6 +1,8 @@
 import crypto from "node:crypto";
 import { accessTokenIsExpired, refreshUserToken } from "@twurple/auth";
 import { EventEmitter } from "events";
+import { createStorage, prefixStorage } from "unstorage";
+import fsDriver from "unstorage/drivers/fs";
 
 /*
     - Get and set data
@@ -8,22 +10,40 @@ import { EventEmitter } from "events";
     - Check for changes and export that
  */
 
-const store = new Map();
-const hiddenEvents = new Map();
-const authMap = new Map();
-const players = new Map();
-const attachments = new Map();
+const storage = createStorage();
+if (process.env.PERSIST_DATA === "true") {
+    storage.mount("", fsDriver({ base : "./data"}));
+}
+
+const store = prefixStorage(storage, "airtable");
+const hiddenEvents = prefixStorage(storage, "hidden-events");
+const authMap = prefixStorage(storage, "auth");
+const players = prefixStorage(storage, "players");
+const attachments = prefixStorage(storage, "attachments");
 
 const emitter = new EventEmitter();
 
-function getAntiLeakIDs() {
-    if (process.env.DISABLE_ANTILEAK === "true") return []; // don't hide anything on local
-    let ids = [];
-    hiddenEvents.forEach((val) => {
-        if (val?.length) val.forEach(id => ids.push(id));
-    });
-    return ids;
+const antiLeakIDs = new Set();
+
+async function recomputeAntiLeakIDs() {
+    console.log("Recomputing antileak IDs");
+    let keys = await hiddenEvents.getKeys();
+    let ids = (await hiddenEvents.getItems(keys)).flatMap(el => el.value);
+    antiLeakIDs.clear();
+    ids.forEach(id => antiLeakIDs.add(id));
 }
+
+await store.watch(async (event, key) => {
+    if (!key.startsWith("hidden-events")) return;
+    if (event === "update") {
+        let ids = await storage.getItem(key);
+        for (const id of ids) {
+            antiLeakIDs.add(id);
+        }
+    } else {
+        await recomputeAntiLeakIDs();
+    }
+});
 
 // TODO: Add a file manager (save to file, read to file)
 // TODO: Add a save to file export so other scripts can call it (ie after a table has been synced)
@@ -59,15 +79,14 @@ const updateFunction = function(id, data) {
 };
 
 async function removeAntiLeak(id, data) {
-    let antiLeakIDs = getAntiLeakIDs();
-    if (antiLeakIDs.includes(id)) {
+    if (antiLeakIDs.has(id)) {
         // console.log("antileak", antiLeakIDs, id);
         return null;
     }
 
     Object.entries(data).forEach(([key, val]) => {
         if (typeof val === "object" && val?.length) {
-            data[key] = val.filter(id => !antiLeakIDs.includes(cleanID(id)));
+            data[key] = val.filter(id => !antiLeakIDs.has(cleanID(id)));
             if (data[key].length === 0) delete data[key];
         }
     });
@@ -93,13 +112,15 @@ async function dataUpdate(id, data, options) {
     // broadcast something here
     if (options?.eager) console.log("Eager update on", id);
     recents.triggered++;
-    if (JSON.stringify(store.get(id)) !== JSON.stringify(data)) {
+    const oldData = await store.getItem(id);
+    if (JSON.stringify(oldData) !== JSON.stringify(data)) {
         // console.log(`Data update on [${id}]`);
         recents.sent++;
         if (data) data = await removeAntiLeak(id, data);
         // if (options?.eager) console.log("Sending");
         await broadcast(id, "data_update", id, data);
-        if (!(options && options.custom)) updateFunction(id, { oldData: store.get(id), newData: data });
+        const oldData = await store.getItem(id);
+        if (!(options && options.custom)) updateFunction(id, { oldData, newData: data });
     }
 }
 
@@ -165,13 +186,13 @@ async function removeAttachmentTimestamps(data) {
 
     let tableData = slmnggAttachments[data.__tableName];
     if (tableData) {
-        tableData.forEach(key => {
+        for (const key of tableData) {
             if (data[key]) {
-                data[key].forEach(attachment => {
+                for (const attachment of data[key]) {
                     let { ending, filename } = getAutoFilename(attachment);
                     attachment._autoFilename = filename;
                     attachment.fileExtension = ending;
-                    attachments.set(attachment.id, JSON.parse(JSON.stringify(attachment)));
+                    await attachments.setItem(attachment.id, JSON.parse(JSON.stringify(attachment)));
                     // console.log("att set", attachment, attachments.get(attachment.id));
 
                     // we don't want the URLs to appear in requests anymore
@@ -184,9 +205,11 @@ async function removeAttachmentTimestamps(data) {
                         size.url = null; // generateAttachmentURL(size.url, attachment);
                     }
 
-                });
+                }
             }
-        });
+
+        }
+
     }
 
     return data;
@@ -246,12 +269,12 @@ export async function set(id, data, options) {
     }
 
     if (data?.__tableName === "Channels") {
-        authMap.set(`channel_${id}`, data);
+        await authMap.setItem(`channel_${id}`, data);
         return; // not setting it on global requestable store
     }
 
     if (data?.__tableName === "Discord Bots") {
-        authMap.set(`bot_${cleanID(id)}`, data);
+        await authMap.setItem(`bot_${cleanID(id)}`, data);
 
         return; // not setting it on global requestable store
     }
@@ -259,8 +282,9 @@ export async function set(id, data, options) {
     if (data?.__tableName === "Events") {
         // update antileak
         if (!data.antileak?.length) {
-            hiddenEvents.set(id, null);
+            await hiddenEvents.removeItem(id);
         } else {
+            console.log("Setting antileak", id, data);
             let hiddenIDs = [];
 
             if (["all", "teams"].some(t => data.antileak.includes(`Hide ${t}`))) {
@@ -282,7 +306,7 @@ export async function set(id, data, options) {
                 ]);
             }
 
-            hiddenEvents.set(id, hiddenIDs.map(id => cleanID(id)));
+            await hiddenEvents.setItem(id, hiddenIDs.map(id => cleanID(id)));
         }
 
         // will automatically update first level attributes, no more
@@ -291,7 +315,7 @@ export async function set(id, data, options) {
     }
 
     if (data?.__tableName === "Players") {
-        if (data.discord_id) players.set(data.discord_id, data);
+        if (data.discord_id) await players.setItem(data.discord_id, data);
     }
     if (data?.__tableName === "Teams") {
         // Limited Players
@@ -305,8 +329,8 @@ export async function set(id, data, options) {
     // Check antileak to see if this should be hidden or redacted
     // data = await removeAntiLeak(id, data);
 
-    let oldData = store.get(id);
-    if (oldData && (data.modified !== oldData.modified)) {
+    let oldData = await store.getItem(id);
+    if (data && oldData && (data.modified !== oldData.modified)) {
         let [oldDate, newDate] = [oldData.modified, data.modified].map(x => new Date(x));
         if (newDate.getTime() < oldDate.getTime()) {
             if (oldDate.getTime() - newDate.getTime() > 3000) {
@@ -323,7 +347,7 @@ export async function set(id, data, options) {
     }
 
     await dataUpdate(id, data, options);
-    store.set(id, data);
+    await store.setItem(id, data);
 
 }
 function cleanID(id) {
@@ -334,7 +358,7 @@ function cleanID(id) {
 }
 export async function get(id) {
     id = cleanID(id);
-    let data = store.get(id);
+    let data = await store.getItem(id);
     if (data) data = await removeAntiLeak(id, data);
     return {
         ...data,
@@ -359,7 +383,7 @@ async function getOrCreateToken() {
 async function authStart(storedData) {
     const token = await createToken();
     // console.log(token, storedData);
-    authMap.set(token, storedData);
+    await authMap.setItem(token, storedData);
     return token;
 }
 
@@ -369,7 +393,7 @@ async function authStart(storedData) {
  * @returns {Promise<UserData | null>}
  */
 async function getAuthenticatedData(token) {
-    let data = authMap.get(token);
+    let data = await authMap.getItem(token);
 
     // update airtable data
     if (data?.airtableID) {
@@ -380,14 +404,14 @@ async function getAuthenticatedData(token) {
 }
 
 async function getPlayer(discordID) {
-    return players.get(discordID);
+    return players.getItem(discordID);
 }
 
 async function getChannel(airtableID) {
-    return authMap.get(`channel_${cleanID(airtableID)}`);
+    return authMap.getItem(`channel_${cleanID(airtableID)}`);
 }
 async function getBot(airtableID) {
-    return authMap.get(`bot_${cleanID(airtableID)}`);
+    return authMap.getItem(`bot_${cleanID(airtableID)}`);
 }
 async function getChannelByID(channelID) {
     return (await getChannels()).find(channel => channel.channel_id === channelID);
@@ -403,12 +427,12 @@ async function getTwitchAccessToken(channel) {
     // get stored access token, check if it's valid
     // otherwise / or if no token, get from refresh token
     if (!channel) return null;
-    let storedToken = authMap.get(`twitch_access_token_${channel.channel_id}`);
+    let storedToken = await authMap.getItem(`twitch_access_token_${channel.channel_id}`);
 
     if (!storedToken || accessTokenIsExpired(storedToken)) {
         // refresh token
         let token = await refreshUserToken(process.env.TWITCH_CLIENT_ID, process.env.TWITCH_CLIENT_SECRET, channel.twitch_refresh_token);
-        authMap.set(`twitch_access_token_${channel.channel_id}`, token);
+        await authMap.setItem(`twitch_access_token_${channel.channel_id}`, token);
         return token;
 
     }
@@ -440,11 +464,13 @@ async function startRawDiscordAuth(discordUser) {
     };
 }
 
+export async function getAttachment(id) {
+    return attachments.getItem(id);
+}
+
 export const auth = {
     start: authStart, getData: getAuthenticatedData, startRawDiscordAuth,
     getPlayer, getChannel, getChannelByID,
     getTwitchAccessToken, getBots
 };
-export function getAttachment(id) {
-    return attachments.get(id);
-}
+

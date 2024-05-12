@@ -159,7 +159,7 @@ export default ({ app, cors, Cache }) => {
                 return res.status(400).send("Required parameter 'id' is missing");
             }
 
-            let att = Cache.getAttachment(req.query.id);
+            let att = await Cache.getAttachment(req.query.id);
             if (!att) return res.status(404).send("Could not find attachment data");
 
             let airtableURL = att.url;

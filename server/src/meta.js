@@ -246,8 +246,8 @@ export default ({ app, Cache }) => {
                 let event = thing?.event && await Cache.get(thing.event[0]);
                 let theme = event?.theme && await Cache.get(event.theme[0]);
 
-                let thumbnail = thing?.thumbnail?.[0] && Cache.getAttachment(thing.thumbnail[0].id);
-                let header = !thumbnail && thing?.header?.[0] && Cache.getAttachment(thing.header[0].id);
+                let thumbnail = thing?.thumbnail?.[0] && await Cache.getAttachment(thing.thumbnail[0].id);
+                let header = !thumbnail && thing?.header?.[0] && await Cache.getAttachment(thing.header[0].id);
 
                 console.log({ thing, thumbnail, header });
 

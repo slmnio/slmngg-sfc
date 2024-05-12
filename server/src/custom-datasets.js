@@ -6,7 +6,7 @@ function tableUpdated(tableName, Cache) {
     if (tableName === "Matches") matchUpdate(Cache);
     if (tableName === "Broadcasts") broadcastUpdate(Cache);
     if (tableName === "Players") playerList(Cache);
-    if (tableName === "Teams") teamList(Cache);
+    if (["Teams", "Events"].includes(tableName)) teamList(Cache);
     if (tableName === "Events") publicEvents(Cache);
     // TODO: maybe add discord bots here?
 }
@@ -30,7 +30,7 @@ async function publicEvents(Cache) {
             if (b.start_date) return 1;
         });
 
-    Cache.set("special:public-events", { events: liveEvents.map(m => m.id) });
+    Cache.set("special:public-events", { events: liveEvents.map(m => m.id), __tableName: "Special Collection" });
 }
 
 async function matchUpdate(Cache) {
@@ -39,7 +39,7 @@ async function matchUpdate(Cache) {
 
     let allMatchData = (await Promise.all(allMatches.ids.map(id => (Cache.get(id.slice(3))))));
     let liveMatches = allMatchData.filter(match => match.live);
-    Cache.set("internal:live-matches", { matches: liveMatches.map(m => m.id) });
+    Cache.set("internal:live-matches", { matches: liveMatches.map(m => m.id), __tableName: "Internal Collection" });
 
     let allLiveMatchIDs = (await Cache.get("special:live-matches")).matches;
 
@@ -82,7 +82,7 @@ async function matchUpdate(Cache) {
         return false;
     }).sort((a,b) => new Date(a.start) - new Date(b.start));
 
-    Cache.set("special:upcoming-matches", { matches: upcomingMatches.map(m => m.id) });
+    Cache.set("special:upcoming-matches", { matches: upcomingMatches.map(m => m.id), __tableName: "Special Collection" });
 }
 
 async function broadcastUpdate(Cache) {
@@ -101,7 +101,7 @@ async function broadcastUpdate(Cache) {
         ].filter((i, p, a) => a.indexOf(i) === p);
     }
 
-    Cache.set("special:live-matches", { matches: matchIDs });
+    Cache.set("special:live-matches", { matches: matchIDs, __tableName: "Special Collection" });
 }
 
 async function playerList(Cache) {
@@ -127,8 +127,8 @@ async function playerList(Cache) {
         publicPlayers.push(player);
     });
 
-    Cache.set("special:players", { players: publicPlayers });
-    Cache.set("special:pro-players", { players: proPlayers });
+    Cache.set("special:players", { players: publicPlayers, __tableName: "Special Collection" });
+    Cache.set("special:pro-players", { players: proPlayers, __tableName: "Special Collection" });
 }
 
 async function teamList(Cache) {
@@ -156,5 +156,5 @@ async function teamList(Cache) {
             eventStart: event.start_date
         });
     });
-    Cache.set("special:teams", { teams: publicTeams });
+    Cache.set("special:teams", { teams: publicTeams, __tableName: "Special Collection" });
 }

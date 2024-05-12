@@ -1,23 +1,26 @@
 <template>
-    <div :class="`map ${mapClass} ${condensed ? 'condensed' : ''} ${banned ? 'is-banned' : ''}`" v-if="showBannedMaps ? true : !banned">
+    <div v-if="showBannedMaps ? true : !banned" :class="`map ${mapClass} ${condensed ? 'condensed' : ''} ${banned ? 'is-banned' : ''}`">
         <div class="map-image default-thing" :style="imageCSS">
-            <div class="map-color-overlay draw" v-if="map.draw"></div>
-            <div class="map-color-overlay banned" v-if="banned"></div>
-            <div class="map-color-overlay winner" v-if="winner" :style="logoBackground1(winner)"></div>
+            <div v-if="map?.draw" class="map-color-overlay draw"></div>
+            <div v-if="banned" class="map-color-overlay banned"></div>
+            <div v-if="winner" class="map-color-overlay winner" :style="logoBackground1(winner)"></div>
 
-            <div class="map-winner-image bg-center" v-if="winner" :style="resizedImage(winner.theme, ['default_logo', 'small_logo'], 'h-90')"></div>
-            <div class="map-insert-number" v-if="number && !condensed && !banned">{{ number }}</div>
+            <div v-if="winner" class="map-winner-image bg-center" :style="resizedImage(winner.theme, ['default_logo', 'small_logo'], 'h-90')"></div>
+            <div v-if="number && !condensed && !banned" class="map-insert-number">{{ number }}</div>
 
-            <div class="map-insert-text" v-if="banned && !condensed">BANNED</div>
-            <div class="map-insert-text" v-if="map.draw && complete && !condensed">DRAW</div>
-            <div class="map-insert-text" v-if="!complete && !condensed && !winner && mapClass === 'tiebreaker'">TIEBREAKER</div>
-            <div class="map-insert-text" v-if="!complete && !condensed && !winner && mapClass === 'extra'">IF REQUIRED</div>
+            <div v-if="banned && !condensed" class="map-insert-text">BANNED</div>
+            <div v-if="map?.draw && complete && !condensed" class="map-insert-text">DRAW</div>
+            <div v-if="!complete && !condensed && !winner && mapClass === 'tiebreaker'" class="map-insert-text">TIEBREAKER</div>
+            <div v-if="!complete && !condensed && !winner && mapClass === 'extra'" class="map-insert-text">IF REQUIRED</div>
         </div>
         <div class="map-lower-text map-name">{{ name || '--' }}</div>
-        <div class="map-lower-text map-scores" v-if="scores">{{ scores }}</div>
-        <div class="map-lower-text map-pick" v-if="!condensed && banText || pickText">{{ banText || pickText  || '' }}</div>
-        <div class="map-lower-text map-replay-code" v-if="!condensed && map.replay_code">
-             <i class="fas fa-history fa-fw" v-b-tooltip="'Replay Code'"></i> <CopyTextButton>{{ map.replay_code }}</CopyTextButton>
+        <div v-if="scores" class="map-lower-text map-scores">{{ scores }}</div>
+        <div v-if="!condensed && (banText || pickText)" class="map-lower-text map-pick">{{ banText || pickText || '' }}</div>
+        <div v-if="!condensed && map?.replay_code" class="map-lower-text map-replay-code">
+            <i v-b-tooltip="'Replay Code'" class="fas fa-history fa-fw"></i> <CopyTextButton>{{ map.replay_code }}</CopyTextButton>
+        </div>
+        <div v-if="showSelfPicks && map.picker?.id === self?.id" class="map-self-pick">
+            {{ self.code }} PICK
         </div>
     </div>
 </template>
@@ -31,7 +34,7 @@ import CopyTextButton from "@/components/website/CopyTextButton.vue";
 export default {
     name: "MapDisplay",
     components: { CopyTextButton },
-    props: ["map", "theme", "match", "i", "condensed", "showBannedMaps"],
+    props: ["map", "theme", "match", "i", "condensed", "showBannedMaps", "showSelfPicks", "self"],
     computed: {
         mapClass() {
             if (!this.match) return "";
@@ -43,39 +46,40 @@ export default {
             return this.map?.number || this.i + 1;
         },
         winner() {
-            return this.getTeamFromID(this.map.winner);
+            return this.getTeamFromID(this.map?.winner);
         },
         banned() {
-            return this.map.banned || this.banned_by;
+            return this.map?.banned || this.banned_by;
         },
         banned_by() {
-            return this.getTeamFromID(this.map.banner);
+            return this.getTeamFromID(this.map?.banner);
         },
         picked_by() {
-            return this.getTeamFromID(this.map.picker);
+            return this.getTeamFromID(this.map?.picker);
         },
         imageCSS() {
             let mapTheme = { color: "#ffffff" };
-            if (!this.map?.image && this.theme) {
+            if (!(this.map?.map?.image || this.map?.image) && this.theme) {
                 mapTheme = themeBackground(this.theme);
             }
             return {
-                ...resizedImage(this.map, ["image"], "h-160"),
+                ...resizedImage((this.map?.map || this.map), ["image"], "h-160"),
                 ...mapTheme
             };
         },
         complete() {
             if (!this.match) return false;
-            return [this.match.score_1, this.match.score_2].some(s => s === this.match.first_to);
+            return [this.match?.score_1, this.match?.score_2].some(s => s === this.match.first_to);
         },
         name() {
+            console.log(this.map);
             try {
-                if (this.condensed) return this.map.short_name[0];
-                return this.map.name[0];
+                if (this.condensed) return this.map.map?.short_name || this.map.short_name[0];
+                return this.map.map?.name || this.map.name[0];
             } catch (e) { return ""; }
         },
         scores() {
-            if (this.map.score_1 == null || this.map.score_2 == null) return null;
+            if (this.map?.score_1 == null || this.map?.score_2 == null) return null;
             return [this.map.score_1, this.map.score_2].join(" - ");
         },
         pickText() {
@@ -102,6 +106,7 @@ export default {
     .map {
         width: 160px;
         margin: 10px;
+        position: relative;
     }
     .map-image {
         padding-bottom: 56.25%;
@@ -176,5 +181,15 @@ export default {
     .map.condensed .map-name {
         font-size: 0.6em;
         margin-top: 3px;
+    }
+    .map-self-pick {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        background-color: rgba(0,0,0,0.8);
+        font-size: 0.55em;
+        font-weight: bold;
     }
 </style>

@@ -1,7 +1,7 @@
 <template>
     <div class="listen-in" :style="themeBackground1(team)">
         <div class="team-logo-square">
-            <ThemeLogo border-width="0px" class="team-logo" :theme="team.theme"></ThemeLogo>
+            <ThemeLogo border-width="0px" class="team-logo" :theme="team.theme" />
         </div>
         <div class="text">{{ text || "Listen In" }}</div>
     </div>

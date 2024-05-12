@@ -1,21 +1,20 @@
 <template>
     <div v-if="team">
-        <ThingTop :thing="team" type="team" :themeURL="subLink('theme')"></ThingTop>
+        <ThingTop :thing="team" type="team" :theme-u-r-l="subLink('theme')" />
         <SubPageNav class="my-2">
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">{{ showPublicTeamDetails === true ? 'Details' : 'Overview' }}</router-link></li>
-            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
-            <li class="nav-item" v-if="useTeamCompositions"><router-link class="nav-link" :to="subLink('composition')">Composition</router-link></li>
-            <li class="nav-item" v-if="team.theme"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
-<!--            <li class="nav-item"><router-link class="nav-link" :to="subLink('details')">Details</router-link></li>-->
+            <li v-if="team.matches" class="nav-item"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
+            <li v-if="useTeamCompositions" class="nav-item"><router-link class="nav-link" :to="subLink('composition')">Composition</router-link></li>
+            <li v-if="team.theme" class="nav-item"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
+            <!--            <li class="nav-item"><router-link class="nav-link" :to="subLink('details')">Details</router-link></li>-->
 
-            <ul class="socials d-flex" v-if="team.socials">
+            <ul v-if="team.socials" class="socials d-flex">
                 <li class="nav-item">
-                    <Social class="ct-active" :social="social" v-for="social in team.socials" :key="social.id"/>
+                    <Social v-for="social in team.socials" :key="social.id" class="ct-active" :social="social" />
                 </li>
             </ul>
-
         </SubPageNav>
-        <router-view :team="team"></router-view>
+        <router-view :team="team" />
     </div>
 </template>
 
@@ -29,26 +28,14 @@ import { cleanID } from "@/utils/content-utils";
 
 export default {
     name: "Team",
-    props: ["id"],
     components: {
         ThingTop, SubPageNav, Social
     },
-    metaInfo() {
-        return {
-            title: this.team.name,
-            meta: [
-                { name: "description", content: "test description" },
-                { name: "og:description", content: "test description" },
-                { name: "og:title", content: this.team.name }
-            ],
-            link: [{ rel: "icon", href: resizedImageNoWrap(this.team.theme, ["small_logo", "default_logo"], "s-128") }]
-        };
+    beforeRouteLeave(to, from, next) {
+        this.$emit("id_change", null);
+        next();
     },
-    methods: {
-        subLink(page) {
-            return `/team/${this.team.id}/${page}`;
-        }
-    },
+    props: ["id"],
     computed: {
         team() {
             return ReactiveRoot(this.id, {
@@ -109,6 +96,11 @@ export default {
             return this.eventSettings?.composition?.use && (this.team?.players || []).some(p => p.composition_tank_sr || p.composition_dps_sr || p.composition_support_sr);
         }
     },
+    methods: {
+        subLink(page) {
+            return `/team/${this.team.id}/${page}`;
+        }
+    },
     watch: {
         eventID: {
             handler(id) {
@@ -118,9 +110,16 @@ export default {
             immediate: true
         }
     },
-    beforeRouteLeave(to, from, next) {
-        this.$emit("id_change", null);
-        next();
+    head() {
+        return {
+            title: this.team.name,
+            meta: [
+                { name: "description", content: "test description" },
+                { name: "og:description", content: "test description" },
+                { name: "og:title", content: this.team.name }
+            ],
+            link: [{ rel: "icon", key: "favicon", href: resizedImageNoWrap(this.team.theme, ["small_logo", "default_logo"], "s-128") }]
+        };
     }
 };
 

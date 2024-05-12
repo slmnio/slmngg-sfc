@@ -1,19 +1,19 @@
 <template>
     <div class="team-image-overlay">
-        <div class="team-image" v-if="image?.url && (image?.type).includes('video')">
-            <video :src="image.url" loop autoplay muted />
+        <div v-if="image?.url && (image?.type).includes('video')" class="team-image">
+            <video :src="image.url" loop autoplay muted></video>
         </div>
-        <div class="team-image" v-if="image?.url && (image?.type).includes('image')" :style="bg(image.url)"></div>
+        <div v-if="image?.url && (image?.type).includes('image')" class="team-image" :style="bg(image.url)"></div>
     </div>
 </template>
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { bg, resizedAttachment } from "@/utils/images";
+import { useStatusStore } from "@/stores/statusStore";
 
 export default {
     name: "TeamImageOverlay",
-    methods: { bg },
     props: ["broadcast", "teamNum", "imageNum", "overrideURL"],
     computed: {
         match() {
@@ -44,12 +44,12 @@ export default {
             };
         }
     },
+    methods: { bg },
     watch: {
         team: {
             deep: true,
             handler(team) {
-                console.log("team change", this.$parent);
-                this.$parent.updateTheme(team?.theme);
+                useStatusStore().customStingerTheme = team?.theme;
             }
         }
     }

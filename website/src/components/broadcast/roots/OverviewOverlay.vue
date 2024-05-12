@@ -1,21 +1,21 @@
 <template>
     <div class="overview-overlay">
-        <div class="part part-desk-match">
-            <DeskMatch class="desk-match" :matchID="matchID" :_match="virtualMatch"/>
+        <div class="part part-desk-match" :class="{'live-desk flex-center': useLiveDesk}">
+            <DeskMatch class="desk-match w-100" :match-i-d="matchID" :_match="virtualMatch" :broadcast="useLiveDesk ? broadcast : null" />
         </div>
         <div class="part part-map-display flex-grow-1">
-            <MapDisplay :broadcast="broadcast" use-transitions="true" :virtual-match="virtualMatch" :no-map-videos="noMapVideos" />
+            <BroadcastMapDisplay :broadcast="broadcast" use-transitions="true" :virtual-match="virtualMatch" :no-map-videos="noMapVideos" />
         </div>
     </div>
 </template>
 
 <script>
-import MapDisplay from "@/components/broadcast/MapDisplay";
+import BroadcastMapDisplay from "@/components/broadcast/BroadcastMapDisplay";
 import DeskMatch from "@/components/broadcast/desk/DeskMatch";
 export default {
     name: "OverviewOverlay",
-    components: { DeskMatch, MapDisplay },
-    props: ["broadcast", "virtualMatch", "noMapVideos"],
+    components: { DeskMatch, BroadcastMapDisplay },
+    props: ["broadcast", "virtualMatch", "noMapVideos", "useLiveDesk"],
     computed: {
         matchID() {
             if (this.virtualMatch) return null;
@@ -23,7 +23,7 @@ export default {
             return this.broadcast.live_match[0];
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Overview | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -53,12 +53,15 @@ export default {
     padding-top: 60px;
 }
 
-.desk-match >>> .team-name,
-.desk-match >>> .match-vs,
-.desk-match >>> .team-logo-holder {
+.desk-match:deep(.team-name),
+.desk-match:deep(.match-vs),
+.desk-match:deep(.team-logo-holder) {
     height: 120px !important;
 }
-.part-map-display >>> .map-lower {
+.part-map-display:deep(.map-lower) {
     padding: 10px;
+}
+.part-desk-match.live-desk {
+    height: 140px;
 }
 </style>

@@ -1,19 +1,24 @@
 <template>
     <div class="map-stats-segment">
         <MapSegment class="map-segment" :broadcast="broadcast" :map="map" :basic="true" />
-<!--        <div class="records-header">{{ mapGroup.name }} Stats</div>-->
+        <!--        <div class="records-header">{{ mapGroup.name }} Stats</div>-->
 
-        <div class="map-records" v-if="mapGroup && !map?.hide_records">
-            <div class="record-map" v-for="map in mapGroup.maps" :key="map.id">
+        <div v-if="mapGroup && !map?.hide_records" class="map-records">
+            <div v-for="map in mapGroup.maps" :key="map.id" class="record-map">
                 <div class="map-name">{{ map.name }}</div>
-                <div class="team-stats flex-center w-100" v-if="mapStats(map)">
-                    <div :style="{ order: i * 2 }" class="team-stat flex-center" v-for="(teamStats, i) in mapStats(map).stats" :key="teamStats.team.id" :class="{'right': i === 1}">
-                        <ThemeLogo logo-size="h-50" class="team-logo" :theme="teamStats.team.theme" border-width="0px"></ThemeLogo>
+                <div v-if="mapStats(map)" class="team-stats flex-center w-100">
+                    <div
+                        v-for="(teamStats, i) in mapStats(map).stats"
+                        :key="teamStats.team.id"
+                        :style="{ order: i * 2 }"
+                        class="team-stat flex-center"
+                        :class="{'right': i === 1}">
+                        <ThemeLogo logo-size="h-50" class="team-logo" :theme="teamStats.team.theme" border-width="0px" />
                         <div class="team-stats-box" :class="{'opacity-50': teamStats.stats.played === 0}" :style="(teamStats.stats.score_winner && teamStats.stats.played) ? logoBackground1(teamStats.team) : {}">
-                            {{ teamStats.stats | wld }}
+                            {{ wld(teamStats.stats) }}
                         </div>
                     </div>
-                    <MapStatsBar class="stats-bar" :stats="mapStats(map).stats"></MapStatsBar>
+                    <MapStatsBar class="stats-bar" :stats="mapStats(map).stats" />
                 </div>
             </div>
         </div>
@@ -50,7 +55,7 @@ export default {
         },
         mapGroup() {
             if (!this.map || !this.mapGroups.length) return null;
-            const group = this.mapGroups.find(group => group.name === this.map.type?.[0]);
+            const group = this.mapGroups.find(group => group.name === this.map.map?.type);
             if (!group) return null;
             if (!this.map.dummy) {
                 group.maps = group.maps.sort((a, b) => a.name === this.map.name?.[0] ? -1 : (b.name === this.map.name?.[0] ? 1 : 0));
@@ -63,9 +68,6 @@ export default {
         mapStats(map) {
             return getTeamsMapStats(this.match.teams, this.match, map);
         },
-        logoBackground1
-    },
-    filters: {
         wld(stats) {
             const str = [
                 stats.wins,
@@ -73,7 +75,8 @@ export default {
             ];
             if (stats.draws) str.push(stats.draws);
             return str.join("-");
-        }
+        },
+        logoBackground1
     }
 };
 </script>
@@ -139,7 +142,7 @@ export default {
         margin-top: .5em;
     }
 
-    .map-segment >>> .map-bg {
+    .map-segment:deep(.map-bg) {
         transform: translate(0, -15%);
     }
 

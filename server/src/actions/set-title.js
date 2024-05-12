@@ -12,8 +12,8 @@ module.exports = {
      * @returns {Promise<string>}
      */
     // eslint-disable-next-line no-empty-pattern
-    async handler(params, { client }) {
-        const { broadcast, channel } = await getTwitchChannel(client, ["channel:manage:broadcast"]);
+    async handler(params, { client, isAutomation }) {
+        const { broadcast, channel } = await getTwitchChannel(client, ["channel:manage:broadcast"], isAutomation ? params?.broadcastID : null);
 
         if (!broadcast.title_format) throw "The broadcast has no title format";
 
@@ -57,7 +57,7 @@ module.exports = {
             "Overwatch": "Overwatch 2",
             "Valorant": "VALORANT",
             "League of Legends": "League of Legends",
-            "F1": "F1 22"
+            "F1": "F1 23"
         };
 
         if (event.game && gameMap[event.game]) {

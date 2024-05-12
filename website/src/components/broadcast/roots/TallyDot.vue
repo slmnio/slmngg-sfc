@@ -1,13 +1,13 @@
 <template>
-    <div class="tally-dot" :class="{ preview: state === 'preview', active: state === 'active', 'unassigned': !observer }">
-        <div class="d-flex">
+    <div class="tally-dot" :class="{ preview: state === 'preview', active: state === 'active', 'unassigned': !observer, 'align-left': align === 'left', 'align-right': align === 'right' }">
+        <div class="d-flex dot-content">
             <div class="dot" :class="{ preview: state === 'preview', active: state === 'active', 'unassigned': !observer }">
                 <span class="industry-align">{{ number }}</span>
             </div>
-            <div class="text">
+            <div class="text d-flex">
                 <span class="name">{{ observerName || '' }}</span>
-                <span class="team-cams">
-                    <span class="team" v-for="team in teamCams" :key="team">{{ team.slice(-1) }}</span>
+                <span class="team-cams mx-3">
+                    <span v-for="team in teamCams" :key="team" class="team">{{ team.slice(-1) }}</span>
                 </span>
             </div>
         </div>
@@ -19,35 +19,17 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "TallyDot",
-    props: ["client", "number"],
-    sockets: {
-        tally_change({ state, number }) {
-            this.state = state;
-            this.number = number;
-        },
-        prod_preview_program_change(data) {
-            console.log(data);
-            this.producerClientKey = data.clientSource;
-            this.producerPreviewScene = data.previewScene;
-            this.producerProgramScene = data.programScene;
+    props: ["client", "number", "align"],
+    data: () => ({
+        state: "inactive",
+        wakeLock: null,
+        producerClientKey: null,
+        producerPreviewScene: null,
+        producerProgramScene: null,
 
-
-            if (this.targetsMe(this.producerProgramScene)) {
-                this.state = "active";
-            } else if (this.targetsMe(this.producerPreviewScene)) {
-                this.state = "preview";
-            } else {
-                this.state = "inactive";
-            }
-        }
-    },
-    methods: {
-        targetsMe(sceneName) {
-            const number = this.number || this.selfObserverNumber;
-            if (!number) return false;
-            return ["Obs", "Game"].some(str => sceneName.toLowerCase().includes(str.toLowerCase())) && sceneName.includes(number.toString());
-        }
-    },
+        noBroadcastStyle: true,
+        noStinger: true
+    }),
     computed: {
         producer() {
             if (!this.producerClientKey) return null;
@@ -77,17 +59,34 @@ export default {
             return this.observer?.player?.clients?.cams || [];
         }
     },
-    data: () => ({
-        state: "inactive",
-        wakeLock: null,
-        producerClientKey: null,
-        producerPreviewScene: null,
-        producerProgramScene: null,
+    methods: {
+        targetsMe(sceneName) {
+            const observerNumber = this.number || this.selfObserverNumber;
+            if (!observerNumber) return false;
+            return ["Obs", "Game"].some(str => sceneName.toLowerCase().includes(str.toLowerCase())) && sceneName.includes(observerNumber.toString());
+        }
+    },
+    sockets: {
+        tally_change({ state }) {
+            this.state = state;
+        },
+        prod_preview_program_change(data) {
+            console.log(data);
+            this.producerClientKey = data.clientSource;
+            this.producerPreviewScene = data.previewScene;
+            this.producerProgramScene = data.programScene;
 
-        noBroadcastStyle: true,
-        noStinger: true
-    }),
-    metaInfo() {
+
+            if (this.targetsMe(this.producerProgramScene)) {
+                this.state = "active";
+            } else if (this.targetsMe(this.producerPreviewScene)) {
+                this.state = "preview";
+            } else {
+                this.state = "inactive";
+            }
+        }
+    },
+    head() {
         return {
             title: `Tally Dot #${this.number} | ${this.client?.name || this.client?.key || ""}`
         };
@@ -107,6 +106,15 @@ export default {
     font-size: 120px;
     justify-content: flex-start;
     align-items: flex-end;
+}
+.tally-dot.align-right {
+    justify-content: flex-end;
+    left: auto;
+    right: 0;
+}
+.tally-dot.align-right .dot-content,
+.tally-dot.align-right .text {
+    flex-direction: row-reverse;
 }
 .tally-dot.active {
     border-color: rgba(255,0,0,0.5);
@@ -131,7 +139,7 @@ export default {
 
 .text {
     font-weight: bold;
-    margin-left: .2em;
+    margin: 0 .2em;
     text-shadow: 8px 8px black, 0 0 8px black;
 }
 

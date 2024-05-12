@@ -1,70 +1,85 @@
 <template>
     <div class="event-schedule container">
-<!--        <div class="d-sm-flex w-100 gap-1 align-items-center justify-content-end timezone-swapper-holder d-none">-->
-<!--            <h2 class="mr-5">Schedule</h2>-->
-<!--            <TimezoneSwapper :inline="true"/>-->
-<!--            <AddToCalendar :event="event"/>-->
-<!--        </div>-->
-        <div class="d-sm-flex w-100 justify-content-end timezone-swapper-holder d-none">
+        <div class="d-sm-flex w-100 timezone-swapper-holder flex-column align-items-end gap-1 d-none">
             <TimezoneSwapper :inline="true" />
-        </div>
-
-        <div class="d-flex align-items-center flex-wrap-reverse">
-            <div style="width: 50%"></div>
-            <h2 style="transform: translateX(-50%);">Schedule</h2>
-            <div class="d-flex align-items-end flex-col gap-1 ml-auto">
-                <AddToCalendar :event="event" />
-            </div>
+            <b-form-group v-if="showBroadcastSettings" label-cols="auto" label-size="sm" label="Broadcast">
+                <b-form-select
+                    v-if="eventBroadcasts?.length"
+                    v-model="selectedBroadcastID"
+                    :options="eventBroadcasts"
+                    size="sm"
+                    class="w-auto" />
+            </b-form-group>
+            <AddToCalendar :event="event" />
         </div>
 
         <div class="schedule-top mb-2">
-            <ul class="schedule-group-holder nav justify-content-center" v-if="pagedMatches.length > 1">
-                <li class="nav-item schedule-group" v-for="(pm) in pagedMatches" :key="pm.num"
+            <h2 class="text-center">Schedule</h2>
+            <ul v-if="pagedMatches.length > 1" class="schedule-group-holder nav justify-content-center">
+                <li
+                    v-for="(pm) in pagedMatches"
+                    :key="pm.num"
+                    class="nav-item schedule-group"
                     :class="{ 'active': activeScheduleGroup.num === pm.num, 'ct-active': activeScheduleGroup.num === pm.num, 'ct-passive': activeScheduleGroup.num !== pm.num }">
-                    <a @click="activeScheduleNum = pm.num" class="nav-link no-link-style">{{ pm.text }}</a>
+                    <a class="nav-link no-link-style" @click="activeScheduleNum = pm.num">{{ pm.text }}</a>
                 </li>
 
-                <li class="nav-item schedule-group nav-link no-link-style" @click="showAll = true"
-                    :class="{'active ct-active': showAll === true, 'ct-passive': showAll !== true }">
+                <li
+                    class="nav-item schedule-group nav-link no-link-style"
+                    :class="{'active ct-active': activeScheduleNum === 'all', 'ct-passive': activeScheduleNum !== 'all' }"
+                    @click="activeScheduleNum = 'all'">
                     <b>All matches</b>
                 </li>
             </ul>
         </div>
 
-        <div class="schedule-filter flex-center text-center mb-2" v-if="showAll">
-            <div class="btn btn-sm mx-2" @click="hideCompleted = !hideCompleted" :class="{'btn-light': hideCompleted, 'btn-dark': !hideCompleted}">
+        <div v-if="showAll" class="schedule-filter flex-center text-center mb-2">
+            <div class="btn btn-sm mx-2" :class="{'btn-light': hideCompleted, 'btn-dark': !hideCompleted}" @click="hideCompleted = !hideCompleted">
                 Hide completed matches
             </div>
-            <div class="btn btn-sm mx-2" @click="hideNoVods = !hideNoVods" :class="{'btn-light': hideNoVods, 'btn-dark': !hideNoVods}">
+            <div class="btn btn-sm mx-2" :class="{'btn-light': hideNoVods, 'btn-dark': !hideNoVods}" @click="hideNoVods = !hideNoVods">
                 Hide matches without VODs
             </div>
         </div>
 
-        <div class="schedule-matches mt-3" v-if="activeScheduleGroup">
-            <ScheduleMatch v-for="(match, i) in groupMatches" :key="match.id" :match="match"
-                           :class="i > 0 && getMatchClass(match, groupMatches[i-1])" :custom-text="showAll && match.match_group ? match.match_group : null"
-                           :show-editor-button="showEditorButton" />
+        <div v-if="activeScheduleGroup" class="schedule-matches mt-3">
+            <ScheduleMatch
+                v-for="(match, i) in groupMatches"
+                :key="match.id"
+                :match="match"
+                :class="i > 0 && getMatchClass(match, groupMatches[i-1])"
+                :custom-text="showAll && match.match_group ? match.match_group : null"
+                :can-edit-matches="showEditorButton"
+                :can-edit-broadcasts="showBroadcastSettings"
+                :selected-broadcast="selectedBroadcast" />
         </div>
     </div>
 </template>
 
 <script>
-import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
+import { ReactiveArray, ReactiveThing, ReactiveRoot } from "@/utils/reactive";
 import ScheduleMatch from "@/components/website/schedule/ScheduleMatch";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
-import { canEditMatch } from "@/utils/client-action-permissions";
 import AddToCalendar from "@/components/website/AddToCalendar.vue";
+import { canEditMatch, isEventStaffOrHasRole } from "@/utils/client-action-permissions";
+import { useAuthStore } from "@/stores/authStore";
+import { useRouteQuery } from "@vueuse/router";
+
 
 export default {
     name: "EventSchedule",
     components: { AddToCalendar, TimezoneSwapper, ScheduleMatch },
     props: ["event"],
     data: () => ({
-        showAll: false,
+        activeScheduleNum: useRouteQuery("page", undefined, { transform: val => val === "all" ? val : parseInt(val), mode: "replace" }),
         hideCompleted: false,
-        hideNoVods: false
+        hideNoVods: false,
+        selectedBroadcastID: null
     }),
     computed: {
+        showAll() {
+            return this.activeScheduleNum === "all";
+        },
         defaultScheduleNum() {
             const filtered = this.pagedMatches.filter(page => {
                 const allMatchesComplete = page.matches.every(m => m.special_event || [m.score_1, m.score_2].includes(m.first_to));
@@ -90,8 +105,12 @@ export default {
 
             return 0;
         },
+        activeScheduleNumWithDefault() {
+            if (this.activeScheduleNum) return this.activeScheduleNum;
+            return this.defaultScheduleNum;
+        },
         matches() {
-            if (!this.event || !this.event.matches) return [];
+            if (!this.event?.matches) return [];
             return ReactiveArray("matches", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -133,7 +152,7 @@ export default {
                 };
             }
 
-            let group = this.pagedMatches.find(group => group.num === this.activeScheduleNum);
+            let group = this.pagedMatches.find(group => group.num === this.activeScheduleNumWithDefault);
             if (!group || group.matches.length === 0) {
                 // this is where to set the default
                 // TODO: make the default page show the next incomplete match
@@ -172,26 +191,33 @@ export default {
                 return 0;
             });
         },
-        activeScheduleNum: {
-            set(newNum) {
-                this.showAll = false;
-                this.hideCompleted = false;
-                this.hideNoVods = false;
-
-                this.$store.commit("setEventMatchPage", {
-                    eventID: this.event.id,
-                    matchPage: newNum
-                });
-            },
-            get() {
-                const lastPage = this.$store.getters.getLastMatchPage(this.event.id);
-                if (!lastPage) return this.defaultScheduleNum;
-                // if (lastPage.matchPage > this.pagedMatches.length) return this.defaultScheduleNum;
-                return lastPage.matchPage;
-            }
-        },
         showEditorButton() {
-            return canEditMatch(this.$root?.auth?.user, { event: this.event });
+            const { user } = useAuthStore();
+            return canEditMatch(user, { event: this.event });
+        },
+        _event() {
+            return ReactiveRoot(this.event?.id, {
+                broadcasts: ReactiveArray("broadcasts")
+            });
+        },
+        eventBroadcasts() {
+            return (this._event?.broadcasts || []).map(broadcast => ({
+                value: broadcast.id,
+                text: broadcast.relative_name || broadcast.name
+            }));
+        },
+        selectedBroadcast() {
+            if (!this.selectedBroadcastID) return null;
+            return (this._event?.broadcasts || []).find(b => b.id === this.selectedBroadcastID);
+        },
+        showBroadcastSettings() {
+            const { isAuthenticated, user } = useAuthStore();
+            if (!isAuthenticated) return false;
+            return isEventStaffOrHasRole(user, {
+                event: this.event,
+                role: "Broadcast Manager",
+                websiteRoles: ["Can edit any match", "Can edit any event", "Full broadcast permissions"]
+            });
         }
     },
     methods: {
@@ -208,19 +234,19 @@ export default {
             return Object.fromEntries(classes.map(c => ([c, true])));
         }
     },
-    // watch: {
-    //     defaultScheduleNum(newNum, oldNum) {
-    //         if (oldNum !== newNum && !this.activeScheduleNum) {
-    //             this.activeScheduleNum = newNum;
-    //         }
-    //     }
-    // },
-    // mounted() {
-    //     if (this.defaultScheduleNum && !this.activeScheduleNum) {
-    //         this.activeScheduleNum = this.defaultScheduleNum;
-    //     }
-    // },
-    metaInfo() {
+    watch: {
+        eventBroadcasts: {
+            deep: true,
+            immediate: true,
+            handler(broadcasts) {
+                if (!broadcasts?.length) return;
+                if (!this.selectedBroadcastID) {
+                    this.selectedBroadcastID = broadcasts[0]?.value;
+                }
+            }
+        }
+    },
+    head() {
         return {
             title: "Schedule"
             // title: this.event?.name ? `Schedule | ${this.event?.name}` : "Schedule"

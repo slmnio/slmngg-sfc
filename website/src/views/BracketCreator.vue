@@ -1,85 +1,39 @@
 <template>
     <div class="bracket-creator">
-        <div class="container"><h1>Bracket Creator</h1>
+        <div class="container">
+            <h1>Bracket Creator</h1>
 
 
             <div class="button flex w-100 d-flex mb-2 buttons">
-                <b-button variant="danger" size="sm" @click="endConnectionSpecial('eliminated')"
-                          :disabled="!activeConnection">
+                <b-button
+                    variant="danger"
+                    size="sm"
+                    :disabled="!activeConnection"
+                    @click="endConnectionSpecial('eliminated')">
                     <i class="fas fa-skull fa-fw"></i> Eliminated
                 </b-button>
                 <div class="spacer flex-grow-1"></div>
-                <b-button variant="danger" size="sm" @click="setAllEliminations()" :disabled="!!activeConnection">
+                <b-button variant="danger" size="sm" :disabled="!!activeConnection" @click="setAllEliminations()">
                     <i class="fas fa-skull fa-fw"></i> Set all remaining losses as eliminations
                 </b-button>
                 <div class="spacer flex-grow-1"></div>
-                <b-button variant="warning" size="sm" @click="endConnectionSpecial('champion')"
-                          :disabled="!activeConnection">
+                <b-button
+                    variant="warning"
+                    size="sm"
+                    :disabled="!activeConnection"
+                    @click="endConnectionSpecial('champion')">
                     <i class="fas fa-crown fa-fw"></i> Champion
                 </b-button>
             </div>
         </div>
         <div class="container-fluid">
             <div class="bracket-controls w-100 flex-center mb-3 flex-column">
-                <div class="bracket flex-center flex-column mb-3" v-for="(bracket, bi) in brackets" :key="bi">
-                    <div class="columns">
-                        <div class="column" v-for="(column, ci) in bracket.columns" :key="'col-' + ci">
-                            <input class="header" v-model="column.header"/>
-                            <div class="game-area">
-                                <div class="game" :class="{'empty': game.empty}" v-for="(game, mi) in column.games"
-                                     :key="mi">
-                                    <div class="game-teams">
-                                        <div class="game-team" :class="{
-                                        'highlight': activeConnection,
-                                        'hover-active': highlightConnectionMatches(bi, ci, mi, 1),
-                                        'has-lose-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'lose',
-                                        'has-win-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'win'
-                                    }" @click="endConnection(bi, ci, mi, 1)">
-                                            {{ getReverseConnectionText(bi, ci, mi, 1) }}
-                                        </div>
-                                        <div class="match-number" v-if="!game.empty">{{ getMatchNum(bi,ci,mi) }}</div>
-                                        <div class="game-team" :class="{
-                                        'highlight': activeConnection,
-                                        'hover-active': highlightConnectionMatches(bi, ci, mi, 2),
-                                        'has-lose-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'lose',
-                                        'has-win-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'win'
-                                    }" @click="endConnection(bi, ci, mi, 2)">
-                                            {{ getReverseConnectionText(bi, ci, mi, 2) }}
-                                        </div>
-                                    </div>
-                                    <div class="game-buttons">
-                                        <div class="game-button remove" @click="column.games.splice(mi,1)"><i
-                                                class="fas fa-trash"></i></div>
-                                    </div>
-                                    <div class="connection-buttons">
-                                        <div class="connection-button"
-                                             :class="{
-                                            'active': activeConnectionMatches(bi, ci, mi, 'win') || getConnection(bi, ci, mi, 'win'),
-                                            'champion':getConnection(bi, ci, mi, 'win') === 'champion',
-                                         }"
-                                             @mouseenter="showConnection(bi, ci, mi, 'win')"
-                                             @mouseleave="hideConnection()"
-                                             @click="startConnection(bi, ci, mi, 'win')">
-                                            W
-                                        </div>
-                                        <div class="connection-button"
-                                             :class="{
-                                            'active': activeConnectionMatches(bi, ci, mi, 'lose') || getConnection(bi, ci, mi, 'lose'),
-                                            'eliminated':getConnection(bi, ci, mi, 'lose') === 'eliminated',
-                                         }"
-                                             @mouseenter="showConnection(bi, ci, mi, 'lose')"
-                                             @mouseleave="hideConnection()"
-                                             @click="startConnection(bi, ci, mi, 'lose')">
-                                            L
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="columns">
-                        <div class="column col-buttons" v-for="(column, ci) in bracket.columns"
-                             :key="'col-buttons-' + ci">
+                <div v-for="(bracket, bi) in brackets" :key="bi" class="bracket flex-center flex-column mb-3">
+                    <div class="columns my-2">
+                        <div
+                            v-for="(column, ci) in bracket.columns"
+                            :key="'col-buttons-' + ci"
+                            class="column col-buttons">
                             <div class="buttons flex-wrap flex-center">
                                 <b-button variant="secondary" size="sm" @click="column.games.push({ empty: false })">
                                     <i class="fas fa-plus fa-fw"></i> Game
@@ -90,6 +44,76 @@
                                 <b-button variant="danger" size="sm" @click="bracket.columns.splice(ci, 1)">
                                     <i class="fas fa-trash fa-fw"></i> Delete Column
                                 </b-button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div v-for="(column, ci) in bracket.columns" :key="'col-' + ci" class="column">
+                            <input v-model="column.header" class="mt-2 header">
+                            <div class="game-area">
+                                <div
+                                    v-for="(game, mi) in column.games"
+                                    :key="mi"
+                                    class="game"
+                                    :class="{'empty': game.empty}">
+                                    <div class="game-teams">
+                                        <div
+                                            class="game-team"
+                                            :class="{
+                                                'highlight': activeConnection,
+                                                'hover-active': highlightConnectionMatches(bi, ci, mi, 1),
+                                                'has-lose-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'lose',
+                                                'has-win-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'win'
+                                            }"
+                                            @mouseup="endConnection(bi, ci, mi, 1)">
+                                            {{ getReverseConnectionText(bi, ci, mi, 1) }}
+                                        </div>
+                                        <div v-if="!game.empty" class="match-number">{{ getMatchNum(bi,ci,mi) }}</div>
+                                        <div
+                                            class="game-team"
+                                            :class="{
+                                                'highlight': activeConnection,
+                                                'hover-active': highlightConnectionMatches(bi, ci, mi, 2),
+                                                'has-lose-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'lose',
+                                                'has-win-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'win'
+                                            }"
+                                            @mouseup="endConnection(bi, ci, mi, 2)">
+                                            {{ getReverseConnectionText(bi, ci, mi, 2) }}
+                                        </div>
+                                    </div>
+                                    <div class="game-buttons">
+                                        <div class="game-button remove" @click="column.games.splice(mi,1)">
+                                            <i
+                                                class="fas fa-trash"></i>
+                                        </div>
+                                    </div>
+                                    <div class="connection-buttons">
+                                        <div
+                                            class="connection-button"
+                                            :class="{
+                                                'active': activeConnectionMatches(bi, ci, mi, 'win') || getConnection(bi, ci, mi, 'win'),
+                                                'champion':getConnection(bi, ci, mi, 'win') === 'champion',
+                                            }"
+                                            @mouseenter="showConnection(bi, ci, mi, 'win')"
+                                            @mouseleave="hideConnection()"
+                                            @mousedown="startConnection(bi, ci, mi, 'win')"
+                                        >
+                                            W
+                                        </div>
+                                        <div
+                                            class="connection-button"
+                                            :class="{
+                                                'active': activeConnectionMatches(bi, ci, mi, 'lose') || getConnection(bi, ci, mi, 'lose'),
+                                                'eliminated':getConnection(bi, ci, mi, 'lose') === 'eliminated',
+                                            }"
+                                            @mouseenter="showConnection(bi, ci, mi, 'lose')"
+                                            @mouseleave="hideConnection()"
+                                            @mousedown="startConnection(bi, ci, mi, 'lose')"
+                                        >
+                                            L
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -109,8 +133,15 @@
                 </div>
             </div>
         </div>
-        <div class="container"><textarea type="text" rows="3" class="autogen w-100" style="white-space: normal;" contenteditable
-                     @keydown.ctrl.enter="updateCustomFormat()" v-model="customFormat"/>
+        <div class="container">
+            <textarea
+                v-model="customFormat"
+                type="text"
+                rows="3"
+                class="autogen w-100"
+                style="white-space: normal;"
+                contenteditable
+                @keydown.ctrl.enter="updateCustomFormat()"></textarea>
             <div class="button flex w-100 d-flex flex-row-reverse mb-3">
                 <b-button variant="success" size="sm" @click="updateCustomFormat()">
                     <i class="fas fa-save fa-fw"></i> Update data
@@ -120,18 +151,17 @@
             <h3>Bracket Preview</h3>
         </div>
         <div class="container-fluid flex-center">
-            <Bracket class="py-3" :bracket="bracketData"/>
+            <Bracket class="py-3" :bracket="bracketData" />
         </div>
     </div>
 </template>
 
 <script>
 import Bracket from "@/components/website/bracket/Bracket.vue";
-import { BButton } from "bootstrap-vue";
 
 export default {
     name: "BracketCreator",
-    components: { Bracket, BButton },
+    components: { Bracket },
     data: () => ({
         brackets: [
             {
@@ -206,6 +236,8 @@ export default {
         }
     },
     methods: {
+        handleDrag(dir, bracketNum, columnNum, gameNum) {
+        },
         startConnection(bracketNum, columnNum, gameNum, mode) {
             if (this.activeConnectionMatches(bracketNum, columnNum, gameNum, mode)) {
                 this.activeConnection = null;
@@ -226,7 +258,7 @@ export default {
                 this.activeConnection.gameNum,
                 this.activeConnection.mode
             ].join("-");
-            this.$set(this.connections, key, { bracketNum, columnNum, gameNum, position });
+            this.connections[key] = { bracketNum, columnNum, gameNum, position };
             this.activeConnection = null;
         },
         endConnectionSpecial(special) {
@@ -237,7 +269,7 @@ export default {
                 this.activeConnection.gameNum,
                 this.activeConnection.mode
             ].join("-");
-            this.$set(this.connections, key, special);
+            this.connections[key] = special;
             this.activeConnection = null;
         },
         setAllEliminations() {
@@ -246,7 +278,7 @@ export default {
                     column.games.forEach((game, gi) => {
                         const connection = this.getConnection(bi, ci, gi, "lose");
                         if (!connection) {
-                            this.$set(this.connections, [bi, ci, gi, "lose"].join("-"), "eliminated");
+                            this.connections[[bi, ci, gi, "lose"].join("-")] = "eliminated";
                         }
                     });
                 });

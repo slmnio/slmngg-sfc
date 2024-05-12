@@ -1,10 +1,7 @@
-const {
-    SlashCommandBuilder,
-    CommandInteraction
-} = require("discord.js");
-
+const { SlashCommandBuilder } = require("discord.js");
 const Cache = require("../../../cache.js");
 const { MapObject } = require("../../managers");
+const { cleanID } = require("../../../action-utils/action-utils");
 
 
 module.exports = {
@@ -13,7 +10,7 @@ module.exports = {
         .setDescription("Get a link to the current match's detailed view"),
     /**
      *
-     * @param {CommandInteraction} interaction
+     * @param {import("discord.js").CommandInteraction} interaction
      * @returns {Promise<void>}
      */
     async execute(interaction) {
@@ -66,6 +63,6 @@ module.exports = {
             }
         }
 
-        return interaction.followUp(`https://${subdomain}slmn.gg/detailed/${match.id}`);
+        return interaction.followUp(`https://${subdomain}slmn.gg/detailed/${cleanID(match.id)}`);
     },
 };

@@ -1,12 +1,17 @@
 <template>
     <div class="caster-cam-wrapper flex-center">
-        <iframe v-if="manualCamera ? useCam : (useCam || extendedIframeUse)" v-show="manualCamera || extendedIframeVisible" allow="autoplay;camera;microphone;fullscreen;picture-in-picture;display-capture;" :src="src" class="caster-frame"></iframe>
+        <iframe
+            v-if="manualCamera ? useCam : (useCam || extendedIframeUse)"
+            v-show="manualCamera || extendedIframeVisible"
+            allow="autoplay;camera;microphone;fullscreen;picture-in-picture;display-capture;"
+            :src="src"
+            class="caster-frame"></iframe>
         <transition name="mid-split">
-<!--            <slot v-if="useCam ? !apiVisible : true">-->
-                <div v-if="useCam ? !cameraIsOn : true" class="caster-bg flex-center" :style="{backgroundColor: color}">
-                    <div v-if="avatar" class="caster-avatar" :class="{'event-fallback': avatar.eventFallback}" :style="avatar"></div>
-                </div>
-<!--            </slot>-->
+            <!--            <slot v-if="useCam ? !apiVisible : true">-->
+            <div v-if="useCam ? !cameraIsOn : true" class="caster-bg flex-center" :style="{backgroundColor: color}">
+                <div v-if="avatar" class="caster-avatar" :class="{'event-fallback': avatar.eventFallback}" :style="avatar"></div>
+            </div>
+            <!--            </slot>-->
         </transition>
     </div>
 </template>
@@ -40,7 +45,14 @@ export default {
         streamID() {
             if (this.guest?.webcam) return this.guest.webcam;
             if (this.relayPrefix) return this.relayPrefix;
-            return this.guest?.cam_code || "";
+            return this.guest?.cam_code || this.guest?.discord_id || "";
+        },
+        streamCode() {
+            if (this.streamID.includes("view=")) {
+                const url = new URL(this.streamID);
+                return url.searchParams.get("view");
+            }
+            return this.streamID;
         },
         src() {
             const vdoDomain = "https://cams.prod.slmn.gg";
@@ -68,6 +80,14 @@ export default {
             return bg(this.guest.avatar);
         }
     },
+    methods: {
+        slowDisableCam() {
+            this.apiVisible = false;
+            setTimeout(() => {
+                this.extendedIframeUse = false;
+            }, 700);
+        }
+    },
     watch: {
         useCam(newCam, oldCam) {
             console.log({ newCam, oldCam });
@@ -82,28 +102,22 @@ export default {
             console.log("cam_visible", isVisible);
         }
     },
-    methods: {
-        slowDisableCam() {
-            this.apiVisible = false;
-            setTimeout(() => {
-                this.extendedIframeUse = false;
-            }, 700);
-        }
-    },
     mounted() {
         window.addEventListener("message", (e) => {
             if (e.data?.source?.startsWith("vue-")) return;
             console.log("[global iframe]", e.data);
             const data = e.data;
 
-            if (data.action === "new-track-added" && data.streamID === this.streamID) {
+            console.log("stream ID", this.streamCode, data.streamID);
+
+            if (data.action === "new-track-added" && data.streamID === this.streamCode) {
                 setTimeout(() => {
                     this.apiVisible = true;
                     this.extendedIframeVisible = true;
                 }, 400);
                 console.log("track added, loaded");
             }
-            if (data.action === "end-view-connection" && data.value === this.streamID) {
+            if (data.action === "end-view-connection" && data.value === this.streamCode) {
                 this.slowDisableCam(); // we need it to stay open if they reconnect
                 console.log("view dc, unloaded");
             }
@@ -152,11 +166,11 @@ export default {
         max-width: 100%;
         transition: all 400ms var(--originalCurve) 250ms !important;
     }
-    .mid-split-enter, .mid-split-leave-to {
+    .mid-split-enter-from, .mid-split-leave-to {
         /*clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);*/
         clip-path: polygon(0% 0%, 0% 100%, 0% 100%, 0% 0, 100% 0, 100% 100%, 100% 100%, 100% 0%);
     }
-    .mid-split-enter-to, .mid-split-leave {
+    .mid-split-enter-to, .mid-split-leave-from {
         /*clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);*/
         clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 100% 100%, 100% 0%);
     }

@@ -2,28 +2,46 @@
     <div class="draft-overlay">
         <div class="draft d-flex w-100 h-100">
             <div class="available-players">
-                <ThemeLogo v-if="event && event.theme" class="event-logo" :theme="event.theme" border-width="6px" logo-size="w-500" icon-padding="24px"></ThemeLogo>
+                <ThemeLogo
+                    v-if="event && event.theme"
+                    class="event-logo"
+                    :theme="event.theme"
+                    border-width="6px"
+                    logo-size="w-500"
+                    icon-padding="24px" />
                 <div class="title" :style="background">DRAFTABLE PLAYERS</div>
                 <!--<div class="player" v-for="player in availablePlayers" :key="player.id">
                     {{ player.name }}
                 </div>-->
-                <transition-group class="players-transition" name="draftable">
-                    <DraftPlayer :style="draftPlayerStyle" v-for="player in availablePlayers" :key="player.id"
-                                 :player="player" :theme="event.theme" :show-icon="icons" :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
+                <transition-group class="players-transition" name="draftable" tag="div">
+                    <DraftPlayer
+                        v-for="player in availablePlayers"
+                        :key="player.id"
+                        :style="draftPlayerStyle"
+                        :player="player"
+                        :theme="event.theme"
+                        :show-icon="icons"
+                        :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
                 </transition-group>
             </div>
             <div class="teams d-flex">
-                <div class="team-row" v-for="(row, rowI) in draftRows" :key="rowI">
-                    <div class="team flex-grow-1" v-for="team in row" :key="team.id">
-                        <DraftTeam class="team-top" :class="{'team-bottom-border': !showStaff}" :show-logo="showLogos" :team="team"></DraftTeam>
-                        <div class="team-staff-list default-thing" v-if="showStaff" :style="logoBackground1(team)">
-                            <div class="team-staff" v-for="staff in getTeamStaff(team)" :key="staff.id">
+                <div v-for="(row, rowI) in draftRows" :key="rowI" class="team-row">
+                    <div v-for="team in row" :key="team.id" class="team flex-grow-1">
+                        <DraftTeam class="team-top" :class="{'team-bottom-border': !showStaff}" :show-logo="showLogos" :team="team" />
+                        <div v-if="showStaff" class="team-staff-list default-thing" :style="logoBackground1(team)">
+                            <div v-for="staff in getTeamStaff(team)" :key="staff.id" class="team-staff">
                                 {{ staff.name }}
                             </div>
                         </div>
-                        <transition-group name="player" class="team-players">
-                            <DraftPlayer class="drafted-player" v-for="player in insertDummies(team.players)" :key="player.id"
-                                         :player="player" :theme="event.theme" :show-icon="icons" :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
+                        <transition-group name="player" class="team-players" tag="div">
+                            <DraftPlayer
+                                v-for="player in insertDummies(team.players)"
+                                :key="player.id"
+                                class="drafted-player"
+                                :player="player"
+                                :theme="event.theme"
+                                :show-icon="icons"
+                                :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
                         </transition-group>
                     </div>
                 </div>
@@ -48,6 +66,128 @@ export default {
     data: () => ({
         dummy: false
     }),
+    computed: {
+        event() {
+            if (!this.broadcast?.event) return null;
+            return ReactiveRoot(this.broadcast.event.id, {
+                theme: ReactiveThing("theme"),
+                teams: ReactiveArray("teams", {
+                    theme: ReactiveThing("theme"),
+                    staff: ReactiveArray("staff"),
+                    players: ReactiveArray("players"),
+                    captains: ReactiveArray("captains")
+                }),
+                draftable_players: ReactiveArray("draftable_players")
+            });
+        },
+        highlight_event() {
+            if (!this.broadcast?.highlight_event) return null;
+            return ReactiveRoot(this.broadcast.highlight_event?.[0], {
+                theme: ReactiveThing("theme"),
+                teams: ReactiveArray("teams", {
+                    theme: ReactiveThing("theme"),
+                    players: ReactiveArray("players"),
+                    captains: ReactiveArray("captains")
+                })
+            });
+        },
+        useHighlightEventBadges() {
+            return (this.broadcast?.broadcast_settings || []).includes("Use highlight event team badges");
+        },
+        game() {
+            return this.event?.game || "Overwatch";
+        },
+        background() {
+            if (!this.event?.theme) return null;
+            return logoBackground(this.event.theme);
+        },
+        accentColor() {
+            if (!this.event?.theme) return null;
+            return this.event.theme.color_theme;
+        },
+        availablePlayers() {
+            if (!this.event?.draftable_players) return [];
+            // if (this.dummy) {
+            //     players.unshift({ name: "Solomon", id: "x" });
+            // };
+            return this.event.draftable_players.filter(player => {
+                for (const team of this.draftTeams) {
+                    if ((team.players || []).find(p => p.id === player.id)) {
+                        return false;
+                    }
+                }
+                if (!player.name) return false;
+                return true;
+            }).map(player => {
+                // attempt to get SR
+                if (this.useHighlightEventBadges) {
+                    // get team from highlight event
+                    player._highlight_team = this.getHighlightEventTeam(player) || null;
+                }
+
+                try {
+                    const ow = JSON.parse(player.overwatch_data);
+                    if (ow?.ratings && player.role) {
+                        let sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
+                        if (sr) return { ...player, rating: { level: sr, note: "Pulled from their Battletag" } };
+                        sr = Math.floor(ow.ratings.reduce((p, c) => p + c.level, 0) / ow.ratings.length);
+                        // console.log(sr);
+                        if (sr) return { ...player, rating: { level: sr, note: "Average of other roles" } };
+                    }
+                    if (player.manual_sr) {
+                        return { ...player, rating: { level: parseInt(player.manual_sr), note: "Manually added" } };
+                    }
+                } catch (e) {
+                    return player;
+                }
+
+
+                return player;
+            }).map(player => {
+                try {
+                    const draftData = JSON.parse(player.draft_data);
+                    player._draftData = draftData;
+                } catch (e) { return player; }
+
+                return player;
+            }).sort((a, b) => {
+                if (this.game === "Valorant") {
+                    return this.sortValorant(a, b);
+                }
+
+                if (!a.role) return 1; if (!b.role) return -1;
+                if (a.role !== b.role) {
+                    const order = ["Tank", "DPS", "Support"];
+                    return order.indexOf(a.role) - order.indexOf(b.role);
+                }
+
+                if (!a.rating) return 1; if (!b.rating) return -1;
+                return b.rating.level - a.rating.level;
+            });
+        },
+        draftTeams() {
+            if (!this.event?.teams) return [];
+            return this.event.teams.filter(team => team.draft_order !== undefined).sort((a, b) => a.draft_order - b.draft_order);
+        },
+        draftRows() {
+            if (!this.draftTeams) return [];
+            const rows = [];
+
+            const chunkSize = this.draftTeams.length / this.teamRows;
+
+            this.draftTeams.forEach((team, i) => {
+                const group = Math.ceil((i + 1) / chunkSize) - 1;
+                if (!rows[group]) rows[group] = [];
+                rows[group].push(team);
+            });
+            return rows;
+        },
+        draftPlayerStyle() {
+            return {
+                width: `calc(100% / ${this.columns} - 4px)`
+            };
+        }
+    },
     methods: {
         insertDummies(players = []) {
             if (!this.eachTeam) return players;
@@ -134,134 +274,12 @@ export default {
             return this.highlight_event.teams.find(team => (team.players || []).find(p => p.id === player.id) || (team.captains || []).find(p => p.id === player.id));
         }
     },
-    computed: {
-        event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
-            return ReactiveRoot(this.broadcast.event.id, {
-                theme: ReactiveThing("theme"),
-                teams: ReactiveArray("teams", {
-                    theme: ReactiveThing("theme"),
-                    staff: ReactiveArray("staff"),
-                    players: ReactiveArray("players"),
-                    captains: ReactiveArray("captains")
-                }),
-                draftable_players: ReactiveArray("draftable_players")
-            });
-        },
-        highlight_event() {
-            if (!this.broadcast?.highlight_event) return null;
-            return ReactiveRoot(this.broadcast.highlight_event?.[0], {
-                theme: ReactiveThing("theme"),
-                teams: ReactiveArray("teams", {
-                    theme: ReactiveThing("theme"),
-                    players: ReactiveArray("players"),
-                    captains: ReactiveArray("captains")
-                })
-            });
-        },
-        useHighlightEventBadges() {
-            return (this.broadcast?.broadcast_settings || []).includes("Use highlight event team badges");
-        },
-        game() {
-            return this.event?.game || "Overwatch";
-        },
-        background() {
-            if (!this.event?.theme) return null;
-            return logoBackground(this.event.theme);
-        },
-        accentColor() {
-            if (!this.event || !this.event.theme) return null;
-            return this.event.theme.color_theme;
-        },
-        availablePlayers() {
-            if (!this.event?.draftable_players) return [];
-            // if (this.dummy) {
-            //     players.unshift({ name: "Solomon", id: "x" });
-            // };
-            return this.event.draftable_players.filter(player => {
-                for (const team of this.draftTeams) {
-                    if ((team.players || []).find(p => p.id === player.id)) {
-                        return false;
-                    }
-                }
-                if (!player.name) return false;
-                return true;
-            }).map(player => {
-                // attempt to get SR
-                if (this.useHighlightEventBadges) {
-                    // get team from highlight event
-                    player._highlight_team = this.getHighlightEventTeam(player) || null;
-                }
-
-                try {
-                    const ow = JSON.parse(player.overwatch_data);
-                    if (ow && ow.ratings && player.role) {
-                        let sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
-                        if (sr) return { ...player, rating: { level: sr, note: "Pulled from their Battletag" } };
-                        sr = Math.floor(ow.ratings.reduce((p, c) => p + c.level, 0) / ow.ratings.length);
-                        // console.log(sr);
-                        if (sr) return { ...player, rating: { level: sr, note: "Average of other roles" } };
-                    }
-                    if (player.manual_sr) {
-                        return { ...player, rating: { level: parseInt(player.manual_sr), note: "Manually added" } };
-                    }
-                } catch (e) {
-                    return player;
-                }
-
-
-                return player;
-            }).map(player => {
-                try {
-                    const draftData = JSON.parse(player.draft_data);
-                    player._draftData = draftData;
-                } catch (e) { return player; }
-
-                return player;
-            }).sort((a, b) => {
-                if (this.game === "Valorant") {
-                    return this.sortValorant(a, b);
-                }
-
-                if (!a.role) return 1; if (!b.role) return -1;
-                if (a.role !== b.role) {
-                    const order = ["Tank", "DPS", "Support"];
-                    return order.indexOf(a.role) - order.indexOf(b.role);
-                }
-
-                if (!a.rating) return 1; if (!b.rating) return -1;
-                return b.rating.level - a.rating.level;
-            });
-        },
-        draftTeams() {
-            if (!this.event?.teams) return [];
-            return this.event.teams.filter(team => team.draft_order !== undefined).sort((a, b) => a.draft_order - b.draft_order);
-        },
-        draftRows() {
-            if (!this.draftTeams) return [];
-            const rows = [];
-
-            const chunkSize = this.draftTeams.length / this.teamRows;
-
-            this.draftTeams.forEach((team, i) => {
-                const group = Math.ceil((i + 1) / chunkSize) - 1;
-                if (!rows[group]) rows[group] = [];
-                rows[group].push(team);
-            });
-            return rows;
-        },
-        draftPlayerStyle() {
-            return {
-                width: `calc(100% / ${this.columns} - 4px)`
-            };
-        }
-    },
     mounted() {
         setInterval(() => {
             this.dummy = !this.dummy;
         }, 2500);
     },
-    metaInfo() {
+    head() {
         return {
             title: `Draft | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -377,7 +395,7 @@ export default {
         transition: transform .5s ease;
     }
 
-    .draftable-enter {
+    .draftable-enter-from {
         max-height: 0;
         padding: 0 8px !important;
         opacity: 0;
@@ -398,7 +416,7 @@ export default {
         transition: all .5s ease;
         /*transition: none !important;*/
     }
-    .player-enter, .player-leave-to {
+    .player-enter-from, .player-leave-to {
         max-height: 0;
         padding: 0 8px !important;
         opacity: 0;

@@ -1,17 +1,18 @@
 <template>
-    <div class="container text-center" v-if="!errorMessage">
-        <h1 v-if="$root.auth.user">Hello {{ $root.authUser.name || $root.auth.user.name }}!</h1>
-        <h1 v-else><LoadingIcon/> Authenticating</h1>
+    <div v-if="!errorMessage" class="container text-center">
+        <h1 v-if="user">Hello {{ user?.name }}!</h1>
+        <h1 v-else><LoadingIcon /> Authenticating</h1>
     </div>
-    <div class="container text-center" v-else>
+    <div v-else class="container text-center">
         <h1>Authentication error</h1>
         <h3>{{ errorMessage }}</h3>
     </div>
 </template>
 
 <script>
+import { mapState } from "pinia";
 import LoadingIcon from "@/components/website/LoadingIcon";
-import { authenticateWithDiscord, getAuthNext } from "@/utils/auth";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "Authenticator",
@@ -21,14 +22,19 @@ export default {
         loading: true,
         errorMessage: null
     }),
+    computed: {
+        ...mapState(useAuthStore, ["user"])
+    },
     async mounted() {
-        const authResult = await authenticateWithDiscord(this.$root, this.code);
+        const authStore = useAuthStore();
+
+        const authResult = await authStore.authenticateWithDiscord(this.code);
         this.loading = false;
 
         if (authResult.error) {
-            this.errorMessage = authResult.errorMessage;
+            this.errorMessage = authResult?.errorMessage;
         } else {
-            const next = getAuthNext(this.$root);
+            const next = authStore.getAuthNext();
 
             if (next) {
                 if (next.startsWith("http")) {

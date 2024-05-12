@@ -132,7 +132,11 @@ module.exports = {
                     throw ("No valid maps have been completed");
                 }
                 if (lastMap.draw) {
-                    await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === "Draw").id);
+                    if ((broadcast.broadcast_settings || []).includes("Allow draw predictions")) {
+                        await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === "Draw").id);
+                    } else {
+                        throw "Prediction cannot be resolved because map draw predictions were not enabled.";
+                    }
                 } else {
                     await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === lastMap.winner.name).id);
                 }

@@ -1,10 +1,10 @@
 <template>
     <a v-if="news && news.redirect_url" :href="news.redirect_url" target="_blank" class="no-link-style">
-        <NewsThumbnail :item="news"/>
+        <NewsThumbnail :item="news" />
         <div class="news-headline">{{ news.headline }}</div>
     </a>
     <router-link v-else :to="`/news/${news.slug}`" class="news no-link-style">
-        <NewsThumbnail :item="news"/>
+        <NewsThumbnail :item="news" />
         <div class="news-headline">{{ news.headline }}</div>
     </router-link>
 </template>
@@ -15,8 +15,8 @@ import { url } from "@/utils/content-utils";
 import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "News",
-    props: ["item"],
     components: { NewsThumbnail },
+    props: ["item"],
     computed: {
         news() {
             if (!this.item) return {};

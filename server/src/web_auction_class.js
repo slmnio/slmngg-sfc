@@ -38,7 +38,7 @@ module.exports = class Auction {
         this.bidData = [];
         this.timerTimeout = null;
 
-        this.log("New auction", this.id);
+        // this.log("New auction", this.id);
 
         let existingSockets = [...(this.io.of("/").adapter.rooms.get(this.socketIdentifier) || [])];
         existingSockets.forEach(id => this.welcomeSocket(id));

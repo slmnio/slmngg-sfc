@@ -2,8 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const {
     updateRecord,
-    createRecord,
-    getSelfClient
+    createRecord
 } = require("./action-utils");
 
 const Cache = require("../cache.js");
@@ -58,7 +57,7 @@ class Action {
     }) {
         return this.handler(args, auth)
             .then(data => {
-                console.log(`[actions] Success in ${this.key}`, data);
+                console.log(`[actions] Success in ${this.key}`);
                 success(data);
             },
             e => {
@@ -277,7 +276,7 @@ class InternalActionManager extends ActionManager {
         };
     }
 
-    async runAction(actionKey, args, token) {
+    async runAction(actionKey, args, token, isAutomation) {
         let action = this.actions.get(actionKey);
         if (!(action instanceof Action)) action = new Action(action);
         if (!action) return console.error(`Oh god no action ${actionKey}`);
@@ -290,6 +289,18 @@ class InternalActionManager extends ActionManager {
                     error: (errorCode, errorMessage) => reject({ errorCode, errorMessage }),
                     success: resolve,
                 }),
+                isAutomation
+            });
+        });
+    }
+
+    async runActionAsAutomation(actionKey, args) {
+        let action = this.actions.get(actionKey);
+        if (!(action instanceof Action)) action = new Action(action);
+        return new Promise((resolve, reject) => {
+            return action.execute(args, { isAutomation: true }, {
+                success: (s) => resolve(s),
+                error: (e) => reject(e)
             });
         });
     }

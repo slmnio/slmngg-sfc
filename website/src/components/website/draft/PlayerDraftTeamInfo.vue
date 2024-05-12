@@ -1,5 +1,5 @@
 <template>
-    <div class="player-draft-team-info" v-b-tooltip.top="title" v-if="show">
+    <div v-if="show" v-b-tooltip.top="title" class="player-draft-team-info">
         <ThemeLogo class="event-logo" :theme="team.event.theme" border-width="3" icon-padding="4" />
         {{ team.ranking_text }}
     </div>

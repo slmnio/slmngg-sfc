@@ -1,10 +1,9 @@
-const fetch = require("node-fetch");
 const { updateRecord,
     createRecord
 } = require("./action-utils/action-utils");
-const { exchangeCode,
-    getTokenInfo
+const { exchangeCode, getTokenInfo, StaticAuthProvider
 } = require("@twurple/auth");
+const { ApiClient } = require("@twurple/api");
 
 function cleanID(id) {
     if (!id) return null;
@@ -21,10 +20,10 @@ function niceJoin(array) {
     return array[0];
 }
 
-module.exports = ({ app, cors, Cache, io }) => {
+module.exports = ({ app, Cache, io }) => {
     app.get("/redirect", async (req, res) => {
         try {
-            let redirects = (await Cache.get("Redirects"))?.items;
+            let redirects = await Promise.all(((await Cache.get("Redirects"))?.ids || []).map(id => Cache.get(id)));
 
             let subdomain = req.query.subdomain || null;
             let path = req.query.path;
@@ -32,7 +31,7 @@ module.exports = ({ app, cors, Cache, io }) => {
             path = path.trim().toLowerCase();
 
 
-            if (!redirects) return res.send({ redirect: null, warn: "no redirects loaded" });
+            if (!redirects?.length) return res.send({ redirect: null, warn: "no redirects loaded" });
 
             let redirect = redirects.find(r => {
                 if (!r.active) return false;
@@ -142,7 +141,7 @@ module.exports = ({ app, cors, Cache, io }) => {
         if (!broadcast.event) return { "error": true, "message": "No event is linked to this stream." };
         let event = await Cache.get(cleanID(broadcast.event[0]));
 
-        let url = "";
+        let url;
 
         if (event.subdomain) {
             url = `https://${event.subdomain}.slmn.gg/`;
@@ -338,6 +337,17 @@ module.exports = ({ app, cors, Cache, io }) => {
             // let scopes = states[req.query.state];
             // if (scopes) delete states[req.query.state];
 
+            let streamKey = null;
+            if (tokenInfo.scopes.includes("channel:read:stream_key")) {
+                try {
+                    const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, token.accessToken);
+                    const api = new ApiClient({authProvider});
+                    streamKey = await api.streams.getStreamKey(tokenInfo.userId);
+                } catch (e) {
+                    console.error("[Twitch Auth] error getting stream key", e);
+                }
+            }
+
             // get or create channel in table
 
             const existingChannel = await Cache.auth.getChannelByID(tokenInfo.userId);
@@ -352,7 +362,8 @@ module.exports = ({ app, cors, Cache, io }) => {
                     "Twitch Refresh Token": token.refreshToken,
                     "Twitch Scopes": tokenInfo.scopes.join(" "),
                     "Channel ID": tokenInfo.userId,
-                    "Name": tokenInfo.userName
+                    "Name": tokenInfo.userName,
+                    "Stream Key": streamKey || undefined
                 });
 
             } else {
@@ -360,7 +371,8 @@ module.exports = ({ app, cors, Cache, io }) => {
                     "Twitch Refresh Token": token.refreshToken,
                     "Twitch Scopes": tokenInfo.scopes.join(" "),
                     "Channel ID": tokenInfo.userId,
-                    "Name": tokenInfo.userName
+                    "Name": tokenInfo.userName,
+                    "Stream Key": streamKey || undefined
                 }]);
             }
 

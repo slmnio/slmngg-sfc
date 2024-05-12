@@ -41,7 +41,7 @@ module.exports = {
             validatedData["Profile Picture Theme"] = [dirtyID(profileData.profile_picture_theme)];
         }
 
-        console.log("[profile]", user.airtable.name, user.airtable.id, "is setting", validatedData);
+        console.log("[Profile]", user.airtable.name, user.airtable.id, "is setting", validatedData);
         let response = await this.helpers.updateRecord("Players", user.airtable, {
             ...validatedData
         });

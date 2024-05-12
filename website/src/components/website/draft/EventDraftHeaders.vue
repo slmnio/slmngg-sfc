@@ -5,7 +5,7 @@
         <th v-if="game === 'Overwatch'" class="text-center">Role</th>
         <th v-if="game === 'Valorant'" class="text-center">Highest rank</th>
         <th v-if="game === 'Valorant'" class="text-center">Current rank</th>
-        <th class="text-center" v-if="hasDraftData && settings.heroes">Best heroes</th>
+        <th v-if="hasDraftData && settings.heroes" class="text-center">Best heroes</th>
         <th v-if="settings.slmn_events">SLMN Events</th>
         <th v-if="hasDraftData && settings.info_for_captains">Info for captains</th>
         <th v-if="settings.custom_notes">Player notes</th>

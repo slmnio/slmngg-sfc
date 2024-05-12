@@ -3,35 +3,63 @@
         <div class="team-top text-center w-100 my-3" :style="theme">
             <div class="industry-align">{{ team.name }}</div>
         </div>
-        <div class="team-history w-100 d-flex" v-if="showHeaders && !groupedMatches?.allMatches">
+        <div v-if="showHeaders && !groupedMatches?.allMatches" class="team-history w-100 d-flex">
             <div class="group">
                 <div class="group-title">Previous matches</div>
                 <div class="group-items">
-                    <SeasonHistoryMatch class="match" v-for="(match, i) in groupedMatches.completedMatches" :key="match.id"
-                                        :animation-delay="i" :active="active"
-                                        :match="match" :home-team="team" :live-match="liveMatch" :timezone="timezone" />
+                    <SeasonHistoryMatch
+                        v-for="(match, i) in groupedMatches.completedMatches"
+                        :key="match.id"
+                        class="match"
+                        :animation-delay="i"
+                        :active="active"
+                        :match="match"
+                        :home-team="team"
+                        :live-match="liveMatch"
+                        :timezone="timezone" />
                 </div>
             </div>
             <div class="group">
                 <div class="group-title">This match</div>
                 <div class="group-items">
-                    <SeasonHistoryMatch class="match" :key="liveMatch.id"
-                                        :animation-delay="groupedMatches.completedMatches.length + 1" :active="active"
-                                        :match="liveMatch" :home-team="team" :live-match="liveMatch" :timezone="timezone" />
+                    <SeasonHistoryMatch
+                        :key="liveMatch.id"
+                        class="match"
+                        :animation-delay="groupedMatches.completedMatches.length + 1"
+                        :active="active"
+                        :match="liveMatch"
+                        :home-team="team"
+                        :live-match="liveMatch"
+                        :timezone="timezone" />
                 </div>
             </div>
             <div class="group">
                 <div class="group-title">Upcoming matches</div>
                 <div class="group-items">
-                    <SeasonHistoryMatch class="match" v-for="(match, i) in groupedMatches.incompleteMatches" :key="match.id"
-                                        :animation-delay="groupedMatches.completedMatches.length + 2 + i" :active="active"
-                                        :match="match" :home-team="team" :live-match="liveMatch" :timezone="timezone" />
+                    <SeasonHistoryMatch
+                        v-for="(match, i) in groupedMatches.incompleteMatches"
+                        :key="match.id"
+                        class="match"
+                        :animation-delay="groupedMatches.completedMatches.length + 2 + i"
+                        :active="active"
+                        :match="match"
+                        :home-team="team"
+                        :live-match="liveMatch"
+                        :timezone="timezone" />
                 </div>
             </div>
         </div>
-        <div class="team-history w-100 d-flex" v-else>
-            <SeasonHistoryMatch class="match" v-for="(match, i) in highlightedMatches" :key="match.id" :animation-delay="i" :active="active"
-                                :match="match" :home-team="team" :live-match="liveMatch" :timezone="timezone" />
+        <div v-else class="team-history w-100 d-flex">
+            <SeasonHistoryMatch
+                v-for="(match, i) in highlightedMatches"
+                :key="match.id"
+                class="match"
+                :animation-delay="i"
+                :active="active"
+                :match="match"
+                :home-team="team"
+                :live-match="liveMatch"
+                :timezone="timezone" />
         </div>
     </div>
 </template>

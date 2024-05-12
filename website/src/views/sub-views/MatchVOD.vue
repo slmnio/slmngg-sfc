@@ -1,23 +1,29 @@
 <template>
     <div class="match-vod">
-        <EmbeddedVideo :src="vodLink" v-if="vodLink" />
+        <EmbeddedVideo v-if="vodLink" :src="vodLink" />
 
-        <div class="vod-2-holder d-flex justify-content-end w-100 mt-2" v-if="match.vod_2">
+        <div v-if="match.vod_2" class="vod-2-holder d-flex justify-content-end w-100 mt-2">
             <div class="btn btn-sm text-light">This match has multiple VODs:</div>
-            <div class="btn btn-dark btn-sm" @click="useVOD2 = true" v-if="!useVOD2">Show part 2</div>
-            <div class="btn btn-dark btn-sm" @click="useVOD2 = false" v-if="useVOD2">Show part 1</div>
+            <div v-if="!useVOD2" class="btn btn-dark btn-sm" @click="useVOD2 = true">Show part 2</div>
+            <div v-if="useVOD2" class="btn btn-dark btn-sm" @click="useVOD2 = false">Show part 1</div>
         </div>
 
-        <div class="embed embed-responsive embed-responsive-16by9" v-if="showNoVOD">
+        <div v-if="showNoVOD" class="embed ratio ratio-16x9">
             <div class="no-embed-text flex-center">No VOD available for this match</div>
         </div>
-        <!--  TODO: add spoilers? -->
-        <div class="maps-container mt-3 flex-column" v-if="match.maps">
-            <div class="checkbox-holder flex-center justify-content-end" v-if="hasBannedMaps">
+        <div v-if="match.maps" class="maps-container mt-3 flex-column">
+            <div v-if="hasBannedMaps" class="checkbox-holder flex-center justify-content-end">
                 <b-form-checkbox v-model="showBannedMaps" switch> Show banned maps</b-form-checkbox>
             </div>
             <div class="maps-holder flex-center w-100">
-                <MapDisplay v-for="(map, i) in match.maps" :i="i" :map="map" :match="match" :theme="theme" :key="map.id" :show-banned-maps="showBannedMaps"/>
+                <MapDisplay
+                    v-for="(map, i) in match.maps"
+                    :key="map.id"
+                    :i="i"
+                    :map="map"
+                    :match="match"
+                    :theme="theme"
+                    :show-banned-maps="showBannedMaps" />
             </div>
         </div>
     </div>
@@ -26,12 +32,11 @@
 <script>
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 import MapDisplay from "@/components/website/match/MapDisplay";
-import { BFormCheckbox } from "bootstrap-vue";
 
 export default {
     name: "MatchVOD",
+    components: { EmbeddedVideo, MapDisplay },
     props: ["match"],
-    components: { EmbeddedVideo, MapDisplay, BFormCheckbox },
     data: () => ({
         useVOD2: false,
         showBannedMaps: false

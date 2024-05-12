@@ -2,7 +2,7 @@ import store from "../thing-store";
 import { queueThings, resolveThing } from "@/utils/fetch";
 import { cleanID } from "@/utils/content-utils";
 
-export function ReactiveRoot (id, structure) {
+export function ReactiveRoot(id, structure) {
     // console.log("[reactive-root]", id);
     id = cleanID(id);
     const data = store.getters.thing(id);
@@ -78,17 +78,17 @@ export function ReactiveArray (key, structure) {
 
     return (originalData) => {
         let data = originalData[key];
-        const newIDs = [];
+        // const newIDs = [];
 
         const idsToResolve = [];
 
-        data = data.map(id => {
+        data = (data || []).map(id => {
             if (typeof id === "object" && id?.id && id.length === undefined) id = id.id;
             id = cleanID(id);
             if (!id) return {};
             const d = store.getters.thing(id);
             if (!d) idsToResolve.push(id);
-            newIDs.push(id);
+            // newIDs.push(id);
             store.dispatch("subscribe", id);
             if (!d) return {};
 
@@ -125,6 +125,7 @@ export function ReactiveCacheArray(ids) {
         id = cleanID(id);
         const data = store.getters.thing(id);
         if (!data) idsToResolve.push(id);
+        return null;
     });
     return queueThings(idsToResolve);
 }

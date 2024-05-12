@@ -2,6 +2,29 @@ import spacetime from "spacetime";
 import informal from "spacetime-informal";
 import { sortEvents, sortTeams } from "@/utils/sorts";
 
+import assault from "@/assets/default-map-images/assault.png";
+import escort from "@/assets/default-map-images/escort.png";
+import hybrid from "@/assets/default-map-images/hybrid.png";
+import control from "@/assets/default-map-images/control.png";
+import push from "@/assets/default-map-images/push.png";
+import spike from "@/assets/default-map-images/spike.png";
+import spikeRush from "@/assets/default-map-images/spike_rush.png";
+import valDeathmatch from "@/assets/default-map-images/val_deathmatch.png";
+import slayer from "@/assets/default-map-images/slayer.png";
+import strongholds from "@/assets/default-map-images/strongholds.png";
+import ctf from "@/assets/default-map-images/ctf.png";
+import oddball from "@/assets/default-map-images/oddball.png";
+import flashpoint from "@/assets/default-map-images/flashpoint.png";
+import clash from "@/assets/default-map-images/clash.png";
+
+import hybridIcon from "@/assets/map-type-icons/hybrid.svg";
+import escortIcon from "@/assets/map-type-icons/escort.svg";
+import controlIcon from "@/assets/map-type-icons/control.svg";
+import pushIcon from "@/assets/map-type-icons/push.svg";
+import assaultIcon from "@/assets/map-type-icons/assault.svg";
+import flashpointIcon from "@/assets/map-type-icons/flashpoint.svg";
+import clashIcon from "@/assets/map-type-icons/clash.png";
+
 export function getImage (i) {
     // console.log(i);
     if (!i) return null;
@@ -96,9 +119,7 @@ export function multiImage(theme, keys, minSize = 30, useResizer = true) {
 
 export function getMatchContext(match) {
     const text = [];
-    let out = "";
-
-    out = (match?.event?.short || match?.event?.name || "");
+    const out = (match?.event?.short || match?.event?.name || "");
 
     // sub_event: round
     // week_text: round
@@ -120,7 +141,7 @@ export function getRoleSVG(name) {
 <path d="M51.4,24.1c0,3.1,0,6.2,0,9.3a4.7,4.7,0,0,1-.6,2.4A57.2,57.2,0,0,1,33.2,55.5a1.8,1.8,0,0,1-2.4,0A57.4,57.4,0,0,1,13.2,36a5.5,5.5,0,0,1-.7-2.8c0-5.8.1-11.7,0-17.5-.1-4.2,3.2-4.9,6.1-5.6A59.4,59.4,0,0,1,32.9,8C37.5,8,44.5,9.6,47,10.4s4.1,1.4,4.3,3.3.1,3.2.1,4.9,0,3.7,0,5.5Z"/>
 </svg>`;
     }
-    if (name === "DPS") {
+    if (["Damage", "DPS"].includes(name)) {
         return `<svg id="role_offense" style="fill:currentColor" viewBox="0 0 64 64" width="100%" height="100%">
 <rect class="cls-1" x="12" y="49.3" width="10.2" height="5.61"/>
 <path class="cls-1" d="M22.2,19.1a10.2,10.2,0,0,0,0-1c-.8-6.9-5.1-9-5.1-9s-4.3,2.1-5.1,9c0,.3,0,1,0,1V45.4H22.2Z"/>
@@ -171,6 +192,20 @@ C13.888,14.756,13.487,14.83,13.065,14.847z"/>
     return "";
 }
 
+// export function getMapData(match, mapSet, { showBannedMaps = false }) {
+//     const firstTo = match.first_to;
+//     let maps = [...(match.maps || [])];
+//     if (!firstTo) return maps; // can't predict if we don't know first_to
+//     maps = maps.filter(m => m.map); // hide things without map objects
+//
+//     if (!showBannedMaps) {
+//         maps = maps.filter(m => !(m.banner || m.banned));
+//     }
+//
+//     const neededMapCount = likelyNeededMaps(match);
+//     const dummyMapCount = neededMapCount - maps.length;
+// }
+
 export function money(num) {
     return `$${num || 0}k`;
 }
@@ -184,11 +219,6 @@ export function clarifyTeam(team) {
         return `${team.name} (${team.event.short})`;
     }
     return team.name;
-}
-
-export function pronounsFilter(pronouns) {
-    if (pronouns === "any") return "any pronouns";
-    return pronouns;
 }
 
 export function textSort(a, b) {
@@ -223,37 +253,42 @@ export function likelyNeededMaps(match) {
 }
 
 export const DefaultMapImages = {
-    Assault: "https://cdn.discordapp.com/attachments/855517740914573342/868231135224819743/44684849494984.png",
-    Escort: "https://cdn.discordapp.com/attachments/855517740914573342/868231132444000276/484444884949494949494948421651615641.png",
-    Hybrid: "https://cdn.discordapp.com/attachments/855517740914573342/868231133765201950/448489494949849494949494949494949.png",
-    Control: "https://cdn.discordapp.com/attachments/855517740914573342/868230457622396928/63541654456789487695.png",
-    Push: "https://cdn.discordapp.com/attachments/855517740914573342/969692510249177098/puuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuush.png",
-    Spike: "https://cdn.discordapp.com/attachments/880305022716481639/883811894463447110/newspikeplant.png",
-    SpikeRush: "https://cdn.discordapp.com/attachments/880305022716481639/883809271198924840/spikerush_default.png",
-    ValDeathmatch: "https://cdn.discordapp.com/attachments/880305022716481639/883809264261529670/valdeathmatch_default.png",
-    Slayer: "https://media.discordapp.net/attachments/855517740914573342/913747752729595904/slayer.png",
-    Strongholds: "https://media.discordapp.net/attachments/855517740914573342/913747753086107668/strongholds.png",
-    CTF: "https://media.discordapp.net/attachments/855517740914573342/913747753392304158/ctf.png",
-    Oddball: "https://media.discordapp.net/attachments/855517740914573342/913747753694269440/oddball.png"
+    Assault: assault,
+    Escort: escort,
+    Hybrid: hybrid,
+    Control: control,
+    Push: push,
+    Spike: spike,
+    SpikeRush: spikeRush,
+    ValDeathmatch: valDeathmatch,
+    Slayer: slayer,
+    Strongholds: strongholds,
+    CTF: ctf,
+    Oddball: oddball,
+    Flashpoint: flashpoint,
+    Clash: clash
 };
 
 export const MapTypeIcons = {
-    Hybrid: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907303867088896/180.png",
-    Escort: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907343893336097/180.png",
-    Control: "https://cdn.discordapp.com/attachments/1125871284702679041/1125907374708903946/180.png",
-    Push: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908279537717392/Push.png",
-    Assault: "https://cdn.discordapp.com/attachments/1125871284702679041/1125908385250934904/assault.png"
+    Hybrid: hybridIcon,
+    Escort: escortIcon,
+    Control: controlIcon,
+    Push: pushIcon,
+    Assault: assaultIcon,
+    Flashpoint: flashpointIcon,
+    Clash: clashIcon
 };
 
-export function getTeamsMapStats(teams, requestMatch, requestMap) {
-    console.log(requestMatch);
+export function getTeamsMapStats(teams, requestMatch, requestMap, filters) {
+    console.log("get teams map stats", requestMatch, filters);
     if (!teams) return null;
     const stats = teams.map(team => {
         const stat = {
             played: 0,
             wins: 0,
             losses: 0,
-            draws: 0
+            draws: 0,
+            unplayed: 0
         };
 
         const prevMatches = (team.matches || [])
@@ -263,7 +298,17 @@ export function getTeamsMapStats(teams, requestMatch, requestMap) {
         const latestMatch = prevMatches.length ? prevMatches[0] : null;
 
 
-        (team.matches || []).forEach(match => {
+        (team.matches || []).filter(m => {
+            if (filters?.match_group) {
+                console.log("match group", filters.match_group, m.match_group, filters.match_group !== m.match_group);
+                if (filters.match_group !== m.match_group) return false;
+            }
+            if (filters?.sub_event) {
+                console.log("sub event", filters.sub_event, m.sub_event, filters.sub_event !== m.sub_event);
+                if (filters.sub_event !== m.sub_event) return false;
+            }
+            return true;
+        }).forEach(match => {
             (match.maps || []).forEach(matchMap => {
                 if (!matchMap.map) return; // no proper map data
                 if (requestMap.id !== cleanID(matchMap.map[0])) return; // isn't this map
@@ -274,7 +319,11 @@ export function getTeamsMapStats(teams, requestMatch, requestMap) {
                     if (scheduledMap) stat.scheduled_for_match = true;
                 }
 
-                if (!(matchMap.draw || matchMap.winner)) return; // wasn't played fully
+                if (!(matchMap.draw || matchMap.winner || matchMap.banner)) {
+                    // wasn't played fully
+                    if ([match.score_1, match.score_2].includes(match.first_to)) stat.unplayed++;
+                    return;
+                }
 
                 // woo right map
 
@@ -340,6 +389,18 @@ export function getAbbrev(timezone, time) {
     return time.isDST() ? display.daylight.abbrev : display.standard.abbrev;
 }
 
+function getNoSunAbbreviation(abbrev) {
+    const map = {
+        PDT: "PT",
+        PST: "PT",
+        EDT: "ET",
+        EST: "ET",
+        BST: "UK",
+        GMT: "UK"
+    };
+    return map[abbrev] ?? abbrev;
+}
+
 
 /**
  *
@@ -356,6 +417,7 @@ export function formatTime(timeString, { tz, use24HourTime = false, format = "{d
     return time.format(
         format
             .replace("{tz}", abbrev)
+            .replace("{tz-no-sun}", getNoSunAbbreviation(abbrev))
             .replace("{time}", use24HourTime ? "{time-24}" : "{time}")
             .replace("{year-short-prev-only}", time.year() === spacetime.now().year() ? "" : "{year-short}")
             .trim()
@@ -409,22 +471,24 @@ export function getEmbedData(url) {
     if (url.endsWith(".pdf")) {
         return {
             service: "pdf",
-            url: url
+            url
         };
     }
 
     if (["mp4", "webm"].some(file => url.endsWith("." + file))) {
         return {
             service: "unknown-video",
-            url: url
+            url
         };
     }
 
-    return { service: "unknown", url: url };
+    return { service: "unknown", url };
 }
 
 
 export function unescapeText(text) {
+    if (!text) return "";
+
     return text
         .replaceAll("&amp;", "&")
         .replaceAll("&lt;", "<")
@@ -491,4 +555,29 @@ export function getAssociatedThemeOptions(player, valueFn) {
         { label: "Teams", options: teams.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortTeams).map((t) => ({ ...t, text: t.name, value: valueFn ? valueFn(t) : t.id })) },
         { label: "Events", options: events.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortEvents).map((e) => ({ ...e, text: e.name, value: valueFn ? valueFn(e) : e.id })) }
     ];
+}
+
+export function autoRecord(team, stage) {
+    console.log("auto record", team, stage);
+    if (!stage) return null;
+
+    const matches = team?.matches?.filter(m => m.match_group === stage);
+
+    console.log(matches);
+    if (!matches?.length) return null;
+
+    let [wins, losses] = [0, 0];
+
+    matches.forEach(m => {
+        const scores = [m.score_1 || 0, m.score_2 || 0];
+        if (!scores.some(s => s === m.first_to)) return; // not finished
+        const won = scores[0] === m.first_to ? team.id === m.teams[0].id : team.id === m.teams[1].id;
+        if (won) {
+            wins++;
+        } else {
+            losses++;
+        }
+    });
+
+    return [wins, losses].join(" - ");
 }

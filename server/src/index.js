@@ -49,15 +49,15 @@ const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials:
 //     test: ["hi"]
 // });
 
-const test = require("./discord/slash-commands.js");
-
-
 const Cache = (require("./cache.js")).setup(io);
 (require("./airtable-v2.js")).setup({ web: app, io });
 (require("./discord/bot-controller.js")).setup(io);
 
 const actions = require("./action-utils/action-manager.js");
 actions.load(app, localCors, Cache, io);
+
+require("./discord/slash-commands.js");
+require("./automation-manager.js");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -109,13 +109,11 @@ function cleanID(id) {
 
 let connected = 0;
 
-// eslint-disable-next-line no-unused-vars
 io.on("connection", (socket) => {
     console.log(`[socket] on site: ${++connected}`);
 
     socket.on("subscribe", (id) => {
         id = cleanID(id);
-        // console.log("joined", id);
         socket.join(id);
     });
     socket.on("unsubscribe", (id) => {
@@ -130,7 +128,7 @@ io.on("connection", (socket) => {
     });
     socket.on("disconnect", () => {
         if (socket._clientName)
-            io.sockets.to(`prod:client-${socket._clientName}-overview`).emit("prod_disconnect", socket.id);
+            io.sockets.to(`prod:client-${socket._clientName?.toLowerCase()}-overview`).emit("prod_disconnect", socket.id);
         connected--;
     });
 
@@ -142,12 +140,16 @@ io.on("connection", (socket) => {
         // console.log("get and subscribe out:", id);
     });
     socket.on("prod-join", (clientName) => {
+        if (!clientName) return;
+        clientName = clientName.toLowerCase();
         console.log("[prod:client] join", `prod:client-${clientName}`);
         socket._clientName = clientName;
         socket.join(`prod:client-${clientName}`);
     });
 
     socket.on("prod-overview-join", (clientName) => {
+        if (!clientName) return;
+        clientName = clientName.toLowerCase();
         console.log("[prod-overview] join ", clientName);
         socket._clientName = clientName;
         socket.join(`prod:client-${clientName}-overview`);
@@ -155,6 +157,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("prod-broadcast-join", (broadcastKey) => {
+        if (!broadcastKey) return;
         if (socket._broadcastKey) {
             // console.log("[prod:broadcast] leaving", `prod:broadcast-${socket._broadcastKey}`);
             socket.leave(`prod:broadcast-${socket._broadcastKey}`);
@@ -176,7 +179,7 @@ io.on("connection", (socket) => {
 
     socket.on("prod-update", (data) => {
         if (data.clientName) {
-            socket._clientName = data.clientName;
+            socket._clientName = data.clientName.toLowerCase();
         }
         if (!socket._clientName) return console.warn("prod update without client name", data);
         data = {
@@ -188,6 +191,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("obs_data_change", async ({ clientName, previewScene, programScene }) => {
+        clientName = clientName.toLowerCase();
         let client = await Cache.get(`client-${clientName}`);
         console.log("obs_data_change", { clientName, previewScene, programScene });
 
@@ -200,9 +204,10 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("tally_change", ({ clientName, state, number, data }) => {
-        console.log("[tally]", clientName, state, number, data);
-        socket.to(`prod:client-${clientName}`).emit("tally_change", { state, number });
+    socket.on("tally_change", ({ clientName, state, data }) => {
+        clientName = clientName.toLowerCase();
+        console.log("[tally]", clientName, state, data);
+        socket.to(`prod:client-${clientName}`).emit("tally_change", { state });
     });
 
     socket.on("media_update", (status, value) => {

@@ -2,6 +2,8 @@ const crypto = require("crypto");
 const { accessTokenIsExpired,
     refreshUserToken
 } = require("@twurple/auth");
+
+const { EventEmitter } = require("events");
 /*
     - Get and set data
     - Store data
@@ -14,10 +16,12 @@ const auth = new Map();
 const players = new Map();
 const attachments = new Map();
 
+const emitter = new EventEmitter();
+
 function getAntiLeakIDs() {
     if (process.env.DISABLE_ANTILEAK === "true") return []; // don't hide anything on local
     let ids = [];
-    hiddenEvents.forEach((val, key) => {
+    hiddenEvents.forEach((val) => {
         if (val?.length) val.forEach(id => ids.push(id));
     });
     return ids;
@@ -38,18 +42,22 @@ function setup(_io) {
 }
 
 async function broadcast(room, command, ...data) {
-    // TODO: get the socket.io server here
-    // socket to (room).emit(command, ...data)
     io.to(room).emit(command, ...data);
 }
 
-let updateFunctions = [];
-function onUpdate(fn) {
-    updateFunctions.push(fn);
+// let updateFunctions = [];
+/**
+ *
+ * @param {function(id: AnyAirtableID, data: {oldData: object, newData: object})} callback
+ */
+function onUpdate(callback) {
+    emitter.on("update", callback);
+    // updateFunctions.push(fn);
 }
 
 const updateFunction = function(id, data) {
-    updateFunctions.forEach(fn => fn(id, data));
+    emitter.emit("update", id, data);
+    // updateFunctions.forEach(fn => fn(id, data));
 };
 
 async function removeAntiLeak(id, data) {
@@ -111,7 +119,7 @@ const slmnggAttachments = {
     "Map Data": ["image", "big_image", "video", "audio"],
     "Maps": ["image", "big_image"],
     "Log Files": ["log_file"],
-    "Heroes": ["main_image", "recolor_base", "recolor_layers"],
+    "Heroes": ["main_image", "recolor_base", "recolor_layers", "alternate_set_image"],
     "Ad Reads": ["audio", "image"],
     "Tracks": ["file"],
     "Teams": ["icon", "images"],
@@ -200,7 +208,7 @@ function generateLimitedPlayers(longText) {
         parts.forEach(part => {
             let split = part.indexOf("=");
             let key = keyDeAirtable(part.slice(0, split));
-            let val = part.slice(split + 1);
+            let val = part.slice(split + 1).trim();
 
             if (!key || !val) return;
 
@@ -229,6 +237,8 @@ async function set(id, data, options) {
                 if (data[key] === "\n") delete data[key];
             });
         }
+    } else {
+        console.warn("Data set without a table name", id);
     }
     if (options?.eager) {
         // console.log({

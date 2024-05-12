@@ -1,30 +1,35 @@
 <template>
-    <div class="standings" v-if="standings && standings.standings && standings.standings.length" :style="useAutoFontSize ? { 'fontSize': autoFontSize} : {}">
-<!--        <div>{{ event.name }} / {{ stage }} / {{ allMatches.length }} -> {{ stageMatches.length }} ({{ teams.length }} teams)</div>-->
+    <div v-if="standings && standings.standings && standings.standings.length" class="standings" :style="useAutoFontSize ? { 'fontSize': autoFontSize} : {}">
+        <!--        <div>{{ event.name }} / {{ stage }} / {{ allMatches.length }} -> {{ stageMatches.length }} ({{ teams.length }} teams)</div>-->
         <h3 class="top-standings-name text-center d-md-none">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</h3>
         <div class="standings-header d-flex align-items-center">
-            <div class="team-name flex-grow-1 text-left d-none d-md-flex">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</div>
-            <div class="team-name team-code flex-grow-1 text-left d-md-none"></div>
+            <div class="team-name flex-grow-1 text-start d-none d-md-flex">{{ title || (standingsSettings && standingsSettings.title) || stage || 'Team' }}</div>
+            <div class="team-name team-code flex-grow-1 text-start d-md-none"></div>
             <div class="team-stats d-flex">
-                <div class="team-stat text-center" v-for="col in showColumns" :key="col" v-b-tooltip="getColumnText(col).title">
+                <div v-for="col in showColumns" :key="col" v-b-tooltip="getColumnText(col).title" class="team-stat text-center">
                     {{ getColumnText(col).header }}
                 </div>
-<!--                <div class="team-stat text-center">Matches</div>-->
-<!--                <div class="team-stat text-center">Maps</div>-->
-<!--                <div class="team-stat text-center">Map Diff</div>-->
-<!--                <div v-if="useOMW" class="team-stat text-center d-none d-md-block" v-b-tooltip:top="'Opponent Match Winrate'">OMW</div>-->
-<!--                <div class="team-stat text-center">Points</div>-->
+                <!--                <div class="team-stat text-center">Matches</div>-->
+                <!--                <div class="team-stat text-center">Maps</div>-->
+                <!--                <div class="team-stat text-center">Map Diff</div>-->
+                <!--                <div v-if="useOMW" class="team-stat text-center d-none d-md-block" v-b-tooltip:top="'Opponent Match Winrate'">OMW</div>-->
+                <!--                <div class="team-stat text-center">Points</div>-->
             </div>
         </div>
         <div class="teams">
-            <div class="team-group" v-for="(group, i) in standings.standings" :key="i">
-                <div class="team" v-for="team in group" :key="team.id">
-                    <StandingsTeam :team="team" :tie-text="tieText" :showColumns="showColumns" icon-size="w-60" :use-codes="useCodes" />
+            <div v-for="(group, i) in standings.standings" :key="i" class="team-group">
+                <div v-for="team in group" :key="team.id" class="team">
+                    <StandingsTeam
+                        :team="team"
+                        :tie-text="tieText"
+                        :show-columns="showColumns"
+                        icon-size="w-60"
+                        :use-codes="useCodes" />
                 </div>
             </div>
         </div>
-        <div class="warnings flex-center flex-column mt-2 mx-2" v-if="standings && standings.warnings.length">
-            <div class="warning bg-warning text-dark p-1 px-2 mb-1" v-for="warn in standings.warnings" :key="warn">{{ warn }}</div>
+        <div v-if="standings && standings.warnings.length" class="warnings flex-center flex-column mt-2 mx-2">
+            <div v-for="warn in standings.warnings" :key="warn" class="warning bg-warning text-dark p-1 px-2 mb-1">{{ warn }}</div>
         </div>
     </div>
 </template>
@@ -46,6 +51,7 @@ function avg(arr) {
 
 export default {
     name: "Standings",
+    components: { StandingsTeam },
     props: {
         event: Object,
         stage: String,
@@ -55,34 +61,6 @@ export default {
         useCodes: Boolean,
         overrideShowColumns: Array,
         useAutoFontSize: Boolean
-    },
-    components: { StandingsTeam },
-    methods: {
-        getColumnText(col) {
-            /* eslint-disable quote-props */
-            return ({
-                "MatchWinrate": { header: "W%", title: "Match winrate" },
-                "MapWinrate": { header: "MW%", title: "Map winrate" },
-                "OMatchWinrate": { header: "OW%", title: "Opponents' match winrate" },
-                "OMapWinrate": { header: "OMW%", title: "Opponents' map winrate" },
-                "Matches": { header: "Matches", title: "Matches won and lost" },
-                "MatchDiff": { header: "Match Diff", title: "Matches won - matches lost" },
-                "Maps": { header: "Maps", title: "Maps won and lost" },
-                "MapDiff": { header: "Map Diff", title: "Maps won - maps lost" },
-                "ValorantRounds": { header: "RW-RL", title: "Rounds won - rounds lost" },
-                "ValorantRoundDiff": { header: "ΔR", title: "Round diff" }
-            })[col] || {
-                header: "-", title: col
-            };
-
-
-            /* eslint-enable quote-props */
-        },
-        hasColumns(...cols) {
-            // TODO: needs to be either shown columns or has columns? feel like it's getting a little tangled
-            console.log("cols", cols, this.showColumns);
-            return this.showColumns.some(col => cols.includes(col));
-        }
     },
     computed: {
         autoFontSize() {
@@ -95,7 +73,7 @@ export default {
             return clamp(380 / ((teams?.length || 0) + 1.2), 16, 46) + "px";
         },
         allMatches() {
-            if (!this.event || !this.event.matches) return [];
+            if (!this.event?.matches) return [];
             return ReactiveArray("matches", {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -104,12 +82,12 @@ export default {
             })(this.event);
         },
         stageMatches() {
-            if (!this.allMatches || !this.allMatches.length || !this.stage) return [];
+            if (!this.allMatches?.length || !this.stage) return [];
             if (!this.stage) return this.allMatches;
             return this.allMatches.filter(match => match.match_group && match.match_group.toLowerCase() === this.stage.toLowerCase());
         },
         blocks() {
-            if (!this.event || !this.event.blocks) return null;
+            if (!this.event?.blocks) return null;
             try {
                 const blocks = JSON.parse(this.event.blocks);
                 return blocks || null;
@@ -142,7 +120,7 @@ export default {
 
             const teamMap = new Map();
             this.stageMatches.forEach(match => {
-                match.teams && match.teams.forEach(team => {
+                match.teams?.forEach(team => {
                     teamMap.set(team.id, team);
                 });
             });
@@ -190,7 +168,7 @@ export default {
                 // }
 
 
-                if (this.settings && this.settings.points) team.standings.points = 0;
+                if (this.settings?.points) team.standings.points = 0;
                 // get matches here
                 this.stageMatches.forEach(match => {
                     if (!match.teams) return;
@@ -204,9 +182,7 @@ export default {
                     team.standings.played++;
                     if (team.standings.matches) team.standings.matches.played++;
 
-                    if (match.maps) {
-
-                    } else {
+                    if (!match.maps) {
                         team.standings.maps_played += match.score_1 + match.score_2;
                     }
 
@@ -225,8 +201,10 @@ export default {
                         });
                     }
 
-                    if (this.settings && this.settings.points) team.standings.points += (this.settings.points.map_wins * team.standings.map_wins);
-                    if (this.settings && this.settings.points) team.standings.points += (this.settings.points.map_losses * team.standings.map_losses);
+                    if (this.settings?.points) {
+                        team.standings.points += (this.settings.points.map_wins * team.standings.map_wins);
+                        team.standings.points += (this.settings.points.map_losses * team.standings.map_losses);
+                    }
 
                     const winIndex = match.score_1 === match.first_to ? 0 : 1;
                     const winner = match.teams[winIndex];
@@ -235,13 +213,13 @@ export default {
 
                     if (winner.id === team.id) {
                         team.standings.wins++;
-                        if (this.settings && this.settings.points) team.standings.points += this.settings.points.wins;
+                        if (this.settings?.points) team.standings.points += this.settings.points.wins;
 
                         // update win/loss h2h against opponent
                         team.standings.h2h[opponent.id]++;
                     } else {
                         team.standings.losses++;
-                        if (this.settings && this.settings.points) team.standings.points += this.settings.points.losses;
+                        if (this.settings?.points) team.standings.points += this.settings.points.losses;
                         team.standings.h2h[opponent.id]--;
                     }
                     if (!team.standings.h2h_maps[opponent.id]) team.standings.h2h_maps[opponent.id] = 0;
@@ -274,6 +252,30 @@ export default {
                     // console.log(team.standings.opponentWinrates, avg(team.standings.opponentWinrates));
                     team.standings.opponent_winrate = avg(team.standings.opponentWinrates);
                     team.standings.opponent_map_winrate = avg(team.standings.opponentMapWinrates);
+                    return team;
+                });
+            }
+            console.log("preparing standings sort", this.standingsSort);
+            if (["OMatchWinsPoints", "OPoints"].some(s => this.standingsSort.includes(s))) {
+                console.log("preparing opponent points");
+                teams.map(team => {
+                    team.standings.opponentPoints = [];
+                    team.standings.opponentPointsMatchWins = [];
+
+                    this.stageMatches.forEach(match => {
+                        if (!(match.teams || []).some(t => t.code === team.code)) return;
+                        const scores = [match.score_1, match.score_2];
+                        if (!scores.some(score => score === match.first_to)) return; // not finished
+                        const opponent = match.teams.find(t => t.code !== team.code);
+                        if (!opponent) return null;
+                        const localOpponent = teams.find(t => t.code === opponent.code);
+                        team.standings.opponentPoints.push(localOpponent.extra_points || 0);
+                        team.standings.opponentPointsMatchWins.push(localOpponent.standings.wins + (localOpponent.extra_points || 0));
+                    });
+
+                    // console.log(team.standings.opponentWinrates, avg(team.standings.opponentWinrates));
+                    team.standings.opponent_points = team.standings.opponentPoints.reduce((c, v) => c + v, 0);
+                    team.standings.opponent_points_wins = team.standings.opponentPointsMatchWins.reduce((c, v) => c + v, 0);
                     return team;
                 });
             }
@@ -349,6 +351,42 @@ export default {
             //
             //
             // return teams;
+        }
+    },
+    methods: {
+        getColumnText(col) {
+            /* eslint-disable quote-props */
+            return ({
+                "MatchWinrate": { header: "W%", title: "Match winrate" },
+                "MapWinrate": { header: "MW%", title: "Map winrate" },
+                "OMatchWinrate": { header: "OW%", title: "Opponents' match winrate" },
+                "OMapWinrate": { header: "OMW%", title: "Opponents' map winrate" },
+                "Matches": { header: "Matches", title: "Matches won and lost" },
+                "MatchDiff": { header: "Match Diff", title: "Matches won - matches lost" },
+                "Maps": { header: "Maps", title: "Maps won and lost" },
+                "MapDiff": { header: "Map Diff", title: "Maps won - maps lost" },
+                "ValorantRounds": { header: "RW-RL", title: "Rounds won - rounds lost" },
+                "ValorantRoundDiff": { header: "ΔR", title: "Round diff" },
+                "Points": { header: "Points", title: "Team points" },
+                "MatchWins": { header: "Wins", title: "Match wins" },
+                "MatchLosses": { header: "Losses", title: "Match losses" },
+                "MatchDiffPoints": { header: "Match diff", title: "Matches won and lost (+ team points)" },
+                "MatchWinsPoints": { header: "Points", title: "Match wins + team points" },
+                "MatchesPoints": { header: "Summit Sorting", title: "Matches won - matches lost + team points" },
+                "Played": { header: "Played", title: "Matches played" },
+                "OPoints": { header: "Opp Pts", title: "Opponent points" },
+                "OMatchWinsPoints": { header: "Opp Pts", title: "Opponent points + match wins" }
+            })[col] || {
+                header: "-", title: col
+            };
+
+
+            /* eslint-enable quote-props */
+        },
+        hasColumns(...cols) {
+            // TODO: needs to be either shown columns or has columns? feel like it's getting a little tangled
+            console.log("cols", cols, this.showColumns);
+            return this.showColumns.some(col => cols.includes(col));
         }
     }
 };

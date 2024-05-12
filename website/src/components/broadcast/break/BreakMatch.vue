@@ -1,8 +1,8 @@
 <template>
-    <div class="break-match flex-center" :class="{'expanded': expanded}" :data-center="centerShow">
-        <div class="match-next-details" v-if="!expanded">
+    <div class="break-match flex-center" :class="{'expanded': expanded, 'has-scores': hasScore}" :data-center="centerShow">
+        <div v-if="!expanded" class="match-next-details">
             <transition name="fade" mode="out-in">
-                <span :key="match ? match.round : 'empty'">{{ hasFinished ? 'FINAL SCORE:' : 'UP NEXT:'}} {{ match && match.round }}</span>
+                <span :key="match ? match.round : 'empty'">{{ hasFinished ? 'FINAL SCORE:' : 'UP NEXT:' }} {{ match && match.round }}</span>
             </transition>
         </div>
         <!--
@@ -10,27 +10,26 @@
             {{ start }}
         </div>
         -->
-<!--        <transition-group name="fade" mode="out-in" class="match-teams flex-center">-->
+        <!--        <transition-group name="fade" mode="out-in" class="match-teams flex-center">-->
 
 
-        <div class="match-teams flex-center" v-if="match">
-
-            <div class="match-special-event-name" v-if="match.special_event">
+        <div v-if="match" class="match-teams flex-center">
+            <div v-if="match.special_event" class="match-special-event-name">
                 {{ match.custom_name }}
             </div>
 
-                <div class="match-team" v-for="(team, i) in teams" :key="team ? `${team.id}-${team.name}-${team.code}-${i}` : i" :style="{ order: i*2 }">
-                    <div :class="expanded ? 'match-team-name' : 'match-team-code'" v-if="team && expanded" :data-code="team.code">
-                        <span class="industry-align" v-if="team.dummy">{{ team.text }}</span>
-                        <span class="industry-align" v-else-if="expanded && team.split_name" v-html="nbr(team.split_name)"></span>
-                        <span v-else class="industry-align">{{ expanded ? team.name : team.code }}</span>
-                    </div>
-                    <div class="match-team-logo-holder flex-center" :style="teamTheme(team)">
-                        <div class="match-team-logo bg-center" :style="teamLogo(team)"></div>
-                    </div>
-                    <div class="match-team-logo-spacer" v-if="expanded"></div>
+            <div v-for="(team, i) in teams" :key="team ? `${team.id}-${team.name}-${team.code}-${i}` : i" class="match-team" :style="{ order: i*2 }">
+                <div v-if="team && expanded" :class="expanded ? 'match-team-name' : 'match-team-code'" :data-code="team.code">
+                    <span v-if="team.dummy" class="industry-align">{{ team.text }}</span>
+                    <span v-else-if="expanded && team.split_name" class="industry-align" v-html="nbr(team.split_name)"></span>
+                    <span v-else class="industry-align">{{ expanded ? team.name : team.code }}</span>
                 </div>
-            <div class="match-team-center industry-align" v-if="match">
+                <div class="match-team-logo-holder flex-center" :style="teamTheme(team)">
+                    <div class="match-team-logo bg-center" :style="teamLogo(team)"></div>
+                </div>
+                <div v-if="expanded" class="match-team-logo-spacer"></div>
+            </div>
+            <div v-if="match" class="match-team-center industry-align">
                 <div v-if="centerShow === 'scores'" class="center-scores flex-center">
                     <div class="center-score" :style="winCSS(0)" :class="{'win': scores[0] === match.first_to}"><span class="industry-align">{{ scores[0] }}</span></div>
                     <div class="center-dash">-</div>
@@ -39,15 +38,21 @@
                 <div v-if="centerShow === 'time'" class="center-time">{{ start }}</div>
                 <div v-if="centerShow === 'vs'" class="center-vs">vs</div>
             </div>
+            <div v-if="match" class="d-none hidden-extra-data center-scores flex-center">
+                <div class="center-score" :style="winCSS(0)" :class="{'win': scores[0] === match.first_to}"><span class="industry-align">{{ scores[0] }}</span></div>
+                <div class="center-dash">-</div>
+                <div class="center-score" :style="winCSS(1)" :class="{'win': scores[1] === match.first_to}"><span class="industry-align">{{ scores[1] }}</span></div>
+            </div>
+            <div v-if="match" class="d-none hidden-extra-data center-time">{{ start }}</div>
+            <div v-if="match" class="d-none hidden-extra-data center-vs">vs</div>
         </div>
-<!--        </transition-group>-->
+        <!--        </transition-group>-->
 
-        <div class="match-schedule-text w-100 flex-center" v-if="expanded && match.schedule_text">
+        <div v-if="expanded && match.schedule_text" class="match-schedule-text w-100 flex-center">
             <transition name="fade" mode="out-in">
-                <div class="industry-align" :key="match.schedule_text">{{ match.schedule_text }}</div>
+                <div :key="match.schedule_text" class="industry-align">{{ match.schedule_text }}</div>
             </transition>
         </div>
-
     </div>
 </template>
 
@@ -100,14 +105,12 @@ export default {
             return [];
         },
         start() {
-            if (!this.match || !this.match.start) return null;
+            if (!this.match?.start) return null;
             const utc = spacetime(this.match.start);
             const local = utc.goto(this.timezone || "America/New_York");
             return local.format("time");
         },
         hasScore() {
-            // return false;
-            // eslint-disable-next-line no-unreachable
             if (!this.match) return false;
             if (this.match.live) return true;
             return this.scores.some(t => !!t);
@@ -141,7 +144,7 @@ export default {
     },
     methods: {
         teamLogo(team) {
-            if (!team || !team.theme) return {};
+            if (!team?.theme) return {};
             return {
                 ...resizedImage(team.theme, ["small_logo", "default_logo"], "h-100")
             };
@@ -207,7 +210,7 @@ export default {
         font-weight: bold;
         font-size: 0.6em;
         text-transform: uppercase;
-        margin-bottom: .3em;
+        margin: .3em;
         line-height: 1;
         text-align: center;
     }

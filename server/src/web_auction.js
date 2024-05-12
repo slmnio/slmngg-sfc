@@ -29,15 +29,15 @@ function getAuctionData(event) {
 }
 
 
-module.exports = async ({ app, io }) => {
+module.exports = async ({ io }) => {
     console.log("Web auction system loading");
 
 
-    onUpdate((id, { oldData, newData: data }) => {{
+    onUpdate((id, { newData: data }) => {{
         if (!data?.__tableName) return;
         if (data.__tableName === "Events") {
             if (id.startsWith("subdomain-")) return;
-            console.log(id, data?.name);
+            // console.log(id, data?.name);
 
             if (!Auctions.has(id)) {
                 Auctions.set(id, new Auction(data, io, getAuctionData(data)));

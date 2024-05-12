@@ -6,7 +6,17 @@
             <div class="event-icon-holder flex-center">
                 <div class="event-icon bg-center" :style="eventIcon"></div>
             </div>
-            <div class="title" v-if="title" :style="textColor" contenteditable="true">{{ title }}</div>
+            <div v-if="showSchedule" class="schedule-holder d-flex" :class="{'has-title': !!title}">
+                <div v-for="match in schedule" :key="match.id" class="match d-flex">
+                    <ThemeLogo
+                        v-for="team in match.teams"
+                        :key="team.id"
+                        icon-padding="32px"
+                        class="team"
+                        :theme="team.theme" />
+                </div>
+            </div>
+            <div v-if="title" class="title" :style="textColor" contenteditable="true">{{ title }}</div>
         </div>
 
         <div class="event-gradient position-absolute w-100 h-100" :style="gradient">
@@ -19,52 +29,63 @@
 </template>
 
 <script>
-import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { resizedImage } from "@/utils/images";
+import ThemeLogo from "@/components/website/ThemeLogo.vue";
 
 export default {
     name: "EventThumbnailCreator",
-    props: ["broadcast", "title"],
+    components: { ThemeLogo },
+    props: ["broadcast", "title", "showSchedule"],
     data: () => ({
         noStinger: true
     }),
     computed: {
         event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
+            if (!this.broadcast?.event) return null;
             return ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme")
             });
         },
+        schedule() {
+            return (ReactiveRoot(this.broadcast, {
+                schedule: ReactiveArray("schedule", {
+                    teams: ReactiveArray("teams", {
+                        theme: ReactiveThing("theme")
+                    })
+                })
+            })?.schedule || []).filter(m => m.show_on_overlays);
+        },
         eventIcon() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return resizedImage(this.event.theme, ["default_wordmark", "default_logo", "small_logo"], "orig");
         },
         thumbnailBackground() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 backgroundColor: this.event.theme.color_logo_background
             };
         },
         gradient() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 backgroundImage: `linear-gradient(0deg, ${this.event.theme.color_logo_accent},transparent)`
             };
         },
         lowerBar() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 backgroundColor: this.event.theme.color_alt
             };
         },
         textColor() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 color: this.event.theme.color_text_on_logo_background || this.event.theme.color_text_on_theme
             };
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Event Thumbnail | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -118,6 +139,24 @@ export default {
         padding: 2vh 0;
         white-space: pre-wrap;
         text-align: center;
+    }
+
+    .schedule-holder {
+        width: 80%;
+        height: 25%;
+        display: flex;
+        justify-content: center;
+        gap: 5%;
+        margin-bottom: 2%;
+        flex-shrink: 0;
+    }
+    .schedule-holder.has-title {
+        margin-bottom: 1%;
+    }
+
+    .team {
+        height: 100% !important;
+        width: 250px !important;
     }
 
 </style>

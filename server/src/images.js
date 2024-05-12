@@ -144,10 +144,10 @@ async function fullGetURL(attachment, sizeText, sizeData) {
     return await getImage(filename, sizeText);
 }
 
-module.exports = ({ app, cors, Cache, corsHandle }) => {
+module.exports = ({ app, cors, Cache }) => {
 
-    ensureFolder("").then(r => console.log("[images] images folder ensured"));
-    ensureFolder("orig").then(r => console.log("[images] orig folder ensured"));
+    ensureFolder("").then(() => console.log("[images] images folder ensured"));
+    ensureFolder("orig").then(() => console.log("[images] orig folder ensured"));
 
     async function handleImageRequests(req, res) {
 
@@ -272,7 +272,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
             let logo = await Cache.getAttachment(theme.default_logo?.[0]?.id);
 
             if (!logo) return res.status(400).send("No logo to use");
-            let themeColor = theme.color_logo_background || theme.color_theme || "#222222";
+            let themeColor = (theme.color_logo_background || theme.color_theme || "#222222").trim();
 
             // background: logo background
             // centered logo
@@ -288,7 +288,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
 
             let heldImage = await getImage(filename, sizeText);
             if (heldImage) {
-                console.log("[image|theme]", `theme using saved @${size} in ${Date.now() - t}ms`);
+                // console.log("[image|theme]", `theme using saved @${size} in ${Date.now() - t}ms`);
                 return res.sendFile(heldImage);
             }
 
@@ -373,7 +373,7 @@ module.exports = ({ app, cors, Cache, corsHandle }) => {
                     const logo = await Cache.getAttachment(team.theme?.default_logo?.[0]?.id);
                     if (!logo) return null;
                     let filePath = await fullGetURL(logo, "orig", null);
-                    let themeColor = team.theme.color_logo_background || team.theme.color_theme || "#222222";
+                    let themeColor = (team.theme.color_logo_background || team.theme.color_theme || "#222222").trim();
 
                     let resizedLogo = await sharp(filePath).resize({
                         width: halfWidth - padding,

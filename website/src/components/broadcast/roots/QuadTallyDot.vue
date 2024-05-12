@@ -1,9 +1,9 @@
 <template>
     <div class="quad-tally-dot">
-        <TallyDot :client="client" class="mini-dot" :number="1"></TallyDot>
-        <TallyDot :client="client" class="mini-dot" :number="2"></TallyDot>
-        <TallyDot :client="client" class="mini-dot" :number="3"></TallyDot>
-        <TallyDot :client="client" class="mini-dot" :number="4"></TallyDot>
+        <TallyDot :client="client" :align="align" class="mini-dot" :number="1" />
+        <TallyDot :client="client" :align="align" class="mini-dot" :number="2" />
+        <TallyDot :client="client" :align="align" class="mini-dot" :number="3" />
+        <TallyDot :client="client" :align="align" class="mini-dot" :number="4" />
     </div>
 </template>
 
@@ -12,8 +12,8 @@ import TallyDot from "@/components/broadcast/roots/TallyDot.vue";
 
 export default {
     name: "QuadTallyDot",
-    props: ["client"],
     components: { TallyDot },
+    props: ["client", "align"],
     data: () => ({
         noBroadcastStyle: true,
         noStinger: true

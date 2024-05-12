@@ -3,15 +3,47 @@
         <div class="top-holder">
             <TourneyBar :left="broadcast.event && broadcast.event.short" :right="broadcast.subtitle" :event="broadcast.event" />
         </div>
-        <transition-group class="casters flex-center" name="anim-talent">
-            <Caster v-for="(caster, i) in casters" :key="caster.manual ? caster.name : caster.id" :guest="caster" :color="getColor(i)"
-                    :event="event" :disable-video="shouldDisableCasterVideo" :class="{'wide-feed': caster.wide_feed}"
-                    :show-pronouns="showPronouns" :pronouns-on-newline="pronounsOnNewline" />
+        <transition-group class="casters flex-center" tag="div" name="anim-talent">
+            <Caster
+                v-for="(caster, i) in casters"
+                :key="caster.manual ? caster.name : caster.id"
+                :guest="caster"
+                :color="getColor(i)"
+                :event="event"
+                :disable-video="shouldDisableCasterVideo"
+                :class="{'wide-feed': caster.wide_feed}"
+                :show-pronouns="showPronouns"
+                :pronouns-on-newline="pronounsOnNewline" />
         </transition-group>
-        <transition tag="div" class="lower-holder flex-center" mode="out-in" name="break-content">
-            <DeskMatch :broadcast="broadcast" class="w-100" :_match="liveMatch" :theme-color="themeColor" :guests="guests" v-if="liveMatch && !useScoreboard" key="desk-match" />
-            <MatchScoreboard :active="animationActive" class="scoreboard" v-if="liveMatch && useScoreboard" :match="liveMatch" :broadcast="broadcast" key="scoreboard" :animate-on-mount="true" />
+        <transition tag="div" mode="out-in" name="break-content">
+            <DeskMatch
+                v-if="liveMatch && !useScoreboard"
+                key="desk-match"
+                :broadcast="broadcast"
+                class="w-100"
+                :_match="liveMatch"
+                :theme-color="themeColor"
+                :guests="guests" />
+            <MatchScoreboard
+                v-else-if="liveMatch && useScoreboard"
+                key="scoreboard"
+                :active="animationActive"
+                class="scoreboard"
+                :match="liveMatch"
+                :broadcast="broadcast"
+                :animate-on-mount="true" />
         </transition>
+
+        <div class="preload">
+            <DeskMatch
+                v-if="liveMatch"
+                key="desk-match"
+                class="w-100"
+                :broadcast="broadcast"
+                :_match="liveMatch"
+                :theme-color="themeColor"
+                force-mode="Maps" />
+        </div>
     </div>
 </template>
 
@@ -28,12 +60,6 @@ export default {
     name: "DeskOverlay",
     components: { MatchScoreboard, DeskMatch, Caster, TourneyBar },
     props: ["broadcast", "group", "disableCasters", "animationActive"],
-    methods: {
-        getColor(index) {
-            if (!this.deskColors?.length) return this.broadcast?.event?.theme?.color_logo_background || this.broadcast?.event?.theme?.color_theme;
-            return this.deskColors[index % this.deskColors.length];
-        }
-    },
     computed: {
         event() {
             return this.broadcast?.event;
@@ -47,7 +73,10 @@ export default {
             if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
-                    theme: ReactiveThing("theme")
+                    theme: ReactiveThing("theme"),
+                    matches: ReactiveArray("matches", {
+                        teams: ReactiveArray("teams")
+                    })
                 }),
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")
@@ -67,16 +96,18 @@ export default {
             console.log(manualGuests);
             return manualGuests;
         },
-        guests: function() {
-            const guests = (!this.broadcast?.guests) ? [] : ReactiveArray("guests", {
-                player: ReactiveThing("player", {
-                    socials: ReactiveArray("socials")
-                }),
-                theme: ReactiveThing("theme"),
-                prediction_team: ReactiveThing("prediction_team", {
-                    theme: ReactiveThing("theme")
-                })
-            })(this.broadcast);
+        guests() {
+            const guests = (!this.broadcast?.guests)
+                ? []
+                : ReactiveArray("guests", {
+                    player: ReactiveThing("player", {
+                        socials: ReactiveArray("socials")
+                    }),
+                    theme: ReactiveThing("theme"),
+                    prediction_team: ReactiveThing("prediction_team", {
+                        theme: ReactiveThing("theme")
+                    })
+                })(this.broadcast);
 
             return [
                 ...guests,
@@ -111,7 +142,13 @@ export default {
         }
 
     },
-    metaInfo() {
+    methods: {
+        getColor(index) {
+            if (!this.deskColors?.length) return this.broadcast?.event?.theme?.color_logo_background || this.broadcast?.event?.theme?.color_theme;
+            return this.deskColors[index % this.deskColors.length];
+        }
+    },
+    head() {
         return {
             title: `Desk | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -150,14 +187,14 @@ export default {
     .anim-talent-leave-active {
         transition: all .3s ease, opacity .2s ease;
     }
-    .anim-talent-enter, .anim-talent-leave-to {
+    .anim-talent-enter-from, .anim-talent-leave-to {
         /* hide */
         max-width: 0;
         min-width: 0 !important;
         opacity: 0;
         padding: 0 0;
     }
-    .anim-talent-enter-to, .anim-talent-leave {
+    .anim-talent-enter-to, .anim-talent-leave-from {
         /* show */
         opacity: 1;
     }
@@ -211,7 +248,14 @@ export default {
     .caster.wide-feed {
         min-width: var(--caster-width)
     }
-    .caster.wide-feed >>> .caster-frame {
+    .caster.wide-feed:deep(.caster-frame) {
         --oversize: 1% !important;
+    }
+
+    .preload {
+        opacity: 0;
+        max-width: 0;
+        max-height: 0;
+        overflow: hidden;
     }
 </style>

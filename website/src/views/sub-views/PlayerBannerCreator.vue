@@ -1,15 +1,36 @@
 <template>
     <div class="container">
         <h2>Banner Creator (beta)</h2>
-        <b-form-select class="my-1" name="banner" id="" v-model="bannerID" :options="bannerTemplateOptions" />
-        <b-form-select class="my-1" name="customTheme" id="" v-model="customThemeID" :options="playerThings" />
-        <b-form-select class="my-1" name="customText" id="" v-model="customText" :options="textOptions" />
+        <b-form-select
+            id=""
+            v-model="bannerID"
+            class="my-1"
+            name="banner"
+            :options="bannerTemplateOptions" />
+        <b-form-select
+            id=""
+            v-model="customThemeID"
+            class="my-1"
+            name="customTheme"
+            :options="playerThings" />
+        <b-form-select
+            id=""
+            v-model="customText"
+            class="my-1"
+            name="customText"
+            :options="textOptions" />
 
         <div class="canvas-wrapper my-3">
-            <canvas width="1500" height="500" class="banner" ref="canvas"></canvas>
+            <canvas ref="canvas" width="1500" height="500" class="banner"></canvas>
         </div>
 
-        <b-button v-if="customTheme && png" class="no-link-style d-inline-block" :download="filename" target="_blank" :href="png" variant="success">
+        <b-button
+            v-if="customTheme && png"
+            class="no-link-style d-inline-block"
+            :download="filename"
+            target="_blank"
+            :href="png"
+            variant="success">
             <i class="fa-fw fas fa-save"></i> Save
         </b-button>
 
@@ -23,16 +44,12 @@
 <script>
 import { AllBanners } from "@/utils/banners";
 import { resizedImageNoWrap } from "@/utils/images";
-import { BAlert, BButton, BFormSelect } from "bootstrap-vue";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { getAssociatedThemeOptions } from "@/utils/content-utils";
 
 export default {
     name: "PlayerBannerCreator",
     props: ["player"],
-    components: {
-        BButton, BFormSelect, BAlert
-    },
     data: () => ({
         bannerID: 1,
         customThemeID: null,
@@ -148,6 +165,23 @@ export default {
             return `${code} ${this.customText ? this.customText + " " : ""}${this.player?.name || "Gamer"} Banner.png`;
         }
     },
+    methods: {
+        async createBanner() {
+            if (this.selectedBanner && this.customTheme) {
+                this.selectedBanner.customize({
+                    text: this.player?.name || "Gamer",
+                    background: this.customTheme?.theme?.color_logo_background || "#111111",
+                    accent: this.customTheme?.theme?.color_logo_accent || "#66D9FF",
+                    textColor: this.customTheme?.theme?.color_text_on_logo_background,
+                    logo: resizedImageNoWrap(this.customTheme?.theme, ["default_logo"], "h-150"),
+                    subtitle: this.customText
+                });
+                return await this.selectedBanner.drawImage(this.$refs.canvas);
+                // return this.$refs.canvas.toDataURL("image/png"); ;
+            }
+            return null;
+        }
+    },
     watch: {
         customTheme: {
             deep: true,
@@ -166,24 +200,7 @@ export default {
             this.png = await this.createBanner();
         }
     },
-    methods: {
-        async createBanner() {
-            if (this.selectedBanner && this.customTheme) {
-                this.selectedBanner.customize({
-                    text: this.player?.name || "Gamer",
-                    background: this.customTheme?.theme?.color_logo_background || "#111111",
-                    accent: this.customTheme?.theme?.color_logo_accent || "#66D9FF",
-                    textColor: this.customTheme?.theme?.color_text_on_logo_background,
-                    logo: resizedImageNoWrap(this.customTheme?.theme, ["default_logo"], "h-150"),
-                    subtitle: this.customText
-                });
-                return await this.selectedBanner.drawImage(this.$refs.canvas);
-                // return this.$refs.canvas.toDataURL("image/png"); ;
-            }
-            return null;
-        }
-    },
-    beforeDestroy() {
+    beforeUnmount() {
         if (this.$refs.canvas) {
             const context = this.$refs.canvas.getContext("2d");
             context.clearRect(0, 0, this.$refs.canvas.width, this.$refs.canvas.height);

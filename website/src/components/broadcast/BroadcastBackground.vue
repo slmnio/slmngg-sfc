@@ -1,8 +1,8 @@
 <template>
-    <div class="background" v-if="background">
-        <div class="image-background full" v-if="type === 'image'" :style="bg(backgroundURL)"></div>
-        <div class="video-background full flex-center" v-if="type === 'video'">
-            <video :src="backgroundURL" loop autoplay muted />
+    <div v-if="background" class="background">
+        <div v-if="type === 'image'" class="image-background full" :style="bg(backgroundURL)"></div>
+        <div v-if="type === 'video'" class="video-background full flex-center">
+            <video :src="backgroundURL" loop autoplay muted></video>
         </div>
     </div>
 </template>
@@ -37,13 +37,13 @@ export default {
             return types[0];
         }
     },
-    metaInfo() {
+    methods: {
+        bg
+    },
+    head() {
         return {
             title: `Background${this.index ? ` #${this.index}` : ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
-    },
-    methods: {
-        bg
     }
 };
 </script>

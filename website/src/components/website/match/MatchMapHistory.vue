@@ -2,24 +2,24 @@
     <tr class="match-map-history" :class="{ 'scheduled': isScheduled }">
         <td class="map-name" style="width: 200px">
             {{ map.name }}
-            <i class="fa fa-fw fa-check" v-b-tooltip.top="'Scheduled for this match'" v-if="isScheduled"></i>
+            <i v-if="isScheduled" v-b-tooltip.top="'Scheduled for this match'" class="fa fa-fw fa-check"></i>
         </td>
-        <TeamMapStats class="map-team-stats" v-for="(data, ti) in data.stats"
-                      :key="ti" :data="data"/>
+        <TeamMapStats
+            v-for="(data, ti) in data.stats"
+            :key="ti"
+            class="map-team-stats"
+            :show-unplayed-maps="showUnplayedMaps"
+            :data="data" />
     </tr>
 </template>
 
 <script>
 import TeamMapStats from "@/components/website/match/TeamMapStats";
-import { VBTooltip } from "bootstrap-vue";
 
 export default {
     name: "MatchMapHistory",
-    directives: {
-        VBTooltip
-    },
     components: { TeamMapStats },
-    props: ["data", "map"],
+    props: ["data", "map", "showUnplayedMaps"],
     computed: {
         isScheduled() {
             return this.data?.meta?.scheduledForMatch;
@@ -29,7 +29,7 @@ export default {
 </script>
 
 <style scoped>
-    .team-map-stats:last-of-type >>> div {
+    .team-map-stats:last-of-type:deep(div)  {
         flex-direction: row-reverse;
     }
     .match-map-history.scheduled .map-name {

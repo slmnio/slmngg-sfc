@@ -1,0 +1,41 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: lint_build
+
+on:
+  pull_request:
+  push:
+    branches: master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        folder: [website, server]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install pnpm
+      uses: pnpm/action-setup@v3
+      with:
+        version: 9
+    - name: Use Node.js 18.20.2
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.20.2
+        cache: 'pnpm'
+        cache-dependency-path: ./pnpm-lock.yaml
+
+    - name: "${{ matrix.folder }}: install"
+      run: pnpm install
+      working-directory: ./${{ matrix.folder }}
+    - name: "${{ matrix.folder }}: lint"
+      run: pnpm lint
+      working-directory: ./${{ matrix.folder }}
+    - name: "${{ matrix.folder }}: build"
+      run: pnpm build
+      working-directory: ./${{ matrix.folder }}

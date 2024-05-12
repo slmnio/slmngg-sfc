@@ -1,6 +1,6 @@
 <template>
     <div class="event-brackets container-fluid">
-        <div class="bracket-wrapper" v-for="bracket in brackets" :key="bracket.id">
+        <div v-for="bracket in brackets" :key="bracket.id" class="bracket-wrapper">
             <div class="container position-relative">
                 <h1 class="bracket-name mb-3">{{ bracket.name }}</h1>
                 <BracketResolveButton class="resolve-button" :bracket="bracket" />
@@ -23,17 +23,22 @@ export default {
     props: ["event"],
     computed: {
         brackets() {
-            if (!this.event || !this.event.brackets) return [];
-            return ReactiveArray("brackets", {
+            if (!this.event?.brackets) return [];
+            return (ReactiveArray("brackets", {
                 ordered_matches: ReactiveArray("ordered_matches", {
                     teams: ReactiveArray("teams", {
                         theme: ReactiveThing("theme")
                     }),
                     maps: ReactiveArray("maps")
                 })
-            })(this.event);
+            })(this.event)).filter(e => !e?.hide_bracket);
             // return this.event.brackets;
         }
+    },
+    head() {
+        return {
+            title: "Brackets"
+        };
     }
 };
 </script>

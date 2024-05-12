@@ -1,14 +1,29 @@
 <template>
-    <div class="overlay ingame-comms-overlay" v-if="match && match.teams">
+    <div v-if="match && match.teams" class="overlay ingame-comms-overlay">
         <div class="teams" :class="{'flip': match.flip_teams}" :style="{ marginTop: topOffset }">
-            <div class="team" v-for="(team, i) in match.teams" :key="team.id" :style="{ width: teamWidth }" :class="{'left': match.flip_teams ? i === 1 : i === 0}">
-                <ThemeTransition class="listen-in-holder" :duration="250" :theme="team.theme"
-                                 :active="activeTeamIndex === i"
-                                 :start="match.flip_teams ? i === 1 : i === 0 ? 'left' : 'right'"
-                                 :end="match.flip_teams ? i === 1 : i === 0 ? 'right' : 'left'">
+            <div
+                v-for="(team, i) in match.teams"
+                :key="team.id"
+                class="team"
+                :style="{ width: teamWidth }"
+                :class="{'left': match.flip_teams ? i === 1 : i === 0}">
+                <ThemeTransition
+                    class="listen-in-holder"
+                    :duration="250"
+                    :theme="team.theme"
+                    use-fit-content
+                    :active="(activeTeamIndex - 1) === i"
+                    :start="match.flip_teams ? i === 1 : i === 0 ? 'left' : 'right'"
+                    :end="match.flip_teams ? i === 1 : i === 0 ? 'right' : 'left'">
                     <ListenInBug :text="listenInText" :team="team" />
                 </ThemeTransition>
-                <TeamAudio :always-unmuted="forceTeam && activeTeamIndex === i" :team="team" :broadcast="broadcast" :task-key="`team${i+1}`" :ref="`team${i+1}`" :buffer="buffer" />
+                <TeamAudio
+                    :ref="`team${i+1}`"
+                    :always-unmuted="forceTeam && activeTeamIndex === i"
+                    :team="team"
+                    :broadcast="broadcast"
+                    :task-key="`team${i+1}`"
+                    :buffer="buffer" />
             </div>
         </div>
     </div>
@@ -22,8 +37,8 @@ import ThemeTransition from "@/components/broadcast/ThemeTransition";
 
 export default {
     name: "IngameCommsOverlay",
-    props: ["broadcast", "listenInText", "buffer", "forceTeam"],
     components: { ListenInBug, TeamAudio, ThemeTransition },
+    props: ["broadcast", "listenInText", "buffer", "forceTeam"],
     data: () => ({
         socketActiveTeamIndex: null,
         noStinger: true
@@ -36,26 +51,24 @@ export default {
                 })
             });
         },
-        activeTeam() {
-            if (!this.match?.teams?.length || this.activeTeamIndex === null) return;
-            return this.match.teams[this.activeTeamIndex];
-        },
         teamWidth() {
             return `${this.broadcast?.ingame_team_width || 690}px`;
         },
         topOffset() {
-            let num = (this.broadcast?.margin || 0) * 55;
+            let num = Math.floor((this.broadcast?.margin || 0) * 55);
             num += 12; // top of overlay
             num += 48; // bottom of top banner
             num += 12; // top of player boxes
             num += 78; // bottom of player boxes
+            num += 12;
+            num += 4;
             return `${num}px`;
         },
         ignoreSockets() {
             return !!this.forceTeam;
         },
         activeTeamIndex() {
-            return this.forceTeam || (this.socketActiveTeamIndex - 1);
+            return this.forceTeam || (this.socketActiveTeamIndex);
         }
     },
     sockets: {
@@ -65,7 +78,7 @@ export default {
             const teamRef = `team${team}`;
             this.$refs[teamRef]?.[0]?.enable();
 
-            this.socketActiveTeamIndex = team - 1;
+            this.socketActiveTeamIndex = team;
 
             const otherTeamRef = `team${(+!(team - 1)) + 1}`;
             this.$refs[otherTeamRef]?.[0]?.disable();
@@ -91,11 +104,11 @@ export default {
     }
     .teams {
         display: flex;
-        width: 100%;
         justify-content: space-between;
+        margin-left: var(--side-margins, 0);
+        margin-right: var(--side-margins, 0);
     }
     .team {
-        padding: 0 8px;
         display: flex;
     }
     .team.left {

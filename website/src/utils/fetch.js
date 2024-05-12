@@ -4,13 +4,17 @@ import { cleanID } from "@/utils/content-utils";
 async function addToBuffer(id) {
     return store.commit("addToRequestBuffer", id);
 }
+
+/**
+ * @returns {string}
+ */
 export function getDataServerAddress() {
     // console.log("[data server address]", window.location.hostname, process.env.VITE_DATA_SERVER);
     // can override this with .env.development etc
     if (import.meta.env.VITE_DATA_SERVER) return import.meta.env.VITE_DATA_SERVER;
 
     if (import.meta.env.VITE_DEPLOY_MODE === "local") {
-        return `//${window.location.hostname}:8901`;
+        return `http://${window.location.hostname}:8901`;
     }
     return "https://data.slmn.gg";
 }
@@ -35,7 +39,6 @@ export async function fetchThing (id) {
     }
     return addToBuffer(id);
 
-    // eslint-disable-next-line no-unreachable
     // try {
     //     id = cleanID(id);
     //
@@ -140,10 +143,6 @@ export async function getThings(ids) {
     return ids.map(id => getThing(id));
 }
 
-export async function getAndWait(id) {
-
-}
-
 export function getMainDomain(subdomain) {
     try {
         if (subdomain) {
@@ -160,6 +159,10 @@ export function getMainDomain(subdomain) {
     } catch (e) {
         return "https://dev.slmn.gg";
     }
+}
+
+export function isOnMainDomain() {
+    return window.location.origin === getMainDomain();
 }
 
 export function getMainCookieDomain(subdomain) {

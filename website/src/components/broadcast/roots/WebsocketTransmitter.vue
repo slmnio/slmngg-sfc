@@ -9,7 +9,7 @@
         <div v-if="isConnected">
             <i class="fas fa-check-circle"></i> Connected
         </div>
-        <div class="text-center" v-else>
+        <div v-else class="text-center">
             <div>
                 <i class="fas fa-wifi-slash"></i> Not Connected
             </div>
@@ -26,6 +26,7 @@
     </div>
 </template>
 <script>
+import { socket } from "@/socket";
 import OBSWebSocket from "obs-websocket-js";
 
 export default {
@@ -55,7 +56,7 @@ export default {
 
     methods: {
         transmit() {
-            this.$socket.client.emit("obs_data_change", {
+            socket.emit("obs_data_change", {
                 clientName: this.client?.key,
                 previewScene: this.wsPreview,
                 programScene: this.wsProgram
@@ -116,7 +117,7 @@ export default {
             this.connectWs();
         }, 1000);
     },
-    metaInfo() {
+    head() {
         return {
             title: `Websocket Transmitter | ${this.client?.name || this.client?.key || ""}`
         };
@@ -125,7 +126,7 @@ export default {
 </script>
 <style scoped>
 h1 {
-    font-size: 5rem;
+    font-size: 2em;
 }
 
 .websocket-transmitter {
@@ -135,7 +136,7 @@ h1 {
     color: #ffffff;
     display: grid;
     place-items: center;
-    font-size: 4rem;
+    font-size: clamp(10px, 5vw, 25vh);
     font-family: "SLMN-Industry", "Industry", sans-serif;
 }
 
@@ -143,7 +144,7 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 3rem;
+    font-size: 1.5em;
     flex-grow: 1;
     font-weight: bold;
     width: 80vw;
@@ -151,7 +152,7 @@ h1 {
 
 .prod-scenes div {
     border: 3px solid rgba(255, 255, 255, 0.5);
-    padding: 0.5em .25em;
+    padding: 0.2em .25em;
     margin: 0 0.25em;
     background-color: black;
     width: 100%;
@@ -166,16 +167,16 @@ h1 {
 .prod-scenes .prod-preview {
     color: lime;
     border-color: lime;
-    border-radius: .1em;
+    border-radius: .2em;
 }
 
 .prod-scenes .prod-program {
     color: #ff4646;
     border-color: #ff0000;
-    border-radius: .1em;
+    border-radius: .2em;
 }
 
 .error {
-    font-size: 2.5rem;
+    font-size: 2.5em;
 }
 </style>

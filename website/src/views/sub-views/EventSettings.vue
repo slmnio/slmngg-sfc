@@ -76,7 +76,7 @@
                     <td>{{ team._control.get("voice_channel_id") ?? "Not set" }}</td>
                     <td>
                         <ul>
-                            <li v-for="item in fixes.filter(f => !['player_details_updated', 'discord_id_not_found'].includes(f.type) && f.teamID === `rec` + team.id)">
+                            <li v-for="(item, i) in fixes.filter(f => !['player_details_updated', 'discord_id_not_found'].includes(f.type) && f.teamID === `rec` + team.id)" :key="i">
                                 <EventSettingsFix :item="item" :teams="teams" />
                             </li>
                         </ul>

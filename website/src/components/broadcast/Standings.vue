@@ -39,6 +39,7 @@ import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import StandingsTeam from "@/components/broadcast/StandingsTeam";
 import { sortTeamsIntoStandings } from "@/utils/scenarios";
 import { cleanID } from "@/utils/content-utils";
+import { StandingsShowKeys } from "@/utils/standings";
 
 
 function avg(arr) {
@@ -355,33 +356,9 @@ export default {
     },
     methods: {
         getColumnText(col) {
-            /* eslint-disable quote-props */
-            return ({
-                "MatchWinrate": { header: "W%", title: "Match winrate" },
-                "MapWinrate": { header: "MW%", title: "Map winrate" },
-                "OMatchWinrate": { header: "OW%", title: "Opponents' match winrate" },
-                "OMapWinrate": { header: "OMW%", title: "Opponents' map winrate" },
-                "Matches": { header: "Matches", title: "Matches won and lost" },
-                "MatchDiff": { header: "Match Diff", title: "Matches won - matches lost" },
-                "Maps": { header: "Maps", title: "Maps won and lost" },
-                "MapDiff": { header: "Map Diff", title: "Maps won - maps lost" },
-                "ValorantRounds": { header: "RW-RL", title: "Rounds won - rounds lost" },
-                "ValorantRoundDiff": { header: "ΔR", title: "Round diff" },
-                "Points": { header: "Points", title: "Team points" },
-                "MatchWins": { header: "Wins", title: "Match wins" },
-                "MatchLosses": { header: "Losses", title: "Match losses" },
-                "MatchDiffPoints": { header: "Match diff", title: "Matches won and lost (+ team points)" },
-                "MatchWinsPoints": { header: "Points", title: "Match wins + team points" },
-                "MatchesPoints": { header: "Summit Sorting", title: "Matches won - matches lost + team points" },
-                "Played": { header: "Played", title: "Matches played" },
-                "OPoints": { header: "Opp Pts", title: "Opponent points" },
-                "OMatchWinsPoints": { header: "Opp Pts", title: "Opponent points + match wins" }
-            })[col] || {
+            return (StandingsShowKeys)[col] || {
                 header: "-", title: col
             };
-
-
-            /* eslint-enable quote-props */
         },
         hasColumns(...cols) {
             // TODO: needs to be either shown columns or has columns? feel like it's getting a little tangled

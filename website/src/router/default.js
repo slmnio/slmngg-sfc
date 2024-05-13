@@ -61,6 +61,11 @@ export default [
                 component: Learn
             },
             {
+                path: "/guide",
+                alias: ["/guides", "/tools"],
+                redirect: "/learn"
+            },
+            {
                 path: "/learn/guides/observing-tech",
                 component: () => import("@/views/sub-views/guide/observer/ObserverGuideContainer.vue"),
                 children: [
@@ -117,6 +122,14 @@ export default [
                 component: BracketCreator
             }
         ]
+    },
+    {
+        path: "/bracket-creator",
+        redirect: "/tools/bracket-creator"
+    },
+    {
+        path: "/twitch-auth",
+        redirect: "/tools/twitch-auth"
     },
     {
         path: "/broadcast/:broadcastCode",

@@ -47,7 +47,7 @@
 
         <ul>
             <li>
-                <a href="https://borpa.business">List of active SRT feeds</a>
+                <a href="https://borpa.business" target="_blank">List of active SRT feeds <i class="fas fa-external-link ml-1"></i></a>
             </li>
         </ul>
     </div>

@@ -1,28 +1,44 @@
 <template>
-    <div class="container">
-        <b-form-group label="Client">
-            <b-form-input v-model="client" @update="updateClient" />
-            <template #description>
-                <span class="text-white">
-                    Clients identify production staff and will dynamically change your setup to whichever broadcast you're
-                    working on.<br>
-                    <b>Use this if you're creating a setup that will work for any broadcast.</b>
-                </span>
-            </template>
-        </b-form-group>
+    <div class="container d-flex flex-column gap-2">
+        <div class="d-flex mb-2 flex-column flex-md-row">
+            <b-form-group label="Client">
+                <b-form-input
+                    :model-value="client"
+                    :disabled="!(broadcast === '' || !broadcast)"
+                    @update:model-value="(v) => client = cleanString(v)" />
+                <template #description>
+                    <div class="text-white">
+                        Clients identify production staff and will dynamically change your setup to whichever broadcast you're
+                        working on.<br>
+                        <b>Use this if you're creating a personal setup that will work for any broadcast.</b>
+                    </div>
+                    <div v-if="authClient?.key" class="text-white d-flex align-items-center gap-1 mt-1">
+                        Your client key is <b-button variant="primary" size="sm" @click="broadcast = ''; client = authClient.key">{{ authClient.key }}</b-button>
+                    </div>
+                </template>
+            </b-form-group>
 
-        <div class="text-center font-bold">or</div>
+            <div class="text-center font-bold px-4 pt-4">or</div>
 
-        <b-form-group label="Broadcast">
-            <b-form-input v-model="broadcast" :disabled="!(client === '' || !client)" />
-            <template #description>
-                <span class="text-white">
-                    Broadcast keys are locked to specific broadcasts and won't update if you work on a different
-                    broadcast.<br>
-                    <b>Use this if you're creating a setup for a one-off broadcast.</b>
-                </span>
-            </template>
-        </b-form-group>
+            <b-form-group label="Broadcast">
+                <b-form-input
+                    :model-value="broadcast"
+                    :disabled="!(client === '' || !client)"
+                    @update:model-value="(v) => broadcast = cleanString(v)"
+                />
+
+                <template #description>
+                    <div class="text-white">
+                        Broadcast keys are locked to specific broadcasts and won't update if you work on a different
+                        broadcast.<br>
+                        <b>Use this if you're creating a setup for a one-off broadcast.</b>
+                    </div>
+                    <div v-if="authBroadcast?.key" class="text-white d-flex align-items-center gap-1 mt-1">
+                        Your current broadcast key is <b-button variant="primary" size="sm" @click="client = ''; broadcast = authBroadcast.key">{{ authBroadcast.key }}</b-button> ({{ authBroadcast?.name }})
+                    </div>
+                </template>
+            </b-form-group>
+        </div>
 
         <b-form-group label="Profile Type">
             <b-form-select
@@ -108,7 +124,8 @@
 
         <div
             v-if="output"
-            class="p-6 rounded-lg cursor-not-allowed select-none bg-slate-800 text-white overflow-x-scroll">
+            class="p-6 rounded-lg cursor-not-allowed select-none bg-slate-800 text-white">
+            Scenes
             <ul>
                 <li v-for="(scene, i) in JSON.parse(output)?.scene_order" :key="i">{{ scene?.name }}</li>
             </ul>
@@ -129,6 +146,7 @@ import timelessProd from "./collections/timeless_prod.json";
 import prodBeta from "./collections/24.0 prod.json";
 import { useAuthStore } from "@/stores/authStore";
 import { mapState } from "pinia";
+import { ReactiveRoot } from "@/utils/reactive";
 
 const OBS = {
     scene: {
@@ -308,6 +326,10 @@ export default {
     }),
     computed: {
         ...mapState(useAuthStore, {authClient: "client"}),
+        authBroadcast() {
+            if (!this.authClient?.broadcast?.length) return null;
+            return ReactiveRoot(this.authClient?.broadcast?.[0]);
+        },
         output() {
             if (!this.json) return;
             let jsonText = this.json;
@@ -319,30 +341,25 @@ export default {
                 jsonText = jsonText.replaceAll("client/X-CLIENT", `broadcast/${this.broadcast.toLowerCase().trim()}`).replaceAll("X-CLIENT", this.broadcast.toLowerCase().trim());
             }
 
-            const editable = { ...JSON.parse(jsonText) };
+            let editable = {...JSON.parse(jsonText)};
             if (this.selectedJSON?.name === "Observing" && this.selectedKeybinds) {
                 // try keybinds
                 editable.sources.filter(source => source.id === "scene" && source.name.startsWith("POV"))
                     .sort((a, b) => {
-                        const [aNum, bNum] = [a, b].map(x => parseInt(x.name.split(" ").pop()));
+                        let [aNum, bNum] = [a, b].map(x => parseInt(x.name.split(" ").pop()));
                         return (aNum - bNum);
                     })
                     .forEach((scene, i) => {
-                        scene.hotkeys["OBSBasic.SelectScene"] = [{ key: `OBS_KEY_${this.selectedKeybinds.keys[i]}` }];
+                        scene.hotkeys["OBSBasic.SelectScene"] = [{key: `OBS_KEY_${this.selectedKeybinds.keys[i]}`}];
                     });
 
                 if (this.selectedKeybinds.mainRebind) {
-                    editable.sources.find(source => source.id === "scene" && source.name === "Observing").hotkeys["OBSBasic.SelectScene"] = [{ key: `OBS_KEY_${this.selectedKeybinds.mainRebind}` }];
+                    editable.sources.find(source => source.id === "scene" && source.name === "Observing").hotkeys["OBSBasic.SelectScene"] = [{key: `OBS_KEY_${this.selectedKeybinds.mainRebind}`}];
                 }
             }
 
+
             if (this.selectedJSON?.customizable && (this.customisation.length || this.customGFXcount)) {
-                /*
-                For new scenes:
-                - add string name to scene_order
-
-                 */
-
                 const newSources = [];
 
                 const gfxScenes = [];
@@ -353,7 +370,7 @@ export default {
                             url: `https://dev.slmn.gg/client/X-CLIENT/gfx/${i}`,
                             insertInGroup: "GFX"
                         },
-                        ...({ ...globalCustomisationDefault })
+                        ...({...globalCustomisationDefault })
                     });
                 }
                 if (gfxScenes.length) {
@@ -365,14 +382,14 @@ export default {
                         withStinger: false,
                         casterAudio: null,
                         music: null,
-                        background: null
+                        background: null,
                     });
                 }
                 console.log({ gfxScenes });
 
                 const customScenes = [];
 
-                console.log({ customisation: this.customisation });
+                console.log({customisation: this.customisation});
 
                 this.customisation.filter(s => s.scene?.multiple).forEach(parent => {
                     parent.scene.multiple.forEach(child => {
@@ -385,12 +402,12 @@ export default {
                             scene: {
                                 url: child.url,
                                 name: child.name,
-                                insertInGroup: parent.scene.insertInGroup
+                                insertInGroup: parent.scene.insertInGroup,
                             }
                         });
                     });
                 });
-                console.log({ customScenes });
+                console.log({customScenes});
 
                 [
                     ...this.customisation.filter(s => !s.scene?.multiple),
@@ -398,87 +415,96 @@ export default {
                     ...gfxScenes
                 ].forEach(newScene => {
                     if (!newScene.scene) return;
+                    if (editable.scene_order.some(s => s.name === newScene.scene.name)) return console.warn(`Not adding "${newScene.scene.name}" since it already exists`);
 
                     const sceneID = crypto.randomUUID();
                     let sourceIDcounter = 1;
 
                     const scene = {
                         ...({ ...OBS.scene }),
-                        name: newScene.scene.name,
-                        uuid: sceneID,
-                        settings: {
-                            items: []
+                        "name": newScene.scene.name,
+                        "uuid": sceneID,
+                        "settings": {
+                            "items": []
                         }
                     };
 
-                    if (newScene.scene.url) {
-                        const mainSourceID = crypto.randomUUID();
-                        scene.settings.items.push({
-                            ...({ ...OBS.sceneItem }),
-                            name: `Browser - ${newScene.scene.name}`,
-                            source_uuid: mainSourceID,
-                            id: sourceIDcounter++,
-                            private_settings: {
-                                "color-preset": 2
-                            }
-                        });
-                        newSources.push({
-                            ...({ ...OBS.source }),
-                            name: `Browser - ${newScene.scene.name}`,
-                            uuid: mainSourceID,
-                            settings: {
-                                ...OBS.browserSourceSettings,
-                                url: `${newScene.scene.url.replace("X-CLIENT", this.client.toLowerCase().trim())}${newScene.withStinger ? "" : "?stinger=false"}`
-                            }
-                        });
-                    }
+                    /* Order in OBS
+                     * CASTER AUDIO SCENE
+                     * STINGER
+                     * OVERLAY
+                     * MUSIC
+                     * BACKGROUND
+                     */
 
-                    if (!newScene.scene.url?.includes("slmn.gg")) {
-                        // Add a custom stinger
-                        const stingerID = crypto.randomUUID();
-                        scene.settings.items.push({
-                            ...({ ...OBS.sceneItem }),
-                            name: `Stinger - ${newScene.scene.name}`,
-                            source_uuid: stingerID,
-                            id: sourceIDcounter++,
-                            private_settings: {
-                                "color-preset": 2
-                            }
-                        });
-                        newSources.push({
-                            ...({ ...OBS.source }),
-                            name: `Stinger - ${newScene.scene.name}`,
-                            uuid: stingerID,
-                            settings: {
-                                ...OBS.browserSourceSettings,
-                                url: `${"https://dev.slmn.gg/client/X-CLIENT/stinger".replace("X-CLIENT", this.client.toLowerCase().trim())}`
-                            }
-                        });
-                    }
 
                     if (newScene.casterAudio) {
                         const casterAudioScene = editable.sources.find(s => s.name === "Caster Audio Scene" && s.id === "scene");
                         if (casterAudioScene) {
-                            scene.settings.items.push({
+                            scene.settings.items.unshift({
                                 ...({ ...OBS.sceneItem }),
-                                name: "Caster Audio Scene",
-                                source_uuid: casterAudioScene.uuid,
-                                id: sourceIDcounter++,
-                                private_settings: {
+                                "name": "Caster Audio Scene",
+                                "source_uuid": casterAudioScene.uuid,
+                                "id": sourceIDcounter++,
+                                "private_settings": {
                                     "color-preset": 1
                                 }
                             });
                         }
                     }
+                    if (!newScene.scene.url?.includes("slmn.gg")) {
+                        // Add a custom stinger
+                        const stingerID = crypto.randomUUID();
+                        scene.settings.items.unshift({
+                            ...({ ...OBS.sceneItem }),
+                            "name": `Stinger - ${newScene.scene.name}`,
+                            "source_uuid": stingerID,
+                            "id": sourceIDcounter++,
+                            "private_settings": {
+                                "color-preset": 2
+                            }
+                        });
+                        newSources.push({
+                            ...({ ...OBS.source }),
+                            "name": `Stinger - ${newScene.scene.name}`,
+                            "uuid": stingerID,
+                            "settings": {
+                                ...OBS.browserSourceSettings,
+                                "url": `${"https://dev.slmn.gg/client/X-CLIENT/stinger".replace("X-CLIENT", this.client.toLowerCase().trim())}`,
+                            },
+                        });
+                    }
+
+                    if (newScene.scene.url) {
+                        const mainSourceID = crypto.randomUUID();
+                        scene.settings.items.unshift({
+                            ...({ ...OBS.sceneItem }),
+                            "name": `Browser - ${newScene.scene.name}`,
+                            "source_uuid": mainSourceID,
+                            "id": sourceIDcounter++,
+                            "private_settings": {
+                                "color-preset": 2
+                            }
+                        });
+                        newSources.push({
+                            ...({ ...OBS.source }),
+                            "name": `Browser - ${newScene.scene.name}`,
+                            "uuid": mainSourceID,
+                            "settings": {
+                                ...OBS.browserSourceSettings,
+                                "url": `${newScene.scene.url.replace("X-CLIENT", this.client.toLowerCase().trim())}${newScene.withStinger ? "" : "?stinger=false"}`,
+                            },
+                        });
+                    }
                     if (newScene.music) {
                         const musicSource = editable.sources.find(s => s.name === `Music - ${newScene.music}`);
                         if (musicSource) {
-                            scene.settings.items.push({
+                            scene.settings.items.unshift({
                                 ...({ ...OBS.sceneItem }),
-                                name: `Music - ${newScene.music}`,
-                                source_uuid: musicSource.uuid,
-                                id: sourceIDcounter++,
-                                private_settings: {
+                                "name": `Music - ${newScene.music}`,
+                                "source_uuid": musicSource.uuid,
+                                "id": sourceIDcounter++,
+                                "private_settings": {
                                     "color-preset": 4
                                 }
                             });
@@ -487,12 +513,12 @@ export default {
                     if (newScene.background) {
                         const backgroundSource = editable.sources.find(s => s.name === `Background (${newScene.background})`);
                         if (backgroundSource) {
-                            scene.settings.items.push({
+                            scene.settings.items.unshift({
                                 ...({ ...OBS.sceneItem }),
-                                name: `Background (${newScene.background})`,
-                                source_uuid: backgroundSource.uuid,
-                                id: sourceIDcounter++,
-                                private_settings: {
+                                "name": `Background (${newScene.background})`,
+                                "source_uuid": backgroundSource.uuid,
+                                "id": sourceIDcounter++,
+                                "private_settings": {
                                     "color-preset": 5
                                 }
                             });
@@ -502,6 +528,22 @@ export default {
                     newSources.push(scene);
                     console.log(scene);
 
+                    const parentSceneName = newScene.scene.insertAfter || newScene.scene.insertBefore || newScene.scene.insertInGroup;
+                    if (parentSceneName && !editable.scene_order.find(scene => scene.name === `| ---------- ${parentSceneName}`)) {
+                        // no parent name found
+                        newSources.push({
+                            ...({ ...OBS.scene }),
+                            "name": `| ---------- ${parentSceneName}`,
+                            "uuid": crypto.randomUUID(),
+                            "settings": {
+                                "items": []
+                            }
+                        });
+                        editable.scene_order.push({
+                            name: `| ---------- ${parentSceneName}`
+                        });
+                    }
+
                     if (newScene.scene.insertAfter) {
                         editable.scene_order.splice(editable.scene_order.findIndex(s => s.name === newScene.scene.insertAfter) + 1, 0, { name: scene.name });
                     } else if (newScene.scene.insertBefore) {
@@ -509,7 +551,8 @@ export default {
                     } else if (newScene.scene.insertInGroup) {
                         const groupStart = editable.scene_order.findIndex(s => s.name === `| ---------- ${newScene.scene.insertInGroup}`);
                         console.log(groupStart);
-                        const groupEnd = editable.scene_order.findIndex((s, i) => s.name.startsWith("| ----------") && i > groupStart);
+                        let groupEnd = editable.scene_order.findIndex((s, i) => s.name.startsWith("| ----------") && i > groupStart);
+                        if (groupEnd === -1) groupEnd = editable.scene_order.length;
                         editable.scene_order.splice(groupEnd, 0, { name: scene.name });
                     } else {
                         editable.scene_order.push({
@@ -578,12 +621,15 @@ export default {
                 this.customisation[i][key] = val;
             });
         },
-        updateClient() {
-            this.client = this.client
+        cleanString(str) {
+            console.log(str);
+            let diff = str
                 .replace(/ /g, "-")
                 .replace(/[^a-zA-Z0-9-_]/g, "")
                 .toLocaleLowerCase()
                 .trim();
+            console.log(diff);
+            return diff;
         }
     },
     watch: {
@@ -613,5 +659,8 @@ export default {
     display: grid;
     place-items: center;
     border-radius: .2rem;
+}
+.form-control:disabled, .form-select:disabled {
+    opacity: 0.5;
 }
 </style>

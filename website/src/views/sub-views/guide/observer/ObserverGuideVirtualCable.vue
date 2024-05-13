@@ -12,7 +12,7 @@
             autoplay
             loop
             muted
-            height="300"></video>
+            height="328"></video>
 
 
         <p>
@@ -63,7 +63,7 @@
                     autoplay
                     muted
                     loop
-                    height="400"></video>
+                    height="471"></video>
             </b-tab>
         </b-tabs>
 

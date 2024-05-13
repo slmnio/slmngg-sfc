@@ -6,14 +6,11 @@
             <h4 class="alert-heading">Unsupported browser!</h4>
             <p>
                 Unfortunately, your browser doesn't support this feature! Try using Chrome instead (or a browser
-                based on it
-                like Edge).
+                based on it like Edge).
             </p>
         </b-alert>
-
-        <p>Try using Chrome instead (or a browser based on it like Edge)</p>
     </div>
-    <div v-else-if="appStatus === 'idle'">
+    <div v-else-if="appStatus === 'idle'" class="d-flex flex-column gap-2">
         <b-alert :model-value="true" variant="warning">
             Overwatch <strong>must be fully closed</strong> during this! Make sure Battle.net is showing "Play"
             instead of "Playing Now".
@@ -23,13 +20,12 @@
         </p>
         <b-button variant="primary" @click="loadSettings">Load Settings</b-button>
     </div>
-    <div v-else-if="appStatus === 'loaded'">
+    <div v-else-if="appStatus === 'loaded'" class="d-flex flex-column gap-2">
         <b-form-group label="Preset">
             <b-form-radio-group
                 v-model="action"
-                :options="[...presetOptions.map((presetOption) => ({ text: presetOption.name, value: presetOption.id })), { text: `Restore Backup${!hasValidBackup ? ' (Unavailable)' : ''}`, value: 'restore', disabled: !hasValidBackup}]"
-                buttons
                 stacked
+                :options="[...presetOptions.map((presetOption) => ({ text: presetOption.name, value: presetOption.id })), { text: `Restore Backup${!hasValidBackup ? ' (Unavailable)' : ''}`, value: 'restore', disabled: !hasValidBackup}]"
             />
             <template #description>
                 <span class="text-white">

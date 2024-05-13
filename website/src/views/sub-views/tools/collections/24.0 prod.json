@@ -138,7 +138,7 @@
             "name": "Technical Difficulties"
         }
     ],
-    "name": "SLMN.GG 24.1 (X-CLIENT)",
+    "name": "SLMN.GG 24.2.3 (X-CLIENT)",
     "groups": [
         {
             "prev_ver": 503316480,
@@ -498,9 +498,9 @@
             "versioned_id": "wasapi_process_output_capture",
             "settings": {
                 "priority": 2,
-                "window": "#22a-live | BPL - Discord:Chrome_WidgetWin_1:DiscordPTB.exe"
+                "window": "#a-live | BPL - Discord:Chrome_WidgetWin_1:DiscordPTB.exe"
             },
-            "mixers": 255,
+            "mixers": 197,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -529,7 +529,7 @@
             "id": "wasapi_output_capture",
             "versioned_id": "wasapi_output_capture",
             "settings": {},
-            "mixers": 255,
+            "mixers": 197,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -2080,7 +2080,7 @@
                 "width": 1920,
                 "height": 1080
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -2114,7 +2114,7 @@
                 "width": 1920,
                 "height": 1080
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -2149,7 +2149,7 @@
                 "css": "* { background-color: rgba(0, 0, 0, 0) !important; margin: 0px auto; overflow: hidden; }",
                 "url": "https://slmn.io/bpl-white-large.png"
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -2343,7 +2343,7 @@
                 "width": 1920,
                 "height": 1080
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -2384,7 +2384,7 @@
                 "css": "body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; overflow: hidden; }",
                 "reroute_audio": true
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -2570,7 +2570,7 @@
                 "width": 1920,
                 "height": 1080
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -2645,7 +2645,7 @@
                 "width": 1920,
                 "height": 1080
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -2679,7 +2679,7 @@
                 "width": 1920,
                 "height": 1080
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -2713,7 +2713,7 @@
                 "width": 1920,
                 "height": 1080
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -2754,7 +2754,7 @@
                 "css": "body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; overflow: hidden; }",
                 "reroute_audio": true
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -2905,7 +2905,7 @@
                 "width": 1920,
                 "height": 1080
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -2980,7 +2980,7 @@
                 "width": 1920,
                 "height": 1080
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -3055,7 +3055,7 @@
                 "width": 1920,
                 "height": 1080
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -3096,7 +3096,7 @@
                 "css": "body, html { background-color: rgba(0, 0, 0, 0) !important; margin: 0px auto; overflow: hidden; }",
                 "reroute_audio": false
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -3131,7 +3131,7 @@
                 "height": 1080,
                 "css": "body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; overflow: hidden; color: white !important }"
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -6788,10 +6788,10 @@
                 "input": "srt://na.borpa.business:10000?streamid=play/obsdirector&latency=500000",
                 "input_format": "mpegts"
             },
-            "mixers": 255,
+            "mixers": 195,
             "sync": 0,
             "flags": 0,
-            "volume": 1.0,
+            "volume": 0.22387212514877319,
             "balance": 0.5,
             "enabled": true,
             "muted": false,
@@ -6811,7 +6811,7 @@
             },
             "deinterlace_mode": 0,
             "deinterlace_field_order": 0,
-            "monitoring_type": 0,
+            "monitoring_type": 2,
             "private_settings": {}
         },
         {
@@ -7023,10 +7023,10 @@
             "settings": {
                 "device_id": "{0.0.0.00000000}.{8d2283b0-ff07-4f4d-82f9-195cf4768b65}"
             },
-            "mixers": 255,
+            "mixers": 195,
             "sync": 0,
             "flags": 0,
-            "volume": 1.0,
+            "volume": 0.22387212514877319,
             "balance": 0.5,
             "enabled": true,
             "muted": false,
@@ -7261,10 +7261,10 @@
                 "input": "srt://na.borpa.business:10000?streamid=play/replay&latency=500000",
                 "input_format": "mpegts"
             },
-            "mixers": 255,
+            "mixers": 195,
             "sync": 0,
             "flags": 0,
-            "volume": 1.0,
+            "volume": 0.22387212514877319,
             "balance": 0.5,
             "enabled": true,
             "muted": false,
@@ -7284,7 +7284,7 @@
             },
             "deinterlace_mode": 0,
             "deinterlace_field_order": 0,
-            "monitoring_type": 0,
+            "monitoring_type": 2,
             "private_settings": {}
         },
         {
@@ -8919,7 +8919,7 @@
                 "width": 1920,
                 "height": 1080
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -8953,7 +8953,7 @@
                 "height": 1080,
                 "url": "https://dev.slmn.gg/client/X-CLIENT/bug?small=true&title=Be right back"
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -8987,7 +8987,7 @@
                 "height": 1080,
                 "url": "https://dev.slmn.gg/client/X-CLIENT/bug?title=Highlights&stingerText=Highlights"
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -9021,7 +9021,7 @@
                 "height": 1080,
                 "url": "https://dev.slmn.gg/client/X-CLIENT/bug?title=Replay&stingerText=Replay"
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -9055,7 +9055,7 @@
                 "width": 1920,
                 "height": 1080
             },
-            "mixers": 255,
+            "mixers": 193,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -9443,7 +9443,7 @@
         },
         {
             "prev_ver": 503316480,
-            "name": "| ------------",
+            "name": "| ---------- Tools",
             "uuid": "6f4daeae-2586-407a-b1aa-8944d8f2408b",
             "id": "scene",
             "versioned_id": "scene",

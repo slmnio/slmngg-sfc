@@ -100,8 +100,8 @@ importers:
         specifier: ^5.3.3
         version: 5.3.3(@popperjs/core@2.11.8)
       bootstrap-vue-next:
-        specifier: ^0.17.2
-        version: 0.17.5(vue@3.4.27(typescript@5.4.5))
+        specifier: ^0.17.6
+        version: 0.17.6(vue@3.4.27(typescript@5.4.5))
       howler:
         specifier: ^2.2.4
         version: 2.2.4
@@ -926,8 +926,8 @@ packages:
   boolbase@1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
 
-  bootstrap-vue-next@0.17.5:
-    resolution: {integrity: sha512-W7DIcYdTjhuAnJFub+4vgbC8G1oxW5txiFFwnGE+obdfJ8B2xuW+cpOwh2EsdBYE9YGTgAHtZ6uiNGjYFsIohw==}
+  bootstrap-vue-next@0.17.6:
+    resolution: {integrity: sha512-dfZdJEVlpmzVLGJUY15+yWBqC3iMd9iItBwVQ1FRcPcGUoziU45KcdF+YdEMHmRaVuT0VKfC96wpTFTeHrA0Mw==}
     peerDependencies:
       vue: ^3.4.21
 
@@ -3544,7 +3544,7 @@ snapshots:
 
   boolbase@1.0.0: {}
 
-  bootstrap-vue-next@0.17.5(vue@3.4.27(typescript@5.4.5)):
+  bootstrap-vue-next@0.17.6(vue@3.4.27(typescript@5.4.5)):
     dependencies:
       '@floating-ui/vue': 1.0.6(vue@3.4.27(typescript@5.4.5))
       '@vueuse/core': 10.9.0(vue@3.4.27(typescript@5.4.5))

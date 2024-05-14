@@ -56,10 +56,29 @@
                 <p>
                     This is the best option. It'll use less network bandwidth and give you better quality.
                 </p>
-                <li><strong>Rate Control</strong>: CBR</li>
-                <li><strong>Bitrate</strong>: 6000</li>
-                <li><strong>Preset</strong>: P5: Slow (Good Quality)</li>
-                <li><strong>Tuning</strong>: Ultra Low Latency</li>
+
+                <ul>
+                    <li><strong>Rate Control</strong>: CBR</li>
+                    <li><strong>Bitrate</strong>: 6000</li>
+                    <li><strong>Preset</strong>: P5: Slow (Good Quality)</li>
+                    <li><strong>Tuning</strong>: Ultra Low Latency</li>
+                </ul>
+
+                <p>
+                    Leave the rest as default.
+                </p>
+            </b-tab>
+            <b-tab title="AMD HW H.265 (HEVC)">
+                <p>
+                    This is the best option. It'll use more network bandwidth and give you worse quality.
+                </p>
+
+                <ul>
+                    <li><strong>Rate Control</strong>: CBR</li>
+                    <li><strong>Bitrate</strong>: 6000</li>
+                    <li><strong>Preset</strong>: Speed</li>
+                </ul>
+
                 <p>
                     Leave the rest as default.
                 </p>
@@ -69,10 +88,28 @@
                     This is the second-best option. It'll use more network bandwidth and give you worse quality.
                 </p>
 
-                <li><strong>Rate Control</strong>: CBR</li>
-                <li><strong>Bitrate</strong>: 12000</li>
-                <li><strong>Preset</strong>: P5: Slow (Good Quality)</li>
-                <li><strong>Tuning</strong>: Ultra Low Latency</li>
+                <ul>
+                    <li><strong>Rate Control</strong>: CBR</li>
+                    <li><strong>Bitrate</strong>: 12000</li>
+                    <li><strong>Preset</strong>: P5: Slow (Good Quality)</li>
+                    <li><strong>Tuning</strong>: Ultra Low Latency</li>
+                </ul>
+
+                <p>
+                    Leave the rest as default.
+                </p>
+            </b-tab>
+            <b-tab title="AMD HW H.264 (AVC)">
+                <p>
+                    This is the second-best option. It'll use more network bandwidth and give you worse quality.
+                </p>
+
+                <ul>
+                    <li><strong>Rate Control</strong>: CBR</li>
+                    <li><strong>Bitrate</strong>: 12000</li>
+                    <li><strong>Preset</strong>: Speed</li>
+                </ul>
+
                 <p>
                     Leave the rest as default.
                 </p>
@@ -83,15 +120,17 @@
                     It'll stress your CPU a lot and give you worse quality.
                 </p>
 
-                <li><strong>Rate Control</strong>: CBR</li>
-                <li><strong>Bitrate</strong>: 6000 - 12000, depending on what your CPU can handle</li>
-                <li><strong>CPU Usage Preset</strong>: veryfast</li>
-                <li><strong>Tune</strong>: zerolatency</li>
+                <ul>
+                    <li><strong>Rate Control</strong>: CBR</li>
+                    <li><strong>Bitrate</strong>: 6000 - 12000, depending on what your CPU can handle</li>
+                    <li><strong>CPU Usage Preset</strong>: veryfast</li>
+                    <li><strong>Tune</strong>: zerolatency</li>
+                </ul>
+
                 <p>
                     Leave the rest as default.
                 </p>
             </b-tab>
-            <b-tab title="TODO Other" />
         </b-tabs>
 
         <h4>Video</h4>

@@ -49,6 +49,14 @@
         <p>
             At this point you can test out streaming to our server. You can stream to it at any time if you need to test your connection.
         </p>
+
+        <h3>"Zeroing Out"</h3>
+
+        <p>
+            Our package will automatically add little shield icons over players' perspectives when you switch to them.
+            However, if you switch back to free cam, the shield icons will remain. To remove them, you need to press the <kbd>0</kbd> hotkey.
+            You can change this to a different key in the OBS Settings if you want.
+        </p>
     </div>
 </template>
 

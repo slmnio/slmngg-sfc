@@ -50,21 +50,6 @@ export default {
                         type: "account"
                     },
                     {
-                        title: "Achievement Display",
-                        description: "Neither",
-                        type: "account"
-                    },
-                    {
-                        title: "Tips Display",
-                        description: "Off",
-                        type: "account"
-                    },
-                    {
-                        title: "In-Game Challenge UI Notifications",
-                        description: "Off",
-                        type: "account"
-                    },
-                    {
                         title: "Show Capture Play of the Game UI",
                         description: "Off",
                         type: "account"

@@ -29,29 +29,47 @@
         <p>
             Under Interface, set yourself a keybind for pausing the game. It should be something memorable, but not
             something you'll hit by accident.
-            A lot of use use <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>=</kbd> or <kbd>Pause</kbd>.
+            A lot of use use <InputImage type="kb" value="Ctrl" />  <InputImage type="kb" value="Shift" /><InputImage type="kb" value="Plus" />.
         </p>
 
         <h4>Spectate Options</h4>
 
-        <div v-for="option in options">
-            {{ option.name }}
-            <img
-                v-for="button in option.keyboard"
-                :src="`/assets/input_icons/knb/dark/${button}_Key_Dark.png`"
-                height="35">
-            <img
-                v-for="button in option.controller"
-                :src="`/assets/input_icons/xbox/XboxSeriesX_${button}.png`"
-                height="35">
-        </div>
+        <table class="table table-sm table-dark table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>Setting</th>
+                    <th>Keyboard</th>
+                    <th>Controller</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="option in options">
+                    <td>{{ option.name }}</td>
+                    <td class="text-center">
+                        <template v-if="option.keyboard_override">{{ option.keyboard_override }}</template>
+                        <InputImage
+                            v-for="button in option.keyboard"
+                            v-else
+                            :key="button"
+                            type="kb"
+                            :value="button" />
+                    </td>
+                    <td class="text-center">
+                        <InputImage v-for="button in option.controller" :key="button" type="xbox" :value="button" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </template>
 <script>
 import defaultCrosshair from "@/assets/guide/default_crosshair.png";
+import LinkedPlayers from "@/components/website/LinkedPlayers.vue";
+import InputImage from "@/components/website/guide/InputImage.vue";
 
 export default {
     name: "OverwatchSettingsGuideControls",
+    components: { InputImage, LinkedPlayers },
     data: () => ({
         defaultCrosshair,
         options: [
@@ -108,11 +126,13 @@ export default {
             {
                 name: "Decrease Speed / Zoom Out",
                 keyboard: [],
+                keyboard_override: "Scroll Down",
                 controller: ["Dpad_Left"]
             },
             {
                 name: "Increase Speed / Zoom In",
                 keyboard: [],
+                keyboard_override: "Scroll Up",
                 controller: ["Dpad_Right"]
             }
         ]

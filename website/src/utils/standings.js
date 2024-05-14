@@ -117,7 +117,7 @@ export const StandingsShowKeys = {
     "MatchesPoints": {
         header: "Summit Sorting",
         title: "Matches won - matches lost + team points",
-        display: (team) => `${team.standings.wins + (team.extra_points > 0 ? team.extra_points : 0)}-${team.standings.losses + (team.extra_points < 0 ? team.extra_points : 0)}`
+        display: (team) => `${team.standings.wins + (team.extra_points > 0 ? team.extra_points : 0)}-${team.standings.losses + (team.extra_points < 0 ? team.extra_points : 0)}`,
     },
     "OPoints": {
         header: "Opp Pts",

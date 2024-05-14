@@ -8,6 +8,15 @@
             <router-link to="/learn/guides/ow-settings">a separate guide for this</router-link>
             .
         </p>
+
+        <h3>
+            Using the Settings
+        </h3>
+
+        <p>
+            During the settings setup you set a hotkey to <strong>Show Health Bars</strong>. You need to press this hotkey
+            <strong>at the start of every match</strong>, but only after the popup at the bottom of the screen has disappeared.
+        </p>
     </div>
 </template>
 <script>

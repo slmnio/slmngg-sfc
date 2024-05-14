@@ -15,8 +15,8 @@
             <li>
                 <router-link to="/learn/guides/ow-settings">Overwatch Settings Guide</router-link>
             </li>
-            <li>
-                <router-link to="/learn/guides/companion-module">SLMN.GG Companion Module</router-link>
+            <li style="opacity: 0.8">
+                SLMN.GG Companion Module Guide (coming soon)
             </li>
         </ul>
 

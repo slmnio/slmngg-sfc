@@ -17,8 +17,8 @@
             <thead>
                 <tr>
                     <th>Key</th>
-                    <th>Short</th>
-                    <th>Name</th>
+                    <th>Header</th>
+                    <th>Title</th>
                     <th>Description</th>
                 </tr>
             </thead>

@@ -15,7 +15,9 @@
             <li v-if="event.theme" class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
             <li v-if="event.about" class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('about')">About</router-link></li>
             <!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
-            <li v-if="canEditEventSettings" class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('settings')">Settings</router-link></li>
+            <li v-if="canEditEventSettings" class="nav-item ct-passive">
+                <router-link class="nav-link" :to="subLink('settings')" active-class="rl-active">Settings</router-link>
+            </li>
             <ul v-if="event.socials" class="socials d-flex">
                 <li class="nav-item">
                     <Social v-for="social in event.socials" :key="social.id" class="ct-active" :social="social" />
@@ -27,7 +29,7 @@
             </li>
         </SubPageNav>
 
-        <router-view :event="event" />
+        <router-view :event="event" :is-minisite="isMinisite" />
     </div>
 </template>
 

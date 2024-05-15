@@ -1,6 +1,6 @@
 <template>
-    <div v-if="canEditEventSettings" class="event-settings container">
-        <h2>Event Discord Settings</h2>
+    <div v-if="canEditEventSettings" class="event-settings">
+        <!--        <h3>Discord Settings</h3>-->
         <div class="settings">
             <b-form-group
                 label="Server"
@@ -98,7 +98,7 @@ import EventSettingsFix from "@/components/website/EventSettingsFix.vue";
 import { useAuthStore } from "@/stores/authStore";
 
 export default {
-    name: "EventSettings",
+    name: "EventSettingsDiscord",
     components: { EventSettingsFix, CopyTextButton, ThemeLogo },
     props: {
         event: {}

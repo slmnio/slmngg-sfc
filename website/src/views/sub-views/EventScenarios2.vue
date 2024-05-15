@@ -11,7 +11,7 @@
             <!--            </select>-->
 
             <!--            <BFormCheckbox class="mr-3" v-model="showOnlyPossible">Show only possible</BFormCheckbox>-->
-            <BFormCheckbox v-model="showOnlyIncomplete">Show only incomplete</BFormCheckbox>
+            <BFormCheckbox v-model="showOnlyIncomplete">Show only tied scenarios</BFormCheckbox>
             <BFormCheckbox v-model="showCountsAsPercentages">Show counts as percentages</BFormCheckbox>
 
             <!--            <div class="btn btn-secondary" v-if="showCountsAsPercentages" @click="showCountsAsPercentages = false">View as numbers</div>-->
@@ -51,7 +51,7 @@
                         #{{ i + 1 }}
                     </th>
                     <th class="p-2 border-dark incomplete-border" colspan="2">
-                        Incomplete
+                        Tied scenarios
                     </th>
                     <th class="p-2 border-dark incomplete-border">
                         Range
@@ -388,7 +388,7 @@ export default {
                 teamMap[team.code] = i;
             });
             const positions = [];
-            teams.forEach(t => positions.push(0));
+            teams.forEach(() => positions.push(0));
             positions.push(0);
             // positions.push(this.scenarios.incompleteScenarios.length); // last column is incompletes
 
@@ -770,7 +770,7 @@ export default {
             let end;
             pos.forEach((count, i) => {
                 count = count || altPositions?.[i];
-                if (count && !start) start = i;
+                if (count && start == null) start = i;
                 if (count) end = i;
             });
             if (start === end) return `#${start + 1} only`;

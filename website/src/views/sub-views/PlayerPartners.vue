@@ -24,7 +24,7 @@
                     </td>
                     <td>{{ partner.matches }}</td>
                     <td>
-                        {{ formatTime(partner.lastMatch.start, { format: "{day} {date-ordinal} {month} {year}", tz: useSettingsStore().timezone, use24HourTime: useSettingsStore().use24HourTime }) }} -
+                        {{ partner.lastMatch?.start ? formatTime(partner.lastMatch.start, { format: "{day} {date-ordinal} {month} {year}", tz: useSettingsStore().timezone, use24HourTime: useSettingsStore().use24HourTime }) + " - " : '' }}
                         <span v-if="partner.lastMatch?.event">
                             <router-link :to="url('event', partner.lastMatch?.event)">{{ partner.lastMatch?.event?.name || "..." }}</router-link> -
                         </span>
@@ -48,6 +48,7 @@ export default {
     computed: {
         partnerTypes() {
             const types = [];
+            types.push({ value: null, disabled: true, text: "Partner type" });
             if (this.player?.player_relationships?.length) {
                 types.push({ value: { from: "Production", to: "Production" }, text: "Production ↔ Production" });
                 types.push({ value: { from: "Production", to: "Caster" }, text: "Production ↔ Casters" });
@@ -106,7 +107,7 @@ export default {
                 const data = partners.get(id);
                 data.matches++;
 
-                if (new Date(data.lastMatch.start) < new Date(match.start)) {
+                if (match.start && new Date(data.lastMatch.start) < new Date(match.start)) {
                     data.lastMatch = match;
                 }
                 partners.set(id, data);

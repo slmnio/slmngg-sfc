@@ -94,7 +94,7 @@ export default {
         font-size: 6em;
     }
     .control-button.score span {
-        transform: translate(0, -0.09em);
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
     }
     .control-button.score.is-score {
         background-color: var(--theme, red);

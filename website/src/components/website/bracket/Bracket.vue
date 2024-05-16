@@ -40,7 +40,7 @@
                     v-if="showHeaders && column.header"
                     class="header text-center mb-3"
                     :style="logoBackground1(event)">
-                    {{ column.header }}
+                    <div class="industry-align">{{ column.header }}</div>
                 </div>
                 <div class="column-matches flex-grow-1">
                     <BracketMatch

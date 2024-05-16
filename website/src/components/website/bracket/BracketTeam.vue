@@ -12,10 +12,12 @@
                 <div class="team-logo bg-center" :style="teamLogo"></div>
             </div>
             <div v-if="team" class="team-name-holder">
-                <div class="team-name">{{ team.name }}</div>
-                <div class="team-code">{{ team.code }}</div>
+                <div class="team-name industry-align">{{ team.name }}</div>
+                <div class="team-code industry-align">{{ team.code }}</div>
             </div>
-            <div v-if="team && score !== null" class="team-score flex-center" :class="{ 'win': win }">{{ score }}</div>
+            <div v-if="team && score !== null" class="team-score flex-center" :class="{ 'win': win }">
+                <div class="industry-align">{{ score }}</div>
+            </div>
         </div>
     </div>
 </template>
@@ -96,7 +98,6 @@ export default {
     }
     .team-name {
         line-height: 0.92;
-        transform: translate(0, -0.05em);
         /*line-height: 1;*/
         /* transform: var(--overlay-line-height-adjust, translate(0, -0.0925em)); !* industry-align *!*/
 

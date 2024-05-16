@@ -7,7 +7,9 @@
         @mouseover="matchHover"
         @mouseleave="matchEmpty">
         <div class="match-name d-none">{{ match && match.name }}</div>
-        <div v-if="matchNumber" class="match-number" :class="{'lowlight': lowlight}">{{ matchNumber }}</div>
+        <div v-if="matchNumber" class="match-number" :class="{'lowlight': lowlight}">
+            <div class="industry-align">{{ matchNumber }}</div>
+        </div>
         <div class="match-extra-info">
             <div v-if="showBroadcasts && match.stream_code" class="match-stream" :class="{'lowlight': lowlight}">{{ match.stream_code }} stream</div>
             <div v-if="showTimes && friendlyStartTime" class="match-time" :class="{'lowlight': lowlight}">{{ friendlyStartTime }}</div>

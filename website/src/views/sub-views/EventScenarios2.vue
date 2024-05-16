@@ -40,8 +40,7 @@
             <div v-if="activeMatchGroup" class="ml-2">{{ matches?.length }} {{ matches?.length === 1 ? "match" : "matches" }}, {{ incompleteMatches?.length }} to play</div>
         </div>
 
-
-        <table v-if="counts && counts[0] && counts[0].positions" class="table table-bordered text-light mb-3 table-dark w-auto">
+        <table v-if="counts && counts[0] && counts[0].positions" class="table table-bordered text-light table-dark w-auto mb-1">
             <thead>
                 <tr v-if="counts" class="fw-bold">
                     <th class="p-2 border-dark text-end" style="min-width: 8.5em">
@@ -52,9 +51,11 @@
                     </th>
                     <th class="p-2 border-dark incomplete-border" colspan="2">
                         Tied scenarios
+                    <th class="p-2 border-dark incomplete-border">
+                        Tied
                     </th>
                     <th class="p-2 border-dark incomplete-border">
-                        Range
+                        Position range
                     </th>
                     <th v-for="calc in settings?.calculate" :key="JSON.stringify(calc)" class="p-2 border-dark">
                         {{ Object.entries(calc)?.[0]?.join(": ") }}
@@ -77,14 +78,25 @@
                         }"
                         @click="() => showWhen(team.code, posi)"
                     >
-                        <span v-if="showCountsAsPercentages">{{ perc(pos / currentScenarioView.length) }}</span>
-                        <span v-else>{{ pos }}</span>
-                    </td>
-                    <td class="p-2 border-dark text-info" :class="{'incomplete': team.incompletePositions?.length}">
-                        <div v-if="team.incompletePositions?.length">
-                            {{ analyseIncompletePositions(team.incompletePositions) }}
+                        <div class="d-flex flex-column flex-center">
+                            <span v-if="showCountsAsPercentages">{{ perc(pos / currentScenarioView.length) }}</span>
+                            <span v-else>{{ pos }}</span>
+
+                            <span
+                                v-if="showCountsAsPercentages && team?.incompletePositions?.[posi]"
+                                class="incomplete-cell-num text-info">
+                                {{ perc(team?.incompletePositions?.[posi] / currentScenarioView?.length) }}
+                            </span>
+                            <span v-else-if="team?.incompletePositions?.[posi]" class="incomplete-cell-num text-info">
+                                {{ team?.incompletePositions?.[posi] }}
+                            </span>
                         </div>
                     </td>
+                    <!--                    <td class="p-2 border-dark text-info" :class="{'incomplete': team.incompletePositions?.length}">-->
+                    <!--                        <div v-if="team.incompletePositions?.length">-->
+                    <!--                            {{ analyseIncompletePositions(team.incompletePositions) }}-->
+                    <!--                        </div>-->
+                    <!--                    </td>-->
                     <td class="p-2 border-dark incomplete-border" :class="{'text-warning': analyseIncompletePositions(team.positions.slice(0, -1), team.incompletePositions)?.includes('only') }">
                         {{ analyseIncompletePositions(team.positions.slice(0, -1), team.incompletePositions) }}
                     </td>
@@ -96,7 +108,19 @@
             </tbody>
         </table>
 
-        <table v-if="scenarios" class="table table-bordered text-light mb-3 border-dark table-dark w-auto">
+        <div
+            v-if="(currentScenarioView || []).some(s => s.standings?.standings.length !== s.teams.length)"
+            class="d-flex"
+        >
+            <div
+                class="px-2 py-1 mb-1 text-info"
+                style="background-color: #1e4146; font-size: 14px">
+                Small blue numbers show scenarios where teams are still tied after all sorting methods are exhausted.<br>
+                Since they are tied, the positional counts overlap. The total number of tied scenarios per team is displayed in the "Tied" column.
+            </div>
+        </div>
+
+        <table v-if="scenarios" class="table table-bordered text-light mt-3 mb-3 border-dark table-dark w-auto">
             <thead>
                 <tr>
                     <th class="p-2 border-dark"></th>
@@ -343,7 +367,19 @@ export default {
                         score.reverse();
                         winner = m.teams[1];
                     }
-                    outcomes.push({ scores: score, winner, scoreFirstWinner: [m.first_to, (i % m.first_to)] });
+
+                    let valid = true;
+
+                    // check to see if this match is in progress and valid or not
+                    if ([m.score_1, m.score_2].some(m => m > 0)) {
+                        if ((score[0] < m.score_1) || (score[1] < m.score_2)) {
+                            // console.log(`Invalid scenario based on in-progress match - scenario scoreline [${score.join("-")}] is not possible with current match scoreline [${[m.score_1, m.score_2].join("-")}]`);
+                            valid = false;
+                        }
+                    }
+
+
+                    if (valid) outcomes.push({ scores: score, winner, valid, scoreFirstWinner: [m.first_to, (i % m.first_to)] });
                 }
                 return { ...m, outcomes };
             });
@@ -497,7 +533,7 @@ export default {
             const allMatches = this.scenarioMatchesWithOutcomes;
             const matches = allMatches.filter(m => ![m.score_1, m.score_2].includes(m.first_to));
             // const remainingMatches = JSON.stringify(allMatches.filter(m => [m.score_1, m.score_2].includes(m.first_to)));
-            const maxBits = matches.map(m => m.first_to * 2);
+            const maxBits = matches.map(m => m.outcomes.length);
             const scenarioCount = maxBits.reduce((last, curr) => last * curr, 1);
             // const scenarioCount = 1;
             const _json = { teams: JSON.stringify(this.historicalTeams), matches: JSON.stringify(this.matchesForScenarios) };
@@ -737,7 +773,7 @@ export default {
                     if (team.positions[standingIndex] || team.incompletePositions?.[standingIndex]) {
                         // there is counts here
                         if (standingIndex > (calc.top - 1)) {
-                            console.log("Team", team, "has scenarios where they are", standingIndex + 1, "therefore not locked for", calc);
+                            // console.log("Team", team, "has scenarios where they are", standingIndex + 1, "therefore not locked for", calc);
                             invalidated = true;
                         }
                     }
@@ -752,10 +788,10 @@ export default {
 
                         // REMINDER team.positions.length is one higher since last is incomplete
                         if (standingIndex < ((team.positions.length - 1) - calc.bottom)) {
-                            console.log("Team", team, "has scenarios where they are", standingIndex + 1, "therefore not locked for", calc);
+                            // console.log("Team", team, "has scenarios where they are", standingIndex + 1, "therefore not locked for", calc);
                             invalidated = true;
                         } else {
-                            console.warn({ standingIndex, bottom: calc.bottom }, "Team", team, "has scenarios where they are", standingIndex + 1, "therefore not locked for", calc);
+                            // console.warn({ standingIndex, bottom: calc.bottom }, "Team", team, "has scenarios where they are", standingIndex + 1, "therefore not locked for", calc);
                         }
                     }
                 }
@@ -940,6 +976,9 @@ export default {
                             // scoreline is something like 0 X X - X X 0 or X X 0 - 0 X X
                             const smallest = validLeft[0][0].split("-").map(e => parseInt(e)).reduce((a, c) => a + c, 0);
                             const biggest = validLeft[validLeft.length - 1][0].split("-").map(e => parseInt(e)).reduce((a, c) => a + c, 0);
+                            if (smallest === biggest) {
+                                return `Game must go to ${biggest} maps`;
+                            }
                             return `Game must go to ${smallest}-${biggest} maps`;
                         } else {
                             return "~ Something in the middle";
@@ -1052,5 +1091,15 @@ export default {
     }
     .incomplete-border {
         border-left-width: 3px;
+    }
+    .incomplete-cell-num {
+        font-size: .75em;
+        line-height: .75;
+        position: absolute;
+        bottom: -4px;
+    }
+    .cell-num div {
+        position: relative;
+        padding-bottom: 4px;
     }
 </style>

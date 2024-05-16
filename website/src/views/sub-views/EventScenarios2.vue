@@ -47,7 +47,7 @@
                     <th class="p-2 border-dark text-end" style="min-width: 8.5em">
                         {{ showCountsAsPercentages ? `% of ${currentScenarioView.length} scenarios` : `/${currentScenarioView.length} scenarios` }}
                     </th>
-                    <th v-for="(x, i) in (counts[0].positions).slice(0, -1)" :key="i" class="p-2 border-dark">
+                    <th v-for="(x, i) in (counts[0].positions).slice(0, -1)" :key="i" class="p-2 border-dark" :class="tableBorderLine(i)">
                         #{{ i + 1 }}
                     </th>
                     <th class="p-2 border-dark incomplete-border">
@@ -56,7 +56,7 @@
                     <th class="p-2 border-dark incomplete-border">
                         Position range
                     </th>
-                    <th v-for="calc in settings?.calculate" :key="JSON.stringify(calc)" class="p-2 border-dark">
+                    <th v-for="calc in calculate" :key="JSON.stringify(calc)" class="p-2 border-dark">
                         {{ Object.entries(calc)?.[0]?.join(": ") }}
                     </th>
                 </tr>
@@ -73,7 +73,8 @@
                             'bg-warning text-dark': pos !== 0 && pos === currentScenarioView.length,
                             'text-muted': pos === 0,
                             'incomplete': pos !== 0 && posi === team.positions?.length - 1,
-                            'incomplete-border': posi === team.positions?.length - 1
+                            'incomplete-border': posi === team.positions?.length - 1,
+                            [tableBorderLine(posi)]: true
                         }"
                         @click="() => showWhen(team.id, posi)"
                     >
@@ -100,7 +101,7 @@
                         {{ analyseIncompletePositions(team.positions.slice(0, -1), team.incompletePositions) }}
                     </td>
 
-                    <td v-for="calc in settings?.calculate" :key="JSON.stringify(calc)" class="p-2 border-dark text-center" :class="{'text-muted': !locked(calc, team)}">
+                    <td v-for="calc in calculate" :key="JSON.stringify(calc)" class="p-2 border-dark text-center" :class="{'text-muted': !locked(calc, team)}">
                         <span v-if="locked(calc, team)"><i class="fas fa-check-circle"></i></span>
                     </td>
                 </tr>
@@ -119,12 +120,12 @@
             </div>
         </div>
 
-        <table v-if="scenarios" class="table table-bordered text-light mt-3 mb-3 border-dark table-dark w-auto">
+        <table v-if="scenarios && matchCounts?.length" class="table table-bordered text-light mt-3 mb-3 border-dark table-dark w-auto">
             <thead>
                 <tr>
                     <th class="p-2 border-dark"></th>
                     <th
-                        v-for="([scoreline]) in Object.entries(matchCounts?.[0]?.scorelines)"
+                        v-for="([scoreline]) in Object.entries(matchCounts?.[0]?.scorelines || {})"
                         :key="scoreline"
                         class="p-2 border-dark text-center">
                         {{ scoreline }}
@@ -154,7 +155,7 @@
             </tbody>
         </table>
 
-        <table v-if="scenarios" class="table text-white table-dark">
+        <table v-if="scenarios" class="table text-white table-dark mt-3">
             <thead>
                 <tr class="sticky-top bg-dark">
                     <td>#</td>
@@ -562,12 +563,16 @@ export default {
             }
             return null;
         },
+        calculate() {
+            return this.matchGroupData?.calculate || this.settings?.calculate;
+        },
         scenarios() {
             if (!this.matchesForScenarios?.length) return null;
             if (!this.scenarioTeams?.length) return null;
             console.log("teams", this.scenarioTeams);
             const allMatches = this.scenarioMatchesWithOutcomes;
-            const matches = allMatches.filter(m => ![m.score_1, m.score_2].includes(m.first_to));
+            let matches = allMatches.filter(m => ![m.score_1, m.score_2].includes(m.first_to));
+            if (matches.length === 0) matches = allMatches;
             // const remainingMatches = JSON.stringify(allMatches.filter(m => [m.score_1, m.score_2].includes(m.first_to)));
             const maxBits = matches.map(m => m.outcomes.length);
             const scenarioCount = maxBits.reduce((last, curr) => last * curr, 1);
@@ -583,6 +588,7 @@ export default {
             }
 
             // const bitCounter = maxBits.map(() => 0);
+            console.log({ maxBits, matches, scenarioCount });
             const bitCounter = new BitCounter({ bits: maxBits });
 
             for (let i = 0; i < scenarioCount; i++) {
@@ -794,6 +800,29 @@ export default {
         }
     },
     methods: {
+        tableBorderLine(i) {
+            if (!this.calculate?.length) return "";
+            const classes = [];
+            const total = this.scenarioTeams?.length;
+
+            this.calculate.forEach(calc => {
+                if (calc.top && calc.top - 1 === i) {
+                    classes.push("line-top-right");
+                }
+                if (calc.bottom) {
+                    console.log("calc bottom", {
+                        calc,
+                        total,
+                        i,
+                        minus: total - calc.bottom
+                    });
+                }
+                if (calc.bottom && (total - calc.bottom) === i) {
+                    classes.push("line-bottom-left");
+                }
+            });
+            return classes.join(" ");
+        },
         locked(calc, team) {
             // console.log("locked", calc, team);
             const incomplete = team.positions[team.positions.length - 1];
@@ -1142,5 +1171,14 @@ export default {
     .cell-num div {
         position: relative;
         padding-bottom: 4px;
+    }
+    .line-top-right {
+        border-right-color: rgba(255,255,255,0.75) !important;
+    }
+    .line-bottom-right {
+        border-right-color: rgba(220, 53, 69, 0.75) !important;
+    }
+    .line-bottom-left {
+        border-left-color: rgba(220, 53, 69, 0.75) !important;
     }
 </style>

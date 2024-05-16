@@ -76,9 +76,9 @@
                         :key="posi"
                         class="p-2 border-dark cell-num"
                         :class="{
-                            'bg-info selected': manualScenarioFilters.find((f) => f.team === team.id && f.position === posi),
-                            'bg-warning text-dark': pos !== 0 && pos === currentScenarioView.length,
-                            'text-muted': pos === 0,
+                            'selected': manualScenarioFilters.find((f) => f.team === team.id && f.position === posi),
+                            'pos-locked': pos !== 0 && pos === currentScenarioView.length,
+                            'text-low': pos === 0,
                             'incomplete': pos !== 0 && posi === team.positions?.length - 1,
                             'incomplete-border': posi === team.positions?.length - 1,
                             [tableBorderLine(posi)]: true
@@ -108,7 +108,7 @@
                         {{ analyseIncompletePositions(team.positions.slice(0, -1), team.incompletePositions) }}
                     </td>
 
-                    <td v-for="calc in calculate" :key="JSON.stringify(calc)" class="p-2 border-dark text-center" :class="{'text-muted': !locked(calc, team)}">
+                    <td v-for="calc in calculate" :key="JSON.stringify(calc)" class="p-2 border-dark text-center" :class="{'text-low': !locked(calc, team)}">
                         <span v-if="locked(calc, team)"><i class="fas fa-check-circle"></i></span>
                     </td>
                 </tr>
@@ -148,14 +148,14 @@
                         v-for="([scoreline, count]) in Object.entries(match.scorelines)"
                         :key="scoreline"
                         class="p-2 border-dark text-center cell-num"
-                        :class="{'bg-info selected': scorelineFilterHas(match.id, scoreline), 'text-muted': count === 0}"
+                        :class="{'selected': scorelineFilterHas(match.id, scoreline), 'text-low': count === 0}"
                         @click="showMatchScoreline(match.id, scoreline)">
                         {{ count }}
                     </td>
                     <td class="p-2 border-dark fw-bold text-start">{{ match.teams?.[1]?.code }}</td>
                     <td
                         class="p-2 border-dark text-center"
-                        :class="{'text-muted': matchAnalysis(match) === 'No effect'}">
+                        :class="{'text-low': matchAnalysis(match) === 'No effect'}">
                         {{ matchAnalysis(match) }}
                     </td>
                 </tr>
@@ -1163,15 +1163,27 @@ export default {
     td {
         border-bottom: 1px solid #555;
     }
+    .text-low {
+        color: #6c757d
+    }
     .cell-num {
         min-width: 3em;
         text-align: center;
         cursor: pointer;
         user-select: none;
     }
+    .cell-num:hover {
+        background-color: hsl(210, 10%, 28%)
+    }
     .cell-num.selected {
-        background-color: var(--info) !important;
-        color: var(--light) !important;
+        background-color: var(--info);
+        color: var(--light);
+    }
+    .text-low.cell-num.selected {
+        color: var(--light);
+    }
+    .cell-num.selected:hover {
+        background-color: hsl(188, 78%, 45%)
     }
     .standings-entry {
         white-space: pre;
@@ -1179,10 +1191,20 @@ export default {
         line-height: 1;
     }
     td.incomplete {
-        background: rgb(23 162 184 / 25%);
+        background-color: hsl(188, 40%, 20%);
+    }
+    td.incomplete:hover {
+        background-color: hsl(188, 40%, 25%);
     }
     .incomplete-border {
         border-left-width: 3px;
+    }
+    .pos-locked {
+        background-color: var(--warning);
+        color: var(--dark);
+    }
+    .pos-locked:hover {
+        background-color: hsl(45, 100%, 64%);
     }
     .incomplete-cell-num {
         font-size: .75em;
@@ -1198,7 +1220,7 @@ export default {
         padding-bottom: 4px;
     }
     .line-top-right {
-        border-right-color: rgba(255,255,255,0.75) !important;
+        border-right-color: rgba(255,255,255,0.5) !important;
     }
     .line-bottom-right {
         border-right-color: rgba(220, 53, 69, 0.75) !important;

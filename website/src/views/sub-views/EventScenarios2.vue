@@ -13,6 +13,7 @@
             <!--            <BFormCheckbox class="mr-3" v-model="showOnlyPossible">Show only possible</BFormCheckbox>-->
             <BFormCheckbox v-model="showOnlyIncomplete">Show only tied scenarios</BFormCheckbox>
             <BFormCheckbox v-model="showCountsAsPercentages">Show counts as percentages</BFormCheckbox>
+            <BFormCheckbox v-model="showTiesInScenarioFilter">Show ties in scenario filter</BFormCheckbox>
 
             <!--            <div class="btn btn-secondary" v-if="showCountsAsPercentages" @click="showCountsAsPercentages = false">View as numbers</div>-->
             <!--            <div class="btn btn-secondary" v-if="!showCountsAsPercentages" @click="showCountsAsPercentages = true">View as percentages</div>-->
@@ -49,8 +50,6 @@
                     <th v-for="(x, i) in (counts[0].positions).slice(0, -1)" :key="i" class="p-2 border-dark">
                         #{{ i + 1 }}
                     </th>
-                    <th class="p-2 border-dark incomplete-border" colspan="2">
-                        Tied scenarios
                     <th class="p-2 border-dark incomplete-border">
                         Tied
                     </th>
@@ -70,13 +69,13 @@
                         :key="posi"
                         class="p-2 border-dark cell-num"
                         :class="{
-                            'bg-info selected': manualScenarioFilters.find((f) => f.team === team.code && f.position === posi),
+                            'bg-info selected': manualScenarioFilters.find((f) => f.team === team.id && f.position === posi),
                             'bg-warning text-dark': pos !== 0 && pos === currentScenarioView.length,
                             'text-muted': pos === 0,
                             'incomplete': pos !== 0 && posi === team.positions?.length - 1,
                             'incomplete-border': posi === team.positions?.length - 1
                         }"
-                        @click="() => showWhen(team.code, posi)"
+                        @click="() => showWhen(team.id, posi)"
                     >
                         <div class="d-flex flex-column flex-center">
                             <span v-if="showCountsAsPercentages">{{ perc(pos / currentScenarioView.length) }}</span>
@@ -225,6 +224,7 @@ export default {
         showCountsAsPercentages: false,
         showOnlyPossible: true,
         showOnlyIncomplete: false,
+        showTiesInScenarioFilter: true,
         manualScenarioFilters: [],
         manualScorelineFilters: []
     }),
@@ -251,8 +251,44 @@ export default {
 
             if (this.manualScenarioFilters?.length || this.manualScorelineFilters?.length) {
                 scenarios = scenarios.filter(s => {
-                    const scenarioFilter = this.manualScenarioFilters.some(({ team, position }) => {
-                        return s.standings?.standings[position]?.some(t => t.code === team);
+                    const scenarioFilter = this.manualScenarioFilters.some(({ team: teamID, position }) => {
+                        if (s.incomplete) {
+                            console.log("scenario filter is incomplete", { teamID, position, standings: s.standings?.standings, scenario: s });
+
+                            let foundTeam = false;
+                            let standingsIndex = 0;
+                            let teamCount = 0;
+
+                            while (!foundTeam && standingsIndex <= s.standings?.standings.length) {
+                                const standingsGroup = s.standings?.standings[standingsIndex];
+
+                                if (standingsGroup?.length === 1 && standingsGroup?.[0]?.id === teamID) {
+                                    // single team group, and is this team
+
+                                    // console.log(s.i + 1, "Found scenario filter position ", teamCount + 1, "for team", teamID, "filter is", { teamID, position });
+                                    foundTeam = teamCount === position;
+                                    // if (foundTeam) console.log("^^^ this is valid");
+                                } else if (standingsGroup?.length > 1 && standingsGroup.some(_t => _t.id === teamID)) {
+                                    // team is in here, in a tied group
+                                    console.log(s.i + 1, "Found team", teamID, teamID, "in tied group with", standingsGroup?.length, "teams", "Position could be", (teamCount + 1), " -> ", (teamCount + standingsGroup?.length - 1 + 1));
+
+                                    for (let i = teamCount; i < teamCount + (standingsGroup?.length); i++) {
+                                        console.log(s.i + 1, teamID, teamID, "adding incomplete position", i);
+                                    }
+                                    // console.log(s.i + 1, teamCount, standingsGroup?.length - 1);
+
+                                    foundTeam = this.showTiesInScenarioFilter && (position >= teamCount && position <= (teamCount + standingsGroup?.length - 1));
+                                    // if (foundTeam) console.log("^^^ this is valid");
+                                }
+
+                                teamCount += standingsGroup?.length || 0;
+                                standingsIndex++;
+                            }
+
+                            return foundTeam;
+                        } else {
+                            return s.standings?.standings[position]?.some(t => t.id === teamID);
+                        }
                     });
                     const scorelineFilter = this.manualScorelineFilters.some(({ matchID, scoreline }) => {
                         console.log("scoreline filter", s, matchID, scoreline);
@@ -437,7 +473,7 @@ export default {
                 // console.log("scenario", scenario);
                 if (scenario.standings?.standings.length !== scenario.teams.length) {
                     // add to end
-                    console.log("incomplete scenario in count", scenario.i, scenario);
+                    // console.log("incomplete scenario in count", scenario.i, scenario);
                     teams.forEach(t => {
                         // if the team is not in a tie, and nothing above it is in a tie, this position can't change.
                         let standingsIndex = 0;
@@ -451,20 +487,20 @@ export default {
                             if (standingsGroup?.length === 1 && standingsGroup?.[0]?.id === t.id) {
                                 // single team group, and is this team
                                 t.positions[teamCount]++;
-                                console.log(scenario.i + 1, "Setting position", teamCount + 1, "for team", t.code, t.id, "since it is not in a tied group");
+                                // console.log(scenario.i + 1, "Setting position", teamCount + 1, "for team", t.code, t.id, "since it is not in a tied group");
                                 foundTeam = true;
                             } else if (standingsGroup?.length > 1 && standingsGroup.some(_t => _t.id === t.id)) {
                                 // team is in here, in a tied group
-                                console.log(scenario.i + 1, "Found team", t.id, t.code, "in tied group with", standingsGroup?.length, "teams", "Position could be", (teamCount + 1), " -> ", (teamCount + standingsGroup?.length - 1 + 1));
+                                // console.log(scenario.i + 1, "Found team", t.id, t.code, "in tied group with", standingsGroup?.length, "teams", "Position could be", (teamCount + 1), " -> ", (teamCount + standingsGroup?.length - 1 + 1));
 
                                 if (!t.incompletePositions) {
                                     t.incompletePositions = [];
                                 }
                                 for (let i = teamCount; i < teamCount + (standingsGroup?.length); i++) {
-                                    console.log(scenario.i + 1, t.id, t.code, "adding incomplete position", i);
+                                    // console.log(scenario.i + 1, t.id, t.code, "adding incomplete position", i);
                                     t.incompletePositions[i] = (t.incompletePositions[i] || 0) + 1;
                                 }
-                                console.log(scenario.i + 1, t.incompletePositions, teamCount, standingsGroup?.length - 1);
+                                // console.log(scenario.i + 1, t.incompletePositions, teamCount, standingsGroup?.length - 1);
                             }
 
                             teamCount += standingsGroup?.length || 0;
@@ -500,7 +536,7 @@ export default {
                     scorelines
                 };
             });
-            console.log(matchMap);
+            // console.log(matchMap);
             this.currentScenarioView.forEach(scenario => {
                 scenario.outcomes.forEach(match => {
                     if (!matchMap[match.id]) return;
@@ -735,6 +771,7 @@ export default {
                 // if (!scenario.standings.every(s => s.length === 1)) {
                 //     scenario.sorts++;
                 // }
+                scenario.incomplete = scenario.teams?.length !== scenario.standings?.length;
                 scenarios.push(scenario);
                 bitCounter.add();
             }
@@ -758,7 +795,7 @@ export default {
     },
     methods: {
         locked(calc, team) {
-            console.log("locked", calc, team);
+            // console.log("locked", calc, team);
             const incomplete = team.positions[team.positions.length - 1];
 
 
@@ -769,7 +806,7 @@ export default {
                     // if a position has a count, and that position # is HIGHER than calc.top (top 2, has count on #3)
                     // invalidate
 
-                    console.log(team.code, calc, team.positions, team.incompletePositions, team.positions[standingIndex], team.incompletePositions?.[standingIndex]);
+                    // console.log(team.code, calc, team.positions, team.incompletePositions, team.positions[standingIndex], team.incompletePositions?.[standingIndex]);
                     if (team.positions[standingIndex] || team.incompletePositions?.[standingIndex]) {
                         // there is counts here
                         if (standingIndex > (calc.top - 1)) {
@@ -821,6 +858,7 @@ export default {
             return num;
         },
         showWhen(team, position) {
+            console.log("SHOW WHEN", { team, position });
             if (this.filterHas(team, position)) return this.manualScenarioFilters.splice(this.filterIndex(team, position), 1);
             this.manualScenarioFilters.push({ team, position });
         },
@@ -1097,6 +1135,9 @@ export default {
         line-height: .75;
         position: absolute;
         bottom: -4px;
+    }
+    .selected .incomplete-cell-num {
+        color: #ffffffd6 !important;
     }
     .cell-num div {
         position: relative;

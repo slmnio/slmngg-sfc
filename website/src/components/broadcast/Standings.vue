@@ -358,13 +358,25 @@ export default {
             /* eslint-disable quote-props */
             return ({
                 "MatchWinrate": { header: "W%", title: "Match winrate" },
-                "MapWinrate": { header: "MW%", title: "Map winrate" },
+                "MapWinrate": {
+                    header: this.event?.game === "League of Legends" ? "GW%" : "MW%",
+                    title: this.event?.game === "League of Legends" ? "Game winrate" : "Map winrate"
+                },
                 "OMatchWinrate": { header: "OW%", title: "Opponents' match winrate" },
-                "OMapWinrate": { header: "OMW%", title: "Opponents' map winrate" },
+                "OMapWinrate": {
+                    header: this.event?.game === "League of Legends" ? "OGW%" : "OMW%",
+                    title: this.event?.game === "League of Legends" ? "Opponents' game winrate" : "Opponents' map winrate"
+                },
                 "Matches": { header: "Matches", title: "Matches won and lost" },
                 "MatchDiff": { header: "Match Diff", title: "Matches won - matches lost" },
-                "Maps": { header: "Maps", title: "Maps won and lost" },
-                "MapDiff": { header: "Map Diff", title: "Maps won - maps lost" },
+                "Maps": {
+                    header: this.event?.game === "League of Legends" ? "Games" : "Maps",
+                    title: this.event?.game === "League of Legends" ? "Games won and lost" : "Maps won and lost"
+                },
+                "MapDiff": {
+                    header: this.event?.game === "League of Legends" ? "Game diff" : "Map Diff",
+                    title: this.event?.game === "League of Legends" ? "Games won - games lost" : "Maps won - maps lost"
+                },
                 "ValorantRounds": { header: "RW-RL", title: "Rounds won - rounds lost" },
                 "ValorantRoundDiff": { header: "ΔR", title: "Round diff" },
                 "Points": { header: "Points", title: "Team points" },

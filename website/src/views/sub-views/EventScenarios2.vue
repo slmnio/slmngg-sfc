@@ -1,6 +1,6 @@
 <template>
     <div class="event-scenarios container">
-        <h1>Scenarios 2.0</h1>
+        <h2>Foldy Sheet</h2>
 
 
         <div class="form-inline mb-2">
@@ -14,6 +14,7 @@
             <BFormCheckbox v-model="showOnlyIncomplete">Show only tied scenarios</BFormCheckbox>
             <BFormCheckbox v-model="showCountsAsPercentages">Show counts as percentages</BFormCheckbox>
             <BFormCheckbox v-model="showTiesInScenarioFilter">Show ties in scenario filter</BFormCheckbox>
+            <BFormCheckbox v-model="sortTeamsByPerformance">Sort teams by performance</BFormCheckbox>
 
             <!--            <div class="btn btn-secondary" v-if="showCountsAsPercentages" @click="showCountsAsPercentages = false">View as numbers</div>-->
             <!--            <div class="btn btn-secondary" v-if="!showCountsAsPercentages" @click="showCountsAsPercentages = true">View as percentages</div>-->
@@ -28,19 +29,25 @@
         <!--&lt;!&ndash;            {{ scenarios.bits }}&ndash;&gt;-->
         <!--             -&#45;&#45; {{ matchesForHistorical.length }} historical matches added-->
         <!--        </div>-->
-        <div v-if="sortingMethods" class="mb-2">
-            Sorting methods: {{ sortingMethods.join(' / ') }}
+
+
+        <div class="my-3">
+            <div v-if="matchGroups" class="n-nav mb-1 d-flex align-items-center">
+                <b-form-select
+                    id="match-group-selector"
+                    v-model="activeMatchGroup"
+                    name="match-group-selector"
+                    size="sm"
+                    class="w-auto">
+                    <b-form-select-option selected disabled value="null">Select a group</b-form-select-option>
+                    <b-form-select-option v-for="group in matchGroups" :key="group" :value="group">{{ group }}</b-form-select-option>
+                </b-form-select>
+                <div v-if="activeMatchGroup" class="ml-2">{{ matches?.length }} {{ matches?.length === 1 ? "match" : "matches" }}, {{ incompleteMatches?.length }} to play</div>
+            </div>
+            <div v-if="sortingMethods" class="mt-1">
+                Sorting methods: {{ sortingMethods.join(' / ') }}
+            </div>
         </div>
-
-
-        <div v-if="matchGroups" class="n-nav mb-3 d-flex">
-            <select id="match-group-selector" v-model="activeMatchGroup" name="match-group-selector">
-                <option selected disabled value="null">Select a group</option>
-                <option v-for="group in matchGroups" :key="group" :value="group">{{ group }}</option>
-            </select>
-            <div v-if="activeMatchGroup" class="ml-2">{{ matches?.length }} {{ matches?.length === 1 ? "match" : "matches" }}, {{ incompleteMatches?.length }} to play</div>
-        </div>
-
         <table v-if="counts && counts[0] && counts[0].positions" class="table table-bordered text-light table-dark w-auto mb-1">
             <thead>
                 <tr v-if="counts" class="fw-bold">
@@ -62,7 +69,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="team in counts" :key="team.code">
+                <tr v-for="team in sortedCounts" :key="team.code">
                     <td class="p-2 border-dark text-end fw-bold">{{ team.code }}</td>
                     <td
                         v-for="(pos, posi) in team.positions"
@@ -226,6 +233,7 @@ export default {
         showOnlyPossible: true,
         showOnlyIncomplete: false,
         showTiesInScenarioFilter: true,
+        sortTeamsByPerformance: false,
         manualScenarioFilters: [],
         manualScorelineFilters: []
     }),
@@ -522,6 +530,23 @@ export default {
 
 
             return teams;
+        },
+        sortedCounts() {
+            if (!this.sortTeamsByPerformance) return this.counts;
+            return [...this.counts].sort((a,b) => {
+                let index = 0;
+                while (index <= a.positions.length) {
+                    const aPos = a.positions[index] + (a.incompletePositions?.[index] || 0);
+                    const bPos = b.positions[index] + (b.incompletePositions?.[index] || 0);
+                    if (aPos !== bPos) {
+                        return bPos - aPos;
+                    }
+                    index++;
+                }
+                if (a.code > b.code) return 1;
+                if (a.code < b.code) return -1;
+                return 0;
+            });
         },
         matchCounts() {
             const matchMap = {};

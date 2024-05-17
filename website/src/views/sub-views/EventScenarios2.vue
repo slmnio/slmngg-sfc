@@ -362,7 +362,7 @@ export default {
         },
         incompleteMatches() {
             return this.matches.filter(m => {
-                console.log("matches for scenarios", m.first_to, m.score_1, m.score_2, ([m.score_1, m.score_2]).includes(m.first_to));
+                // console.log("matches for scenarios", m.first_to, m.score_1, m.score_2, ([m.score_1, m.score_2]).includes(m.first_to));
                 return !([m.score_1, m.score_2]).includes(m.first_to);
             });
         },
@@ -416,7 +416,14 @@ export default {
                     let valid = true;
 
                     // check to see if this match is in progress and valid or not
-                    if ([m.score_1, m.score_2].some(m => m > 0)) {
+                    if ([m.score_1, m.score_2].some(score => score === m.first_to)) {
+                        // finished
+                        if ((score[0] !== m.score_1) || (score[1] !== m.score_2)) {
+                            // console.log(`Invalid scenario based on completed match - scenario scoreline [${score.join("-")}] is not possible with finished match scoreline [${[m.score_1, m.score_2].join("-")}]`);
+                            valid = false;
+                        }
+
+                    } else if ([m.score_1, m.score_2].some(m => m > 0)) {
                         if ((score[0] < m.score_1) || (score[1] < m.score_2)) {
                             // console.log(`Invalid scenario based on in-progress match - scenario scoreline [${score.join("-")}] is not possible with current match scoreline [${[m.score_1, m.score_2].join("-")}]`);
                             valid = false;
@@ -833,14 +840,6 @@ export default {
             this.calculate.forEach(calc => {
                 if (calc.top && calc.top - 1 === i) {
                     classes.push("line-top-right");
-                }
-                if (calc.bottom) {
-                    console.log("calc bottom", {
-                        calc,
-                        total,
-                        i,
-                        minus: total - calc.bottom
-                    });
                 }
                 if (calc.bottom && (total - calc.bottom) === i) {
                     classes.push("line-bottom-left");

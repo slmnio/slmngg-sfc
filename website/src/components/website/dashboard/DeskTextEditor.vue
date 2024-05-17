@@ -25,7 +25,7 @@
                 v-for="option in noTextDisplayOptions"
                 :key="option?.text"
                 :disabled="processing"
-                :variant="broadcast?.desk_display === option?.text ? 'primary' : 'secondary'"
+                :variant="(broadcast?.desk_display === option?.value?.text) ? 'primary' : 'secondary'"
                 @click="chosenDisplayOption = option?.value; saveData({ mode: 'show' })">
                 {{ option?.text }}
             </b-button>

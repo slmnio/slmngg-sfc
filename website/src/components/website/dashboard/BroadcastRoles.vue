@@ -23,7 +23,7 @@
                             size="sm"
                             :class="{'low-opacity': clientsLoading}"
                             :options="clientOptions"
-                            @keydown.delete="() => $set(formData[role].selected, i-1, null)" />
+                            @keydown.delete="() => formData[role].selected[i-1] = null" />
                     </td>
                     <td style="width: 2em">
                         <b-button class="role-selectable" size="sm" variant="success" @click="formData[role].count++">
@@ -170,8 +170,8 @@ export default {
             deep: true,
             immediate: true,
             handler(newShit, oldShit) {
-                // console.log(data);
-                this.updateData(newShit, oldShit);
+                const [n, o] = [newShit, oldShit].map(x => (x || []).map(r => `${r?.id}-${r?.player?.name}`).join(","));
+                if (n !== o) this.updateData(newShit, oldShit);
             }
         }
     },

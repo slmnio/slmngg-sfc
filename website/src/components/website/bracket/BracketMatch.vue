@@ -11,8 +11,12 @@
             <div class="industry-align">{{ matchNumber }}</div>
         </div>
         <div class="match-extra-info">
-            <div v-if="showBroadcasts && match.stream_code" class="match-stream" :class="{'lowlight': lowlight}">{{ match.stream_code }} stream</div>
-            <div v-if="showTimes && friendlyStartTime" class="match-time" :class="{'lowlight': lowlight}">{{ friendlyStartTime }}</div>
+            <div v-if="showBroadcasts && match.stream_code" class="match-stream" :class="{'lowlight': lowlight}">
+                <div class="industry-align">{{ match.stream_code }} stream</div>
+            </div>
+            <div v-if="showTimes && friendlyStartTime" class="match-time" :class="{'lowlight': lowlight}">
+                <div class="industry-align">{{ friendlyStartTime }}</div>
+            </div>
         </div>
         <div class="match-teams">
             <BracketTeam
@@ -292,10 +296,8 @@ export default {
     .match-number, .match-extra-info > div {
         background: #333;
         text-align: center;
-        padding: 0 .3em .3em;
+        padding: .25em .5em;
         color: white;
-        border: 2px solid transparent;
-        border-bottom: none;
         transition: opacity 150ms, outline-color 150ms;
 
     }

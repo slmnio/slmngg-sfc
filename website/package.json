@@ -14,9 +14,11 @@
     "@vueuse/core": "^10.9.0",
     "@vueuse/router": "^10.9.0",
     "bootstrap": "^5.3.3",
-    "bootstrap-vue-next": "^0.17.2",
+    "bootstrap-vue-next": "^0.17.6",
     "howler": "^2.2.4",
     "image-js": "^0.35.3",
+    "ini": "^4.1.2",
+    "lodash": "^4.17.21",
     "marked": "^12.0.2",
     "notyf": "^3.10.0",
     "obs-websocket-js": "^5.0.2",
@@ -36,10 +38,13 @@
     "youtube-vue3": "^0.1.15"
   },
   "devDependencies": {
+    "@types/ini": "^4.1.0",
+    "@types/lodash": "^4.17.1",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/compiler-sfc": "^3.4.24",
     "@vue/tsconfig": "^0.5.1",
     "unplugin-vue-components": "^0.26.0",
-    "vite": "^5.2.11"
+    "vite": "^5.2.11",
+    "vue-tsc": "^2.0.16"
   }
 }

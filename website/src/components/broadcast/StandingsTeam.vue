@@ -1,6 +1,6 @@
 <template>
     <div class="standings-team d-flex" :data-team-num="team.standings.teamNum" :class="{'team-odd': team.standings.teamNum % 2 === 1, 'team-even': team.standings.teamNum % 2 === 0}">
-        <div class="team-rank flex-shrink-0">{{ tieText && !teamStats["tie_show_number"] ? tieText : teamStats["rank"] }}</div>
+        <div class="team-rank flex-shrink-0">{{ tieText && !team?.standings?.tie_show_number ? tieText : team?.standings?.rank }}</div>
         <ThemeLogo
             class="team-logo flex-shrink-0"
             :theme="team.theme"
@@ -11,8 +11,8 @@
         <router-link v-if="!useCodes" :to="url('team', team)" class="team-name team-code ct-passive flex-grow-1 text-start d-md-none">{{ team.code }}</router-link>
         <router-link v-if="useCodes" :to="url('team', team)" class="team-name team-code ct-passive flex-grow-1 text-start">{{ team.code }}</router-link>
         <div class="team-stats d-flex">
-            <div v-for="(stat, i) in stats" :key="stat + i" class="team-stat text-center" :class="{'d-none d-md-block': ['omw'].includes(stat) }">
-                {{ teamStats[stat] }}
+            <div v-for="(stat, i) in stats" :key="stat + i" class="team-stat text-center">
+                {{ stat.display(team) }}
             </div>
         </div>
     </div>
@@ -21,6 +21,7 @@
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { url } from "@/utils/content-utils";
+import { StandingsShowKeys } from "@/utils/standings";
 
 function diffString(val) {
     if (val === 0) return "±0";
@@ -42,73 +43,8 @@ export default {
             const stats = [];
 
             this.show.forEach(key => {
-                switch (key) {
-                case "MatchWinrate":
-                    stats.push("winrate_text");
-                    break;
-                case "MapWinrate":
-                    stats.push("mapwinrate_text");
-                    break;
-                case "Matches":
-                    stats.push("matches");
-                    break;
-                case "MatchDiff":
-                    stats.push("diff");
-                    break;
-                case "Maps":
-                    stats.push("maps");
-                    break;
-                case "MapDiff":
-                    stats.push("map_diff");
-                    break;
-                case "ValorantRounds":
-                    stats.push("map_rounds");
-                    break;
-                case "ValorantRoundDiff":
-                    stats.push("map_rounds_diff");
-                    break;
-                case "OMatchWinrate":
-                    stats.push("o_match_winrate_text");
-                    break;
-                case "OMapWinrate":
-                    stats.push("o_map_winrate_text");
-                    break;
-                case "Points":
-                    stats.push("points");
-                    break;
-                case "MatchWins":
-                    stats.push("wins");
-                    break;
-                case "MatchLosses":
-                    stats.push("losses");
-                    break;
-                case "MatchDiffPoints":
-                    stats.push("diff_points");
-                    break;
-                case "MatchWinsPoints":
-                    stats.push("wins_points");
-                    break;
-                case "MatchesPoints":
-                    stats.push("matches_points");
-                    break;
-                case "Played":
-                    stats.push("played");
-                    break;
-                case "OPoints":
-                    stats.push("opponent_points");
-                    break;
-                case "OMatchWinsPoints":
-                    stats.push("opponent_points_wins");
-                    break;
-                default:
-                    stats.push("empty");
-                }
+                stats.push(StandingsShowKeys[key] || StandingsShowKeys["Empty"]);
             });
-
-            // stats.push("matches");
-            // stats.push("maps");
-            // stats.push("map_diff");
-
             return stats;
         },
         teamStats() {

@@ -15,6 +15,7 @@ import ProfilePage from "@/views/ProfilePage";
 import TwitchAuthScopeSelector from "@/components/website/TwitchAuthScopeSelector";
 import BracketCreator from "@/views/BracketCreator.vue";
 import NotFoundPage from "@/views/NotFoundPage";
+import Learn from "@/views/Learn.vue";
 
 export default [
     {
@@ -56,14 +57,112 @@ export default [
                 component: Authenticator
             },
             {
-                path: "/twitch-auth",
+                path: "/learn",
+                component: () => import("@/views/sub-views/guide/LearnWrapper.vue"),
+                children: [
+                    {
+                        path: "",
+                        component: Learn
+                    },
+                    {
+                        path: "broadcast-routes",
+                        name: "broadcast-routes",
+                        component: () => import("@/views/sub-views/tools/ToolProdRoutes.vue")
+                    },
+                    {
+                        path: "standings",
+                        name: "standings",
+                        component: () => import("@/views/sub-views/tools/ToolStandings.vue")
+                    },
+                ],
+            },
+            {
+                path: "/guide",
+                alias: ["/guides", "/tools"],
+                redirect: "/learn"
+            },
+            {
+                path: "/learn/guides",
+                component: () => import("@/views/sub-views/guide/LearnWrapper.vue"),
+                props: () => ({ subtitle: "Guides" }),
+                children: [
+                    {
+                        path: "observing-tech",
+                        component: () => import("@/views/sub-views/guide/observer/ObserverGuideContainer.vue"),
+                        children: [
+                            { path: "", component: () => import("@/views/sub-views/guide/observer/ObserverGuideIntro.vue"), name: "observing-tech-guide" },
+                            { path: "virtual-cable", component: () => import("@/views/sub-views/guide/observer/ObserverGuideVirtualCable.vue"), name: "observing-tech-virtual-cable" },
+                            { path: "obs-setup", component: () => import("@/views/sub-views/guide/observer/ObserverGuideObsSetup.vue"), name: "observing-tech-obs-setup" },
+                            { path: "obs-scenes", component: () => import("@/views/sub-views/guide/observer/ObserverGuideObsScenes.vue"), name: "observing-tech-obs-scenes" },
+                            { path: "overwatch-settings", component: () => import("@/views/sub-views/guide/observer/ObserverGuideOverwatchSettings.vue"), name: "observing-tech-overwatch-settings" },
+                        ]
+                    },
+                    {
+                        path: "overwatch-settings",
+                        component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideContainer.vue"),
+                        children: [
+                            { path: "", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideIntro.vue"), name: "overwatch-settings" },
+                            { path: "tool", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideTool.vue"), name: "overwatch-settings-tool" },
+                            { path: "video", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideVideo.vue"), name: "overwatch-settings-video" },
+                            { path: "sound", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideSound.vue"), name: "overwatch-settings-sound" },
+                            { path: "controls", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideControls.vue"), name: "overwatch-settings-controls" },
+                            { path: "gameplay", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideGameplay.vue"), name: "overwatch-settings-gameplay" },
+                            { path: "social", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideSocial.vue"), name: "overwatch-settings-social" },
+                            { path: "a11y", component: () => import("@/views/sub-views/guide/ow-settings/OverwatchSettingsGuideAccessibility.vue"), name: "overwatch-settings-a11y" }
+                        ]
+                    },
+                    {
+                        path: "companion-module",
+                        component: () => import("@/views/sub-views/guide/companion-module/CompanionModuleGuideContainer.vue"),
+                        children: [
+                            { path: "", component: () => import("@/views/sub-views/guide/companion-module/CompanionModuleGuideIntro.vue"), name: "companion-module" }
+                        ]
+                    },
+                ],
+            },
+            {
+                path: "/tools",
+                component: () => import("@/views/sub-views/guide/LearnWrapper.vue"),
+                props: () => ({ subtitle: "Tools" }),
+                children: [
+                    {
+                        path: "obs-scene-collections",
+                        name: "obs-scene-collections",
+                        component: () => import("@/views/sub-views/tools/ToolObsSceneCollections.vue")
+                    },
+                    {
+                        path: "/tools/overwatch-settings-switcher",
+                        name: "overwatch-settings-switcher",
+                        component: () => import("@/views/sub-views/tools/ToolOWProfileShell.vue")
+                    },
+
+                ]
+            },
+            {
+                path: "/tools/twitch-auth",
+                name: "twitch-auth",
                 component: TwitchAuthScopeSelector
             },
             {
-                path: "/bracket-creator",
+                path: "/tools/bracket-creator",
+                name: "bracket-creator",
                 component: BracketCreator
             }
         ]
+    },
+    {
+        path: "/bracket-creator",
+        redirect: "/tools/bracket-creator"
+    },
+    {
+        path: "/twitch-auth",
+        redirect: "/tools/twitch-auth"
+    },
+    {
+        path: "/scenes",
+        redirect: {
+            name: "observing-tech-obs-scenes"
+        }
     },
     {
         path: "/broadcast/:broadcastCode",

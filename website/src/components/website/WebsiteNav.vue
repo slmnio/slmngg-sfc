@@ -36,6 +36,7 @@
                     <router-link active-class="active" class="nav-link" to="/events">Events</router-link>
                     <router-link active-class="active" class="nav-link" to="/teams">Teams</router-link>
                     <router-link active-class="active" class="nav-link" to="/players">Players</router-link>
+                    <router-link active-class="active" class="nav-link" to="/learn">Learn</router-link>
                     <router-link v-if="isAuthenticated" active-class="active" class="nav-link" to="/profile">Profile</router-link>
                     <router-link v-if="isProduction" active-class="active" class="nav-link" to="/dashboard">Dashboard</router-link>
                     <a v-if="productionClient?.key" target="_blank" class="nav-link" :href="`//dev.slmn.gg/client/${productionClient?.key}/tally-viewer`">Tally <i class="far fa-external-link ml-1"></i></a>

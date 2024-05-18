@@ -1,7 +1,7 @@
 <template>
     <div class="bracket-creator">
         <div class="container">
-            <h1>Bracket Creator</h1>
+            <LearnTitleChip title="Tools" subtitle="Bracket Creator" />
 
 
             <div class="presets mb-3">
@@ -167,10 +167,11 @@
 
 <script>
 import Bracket from "@/components/website/bracket/Bracket.vue";
+import LearnTitleChip from "@/components/website/guide/LearnTitleChip.vue";
 
 export default {
     name: "BracketCreator",
-    components: { Bracket },
+    components: { LearnTitleChip, Bracket },
     data: () => ({
         brackets: [
             {

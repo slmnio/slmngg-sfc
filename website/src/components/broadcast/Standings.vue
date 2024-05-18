@@ -24,6 +24,7 @@
                         :tie-text="tieText"
                         :show-columns="showColumns"
                         icon-size="w-60"
+                        :game="event?.game"
                         :use-codes="useCodes" />
                 </div>
             </div>
@@ -356,7 +357,7 @@ export default {
     },
     methods: {
         getColumnText(col) {
-            return (StandingsShowKeys)[col] || {
+            return (StandingsShowKeys(this.event?.game))[col] || {
                 header: "-", title: col
             };
         },

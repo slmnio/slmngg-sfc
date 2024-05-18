@@ -177,7 +177,7 @@ export default {
     components: { LearnTitleChip },
     computed: {
         standingsShow() {
-            return StandingsShowKeys;
+            return StandingsShowKeys();
         }
     },
     head() {

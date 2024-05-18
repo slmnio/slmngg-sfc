@@ -32,7 +32,7 @@ function diffString(val) {
 export default {
     name: "StandingsTeam",
     components: { ThemeLogo },
-    props: ["team", "tieText", "showColumns", "iconSize", "useCodes"],
+    props: ["team", "tieText", "showColumns", "iconSize", "useCodes", "game"],
     data: () => ({
         // stats: ["diff", "map_diff"/*, "points" */]
 
@@ -43,7 +43,7 @@ export default {
             const stats = [];
 
             this.show.forEach(key => {
-                stats.push(StandingsShowKeys[key] || StandingsShowKeys["Empty"]);
+                stats.push(StandingsShowKeys(this.game)[key] || StandingsShowKeys(this.game)["Empty"]);
             });
             return stats;
         },

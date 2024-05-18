@@ -2,11 +2,9 @@
     <!--    <transition name="ingame-team-anim">-->
     <ThemeTransition
         v-if="loaded"
-        :key="`${team.id}-${right ? '1':'0'}`"
         class="ingame-team-holder"
         :class="{'right': right, 'left': !right}"
         :duration="500"
-        :transition-key="`${team.id}-${right ? '1':'0'}`"
         :use-fit-content="true"
         :active="active"
         :theme="_theme"

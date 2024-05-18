@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <h1>Broadcast Routes</h1>
+        <LearnTitleChip subtitle="Broadcast Routes" />
 
         <p>
             All routes start with <code>/broadcast/{broadcastKey}</code> or <code>/client/{clientKey}</code>.
@@ -85,8 +85,11 @@
 
 <script>
 
+import LearnTitleChip from "@/components/website/guide/LearnTitleChip.vue";
+
 export default {
     name: "ToolProdRoutes",
+    components: { LearnTitleChip },
     data: () => ({
         groups: [
             {

@@ -5,8 +5,7 @@
         </h2>
         <p>
             The last step is configuring your Overwatch settings. We have
-            <router-link to="/learn/guides/ow-settings">a separate guide for this</router-link>
-            .
+            <router-link :to="{ name: 'overwatch-settings' }">a separate guide for this</router-link>.
         </p>
 
         <h3>

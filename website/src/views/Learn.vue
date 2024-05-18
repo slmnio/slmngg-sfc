@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <h1>SLMN.GG Learn</h1>
+        <LearnTitleChip style="font-size: 1.5em;" subtitle="Beta" />
 
         <p>
             Welcome to SLMN.GG Learn! This is a list of all resources we use for running our productions.
@@ -10,38 +10,45 @@
 
         <ul>
             <li>
-                <router-link to="/learn/guides/observing-tech">Observer Tech Guide</router-link>
+                <router-link :to="{ name: 'observing-tech-guide' }">Observer Tech Guide</router-link>
             </li>
             <li>
-                <router-link to="/learn/guides/ow-settings">Overwatch Settings Guide</router-link>
+                <router-link :to="{ name: 'overwatch-settings' }">Overwatch Settings Guide</router-link>
             </li>
             <li style="opacity: 0.8">
                 SLMN.GG Companion Module Guide (coming soon)
+                <!-- <router-link :to="{ name: 'companion-module' }">SLMN.GG Companion Module Guide</router-link> -->
             </li>
         </ul>
+
 
         <h2>Tools</h2>
 
         <ul>
             <li>
-                <router-link to="/tools/ow-settings">Overwatch Settings Switcher</router-link>
+                <router-link :to="{ name: 'overwatch-settings-switcher' }">Overwatch Settings Switcher</router-link>
             </li>
             <li>
-                <router-link to="/tools/obs-scene-collections">OBS Scene Collections</router-link>
+                <router-link :to="{ name: 'obs-scene-collections' }">OBS Scene Collections</router-link>
             </li>
             <li>
-                <router-link to="/tools/broadcast-routes">Broadcast Routes</router-link>
+                <router-link :to="{ name: 'bracket-creator' }">Bracket Creator</router-link>
             </li>
             <li>
-                <router-link to="/tools/standings">Standings</router-link>
-            </li>
-            <li>
-                <router-link to="/tools/bracket-creator">Bracket Creator</router-link>
-            </li>
-            <li>
-                <router-link to="/tools/twitch-auth">Connect Twitch channel to SLMN.GG</router-link>
+                <router-link :to="{ name: 'twitch-auth' }">Connect Twitch channel to SLMN.GG</router-link>
             </li>
         </ul>
+
+        <h2>Reference</h2>
+        <ul>
+            <li>
+                <router-link :to="{ name: 'broadcast-routes' }">Broadcast Routes</router-link>
+            </li>
+            <li>
+                <router-link :to="{ name: 'standings' }">Standings</router-link>
+            </li>
+        </ul>
+
 
         <h2>Quick Links</h2>
 
@@ -54,7 +61,10 @@
 </template>
 <script lang="ts">
 
+import LearnTitleChip from "@/components/website/guide/LearnTitleChip.vue";
+
 export default {
-    name: "Learn"
+    name: "Learn",
+    components: {LearnTitleChip}
 };
 </script>

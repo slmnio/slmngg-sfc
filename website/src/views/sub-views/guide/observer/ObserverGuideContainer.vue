@@ -1,22 +1,22 @@
 <template>
     <div class="container">
-        <h1>Observer Tech Guide</h1>
+        <LearnTitleChip subtitle="Observer Tech Guide" />
 
         <SubPageNav class="my-2">
             <li class="nav-item ct-passive">
-                <router-link class="nav-link" to="/learn/guides/observing-tech">1. Overview</router-link>
+                <router-link class="nav-link" :to="{ name: 'observing-tech-guide' }">1. Overview</router-link>
             </li>
             <li class="nav-item ct-passive">
-                <router-link class="nav-link" to="/learn/guides/observing-tech/virtual-cable">2. Virtual Cable</router-link>
+                <router-link class="nav-link" :to="{ name: 'observing-tech-virtual-cable' }">2. Virtual Cable</router-link>
             </li>
             <li class="nav-item ct-passive">
-                <router-link class="nav-link" to="/learn/guides/observing-tech/obs-setup">3. OBS Setup</router-link>
+                <router-link class="nav-link" :to="{ name: 'observing-tech-obs-setup' }">3. OBS Setup</router-link>
             </li>
             <li class="nav-item ct-passive">
-                <router-link class="nav-link" to="/learn/guides/observing-tech/obs-scenes">4. OBS Scenes</router-link>
+                <router-link class="nav-link" :to="{ name: 'observing-tech-obs-scenes' }">4. OBS Scenes</router-link>
             </li>
             <li class="nav-item ct-passive">
-                <router-link class="nav-link" to="/learn/guides/observing-tech/ow-settings">5. Overwatch Settings</router-link>
+                <router-link class="nav-link" :to="{ name: 'observing-tech-overwatch-settings' }">5. Overwatch Settings</router-link>
             </li>
         </SubPageNav>
         <router-view />
@@ -25,10 +25,12 @@
 <script>
 
 import SubPageNav from "@/components/website/SubPageNav.vue";
+import LearnTitleChip from "@/components/website/guide/LearnTitleChip.vue";
 
 export default {
     name: "ObserverGuideContainer",
     components: {
+        LearnTitleChip,
         SubPageNav
     },
 

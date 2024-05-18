@@ -8,7 +8,7 @@
                 {{ tab.alert }}
             </b-alert>
 
-            <div v-for="setting in tab.settings">
+            <div v-for="setting in tab.settings" :key="setting.title">
                 <b class="mr-1">
                     <i v-if="setting.type === 'file'" class="fa fa-file mx-1"></i>
                     <i v-else-if="setting.type === 'account'" class="fa fa-user mx-1"></i>

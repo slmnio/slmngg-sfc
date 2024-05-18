@@ -33,7 +33,7 @@ export default {
         updateWidth(isAfterTick) {
             const big = this.$refs.big;
             const small = this.$slots.default?.()?.[0]?.el || big?.__vnode?.children?.[0]?.children?.[0]?.el || big?.__vnode?.children?.[0]?.el;
-            console.log({ big, small });
+            // console.log({ big, small });
 
             if (!big?.getBoundingClientRect || !small?.getBoundingClientRect) return;
 

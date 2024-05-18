@@ -8,14 +8,12 @@
 
         <section>
             <h3>Download and Install the Virtual Audio Cable</h3>
-
             <video
                 :src="cableInstall"
                 autoplay
                 loop
                 muted
-                height="328"></video>
-
+                height="498"></video>
 
             <p>
                 Download <a href="https://vb-audio.com/Cable/" target="_blank">VB-Audio Cable</a> and extract the ZIP file.

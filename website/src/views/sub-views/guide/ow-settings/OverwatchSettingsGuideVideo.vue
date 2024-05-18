@@ -126,7 +126,7 @@ export default {
             },
             {
                 title: "Broadcast Margins",
-                alert: "Broadcast Margins are an important setting that can only be changed in the settings file. Our tool will automatically set these for you.",
+                alert: "Broadcast Margins are an important setting that can only be changed in the settings file. The tool will automatically set these for you.",
                 settings: [
                     {
                         title: "Broadcast Margin Top",

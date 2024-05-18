@@ -1,5 +1,6 @@
 <template>
     <div class="container d-flex flex-column gap-2">
+        <LearnTitleChip title="Tools" subtitle="Scene Collections" />
         <div class="d-flex mb-2 flex-column flex-md-row">
             <b-form-group label="Client">
                 <b-form-input
@@ -40,95 +41,109 @@
             </b-form-group>
         </div>
 
-        <b-form-group label="Profile Type">
-            <b-form-select
-                v-model="selectedJSON"
-                :options="jsons.map((_json) => ({value: _json, text: _json.name}))"
-                :disabled="client === '' && broadcast === ''" />
-        </b-form-group>
+        <div class="row">
+            <div class="col-8 d-flex flex-column gap-2">
+                <b-form-group label="Profile Type">
+                    <b-form-select
+                        v-model="selectedJSON"
+                        :options="jsons.map((_json) => ({value: _json, text: _json.name}))"
+                        :disabled="client === '' && broadcast === ''" />
+                </b-form-group>
 
-        <b-form-group v-if="selectedJSON && selectedJSON.name === 'Observing'" label="Keybinds">
-            <b-form-select
-                v-model="selectedKeybinds"
-                :options="observingKeybinds.map((keybind) => ({value: keybind, text: keybind.name}))" />
-        </b-form-group>
+                <b-form-group v-if="selectedJSON && selectedJSON.name === 'Observing'" label="Keybinds">
+                    <b-form-select
+                        v-model="selectedKeybinds"
+                        :options="observingKeybinds.map((keybind) => ({value: keybind, text: keybind.name}))" />
+                </b-form-group>
 
-        <div v-if="selectedJSON && selectedJSON.name === 'Observing' && selectedKeybinds" class="d-flex gap-2">
-            <div v-for="i in 6" :key="i" :style="{backgroundColor: '#2563eb', opacity: i === 6 ? '0.7': '1'}" class="keybind">
-                {{ selectedKeybinds.keys[i - 1] }}
-            </div>
-            <div v-for="i in 6" :key="i" :style="{backgroundColor: '#ef4444', opacity: i === 6 ? '0.7': '1'}" class="keybind">
-                {{ selectedKeybinds.keys[i + 5] }}
-            </div>
-        </div>
+                <div v-if="selectedJSON && selectedJSON.name === 'Observing' && selectedKeybinds" class="d-flex gap-2 mt-2">
+                    <div
+                        v-for="i in 6"
+                        :key="i"
+                        :style="{backgroundColor: '#2563eb', opacity: i === 6 ? '0.7': '1'}"
+                        class="keybind">
+                        {{ selectedKeybinds.keys[i - 1] }}
+                    </div>
+                    <div
+                        v-for="i in 6"
+                        :key="i"
+                        :style="{backgroundColor: '#ef4444', opacity: i === 6 ? '0.7': '1'}"
+                        class="keybind">
+                        {{ selectedKeybinds.keys[i + 5] }}
+                    </div>
+                </div>
 
-        <div v-if="selectedJSON?.customizable">
-            <h2 class="text-lg bold">Customisation</h2>
+                <div v-if="selectedJSON?.customizable">
+                    <h3 class="text-lg bold">Customisation</h3>
 
-            <div v-for="(row, i) in customisation" :key="i">
-                <div class="d-flex gap-3 align-items-center">
-                    <b-form-group label="Scene Type">
-                        <b-form-select
-                            v-model="customisation[i].scene"
-                            :options="customScenes.map((scene) => ({value: scene, text: scene.name}))" />
-                    </b-form-group>
+                    <div v-for="(row, i) in customisation" :key="i">
+                        <div class="d-flex gap-3 align-items-center">
+                            <b-form-group label="Scene Type">
+                                <b-form-select
+                                    v-model="customisation[i].scene"
+                                    :options="customScenes.map((scene) => ({value: scene, text: scene.name}))" />
+                            </b-form-group>
 
-                    <!-- eslint-disable-next-line no-irregular-whitespace -->
-                    <b-form-group label="​">
-                        <!-- There's a zero-width space here so that all the form groups align -->
-                        <b-form-checkbox v-model="customisation[i].withStinger">
-                            {{ row.scene?.url && !row.scene.url?.includes('slmn.gg') ? 'Extra stinger' : 'Stinger' }}
-                        </b-form-checkbox>
+                            <!-- eslint-disable-next-line no-irregular-whitespace -->
+                            <b-form-group label="​">
+                                <!-- There's a zero-width space here so that all the form groups align -->
+                                <b-form-checkbox v-model="customisation[i].withStinger">
+                                    {{
+                                        row.scene?.url && !row.scene.url?.includes("slmn.gg") ? "Extra stinger" : "Stinger"
+                                    }}
+                                </b-form-checkbox>
 
-                        <b-form-checkbox v-model="customisation[i].casterAudio">
-                            Caster Audio
-                        </b-form-checkbox>
-                    </b-form-group>
+                                <b-form-checkbox v-model="customisation[i].casterAudio">
+                                    Caster Audio
+                                </b-form-checkbox>
+                            </b-form-group>
 
-                    <b-form-group label="Background">
-                        <b-form-select
-                            v-model="customisation[i].background"
-                            :options="['Desk', 'Break', null].map((bg) => ({value: bg, text: bg ? `${bg} background` : 'No background'}))" />
-                    </b-form-group>
-                    <b-form-group label="Music">
-                        <b-form-select
-                            v-model="customisation[i].music"
-                            :options="['Desk', 'Break', null].map((bg) => ({value: bg, text: bg ? `${bg} music` : 'No music'}))" />
-                    </b-form-group>
+                            <b-form-group label="Background">
+                                <b-form-select
+                                    v-model="customisation[i].background"
+                                    :options="['Desk', 'Break', null].map((bg) => ({value: bg, text: bg ? `${bg} background` : 'No background'}))" />
+                            </b-form-group>
+                            <b-form-group label="Music">
+                                <b-form-select
+                                    v-model="customisation[i].music"
+                                    :options="['Desk', 'Break', null].map((bg) => ({value: bg, text: bg ? `${bg} music` : 'No music'}))" />
+                            </b-form-group>
 
-                    <!-- eslint-disable-next-line no-irregular-whitespace -->
-                    <b-form-group label="​">
-                        <!-- There's a zero-width space here so that all the form groups align -->
-                        <b-button variant="danger" @click="customisation.splice(i, 1)">Remove Scene</b-button>
-                    </b-form-group>
+                            <!-- eslint-disable-next-line no-irregular-whitespace -->
+                            <b-form-group label="​">
+                                <!-- There's a zero-width space here so that all the form groups align -->
+                                <b-button variant="danger" @click="customisation.splice(i, 1)">Remove Scene</b-button>
+                            </b-form-group>
+                        </div>
+                    </div>
+
+                    <b-button-group class="mt-2">
+                        <b-button @click="addCustomisation">Add scene</b-button>
+                        <b-button @click="addAllCustomisation">Add all scenes</b-button>
+                    </b-button-group>
+
+                    <div class="mt-2">
+                        <b-form-group :label="`${customGFXcount} GFX scenes to add`">
+                            <b-form-input
+                                id="range-1"
+                                v-model="customGFXcount"
+                                type="range"
+                                min="0"
+                                max="12"
+                                value="0" />
+                        </b-form-group>
+                    </div>
                 </div>
             </div>
 
-            <b-button-group>
-                <b-button @click="addCustomisation">Add scene</b-button>
-                <b-button @click="addAllCustomisation">Add all scenes</b-button>
-            </b-button-group>
-
-            <div>
-                <b-form-group :label="`${customGFXcount} GFX scenes to add`">
-                    <b-form-input
-                        id="range-1"
-                        v-model="customGFXcount"
-                        type="range"
-                        min="0"
-                        max="12"
-                        value="0" />
-                </b-form-group>
+            <div
+                v-if="output"
+                class="p-6 col-4 rounded-lg cursor-not-allowed select-none text-white">
+                <h3>Scenes</h3>
+                <ul class="scenes-output">
+                    <li v-for="(scene, i) in JSON.parse(output)?.scene_order" :key="i">{{ scene?.name }}</li>
+                </ul>
             </div>
-        </div>
-
-        <div
-            v-if="output"
-            class="p-6 rounded-lg cursor-not-allowed select-none bg-slate-800 text-white">
-            Scenes
-            <ul>
-                <li v-for="(scene, i) in JSON.parse(output)?.scene_order" :key="i">{{ scene?.name }}</li>
-            </ul>
         </div>
 
 
@@ -147,6 +162,7 @@ import prodBeta from "./collections/24.0 prod.json";
 import { useAuthStore } from "@/stores/authStore";
 import { mapState } from "pinia";
 import { ReactiveRoot } from "@/utils/reactive";
+import LearnTitleChip from "@/components/website/guide/LearnTitleChip.vue";
 
 const OBS = {
     scene: {
@@ -238,6 +254,7 @@ const globalCustomisationDefault = {
 
 export default {
     name: "ToolsObsSceneCollections",
+    components: { LearnTitleChip },
     data: () => ({
         client: "",
         broadcast: "",
@@ -662,5 +679,12 @@ export default {
 }
 .form-control:disabled, .form-select:disabled {
     opacity: 0.5;
+}
+.scenes-output {
+    background-color: rgba(255,255,255,0.1);
+    border-radius: .5em;
+    padding: .5em 0 .5em 2rem;
+    max-height: 50vh;
+    overflow-y: scroll;
 }
 </style>

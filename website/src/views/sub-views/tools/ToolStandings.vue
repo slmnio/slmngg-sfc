@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <h1>Standings</h1>
+        <LearnTitleChip subtitle="Standings Reference" />
         <p>
             The standings pages can be customised from the event or from overlays. There are separate keys to sort
             (ordering teams) and to show (displaying as columns).
@@ -170,9 +170,11 @@
 
 <script>
 import { StandingsShowKeys } from "@/utils/standings";
+import LearnTitleChip from "@/components/website/guide/LearnTitleChip.vue";
 
 export default {
     name: "ToolStandings",
+    components: { LearnTitleChip },
     computed: {
         standingsShow() {
             return StandingsShowKeys;

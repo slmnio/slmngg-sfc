@@ -181,6 +181,12 @@ importers:
       '@vue/tsconfig':
         specifier: ^0.5.1
         version: 0.5.1
+      eslint:
+        specifier: ^8.57.0
+        version: 8.57.0
+      eslint-plugin-vue:
+        specifier: ^9.23.0
+        version: 9.25.0(eslint@8.57.0)
       unplugin-vue-components:
         specifier: ^0.26.0
         version: 0.26.0(@babel/parser@7.24.5)(rollup@4.17.2)(vue@3.4.27(typescript@5.4.5))

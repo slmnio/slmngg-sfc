@@ -2,8 +2,9 @@
     <b-button v-b-modal.socials-modal>Credits</b-button>
     <b-modal id="socials-modal" title="Credits" hide-footer>
         <div v-for="template in templates" :key="template.name">
-            <h2>
-                <CopyTextButton :content="template.template(groups)">{{ template.name }}</CopyTextButton>
+            <h2 class="d-flex align-items-center gap-2">
+                {{ template.name }}
+                <b-button size="sm" @click="copy(template.template(groups), template.name)">{{ lastCopied === template.name ? 'Copied' : 'Copy' }}</b-button>
             </h2>
             <pre>{{ template.template(groups) }}</pre>
         </div>
@@ -30,21 +31,19 @@ export default {
     components: { CopyTextButton },
     props: ["id"],
     data: () => ({
-        roleMode: "emoji",
-        linkMode: "mention",
-        displayMode: "block",
+        lastCopied: "",
         templates: [
             {
                 name: "Twitter",
                 template: (groups) => {
                     return groups?.flatMap(g => g?.items?.map(p => `${g.meta.emoji} ${p?.twitter_link?.length ? p.twitter_link[0].replace("https://twitter.com/", "@") : p.name}`)).join("\n");
-                }
+                },
             },
             {
                 name: "Twitter Inline",
                 template: (groups) => {
                     return groups?.map(g => `${g.meta.emoji} ${g?.items?.map(p => `${p?.twitter_link?.length ? p.twitter_link[0].replace("https://twitter.com/", "@") : p.name}`).join(" ")}`).join("\n");
-                }
+                },
             },
             {
                 name: "YouTube",
@@ -52,7 +51,7 @@ export default {
                     return groups?.map(g => {
                         return `${g.meta.name}\n${g?.items?.map(p => `${p.name} ${p?.twitter_link?.length ? p.twitter_link[0] : ""}`).join("\n")}`;
                     }).join("\n\n");
-                }
+                },
             }
         ]
     }),
@@ -104,6 +103,14 @@ export default {
                 group.meta.emoji = roleMap[group.meta.singular_name] || "";
                 return group;
             });
+        }
+    },
+    methods: {
+        async copy(text, name) {
+            await navigator.clipboard.writeText(text);
+            this.lastCopied = name;
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            this.lastCopied = "";
         }
     }
 };

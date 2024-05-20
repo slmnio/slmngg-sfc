@@ -1,7 +1,5 @@
 <template>
-    <div
-        v-if="!res.isSupported.value"
-    >
+    <div v-if="!res.isSupported.value">
         <b-alert :model-value="true" variant="warning">
             <h4 class="alert-heading">Unsupported browser!</h4>
             <p>
@@ -54,7 +52,7 @@
         </ul>
     </div>
 </template>
-<script setup lang="ts">
+<script setup>
 import { useFileSystemAccess, useLocalStorage } from "@vueuse/core";
 import { encode, parse } from "ini";
 import { computed, ref } from "vue";
@@ -134,10 +132,7 @@ const settings = {
     }
 };
 
-function getMergedSettings(
-    currentSettings: object,
-    settingsName: "bpl" | "bplOpinionated"
-) {
+function getMergedSettings(currentSettings, settingsName) {
     const mergedData = merge(currentSettings, settings[settingsName]);
     return {
         ...mergedData,
@@ -182,9 +177,9 @@ const wasOverwritten = computed(() => {
     return settingsData.value.WasOverwritten?.["1"]?.Value == 1;
 });
 
-const logMessages = ref<string[]>([]);
+const logMessages = ref([]);
 
-async function waitFor(ms: number) {
+async function waitFor(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -216,7 +211,7 @@ async function executeAction() {
         logMessages.value.push("Merging settings...");
         const newData = getMergedSettings(
             settingsData.value,
-            action.value as "bpl" | "bplOpinionated"
+            action.value
         );
         await waitFor(500);
 
@@ -252,7 +247,7 @@ const hasValidBackup = computed(() => {
     return Object.keys(backup.value).length > 0;
 });
 
-async function writeData(data: object) {
+async function writeData(data) {
     if (!res.data.value) return;
     res.data.value = encode(data);
     await res.save();

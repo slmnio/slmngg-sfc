@@ -11,7 +11,7 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { useHead } from "@unhead/vue";
 import ToolOWProfile from "@/components/website/guide/ToolOWProfile.vue";
 import LearnTitleChip from "@/components/website/guide/LearnTitleChip.vue";

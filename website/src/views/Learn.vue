@@ -59,7 +59,7 @@
         </ul>
     </div>
 </template>
-<script lang="ts">
+<script>
 
 import LearnTitleChip from "@/components/website/guide/LearnTitleChip.vue";
 

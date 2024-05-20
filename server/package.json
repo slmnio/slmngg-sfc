@@ -4,7 +4,7 @@
   "scripts": {
     "serve-server": "nodemon src/index.js",
     "register-commands": "node src/discord/register-slash-commands.js",
-    "lint": "eslint --fix src --quiet",
+    "lint": "eslint --fix src",
     "build": "echo \"No build stage for server - skipping\""
   },
   "main": "index.js",

@@ -29,7 +29,7 @@ export default [
             },
         },
         files: [
-            "website/**/*",
+            "website/**/*.ts"
         ]
     },
     {
@@ -179,6 +179,6 @@ export default [
         },
         languageOptions: {
             ecmaVersion: "latest"
-        },
+        }
     }
 ];

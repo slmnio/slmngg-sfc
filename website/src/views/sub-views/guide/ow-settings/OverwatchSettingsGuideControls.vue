@@ -43,7 +43,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="option in options">
+                <tr v-for="option in options" :key="option.name">
                     <td>{{ option.name }}</td>
                     <td class="text-center">
                         <template v-if="option.keyboard_override">{{ option.keyboard_override }}</template>
@@ -64,12 +64,11 @@
 </template>
 <script>
 import defaultCrosshair from "@/assets/guide/default_crosshair.png";
-import LinkedPlayers from "@/components/website/LinkedPlayers.vue";
 import InputImage from "@/components/website/guide/InputImage.vue";
 
 export default {
     name: "OverwatchSettingsGuideControls",
-    components: { InputImage, LinkedPlayers },
+    components: { InputImage },
     data: () => ({
         defaultCrosshair,
         options: [

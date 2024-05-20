@@ -1,5 +1,8 @@
 <template>
     <div class="website-nav">
+        <WebsiteNavBanner v-if="maintenanceMessage" class="bg-warning text-dark">
+            {{ maintenanceMessage }}
+        </WebsiteNavBanner>
         <WebsiteNavBanner v-if="showDisconnectedMessage" class="bg-danger">
             <i class="fas fa-wifi-slash fa-fw mr-1"></i> <b>No connection to the data server.</b> Don't refresh, we're trying to reconnect...
         </WebsiteNavBanner>
@@ -149,6 +152,9 @@ export default {
         },
         siteMode() {
             return import.meta.env.VITE_DEPLOY_MODE || import.meta.env.NODE_ENV;
+        },
+        maintenanceMessage() {
+            return import.meta.env.VITE_MAINTENANCE_MESSAGE;
         },
         dataServerMode() {
             const dataServerURL = new URL(import.meta.env.VITE_DATA_SERVER || "http://localhost");

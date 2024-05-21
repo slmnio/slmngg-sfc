@@ -12,7 +12,6 @@
 </template>
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import CopyTextButton from "@/components/website/CopyTextButton.vue";
 
 // theoretically we could move this into airtable instead
 const roleMap = {
@@ -28,10 +27,10 @@ const roleMap = {
 
 export default {
     name: "CreditCreator",
-    components: { CopyTextButton },
     props: ["id"],
     data: () => ({
         lastCopied: "",
+        copyTimeout: null,
         templates: [
             {
                 name: "Twitter",
@@ -109,8 +108,10 @@ export default {
         async copy(text, name) {
             await navigator.clipboard.writeText(text);
             this.lastCopied = name;
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            this.lastCopied = "";
+            if (this.copyTimeout) clearTimeout(this.copyTimeout);
+            this.copyTimeout = setTimeout(() => {
+                this.lastCopied = "";
+            }, 1000);
         }
     }
 };

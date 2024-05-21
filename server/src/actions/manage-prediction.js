@@ -1,7 +1,4 @@
-const { getTwitchChannel,
-    getTwitchAPIClient,
-    getMatchData
-} = require("../action-utils/action-utils");
+import { getMatchData, getTwitchAPIClient, getTwitchChannel } from "../action-utils/action-utils.js";
 
 const automaticPredictionTitleStartCharacter = "⬥";
 
@@ -40,7 +37,7 @@ function getMatchWinner(match, team1, team2) {
 }
 
 
-module.exports = {
+export default {
     key: "manage-prediction",
     auth: ["client"],
     requiredParams: ["predictionAction"],

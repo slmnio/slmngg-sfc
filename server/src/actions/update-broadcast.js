@@ -1,6 +1,6 @@
-const { safeInput, safeInputNoQuotes } = require("../action-utils/action-utils");
+import { safeInput, safeInputNoQuotes } from "../action-utils/action-utils.js";
 
-module.exports = {
+export default {
     key: "update-broadcast",
     auth: ["client"],
     optionalParams: ["match", "advertise", "playerCams", "mapAttack", "title", "manualGuests", "deskDisplayMode", "deskDisplayText", "showLiveMatch", "countdownEnd"],

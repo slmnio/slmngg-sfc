@@ -1,4 +1,4 @@
-const { dirtyID } = require("../action-utils/action-utils");
+import { dirtyID } from "../action-utils/action-utils.js";
 
 function getLanguage(role) {
     const plural = {
@@ -12,7 +12,7 @@ function getLanguage(role) {
 }
 
 
-module.exports = {
+export default {
     key: "set-player-relationships",
     requiredParams: ["matchID", "roles"],
     auth: ["client", "user"],

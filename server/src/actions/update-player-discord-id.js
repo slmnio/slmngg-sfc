@@ -1,10 +1,11 @@
-const { canUpdateUserDetails } = require("../action-utils/action-permissions");
-const { log } = require("../discord/slmngg-log");
-const { userMention } = require("discord.js");
-const Cache = require("../cache");
-const { cleanID } = require("../action-utils/action-utils");
+import { canUpdateUserDetails } from "../action-utils/action-permissions.js";
+import { log } from "../discord/slmngg-log.js";
+import { userMention } from "discord.js";
+import * as Cache from "../cache.js";
+import { cleanID } from "../action-utils/action-utils.js";
 
-module.exports = {
+
+export default {
     key: "update-player-discord-id",
     requiredParams: ["discordData", "slmnggId"],
     auth: ["user"],

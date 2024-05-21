@@ -1,10 +1,10 @@
-const { SlashCommandBuilder } = require("discord.js");
-const Cache = require("../../../cache.js");
-const { MapObject } = require("../../managers");
-const { cleanID } = require("../../../action-utils/action-utils");
+import { SlashCommandBuilder } from "discord.js";
+import * as Cache from "../../../cache.js";
+import { MapObject } from "../../managers.js";
+import { cleanID } from "../../../action-utils/action-utils.js";
 
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName("detailed")
         .setDescription("Get a link to the current match's detailed view"),

@@ -1,20 +1,23 @@
-require("dotenv").config();
-const express = require("express");
+import "dotenv/config";
+import express from "express";
+import bodyParser from "body-parser";
+import { createServer } from "node:http";
+import { Server } from "socket.io";
 const app = express();
-const bodyParser = require("body-parser");
 const port = 8901;
-const http = require("http").Server(app);
-const cors = require("cors");
-const meta = require("./meta.js");
-const routes = require("./routes.js");
-const images = require("./images.js");
-const discordAuth = require("./discord/auth.js");
-const webAuction = require("./web_auction");
+const http = createServer(app);
+
+import cors from "cors";
+import meta from "./meta.js";
+import routes from "./routes.js";
+import images from "./images.js";
+import discordAuth from "./discord/auth.js";
+import webAuction from "./web_auction.js";
 
 /* The staff module should only run on the server, probably not your local machine. */
 let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEGORY_ID", "STAFFAPPS_APPLICATION_CHANNEL_ID", "IS_SLMNGG_MAIN_SERVER"];
 if (staffKeysRequired.every(key => process.env[key])) {
-    require("./discord/staff.js");
+    await import("./discord/staff.js");
 }
 
 let domains = (process.env.CORS_VALID_DOMAINS || "slmn.gg,localhost").split(/, */g).map(d => new RegExp(`(?:^|.*\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
@@ -40,7 +43,7 @@ function corsHandle(origin, callback) {
 
 const localCors =  () => cors({ origin: corsHandle });
 
-const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials: true}, allowEIO3: true});
+const io = new Server(http, {cors: { origin: corsHandle,  credentials: true}, allowEIO3: true});
 
 // const auction = require("./discord/new_auction.js")({
 //     to: (...a) => io.to(...a),
@@ -49,15 +52,14 @@ const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials:
 //     test: ["hi"]
 // });
 
-const Cache = (require("./cache.js")).setup(io);
-(require("./airtable-v2.js")).setup({ web: app, io });
-(require("./discord/bot-controller.js")).setup(io);
-
-const actions = require("./action-utils/action-manager.js");
+const Cache = (await import("./cache.js")).setup(io);
+(await import("./airtable-v2.js")).setup({ web: app, io });
+(await import("./discord/bot-controller.js")).setup(io);
+import * as actions from "./action-utils/action-manager.js";
 actions.load(app, localCors, Cache, io);
 
-require("./discord/slash-commands.js");
-require("./automation-manager.js");
+await import("./discord/slash-commands.js");
+await import("./automation-manager.js");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 

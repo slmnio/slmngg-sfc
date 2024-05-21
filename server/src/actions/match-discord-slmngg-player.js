@@ -1,7 +1,7 @@
-const { canUpdateUserDetails } = require("../action-utils/action-permissions");
-const Cache = require("../cache");
+import { canUpdateUserDetails } from "../action-utils/action-permissions.js";
+import * as Cache from "../cache.js";
 
-module.exports = {
+export default {
     key: "match-discord-slmngg-player",
     requiredParams: ["discordData"],
     auth: ["user"],

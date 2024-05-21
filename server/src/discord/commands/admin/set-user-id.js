@@ -1,17 +1,13 @@
-const {
-    ContextMenuCommandBuilder,
-    userMention,
-    ApplicationCommandType,
+import {
     ActionRowBuilder,
-    StringSelectMenuBuilder,
-    StringSelectMenuOptionBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-} = require("discord.js");
-const Cache = require("../../../cache.js");
-
-const { getInternalManager } = require("../../../action-utils/action-manager");
-const { cleanID } = require("../../../action-utils/action-utils");
+    ApplicationCommandType, ButtonBuilder, ButtonStyle,
+    ContextMenuCommandBuilder,
+    StringSelectMenuBuilder, StringSelectMenuOptionBuilder,
+    userMention
+} from "discord.js";
+import * as Cache from "../../../cache.js";
+import { getInternalManager } from "../../../action-utils/action-manager.js";
+import { cleanID } from "../../../action-utils/action-utils.js";
 
 
 function generatePlayerDescription(player) {
@@ -71,7 +67,7 @@ function selectUserUI(targetUser, users, selectedUser) {
     };
 }
 
-module.exports = {
+export default {
     data: new ContextMenuCommandBuilder()
         .setName("Associate with SLMN.GG player")
         .setDMPermission(false)

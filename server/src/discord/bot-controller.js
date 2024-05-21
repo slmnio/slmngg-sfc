@@ -1,9 +1,10 @@
-const { Client, GatewayIntentBits } = require("discord.js");
+import { Client, GatewayIntentBits } from "discord.js";
+import { EndBehaviorType, joinVoiceChannel } from "@discordjs/voice";
 
-const {joinVoiceChannel, EndBehaviorType} = require("@discordjs/voice");
+import { onUpdate, get, auth } from "../cache.js";
+const { getBots, getPlayer } = auth;
+import { MapObject } from "./managers.js";
 
-const { onUpdate, auth: { getBots, getPlayer }, get } = require("../cache.js");
-const { MapObject } = require("./managers");
 
 let io;
 
@@ -511,29 +512,27 @@ class MemberList {
     }
 }
 
-module.exports = {
-    setup(_io) {
-        io = _io;
+export function setup(_io) {
+    io = _io;
 
-        io.on("connect", socket => {
-            socket.on("audio_subscribe", ({ taskKey, broadcastKey }) => {
-                console.log("[audio] sub", taskKey, broadcastKey);
-                let audioRoom = `${broadcastKey}/${taskKey}`;
-                // if (socket._audioRoom) socket.leave(socket._audioRoom);
-                // socket._audioRoom = `${broadcastKey}/${taskKey}`;
-                socket.join(audioRoom);
+    io.on("connect", socket => {
+        socket.on("audio_subscribe", ({ taskKey, broadcastKey }) => {
+            console.log("[audio] sub", taskKey, broadcastKey);
+            let audioRoom = `${broadcastKey}/${taskKey}`;
+            // if (socket._audioRoom) socket.leave(socket._audioRoom);
+            // socket._audioRoom = `${broadcastKey}/${taskKey}`;
+            socket.join(audioRoom);
 
-                let client = manager.getClient(taskKey, broadcastKey);
-                if (client) {
-                    client.memberList.sync(socket);
-                }
-                let job = manager.getJob(taskKey, broadcastKey);
-                if (job) {
-                    job.sync(socket);
-                } else {
-                    socket.emit("audio_job_status", audioRoom, null);
-                }
-            });
+            let client = manager.getClient(taskKey, broadcastKey);
+            if (client) {
+                client.memberList.sync(socket);
+            }
+            let job = manager.getJob(taskKey, broadcastKey);
+            if (job) {
+                job.sync(socket);
+            } else {
+                socket.emit("audio_job_status", audioRoom, null);
+            }
         });
-    }
-};
+    });
+}

@@ -1,14 +1,15 @@
 /* eslint-disable */
 /* BPL Staff Automation */
 
-const client = require("./client.js");
-const Airtable = require("airtable");
-const { EmbedBuilder, Permissions } = require("discord.js");
+import client from "./client.js";
+import Airtable from "airtable";
+import { EmbedBuilder, Permissions } from "discord.js";
+import { MapHandler } from "./managers.js";
+import { log } from "./slmngg-log.js";
+
 const airtable = new Airtable({apiKey: process.env.AIRTABLE_KEY});
 const base = airtable.base("appQd7DO7rDiMUIEj");
 
-const { MapHandler } = require("./managers.js");
-const { log } = require("./slmngg-log.js");
 
 function deAirtable(obj) {
     const data = {};

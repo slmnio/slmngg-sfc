@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     key: "set-observer-setting",
     requiredParams: ["setting", "value"],
     auth: ["client"],

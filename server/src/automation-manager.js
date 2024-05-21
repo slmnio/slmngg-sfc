@@ -1,15 +1,16 @@
-const fs = require("fs");
-const path = require("path");
-const { onUpdate } = require("./cache");
+import fs from "node:fs";
+import path from "node:path";
+import { onUpdate } from "./cache.js";
+import { pathToFileURL } from "node:url";
 
 const automations = [];
-const filesPath = path.join(__dirname, "automation");
+const filesPath = path.join(import.meta.dirname, "automation");
 const files = fs.readdirSync(filesPath);
 
 console.log("[auto] loading automations");
 for (const fileName of files) {
     const filePath = path.join(filesPath, fileName);
-    const automation = require(filePath);
+    const { default: automation } = await import(pathToFileURL(filePath));
     automations.push(automation);
     console.log(" ~ ", fileName);
 }

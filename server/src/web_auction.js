@@ -4,10 +4,8 @@
  * Use event.blocks
  */
 
-const { onUpdate,
-    auth
-} = require("./cache");
-const Auction = require("./web_auction_class");
+import { auth, onUpdate } from "./cache.js";
+import Auction from "./web_auction_class.js";
 
 /**
  *
@@ -29,7 +27,7 @@ function getAuctionData(event) {
 }
 
 
-module.exports = async ({ io }) => {
+export default async ({ io }) => {
     console.log("Web auction system loading");
 
 

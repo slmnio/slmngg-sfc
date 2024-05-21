@@ -2,7 +2,7 @@
 * Functions to create custom datasets as we load data
 * */
 
-function tableUpdated(tableName, Cache) {
+export default function tableUpdated(tableName, Cache) {
     if (tableName === "Matches") matchUpdate(Cache);
     if (tableName === "Broadcasts") broadcastUpdate(Cache);
     if (tableName === "Players") playerList(Cache);
@@ -10,7 +10,6 @@ function tableUpdated(tableName, Cache) {
     if (tableName === "Events") publicEvents(Cache);
     // TODO: maybe add discord bots here?
 }
-module.exports = tableUpdated;
 
 async function publicEvents(Cache) {
     let allEvents = await Cache.get("Events");

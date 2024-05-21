@@ -1,5 +1,6 @@
-const { dirtyID } = require("../action-utils/action-utils");
-module.exports = {
+import { dirtyID } from "../action-utils/action-utils.js";
+
+export default {
     key: "update-map-data",
     requiredParams: ["matchID", "mapData"],
     auth: ["user"],

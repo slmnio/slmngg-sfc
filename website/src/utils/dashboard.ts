@@ -1,6 +1,6 @@
 import { getDataServerAddress } from "@/utils/fetch";
 import { Notyf } from "notyf";
-import { type AnyAirtableID, useAuthStore } from "@/stores/authStore";
+import { type AnyAirtableID, type Snowflake, useAuthStore } from "@/stores/authStore";
 
 const notyf = new Notyf({ duration: 5000, position: { x: "right", y: "top" }, dismissible: true });
 
@@ -22,7 +22,9 @@ type ActionKey = "create-live-guest" |
     "update-match-data" |
     "update-profile-data" |
     "set-player-relationships" |
-    "adjust-match-broadcast"
+    "adjust-match-broadcast" |
+    "set-event-guild" |
+    "create-event-discord-items"
 
 type RequestUrl = `actions/${ActionKey}`
 
@@ -182,6 +184,22 @@ interface AdjustMatchBroadcastData {
     matchID: AnyAirtableID
 }
 
+interface SetEventGuidData {
+    guildID: Snowflake
+    eventID: AnyAirtableID
+}
+
+interface CreateEventDiscordItemsData {
+    guildID: Snowflake
+    eventID: AnyAirtableID
+    teamSettings: string[]
+    runSettings?: string[]
+    settings?: {
+        textChannelRoles?: string
+        voiceChannelRoles?: string
+    }
+}
+
 
 type ActionRequestData<U> =
     U extends "actions/create-live-guest" ? CreateLiveGuestData :
@@ -203,6 +221,8 @@ type ActionRequestData<U> =
     U extends "actions/update-profile-data" ? UpdateProfileDataData :
     U extends "actions/set-player-relationships" ? SetPlayerRelationshipsData :
     U extends "actions/adjust-match-broadcast" ? AdjustMatchBroadcastData :
+    U extends "actions/set-event-guild" ? SetEventGuidData :
+    U extends "actions/create-event-discord-items" ? CreateEventDiscordItemsData :
     any;
 
 

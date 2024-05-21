@@ -132,7 +132,7 @@ class HTTPActionManager extends ActionManager {
                 token: token,
                 args: args,
                 error: (errorCode, errorMessage) => {
-                    console.error(`[actions] Error in pre-processing for action [${action.key}]`);
+                    console.error(`[actions] Error in pre-processing for action [${action.key}]`, { errorCode, errorMessage });
                     res.status(errorCode).send({
                         error: true,
                         errorMessage

@@ -16,4 +16,21 @@ export default [
     { path: "auction", component: () => import("@/views/sub-views/event/EventAuction.vue") },
     { path: "streams", name: "event-streams", component: () => import("@/views/sub-views/event/EventStreamDetails.vue") },
     { path: "stream", alias: ["stream-details"], redirect: { name: "event-streams" } },
+    {
+        path: "settings",
+        component: () => import("@/views/sub-views/event-settings/EventSettings.vue"),
+        meta: {
+            requiresAuth: true
+        },
+        children: [
+            {
+                path: "",
+                component: () => import("@/views/sub-views/event-settings/EventSettingsGeneral.vue"),
+            },
+            {
+                path: "discord",
+                component: () => import("@/views/sub-views/event-settings/EventSettingsDiscord.vue"),
+            }
+        ]
+    }
 ];

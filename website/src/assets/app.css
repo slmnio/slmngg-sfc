@@ -351,3 +351,14 @@ input.no-arrows[type=number] {
 .text-muted {
     color: #6c757d !important;
 }
+
+
+.opacity-changes {
+    opacity: 1;
+    transition: opacity .3s ease;
+}
+.low-opacity {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: wait;
+}

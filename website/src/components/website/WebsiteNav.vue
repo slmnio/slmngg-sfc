@@ -26,6 +26,7 @@
         <!--       example: <WebsiteNavBanner class="bg-success" v-if="$socket.connected">Connected to the data server for live data updates!</WebsiteNavBanner>-->
 
         <b-navbar toggleable="lg" type="dark">
+            <div class="loader-bar" :class="{'active': !!loadStatus}" :style="{ width: loaderWidth }"></div>
             <router-link class="navbar-brand " to="/">
                 <img v-if="minisiteIcon" :src="minisiteIcon" alt="" class="navbar-image d-inline-block align-top mr-2">
                 <span class="d-lg-inline d-none">{{ minisite ? (minisite.navbar_name || minisite.series_name || minisite.name) : "SLMN.GG" }}</span>
@@ -64,6 +65,10 @@
                     <!--                    <router-link :to="'/'" v-if="minisite.navbar_short" active-class="active" exact class="nav-link">{{ minisite.navbar_short }}</router-link>-->
                 </b-navbar-nav>
                 <b-navbar-nav class="flex-grow-1" />
+
+                <b-navbar-nav v-if="loadStatus">
+                    <div class="nav-text" :title="loadStatus"><loading-icon /></div>
+                </b-navbar-nav>
 
                 <b-navbar-nav>
                     <div v-b-modal.timezone-swapper-modal class="nav-link">Timezone</div>
@@ -113,11 +118,13 @@ import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 import { getMainDomain } from "@/utils/fetch";
 import { mapState, mapWritableState } from "pinia";
 import { useAuthStore } from "@/stores/authStore";
+import LoadingIcon from "@/components/website/LoadingIcon.vue";
 
 
 export default {
     name: "WebsiteNav",
     components: {
+        LoadingIcon,
         TimezoneSwapper,
         LoggedInUser,
         WebsiteNavBanner,
@@ -127,11 +134,19 @@ export default {
     data: () => ({
         pageNoLongerNew: false,
         resizeObserver: null,
-        height: 0
+        height: 0,
+        maxLoad: 0
     }),
     computed: {
         ...mapWritableState(useAuthStore, ["user"]),
         ...mapState(useAuthStore, ["isProduction", "isAuthenticated"]),
+        loadStatus() {
+            return ((store.state.things || []).filter(t => t.__loading && !t.id.startsWith("special:")))?.length;
+        },
+        loaderWidth() {
+            const perc = 1 - (this.loadStatus / (this.maxLoad || 1));
+            return ((Math.max(perc, 0.2)) * 100) + "%";
+        },
         isRebuilding() {
             return store.getters.hasWebsiteFlag("server_rebuilding");
         },
@@ -216,6 +231,18 @@ export default {
             this.height = this.$el.offsetHeight;
         }
     },
+    watch: {
+        loadStatus: {
+            immediate: true,
+            handler(count) {
+                if (count === 0) {
+                    this.maxLoad = 0;
+                } else if (this.maxLoad < count) {
+                    this.maxLoad += count;
+                }
+            }
+        }
+    },
     mounted() {
         setTimeout(() => {
             // ignore if the socket is disconnected for the first 3 seconds of loading
@@ -260,6 +287,9 @@ export default {
 .live-matches-text {
     font-size: 1.5em;
 }
+.website-nav {
+    position: relative;
+}
 .website-nav:deep(.dropdown-item) {
     padding: 0.5rem 1.5rem;
 }
@@ -283,5 +313,18 @@ export default {
 }
 .nav-link {
     cursor: pointer;
+}
+.loader-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 4px;
+    opacity: 0;
+    transition: opacity .2s ease 1s;
+    background-color: rgba(255,255,255,0.5);
+}
+.loader-bar.active {
+    opacity: 1;
+    transition: width .5s ease;
 }
 </style>

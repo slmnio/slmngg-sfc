@@ -31,10 +31,10 @@ const store = createStore({
             state.request_buffer.push(id);
         },
         clearRequestBuffer(state) {
-            state.request_buffer = state.request_buffer.slice(100);
+            state.request_buffer = state.request_buffer.slice(500);
         },
         executeRequestBuffer(state) {
-            const ids = state.request_buffer.slice(0, 100);
+            const ids = state.request_buffer.slice(0, 500);
             if (!ids.length) return;
             this.commit("clearRequestBuffer");
             return fetchThings(ids);

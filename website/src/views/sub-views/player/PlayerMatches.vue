@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="container">
-            <div>
+            <div class="d-flex align-items-start gap-2">
                 <h6 class="d-flex flex-wrap matches-bar">
                     Games:
                     <a
@@ -11,6 +11,7 @@
                         {{ rel.items.length }} as {{ rel.meta.singular_name }}
                     </a>
                 </h6>
+                <b-button class="text-nowrap" variant="secondary" size="sm" @click="sortDateAscending = !sortDateAscending">{{ sortDateAscending ? 'Newest' : 'Oldest' }} first <i class="fas ml-1" :class="sortDateAscending ? 'fa-sort-amount-down-alt' : 'fa-sort-amount-down'"></i></b-button>
             </div>
             <div v-for="rel in mainPlayerRelationships" :key="rel.meta.singular_name" class="role-group mt-3">
                 <h1 :id="convertToSlug(rel.meta.singular_name)">
@@ -40,6 +41,9 @@ export default {
     name: "PlayerMatches",
     components: { EventMatchGroup },
     props: ["player"],
+    data: () => ({
+        sortDateAscending: false
+    }),
     computed: {
         relationships() {
             if (!this.player?.player_relationships?.length) return [];
@@ -93,7 +97,10 @@ export default {
                     groups[key].events = Object.values(events).map(event => ({
                         ...event,
                         matches: event.matches.sort(sortMatches)
-                    })).sort(sortEvents);
+                    })).sort((a,b) => {
+                        const diff = sortEvents(a.event,b.event);
+                        return this.sortDateAscending ? -1 * diff : diff;
+                    });
                 }
             });
             return groups;

@@ -1,6 +1,6 @@
 <template>
     <div class="container player-partners">
-        <h2 id="partners">Partners</h2>
+        <h2 id="partners">Production Partners</h2>
 
         <b-form-select v-model="chosenPartnerType" class="w-auto mb-1" :options="partnerTypes" />
 

@@ -103,13 +103,15 @@ export default {
         background-color: rgba(255,255,255,0.05);
         margin: 2px 0;
         padding: 2px 4px;
-        cursor: pointer;
     }
     .event-match-group.showing {
         background-color: rgba(255,255,255,0.1);
     }
     .split-contents {
         justify-content: space-between;
+    }
+    .group-header {
+        cursor: pointer;
     }
     .group-header, .header-left {
         align-items: center;

@@ -38,13 +38,17 @@
         </div>
         <SubPageNav>
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
-            <li v-if="player.casts" class="nav-item"><router-link class="nav-link" :to="subLink('casts')">Casts</router-link></li>
-            <li v-if="player.news" class="nav-item"><router-link class="nav-link" :to="subLink('news')">News</router-link></li>
-            <li v-if="player.brands_designed" class="nav-item"><router-link class="nav-link" :to="subLink('brands')">Brands</router-link></li>
-            <li v-if="hasMatchPlayerRelationships" class="nav-item"><router-link class="nav-link" :to="subLink('matches')">Production</router-link></li>
-            <li v-if="player.casts || hasMatchPlayerRelationships" class="nav-item"><router-link class="nav-link" :to="subLink('partners')">Partners</router-link></li>
-            <li v-if="player.member_of && player.member_of.some(t => t.matches)" class="nav-item"><router-link class="nav-link" :to="subLink('played-matches')">Played Match VODs</router-link></li>
+            <li v-if="player.news" class="nav-item"><router-link class="nav-link" :to="subLink('news')">Articles</router-link></li>
             <li v-if="player.member_of && player.member_of.some(t => t.matches)" class="nav-item"><router-link class="nav-link" :to="subLink('match-stats')">Match Stats</router-link></li>
+
+            <li v-if="player.brands_designed" class="nav-item"><router-link class="nav-link" :to="subLink('brands')">Brands</router-link></li>
+
+            <li v-if="player.casts" class="nav-item"><router-link class="nav-link" :to="subLink('casts')">Casting Record</router-link></li>
+            <li v-if="hasMatchPlayerRelationships" class="nav-item"><router-link class="nav-link" :to="subLink('matches')">Production Record</router-link></li>
+            <li v-if="player.casts || hasMatchPlayerRelationships" class="nav-item"><router-link class="nav-link" :to="subLink('partners')">Production Partners</router-link></li>
+
+            <!--<li v-if="player.member_of && player.member_of.some(t => t.matches)" class="nav-item"><router-link class="nav-link" :to="subLink('played-matches')">Played Match VODs</router-link></li>-->
+
             <li class="nav-item"><router-link class="nav-link" :to="subLink('banner')">Banner Creator</router-link></li>
         </SubPageNav>
         <router-view :player="{...player, participationEvents, participationPoints }" />

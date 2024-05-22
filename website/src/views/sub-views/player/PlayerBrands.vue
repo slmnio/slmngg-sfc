@@ -1,7 +1,7 @@
 <template>
     <div class="container player-brands">
-        <div class="row">
-            <router-link v-for="brand in brandsDesigned" :key="brand.id" :to="`/${brand.__tableName === 'Events' ? 'event' : 'team'}/${brand.id}/theme`" class="brand no-link-style ct-passive text-center col-xl-2 col-md-3 col-sm-6 mb-3">
+        <div class="d-flex flex-wrap justify-content-center">
+            <router-link v-for="brand in brandsDesigned" :key="brand.id" :to="`/${brand.__tableName === 'Events' ? 'event' : 'team'}/${brand.id}/theme`" class="brand no-link-style ct-passive text-center mb-3">
                 <ThemeLogo class="brand-logo" :theme="brand.theme" logo-size="w-200" border-width="6" />
                 <div class="theme-title py-1">{{ brand.name }}</div>
             </router-link>
@@ -44,5 +44,9 @@ export default {
     }
     .theme-title {
         line-height: 1;
+    }
+    .brand {
+        width: 180px;
+        margin: 0 15px;
     }
 </style>

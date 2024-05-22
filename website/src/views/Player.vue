@@ -41,7 +41,7 @@
             <li v-if="player.casts" class="nav-item"><router-link class="nav-link" :to="subLink('casts')">Casts</router-link></li>
             <li v-if="player.news" class="nav-item"><router-link class="nav-link" :to="subLink('news')">News</router-link></li>
             <li v-if="player.brands_designed" class="nav-item"><router-link class="nav-link" :to="subLink('brands')">Brands</router-link></li>
-            <li v-if="hasMatchPlayerRelationships" class="nav-item"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
+            <li v-if="hasMatchPlayerRelationships" class="nav-item"><router-link class="nav-link" :to="subLink('matches')">Production</router-link></li>
             <li v-if="player.casts || hasMatchPlayerRelationships" class="nav-item"><router-link class="nav-link" :to="subLink('partners')">Partners</router-link></li>
             <li v-if="player.member_of && player.member_of.some(t => t.matches)" class="nav-item"><router-link class="nav-link" :to="subLink('played-matches')">Played Match VODs</router-link></li>
             <li v-if="player.member_of && player.member_of.some(t => t.matches)" class="nav-item"><router-link class="nav-link" :to="subLink('match-stats')">Match Stats</router-link></li>
@@ -56,7 +56,6 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import Social from "@/components/website/Social";
 import SubPageNav from "@/components/website/SubPageNav";
 import { url } from "@/utils/content-utils";
-// import { sortEvents } from "@/utils/sorts";
 import { bg, resizedImage } from "@/utils/images";
 import { logoBackground } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";

@@ -30,7 +30,7 @@ export default [
             { path: "", component: () => import("@/views/sub-views/player/PlayerMain.vue") },
             { path: "casts", component: () => import("@/views/sub-views/player/PlayerCasts.vue") },
             { path: "news", component: () => import("@/views/sub-views/player/PlayerNews.vue") },
-            { path: "matches", component: () => import("@/views/sub-views/player/PlayerMatches.vue") },
+            { path: "matches", alias: ["production"], component: () => import("@/views/sub-views/player/PlayerMatches.vue") },
             { path: "played-matches", component: () => import("@/views/sub-views/player/PlayerPlayedMatches.vue") },
             { path: "match-stats", component: () => import("@/views/sub-views/player/PlayerMatchStats.vue") },
             { path: "brands", component: () => import("@/views/sub-views/player/PlayerBrands.vue") },

@@ -24,6 +24,7 @@ import pushIcon from "@/assets/map-type-icons/push.svg";
 import assaultIcon from "@/assets/map-type-icons/assault.svg";
 import flashpointIcon from "@/assets/map-type-icons/flashpoint.svg";
 import clashIcon from "@/assets/map-type-icons/clash.png";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export function getImage (i) {
     // console.log(i);
@@ -410,7 +411,8 @@ function getNoSunAbbreviation(abbrev) {
  * @param {boolean?} use24HourTime - use 24 hour time
  * @returns {string}
  */
-export function formatTime(timeString, { tz, use24HourTime = false, format = "{day-short} {date-ordinal} {month-short} {year} {time} {tz}" }) {
+export function formatTime(timeString, { tz, use24HourTime = false, format = "{day-short} {date-ordinal} {month-short} {year} {time} {tz}" } = {}) {
+    if (!tz) tz = useSettingsStore().timezone;
     const timezone = getTimezone(tz);
     const time = spacetime(timeString).goto(timezone);
     const abbrev = getAbbrev(timezone, time);

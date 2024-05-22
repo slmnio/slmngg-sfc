@@ -1,11 +1,13 @@
 <template>
-    <div>
-        <div class="container">
-            <div class="row">
-                <div v-for="match in casts" :key="match.id" class="cast-match col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
-                    <Match :hydrated-match="match" />
-                </div>
-            </div>
+    <div class="container">
+        <h2>Casted matches ({{ casts?.length }})</h2>
+        <div>
+            <event-match-group
+                v-for="event in groupedEvents"
+                :key="event.id"
+                class="event-match-group"
+                :event="event?.event"
+                :matches="event?.matches" />
         </div>
     </div>
 </template>
@@ -13,12 +15,13 @@
 <script>
 import Match from "@/components/website/match/Match.vue";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
-import { sortMatches } from "@/utils/sorts";
+import { sortEvents, sortMatches } from "@/utils/sorts";
 import { formatTime, url } from "@/utils/content-utils";
+import EventMatchGroup from "@/components/website/EventMatchGroup.vue";
 
 export default {
     name: "PlayerCasts",
-    components: { Match },
+    components: { EventMatchGroup },
     props: ["player"],
     computed: {
         casts() {
@@ -31,6 +34,22 @@ export default {
                     theme: ReactiveThing("theme")
                 })
             })(this.player).sort(sortMatches);
+        },
+        groupedEvents() {
+            const casts = [...this.casts];
+            const events = { };
+            casts?.forEach((item) => {
+                const eventID = item?.event?.id;
+                if (eventID) {
+                    if (!events[eventID]) events[eventID] = { event: item.event, matches: [] };
+                    events[eventID].matches.push(item);
+                }
+            });
+
+            return Object.values(events).map(event => ({
+                ...event,
+                matches: event.matches.sort(sortMatches)
+            })).sort(sortEvents);
         }
     },
     methods: { url, formatTime }

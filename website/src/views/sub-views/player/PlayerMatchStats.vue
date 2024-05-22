@@ -13,6 +13,7 @@
                     <th v-if="showTeams" rowspan="2" @click="showTeams = !showTeams">Team</th>
 
                     <th v-if="!showTeams" rowspan="2" colspan="2" @click="showTeams = !showTeams"></th>
+                    <th class="new-category text-center" rowspan="2">Rank</th>
 
                     <th class="category new-category" colspan="3">Regular Season</th>
                     <th class="category new-category" colspan="3">Playoffs</th>
@@ -53,6 +54,10 @@
                             <ThemeLogo :theme="team.theme" border-width="0" logo-size="s-76" class="logo" />
                             <div class="p-1 team-name"><b>{{ team.name }}</b></div>
                         </router-link>
+                    </td>
+
+                    <td class="new-category text-center line-height-1" :style="{ backgroundColor: rankingColor(team?.ranking_sort) }">
+                        {{ team?.ranking_text }}
                     </td>
 
                     <td :class="{'no-matches': team.stats.regular_season.played === 0 }" class="num new-category">
@@ -443,6 +448,25 @@ export default {
                 ...logoBackground1(team),
                 borderColor: null
             };
+        },
+        rankingColor(sort) {
+            if (!sort) return "";
+            console.log(sort);
+            const liquipediaColors = {
+                1: "#ffd739",
+                2: "#bebebe",
+                3: "#bb8644",
+                4: "#f8996b",
+                5: "#007f99",
+                9: "#166f82",
+            };
+
+            for (const [num, color] of Object.entries(liquipediaColors)) {
+                if (sort <= num) {
+                    return color;
+                }
+            }
+            return "#093942";
         }
     }
 };
@@ -489,7 +513,7 @@ export default {
         height: 50px;
         width: 50px;
     }
-    .event-name, .team-name {
+    .event-name, .team-name, .line-height-1 {
         line-height: 1;
     }
 </style>

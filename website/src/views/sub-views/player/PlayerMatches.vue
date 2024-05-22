@@ -12,17 +12,17 @@
                     </a>
                 </h6>
             </div>
-            <div v-for="rel in mainPlayerRelationships" :key="rel.meta.singular_name" class="role-group">
+            <div v-for="rel in mainPlayerRelationships" :key="rel.meta.singular_name" class="role-group mt-3">
                 <h1 :id="convertToSlug(rel.meta.singular_name)">
                     as {{ rel.meta.singular_name }} ({{ rel.items.length }})
                 </h1>
-                <div class="row">
-                    <Match
-                        v-for="item in rel.items"
-                        :key="item.item.id"
-                        class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3"
-                        :hydrated-match="item.item"
-                    />
+                <div>
+                    <event-match-group
+                        v-for="event in rel.events"
+                        :key="event.id"
+                        class="event-match-group"
+                        :event="event?.event"
+                        :matches="event?.matches" />
                 </div>
             </div>
         </div>
@@ -30,71 +30,32 @@
 </template>
 
 <script>
-import Match from "@/components/website/match/Match.vue";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
-import { sortMatches } from "@/utils/sorts";
+import { sortEvents, sortMatches } from "@/utils/sorts";
 import { formatTime, url } from "@/utils/content-utils";
 import { useSettingsStore } from "@/stores/settingsStore";
+import EventMatchGroup from "@/components/website/EventMatchGroup.vue";
 
 export default {
     name: "PlayerMatches",
-    components: {
-        Match
-    },
+    components: { EventMatchGroup },
     props: ["player"],
     computed: {
         relationships() {
             if (!this.player?.player_relationships?.length) return [];
             return ReactiveArray("player_relationships", {
-                event: ReactiveThing("event", {
-                    theme: ReactiveThing("theme")
-                }),
-                teams: ReactiveArray("teams", {
-                    theme: ReactiveThing("theme")
-                }),
                 matches: ReactiveArray("matches", {
                     event: ReactiveThing("event", {
-                        theme: ReactiveThing("theme")
-                    }),
-                    teams: ReactiveArray("teams", {
                         theme: ReactiveThing("theme")
                     })
                 })
             })(this.player);
         },
-        partners() {
-            const partners = new Map();
-            Object.entries(this.mainPlayerRelationships).forEach(([role, { items, meta }]) => {
-                items.forEach(item => {
-                    if (item.type !== "match") return;
-                    const match = item.item;
-                    (match?.player_relationships || []).forEach(rel => {
-                        if (!["Producer", "Observer", "Replay Producer", "Observer Director", "Lobby Admin", "Tournament Admin", "Graphics Operator", "Stats Producer"].includes(rel.singular_name)) return;
-                        if (!rel?.player?.name) return;
-                        if (rel.player.id === this.player?.id) return;
-                        if (!partners.has(rel.player.id)) {
-                            partners.set(rel.player.id, { player: rel.player, matches: 0, lastMatch: match });
-                        }
-                        const data = partners.get(rel.player.id);
-                        data.matches++;
-
-                        if (new Date(data.lastMatch.start) < new Date(match.start)) {
-                            data.lastMatch = match;
-                        }
-                        partners.set(rel.player.id, data);
-                    });
-                });
-            });
-            return [...partners.values()].sort((a, b) => {
-                const diff = b.matches - a.matches;
-                if (diff !== 0) return diff;
-                return new Date(b.lastMatch?.start) - new Date(a.lastMatch?.start);
-            });
-        },
         mainPlayerRelationships() {
             if (!this.relationships) return {};
             const groups = {};
             this.relationships.forEach(rel => {
+
                 if (!groups[rel.singular_name]) {
                     groups[rel.singular_name] = {
                         meta: {
@@ -102,7 +63,8 @@ export default {
                             plural_name: rel.plural_name,
                             singular_name: rel.singular_name
                         },
-                        items: []
+                        items: [],
+                        events: []
                     };
                 }
                 groups[rel.singular_name].items = groups[rel.singular_name].items.concat([
@@ -115,7 +77,24 @@ export default {
                     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete groups[key];
                 }
-                if (groups[key]?.items) groups[key].items = groups[key].items.sort((a, b) => sortMatches(a.item, b.item));
+
+                if (groups[key]?.items) {
+                    const events = { };
+
+                    groups[key]?.items?.forEach(({ item }) => {
+                        const eventID = item?.event?.id;
+                        if (eventID) {
+                            if (!events[eventID]) events[eventID] = { event: item.event, matches: [] };
+                            events[eventID].matches.push(item);
+                        }
+                    });
+
+                    groups[key].items = groups[key].items.sort((a, b) => sortMatches(a.item, b.item));
+                    groups[key].events = Object.values(events).map(event => ({
+                        ...event,
+                        matches: event.matches.sort(sortMatches)
+                    })).sort(sortEvents);
+                }
             });
             return groups;
         }

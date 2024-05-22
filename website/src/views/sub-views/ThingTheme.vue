@@ -85,9 +85,6 @@ import StandingsTeam from "@/components/broadcast/StandingsTeam";
 import { bg, resizedImageNoWrap } from "@/utils/images";
 import { getDataServerAddress } from "@/utils/fetch";
 import CopyTextButton from "@/components/website/CopyTextButton";
-// import RecoloredHero from "@/components/broadcast/RecoloredHero";
-// import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
-// import HeroColorControls from "@/components/broadcast/HeroColorControls";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");

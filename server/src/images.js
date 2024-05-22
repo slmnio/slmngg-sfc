@@ -215,7 +215,7 @@ module.exports = ({ app, cors, Cache }) => {
 
             if (imagePath) {
                 // already cached
-                return res.sendFile(imagePath);
+                return res.header("Cache-Control", "public, max-age=31536000, immutable").sendFile(imagePath);
             }
 
             // not already cached
@@ -245,7 +245,7 @@ module.exports = ({ app, cors, Cache }) => {
 
             console.log("[image]", `resized ${filename} (${att.filename}) @ ${size} in ${Date.now() - t}ms`);
 
-            if (resizedImagePath) return res.sendFile(resizedImagePath);
+            if (resizedImagePath) return res.header("Cache-Control", "public, max-age=31536000, immutable").sendFile(resizedImagePath);
 
         } catch (e) {
             console.error("Image error", e);
@@ -289,7 +289,7 @@ module.exports = ({ app, cors, Cache }) => {
             let heldImage = await getImage(filename, sizeText);
             if (heldImage) {
                 // console.log("[image|theme]", `theme using saved @${size} in ${Date.now() - t}ms`);
-                return res.sendFile(heldImage);
+                return res.header("Cache-Control", "public, max-age=31536000, immutable").sendFile(heldImage);
             }
 
             let resizedLogo = await sharp(filePath).resize({
@@ -314,7 +314,7 @@ module.exports = ({ app, cors, Cache }) => {
             compositeThemeImage.clone().png().toBuffer()
                 .then(data => {
                     console.log("[image|theme]", `theme processed @${size} in ${Date.now() - t}ms`);
-                    res.end(data);
+                    res.header("Cache-Control", "public, max-age=31536000, immutable").end(data);
                 });
 
             return await compositeThemeImage.clone().toFile(resizedFilePath);
@@ -426,7 +426,7 @@ module.exports = ({ app, cors, Cache }) => {
                 ]);
 
                 let thumbBuffer = await thumb.png().toBuffer();
-                return res.header("Content-Type", "image/png").send(thumbBuffer);
+                return res.header("Content-Type", "image/png").header("Cache-Control", "public, max-age=31536000, immutable").send(thumbBuffer);
 
 
             } else {
@@ -455,7 +455,7 @@ module.exports = ({ app, cors, Cache }) => {
                     { input: resizedLogo }
                 ]);
                 let thumbBuffer = await thumb.png().toBuffer();
-                return res.header("Content-Type", "image/png").send(thumbBuffer);
+                return res.header("Content-Type", "image/png").header("Cache-Control", "public, max-age=31536000, immutable").send(thumbBuffer);
             }
         } catch (e) {
             console.error("Match image error", e);

@@ -143,7 +143,7 @@
                     <!--</editor-fold>-->
                 </tr>
                 <tr class="totals">
-                    <td colspan="2" class="text-end">Total ({{ totals.all.played }} matches)</td>
+                    <td colspan="3" class="text-end">Total ({{ totals.all.played }} matches)</td>
 
                     <td class="num new-category">{{ totals.regular_season.wins }}</td>
                     <td class="num">{{ totals.regular_season.losses }}</td>
@@ -162,7 +162,7 @@
                     <td class="winrate">{{ totals.all.winrate }}</td>
                 </tr>
                 <tr class="totals">
-                    <td colspan="2" class="text-end">Total ({{ totals.all.maps.played }} maps)</td>
+                    <td colspan="3" class="text-end">Total ({{ totals.all.maps.played }} maps)</td>
 
                     <td class="num new-category">{{ totals.regular_season.maps.wins }}</td>
                     <td class="num">{{ totals.regular_season.maps.losses }}</td>

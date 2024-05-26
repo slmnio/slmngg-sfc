@@ -13,6 +13,18 @@ function sortKeys([aKey], [bKey]) {
 async function wait(ms){
     return new Promise(r => setTimeout(r, ms));
 }
+const getCircularReplacer = () => {
+    const seen = new WeakSet();
+    return (key, value) => {
+        if (typeof value === "object" && value !== null) {
+            if (seen.has(value)) {
+                return;
+            }
+            seen.add(value);
+        }
+        return value;
+    };
+};
 
 /**
  *
@@ -298,7 +310,7 @@ module.exports = {
         const manager = new AirtableManager();
 
         web.get("/api/requests", async (req, res) => {
-            res.json(manager.getStatusData());
+            res.send(JSON.stringify(manager.getStatusData(), getCircularReplacer()));
         });
         web.get("/requests", async (req, res) => {
             res.sendFile(__dirname + "/request.html");

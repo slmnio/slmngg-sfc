@@ -5,6 +5,15 @@ const path = require("path");
 const https = require("https");
 const { cleanID } = require("./action-utils/action-utils");
 
+
+function cleanAttID(id) {
+    if (!id) return null;
+    if (id?.id) return id.id;
+    if (typeof id !== "string") return null;
+    if (id.startsWith("att") && id.length === 17) id = id.slice(3);
+    return id;
+}
+
 const heldPromises = [];
 function getHeldPromise(parts) {
     return heldPromises[parts.join("-")];
@@ -41,6 +50,10 @@ async function getOrWaitForDownload(url, filename, size) {
         await p;
     }
     return getImage(filename, size);
+}
+
+function safeFilename(name) {
+    return name.replace(/\s+/g, "-")
 }
 
 async function downloadImage(url, filename, size) {
@@ -163,6 +176,7 @@ module.exports = ({ app, cors, Cache }) => {
 
             let airtableURL = att.url;
             let filename = att._autoFilename;
+            let filetype = ((n) => { const dots = n.split("."); return dots[dots.length-1] })(filename)
 
             let size = "orig";
             let sizeData = {};
@@ -215,7 +229,10 @@ module.exports = ({ app, cors, Cache }) => {
 
             if (imagePath) {
                 // already cached
-                return res.header("Cache-Control", "public, max-age=31536000, immutable").sendFile(imagePath);
+                return res
+                    .header("Cache-Control", "public, max-age=31536000, immutable")
+                    .header("Content-Disposition", `inline; filename="${`img-${cleanAttID(att.id)}${size && size !== 'orig' ? "-" + size.toString() : ""}.${filetype}`}"`)
+                    .sendFile(imagePath);
             }
 
             // not already cached
@@ -233,7 +250,12 @@ module.exports = ({ app, cors, Cache }) => {
                 await downloadImage(airtableURL, filename, "orig");
                 console.log("[image]", `downloaded ${filename} (${att.filename}) @ orig in ${Date.now() - t}ms`);
                 orig = await getImage(filename, "orig");
-                if (size === "orig") return res.sendFile(orig);
+                if (size === "orig") {
+                    return res
+                        .header("Cache-Control", "public, max-age=31536000, immutable")
+                        .header("Content-Disposition", `inline; filename="${`img-${cleanAttID(att.id)}${size && size !== 'orig' ? "-" + size.toString() : ""}.${filetype}`}"`)
+                        .sendFile(orig);
+                }
             }
 
             // resize time!
@@ -245,7 +267,12 @@ module.exports = ({ app, cors, Cache }) => {
 
             console.log("[image]", `resized ${filename} (${att.filename}) @ ${size} in ${Date.now() - t}ms`);
 
-            if (resizedImagePath) return res.header("Cache-Control", "public, max-age=31536000, immutable").sendFile(resizedImagePath);
+            if (resizedImagePath) {
+                return res
+                    .header("Cache-Control", "public, max-age=31536000, immutable")
+                    .header("Content-Disposition", `inline; filename="${`img-${cleanAttID(att.id)}${size && size !== 'orig' ? "-" + size.toString() : ""}.${filetype}`}"`)
+                    .sendFile(resizedImagePath);
+            }
 
         } catch (e) {
             console.error("Image error", e);
@@ -278,6 +305,17 @@ module.exports = ({ app, cors, Cache }) => {
             // centered logo
             // with ?padding around it
 
+            let themeThing = null;
+            let themeCode = null;
+
+            if (theme?.event?.length) {
+                themeThing = await Cache.get(theme?.event?.[0]);
+                themeCode = `event-${themeThing?.short?.toLowerCase() || cleanID(themeThing?.id)}`
+            } else if (theme?.team?.length) {
+                themeThing = await Cache.get(theme?.team?.[0])
+                themeCode = `team-${themeThing?.code || cleanID(themeThing?.id)}`
+            }
+
             let filePath = await fullGetURL(logo, "orig", null);
 
             let filename = themeColor.replace("#", "") + "_" + logo._autoFilename;
@@ -289,7 +327,9 @@ module.exports = ({ app, cors, Cache }) => {
             let heldImage = await getImage(filename, sizeText);
             if (heldImage) {
                 // console.log("[image|theme]", `theme using saved @${size} in ${Date.now() - t}ms`);
-                return res.header("Cache-Control", "public, max-age=31536000, immutable").sendFile(heldImage);
+                return res
+                    .header("Content-Disposition", `inline; filename="${safeFilename(`theme-${cleanID(theme.id) + (themeCode ? '-' + themeCode : '')}.png`)}"`)
+                    .sendFile(heldImage);
             }
 
             let resizedLogo = await sharp(filePath).resize({
@@ -298,8 +338,6 @@ module.exports = ({ app, cors, Cache }) => {
                 fit: "contain",
                 background: themeColor
             }).toBuffer();
-
-            res.header("Content-Type", "image/png");
 
             let compositeThemeImage = sharp({
                 create: {
@@ -314,7 +352,10 @@ module.exports = ({ app, cors, Cache }) => {
             compositeThemeImage.clone().png().toBuffer()
                 .then(data => {
                     console.log("[image|theme]", `theme processed @${size} in ${Date.now() - t}ms`);
-                    res.header("Cache-Control", "public, max-age=31536000, immutable").end(data);
+                    res
+                        .header("Content-Type", "image/png")
+                        .header("Content-Disposition", `inline; filename="${safeFilename(`theme-${cleanID(theme.id) + (themeCode ? '-' + themeCode : '')}.png`)}"`)
+                        .end(data);
                 });
 
             return await compositeThemeImage.clone().toFile(resizedFilePath);
@@ -426,7 +467,10 @@ module.exports = ({ app, cors, Cache }) => {
                 ]);
 
                 let thumbBuffer = await thumb.png().toBuffer();
-                return res.header("Content-Type", "image/png").header("Cache-Control", "public, max-age=31536000, immutable").send(thumbBuffer);
+                return res.header("Content-Type", "image/png")
+                    .header("Cache-Control", "public, max-age=31536000, immutable")
+                    .header("Content-Disposition", `inline; filename="${safeFilename(`match-${cleanID(match.id)}-${teams.map(t => t.code || cleanID(t.id)).join("-")}-thumbnail-${size}.png`)}"`)
+                    .send(thumbBuffer);
 
 
             } else {
@@ -455,7 +499,11 @@ module.exports = ({ app, cors, Cache }) => {
                     { input: resizedLogo }
                 ]);
                 let thumbBuffer = await thumb.png().toBuffer();
-                return res.header("Content-Type", "image/png").header("Cache-Control", "public, max-age=31536000, immutable").send(thumbBuffer);
+                return res
+                    .header("Content-Type", "image/png")
+                    .header("Cache-Control", "public, max-age=31536000, immutable")
+                    .header("Content-Disposition", `inline; filename="${safeFilename(`match-${cleanID(match.id)}-default-thumbnail-${size}.png`)}"`)
+                    .send(thumbBuffer);
             }
         } catch (e) {
             console.error("Match image error", e);

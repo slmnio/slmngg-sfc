@@ -2,6 +2,8 @@
 /* BPL Staff Automation */
 
 const client = require("./client.js");
+if (!client) return console.warn("Staff application system will not be set up because no Discord key is set.");
+
 const Airtable = require("airtable");
 const { EmbedBuilder, Permissions } = require("discord.js");
 const airtable = new Airtable({apiKey: process.env.AIRTABLE_KEY});

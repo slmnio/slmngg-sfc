@@ -66,8 +66,8 @@
                 <b-navbar-nav class="flex-grow-1" />
 
                 <b-navbar-nav>
-                    <div v-b-modal.timezone-swapper-modal class="nav-link">Timezone</div>
-                    <a target="_blank" class="nav-link" href="https://slmn.statuspage.io/?utm_source=slmngg_nav">Status</a>
+                    <div v-b-modal.timezone-swapper-modal class="nav-link text-left justify-content-start">Timezone</div>
+<!--                    <a target="_blank" class="nav-link" href="https://slmn.statuspage.io/?utm_source=slmngg_nav">Status</a>-->
                 </b-navbar-nav>
 
                 <b-navbar-nav v-if="minisite">

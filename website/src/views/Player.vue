@@ -93,7 +93,12 @@ export default {
                 }),
                 captain_of: ReactiveArray("captain_of", {
                     event: ReactiveThing("event"),
-                    theme: ReactiveThing("theme")
+                    theme: ReactiveThing("theme"),
+                    accolades: ReactiveArray("accolades", {
+                        event: ReactiveThing("event", {
+                            theme: ReactiveThing("theme")
+                        })
+                    })
                 }),
                 event_staff: ReactiveArray("event_staff", {
                     theme: ReactiveThing("theme")
@@ -146,6 +151,7 @@ export default {
             return [
                 // team things
                 ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => (e.accolades || []).filter(a => a?.show_for_players).map(a => ({ ...a, team: e }))).filter(Boolean)) : []),
+                ...(this.player.captain_of ? [].concat(...this.player.captain_of.map(e => (e.accolades || []).filter(a => a?.show_for_players).map(a => ({ ...a, team: e }))).filter(Boolean)) : []),
                 ...(this.player.accolades ? this.player.accolades.filter(a => a?.show_for_players && a?.teams?.length === 1).map(a => ({ ...a, team: a.teams?.[0] })) : [])
             ].filter(accolade => accolade.trophy_tier).sort((a, b) => {
                 const TierPriority = ["Championship", "Tournament"];

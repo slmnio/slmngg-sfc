@@ -48,12 +48,13 @@ async function getOrWaitForDownload(url, filename, size) {
     if (p) {
         console.log("[image] downloading in other promise, waiting for it");
         await p;
+        console.log("[image] held promise complete");
     }
     return getImage(filename, size);
 }
 
 function safeFilename(name) {
-    return name.replace(/\s+/g, "-")
+    return name.replace(/\s+/g, "-");
 }
 
 async function downloadImage(url, filename, size) {
@@ -62,24 +63,34 @@ async function downloadImage(url, filename, size) {
         const pathName = getPath(filename, size);
         const file = fs.createWriteStream(pathName);
 
-        function error(err) {
+        async function error(err) {
             console.error(`[image] file error for ${filename} ${err.code} ${err.message}`);
-            fs.unlink(pathName, function(err) {
-                if (err) {
-                    console.error(`[image] file error for ${filename} unlink FAILED`, err);
-                } else {
-                    console.error(`[image] file error for ${filename} unlinked`);
-                }
-            });
+            try {
+                await fp.unlink(pathName);
+            } catch (e) {
+                console.warn(`[image|delete] Could not delete ${filename} (download failure)`, e);
+            } finally {
+                console.warn(`[image|delete] Deleted ${filename} (download failure)`, err);
+            }
             reject(err);
         }
 
-        https.get(url, res => {
-            if (![200].includes(res.statusCode)) return error({ code: res.statusCode, message: res.statusMessage });
-            res.pipe(file);
-            file.on("finish", () => {
-                file.close(resolve);
-            });
+        file.on("open", () => {
+            https.get(url, res => {
+                if (![200].includes(res.statusCode)) return error({ code: res.statusCode, message: res.statusMessage });
+                res.pipe(file);
+                file.on("finish", async () => {
+                    try {
+                        const { size } = await fp.stat(pathName);
+                        if (size < 100) {
+                            return error({ message: "Tiny file downloaded, assuming it's an error" });
+                        }
+                        file.close(resolve);
+                    } catch (e) {
+                        error(e);
+                    }
+                });
+            }).on("error", err => error(err));
         }).on("error", err => error(err));
     }));
 }
@@ -112,8 +123,29 @@ async function resizeImage(filename, sizeText, sizeData) {
             return await sharp(origFilePath).resize(sizeData).toFile(resizedFilePath);
         } catch (e) {
             console.error("Resize image error", e, origFilePath, sizeData);
+            console.log("code", e.code, "message", e.message);
             if (e.code === "EEXIST") {
                 return await getImage(filename, sizeText);
+            }
+
+            // try to remove the broken image if something was saved
+            try {
+                await fp.unlink(resizedFilePath);
+            } catch (e2) {
+                console.warn(`[image|delete] Could not delete ${filename} (resize image failure)`, e2);
+            } finally {
+                console.warn(`[image|delete] Deleted ${filename} (resize image failure)`, e);
+            }
+
+            if (["pngload: libspng read error", "Error: Input file contains unsupported image format"].includes(e.message)) {
+                // attempting to also remove the orig image since it may also be broken
+                try {
+                    await fp.unlink(origFilePath);
+                } catch (e2) {
+                    console.warn(`[image|delete] Could not delete original file ${filename} (resize image failure)`, e2);
+                } finally {
+                    console.warn(`[image|delete] Deleted original file ${filename} (resize image failure)`, e);
+                }
             }
             return null;
         }
@@ -159,8 +191,8 @@ async function fullGetURL(attachment, sizeText, sizeData) {
 
 module.exports = ({ app, cors, Cache }) => {
 
-    ensureFolder("").then(() => console.log("[images] images folder ensured"));
-    ensureFolder("orig").then(() => console.log("[images] orig folder ensured"));
+    ensureFolder("").then(() => console.log("[image] images root folder ensured"));
+    ensureFolder("orig").then(() => console.log("[image] orig folder ensured"));
 
     async function handleImageRequests(req, res) {
 
@@ -176,7 +208,7 @@ module.exports = ({ app, cors, Cache }) => {
 
             let airtableURL = att.url;
             let filename = att._autoFilename;
-            let filetype = ((n) => { const dots = n.split("."); return dots[dots.length-1] })(filename)
+            let filetype = ((n) => { const dots = n.split("."); return dots[dots.length-1]; })(filename);
 
             let size = "orig";
             let sizeData = {};
@@ -228,15 +260,27 @@ module.exports = ({ app, cors, Cache }) => {
             let imagePath = await getImage(filename, size);
 
             if (imagePath) {
+                const { size: fileSize } = await fp.stat(imagePath);
+
+                if (fileSize < 100) {
+                    fs.unlink(imagePath, function(err) {
+                        if (err) {
+                            console.error(`[image] detected tiny image unlink for ${filename} unlink FAILED`, err);
+                        } else {
+                            console.warn(`[image] detected tiny image unlink for ${filename} unlinked SUCCESS`);
+                        }
+                    });
+                }
+
                 // already cached
                 return res
                     .header("Cache-Control", "public, max-age=31536000, immutable")
-                    .header("Content-Disposition", `inline; filename="${`img-${cleanAttID(att.id)}${size && size !== 'orig' ? "-" + size.toString() : ""}.${filetype}`}"`)
+                    .header("Content-Disposition", `inline; filename="img-${cleanAttID(att.id)}${size && size !== "orig" ? "-" + size.toString() : ""}.${filetype}"`)
                     .sendFile(imagePath);
             }
 
             // not already cached
-            console.log("[image]", `no file for ${filename} (${att.filename}) @ ${size}`);
+            // console.log("[image]", `no file for ${filename} (${att.filename}) @ ${size}`);
 
             if (!airtableURL) return res.status(404).send("No URL available for this image");
 
@@ -253,7 +297,7 @@ module.exports = ({ app, cors, Cache }) => {
                 if (size === "orig") {
                     return res
                         .header("Cache-Control", "public, max-age=31536000, immutable")
-                        .header("Content-Disposition", `inline; filename="${`img-${cleanAttID(att.id)}${size && size !== 'orig' ? "-" + size.toString() : ""}.${filetype}`}"`)
+                        .header("Content-Disposition", `inline; filename="img-${cleanAttID(att.id)}${size && size !== "orig" ? "-" + size.toString() : ""}.${filetype}"`)
                         .sendFile(orig);
                 }
             }
@@ -270,7 +314,7 @@ module.exports = ({ app, cors, Cache }) => {
             if (resizedImagePath) {
                 return res
                     .header("Cache-Control", "public, max-age=31536000, immutable")
-                    .header("Content-Disposition", `inline; filename="${`img-${cleanAttID(att.id)}${size && size !== 'orig' ? "-" + size.toString() : ""}.${filetype}`}"`)
+                    .header("Content-Disposition", `inline; filename="img-${cleanAttID(att.id)}${size && size !== "orig" ? "-" + size.toString() : ""}.${filetype}"`)
                     .sendFile(resizedImagePath);
             }
 
@@ -310,10 +354,10 @@ module.exports = ({ app, cors, Cache }) => {
 
             if (theme?.event?.length) {
                 themeThing = await Cache.get(theme?.event?.[0]);
-                themeCode = `event-${themeThing?.short?.toLowerCase() || cleanID(themeThing?.id)}`
+                themeCode = `event-${themeThing?.short?.toLowerCase() || cleanID(themeThing?.id)}`;
             } else if (theme?.team?.length) {
-                themeThing = await Cache.get(theme?.team?.[0])
-                themeCode = `team-${themeThing?.code || cleanID(themeThing?.id)}`
+                themeThing = await Cache.get(theme?.team?.[0]);
+                themeCode = `team-${themeThing?.code || cleanID(themeThing?.id)}`;
             }
 
             let filePath = await fullGetURL(logo, "orig", null);
@@ -328,7 +372,7 @@ module.exports = ({ app, cors, Cache }) => {
             if (heldImage) {
                 // console.log("[image|theme]", `theme using saved @${size} in ${Date.now() - t}ms`);
                 return res
-                    .header("Content-Disposition", `inline; filename="${safeFilename(`theme-${cleanID(theme.id) + (themeCode ? '-' + themeCode : '')}.png`)}"`)
+                    .header("Content-Disposition", `inline; filename="${safeFilename(`theme-${cleanID(theme.id) + (themeCode ? "-" + themeCode : "")}.png`)}"`)
                     .sendFile(heldImage);
             }
 
@@ -354,7 +398,7 @@ module.exports = ({ app, cors, Cache }) => {
                     console.log("[image|theme]", `theme processed @${size} in ${Date.now() - t}ms`);
                     res
                         .header("Content-Type", "image/png")
-                        .header("Content-Disposition", `inline; filename="${safeFilename(`theme-${cleanID(theme.id) + (themeCode ? '-' + themeCode : '')}.png`)}"`)
+                        .header("Content-Disposition", `inline; filename="${safeFilename(`theme-${cleanID(theme.id) + (themeCode ? "-" + themeCode : "")}.png`)}"`)
                         .end(data);
                 });
 

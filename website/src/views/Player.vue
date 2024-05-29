@@ -153,7 +153,7 @@ export default {
                 ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => (e.accolades || []).filter(a => a?.show_for_players).map(a => ({ ...a, team: e }))).filter(Boolean)) : []),
                 ...(this.player.captain_of ? [].concat(...this.player.captain_of.map(e => (e.accolades || []).filter(a => a?.show_for_players).map(a => ({ ...a, team: e }))).filter(Boolean)) : []),
                 ...(this.player.accolades ? this.player.accolades.filter(a => a?.show_for_players && a?.teams?.length === 1).map(a => ({ ...a, team: a.teams?.[0] })) : [])
-            ].filter(accolade => accolade.trophy_tier).sort((a, b) => {
+            ].filter((accolade, i, arr) => accolade.trophy_tier && arr.findIndex(x => x.id === accolade.id) === i).sort((a, b) => {
                 const TierPriority = ["Championship", "Tournament"];
                 const tierIndexes = [a, b].map(x => TierPriority.indexOf(x.trophy_tier));
                 const tierCompare = tierIndexes[0] - tierIndexes[1];

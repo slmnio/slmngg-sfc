@@ -105,7 +105,7 @@ export default {
                 ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => (e.accolades || []).filter(a => a?.show_for_players)).filter(Boolean)) : []),
                 ...(this.player.captain_of ? [].concat(...this.player.captain_of.map(e => (e.accolades || []).filter(a => a?.show_for_players)).filter(Boolean)) : []),
                 ...(this.player.accolades ? this.player.accolades : [])
-            ].filter(accolade => !accolade.trophy_tier).sort((a, b) => sortEvents(a?.event, b?.event));
+            ].filter((accolade, i, arr) => accolade.trophy_tier && arr.findIndex(x => x.id === accolade.id) === i).sort((a, b) => sortEvents(a?.event, b?.event));
         },
         teams() {
             if (!this.player?.member_of) return null;

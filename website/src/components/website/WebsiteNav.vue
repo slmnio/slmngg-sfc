@@ -25,14 +25,14 @@
         </WebsiteNavBanner>
         <!--       example: <WebsiteNavBanner class="bg-success" v-if="$socket.connected">Connected to the data server for live data updates!</WebsiteNavBanner>-->
 
-        <b-navbar v-b-color-mode="'dark'" toggleable="lg" type="dark">
+        <b-navbar toggleable="lg" type="dark">
             <router-link class="navbar-brand " to="/">
                 <img v-if="minisiteIcon" :src="minisiteIcon" alt="" class="navbar-image d-inline-block align-top mr-2">
                 <span class="d-lg-inline d-none">{{ minisite ? (minisite.navbar_name || minisite.series_name || minisite.name) : "SLMN.GG" }}</span>
                 <span class="d-inline d-lg-none">{{ minisite ? (minisite.short || minisite.series_name || minisite.name) : "SLMN.GG" }}</span>
             </router-link>
 
-            <b-navbar-toggle target="nav-collapse" />
+            <b-navbar-toggle v-b-color-mode="'dark'" class="toggler" target="nav-collapse" />
 
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav v-if="!minisite">
@@ -283,5 +283,8 @@ export default {
 }
 .nav-link {
     cursor: pointer;
+}
+.toggler.navbar-toggler {
+    --bs-navbar-toggler-border-color: rgba(255,255,255,0.15);
 }
 </style>

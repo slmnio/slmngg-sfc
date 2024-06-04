@@ -25,7 +25,7 @@
         </WebsiteNavBanner>
         <!--       example: <WebsiteNavBanner class="bg-success" v-if="$socket.connected">Connected to the data server for live data updates!</WebsiteNavBanner>-->
 
-        <b-navbar toggleable="lg" type="dark">
+        <b-navbar v-b-color-mode="'dark'" toggleable="lg" type="dark">
             <router-link class="navbar-brand " to="/">
                 <img v-if="minisiteIcon" :src="minisiteIcon" alt="" class="navbar-image d-inline-block align-top mr-2">
                 <span class="d-lg-inline d-none">{{ minisite ? (minisite.navbar_name || minisite.series_name || minisite.name) : "SLMN.GG" }}</span>
@@ -67,7 +67,7 @@
 
                 <b-navbar-nav>
                     <div v-b-modal.timezone-swapper-modal class="nav-link text-left justify-content-start">Timezone</div>
-<!--                    <a target="_blank" class="nav-link" href="https://slmn.statuspage.io/?utm_source=slmngg_nav">Status</a>-->
+                    <!--                    <a target="_blank" class="nav-link" href="https://slmn.statuspage.io/?utm_source=slmngg_nav">Status</a>-->
                 </b-navbar-nav>
 
                 <b-navbar-nav v-if="minisite">

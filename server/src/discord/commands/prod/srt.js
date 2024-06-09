@@ -17,17 +17,13 @@ module.exports = {
                 .setDescription("SRT server region")
                 .addChoices(
                     {
-                        name: "US East (default)",
-                        value: "na"
-                    },
-                    {
-                        name: "EU West",
+                        name: "EU West (default)",
                         value: "eu"
                     },
                     {
-                        name: "US Central (deprecated)",
-                        value: "nac"
-                    },
+                        name: "US East",
+                        value: "na"
+                    }
                 ))
         .addIntegerOption(option =>
             option.setName("latency")
@@ -50,7 +46,7 @@ module.exports = {
             feedId = playerClient?.key;
         }
 
-        const region = interaction.options.getString("region") ?? "na";
+        const region = interaction.options.getString("region") ?? "eu";
         const latency = interaction.options.getInteger("latency") ?? 500;
 
         const embed = new EmbedBuilder()

@@ -55,7 +55,7 @@ export default {
             return this.streamID;
         },
         src() {
-            const vdoDomain = "https://cams.prod.slmn.gg";
+            const vdoDomain = "https://webcam.slmn.gg";
             if (this.streamID.includes("http")) {
                 // custom link
                 return this.streamID + (this.extraParams || "");

@@ -68,7 +68,7 @@ export default {
             return this.playerWithCams.live_guests?.cam_code ?? this.playerWithCams.live_guests?.discord_id;
         },
         camLink() {
-            return `https://cams.prod.slmn.gg/?push=${this.camId}&webcam&cb=0&nmb=0&hideaudio=1`;
+            return `https://webcam.slmn.gg/?push=${this.camId}&webcam&cb=0&nmb=0&hideaudio=1`;
         },
         playerWithCams() {
             const { user } = useAuthStore();

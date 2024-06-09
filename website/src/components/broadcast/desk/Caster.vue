@@ -68,7 +68,7 @@ export default {
             if (this.disableVideo) return false;
             if (!(this.liveGuestData?.cam_code || this.liveGuestData?.discord_id)) return false;
             if (!this.liveGuestData.use_cam) return false;
-            return this.liveGuestData.cam_code.includes("http") ? `${this.liveGuestData.cam_code}&z=04&mute` : `https://cams.prod.slmn.gg/?view=${this.liveGuestData.cam_code}&z=04&mute`;
+            return this.liveGuestData.cam_code.includes("http") ? `${this.liveGuestData.cam_code}&z=04&mute` : `https://webcam.slmn.gg/?view=${this.liveGuestData.cam_code}&z=04&mute`;
         },
         name() {
             return this.caster?.name || this.guest?.name;

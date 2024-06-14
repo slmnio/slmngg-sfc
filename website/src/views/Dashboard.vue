@@ -107,6 +107,9 @@
         <DashboardModule v-if="useTeamComms" class="mb-2" icon-class="fas fa-microphone" title="Team Comms Listen-In">
             <CommsControls :match="liveMatch" />
         </DashboardModule>
+        <DashboardModule v-if="broadcast?.event" class="mb-2" icon-class="fas fa-paint-brush" title="Customisation">
+            <BroadcastCustomisation :broadcast="broadcast" />
+        </DashboardModule>
     </div>
 </template>
 
@@ -134,10 +137,11 @@ import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import GFXController from "@/views/GFXController.vue";
 import BroadcastRoles from "@/components/website/dashboard/BroadcastRoles.vue";
 import { useAuthStore } from "@/stores/authStore";
+import BroadcastCustomisation from "@/components/website/dashboard/BroadcastCustomisation.vue";
 
 export default {
     name: "Dashboard",
-    components: { GFXController, BroadcastRoles, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControls, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher },
+    components: { BroadcastCustomisation, GFXController, BroadcastRoles, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControls, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher },
     data: () => ({
         titleProcessing: false
     }),

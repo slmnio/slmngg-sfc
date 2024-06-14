@@ -120,6 +120,8 @@ interface UpdateBroadcastData {
     deskDisplayMode?: null | "Match" | "Predictions" | "Maps" | "Notice (Team 1)" | "Notice (Team 2)" | "Notice (Event)" | "Scoreboard" | "Drafted Maps" | "Interview" | "Hidden" | "Casters"
     deskDisplayText?: string
     countdownEnd?: any
+    highlightTeamID?: AnyAirtableID
+    highlightHeroID?: AnyAirtableID
 }
 
 interface UpdateGfxIndexData {

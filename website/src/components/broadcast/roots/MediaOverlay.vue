@@ -9,6 +9,7 @@
             width="100%"
             height="100%"
             :class="{'black-out': ended }"
+            :controls="1"
             @ready="playerReady"
             @playing="playerPlaying"
             @ended="playerEnded" />
@@ -112,6 +113,11 @@ export default {
         videoId(newMedia) {
             this.prepared = false;
         },
+        async active(isActive) {
+            if (isActive && this.$refs.youtube.player) {
+                this.$refs.youtube.player.seekTo(0);
+            }
+        },
         async animationActive(isActive) {
             if (isActive && this.$refs.youtube.player) {
                 this.$refs.youtube.player.playVideo();
@@ -141,17 +147,18 @@ export default {
 </script>
 
 <style scoped>
-    .player {
+    .media-overlay:deep(.player) {
         width: 100vw;
         --overlap: 250px;
         height: calc(100vh + calc(var(--overlap) * 2));
         top: calc(var(--overlap) * -1);
         position: absolute;
     }
-    .player:hover, body:hover .player {
+    .media-overlay:deep(.player):hover,
+    body:hover :deep(.player) {
         --overlap: 0px;
     }
-    .player.black-out {
+    .media-overlay:deep(.player.black-out) {
         filter: brightness(0);
     }
 </style>

@@ -122,6 +122,8 @@ interface UpdateBroadcastData {
     countdownEnd?: any
     highlightTeamID?: AnyAirtableID
     highlightHeroID?: AnyAirtableID
+    highlightPlayerID?: AnyAirtableID
+    highlightMediaID?: AnyAirtableID
 }
 
 interface UpdateGfxIndexData {

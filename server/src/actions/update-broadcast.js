@@ -3,7 +3,7 @@ const { safeInput, safeInputNoQuotes } = require("../action-utils/action-utils")
 module.exports = {
     key: "update-broadcast",
     auth: ["client"],
-    optionalParams: ["match", "advertise", "playerCams", "mapAttack", "title", "manualGuests", "deskDisplayMode", "deskDisplayText", "showLiveMatch", "countdownEnd", "highlightTeamID", "highlightHeroID", "highlightPlayerID"],
+    optionalParams: ["match", "advertise", "playerCams", "mapAttack", "title", "manualGuests", "deskDisplayMode", "deskDisplayText", "showLiveMatch", "countdownEnd", "highlightTeamID", "highlightHeroID", "highlightPlayerID", "highlightMediaID"],
     /***
      * @param {AnyAirtableID} match
      * @param {ClientData} client
@@ -23,12 +23,13 @@ module.exports = {
         countdownEnd,
         highlightTeamID,
         highlightHeroID,
-        highlightPlayerID
+        highlightPlayerID,
+        highlightMediaID
     }, { client }) {
         let broadcast = await this.helpers.get(client?.broadcast?.[0]);
         if (!broadcast) throw ("No broadcast associated");
 
-        console.log({ matchID, advertise, playerCams, mapAttack, title, manualGuests, deskDisplayMode, deskDisplayText, showLiveMatch, highlightTeamID, highlightHeroID, highlightPlayerID });
+        console.log({ matchID, advertise, playerCams, mapAttack, title, manualGuests, deskDisplayMode, deskDisplayText, showLiveMatch, highlightTeamID, highlightHeroID, highlightPlayerID, highlightMediaID });
         let validatedData = {};
 
         if (matchID !== undefined) {
@@ -69,6 +70,16 @@ module.exports = {
                 if (!player) throw ("Unknown highlight player");
                 if (player.__tableName !== "Players") throw ("Highlight player object is not a Player");
                 validatedData["Highlight Player"] = [ player.id ];
+            }
+        }
+        if (highlightMediaID !== undefined) {
+            if (highlightMediaID === null) {
+                validatedData["Highlight Media"] = null;
+            } else {
+                let media = await this.helpers.get(highlightMediaID);
+                if (!media) throw ("Unknown highlight media");
+                if (media.__tableName !== "News") throw ("Highlight media object is not a News item");
+                validatedData["Highlight Media"] = [ media.id ];
             }
         }
         if (mapAttack !== undefined) {

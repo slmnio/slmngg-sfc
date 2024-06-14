@@ -100,6 +100,39 @@
                 </b-button>
             </div>
         </div>
+
+
+        <div class="form-row row flex-nowrap flex-center">
+            <div class="label text-nowrap flex-shrink-0 fw-bold col-2">Highlight media</div>
+            <div class="col-10 d-flex gap-2">
+                <div class="flex-shrink-0 bg-center media-name text-center flex-center">
+                    <div>{{ hydratedBroadcast.highlight_media?.name }}</div>
+                </div>
+                <b-form-select
+                    v-model="selectedHighlightMediaID"
+                    :class="{'low-opacity': processing.highlight_media}"
+                    :disabled="processing.highlight_media"
+                    class="opacity-changes"
+                    :options="medias"
+                    @update:model-value="h => setMedia(h, changeInstantly)" />
+                <b-button
+                    :class="{'low-opacity': processing.highlight_media}"
+                    class="opacity-changes text-nowrap flex-shrink-0 disabled-low-opacity"
+                    :disabled="changeInstantly || processing.highlight_media"
+                    variant="success"
+                    @click="setMedia(selectedHighlightMediaID, true)">
+                    <i class="fas fa-save fa-fw"></i> {{ changeInstantly ? "Autosave" : "Save" }}
+                </b-button>
+                <b-button
+                    :class="{'low-opacity': processing.highlight_media}"
+                    :disabled="processing.highlight_media"
+                    class="opacity-changes text-nowrap flex-shrink-0"
+                    variant="danger"
+                    @click="setMedia(null, true)">
+                    <i class="fas fa-times fa-fw"></i> Clear
+                </b-button>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -119,6 +152,7 @@ export default {
         selectedHighlightTeamID: null,
         selectedHighlightHeroID: null,
         selectedHighlightPlayerID: null,
+        selectedHighlightMediaID: null,
         processing: {
 
         }
@@ -131,13 +165,15 @@ export default {
                     "teams": ReactiveArray("teams", {
                         "theme": ReactiveThing("theme"),
                         "players": ReactiveArray("players")
-                    })
+                    }),
+                    "news_items": ReactiveArray("news_items")
                 }),
                 "highlight_team": ReactiveThing("highlight_team", {
                     "theme": ReactiveThing("theme")
                 }),
                 "highlight_hero": ReactiveThing("highlight_hero"),
-                "highlight_player": ReactiveThing("highlight_player")
+                "highlight_player": ReactiveThing("highlight_player"),
+                "highlight_media": ReactiveThing("highlight_media")
             });
         },
         teams() {
@@ -187,6 +223,18 @@ export default {
                     }))
                 })).sort((a,b) => sortAlpha(a,b,"text"))
             ];
+        },
+        medias() {
+            if (!this.hydratedBroadcast?.event?.id) return [
+                { value: null, text: "No media" }
+            ];
+            return [
+                { value: null, text: "No media" },
+                ...(this.hydratedBroadcast?.event?.news_items || []).filter(item => item.embed).map(item => ({
+                    text: item.name,
+                    value: item.id
+                }))
+            ];
         }
     },
     methods: {
@@ -223,6 +271,17 @@ export default {
             } finally {
                 this.processing.highlight_player = false;
             }
+        },
+        async setMedia(mediaID, instant) {
+            if (!instant) return;
+            this.processing.highlight_media = true;
+            try {
+                await authenticatedRequest("actions/update-broadcast", {
+                    highlightMediaID: mediaID
+                });
+            } finally {
+                this.processing.highlight_media = false;
+            }
         }
     },
     watch: {
@@ -246,22 +305,30 @@ export default {
                 console.log("hydrate update", player);
                 this.selectedHighlightPlayerID = player?.id || null;
             }
+        },
+        "hydratedBroadcast.highlight_media": {
+            immediate: true,
+            handler(media) {
+                console.log("hydrate update", media);
+                this.selectedHighlightMediaID = media?.id || null;
+            }
         }
     },
 };
 </script>
 
 <style scoped>
-    .preview-theme, .hero-image, .player-name {
+    .preview-theme, .hero-image, .player-name, .media-name {
         height: 2.5em;
         width: 3em;
         background-color: rgba(255, 255, 255, 0.1)
     }
-    .player-name {
+    .player-name, .media-name {
         width: 6em;
     }
-    .player-name div {
+    .player-name div, .media-name div {
         font-size: .75em;
+        line-height: 1;
     }
 
     .opacity-changes {

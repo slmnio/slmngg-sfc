@@ -1,10 +1,14 @@
-export default [
+/**
+ * @param isSubdomain
+ * @returns {RouteRecordRaw[]}
+ */
+export default (isSubdomain) => [
     { path: "", component: () => import("@/views/sub-views/event/EventMain.vue") },
     { path: "rosters", component: () => import("@/views/sub-views/event/EventRosters.vue") },
-    { path: "bracket", name: "event-bracket", alias: "brackets", component: () => import("@/views/sub-views/event/EventBrackets.vue") },
-    { path: "brackets", redirect: { name: "event-schedule" } },
-    { path: "schedule", name: "event-schedule", component: () => import("@/views/sub-views/event/EventSchedule.vue") },
-    { path: "matches", redirect: { name: "event-schedule" } },
+    { path: "bracket", name: `event-${isSubdomain? "sub-" : ""}-brackets`, alias: "brackets", component: () => import("@/views/sub-views/event/EventBrackets.vue") },
+    { path: "brackets", redirect: { name: `event-${isSubdomain? "sub-" : ""}-brackets` } },
+    { path: "schedule", name: `event-${isSubdomain? "sub-" : ""}-schedule`, component: () => import("@/views/sub-views/event/EventSchedule.vue") },
+    { path: "matches", redirect: { name: `event-${isSubdomain? "sub-" : ""}-schedule` } },
     // { path: "scenarios", component: EventScenarios },
     { path: "scenarios", component: () => import("@/views/sub-views/event/EventScenarios2.vue") },
     { path: "draft", component: () => import("@/views/sub-views/event/EventDraft.vue") },
@@ -14,6 +18,6 @@ export default [
     { path: "theme", component: () => import("@/views/sub-views/ThingTheme.vue") },
     { path: "brands", component: () => import("@/views/sub-views/event/EventBrands.vue") },
     { path: "auction", component: () => import("@/views/sub-views/event/EventAuction.vue") },
-    { path: "streams", name: "event-streams", component: () => import("@/views/sub-views/event/EventStreamDetails.vue") },
-    { path: "stream", alias: ["stream-details"], redirect: { name: "event-streams" } },
+    { path: "streams", name: `event-${isSubdomain? "sub-" : ""}-streams`, component: () => import("@/views/sub-views/event/EventStreamDetails.vue") },
+    { path: "stream", alias: ["stream-details"], redirect: { name: `event-${isSubdomain? "sub-" : ""}-streams` } },
 ];

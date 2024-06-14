@@ -1,4 +1,4 @@
-import EventRoutes from "@/router/event";
+import createEventRoutes from "@/router/event";
 
 export default [
     {
@@ -19,7 +19,7 @@ export default [
         // name: "Event",
         component: () => import("@/views/Event.vue"),
         props: route => ({ id: route.params.id }),
-        children: EventRoutes
+        children: createEventRoutes(false)
     },
     {
         path: "/player/:id",

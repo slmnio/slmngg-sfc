@@ -1,6 +1,6 @@
 <template>
     <div ref="big" class="squeezable" :style="{'--content-scale': allowedContentScale, '--content-transform-origin': (align || 'left')}" @click="updateWidth()">
-        <slot ref="small"></slot>
+        <slot></slot>
     </div>
 </template>
 
@@ -32,10 +32,8 @@ export default {
     methods: {
         updateWidth(isAfterTick) {
             const big = this.$refs.big;
-            const small = this.$slots.default?.()?.[0]?.el || big?.__vnode?.children?.[0]?.children?.[0]?.el || big?.__vnode?.children?.[0]?.el || this.$el?.children?.[0];
-            console.log("default slot", this.$slots.default());
-            console.log("element", this.$el?.children?.[0]);
-            console.log({ big, small });
+            const small = this.$el?.children?.[0];
+            // console.log({ big, small });
 
             if (!big?.getBoundingClientRect || !small?.getBoundingClientRect) return;
 
@@ -51,17 +49,16 @@ export default {
             if (!isAfterTick) this.$nextTick(() => this.updateWidth(true));
         },
         observerUpdate(...a) {
-            console.log("observer update", a);
+            // console.log("observer update", a);
             this.updateWidth();
         }
     },
     mounted() {
         this.elementObserver = new ResizeObserver(this.observerUpdate);
-        console.log("mount refs", { big: this.$refs.big, small: this.$refs.small, defaultSlot: this.$slots.default?.() });
         this.elementObserver.observe(this.$refs.big);
 
         const mutationObserver = new MutationObserver((...a) => {
-            console.log("mutation", a);
+            // console.log("mutation", a);
             this.$nextTick(() => {
                 this.updateWidth(true);
             });

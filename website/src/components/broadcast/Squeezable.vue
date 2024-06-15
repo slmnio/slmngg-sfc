@@ -33,7 +33,7 @@ export default {
         updateWidth(isAfterTick) {
             const big = this.$refs.big;
             const small = this.$slots.default?.()?.[0]?.el || big?.__vnode?.children?.[0]?.children?.[0]?.el || big?.__vnode?.children?.[0]?.el;
-            // console.log({ big, small });
+            console.log({ big, small });
 
             if (!big?.getBoundingClientRect || !small?.getBoundingClientRect) return;
 
@@ -49,12 +49,13 @@ export default {
             if (!isAfterTick) this.$nextTick(() => this.updateWidth(true));
         },
         observerUpdate(...a) {
-            // console.log(a);
+            console.log("observer update", a);
             this.updateWidth();
         }
     },
     mounted() {
         this.elementObserver = new ResizeObserver(this.observerUpdate);
+        console.log("mount refs", { big: this.$refs.big, small: this.$refs.small, defaultSlot: this.$slots.default?.() });
         this.elementObserver.observe(this.$refs.big);
 
         const mutationObserver = new MutationObserver((...a) => {

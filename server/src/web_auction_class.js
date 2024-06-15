@@ -4,6 +4,10 @@ const { cleanID, dirtyID,
 } = require("./action-utils/action-utils");
 const { isEventStaffOrHasRole } = require("./action-utils/action-permissions");
 
+/**
+ * @typedef {{ amount: number, teamID: AnyAirtableID }} Bid
+ */
+
 module.exports = class Auction {
     constructor(eventData, io, auctionData) {
         this.io = io;
@@ -35,6 +39,9 @@ module.exports = class Auction {
             maximumPlayerCount: auctionData?.each_team ?? auctionData?.eachTeam ?? 7
         };
 
+        /**
+         * @type {Bid[]}
+         */
         this.bidData = [];
         this.timerTimeout = null;
 
@@ -177,6 +184,12 @@ module.exports = class Auction {
                         return this.sendError(socket, `The bid $${amount} is out of range`);
                     }
                 }
+
+                const leading = this.bids.getLeading();
+                if (leading?.teamID === data.teamID) {
+                    return this.sendError(socket, "You are already leading this bid");
+                }
+
                 let bidError = await this.errorBiddingForPlayer(data.user, data.teamID, this.activePlayerID, amount, { ignoreUser: false });
                 if (bidError) {
                     this.sendError(socket, bidError);
@@ -255,6 +268,9 @@ module.exports = class Auction {
 
     get bids() {
         return {
+            /**
+             * @param item {Bid}
+             */
             push: (item) => {
                 this.bidData.push(item);
                 console.log(item, this.bidData);
@@ -264,6 +280,9 @@ module.exports = class Auction {
                 this.bidData = [];
                 this.broadcastData("auction_bids", this.bidData);
             },
+            /**
+             * @returns {Bid | null}
+             */
             getLeading: () => {
                 if (!this.bidData.length) return null;
                 return this.bidData[this.bidData.length - 1];

@@ -197,7 +197,15 @@ export default [
     { path: "sponsors", component: () => import("@/components/broadcast/roots/SponsorOverlay.vue") },
     { path: "maps", component: () => import("@/components/broadcast/roots/MapsOverlay.vue"), props: route => ({ autoTitle: route.query.auto }) },
     { path: "branding", component: () => import("@/components/broadcast/roots/BrandingOverlay.vue") },
-    { path: "auction", component: () => import("@/components/broadcast/auction/AuctionOverlay.vue"), props: route => ({ category: route.query.category, showCaptainInfo: !!route.query.captain }) },
+    {
+        path: "auction",
+        component: () => import("@/components/broadcast/auction/AuctionOverlay.vue"),
+        props: route => ({
+            category: route.query.category,
+            showCaptainInfo: !!route.query.captain,
+            undraftedText: route.query.undraftedText || route.query.undrafted || route.query.drop
+        })
+    },
     { path: "ad-read", component: () => import("@/components/broadcast/roots/AdReadOverlay.vue"), props: route => ({ extraDelay: route.query.delay }) },
     { path: "logos", component: () => import("@/components/broadcast/roots/LogoAdOverlay.vue") },
     { path: "staff", component: () => import("@/components/broadcast/roots/StaffOverlay.vue") },

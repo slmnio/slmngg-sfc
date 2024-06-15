@@ -17,7 +17,11 @@ export default (isSubdomain) => [
     { path: "standings", component: () => import("@/views/sub-views/event/EventStandings.vue") },
     { path: "theme", component: () => import("@/views/sub-views/ThingTheme.vue") },
     { path: "brands", component: () => import("@/views/sub-views/event/EventBrands.vue") },
-    { path: "auction", component: () => import("@/views/sub-views/event/EventAuction.vue") },
+    {
+        path: "auction",
+        component: () => import("@/views/sub-views/event/EventAuction.vue"),
+        meta: { requiresAuth: true },
+    },
     { path: "streams", name: `event-${isSubdomain? "sub-" : ""}-streams`, component: () => import("@/views/sub-views/event/EventStreamDetails.vue") },
     { path: "stream", alias: ["stream-details"], redirect: { name: `event-${isSubdomain? "sub-" : ""}-streams` } },
 ];

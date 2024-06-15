@@ -56,14 +56,17 @@
                 <div class="col-12 col-lg-6 d-flex justify-content-end align-items-center control-box">
                     <div class="mr-3">Team control</div>
                     <div class="active-team-select">
-                        <select v-model="actingTeamID">
+                        <b-form-select v-model="actingTeamID" :state="!!actingTeamID">
                             <option :value="null" disabled>Choose a team to control</option>
                             <option v-for="team in teamsYouControl" :key="team.id" :value="team.id">{{ team.name }}</option>
-                        </select>
+                        </b-form-select>
                     </div>
                     <div class="active-team-balance">{{ money(balance) }}</div>
                 </div>
                 <div class="col-12 col-lg-6 text-center bid-buttons">
+                    <div v-if="!actingTeamID" class="status-bar fw-bold">
+                        You cannot bid in this auction without a team selected.
+                    </div>
                     <div class="status-bar mb-1">
                         {{ biddingStatus }}
                     </div>
@@ -204,10 +207,15 @@
                     </select>
                 </div>
 
+                <div class="mb-2 d-flex gap-2">
+                    <b-form-input v-model="searchText" placeholder="Search for players" />
+                    <b-button variant="danger" @click="searchText = ''"><i class="fas fa-times fa-fw"></i></b-button>
+                </div>
+
                 <table class="table table-bordered table-dark table-sm w-100">
                     <tbody>
                         <tr
-                            v-for="(player, i) in undraftedPlayers"
+                            v-for="(player, i) in searchedPlayers"
                             :key="player.id"
                             class="player"
                             :class="{'striped': i % 2 === 1, 'currently-active-player': activePlayer?.id === player.id}">
@@ -264,6 +272,7 @@ import ContentThing from "@/components/website/ContentThing.vue";
 import { themeBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import { useAuthStore } from "@/stores/authStore";
+import { searchInCollection } from "@/utils/search";
 
 export default {
     name: "EventAuction",
@@ -280,7 +289,8 @@ export default {
         bids: [],
         customBidAmount: 0,
         adminTeamID: null,
-        lastStartedTeamID: null
+        lastStartedTeamID: null,
+        searchText: ""
     }),
     computed: {
         activePlayer() {
@@ -467,6 +477,10 @@ export default {
             return this.allPlayers.filter(player => {
                 return !(player?.member_of || []).some(teamID => draftingTeamIDs.includes(dirtyID(teamID)));
             }).sort((a, b) => b.manual_sr - a.manual_sr);
+        },
+        searchedPlayers() {
+            if (!this.searchText) return this.undraftedPlayers;
+            return searchInCollection(this.undraftedPlayers, this.searchText, "name");
         },
         eventID() {
             return cleanID(this.event?._original_data_id);

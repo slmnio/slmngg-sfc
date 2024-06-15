@@ -13,7 +13,7 @@
                     <div>{{ autoSettings?.drafted }} / {{ autoSettings?.totalSlots }} {{ autoSettings?.drafted === 1 ? 'player' : 'players' }} signed</div>
                     <div>{{ autoSettings?.slotsRemaining }} {{ autoSettings?.slotsRemaining === 1 ? 'slot' : 'slots' }} remaining</div>
                     <div>{{ autoSettings?.undraftedPlayerCount }} {{ autoSettings?.undraftedPlayerCount === 1 ? 'player' : 'players' }} in the pool</div>
-                    <div class="small">({{ (autoSettings?.totalDraftablePlayerCount - autoSettings?.totalSlots) }} {{ autoSettings?.totalDraftablePlayerCount - autoSettings?.totalSlots === 1 ? 'player' : 'players' }} won't be drafted)</div>
+                    <div class="small">({{ (autoSettings?.totalDraftablePlayerCount - autoSettings?.totalSlots) }} {{ autoSettings?.totalDraftablePlayerCount - autoSettings?.totalSlots === 1 ? 'player' : 'players' }} {{ undraftedText || "won't be drafted" }})</div>
                     <div v-if="stats && stats.allPlayers">{{ stats.remainingEligiblePlayers }} / {{ stats.allPlayers }} player{{ stats.remainingEligiblePlayers === 1 ? '' : 's' }} remaining</div>
                     <div v-if="stats && stats.remainingPlaces">{{ stats.remainingPlaces }} spot{{ stats.remainingPlaces === 1 ? '' : 's' }} remaining</div>
                     <div v-if="stats && stats.signedPlayers">{{ stats.signedPlayers }} player{{ stats.signedPlayers === 1 ? '' : 's' }} signed</div>
@@ -160,7 +160,7 @@ import AuctionTeamsOverview from "@/components/broadcast/auction/AuctionTeamsOve
 export default {
     name: "AuctionOverlay",
     components: { AuctionTeamsOverview, AuctionLeaderboard, RecoloredHero, TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar, AuctionCountdown, ContentThing },
-    props: ["broadcast", "category", "title", "showCaptainInfo"],
+    props: ["broadcast", "category", "title", "showCaptainInfo", "undraftedText"],
     data: () => ({
         tick: 0,
         socketPlayer: null,
@@ -186,7 +186,7 @@ export default {
 
             (this.teams || []).forEach(team => {
                 totalSlots += playersEachTeam;
-                const playerCount = (team.players || []).length ?? 0;
+                const playerCount = (team?.players || []).length ?? 0;
                 drafted += playerCount;
                 slotsRemaining += (playersEachTeam - playerCount);
             });
@@ -279,7 +279,7 @@ export default {
         accolades() {
             if (!this.player) return [];
 
-            console.log("accolades", this.players?.member_of);
+            console.log("accolades", this?.players?.member_of);
             return [
                 // team things
                 ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => e.accolades).filter(e => e?.show_for_players)) : []),
@@ -401,7 +401,7 @@ export default {
         displayTeamRows() {
             if (!this.teams?.length) return [];
             const teams = this.teams.filter(team => {
-                const isFull = (team.players?.length >= (this.auctionSettings?.each_team || getAuctionMax()));
+                const isFull = (team?.players?.length >= (this.auctionSettings?.each_team || getAuctionMax()));
                 if (this._broadcast?.auction_display === "Not full teams") {
                     return !isFull;
                 } else if (this._broadcast?.auction_display === "Full teams") {

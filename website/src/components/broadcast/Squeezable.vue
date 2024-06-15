@@ -32,7 +32,9 @@ export default {
     methods: {
         updateWidth(isAfterTick) {
             const big = this.$refs.big;
-            const small = this.$slots.default?.()?.[0]?.el || big?.__vnode?.children?.[0]?.children?.[0]?.el || big?.__vnode?.children?.[0]?.el;
+            const small = this.$slots.default?.()?.[0]?.el || big?.__vnode?.children?.[0]?.children?.[0]?.el || big?.__vnode?.children?.[0]?.el || this.$el?.children?.[0];
+            console.log("default slot", this.$slots.default());
+            console.log("element", this.$el?.children?.[0]);
             console.log({ big, small });
 
             if (!big?.getBoundingClientRect || !small?.getBoundingClientRect) return;

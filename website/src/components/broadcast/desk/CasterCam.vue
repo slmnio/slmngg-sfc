@@ -104,13 +104,13 @@ export default {
     },
     mounted() {
         window.addEventListener("message", (e) => {
-            if (e.data?.source?.startsWith("vue-")) return;
+            if (["vue-", "react-"].some(key => e.data?.source?.startsWith(key))) return;
             console.log("[global iframe]", e.data);
             const data = e.data;
 
             console.log("stream ID", this.streamCode, data.streamID);
 
-            if (data.action === "new-track-added" && data.streamID === this.streamCode) {
+            if (data.action === "new-video-track-added" && data.streamID === this.streamCode) {
                 setTimeout(() => {
                     this.apiVisible = true;
                     this.extendedIframeVisible = true;

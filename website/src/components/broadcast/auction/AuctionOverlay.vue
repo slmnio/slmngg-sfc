@@ -279,7 +279,6 @@ export default {
         accolades() {
             if (!this.player) return [];
 
-            console.log("accolades", this?.players?.member_of);
             return [
                 // team things
                 ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => e.accolades).filter(e => e?.show_for_players)) : []),

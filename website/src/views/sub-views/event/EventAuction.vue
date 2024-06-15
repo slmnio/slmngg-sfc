@@ -419,7 +419,7 @@ export default {
             if (!this.teams?.length) return groups;
             (this.teams || []).forEach(team => {
                 // eslint-disable-next-line no-constant-binary-expression
-                if (team.players?.length === this.auctionSettings?.each_team ?? 7) {
+                if (team?.players?.length === this.auctionSettings?.each_team ?? 7) {
                     // Finished
                     groups.finished.push(team);
                 } else {

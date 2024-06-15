@@ -1,5 +1,5 @@
 <template>
-    <div class="recolored-hero" :data-hero="hero?.name">
+    <div v-show="valid && complete" class="recolored-hero" :data-hero="hero?.name">
         <div class="color-holder">
             <div class="hero-image-base" :style="mainImage || fallbackImage" :class="{ 'fallback-image': !mainImage && fallbackImage }"></div>
 
@@ -83,6 +83,7 @@ function getOpacityAdjustment(color, inverted, multiplier, boost, minOpacity, ma
 export default {
     name: "RecoloredHero",
     props: ["hero", "theme"],
+    emits: ["recolor_starting", "recolor_width", "recolor_complete"],
     data: () => ({
         colorData: [
             {
@@ -101,7 +102,8 @@ export default {
         lastRecolor: {
             colors: [],
             images: []
-        }
+        },
+        complete: false
     }),
     computed: {
         mainImage() {
@@ -124,6 +126,9 @@ export default {
                 style.primary,
                 style.secondary
             ];
+        },
+        valid() {
+            return this.mainImage?.backgroundImage || this.fallbackImage?.backgroundImage;
         }
     },
     methods: {
@@ -191,14 +196,16 @@ export default {
             if (JSON.stringify(payload) === JSON.stringify(this.lastRecolor)) return console.warn("[muffle]", "Same payload requested", payload, this.lastRecolor);
             this.lastRecolor = payload;
 
-            console.log("[recolor]", "starting");
+            console.log("[recolor]", "starting", payload);
             this.$emit("recolor_starting");
+            this.complete = false;
             for (let i = 0; i < this.layers.length; i++) {
                 const layer = this.layers[i];
                 await this.recolor(layer, colors[i], i + 1);
             }
-            console.log("[recolor]", "complete");
+            console.log("[recolor]", "complete", payload);
             this.$emit("recolor_complete");
+            this.complete = true;
         }
     },
     watch: {

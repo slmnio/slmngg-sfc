@@ -1,5 +1,8 @@
 <template>
-    <div class="media-overlay" style="height: 100vh; width: 100vw;">
+    <div
+        class="media-overlay"
+        style="height: 100vh; width: 100vw;"
+        :class="{'black-out': ended }">
         <yt-player
             v-if="media"
             ref="youtube"
@@ -116,11 +119,13 @@ export default {
         async active(isActive) {
             if (isActive && this.$refs.youtube.player) {
                 this.$refs.youtube.player.seekTo(0);
+                this.ended = false;
             }
         },
         async animationActive(isActive) {
             if (isActive && this.$refs.youtube.player) {
                 this.$refs.youtube.player.playVideo();
+                this.ended = false;
                 const remaining = await this.$refs.youtube?.player?.getDuration() - await this.$refs.youtube?.player?.getCurrentTime();
                 socket.emit("media_update", "playing", true);
                 socket.emit("media_update", "remaining", remaining);
@@ -158,7 +163,7 @@ export default {
     body:hover :deep(.player) {
         --overlap: 0px;
     }
-    .media-overlay:deep(.player.black-out) {
+    .media-overlay.black-out {
         filter: brightness(0);
     }
 </style>

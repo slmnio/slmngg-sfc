@@ -55,7 +55,8 @@ interface Client {
 
 const cookies = new Cookies(null, {
     path: "/",
-    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30)
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+    domain: window.location.hostname.endsWith("slmn.gg") ? ".slmn.gg" : window.location.hostname
 });
 
 export const useAuthStore = defineStore("auth", () => {

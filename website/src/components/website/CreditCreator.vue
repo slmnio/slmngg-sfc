@@ -35,13 +35,13 @@ export default {
             {
                 name: "Twitter",
                 template: (groups) => {
-                    return groups?.flatMap(g => g?.items?.map(p => `${g.meta.emoji} ${p?.twitter_link?.length ? p.twitter_link[0].replace("https://twitter.com/", "@") : p.name}`)).join("\n");
+                    return groups?.flatMap(g => g?.items?.map(p => `${g.meta.emoji || g.meta.singular_name} ${p?.twitter_link?.length ? p.twitter_link[0].replace("https://twitter.com/", "@") : p.name}`)).join("\n");
                 },
             },
             {
                 name: "Twitter Inline",
                 template: (groups) => {
-                    return groups?.map(g => `${g.meta.emoji} ${g?.items?.map(p => `${p?.twitter_link?.length ? p.twitter_link[0].replace("https://twitter.com/", "@") : p.name}`).join(" ")}`).join("\n");
+                    return groups?.map(g => `${g.meta.emoji || g.meta.name} ${g?.items?.map(p => `${p?.twitter_link?.length ? p.twitter_link[0].replace("https://twitter.com/", "@") : p.name}`).join(" ")}`).join("\n");
                 },
             },
             {
@@ -94,14 +94,14 @@ export default {
                         singular_name: "Caster",
                         plural_name: "Casters"
                     },
-                    items: this.match?.casters
+                    items: this.match?.casters || []
                 },
                 ...this.playerRelationshipGroups
             ].map(group => {
                 group.meta.name = group.items?.length === 1 ? group.meta.singular_name : group.meta.plural_name;
                 group.meta.emoji = roleMap[group.meta.singular_name] || "";
                 return group;
-            });
+            }).filter(g => g.items?.length);
         }
     },
     methods: {

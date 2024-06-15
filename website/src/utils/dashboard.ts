@@ -186,6 +186,10 @@ interface AdjustMatchBroadcastData {
     matchID: AnyAirtableID
 }
 
+interface SetPlayerCamsData {
+    cams: AnyAirtableID[][]
+}
+
 
 type ActionRequestData<U> =
     U extends "actions/create-live-guest" ? CreateLiveGuestData :
@@ -207,6 +211,7 @@ type ActionRequestData<U> =
     U extends "actions/update-profile-data" ? UpdateProfileDataData :
     U extends "actions/set-player-relationships" ? SetPlayerRelationshipsData :
     U extends "actions/adjust-match-broadcast" ? AdjustMatchBroadcastData :
+    U extends "actions/set-player-cams" ? SetPlayerCamsData :
     any;
 
 

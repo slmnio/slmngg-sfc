@@ -28,7 +28,7 @@
                     <transition name="fade-right">
                         <RecoloredHero v-if="!showCaptainInfo && player && player.favourite_hero" :theme="heroColor" :hero="player.favourite_hero" />
                     </transition>
-                    <transition name="fade-right">
+                    <transition name="fade-right" mode="out-in">
                         <div v-if="player" class="player-info">
                             <div class="player-name">{{ player.name }}</div>
                             <div class="player-extras">
@@ -63,6 +63,16 @@
                                     class="player-teams d-flex flex-wrap flex-center"
                                     :class="`group-${group.group}`">
                                     <PlayerTeamDisplay v-for="team in group.teams" :key="team.id" :team="team" />
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else-if="hydratedRecentSignings?.length" class="recents w-100">
+                            <div class="recents-title">Recent signings</div>
+                            <div class="recents-list d-flex flex-column-reverse gap-3">
+                                <div v-for="(signing, i) in hydratedRecentSignings" :key="i" class="recent flex-center">
+                                    <ThemeLogo class="recent-logo" :theme="signing.team?.theme" logo-size="h-100" />
+                                    <div class="recent-name">{{ signing.player?.name }}</div>
+                                    <div class="recent-amount">{{ money(signing.amount) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -156,10 +166,11 @@ import ContentThing from "@/components/website/ContentThing";
 import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import AuctionLeaderboard from "@/components/broadcast/auction/AuctionLeaderboard.vue";
 import AuctionTeamsOverview from "@/components/broadcast/auction/AuctionTeamsOverview.vue";
+import ThemeLogo from "@/components/website/ThemeLogo.vue";
 
 export default {
     name: "AuctionOverlay",
-    components: { AuctionTeamsOverview, AuctionLeaderboard, RecoloredHero, TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar, AuctionCountdown, ContentThing },
+    components: { ThemeLogo, AuctionTeamsOverview, AuctionLeaderboard, RecoloredHero, TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar, AuctionCountdown, ContentThing },
     props: ["broadcast", "category", "title", "showCaptainInfo", "undraftedText"],
     data: () => ({
         tick: 0,
@@ -172,9 +183,19 @@ export default {
         biddingActive: false,
         stats: null,
         auctionServerConnected: true,
-        auctionState: "NOT_CONNECTED"
+        auctionState: "NOT_CONNECTED",
+        recentSignings: []
     }),
     computed: {
+        hydratedRecentSignings() {
+            return this.recentSignings.map(({ teamID, playerID, amount }) => ({
+                amount,
+                team: ReactiveRoot(teamID, {
+                    "theme": ReactiveThing("theme")
+                }),
+                player: ReactiveRoot(playerID),
+            }));
+        },
         wideRight() {
             return this._broadcast?.auction_display === "All teams" && this.rightDisplay === "teams";
         },
@@ -590,6 +611,14 @@ export default {
             this.justSignedTeamID = this.leadingBid?.teamID;
             this.signAmount = this.leadingBid?.amount;
             console.log("POST AUCTION SIGNED", this.leadingBid);
+
+
+            this.recentSignings.push({ playerID: activePlayerID, teamID: this.leadingBid?.teamID, amount: this.leadingBid?.amount });
+            if (this.recentSignings?.length > 6) {
+                this.recentSignings.shift();
+            }
+
+            console.log("recent", this.recentSignings);
         },
         auction_bids(bids) {
             console.log("auction_bids", bids);
@@ -850,11 +879,15 @@ export default {
     }
 
     .bids {
-        transition: background-color 500ms ease;
+        transition: background-color 500ms ease, width 500ms ease;
         background-color: rgba(0,0,0,0);
     }
     .bids.has-bids {
         background-color: rgba(0,0,0,0.15);
+    }
+    .bids:not(.has-bids) {
+        width: 0;
+        overflow: hidden;
     }
     .team-focus {
         height: 100%;
@@ -985,5 +1018,39 @@ export default {
         align-items: center;
         font-size: 2em;
         opacity: 0.8;
+    }
+
+    .recents {
+        font-size: 2.5em;
+        gap: .5em;
+        margin-bottom: 1em;
+        opacity: 0.8;
+    }
+
+    .recent {
+        display: flex;
+        gap: .5em;
+    }
+
+    .recents-title {
+        font-weight: bold;
+        text-transform: uppercase;
+        text-align: center;
+        font-size: 1.5em;
+        margin-bottom: .25em;
+    }
+
+    .recent-logo {
+        width: 2.5em;
+        height: 2em;
+    }
+
+    .recent-name {
+        min-width: 8em;
+        font-weight: bold;
+    }
+    .recent-amount {
+        min-width: 3em;
+        text-align: right;
     }
 </style>

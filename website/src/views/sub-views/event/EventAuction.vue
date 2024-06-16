@@ -10,7 +10,7 @@
             <AuctionCountdown class="auction-countdown mb-2" web :style="themeBackground1(event)" show-time />
 
             <div class="action-row d-flex mb-3">
-                <div class="active-player col-7">
+                <div class="active-player col-7 p-2">
                     <div v-if="lastStartedTeam && ['PRE_AUCTION', 'IN_ACTION'].includes(auctionState)" class="last-started">
                         <div class="badge badge-pill bg-secondary">Started by</div> <ThemeLogo :theme="lastStartedTeam?.theme" border-width="3px" icon-padding="4px" /> <router-link class="no-link-style" :to="url('team', lastStartedTeam)" target="_blank">{{ lastStartedTeam?.name || '&nbsp;' }}</router-link>
                     </div>
@@ -21,7 +21,6 @@
                         <router-link class="no-link-style" :to="url('player', activePlayer)" target="_blank">{{ activePlayer?.name || '&nbsp;' }}</router-link>
                         <div
                             v-if="activePlayer?.role"
-                            v-b-tooltip
                             class="player-role"
                             :title="`Main role: ${activePlayer.role}`"
                             v-html="getRoleSVG(activePlayer.role)"></div>
@@ -45,7 +44,7 @@
                         <AuctionBid
                             v-for="(bid, i) in topBids"
                             v-bind="bid"
-                            :key="i"
+                            :key="[i, bid.amount, bid.teamID].join('-')"
                             class="bid"
                             :winning="i === topBids.length - 1"
                             :won="(i === topBids.length - 1) && auctionState === 'POST_AUCTION'" />

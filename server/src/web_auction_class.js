@@ -23,6 +23,7 @@ module.exports = class Auction {
             beforeFirstBids: auctionData?.time?.beforeFirstBids ?? 5,
             afterInitialBid: auctionData?.time?.afterInitialBid ?? 20,
             afterSubsequentBids: auctionData?.time?.afterSubsequentBids ?? 15,
+            afterSubsequent1kBids: auctionData?.time?.afterSubsequent1kBids ?? 8,
             afterSaleNextAutoPlayer: auctionData?.time?.afterSaleNextAutoPlayer ?? 10,
             preAuction: auctionData?.time?.preAuction ?? 5,
             postAuction: auctionData?.time?.postAuction ?? 10,
@@ -185,19 +186,18 @@ module.exports = class Auction {
                     }
                 }
 
-                const leading = this.bids.getLeading();
-                if (leading?.teamID === data.teamID) {
-                    return this.sendError(socket, "You are already leading this bid");
-                }
-
                 let bidError = await this.errorBiddingForPlayer(data.user, data.teamID, this.activePlayerID, amount, { ignoreUser: false });
                 if (bidError) {
                     this.sendError(socket, bidError);
                     return this.log("Bid error", bidError);
                 }
 
+                const leading = this.bids.getLeading();
+                if (leading?.teamID === data.teamID) {
+                    return this.sendError(socket, "You are already leading this bid");
+                }
 
-                this.timer.proc();
+                this.timer.proc(amount);
                 this.bids.push({
                     amount,
                     teamID: data.teamID
@@ -401,11 +401,12 @@ module.exports = class Auction {
                 }
 
             },
-            proc: () => {
+            proc: (amount) => {
                 this.timer.clear();
-                this.timerTimeout = setTimeout(() => this.autoCloseAuction(), this.wait.afterSubsequentBids * 1000);
+                const time = (amount && amount === 1 ? this.wait.afterSubsequent1kBids : this.wait.afterSubsequentBids) || this.wait.afterSubsequentBids;
+                this.timerTimeout = setTimeout(() => this.autoCloseAuction(), time * 1000);
                 this.broadcastData("auction_timer", {
-                    duration: this.wait.afterSubsequentBids * 1000
+                    duration: time * 1000
                 });
             }
         };

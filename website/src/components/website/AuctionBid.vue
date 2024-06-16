@@ -63,7 +63,7 @@ export default {
     font-weight: bold;
     line-height: 1em;
 }
-.team-row {
+.auction-bid.winning .team-row {
     animation: jump .5s forwards;
 }
 @keyframes jump {

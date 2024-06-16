@@ -30,9 +30,22 @@
                     </transition>
                     <transition name="fade-right" mode="out-in">
                         <div v-if="player" class="player-info">
+                            <div v-if="playerHighlightEventTeams?.length" class="player-highlight-event-teams d-flex flex-center gap-2">
+                                <div v-for="team in playerHighlightEventTeams" :key="team.id" class="player-highlight-team flex-center">
+                                    <!--                                    <div class="player-highlight-team-logo bg-center" :style="resizedImage(team?.theme, ['default_logo', 'small_logo'], 'w-200')"></div>-->
+                                    <theme-logo
+                                        class="player-highlight-team-logo bg-center"
+                                        :theme="team?.theme"
+                                        logo-size="w-200"
+                                        border-width=".3em"
+                                        icon-padding=".5em" />
+                                </div>
+                            </div>
                             <div class="player-name">{{ player.name }}</div>
                             <div class="player-extras">
                                 <div v-if="player.role && !player.eligible_roles" class="player-role" v-html="getRoleSVG(player.role)"></div>
+
+
                                 <div class="player-eligible-roles d-flex">
                                     <div
                                         v-for="role in playerRoles(player?.eligible_roles)"
@@ -297,6 +310,11 @@ export default {
                 favourite_hero: ReactiveThing("favourite_hero")
             });
         },
+        playerHighlightEventTeams() {
+            if (!this._broadcast?.highlight_event?.length) return [];
+            if (!this.player?.member_of?.length) return [];
+            return this._broadcast.highlight_event.map(event => this.player.member_of.find(t => t.event?.id === event?.id)).filter(Boolean);
+        },
         accolades() {
             if (!this.player) return [];
 
@@ -358,7 +376,8 @@ export default {
                         owners: ReactiveArray("owners"),
                         captains: ReactiveArray("captains")
                     })
-                })
+                }),
+                highlight_event: ReactiveArray("highlight_event")
             });
         },
         rightDisplay() {
@@ -520,6 +539,7 @@ export default {
         }
     },
     methods: {
+        resizedImage,
         themeBackground1,
         money,
         getRoleSVG,
@@ -1052,5 +1072,18 @@ export default {
     .recent-amount {
         min-width: 3em;
         text-align: right;
+    }
+    .player-highlight-event-teams {
+        display: flex;
+    }
+
+    .player-highlight-team {
+        width: 5em;
+        height: 4em;
+    }
+
+    .player-highlight-team-logo {
+        width: 90%;
+        height: 90%;
     }
 </style>

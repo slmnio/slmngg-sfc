@@ -273,7 +273,7 @@ module.exports = class Auction {
              */
             push: (item) => {
                 this.bidData.push(item);
-                console.log(item, this.bidData);
+                console.log(item);
                 this.broadcastData("auction_bids", this.bidData);
             },
             empty: () => {

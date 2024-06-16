@@ -360,7 +360,7 @@ module.exports = ({ app, cors, Cache }) => {
                 themeCode = `team-${themeThing?.code || cleanID(themeThing?.id)}`;
             }
 
-            let filePath = await fullGetURL(logo, "orig", null);
+            let filePath = await getOrWaitForDownload(logo.url, logo._autoFilename, "orig");
 
             let filename = themeColor.replace("#", "") + "_" + logo._autoFilename;
             let sizeText = `theme-${size}-${padding}`;
@@ -457,7 +457,7 @@ module.exports = ({ app, cors, Cache }) => {
                 let logos = await Promise.all(teams.map(async team => {
                     const logo = await Cache.getAttachment(team.theme?.default_logo?.[0]?.id);
                     if (!logo) return null;
-                    let filePath = await fullGetURL(logo, "orig", null);
+                    let filePath = await getOrWaitForDownload(logo.url, logo._autoFilename, "orig");
                     let themeColor = (team.theme.color_logo_background || team.theme.color_theme || "#222222").trim();
 
                     let resizedLogo = await sharp(filePath).resize({
@@ -483,7 +483,7 @@ module.exports = ({ app, cors, Cache }) => {
                         let eventTheme = event?.theme?.length ? await Cache.get(event?.theme?.[0]) : null;
                         const logo = await Cache.getAttachment(eventTheme?.default_logo?.[0]?.id);
                         if (!logo) return null;
-                        let eventLogoFilePath = await fullGetURL(logo, "orig", null);
+                        let eventLogoFilePath = await getOrWaitForDownload(logo.url, logo._autoFilename, "orig");
                         eventLogo = await sharp(eventLogoFilePath).resize({
                             height: Math.floor(size * 0.20),
                             width: Math.floor(size * 0.25),
@@ -525,7 +525,7 @@ module.exports = ({ app, cors, Cache }) => {
                 if (!event.theme?.id) return res.status(400).send("No event theme data");
                 let themeColor = event.theme.color_logo_background || event.theme.color_theme || "#222222";
 
-                let filePath = await fullGetURL(event.theme.default_logo[0], "orig", null);
+                let filePath = await getOrWaitForDownload(event.theme.default_logo[0].url, event.theme.default_logo[0]._autoFilename, "orig");
 
                 let resizedLogo = await sharp(filePath).resize({
                     width: width - padding,

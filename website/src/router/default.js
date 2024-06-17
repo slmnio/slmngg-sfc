@@ -16,6 +16,7 @@ import TwitchAuthScopeSelector from "@/components/website/TwitchAuthScopeSelecto
 import BracketCreator from "@/views/BracketCreator.vue";
 import NotFoundPage from "@/views/NotFoundPage";
 import Learn from "@/views/Learn.vue";
+import Cookies from "universal-cookie";
 
 export default [
     {
@@ -196,6 +197,18 @@ export default [
             backgroundIndex: route.query.background && parseInt(route.query.background)
         }),
         children: BroadcastRoutes
+    },
+
+    {
+        path: "/reset",
+        redirect: to => {
+            console.log("setting cookies to empty");
+
+            (new Cookies()).remove("auth", { path: "/" });
+            (new Cookies()).remove("auth", { path: "/", domain: "." + window.location.hostname });
+
+            return { path: "/" };
+        },
     },
     { path: "/:pathMatch(.*)*", component: NotFoundPage }
     // {

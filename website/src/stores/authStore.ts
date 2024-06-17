@@ -59,6 +59,14 @@ const cookies = new Cookies(null, {
     domain: window.location.hostname.endsWith("slmn.gg") ? ".slmn.gg" : window.location.hostname
 });
 
+function removeOldCookies() {
+    (new Cookies()).remove("auth", { path: "/", domain: "dev.slmn.gg" });
+}
+
+if (window.location.hostname === "dev.slmn.gg") {
+    removeOldCookies();
+}
+
 export const useAuthStore = defineStore("auth", () => {
     const token = ref<string | null>(null);
     const authNext = ref<string | null>(null);

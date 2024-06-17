@@ -1004,7 +1004,7 @@ export default {
 
 
     .player-extras {
-        max-height: 670px;
+        max-height: 630px;
     }
 
     .player-info-holder {

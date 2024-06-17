@@ -153,9 +153,7 @@ export default {
         selectedHighlightHeroID: null,
         selectedHighlightPlayerID: null,
         selectedHighlightMediaID: null,
-        processing: {
-
-        }
+        processing: { }
     }),
     computed: {
         hydratedBroadcast() {
@@ -191,7 +189,7 @@ export default {
                 ...(this.hydratedBroadcast?.event?.teams || []).map(t => ({
                     text: t.name,
                     value: t.id
-                }))
+                })).sort((a,b) => sortAlpha(a,b,"name"))
             ];
         },
         heroes() {

@@ -57,6 +57,7 @@ export default {
 .auction-bid.winning {
     margin-bottom: 6px;
     font-size: 1.5em;
+    border-top-right-radius: .25em
 }
 .team-amount {
     font-size: 1.25em;

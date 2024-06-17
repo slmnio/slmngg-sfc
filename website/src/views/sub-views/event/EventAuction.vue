@@ -9,16 +9,30 @@
             </div>
             <AuctionCountdown class="auction-countdown mb-2" web :style="themeBackground1(event)" show-time />
 
-            <div class="action-row d-flex mb-3">
+            <div class="action-row d-flex mb-3 rounded" :class="{'complete': auctionState === 'POST_AUCTION'}">
                 <div class="active-player col-7 p-2">
                     <div v-if="lastStartedTeam && ['PRE_AUCTION', 'IN_ACTION'].includes(auctionState)" class="last-started">
-                        <div class="badge badge-pill bg-secondary">Started by</div> <ThemeLogo :theme="lastStartedTeam?.theme" border-width="3px" icon-padding="4px" /> <router-link class="no-link-style" :to="url('team', lastStartedTeam)" target="_blank">{{ lastStartedTeam?.name || '&nbsp;' }}</router-link>
+                        <div class="badge badge-pill bg-secondary">Started by</div>
+                        <ThemeLogo :theme="lastStartedTeam?.theme" border-width="3px" icon-padding="4px" logo-size="w-100" />
+                        <router-link class="no-link-style" :to="url('team', lastStartedTeam)" target="_blank">
+                            {{ lastStartedTeam?.name || "&nbsp;" }}
+                        </router-link>
                     </div>
                     <div v-if="nextTeamToStart && ['READY', 'POST_AUCTION', 'RESTRICTED'].includes(auctionState)" class="last-started">
-                        <div class="badge badge-pill bg-primary">Next to start</div> <ThemeLogo :theme="nextTeamToStart?.theme" border-width="3px" icon-padding="4px" /> <router-link class="no-link-style" :to="url('team', nextTeamToStart)" target="_blank">{{ nextTeamToStart?.name || ' ' }}</router-link>
+                        <div class="badge badge-pill bg-primary">Next to start</div>
+                        <ThemeLogo :theme="nextTeamToStart?.theme" border-width="3px" icon-padding="4px" logo-size="w-100" />
+                        <router-link class="no-link-style" :to="url('team', nextTeamToStart)" target="_blank">
+                            {{ nextTeamToStart?.name || " " }}
+                        </router-link>
                     </div>
                     <div v-if="activePlayer" class="player-name">
-                        <router-link class="no-link-style" :to="url('player', activePlayer)" target="_blank">{{ activePlayer?.name || '&nbsp;' }}</router-link>
+                        <theme-logo
+                            v-if="winningTeam"
+                            :theme="winningTeam?.theme"
+                            class="signed-team-badge"
+                            logo-size="w-100"
+                            border-width=".15em" />
+                        <router-link class="no-link-style player-name-link" :to="url('player', activePlayer)" target="_blank">{{ activePlayer?.name || '&nbsp;' }}</router-link>
                         <div
                             v-if="activePlayer?.role"
                             class="player-role"
@@ -37,7 +51,13 @@
                             v-html="getRoleSVG(role?.role)"
                         ></div>
                     </div>
-                    <div class="player-info">{{ activePlayer?.draft_data }}</div>
+                    <div class="player-bits d-flex gap-2 my-1">
+                        <div v-if="activePlayer?.pronouns" class="px-2 bg-secondary rounded small">{{ activePlayer?.pronouns }}</div>
+                        <div v-if="activePlayer?.pronunciation" class="px-2 bg-secondary rounded small"><i class="fas fa-lips fa-fw"></i> {{ activePlayer?.pronunciation }}</div>
+                    </div>
+                    <div v-if="activePlayer" class="player-info rounded">
+                        {{ activePlayer?.draft_data }}
+                    </div>
                 </div>
                 <div class="bids col-5">
                     <div class="bid-list d-flex flex-column-reverse">
@@ -67,7 +87,7 @@
                         You cannot bid in this auction without a team selected.
                     </div>
                     <div class="status-bar mb-1">
-                        {{ biddingStatus }}
+                        {{ biddingStatus || "&middot;" }}
                     </div>
                     <div class="d-flex buttons">
                         <div class="d-flex buttons">
@@ -354,7 +374,7 @@ export default {
             return this.eventSettings?.auction;
         },
         topBids() {
-            return this.bids.slice(-5);
+            return this.bids.slice(-8);
         },
         leadingBid() {
             if (!this.bids?.length) return null;
@@ -371,7 +391,8 @@ export default {
             return this.teamBids[this.teamBids.length - 1];
         },
         canBid() {
-            return this.actingTeam?.id && ["IN_ACTION"].includes(this.auctionState) && !this.isLeading;
+            return this.actingTeam?.id && ["IN_ACTION"].includes(this.auctionState) && !this.isLeading &&
+                (this.actingTeam?.players?.length < (this.auctionSettings?.each_team ?? 7));
         },
         biddingStatus() {
             if (this.auctionState === "PRE_AUCTION") {
@@ -379,6 +400,9 @@ export default {
             } else if (this.auctionState === "POST_AUCTION") {
                 return this.isLeading ? "You won the player!" : "Auction is over";
             } else if (this.auctionState === "IN_ACTION") {
+                if (this.actingTeam?.players?.length >= (this.auctionSettings?.each_team ?? 7)) {
+                    return "Your team is complete - you cannot bid";
+                }
                 const bidError = this.customBidError;
                 if (bidError) {
                     return this.customBidError;
@@ -447,6 +471,7 @@ export default {
                 if (diff > this.autoSettings.money.maximumBidIncrement) return `${money(this.customBidAmount)} is over the maximum bid increment of ${money(this.autoSettings.money.maximumBidIncrement)}`;
                 if (diff < this.autoSettings.money.minimumBidIncrement) {
                     if (parseInt(this.customBidAmount) === this.balance) return null;
+                    if (parseInt(this.customBidAmount) === 0) return null;
                     return `${money(this.customBidAmount)} is below the minimum bid increment of ${money(this.autoSettings.money.minimumBidIncrement)}`;
                 }
             }
@@ -489,6 +514,24 @@ export default {
                 if (this.auctionState === "RESTRICTED") return true;
             }
             return this.auctionState === "READY";
+        },
+        winningTeam() {
+            if (this.auctionState !== "POST_AUCTION") return null;
+            return ReactiveRoot(this.leadingBid?.teamID, {
+                "theme": ReactiveThing("theme")
+            });
+        },
+        title() {
+            if (this.winningTeam?.name && this.activePlayer?.name) return `Complete: ${this.activePlayer?.name}`;
+            if (this.activePlayer?.name) return `🔴 Live: ${this.activePlayer?.name}`;
+            if (this.nextTeamToStart?.name) {
+                if (this.nextTeamToStart?.id === this.actingTeamID) {
+                    return `🔴 Next: (You) ${this.nextTeamToStart?.name}`;
+                } else {
+                    return `Next: ${this.nextTeamToStart?.name}`;
+                }
+            }
+            return "";
         }
     },
     methods: {
@@ -578,6 +621,15 @@ export default {
                 console.log("latest team bid", latestBid);
                 // this.customBidAmount = latestBid.amount + (this.autoSettings.money.minimumBidIncrement * 2);
             }
+        },
+        title(text) {
+            console.log(text);
+            // if (text) {
+            //     document.title = `${text} | Auction | ${this.event?.name}`;
+            //
+            // } else {
+            //     document.title = `Auction | ${this.event?.name}`;
+            // }
         }
     },
     sockets: {
@@ -625,6 +677,11 @@ export default {
         setTimeout(() => {
             this.pageNoLongerNew = true;
         }, 3000);
+    },
+    head() {
+        return {
+            title: `${this.title ? `${this.title} | ` : ""}Auction`
+        };
     }
 };
 </script>
@@ -659,13 +716,18 @@ export default {
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
     }
-    .active-player {
+    .action-row {
         background-color: rgba(0,0,0,0.1);
+        transition: background-color 200ms ease;
+    }
+    .action-row.complete {
+        background-color: rgba(255,255,255,0.1);
     }
     .bids {
         min-height: 15em;
-        background-color: rgba(0,0,0,0.1);
+        transition: background-color 200ms ease;
     }
+
 
     .player-role {
         width: 1.5em;
@@ -693,6 +755,15 @@ export default {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: .2em;
+        padding: .1em 0;
+    }
+    .active-player .player-name-link {
+        flex-grow: 1;
+    }
+    .signed-team-badge {
+        width: 1.75em;
+        height: 1.5em;
     }
     .active-player .player-role {
         height: 1.25em;
@@ -716,7 +787,7 @@ export default {
     }
     .last-started .icon-holder {
         height: 2em;
-        width: 2em;
+        width: 2.5em;
     }
     .last-started .badge {
         font-size: 1em;
@@ -756,6 +827,41 @@ export default {
         align-items: center;
         font-size: 1.5em;
         opacity: 0.7;
+    }
+
+
+    .player-info {
+        height: 10em;
+        overflow-y: scroll;
+        background-color: rgba(64,64,64,0.2);
+        padding: .5em;
+    }
+
+    .player-info::-webkit-scrollbar-track {
+        border-radius: 4px;
+        background-color: transparent;
+    }
+
+    .player-info::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+        background-color: transparent;
+    }
+
+    .player-info::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.5);
+        background-color: #222;
+        transition: background-color 300ms ease;
+    }
+
+    .player-info:hover::-webkit-scrollbar-thumb,
+    .player-info:active::-webkit-scrollbar-thumb {
+        background-color: #333;
+    }
+
+    .active-player {
+        min-height: 22em;
     }
 </style>
 

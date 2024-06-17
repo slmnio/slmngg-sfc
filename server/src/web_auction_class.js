@@ -8,6 +8,10 @@ const { isEventStaffOrHasRole } = require("./action-utils/action-permissions");
  * @typedef {{ amount: number, teamID: AnyAirtableID }} Bid
  */
 
+function money(num) {
+    return `$${num || 0}k`;
+}
+
 module.exports = class Auction {
     constructor(eventData, io, auctionData) {
         this.io = io;
@@ -180,9 +184,9 @@ module.exports = class Auction {
                     if (amount > (this.bids.getLeading()?.amount || 0) &&
                         (amount - this.bids.getLeading().amount <= this.money.maximumBidIncrement) &&
                         amount === (team.balance || 0)) {
-                        this.log(`Letting team ${team.name} bid ${amount} since it's all their money ${team.balance}`);
+                        this.log(`Letting team ${team.name} bid ${money(amount)} since it's all their money ${team.balance}`);
                     } else {
-                        return this.sendError(socket, `The bid $${amount} is out of range`);
+                        return this.sendError(socket, `The bid$${(amount)} is out of range`);
                     }
                 }
 
@@ -257,7 +261,7 @@ module.exports = class Auction {
             return `${team.name} already has the maximum player count (${this.playerNumbers.maximumPlayerCount})`;
 
         if ((team.balance || 0) < bidAmount) {
-            return `${team.name} doesn't have enough funds to bid for player at $${bidAmount}`;
+            return `${team.name} doesn't have enough funds to bid for player at ${money(bidAmount)}`;
         }
 
         // TODO: check auction order & player teams - are they eligible?

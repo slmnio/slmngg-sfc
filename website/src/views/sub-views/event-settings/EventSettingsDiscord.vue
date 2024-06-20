@@ -158,22 +158,22 @@ export default {
     },
     methods: {
         async setID() {
-            this.$set(this.processing, "guild_id", true);
+            this.processing["guild_id"] = true;
             const response = await authenticatedRequest("actions/set-event-guild", {
                 eventID: this.event.id,
-                serverID: this.selectedGuildID,
+                guildID: this.selectedGuildID,
             });
             if (response.error) {
                 console.error(response.error);
             }
-            this.$set(this.processing, "guild_id", false);
+            this.processing["guild_id"] = false;
         },
         async startProcessing() {
-            this.$set(this.processing, "creating", true);
+            this.processing["creating"] = true;
             this.fixes = [];
             const output = await authenticatedRequest("actions/create-event-discord-items", {
                 eventID: this.event.id,
-                serverID: this.selectedGuildID,
+                guildID: this.selectedGuildID,
                 teamSettings: this.selectedTeamSettings,
                 runSettings: this.selectedRunSettings,
                 settings: {
@@ -181,7 +181,7 @@ export default {
                     voiceChannelRoles: this.voiceChannelRoles
                 }
             });
-            this.$set(this.processing, "creating", false);
+            this.processing["creating"] = false;
             this.selectedRunSettings = [];
 
             if (!output?.error) {

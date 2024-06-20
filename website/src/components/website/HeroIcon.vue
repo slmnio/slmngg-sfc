@@ -1,5 +1,5 @@
 <template>
-    <img class="hero-icon" :src="url" />
+    <img class="hero-icon" :src="url">
 </template>
 
 <script>

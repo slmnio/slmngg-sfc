@@ -13,15 +13,15 @@ export default {
 </script>
 
 <style scoped>
-    .sub-page-nav >>> .nav-link:not(.themed) {
+    .sub-page-nav:deep(.nav-link:not(.themed))  {
         color: var(--theme-passive, #ffffff);
     }
     .sub-page-nav .nav-link.router-link-exact-active {
         color: var(--theme);
     }
-    .sub-page-nav >>> .nav-link.active,
-    .sub-page-nav >>> .nav-link.router-link-exact-active,
-    .sub-page-nav >>> .nav-link:not(.themed):hover  {
+    .sub-page-nav:deep(.nav-link.active) ,
+    .sub-page-nav:deep(.nav-link.router-link-exact-active) ,
+    .sub-page-nav:deep(.nav-link:not(.themed):hover)   {
         color: var(--theme-active, #66D9FF);
     }
 </style>

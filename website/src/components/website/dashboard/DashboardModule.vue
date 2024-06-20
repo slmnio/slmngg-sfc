@@ -3,15 +3,20 @@
         <div class="module-header bg-dark p-2 d-flex flex-center" @click="() => showDropdown = !showDropdown">
             <div class="text">
                 <i class="fa-fw" :class="iconClass"></i>
-                <b class="ml-2" v-if="title">{{ title }}</b>
-                <span class="slot-dot" v-if="$slots.header"> • </span>
+                <b v-if="title" class="ml-2">{{ title }}</b>
+                <span v-if="$slots.header" class="slot-dot"> • </span>
                 <slot name="header"></slot>
             </div>
             <div class="spacer flex-grow-1"></div>
             <i class="fa fa-fw fa-chevron-left" :class="{ 'rotate': showDropdown }"></i>
         </div>
         <transition name="clip-swipe-down">
-            <div class="module-content bg-dark" :class="(contentClass || '') + (noContentBorder ? ' no-border' : '')" :style="moduleContentCSS" v-show="showDropdown" ref="content">
+            <div
+                v-show="showDropdown"
+                ref="content"
+                class="module-content bg-dark"
+                :class="(contentClass || '') + (noContentBorder ? ' no-border' : '')"
+                :style="moduleContentCSS">
                 <slot v-if="loadDropdown"></slot>
             </div>
         </transition>
@@ -19,6 +24,9 @@
 </template>
 
 <script>
+import { useSettingsStore } from "@/stores/settingsStore";
+import { mapWritableState } from "pinia";
+
 export default {
     name: "DashboardModule",
     props: {
@@ -29,11 +37,32 @@ export default {
         noContentBorder: Boolean
     },
     data: () => ({
-        showDropdown: false,
         loadDropdown: false,
         contentHeight: 0
     }),
     computed: {
+        ...mapWritableState(useSettingsStore, ["openDashboardModules"]),
+        showDropdown: {
+            get() {
+                const visible = this.openDashboardModules?.[this.title];
+                if (visible !== undefined) {
+                    return visible;
+                }
+                return this.startOpened;
+            },
+            set(visible) {
+                this.openDashboardModules[this.title] = visible;
+
+                this.loadDropdown = true;
+
+                this.$nextTick(() => {
+                    this.setHeight();
+                    setTimeout(() => {
+                        this.setHeight();
+                    }, 250);
+                });
+            }
+        },
         moduleContentCSS() {
             if (this.contentHeight <= 50) return {};
             return {
@@ -49,24 +78,7 @@ export default {
         }
     },
     created() {
-        const storeData = this.$store.getters.dashboardModuleIsVisible(this.title);
-        if (storeData !== undefined) this.showDropdown = storeData;
-
-        if (this.startOpened) this.showDropdown = true;
         this.loadDropdown = this.showDropdown;
-    },
-    watch: {
-        showDropdown(isVisible) {
-            this.$store.commit("setDashboardModuleVisibility", { moduleName: this.title, visible: isVisible });
-            this.loadDropdown = true;
-
-            this.$nextTick(() => {
-                this.setHeight();
-                setTimeout(() => {
-                    this.setHeight();
-                }, 250);
-            });
-        }
     }
 };
 </script>
@@ -91,12 +103,12 @@ export default {
         border: none;
     }
 
-    .module-content >>> .table tr th:last-child,
-    .module-content >>> .table tr td:last-child {
+    .module-content:deep(.table tr th:last-child),
+    .module-content:deep(.table tr td:last-child) {
         border-right: none;
     }
-    .module-content >>> .table tr th:first-child,
-    .module-content >>> .table tr td:first-child {
+    .module-content:deep(.table tr th:first-child),
+    .module-content:deep(.table tr td:first-child) {
         border-left: none;
     }
 
@@ -106,11 +118,11 @@ export default {
     }
 
     .clip-swipe-down-enter-to,
-    .clip-swipe-down-leave {
+    .clip-swipe-down-leave-from {
         clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
         max-height: var(--height, 50vh);
     }
-    .clip-swipe-down-enter,
+    .clip-swipe-down-enter-from,
     .clip-swipe-down-leave-to {
         clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
         max-height: 0;

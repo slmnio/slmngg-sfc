@@ -1,11 +1,28 @@
 <template>
-    <GenericOverlay class="bracket-overlay" v-if="!extended" :title="title || 'Bracket'">
-        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :scale="scale" :small="small"
-                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" :custom-timezone="broadcastTimezone" />
+    <GenericOverlay v-if="!extended" class="bracket-overlay" :title="title || 'Bracket'">
+        <Bracket
+            class="bracket"
+            :event="event"
+            :bracket="bracket"
+            use-overlay-scale
+            :scale="scale"
+            :small="small"
+            :broadcast-highlight-match="highlightMatch"
+            :broadcast-highlight-team="highlightTeam"
+            :custom-timezone="broadcastTimezone" />
     </GenericOverlay>
-    <div class="bracket-overlay bracket-extended" :style="zoom" v-else>
-        <Bracket class="bracket" :event="event" :bracket="bracket" use-overlay-scale :scale="scale" :small="small"
-                 :broadcast-highlight-match="highlightMatch" :broadcast-highlight-team="highlightTeam" :extended="extended" :custom-timezone="broadcastTimezone" />
+    <div v-else class="bracket-overlay bracket-extended" :style="zoom">
+        <Bracket
+            class="bracket"
+            :event="event"
+            :bracket="bracket"
+            use-overlay-scale
+            :scale="scale"
+            :small="small"
+            :broadcast-highlight-match="highlightMatch"
+            :broadcast-highlight-team="highlightTeam"
+            :extended="extended"
+            :custom-timezone="broadcastTimezone" />
     </div>
 </template>
 
@@ -14,13 +31,14 @@ import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import Bracket from "@/components/website/bracket/Bracket";
 import { cleanID } from "@/utils/content-utils";
+import { useStatusStore } from "@/stores/statusStore";
 export default {
     name: "BracketOverlay",
     components: { Bracket, GenericOverlay },
     props: ["broadcast", "title", "bracketKey", "extended", "scale", "small", "forceBracket"],
     computed: {
         event() {
-            if (!this.broadcast || !this.broadcast.event) return null;
+            if (!this.broadcast?.event) return null;
             return ReactiveRoot(this.broadcast.event.id, {
                 theme: ReactiveThing("theme"),
                 brackets: ReactiveArray("brackets", {
@@ -41,6 +59,10 @@ export default {
             if (this.broadcast?.bracket_key) key = this.broadcast.bracket_key;
             if (this.bracketKey) key = this.bracketKey;
 
+            if (this.liveMatch && (!key || key === "match")) {
+                key = this.liveMatch.brackets?.[0]?.key;
+            }
+
             if (!key) return this.event.brackets[0];
             const bracket = this.event.brackets.find(b => b && b.key === key);
             return bracket || this.event.brackets[0];
@@ -52,7 +74,8 @@ export default {
         liveMatch() {
             if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
-                teams: ReactiveArray("teams")
+                teams: ReactiveArray("teams"),
+                brackets: ReactiveArray("brackets")
             });
         },
         highlightMatch() {
@@ -74,16 +97,16 @@ export default {
     watch: {
         highlightTeam(team) {
             const id = cleanID(team?.id || team?.[0]);
-            this.$store.commit("setHighlightedTeam", id);
+            useStatusStore().highlightedTeam = id;
             console.log("[set highlight] team", id);
         },
         highlightMatch(match) {
             const id = cleanID(match?.id || match?.[0]);
-            this.$store.commit("setHighlightedMatch", id);
+            useStatusStore().highlightedMatch = id;
             console.log("[set highlight] match", id);
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Bracket ${this.bracketKey || this.broadcast?.bracket_key || ""}${this.extended ? " (extended)" : ""}${this.small ? " (small)" : ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -120,31 +143,31 @@ export default {
     .broadcast--active:not(.broadcast--animation-active) .bracket {
         display: none;
     }
-    .broadcast--animation-active .bracket >>> .column {
+    .broadcast--animation-active .bracket:deep(.column) {
         animation: colreveal 500ms backwards;
         animation-delay: var(--anim-base);
     }
-    .bracket >>> .column:nth-child(2) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 1); }
-    .bracket >>> .column:nth-child(3) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 2); }
-    .bracket >>> .column:nth-child(4) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 3); }
-    .bracket >>> .column:nth-child(5) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 4); }
-    .bracket >>> .column:nth-child(6) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 5); }
-    .bracket >>> .column:nth-child(7) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 6); }
-    .bracket >>> .column:nth-child(8) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 7); }
-    .bracket >>> .column:nth-child(9) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 8); }
+    .bracket:deep(.column:nth-child(2)) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 1); }
+    .bracket:deep(.column:nth-child(3)) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 2); }
+    .bracket:deep(.column:nth-child(4)) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 3); }
+    .bracket:deep(.column:nth-child(5)) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 4); }
+    .bracket:deep(.column:nth-child(6)) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 5); }
+    .bracket:deep(.column:nth-child(7)) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 6); }
+    .bracket:deep(.column:nth-child(8)) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 7); }
+    .bracket:deep(.column:nth-child(9)) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 8); }
 
-    .bracket >>> .connection[data-column-num] {
+    .bracket:deep(.connection[data-column-num]) {
         animation: colreveal 600ms backwards;
         animation-delay: var(--anim-base);
     }
-    .bracket >>> .connection[data-column-num="1"] { animation-delay: calc(var(--anim-base)); }
-    .bracket >>> .connection[data-column-num="2"] { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 1); }
-    .bracket >>> .connection[data-column-num="3"] { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 2); }
-    .bracket >>> .connection[data-column-num="4"] { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 3); }
-    .bracket >>> .connection[data-column-num="5"] { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 4); }
-    .bracket >>> .connection[data-column-num="6"] { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 5); }
-    .bracket >>> .connection[data-column-num="7"] { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 6); }
-    .bracket >>> .connection[data-column-num="8"] { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 7); }
+    .bracket:deep(.connection[data-column-num="1"]) { animation-delay: calc(var(--anim-base)); }
+    .bracket:deep(.connection[data-column-num="2"]) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 1); }
+    .bracket:deep(.connection[data-column-num="3"]) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 2); }
+    .bracket:deep(.connection[data-column-num="4"]) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 3); }
+    .bracket:deep(.connection[data-column-num="5"]) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 4); }
+    .bracket:deep(.connection[data-column-num="6"]) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 5); }
+    .bracket:deep(.connection[data-column-num="7"]) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 6); }
+    .bracket:deep(.connection[data-column-num="8"]) { animation-delay: calc(var(--anim-base) + var(--anim-jump) * 7); }
     @keyframes colreveal {
         0% {
             clip-path: polygon(-10% -10%, -10% -10%, -10% 110%, -10% 110%);
@@ -156,7 +179,7 @@ export default {
         }
     }
 
-    /*.broadcast--animation-active .bracket >>> .connections {*/
+    /*.broadcast--animation-active .bracket:deep(.connections) {*/
     /*    animation: conreveal 400ms backwards;*/
     /*    animation-delay: calc(var(--anim-base) + (var(--bracket-columns, 1) + 2) * var(--anim-jump))*/
     /*}*/

@@ -1,17 +1,58 @@
 <template>
-    <div class="media-overlay">
-        <yt-player class="player" v-if="media" :video-id="videoId" :player-vars="playerVars" player-width="100%" player-height="100%"
-                   @ready="playerReady" @playing="playerPlaying" @ended="playerEnded" :class="{'black-out': ended }" />
+    <div
+        class="media-overlay"
+        style="height: 100vh; width: 100vw;"
+        :class="{'black-out': ended }">
+        <yt-player
+            v-if="media"
+            ref="youtube"
+            class="player"
+            :videoid="videoId"
+            :player-vars="playerVars"
+            width="100%"
+            height="100%"
+            :class="{'black-out': ended }"
+            :controls="1"
+            @ready="playerReady"
+            @playing="playerPlaying"
+            @ended="playerEnded" />
     </div>
 </template>
 
 <script>
-import { YouTubePlayer } from "vue-youtube-embed";
+import { socket } from "@/socket";
+import { YoutubeVue3 } from "youtube-vue3";
+
+const youtubeRegexp = /https?:\/\/(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube(?:-nocookie)?\.com\S*[^\w\s-])([\w-]{11})(?=[^\w-]|$)(?![?=&+%\w.-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/ig;
+
+/**
+ * get id from url
+ * @param  {string} url url
+ * @return {string}     id
+ */
+export function getIdFromURL (url) {
+    let id = url.replace(youtubeRegexp, "$1");
+
+    if (id.includes(";")) {
+        const pieces = id.split(";");
+
+        if (pieces[1].includes("%")) {
+            const uriComponent = decodeURIComponent(pieces[1]);
+            id = `https://youtube.com${uriComponent}`.replace(youtubeRegexp, "$1");
+        } else {
+            id = pieces[0];
+        }
+    } else if (id.includes("#")) {
+        id = id.split("#")[0];
+    }
+
+    return id;
+}
 
 export default {
     name: "MediaOverlay",
+    components: { "yt-player": YoutubeVue3 },
     props: ["broadcast", "active", "animationActive"],
-    components: { "yt-player": YouTubePlayer },
     data: () => ({
         player: null,
         playerVars: {
@@ -30,7 +71,7 @@ export default {
         },
         videoId() {
             if (!this.media?.embed) return null;
-            return this.$youtube.getIdFromURL(this.media.embed);
+            return getIdFromURL(this.media.embed);
         }
     },
     methods: {
@@ -39,19 +80,19 @@ export default {
             if (this.prepared) return;
             console.log("prep2, active:", this.animationActive);
 
-            this.player.pauseVideo();
-            this.player.setVolume(100);
-            this.player.unMute();
-            this.player.seekTo(0);
+            this.$refs.youtube.player.pauseVideo();
+            this.$refs.youtube.player.setVolume(100);
+            this.$refs.youtube.player.unMute();
+            this.$refs.youtube.player.seekTo(0);
 
-            this.player.addEventListener("timeupdate", (d) => {
+            this.$refs.youtube.player.addEventListener("timeupdate", (d) => {
                 console.log("timeupdate", { d });
             });
 
             this.prepared = true;
         },
         playerReady(e) {
-            this.player = e.target;
+            this.$refs.youtube.player = e.target;
             console.log("player ready", e);
             this.preparePlayer();
         },
@@ -64,10 +105,10 @@ export default {
         playerEnded() {
             this.ended = true;
         },
-        emitTimes() {
-            this.$socket.client.emit("media_update", "time", {
-                duration: this.player.getDuration(),
-                current: this.player.getCurrentTime()
+        async emitTimes() {
+            socket.emit("media_update", "time", {
+                duration: await this.$refs.youtube?.player?.getDuration(),
+                current: await this.$refs.youtube?.player?.getCurrentTime()
             });
         }
     },
@@ -75,27 +116,34 @@ export default {
         videoId(newMedia) {
             this.prepared = false;
         },
-        animationActive(isActive) {
-            console.log("play media", this.player);
-            if (isActive && this.player) {
-                this.player.playVideo();
-                this.$socket.client.emit("media_update", "playing", true);
-                this.$socket.client.emit("media_update", "remaining", this.player.getDuration() - this.player.getCurrentTime());
+        async active(isActive) {
+            if (isActive && this.$refs.youtube.player) {
+                this.$refs.youtube.player.seekTo(0);
+                this.ended = false;
+            }
+        },
+        async animationActive(isActive) {
+            if (isActive && this.$refs.youtube.player) {
+                this.$refs.youtube.player.playVideo();
+                this.ended = false;
+                const remaining = await this.$refs.youtube?.player?.getDuration() - await this.$refs.youtube?.player?.getCurrentTime();
+                socket.emit("media_update", "playing", true);
+                socket.emit("media_update", "remaining", remaining);
             }
         },
         prepared(isPrepared) {
-            this.$socket.client.emit("media_update", "prepared", isPrepared);
+            socket.emit("media_update", "prepared", isPrepared);
             console.log({ isPrepared });
         },
         ended(ended) {
-            this.$socket.client.emit("media_update", "ended", ended);
+            socket.emit("media_update", "ended", ended);
         }
     },
     mounted() {
         if (this.emitTimeTimeout) clearInterval(this.emitTimeTimeout);
         this.emitTimeTimeout = setInterval(this.emitTimes, 500);
     },
-    metaInfo() {
+    head() {
         return {
             title: `Media | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -104,17 +152,18 @@ export default {
 </script>
 
 <style scoped>
-    .player {
+    .media-overlay:deep(.player) {
         width: 100vw;
         --overlap: 250px;
         height: calc(100vh + calc(var(--overlap) * 2));
         top: calc(var(--overlap) * -1);
         position: absolute;
     }
-    .player:hover, body:hover .player {
+    .media-overlay:deep(.player):hover,
+    body:hover :deep(.player) {
         --overlap: 0px;
     }
-    .player.black-out {
+    .media-overlay.black-out {
         filter: brightness(0);
     }
 </style>

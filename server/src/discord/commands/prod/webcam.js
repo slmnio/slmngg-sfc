@@ -1,7 +1,6 @@
 const {
     SlashCommandBuilder,
     userMention,
-    CommandInteraction,
     EmbedBuilder
 } = require("discord.js");
 
@@ -11,7 +10,7 @@ const { getInternalManager } = require("../../../action-utils/action-manager");
 
 function generateWebcamLink(code) {
     if (code.includes("http")) return code.replace("view=", "push=");
-    return `https://cams.prod.slmn.gg/?push=${code}&webcam&cb=0&nmb=0&hideaudio=1`;
+    return `https://webcam.slmn.gg/?push=${code}&webcam&cb=0&nmb=0&hideaudio=1`;
 }
 
 module.exports = {
@@ -22,7 +21,7 @@ module.exports = {
         .setDescription("Get a webcam link for a user"),
     /**
      *
-     * @param {CommandInteraction} interaction
+     * @param {import("discord.js").CommandInteraction} interaction
      * @returns {Promise<void>}
      */
     async execute(interaction) {

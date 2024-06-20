@@ -1,8 +1,13 @@
 <template>
     <div class="podcast-overlay">
-        <div class="podcast-row" v-for="(row, i) in rowsOfGuests(rows || 2)" :key="i">
-            <transition-group class="casters flex-center" name="anim-talent">
-                <Caster v-for="caster in row" :key="caster.id" :guest="caster" :disable-video="shouldDisablePodcastVideo" />
+        <div v-for="(row, i) in rowsOfGuests(rows || 2)" :key="i" class="podcast-row">
+            <transition-group class="casters flex-center w-100" name="anim-talent" tag="div">
+                <Caster
+                    v-for="caster in row"
+                    :key="caster.id"
+                    :color="getColor(caster.i)"
+                    :guest="caster"
+                    :disable-video="shouldDisablePodcastVideo" />
             </transition-group>
         </div>
         <v-style>{{ autoWidth }}</v-style>
@@ -15,8 +20,8 @@ import Caster from "@/components/broadcast/desk/Caster";
 
 export default {
     name: "PodcastOverlay",
-    props: ["broadcast", "rows"],
     components: { Caster },
+    props: ["broadcast", "rows"],
     computed: {
         shouldDisablePodcastVideo() {
             if (!this.broadcast?.broadcast_settings) return true;
@@ -28,7 +33,7 @@ export default {
                 player: ReactiveThing("player", {
                     socials: ReactiveArray("socials")
                 })
-            })(this.broadcast).filter(g => !g.hide);
+            })(this.broadcast).filter(g => !g.hide).map((c, i) => ({ ...c, i }));
         },
         autoWidth() {
             const maxGroupSize = Math.max(...this.rowsOfGuests(this.rows || 2).map(r => r.length));
@@ -39,9 +44,17 @@ export default {
             };
 
             return `.podcast-overlay, .caster { --caster-width: ${sizes[maxGroupSize] || "700"}px !important; }`;
+        },
+        deskColors() {
+            if (!this.broadcast?.event?.theme?.desk_colors) return [];
+            return this.broadcast.event.theme.desk_colors.trim().split(/[\n,]/g).map(e => e.trim());
         }
     },
     methods: {
+        getColor(index) {
+            if (!this.deskColors?.length) return this.broadcast?.event?.theme?.color_logo_background || this.broadcast?.event?.theme?.color_theme;
+            return this.deskColors[index % this.deskColors.length];
+        },
         rowsOfGuests(number) {
             if (!this.guests) return [];
             const rows = [];
@@ -57,7 +70,7 @@ export default {
             return rows;
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Podcast | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -102,13 +115,13 @@ export default {
     .anim-talent-leave-active {
         transition: all .4s ease-in-out, opacity .4s ease;
     }
-    .anim-talent-enter, .anim-talent-leave-to {
+    .anim-talent-enter-from, .anim-talent-leave-to {
         /* hide */
         max-width: 0;
         opacity: 0;
         padding: 0 0;
     }
-    .anim-talent-enter-to, .anim-talent-leave {
+    .anim-talent-enter-to, .anim-talent-leave-from {
         /* show */
         opacity: 1;
     }

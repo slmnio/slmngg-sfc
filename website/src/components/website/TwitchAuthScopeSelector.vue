@@ -1,29 +1,27 @@
 <template>
     <div class="container">
-        <h1>Give our systems access to a twitch account</h1>
-        <b-form-group label="Enabled features" v-slot="{ ariaDescribedby }">
+        <LearnTitleChip title="Tools" subtitle="Twitch Authentication" />
+
+        <b-form-group v-slot="{ ariaDescribedby }" label="Enabled features">
             <b-form-checkbox-group
                 id="checkbox-group-1"
                 v-model="selected"
                 :options="options"
                 :aria-describedby="ariaDescribedby"
                 stacked
-            ></b-form-checkbox-group>
+            />
         </b-form-group>
 
-        <a :href="twitchAuthURL" class="btn btn-dark" :class="{'disabled': selected.length === 0}">Authorize</a>
-
+        <b-button variant="primary" class="text-white mt-2" :href="twitchAuthURL" :class="{'disabled': selected.length === 0}">Authorize</b-button>
     </div>
 </template>
 
 <script>
-import { BFormCheckboxGroup, BFormGroup } from "bootstrap-vue";
+import LearnTitleChip from "@/components/website/guide/LearnTitleChip.vue";
+
 export default {
     name: "TwitchAuthScopeSelector",
-    components: {
-        BFormGroup,
-        BFormCheckboxGroup
-    },
+    components: { LearnTitleChip },
     data: () => ({
         selected: [], // Must be an array reference!
         options: [
@@ -38,6 +36,10 @@ export default {
             {
                 text: "Ads (channel:edit:commercial)",
                 value: "channel:edit:commercial"
+            },
+            {
+                text: "Stream Key (channel:read:stream_key)",
+                value: "channel:read:stream_key"
             }
         ]
     }),
@@ -45,6 +47,9 @@ export default {
         twitchAuthURL() {
             return `${import.meta.env.VITE_DATA_SERVER}/twitch_auth/${this.selected.join(" ")}`;
         }
+    },
+    mounted() {
+        this.selected = this.options.map(opt => opt.value);
     }
 };
 </script>

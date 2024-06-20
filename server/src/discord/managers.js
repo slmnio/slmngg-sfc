@@ -1,5 +1,5 @@
 class MapHandler {
-    constructor({ map, ids, event, create_function }) {
+    constructor({ map, ids, create_function }) {
         // console.log("Map constructor", {map, ids});
         this.map = new MapObject(map, true);
         this.ids = new MapObject(ids);

@@ -1,14 +1,15 @@
 <template>
     <div class="player-audio" @click="isMuted = !isMuted">
-        <div class="member-list" v-if="showMemberList">
-            <div class="member" v-for="member in decoratedMemberList" :key="member.id" :class="{'speaking': member.speaking}">
-                {{ member.airtable && member.airtable.name }} {{ member.name }} {{ member.id }} {{ member.speaking }}
+        <div v-if="!isMuted" class="member-list">
+            <div v-for="member in sortedMemberList" :key="member.id" class="member" :class="{'speaking': member.speaking}">
+                <!--                {{ member.airtable && member.airtable.name }} {{ member.name }} {{ member.id }} {{ member.speaking }}-->
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import { socket } from "@/socket";
 import PCMPlayer from "@/utils/pcmplayer";
 import { OpusDecoderWebWorker } from "opus-decoder";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
@@ -16,7 +17,97 @@ import { cleanID } from "@/utils/content-utils";
 
 export default {
     name: "TeamAudio",
-    props: ["broadcast", "taskKey", "buffer", "alwaysUnmuted"],
+    props: ["broadcast", "taskKey", "buffer", "alwaysUnmuted", "team"],
+    data: () => ({
+        noStinger: true,
+        players: {},
+        decoders: {},
+        lastPacketTime: {},
+        memberList: [],
+        isMuted: true,
+        status: null,
+        showMemberList: false
+    }),
+    computed: {
+        muted() {
+            return this.alwaysUnmuted ? false : this.isMuted;
+        },
+        broadcastKey() {
+            return this.broadcast.key;
+        },
+        decoratedMemberList() {
+            const airtableData = ReactiveArray("members", {
+                live_guests: ReactiveThing("live_guests")
+            })({ members: this.memberList.map(m => m.airtableID).filter(m => m) });
+
+            return this.memberList.map(member => ({
+                ...member,
+                airtable: airtableData.find(m => cleanID(m.id) === cleanID(member.airtableID))
+            }));
+        },
+        sortedMemberList() {
+            const players = (this.team?.players || this.team?.limited_players || []);
+            console.log(players, this.team);
+            if (!players.length) {
+                return [...this.decoratedMemberList].sort((a, b) => {
+                    if (a.name > b.name) return 1;
+                    if (a.name < b.name) return -1;
+                    return 0;
+                });
+            }
+
+            const p = players.map(player => {
+                return this.decoratedMemberList.find(member => {
+                    if (player.id === member.airtableID || player.discord_id === member.id) return member;
+                    return false;
+                });
+            }).filter(p => !!p);
+            console.log("sorted member list", p);
+            return p;
+        },
+        roomKey() {
+            return `${this.broadcastKey}/${this.taskKey}`;
+        }
+    },
+    methods: {
+        async garbageCollect() {
+            for (const [user, time] of Object.entries(this.lastPacketTime)) {
+                if (Date.now() - time > 10000) {
+                    console.log("garbage collecting", user);
+                    this.players[user].destroy();
+                    // TODO: fix these
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+                    delete this.players[user];
+                    this.decoders[user].free();
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+                    delete this.decoders[user];
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+                    delete this.lastPacketTime[user];
+                }
+            }
+        },
+        audioSub(key) {
+            if (!this.broadcastKey) return;
+            socket.emit("audio_subscribe", {
+                taskKey: key || this.taskKey,
+                broadcastKey: this.broadcastKey
+            });
+        },
+        enable() {
+            this.isMuted = false;
+        },
+        disable() {
+            this.isMuted = true;
+        }
+    },
+    watch: {
+        taskKey() {
+            this.audioSub();
+        },
+        broadcastKey() {
+            this.audioSub();
+        }
+    },
     sockets: {
         async audio(room, { data, user }) {
             if (room !== this.roomKey) return;
@@ -57,72 +148,6 @@ export default {
                 console.log("status", this.taskKey, status);
                 this.status = status;
             }, this.buffer || 0);
-        }
-    },
-    data: () => ({
-        noStinger: true,
-        players: {},
-        decoders: {},
-        lastPacketTime: {},
-        memberList: [],
-        isMuted: true,
-        status: null,
-        showMemberList: false
-    }),
-    computed: {
-        muted() {
-            return this.alwaysUnmuted ? false : this.isMuted;
-        },
-        broadcastKey() {
-            return this.broadcast.key;
-        },
-        decoratedMemberList() {
-            const airtableData = ReactiveArray("members", {
-                live_guests: ReactiveThing("live_guests")
-            })({ members: this.memberList.map(m => m.airtableID).filter(m => m) });
-
-            return this.memberList.map(member => ({
-                ...member,
-                airtable: airtableData.find(m => cleanID(m.id) === cleanID(member.airtableID))
-            }));
-        },
-        roomKey() {
-            return `${this.broadcastKey}/${this.taskKey}`;
-        }
-    },
-    methods: {
-        async garbageCollect() {
-            for (const [user, time] of Object.entries(this.lastPacketTime)) {
-                if (Date.now() - time > 10000) {
-                    console.log("garbage collecting", user);
-                    this.players[user].destroy();
-                    delete this.players[user];
-                    this.decoders[user].free();
-                    delete this.decoders[user];
-                    delete this.lastPacketTime[user];
-                }
-            }
-        },
-        audioSub(key) {
-            if (!this.broadcastKey) return;
-            this.$socket.client.emit("audio_subscribe", {
-                taskKey: key || this.taskKey,
-                broadcastKey: this.broadcastKey
-            });
-        },
-        enable() {
-            this.isMuted = false;
-        },
-        disable() {
-            this.isMuted = true;
-        }
-    },
-    watch: {
-        taskKey() {
-            this.audioSub();
-        },
-        broadcastKey() {
-            this.audioSub();
         }
     },
     mounted() {

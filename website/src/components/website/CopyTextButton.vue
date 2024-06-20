@@ -1,6 +1,6 @@
 <template>
     <span class="parent" @click="copyText">
-        <span ref="copy"><slot></slot></span> <i :class="`fas fa-fw ${recentlyCopied ? 'fa-clipboard-check' : 'fa-copy'}`"></i>
+        <span ref="copy"><slot></slot></span><i v-if="!noIcon" :class="`ml-1 fas fa-fw ${recentlyCopied ? 'fa-clipboard-check' : 'fa-copy'}`"></i>
     </span>
 </template>
 
@@ -8,12 +8,13 @@
 
 export default {
     name: "CopyTextButton",
+    props: ["content", "noIcon"],
     data: () => ({
         recentlyCopied: false
     }),
     methods: {
         copyText() {
-            navigator.clipboard.writeText(this.$refs.copy.innerText);
+            navigator.clipboard.writeText(this.content || this.$refs.copy.innerText);
             this.recentlyCopied = true;
             setTimeout(() => {
                 this.recentlyCopied = false;

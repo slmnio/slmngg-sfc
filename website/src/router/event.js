@@ -1,20 +1,27 @@
-export default [
-    { path: "", component: () => import("@/views/sub-views/EventMain.vue") },
-    { path: "rosters", component: () => import("@/views/sub-views/EventRosters.vue") },
-    { path: "bracket", component: () => import("@/views/sub-views/EventBrackets.vue") },
-    { path: "brackets", redirect: "bracket" },
-    { path: "schedule", component: () => import("@/views/sub-views/EventSchedule.vue") },
-    { path: "matches", redirect: "schedule" },
+/**
+ * @param isSubdomain
+ * @returns {RouteRecordRaw[]}
+ */
+export default (isSubdomain) => [
+    { path: "", component: () => import("@/views/sub-views/event/EventMain.vue") },
+    { path: "rosters", component: () => import("@/views/sub-views/event/EventRosters.vue") },
+    { path: "bracket", name: `event-${isSubdomain? "sub-" : ""}-brackets`, alias: "brackets", component: () => import("@/views/sub-views/event/EventBrackets.vue") },
+    { path: "brackets", redirect: { name: `event-${isSubdomain? "sub-" : ""}-brackets` } },
+    { path: "schedule", name: `event-${isSubdomain? "sub-" : ""}-schedule`, component: () => import("@/views/sub-views/event/EventSchedule.vue") },
+    { path: "matches", redirect: { name: `event-${isSubdomain? "sub-" : ""}-schedule` } },
     // { path: "scenarios", component: EventScenarios },
-    { path: "scenarios", component: () => import("@/views/sub-views/EventScenarios2.vue") },
-    { path: "draft", component: () => import("@/views/sub-views/EventDraft.vue") },
-    { path: "staff", component: () => import("@/views/sub-views/EventStaff.vue") },
-    { path: "about", component: () => import("@/views/sub-views/EventAbout.vue") },
-    { path: "standings", component: () => import("@/views/sub-views/EventStandings.vue") },
+    { path: "scenarios", component: () => import("@/views/sub-views/event/EventScenarios2.vue") },
+    { path: "draft", component: () => import("@/views/sub-views/event/EventDraft.vue") },
+    { path: "staff", component: () => import("@/views/sub-views/event/EventStaff.vue") },
+    { path: "about", component: () => import("@/views/sub-views/event/EventAbout.vue") },
+    { path: "standings", component: () => import("@/views/sub-views/event/EventStandings.vue") },
     { path: "theme", component: () => import("@/views/sub-views/ThingTheme.vue") },
-    { path: "brands", component: () => import("@/views/sub-views/EventBrands.vue") },
-    { path: "auction", component: () => import("@/views/sub-views/EventAuction.vue") },
-    { path: "stream", redirect: "streams" },
-    { path: "stream-details", redirect: "streams" },
-    { path: "streams", component: () => import("@/views/sub-views/EventStreamDetails.vue") }
+    { path: "brands", component: () => import("@/views/sub-views/event/EventBrands.vue") },
+    {
+        path: "auction",
+        component: () => import("@/views/sub-views/event/EventAuction.vue"),
+        meta: { requiresAuth: true },
+    },
+    { path: "streams", name: `event-${isSubdomain? "sub-" : ""}-streams`, component: () => import("@/views/sub-views/event/EventStreamDetails.vue") },
+    { path: "stream", alias: ["stream-details"], redirect: { name: `event-${isSubdomain? "sub-" : ""}-streams` } },
 ];

@@ -74,6 +74,7 @@ export default {
         width: 100%;
         height: 100%;
         left: 0;
+        color: white;
         /*transform: translate(0, 0.05em);*/
     }
 </style>

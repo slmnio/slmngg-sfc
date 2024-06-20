@@ -15,6 +15,8 @@ const webAuction = require("./web_auction");
 let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEGORY_ID", "STAFFAPPS_APPLICATION_CHANNEL_ID", "IS_SLMNGG_MAIN_SERVER"];
 if (staffKeysRequired.every(key => process.env[key])) {
     require("./discord/staff.js");
+} else {
+    console.warn("Staff application system won't be set up. Set the required STAFFAPPS keys in server/.env")
 }
 
 let domains = (process.env.CORS_VALID_DOMAINS || "slmn.gg,localhost").split(/, */g).map(d => new RegExp(`(?:^|.*\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
@@ -49,9 +51,6 @@ const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials:
 //     test: ["hi"]
 // });
 
-const test = require("./discord/slash-commands.js");
-
-
 const Cache = (require("./cache.js")).setup(io);
 (require("./airtable-v2.js")).setup({ web: app, io });
 (require("./discord/bot-controller.js")).setup(io);
@@ -59,22 +58,37 @@ const Cache = (require("./cache.js")).setup(io);
 const actions = require("./action-utils/action-manager.js");
 actions.load(app, localCors, Cache, io);
 
-app.use(bodyParser.urlencoded({ extended: true }));
+require("./discord/slash-commands.js");
+require("./automation-manager.js");
+
+app.use(express.urlencoded({ extended: true }));
+app.options("/*", cors());
 
 app.get("/", async (req, res) => {
     res.send("[slmngg-server] pee pee poo poo");
 });
 
 
-app.get("/thing/:id", cors({ origin: corsHandle}), async (req, res) => {
+app.get("/thing/:id", cors({ origin: corsHandle }), async (req, res) => {
     let id = req.params.id;
     let data = await Cache.get(id);
     if (!data) return res.status(404).send({ error: true, message: "Unknown ID"});
-    console.log("[thing request]", id);
     res.end(JSON.stringify(data));
 });
-app.get("/things/:ids", cors({ origin: corsHandle}), async (req, res) => {
+app.get("/things/:ids", cors({ origin: corsHandle }), async (req, res) => {
     let ids = req.params.ids.split(",");
+    return handleThingsRequest(ids, req, res);
+});
+
+app.post("/things", bodyParser.json(), cors({ origin: corsHandle }), async (req, res) => {
+    const ids = req.body?.ids?.split(",");
+    if (!ids?.length) return res.status(400).send({ error: true, message: "No IDs supplied" });
+    if (ids?.length > 500) return res.status(400).send({ error: true, message: "Too many IDs supplied" });
+    return handleThingsRequest(ids, req, res);
+});
+
+async function handleThingsRequest(ids, req, res) {
+
     let promises = ids.map(async id => await Cache.get(id));
     let data = await Promise.all(promises);
 
@@ -89,7 +103,7 @@ app.get("/things/:ids", cors({ origin: corsHandle}), async (req, res) => {
     data = [...data, ...themes].filter(d => d != null);
     // if (!data) return res.status(404).send({ error: true, message: "Unknown ID"});
     res.end(JSON.stringify(data));
-});
+}
 
 routes({ app, cors, Cache, io });
 
@@ -109,13 +123,11 @@ function cleanID(id) {
 
 let connected = 0;
 
-// eslint-disable-next-line no-unused-vars
 io.on("connection", (socket) => {
     console.log(`[socket] on site: ${++connected}`);
 
     socket.on("subscribe", (id) => {
         id = cleanID(id);
-        // console.log("joined", id);
         socket.join(id);
     });
     socket.on("unsubscribe", (id) => {
@@ -130,7 +142,7 @@ io.on("connection", (socket) => {
     });
     socket.on("disconnect", () => {
         if (socket._clientName)
-            io.sockets.to(`prod:client-${socket._clientName}-overview`).emit("prod_disconnect", socket.id);
+            io.sockets.to(`prod:client-${socket._clientName?.toLowerCase()}-overview`).emit("prod_disconnect", socket.id);
         connected--;
     });
 
@@ -142,12 +154,16 @@ io.on("connection", (socket) => {
         // console.log("get and subscribe out:", id);
     });
     socket.on("prod-join", (clientName) => {
+        if (!clientName) return;
+        clientName = clientName.toLowerCase();
         console.log("[prod:client] join", `prod:client-${clientName}`);
         socket._clientName = clientName;
         socket.join(`prod:client-${clientName}`);
     });
 
     socket.on("prod-overview-join", (clientName) => {
+        if (!clientName) return;
+        clientName = clientName.toLowerCase();
         console.log("[prod-overview] join ", clientName);
         socket._clientName = clientName;
         socket.join(`prod:client-${clientName}-overview`);
@@ -155,6 +171,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("prod-broadcast-join", (broadcastKey) => {
+        if (!broadcastKey) return;
         if (socket._broadcastKey) {
             // console.log("[prod:broadcast] leaving", `prod:broadcast-${socket._broadcastKey}`);
             socket.leave(`prod:broadcast-${socket._broadcastKey}`);
@@ -176,7 +193,7 @@ io.on("connection", (socket) => {
 
     socket.on("prod-update", (data) => {
         if (data.clientName) {
-            socket._clientName = data.clientName;
+            socket._clientName = data.clientName.toLowerCase();
         }
         if (!socket._clientName) return console.warn("prod update without client name", data);
         data = {
@@ -188,6 +205,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("obs_data_change", async ({ clientName, previewScene, programScene }) => {
+        clientName = clientName.toLowerCase();
         let client = await Cache.get(`client-${clientName}`);
         console.log("obs_data_change", { clientName, previewScene, programScene });
 
@@ -200,9 +218,10 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("tally_change", ({ clientName, state, number, data }) => {
-        console.log("[tally]", clientName, state, number, data);
-        socket.to(`prod:client-${clientName}`).emit("tally_change", { state, number });
+    socket.on("tally_change", ({ clientName, state, data }) => {
+        clientName = clientName.toLowerCase();
+        console.log("[tally]", clientName, state, data);
+        socket.to(`prod:client-${clientName}`).emit("tally_change", { state });
     });
 
     socket.on("media_update", (status, value) => {

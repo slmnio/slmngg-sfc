@@ -1,21 +1,22 @@
 <template>
     <div class="match-thumbnail" :style="eventBackground">
-
-        <div class="match-thumbnail-half flex-center"
-             v-for="team in teams" :key="team.id"
-             :style="teamBackground(team)">
-<!--            <div class="match-loading-code" v-if="isLoading">LOADING: {{ team.code }}</div>-->
+        <div
+            v-for="team in teams"
+            :key="team.id"
+            class="match-thumbnail-half flex-center"
+            :style="teamBackground(team)">
+            <!--            <div class="match-loading-code" v-if="isLoading">LOADING: {{ team.code }}</div>-->
             <div class="match-thumbnail-logo bg-center" :style="logo(team)"></div>
         </div>
 
-      <div class="match-thumbnail-loading-holder flex-center" v-if="isLoading">
-        <LoadingIcon />
-      </div>
+        <div v-if="isLoading" class="match-thumbnail-loading-holder flex-center">
+            <LoadingIcon />
+        </div>
 
-      <div class="match-thumbnail-event-full w-100 flex-center" v-if="noTeams">
-        <div class="match-thumbnail-logo bg-center" :style="logo(match.event)"></div>
-      </div>
-        <div class="match-thumbnail-insert" v-if="!noTeams">
+        <div v-if="noTeams" class="match-thumbnail-event-full w-100 flex-center">
+            <div class="match-thumbnail-logo bg-center" :style="logo(match.event)"></div>
+        </div>
+        <div v-if="!noTeams" class="match-thumbnail-insert">
             <div class="match-event-logo bg-center" :style="logo(match.event, 50)"></div>
         </div>
         <div class="match-thumbnail-border default-thing-border-bg" :style="{...eventBorder, ...borderHeight}"></div>
@@ -28,10 +29,10 @@ import LoadingIcon from "@/components/website/LoadingIcon";
 
 export default {
     name: "MatchThumbnail",
-    props: ["match", "stripeHeight"],
     components: {
         LoadingIcon
     },
+    props: ["match", "stripeHeight"],
     computed: {
         isLoading() {
             try {
@@ -48,7 +49,7 @@ export default {
             return this.match?.teams ? this.match.teams.length === 0 : true;
         },
         eventBackground() {
-            if (!this.match || !this.match.event || !this.match.event.theme) return { backgroundColor: "#333" };
+            if (!this.match?.event?.theme) return { backgroundColor: "#333" };
 
             return {
                 backgroundColor: this.match.event.theme.color_logo_background || this.match.event.theme.color_theme,
@@ -60,7 +61,7 @@ export default {
             return { height: this.stripeHeight };
         },
         eventBorder() {
-            if (!this.match || !this.match.event || !this.match.event.theme) return { backgroundColor: "#333" };
+            if (!this.match?.event?.theme) return { backgroundColor: "#333" };
             if (this.noTeams) {
                 return {
                     backgroundColor: this.match.event.theme.color_logo_accent || this.match.event.theme.color_accent || this.match.event.theme.color_theme
@@ -81,7 +82,7 @@ export default {
     },
     methods: {
         teamBackground(team) {
-            if (!team || !team.theme) return {};
+            if (!team?.theme) return {};
             return {
                 backgroundColor: team.theme.color_logo_background || team.theme.color_theme,
                 borderColor: team.theme.color_logo_accent || team.theme.color_accent,
@@ -89,7 +90,7 @@ export default {
             };
         },
         logo(team, minSize = 120) {
-            if (!team || !team.theme) return {};
+            if (!team?.theme) return {};
             return resizedImage(team.theme, ["small_logo", "default_logo"], `h-${minSize}`);
         }
     }

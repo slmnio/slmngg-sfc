@@ -1,22 +1,23 @@
 <template>
-    <div class="mt-2">
-        <b-button class="mr-1" :variant="enabledComms === 1 ? 'primary' : 'secondary'" @click="() => enableComms(1)">
-            <i class="fas fa-fw mr-1 fa-microphone"></i>{{ teamName(0) }} Comms
+    <div class="p-2">
+        <b-button
+            v-for="(team, i) in teams"
+            :key="team.id"
+            class="mr-1"
+            :variant="enabledComms === i+1 ? 'primary' : 'secondary'"
+            @click="() => enableComms(i+1)">
+            <i class="fas fa-fw mr-1 fa-microphone"></i>{{ team?.name || `Team ${i+1}` }} Comms
         </b-button>
-        <b-button class="mr-1" :variant="enabledComms === 2 ? 'primary' : 'secondary'" @click="() => enableComms(2)">
-            <i class="fas fa-fw mr-1 fa-microphone"></i>{{ teamName(1) }} Comms
-        </b-button>
-        <b-button class="mr-1" variant="dark" @click="disableComms"><i class="fas mr-1 fa-microphone-slash"></i>Disable Comms</b-button>
+        <b-button class="mr-1 text-light" variant="outline-secondary" @click="disableComms"><i class="fas mr-1 fa-microphone-slash"></i>Disable Comms</b-button>
     </div>
 </template>
 
 <script>
-import { BButton } from "bootstrap-vue";
+import { socket } from "@/socket";
 
 export default {
-    name: "CommsControl",
+    name: "CommsControls",
     props: ["match"],
-    components: { BButton },
     data: () => ({
         enabledComms: null
     }),
@@ -28,12 +29,12 @@ export default {
     },
     methods: {
         async enableComms(team) {
-            this.$socket.client.emit("prod_trigger", "comms_enable", {
-                team: team
+            socket.emit("prod_trigger", "comms_enable", {
+                team
             });
         },
         async disableComms() {
-            this.$socket.client.emit("prod_trigger", "comms_disable");
+            socket.emit("prod_trigger", "comms_disable");
         },
         teamName(i) {
             return this.teams?.[i]?.name || `Team ${i + 1}`;

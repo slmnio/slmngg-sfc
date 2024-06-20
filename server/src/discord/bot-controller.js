@@ -101,30 +101,34 @@ async function checkBroadcast(id, broadcast) {
     }
 }
 
-onUpdate(async(id, { newData, oldData }) => {
-    setTimeout(async () => {
-        if (id === "Broadcasts") {
-            broadcastIDs = newData.ids.map(id => cleanID(id));
-            // check all broadcasts
-            broadcastIDs.map(id => checkBroadcast(id));
-        }
+if (!process.env.DISCORD_RUN_VOICE_BOTS) {
+    console.log("Discord voice bots won't run because DISCORD_RUN_VOICE_BOTS is not set.");
+} else {
+    onUpdate(async(id, { newData }) => {
+        setTimeout(async () => {
+            if (id === "Broadcasts") {
+                broadcastIDs = newData.ids.map(id => cleanID(id));
+                // check all broadcasts
+                broadcastIDs.map(id => checkBroadcast(id));
+            }
 
-        if (broadcastIDs.includes(cleanID(id))) {
-            checkBroadcast(id, newData);
-        // check broadcast ID
-        }
-        if (watchIDs.includes(cleanID(id))) {
-            broadcastIDs.map(id => checkBroadcast(id));
-        }
+            if (broadcastIDs.includes(cleanID(id))) {
+                checkBroadcast(id, newData);
+                // check broadcast ID
+            }
+            if (watchIDs.includes(cleanID(id))) {
+                broadcastIDs.map(id => checkBroadcast(id));
+            }
 
-        if (id === "Discord Bots") {
-            let botData = await getBots(); // update manager?
-            manager.setTokens(botData.filter(d => d?.token).map(d => d.token));
+            if (id === "Discord Bots") {
+                let botData = await getBots(); // update manager?
+                manager.setTokens(botData.filter(d => d?.token).map(d => d.token));
 
-            // manager.createJob("996236081819303936", "bpl4", "assistance");
-        }
-    }, 100);
-});
+                // manager.createJob("996236081819303936", "bpl4", "assistance");
+            }
+        }, 100);
+    });
+}
 
 
 /**
@@ -326,6 +330,7 @@ class DiscordBot {
             }
             if (newState.channelId === this.job?.channelID) {
                 this.subscribeUserAudio(newState.member);
+                this.memberList.updateMembers(newState.channel.members);
             }
         });
 
@@ -378,6 +383,7 @@ class DiscordBot {
     }
 
     checkJob(currentChannelID) {
+        console.log("checking job", this.job);
         if (!this.job) return this.log(`No job but currently in channel ${currentChannelID}`);
 
         this.log(`Current job is ${this.socketRoom} ${this.job.broadcastKey}/${this.job.taskKey} ${this.job.channelID}`);
@@ -457,7 +463,7 @@ class DiscordBot {
 
     async disconnect() {
         // TODO: implement
-        this.connection.disconnect();
+        if (this.connection) this.connection.disconnect();
         this.setStatus("ready");
         this.manager.deleteWorkerJob(this);
     }
@@ -491,7 +497,7 @@ class MemberList {
 
     updateMembers(discordMembers) {
         this.members = discordMembers.filter(m => !m.user.bot).map(member => ({
-            name: member.name,
+            name: member.nickname || member.user?.username,
             id: member.id,
             tag: member.tag
         }));

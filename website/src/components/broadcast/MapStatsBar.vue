@@ -1,6 +1,6 @@
 <template>
     <div class="map-stats-bar">
-        <div class="bar-segment" v-for="(win, i) in wins" :style="{ width: `${(win / total) * 100}%`, ...themeBackground(teams[i].theme) }" :key="teams[i].id"></div>
+        <div v-for="(win, i) in wins" :key="teams[i].id" class="bar-segment" :style="{ width: `${(win / total) * 100}%`, ...themeBackground(teams[i].theme) }"></div>
     </div>
 </template>
 

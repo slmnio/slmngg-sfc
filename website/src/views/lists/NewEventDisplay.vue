@@ -3,7 +3,7 @@
         <div class="event-block flex-center">
             <div class="event-block-logo bg-center" :style="blockLogo"></div>
         </div>
-        <div class="event-name">
+        <div class="event-name industry-align">
             {{ event.name }}
         </div>
     </a>
@@ -11,7 +11,7 @@
         <div class="event-block flex-center">
             <div class="event-block-logo bg-center" :style="blockLogo"></div>
         </div>
-        <div class="event-name">
+        <div class="event-name industry-align">
             {{ event.name }}
         </div>
     </router-link>
@@ -24,11 +24,10 @@ import { resizedImage } from "@/utils/images";
 export default {
     name: "NewEventDisplay",
     props: ["event"],
-    methods: { url },
     data: () => ({ useRawTag: false }),
     computed: {
         blockTheme() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return {
                 backgroundColor: this.event.theme.color_logo_background || this.event.theme.color_theme,
                 borderColor: this.event.theme.color_logo_accent || this.event.theme.color_text_on_theme,
@@ -36,10 +35,11 @@ export default {
             };
         },
         blockLogo() {
-            if (!this.event || !this.event.theme) return {};
+            if (!this.event?.theme) return {};
             return resizedImage(this.event.theme, ["default_logo"], "h-50");
         }
-    }
+    },
+    methods: { url }
 };
 </script>
 
@@ -68,7 +68,7 @@ export default {
 .event-name {
     font-size: 1.2em;
     line-height: 1;
-    margin: 0 .25em .25em 0;
+    margin-right: .33em;
 }
 .event.team-display .event-name {
     font-weight: bold;

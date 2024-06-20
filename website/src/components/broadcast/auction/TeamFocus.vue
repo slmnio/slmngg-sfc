@@ -1,21 +1,26 @@
 <template>
-    <div class="team-focus p-3" v-if="team">
-        <ThemeLogo :class="{'leading': isLeading }" class="top-logo w-100" :theme="team.theme"/>
-        <div class="title pt-3 font-weight-bold text-center">{{ team.name }}</div>
+    <div v-if="team" class="team-focus p-3">
+        <ThemeLogo :class="{'leading': isLeading }" class="top-logo w-100" :theme="team.theme" />
+        <div class="title pt-3 fw-bold text-center">{{ team.name }}</div>
 
         <div class="player-list">
-            <div class="player" :class="{empty: player.empty, latest: player.latest}" v-for="player in players" :key="player.id"  :style="(player.latest ? teamBG : {})">
-                <div class="player-internal" v-if="!player.empty" >
+            <div
+                v-for="player in players"
+                :key="player.id"
+                class="player"
+                :class="{empty: player.empty, latest: player.latest}"
+                :style="(player.latest ? teamBG : {})">
+                <div v-if="!player.empty" class="player-internal">
                     <span class="player-role" v-html="getRoleSVG(player.role)"></span>
                     <span class="player-name">{{ player.name }}</span>
-                    <span class="player-money" v-if="player.auction_price">{{ money(player.auction_price) }}</span>
+                    <span v-if="player.auction_price" class="player-money">{{ money(player.auction_price) }}</span>
                 </div>
                 <div v-else style="opacity: 0;">...</div>
             </div>
         </div>
 
-        <MoneyBar class="team-focus-bar" :team="team" :auction-settings="auctionSettings"></MoneyBar>
-<!--        <div class="remaining font-weight-bold text-center">Remaining: {{ money(team.balance) }}</div>-->
+        <MoneyBar class="team-focus-bar" :team="team" :auction-settings="auctionSettings" />
+        <!--        <div class="remaining fw-bold text-center">Remaining: {{ money(team.balance) }}</div>-->
     </div>
 </template>
 
@@ -29,7 +34,6 @@ export default {
     name: "TeamFocus",
     components: { MoneyBar, ThemeLogo },
     props: ["team", "leading", "auctionSettings"],
-    methods: { money, getRoleSVG },
     computed: {
         players() {
             const max = (this.auctionSettings?.each_team || getAuctionMax());
@@ -45,7 +49,8 @@ export default {
             if (!this.leading) return false;
             return cleanID(this.leading.teamID) === this.team?.id;
         }
-    }
+    },
+    methods: { money, getRoleSVG }
 };
 </script>
 

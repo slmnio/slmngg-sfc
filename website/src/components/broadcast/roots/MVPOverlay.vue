@@ -3,23 +3,33 @@
         <div v-if="mvp">
             <div class="text-container">
                 <div class="title-holder">
-                    <ThemeTransition start="right" :theme="themeBackground" :active="animationActive" :starting-delay="100" :duration="500">
+                    <ThemeTransition
+                        start="right"
+                        :theme="themeBackground"
+                        :active="animationActive"
+                        :starting-delay="100"
+                        :duration="500">
                         <div class="title" :style="borderColor">{{ title || 'MVP' }}</div>
                     </ThemeTransition>
                 </div>
 
                 <div class="text-holder">
-                    <ThemeTransition start="right" :theme="themeBackground" :active="animationActive" :startingDelay="400" :duration="300">
+                    <ThemeTransition
+                        start="right"
+                        :theme="themeBackground"
+                        :active="animationActive"
+                        :starting-delay="400"
+                        :duration="300">
                         <div class="player-name-holder" :style="themeBackground">
-                            <ThemeLogo icon-padding="20%" border-width="0" :theme="mvpTeam && mvpTeam.theme" class="player-team-logo"></ThemeLogo>
+                            <ThemeLogo icon-padding="20%" border-width="0" :theme="mvpTeam && mvpTeam.theme" class="player-team-logo" />
                             <div class="player-name">{{ mvp.name }}</div>
                         </div>
                     </ThemeTransition>
                 </div>
             </div>
             <transition name="hero-move">
-                <div class="hero-container" v-show="animationActive && mvpTeam && mvpTeam.theme">
-                    <recolored-hero class="hero" v-if="mvpTeam && mvpTeam.theme" :theme="mvpTeam.theme" :hero="hero"></recolored-hero>
+                <div v-show="animationActive && mvpTeam && mvpTeam.theme" class="hero-container">
+                    <recolored-hero v-if="mvpTeam && mvpTeam.theme" class="hero" :theme="mvpTeam.theme" :hero="hero" />
                 </div>
             </transition>
         </div>
@@ -32,6 +42,7 @@ import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { themeBackground1 } from "@/utils/theme-styles";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
+import { useStatusStore } from "@/stores/statusStore";
 
 export default {
     name: "MVPOverlay",
@@ -84,13 +95,13 @@ export default {
         mvpTeam: {
             deep: true,
             handler(team) {
-                if (team && team?.theme) {
-                    this.$parent.updateTheme(team.theme);
+                if (team?.theme) {
+                    useStatusStore().customStingerTheme = team?.theme;
                 }
             }
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `MVP | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -145,15 +156,15 @@ export default {
         border-bottom: 8px solid transparent;
     }
 
-    .mvp-overlay >>> .theme-transition,
-    .mvp-overlay >>> .theme-transition-outer,
-    .mvp-overlay >>> .theme-transition-inner {
+    .mvp-overlay:deep(.theme-transition),
+    .mvp-overlay:deep(.theme-transition-outer),
+    .mvp-overlay:deep(.theme-transition-inner) {
         width: auto !important;
         height: auto !important;
     }
 
     .hero-move-enter-active { transition: all .5s; transform: translate(0%, 0%); transition-delay: 500ms; }
     .hero-move-leave-active { transition: none; }
-    .hero-move-enter, .hero-move-leave-to { transform: translate(100%, 0%) }
-    .hero-move-enter-to, .hero-move-leave { transform: translate(0%, 0%) }
+    .hero-move-enter-from, .hero-move-leave-to { transform: translate(100%, 0%) }
+    .hero-move-enter-to, .hero-move-leave-from { transform: translate(0%, 0%) }
 </style>

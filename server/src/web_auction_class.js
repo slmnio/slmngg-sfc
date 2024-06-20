@@ -4,6 +4,14 @@ const { cleanID, dirtyID,
 } = require("./action-utils/action-utils");
 const { isEventStaffOrHasRole } = require("./action-utils/action-permissions");
 
+/**
+ * @typedef {{ amount: number, teamID: AnyAirtableID }} Bid
+ */
+
+function money(num) {
+    return `$${num || 0}k`;
+}
+
 module.exports = class Auction {
     constructor(eventData, io, auctionData) {
         this.io = io;
@@ -19,6 +27,7 @@ module.exports = class Auction {
             beforeFirstBids: auctionData?.time?.beforeFirstBids ?? 5,
             afterInitialBid: auctionData?.time?.afterInitialBid ?? 20,
             afterSubsequentBids: auctionData?.time?.afterSubsequentBids ?? 15,
+            afterSubsequent1kBids: auctionData?.time?.afterSubsequent1kBids ?? 8,
             afterSaleNextAutoPlayer: auctionData?.time?.afterSaleNextAutoPlayer ?? 10,
             preAuction: auctionData?.time?.preAuction ?? 5,
             postAuction: auctionData?.time?.postAuction ?? 10,
@@ -35,10 +44,13 @@ module.exports = class Auction {
             maximumPlayerCount: auctionData?.each_team ?? auctionData?.eachTeam ?? 7
         };
 
+        /**
+         * @type {Bid[]}
+         */
         this.bidData = [];
         this.timerTimeout = null;
 
-        this.log("New auction", this.id);
+        // this.log("New auction", this.id);
 
         let existingSockets = [...(this.io.of("/").adapter.rooms.get(this.socketIdentifier) || [])];
         existingSockets.forEach(id => this.welcomeSocket(id));
@@ -172,19 +184,24 @@ module.exports = class Auction {
                     if (amount > (this.bids.getLeading()?.amount || 0) &&
                         (amount - this.bids.getLeading().amount <= this.money.maximumBidIncrement) &&
                         amount === (team.balance || 0)) {
-                        this.log(`Letting team ${team.name} bid ${amount} since it's all their money ${team.balance}`);
+                        this.log(`Letting team ${team.name} bid ${money(amount)} since it's all their money ${team.balance}`);
                     } else {
-                        return this.sendError(socket, `The bid $${amount} is out of range`);
+                        return this.sendError(socket, `The bid$${(amount)} is out of range`);
                     }
                 }
+
                 let bidError = await this.errorBiddingForPlayer(data.user, data.teamID, this.activePlayerID, amount, { ignoreUser: false });
                 if (bidError) {
                     this.sendError(socket, bidError);
                     return this.log("Bid error", bidError);
                 }
 
+                const leading = this.bids.getLeading();
+                if (leading?.teamID === data.teamID) {
+                    return this.sendError(socket, "You are already leading this bid");
+                }
 
-                this.timer.proc();
+                this.timer.proc(amount);
                 this.bids.push({
                     amount,
                     teamID: data.teamID
@@ -244,7 +261,7 @@ module.exports = class Auction {
             return `${team.name} already has the maximum player count (${this.playerNumbers.maximumPlayerCount})`;
 
         if ((team.balance || 0) < bidAmount) {
-            return `${team.name} doesn't have enough funds to bid for player at $${bidAmount}`;
+            return `${team.name} doesn't have enough funds to bid for player at ${money(bidAmount)}`;
         }
 
         // TODO: check auction order & player teams - are they eligible?
@@ -255,15 +272,21 @@ module.exports = class Auction {
 
     get bids() {
         return {
+            /**
+             * @param item {Bid}
+             */
             push: (item) => {
                 this.bidData.push(item);
-                console.log(item, this.bidData);
+                console.log(item);
                 this.broadcastData("auction_bids", this.bidData);
             },
             empty: () => {
                 this.bidData = [];
                 this.broadcastData("auction_bids", this.bidData);
             },
+            /**
+             * @returns {Bid | null}
+             */
             getLeading: () => {
                 if (!this.bidData.length) return null;
                 return this.bidData[this.bidData.length - 1];
@@ -382,11 +405,12 @@ module.exports = class Auction {
                 }
 
             },
-            proc: () => {
+            proc: (amount) => {
                 this.timer.clear();
-                this.timerTimeout = setTimeout(() => this.autoCloseAuction(), this.wait.afterSubsequentBids * 1000);
+                const time = (amount && amount === 1 ? this.wait.afterSubsequent1kBids : this.wait.afterSubsequentBids) || this.wait.afterSubsequentBids;
+                this.timerTimeout = setTimeout(() => this.autoCloseAuction(), time * 1000);
                 this.broadcastData("auction_timer", {
-                    duration: this.wait.afterSubsequentBids * 1000
+                    duration: time * 1000
                 });
             }
         };

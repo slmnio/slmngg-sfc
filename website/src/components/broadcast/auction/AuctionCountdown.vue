@@ -1,8 +1,8 @@
 <template>
     <transition name="fade-down">
-        <div class="countdown-holder" v-show="countdownLeft || web" :class="{'web': web}">
+        <div v-show="countdownLeft || web" class="countdown-holder" :class="{'web': web}">
             <div class="countdown">
-                <div class="countdown-bar-text" style="font-variant-numeric: tabular-nums">{{ humanText }} {{ (showTime && countdownLeft) ? (countdownLeft / 1000).toFixed(1) : ''}}</div>
+                <div class="countdown-bar-text" style="font-variant-numeric: tabular-nums">{{ humanText }} {{ (showTime && countdownLeft) ? (countdownLeft / 1000).toFixed(1) : '' }}</div>
                 <div class="countdown-bar" :style="{ width: `${this.barWidth}%` }"></div>
             </div>
         </div>
@@ -24,6 +24,7 @@ export default {
     computed: {
         barWidth() {
             if (!this.countdownMax) return 0;
+            if (["POST_AUCTION"].includes(this.auctionState)) return 0;
             return (this.countdownLeft / this.countdownMax) * 100;
         },
         humanText() {

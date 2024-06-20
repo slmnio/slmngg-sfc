@@ -1,30 +1,43 @@
 <template>
-    <div class="desk-text-editor p-2">
+    <div class="desk-text-editor p-2 gap-3 d-flex flex-column">
         <div class="d-flex gap-2">
-            <b-form-input class="opacity-changes disabled-low-opacity" :disabled="chosenDisplayOption?.hasText === false"
-                          @keydown.ctrl.enter="saveData({mode: 'show'})"
-                          type="text" v-model="deskTextPrefix" placeholder="Text prefix"/>
-            <b-form-input class="opacity-changes disabled-low-opacity" :disabled="chosenDisplayOption?.hasText === false"
-                          @keydown.ctrl.enter="saveData({mode: 'show'})"
-                          type="text" v-model="deskText" placeholder="Desk text"/>
-            <b-form-select class="w-auto" :options="displayOptions" v-model="chosenDisplayOption"></b-form-select>
-            <b-button @click="saveData({ mode: 'show'})" class="flex-shrink-0" :disabled="processing" :variant="!dataDeskMode ? 'primary' : 'secondary'"><i class="fas fa-fw fa-eye"></i> Show</b-button>
-            <b-button @click="saveData({ mode: 'hide'})" class="flex-shrink-0" :disabled="processing" :variant="!dataDeskMode ? 'secondary' : 'primary'"><i class="fas fa-eye-slash"></i> Hide</b-button>
+            <b-button class="flex-shrink-0" :disabled="processing || chosenDisplayOption?.hasText === false" @click="autoSetPrefixText()">Team scores</b-button>
+            <b-form-input
+                v-model="deskTextPrefix"
+                class="opacity-changes disabled-low-opacity"
+                :disabled="chosenDisplayOption?.hasText === false"
+                type="text"
+                placeholder="Text prefix"
+                @keydown.ctrl.enter="saveData({mode: 'show'})" />
+            <b-form-input
+                v-model="deskText"
+                class="opacity-changes disabled-low-opacity"
+                :disabled="chosenDisplayOption?.hasText === false"
+                type="text"
+                placeholder="Desk text"
+                @keydown.ctrl.enter="saveData({mode: 'show'})" />
+            <b-form-select v-model="chosenDisplayOption" class="w-auto" :options="displayOptions" />
+            <b-button class="flex-shrink-0" :disabled="processing" :variant="!dataDeskMode ? 'primary' : 'secondary'" @click="saveData({ mode: 'show'})"><i class="fas fa-fw fa-eye"></i> Show</b-button>
+            <b-button class="flex-shrink-0" :disabled="processing" :variant="!dataDeskMode ? 'secondary' : 'primary'" @click="saveData({ mode: 'hide'})"><i class="fas fa-eye-slash"></i> Hide</b-button>
+        </div>
+        <div class="d-flex gap-2 align-items-center justify-content-center flex-wrap">
+            <b-button
+                v-for="option in noTextDisplayOptions"
+                :key="option?.text"
+                :disabled="processing"
+                :variant="(broadcast?.desk_display === option?.value?.text) ? 'primary' : 'secondary'"
+                @click="chosenDisplayOption = option?.value; saveData({ mode: 'show' })">
+                {{ option?.text }}
+            </b-button>
         </div>
     </div>
 </template>
 
 <script>
-import { BButton, BFormInput, BFormSelect } from "bootstrap-vue";
-import { updateBroadcastData } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "DeskTextEditor",
-    components: {
-        BFormSelect,
-        BFormInput,
-        BButton
-    },
     props: {
         broadcast: {}
     },
@@ -63,6 +76,20 @@ export default {
                 }
             },
             {
+                text: "Drafted Maps",
+                value: {
+                    hasText: false,
+                    text: "Drafted Maps"
+                }
+            },
+            {
+                text: "Interview",
+                value: {
+                    hasText: false,
+                    text: "Interview"
+                }
+            },
+            {
                 text: "Text (Event)",
                 value: {
                     hasText: true,
@@ -82,9 +109,41 @@ export default {
                     hasText: true,
                     text: "Notice (Team 2)"
                 }
+            },
+            {
+                text: "Hidden",
+                value: {
+                    hasText: false,
+                    text: "Hidden"
+                }
+            },
+            {
+                text: "Casters",
+                value: {
+                    hasText: false,
+                    text: "Casters"
+                }
             }
         ]
     }),
+    computed: {
+        dataDeskText() {
+            return this.broadcast?.notice_text;
+        },
+        dataDeskMode() {
+            const display = this.broadcast?.desk_display;
+            return display === "Match" ? null : display;
+        },
+        combinedDeskText() {
+            return [
+                this.deskTextPrefix,
+                this.deskText
+            ].filter(Boolean).join("|");
+        },
+        noTextDisplayOptions() {
+            return this.displayOptions.filter(option => !option?.value?.hasText);
+        }
+    },
     methods: {
         async saveData({ mode }) {
             if (this.processing) return;
@@ -104,28 +163,25 @@ export default {
             }
 
             try {
-                const response = await updateBroadcastData(this.$root.auth, data);
+                const response = await authenticatedRequest("actions/update-broadcast", data);
                 if (!response.error) {
                     this.$notyf.success("Updated desk display");
                 }
             } finally {
                 this.processing = false;
             }
-        }
-    },
-    computed: {
-        dataDeskText() {
-            return this.broadcast?.notice_text;
         },
-        dataDeskMode() {
-            const display = this.broadcast?.desk_display;
-            return display === "Match" ? null : display;
-        },
-        combinedDeskText() {
-            return [
-                this.deskTextPrefix,
-                this.deskText
-            ].filter(Boolean).join("|");
+        autoSetPrefixText() {
+            console.log(this.broadcast?.match);
+            this.deskTextPrefix = this.broadcast?.live_match?.teams.map((t, i) => {
+                let text = [
+                    t.name,
+                    this.broadcast?.live_match[`score_${i + 1}`]
+                ];
+                console.log(text);
+                if (i === 1) text = text.reverse();
+                return text.join(" ");
+            }).join("-");
         }
     },
     watch: {

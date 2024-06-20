@@ -1,43 +1,62 @@
 <template>
-    <router-link :to="url('match', this.match)" class="bracket-match no-link-style" v-if="!!match"
-                 :class="{'hover': hover, 'forfeit': match && match.forfeit }"
-                 @mouseover.native="matchHover" @mouseleave.native="matchEmpty">
+    <router-link
+        v-if="!!match"
+        :to="url('match', this.match)"
+        class="bracket-match no-link-style"
+        :class="{'hover': hover, 'forfeit': match && match.forfeit }"
+        @mouseover="matchHover"
+        @mouseleave="matchEmpty">
         <div class="match-name d-none">{{ match && match.name }}</div>
-        <div class="match-number" :class="{'lowlight': lowlight}" v-if="matchNumber">{{ matchNumber }}</div>
+        <div v-if="matchNumber" class="match-number" :class="{'lowlight': lowlight}">
+            <div class="industry-align">{{ matchNumber }}</div>
+        </div>
         <div class="match-extra-info">
-            <div class="match-stream" :class="{'lowlight': lowlight}" v-if="showBroadcasts && match.stream_code">{{ match.stream_code }} stream</div>
-            <div class="match-time" :class="{'lowlight': lowlight}" v-if="showTimes && friendlyStartTime">{{ friendlyStartTime }}</div>
+            <div v-if="showBroadcasts && match.stream_code" class="match-stream" :class="{'lowlight': lowlight}">
+                <div class="industry-align">{{ match.stream_code }} stream</div>
+            </div>
+            <div v-if="showTimes && friendlyStartTime" class="match-time" :class="{'lowlight': lowlight}">
+                <div class="industry-align">{{ friendlyStartTime }}</div>
+            </div>
         </div>
         <div class="match-teams">
-            <BracketTeam v-for="(team, i) in teams"
-                         :team="team.id && team"
-                         :text="team.dummy && team.text"
-                         :short="team.dummy && team.short"
-                         :empty="team._empty"
-                         :key="team.id"
-                         :score="displayScores[i]" :win="scores[i] === match.first_to"
+            <BracketTeam
+                v-for="(team, i) in teams"
+                :key="team.id"
+                :team="team.id && team"
+                :text="team.dummy && team.text"
+                :short="team.dummy && team.short"
+                :empty="team._empty"
+                :score="displayScores[i]"
+                :win="scores[i] === match.first_to"
             />
         </div>
         <transition name="fade">
-            <div class="match-highlight-text" v-if="matchHighlight"
-                 :data-side="matchHighlight.side" :class="{ 'feeder': matchHighlight.feeder }">
+            <div
+                v-if="matchHighlight"
+                class="match-highlight-text"
+                :data-side="matchHighlight.side"
+                :class="{ 'feeder': matchHighlight.feeder }">
                 {{ matchHighlight.text }}
-                <i class="fas fa-chevron-down" v-if="matchHighlight.feeder && matchHighlight.text === 'Loser'"></i>
-                <i class="fas fa-chevron-right" v-if="matchHighlight.feeder && matchHighlight.text !== 'Loser'"></i>
+                <i v-if="matchHighlight.feeder && matchHighlight.text === 'Loser'" class="fas fa-chevron-down"></i>
+                <i v-if="matchHighlight.feeder && matchHighlight.text !== 'Loser'" class="fas fa-chevron-right"></i>
             </div>
         </transition>
     </router-link>
-    <div v-else class="bracket-match bracket-match-spacer"
-         @mouseover="matchHover" @mouseleave="matchEmpty">
+    <div
+        v-else
+        class="bracket-match bracket-match-spacer"
+        @mouseover="matchHover"
+        @mouseleave="matchEmpty">
         <div class="match-name d-none"></div>
         <div class="match-teams">
-            <BracketTeam v-for="(team, i) in teams"
-                         :team="team.id && team"
-                         :text="team.dummy && team.text"
-                         :short="team.dummy && team.short"
-                         :empty="team._empty"
-                         :key="team.id"
-                         :score="displayScores[i]"
+            <BracketTeam
+                v-for="(team, i) in teams"
+                :key="team.id"
+                :team="team.id && team"
+                :text="team.dummy && team.text"
+                :short="team.dummy && team.short"
+                :empty="team._empty"
+                :score="displayScores[i]"
             />
         </div>
     </div>
@@ -46,8 +65,9 @@
 <script>
 import BracketTeam from "@/components/website/bracket/BracketTeam";
 import { url } from "@/utils/content-utils";
-import store from "@/thing-store";
 import spacetime from "spacetime";
+import { useStatusStore } from "@/stores/statusStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "BracketMatch",
@@ -56,71 +76,6 @@ export default {
     data: () => ({
         hover: false
     }),
-    methods: {
-        url,
-        matchHover() {
-            this.hover = true;
-            // console.log(this.match);
-            const connections = this?.match?._bracket_data?.connections;
-            if (!connections) return;
-
-            // const cons = [
-            //     { id: connections.winner.id, text: "Winner advances here", side: connections.winner.side, number: connections.winner?.match_number },
-            //     { id: connections.loser.id, text: "Loser drops to here", side: connections.loser.side, number: connections.loser?.match_number }
-            // ];
-
-            // connections.feederMatches.map(f => {
-            //     cons.push({
-            //         id: f.id,
-            //         text: f._m,
-            //         feeder: true
-            //     });
-            // });
-
-            // store.commit("setHighlights", cons); // disable this for now
-            store.commit("setHighlightedMatch", this.match.id);
-        },
-        matchEmpty() {
-            this.hover = false;
-            // console.log(this.match, "empty");
-            store.commit("setHighlights", []);
-            store.commit("setHighlightedMatch", null);
-        },
-        generateDummies(dummy, match) {
-            // "1" and "2" come from the dot notation (eg "winner": "7.2")
-            // so 1 is top/left, 2 is bottom/right
-
-            const feederMatches = match?._bracket_data?.connections?.feederMatches;
-            // console.log("cons", match?._bracket_data?.num, match?._bracket_data?.connections);
-            if (!feederMatches || (!feederMatches["1"] && !feederMatches["2"])) return [dummy, dummy];
-            const dummies = [dummy, dummy];
-            if (feederMatches["1"]) {
-                // console.log("f1", feederMatches["1"]);
-                dummies[0] = {
-                    ...dummy,
-                    text: this.generateDummyText(feederMatches["1"])
-                };
-            }
-
-            if (feederMatches["2"]) {
-                // console.log("f2", feederMatches["2"]);
-                dummies[1] = {
-                    ...dummy,
-                    text: this.generateDummyText(feederMatches["2"])
-                };
-            }
-
-            // console.log("dummies", match._bracket_data.num, dummies);
-
-            return dummies;
-        },
-        generateDummyText(match) {
-            if (match?.teams?.length === 2 && match.teams.every(team => team.code)) {
-                return `${match._m} of ${match.teams.map(team => team.code).join(" vs ")}`;
-            }
-            return `${match._m} M${(match.match_number || match.side)}`;
-        }
-    },
     computed: {
         matchNumber() {
             const localNumber = this.match?._bracket_data?.num;
@@ -134,6 +89,15 @@ export default {
             return [this.match.score_1, this.match.score_2];
         },
         displayScores() {
+            if (this.match?.forfeit) {
+                // check that it was a 3-0 or similar
+                // some matches are forfeited with other scores that are important to display
+                if (this.scores[0] === this.match.first_to && !this.scores[1]) {
+                    return ["W", "FF"];
+                } else if (this.scores[1] === this.match.first_to && !this.scores[0]) {
+                    return ["FF", "W"];
+                }
+            }
             if (this.match && this.match.first_to === 1 && this.match.maps?.length === 1) {
                 const map = this.match.maps[0];
                 if (map.id && (map.score_1 !== undefined && map.score_2 !== undefined)) {
@@ -186,10 +150,10 @@ export default {
             return [];
         },
         matchHighlight() {
-            return store.getters.getHighlight(this.match.id);
+            return useStatusStore().matchHighlights.find(match => match.id === this.match.id);
         },
         lowlight() {
-            return !!store.state.highlighted_team;
+            return !!useStatusStore().highlightedTeam;
         },
         friendlyStartTime() {
             if (!this.match.start) return null;
@@ -201,7 +165,6 @@ export default {
 
             const clarifyDate = diffFromNow <= 0 || diffFromNow >= 1000 * 60 * 60 * 24 * 7;
 
-            // eslint-disable-next-line no-unreachable
             const format = "{day-short}[D] {hour}[M]{ampm}"
                 .replace("[M]", time.minute() === 0 ? "" : ":{minute-pad}")
                 .replace("[D]", clarifyDate ? " {date-ordinal} {month-short}" : "");
@@ -209,9 +172,74 @@ export default {
             return time.format(format);
         },
         activeTimezone() {
-            const stz = this.customTimezone || store.state.timezone;
+            const stz = this.customTimezone || useSettingsStore().timezone;
             if (!stz || stz === "local") return spacetime.now().timezone().name;
             return stz;
+        }
+    },
+    methods: {
+        url,
+        matchHover() {
+            this.hover = true;
+            // console.log(this.match);
+            const connections = this?.match?._bracket_data?.connections;
+            if (!connections) return;
+
+            // const cons = [
+            //     { id: connections.winner.id, text: "Winner advances here", side: connections.winner.side, number: connections.winner?.match_number },
+            //     { id: connections.loser.id, text: "Loser drops to here", side: connections.loser.side, number: connections.loser?.match_number }
+            // ];
+
+            // connections.feederMatches.map(f => {
+            //     cons.push({
+            //         id: f.id,
+            //         text: f._m,
+            //         feeder: true
+            //     });
+            // });
+
+            // store.commit("setHighlights", cons); // disable this for now
+            useStatusStore().highlightedMatch = this.match.id;
+        },
+        matchEmpty() {
+            this.hover = false;
+            // console.log(this.match, "empty");
+            useStatusStore().matchHighlights = [];
+            useStatusStore().highlightedMatch = null;
+        },
+        generateDummies(dummy, match) {
+            // "1" and "2" come from the dot notation (eg "winner": "7.2")
+            // so 1 is top/left, 2 is bottom/right
+
+            const feederMatches = match?._bracket_data?.connections?.feederMatches;
+            // console.log("cons", match?._bracket_data?.num, match?._bracket_data?.connections);
+            if (!feederMatches || (!feederMatches["1"] && !feederMatches["2"])) return [dummy, dummy];
+            const dummies = [dummy, dummy];
+            if (feederMatches["1"]) {
+                // console.log("f1", feederMatches["1"]);
+                dummies[0] = {
+                    ...dummy,
+                    text: this.generateDummyText(feederMatches["1"])
+                };
+            }
+
+            if (feederMatches["2"]) {
+                // console.log("f2", feederMatches["2"]);
+                dummies[1] = {
+                    ...dummy,
+                    text: this.generateDummyText(feederMatches["2"])
+                };
+            }
+
+            // console.log("dummies", match._bracket_data.num, dummies);
+
+            return dummies;
+        },
+        generateDummyText(match) {
+            if (match?.teams?.length === 2 && match.teams.every(team => team.code)) {
+                return `${match._m} of ${match.teams.map(team => team.code).join(" vs ")}`;
+            }
+            return `${match._m} M${(match.match_number || match.side)}`;
         }
     }
 };
@@ -268,10 +296,8 @@ export default {
     .match-number, .match-extra-info > div {
         background: #333;
         text-align: center;
-        padding: 0 .3em .3em;
+        padding: .25em .5em;
         color: white;
-        border: 2px solid transparent;
-        border-bottom: none;
         transition: opacity 150ms, outline-color 150ms;
 
     }

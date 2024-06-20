@@ -1,10 +1,10 @@
 <template>
     <div class="auction-bid" :class="{'winning': winning}" :style="logoBackground1(team)">
-        <div class="team-top" v-if="winning">{{ won ? 'Winning Bid' : 'Leading Bid' }}</div>
+        <div v-if="winning" class="team-top">{{ won ? 'Winning Bid' : 'Leading Bid' }}</div>
         <div class="team-row d-flex flex-row">
             <div class="team-logo bg-center" :style="resizedImage(team.theme, ['default_logo', 'small_logo'], 'w-100')"></div>
             <div class="team-amount">{{ money(amount) }}</div>
-            <div class="team-name text-right flex-grow-1">(has {{ money(team.balance) }})</div>
+            <div class="team-name text-end flex-grow-1">(has {{ money(team.balance) }})</div>
         </div>
     </div>
 </template>
@@ -17,7 +17,6 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "AuctionBid",
-    methods: { logoBackground1, money, resizedImage },
     props: {
         teamID: String,
         amount: Number,
@@ -30,7 +29,8 @@ export default {
                 theme: ReactiveThing("theme")
             });
         }
-    }
+    },
+    methods: { logoBackground1, money, resizedImage }
 };
 </script>
 
@@ -57,13 +57,14 @@ export default {
 .auction-bid.winning {
     margin-bottom: 6px;
     font-size: 1.5em;
+    border-top-right-radius: .25em
 }
 .team-amount {
     font-size: 1.25em;
     font-weight: bold;
     line-height: 1em;
 }
-.team-row {
+.auction-bid.winning .team-row {
     animation: jump .5s forwards;
 }
 @keyframes jump {

@@ -1,21 +1,47 @@
 <template>
-  <div class="ingame-overlay" :class="{'basic': basicMode}">
-      <div class="top-overlay" :style="broadcastMargin">
-          <IngameTeam :key="team.id" v-for="(team, i) in teams" :theme="getAltTheme(team, i)"
-                      :team="team"  :right="i === 1"
-                      :active="noAnimation || shouldShowTeams" :score="scores[i]" :hide-scores="broadcast.hide_scores"
-                      :extend-icons="extendIcons"
-                      :width="teamWidth" :codes="useCodes" :event="broadcast.event" :auto-small="autoSmall"
-                      :map-attack="attacks[i]" :use-dots="useDots" :first-to="match && match.first_to"
-          />
-          <!--   -->
-          <Middle v-if="!basicMode" :active="shouldShowMiddle" :theme="broadcast?.event?.theme" :text="middleText"
-                  :tiny="broadcast.margin === 0" :borders="middleBorders" />
-      </div>
-      <transition name="fade" mode="out-in">
-          <Sponsors v-if="showFadeSponsors && !basicMode" class="ingame-fade-sponsors" :sponsors="fadeSponsors" mode="out-in" :speed="sponsorFadeSpeed" />
-      </transition>
-  </div>
+    <div class="ingame-overlay" :class="{'basic': basicMode}">
+        <div class="top-overlay" :style="broadcastMargin">
+            <IngameTeam
+                v-for="(team, i) in teams"
+                :key="team.id"
+                :theme="getAltTheme(team, i)"
+                :team="team"
+                :right="i === 1"
+                :active="noAnimation || shouldShowTeams"
+                :score="scores[i]"
+                :hide-scores="broadcast.hide_scores"
+                :extend-icons="extendIcons"
+                :color-logo-holder="colorLogoHolder"
+                :width="teamWidth"
+                :codes="useCodes"
+                :event="broadcast.event"
+                :auto-small="autoSmall"
+                :map-attack="attacks[i]"
+                :use-dots="useDots"
+                :first-to="match && match.first_to"
+                :event-info="i === 0 ? eventData : null"
+                :map-info="i === 1 ? mapInformation : null"
+            />
+            <Middle
+                v-if="!basicMode"
+                :active="shouldShowMiddle"
+                :theme="broadcast?.event?.theme"
+                :text="middleText"
+                :tiny="broadcast.margin === 0"
+                :borders="middleBorders" />
+            <div class="ingame-promote">
+                <ingame-promotion :broadcast="broadcast" :animation-active="animationActive" :match="match" />
+            </div>
+        </div>
+        <transition name="fade" mode="out-in">
+            <Sponsors
+                v-if="showFadeSponsors && !basicMode"
+                class="ingame-fade-sponsors"
+                :sponsors="fadeSponsors"
+                mode="out-in"
+                :speed="sponsorFadeSpeed" />
+        </transition>
+    </div>
 </template>
 
 <script>
@@ -23,18 +49,23 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import IngameTeam from "@/components/broadcast/IngameTeam";
 import Middle from "@/components/broadcast/Middle";
 import Sponsors from "@/components/broadcast/Sponsors";
-import { themeBackground1 } from "@/utils/theme-styles";
+import IngamePromotion from "@/components/broadcast/IngamePromotion.vue";
 
 export default {
     name: "IngameOverlay",
+    components: {
+        IngamePromotion,
+        IngameTeam,
+        Middle,
+        Sponsors
+    },
     props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed", "noAnimation", "basicMode"],
-    components: { IngameTeam, Middle, Sponsors },
     data: () => ({
         flippingTeams: false
     }),
     computed: {
         match() {
-            if (!this.broadcast || !this.broadcast.live_match) return null;
+            if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
@@ -49,7 +80,7 @@ export default {
         },
         teams() {
             console.warn("Teams", this.match?.teams);
-            if (!this.match || !this.match.teams || !this.match.teams.every(t => {
+            if (!this.match?.teams?.every(t => {
                 if (t.theme === undefined && t.has_theme === 0) return true;
                 return t.theme && !t.theme.__loading && t.theme.id;
             })) {
@@ -80,7 +111,10 @@ export default {
             return this.broadcast?.broadcast_settings?.includes("Use dots instead of numbers for score");
         },
         autoSmall() {
-            return this.broadcast?.broadcast_settings?.includes("Show match records ingame") ? { show: "record", stage: this.broadcast?.current_stage || this.match?.match_group } : null;
+            return this.broadcast?.broadcast_settings?.includes("Show match records ingame") ? {
+                show: "record",
+                stage: this.broadcast?.current_stage || this.match?.match_group
+            } : null;
         },
         scores() {
             if (!this.teams) return [];
@@ -162,13 +196,17 @@ export default {
                 }
             }
 
-            if (this.match.round && this.match.first_to) { return `${this.match.round.toUpperCase()} - FIRST TO ${this.match.first_to}`; }
-            if (this.match.week_text && this.match.first_to) { return `${this.match.week_text.toUpperCase()} - FIRST TO ${this.match.first_to}`; }
+            if (this.match.round && this.match.first_to) {
+                return `${this.match.round.toUpperCase()} - FIRST TO ${this.match.first_to}`;
+            }
+            if (this.match.week_text && this.match.first_to) {
+                return `${this.match.week_text.toUpperCase()} - FIRST TO ${this.match.first_to}`;
+            }
             return null;
         },
         broadcastMargin() {
             if (!this.broadcast) return { marginTop: "0px" };
-            return { marginTop: `${(this.broadcast.margin * 55)}px` };
+            return { marginTop: `${Math.floor(this.broadcast.margin * 55)}px` };
         },
         teamWidth() {
             if (!this.broadcast?.ingame_team_width) return null;
@@ -201,35 +239,40 @@ export default {
             if (!(this.broadcast?.broadcast_settings || []).includes("Show borders on middle")) return null;
             return this.teams.map(t => {
                 if (!t?.theme) return {};
-                let color = t.theme.color_accent;
+                let color = t.theme.color_theme;
                 if (!color || color.toLowerCase() === "#ffffff") color = t.theme.color_logo_accent;
-                if (!color || color.toLowerCase() === "#ffffff") color = t.theme.color_theme;
+                if (!color || color.toLowerCase() === "#ffffff") color = t.theme.color_accent;
                 return {
                     backgroundColor: color
                 };
             });
-        }
-    },
-    watch: {
-        broadcast() {
-            if (this.broadcast) {
-                document.body.dataset.broadcast = this.broadcast.key;
-            }
         },
-        flipTeams: {
-            handler(newValue) {
-                console.log("flip teams now", newValue);
-                this.flippingTeams = true;
-                setTimeout(() => {
-                    this.flippingTeams = false;
-                    console.log("flip teams now", this.flippingTeams);
-                }, 1500);
-            }
+        colorLogoHolder() {
+            return (this.broadcast?.broadcast_settings || []).includes("Color ingame team logo holder");
         },
-        shouldShowTeams: {
-            handler(val) {
-                console.log("should show teams", val);
-            }
+        showEventData() {
+            return (this.broadcast?.broadcast_settings || []).includes("Show event details ingame");
+        },
+        eventData() {
+            if (!this.showEventData) return [];
+            return [
+                this.broadcast?.event?.name,
+                this.match.round || ""
+            ].filter(Boolean);
+        },
+        showMapInformation() {
+            return (this.broadcast?.broadcast_settings || []).includes("Show map information ingame");
+        },
+        mapInformation() {
+            if (!this.showMapInformation) return [];
+            /*
+            [
+                last map with winner,
+                current map with type,
+                next map or type
+            ]
+             */
+            return [];
         }
     },
     methods: {
@@ -259,7 +302,29 @@ export default {
             return team.theme;
         }
     },
-    metaInfo() {
+    watch: {
+        broadcast() {
+            if (this.broadcast) {
+                document.body.dataset.broadcast = this.broadcast.key;
+            }
+        },
+        flipTeams: {
+            handler(newValue) {
+                console.log("flip teams now", newValue);
+                this.flippingTeams = true;
+                setTimeout(() => {
+                    this.flippingTeams = false;
+                    console.log("flip teams now", this.flippingTeams);
+                }, 1500);
+            }
+        },
+        shouldShowTeams: {
+            handler(val) {
+                console.log("should show teams", val);
+            }
+        }
+    },
+    head() {
         return {
             title: `Ingame | ${this.match?.name || this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -305,16 +370,23 @@ export default {
 .top-overlay {
     position: relative;
     transition: margin-top .2s;
+    --team-height: 48px;
+    --side-margins: 43px;
+    --side-margins: 0px;
+    margin-left: var(--side-margins);
+    margin-right: var(--side-margins);
 }
 
 
 .itah-enter-active, .itah-leave-active {
     transition: all .5s ease-in-out;
 }
-.itah-enter-to, .itah-leave {
+
+.itah-enter-to, .itah-leave-from {
     max-width: 700px;
 }
-.itah-enter, .itah-leave-to {
+
+.itah-enter-from, .itah-leave-to {
     max-width: 0;
 }
 
@@ -329,23 +401,32 @@ export default {
     height: 80px;
 }
 
-.ingame-fade-sponsors >>> .sponsors-holder {
+.ingame-fade-sponsors:deep(.sponsors-holder) {
     height: 100% !important;
     width: 320px !important;
 }
 
-.ingame-fade-sponsors >>> .break-sponsor {
+.ingame-fade-sponsors:deep(.break-sponsor) {
     background-color: transparent !important;
 }
 
-.ingame-fade-sponsors >>> .break-sponsor-logo {
+.ingame-fade-sponsors:deep(.break-sponsor-logo) {
     height: calc(100% - 1.5em) !important;
 }
-.ingame-overlay.basic >>> .team-score,
-.ingame-overlay.basic >>> .attack-holder {
+
+.ingame-overlay.basic:deep(.small-overlay-text),
+.ingame-overlay.basic:deep(.team-score),
+.ingame-overlay.basic:deep(.attack-holder) {
     display: none !important;
 }
-.ingame-overlay.basic >>> .ingame-team {
+
+.ingame-overlay.basic:deep(.ingame-team) {
     --team-expand: 0px !important;
+}
+
+.ingame-promote {
+    position: relative;
+    top: 165px;
+    display: flex;
 }
 </style>

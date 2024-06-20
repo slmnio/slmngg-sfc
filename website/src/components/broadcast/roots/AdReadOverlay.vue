@@ -1,7 +1,7 @@
 <template>
     <div class="overlay ad-read-overlay">
         <transition name="fade" duration="200">
-            <div class="active-read position-absolute w-100 h-100 flex-center" v-if="activeRead" :key="activeRead.id">
+            <div v-if="activeRead" :key="activeRead.id" class="active-read position-absolute w-100 h-100 flex-center">
                 <div class="active-read-img-holder flex-center">
                     <div class="active-read-img-inner bg-center" :style="readImage"></div>
                 </div>
@@ -66,30 +66,6 @@ export default {
             });
 
             return images;
-        }
-    },
-    mounted() {
-        document.body.removeEventListener("click", this.clickHandler);
-        document.body.addEventListener("click", () => {
-            console.log("click");
-            this.runGroup(this.getActiveGroup());
-        });
-        document.body.addEventListener("contextmenu", e => {
-            e.preventDefault();
-            console.log("rclick");
-            localStorage.setItem("ad-reads", "{}");
-            this.localData = {};
-        });
-
-        this.localData = JSON.parse(localStorage.getItem("ad-reads") || "{}");
-    },
-    watch: {
-        active(isActive) {
-            if (isActive) {
-                setTimeout(() => {
-                    this.runGroup(this.getActiveGroup());
-                }, this.broadcast?.transition_offset || 500);
-            }
         }
     },
     methods: {
@@ -163,12 +139,36 @@ export default {
             this.activeGroup = null;
         }
     },
+    watch: {
+        active(isActive) {
+            if (isActive) {
+                setTimeout(() => {
+                    this.runGroup(this.getActiveGroup());
+                }, this.broadcast?.transition_offset || 500);
+            }
+        }
+    },
     sockets: {
         ad_read_start() {
             this.runGroup(this.getActiveGroup());
         }
     },
-    metaInfo() {
+    mounted() {
+        document.body.removeEventListener("click", this.clickHandler);
+        document.body.addEventListener("click", () => {
+            console.log("click");
+            this.runGroup(this.getActiveGroup());
+        });
+        document.body.addEventListener("contextmenu", e => {
+            e.preventDefault();
+            console.log("rclick");
+            localStorage.setItem("ad-reads", "{}");
+            this.localData = {};
+        });
+
+        this.localData = JSON.parse(localStorage.getItem("ad-reads") ?? "{}");
+    },
+    head() {
         return {
             title: `Ad Read | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

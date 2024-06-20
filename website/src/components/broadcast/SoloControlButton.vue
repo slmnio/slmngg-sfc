@@ -1,6 +1,6 @@
 <template>
-    <div class="control-button d-flex flex-column" v-bind:class="elClass" @click="() => click && !noclick && click()" :style="css">
-        <span class="icon" v-if="icon"><i :class="icon"></i></span>
+    <div class="control-button d-flex flex-column" :class="elClass" :style="css" @click="() => click && !noclick && click()">
+        <span v-if="icon" class="icon"><i :class="icon"></i></span>
         <span class="slot"><slot></slot></span>
     </div>
 </template>
@@ -94,7 +94,7 @@ export default {
         font-size: 6em;
     }
     .control-button.score span {
-        transform: translate(0, -0.09em);
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
     }
     .control-button.score.is-score {
         background-color: var(--theme, red);

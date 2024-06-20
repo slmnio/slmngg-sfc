@@ -1,56 +1,88 @@
 <template>
     <div class="desk-editor">
-        <table class="table table-bordered table-sm table-dark mb-0 opacity-changes border-no-top"  :class="{'low-opacity': processing }">
-            <tr v-if="manualGuests?.length">
-                <th>Name</th>
-                <th>Avatar</th>
-                <th>Webcam link</th>
-                <th>Twitter handle</th>
-                <th>Pronouns</th>
-                <th></th>
-            </tr>
-            <tr class="guest-row" v-for="(guest, i) in manualGuests" :key="i">
-                <td>
-                    <b-form-input v-model="manualGuests[i].name" type="text" placeholder="Guest name" :state="!manualGuests[i]?.name ? false : checkInputKeyMatches(manualGuests[i], 'name')"  />
-                    <b-form-invalid-feedback>{{ manualGuests[i]?.name ? 'Name must be distinguishable from other inputs' : 'Name is required' }}</b-form-invalid-feedback>
-                </td>
-                <td>
-                    <div class="d-flex">
-                        <div class="avatar-preview rounded-circle mr-1 bg-center flex-shrink-0" :style="{'backgroundImage': manualGuests[i]?.avatar && `url(${manualGuests[i]?.avatar})`}"></div>
-                        <div>
-                            <b-form-input v-model="manualGuests[i].avatar" type="text" placeholder="https://i.imgur.com/HHvEClX.png" :state="checkInputKeyMatches(manualGuests[i], 'avatar')" />
-                            <b-form-invalid-feedback>Avatars must be valid links</b-form-invalid-feedback>
+        <table class="table table-bordered table-sm table-dark mb-0 opacity-changes border-no-top" :class="{'low-opacity': processing }">
+            <thead>
+                <tr v-if="manualGuests?.length">
+                    <th>Name</th>
+                    <th>Avatar</th>
+                    <th>Webcam link</th>
+                    <th>Twitter handle</th>
+                    <th>Pronouns</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(guest, i) in manualGuests" :key="i" class="guest-row">
+                    <td>
+                        <b-form-input
+                            v-model="manualGuests[i].name"
+                            type="text"
+                            placeholder="Guest name"
+                            :state="!manualGuests[i]?.name ? false : checkInputKeyMatches(manualGuests[i], 'name')" />
+                        <b-form-invalid-feedback>
+                            {{
+                                manualGuests[i]?.name ? "Name must be distinguishable from other inputs" : "Name is required"
+                            }}
+                        </b-form-invalid-feedback>
+                    </td>
+                    <td>
+                        <div class="d-flex">
+                            <div
+                                class="avatar-preview rounded-circle mr-1 bg-center flex-shrink-0"
+                                :style="{'backgroundImage': manualGuests[i]?.avatar && `url(${manualGuests[i]?.avatar})`}"></div>
+                            <div>
+                                <b-form-input
+                                    v-model="manualGuests[i].avatar"
+                                    type="text"
+                                    placeholder="https://i.imgur.com/HHvEClX.png"
+                                    :state="checkInputKeyMatches(manualGuests[i], 'avatar')" />
+                                <b-form-invalid-feedback>Avatars must be valid links</b-form-invalid-feedback>
+                            </div>
                         </div>
-                    </div>
-                </td>
-                <td>
-                    <b-form-input v-model="manualGuests[i].webcam" type="text" placeholder="https://vdo.ninja/?view=SLMN" :state="checkInputKeyMatches(manualGuests[i], 'webcam')" />
-                    <b-form-invalid-feedback>Webcams must be valid VDO.Ninja view links</b-form-invalid-feedback>
-                </td>
-                <td>
-                    <b-form-input v-model="manualGuests[i].twitter" type="text" placeholder="@slmnio" :state="checkInputKeyMatches(manualGuests[i], 'twitter')" />
-                    <b-form-invalid-feedback>Twitter handles must start with @</b-form-invalid-feedback>
-                </td>
-                <td>
-                    <b-form-input v-model="manualGuests[i].pronouns" type="text" placeholder="he/him" :state="checkInputKeyMatches(manualGuests[i], 'pronouns')" />
-                    <b-form-invalid-feedback>Pronouns must contain "/"</b-form-invalid-feedback>
-                </td>
-                <td>
-                    <b-button variant="danger" @click="confirmRemoveGuest(i)"><i class="fas fa-trash"></i></b-button>
-                </td>
-            </tr>
-            <tr v-if="!manualGuests?.length">
-                <td class="text-center" colspan="5">
-                    <i>No manual guests listed</i>
-                </td>
-            </tr>
+                    </td>
+                    <td>
+                        <b-form-input
+                            v-model="manualGuests[i].webcam"
+                            type="text"
+                            placeholder="https://vdo.ninja/?view=SLMN"
+                            :state="checkInputKeyMatches(manualGuests[i], 'webcam')" />
+                        <b-form-invalid-feedback>Webcams must be valid VDO.Ninja view links</b-form-invalid-feedback>
+                    </td>
+                    <td>
+                        <b-form-input
+                            v-model="manualGuests[i].twitter"
+                            type="text"
+                            placeholder="@slmnio"
+                            :state="checkInputKeyMatches(manualGuests[i], 'twitter')" />
+                        <b-form-invalid-feedback>Twitter handles must start with @</b-form-invalid-feedback>
+                    </td>
+                    <td>
+                        <b-form-input
+                            v-model="manualGuests[i].pronouns"
+                            type="text"
+                            placeholder="he/him"
+                            :state="checkInputKeyMatches(manualGuests[i], 'pronouns')" />
+                        <b-form-invalid-feedback>Pronouns must contain "/"</b-form-invalid-feedback>
+                    </td>
+                    <td>
+                        <b-button variant="danger" @click="confirmRemoveGuest(i)">
+                            <i class="fas fa-trash"></i>
+                        </b-button>
+                    </td>
+                </tr>
+                <tr v-if="!manualGuests?.length">
+                    <td class="text-center" colspan="5">
+                        <i>No manual guests listed</i>
+                    </td>
+                </tr>
+            </tbody>
         </table>
         <div class="p-2 w-100 d-flex">
-            <b-button variant="success" @click="addGuest">
+            <b-button variant="secondary" @click="addGuest">
                 <i class="fas fa-fw fa-plus"></i> Add guest
             </b-button>
             <div class="spacer flex-grow-1"></div>
-            <b-button :disabled="processing" class="ml-2" :variant="saveData === lastSavedData ? 'secondary' : 'primary'" @click="saveGuests">
+            <b-button :disabled="processing" class="ml-2" :variant="saveData === lastSavedData ? 'secondary' : 'success'" @click="saveGuests">
                 <i class="fas fa-fw" :class="{'fa-save': !processing, 'fa-pulse fa-spinner': processing}"></i> Save guests
             </b-button>
         </div>
@@ -60,12 +92,10 @@
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { createGuestObject, getGuestString } from "@/utils/content-utils";
-import { BButton, BFormInput, BFormInvalidFeedback } from "bootstrap-vue";
-import { updateBroadcastData } from "@/utils/dashboard";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "DeskEditor",
-    components: { BFormInvalidFeedback, BButton, BFormInput },
     props: {
         broadcast: {}
     },
@@ -104,7 +134,7 @@ export default {
         },
         confirmRemoveGuest(i) {
             if (this.manualGuests?.[i]?.name) {
-                const okay = window.confirm(`Remove guest "${this.manualGuests?.[i]?.name}"?`) === true;
+                const okay = window.confirm(`Remove guest "${this.manualGuests?.[i]?.name}"?`);
                 if (!okay) return;
             }
             this.manualGuests.splice(i, 1);
@@ -114,7 +144,7 @@ export default {
             this.lastSavedData = this.saveData;
 
             try {
-                const response = await updateBroadcastData(this.$root.auth, {
+                const response = await authenticatedRequest("actions/update-broadcast", {
                     manualGuests: this.saveData
                 });
                 if (!response.error) {
@@ -142,7 +172,7 @@ export default {
 </script>
 
 <style scoped>
-    .guest-row >>> .invalid-feedback {
+    .guest-row:deep(.invalid-feedback) {
         color: #ff6473;
     }
     ::placeholder {

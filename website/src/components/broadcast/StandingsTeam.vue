@@ -1,13 +1,18 @@
 <template>
     <div class="standings-team d-flex" :data-team-num="team.standings.teamNum" :class="{'team-odd': team.standings.teamNum % 2 === 1, 'team-even': team.standings.teamNum % 2 === 0}">
-        <div class="team-rank flex-shrink-0">{{ tieText && !teamStats["tie_show_number"] ? tieText : teamStats["rank"] }}</div>
-        <ThemeLogo class="team-logo flex-shrink-0" :theme="team.theme" icon-padding="0.2em" border-width="0.125em" :logo-size="iconSize || 'w-30'" />
-        <router-link v-if="!useCodes" :to="url('team', team)" class="team-name ct-passive flex-grow-1 text-left d-none d-md-flex">{{ team.name }}</router-link>
-        <router-link v-if="!useCodes" :to="url('team', team)" class="team-name team-code ct-passive flex-grow-1 text-left d-md-none">{{ team.code }}</router-link>
-        <router-link v-if="useCodes" :to="url('team', team)" class="team-name team-code ct-passive flex-grow-1 text-left">{{ team.code }}</router-link>
+        <div class="team-rank flex-shrink-0">{{ tieText && !team?.standings?.tie_show_number ? tieText : team?.standings?.rank }}</div>
+        <ThemeLogo
+            class="team-logo flex-shrink-0"
+            :theme="team.theme"
+            icon-padding="0.2em"
+            border-width="0.125em"
+            :logo-size="iconSize || 'w-30'" />
+        <router-link v-if="!useCodes" :to="url('team', team)" class="team-name ct-passive flex-grow-1 text-start d-none d-md-flex">{{ team.name }}</router-link>
+        <router-link v-if="!useCodes" :to="url('team', team)" class="team-name team-code ct-passive flex-grow-1 text-start d-md-none">{{ team.code }}</router-link>
+        <router-link v-if="useCodes" :to="url('team', team)" class="team-name team-code ct-passive flex-grow-1 text-start">{{ team.code }}</router-link>
         <div class="team-stats d-flex">
-            <div class="team-stat text-center" v-for="(stat, i) in stats" :key="stat + i" :class="{'d-none d-md-block': ['omw'].includes(stat) }">
-                {{ teamStats[stat] }}
+            <div v-for="(stat, i) in stats" :key="stat + i" class="team-stat text-center">
+                {{ stat.display(team) }}
             </div>
         </div>
     </div>
@@ -16,9 +21,10 @@
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { url } from "@/utils/content-utils";
+import { StandingsShowKeys } from "@/utils/standings";
 
 function diffString(val) {
-    if (val === 0) return "±0"; // TODO: update to special char
+    if (val === 0) return "±0";
     if (val > 0) return `+${val}`;
     return val;
 }
@@ -26,7 +32,7 @@ function diffString(val) {
 export default {
     name: "StandingsTeam",
     components: { ThemeLogo },
-    props: ["team", "tieText", "showColumns", "iconSize", "useCodes"],
+    props: ["team", "tieText", "showColumns", "iconSize", "useCodes", "game"],
     data: () => ({
         // stats: ["diff", "map_diff"/*, "points" */]
 
@@ -37,55 +43,23 @@ export default {
             const stats = [];
 
             this.show.forEach(key => {
-                switch (key) {
-                case "MatchWinrate":
-                    stats.push("winrate_text");
-                    break;
-                case "MapWinrate":
-                    stats.push("mapwinrate_text");
-                    break;
-                case "Matches":
-                    stats.push("matches");
-                    break;
-                case "MatchDiff":
-                    stats.push("diff");
-                    break;
-                case "Maps":
-                    stats.push("maps");
-                    break;
-                case "MapDiff":
-                    stats.push("map_diff");
-                    break;
-                case "ValorantRounds":
-                    stats.push("map_rounds");
-                    break;
-                case "ValorantRoundDiff":
-                    stats.push("map_rounds_diff");
-                    break;
-                case "OMatchWinrate":
-                    stats.push("o_match_winrate_text");
-                    break;
-                case "OMapWinrate":
-                    stats.push("o_map_winrate_text");
-                    break;
-                default:
-                    stats.push("empty");
-                }
+                stats.push(StandingsShowKeys(this.game)[key] || StandingsShowKeys(this.game)["Empty"]);
             });
-
-            // stats.push("matches");
-            // stats.push("maps");
-            // stats.push("map_diff");
-
             return stats;
         },
         teamStats() {
             return {
+                wins: this.team.standings.wins,
+                losses: this.team.standings.losses,
+                played: this.team.standings.wins + this.team.standings.losses,
                 matches: `${this.team.standings.wins}-${this.team.standings.losses}`,
                 diff: diffString(this.team.standings.wins - this.team.standings.losses),
                 maps: `${this.team.standings.map_wins}-${this.team.standings.map_losses}`,
                 map_diff: diffString(this.team.standings.map_wins - this.team.standings.map_losses),
-                // points: this.team.standings.points,
+                points: this.team.extra_points,
+                wins_points: this.team.standings.wins + (this.team.extra_points || 0),
+                diff_points: diffString(this.team.standings.wins - this.team.standings.losses + (this.team.extra_points || 0)),
+                matches_points: `${this.team.standings.wins + (this.team.extra_points > 0 ? this.team.extra_points : 0)}-${this.team.standings.losses + (this.team.extra_points < 0 ? this.team.extra_points : 0)}`,
                 rank: this.team.standings.rank,
                 tie_show_number: this.team.standings.tie_show_number,
                 winrate: this.team.standings.winrate,
@@ -97,7 +71,9 @@ export default {
                 omw: this.team.standings?.omw !== undefined ? Math.floor(this.team.standings.omw * 100) + "%" : "-",
                 empty: "-",
                 map_rounds: `${this.team.standings.map_round_wins}-${this.team.standings.map_round_losses}`,
-                map_rounds_diff: diffString(this.team.standings.map_round_wins - this.team.standings.map_round_losses)
+                map_rounds_diff: diffString(this.team.standings.map_round_wins - this.team.standings.map_round_losses),
+                opponent_points: this.team.standings.opponent_points,
+                opponent_points_wins: this.team.standings.opponent_points_wins
             };
         }
     },

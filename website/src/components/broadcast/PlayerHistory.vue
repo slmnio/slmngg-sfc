@@ -1,20 +1,20 @@
 <template>
     <GenericOverlay class="player-history-overlay" :title="customTitle">
         <div class="career-wrapper d-flex flex-center">
-            <div class="hero-segment d-flex flex-column flex-center" v-if="hero">
+            <div v-if="hero" class="hero-segment d-flex flex-column flex-center">
                 <div class="hero-card h-100 d-flex flex-column">
-                    <PlayerHero class="h-100" :hero="hero"></PlayerHero>
+                    <PlayerHero class="h-100" :hero="hero" />
                 </div>
             </div>
             <div class="teams-wrapper flex-column flex-center">
-                <div class="first-event d-flex flex-center mb-3" v-if="firstEvent">
+                <div v-if="firstEvent" class="first-event d-flex flex-center mb-3">
                     <div class="first-event-text mr-3">First event</div>
-                    <NewEventDisplay :event="firstEvent"/>
+                    <NewEventDisplay :event="firstEvent" />
                 </div>
 
                 <div class="title d-flex flex-column text-center mb-2">Team History</div>
                 <div class="player-teams d-flex flex-wrap flex-center">
-                    <PlayerTeamDisplay :team="team" v-for="team in playerTeams" :key="team.id" :showName="true"/>
+                    <PlayerTeamDisplay v-for="team in playerTeams" :key="team.id" :team="team" :show-name="true" />
                 </div>
             </div>
         </div>
@@ -58,8 +58,8 @@ export default {
         playerTeams() {
             if (!this.player?.member_of) return [];
             return this.player.member_of.filter(t => {
-                if (!t) return;
-                if (!t.event) return;
+                if (!t) return false;
+                if (!t.event) return false;
                 if (!this.showMinor && t.minor_team) return false;
                 // if (!t.ranking_sort) return false;
                 return true;
@@ -73,7 +73,7 @@ export default {
             return events[0];
         }
     },
-    metaInfo() {
+    head() {
         return {
             title: `Player History | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -82,7 +82,7 @@ export default {
 </script>
 
 <style scoped>
-.player-history-overlay >>> .generic-overlay-body {
+.player-history-overlay:deep(.generic-overlay-body) {
     padding: 0;
 }
 .career-wrapper {
@@ -101,11 +101,8 @@ export default {
     flex-grow: 1;
     padding: 0 50px;
 }
-.teams-label {
-    float: top;
-}
-.teams-wrapper >>> .player-team-display,
-.teams-wrapper >>> .team-name {
+.teams-wrapper:deep(.player-team-display),
+.teams-wrapper:deep(.team-name) {
     width: 176px;
 }
 .teams-wrapper .title {
@@ -120,7 +117,7 @@ export default {
     font-size: 1.2em;
     font-weight: bold;
 }
-.first-event >>> .event-name {
+.first-event:deep(.event-name) {
     margin: 0 0.3em 0 0  !important;
 }
 .player-teams {

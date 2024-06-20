@@ -1,15 +1,14 @@
 <template>
-    <div class="recolored-hero" :data-hero="hero?.name">
+    <div v-show="valid" class="recolored-hero" :data-hero="hero?.name">
         <div class="color-holder">
             <div class="hero-image-base" :style="mainImage || fallbackImage" :class="{ 'fallback-image': !mainImage && fallbackImage }"></div>
 
-            <div :class="`color color-${i+1}`" v-for="(layer, i) in layers" :key="layer.id">
-                <canvas :class="`adjustment-layer hue-layer target-color-${i+1}`" :ref="`hue-color-${i+1}`"></canvas>
-                <canvas :class="`adjustment-layer overlay-layer target-color-${i+1}`" :ref="`overlay-color-${i+1}`"></canvas>
-                <canvas :style="{ opacity: getOpacityAdjustment(themeColors[i], false, 1, -0.5, 0, 0.5) }" :class="`adjustment-layer multiply-layer target-color-${i+1}`" :ref="`multiply-color-${i+1}`"></canvas>
-                <canvas :class="`adjustment-layer saturation-layer target-color-${i+1}`" :ref="`saturation-color-${i+1}`"></canvas>
+            <div v-for="(layer, i) in layers" :key="layer.id" :class="`color color-${i+1}`">
+                <canvas :ref="`hue-color-${i+1}`" :class="`adjustment-layer hue-layer target-color-${i+1}`"></canvas>
+                <canvas :ref="`overlay-color-${i+1}`" :class="`adjustment-layer overlay-layer target-color-${i+1}`"></canvas>
+                <canvas :ref="`multiply-color-${i+1}`" :style="{ opacity: getOpacityAdjustment(themeColors[i], false, 1, -0.5, 0, 0.5) }" :class="`adjustment-layer multiply-layer target-color-${i+1}`"></canvas>
+                <canvas :ref="`saturation-color-${i+1}`" :class="`adjustment-layer saturation-layer target-color-${i+1}`"></canvas>
             </div>
-
         </div>
     </div>
 </template>
@@ -84,6 +83,7 @@ function getOpacityAdjustment(color, inverted, multiplier, boost, minOpacity, ma
 export default {
     name: "RecoloredHero",
     props: ["hero", "theme"],
+    emits: ["recolor_starting", "recolor_width", "recolor_complete"],
     data: () => ({
         colorData: [
             {
@@ -102,7 +102,8 @@ export default {
         lastRecolor: {
             colors: [],
             images: []
-        }
+        },
+        complete: false
     }),
     computed: {
         mainImage() {
@@ -125,23 +126,9 @@ export default {
                 style.primary,
                 style.secondary
             ];
-        }
-    },
-    mounted() {
-        this.colorImageTheme();
-    },
-    watch: {
-        themeColors: {
-            deep: true,
-            handler() {
-                this.colorImageTheme();
-            }
         },
-        hero: {
-            deep: true,
-            handler() {
-                this.colorImageTheme();
-            }
+        valid() {
+            return this.mainImage?.backgroundImage || this.fallbackImage?.backgroundImage;
         }
     },
     methods: {
@@ -202,22 +189,41 @@ export default {
             const colors = this.themeColors;
 
             const payload = {
-                colors: colors,
+                colors,
                 images: [this.mainImage?.backgroundImage, ...this.layers]
             };
             // muffling stops some colours mix down properly on changes, not sure why
             if (JSON.stringify(payload) === JSON.stringify(this.lastRecolor)) return console.warn("[muffle]", "Same payload requested", payload, this.lastRecolor);
             this.lastRecolor = payload;
 
-            console.log("[recolor]", "starting");
+            console.log("[recolor]", "starting", payload);
             this.$emit("recolor_starting");
+            this.complete = false;
             for (let i = 0; i < this.layers.length; i++) {
                 const layer = this.layers[i];
                 await this.recolor(layer, colors[i], i + 1);
             }
-            console.log("[recolor]", "complete");
+            console.log("[recolor]", "complete", payload);
             this.$emit("recolor_complete");
+            this.complete = true;
         }
+    },
+    watch: {
+        themeColors: {
+            deep: true,
+            handler() {
+                this.colorImageTheme();
+            }
+        },
+        hero: {
+            deep: true,
+            handler() {
+                this.colorImageTheme();
+            }
+        }
+    },
+    mounted() {
+        this.colorImageTheme();
     }
 };
 </script>

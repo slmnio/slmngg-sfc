@@ -1,34 +1,67 @@
 <template>
-    <div class="map d-flex position-relative" :class="{'next-map': map._next, 'map-dummy': map.dummy }">
+    <div class="map d-flex position-relative" :class="{'next-map': map._next, 'map-dummy': map.dummy, 'drafted-map': draftedStyle, 'upcoming-map': draftedStyle && !complete && !map._next }">
         <div v-if="mapVideo" class="map-bg map-video w-100 h-100 bg-center" :class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground">
             <video :src="mapVideo" autoplay muted loop></video>
         </div>
+
         <div v-else class="map-bg w-100 h-100 bg-center" :class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground"></div>
         <div class="map-gel w-100 h-100 position-absolute" :style="winnerBG"></div>
-        <div class="map-gel w-100 h-100 position-absolute draw-gel" v-if="map && map.draw"></div>
-        <div class="map-gel w-100 h-100 position-absolute ban-gel flex-center" v-if="map && map.banner"></div>
+        <div v-if="map && map.draw" class="map-gel w-100 h-100 position-absolute draw-gel"></div>
+        <div v-if="map && map.banner" class="map-gel w-100 h-100 position-absolute ban-gel flex-center"></div>
+        <div v-if="draftedStyle && !complete && !map._next" class="map-gel w-100 h-100 position-absolute upcoming-gel flex-center"></div>
         <div class="map-main d-flex flex-column h-100 w-100 position-absolute">
-            <div class="map-upper flex-center" :style="accent" v-if="map.picker || map.banner">
-                <ThemeLogo class="pick-ban-team" :theme="pickBanTheme" border-width="4px" logo-size="w-100" icon-padding="2" />
-                <div class="pick-ban-text" :style="pickBanBorder">{{ map.banner ? 'Ban' : (map.picker ? 'Pick' : '')  }}</div>
+            <div v-if="!small">
+                <div v-if="map.picker || map.banner" class="map-upper flex-center" :style="accent">
+                    <ThemeLogo
+                        class="pick-ban-team"
+                        :theme="pickBanTheme"
+                        border-width="4px"
+                        logo-size="w-100"
+                        icon-padding="2" />
+                    <div class="pick-ban-text" :style="pickBanBorder">
+                        {{
+                            map.banner ? "Ban" : (map.picker ? "Pick" : "")
+                        }}
+                    </div>
+                </div>
+                <div v-else class="map-upper-spacer"></div>
             </div>
-            <div class="map-top flex-grow-1 h-100 w-100 flex-center flex-column">
-                <div class="map-logo-holder w-100 h-50 flex-center" v-if="winnerBG">
+            <div v-if="!draftedStyle" class="map-top flex-grow-1 h-100 w-100 flex-center flex-column">
+                <div v-if="winnerBG" class="map-logo-holder w-100 h-50 flex-center">
                     <div class="map-logo bg-center" :style="winnerLogo"></div>
                 </div>
-                <div class="gel-text" v-if="map && map.draw">DRAW</div>
-                <div class="ban-icon-holder" v-if="map.banner">
+                <div v-if="map && map.draw" class="gel-text">DRAW</div>
+                <div v-if="map.banner" class="ban-icon-holder">
                     <i class="ban-icon fas fa-ban"></i>
                 </div>
-                <div class="map-score flex-center" v-if="showMapScores && (map.score_1 || map.score_2)">
+                <div v-if="showMapScores && (map.score_1 || map.score_2)" class="map-score flex-center">
                     <div class="map-score">{{ map.score_1 }}</div>
                     <div class="map-dash">-</div>
                     <div class="map-score">{{ map.score_2 }}</div>
                 </div>
             </div>
-            <div class="map-lower flex-center flex-column" :style="accent">
+            <div v-if="!draftedStyle" class="map-lower flex-center flex-column" :style="accent">
                 <div class="map-lower-name flex-center"><span class="industry-align">{{ name }}</span></div>
-                <div class="map-lower-type" v-if="type"><span class="industry-align">{{ type }}</span></div>
+                <div v-if="type" class="map-lower-type"><span class="industry-align">{{ type }}</span></div>
+            </div>
+
+            <div v-if="draftedStyle" class="map-draft-top flex-center" :class="{'complete': complete, 'next': map._next, 'draw': map.draw}" :style="winnerBG">
+                <div class="draft-map-data flex-grow-1 fw-bold">
+                    <div class="draft-map-type">{{ map.mode || map.type?.[0] }}</div>
+                    <div class="draft-map-name">{{ name }}</div>
+                </div>
+                <div class="draft-map-status">
+                    <div v-if="complete" class="status-complete flex-center flex-column">
+                        <div class="team-logo" :style="winnerLogo"></div>
+                        <div v-if="map.score_1 || map.score_2" class="map-score text-nowrap">{{ teamLeadingScoresText }}</div>
+                    </div>
+                    <div v-else-if="map._next" class="status-up-next text-center flex-center">
+                        <div class="text">UP NEXT</div>
+                    </div>
+                    <div v-else class="status-up-later text-center flex-center">
+                        <div class="text">MAP {{ map._number }}</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -42,11 +75,22 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 
 export default {
     name: "MapSegment",
-    props: ["broadcast", "map", "accentColor", "showMapVideo", "firstTo", "useShorterNames"],
     components: {
         ThemeLogo
     },
+    props: ["broadcast", "map", "accentColor", "showMapVideo", "firstTo", "useShorterNames", "small", "draftedStyle"],
     computed: {
+        complete() {
+            return this.map.winner || this.map.draw;
+        },
+        teamLeadingScoresText() {
+            if (!(this.map?.score_1 || this.map?.score_2)) return "";
+            if (this.map.score_1 > this.map.score_2) {
+                return `${this.map.score_1} - ${this.map.score_2}`;
+            } else {
+                return `${this.map.score_2} - ${this.map.score_1}`;
+            }
+        },
         pickBanTheme() {
             return (this.map.banner || this.map.picker)?.theme;
         },
@@ -61,7 +105,7 @@ export default {
             if (!(image)) return {};
 
             try {
-                return bg(image?.url || getNewURL(image, "orig"));
+                return bg(image?.url || getNewURL(image, this.small ? "w-400" : "orig"));
             } catch (e) {
                 return {};
             }
@@ -104,6 +148,10 @@ export default {
         mapVideo() {
             if (!this.showMapVideo) return null;
             if (!this.map?.map?.video?.length) return null;
+
+            if (!this.map._next && !this.broadcast?.broadcast_settings?.includes("Always show map videos")) {
+                return null;
+            }
             return getNewURL(this.map.map.video?.[0], "orig");
         }
     }
@@ -133,12 +181,13 @@ export default {
         padding: 10px 5px;
         line-height: 1;
         min-height: 120px;
+        height: 0;
 
         /* default */
         background-color: #333333;
         color: #ffffff;
     }
-    .map-upper {
+    .map-upper, .map-upper-spacer {
         font-size: 24px;
         min-height: 2em;
         padding: 0;
@@ -199,5 +248,38 @@ export default {
     }
     .map-dash {
         margin: 0 .2em;
+    }
+
+    .map.drafted-map .map-main {
+        justify-content: center;
+    }
+
+    .map-draft-top {
+        width: 100%;
+        background: #444;
+        color: white;
+        padding: 0.5em 0.75em;
+        font-size: 18px;
+        height: 50%;
+    }
+
+
+    .draft-map-name {
+        font-size: 1.75em;
+        line-height: 1;
+    }
+
+
+    .draft-map-status {
+        line-height: 1.25em;
+    }
+
+    .team-logo {
+        width: 2.5em;
+        height: 2.5em;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        margin-bottom: .75em;
     }
 </style>

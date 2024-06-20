@@ -1,6 +1,6 @@
 <template>
-    <div class="squeezable" @click="updateWidth()" ref="big" :style="{'--content-scale': allowedContentScale, '--content-transform-origin': (align || 'left')}">
-        <slot ref="small"></slot>
+    <div ref="big" class="squeezable" :style="{'--content-scale': allowedContentScale, '--content-transform-origin': (align || 'left')}" @click="updateWidth()">
+        <slot></slot>
     </div>
 </template>
 
@@ -32,7 +32,7 @@ export default {
     methods: {
         updateWidth(isAfterTick) {
             const big = this.$refs.big;
-            const small = this.$slots.default?.[0]?.elm;
+            const small = this.$el?.children?.[0];
             // console.log({ big, small });
 
             if (!big?.getBoundingClientRect || !small?.getBoundingClientRect) return;
@@ -41,7 +41,7 @@ export default {
             const contentSize = small.getBoundingClientRect().width;
             const contentScale = boxSize / contentSize;
             // console.log(contentScale, this.contentScale);
-            this.contentScale = contentScale * this.contentScale;
+            this.contentScale = contentScale * this.allowedContentScale;
             if (isNaN(this.contentScale) || this.contentScale === Infinity) {
                 this.contentScale = 1;
             }
@@ -49,7 +49,7 @@ export default {
             if (!isAfterTick) this.$nextTick(() => this.updateWidth(true));
         },
         observerUpdate(...a) {
-            // console.log(a);
+            // console.log("observer update", a);
             this.updateWidth();
         }
     },
@@ -58,7 +58,7 @@ export default {
         this.elementObserver.observe(this.$refs.big);
 
         const mutationObserver = new MutationObserver((...a) => {
-            console.log("mutation", a);
+            // console.log("mutation", a);
             this.$nextTick(() => {
                 this.updateWidth(true);
             });
@@ -78,7 +78,7 @@ export default {
         flex-wrap: nowrap;
         overflow: hidden;
     }
-    .squeezable>*, .squeezable >>> > * {
+    .squeezable>*, .squeezable:deep(*) {
         width: fit-content;
         transform:
             scaleX(var(--content-scale, 1))

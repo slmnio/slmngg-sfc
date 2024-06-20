@@ -1,7 +1,7 @@
 <template>
     <router-link :to="url('team', team)" class="team no-link-style d-flex flex-center flex-column default-thing" :style="teamTheme">
         <div class="team-logo-holder flex-center">
-            <div class="team-logo bg-center" :style="logo" ></div>
+            <div class="team-logo bg-center" :style="logo"></div>
         </div>
         <div class="team-name">{{ team.name }}</div>
     </router-link>
@@ -15,18 +15,18 @@ import { logoBackground1 } from "@/utils/theme-styles";
 export default {
     name: "TeamDisplay",
     props: ["team"],
-    methods: {
-        url
-    },
     computed: {
         teamTheme() {
-            if (!this.team || !this.team.theme) return {};
+            if (!this.team?.theme) return {};
             return logoBackground1(this.team);
         },
         logo() {
-            if (!this.team || !this.team.theme) return {};
+            if (!this.team?.theme) return {};
             return resizedImage(this.team.theme, ["small_logo", "default_logo"], "h-50");
         }
+    },
+    methods: {
+        url
     }
 };
 </script>

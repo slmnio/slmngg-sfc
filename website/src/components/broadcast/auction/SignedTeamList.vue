@@ -1,37 +1,40 @@
 <template>
-    <div class="signed-team-list p-3" v-if="team">
-        <ThemeLogo class="top-logo w-100" :theme="team.theme"/>
-        <div class="signed-title pt-4 font-weight-bold text-center">SIGNED TO</div>
-        <div class="signed-team pt-3 font-weight-bold text-center">{{ team.name }}</div>
-        <div class="signed-amount pt-1 font-weight-bold text-center">for {{ money(amount) }}</div>
+    <div v-if="team" class="signed-team-list p-3">
+        <ThemeLogo class="top-logo w-100" :theme="team.theme" />
+        <div class="signed-title pt-4 fw-bold text-center">SIGNED TO</div>
+        <div class="signed-team pt-3 fw-bold text-center">{{ team.name }}</div>
+        <div class="signed-amount pt-1 fw-bold text-center">for {{ money(amount) }}</div>
 
         <div class="player-list">
-            <div class="player" :class="{empty: player.empty, latest: player.latest}" v-for="player in players" :key="player.id"  :style="(player.latest ? teamBG : {})">
-                <div class="player-internal" v-if="!player.empty">
+            <div
+                v-for="player in players"
+                :key="player.id"
+                class="player"
+                :class="{empty: player.empty, latest: player.latest}"
+                :style="(player.latest ? teamBG : {})">
+                <div v-if="!player.empty" class="player-internal">
+                    <span class="player-role" v-html="getRoleSVG(player.role)"></span>
                     <span class="player-name">{{ player.name }}</span>
-                    <span class="player-money" v-if="player.auction_price">{{ money(player.auction_price) }}</span>
+                    <span v-if="player.auction_price" class="player-money">{{ money(player.auction_price) }}</span>
                 </div>
                 <div v-else style="opacity: 0;">...</div>
             </div>
         </div>
-        <MoneyBar class="team-focus-bar" :team="team" :auction-settings="auctionSettings"></MoneyBar>
-<!--        <div class="remaining font-weight-bold text-center">Remaining: {{ money(team.balance) }}</div>-->
+        <MoneyBar class="team-focus-bar" :team="team" :auction-settings="auctionSettings" />
+        <!--        <div class="remaining fw-bold text-center">Remaining: {{ money(team.balance) }}</div>-->
     </div>
 </template>
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cleanID, getAuctionMax, money } from "@/utils/content-utils";
+import { getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
 import MoneyBar from "@/components/broadcast/auction/MoneyBar";
 
 export default {
     name: "SignedTeamList",
     components: { ThemeLogo, MoneyBar },
     props: ["team", "amount", "signedPlayer", "auctionSettings"],
-    methods: {
-        money
-    },
     computed: {
         teamBG() {
             return logoBackground1(this.team);
@@ -55,6 +58,10 @@ export default {
             }
             return arr;
         }
+    },
+    methods: {
+        getRoleSVG,
+        money
     }
 };
 </script>
@@ -104,5 +111,11 @@ export default {
     .money-bar.team-focus-bar {
         font-size: 36px;
         margin-top: 4px;
+    }
+    .player-role {
+        width: 36px;
+        height: 36px;
+        margin-right: 2px;
+        transform: translate(-2px, -4px);
     }
 </style>

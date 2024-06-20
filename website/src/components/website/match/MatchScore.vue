@@ -1,9 +1,13 @@
 <template>
-    <div class="match-scoreline" v-if="match.first_to">
-        <div class="match-score flex-center default-thing" v-for="(score, i) in scores"
-             :class="{'match-score-win': score === match.first_to }"
-             :key="i"
-             :style="{order: i*2, ...(score === match.first_to ? {... pointColor} : {})}">{{ displayScores[i] }}</div>
+    <div v-if="match.first_to" class="match-scoreline">
+        <div
+            v-for="(score, i) in scores"
+            :key="i"
+            class="match-score flex-center default-thing"
+            :class="{'match-score-win': score === match.first_to }"
+            :style="{order: i*2, ...(score === match.first_to ? {... pointColor} : {})}">
+            {{ displayScores[i] }}
+        </div>
         <div class="match-score-center">-</div>
     </div>
 </template>
@@ -19,7 +23,7 @@ export default {
         displayScores() {
             if (this.match.first_to === 1 && this.match.valorant) {
                 const valorantData = Object.fromEntries(this.match.valorant.split("|").map(section => section.split(":")));
-                if (valorantData && valorantData.rounds) {
+                if (valorantData?.rounds) {
                     const score = [0, 0];
                     valorantData.rounds.toLowerCase().trim()
                         .split(",")
@@ -38,8 +42,7 @@ export default {
             return this.scores;
         },
         pointColor() {
-            // eslint-disable-next-line no-unused-vars
-            try { const e = this.match.event.theme.color_theme; } catch (e) { return {}; }
+            if (!this.match?.event?.theme?.color_theme) return {};
             return {
                 backgroundColor: this.match.event.theme.color_theme,
                 color: this.match.event.theme.color_text_on_theme

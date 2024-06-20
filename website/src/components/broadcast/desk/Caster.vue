@@ -1,16 +1,20 @@
 <template>
     <div class="caster flex-center flex-column" :style="themeColor">
         <div class="caster-cam-box flex-center" :style="{borderColor}" :class="align">
-            <CasterCam class="caster-cam-wrapper" :guest="liveGuestData" :disableVideo="disableVideo" :color="color"
-            :event="event" />
+            <CasterCam
+                class="caster-cam-wrapper"
+                :guest="liveGuestData"
+                :disable-video="disableVideo"
+                :color="color"
+                :event="event" />
         </div>
         <transition name="fade">
-            <div class="caster-lower flex-center" :key="`${name}-${twitter}-${lowerType}`" :class="{'cl-traditional': lowerType === 'traditional'}">
+            <div :key="`${name}-${twitter}-${lowerType}`" class="caster-lower flex-center" :class="{'cl-traditional': lowerType === 'traditional'}">
                 <div class="caster-name flex-center">
                     <div class="c-name industry-align">{{ name }}</div>
-                    <div class="c-twitter industry-align" v-if="twitter">{{ twitter }}</div>
-                    <div class="c-pronouns industry-align" v-if="pronouns && showPronouns && !pronounsOnNewline">{{ pronouns }}</div>
-                    <div class="c-pronouns industry-align" v-if="pronouns && showPronouns && pronounsOnNewline" v-html="breakUp(pronouns)"></div>
+                    <div v-if="twitter" class="c-twitter industry-align">{{ twitter }}</div>
+                    <div v-if="pronouns && showPronouns && !pronounsOnNewline" class="c-pronouns industry-align">{{ pronouns }}</div>
+                    <div v-if="pronouns && showPronouns && pronounsOnNewline" class="c-pronouns industry-align" v-html="breakUp(pronouns)"></div>
                 </div>
             </div>
         </transition>
@@ -22,8 +26,8 @@ import CasterCam from "@/components/broadcast/desk/CasterCam";
 
 export default {
     name: "Caster",
-    props: ["caster", "guest", "color", "disableVideo", "event", "showPronouns", "pronounsOnNewline"],
     components: { CasterCam },
+    props: ["caster", "guest", "color", "disableVideo", "event", "showPronouns", "pronounsOnNewline"],
     computed: {
         align() {
             const alignSettings = (this.guest.align || []);
@@ -62,9 +66,9 @@ export default {
         },
         cam() {
             if (this.disableVideo) return false;
-            if (!this.liveGuestData?.cam_code) return false;
+            if (!(this.liveGuestData?.cam_code || this.liveGuestData?.discord_id)) return false;
             if (!this.liveGuestData.use_cam) return false;
-            return this.liveGuestData.cam_code.includes("http") ? `${this.liveGuestData.cam_code}&z=04&mute` : `https://cams.prod.slmn.gg/?view=${this.liveGuestData.cam_code}&z=04&mute`;
+            return this.liveGuestData.cam_code.includes("http") ? `${this.liveGuestData.cam_code}&z=04&mute` : `https://webcam.slmn.gg/?view=${this.liveGuestData.cam_code}&z=04&mute`;
         },
         name() {
             return this.caster?.name || this.guest?.name;

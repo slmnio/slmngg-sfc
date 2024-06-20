@@ -4,6 +4,10 @@ import { cleanID } from "@/utils/content-utils";
 async function addToBuffer(id) {
     return store.commit("addToRequestBuffer", id);
 }
+
+/**
+ * @returns {string}
+ */
 export function getDataServerAddress() {
     // console.log("[data server address]", window.location.hostname, process.env.VITE_DATA_SERVER);
     // can override this with .env.development etc
@@ -35,7 +39,6 @@ export async function fetchThing (id) {
     }
     return addToBuffer(id);
 
-    // eslint-disable-next-line no-unreachable
     // try {
     //     id = cleanID(id);
     //
@@ -70,7 +73,13 @@ export async function fetchThings (ids) {
             id, data: { __loading: true }
         }));
 
-        const data = await fetch(`${getDataServerAddress()}/things/${ids.join(",")}`).then(res => res.json());
+        const data = await fetch(`${getDataServerAddress()}/things`, {
+            method: "POST",
+            body: JSON.stringify({ ids: ids.join(",") }),
+            headers: {
+                "content-type": "application/json"
+            }
+        }).then(res => res.json());
 
         if (data.error) {
             console.error(data.message);
@@ -140,10 +149,6 @@ export async function getThings(ids) {
     return ids.map(id => getThing(id));
 }
 
-export async function getAndWait(id) {
-
-}
-
 export function getMainDomain(subdomain) {
     try {
         if (subdomain) {
@@ -160,6 +165,10 @@ export function getMainDomain(subdomain) {
     } catch (e) {
         return "https://dev.slmn.gg";
     }
+}
+
+export function isOnMainDomain() {
+    return window.location.origin === getMainDomain();
 }
 
 export function getMainCookieDomain(subdomain) {

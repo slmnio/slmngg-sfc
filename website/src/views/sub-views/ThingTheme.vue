@@ -1,9 +1,14 @@
 <template>
     <div class="thing-theme container">
-
         <ContentRow v-if="thing.brand_designers" :title="thing.brand_designers.length === 1 ? 'Brand designer' : 'Brand designers'">
-            <ContentThing type="player" :text="designer.name" :thing="designer" :theme="thing.theme" v-for="designer in thing.brand_designers"
-                          :key="designer.id" :link-options="{ 'subPage': 'brands' }"></ContentThing>
+            <ContentThing
+                v-for="designer in thing.brand_designers"
+                :key="designer.id"
+                type="player"
+                :text="designer.name"
+                :thing="designer"
+                :theme="thing.theme"
+                :link-options="{ 'subPage': 'brands' }" />
         </ContentRow>
 
         <h3>Themes</h3>
@@ -19,20 +24,20 @@
 
         <h3 v-if="colors.length">Colors</h3>
         <div v-if="colors.length" class="color-list mb-3">
-            <div class="color" v-for="color in colors" :key="color.name">
+            <div v-for="color in colors" :key="color.name" class="color">
                 <div class="color-swatch" :style="{backgroundColor: color.value}"></div>
                 <div class="color-name">{{ color.name }}: <CopyTextButton><code>{{ color.value }}</code></CopyTextButton> </div>
             </div>
         </div>
 
-<!--        <h3>Hero</h3>-->
-<!--        <div class="heroes d-flex">-->
-<!--            <RecoloredHero :show-controls="true" class="recolored-hero" v-for="hero in heroes" :theme="theme" :hero="hero" :key="hero.id"></RecoloredHero>-->
-<!--        </div>-->
-<!--        <HeroColorControls :theme="theme"></HeroColorControls>-->
+        <!--        <h3>Hero</h3>-->
+        <!--        <div class="heroes d-flex">-->
+        <!--            <RecoloredHero :show-controls="true" class="recolored-hero" v-for="hero in heroes" :theme="theme" :hero="hero" :key="hero.id"></RecoloredHero>-->
+        <!--        </div>-->
+        <!--        <HeroColorControls :theme="theme"></HeroColorControls>-->
         <h3 v-if="logos.length">Logos</h3>
         <div v-if="logos.length" class="logo-list mb-3">
-            <div class="logo-holder flex-center" v-for="logo in logos" :key="logo.key" :style="logoBackground">
+            <div v-for="logo in logos" :key="logo.key" class="logo-holder flex-center" :style="logoBackground">
                 <a :href="logo.image" target="_blank" class="bg-center logo" :style="bg(logo.image)"></a>
                 <div class="logo-name">{{ logo.key }}</div>
             </div>
@@ -49,7 +54,7 @@
         </div>
 
 
-        <div class="team-specific" v-if="team">
+        <div v-if="team" class="team-specific">
             <h3>Ingame overlay</h3>
             <div class="overlay-area ingame-overlay mb-3">
                 <IngameTeam :team="team" :event="team.event" :active="true" />
@@ -58,7 +63,7 @@
             <h3>Bracket</h3>
             <div class="overlay-area mb-3">
                 <div class="bracket-match">
-                    <BracketTeam :team="team" score="0"/>
+                    <BracketTeam :team="team" score="0" />
                 </div>
             </div>
 
@@ -67,7 +72,6 @@
                 <StandingsTeam :team="standingsData" />
             </div>
         </div>
-
     </div>
 </template>
 
@@ -81,9 +85,6 @@ import StandingsTeam from "@/components/broadcast/StandingsTeam";
 import { bg, resizedImageNoWrap } from "@/utils/images";
 import { getDataServerAddress } from "@/utils/fetch";
 import CopyTextButton from "@/components/website/CopyTextButton";
-// import RecoloredHero from "@/components/broadcast/RecoloredHero";
-// import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
-// import HeroColorControls from "@/components/broadcast/HeroColorControls";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");
@@ -249,7 +250,7 @@ export default {
         font-size: 24px;
         width: fit-content;
     }
-    .standings >>> .team-name {
+    .standings:deep(.team-name) {
         margin-right: 32px;
         min-width: 250px;
     }
@@ -272,7 +273,7 @@ export default {
     /*.recolored-hero {*/
     /*    width: 200px;*/
     /*}*/
-    /*.recolored-hero >>> .color-holder {*/
+    /*.recolored-hero:deep(.color-holder) {*/
     /*    height: 500px;*/
     /*}*/
 </style>

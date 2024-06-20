@@ -1,26 +1,56 @@
 <template>
-    <div class="bracket row flex-column" :style="winVars" :class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
-        <div class="connections" ref="connections-holder">
-            <div class="connection" v-for="bug in connectionBugs" :key="bug.key" :data-key="bug.key" :class="connectionBugClass(bug)" :style="bug.style"
+    <div
+        class="bracket row flex-column"
+        :style="winVars"
+        :class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
+        <div ref="connections-holder" class="connections">
+            <div
+                v-for="bug in connectionBugs"
+                :key="bug.key"
+                class="connection"
+                :data-key="bug.key"
+                :class="connectionBugClass(bug)"
+                :style="bug.style"
                 :data-column-num="bug.column">
-                <div class="c-top" v-if="bug.type === 'normal'"></div><div class="c-middle"></div><div class="c-bottom"></div>
-                <div class="c-text" :title="bug.title" v-if="bug.type === 'loser-drops'">{{ bug.text }}</div>
+                <div v-if="['normal'].includes(bug.type)" class="c-top"></div>
+                <div v-if="['normal', 'loser-drops'].includes(bug.type)" class="c-middle"></div>
+                <div v-if="['normal', 'loser-drops'].includes(bug.type)" class="c-bottom"></div>
+                <div v-if="['arrow', 'arrow-number'].includes(bug.type)" class="c-arrow c-arrow-line"></div>
+                <div v-if="['arrow', 'arrow-number'].includes(bug.type)" class="c-arrow c-arrow-head"></div>
+                <div v-if="['loser-drops', 'arrow-number'].includes(bug.type)" class="c-text" :title="bug.title">
+                    {{ bug.text }}
+                </div>
             </div>
         </div>
         <v-style>
             .bracket {
-                --bracket-columns: {{ bracketCols || 0 }};
+            --bracket-columns: {{ bracketCols || 0 }};
             }
             .bracket .connections {
-                --b-width: {{ connectionWidth }}px !important;
+            --b-width: {{ connectionWidth }}px !important;
             }
         </v-style>
-        <div class="internal-bracket d-flex" v-for="(_bracket, i) in brackets" :key="i">
-            <div class="column" v-for="(column, ci) in _bracket.columns" :key="ci">
-                <div class="header text-center mb-3" :style="logoBackground1(event)" v-if="showHeaders && column.header">{{ column.header }}</div>
+        <div v-for="(_bracket, i) in brackets" :key="i" class="internal-bracket d-flex">
+            <div
+                v-for="(column, ci) in _bracket.columns"
+                :key="ci"
+                class="column"
+                :class="{'gap-right': column.gapRight}">
+                <div
+                    v-if="showHeaders && column.header"
+                    class="header text-center mb-3"
+                    :style="logoBackground1(event)">
+                    <div class="industry-align">{{ column.header }}</div>
+                </div>
                 <div class="column-matches flex-grow-1">
-                    <BracketMatch v-for="matchNum in column.games" :key="matchNum" :ref="`match-${matchNum}`" :custom-timezone="customTimezone"
-                                  :show-times="bracket.show_times" :show-broadcasts="bracket.show_broadcasts" :match="getMatch(matchNum)"/>
+                    <BracketMatch
+                        v-for="matchNum in column.games"
+                        :key="matchNum"
+                        :ref="`match-${matchNum}`"
+                        :custom-timezone="customTimezone"
+                        :show-times="bracket.show_times"
+                        :show-broadcasts="bracket.show_broadcasts"
+                        :match="getMatch(matchNum)" />
                 </div>
             </div>
         </div>
@@ -30,7 +60,7 @@
 <script>
 import BracketMatch from "@/components/website/bracket/BracketMatch";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
-import Store from "@/thing-store";
+import { useStatusStore } from "@/stores/statusStore";
 
 export default {
     name: "Bracket",
@@ -52,19 +82,19 @@ export default {
     }),
     computed: {
         matches() {
-            if (!this.bracket || !this.bracket.ordered_matches) return [];
+            if (!this.bracket?.ordered_matches) return [];
             return this.bracket.ordered_matches;
         },
         layout() {
-            if (!this.bracket || !this.bracket.bracket_layout) return null;
+            if (!this.bracket?.bracket_layout) return null;
             return JSON.parse(this.bracket.bracket_layout);
         },
         brackets() {
-            if (!this.layout || !this.layout.brackets) return null;
+            if (!this.layout?.brackets) return null;
             return this.layout.brackets;
         },
         connections() {
-            if (!this.layout || !this.layout.connections) return null;
+            if (!this.layout?.connections) return null;
             return this.layout.connections;
         },
         bracketCols() {
@@ -96,10 +126,10 @@ export default {
             };
         },
         highlightedTeam() {
-            return this.$store.state.highlighted_team || this.broadcastHighlightTeam || null;
+            return (useStatusStore().highlightedTeam ?? this.broadcastHighlightTeam) || null;
         },
         highlightedMatch() {
-            return this.getOrderedMatchNum(this.$store.getters.highlightedMatch());
+            return this.getOrderedMatchNum(useStatusStore().highlightedMatch);
         },
         connectionsToHighlight() {
             // If a team is highlighted: highlight their path
@@ -157,6 +187,10 @@ export default {
             const classes = [`dir-${bug.direction}`];
             let highlight = null;
 
+            if (bug.customStyle) {
+                classes.push(`style-${bug.customStyle}`);
+            }
+
             if (this.connectionsToHighlight?.matches) {
                 // console.log("bug highlight", bug, this.connectionsToHighlight);
                 const bugMatches = bug.key.split("->").map(e => e.split(".").shift());
@@ -211,10 +245,16 @@ export default {
             };
             Object.entries(this.connections).forEach(([_n, connection]) => {
                 if (connection.win && Math.floor(connection.win) === parseInt(num)) {
-                    feederMatches[connection.win.split(".").pop()] = { ...this.getConnectionMatch(_n), _m: "Winner" };
+                    feederMatches[connection.win.split(".").pop()] = {
+                        ...this.getConnectionMatch(_n),
+                        _m: "Winner"
+                    };
                 }
                 if (connection.lose && Math.floor(connection.lose) === parseInt(num)) {
-                    feederMatches[connection.lose.split(".").pop()] = { ...this.getConnectionMatch(_n), _m: "Loser" };
+                    feederMatches[connection.lose.split(".").pop()] = {
+                        ...this.getConnectionMatch(_n),
+                        _m: "Loser"
+                    };
                 }
             });
             // console.log(`feeder matches n=${num}`, feederMatches);
@@ -249,11 +289,11 @@ export default {
 
                 if (connectionData.win) {
                     const [otherMatchNum, destNum] = connectionData.win.toString().split(".");
-                    this.createConnectionBetweenRefs(matchRef, this.getMatchRef(otherMatchNum), matchNum, otherMatchNum, parseInt(destNum || "0"));
+                    this.createConnectionBetweenRefs(matchRef, this.getMatchRef(otherMatchNum), matchNum, otherMatchNum, parseInt(destNum || "0"), connectionData.winStyle);
                 }
                 if (connectionData.lose) {
                     const [otherMatchNum, destNum] = connectionData.lose.toString().split(".");
-                    this.createLoserDropsConnection(this.getMatchRef(otherMatchNum), matchNum, otherMatchNum, parseInt(destNum || "0"));
+                    this.createLoserDropsConnection(this.getMatchRef(otherMatchNum), matchNum, otherMatchNum, parseInt(destNum || "0"), connectionData.loseStyle);
                 }
             });
         },
@@ -261,24 +301,25 @@ export default {
             // console.log(this.$refs);
             return this.$refs[`match-${matchNum}`];
         },
-        createConnectionBetweenRefs(source, dest, sourceNum, destNum, destSide) {
+        createConnectionBetweenRefs(source, dest, sourceNum, destNum, destSide, customStyle) {
             if (!source || !dest || !destSide) return;
+
+            if (["hidden", "none", "empty", "null", null].includes(customStyle)) return;
+
             const container = this.$refs["connections-holder"];
+            const alignmentDiff = container.getBoundingClientRect();
             // console.log({ container });
 
             // console.log("connection between", { source, dest });
             const [sourceBox, destBox] = [source, dest].map(c => c[0].$el.getBoundingClientRect());
             // console.log({ sourceBox, destBox });
 
-            const connection = document.createElement("div");
-            connection.className = "connection";
-            // connection.dataset.data = JSON.stringify(data);
-
             const HalfLine = 1;
 
             const coord = {};
             coord.leftSide = sourceBox.right;
             coord.rightSide = destBox.left;
+
 
             const sourcePoint = (sourceBox.bottom - (sourceBox.height / 2));
             let destPoint = (destBox.bottom - (destBox.height / 2));
@@ -291,10 +332,6 @@ export default {
                     destPoint += quarterHeight;
                 }
             }
-
-            connection.dataset.points = JSON.stringify({ sourcePoint, destPoint });
-
-            const alignmentDiff = container.getBoundingClientRect();
 
 
             coord.topSide = Math.min(sourcePoint, destPoint);
@@ -310,18 +347,22 @@ export default {
                 coord.bottomSide += HalfLine * 2;
             }
 
-            connection.classList.add(`dir-${coord.direction}`);
-
-
-            connection.style.left = `${coord.leftSide - alignmentDiff.left}px`;
-            connection.style.top = `${coord.topSide - alignmentDiff.bottom}px`;
-
-            connection.style.height = `${coord.bottomSide - coord.topSide}px`;
-            connection.style.width = `${coord.rightSide - coord.leftSide}px`;
-
-
-            connection.innerHTML = "<div class=\"c-top\"></div><div class=\"c-middle\"></div><div class=\"c-bottom\"></div>";
-
+            if (["arrow", "arrow-number"].includes(customStyle)) {
+                return this.connectionBugs.push({
+                    type: customStyle,
+                    customStyle,
+                    key: `${sourceNum}->${destNum}`,
+                    column: Math.max(this.getMatchColumnNum(sourceNum), this.getMatchColumnNum(destNum)),
+                    text: customStyle === "arrow-number" ? destNum : null,
+                    direction: "down",
+                    style: {
+                        left: `${sourceBox.right - alignmentDiff.left}px`,
+                        top: `${sourceBox.top - alignmentDiff.top}px`,
+                        height: `${sourceBox.height}px`,
+                        width: "32px"
+                    }
+                });
+            }
 
             this.connectionBugs.push({
                 type: "normal",
@@ -335,9 +376,6 @@ export default {
                     width: `${coord.rightSide - coord.leftSide}px`
                 }
             });
-
-            // container.appendChild(connection);
-            this.connectionElements.push(connection);
         },
         createLoserDropsConnection(dest, sourceNum, destNum, destSide) {
             if (!dest || !destSide) return; // console.log("No destination for loser drops from", sourceNum, "to", destSide);
@@ -396,14 +434,6 @@ export default {
             });
         }
     },
-    beforeDestroy() {
-        Store.commit("setHighlightedTeam", null);
-        Store.commit("setHighlightedMatch", null);
-    },
-    beforeUpdate() {
-        // console.log("[bracket rerender]");
-        // this.createConnections();
-    },
     watch: {
         layout: {
             deep: true,
@@ -420,6 +450,11 @@ export default {
             }
         }
     },
+    beforeUnmount() {
+        const statusStore = useStatusStore();
+        statusStore.highlightedTeam = null;
+        statusStore.highlightedMatch = null;
+    },
     mounted() {
         // console.log("[bracket mounted]");
         this.$nextTick(() => this.createConnections());
@@ -428,133 +463,191 @@ export default {
 </script>
 
 <style scoped>
-    .bracket {
-        position: relative;
-    }
-    .column {
-        width: 12.5em;
-        margin: 0 1em;
-        display: flex;
-        flex-direction: column;
-    }
-    .column-matches {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
+.bracket {
+    position: relative;
+}
 
-    .internal-bracket {
-        padding: 0 6px;
-    }
+.column {
+    --column-width: 12.5em;
+    --margin-width: 1em;
+    width: var(--column-width);
+    margin: 0 var(--margin-width);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
 
-    .internal-bracket + .internal-bracket {
-        margin-top: 1.5em;
-    }
+.column.gap-right {
+    --gap-width: 4em;
+    margin-right: calc((2 * var(--margin-width)) + var(--gap-width));
+}
 
+.column-matches {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
-    .bracket.small >>> .inner .short {
-        display: initial;
-        font-size: 1.75em;
-    }
-    .bracket.small >>> .inner .text,
-    .bracket.small >>> .match-number,
-    .bracket.small >>> .match-extra-info {
-        display: none
-    }
-    .bracket >>> .connection {
-        /*background-color: rgba(255,0,0,0.25);*/
-        position: absolute;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        transition: opacity 150ms ease, border-color 150ms ease, background-color 150ms ease;
-        overflow: hidden;
-    }
-    /*.bracket >>> .connection.dir-up { background-color: rgba(255,255,0,0.25); }*/
-    /*.bracket >>> .connection.dir-down { background-color: rgba(0, 255,255,0.25); }*/
-    .connections {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-    }
+.internal-bracket {
+    padding: 0 6px;
+}
+
+.internal-bracket + .internal-bracket {
+    margin-top: 1.5em;
+}
 
 
-    .bracket {
-        z-index: 2;
-    }
-    .connections {
-        z-index: 1;
-    }
+.bracket.small:deep(.inner .short) {
+    display: initial;
+    font-size: 1.75em;
+}
 
-    .bracket >>> .connections {
-        --b-width: 2px;
-        --b-color: rgba(255,255,255,0.75);
-        --b-curve: 4px;
-    }
-    .bracket >>> .connection.dir-down .c-top { border-top-right-radius: var(--b-curve); }
-    .bracket >>> .connection.dir-down .c-bottom { border-bottom-left-radius: var(--b-curve); }
-    .bracket >>> .connection.dir-up .c-top { border-top-left-radius: var(--b-curve); }
-    .bracket >>> .connection.dir-up .c-bottom { border-bottom-right-radius: var(--b-curve); }
+.bracket.small:deep(.inner .text),
+.bracket.small:deep(.match-number),
+.bracket.small:deep(.match-extra-info) {
+    display: none
+}
 
-    .bracket >>> .connection.bug-lowlight {
-        opacity: 0.2;
-    }
-    .bracket >>> .connection.bug-highlight {
-        --b-color: rgba(255,255,255,1);
-    }
+.bracket:deep(.connection) {
+    /*background-color: rgba(255,0,0,0.25);*/
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 150ms ease, border-color 150ms ease, background-color 150ms ease;
+    overflow: hidden;
+}
 
-    .bracket >>> .connection .c-top {
-        width: calc(50% + var(--b-width));
-        height: 32px;
-        margin-right: 50%;
-        border-top: var(--b-width) solid var(--b-color);
-        border-right: var(--b-width) solid var(--b-color);
-    }
+/*.bracket:deep(.connection.dir-up){ background-color: rgba(255,255,0,0.25); }*/
+/*.bracket:deep(.connection.dir-down){ background-color: rgba(0, 255,255,0.25); }*/
+.connections {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
 
-    .bracket >>> .connection .c-middle {
-        width: var(--b-width);
-        background-color: var(--b-color);
-        flex-grow: 1;
-    }
 
-    .bracket >>> .connection .c-bottom {
-        width: calc(50% + var(--b-width));
-        height: 32px;
-        margin-left: 50%;
-        border-bottom: var(--b-width) solid var(--b-color);
-        border-left: var(--b-width) solid var(--b-color);
-    }
+.bracket {
+    z-index: 2;
+}
 
-    .bracket >>> .connection.dir-up .c-top {
-        margin-right: 0;
-        margin-left: 50%;
-        border: none;
-        border-top: var(--b-width) solid var(--b-color);
-        border-left: var(--b-width) solid var(--b-color);
-    }
-    .bracket >>> .connection.dir-up .c-bottom {
-        margin-left: 0;
-        margin-right: 50%;
-        border: none;
-        border-bottom: var(--b-width) solid var(--b-color);
-        border-right: var(--b-width) solid var(--b-color);
-    }
+.connections {
+    z-index: 1;
+}
 
-    .bracket >>> .connection.dir-loser-drops .c-bottom {
-        margin-left: 0;
-        width: 100%;
-        border-bottom-left-radius: var(--b-curve);
-    }
-    .bracket >>> .c-text {
-        position: absolute;
-        font-size: 0.8em;
-        width: 100%;
-        text-align: center;
-        margin-bottom: .2em;
-        margin-left: var(--b-width);
-        color: var(--b-color);
-    }
+.bracket:deep(.connections ) {
+    --b-width: 2px;
+    --b-color: rgba(255, 255, 255, 0.75);
+    --b-curve: 4px;
+}
 
+.bracket:deep(.connection.dir-down .c-top ) {
+    border-top-right-radius: var(--b-curve);
+}
+
+.bracket:deep(.connection.dir-down .c-bottom ) {
+    border-bottom-left-radius: var(--b-curve);
+}
+
+.bracket:deep(.connection.dir-up .c-top ) {
+    border-top-left-radius: var(--b-curve);
+}
+
+.bracket:deep(.connection.dir-up .c-bottom ) {
+    border-bottom-right-radius: var(--b-curve);
+}
+
+.bracket:deep(.connection.bug-lowlight ) {
+    opacity: 0.2;
+}
+
+.bracket:deep(.connection.bug-highlight ) {
+    --b-color: rgba(255, 255, 255, 1);
+}
+
+.bracket:deep(.connection .c-top ) {
+    width: calc(50% + var(--b-width));
+    height: 32px;
+    margin-right: 50%;
+    border-top: var(--b-width) solid var(--b-color);
+    border-right: var(--b-width) solid var(--b-color);
+}
+
+.bracket:deep(.connection .c-middle ) {
+    width: var(--b-width);
+    background-color: var(--b-color);
+    flex-grow: 1;
+}
+
+.bracket:deep(.connection .c-bottom ) {
+    width: calc(50% + var(--b-width));
+    height: 32px;
+    margin-left: 50%;
+    border-bottom: var(--b-width) solid var(--b-color);
+    border-left: var(--b-width) solid var(--b-color);
+}
+
+.bracket:deep(.connection.dir-up .c-top ) {
+    margin-right: 0;
+    margin-left: 50%;
+    border: none;
+    border-top: var(--b-width) solid var(--b-color);
+    border-left: var(--b-width) solid var(--b-color);
+}
+
+.bracket:deep(.connection.dir-up .c-bottom ) {
+    margin-left: 0;
+    margin-right: 50%;
+    border: none;
+    border-bottom: var(--b-width) solid var(--b-color);
+    border-right: var(--b-width) solid var(--b-color);
+}
+
+.bracket:deep(.connection.dir-loser-drops .c-bottom ) {
+    margin-left: 0;
+    width: 100%;
+    border-bottom-left-radius: var(--b-curve);
+}
+
+.bracket:deep(.c-text ) {
+    position: absolute;
+    font-size: 0.8em;
+    width: 100%;
+    text-align: center;
+    margin-bottom: .2em;
+    margin-left: var(--b-width);
+    color: var(--b-color);
+}
+
+.bracket:deep(.connection.style-arrow),
+.bracket:deep(.connection.style-arrow-number ) {
+    align-items: flex-start;
+    --b-arrow-length: 75%;
+}
+
+.bracket:deep(.c-arrow.c-arrow-line ) {
+    height: var(--b-width);
+    width: var(--b-arrow-length);
+    background-color: var(--b-color);
+}
+
+.bracket:deep(.c-arrow.c-arrow-head ) {
+    --b-arrow-size: calc(min(var(--b-width) * 4, 40%));
+    border-top: var(--b-width) solid var(--b-color);
+    border-right: var(--b-width) solid var(--b-color);
+    width: var(--b-arrow-size);
+    height: var(--b-arrow-size);
+    transform: rotate(45deg);
+    position: absolute;
+    right: calc(100% - var(--b-arrow-length));
+}
+
+.bracket:deep(.connection.style-arrow .c-text),
+.bracket:deep(.connection.style-arrow-number .c-text ) {
+    width: var(--b-arrow-length);
+    margin-left: 0;
+    bottom: 50%;
+}
 </style>

@@ -1,10 +1,18 @@
 <template>
     <div class="cams-overlay">
         <transition name="slide-in">
-            <div class="team-cams" v-show="showCams">
-                <TeamCamsGroup :style="{ order: match.flip_teams ? +!ti : ti }" v-for="(team, ti) in teams" :key="team.id"
-                               :team="team" :guests="guests[ti]" :params="camParams" :event="broadcast && broadcast.event"
-                               :relay-prefix="relayPrefix" :ti="match.flip_teams ? +!ti : ti" :disable-cams="disable" />
+            <div v-show="showCams" class="team-cams">
+                <TeamCamsGroup
+                    v-for="(team, ti) in teams"
+                    :key="team.id"
+                    :style="{ order: match.flip_teams ? +!ti : ti }"
+                    :team="team"
+                    :guests="guests[ti]"
+                    :params="camParams"
+                    :event="broadcast && broadcast.event"
+                    :relay-prefix="relayPrefix"
+                    :ti="match.flip_teams ? +!ti : ti"
+                    :disable-cams="disable" />
             </div>
         </transition>
     </div>
@@ -16,8 +24,8 @@ import TeamCamsGroup from "@/components/broadcast/cams/TeamCamsGroup";
 
 export default {
     name: "CamsOverlay",
-    props: ["broadcast", "params"],
     components: { TeamCamsGroup },
+    props: ["broadcast", "params"],
     data: () => ({
         showCams: false
     }),
@@ -26,7 +34,7 @@ export default {
             return this.broadcast?.broadcast_settings?.includes("Disable team cams");
         },
         match() {
-            if (!this.broadcast || !this.broadcast.live_match) return null;
+            if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -37,7 +45,7 @@ export default {
             return this.broadcast?.cams_relay_prefix;
         },
         teams() {
-            if (!this.match || !this.match.teams || !this.match.teams.every(t => {
+            if (!this.match?.teams?.every(t => {
                 if (t.theme === undefined && t.has_theme === 0) return true;
                 return t.theme && !t.theme.__loading && t.theme.id;
             })) return [];
@@ -60,11 +68,6 @@ export default {
             return this.broadcast?.show_cams;
         }
     },
-    sockets: {
-        toggle_cams() {
-            this.showCams = !this.showCams;
-        }
-    },
     watch: {
         broadcastShowCams(show) {
             if (show !== this.showCams) {
@@ -72,7 +75,12 @@ export default {
             }
         }
     },
-    metaInfo() {
+    sockets: {
+        toggle_cams() {
+            this.showCams = !this.showCams;
+        }
+    },
+    head() {
         return {
             title: `Ingame Cams | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };
@@ -119,7 +127,7 @@ export default {
 
     .slide-in-enter-active { transition: bottom 300ms var(--reversedCurve); }
     .slide-in-leave-active { transition: bottom 300ms var(--originalCurve); }
-    .slide-in-enter, .slide-in-leave-to { bottom: -320px }
-    .slide-in-enter-to, .slide-in-leave { bottom: 0; }
+    .slide-in-enter-from, .slide-in-leave-to { bottom: -320px }
+    .slide-in-enter-to, .slide-in-leave-from { bottom: 0; }
 
 </style>

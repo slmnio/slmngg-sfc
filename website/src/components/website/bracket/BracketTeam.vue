@@ -1,52 +1,57 @@
 <template>
-    <div class="bracket-team default-thing" :class="{'text': !!text, 'empty': empty, 'highlighted': highlighted, 'lowlighted': lowlighted}"
-         @mouseover="highlight" @mouseout="unHighlight"
-         :style="background">
-        <div class="inner" v-if="!empty">
+    <div
+        class="bracket-team default-thing"
+        :class="{'text': !!text, 'empty': empty, 'highlighted': highlighted, 'lowlighted': lowlighted}"
+        :style="background"
+        @mouseover="highlight"
+        @mouseout="unHighlight">
+        <div v-if="!empty" class="inner">
             <span class="text">{{ text }}</span>
             <span class="short">{{ short }}</span>
-            <div class="team-logo-holder flex-center" v-if="team">
+            <div v-if="team" class="team-logo-holder flex-center">
                 <div class="team-logo bg-center" :style="teamLogo"></div>
             </div>
-            <div class="team-name-holder" v-if="team">
-                <div class="team-name">{{ team.name }}</div>
-                <div class="team-code">{{ team.code }}</div>
+            <div v-if="team" class="team-name-holder">
+                <div class="team-name industry-align">{{ team.name }}</div>
+                <div class="team-code industry-align">{{ team.code }}</div>
             </div>
-            <div class="team-score flex-center" :class="{ 'win': win }" v-if="team && score !== null">{{ score }}</div>
+            <div v-if="team && score !== null" class="team-score flex-center" :class="{ 'win': win }">
+                <div class="industry-align">{{ score }}</div>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 import { logoBackground1 } from "@/utils/theme-styles";
-import Store from "@/thing-store";
 import { resizedImage } from "@/utils/images";
+import { useStatusStore } from "@/stores/statusStore";
 
 export default {
     name: "BracketTeam",
     props: ["team", "text", "empty", "score", "win", "short"],
-    methods: {
-        highlight() { Store.commit("setHighlightedTeam", this.team?.id || null); },
-        unHighlight() { Store.commit("setHighlightedTeam", null); }
-    },
     computed: {
         highlighted() {
             if (!this.team) return false;
-            return Store.getters.isHighlighted(this.team.id);
+            return useStatusStore().highlightedTeam === this.team.id;
         },
         lowlighted() {
             if (this.highlighted) return false;
-            return !!Store.state.highlighted_team;
+            return useStatusStore().highlightedTeam !== null;
         },
         background() {
             if (this.empty) return { backgroundColor: "transparent" };
-            if (this.team && this.team.id) return logoBackground1(this.team);
+            if (this.team?.id) return logoBackground1(this.team);
             return {};
         },
         teamLogo() {
             if (!this.team) return {};
             return resizedImage(this.team?.theme, ["small_logo", "default_logo"], "s-80");
         }
+    },
+    methods: {
+        highlight() { useStatusStore().highlightedTeam = this.team?.id || null; },
+        unHighlight() { useStatusStore().highlightedTeam = null; }
     }
 };
 </script>
@@ -71,7 +76,7 @@ export default {
         flex-shrink: 0;
     }
     .team-logo {
-        --padding: 4px;
+        --padding: .25em;
         width: calc(100% - var(--padding));
         height: calc(100% - var(--padding));
     }
@@ -93,7 +98,6 @@ export default {
     }
     .team-name {
         line-height: 0.92;
-        transform: translate(0, -0.05em);
         /*line-height: 1;*/
         /* transform: var(--overlay-line-height-adjust, translate(0, -0.0925em)); !* industry-align *!*/
 

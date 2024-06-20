@@ -51,6 +51,7 @@ async function updateRecord(Cache, tableName, item, data) {
     console.log(`[update record] updating table=${tableName} id=${item.id}`, data);
 
     let slmnggData = {
+        __tableName: tableName,
         ...deAirtable({ ...item, ...data }),
         modified: (new Date((new Date()).getTime() + TimeOffset)).toString()
     };
@@ -58,10 +59,10 @@ async function updateRecord(Cache, tableName, item, data) {
     Cache.set(cleanID(item.id), slmnggData, { eager: true });
 
     // Update custom keys
-    if (tableName === "Broadcasts" && item.key) Cache.set(`broadcast-${item.key}`, slmnggData, { eager: true });
-    if (tableName === "Clients" && item.key) Cache.set(`client-${item.key}`, slmnggData, { eager: true });
-    if (tableName === "Events" && item.subdomain) Cache.set(`subdomain-${item.subdomain}`, slmnggData, { eager: true });
-    if (tableName === "News" && item.slug) Cache.set(`news-${item.slug}`, slmnggData, { eager: true });
+    if (tableName === "Broadcasts" && item.key) Cache.set(`broadcast-${item.key}`, { ...slmnggData, customKey: true }, { eager: true });
+    if (tableName === "Clients" && item.key) Cache.set(`client-${item.key?.toLowerCase()}`, { ...slmnggData, customKey: true }, { eager: true });
+    if (tableName === "Events" && item.subdomain) Cache.set(`subdomain-${item.subdomain}`, { ...slmnggData, customKey: true }, { eager: true });
+    if (tableName === "News" && item.slug) Cache.set(`news-${item.slug}`, { ...slmnggData, customKey: true }, { eager: true });
 
     try {
         return await slmngg(tableName).update(item.id, data);
@@ -79,16 +80,14 @@ async function updateRecord(Cache, tableName, item, data) {
  */
 async function createRecord(Cache, tableName, records) {
     console.log(`[create record] creating table=${tableName} records=${records.length}`);
-
-    // TODO: think about how eager update would work
-
     try {
         let newRecords = await slmngg(tableName).create(records.map(recordData => ({ fields: recordData })));
         newRecords.forEach(record => {
-            Cache.set(cleanID(record.id), deAirtable(record.fields), { eager: true });
+            Cache.set(cleanID(record.id), {
+                ...deAirtable(record.fields),
+                __tableName: tableName
+            }, { eager: true });
         });
-        // console.log(newRecords.length);
-        // console.log(newRecords);
         return newRecords;
     } catch (e) {
         console.error("Airtable create failed", e);
@@ -134,8 +133,8 @@ async function getMaps(match) {
     return getAll(match.maps);
 }
 
-async function getTwitchChannel(client, requestedScopes) {
-    let broadcast = await getBroadcast(client);
+async function getTwitchChannel(client, requestedScopes, forceBroadcastID) {
+    let broadcast = await (forceBroadcastID ? Cache.get(forceBroadcastID) : getBroadcast(client));
     const channel = await Cache.auth.getChannel(broadcast?.channel?.[0]);
     if (!channel?.twitch_refresh_token) throw "No Twitch auth token associated with channel";
     if (!channel?.channel_id || !channel?.name || !channel.twitch_scopes) throw "Invalid channel data";
@@ -185,7 +184,6 @@ function getTwitchAPIError(error) {
 
 function safeInput(string) {
     return string
-        .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
@@ -193,7 +191,6 @@ function safeInput(string) {
 }
 function safeInputNoQuotes(string) {
     return string
-        .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
 }

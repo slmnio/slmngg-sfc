@@ -94,8 +94,8 @@ module.exports = {
                 let teamIndex = connectionMatch.first_to === connectionMatch.score_1 ? 0 : 1;
                 if (connection.loser) teamIndex = +!teamIndex;
                 let team = connectionMatch.teams[teamIndex];
-                team._position = connection.position;
                 if (team) {
+                    team._position = connection.position;
                     correctTeams[parseInt(connection.position) - 1] = team;
                 } else {
                     console.warn("No team available", connection, team);

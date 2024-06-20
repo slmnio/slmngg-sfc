@@ -11,7 +11,7 @@ export default {
     name: "OtherBroadcastsOverlay",
     components: { OtherBroadcasts, GenericOverlay },
     props: ["broadcast", "title"],
-    metaInfo() {
+    head() {
         return {
             title: `Other Broadcasts | ${this.broadcast?.code || this.broadcast?.name || ""}`
         };

@@ -1,85 +1,48 @@
 <template>
     <div class="bracket-creator">
-        <div class="container"><h1>Bracket Creator</h1>
+        <div class="container">
+            <LearnTitleChip title="Tools" subtitle="Bracket Creator" />
 
+
+            <div class="presets mb-3">
+                <b-button-toolbar class="d-flex gap-2">
+                    <b-form-select v-model="selectedPreset" class="w-auto" :options="presetOptions" />
+                    <b-button variant="success" :disabled="!selectedPreset" @click="applyPreset">
+                        Apply preset
+                    </b-button>
+                </b-button-toolbar>
+            </div>
 
             <div class="button flex w-100 d-flex mb-2 buttons">
-                <b-button variant="danger" size="sm" @click="endConnectionSpecial('eliminated')"
-                          :disabled="!activeConnection">
+                <b-button
+                    variant="danger"
+                    size="sm"
+                    :disabled="!activeConnection"
+                    @click="endConnectionSpecial('eliminated')">
                     <i class="fas fa-skull fa-fw"></i> Eliminated
                 </b-button>
                 <div class="spacer flex-grow-1"></div>
-                <b-button variant="danger" size="sm" @click="setAllEliminations()" :disabled="!!activeConnection">
+                <b-button variant="danger" size="sm" :disabled="!!activeConnection" @click="setAllEliminations()">
                     <i class="fas fa-skull fa-fw"></i> Set all remaining losses as eliminations
                 </b-button>
                 <div class="spacer flex-grow-1"></div>
-                <b-button variant="warning" size="sm" @click="endConnectionSpecial('champion')"
-                          :disabled="!activeConnection">
+                <b-button
+                    variant="warning"
+                    size="sm"
+                    :disabled="!activeConnection"
+                    @click="endConnectionSpecial('champion')">
                     <i class="fas fa-crown fa-fw"></i> Champion
                 </b-button>
             </div>
         </div>
         <div class="container-fluid">
             <div class="bracket-controls w-100 flex-center mb-3 flex-column">
-                <div class="bracket flex-center flex-column mb-3" v-for="(bracket, bi) in brackets" :key="bi">
-                    <div class="columns">
-                        <div class="column" v-for="(column, ci) in bracket.columns" :key="'col-' + ci">
-                            <input class="header" v-model="column.header"/>
-                            <div class="game-area">
-                                <div class="game" :class="{'empty': game.empty}" v-for="(game, mi) in column.games"
-                                     :key="mi">
-                                    <div class="game-teams">
-                                        <div class="game-team" :class="{
-                                        'highlight': activeConnection,
-                                        'hover-active': highlightConnectionMatches(bi, ci, mi, 1),
-                                        'has-lose-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'lose',
-                                        'has-win-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'win'
-                                    }" @click="endConnection(bi, ci, mi, 1)">
-                                            {{ getReverseConnectionText(bi, ci, mi, 1) }}
-                                        </div>
-                                        <div class="match-number" v-if="!game.empty">{{ getMatchNum(bi,ci,mi) }}</div>
-                                        <div class="game-team" :class="{
-                                        'highlight': activeConnection,
-                                        'hover-active': highlightConnectionMatches(bi, ci, mi, 2),
-                                        'has-lose-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'lose',
-                                        'has-win-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'win'
-                                    }" @click="endConnection(bi, ci, mi, 2)">
-                                            {{ getReverseConnectionText(bi, ci, mi, 2) }}
-                                        </div>
-                                    </div>
-                                    <div class="game-buttons">
-                                        <div class="game-button remove" @click="column.games.splice(mi,1)"><i
-                                                class="fas fa-trash"></i></div>
-                                    </div>
-                                    <div class="connection-buttons">
-                                        <div class="connection-button"
-                                             :class="{
-                                            'active': activeConnectionMatches(bi, ci, mi, 'win') || getConnection(bi, ci, mi, 'win'),
-                                            'champion':getConnection(bi, ci, mi, 'win') === 'champion',
-                                         }"
-                                             @mouseenter="showConnection(bi, ci, mi, 'win')"
-                                             @mouseleave="hideConnection()"
-                                             @click="startConnection(bi, ci, mi, 'win')">
-                                            W
-                                        </div>
-                                        <div class="connection-button"
-                                             :class="{
-                                            'active': activeConnectionMatches(bi, ci, mi, 'lose') || getConnection(bi, ci, mi, 'lose'),
-                                            'eliminated':getConnection(bi, ci, mi, 'lose') === 'eliminated',
-                                         }"
-                                             @mouseenter="showConnection(bi, ci, mi, 'lose')"
-                                             @mouseleave="hideConnection()"
-                                             @click="startConnection(bi, ci, mi, 'lose')">
-                                            L
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="columns">
-                        <div class="column col-buttons" v-for="(column, ci) in bracket.columns"
-                             :key="'col-buttons-' + ci">
+                <div v-for="(bracket, bi) in brackets" :key="bi" class="bracket flex-center flex-column mb-3">
+                    <div class="columns my-2">
+                        <div
+                            v-for="(column, ci) in bracket.columns"
+                            :key="'col-buttons-' + ci"
+                            class="column col-buttons">
                             <div class="buttons flex-wrap flex-center">
                                 <b-button variant="secondary" size="sm" @click="column.games.push({ empty: false })">
                                     <i class="fas fa-plus fa-fw"></i> Game
@@ -90,6 +53,76 @@
                                 <b-button variant="danger" size="sm" @click="bracket.columns.splice(ci, 1)">
                                     <i class="fas fa-trash fa-fw"></i> Delete Column
                                 </b-button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div v-for="(column, ci) in bracket.columns" :key="'col-' + ci" class="column">
+                            <input v-model="column.header" class="mt-2 header">
+                            <div class="game-area">
+                                <div
+                                    v-for="(game, mi) in column.games"
+                                    :key="mi"
+                                    class="game"
+                                    :class="{'empty': game.empty}">
+                                    <div class="game-teams">
+                                        <div
+                                            class="game-team"
+                                            :class="{
+                                                'highlight': activeConnection,
+                                                'hover-active': highlightConnectionMatches(bi, ci, mi, 1),
+                                                'has-lose-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'lose',
+                                                'has-win-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'win'
+                                            }"
+                                            @mouseup="endConnection(bi, ci, mi, 1)">
+                                            {{ getReverseConnectionText(bi, ci, mi, 1) }}
+                                        </div>
+                                        <div v-if="!game.empty" class="match-number">{{ getMatchNum(bi,ci,mi) }}</div>
+                                        <div
+                                            class="game-team"
+                                            :class="{
+                                                'highlight': activeConnection,
+                                                'hover-active': highlightConnectionMatches(bi, ci, mi, 2),
+                                                'has-lose-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'lose',
+                                                'has-win-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'win'
+                                            }"
+                                            @mouseup="endConnection(bi, ci, mi, 2)">
+                                            {{ getReverseConnectionText(bi, ci, mi, 2) }}
+                                        </div>
+                                    </div>
+                                    <div class="game-buttons">
+                                        <div class="game-button remove" @click="column.games.splice(mi,1)">
+                                            <i
+                                                class="fas fa-trash"></i>
+                                        </div>
+                                    </div>
+                                    <div class="connection-buttons">
+                                        <div
+                                            class="connection-button"
+                                            :class="{
+                                                'active': activeConnectionMatches(bi, ci, mi, 'win') || getConnection(bi, ci, mi, 'win'),
+                                                'champion':getConnection(bi, ci, mi, 'win') === 'champion',
+                                            }"
+                                            @mouseenter="showConnection(bi, ci, mi, 'win')"
+                                            @mouseleave="hideConnection()"
+                                            @mousedown="startConnection(bi, ci, mi, 'win')"
+                                        >
+                                            W
+                                        </div>
+                                        <div
+                                            class="connection-button"
+                                            :class="{
+                                                'active': activeConnectionMatches(bi, ci, mi, 'lose') || getConnection(bi, ci, mi, 'lose'),
+                                                'eliminated':getConnection(bi, ci, mi, 'lose') === 'eliminated',
+                                            }"
+                                            @mouseenter="showConnection(bi, ci, mi, 'lose')"
+                                            @mouseleave="hideConnection()"
+                                            @mousedown="startConnection(bi, ci, mi, 'lose')"
+                                        >
+                                            L
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -109,8 +142,15 @@
                 </div>
             </div>
         </div>
-        <div class="container"><textarea type="text" rows="3" class="autogen w-100" style="white-space: normal;" contenteditable
-                     @keydown.ctrl.enter="updateCustomFormat()" v-model="customFormat"/>
+        <div class="container">
+            <textarea
+                v-model="customFormat"
+                type="text"
+                rows="3"
+                class="autogen w-100"
+                style="white-space: normal;"
+                contenteditable
+                @keydown.ctrl.enter="updateCustomFormat()"></textarea>
             <div class="button flex w-100 d-flex flex-row-reverse mb-3">
                 <b-button variant="success" size="sm" @click="updateCustomFormat()">
                     <i class="fas fa-save fa-fw"></i> Update data
@@ -120,18 +160,18 @@
             <h3>Bracket Preview</h3>
         </div>
         <div class="container-fluid flex-center">
-            <Bracket class="py-3" :bracket="bracketData"/>
+            <Bracket class="py-3" :bracket="bracketData" />
         </div>
     </div>
 </template>
 
 <script>
 import Bracket from "@/components/website/bracket/Bracket.vue";
-import { BButton } from "bootstrap-vue";
+import LearnTitleChip from "@/components/website/guide/LearnTitleChip.vue";
 
 export default {
     name: "BracketCreator",
-    components: { Bracket, BButton },
+    components: { LearnTitleChip, Bracket },
     data: () => ({
         brackets: [
             {
@@ -146,7 +186,47 @@ export default {
         activeConnection: null,
         connections: {},
         highlightedConnection: null,
-        customFormat: ""
+        customFormat: "",
+        selectedPreset: null,
+        presetOptions: [
+            {
+                value: null,
+                text: "Choose a preset",
+                disabled: true,
+            },
+            {
+                value: {"brackets":[{"columns":[{"games":[]},{"games":[]},{"games":[]},{"games":[]}]}],"connections":{}},
+                text: "Empty"
+            },
+            {
+                value: {"brackets":[{"columns":[{"games":[1,2,3,4],"header":"Quarterfinals"},{"games":[5,null,6],"header":"Semifinals"},{"games":[7],"header":"Finals"}]}],"connections":{"1":{"win":"5.1","lose":"eliminated"},"2":{"win":"5.2","lose":"eliminated"},"3":{"win":"6.1","lose":"eliminated"},"4":{"win":"6.2","lose":"eliminated"},"5":{"win":"7.1","lose":"eliminated"},"6":{"win":"7.2","lose":"eliminated"},"7":{"win":"champion","lose":"eliminated"}}},
+                text: "8-team single elimination"
+            },
+            {
+                value: {"brackets":[{"columns":[{"games":[1,2,3,4],"header":"Round 1"},{"games":[5,6,7,8],"header":"Round 2"},{"games":[9,null,10],"header":"Semifinals"},{"games":[11],"header":"Final"}]}],"connections":{"1":{"win":"5.2","lose":"eliminated"},"2":{"win":"6.2","lose":"eliminated"},"3":{"win":"7.2","lose":"eliminated"},"4":{"win":"8.2","lose":"eliminated"},"5":{"win":"9.1","lose":"eliminated"},"6":{"win":"9.2","lose":"eliminated"},"7":{"win":"10.1","lose":"eliminated"},"8":{"win":"10.2","lose":"eliminated"},"9":{"win":"11.1","lose":"eliminated"},"10":{"win":"11.2","lose":"eliminated"},"11":{"lose":"eliminated","win":"champion"}}},
+                text: "12-team single elimination"
+            },
+            {
+                value: {"brackets":[{"columns":[{"games":[1,2,3,4,5,6,7,8]},{"games":[9,null,10,null,11,null,12]},{"games":[13,null,null,14]},{"games":[15]}]}],"connections":{"1":{"win":"9.1","lose":"eliminated"},"2":{"win":"9.2","lose":"eliminated"},"3":{"win":"10.1","lose":"eliminated"},"4":{"win":"10.2","lose":"eliminated"},"5":{"win":"11.1","lose":"eliminated"},"6":{"win":"11.2","lose":"eliminated"},"7":{"win":"12.1","lose":"eliminated"},"8":{"win":"12.2","lose":"eliminated"},"9":{"win":"13.1","lose":"eliminated"},"10":{"win":"13.2","lose":"eliminated"},"11":{"win":"14.1","lose":"eliminated"},"12":{"win":"14.2","lose":"eliminated"},"13":{"win":"15.1","lose":"eliminated"},"14":{"win":"15.2","lose":"eliminated"},"15":{"win":"champion","lose":"eliminated"}}},
+                text: "16-team single elimination"
+            },
+            {
+                value: {"brackets":[{"columns":[{"games":[1,2,3,4,5,6,7,8],"header":"Round of 16"},{"games":[9,null,10,null,11,null,12],"header":"Quarterfinals"},{"games":[13,null,null,null,14],"header":"Semifinals"},{"games":[null,null,null,15,null,null,16],"header":"Finals"}]}],"connections":{"1":{"win":"9.1","lose":"eliminated"},"2":{"win":"9.2","lose":"eliminated"},"3":{"win":"10.1","lose":"eliminated"},"4":{"win":"10.2","lose":"eliminated"},"5":{"win":"11.1","lose":"eliminated"},"6":{"win":"11.2","lose":"eliminated"},"7":{"win":"12.1","lose":"eliminated"},"8":{"win":"12.2","lose":"eliminated"},"9":{"win":"13.1","lose":"eliminated"},"10":{"win":"13.2","lose":"eliminated"},"11":{"win":"14.1","lose":"eliminated"},"12":{"win":"14.2","lose":"eliminated"},"13":{"win":"15.1","lose":"16.1"},"14":{"win":"15.2","lose":"16.2"},"15":{"win":"champion","lose":"advance"},"16":{"win":"advance","lose":"eliminated"}}},
+                text: "16-team single elimination with 3rd place match"
+            },
+            {
+                value: {"brackets":[{"columns":[{"games":[1,2,null]},{"games":[3,null,4]},{"games":[5]}]}],"connections":{"1":{"win":"3.1","lose":"4.1"},"2":{"lose":"4.2","win":"3.2"},"3":{"win":"5.1"},"4":{"win":"5.2"}}},
+                text: "4-team double elimination (GSL)"
+            },
+            {
+                value: {"brackets":[{"columns":[{"games":[1,2,3,4],"header":"Round 1"},{"games":[7,null,8],"header":"Semifinals"},{"games":[11],"header":"Upper Finals"},{"games":[]},{"games":[14],"header":"Grand Finals"}]},{"columns":[{"games":[5,6],"header":"LB Round 1"},{"games":[9,10],"header":"LB Round 2"},{"games":[12],"header":"Lower Semifinals"},{"games":[13],"header":"Lower Finals"},{"games":[]}]}],"connections":{"1":{"win":"7.1","lose":"5.1"},"2":{"win":"7.2","lose":"5.2"},"3":{"win":"8.1","lose":"6.1"},"4":{"win":"8.2","lose":"6.2"},"5":{"win":"9.2","lose":"eliminated"},"6":{"win":"10.2","lose":"eliminated"},"7":{"win":"11.1","lose":"10.1"},"8":{"win":"11.2","lose":"9.1"},"9":{"win":"12.1","lose":"eliminated"},"10":{"win":"12.2","lose":"eliminated"},"11":{"win":"14.1","lose":"13.1"},"12":{"win":"13.2","lose":"eliminated"},"13":{"win":"14.2","lose":"eliminated"},"14":{"win":"champion","lose":"eliminated"}}},
+                text: "8-team double elimination"
+            },
+            {
+                value: {"brackets":[{"name":"Upper Bracket","columns":[{"header":"UB Round 1","games":[1,2,3,4]},{"header":"UB Round 2","games":[5,6,7,8]},{"games":[]},{"header":"UB Semifinals","games":[15,null,16]},{"header":"UB Finals","games":[19]},{"games":[]},{"header":"Grand Finals","games":[22]}]},{"name":"Lower Bracket","columns":[{"games":[]},{"header":"LB Round 1","games":[9,10,11,12]},{"header":"LB Round 2","games":[13,null,14]},{"header":"LB Round 3","games":[17,18]},{"header":"LB Semifinals","games":[20]},{"header":"LB Finals","games":[21]},{"games":[]}]}],"connections":{"1":{"win":"5.2","lose":"12.2"},"2":{"win":"6.2","lose":"11.2"},"3":{"win":"7.2","lose":"10.2"},"4":{"win":"8.2","lose":"9.2"},"5":{"win":"15.1","lose":"9.1"},"6":{"win":"15.2","lose":"10.1"},"7":{"win":"16.1","lose":"11.1"},"8":{"win":"16.2","lose":"12.1"},"9":{"win":"13.1","lose":"eliminated"},"10":{"win":"13.2","lose":"eliminated"},"11":{"win":"14.1","lose":"eliminated"},"12":{"win":"14.2","lose":"eliminated"},"13":{"win":"17.2","lose":"eliminated"},"14":{"win":"18.2","lose":"eliminated"},"15":{"win":"19.1","lose":"18.1"},"16":{"win":"19.2","lose":"17.1"},"17":{"win":"20.1","lose":"eliminated"},"18":{"win":"20.2","lose":"eliminated"},"19":{"win":"22.1","lose":"21.1"},"20":{"win":"21.2","lose":"eliminated"},"21":{"win":"22.2","lose":"elminated"},"22":{"win":"champion","lose":"elminated"}}},
+                text: "12-team double elimination"
+            }
+        ]
     }),
     computed: {
         bracketData() {
@@ -206,6 +286,15 @@ export default {
         }
     },
     methods: {
+        applyPreset() {
+            if (!this.selectedPreset) return;
+            if (!confirm("Are you sure you want to apply this preset?\nAny changes will be lost.")) return;
+            this.customFormat = JSON.stringify(this.selectedPreset);
+            this.selectedPreset = null;
+            this.updateCustomFormat();
+        },
+        handleDrag(dir, bracketNum, columnNum, gameNum) {
+        },
         startConnection(bracketNum, columnNum, gameNum, mode) {
             if (this.activeConnectionMatches(bracketNum, columnNum, gameNum, mode)) {
                 this.activeConnection = null;
@@ -226,7 +315,7 @@ export default {
                 this.activeConnection.gameNum,
                 this.activeConnection.mode
             ].join("-");
-            this.$set(this.connections, key, { bracketNum, columnNum, gameNum, position });
+            this.connections[key] = { bracketNum, columnNum, gameNum, position };
             this.activeConnection = null;
         },
         endConnectionSpecial(special) {
@@ -237,7 +326,7 @@ export default {
                 this.activeConnection.gameNum,
                 this.activeConnection.mode
             ].join("-");
-            this.$set(this.connections, key, special);
+            this.connections[key] = special;
             this.activeConnection = null;
         },
         setAllEliminations() {
@@ -246,7 +335,7 @@ export default {
                     column.games.forEach((game, gi) => {
                         const connection = this.getConnection(bi, ci, gi, "lose");
                         if (!connection) {
-                            this.$set(this.connections, [bi, ci, gi, "lose"].join("-"), "eliminated");
+                            this.connections[[bi, ci, gi, "lose"].join("-")] = "eliminated";
                         }
                     });
                 });

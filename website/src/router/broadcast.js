@@ -45,6 +45,16 @@ export default [
             interval: route.query.interval || route.query.headlineInterval
         })
     },
+    { path: "break-schedule", component: () => import("@/components/broadcast/break/BreakScheduleOverlay.vue") },
+    { path: "versus", component: () => import("@/components/broadcast/roots/VersusOverlay.vue") },
+    {
+        path: "winners",
+        component: () => import("@/components/broadcast/roots/WinnersOverlay.vue"),
+        props: route => ({
+            useConfetti: !!route.query.confetti
+        })
+    },
+    { path: "map-bump", component: () => import("@/components/broadcast/roots/MapBumpOverlay.vue") },
     { path: "break-bar", component: () => import("@/components/broadcast/break/BreakBarOverlay.vue") },
     {
         path: "break-text",
@@ -65,17 +75,17 @@ export default [
     { path: "standings", component: () => import("@/components/broadcast/roots/StandingsOverlay.vue"), props: route => ({ stage: route.query.stage || route.query.group }) },
     {
         path: "multi-standings",
+        alias: "multistandings",
         component: () => import("@/components/broadcast/roots/MultiStandingsOverlay.vue"),
         props: route => ({
-            stageCodes: (route.query.stage || route.query.group || route.query.stages || route.query.groups || "").split(",").filter(t => t),
+            stageCodes: (route.query.stage || route.query.group || route.query.stages || route.query.groups || "").split(",").filter(Boolean),
             useCodes: !!route.query.codes,
-            showColumns: (route.query.columns || route.query.show || "").split(",").filter(t => t)
+            showColumns: (route.query.columns || route.query.show || "").split(",").filter(Boolean)
         })
     },
-    { path: "multistandings", redirect: "multi-standings" },
-    { path: "roster", redirect: "rosters" },
     {
         path: "rosters",
+        alias: "roster",
         component: () => import("@/components/broadcast/roots/RosterOverlay.vue"),
         props: route => ({
             showRoles: route.query.roles,
@@ -85,15 +95,29 @@ export default [
             splitPlayers: route.query.split ? parseInt(route.query.split) : null
         })
     },
-    { path: "hero-rosters", redirect: "hero-roster" },
     {
         path: "hero-roster",
+        alias: "hero-rosters",
         component: () => import("@/components/broadcast/roots/HeroRosterOverlay.vue"),
         props: route => ({
             teamNum: route.query.team || route.query.teamNum,
             playerCount: route.query.count || route.query.players || route.query.playerCount,
             showRoles: !!route.query.role || !!route.query.roles || !!route.query.icons,
             showPronouns: !!route.query.pronouns
+        })
+    },
+    {
+        path: "boxed-roster",
+        alias: ["boxed-hero-roster", "boxed-hero-rosters", "boxed-rosters"],
+        component: () => import("@/components/broadcast/roots/BoxedHeroRosterOverlay.vue"),
+        props: route => ({
+            teamNum: route.query.team || route.query.teamNum,
+            playerCount: route.query.count || route.query.players || route.query.playerCount,
+            showRoles: !!route.query.role || !!route.query.roles || !!route.query.icons,
+            showPronouns: !!route.query.pronouns,
+            subtitle: route.query.subtitle,
+            alternate: route.query.alternate ? parseInt(route.query.alternate) : null,
+            showStaff: !!route.query.staff
         })
     },
     {
@@ -122,7 +146,13 @@ export default [
             stage: route.query.stage || route.query.group
         })
     },
-    { path: "thumbnail", component: () => import("@/components/broadcast/EventThumbnailCreator.vue") },
+    {
+        path: "thumbnail",
+        component: () => import("@/components/broadcast/EventThumbnailCreator.vue"),
+        props: route => ({
+            showSchedule: route.query.schedule
+        })
+    },
     {
         path: "draft",
         component: () => import("@/components/broadcast/roots/DraftOverlay.vue"),
@@ -135,7 +165,6 @@ export default [
             eachTeam: route.query.eachTeam || route.query.players
         })
     },
-    { path: "casters", redirect: "desk" },
     {
         path: "caster-bg",
         component: () => import("@/components/broadcast/CasterBackground.vue"),
@@ -146,6 +175,7 @@ export default [
     },
     {
         path: "desk",
+        alias: "casters",
         component: () => import("@/components/broadcast/desk/DeskOverlay.vue"),
         props: route => ({
             group: "casters",
@@ -155,16 +185,39 @@ export default [
     { path: "podcast", component: () => import("@/components/broadcast/roots/PodcastOverlay.vue"), props: route => ({ rows: route.query.rows }) },
     { path: "custom", component: () => import("@/components/broadcast/roots/CustomOverlay.vue") },
     { path: "info", component: () => import("@/components/broadcast/roots/InfoOverlay.vue") },
+    {
+        path: "bug",
+        component: () => import("@/components/broadcast/roots/BugOverlay.vue"),
+        props: route => ({
+            small: !!route.query.small
+        })
+    },
+    { path: "l-bar", component: () => import("@/components/broadcast/roots/LBarOverlay") },
     { path: "background", component: () => import("@/components/broadcast/BroadcastBackground.vue"), props: route => ({ index: route.query.index }) },
     { path: "sponsors", component: () => import("@/components/broadcast/roots/SponsorOverlay.vue") },
     { path: "maps", component: () => import("@/components/broadcast/roots/MapsOverlay.vue"), props: route => ({ autoTitle: route.query.auto }) },
     { path: "branding", component: () => import("@/components/broadcast/roots/BrandingOverlay.vue") },
-    { path: "auction", component: () => import("@/components/broadcast/auction/AuctionOverlay.vue"), props: route => ({ category: route.query.category, showCaptainInfo: !!route.query.captain }) },
+    {
+        path: "auction",
+        component: () => import("@/components/broadcast/auction/AuctionOverlay.vue"),
+        props: route => ({
+            category: route.query.category,
+            showCaptainInfo: !!route.query.captain,
+            undraftedText: route.query.undraftedText || route.query.undrafted || route.query.drop
+        })
+    },
     { path: "ad-read", component: () => import("@/components/broadcast/roots/AdReadOverlay.vue"), props: route => ({ extraDelay: route.query.delay }) },
     { path: "logos", component: () => import("@/components/broadcast/roots/LogoAdOverlay.vue") },
     { path: "staff", component: () => import("@/components/broadcast/roots/StaffOverlay.vue") },
     { path: "player-history", component: () => import("@/components/broadcast/PlayerHistory.vue"), props: route => ({ showMinor: route.query.minor }) },
-    { path: "overview", component: () => import("@/components/broadcast/roots/OverviewOverlay.vue") },
+    {
+        path: "overview",
+        component: () => import("@/components/broadcast/roots/OverviewOverlay.vue"),
+        props: route => ({
+            noMapVideos: (route.query.video === "false" || route.query.videos === "false"),
+            useLiveDesk: !!route.query.live
+        })
+    },
     { path: "media", component: () => import("@/components/broadcast/roots/MediaOverlay.vue") },
     {
         path: "music",
@@ -178,8 +231,7 @@ export default [
         })
     },
     { path: "desk-graphics", component: () => import("@/components/broadcast/roots/DeskGraphicsOverlay.vue") },
-    { path: "stinger", component: () => import("@/components/broadcast/roots/EmptyStingerOverlay.vue") },
-    { path: "empty", redirect: "stinger" },
+    { path: "stinger", alias: "empty", component: () => import("@/components/broadcast/roots/EmptyStingerOverlay.vue") },
     { path: "broadcasts", component: () => import("@/components/broadcast/roots/OtherBroadcastsOverlay.vue") },
     { path: "mvp", component: () => import("@/components/broadcast/roots/MVPOverlay.vue") },
     {
@@ -214,19 +266,51 @@ export default [
             index: parseInt(route.params.index) || parseInt(route.query.index ?? route.query.number) || 1
         })
     },
+    {
+        path: "confetti",
+        component: () => import("@/components/broadcast/roots/ConfettiOverlay.vue"),
+        props: route => ({
+            themeId: route.query.theme || route.query.themeId || route.query.themeid || route.query.themeID
+        })
+    },
+    {
+        path: "champions",
+        component: () => import("@/components/broadcast/roots/ChampionsOverlay.vue"),
+        props: route => ({
+            stingerText: route.query.stingerText
+        })
+    },
 
     /* Production staff stuff */
     { path: "clock", component: () => import("@/components/broadcast/roots/MediaClock.vue") },
     { path: "tester", component: () => import("@/components/broadcast/roots/ThemeTransitionTester.vue") },
     { path: "admin", component: () => import("@/components/broadcast/roots/ClientOverview.vue") },
     { path: "syncer", component: () => import("@/components/broadcast/roots/SyncerOverlay.vue") },
-    { path: "tally-viewer", component: () => import("@/components/broadcast/roots/TallyViewer.vue") },
+    { path: "tally", redirect: { name: "tally-viewer" } },
+    {
+        path: "tally-viewer",
+        name: "tally-viewer",
+        component: () => import("@/components/broadcast/roots/TallyViewer.vue"),
+        props: route => ({
+            customText: ["scene", "scenes", "text", "custom", "customText", "force"].reduce((prev, current) => prev || route.query[current], null)
+        })
+    },
     {
         path: "tally-dot",
+        alias: "dot",
         component: () => import("@/components/broadcast/roots/TallyDot.vue"),
-        props: route => ({ number: parseInt(route.query.number || route.query.number) })
+        props: route => ({
+            number: parseInt(route.query.number || route.query.number || "1"),
+            align: route.query.align || (route.query.left ? "left" : "") || (route.query.right ? "right" : "") || "right"
+        })
     },
-    { path: "quad", component: () => import("@/components/broadcast/roots/QuadTallyDot.vue") },
+    {
+        path: "quad",
+        component: () => import("@/components/broadcast/roots/QuadTallyDot.vue"),
+        props: route => ({
+            align: route.query.align || (route.query.left ? "left" : "") || (route.query.right ? "right" : "") || "right"
+        })
+    },
     {
         path: "tally-transmitter",
         component: () => import("@/components/broadcast/roots/TallyTransmitter.vue"),
@@ -237,6 +321,14 @@ export default [
     {
         path: "websocket-transmitter",
         component: () => import("@/components/broadcast/roots/WebsocketTransmitter.vue"),
+        props: route => ({
+            wsUrl: route.query.url || route.query.wsUrl || route.query.wsurl || route.query.wsURL || "ws://127.0.0.1:4455",
+            wsPassword: route.query.wsPassword || route.query.password || route.query.pw
+        })
+    },
+    {
+        path: "remote",
+        component: () => import("@/components/broadcast/roots/RemoteObsController.vue"),
         props: route => ({
             wsUrl: route.query.url || route.query.wsUrl || route.query.wsurl || route.query.wsURL || "ws://127.0.0.1:4455",
             wsPassword: route.query.wsPassword || route.query.password || route.query.pw

@@ -1,8 +1,11 @@
+/* eslint-disable */
 /* BPL Staff Automation */
 
 const client = require("./client.js");
+if (!client) return console.warn("Staff application system will not be set up because no Discord key is set.");
+
 const Airtable = require("airtable");
-const { MessageEmbed, Permissions } = require("discord.js");
+const { EmbedBuilder, Permissions } = require("discord.js");
 const airtable = new Airtable({apiKey: process.env.AIRTABLE_KEY});
 const base = airtable.base("appQd7DO7rDiMUIEj");
 
@@ -366,8 +369,8 @@ async function checkForApplications() {
 setInterval(checkForApplications, 5 * 1000);
 
 async function findMember(guild, discordTag) {
-    let [username, discriminator] = discordTag.split("#");
-    let checkFunction = (m) => m.user && m.user.username.toLowerCase() === username.toLowerCase() && m.user.discriminator === discriminator;
+    let [username] = discordTag.split("#");
+    let checkFunction = (m) => m.user && m.user.username.toLowerCase() === username.toLowerCase();
 
     let member = guild.members?.cache?.find(checkFunction);
     if (member) return member;
@@ -396,7 +399,7 @@ async function sendApplicationMessage(application) {
 
     let member = await findMember(guild, application.discord_tag);
 
-    let embed = new MessageEmbed();
+    let embed = new EmbedBuilder();
     embed.setTitle(`${application.event.name} – Staff Application – ${application.name}`);
     embed.setColor(application.event.color);
 
@@ -410,11 +413,13 @@ async function sendApplicationMessage(application) {
     }
     embed.setDescription(description.join("\n"));
 
-    if (application.background_and_experience) embed.addField("Background and experience", application.background_and_experience.slice(0, 750) + (application.background_and_experience.length > 750 ? "..." : ""));
-    if (application.technical_details) embed.addField("Technical details", application.technical_details.slice(0, 250) + (application.technical_details.length > 250 ? "..." : ""));
+    if (application.background_and_experience)
+        embed.addFields({name: "Background and experience", value: application.background_and_experience.slice(0, 750) + (application.background_and_experience.length > 750 ? "..." : ""), inline: true});
+    if (application.technical_details)
+        embed.addFields({name: "Technical details", value: application.technical_details.slice(0, 250) + (application.technical_details.length > 250 ? "..." : ""), inline: true});
 
-    embed.addField("Discord tag", application.discord_tag, true);
-    if (application.battletag) embed.addField("Battletag", application.battletag, true);
+    embed.addFields({name: "Discord tag", value: application.discord_tag, inline: true});
+    if (application.battletag) embed.addFields({name: "Battletag", value: application.battletag, inline: true});
     let message = await channel.send({ embeds: [embed] });
     await base("Staff Applications").update(application.id, {
         "Notification Message ID": message.id

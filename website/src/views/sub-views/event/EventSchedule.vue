@@ -1,26 +1,31 @@
 <template>
     <div class="event-schedule container">
-        <div class="d-sm-flex w-100 timezone-swapper-holder flex-column align-items-end gap-1 d-none">
-            <TimezoneSwapper :inline="true" />
-            <b-form-group v-if="showBroadcastSettings" label-cols="auto" label-size="sm" label="Broadcast">
-                <b-form-select
-                    v-if="eventBroadcasts?.length"
-                    v-model="selectedBroadcastID"
-                    :options="eventBroadcasts"
-                    size="sm"
-                    class="w-auto" />
-            </b-form-group>
-            <div class="d-flex align-items-center flex-wrap-reverse">
-                <div style="width: 50%"></div>
-                <h2 style="transform: translateX(-50%);">Schedule</h2>
-                <div class="d-flex align-items-end flex-col gap-1 ml-auto">
-                    <AddToCalendar :event="event" />
-                </div>
+        <div class="schedule-title">
+            <h2 class="text-center">Schedule</h2>
+
+            <div class="d-flex w-100 flex-column align-items-end gap-1 top-right-settings">
+                <b-dropdown auto-close="outside">
+                    <template #button-content>
+                        <i class="fas fa-cog fa-fw mr-1"></i>
+                        <span class="d-none d-lg-inline-block" style="line-height:1">Settings & Sync</span>
+                    </template>
+                    <div class="dropdown-content d-flex flex-column align-items-end gap-3 p-3" style="min-width: min(100vw, 300px)">
+                        <TimezoneSwapper align="left" :inline="true" />
+                        <b-form-group v-if="showBroadcastSettings" label-cols="auto" label-size="sm" label="Broadcast">
+                            <b-form-select
+                                v-if="eventBroadcasts?.length"
+                                v-model="selectedBroadcastID"
+                                :options="eventBroadcasts"
+                                size="sm"
+                                class="w-auto" />
+                        </b-form-group>
+                        <AddToCalendar :event="event" />
+                    </div>
+                </b-dropdown>
             </div>
         </div>
 
         <div class="schedule-top mb-2">
-            <h2 class="text-center">Schedule</h2>
             <ul v-if="pagedMatches.length > 1" class="schedule-group-holder nav justify-content-center">
                 <li
                     v-for="(pm) in pagedMatches"
@@ -80,7 +85,8 @@ export default {
         activeScheduleNum: useRouteQuery("page", undefined, { transform: val => val === "all" ? val : parseInt(val), mode: "replace" }),
         hideCompleted: false,
         hideNoVods: false,
-        selectedBroadcastID: null
+        selectedBroadcastID: null,
+        showSettings: false
     }),
     computed: {
         showAll() {
@@ -281,5 +287,18 @@ export default {
             margin-bottom: 1em;
             margin-top: 1.5em;
         }
+    }
+
+    .top-right-settings {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+    .top-right-settings .group-content {
+        z-index: 100;
+        box-shadow: 0 0 4px 2px #202020;
+    }
+    .schedule-title {
+        position: relative;
     }
 </style>

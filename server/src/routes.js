@@ -297,8 +297,6 @@ module.exports = ({ app, Cache, io }) => {
                 if (!ical) return res.status(400).send("No matches scheduled");
                 return res.header("Content-Type", "text/calendar").send(ical);
             }
-
-
         } catch (e) {
             console.error(e);
             return res.status(500).send(e.message);

@@ -14,7 +14,7 @@ export function getDataServerAddress() {
     if (import.meta.env.VITE_DATA_SERVER) return import.meta.env.VITE_DATA_SERVER;
 
     if (import.meta.env.VITE_DEPLOY_MODE === "local") {
-        return `//${window.location.hostname}:8901`;
+        return `${window.location.protocol}//${window.location.hostname}:8901`;
     }
     return "https://data.slmn.gg";
 }

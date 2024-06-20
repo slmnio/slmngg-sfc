@@ -58,9 +58,7 @@ export default {
         },
         webcalURL() {
             if (!this.calendarURL) return null;
-            const url = new URL(this.calendarURL);
-            url.protocol = "webcal";
-            return url.toString();
+            return this.calendarURL.replace(/^https?:/, "webcal:");
         },
         googleCalendarURL() {
             return `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(this.webcalURL)}`;

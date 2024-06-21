@@ -108,8 +108,8 @@ export default {
     .markdown:deep(img:hover) {
         transform: scale(1.02);
     }
-    .markdown:deep(p:last-child) {
-        margin-bottom: .5rem;
+    .markdown:deep(p:last-of-type) {
+        margin-bottom: 0;
     }
     .markdown:deep(a) {
         color: var(--theme-active, #66d9ff);

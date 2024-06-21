@@ -99,9 +99,17 @@
                     :match="match"
                     link-to-detailed-match />
 
-                <div v-if="showShowNotes && match.show_notes" class="show-notes mt-2">
-                    <h2>Show notes</h2>
-                    <Markdown :markdown="match.show_notes" />
+                <div v-if="showShowNotes && anyShowNotes" class="show-notes mt-2">
+                    <h2 class="text-center">Show notes</h2>
+                    <Markdown class="p-1 px-2 bg-dark rounded" :markdown="match.show_notes" />
+                    <div v-if="teamShowNotes" class="team-notes d-flex gap-2 mt-2">
+                        <div v-for="team in match.teams" :key="team.id" class="team-note w-50">
+                            <div v-if="team.show_notes">
+                                <h3 class="text-center">{{ team.name }}</h3>
+                                <Markdown class="p-1 px-2 bg-dark rounded" :markdown="team.show_notes" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="right-holder col-12 col-md-3">
@@ -175,7 +183,7 @@
                         Show non-event matches
                     </div>
                     <div
-                        v-if="match.show_notes"
+                        v-if="anyShowNotes"
                         :class="`btn btn-block btn-${showShowNotes ? 'light' : 'secondary'}`"
                         @click="showShowNotes = !showShowNotes">
                         <i class="fa-fw far fa-file-video"></i>
@@ -371,6 +379,12 @@ export default {
             const { isAuthenticated, user } = useAuthStore();
             if (!isAuthenticated) return false;
             return canEditMatch(user, { event: this.match?.event, match: this.match });
+        },
+        anyShowNotes() {
+            return !!this.match?.show_notes || this.teamShowNotes;
+        },
+        teamShowNotes() {
+            return (this.match?.teams || []).some(t => !!t.show_notes);
         }
     },
     methods: {

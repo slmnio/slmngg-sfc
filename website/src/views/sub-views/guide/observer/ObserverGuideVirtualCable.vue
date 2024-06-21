@@ -115,8 +115,8 @@
 </template>
 <script>
 import cableInstall from "@/assets/guide/cable_install.webm";
-import win11AudioRoute from "@/assets/guide/win11_ow_audio_route.mp4";
-import soundControl from "@/assets/guide/sound_control.mp4";
+import win11AudioRoute from "@/assets/guide/win11_ow_audio_route.webm";
+import soundControl from "@/assets/guide/sound_control.webm";
 
 export default {
     name: "ObserverGuideVirtualCable",

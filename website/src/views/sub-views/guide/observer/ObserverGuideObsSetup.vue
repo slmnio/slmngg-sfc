@@ -15,7 +15,7 @@
             Stream settings
         </h3>
         <p>
-            In OBS, create a new profile and close the auto-configuration wizard. Open the settings by clicking on the
+            In OBS, create a new profile and close the auto-configuration wizard. Open the settings by clicking on
             <strong>File > Settings</strong>.
         </p>
 
@@ -70,7 +70,7 @@
             </b-tab>
             <b-tab title="AMD HW H.265 (HEVC)">
                 <p>
-                    This is the best option. It'll use more network bandwidth and give you worse quality.
+                    This is the best option. It'll use less network bandwidth and give you better quality.
                 </p>
 
                 <ul>

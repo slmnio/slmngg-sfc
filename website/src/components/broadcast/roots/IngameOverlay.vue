@@ -20,7 +20,8 @@
                 :use-dots="useDots"
                 :first-to="match && match.first_to"
                 :event-info="i === 0 ? eventData : null"
-                :map-info="i === 1 ? mapInformation : null"
+                :show-event-maps="i === 1 ? showMapInformation : null"
+                :match="match"
             />
             <Middle
                 v-if="!basicMode"
@@ -256,23 +257,13 @@ export default {
         eventData() {
             if (!this.showEventData) return [];
             return [
-                this.broadcast?.event?.name,
+                this.broadcast?.event?.short || this.broadcast?.event?.name,
+                this.match.sub_event || "",
                 this.match.round || ""
             ].filter(Boolean);
         },
         showMapInformation() {
             return (this.broadcast?.broadcast_settings || []).includes("Show map information ingame");
-        },
-        mapInformation() {
-            if (!this.showMapInformation) return [];
-            /*
-            [
-                last map with winner,
-                current map with type,
-                next map or type
-            ]
-             */
-            return [];
         }
     },
     methods: {

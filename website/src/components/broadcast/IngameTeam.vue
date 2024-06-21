@@ -59,9 +59,9 @@
                 </div>
             </transition>
             <transition name="fly-in">
-                <div v-if="active && eventInfo?.length" class="event-info">
+                <div v-if="active && eventInfo?.length" class="event-info event-fly-in">
                     <squeezable>
-                        <div class="event-info-text">
+                        <div class="event-info-text industry-align">
                             <div v-for="(item, i) in eventInfo" :key="item" class="text" :style="{order: i * 2}">
                                 {{ item }}
                             </div>
@@ -70,6 +70,9 @@
                             </div>
                         </div>
                     </squeezable>
+                </div>
+                <div v-else-if="active && showEventMaps" class="event-maps event-fly-in">
+                    <IngameMaps :match="match" />
                 </div>
             </transition>
         </div>
@@ -83,11 +86,12 @@ import Squeezable from "@/components/broadcast/Squeezable.vue";
 import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
 import { logoBackground } from "@/utils/theme-styles";
 import { autoRecord } from "@/utils/content-utils";
+import IngameMaps from "@/components/broadcast/IngameMaps.vue";
 
 export default {
     name: "IngameTeam",
-    components: { Squeezable, ThemeTransition },
-    props: ["team", "active", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo", "colorLogoHolder", "eventInfo"],
+    components: { IngameMaps, Squeezable, ThemeTransition },
+    props: ["team", "active", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo", "colorLogoHolder", "eventInfo", "showEventMaps", "match"],
     data: () => ({
         textureData: {
             url: null,
@@ -461,17 +465,18 @@ export default {
         background-color: white;
     }
 
-    .event-info {
+    .event-fly-in {
         position: absolute;
         bottom: 100%;
         background-color: rgba(0,0,0,0.75);
+        color: white;
         width: 100%;
         left: 0;
         margin-bottom: 6px;
     }
-    .event-info .event-info-text {
+    .event-fly-in .event-info-text {
         height: 30px;
-        padding: 0 20px;
+        padding: 0 10px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -479,6 +484,9 @@ export default {
         font-size: 20px;
         text-transform: uppercase;
         min-width: 100%;
+    }
+    .event-info .event-info-text * {
+        transform: none !important;
     }
     .event-info .dash {
         margin: 0 0.5em;

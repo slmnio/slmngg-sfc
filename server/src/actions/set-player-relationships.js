@@ -15,14 +15,18 @@ function getLanguage(role) {
 module.exports = {
     key: "set-player-relationships",
     requiredParams: ["matchID", "roles"],
+    optionalParams: ["clientCams"],
     auth: ["client", "user"],
     /***
+     * @typedef {"Team 1" | "Team 2" | "None"} Cams
+     * @typedef {{ clientID: AnyAirtableID, cams: Cams[] }[]} CamsData
      * @param {Object?} params
      * @param {ClientData} client
+     * @param {CamsData} clientCams
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern
-    async handler({ matchID, roles }, { user }) {
+    async handler({ matchID, roles, clientCams }, { user }) {
 
         let match = await this.helpers.get(matchID);
         if (!match) throw "No match associated";
@@ -75,6 +79,20 @@ module.exports = {
         if (response?.error) {
             console.error("Airtable error", response.error);
             throw "Airtable error";
+        }
+
+        if (clientCams) {
+            console.log("Setting client cams", clientCams);
+            await Promise.all(clientCams.map(async ({ clientID, cams }) => {
+                const client = await this.helpers.get(clientID);
+                if (!client || client.__tableName !== "Clients") throw "Invalid client";
+
+                if (JSON.stringify(cams) === JSON.stringify(client.cams || [])) return null;
+
+                return this.helpers.updateRecord("Clients", client, {
+                    "Cams": cams
+                });
+            }).filter(Boolean));
         }
 
         return {

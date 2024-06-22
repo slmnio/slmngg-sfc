@@ -58,6 +58,8 @@
                     </transition>
                 </div>
             </transition>
+
+
             <transition name="fly-in">
                 <div v-if="active && eventInfo?.length" class="event-info event-fly-in">
                     <squeezable>
@@ -71,9 +73,7 @@
                         </div>
                     </squeezable>
                 </div>
-                <div v-else-if="active && showEventMaps" class="event-maps event-fly-in">
-                    <IngameMaps :match="match" />
-                </div>
+                <IngameMaps v-else-if="active && showEventMaps" class="event-maps event-fly-in" :match="match" :broadcast="broadcast" />
             </transition>
         </div>
     </ThemeTransition>
@@ -91,7 +91,7 @@ import IngameMaps from "@/components/broadcast/IngameMaps.vue";
 export default {
     name: "IngameTeam",
     components: { IngameMaps, Squeezable, ThemeTransition },
-    props: ["team", "active", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo", "colorLogoHolder", "eventInfo", "showEventMaps", "match"],
+    props: ["team", "active", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo", "colorLogoHolder", "eventInfo", "showEventMaps", "match", "broadcast"],
     data: () => ({
         textureData: {
             url: null,
@@ -470,12 +470,14 @@ export default {
         bottom: 100%;
         background-color: rgba(0,0,0,0.75);
         color: white;
-        width: 100%;
+        width: calc(100% - var(--team-expand));
         left: 0;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
+        transition: width 200ms ease;
+        height: 31px;
     }
     .event-fly-in .event-info-text {
-        height: 30px;
+        height: 31px;
         padding: 0 10px;
         display: flex;
         justify-content: space-between;
@@ -496,7 +498,7 @@ export default {
     }
 
     .fly-in-enter-active {
-        transition: all .75s ease 1.5s;
+        transition: all .75s ease 1.5s, width 200ms ease;
     }
     .fly-in-enter-from {
         transform: translate(0, -40px);
@@ -506,9 +508,14 @@ export default {
     }
 
     .fly-in-leave-active {
-        transition: opacity .3s ease;
+        transition: opacity .3s ease, width 200ms ease;
     }
     .fly-in-leave-to {
         opacity: 0;
+    }
+
+    .event-maps {
+        left: auto;
+        right: 0;
     }
 </style>

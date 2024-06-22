@@ -95,7 +95,7 @@
         <div class="spacer flex-grow-1"></div>
         <div class="area right-area">
             <div class="group text-end">
-                <div class="group-top">Break match</div>
+                <div v-b-tooltip="'Show live match on break'" class="group-top">Break match</div>
                 <div class="group-bottom">
                     <b-button
                         class="quick-button"
@@ -103,6 +103,19 @@
                         :pressed="broadcast.show_live_match"
                         :disabled="updateData?.showLiveMatch !== undefined"
                         @click="() => setLiveMatchVisibility(!broadcast.show_live_match)">
+                        <i class="fas fa-binoculars"></i>
+                    </b-button>
+                </div>
+            </div>
+            <div class="group text-end">
+                <div v-b-tooltip="'Advertise live match on SLMN.GG'" class="group-top">Advertise</div>
+                <div class="group-bottom">
+                    <b-button
+                        class="quick-button"
+                        :variant="broadcast.advertise ? 'primary' : 'secondary'"
+                        :pressed="broadcast.advertise"
+                        :disabled="updateData?.advertise !== undefined"
+                        @click="() => advertiseBroadcast(!broadcast.advertise)">
                         <i class="fas fa-signal-stream"></i>
                     </b-button>
                 </div>

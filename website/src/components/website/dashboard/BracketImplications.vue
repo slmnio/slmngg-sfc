@@ -133,7 +133,7 @@ export default {
 
                 const feederMatch = feederMatches.filter(match => this.match.id !== match.id)[0];
 
-                if ((feederMatch.first_to && [feederMatch.score_1, feederMatch.score_2].some(s => s === feederMatch.first_to))) {
+                if ((feederMatch?.first_to && [feederMatch?.score_1, feederMatch?.score_2].some(s => s === feederMatch?.first_to))) {
                     console.log("feeder match already finished");
 
                     if (feederMatch.feederTake === "Winner") {

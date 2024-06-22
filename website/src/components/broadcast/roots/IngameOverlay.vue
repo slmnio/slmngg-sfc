@@ -22,6 +22,7 @@
                 :event-info="i === 0 ? eventData : null"
                 :show-event-maps="i === 1 ? showMapInformation : null"
                 :match="match"
+                :broadcast="broadcast"
             />
             <Middle
                 v-if="!basicMode"
@@ -407,7 +408,8 @@ export default {
 
 .ingame-overlay.basic:deep(.small-overlay-text),
 .ingame-overlay.basic:deep(.team-score),
-.ingame-overlay.basic:deep(.attack-holder) {
+.ingame-overlay.basic:deep(.attack-holder),
+.ingame-overlay.basic:deep(.event-fly-in) {
     display: none !important;
 }
 

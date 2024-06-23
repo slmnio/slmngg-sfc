@@ -724,11 +724,12 @@ export default {
     .break-transition-top {
         height: 160px !important;
     }
-.break-area {
-    margin-top: 60px;
-    gap: 40px;
-}
-.break-transition-main {
-    flex-grow: 1;
-}
+    .break-area {
+        margin-top: 60px;
+        gap: 40px;
+        max-height: 620px;
+    }
+    .break-transition-main {
+        flex-grow: 1;
+    }
 </style>

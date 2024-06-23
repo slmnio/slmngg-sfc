@@ -490,6 +490,7 @@ export default {
 
 .internal-bracket {
     padding: 0 6px;
+    justify-content: center;
 }
 
 .internal-bracket + .internal-bracket {

@@ -198,9 +198,6 @@ export default {
         display: flex;
         width: 100%;
     }
-    .break-match.expanded .match-teams {
-        margin-left: .2em;
-    }
     .break-match:not(.expanded) .match-teams {
         margin-top: .2em
     }

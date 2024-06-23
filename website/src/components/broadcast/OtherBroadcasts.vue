@@ -16,6 +16,9 @@
                     <!--                        <span class="detail" v-if="broadcast.live_match.round">{{ broadcast.live_match.round}} </span>-->
                     <!--                        <span class="detail" v-if="broadcast.live_match.first_to">First to {{ broadcast.live_match.first_to}} </span>-->
                     <!--                    </div>-->
+                    <div v-if="teamsString(broadcast)" class="teams fw-bold">
+                        {{ teamsString(broadcast) }}
+                    </div>
                     <div v-if="broadcast.live_match && broadcast.live_match.casters" class="casters">
                         Casters: <LinkedPlayers class="caster-names" :players="broadcast.live_match.casters" />
                     </div>
@@ -77,6 +80,13 @@ export default {
                 _stream_link: broadcast?.stream_link || (broadcast?.channel_username?.[0] ? `twitch.tv/${broadcast?.channel_username?.[0]}` : null)
             }));
         }
+    },
+    methods: {
+        teamsString(broadcast) {
+            if (broadcast?.live_match?.special_event && broadcast?.live_match?.custom_name) return broadcast.live_match.custom_name;
+            if (!broadcast?.live_match?.teams?.length) return null;
+            return (broadcast?.live_match?.teams || []).map(t => t?.name).join(" vs ");
+        }
     }
 };
 </script>
@@ -112,7 +122,7 @@ export default {
         flex-grow: 1;
         padding: .25em 0;
     }
-    .broadcast-details > div {
+    .broadcast-details {
         margin-top: .25em;
     }
 

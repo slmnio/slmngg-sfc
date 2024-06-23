@@ -1,5 +1,5 @@
 <template>
-    <div v-if="user && user.name" class="container">
+    <div v-if="user && user.name" class="container-fluid container-lg">
         <h1 class="text-md-start text-center">SLMN.GG Dashboard</h1>
         <div v-if="client && client.broadcast" class="client-broadcasts d-flex flex-wrap flex-column flex-md-row align-items-center">
             <div class="wrapper mb-2">

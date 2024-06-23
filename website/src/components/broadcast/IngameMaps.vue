@@ -1,7 +1,7 @@
 <template>
     <div class="ingame-maps flex-center">
         <div v-for="map in maps" :key="map.id" class="map flex-center">
-            <div class="box flex-center" :style="map?.boxCSS">
+            <div class="box flex-center default-thing" :style="map?.boxCSS">
                 <div class="box-image bg-center" :style="map?.boxImageCSS"></div>
             </div>
             <div class="map-text industry-align">{{ map?.text }}</div>
@@ -57,25 +57,26 @@ export default {
                     if (setMap?.winner) {
                         // use winner
                         maps.push({
-                            text: setMap?.map?.shorter_name || setMap?.map?.name,
+                            text: setMap?.map?.shorter_name || setMap?.map?.name || presetType,
                             boxCSS: logoBackground(setMap?.winner?.theme),
                             boxImageCSS: resizedImage(setMap?.winner?.theme, ["small_logo", "default_logo"], "s-100")
                         });
                     } else if (setMap?.draw) {
                         // use grey?
                         maps.push({
-                            text: setMap?.map?.shorter_name || setMap?.map?.name,
-                            boxCSS: { },
-                            boxImageCSS: bg(MapTypeIcons[setMap?.map?.type])
+                            text: setMap?.map?.shorter_name || setMap?.map?.name || presetType,
+                            boxCSS: {
+                                backgroundColor: "#aaaaaa"
+                            },
+                            boxImageCSS: bg(MapTypeIcons[setMap?.map?.type || presetType])
                         });
                     } else {
                         // not complete
                         maps.push({
-                            text: setMap?.map?.shorter_name || setMap?.map?.name,
+                            text: setMap?.map?.shorter_name || setMap?.map?.name || presetType,
                             boxCSS: {
-                                backgroundColor: "#888888"
                             },
-                            boxImageCSS: bg(MapTypeIcons[setMap?.map?.type])
+                            boxImageCSS: bg(MapTypeIcons[setMap?.map?.type || presetType])
                         });
                     }
                 }
@@ -102,7 +103,7 @@ export default {
         height: var(--height);
         width: var(--height);
         flex-shrink: 0;
-        background-color: rgba(255,255,255,0.2);
+        /*background-color: rgba(255,255,255,0.2);*/
     }
 
     .box-image {

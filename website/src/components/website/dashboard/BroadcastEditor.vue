@@ -297,7 +297,7 @@ export default {
         margin-left: auto;
     }
     .group-top {
-        font-size: 0.7em;
+        font-size: 0.5em;
         text-transform: uppercase;
         font-weight: bold;
         margin-bottom: 0.25em;
@@ -326,16 +326,17 @@ export default {
     .btn-group.quick-button:deep(.btn),
     .broadcast-editor:deep(.btn.quick-button),
     .broadcast-editor:deep(.btn-group.quick-button .btn) {
-        font-size: 30px;
+        font-size: 24px;
         width: 2.5em;
         height: 2.5em;
         position: relative;
         padding: 0.1em .1em;
     }
+
     .btn-group.quick-button:deep(.btn+.btn.dropdown-toggle),
     .broadcast-editor:deep(.btn-group.quick-button .btn+.btn.dropdown-toggle) {
         width: 1.5em;
-        font-size: 20px;
+        font-size: 16px;
         height: 3.75em;
     }
     .btn-group.quick-button.no-main-button .btn:not(.dropdown-toggle),
@@ -404,5 +405,31 @@ export default {
         top: .33em;
         right: .33em;
         opacity: 0.7;
+    }
+
+
+    @media (min-width: 1200px) {
+        /* md */
+
+        .btn.quick-button,
+        .btn-group.quick-button:deep(.btn),
+        .broadcast-editor:deep(.btn.quick-button),
+        .broadcast-editor:deep(.btn-group.quick-button .btn) {
+            font-size: 30px;
+            width: 2.5em;
+            height: 2.5em;
+            position: relative;
+            padding: 0.1em .1em;
+        }
+        .btn-group.quick-button:deep(.btn+.btn.dropdown-toggle),
+        .broadcast-editor:deep(.btn-group.quick-button .btn+.btn.dropdown-toggle) {
+            width: 1.5em;
+            font-size: 20px;
+            height: 3.75em;
+        }
+
+        .group-top {
+            font-size: 0.7em;
+        }
     }
 </style>

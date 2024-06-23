@@ -714,7 +714,7 @@ export default {
 
     .break-others-info:deep(.broadcast-match) {
         font-size: 38px !important;
-        width: 300px !important;
+        width: 304px !important;
     }
 
     .break-others-info:deep(.broadcast) {

@@ -18,6 +18,7 @@
 
 <script>
 import LearnTitleChip from "@/components/website/guide/LearnTitleChip.vue";
+import { getDataServerAddress } from "@/utils/fetch";
 
 export default {
     name: "TwitchAuthScopeSelector",
@@ -45,7 +46,7 @@ export default {
     }),
     computed: {
         twitchAuthURL() {
-            return `${import.meta.env.VITE_DATA_SERVER}/twitch_auth/${this.selected.join(" ")}`;
+            return `${getDataServerAddress()}/twitch_auth/${this.selected.join(" ")}`;
         }
     },
     mounted() {

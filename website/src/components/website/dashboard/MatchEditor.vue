@@ -49,7 +49,7 @@
                     <b-button size="sm" @click="() => extraMaps++">
                         <i class="fas fa-fw fa-plus"></i> Add map
                     </b-button>
-                    <b-button class="ml-2 top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save {{ hideMatchExtras ? 'all' : 'maps' }}</b-button>
+                    <b-button class="top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save {{ hideMatchExtras ? 'all' : 'maps' }}</b-button>
                 </div>
             </div>
             <div class="maps-table-wrapper">
@@ -171,7 +171,7 @@
                         <i class="fas fa-save fa-fw"></i> Save details
                     </b-button>
                 </div>
-                <div class="match-details py-2">
+                <div class="match-details py-2 d-flex flex-column gap-2">
                     <b-form-group
                         label="Special Event"
                         description="Show this match with a single name and without teams."
@@ -197,16 +197,26 @@
                     <b-form-group
                         label-for="details-vod"
                         label="VOD"
-                        description="Long term storage, such as highlighted Twitch VODs or YouTube videos."
+                        description="Long term storage, such as highlighted Twitch VODs or YouTube videos. If the primary VOD is also uploaded to a separate platform (e.g. primary VOD is on Twitch, and it's also uploaded to YouTube), set it as the alternative VOD."
                         label-cols-lg="2"
                         label-cols-md="3">
-                        <b-form-input id="details-vod" v-model.trim="matchData.vod" type="url" placeholder="Long term storage URL, eg: https://www.twitch.tv/videos/642974687" />
+                        <b-form-input
+                            id="details-vod"
+                            v-model.trim="matchData.vod"
+                            type="url"
+                            placeholder="Long term storage URL, eg: https://www.twitch.tv/videos/642974687" />
                         <b-form-input
                             id="details-vod-2"
                             v-model.trim="matchData.vod_2"
                             class="mt-1"
                             type="url"
                             placeholder="Second part of VOD if needed" />
+                        <b-form-input
+                            id="details-alternative-vod"
+                            v-model.trim="matchData.alternative_vod"
+                            class="mt-1"
+                            type="url"
+                            placeholder="Alternative platform for main VOD" />
                     </b-form-group>
                 </div>
             </div>
@@ -237,7 +247,8 @@ export default {
             forfeit: null,
             forfeit_reason: null,
             vod: null,
-            vod_2: null
+            vod_2: null,
+            alternative_vod: null
         },
         draws: [],
         mapChoices: [],
@@ -783,5 +794,14 @@ export default {
 
     .draw-checkbox-wrapper:deep(.btn-light) {
         color: rgba(0,0,0,0.25);
+    }
+
+    .right-buttons {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        gap: .25em;
+        flex-wrap: wrap;
     }
 </style>

@@ -454,15 +454,35 @@ export function getEmbedData(url) {
 
         console.log(ts);
 
-        return { service: "youtube", key: vodURL.searchParams.get("v"), timestamp: ts || null };
+        return {
+            service: "youtube",
+            key: vodURL.searchParams.get("v"),
+            timestamp: ts || null,
+            display: {
+                text: "YouTube",
+                icon: "fab fa-youtube"
+            }
+        };
     }
     if (vodURL.host === "youtu.be") {
-        return { service: "youtube", key: vodURL.pathname.slice(1), timestamp: vodURL.searchParams.get("t") || null };
+        return {
+            service: "youtube",
+            key: vodURL.pathname.slice(1),
+            timestamp: vodURL.searchParams.get("t") || null,
+            display: {
+                text: "YouTube",
+                icon: "fab fa-youtube"
+            }
+        };
     }
     if (["www.twitch.tv", "twitch.tv"].includes(vodURL.host)) {
         const embed = {
             service: (vodURL.pathname.split("/").length === 3 ? "twitch" : "twitch-live"),
-            key: vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1)
+            key: vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1),
+            display: {
+                text: "Twitch",
+                icon: "fab fa-twitch"
+            }
         };
         if (embed.service === "twitch") {
             embed.timestamp = vodURL.searchParams.get("t") || null;
@@ -473,18 +493,33 @@ export function getEmbedData(url) {
     if (url.endsWith(".pdf")) {
         return {
             service: "pdf",
-            url
+            url,
+            display: {
+                text: "PDF",
+                icon: "fas fa-file-pdf"
+            }
         };
     }
 
     if (["mp4", "webm"].some(file => url.endsWith("." + file))) {
         return {
             service: "unknown-video",
-            url
+            url,
+            display: {
+                text: "Video",
+                icon: "fas fa-file-video"
+            }
         };
     }
 
-    return { service: "unknown", url };
+    return {
+        service: "unknown",
+        url,
+        display: {
+            text: "Unknown",
+            icon: "fas fa-file"
+        }
+    };
 }
 
 

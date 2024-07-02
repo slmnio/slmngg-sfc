@@ -352,3 +352,6 @@ input.no-arrows[type=number] {
 .text-muted {
     color: #6c757d !important;
 }
+small.text-body-secondary {
+    color: white !important;
+}

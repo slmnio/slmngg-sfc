@@ -23,6 +23,7 @@ module.exports = {
             "forfeit_reason": "Forfeit Reason",
             "vod": "VOD",
             "vod_2": "VOD 2",
+            "alternative_vod": "Alternative VOD",
         };
         let validatedData = {};
 

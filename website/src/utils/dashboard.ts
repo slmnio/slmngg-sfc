@@ -157,6 +157,7 @@ interface UpdateMatchDataData {
         forfeit_reason?: string
         vod?: string
         vod_2?: string
+        alternative_vod?: string
     }
 }
 

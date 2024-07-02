@@ -174,10 +174,10 @@ export default {
     height: fit-content;
 }
 
-.theme-transition.tt-border-left .theme-transition-inner { border-left: var(--tt-border-width) solid transparent; }
-.theme-transition.tt-border-right .theme-transition-inner { border-right: var(--tt-border-width) solid transparent; }
-.theme-transition.tt-border-top .theme-transition-inner { border-top: var(--tt-border-width) solid transparent; }
-.theme-transition.tt-border-bottom .theme-transition-inner { border-bottom: var(--tt-border-width) solid transparent; }
+.theme-transition.tt-border-left .theme-transition-inner { border-left: var(--tt-border-width) solid inherit; }
+.theme-transition.tt-border-right .theme-transition-inner { border-right: var(--tt-border-width) solid inherit; }
+.theme-transition.tt-border-top .theme-transition-inner { border-top: var(--tt-border-width) solid inherit; }
+.theme-transition.tt-border-bottom .theme-transition-inner { border-bottom: var(--tt-border-width) solid inherit; }
 
 .tt-enter-active,
 .tt-enter-active .theme-transition-inner,

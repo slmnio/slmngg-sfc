@@ -1,5 +1,5 @@
 <template>
-    <div class="ingame-maps flex-center">
+    <div class="ingame-maps flex-center" :class="{'small' : maps.length > 4}">
         <div v-for="map in maps" :key="map.id" class="map flex-center">
             <div class="box flex-center default-thing" :style="map?.boxCSS">
                 <div class="box-image bg-center" :style="map?.boxImageCSS"></div>
@@ -98,6 +98,9 @@ export default {
         font-size: 16px;
         --height: 31px;
         overflow: hidden;
+    }
+    .ingame-maps.small {
+        font-size: 13px;
     }
     .box {
         height: var(--height);

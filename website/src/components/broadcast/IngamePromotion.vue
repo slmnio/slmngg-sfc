@@ -63,21 +63,7 @@ import RebuiltThemeTransition from "@/components/broadcast/RebuiltThemeTransitio
 import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
 import { resizedImage } from "@/utils/images";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-
-const PRODUCTION_HIERARCHY = [
-    "Caster",
-    "Desk Host",
-    "Host",
-    "Interviewer",
-    "Director",
-    "Producer",
-    "Observer Director",
-    "Replay Operator",
-    "Observer",
-    "Lobby Admin",
-    "Stream Admin",
-    "Moderator"
-];
+import { PRODUCTION_HIERARCHY } from "@/utils/sorts";
 
 export default {
     name: "IngamePromotion",

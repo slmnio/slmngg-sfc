@@ -2,8 +2,20 @@
     <div class="event-schedule container">
         <div class="schedule-title">
             <h2 class="text-center">Schedule</h2>
-
-            <div class="d-flex w-100 flex-column align-items-end gap-1 top-right-settings">
+            <div class="d-flex w-100 justify-content-end align-items-center gap-1 top-right-settings">
+                <b-button-group v-if="showBroadcastSettings">
+                    <b-button title="Show batch checkboxes" :variant="showBatchCheckboxes ? 'primary' : 'secondary'" @click="showBatchCheckboxes = !showBatchCheckboxes">
+                        <i class="fas fa-check-square"></i>
+                    </b-button>
+                    <b-button title="Unselect matches" :variant="selectedMatches?.length ? 'danger' : 'secondary'" @click="batchSelectedMatches = {}">
+                        <i class="far fa-times-square"></i>
+                    </b-button>
+                    <BDropdown end :text="`Batch (${selectedMatches?.length || 0})`">
+                        <CreditCreator :ids="selectedMatches" dropdown-item />
+                        <BDropdownDivider />
+                        <BDropdownItem variant="danger" @click="batchSelectedMatches = {}"><i class="fas fa-trash fa-fw"></i> Clear selection</BDropdownItem>
+                    </BDropdown>
+                </b-button-group>
                 <b-dropdown auto-close="outside">
                     <template #button-content>
                         <i class="fas fa-cog fa-fw mr-1"></i>
@@ -11,7 +23,14 @@
                     </template>
                     <div class="dropdown-content d-flex flex-column align-items-end gap-3 p-3" style="min-width: min(100vw, 300px)">
                         <TimezoneSwapper align="left" :inline="true" />
-                        <b-form-group v-if="showBroadcastSettings" label-cols="auto" label-size="sm" label="Broadcast">
+                        <b-form-group label-cols="auto" label-size="sm" label="Sort">
+                            <b-form-select
+                                v-model="matchesSort"
+                                :options="['Default', 'Chronological']"
+                                size="sm"
+                                class="w-auto" />
+                        </b-form-group>
+                        <b-form-group v-if="showBroadcastSettings" label-cols="auto" label-size="sm" label="Set broadcast">
                             <b-form-select
                                 v-if="eventBroadcasts?.length"
                                 v-model="selectedBroadcastID"
@@ -53,7 +72,7 @@
             </div>
         </div>
 
-        <div v-if="activeScheduleGroup" class="schedule-matches mt-3">
+        <div v-if="activeScheduleGroup" class="schedule-matches mt-3" :class="{'no-gaps': matchesSort !== 'Default'}">
             <ScheduleMatch
                 v-for="(match, i) in groupMatches"
                 :key="match.id"
@@ -62,6 +81,7 @@
                 :custom-text="showAll && match.match_group ? match.match_group : null"
                 :can-edit-matches="showEditorButton"
                 :can-edit-broadcasts="showBroadcastSettings"
+                :show-batch-checkboxes="showBroadcastSettings && showBatchCheckboxes"
                 :selected-broadcast="selectedBroadcast" />
         </div>
     </div>
@@ -75,20 +95,29 @@ import { canEditMatch, isEventStaffOrHasRole } from "@/utils/client-action-permi
 import { useAuthStore } from "@/stores/authStore";
 import { useRouteQuery } from "@vueuse/router";
 import AddToCalendar from "@/components/website/AddToCalendar.vue";
+import { mapWritableState } from "pinia";
+import { useSettingsStore } from "@/stores/settingsStore";
+import CreditCreator from "@/components/website/CreditCreator.vue";
 
 
 export default {
     name: "EventSchedule",
-    components: { AddToCalendar, TimezoneSwapper, ScheduleMatch },
+    components: { CreditCreator, AddToCalendar, TimezoneSwapper, ScheduleMatch },
     props: ["event"],
     data: () => ({
         activeScheduleNum: useRouteQuery("page", undefined, { transform: val => val === "all" ? val : parseInt(val), mode: "replace" }),
         hideCompleted: false,
         hideNoVods: false,
         selectedBroadcastID: null,
-        showSettings: false
+        showSettings: false,
+        matchesSort: "Default"
     }),
     computed: {
+        ...mapWritableState(useSettingsStore, ["batchSelectedMatches"]),
+        ...mapWritableState(useSettingsStore, ["showBatchCheckboxes"]),
+        selectedMatches() {
+            return Object.entries(this.batchSelectedMatches || {}).filter(([id, selected]) => selected).map(([id, selected]) => id);
+        },
         showAll() {
             return this.activeScheduleNum === "all";
         },
@@ -181,24 +210,28 @@ export default {
                     if (a.start < b.start) return -1;
                 }
 
-                if (a.week > b.week) return 1;
-                if (a.week < b.week) return -1;
+                if (this.matchesSort === "Default") {
+                    if (a.week > b.week) return 1;
+                    if (a.week < b.week) return -1;
 
-                if (a.start === b.start) {
-                    if (a.match_number > b.match_number) return 1;
-                    if (a.match_number < b.match_number) return -1;
-                    return 0;
+                    if (a.day > b.day) return 1;
+                    if (a.day < b.day) return -1;
+
+                    if (a.start === b.start) {
+                        if (a.match_number > b.match_number) return 1;
+                        if (a.match_number < b.match_number) return -1;
+                        return 0;
+                    }
                 }
-
-
-                if (a.day > b.day) return 1;
-                if (a.day < b.day) return -1;
 
                 if (!a.start && !!b.start) return 1;
                 if (!!a.start && !b.start) return -1;
 
                 if (a.start > b.start) return 1;
                 if (a.start < b.start) return -1;
+
+                if (a.stream_code > b.stream_code) return 1;
+                if (a.stream_code < b.stream_code) return -1;
 
                 return 0;
             });
@@ -275,10 +308,10 @@ export default {
         text-decoration: underline;
     }
 
-    .match-wrapper.day-diff {
+    .schedule-matches:not(.no-gaps) .match-wrapper.day-diff {
         margin-top: 1.5em !important;
     }
-    .match-wrapper.week-diff {
+    .schedule-matches:not(.no-gaps) .match-wrapper.week-diff {
         margin-top: 2.5em !important;
     }
 

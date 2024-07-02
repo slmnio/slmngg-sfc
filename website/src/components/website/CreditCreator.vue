@@ -1,6 +1,7 @@
 <template>
-    <b-button v-b-modal.socials-modal>Credits</b-button>
-    <b-modal id="socials-modal" title="Credits" hide-footer>
+    <b-dropdown-item v-if="dropdownItem" v-b-modal.socials-modal>Credits</b-dropdown-item>
+    <b-button v-else v-b-modal.socials-modal>Credits</b-button>
+    <b-modal id="socials-modal" :title="titleText" hide-footer>
         <div v-for="template in templates" :key="template.name">
             <h2 class="d-flex align-items-center gap-2">
                 {{ template.name }}
@@ -12,6 +13,7 @@
 </template>
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { PRODUCTION_HIERARCHY, sortMatches } from "@/utils/sorts";
 
 // theoretically we could move this into airtable instead
 const roleMap = {
@@ -27,7 +29,11 @@ const roleMap = {
 
 export default {
     name: "CreditCreator",
-    props: ["id"],
+    props: {
+        id: String,
+        ids: Array,
+        dropdownItem: Boolean
+    },
     data: () => ({
         lastCopied: "",
         copyTimeout: null,
@@ -55,6 +61,10 @@ export default {
         ]
     }),
     computed: {
+        titleText() {
+            const count = this.matches?.length || 0;
+            return `Credits (${count} match${count === 1 ? "" : "es"})`;
+        },
         match() {
             return ReactiveRoot(this.id, {
                 casters: ReactiveArray("casters"),
@@ -65,22 +75,52 @@ export default {
                 })
             });
         },
+        matches() {
+            if (this.match?.id) return [this.match];
+            return ReactiveArray("ids", {
+                casters: ReactiveArray("casters"),
+                player_relationships: ReactiveArray("player_relationships", {
+                    player: ReactiveThing("player", {
+                        clients: ReactiveArray("clients")
+                    })
+                })
+            })({ ids: this.ids }).sort(sortMatches);
+        },
         playerRelationshipGroups() {
-            if (!this.match?.player_relationships) return [];
             const groups = {};
 
-            this.match?.player_relationships.forEach(rel => {
-                if (!groups[rel.singular_name]) {
-                    groups[rel.singular_name] = {
-                        meta: {
-                            player_text: rel.player_text,
-                            plural_name: rel.plural_name,
-                            singular_name: rel.singular_name
-                        },
-                        items: []
-                    };
-                }
-                groups[rel.singular_name].items = groups[rel.singular_name].items.concat(rel.player);
+            this.matches.forEach(match => {
+                (match?.player_relationships || []).forEach(rel => {
+                    if (!groups[rel.singular_name]) {
+                        groups[rel.singular_name] = {
+                            meta: {
+                                player_text: rel.player_text,
+                                plural_name: rel.plural_name,
+                                singular_name: rel.singular_name
+                            },
+                            items: []
+                        };
+                    }
+
+                    if (groups[rel.singular_name].items.every(item => item?.id !== rel?.player?.id)) {
+                        groups[rel.singular_name].items = groups[rel.singular_name].items.concat(rel.player);
+                    }
+                });
+                (match?.casters || []).forEach(caster => {
+                    if (!groups["Caster"]) {
+                        groups["Caster"] = {
+                            meta: {
+                                player_text: "Caster for",
+                                plural_name: "Casters",
+                                singular_name: "Caster"
+                            },
+                            items: []
+                        };
+                    }
+                    if (groups["Caster"].items.every(item => item?.id !== caster?.id)) {
+                        groups["Caster"].items = groups["Caster"].items.concat(caster);
+                    }
+                });
             });
 
             if (groups[undefined]) return [];
@@ -88,20 +128,17 @@ export default {
             return Object.values(groups);
         },
         groups() {
-            return [
-                {
-                    meta: {
-                        singular_name: "Caster",
-                        plural_name: "Casters"
-                    },
-                    items: this.match?.casters || []
-                },
-                ...this.playerRelationshipGroups
-            ].map(group => {
+            return this.playerRelationshipGroups.map(group => {
                 group.meta.name = group.items?.length === 1 ? group.meta.singular_name : group.meta.plural_name;
                 group.meta.emoji = roleMap[group.meta.singular_name] || "";
                 return group;
-            }).filter(g => g.items?.length);
+            }).filter(g => g.items?.length).sort((a, b) => {
+                const [ha, hb] = [a, b].map(x => PRODUCTION_HIERARCHY.indexOf(x.meta.singular_name));
+                if (ha === -1 && hb === -1) return 0;
+                if (ha === -1) return 1;
+                if (hb === -1) return -1;
+                return ha - hb;
+            });
         }
     },
     methods: {

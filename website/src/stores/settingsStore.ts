@@ -8,6 +8,7 @@ export const useSettingsStore = defineStore("settings", () => {
     const showBatchCheckboxes = ref(false);
     const restrictToMapPool = ref(true);
     const assumeLoserPicks = ref(true);
+    const gfxButtonCount = ref(6);
 
 
     const draftNotes = ref<Record<string, { tag: string, notes: string }>>({});
@@ -23,6 +24,7 @@ export const useSettingsStore = defineStore("settings", () => {
         batchSelectedMatches,
         showBatchCheckboxes,
         restrictToMapPool,
-        assumeLoserPicks
+        assumeLoserPicks,
+        gfxButtonCount
     };
 }, { persist: true });

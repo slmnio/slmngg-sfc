@@ -22,7 +22,7 @@
                 <div class="checkboxes">
                     <b-form-checkbox v-if="showRestrictCheckbox" id="map-pool-checkbox" v-model="restrictToMapPool" class="mr-2">Restrict to map pool</b-form-checkbox>
                     <b-form-checkbox id="map-ban-checkbox" v-model="showMapBanButtons" class="mr-2">Show map bans</b-form-checkbox>
-                    <b-form-checkbox id="loser-picks-checkbox" v-model="autoLoserPicks" class="mr-2">Assume loser picks</b-form-checkbox>
+                    <b-form-checkbox id="loser-picks-checkbox" v-model="assumeLoserPicks" class="mr-2">Assume loser picks</b-form-checkbox>
                 </div>
                 <div class="spacer" style="order:0"></div>
                 <div v-for="(team, i) in teams" :key="team.id" class="team" :class="{'end': i === 1}">
@@ -233,6 +233,7 @@ import TeamPicker from "@/components/website/dashboard/TeamPicker";
 import MapScoreEditor from "@/components/website/dashboard/MapScoreEditor";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { mapWritableState } from "pinia";
 
 export default {
     name: "MatchEditor",
@@ -264,11 +265,11 @@ export default {
         errorMessage: null,
         previousAutoData: null,
         scoreDebounceTimeouts: [],
-        restrictToMapPool: true,
-        showMapBanButtons: false,
-        autoLoserPicks: true
+        showMapBanButtons: false
     }),
     computed: {
+        ...mapWritableState(useSettingsStore, ["assumeLoserPicks"]),
+        ...mapWritableState(useSettingsStore, ["restrictToMapPool"]),
         teams() {
             const dummy = { dummy: true };
 
@@ -612,7 +613,7 @@ export default {
             this.winners.forEach((winnerID) => {
                 if (teamIDs[0] === winnerID) {
                     score[0]++;
-                } else {
+                } else if (teamIDs[1] === winnerID) {
                     score[1]++;
                 }
             });
@@ -628,7 +629,7 @@ export default {
                     // set left winner
 
                     this.winners[i] = this.teams[0].id;
-                    if (this.autoLoserPicks && this.maps?.[i + 1]) {
+                    if (this.assumeLoserPicks && this.maps?.[i + 1]) {
                         this.pickers[i + 1] = this.teams[1].id;
                     }
                     this.autoUpdateScore();
@@ -636,7 +637,7 @@ export default {
                     // set right winner
 
                     this.winners[i] = this.teams[1].id;
-                    if (this.autoLoserPicks && this.maps?.[i + 1]) {
+                    if (this.assumeLoserPicks && this.maps?.[i + 1]) {
                         this.pickers[i + 1] = this.teams[0].id;
                     }
                     this.autoUpdateScore();
@@ -647,7 +648,7 @@ export default {
             console.log("winner selected", i, teamID);
             if (!teamID) return;
 
-            if (this.autoLoserPicks && this.maps?.[i + 1] && !this.banners?.[i + 1]) {
+            if (this.assumeLoserPicks && this.maps?.[i + 1] && !this.banners?.[i + 1]) {
                 const teamIDs = this.teams.map(t => t?.id).filter(Boolean);
                 const loserID = teamIDs.find(id => id !== teamID);
                 // console.log("loser", loserID);

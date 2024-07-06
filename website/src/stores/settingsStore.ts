@@ -6,6 +6,10 @@ export const useSettingsStore = defineStore("settings", () => {
     const use24HourTime = ref(false);
     const editTimeInSiteTimezone = ref(false);
     const showBatchCheckboxes = ref(false);
+    const restrictToMapPool = ref(true);
+    const assumeLoserPicks = ref(true);
+
+
     const draftNotes = ref<Record<string, { tag: string, notes: string }>>({});
     const openDashboardModules = ref<Record<string, boolean>>({});
     const batchSelectedMatches = ref<Record<string, boolean>>({}); // I wish this could be a Set
@@ -17,6 +21,8 @@ export const useSettingsStore = defineStore("settings", () => {
         draftNotes,
         openDashboardModules,
         batchSelectedMatches,
-        showBatchCheckboxes
+        showBatchCheckboxes,
+        restrictToMapPool,
+        assumeLoserPicks
     };
 }, { persist: true });

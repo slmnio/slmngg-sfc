@@ -232,7 +232,7 @@ export default [
     },
     { path: "desk-graphics", component: () => import("@/components/broadcast/roots/DeskGraphicsOverlay.vue") },
     { path: "stinger", alias: "empty", component: () => import("@/components/broadcast/roots/EmptyStingerOverlay.vue") },
-    { path: "broadcasts", component: () => import("@/components/broadcast/roots/OtherBroadcastsOverlay.vue") },
+    { path: "broadcasts", alias: ["other-streams", "other-broadcasts"], component: () => import("@/components/broadcast/roots/OtherBroadcastsOverlay.vue") },
     { path: "mvp", component: () => import("@/components/broadcast/roots/MVPOverlay.vue") },
     {
         path: "ingame-comms",

@@ -132,4 +132,7 @@ export default {
     span.detail:last-child {
         margin-right: 0;
     }
+    .teams {
+        text-align: right;
+    }
 </style>

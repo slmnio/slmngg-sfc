@@ -33,9 +33,7 @@
                 <div class="icon-stack">
                     <i class="fas fa-fw fa-text"></i>
                     <i class="fas fa-fw fa-sliders-h top-describer-button"></i>
-                    <squeezable class="icon-text" align="center">
-                        <div style="font-size: 0.75em">{{ broadcast?.title }}</div>
-                    </squeezable>
+                    <div class="icon-text" style="font-size: 0.3em;">{{ broadcast?.title }}</div>
                 </div>
             </b-button>
             <BDropdown

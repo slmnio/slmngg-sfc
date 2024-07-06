@@ -79,6 +79,13 @@
                     <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title<span v-if="titleAutomated"> (automated) <i class="fas fa-sparkles"></i></span>
                 </b-button>
                 <b-button
+                    v-b-tooltip.top
+                    variant="secondary"
+                    class="ml-1"
+                    @click="setMarker">
+                    Set marker
+                </b-button>
+                <b-button
                     v-if="streamLink"
                     class="ml-2 no-link-style d-inline-block"
                     variant="outline-secondary"
@@ -282,6 +289,18 @@ export default {
             } finally {
                 this.titleProcessing = false;
             }
+        },
+        async setMarker() {
+            const markerText = prompt("Set a marker");
+            if (!markerText) return;
+            const response = await authenticatedRequest("actions/set-marker", {
+                text: markerText
+            });
+            if (response.error) return; // handled by internal
+            this.$notyf.success({
+                message: response.data,
+                duration: 20000
+            });
         },
         hasPermission(permission) {
             return (this.user.website_settings || []).includes(permission);

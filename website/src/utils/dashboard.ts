@@ -191,6 +191,10 @@ interface SetPlayerCamsData {
     cams: AnyAirtableID[][]
 }
 
+interface SetMarkerData {
+    text: string
+}
+
 
 type ActionRequestData<U> =
     U extends "actions/create-live-guest" ? CreateLiveGuestData :
@@ -213,6 +217,7 @@ type ActionRequestData<U> =
     U extends "actions/set-player-relationships" ? SetPlayerRelationshipsData :
     U extends "actions/adjust-match-broadcast" ? AdjustMatchBroadcastData :
     U extends "actions/set-player-cams" ? SetPlayerCamsData :
+    U extends "actions/set-marker" ? SetMarkerData :
     any;
 
 

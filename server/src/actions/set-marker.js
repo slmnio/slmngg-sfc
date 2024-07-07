@@ -23,7 +23,7 @@ module.exports = {
         const api = await getTwitchAPIClient(channel);
         const { match, team1, team2 } = await getMatchData(broadcast, true);
 
-        const markerText = text || [team1, team2].map(t => t.name).join("vs");
+        const markerText = text || (match.special_event ? match.custom_name : [team1, team2].map(t => t.name).join(" vs "));
 
         await api.streams.createStreamMarker(channel.channel_id, markerText);
 

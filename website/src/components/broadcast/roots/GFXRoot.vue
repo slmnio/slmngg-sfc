@@ -6,6 +6,7 @@
         <IframeOverlay v-if="gfx?.type === 'Iframe'" v-bind="overlayProps" />
         <StandingsOverlay v-if="gfx?.type === 'Standings'" v-bind="overlayProps" :stage="overlayProps.identifier" />
         <TextOverlay v-if="gfx?.type === 'Text'" v-bind="overlayProps" />
+        <MultiStandingsOverlay v-if="gfx?.type === 'Multi Standings'" v-bind="overlayProps" :stage-codes="gfx?.identifier?.split(',')" />
         <v-style>
             {{ gfx?.custom_css }}
         </v-style>
@@ -20,10 +21,11 @@ import ImageOverlay from "@/components/broadcast/roots/ImageOverlay.vue";
 import IframeOverlay from "@/components/broadcast/roots/IframeOverlay.vue";
 import StandingsOverlay from "@/components/broadcast/roots/StandingsOverlay.vue";
 import TextOverlay from "@/components/broadcast/roots/TextOverlay.vue";
+import MultiStandingsOverlay from "@/components/broadcast/roots/MultiStandingsOverlay.vue";
 
 export default {
     name: "GFXRoot",
-    components: { TextOverlay, StandingsOverlay, IframeOverlay, ImageOverlay, BracketOverlay, ScheduleOverlay },
+    components: { MultiStandingsOverlay, TextOverlay, StandingsOverlay, IframeOverlay, ImageOverlay, BracketOverlay, ScheduleOverlay },
     props: {
         index: Number,
         broadcast: Object,

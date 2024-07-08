@@ -3,7 +3,9 @@ import dns from "dns";
 import { fileURLToPath, URL } from "url";
 import { defineConfig } from "vite";
 import Components from "unplugin-vue-components/vite";
-import { BootstrapVueNextResolver } from "unplugin-vue-components/resolvers";
+import { BootstrapVueNextResolver } from "bootstrap-vue-next";
+import vueDevTools from 'vite-plugin-vue-devtools'
+
 
 // make sure we use localhost instead of 127.0.0.1
 dns.setDefaultResultOrder("verbatim");
@@ -14,7 +16,10 @@ export default defineConfig(({ mode }) => ({
         createVuePlugin(),
         Components({
             resolvers: [BootstrapVueNextResolver()]
-        })
+        }),
+        vueDevTools({
+            launchEditor: "webstorm"
+        }),
     ],
     build: {
         assetsInlineLimit: 0

@@ -83,6 +83,14 @@ export default [
                 redirect: "/learn"
             },
             {
+                path: "/livekit/send",
+                component: () => import("@/views/LiveKitSend.vue"),
+            },
+            {
+                path: "/livekit/receive",
+                component: () => import("@/views/LiveKitReceive.vue"),
+            },
+            {
                 path: "/learn/guides",
                 component: () => import("@/views/sub-views/guide/LearnWrapper.vue"),
                 props: () => ({ subtitle: "Guides" }),

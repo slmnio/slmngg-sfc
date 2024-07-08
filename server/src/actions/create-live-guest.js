@@ -1,4 +1,6 @@
-const { deAirtable } = require("../action-utils/action-utils");
+const { deAirtable,
+    cleanID
+} = require("../action-utils/action-utils");
 module.exports = {
     key: "create-live-guest",
     requiredParams: [],
@@ -24,7 +26,10 @@ module.exports = {
                 console.error("Airtable error", response.error);
                 throw "Airtable error";
             }
-            return deAirtable(response.fields);
+            return deAirtable({
+                ...response.fields,
+                id: cleanID(response?.id)
+            });
         } else {
             let response = await this.helpers.createRecord("Live Guests", {
                 "Discord ID": user.discord.id,
@@ -36,7 +41,10 @@ module.exports = {
                 console.error("Airtable error", response.error);
                 throw "Airtable error";
             }
-            return deAirtable(response[0].fields);
+            return deAirtable({
+                ...response[0].fields,
+                id: cleanID(response[0]?.id)
+            });
         }
     }
 };

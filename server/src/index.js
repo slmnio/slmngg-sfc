@@ -16,7 +16,7 @@ let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEG
 if (staffKeysRequired.every(key => process.env[key])) {
     require("./discord/staff.js");
 } else {
-    console.warn("Staff application system won't be set up. Set the required STAFFAPPS keys in server/.env")
+    console.warn("Staff application system won't be set up. Set the required STAFFAPPS keys in server/.env");
 }
 
 let domains = (process.env.CORS_VALID_DOMAINS || "slmn.gg,localhost").split(/, */g).map(d => new RegExp(`(?:^|.*\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
@@ -85,6 +85,19 @@ app.post("/things", bodyParser.json(), cors({ origin: corsHandle }), async (req,
     if (!ids?.length) return res.status(400).send({ error: true, message: "No IDs supplied" });
     if (ids?.length > 500) return res.status(400).send({ error: true, message: "Too many IDs supplied" });
     return handleThingsRequest(ids, req, res);
+});
+
+app.get("/get-player-cam-receiver-token", cors({ origin: corsHandle }), async (req, res) => {
+    const { AccessToken } = await import("livekit-server-sdk");
+
+    const at = new AccessToken("devkey", "secret", {
+        identity: crypto.randomUUID(),
+        ttl: "10m",
+    });
+    at.addGrant({ roomJoin: true, room: "player_cams", canSubscribe: true });
+
+    const token = await at.toJwt();
+    res.send(token);
 });
 
 async function handleThingsRequest(ids, req, res) {

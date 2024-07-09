@@ -237,8 +237,8 @@ export default {
             });
         },
         showEditorButton() {
-            const { user } = useAuthStore();
-            return canEditMatch(user, { event: this.event });
+            const { player } = useAuthStore();
+            return canEditMatch(player, { event: this.event });
         },
         _event() {
             return ReactiveRoot(this.event?.id, {

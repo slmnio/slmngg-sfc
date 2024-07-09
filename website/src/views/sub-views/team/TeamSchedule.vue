@@ -63,8 +63,8 @@ export default {
             });
         },
         showEditorButton() {
-            const { user } = useAuthStore();
-            return canEditMatch(user, { event: this.hydratedEvent });
+            const { player } = useAuthStore();
+            return canEditMatch(player, { event: this.hydratedEvent });
         }
     }
 };

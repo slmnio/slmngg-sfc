@@ -376,9 +376,9 @@ export default {
             return Object.values(groups);
         },
         matchEditable() {
-            const { isAuthenticated, user } = useAuthStore();
+            const { isAuthenticated, player } = useAuthStore();
             if (!isAuthenticated) return false;
-            return canEditMatch(user, { event: this.match?.event, match: this.match });
+            return canEditMatch(player, { event: this.match?.event, match: this.match });
         },
         anyShowNotes() {
             return !!this.match?.show_notes || this.teamShowNotes;

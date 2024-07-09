@@ -1,5 +1,13 @@
 const { dirtyID } = require("../action-utils/action-utils");
 
+function getPermissions(role) {
+    const permissions = {
+        "Match Editor": ["Producer", "Lobby Admin", "Commissioner", "Admin", "Event Director", "Tournament Director"]
+    };
+
+    return Object.entries(permissions).filter(([permissionName, roles]) => roles.includes(role)).map(([permissionName, roles]) => permissionName) || [];
+}
+
 function getLanguage(role) {
     const plural = {
         "Graphics Operator": "Graphics Operators"
@@ -52,7 +60,8 @@ module.exports = {
                     const [newRelationship] = await this.helpers.createRecord("Player Relationships", {
                         "Singular Name": roleKey,
                         "Player": [dirtyID(player.id)],
-                        ...getLanguage(roleKey)
+                        ...getLanguage(roleKey),
+                        "Permissions": getPermissions(roleKey)
                     });
 
                     await this.helpers.updateRecord("Players", player, {

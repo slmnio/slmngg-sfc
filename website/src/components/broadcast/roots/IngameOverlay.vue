@@ -406,7 +406,7 @@ export default {
     height: calc(100% - 1.5em) !important;
 }
 
-.ingame-overlay.basic:deep(.small-overlay-text),
+.ingame-overlay.basic:deep(.team-small-text),
 .ingame-overlay.basic:deep(.team-score),
 .ingame-overlay.basic:deep(.attack-holder),
 .ingame-overlay.basic:deep(.event-fly-in) {

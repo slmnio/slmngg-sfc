@@ -52,6 +52,7 @@ import IngameTeam from "@/components/broadcast/IngameTeam";
 import Middle from "@/components/broadcast/Middle";
 import Sponsors from "@/components/broadcast/Sponsors";
 import IngamePromotion from "@/components/broadcast/IngamePromotion.vue";
+import { getFormatOptions } from "@/utils/content-utils";
 
 export default {
     name: "IngameOverlay",
@@ -257,11 +258,14 @@ export default {
         },
         eventData() {
             if (!this.showEventData) return [];
-            return [
-                this.broadcast?.event?.short || this.broadcast?.event?.name,
-                this.match.sub_event || "",
-                this.match.round || ""
-            ].filter(Boolean);
+
+            const formatOptions = getFormatOptions(this.broadcast?.event, this.match);
+            const format = this.broadcast?.ingame_details_format || "event_short,event_sub_event,match_round";
+
+            return format.split(",").map(key => {
+                key = key.replaceAll(/[{}]/g,"");
+                return formatOptions[key] || "";
+            }).filter(Boolean);
         },
         showMapInformation() {
             return (this.broadcast?.broadcast_settings || []).includes("Show map information ingame");

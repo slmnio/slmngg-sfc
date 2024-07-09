@@ -618,3 +618,27 @@ export function autoRecord(team, stage) {
 
     return [wins, losses].join(" - ");
 }
+
+export function getFormatOptions(event, match) {
+    return {
+        event: event.name,
+        event_name: event.name,
+        event_long: event.name,
+        event_short: event.short,
+
+        team_1_code: match?.teams?.[0]?.code,
+        team_1_name: match?.teams?.[0]?.name,
+        team_2_code: match?.teams?.[1]?.code,
+        team_2_name: match?.teams?.[1]?.name,
+
+        match_custom_name: match?.custom_name,
+        match_sub_event: match?.sub_event,
+        match_group: match?.match_group,
+        match_round: match?.round,
+        match_number: match?.match_number,
+        match_week_text: match?.week_text,
+        match_week_number: match?.week,
+        match_day: match?.day,
+        match_first_to: match?.first_to
+    };
+}

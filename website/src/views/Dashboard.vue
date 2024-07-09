@@ -126,7 +126,7 @@
 <script>
 import { socket } from "@/socket";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { url } from "@/utils/content-utils";
+import { getFormatOptions, url } from "@/utils/content-utils";
 import BroadcastSwitcher from "@/components/website/dashboard/BroadcastSwitcher";
 import MatchThumbnail from "@/components/website/match/MatchThumbnail";
 import MatchEditor from "@/components/website/dashboard/MatchEditor";
@@ -243,27 +243,7 @@ export default {
             const event = this.broadcast?.event || this.liveMatch?.event;
             if (!event) return null;
 
-            const formatOptions = {
-                event: event.name,
-                event_name: event.name,
-                event_long: event.name,
-                event_short: event.short,
-
-                team_1_code: this.liveMatch?.teams?.[0]?.code,
-                team_1_name: this.liveMatch?.teams?.[0]?.name,
-                team_2_code: this.liveMatch?.teams?.[1]?.code,
-                team_2_name: this.liveMatch?.teams?.[1]?.name,
-
-                match_custom_name: this.liveMatch?.custom_name,
-                match_sub_event: this.liveMatch?.sub_event,
-                match_group: this.liveMatch?.match_group,
-                match_round: this.liveMatch?.round,
-                match_number: this.liveMatch?.match_number,
-                match_week_text: this.liveMatch?.week_text,
-                match_week_number: this.liveMatch?.week,
-                match_day: this.liveMatch?.day,
-                match_first_to: this.liveMatch?.first_to
-            };
+            const formatOptions = getFormatOptions(event, this.liveMatch);
 
             let newTitle = this.broadcast.title_format;
 

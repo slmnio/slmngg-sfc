@@ -163,7 +163,7 @@ export default {
         BreakDisplayMultiModal,
         ObserverSettingsModal
     },
-    props: ["client"],
+    props: ["broadcast"],
     data: () => ({
         updateData: { },
         broadcastUpdateTimeout: null,
@@ -172,9 +172,6 @@ export default {
         }
     }),
     computed: {
-        broadcast() {
-            return this.client.broadcast?.[0] || {};
-        },
         match() {
             return this.broadcast?.live_match || {};
         },

@@ -1,7 +1,7 @@
 <template>
     <div v-if="user && user.name" class="container-fluid container-lg">
         <h1 class="text-md-start text-center">SLMN.GG Dashboard</h1>
-        <div v-if="client && client.broadcast" class="client-broadcasts d-flex flex-wrap flex-column flex-md-row align-items-center">
+        <div v-if="client && broadcast" class="client-broadcasts d-flex flex-wrap flex-column flex-md-row align-items-center">
             <div class="wrapper mb-2">
                 <BroadcastSwitcher :broadcasts="client.broadcast" />
                 <router-link v-if="liveMatch" :to="url('detailed', liveMatch)">
@@ -24,8 +24,8 @@
                 </div>
             </div>
         </div>
-        <div v-if="client && client.broadcast" class="broadcast-editor mb-2">
-            <BroadcastEditor :client="client" />
+        <div v-if="broadcast" class="broadcast-editor mb-2">
+            <BroadcastEditor :broadcast="broadcast" />
         </div>
         <DashboardModule
             v-if="liveMatch?.id"
@@ -165,26 +165,9 @@ export default {
                     broadcast: ReactiveArray("broadcast", {
                         event: ReactiveThing("event", {
                             theme: ReactiveThing("theme")
-                        }),
-                        theme_override: ReactiveThing("theme_override"),
-                        live_match: ReactiveThing("live_match", {
-                            maps: ReactiveArray("maps", {
-                                map: ReactiveThing("map"),
-                                winner: ReactiveThing("winner"),
-                                banner: ReactiveThing("banner"),
-                                picker: ReactiveThing("picker")
-                            }),
-                            teams: ReactiveArray("teams", {
-                                theme: ReactiveThing("theme")
-                            }),
-                            event: ReactiveThing("event", {
-                                broadcasts: ReactiveThing("broadcasts"),
-                                theme: ReactiveThing("theme")
-                            })
-                        }),
-                        gfx: ReactiveArray("gfx")
+                        })
                     })
-                }) // TODO: make this just client
+                })
             });
         },
         titleAutomated() {
@@ -197,7 +180,29 @@ export default {
             return client;
         },
         broadcast() {
-            return this.client?.broadcast?.[0];
+            if (!this.client?.broadcast?.[0]?.id) return null;
+            return ReactiveRoot(this.client?.broadcast?.[0]?.id, {
+                event: ReactiveThing("event", {
+                    theme: ReactiveThing("theme")
+                }),
+                theme_override: ReactiveThing("theme_override"),
+                live_match: ReactiveThing("live_match", {
+                    maps: ReactiveArray("maps", {
+                        map: ReactiveThing("map"),
+                        winner: ReactiveThing("winner"),
+                        banner: ReactiveThing("banner"),
+                        picker: ReactiveThing("picker")
+                    }),
+                    teams: ReactiveArray("teams", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    event: ReactiveThing("event", {
+                        broadcasts: ReactiveThing("broadcasts"),
+                        theme: ReactiveThing("theme")
+                    })
+                }),
+                gfx: ReactiveArray("gfx")
+            });
         },
         streamLink() {
             return this.broadcast?.stream_link || (this.broadcast?.channel_username?.[0] ? `twitch.tv/${this.broadcast?.channel_username?.[0]}` : null);

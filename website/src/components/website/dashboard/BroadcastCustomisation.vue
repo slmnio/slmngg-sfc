@@ -1,9 +1,12 @@
 <template>
-    <div class="broadcast-customisation p-2 d-flex flex-column gap-3">
+    <div class="broadcast-customisation p-2 d-flex flex-column gap-2">
         <b-form-checkbox v-model="changeInstantly" switch>Change instantly</b-form-checkbox>
 
         <div class="form-row row flex-nowrap flex-center">
-            <div class="label text-nowrap flex-shrink-0 fw-bold col-2">Highlight team</div>
+            <div class="label text-nowrap flex-shrink-0 fw-bold col-2">
+                <span class="d-none d-lg-inline">Highlight team</span>
+                <span class="d-lg-none">Team</span>
+            </div>
             <div class="col-10 d-flex gap-2">
                 <theme-logo
                     :theme="hydratedBroadcast?.highlight_team?.theme"
@@ -16,6 +19,7 @@
                     :class="{'low-opacity': processing.highlight_team}"
                     :disabled="processing.highlight_team"
                     class="opacity-changes"
+                    size="sm"
                     :options="teams"
                     @update:model-value="t => setTeam(t, changeInstantly)" />
                 <b-button
@@ -23,6 +27,7 @@
                     class="opacity-changes text-nowrap flex-shrink-0 disabled-low-opacity"
                     :disabled="changeInstantly || processing.highlight_team"
                     variant="success"
+                    size="sm"
                     @click="setTeam(selectedHighlightTeamID, true)">
                     <i class="fas fa-save fa-fw"></i> {{ changeInstantly ? "Autosave" : "Save" }}
                 </b-button>
@@ -31,6 +36,7 @@
                     :disabled="processing.highlight_team"
                     class="opacity-changes text-nowrap flex-shrink-0"
                     variant="danger"
+                    size="sm"
                     @click="setTeam(null, true)">
                     <i class="fas fa-times fa-fw"></i> Clear
                 </b-button>
@@ -39,7 +45,10 @@
 
 
         <div class="form-row row flex-nowrap flex-center">
-            <div class="label text-nowrap flex-shrink-0 fw-bold col-2">Highlight hero</div>
+            <div class="label text-nowrap flex-shrink-0 fw-bold col-2">
+                <span class="d-none d-lg-inline">Highlight hero</span>
+                <span class="d-lg-none">Hero</span>
+            </div>
             <div class="col-10 d-flex gap-2">
                 <div class="hero-image flex-shrink-0 bg-center" :style="resizedImage(hydratedBroadcast.highlight_hero, ['main_image'], 'h-76')"></div>
                 <b-form-select
@@ -48,12 +57,14 @@
                     :disabled="processing.highlight_hero"
                     class="opacity-changes"
                     :options="heroes"
+                    size="sm"
                     @update:model-value="h => setHero(h, changeInstantly)" />
                 <b-button
                     :class="{'low-opacity': processing.highlight_hero}"
                     class="opacity-changes text-nowrap flex-shrink-0 disabled-low-opacity"
                     :disabled="changeInstantly || processing.highlight_hero"
                     variant="success"
+                    size="sm"
                     @click="setHero(selectedHighlightHeroID, true)">
                     <i class="fas fa-save fa-fw"></i> {{ changeInstantly ? "Autosave" : "Save" }}
                 </b-button>
@@ -62,6 +73,7 @@
                     :disabled="processing.highlight_hero"
                     class="opacity-changes text-nowrap flex-shrink-0"
                     variant="danger"
+                    size="sm"
                     @click="setHero(null, true)">
                     <i class="fas fa-times fa-fw"></i> Clear
                 </b-button>
@@ -70,7 +82,10 @@
 
 
         <div class="form-row row flex-nowrap flex-center">
-            <div class="label text-nowrap flex-shrink-0 fw-bold col-2">Highlight player</div>
+            <div class="label text-nowrap flex-shrink-0 fw-bold col-2">
+                <span class="d-none d-lg-inline">Highlight player</span>
+                <span class="d-lg-none">Player</span>
+            </div>
             <div class="col-10 d-flex gap-2">
                 <div class="flex-shrink-0 bg-center player-name text-center flex-center">
                     <div>{{ hydratedBroadcast.highlight_player?.name }}</div>
@@ -81,12 +96,14 @@
                     :disabled="processing.highlight_player"
                     class="opacity-changes"
                     :options="players"
+                    size="sm"
                     @update:model-value="h => setPlayer(h, changeInstantly)" />
                 <b-button
                     :class="{'low-opacity': processing.highlight_player}"
                     class="opacity-changes text-nowrap flex-shrink-0 disabled-low-opacity"
                     :disabled="changeInstantly || processing.highlight_player"
                     variant="success"
+                    size="sm"
                     @click="setPlayer(selectedHighlightPlayerID, true)">
                     <i class="fas fa-save fa-fw"></i> {{ changeInstantly ? "Autosave" : "Save" }}
                 </b-button>
@@ -95,6 +112,7 @@
                     :disabled="processing.highlight_player"
                     class="opacity-changes text-nowrap flex-shrink-0"
                     variant="danger"
+                    size="sm"
                     @click="setPlayer(null, true)">
                     <i class="fas fa-times fa-fw"></i> Clear
                 </b-button>
@@ -103,7 +121,10 @@
 
 
         <div class="form-row row flex-nowrap flex-center">
-            <div class="label text-nowrap flex-shrink-0 fw-bold col-2">Highlight media</div>
+            <div class="label text-nowrap flex-shrink-0 fw-bold col-2">
+                <span class="d-none d-lg-inline">Highlight media</span>
+                <span class="d-lg-none">Media</span>
+            </div>
             <div class="col-10 d-flex gap-2">
                 <div class="flex-shrink-0 bg-center media-name text-center flex-center">
                     <div>{{ hydratedBroadcast.highlight_media?.name }}</div>
@@ -114,12 +135,14 @@
                     :disabled="processing.highlight_media"
                     class="opacity-changes"
                     :options="medias"
+                    size="sm"
                     @update:model-value="h => setMedia(h, changeInstantly)" />
                 <b-button
                     :class="{'low-opacity': processing.highlight_media}"
                     class="opacity-changes text-nowrap flex-shrink-0 disabled-low-opacity"
                     :disabled="changeInstantly || processing.highlight_media"
                     variant="success"
+                    size="sm"
                     @click="setMedia(selectedHighlightMediaID, true)">
                     <i class="fas fa-save fa-fw"></i> {{ changeInstantly ? "Autosave" : "Save" }}
                 </b-button>
@@ -128,6 +151,7 @@
                     :disabled="processing.highlight_media"
                     class="opacity-changes text-nowrap flex-shrink-0"
                     variant="danger"
+                    size="sm"
                     @click="setMedia(null, true)">
                     <i class="fas fa-times fa-fw"></i> Clear
                 </b-button>
@@ -317,8 +341,8 @@ export default {
 
 <style scoped>
     .preview-theme, .hero-image, .player-name, .media-name {
-        height: 2.5em;
-        width: 3em;
+        height: 2em;
+        width: 2.5em;
         background-color: rgba(255, 255, 255, 0.1)
     }
     .player-name, .media-name {

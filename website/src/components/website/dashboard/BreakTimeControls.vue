@@ -29,6 +29,20 @@
                 </b-button>
             </div>
         </div>
+        <div v-if="showLiveMatch" class="d-flex gap-2 opacity-changes" :class="{'low-opacity': processing}">
+            <div class="flex-grow-1 d-flex gap-3">
+                <div class="stack">
+                    <div class="label small text-muted">From match start ({{ formatTime(broadcast.live_match.start, { format: "{time} {tz}" }) }})</div>
+                    <div class="div d-flex gap-1">
+                        <b-button variant="success" @click="setManualCountdownEnd(new Date(broadcast.live_match.start).getTime() - (5 * 60 * 1000))">-5:00</b-button>
+                        <b-button variant="success" @click="setManualCountdownEnd(new Date(broadcast.live_match.start).getTime() - (2 * 60 * 1000))">-2:00</b-button>
+                        <b-button variant="secondary" @click="setManualCountdownEnd(new Date(broadcast.live_match.start).getTime())">Start</b-button>
+                        <b-button variant="success" @click="setManualCountdownEnd(new Date(broadcast.live_match.start).getTime() + (2 * 60 * 1000))">+2:00</b-button>
+                        <b-button variant="success" @click="setManualCountdownEnd(new Date(broadcast.live_match.start).getTime() + (5 * 60 * 1000))">+5:00</b-button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="d-flex gap-2 opacity-changes" :class="{'low-opacity': processing}">
             <div class="flex-grow-1">
                 <div class="d-flex gap-1">
@@ -76,6 +90,7 @@
 import { authenticatedRequest } from "@/utils/dashboard";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";
 import Countdown from "@/components/broadcast/Countdown.vue";
+import { formatTime } from "../../../utils/content-utils";
 
 export default {
     name: "BreakTimeControls",
@@ -96,9 +111,17 @@ export default {
     computed: {
         customDuration() {
             return (this.hours * 60 * 60) + (this.minutes * 60) + this.seconds;
+        },
+        showLiveMatch() {
+            if (!this.broadcast?.live_match?.start) return false;
+            const now = new Date();
+            const matchStart = new Date(this.broadcast.live_match.start);
+            const diff = Math.floor((matchStart - now) / 1000);
+            return diff > 2 * 60;
         }
     },
     methods: {
+        formatTime,
         async setManualCountdownEnd(dateString) {
             this.manualProcessing = true;
             return await this.setCountdownEnd((new Date(dateString)).getTime());

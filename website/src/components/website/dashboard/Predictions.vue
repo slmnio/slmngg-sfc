@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 flex-wrap">
         <b-button-group>
             <b-button :disabled="processing" variant="success" @click="createPred({ type: 'match' })"><i class="fas fa-fw fa-plus-hexagon mr-1"></i>Create Match</b-button>
             <b-button :disabled="processing" variant="light" @click="resolvePred({ type: 'match' })"><i class="fas fa-fw fa-hand-holding-usd mr-1"></i>Resolve</b-button>

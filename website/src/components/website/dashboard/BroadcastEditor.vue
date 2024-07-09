@@ -121,12 +121,12 @@
                 </div>
             </div>
             <div class="group text-end">
-                <div class="group-top">Twitch Title</div>
+                <div class="group-top">Marker</div>
                 <div class="group-bottom">
                     <div class="fake-btn-group">
-                        <b-button class="quick-button" :disabled="processing?.twitchTitle" @click="setTwitchTitle">
+                        <b-button class="quick-button" :disabled="processing?.setMarker" @click="setMarker">
                             <div class="icon-stack">
-                                <i class="fal fa-wand-magic"></i>
+                                <i class="fas fa-marker"></i>
                             </div>
                         </b-button>
                     </div>
@@ -275,7 +275,24 @@ export default {
             } finally {
                 this.processing.twitchTitle = false;
             }
-        }
+        },
+        async setMarker() {
+            this.processing.setMarker = true;
+            const markerText = prompt("Set a marker");
+            if (!markerText) return;
+            try {
+                const response = await authenticatedRequest("actions/set-marker", {
+                    text: markerText
+                });
+                if (response.error) return; // handled by internal
+                this.$notyf.success({
+                    message: response.data,
+                    duration: 10000
+                });
+            } finally {
+                this.processing.setMarker = false;
+            }
+        },
 
     }
 };

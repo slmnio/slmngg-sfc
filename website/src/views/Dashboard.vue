@@ -74,56 +74,54 @@
                 class="mb-2"
                 title="Twitch Controls"
                 icon-class="fas fa-wrench"
-                content-class="p-2">
+                content-class="">
                 <template v-if="streamLink" #header>{{ streamLink }}</template>
-                <Predictions v-if="liveMatch" :client="client" />
-                <Commercials v-if="hasPermission('Full broadcast permissions')" :client="client" />
-                <div class="mt-2">
-                    <b-button
-                        v-b-tooltip.top
-                        variant="secondary"
-                        :disabled="titleProcessing || !liveMatch || !broadcast?.title_format"
-                        :title="`Title will be set to: '${parsedTitle}'`"
-                        @click="updateTitle">
-                        <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title<span v-if="titleAutomated"> (automated) <i
-                            class="fas fa-sparkles"></i></span>
-                    </b-button>
-                    <b-button
-                        v-b-tooltip.top
-                        variant="secondary"
-                        class="ml-1"
-                        @click="setMarker">
-                        Set marker
-                    </b-button>
-                    <b-button
-                        v-if="streamLink"
-                        class="ml-2 no-link-style d-inline-block"
-                        variant="outline-secondary"
-                        :href="`https://${streamLink}`"
-                        target="_blank">
-                        Stream <i class="fas fa-fw fa-external-link"></i>
-                    </b-button>
-                    <b-button
-                        v-if="streamLink"
-                        class="ml-2 no-link-style d-inline-block"
-                        variant="outline-secondary"
-                        :href="`https://${streamLink}/chat`"
-                        target="_blank">
-                        <i class="fab mr-1 fa-twitch"></i> Chat <i class="fas fa-fw fa-external-link"></i>
-                    </b-button>
-                    <b-button
-                        v-if="twitchChannelName"
-                        class="ml-2 no-link-style d-inline-block"
-                        variant="outline-secondary"
-                        :href="`https://dashboard.twitch.tv/u/${twitchChannelName}`"
-                        target="_blank">
-                        <i class="fab mr-1 fa-twitch"></i> Dashboard <i class="fas fa-fw fa-external-link"></i>
-                    </b-button>
+                <div class="d-flex gap-2 flex-wrap flex-column p-2">
+                    <Predictions v-if="liveMatch" :client="client" />
+                    <Commercials v-if="hasPermission('Full broadcast permissions')" :client="client" />
+                    <div class="d-flex gap-2 flex-wrap">
+                        <b-button
+                            variant="secondary"
+                            :disabled="titleProcessing || !liveMatch || !broadcast?.title_format"
+                            :title="`Title will be set to: '${parsedTitle}'`"
+                            @click="updateTitle">
+                            <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title<span v-if="titleAutomated"> (automated) <i
+                                class="fas fa-sparkles"></i></span>
+                        </b-button>
+                        <b-button
+                            variant="secondary"
+                            @click="setMarker">
+                            Set stream marker
+                        </b-button>
+                        <b-button
+                            v-if="streamLink"
+                            class="no-link-style d-inline-block"
+                            variant="outline-secondary"
+                            :href="`https://${streamLink}`"
+                            target="_blank">
+                            Stream <i class="fas fa-fw fa-external-link"></i>
+                        </b-button>
+                        <b-button
+                            v-if="streamLink"
+                            class="no-link-style d-inline-block"
+                            variant="outline-secondary"
+                            :href="`https://${streamLink}/chat`"
+                            target="_blank">
+                            <i class="fab mr-1 fa-twitch"></i> Chat <i class="fas fa-fw fa-external-link"></i>
+                        </b-button>
+                        <b-button
+                            v-if="twitchChannelName"
+                            class="no-link-style d-inline-block"
+                            variant="outline-secondary"
+                            :href="`https://dashboard.twitch.tv/u/${twitchChannelName}`"
+                            target="_blank">
+                            <i class="fab mr-1 fa-twitch"></i> Dashboard <i class="fas fa-fw fa-external-link"></i>
+                        </b-button>
+                    </div>
                 </div>
             </DashboardModule>
             <DashboardModule
                 v-if="useTeamComms"
-                class="mb-2"
                 icon-class="fas fa-microphone"
                 title="Team Comms Listen-In">
                 <CommsControls :match="liveMatch" />
@@ -299,7 +297,7 @@ export default {
             if (response.error) return; // handled by internal
             this.$notyf.success({
                 message: response.data,
-                duration: 20000
+                duration: 10000
             });
         },
         hasPermission(permission) {

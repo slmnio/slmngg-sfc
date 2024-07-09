@@ -27,7 +27,7 @@ module.exports = {
         highlightMediaID
     }, { client }) {
         let broadcast = await this.helpers.get(client?.broadcast?.[0]);
-        if (!broadcast) throw ("No broadcast associated");
+        if (!broadcast?.id) throw ("No broadcast associated");
 
         console.log({ matchID, advertise, playerCams, mapAttack, title, manualGuests, deskDisplayMode, deskDisplayText, showLiveMatch, highlightTeamID, highlightHeroID, highlightPlayerID, highlightMediaID });
         let validatedData = {};
@@ -37,7 +37,7 @@ module.exports = {
                 validatedData["Live Match"] = null;
             } else {
                 let match = await this.helpers.get(matchID);
-                if (!match) throw ("Unknown match");
+                if (!match?.id) throw ("Unknown match");
                 if (match.__tableName !== "Matches") throw ("Live match object is not a Match");
                 validatedData["Live Match"] = [ match.id ];
             }
@@ -47,7 +47,7 @@ module.exports = {
                 validatedData["Highlight Team"] = null;
             } else {
                 let team = await this.helpers.get(highlightTeamID);
-                if (!team) throw ("Unknown highlight team");
+                if (!team?.id) throw ("Unknown highlight team");
                 if (team.__tableName !== "Teams") throw ("Highlight team object is not a Team");
                 validatedData["Highlight Team"] = [ team.id ];
             }
@@ -57,7 +57,7 @@ module.exports = {
                 validatedData["Highlight Hero"] = null;
             } else {
                 let hero = await this.helpers.get(highlightHeroID);
-                if (!hero) throw ("Unknown highlight hero");
+                if (!hero?.id) throw ("Unknown highlight hero");
                 if (hero.__tableName !== "Heroes") throw ("Highlight hero object is not a Hero");
                 validatedData["Highlight Hero"] = [ hero.id ];
             }
@@ -67,7 +67,7 @@ module.exports = {
                 validatedData["Highlight Player"] = null;
             } else {
                 let player = await this.helpers.get(highlightPlayerID);
-                if (!player) throw ("Unknown highlight player");
+                if (!player?.id) throw ("Unknown highlight player");
                 if (player.__tableName !== "Players") throw ("Highlight player object is not a Player");
                 validatedData["Highlight Player"] = [ player.id ];
             }
@@ -77,7 +77,7 @@ module.exports = {
                 validatedData["Highlight Media"] = null;
             } else {
                 let media = await this.helpers.get(highlightMediaID);
-                if (!media) throw ("Unknown highlight media");
+                if (!media?.id) throw ("Unknown highlight media");
                 if (media.__tableName !== "News") throw ("Highlight media object is not a News item");
                 validatedData["Highlight Media"] = [ media.id ];
             }

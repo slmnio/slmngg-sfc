@@ -11,7 +11,7 @@ module.exports = {
     // eslint-disable-next-line no-empty-pattern
     async handler({ cams }, { client }) {
         let broadcast = await this.helpers.get(client?.broadcast?.[0]);
-        if (!broadcast) throw ("No broadcast associated");
+        if (!broadcast?.id) throw ("No broadcast associated");
 
         const [team1Cams, team2Cams] = cams;
         console.log({ team1Cams, team2Cams });
@@ -25,7 +25,7 @@ module.exports = {
             const team = cams[teamIndex];
             for (let playerID of team) {
                 const player = await this.helpers.get(playerID);
-                if (!player || player.__tableName !== "Players") throw "Invalid player";
+                if (!player?.id || player.__tableName !== "Players") throw "Invalid player";
 
                 if (!player?.live_guests?.[0]) throw "Player has no live guest record";
 

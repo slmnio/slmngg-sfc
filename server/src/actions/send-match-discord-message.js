@@ -16,7 +16,7 @@ module.exports = {
         if (!isAutomation && !user.airtable?.website_settings?.includes("Full broadcast permissions")) throw { errorCode: 403, errorMessage: "You don't have permission to start a commercial" };
 
         let broadcast = await this.helpers.get(isAutomation ? broadcastID : client?.broadcast?.[0]);
-        if (!broadcast) throw ("No broadcast associated");
+        if (!broadcast?.id) throw ("No broadcast associated");
 
         if (!broadcast?.discord_control) throw "No Discord data on this broadcast";
         const discordData = new MapObject(broadcast.discord_control);

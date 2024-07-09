@@ -18,7 +18,7 @@ module.exports = {
         const { broadcast, channel } = await getTwitchChannel(client, ["channel:manage:broadcast"], isAutomation ? broadcastID : null);
 
         const event = await this.helpers.get(broadcast.event?.[0]);
-        if (!event) throw ("No event associated with broadcast");
+        if (!event?.id) throw ("No event associated with broadcast");
 
         const api = await getTwitchAPIClient(channel);
         const { match, team1, team2 } = await getMatchData(broadcast, true);

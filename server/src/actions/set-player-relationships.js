@@ -29,7 +29,7 @@ module.exports = {
     async handler({ matchID, roles, clientCams }, { user }) {
 
         let match = await this.helpers.get(matchID);
-        if (!match) throw "No match associated";
+        if (!match?.id) throw "No match associated";
         if (!(await this.helpers.permissions.canEditMatch(user, { match }))) throw { errorMessage: "You don't have permission to edit this item", errorCode: 403 };
 
         const matchRelationships = await Promise.all((match.player_relationships || []).map(id => this.helpers.get(id)));
@@ -42,7 +42,7 @@ module.exports = {
             for (const playerID of roles[roleKey].selected) {
                 if (!playerID) continue;
                 const player = await this.helpers.get(playerID);
-                if (!player) continue;
+                if (!player?.id) continue;
                 const playerRelationships = await Promise.all((player.player_relationships || []).map(id => this.helpers.get(id)));
 
                 const realRelation = playerRelationships.filter((x) => x.singular_name === roleKey);
@@ -85,7 +85,7 @@ module.exports = {
             console.log("Setting client cams", clientCams);
             await Promise.all(clientCams.map(async ({ clientID, cams }) => {
                 const client = await this.helpers.get(clientID);
-                if (!client || client.__tableName !== "Clients") throw "Invalid client";
+                if (!client?.id || client.__tableName !== "Clients") throw "Invalid client";
 
                 if (JSON.stringify(cams) === JSON.stringify(client.cams || [])) return null;
 

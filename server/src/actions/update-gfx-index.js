@@ -12,7 +12,7 @@ module.exports = {
     // eslint-disable-next-line no-empty-pattern
     async handler({ gfxID, index }, { client }) {
         let broadcast = await this.helpers.get(client?.broadcast?.[0]);
-        if (!broadcast) throw ("No broadcast associated");
+        if (!broadcast?.id) throw ("No broadcast associated");
 
         gfxID = cleanID(gfxID);
 

@@ -12,7 +12,7 @@ module.exports = {
         if (!user.airtable?.website_settings?.includes("Can edit any match")) throw { errorMessage: "You don't have permission to edit this item", errorCode: 403 };
 
         let match = await this.helpers.get(matchID);
-        if (!match) throw "No match associated";
+        if (!match?.id) throw "No match associated";
 
         overlayType = overlayType.toLowerCase();
         if (!["primary", "secondary"].includes(overlayType)) throw "Unknown overlay type";

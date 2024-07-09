@@ -104,7 +104,7 @@ export default {
                 getCommands: (ref) => {
                     console.log(ref);
                     return [
-                        ref.setTitle(this.broadcast?.event?.short || this.broadcast?.event?.name || this.broadcast?.name),
+                        ref.setTitle(ref.broadcast?.event?.short || this.broadcast?.event?.name || this.broadcast?.name),
                         ref.setBreakDisplayOption("Automated"),
                     ];
                 }

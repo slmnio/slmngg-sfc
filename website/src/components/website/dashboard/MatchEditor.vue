@@ -27,13 +27,12 @@
                 <div class="spacer" style="order:0"></div>
                 <div v-for="(team, i) in teams" :key="team.id" class="team" :class="{'end': i === 1}">
                     <ContentThing
-                        v-if="!team.empty"
+                        v-if="!team.empty && !team.dummy"
                         :thing="team"
                         :theme="team.theme"
                         show-logo="true"
                         type="team"
                         text="" />
-                    <div v-else class="team-dummy">Dummy</div>
                 </div>
                 <b-form-input
                     v-for="(score, i) in scores"

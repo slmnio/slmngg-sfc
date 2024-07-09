@@ -55,7 +55,7 @@
                     </b-button-group>
                 </div>
             </div>
-            <div class="group map-attack">
+            <div v-if="match?.teams?.length" class="group map-attack">
                 <div class="group-top">Map Win</div>
                 <div class="group-bottom">
                     <b-button-group>
@@ -277,9 +277,9 @@ export default {
             }
         },
         async setMarker() {
-            this.processing.setMarker = true;
             const markerText = prompt("Set a marker");
             if (!markerText) return;
+            this.processing.setMarker = true;
             try {
                 const response = await authenticatedRequest("actions/set-marker", {
                     text: markerText

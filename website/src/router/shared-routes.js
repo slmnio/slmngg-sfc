@@ -11,7 +11,8 @@ export default [
             { path: "matches", component: () => import("@/views/sub-views/team/TeamSchedule.vue") },
             { path: "theme", component: () => import("@/views/sub-views/ThingTheme.vue") },
             { path: "details", component: () => import("@/views/sub-views/team/TeamDetails.vue") },
-            { path: "composition", component: () => import("@/views/sub-views/team/TeamComposition.vue") }
+            { path: "composition", component: () => import("@/views/sub-views/team/TeamComposition.vue") },
+            { path: "previous", component: () => import("@/views/sub-views/team/TeamPrevious.vue") }
         ]
     },
     {

@@ -6,6 +6,7 @@
             <li v-if="team.matches" class="nav-item"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
             <li v-if="useTeamCompositions" class="nav-item"><router-link class="nav-link" :to="subLink('composition')">Composition</router-link></li>
             <li v-if="team.theme" class="nav-item"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
+            <li v-if="team.theme" class="nav-item"><router-link class="nav-link" :to="subLink('previous')">Previous Teams</router-link></li>
             <!--            <li class="nav-item"><router-link class="nav-link" :to="subLink('details')">Details</router-link></li>-->
 
             <ul v-if="team.socials" class="socials d-flex">

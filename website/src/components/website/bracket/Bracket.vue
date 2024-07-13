@@ -1,6 +1,6 @@
 <template>
     <div
-        class="bracket row flex-column"
+        class="bracket flex-column"
         :style="winVars"
         :class="{ 'small': small || (useOverlayScale && fontSize < 15) }">
         <div ref="connections-holder" class="connections">
@@ -490,7 +490,6 @@ export default {
 
 .internal-bracket {
     padding: 0 6px;
-    justify-content: center;
 }
 
 .internal-bracket + .internal-bracket {

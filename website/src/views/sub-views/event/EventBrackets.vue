@@ -6,7 +6,7 @@
                 <BracketResolveButton class="resolve-button" :bracket="bracket" />
             </div>
             <div class="event-bracket-container mb-4">
-                <Bracket class="event-bracket" :bracket="bracket" :event="event" />
+                <Bracket class="event-bracket row" :bracket="bracket" :event="event" />
             </div>
         </div>
     </div>

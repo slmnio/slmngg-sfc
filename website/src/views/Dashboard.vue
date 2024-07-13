@@ -61,6 +61,7 @@
                 <Bracket
                     v-for="bracket in bracketData"
                     :key="bracket.id"
+                    class="row"
                     :scale="0.75"
                     :event="liveMatch.event"
                     :bracket="bracket" />

@@ -160,7 +160,7 @@
             <h3>Bracket Preview</h3>
         </div>
         <div class="container-fluid flex-center">
-            <Bracket class="py-3" :bracket="bracketData" />
+            <Bracket class="py-3 row" :bracket="bracketData" />
         </div>
     </div>
 </template>

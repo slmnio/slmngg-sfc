@@ -189,7 +189,8 @@ export default [
         path: "bug",
         component: () => import("@/components/broadcast/roots/BugOverlay.vue"),
         props: route => ({
-            small: !!route.query.small
+            small: !!route.query.small,
+            teamNum: route.query.team || route.query.teamNum,
         })
     },
     { path: "l-bar", component: () => import("@/components/broadcast/roots/LBarOverlay") },
@@ -231,7 +232,14 @@ export default [
         })
     },
     { path: "desk-graphics", component: () => import("@/components/broadcast/roots/DeskGraphicsOverlay.vue") },
-    { path: "stinger", alias: "empty", component: () => import("@/components/broadcast/roots/EmptyStingerOverlay.vue") },
+    {
+        path: "stinger",
+        alias: "empty",
+        component: () => import("@/components/broadcast/roots/EmptyStingerOverlay.vue"),
+        props: route => ({
+            teamNum: route.query.team || route.query.teamNum,
+        })
+    },
     { path: "broadcasts", alias: ["other-streams", "other-broadcasts"], component: () => import("@/components/broadcast/roots/OtherBroadcastsOverlay.vue") },
     { path: "mvp", component: () => import("@/components/broadcast/roots/MVPOverlay.vue") },
     {

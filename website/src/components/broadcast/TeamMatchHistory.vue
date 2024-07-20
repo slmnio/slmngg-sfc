@@ -5,6 +5,7 @@
             :key="match.id"
             class="match"
             :match="match"
+            :show-sub-event="showSubEvent"
             :this-team="team" />
     </div>
 </template>
@@ -37,6 +38,14 @@ export default {
 
             return matches.slice(0, this.max);
         },
+        showSubEvent() {
+            if (!this.matches?.length) return [];
+            const subEvents = new Set();
+            for (const match of this.matches) {
+                subEvents.add(match.sub_event);
+            }
+            return subEvents.size > 1;
+        },
         fontSize() {
             const max = this.matches?.length || 5;
             if (max <= 5) return 48;
@@ -49,7 +58,6 @@ export default {
 </script>
 
 <style scoped>
-
 .team-match-history {
     justify-content: flex-start;
     overflow: hidden;

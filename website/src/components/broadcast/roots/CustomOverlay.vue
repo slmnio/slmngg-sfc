@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay :title="title" />
+    <GenericOverlay class="custom-overlay" :title="title" />
 </template>
 
 <script>

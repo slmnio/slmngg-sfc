@@ -1,5 +1,5 @@
 <template>
-    <div></div>
+    <div class="confetti-overlay"></div>
 </template>
 <script>
 import { ReactiveRoot } from "@/utils/reactive";

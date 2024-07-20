@@ -1,5 +1,5 @@
 <template>
-    <iframe v-if="extended" class="w-100 h-100 border-0" :src="processedURL"></iframe>
+    <iframe v-if="extended" class="iframe-overlay-raw w-100 h-100 border-0" :src="processedURL"></iframe>
     <GenericOverlay v-else-if="!extended" class="iframe-overlay" :title="title">
         <iframe class="w-100 h-100 border-0" :src="processedURL"></iframe>
     </GenericOverlay>

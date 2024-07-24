@@ -47,7 +47,7 @@ module.exports = {
             "match_first_to": match.first_to
         };
 
-        let newTitle = broadcast.title_format;
+        let newTitle = format;
 
         Object.entries(formatOptions).forEach(([key, val]) => {
             newTitle = newTitle.replace(`{${key}}`, val || "");

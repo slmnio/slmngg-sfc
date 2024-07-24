@@ -83,7 +83,7 @@
                     <div class="d-flex gap-2 flex-wrap">
                         <b-button
                             variant="secondary"
-                            :disabled="titleProcessing || !liveMatch || !broadcast?.title_format"
+                            :disabled="titleProcessing || !liveMatch || !canSetTitle"
                             :title="`Title will be set to: '${parsedTitle}'`"
                             @click="updateTitle">
                             <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title<span v-if="titleAutomated"> (automated) <i
@@ -187,6 +187,10 @@ export default {
         titleAutomated() {
             const settings = this.broadcast?.automation_settings || [];
             return settings.includes("Set title when live match changes");
+        },
+        canSetTitle() {
+            if (this.liveMatch?.special_event) return this.broadcast?.special_title_format || this.broadcast?.title_format;
+            return this.broadcast?.title_format;
         },
         client() {
             const client = this.user?.clients?.[0];

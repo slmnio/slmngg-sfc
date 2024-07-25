@@ -72,6 +72,10 @@
                 <StandingsTeam :team="standingsData" />
             </div>
         </div>
+
+        <div v-if="event && event.teams">
+            <b-button class="no-link-style d-inline-block" :to="url('event', event, { subPage: 'brands'})">Team branding <i class="fas fa-chevron-right fa-fw"></i></b-button>
+        </div>
     </div>
 </template>
 
@@ -85,6 +89,7 @@ import StandingsTeam from "@/components/broadcast/StandingsTeam";
 import { bg, resizedImageNoWrap } from "@/utils/images";
 import { getDataServerAddress } from "@/utils/fetch";
 import CopyTextButton from "@/components/website/CopyTextButton";
+import { url } from "@/utils/content-utils";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");
@@ -158,7 +163,8 @@ export default {
         bg,
         dataServerURL(path) {
             return `${getDataServerAddress()}/${path}`;
-        }
+        },
+        url
     }
 };
 </script>

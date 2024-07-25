@@ -102,6 +102,9 @@ importers:
       bootstrap-vue-next:
         specifier: ^0.17.6
         version: 0.17.6(vue@3.4.27(typescript@5.4.5))
+      client-zip:
+        specifier: ^2.4.5
+        version: 2.4.5
       howler:
         specifier: ^2.2.4
         version: 2.2.4
@@ -1128,6 +1131,9 @@ packages:
   cli-spinners@2.9.2:
     resolution: {integrity: sha512-ywqV+5MmyL4E7ybXgKys4DugZbX0FC6LnwrhjuykIjnK9k8OQacQ7axGKnjDXWNhns0xot3bZI5h55H8yo9cJg==}
     engines: {node: '>=6'}
+
+  client-zip@2.4.5:
+    resolution: {integrity: sha512-4y4d5ZeTH/szIAMQeC8ju67pxtvj+3u20wMGwOFrZk+pegy3aSEA2JkwgC8XVDTXP/Iqn1gyqNQXmkyBp4KLEQ==}
 
   clone@1.0.4:
     resolution: {integrity: sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==}
@@ -3761,6 +3767,8 @@ snapshots:
       restore-cursor: 3.1.0
 
   cli-spinners@2.9.2: {}
+
+  client-zip@2.4.5: {}
 
   clone@1.0.4: {}
 

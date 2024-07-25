@@ -338,9 +338,13 @@ module.exports = ({ app, cors, Cache }) => {
 
             if (size > 3000) return res.status(400).send("Requested image too large");
 
+            let logoType = "default_logo";
+            if (req.query.type && ["wordmark", "small", "default"].includes(req.query.type)) {
+                logoType = req.query.type + "_logo";
+            }
 
             let theme = await Cache.get(req.query.id);
-            let logo = await Cache.getAttachment(theme.default_logo?.[0]?.id);
+            let logo = await Cache.getAttachment(theme?.[logoType]?.[0]?.id || theme?.["default_logo"]?.[0]?.id);
 
             if (!logo) return res.status(400).send("No logo to use");
             let themeColor = (theme.color_logo_background || theme.color_theme || "#222222").trim();
@@ -416,8 +420,8 @@ module.exports = ({ app, cors, Cache }) => {
         //     .then(data => res.end(data));
 
     }
-    app.get("/theme", handleThemeRequests);
-    app.get("/theme.:fileFormat", handleThemeRequests);
+    app.get("/theme", cors(), handleThemeRequests);
+    app.get("/theme.:fileFormat", cors(), handleThemeRequests);
 
     async function handleMatchRequests(req, res) {
         try {

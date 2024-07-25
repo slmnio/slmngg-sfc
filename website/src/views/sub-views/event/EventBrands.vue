@@ -399,7 +399,7 @@ export default {
                 .replaceAll("{team_id}", team?.id || "")
                 .replaceAll("{team_code}", team?.code || "")
                 .replaceAll("{team_name}", team?.name || "")
-                .replaceAll("{team_category}", team?.team_category || "")
+                .replaceAll("{team_category}", (team?.team_category?.includes(";") ? team.team_category.split(";")?.[1] : team?.team_category) || "")
                 .replaceAll("{theme_id}", theme?.id || "")
                 .replaceAll("{event_id}", event?.id || "")
                 .replaceAll("{event_name}", event?.name || "")

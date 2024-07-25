@@ -265,6 +265,7 @@ export default {
                     player: (team.players || []).length
                 };
             }
+            return { team: null, player: null };
         }
     },
     methods: {

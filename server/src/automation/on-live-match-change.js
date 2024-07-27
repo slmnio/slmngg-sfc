@@ -1,7 +1,8 @@
-const Cache = require("../cache");
-const { cleanID } = require("../action-utils/action-utils");
-const { getInternalManager } = require("../action-utils/action-manager");
-module.exports = {
+import * as Cache from "../cache";
+import { cleanID } from "../action-utils/action-utils";
+import { getInternalManager } from "../action-utils/action-manager";
+
+export default {
     /**
      *
      * @param {AnyAirtableID} id

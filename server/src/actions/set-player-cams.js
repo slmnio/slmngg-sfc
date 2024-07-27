@@ -1,5 +1,6 @@
-const { dirtyID } = require("../action-utils/action-utils");
-module.exports = {
+import { dirtyID } from "../action-utils/action-utils";
+
+export default {
     key: "set-player-cams",
     auth: ["client"],
     requiredParams: ["cams"],

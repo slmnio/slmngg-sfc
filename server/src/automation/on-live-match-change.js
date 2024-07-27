@@ -1,6 +1,6 @@
-import * as Cache from "../cache";
-import { cleanID } from "../action-utils/action-utils";
-import { getInternalManager } from "../action-utils/action-manager";
+import * as Cache from "../cache.js";
+import { cleanID } from "../action-utils/action-utils.js";
+import { getInternalManager } from "../action-utils/action-manager.js";
 
 export default {
     /**

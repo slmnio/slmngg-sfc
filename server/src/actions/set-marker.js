@@ -1,4 +1,4 @@
-import { getMatchData, getTwitchAPIClient, getTwitchChannel } from "../action-utils/action-utils";
+import { getMatchData, getTwitchAPIClient, getTwitchChannel } from "../action-utils/action-utils.js";
 
 
 export default {

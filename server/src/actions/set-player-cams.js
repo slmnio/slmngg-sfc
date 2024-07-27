@@ -1,4 +1,4 @@
-import { dirtyID } from "../action-utils/action-utils";
+import { dirtyID } from "../action-utils/action-utils.js";
 
 export default {
     key: "set-player-cams",

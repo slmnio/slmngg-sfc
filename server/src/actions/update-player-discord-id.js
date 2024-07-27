@@ -25,7 +25,7 @@ export default {
 
         const targetUser = await Cache.get(cleanID(slmnggId));
 
-        if (!targetUser) throw { errorMessage: "No user found to send to Airtable" };
+        if (!targetUser?.id) throw { errorMessage: "No user found to send to Airtable" };
 
         let response = await this.helpers.updateRecord("Players", targetUser, {
             "Discord ID": discordData.id,

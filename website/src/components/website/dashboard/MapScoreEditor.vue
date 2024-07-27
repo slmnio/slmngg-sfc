@@ -4,11 +4,11 @@
         <b-form-input
             class="score-input no-arrows"
             autocomplete="off"
-            :value="score"
+            :model-value="modelValue"
             type="number"
             min="0"
             step="1"
-            @input="(n) => this.$emit('input', parseInt(n))" />
+            @update:model-value="(n) => this.$emit('update:modelValue', parseInt(n))" />
     </div>
 </template>
 
@@ -17,11 +17,8 @@ import { themeBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "MapScoreEditor",
-    model: {
-        prop: "score",
-        event: "input"
-    },
-    props: ["team", "score", "reverse"],
+    props: ["team", "modelValue", "reverse"],
+    emits: ["update:modelValue"],
     computed: {
         teamSliceBackground() {
             return themeBackground1(this.team);

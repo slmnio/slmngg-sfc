@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay :title="title || stageTitle || 'Standings'">
+    <GenericOverlay :title="title || stageTitle || 'Standings'" class="standings-overlay">
         <Standings
             class="standings"
             :event="event"

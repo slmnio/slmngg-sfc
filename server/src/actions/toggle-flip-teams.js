@@ -9,10 +9,10 @@ export default {
     // eslint-disable-next-line no-empty-pattern
     async handler(params, { client }) {
         let broadcast = await this.helpers.get(client?.broadcast?.[0]);
-        if (!broadcast) throw "No broadcast associated";
+        if (!broadcast?.id) throw "No broadcast associated";
 
         let match = await this.helpers.get(broadcast?.live_match?.[0]);
-        if (!match) throw "No match associated";
+        if (!match?.id) throw "No match associated";
 
         let response = await this.helpers.updateRecord("Matches", match, {
             "Flip Teams": !match.flip_teams

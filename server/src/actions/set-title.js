@@ -14,13 +14,14 @@ export default {
     async handler(params, { client, isAutomation }) {
         const { broadcast, channel } = await getTwitchChannel(client, ["channel:manage:broadcast"], isAutomation ? params?.broadcastID : null);
 
-        if (!broadcast.title_format) throw "The broadcast has no title format";
-
         const event = await this.helpers.get(broadcast.event?.[0]);
-        if (!event) throw ("No event associated with broadcast");
+        if (!event?.id) throw ("No event associated with broadcast");
 
         const api = await getTwitchAPIClient(channel);
         const { match, team1, team2 } = await getMatchData(broadcast, true);
+
+        const format = (match.special_event ? broadcast.special_title_format : broadcast.title_format) || broadcast.title_format;
+        if (!format) throw "The broadcast has no title format";
 
         const formatOptions = {
             "event": event.name,
@@ -44,7 +45,7 @@ export default {
             "match_first_to": match.first_to
         };
 
-        let newTitle = broadcast.title_format;
+        let newTitle = format;
 
         Object.entries(formatOptions).forEach(([key, val]) => {
             newTitle = newTitle.replace(`{${key}}`, val || "");

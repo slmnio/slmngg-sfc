@@ -5,8 +5,13 @@
             <div class="opponent-icon bg-center" :style="opponentTheme.logo"></div>
         </div>
         <div class="item scores">{{ scores }}</div>
-        <squeezable class="item date">
-            <div>{{ match.round }}</div>
+        <squeezable class="item date-section" align="right">
+            <div v-if="match.sub_event" class="date date-sub-event fw-bold">
+                <div>{{ match.sub_event }}</div>
+            </div>
+            <div v-if="match.round || match.week_text" class="date date-round">
+                <div>{{ match.round || match.week_text }}</div>
+            </div>
         </squeezable>
     </div>
 </template>
@@ -19,7 +24,7 @@ import Squeezable from "@/components/broadcast/Squeezable.vue";
 export default {
     name: "MatchHistory",
     components: { Squeezable },
-    props: ["match", "thisTeam"],
+    props: ["match", "thisTeam", "showSubEvent"],
     computed: {
         opponent() {
             if (!this.match?.teams?.length) return null;
@@ -100,9 +105,16 @@ export default {
     flex-shrink: 0;
 }
 
-.item.date {
+.item.date-section {
     margin: 0 .5em;
-    font-size: 0.6em;
+    font-size: 0.4em;
     text-align: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+}
+.date {
+    line-height: 1.2;
 }
 </style>

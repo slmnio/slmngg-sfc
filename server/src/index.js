@@ -1,6 +1,5 @@
 import "dotenv/config";
 import express from "express";
-import bodyParser from "body-parser";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 const app = express();
@@ -18,6 +17,8 @@ import webAuction from "./web_auction.js";
 let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEGORY_ID", "STAFFAPPS_APPLICATION_CHANNEL_ID", "IS_SLMNGG_MAIN_SERVER"];
 if (staffKeysRequired.every(key => process.env[key])) {
     await import("./discord/staff.js");
+} else {
+    console.warn("Staff application system won't be set up. Set the required STAFFAPPS keys in server/.env")
 }
 
 let domains = (process.env.CORS_VALID_DOMAINS || "slmn.gg,localhost").split(/, */g).map(d => new RegExp(`(?:^|.*\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
@@ -61,22 +62,34 @@ actions.load(app, localCors, Cache, io);
 await import("./discord/slash-commands.js");
 await import("./automation-manager.js");
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
+app.options("/*", cors());
 
 app.get("/", async (req, res) => {
     res.send("[slmngg-server] pee pee poo poo");
 });
 
 
-app.get("/thing/:id", cors({ origin: corsHandle}), async (req, res) => {
+app.get("/thing/:id", cors({ origin: corsHandle }), async (req, res) => {
     let id = req.params.id;
     let data = await Cache.get(id);
     if (!data) return res.status(404).send({ error: true, message: "Unknown ID"});
-    console.log("[thing request]", id);
     res.end(JSON.stringify(data));
 });
-app.get("/things/:ids", cors({ origin: corsHandle}), async (req, res) => {
+app.get("/things/:ids", cors({ origin: corsHandle }), async (req, res) => {
     let ids = req.params.ids.split(",");
+    return handleThingsRequest(ids, req, res);
+});
+
+app.post("/things", express.json(), cors({ origin: corsHandle }), async (req, res) => {
+    const ids = req.body?.ids?.split(",");
+    if (!ids?.length) return res.status(400).send({ error: true, message: "No IDs supplied" });
+    if (ids?.length > 500) return res.status(400).send({ error: true, message: "Too many IDs supplied" });
+    return handleThingsRequest(ids, req, res);
+});
+
+async function handleThingsRequest(ids, req, res) {
+
     let promises = ids.map(async id => await Cache.get(id));
     let data = await Promise.all(promises);
 
@@ -91,7 +104,7 @@ app.get("/things/:ids", cors({ origin: corsHandle}), async (req, res) => {
     data = [...data, ...themes].filter(d => d != null);
     // if (!data) return res.status(404).send({ error: true, message: "Unknown ID"});
     res.end(JSON.stringify(data));
-});
+}
 
 routes({ app, cors, Cache, io });
 

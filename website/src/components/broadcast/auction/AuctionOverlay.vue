@@ -13,7 +13,7 @@
                     <div>{{ autoSettings?.drafted }} / {{ autoSettings?.totalSlots }} {{ autoSettings?.drafted === 1 ? 'player' : 'players' }} signed</div>
                     <div>{{ autoSettings?.slotsRemaining }} {{ autoSettings?.slotsRemaining === 1 ? 'slot' : 'slots' }} remaining</div>
                     <div>{{ autoSettings?.undraftedPlayerCount }} {{ autoSettings?.undraftedPlayerCount === 1 ? 'player' : 'players' }} in the pool</div>
-                    <div class="small">({{ (autoSettings?.totalDraftablePlayerCount - autoSettings?.totalSlots) }} {{ autoSettings?.totalDraftablePlayerCount - autoSettings?.totalSlots === 1 ? 'player' : 'players' }} won't be drafted)</div>
+                    <div class="small">({{ (autoSettings?.totalDraftablePlayerCount - autoSettings?.totalSlots) }} {{ autoSettings?.totalDraftablePlayerCount - autoSettings?.totalSlots === 1 ? 'player' : 'players' }} {{ undraftedText || "won't be drafted" }})</div>
                     <div v-if="stats && stats.allPlayers">{{ stats.remainingEligiblePlayers }} / {{ stats.allPlayers }} player{{ stats.remainingEligiblePlayers === 1 ? '' : 's' }} remaining</div>
                     <div v-if="stats && stats.remainingPlaces">{{ stats.remainingPlaces }} spot{{ stats.remainingPlaces === 1 ? '' : 's' }} remaining</div>
                     <div v-if="stats && stats.signedPlayers">{{ stats.signedPlayers }} player{{ stats.signedPlayers === 1 ? '' : 's' }} signed</div>
@@ -28,11 +28,24 @@
                     <transition name="fade-right">
                         <RecoloredHero v-if="!showCaptainInfo && player && player.favourite_hero" :theme="heroColor" :hero="player.favourite_hero" />
                     </transition>
-                    <transition name="fade-right">
+                    <transition name="fade-right" mode="out-in">
                         <div v-if="player" class="player-info">
+                            <div v-if="playerHighlightEventTeams?.length" class="player-highlight-event-teams d-flex flex-center gap-2">
+                                <div v-for="team in playerHighlightEventTeams" :key="team.id" class="player-highlight-team flex-center">
+                                    <!--                                    <div class="player-highlight-team-logo bg-center" :style="resizedImage(team?.theme, ['default_logo', 'small_logo'], 'w-200')"></div>-->
+                                    <theme-logo
+                                        class="player-highlight-team-logo bg-center"
+                                        :theme="team?.theme"
+                                        logo-size="w-200"
+                                        border-width=".3em"
+                                        icon-padding=".5em" />
+                                </div>
+                            </div>
                             <div class="player-name">{{ player.name }}</div>
                             <div class="player-extras">
                                 <div v-if="player.role && !player.eligible_roles" class="player-role" v-html="getRoleSVG(player.role)"></div>
+
+
                                 <div class="player-eligible-roles d-flex">
                                     <div
                                         v-for="role in playerRoles(player?.eligible_roles)"
@@ -63,6 +76,16 @@
                                     class="player-teams d-flex flex-wrap flex-center"
                                     :class="`group-${group.group}`">
                                     <PlayerTeamDisplay v-for="team in group.teams" :key="team.id" :team="team" />
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else-if="hydratedRecentSignings?.length" class="recents w-100">
+                            <div class="recents-title">Recent signings</div>
+                            <div class="recents-list d-flex flex-column-reverse gap-3">
+                                <div v-for="(signing, i) in hydratedRecentSignings" :key="i" class="recent flex-center">
+                                    <ThemeLogo class="recent-logo" :theme="signing.team?.theme" logo-size="h-100" />
+                                    <div class="recent-name">{{ signing.player?.name }}</div>
+                                    <div class="recent-amount">{{ money(signing.amount) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -156,11 +179,12 @@ import ContentThing from "@/components/website/ContentThing";
 import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import AuctionLeaderboard from "@/components/broadcast/auction/AuctionLeaderboard.vue";
 import AuctionTeamsOverview from "@/components/broadcast/auction/AuctionTeamsOverview.vue";
+import ThemeLogo from "@/components/website/ThemeLogo.vue";
 
 export default {
     name: "AuctionOverlay",
-    components: { AuctionTeamsOverview, AuctionLeaderboard, RecoloredHero, TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar, AuctionCountdown, ContentThing },
-    props: ["broadcast", "category", "title", "showCaptainInfo"],
+    components: { ThemeLogo, AuctionTeamsOverview, AuctionLeaderboard, RecoloredHero, TeamPlayerList, PlayerTeamDisplay, SignedTeamList, BidFocus, TeamFocus, BiddingWar, AuctionCountdown, ContentThing },
+    props: ["broadcast", "category", "title", "showCaptainInfo", "undraftedText"],
     data: () => ({
         tick: 0,
         socketPlayer: null,
@@ -172,9 +196,19 @@ export default {
         biddingActive: false,
         stats: null,
         auctionServerConnected: true,
-        auctionState: "NOT_CONNECTED"
+        auctionState: "NOT_CONNECTED",
+        recentSignings: []
     }),
     computed: {
+        hydratedRecentSignings() {
+            return this.recentSignings.map(({ teamID, playerID, amount }) => ({
+                amount,
+                team: ReactiveRoot(teamID, {
+                    "theme": ReactiveThing("theme")
+                }),
+                player: ReactiveRoot(playerID),
+            }));
+        },
         wideRight() {
             return this._broadcast?.auction_display === "All teams" && this.rightDisplay === "teams";
         },
@@ -186,7 +220,7 @@ export default {
 
             (this.teams || []).forEach(team => {
                 totalSlots += playersEachTeam;
-                const playerCount = (team.players || []).length ?? 0;
+                const playerCount = (team?.players || []).length ?? 0;
                 drafted += playerCount;
                 slotsRemaining += (playersEachTeam - playerCount);
             });
@@ -276,10 +310,14 @@ export default {
                 favourite_hero: ReactiveThing("favourite_hero")
             });
         },
+        playerHighlightEventTeams() {
+            if (!this._broadcast?.highlight_event?.length) return [];
+            if (!this.player?.member_of?.length) return [];
+            return this._broadcast.highlight_event.map(event => this.player.member_of.find(t => t.event?.id === event?.id)).filter(Boolean);
+        },
         accolades() {
             if (!this.player) return [];
 
-            console.log("accolades", this.players?.member_of);
             return [
                 // team things
                 ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => e.accolades).filter(e => e?.show_for_players)) : []),
@@ -338,7 +376,8 @@ export default {
                         owners: ReactiveArray("owners"),
                         captains: ReactiveArray("captains")
                     })
-                })
+                }),
+                highlight_event: ReactiveArray("highlight_event")
             });
         },
         rightDisplay() {
@@ -401,7 +440,7 @@ export default {
         displayTeamRows() {
             if (!this.teams?.length) return [];
             const teams = this.teams.filter(team => {
-                const isFull = (team.players?.length >= (this.auctionSettings?.each_team || getAuctionMax()));
+                const isFull = (team?.players?.length >= (this.auctionSettings?.each_team || getAuctionMax()));
                 if (this._broadcast?.auction_display === "Not full teams") {
                     return !isFull;
                 } else if (this._broadcast?.auction_display === "Full teams") {
@@ -500,6 +539,7 @@ export default {
         }
     },
     methods: {
+        resizedImage,
         themeBackground1,
         money,
         getRoleSVG,
@@ -591,6 +631,14 @@ export default {
             this.justSignedTeamID = this.leadingBid?.teamID;
             this.signAmount = this.leadingBid?.amount;
             console.log("POST AUCTION SIGNED", this.leadingBid);
+
+
+            this.recentSignings.push({ playerID: activePlayerID, teamID: this.leadingBid?.teamID, amount: this.leadingBid?.amount });
+            if (this.recentSignings?.length > 6) {
+                this.recentSignings.shift();
+            }
+
+            console.log("recent", this.recentSignings);
         },
         auction_bids(bids) {
             console.log("auction_bids", bids);
@@ -851,11 +899,15 @@ export default {
     }
 
     .bids {
-        transition: background-color 500ms ease;
+        transition: background-color 500ms ease, width 500ms ease;
         background-color: rgba(0,0,0,0);
     }
     .bids.has-bids {
         background-color: rgba(0,0,0,0.15);
+    }
+    .bids:not(.has-bids) {
+        width: 0;
+        overflow: hidden;
     }
     .team-focus {
         height: 100%;
@@ -952,7 +1004,7 @@ export default {
 
 
     .player-extras {
-        max-height: 670px;
+        max-height: 630px;
     }
 
     .player-info-holder {
@@ -986,5 +1038,52 @@ export default {
         align-items: center;
         font-size: 2em;
         opacity: 0.8;
+    }
+
+    .recents {
+        font-size: 2.5em;
+        gap: .5em;
+        margin-bottom: 1em;
+        opacity: 0.8;
+    }
+
+    .recent {
+        display: flex;
+        gap: .5em;
+    }
+
+    .recents-title {
+        font-weight: bold;
+        text-transform: uppercase;
+        text-align: center;
+        font-size: 1.5em;
+        margin-bottom: .25em;
+    }
+
+    .recent-logo {
+        width: 2.5em;
+        height: 2em;
+    }
+
+    .recent-name {
+        min-width: 8em;
+        font-weight: bold;
+    }
+    .recent-amount {
+        min-width: 3em;
+        text-align: right;
+    }
+    .player-highlight-event-teams {
+        display: flex;
+    }
+
+    .player-highlight-team {
+        width: 5em;
+        height: 4em;
+    }
+
+    .player-highlight-team-logo {
+        width: 90%;
+        height: 90%;
     }
 </style>

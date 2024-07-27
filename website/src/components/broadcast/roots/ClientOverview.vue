@@ -112,7 +112,7 @@ export default {
             this.overlays[data.socket] = data;
         },
         prod_disconnect(socketID) {
-            this.$delete(this.overlays, socketID);
+            delete this.overlays[socketID];
         },
         obs_remote_data(data) {
             if (!data?.[0]?.results) return;

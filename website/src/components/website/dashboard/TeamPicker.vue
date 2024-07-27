@@ -2,7 +2,7 @@
     <div class="team-picker">
         <div class="title flex-center text-center">{{ title }}</div>
         <div class="options d-flex">
-            <div class="option option-none" :class="{'selected': !choice}" :style="{order: 2}" @click="setTeam(null)">
+            <div class="option option-none" :class="{'selected': !modelValue}" :style="{order: 2}" @click="setTeam(null)">
                 <div class="team-logo none flex-center">
                     <span class="none-text">None</span>
                 </div>
@@ -12,7 +12,7 @@
                 :key="team.id"
                 class="option option-team"
                 :style="{ order: (i * 2) + 1}"
-                :class="{'selected': choice === team.id }"
+                :class="{'selected': modelValue === team.id }"
                 @click="setTeam(team.id)">
                 <ThemeLogo
                     logo-size="w-50"
@@ -30,14 +30,11 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 export default {
     name: "TeamPicker",
     components: { ThemeLogo },
-    model: {
-        prop: "choice",
-        event: "change"
-    },
-    props: ["title", "teams", "choice"],
+    props: ["title", "modelValue", "teams"],
+    emits: ["update:modelValue"],
     methods: {
         setTeam(id) {
-            this.$emit("change", id);
+            this.$emit("update:modelValue", id);
         }
     }
 };

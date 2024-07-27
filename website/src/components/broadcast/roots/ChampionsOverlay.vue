@@ -1,5 +1,5 @@
 <template>
-    <ConfettiOverlay v-if="winner" :theme="winner?.theme" />
+    <ConfettiOverlay v-if="winner" class="champions-overlay" :theme="winner?.theme" />
 </template>
 
 <script>

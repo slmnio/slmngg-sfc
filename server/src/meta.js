@@ -175,7 +175,7 @@ export default ({ app, Cache }) => {
                 let players = await subArrayNames(thing?.players);
                 let staff = await subArrayNames(thing?.staff);
 
-                console.log(captains);
+                // console.log(captains);
 
                 let description = [];
                 if (event?.name) description.push(`${thing.name} from ${event.name}.\n`);
@@ -249,7 +249,7 @@ export default ({ app, Cache }) => {
                 let thumbnail = thing?.thumbnail?.[0] && Cache.getAttachment(thing.thumbnail[0].id);
                 let header = !thumbnail && thing?.header?.[0] && Cache.getAttachment(thing.header[0].id);
 
-                console.log({ thing, thumbnail, header });
+                // console.log({ thing, thumbnail, header });
 
 
                 /*

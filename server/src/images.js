@@ -6,6 +6,15 @@ import https from "node:https";
 import { cleanID } from "./action-utils/action-utils.js";
 
 
+
+function cleanAttID(id) {
+    if (!id) return null;
+    if (id?.id) return id.id;
+    if (typeof id !== "string") return null;
+    if (id.startsWith("att") && id.length === 17) id = id.slice(3);
+    return id;
+}
+
 const heldPromises = [];
 function getHeldPromise(parts) {
     return heldPromises[parts.join("-")];
@@ -40,8 +49,13 @@ async function getOrWaitForDownload(url, filename, size) {
     if (p) {
         console.log("[image] downloading in other promise, waiting for it");
         await p;
+        console.log("[image] held promise complete");
     }
     return getImage(filename, size);
+}
+
+function safeFilename(name) {
+    return name.replace(/\s+/g, "-");
 }
 
 async function downloadImage(url, filename, size) {
@@ -50,24 +64,34 @@ async function downloadImage(url, filename, size) {
         const pathName = getPath(filename, size);
         const file = fs.createWriteStream(pathName);
 
-        function error(err) {
+        async function error(err) {
             console.error(`[image] file error for ${filename} ${err.code} ${err.message}`);
-            fs.unlink(pathName, function(err) {
-                if (err) {
-                    console.error(`[image] file error for ${filename} unlink FAILED`, err);
-                } else {
-                    console.error(`[image] file error for ${filename} unlinked`);
-                }
-            });
+            try {
+                await fp.unlink(pathName);
+            } catch (e) {
+                console.warn(`[image|delete] Could not delete ${filename} (download failure)`, e);
+            } finally {
+                console.warn(`[image|delete] Deleted ${filename} (download failure)`, err);
+            }
             reject(err);
         }
 
-        https.get(url, res => {
-            if (![200].includes(res.statusCode)) return error({ code: res.statusCode, message: res.statusMessage });
-            res.pipe(file);
-            file.on("finish", () => {
-                file.close(resolve);
-            });
+        file.on("open", () => {
+            https.get(url, res => {
+                if (![200].includes(res.statusCode)) return error({ code: res.statusCode, message: res.statusMessage });
+                res.pipe(file);
+                file.on("finish", async () => {
+                    try {
+                        const { size } = await fp.stat(pathName);
+                        if (size < 100) {
+                            return error({ message: "Tiny file downloaded, assuming it's an error" });
+                        }
+                        file.close(resolve);
+                    } catch (e) {
+                        error(e);
+                    }
+                });
+            }).on("error", err => error(err));
         }).on("error", err => error(err));
     }));
 }
@@ -100,8 +124,29 @@ async function resizeImage(filename, sizeText, sizeData) {
             return await sharp(origFilePath).resize(sizeData).toFile(resizedFilePath);
         } catch (e) {
             console.error("Resize image error", e, origFilePath, sizeData);
+            console.log("code", e.code, "message", e.message);
             if (e.code === "EEXIST") {
                 return await getImage(filename, sizeText);
+            }
+
+            // try to remove the broken image if something was saved
+            try {
+                await fp.unlink(resizedFilePath);
+            } catch (e2) {
+                console.warn(`[image|delete] Could not delete ${filename} (resize image failure)`, e2);
+            } finally {
+                console.warn(`[image|delete] Deleted ${filename} (resize image failure)`, e);
+            }
+
+            if (["pngload: libspng read error", "Error: Input file contains unsupported image format"].includes(e.message)) {
+                // attempting to also remove the orig image since it may also be broken
+                try {
+                    await fp.unlink(origFilePath);
+                } catch (e2) {
+                    console.warn(`[image|delete] Could not delete original file ${filename} (resize image failure)`, e2);
+                } finally {
+                    console.warn(`[image|delete] Deleted original file ${filename} (resize image failure)`, e);
+                }
             }
             return null;
         }
@@ -147,8 +192,8 @@ async function fullGetURL(attachment, sizeText, sizeData) {
 
 export default ({ app, cors, Cache }) => {
 
-    ensureFolder("").then(() => console.log("[images] images folder ensured"));
-    ensureFolder("orig").then(() => console.log("[images] orig folder ensured"));
+    ensureFolder("").then(() => console.log("[image] images root folder ensured"));
+    ensureFolder("orig").then(() => console.log("[image] orig folder ensured"));
 
     async function handleImageRequests(req, res) {
 
@@ -164,6 +209,7 @@ export default ({ app, cors, Cache }) => {
 
             let airtableURL = att.url;
             let filename = att._autoFilename;
+            let filetype = ((n) => { const dots = n.split("."); return dots[dots.length-1]; })(filename);
 
             let size = "orig";
             let sizeData = {};
@@ -215,12 +261,27 @@ export default ({ app, cors, Cache }) => {
             let imagePath = await getImage(filename, size);
 
             if (imagePath) {
+                const { size: fileSize } = await fp.stat(imagePath);
+
+                if (fileSize < 100) {
+                    fs.unlink(imagePath, function(err) {
+                        if (err) {
+                            console.error(`[image] detected tiny image unlink for ${filename} unlink FAILED`, err);
+                        } else {
+                            console.warn(`[image] detected tiny image unlink for ${filename} unlinked SUCCESS`);
+                        }
+                    });
+                }
+
                 // already cached
-                return res.sendFile(imagePath);
+                return res
+                    .header("Cache-Control", "public, max-age=31536000, immutable")
+                    .header("Content-Disposition", `inline; filename="img-${cleanAttID(att.id)}${size && size !== "orig" ? "-" + size.toString() : ""}.${filetype}"`)
+                    .sendFile(imagePath);
             }
 
             // not already cached
-            console.log("[image]", `no file for ${filename} (${att.filename}) @ ${size}`);
+            // console.log("[image]", `no file for ${filename} (${att.filename}) @ ${size}`);
 
             if (!airtableURL) return res.status(404).send("No URL available for this image");
 
@@ -234,7 +295,12 @@ export default ({ app, cors, Cache }) => {
                 await downloadImage(airtableURL, filename, "orig");
                 console.log("[image]", `downloaded ${filename} (${att.filename}) @ orig in ${Date.now() - t}ms`);
                 orig = await getImage(filename, "orig");
-                if (size === "orig") return res.sendFile(orig);
+                if (size === "orig") {
+                    return res
+                        .header("Cache-Control", "public, max-age=31536000, immutable")
+                        .header("Content-Disposition", `inline; filename="img-${cleanAttID(att.id)}${size && size !== "orig" ? "-" + size.toString() : ""}.${filetype}"`)
+                        .sendFile(orig);
+                }
             }
 
             // resize time!
@@ -246,7 +312,12 @@ export default ({ app, cors, Cache }) => {
 
             console.log("[image]", `resized ${filename} (${att.filename}) @ ${size} in ${Date.now() - t}ms`);
 
-            if (resizedImagePath) return res.sendFile(resizedImagePath);
+            if (resizedImagePath) {
+                return res
+                    .header("Cache-Control", "public, max-age=31536000, immutable")
+                    .header("Content-Disposition", `inline; filename="img-${cleanAttID(att.id)}${size && size !== "orig" ? "-" + size.toString() : ""}.${filetype}"`)
+                    .sendFile(resizedImagePath);
+            }
 
         } catch (e) {
             console.error("Image error", e);
@@ -268,9 +339,13 @@ export default ({ app, cors, Cache }) => {
 
             if (size > 3000) return res.status(400).send("Requested image too large");
 
+            let logoType = "default_logo";
+            if (req.query.type && ["wordmark", "small", "default"].includes(req.query.type)) {
+                logoType = req.query.type + "_logo";
+            }
 
             let theme = await Cache.get(req.query.id);
-            let logo = await Cache.getAttachment(theme.default_logo?.[0]?.id);
+            let logo = await Cache.getAttachment(theme?.[logoType]?.[0]?.id || theme?.["default_logo"]?.[0]?.id);
 
             if (!logo) return res.status(400).send("No logo to use");
             let themeColor = (theme.color_logo_background || theme.color_theme || "#222222").trim();
@@ -279,7 +354,18 @@ export default ({ app, cors, Cache }) => {
             // centered logo
             // with ?padding around it
 
-            let filePath = await fullGetURL(logo, "orig", null);
+            let themeThing = null;
+            let themeCode = null;
+
+            if (theme?.event?.length) {
+                themeThing = await Cache.get(theme?.event?.[0]);
+                themeCode = `event-${themeThing?.short?.toLowerCase() || cleanID(themeThing?.id)}`;
+            } else if (theme?.team?.length) {
+                themeThing = await Cache.get(theme?.team?.[0]);
+                themeCode = `team-${themeThing?.code || cleanID(themeThing?.id)}`;
+            }
+
+            let filePath = await getOrWaitForDownload(logo.url, logo._autoFilename, "orig");
 
             let filename = themeColor.replace("#", "") + "_" + logo._autoFilename;
             let sizeText = `theme-${size}-${padding}`;
@@ -290,7 +376,9 @@ export default ({ app, cors, Cache }) => {
             let heldImage = await getImage(filename, sizeText);
             if (heldImage) {
                 // console.log("[image|theme]", `theme using saved @${size} in ${Date.now() - t}ms`);
-                return res.sendFile(heldImage);
+                return res
+                    .header("Content-Disposition", `inline; filename="${safeFilename(`theme-${cleanID(theme.id) + (themeCode ? "-" + themeCode : "")}.png`)}"`)
+                    .sendFile(heldImage);
             }
 
             let resizedLogo = await sharp(filePath).resize({
@@ -299,8 +387,6 @@ export default ({ app, cors, Cache }) => {
                 fit: "contain",
                 background: themeColor
             }).toBuffer();
-
-            res.header("Content-Type", "image/png");
 
             let compositeThemeImage = sharp({
                 create: {
@@ -315,7 +401,10 @@ export default ({ app, cors, Cache }) => {
             compositeThemeImage.clone().png().toBuffer()
                 .then(data => {
                     console.log("[image|theme]", `theme processed @${size} in ${Date.now() - t}ms`);
-                    res.end(data);
+                    res
+                        .header("Content-Type", "image/png")
+                        .header("Content-Disposition", `inline; filename="${safeFilename(`theme-${cleanID(theme.id) + (themeCode ? "-" + themeCode : "")}.png`)}"`)
+                        .end(data);
                 });
 
             return await compositeThemeImage.clone().toFile(resizedFilePath);
@@ -332,8 +421,8 @@ export default ({ app, cors, Cache }) => {
         //     .then(data => res.end(data));
 
     }
-    app.get("/theme", handleThemeRequests);
-    app.get("/theme.:fileFormat", handleThemeRequests);
+    app.get("/theme", cors(), handleThemeRequests);
+    app.get("/theme.:fileFormat", cors(), handleThemeRequests);
 
     async function handleMatchRequests(req, res) {
         try {
@@ -373,7 +462,7 @@ export default ({ app, cors, Cache }) => {
                 let logos = await Promise.all(teams.map(async team => {
                     const logo = await Cache.getAttachment(team.theme?.default_logo?.[0]?.id);
                     if (!logo) return null;
-                    let filePath = await fullGetURL(logo, "orig", null);
+                    let filePath = await getOrWaitForDownload(logo.url, logo._autoFilename, "orig");
                     let themeColor = (team.theme.color_logo_background || team.theme.color_theme || "#222222").trim();
 
                     let resizedLogo = await sharp(filePath).resize({
@@ -399,7 +488,7 @@ export default ({ app, cors, Cache }) => {
                         let eventTheme = event?.theme?.length ? await Cache.get(event?.theme?.[0]) : null;
                         const logo = await Cache.getAttachment(eventTheme?.default_logo?.[0]?.id);
                         if (!logo) return null;
-                        let eventLogoFilePath = await fullGetURL(logo, "orig", null);
+                        let eventLogoFilePath = await getOrWaitForDownload(logo.url, logo._autoFilename, "orig");
                         eventLogo = await sharp(eventLogoFilePath).resize({
                             height: Math.floor(size * 0.20),
                             width: Math.floor(size * 0.25),
@@ -427,7 +516,10 @@ export default ({ app, cors, Cache }) => {
                 ]);
 
                 let thumbBuffer = await thumb.png().toBuffer();
-                return res.header("Content-Type", "image/png").send(thumbBuffer);
+                return res.header("Content-Type", "image/png")
+                    .header("Cache-Control", "public, max-age=31536000, immutable")
+                    .header("Content-Disposition", `inline; filename="${safeFilename(`match-${cleanID(match.id)}-${teams.map(t => t.code || cleanID(t.id)).join("-")}-thumbnail-${size}.png`)}"`)
+                    .send(thumbBuffer);
 
 
             } else {
@@ -438,7 +530,7 @@ export default ({ app, cors, Cache }) => {
                 if (!event.theme?.id) return res.status(400).send("No event theme data");
                 let themeColor = event.theme.color_logo_background || event.theme.color_theme || "#222222";
 
-                let filePath = await fullGetURL(event.theme.default_logo[0], "orig", null);
+                let filePath = await getOrWaitForDownload(event.theme.default_logo[0].url, event.theme.default_logo[0]._autoFilename, "orig");
 
                 let resizedLogo = await sharp(filePath).resize({
                     width: width - padding,
@@ -456,7 +548,11 @@ export default ({ app, cors, Cache }) => {
                     { input: resizedLogo }
                 ]);
                 let thumbBuffer = await thumb.png().toBuffer();
-                return res.header("Content-Type", "image/png").send(thumbBuffer);
+                return res
+                    .header("Content-Type", "image/png")
+                    .header("Cache-Control", "public, max-age=31536000, immutable")
+                    .header("Content-Disposition", `inline; filename="${safeFilename(`match-${cleanID(match.id)}-default-thumbnail-${size}.png`)}"`)
+                    .send(thumbBuffer);
             }
         } catch (e) {
             console.error("Match image error", e);

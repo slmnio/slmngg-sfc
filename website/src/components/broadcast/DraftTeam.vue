@@ -19,7 +19,7 @@ export default {
     computed: {
         background() { return logoBackground1(this.team); },
         logo() {
-            return resizedImage(this.team.theme, ["default_wordmark", "default_logo", "small_logo"], "w-200");
+            return resizedImage(this.team.theme, ["default_logo", "small_logo"], "w-200");
         }
     }
 };

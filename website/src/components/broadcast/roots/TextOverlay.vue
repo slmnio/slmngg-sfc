@@ -1,5 +1,5 @@
 <template>
-    <GenericOverlay :title="title">
+    <GenericOverlay class="text-overlay" :title="title">
         <Markdown class="overlay-markdown w-100 h-100" :markdown="markdown" />
     </GenericOverlay>
 </template>

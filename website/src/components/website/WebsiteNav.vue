@@ -1,5 +1,8 @@
 <template>
     <div class="website-nav">
+        <WebsiteNavBanner v-if="maintenanceMessage" class="bg-warning text-dark">
+            {{ maintenanceMessage }}
+        </WebsiteNavBanner>
         <WebsiteNavBanner v-if="showDisconnectedMessage" class="bg-danger">
             <i class="fas fa-wifi-slash fa-fw mr-1"></i> <b>No connection to the data server.</b> Don't refresh, we're trying to reconnect...
         </WebsiteNavBanner>
@@ -29,13 +32,14 @@
                 <span class="d-inline d-lg-none">{{ minisite ? (minisite.short || minisite.series_name || minisite.name) : "SLMN.GG" }}</span>
             </router-link>
 
-            <b-navbar-toggle target="nav-collapse" />
+            <b-navbar-toggle v-b-color-mode="'dark'" class="toggler" target="nav-collapse" />
 
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav v-if="!minisite">
                     <router-link active-class="active" class="nav-link" to="/events">Events</router-link>
                     <router-link active-class="active" class="nav-link" to="/teams">Teams</router-link>
                     <router-link active-class="active" class="nav-link" to="/players">Players</router-link>
+                    <router-link active-class="active" class="nav-link" to="/learn">Learn</router-link>
                     <router-link v-if="isAuthenticated" active-class="active" class="nav-link" to="/profile">Profile</router-link>
                     <router-link v-if="isProduction" active-class="active" class="nav-link" to="/dashboard">Dashboard</router-link>
                     <a v-if="productionClient?.key" target="_blank" class="nav-link" :href="`//dev.slmn.gg/client/${productionClient?.key}/tally-viewer`">Tally <i class="far fa-external-link ml-1"></i></a>
@@ -62,8 +66,8 @@
                 <b-navbar-nav class="flex-grow-1" />
 
                 <b-navbar-nav>
-                    <div v-b-modal.timezone-swapper-modal class="nav-link">Timezone</div>
-                    <a target="_blank" class="nav-link" href="https://slmn.statuspage.io/?utm_source=slmngg_nav">Status</a>
+                    <div v-b-modal.timezone-swapper-modal class="nav-link text-left justify-content-start">Timezone</div>
+                    <!--                    <a target="_blank" class="nav-link" href="https://slmn.statuspage.io/?utm_source=slmngg_nav">Status</a>-->
                 </b-navbar-nav>
 
                 <b-navbar-nav v-if="minisite">
@@ -148,6 +152,9 @@ export default {
         },
         siteMode() {
             return import.meta.env.VITE_DEPLOY_MODE || import.meta.env.NODE_ENV;
+        },
+        maintenanceMessage() {
+            return import.meta.env.VITE_MAINTENANCE_MESSAGE;
         },
         dataServerMode() {
             const dataServerURL = new URL(import.meta.env.VITE_DATA_SERVER || "http://localhost");
@@ -276,5 +283,8 @@ export default {
 }
 .nav-link {
     cursor: pointer;
+}
+.toggler.navbar-toggler {
+    --bs-navbar-toggler-border-color: rgba(255,255,255,0.15);
 }
 </style>

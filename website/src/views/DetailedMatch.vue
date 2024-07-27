@@ -99,9 +99,17 @@
                     :match="match"
                     link-to-detailed-match />
 
-                <div v-if="showShowNotes && match.show_notes" class="show-notes mt-2">
-                    <h2>Show notes</h2>
-                    <Markdown :markdown="match.show_notes" />
+                <div v-if="showShowNotes && anyShowNotes" class="show-notes mt-2">
+                    <h2 class="text-center">Show notes</h2>
+                    <Markdown class="p-1 px-2 bg-dark rounded" :markdown="match.show_notes" />
+                    <div v-if="teamShowNotes" class="team-notes d-flex gap-2 mt-2">
+                        <div v-for="team in match.teams" :key="team.id" class="team-note w-50">
+                            <div v-if="team.show_notes">
+                                <h3 class="text-center">{{ team.name }}</h3>
+                                <Markdown class="p-1 px-2 bg-dark rounded" :markdown="team.show_notes" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="right-holder col-12 col-md-3">
@@ -175,7 +183,7 @@
                         Show non-event matches
                     </div>
                     <div
-                        v-if="match.show_notes"
+                        v-if="anyShowNotes"
                         :class="`btn btn-block btn-${showShowNotes ? 'light' : 'secondary'}`"
                         @click="showShowNotes = !showShowNotes">
                         <i class="fa-fw far fa-file-video"></i>
@@ -218,12 +226,7 @@
                             <a class="ct-active" :href="matchThumbnailURL(match, 1080)" rel="nofollow" target="_blank">1080p</a>
                         </template>
                     </stat>
-                    <stat v-if="credits">
-                        Credits
-                        <template #content>
-                            <CopyTextButton style="white-space: pre" :content="credits">Copy credits</CopyTextButton>
-                        </template>
-                    </stat>
+                    <CreditCreator :id="id" />
                 </div>
             </div>
         </div>
@@ -246,10 +249,11 @@ import { getDataServerAddress } from "@/utils/fetch";
 import { canEditMatch } from "@/utils/client-action-permissions";
 import MatchHistory from "@/views/sub-views/MatchHistory.vue";
 import { useAuthStore } from "@/stores/authStore";
+import CreditCreator from "@/components/website/CreditCreator.vue";
 
 export default {
     name: "DetailedMatch",
-    components: { MatchHistory, BracketImplications, CopyTextButton, Markdown, PreviousMatch, ThemeLogo, MapDisplay, stat: DetailedMatchStat },
+    components: { CreditCreator, MatchHistory, BracketImplications, CopyTextButton, Markdown, PreviousMatch, ThemeLogo, MapDisplay, stat: DetailedMatchStat },
     props: ["id"],
     data: () => ({
         showPlayerInfo: false,
@@ -346,25 +350,6 @@ export default {
                 return bData.earliest - aData.earliest;
             });
         },
-        credits() {
-            const groups = [
-                {
-                    meta: {
-                        singular_name: "Caster",
-                        plural_name: "Casters"
-                    },
-                    items: this.match?.casters
-                },
-                ...this.playerRelationshipGroups
-            ];
-
-            console.log("credits groups", groups);
-
-            return groups.filter(g => g.items?.length).map(group => [
-                (group.items?.length === 1 ? group.meta.singular_name + ": " : group.meta.plural_name + ":"),
-                group.items?.map(p => p.name + (p.twitter_link ? " " + p.twitter_link : "")).join("\n")
-            ].join("\n")).join("\n\n");
-        },
         _theme() {
             return this.match?.event?.theme;
         },
@@ -391,9 +376,15 @@ export default {
             return Object.values(groups);
         },
         matchEditable() {
-            const { isAuthenticated, user } = useAuthStore();
+            const { isAuthenticated, player } = useAuthStore();
             if (!isAuthenticated) return false;
-            return canEditMatch(user, { event: this.match?.event, match: this.match });
+            return canEditMatch(player, { event: this.match?.event, match: this.match });
+        },
+        anyShowNotes() {
+            return !!this.match?.show_notes || this.teamShowNotes;
+        },
+        teamShowNotes() {
+            return (this.match?.teams || []).some(t => !!t.show_notes);
         }
     },
     methods: {

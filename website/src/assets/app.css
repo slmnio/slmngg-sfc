@@ -85,6 +85,7 @@ a:not(.link-text), a:not(.link-text):hover {
 }
 .dropdown-item.active, .dropdown-item:active {
     background-color: var(--blue);
+    color: white !important;
 }
 .dropdown-item {
     text-transform: uppercase;
@@ -191,6 +192,7 @@ body.overlay {
 }
 .industry-align {
     transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
+    --translate-y: -0.0925em;
 }
 
 h1.big {
@@ -350,4 +352,7 @@ input.no-arrows[type=number] {
 }
 .text-muted {
     color: #6c757d !important;
+}
+small.text-body-secondary {
+    color: white !important;
 }

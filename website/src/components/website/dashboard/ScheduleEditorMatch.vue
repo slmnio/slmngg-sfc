@@ -27,11 +27,12 @@
         </td>
         <td>{{ prettyDate }}</td>
         <td>
-            <b-form-checkbox-group buttons>
+            <div class="fake-btn-group">
                 <b-form-checkbox
                     v-model="showPrimary"
                     button
                     size="sm"
+                    :disabled="processing['primary']"
                     :button-variant="showPrimary ? 'primary' : 'secondary'">
                     Primary
                 </b-form-checkbox>
@@ -39,10 +40,11 @@
                     v-model="showSecondary"
                     button
                     size="sm"
+                    :disabled="processing['secondary']"
                     :button-variant="showSecondary ? 'primary' : 'secondary'">
                     Secondary
                 </b-form-checkbox>
-            </b-form-checkbox-group>
+            </div>
         </td>
         <td>
             <b-form-checkbox
@@ -67,6 +69,9 @@ import { useSettingsStore } from "@/stores/settingsStore";
 export default {
     name: "ScheduleEditorMatch",
     props: ["match", "isLiveMatch", "timezone"],
+    data: () => ({
+        processing: {}
+    }),
     computed: {
         prettyDate() {
             if (!this.match.start) return;
@@ -104,11 +109,16 @@ export default {
             });
         },
         async setShow(overlayType, state) {
-            await authenticatedRequest("actions/set-match-overlays", {
-                match: this.match.id,
-                overlayType,
-                state
-            });
+            this.processing[overlayType] = true;
+            try {
+                await authenticatedRequest("actions/set-match-overlays", {
+                    match: this.match.id,
+                    overlayType,
+                    state
+                });
+            } finally {
+                this.processing[overlayType] = false;
+            }
         },
         getTheme(team) {
             if (!team?.theme) return {};
@@ -142,5 +152,16 @@ export default {
 
 .boxes-cell {
     width: calc(36px + 36px + 4px);
+}
+.fake-btn-group {
+    display: flex;
+}
+.fake-btn-group :deep(div:not(:first-child) .btn) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.fake-btn-group :deep(div:not(:last-child) .btn) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 </style>

@@ -21,8 +21,8 @@
                 class="mb-2"
                 name="datetime-editor"
                 type="datetime-local"
-                :value="temporaryTime || safeSavedTime"
-                @change="(val) => temporaryTime = val" />
+                :model-value="temporaryTime || safeSavedTime"
+                @update:model-value="(val) => temporaryTime = val" />
 
             <div class="text-center mb-2">Editing in <b>{{ editTimeInSiteTimezone ? 'the site' : 'your local' }} timezone</b> ({{ timezoneName }})</div>
             <div class="flex-center text-center timezones">

@@ -55,8 +55,17 @@ interface Client {
 
 const cookies = new Cookies(null, {
     path: "/",
-    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30)
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+    domain: window.location.hostname.endsWith("slmn.gg") ? ".slmn.gg" : window.location.hostname
 });
+
+function removeOldCookies() {
+    (new Cookies()).remove("auth", { path: "/", domain: "dev.slmn.gg" });
+}
+
+if (window.location.hostname === "dev.slmn.gg") {
+    removeOldCookies();
+}
 
 export const useAuthStore = defineStore("auth", () => {
     const token = ref<string | null>(null);

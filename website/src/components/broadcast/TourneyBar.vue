@@ -71,7 +71,7 @@ export default {
         height: 100%;
         line-height: 1;
         text-align: center;
-        transform: translate(0, -0.08em)
+        transform: var(--overlay-line-height-adjust, translate(0, -0.0925em));
     }
 
     .bar-logo {

@@ -1,6 +1,7 @@
 <template>
     <div class="container">
-        <h1>Give our systems access to a twitch account</h1>
+        <LearnTitleChip title="Tools" subtitle="Twitch Authentication" />
+
         <b-form-group v-slot="{ ariaDescribedby }" label="Enabled features">
             <b-form-checkbox-group
                 id="checkbox-group-1"
@@ -11,13 +12,17 @@
             />
         </b-form-group>
 
-        <a :href="twitchAuthURL" class="btn btn-dark" :class="{'disabled': selected.length === 0}">Authorize</a>
+        <b-button variant="primary" class="text-white mt-2" :href="twitchAuthURL" :class="{'disabled': selected.length === 0}">Authorize</b-button>
     </div>
 </template>
 
 <script>
+import LearnTitleChip from "@/components/website/guide/LearnTitleChip.vue";
+import { getDataServerAddress } from "@/utils/fetch";
+
 export default {
     name: "TwitchAuthScopeSelector",
+    components: { LearnTitleChip },
     data: () => ({
         selected: [], // Must be an array reference!
         options: [
@@ -41,8 +46,11 @@ export default {
     }),
     computed: {
         twitchAuthURL() {
-            return `${import.meta.env.VITE_DATA_SERVER}/twitch_auth/${this.selected.join(" ")}`;
+            return `${getDataServerAddress()}/twitch_auth/${this.selected.join(" ")}`;
         }
+    },
+    mounted() {
+        this.selected = this.options.map(opt => opt.value);
     }
 };
 </script>

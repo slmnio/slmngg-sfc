@@ -1,7 +1,7 @@
 <template>
-    <div v-if="user && user.name" class="container">
+    <div v-if="user && user.name" class="container-fluid container-lg">
         <h1 class="text-md-start text-center">SLMN.GG Dashboard</h1>
-        <div v-if="client && client.broadcast" class="client-broadcasts d-flex flex-wrap flex-column flex-md-row align-items-center">
+        <div v-if="client && broadcast" class="client-broadcasts d-flex flex-wrap flex-column flex-md-row align-items-center">
             <div class="wrapper mb-2">
                 <BroadcastSwitcher :broadcasts="client.broadcast" />
                 <router-link v-if="liveMatch" :to="url('detailed', liveMatch)">
@@ -24,96 +24,123 @@
                 </div>
             </div>
         </div>
-        <div v-if="client && client.broadcast" class="broadcast-editor mb-2">
-            <BroadcastEditor :client="client" />
-        </div>
-        <DashboardModule
-            v-if="liveMatch?.id"
-            title="Match Editor"
-            icon-class="fas fa-pennant"
-            class="broadcast-match-editor mb-2"
-            start-opened>
-            <MatchEditor :hide-match-extras="true" :match="liveMatch" />
-        </DashboardModule>
-        <DashboardModule title="Desk Guests" icon-class="fas fa-users" class="desk-editor mb-2">
-            <template v-if="deskGuestSource" #header>Desk guests pulled from: {{ deskGuestSource }}</template>
-            <DeskEditor :broadcast="broadcast" />
-        </DashboardModule>
-        <DashboardModule class="mb-2" title="Desk Display" icon-class="far fa-comment-alt-dots">
-            <DeskTextEditor :broadcast="broadcast" />
-        </DashboardModule>
-        <DashboardModule v-if="broadcast?.gfx?.length" class="mb-2" title="GFX" icon-class="fas fa-palette">
-            <GFXController :broadcast="broadcast" :client="client" />
-        </DashboardModule>
-        <DashboardModule v-if="bracketCount" title="Bracket Implications" icon-class="fas fa-sitemap" class="broadcast-bracket-editor mb-2">
-            <BracketImplications :match="liveMatch" link-to-detailed-match show-resolve-button />
-        </DashboardModule>
-        <DashboardModule v-if="bracketCount" class="bracket-viewer mb-2" icon-class="fas fa-sitemap" :title="bracketCount === 1 ? 'Bracket' : 'Brackets'">
-            <Bracket
-                v-for="bracket in bracketData"
-                :key="bracket.id"
-                :scale="0.75"
-                :event="liveMatch.event"
-                :bracket="bracket" />
-        </DashboardModule>
-        <ScheduleEditor class="broadcast-schedule-editor mb-2" :broadcast="broadcast" />
-        <DashboardModule v-if="liveMatch" class="mb-2" title="Broadcast Roles" icon-class="fas fa-users-class">
-            <BroadcastRoles :broadcast="broadcast" :live-match="liveMatch" />
-        </DashboardModule>
-        <DashboardModule
-            v-if="broadcast && broadcast.channel"
-            class="mb-2"
-            title="Twitch Controls"
-            icon-class="fas fa-wrench"
-            content-class="p-2">
-            <template v-if="streamLink" #header>{{ streamLink }}</template>
-            <Predictions v-if="liveMatch" :client="client" />
-            <Commercials v-if="hasPermission('Full broadcast permissions')" :client="client" />
-            <div class="mt-2">
-                <b-button
-                    v-b-tooltip.top
-                    variant="secondary"
-                    :disabled="titleProcessing || !liveMatch || !broadcast?.title_format"
-                    :title="`Title will be set to: '${parsedTitle}'`"
-                    @click="updateTitle">
-                    <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title<span v-if="titleAutomated"> (automated) <i class="fas fa-sparkles"></i></span>
-                </b-button>
-                <b-button
-                    v-if="streamLink"
-                    class="ml-2 no-link-style d-inline-block"
-                    variant="outline-secondary"
-                    :href="`https://${streamLink}`"
-                    target="_blank">
-                    Stream <i class="fas fa-fw fa-external-link"></i>
-                </b-button>
-                <b-button
-                    v-if="streamLink"
-                    class="ml-2 no-link-style d-inline-block"
-                    variant="outline-secondary"
-                    :href="`https://${streamLink}/chat`"
-                    target="_blank">
-                    <i class="fab mr-1 fa-twitch"></i> Chat <i class="fas fa-fw fa-external-link"></i>
-                </b-button>
-                <b-button
-                    v-if="twitchChannelName"
-                    class="ml-2 no-link-style d-inline-block"
-                    variant="outline-secondary"
-                    :href="`https://dashboard.twitch.tv/u/${twitchChannelName}`"
-                    target="_blank">
-                    <i class="fab mr-1 fa-twitch"></i> Dashboard <i class="fas fa-fw fa-external-link"></i>
-                </b-button>
+        <div v-if="broadcast">
+            <div class="broadcast-editor mb-2">
+                <BroadcastEditor :broadcast="broadcast" />
             </div>
-        </DashboardModule>
-        <DashboardModule v-if="useTeamComms" class="mb-2" icon-class="fas fa-microphone" title="Team Comms Listen-In">
-            <CommsControls :match="liveMatch" />
-        </DashboardModule>
+            <DashboardModule
+                v-if="liveMatch?.id"
+                title="Match Editor"
+                icon-class="fas fa-pennant"
+                class="broadcast-match-editor mb-2"
+                start-opened>
+                <MatchEditor :hide-match-extras="true" :match="liveMatch" />
+            </DashboardModule>
+            <DashboardModule title="Desk Guests" icon-class="fas fa-users" class="desk-editor mb-2">
+                <template v-if="deskGuestSource" #header>Desk guests pulled from: {{ deskGuestSource }}</template>
+                <DeskEditor :broadcast="broadcast" />
+            </DashboardModule>
+            <DashboardModule class="mb-2" title="Desk Display" icon-class="far fa-comment-alt-dots">
+                <DeskTextEditor :broadcast="broadcast" />
+            </DashboardModule>
+            <DashboardModule v-if="broadcast?.gfx?.length" class="mb-2" title="GFX" icon-class="fas fa-palette">
+                <GFXController :broadcast="broadcast" :client="client" />
+            </DashboardModule>
+            <DashboardModule
+                v-if="bracketCount"
+                title="Bracket Implications"
+                icon-class="fas fa-sitemap"
+                class="broadcast-bracket-editor mb-2">
+                <BracketImplications :match="liveMatch" link-to-detailed-match show-resolve-button />
+            </DashboardModule>
+            <DashboardModule
+                v-if="bracketCount"
+                class="bracket-viewer mb-2"
+                icon-class="fas fa-sitemap"
+                :title="bracketCount === 1 ? 'Bracket' : 'Brackets'">
+                <Bracket
+                    v-for="bracket in bracketData"
+                    :key="bracket.id"
+                    class="row"
+                    :scale="0.75"
+                    :event="liveMatch.event"
+                    :bracket="bracket" />
+            </DashboardModule>
+            <ScheduleEditor class="broadcast-schedule-editor mb-2" :broadcast="broadcast" />
+            <DashboardModule v-if="liveMatch" class="mb-2" title="Broadcast Roles" icon-class="fas fa-users-class">
+                <BroadcastRoles :broadcast="broadcast" :live-match="liveMatch" />
+            </DashboardModule>
+            <DashboardModule
+                v-if="broadcast && broadcast.channel"
+                class="mb-2"
+                title="Twitch Controls"
+                icon-class="fas fa-wrench"
+                content-class="">
+                <template v-if="streamLink" #header>{{ streamLink }}</template>
+                <div class="d-flex gap-2 flex-wrap flex-column p-2">
+                    <Predictions v-if="liveMatch" :client="client" />
+                    <Commercials v-if="hasPermission('Full broadcast permissions')" :client="client" />
+                    <div class="d-flex gap-2 flex-wrap">
+                        <b-button
+                            variant="secondary"
+                            :disabled="titleProcessing || !liveMatch || !canSetTitle"
+                            :title="`Title will be set to: '${parsedTitle}'`"
+                            @click="updateTitle">
+                            <i class="fal fa-fw fa-wand-magic mr-1"></i>Update title<span v-if="titleAutomated"> (automated) <i
+                                class="fas fa-sparkles"></i></span>
+                        </b-button>
+                        <b-button
+                            variant="secondary"
+                            @click="setMarker">
+                            Set stream marker
+                        </b-button>
+                        <b-button
+                            v-if="streamLink"
+                            class="no-link-style d-inline-block"
+                            variant="outline-secondary"
+                            :href="`https://${streamLink}`"
+                            target="_blank">
+                            Stream <i class="fas fa-fw fa-external-link"></i>
+                        </b-button>
+                        <b-button
+                            v-if="streamLink"
+                            class="no-link-style d-inline-block"
+                            variant="outline-secondary"
+                            :href="`https://${streamLink}/chat`"
+                            target="_blank">
+                            <i class="fab mr-1 fa-twitch"></i> Chat <i class="fas fa-fw fa-external-link"></i>
+                        </b-button>
+                        <b-button
+                            v-if="twitchChannelName"
+                            class="no-link-style d-inline-block"
+                            variant="outline-secondary"
+                            :href="`https://dashboard.twitch.tv/u/${twitchChannelName}`"
+                            target="_blank">
+                            <i class="fab mr-1 fa-twitch"></i> Dashboard <i class="fas fa-fw fa-external-link"></i>
+                        </b-button>
+                    </div>
+                </div>
+            </DashboardModule>
+            <DashboardModule
+                v-if="useTeamComms"
+                icon-class="fas fa-microphone"
+                title="Team Comms Listen-In">
+                <CommsControls :match="liveMatch" />
+            </DashboardModule>
+            <DashboardModule v-if="broadcast?.event" class="mb-2" icon-class="fas fa-paint-brush" title="Customisation">
+                <BroadcastCustomisation :broadcast="broadcast" />
+            </DashboardModule>
+            <DashboardModule v-if="liveMatch?.teams?.length" class="mb-2" title="Player Cams" icon-class="fas fa-video">
+                <PlayerCamsController :broadcast="broadcast" :match="liveMatch" />
+            </DashboardModule>
+        </div>
     </div>
 </template>
 
 <script>
 import { socket } from "@/socket";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { url } from "@/utils/content-utils";
+import { getFormatOptions, url } from "@/utils/content-utils";
 import BroadcastSwitcher from "@/components/website/dashboard/BroadcastSwitcher";
 import MatchThumbnail from "@/components/website/match/MatchThumbnail";
 import MatchEditor from "@/components/website/dashboard/MatchEditor";
@@ -134,10 +161,12 @@ import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import GFXController from "@/views/GFXController.vue";
 import BroadcastRoles from "@/components/website/dashboard/BroadcastRoles.vue";
 import { useAuthStore } from "@/stores/authStore";
+import BroadcastCustomisation from "@/components/website/dashboard/BroadcastCustomisation.vue";
+import PlayerCamsController from "@/components/website/dashboard/PlayerCamsController.vue";
 
 export default {
     name: "Dashboard",
-    components: { GFXController, BroadcastRoles, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControls, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher },
+    components: { PlayerCamsController, BroadcastCustomisation, GFXController, BroadcastRoles, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControls, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher },
     data: () => ({
         titleProcessing: false
     }),
@@ -150,31 +179,18 @@ export default {
                     broadcast: ReactiveArray("broadcast", {
                         event: ReactiveThing("event", {
                             theme: ReactiveThing("theme")
-                        }),
-                        theme_override: ReactiveThing("theme_override"),
-                        live_match: ReactiveThing("live_match", {
-                            maps: ReactiveArray("maps", {
-                                map: ReactiveThing("map"),
-                                winner: ReactiveThing("winner"),
-                                banner: ReactiveThing("banner"),
-                                picker: ReactiveThing("picker")
-                            }),
-                            teams: ReactiveArray("teams", {
-                                theme: ReactiveThing("theme")
-                            }),
-                            event: ReactiveThing("event", {
-                                broadcasts: ReactiveThing("broadcasts"),
-                                theme: ReactiveThing("theme")
-                            })
-                        }),
-                        gfx: ReactiveArray("gfx")
+                        })
                     })
-                }) // TODO: make this just client
+                })
             });
         },
         titleAutomated() {
             const settings = this.broadcast?.automation_settings || [];
             return settings.includes("Set title when live match changes");
+        },
+        canSetTitle() {
+            if (this.liveMatch?.special_event) return this.broadcast?.special_title_format || this.broadcast?.title_format;
+            return this.broadcast?.title_format;
         },
         client() {
             const client = this.user?.clients?.[0];
@@ -182,7 +198,29 @@ export default {
             return client;
         },
         broadcast() {
-            return this.client?.broadcast?.[0];
+            if (!this.client?.broadcast?.[0]?.id) return null;
+            return ReactiveRoot(this.client?.broadcast?.[0]?.id, {
+                event: ReactiveThing("event", {
+                    theme: ReactiveThing("theme")
+                }),
+                theme_override: ReactiveThing("theme_override"),
+                live_match: ReactiveThing("live_match", {
+                    maps: ReactiveArray("maps", {
+                        map: ReactiveThing("map"),
+                        winner: ReactiveThing("winner"),
+                        banner: ReactiveThing("banner"),
+                        picker: ReactiveThing("picker")
+                    }),
+                    teams: ReactiveArray("teams", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    event: ReactiveThing("event", {
+                        broadcasts: ReactiveThing("broadcasts"),
+                        theme: ReactiveThing("theme")
+                    })
+                }),
+                gfx: ReactiveArray("gfx")
+            });
         },
         streamLink() {
             return this.broadcast?.stream_link || (this.broadcast?.channel_username?.[0] ? `twitch.tv/${this.broadcast?.channel_username?.[0]}` : null);
@@ -228,27 +266,7 @@ export default {
             const event = this.broadcast?.event || this.liveMatch?.event;
             if (!event) return null;
 
-            const formatOptions = {
-                event: event.name,
-                event_name: event.name,
-                event_long: event.name,
-                event_short: event.short,
-
-                team_1_code: this.liveMatch?.teams?.[0]?.code,
-                team_1_name: this.liveMatch?.teams?.[0]?.name,
-                team_2_code: this.liveMatch?.teams?.[1]?.code,
-                team_2_name: this.liveMatch?.teams?.[1]?.name,
-
-                match_custom_name: this.liveMatch?.custom_name,
-                match_sub_event: this.liveMatch?.sub_event,
-                match_group: this.liveMatch?.match_group,
-                match_round: this.liveMatch?.round,
-                match_number: this.liveMatch?.match_number,
-                match_week_text: this.liveMatch?.week_text,
-                match_week_number: this.liveMatch?.week,
-                match_day: this.liveMatch?.day,
-                match_first_to: this.liveMatch?.first_to
-            };
+            const formatOptions = getFormatOptions(event, this.liveMatch);
 
             let newTitle = this.broadcast.title_format;
 
@@ -274,6 +292,18 @@ export default {
             } finally {
                 this.titleProcessing = false;
             }
+        },
+        async setMarker() {
+            const markerText = prompt("Set a marker");
+            if (!markerText) return;
+            const response = await authenticatedRequest("actions/set-marker", {
+                text: markerText
+            });
+            if (response.error) return; // handled by internal
+            this.$notyf.success({
+                message: response.data,
+                duration: 10000
+            });
         },
         hasPermission(permission) {
             return (this.user.website_settings || []).includes(permission);

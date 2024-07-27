@@ -2,7 +2,7 @@ import { createRouter as _createRouter, createWebHistory } from "vue-router";
 import defaultRoutes from "@/router/default";
 import MinisiteWrapperApp from "@/apps/MinisiteWrapperApp.vue";
 import Event from "@/views/Event.vue";
-import EventRoutes from "@/router/event";
+import createEventRoutes from "@/router/event";
 import SharedRoutes from "@/router/shared-routes";
 import NotFoundContent from "@/views/sub-views/NotFoundContent.vue";
 import AuthRedirects from "@/router/auth-redirects";
@@ -39,7 +39,7 @@ export function createRouter(app: App, subID?: string, subdomain?: string) {
                         {
                             path: "/",
                             component: Event,
-                            children: EventRoutes,
+                            children: createEventRoutes(true),
                             props: () => {
                                 return {
                                     id: subID,

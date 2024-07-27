@@ -20,7 +20,7 @@
             border="x">
             <div class="scoreboard-row team-row">
                 <div class="scoreboard-team" :style="logoBackground1(team)">
-                    <ThemeLogo class="team-logo" :theme="team?.theme" border-width="0px" logo-size="" />
+                    <ThemeLogo class="team-logo" :theme="team?.theme" border-width="0px" logo-size="w-100" />
                     <Squeezable class="team-name flex-center" align="center">
                         <div class="industry-align">{{ team.name }}</div>
                     </Squeezable>

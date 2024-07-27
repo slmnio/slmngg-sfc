@@ -2,6 +2,7 @@
 /* BPL Staff Automation */
 
 import client from "./client.js";
+if (!client) return console.warn("Staff application system will not be set up because no Discord key is set.");
 import Airtable from "airtable";
 import { EmbedBuilder, Permissions } from "discord.js";
 import { MapHandler } from "./managers.js";
@@ -368,8 +369,8 @@ async function checkForApplications() {
 setInterval(checkForApplications, 5 * 1000);
 
 async function findMember(guild, discordTag) {
-    let [username, discriminator] = discordTag.split("#");
-    let checkFunction = (m) => m.user && m.user.username.toLowerCase() === username.toLowerCase() && m.user.discriminator === discriminator;
+    let [username] = discordTag.split("#");
+    let checkFunction = (m) => m.user && m.user.username.toLowerCase() === username.toLowerCase();
 
     let member = guild.members?.cache?.find(checkFunction);
     if (member) return member;

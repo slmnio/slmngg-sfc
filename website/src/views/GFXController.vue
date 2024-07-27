@@ -7,7 +7,10 @@
                     <th>Name</th>
                     <th>Type</th>
                     <th>Title</th>
-                    <th>Matrix</th>
+                    <th @click="changeMatrixCount()">
+                        Matrix
+                        <i v-b-tooltip="'Click to set GFX count'" class="fas fa-question-circle opacity-50 ml-1"></i>
+                    </th>
                     <th></th>
                 </tr>
             </thead>
@@ -22,6 +25,7 @@
                             <b-button
                                 v-for="num in buttonNumbers"
                                 :key="num"
+                                class="matrix-btn"
                                 size="sm"
                                 :disabled="processing"
                                 :pressed="i === num"
@@ -43,6 +47,8 @@
 </template>
 <script>
 import { authenticatedRequest } from "@/utils/dashboard";
+import { mapWritableState } from "pinia";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export default {
     name: "GFXController",
@@ -51,12 +57,12 @@ export default {
         client: {}
     },
     data: () => ({
-        buttonCount: 6,
         processing: false
     }),
     computed: {
+        ...mapWritableState(useSettingsStore, ["gfxButtonCount"]),
         buttonNumbers() {
-            return Array.from(Array(this.buttonCount).keys());
+            return Array.from(Array(this.gfxButtonCount).keys());
         }
     },
     methods: {
@@ -70,7 +76,21 @@ export default {
             } finally {
                 this.processing = false;
             }
+        },
+        changeMatrixCount() {
+            const count = parseInt(prompt("Set how many GFX to control", this.gfxButtonCount));
+            if (!count || isNaN(count) || count > 24) return;
+            this.gfxButtonCount = count;
         }
     }
 };
 </script>
+<style scoped>
+    .matrix-btn {
+        min-width: 2em;
+        padding: 0.25em 0.5em;
+    }
+    td.button-matrix {
+        padding: 0.125em 0.25em;
+    }
+</style>

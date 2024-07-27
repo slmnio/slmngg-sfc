@@ -55,7 +55,7 @@
                     </b-button-group>
                 </div>
             </div>
-            <div class="group map-attack">
+            <div v-if="match?.teams?.length" class="group map-attack">
                 <div class="group-top">Map Win</div>
                 <div class="group-bottom">
                     <b-button-group>
@@ -95,7 +95,7 @@
         <div class="spacer flex-grow-1"></div>
         <div class="area right-area">
             <div class="group text-end">
-                <div class="group-top">Break match</div>
+                <div v-b-tooltip="'Show live match on break'" class="group-top">Break match</div>
                 <div class="group-bottom">
                     <b-button
                         class="quick-button"
@@ -103,17 +103,30 @@
                         :pressed="broadcast.show_live_match"
                         :disabled="updateData?.showLiveMatch !== undefined"
                         @click="() => setLiveMatchVisibility(!broadcast.show_live_match)">
+                        <i class="fas fa-binoculars"></i>
+                    </b-button>
+                </div>
+            </div>
+            <div class="group text-end">
+                <div v-b-tooltip="'Advertise live match on SLMN.GG'" class="group-top">Advertise</div>
+                <div class="group-bottom">
+                    <b-button
+                        class="quick-button"
+                        :variant="broadcast.advertise ? 'primary' : 'secondary'"
+                        :pressed="broadcast.advertise"
+                        :disabled="updateData?.advertise !== undefined"
+                        @click="() => advertiseBroadcast(!broadcast.advertise)">
                         <i class="fas fa-signal-stream"></i>
                     </b-button>
                 </div>
             </div>
             <div class="group text-end">
-                <div class="group-top">Twitch Title</div>
+                <div class="group-top">Marker</div>
                 <div class="group-bottom">
                     <div class="fake-btn-group">
-                        <b-button class="quick-button" :disabled="processing?.twitchTitle" @click="setTwitchTitle">
+                        <b-button class="quick-button" :disabled="processing?.setMarker" @click="setMarker">
                             <div class="icon-stack">
-                                <i class="fal fa-wand-magic"></i>
+                                <i class="fas fa-marker"></i>
                             </div>
                         </b-button>
                     </div>
@@ -150,7 +163,7 @@ export default {
         BreakDisplayMultiModal,
         ObserverSettingsModal
     },
-    props: ["client"],
+    props: ["broadcast"],
     data: () => ({
         updateData: { },
         broadcastUpdateTimeout: null,
@@ -159,9 +172,6 @@ export default {
         }
     }),
     computed: {
-        broadcast() {
-            return this.client.broadcast?.[0] || {};
-        },
         match() {
             return this.broadcast?.live_match || {};
         },
@@ -265,7 +275,24 @@ export default {
             } finally {
                 this.processing.twitchTitle = false;
             }
-        }
+        },
+        async setMarker() {
+            const markerText = prompt("Set a marker");
+            if (!markerText) return;
+            this.processing.setMarker = true;
+            try {
+                const response = await authenticatedRequest("actions/set-marker", {
+                    text: markerText
+                });
+                if (response.error) return; // handled by internal
+                this.$notyf.success({
+                    message: response.data,
+                    duration: 10000
+                });
+            } finally {
+                this.processing.setMarker = false;
+            }
+        },
 
     }
 };
@@ -284,7 +311,7 @@ export default {
         margin-left: auto;
     }
     .group-top {
-        font-size: 0.7em;
+        font-size: 0.5em;
         text-transform: uppercase;
         font-weight: bold;
         margin-bottom: 0.25em;
@@ -313,16 +340,17 @@ export default {
     .btn-group.quick-button:deep(.btn),
     .broadcast-editor:deep(.btn.quick-button),
     .broadcast-editor:deep(.btn-group.quick-button .btn) {
-        font-size: 30px;
+        font-size: 24px;
         width: 2.5em;
         height: 2.5em;
         position: relative;
         padding: 0.1em .1em;
     }
+
     .btn-group.quick-button:deep(.btn+.btn.dropdown-toggle),
     .broadcast-editor:deep(.btn-group.quick-button .btn+.btn.dropdown-toggle) {
         width: 1.5em;
-        font-size: 20px;
+        font-size: 16px;
         height: 3.75em;
     }
     .btn-group.quick-button.no-main-button .btn:not(.dropdown-toggle),
@@ -391,5 +419,31 @@ export default {
         top: .33em;
         right: .33em;
         opacity: 0.7;
+    }
+
+
+    @media (min-width: 1200px) {
+        /* md */
+
+        .btn.quick-button,
+        .btn-group.quick-button:deep(.btn),
+        .broadcast-editor:deep(.btn.quick-button),
+        .broadcast-editor:deep(.btn-group.quick-button .btn) {
+            font-size: 30px;
+            width: 2.5em;
+            height: 2.5em;
+            position: relative;
+            padding: 0.1em .1em;
+        }
+        .btn-group.quick-button:deep(.btn+.btn.dropdown-toggle),
+        .broadcast-editor:deep(.btn-group.quick-button .btn+.btn.dropdown-toggle) {
+            width: 1.5em;
+            font-size: 20px;
+            height: 3.75em;
+        }
+
+        .group-top {
+            font-size: 0.7em;
+        }
     }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="icon-holder flex-center" :style="bgStyle">
+    <div :key="theme?.id" class="icon-holder flex-center" :style="bgStyle">
         <div class="icon bg-center" :style="logo"></div>
     </div>
 </template>

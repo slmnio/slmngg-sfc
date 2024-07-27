@@ -41,14 +41,14 @@ export default {
             });
         },
         showResolveButton() {
-            const { user } = useAuthStore();
-            return canEditMatch(user, { event: this.hydratedEvent });
+            const { player } = useAuthStore();
+            return canEditMatch(player, { event: this.hydratedEvent });
         }
     },
     methods: {
         async clickResolveButton(bracket) {
-            const { user } = useAuthStore();
-            if (!canEditMatch(user, { event: this.hydratedEvent })) {
+            const { player } = useAuthStore();
+            if (!canEditMatch(player, { event: this.hydratedEvent })) {
                 return this.$notyf.error("You don't have permission to resolve brackets");
             }
             this.isResolving = true;

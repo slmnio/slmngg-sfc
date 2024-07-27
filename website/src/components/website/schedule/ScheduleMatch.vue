@@ -1,6 +1,9 @@
 <template>
     <div v-if="loaded" class="match-wrapper my-2" :class="{ 'bg-danger' : !loaded }">
-        <div class="match" :class="{'special-event': match.special_event}">
+        <div class="match" :class="{'special-event': match.special_event, 'batch': showBatchCheckboxes }">
+            <div v-if="showBatchCheckboxes" class="batch-checkbox flex-center">
+                <b-form-checkbox v-model="batchCheckboxSelected" size="lg" />
+            </div>
             <div class="match-left match-details flex-center flex-column text-center">
                 <div v-for="detail in details" :key="detail.short" v-b-tooltip="detail.long" class="match-detail">
                     {{ detail.short }}
@@ -61,9 +64,17 @@
         </div>
 
         <div v-if="canEditMatches || canEditBroadcasts" class="buttons flex-center ml-2">
-            <b-button-group class="gap-2">
-                <b-button v-if="canEditMatches" class="text-white" size="sm" :to="url('match', this.match, { subPage: 'editor' })">
+            <b-button-group class="gap-1">
+                <b-button
+                    v-if="canEditMatches"
+                    class="text-white"
+                    size="sm"
+                    :to="url('match', this.match, { subPage: 'editor' })"
+                    title="Editor">
                     <i class="fas fa-pencil"></i>
+                </b-button>
+                <b-button class="text-white" size="sm" :to="url('detailed', this.match)" title="Detailed">
+                    <i class="fas fa-book-open"></i>
                 </b-button>
                 <b-button
                     v-if="canEditBroadcasts"
@@ -84,18 +95,30 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 import { url, cleanID } from "@/utils/content-utils";
 import ScheduleTime from "@/components/website/schedule/ScheduleTime";
 import { authenticatedRequest } from "@/utils/dashboard";
+import { mapWritableState } from "pinia";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 
 export default {
     name: "ScheduleMatch",
     components: { ScheduleTime, ThemeLogo },
-    props: ["match", "customText", "leftTeam", "canEditMatches", "canEditBroadcasts", "selectedBroadcast", "showEditorButton"],
+    props: ["match", "customText", "leftTeam", "canEditMatches", "canEditBroadcasts", "selectedBroadcast", "showEditorButton", "showBatchCheckboxes"],
     data: () => ({
         processing: {
             match_broadcast: false
         }
     }),
     computed: {
+        ...mapWritableState(useSettingsStore, ["batchSelectedMatches"]),
+        batchCheckboxSelected: {
+            get() {
+                return this.batchSelectedMatches?.[this.match?.id];
+            },
+            set(selected) {
+                if (!this.match?.id) return;
+                this.batchSelectedMatches[this.match.id] = selected;
+            }
+        },
         shouldSwapTeams() {
             if (!this.leftTeam?.id) return false;
             if (this.teams?.length !== 2) return false;
@@ -185,7 +208,7 @@ export default {
             }
         },
         isOnSelectedBroadcast() {
-            console.log(this.match?.scheduled_broadcast, this.selectedBroadcast);
+            // console.log(this.match?.scheduled_broadcast, this.selectedBroadcast);
             return (this.match?.scheduled_broadcast || [])?.map(cleanID).includes(this.selectedBroadcast?.id);
         }
     },
@@ -222,9 +245,22 @@ export default {
         height: 48px;
     }
 
+    .batch-checkbox { order: -2; }
     .match-left { order: -1; }
     .match-center { order: 1; }
     .match-right { order: 3; }
+
+    .batch-checkbox:deep(label.form-check-label) {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .batch-checkbox {
+        position: relative;
+    }
 
     .match-team {
         text-align: right;
@@ -250,12 +286,25 @@ export default {
     .match.special-event {
         grid-template-columns: 0.75fr 4.25fr 0.75fr;
     }
+    .match.batch {
+        grid-template-columns: 0.25fr 0.75fr 2fr 0.25fr 2fr 0.75fr;
+    }
+    .match.batch.special-event {
+        grid-template-columns: 0.25fr 0.75fr 4.25fr 0.75fr;
+    }
+
     @media (max-width: 957px) {
         .match {
             grid-template-columns: 0.75fr 1fr 0.2fr 1fr 0.75fr;
         }
         .match.special-event {
             grid-template-columns: 0.75fr 2.2fr 0.75fr;
+        }
+        .match.batch {
+            grid-template-columns: 0.25fr 0.75fr 2fr 0.25fr 2fr 0.75fr;
+        }
+        .match.batch.special-event {
+            grid-template-columns: 0.25fr 0.75fr 4.25fr 0.75fr;
         }
     }
     @media (max-width: 767px) {
@@ -264,6 +313,12 @@ export default {
         }
         .match.special-event {
             grid-template-columns: 0.5fr 2.2fr 0.5fr;
+        }
+        .match.batch {
+            grid-template-columns: 0.25fr 0.75fr 2fr 0.25fr 2fr 0.75fr;
+        }
+        .match.batch.special-event {
+            grid-template-columns: 0.25fr 0.5fr 2.2fr 0.5fr;
         }
     }
     @media (max-width: 575px) {
@@ -275,6 +330,12 @@ export default {
         }
         .match.special-event {
             grid-template-columns: 1fr;
+        }
+        .match.batch {
+            grid-template-columns: 0.75fr 0.75fr 2fr 0.25fr 2fr 0.75fr;
+        }
+        .match.batch.special-event {
+            grid-template-columns: 0.75fr 0.75fr 4.25fr 0.75fr;
         }
     }
 

@@ -213,9 +213,9 @@ export default ({ app, Cache, io }) => {
         }
 
         let matchDesc = [];
-        if (event && event.name) { matchDesc.push("Event: " + event.name); }
+        if (event?.name) { matchDesc.push("Event: " + event.name); }
         if (match.vod) { matchDesc.push("Stream: " + match.vod); }
-        let subdomain = event.subdomain || event.partial_subdomain;
+        let subdomain = event?.subdomain || event?.partial_subdomain;
         matchDesc.push(`Match details: https://${subdomain ? `${subdomain}.` : ""}slmn.gg/match/${match.id.slice(3)}`);
 
         matchDesc.push("");
@@ -245,24 +245,25 @@ export default ({ app, Cache, io }) => {
         ].map(hex => parseInt(hex, 16)).join(":");
     }
 
-    async function generateCal(event) {
-        let theme = (event.theme ? await Cache.get(event.theme[0]) : null);
-        let matches = await Promise.all((event.matches || []).map(id => Cache.get(id)));
-        matches = matches.filter(m => m?.start).map(m => getMatchCal(m, event));
-        if (!matches.length) return null;
+    async function generateCal({ team, event, hydratedMatches, hydratedPlayer, hydratedTheme }) {
+        const matchContainer = team || event || hydratedPlayer;
+        let containerTheme = hydratedTheme || (matchContainer.theme ? await Cache.get(matchContainer.theme[0]) : null);
+        let containerMatches = hydratedMatches || await Promise.all((matchContainer.matches || []).map(id => Cache.get(id)));
+        containerMatches = containerMatches.filter(m => m?.start).map(m => getMatchCal(m, event));
+        if (!containerMatches.length) return null;
         let cal = [
             "BEGIN:VCALENDAR",
             "VERSION:2.0",
-            "PRODID:-//2022//SLMN.GG//EN",
+            "PRODID:-//2023//SLMN.GG//EN",
             "METHOD:PUBLISH",
             "CALSCALE:GREGORIAN",
-            `NAME:${event.name} (SLMN.GG)`,
-            `X-WR-CALNAME:${event.name} (SLMN.GG)`,
-            `COLOR:${theme ? getCalCol(theme.color_theme) : "64:64:64"}`,
+            `NAME:${matchContainer.name} (SLMN.GG)`,
+            `X-WR-CALNAME:${matchContainer.name} (SLMN.GG)`,
+            `COLOR:${containerTheme ? getCalCol(containerTheme.color_theme) : "64:64:64"}`,
             "REFRESH-INTERVAL;VALUE=DURATION:PT10M",
             "X-PUBLISHED-TTL:PT10M"
         ];
-        matches.forEach(matchCal => {
+        containerMatches.forEach(matchCal => {
             cal = [
                 ...cal,
                 ...matchCal,
@@ -274,14 +275,61 @@ export default ({ app, Cache, io }) => {
 
     app.get("/ical", async (req, res) => {
         try {
-            if (!req.query.event) return res.status(400).send("The 'event' query is required");
-            let event = await Cache.get(req.query.event);
-            if (!event || event.__tableName !== "Events") return res.status(400).send("Unknown event");
+            const argCount = [req.query.event, req.query.team, req.query.player].filter(Boolean).length;
+            if (argCount === 0) {
+                return res.status(400).send("No argument specified. You must specify one of 'team', 'event' or 'player'");
+            } else if (argCount > 1) {
+                return res.status(400).send("Too many arguments. You must specify only one of 'team', 'event' or 'player'");
+            }
 
-            let ical = await generateCal(event);
-            if (!ical) return res.status(400).send("No matches scheduled");
+            if (req.query.player) {
+                const startDate = (req.query.start ? parseInt(req.query.start) || req.query.start : null) || (new Date()).getTime();
+                // console.log(req.query.start, startDate);
+                const player = await Cache.get(req.query.player);
+                if (!player?.id || player.__tableName !== "Players") return res.status(400).send("Unknown player");
+                // player.casts
+                // player.player_relationships.map(rel => rel.matches)
 
-            return res.header("Content-Type", "text/calendar").send(ical);
+                const seenMatchIDs = new Set();
+
+                const matches = [
+                    ...await Promise.all((player.casts || []).map(id => Cache.get(id))),
+                    ...(await Promise.all((player.player_relationships || []).map(async id => {
+                        const rel = await Cache.get(id);
+                        return await Promise.all((rel.matches || []).map(m => Cache.get(m)));
+                    }))).flat(),
+                ].filter(match => {
+                    // sometimes get dupes if player has multiple roles on the same match
+                    if (seenMatchIDs.has(match?.id)) return false;
+                    seenMatchIDs.add(match.id);
+                    return match?.start && (new Date(match.start)).getTime() > startDate;
+                });
+
+
+                console.log(matches?.length);
+
+                let ical = await generateCal({ hydratedPlayer: player, hydratedMatches: matches });
+                if (!ical) return res.status(400).send("No matches scheduled");
+                return res.header("Content-Type", "text/calendar").send(ical);
+
+            } else if (req.query.team) {
+                let team = await Cache.get(req.query.team);
+                if (!team?.id || team.__tableName !== "Teams") return res.status(400).send("Unknown team");
+
+                let event = await Cache.get(team.event?.[0]);
+                if (!event?.id || event.__tableName !== "Events") return res.status(400).send("Did not find an event for this team");
+
+                let ical = await generateCal({ team, event });
+                if (!ical) return res.status(400).send("No matches scheduled");
+                return res.header("Content-Type", "text/calendar").send(ical);
+            } else {
+                let event = await Cache.get(req.query.event);
+                if (!event?.id || event.__tableName !== "Events") return res.status(400).send("Unknown event");
+
+                let ical = await generateCal({ event });
+                if (!ical) return res.status(400).send("No matches scheduled");
+                return res.header("Content-Type", "text/calendar").send(ical);
+            }
         } catch (e) {
             console.error(e);
             return res.status(500).send(e.message);

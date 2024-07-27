@@ -2,10 +2,19 @@
     <div class="match-vod">
         <EmbeddedVideo v-if="vodLink" :src="vodLink" />
 
-        <div v-if="match.vod_2" class="vod-2-holder d-flex justify-content-end w-100 mt-2">
+        <div v-if="match.vod_2" class="vod-2-holder d-flex justify-content-end w-100 mt-2 gap-1">
             <div class="btn btn-sm text-light">This match has multiple VODs:</div>
             <div v-if="!useVOD2" class="btn btn-dark btn-sm" @click="useVOD2 = true">Show part 2</div>
             <div v-if="useVOD2" class="btn btn-dark btn-sm" @click="useVOD2 = false">Show part 1</div>
+        </div>
+        <div v-else-if="match.alternative_vod" class="vod-2-holder d-flex justify-content-end w-100 mt-2 gap-1">
+            <div class="btn btn-sm text-light">This match has multiple VODs:</div>
+            <div class="btn btn-dark btn-sm" :class="{'bg-primary': vodLink === match.vod}" @click="useAlternativeVOD = false">
+                <i class="fa-fw" :class="getEmbedData(match.vod)?.display?.icon"></i> {{ getEmbedData(match.vod)?.display?.text }}
+            </div>
+            <div class="btn btn-dark btn-sm" :class="{'bg-primary': vodLink === match.alternative_vod}" @click="useAlternativeVOD = true">
+                <i class="fa-fw" :class="getEmbedData(match.alternative_vod)?.display?.icon"></i> {{ getEmbedData(match.alternative_vod)?.display?.text }}
+            </div>
         </div>
 
         <div v-if="showNoVOD" class="embed ratio ratio-16x9">
@@ -32,6 +41,7 @@
 <script>
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 import MapDisplay from "@/components/website/match/MapDisplay";
+import { getEmbedData } from "@/utils/content-utils";
 
 export default {
     name: "MatchVOD",
@@ -39,6 +49,7 @@ export default {
     props: ["match"],
     data: () => ({
         useVOD2: false,
+        useAlternativeVOD: false,
         showBannedMaps: false
     }),
     computed: {
@@ -51,6 +62,7 @@ export default {
         },
         vodLink() {
             if (this.useVOD2) return this.match?.vod_2;
+            if (this.useAlternativeVOD) return this.match?.alternative_vod;
             return this.match?.vod;
         },
         theme() {
@@ -60,7 +72,8 @@ export default {
             if (!this.match.maps?.length) return false;
             return this.match.maps.some(m => m.banner || m.banned);
         }
-    }
+    },
+    methods: { getEmbedData }
 };
 </script>
 

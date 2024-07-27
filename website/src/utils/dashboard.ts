@@ -120,6 +120,10 @@ interface UpdateBroadcastData {
     deskDisplayMode?: null | "Match" | "Predictions" | "Maps" | "Notice (Team 1)" | "Notice (Team 2)" | "Notice (Event)" | "Scoreboard" | "Drafted Maps" | "Interview" | "Hidden" | "Casters"
     deskDisplayText?: string
     countdownEnd?: any
+    highlightTeamID?: AnyAirtableID
+    highlightHeroID?: AnyAirtableID
+    highlightPlayerID?: AnyAirtableID
+    highlightMediaID?: AnyAirtableID
 }
 
 interface UpdateGfxIndexData {
@@ -153,6 +157,7 @@ interface UpdateMatchDataData {
         forfeit_reason?: string
         vod?: string
         vod_2?: string
+        alternative_vod?: string
     }
 }
 
@@ -182,6 +187,14 @@ interface AdjustMatchBroadcastData {
     matchID: AnyAirtableID
 }
 
+interface SetPlayerCamsData {
+    cams: AnyAirtableID[][]
+}
+
+interface SetMarkerData {
+    text: string
+}
+
 
 type ActionRequestData<U> =
     U extends "actions/create-live-guest" ? CreateLiveGuestData :
@@ -203,6 +216,8 @@ type ActionRequestData<U> =
     U extends "actions/update-profile-data" ? UpdateProfileDataData :
     U extends "actions/set-player-relationships" ? SetPlayerRelationshipsData :
     U extends "actions/adjust-match-broadcast" ? AdjustMatchBroadcastData :
+    U extends "actions/set-player-cams" ? SetPlayerCamsData :
+    U extends "actions/set-marker" ? SetMarkerData :
     any;
 
 

@@ -4,6 +4,8 @@ import { Collection, Events } from "discord.js";
 import client from "./client.js";
 import { pathToFileURL } from "node:url";
 
+if (!client) return console.warn("Discord slash commands will not be set up because no Discord key is set.");
+
 client.commands = new Collection();
 const foldersPath = path.join(import.meta.dirname, "commands");
 const commandFolders = fs.readdirSync(foldersPath);

@@ -33,8 +33,8 @@ export default {
             { value: "Staff", text: "Event staff" },
             { value: "Matchup", text: "Matchup" },
             { value: "Title", text: "Title" },
-            { value: "Other Streams", text: "Other Streams" },
-            { value: "Other Info", text: "Other Info" }
+            { value: "Other Info", text: "Other Broadcasts" },
+            { value: "Other Streams", text: "Other Stream Feeds" }
         ],
         selected: null,
         processing: false

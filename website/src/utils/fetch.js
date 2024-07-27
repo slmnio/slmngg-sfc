@@ -14,7 +14,7 @@ export function getDataServerAddress() {
     if (import.meta.env.VITE_DATA_SERVER) return import.meta.env.VITE_DATA_SERVER;
 
     if (import.meta.env.VITE_DEPLOY_MODE === "local") {
-        return `//${window.location.hostname}:8901`;
+        return `${window.location.protocol}//${window.location.hostname}:8901`;
     }
     return "https://data.slmn.gg";
 }
@@ -73,7 +73,13 @@ export async function fetchThings (ids) {
             id, data: { __loading: true }
         }));
 
-        const data = await fetch(`${getDataServerAddress()}/things/${ids.join(",")}`).then(res => res.json());
+        const data = await fetch(`${getDataServerAddress()}/things`, {
+            method: "POST",
+            body: JSON.stringify({ ids: ids.join(",") }),
+            headers: {
+                "content-type": "application/json"
+            }
+        }).then(res => res.json());
 
         if (data.error) {
             console.error(data.message);

@@ -1,7 +1,7 @@
 <template>
     <div class="draft-overlay">
         <div class="draft d-flex w-100 h-100">
-            <div class="available-players">
+            <div v-if="roleColumns" class="available-players role-columns">
                 <ThemeLogo
                     v-if="event && event.theme"
                     class="event-logo"
@@ -9,7 +9,31 @@
                     border-width="6px"
                     logo-size="w-500"
                     icon-padding="24px" />
-                <div class="title" :style="background">DRAFTABLE PLAYERS</div>
+                <div class="title" :style="background">{{ title || 'DRAFTABLE PLAYERS' }}</div>
+                <div class="available-role-columns">
+                    <div v-for="(players, i) in roleGroupedPlayers" :key="i" class="role-column">
+                        <transition-group class="players-transition" name="draftable" tag="div">
+                            <DraftPlayer
+                                v-for="player in players"
+                                :key="player.id"
+                                :style="draftPlayerStyle"
+                                :player="player"
+                                :theme="event.theme"
+                                :show-icon="icons"
+                                :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
+                        </transition-group>
+                    </div>
+                </div>
+            </div>
+            <div v-else class="available-players">
+                <ThemeLogo
+                    v-if="event && event.theme"
+                    class="event-logo"
+                    :theme="event.theme"
+                    border-width="6px"
+                    logo-size="w-500"
+                    icon-padding="24px" />
+                <div class="title" :style="background">{{ title || 'DRAFTABLE PLAYERS' }}</div>
                 <!--<div class="player" v-for="player in availablePlayers" :key="player.id">
                     {{ player.name }}
                 </div>-->
@@ -35,12 +59,15 @@
                         </div>
                         <transition-group name="player" class="team-players" tag="div">
                             <DraftPlayer
-                                v-for="player in insertDummies(team.players)"
+                                v-for="(player, pI) in insertDummies(team.players)"
                                 :key="player.id"
                                 class="drafted-player"
                                 :player="player"
                                 :theme="event.theme"
                                 :show-icon="icons"
+                                :highlight="team.id === highlightPlace?.team && pI === highlightPlace?.player"
+                                :data-team-id="team.id"
+                                :data-pi="pI"
                                 :badge="useHighlightEventBadges && getHighlightEventTeam(player)" />
                         </transition-group>
                     </div>
@@ -62,7 +89,7 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 export default {
     name: "DraftOverlay",
     components: { ThemeLogo, DraftTeam, DraftPlayer },
-    props: ["broadcast", "bracketKey", "columns", "icons", "showStaff", "teamRows", "eachTeam", "showLogos"],
+    props: ["title", "broadcast", "bracketKey", "columns", "icons", "showStaff", "teamRows", "eachTeam", "showLogos", "category", "roleColumns", "highlightOrder"],
     data: () => ({
         dummy: false
     }),
@@ -111,7 +138,7 @@ export default {
             //     players.unshift({ name: "Solomon", id: "x" });
             // };
             return this.event.draftable_players.filter(player => {
-                for (const team of this.draftTeams) {
+                for (const team of (this.event?.teams || [])) {
                     if ((team.players || []).find(p => p.id === player.id)) {
                         return false;
                     }
@@ -138,6 +165,9 @@ export default {
                         return { ...player, rating: { level: parseInt(player.manual_sr), note: "Manually added" } };
                     }
                 } catch (e) {
+                    if (player.manual_sr) {
+                        return { ...player, rating: { level: parseInt(player.manual_sr), note: "Manually added" } };
+                    }
                     return player;
                 }
 
@@ -165,9 +195,20 @@ export default {
                 return b.rating.level - a.rating.level;
             });
         },
+        roleGroupedPlayers() {
+            if (!this.availablePlayers) return [];
+            const groups = {};
+            this.availablePlayers.forEach(player => {
+                if (!groups[player?.role]) groups[player.role] = [];
+                groups[player.role].push(player);
+            });
+            return Object.values(groups);
+        },
         draftTeams() {
             if (!this.event?.teams) return [];
-            return this.event.teams.filter(team => team.draft_order !== undefined).sort((a, b) => a.draft_order - b.draft_order);
+            let teams = this.event.teams.filter(team => team.draft_order !== undefined).sort((a, b) => a.draft_order - b.draft_order);
+            if (this.category) teams = teams.filter(t => !this.category || (t.team_category?.includes(";") ? t.team_category.split(";")[1] : t.team_category) === this.category);
+            return teams;
         },
         draftRows() {
             if (!this.draftTeams) return [];
@@ -186,6 +227,45 @@ export default {
             return {
                 width: `calc(100% / ${this.columns} - 4px)`
             };
+        },
+        highlightPlace() {
+            if (!this.highlightOrder) return null;
+            const teams = [...this.draftTeams];
+            if (!teams.length) return null;
+
+            if (this.highlightOrder === "straight") {
+                let team = teams.sort((a,b) => (a.players || []).length - (b.players || []).length)?.[0];
+                if (!team) return null;
+                return {
+                    team: team.id,
+                    player: (team.players || []).length
+                };
+            }
+            if (this.highlightOrder === "snake" || this.highlightOrder === "snake-offset") {
+                let sortedTeams = teams.map((t, i) => ({ team: t, index: i })).sort((a,b) => {
+                    if (a.team?.players?.length > b.team?.players?.length) return 1;
+                    if (a.team?.players?.length < b.team?.players?.length) return 1;
+
+                    if (a.index > b.index) return 1;
+                    if (a.index < b.index) return 1;
+
+                    return 0;
+                }).map(t => t.team);
+
+                const minPlayers = Math.min(...sortedTeams.map(t => (t.players || []).length));
+                const teamsNotDraftedThisRound = sortedTeams.filter(t => (t.players || []).length === minPlayers);
+
+                const forwards = this.highlightOrder === "snake" ? (minPlayers % 2 === 0) : (minPlayers % 2 === 1);
+
+                const team = teamsNotDraftedThisRound?.[forwards ? 0 : (teamsNotDraftedThisRound.length - 1)];
+
+                if (!team) return null;
+                return {
+                    team: team.id,
+                    player: (team.players || []).length
+                };
+            }
+            return { team: null, player: null };
         }
     },
     methods: {
@@ -300,6 +380,7 @@ export default {
         color: #eee;
         font-family: "SLMN-Industry", "Industry", sans-serif;
         overflow: hidden;
+        --players-width: 25%;
     }
     .available-players {
         display: flex;
@@ -325,9 +406,10 @@ export default {
         font-size: 32px;
         font-weight: bold;
         width: 100%;
-        margin: 0 2px 8px;
+        margin: 0 0 8px;
         padding: 2px 8px;
         width: calc(100% - 4px);
+        text-transform: uppercase;
     }
 
     .team {
@@ -343,10 +425,10 @@ export default {
 
 
     .available-players {
-        width: 25%;
+        width: var(--players-width);
     }
     .teams {
-        width: 75%;
+        width: calc(100% - var(--players-width));
         margin-left: 2em;
     }
     .theme-bar {
@@ -407,7 +489,7 @@ export default {
 
     .draftable-leave-active {
         /*display: none;*/
-        transition: all .2s ease;
+        transition: all .5s ease;
         position: absolute;
         right: 0;
     }
@@ -442,4 +524,38 @@ export default {
         width: calc(100% - 4px) !important;
         height: 200px;
     }
+
+    .available-players.role-columns .title {
+        margin: 0 0 8px;
+    }
+    .available-role-columns {
+        display: flex;
+        flex-grow: 1;
+        width: 100%;
+        gap: 4px;
+    }
+    .role-column {
+        flex-shrink: 0;
+        flex-grow: 1;
+    }
+
+    .role-column .players-transition {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        height: auto !important;
+    }
+
+    .available-players.role-columns,
+    .available-role-columns,
+    .role-column .players-transition {
+        height: 100%;
+    }
+
+    .role-column .draft-player {
+        width: 196px;
+        margin: 1px 0;
+        font-size: 18px;
+        padding: 0 8px;
+    }
+
 </style>

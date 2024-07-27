@@ -1,5 +1,13 @@
 import { dirtyID } from "../action-utils/action-utils.js";
 
+function getPermissions(role) {
+    const permissions = {
+        "Match Editor": ["Producer", "Lobby Admin", "Commissioner", "Admin", "Event Director", "Tournament Director"]
+    };
+
+    return Object.entries(permissions).filter(([permissionName, roles]) => roles.includes(role)).map(([permissionName, roles]) => permissionName) || [];
+}
+
 function getLanguage(role) {
     const plural = {
         "Graphics Operator": "Graphics Operators"
@@ -15,17 +23,21 @@ function getLanguage(role) {
 export default {
     key: "set-player-relationships",
     requiredParams: ["matchID", "roles"],
+    optionalParams: ["clientCams"],
     auth: ["client", "user"],
     /***
+     * @typedef {"Team 1" | "Team 2" | "None"} Cams
+     * @typedef {{ clientID: AnyAirtableID, cams: Cams[] }[]} CamsData
      * @param {Object?} params
      * @param {ClientData} client
+     * @param {CamsData} clientCams
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern
-    async handler({ matchID, roles }, { user }) {
+    async handler({ matchID, roles, clientCams }, { user }) {
 
         let match = await this.helpers.get(matchID);
-        if (!match) throw "No match associated";
+        if (!match?.id) throw "No match associated";
         if (!(await this.helpers.permissions.canEditMatch(user, { match }))) throw { errorMessage: "You don't have permission to edit this item", errorCode: 403 };
 
         const matchRelationships = await Promise.all((match.player_relationships || []).map(id => this.helpers.get(id)));
@@ -38,7 +50,7 @@ export default {
             for (const playerID of roles[roleKey].selected) {
                 if (!playerID) continue;
                 const player = await this.helpers.get(playerID);
-                if (!player) continue;
+                if (!player?.id) continue;
                 const playerRelationships = await Promise.all((player.player_relationships || []).map(id => this.helpers.get(id)));
 
                 const realRelation = playerRelationships.filter((x) => x.singular_name === roleKey);
@@ -48,7 +60,8 @@ export default {
                     const [newRelationship] = await this.helpers.createRecord("Player Relationships", {
                         "Singular Name": roleKey,
                         "Player": [dirtyID(player.id)],
-                        ...getLanguage(roleKey)
+                        ...getLanguage(roleKey),
+                        "Permissions": getPermissions(roleKey)
                     });
 
                     await this.helpers.updateRecord("Players", player, {
@@ -75,6 +88,20 @@ export default {
         if (response?.error) {
             console.error("Airtable error", response.error);
             throw "Airtable error";
+        }
+
+        if (clientCams) {
+            console.log("Setting client cams", clientCams);
+            await Promise.all(clientCams.map(async ({ clientID, cams }) => {
+                const client = await this.helpers.get(clientID);
+                if (!client?.id || client.__tableName !== "Clients") throw "Invalid client";
+
+                if (JSON.stringify(cams) === JSON.stringify(client.cams || [])) return null;
+
+                return this.helpers.updateRecord("Clients", client, {
+                    "Cams": cams
+                });
+            }).filter(Boolean));
         }
 
         return {

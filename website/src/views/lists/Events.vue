@@ -50,7 +50,10 @@ export default {
                 events: ReactiveArray("events", {
                     theme: ReactiveThing("theme")
                 })
-            }).sort((a, b) => a.order - b.order);
+            }).sort((a, b) => a.order - b.order).map(series => ({
+                ...series,
+                events: (series.events || []).sort(sortEvents)
+            }));
         },
         otherEvents() {
             if (!this.eventSeries.some(e => e._original_data_id)) return [];

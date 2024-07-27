@@ -38,13 +38,17 @@
         </div>
         <SubPageNav>
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
-            <li v-if="player.casts" class="nav-item"><router-link class="nav-link" :to="subLink('casts')">Casts</router-link></li>
-            <li v-if="player.news" class="nav-item"><router-link class="nav-link" :to="subLink('news')">News</router-link></li>
-            <li v-if="player.brands_designed" class="nav-item"><router-link class="nav-link" :to="subLink('brands')">Brands</router-link></li>
-            <li v-if="hasMatchPlayerRelationships" class="nav-item"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
-            <li v-if="player.casts || hasMatchPlayerRelationships" class="nav-item"><router-link class="nav-link" :to="subLink('partners')">Partners</router-link></li>
-            <li v-if="player.member_of && player.member_of.some(t => t.matches)" class="nav-item"><router-link class="nav-link" :to="subLink('played-matches')">Played Match VODs</router-link></li>
+            <li v-if="player.news" class="nav-item"><router-link class="nav-link" :to="subLink('news')">Articles</router-link></li>
             <li v-if="player.member_of && player.member_of.some(t => t.matches)" class="nav-item"><router-link class="nav-link" :to="subLink('match-stats')">Match Stats</router-link></li>
+
+            <li v-if="player.brands_designed" class="nav-item"><router-link class="nav-link" :to="subLink('brands')">Brands</router-link></li>
+
+            <li v-if="player.casts" class="nav-item"><router-link class="nav-link" :to="subLink('casts')">Casting Record</router-link></li>
+            <li v-if="hasMatchPlayerRelationships" class="nav-item"><router-link class="nav-link" :to="subLink('matches')">Production Record</router-link></li>
+            <li v-if="player.casts || hasMatchPlayerRelationships" class="nav-item"><router-link class="nav-link" :to="subLink('partners')">Production Partners</router-link></li>
+
+            <!--<li v-if="player.member_of && player.member_of.some(t => t.matches)" class="nav-item"><router-link class="nav-link" :to="subLink('played-matches')">Played Match VODs</router-link></li>-->
+
             <li class="nav-item"><router-link class="nav-link" :to="subLink('banner')">Banner Creator</router-link></li>
         </SubPageNav>
         <router-view :player="{...player, participationEvents, participationPoints }" />
@@ -56,7 +60,6 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import Social from "@/components/website/Social";
 import SubPageNav from "@/components/website/SubPageNav";
 import { url } from "@/utils/content-utils";
-// import { sortEvents } from "@/utils/sorts";
 import { bg, resizedImage } from "@/utils/images";
 import { logoBackground } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
@@ -90,7 +93,12 @@ export default {
                 }),
                 captain_of: ReactiveArray("captain_of", {
                     event: ReactiveThing("event"),
-                    theme: ReactiveThing("theme")
+                    theme: ReactiveThing("theme"),
+                    accolades: ReactiveArray("accolades", {
+                        event: ReactiveThing("event", {
+                            theme: ReactiveThing("theme")
+                        })
+                    })
                 }),
                 event_staff: ReactiveArray("event_staff", {
                     theme: ReactiveThing("theme")
@@ -143,8 +151,9 @@ export default {
             return [
                 // team things
                 ...(this.player.member_of ? [].concat(...this.player.member_of.map(e => (e.accolades || []).filter(a => a?.show_for_players).map(a => ({ ...a, team: e }))).filter(Boolean)) : []),
+                ...(this.player.captain_of ? [].concat(...this.player.captain_of.map(e => (e.accolades || []).filter(a => a?.show_for_players).map(a => ({ ...a, team: e }))).filter(Boolean)) : []),
                 ...(this.player.accolades ? this.player.accolades.filter(a => a?.show_for_players && a?.teams?.length === 1).map(a => ({ ...a, team: a.teams?.[0] })) : [])
-            ].filter(accolade => accolade.trophy_tier).sort((a, b) => {
+            ].filter((accolade, i, arr) => accolade.trophy_tier && arr.findIndex(x => x.id === accolade.id) === i).sort((a, b) => {
                 const TierPriority = ["Championship", "Tournament"];
                 const tierIndexes = [a, b].map(x => TierPriority.indexOf(x.trophy_tier));
                 const tierCompare = tierIndexes[0] - tierIndexes[1];

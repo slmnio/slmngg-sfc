@@ -57,13 +57,14 @@ export default {
 .auction-bid.winning {
     margin-bottom: 6px;
     font-size: 1.5em;
+    border-top-right-radius: .25em
 }
 .team-amount {
     font-size: 1.25em;
     font-weight: bold;
     line-height: 1em;
 }
-.team-row {
+.auction-bid.winning .team-row {
     animation: jump .5s forwards;
 }
 @keyframes jump {

@@ -1,7 +1,7 @@
 <template>
     <div>
         <p>
-            Hi! This guide will teach you how to set everything your PC so you can observe Overwatch with BPL.
+            This guide will teach you how to setup everything your PC so you can observe Overwatch with BPL.
         </p>
 
         <h2>Prerequisites</h2>
@@ -18,6 +18,9 @@
                 src="https://www.metercustom.net/plugin/?hl=en"></iframe>
         </b-collapse>
 
+        <p>
+            Where possible, use an ethernet cable to connect to the internet. You're going to be streaming a lot of video at a constant rate. WiFi may be too unreliable for a consistent connection.
+        </p>
 
         <h3>Observing Account</h3>
         <p>

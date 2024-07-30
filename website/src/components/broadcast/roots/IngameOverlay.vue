@@ -158,6 +158,17 @@ export default {
             if (!this.match) return null;
             if (this.match.middle_text) return this.match.middle_text;
 
+            if (this.broadcast?.middle_text_format) {
+                let format = this.broadcast?.middle_text_format;
+                const formatOptions = getFormatOptions(this.broadcast?.event, this.match);
+
+                Object.entries(formatOptions).forEach(([key, val]) => {
+                    format = format.replace(`{${key}}`, val || "");
+                });
+
+                return format.trim();
+            }
+
             if ((this.broadcast?.broadcast_settings || [])?.includes("Use map number in middle text")) {
                 console.log("middle match maps", this.match.maps);
 

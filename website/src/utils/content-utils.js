@@ -621,10 +621,10 @@ export function autoRecord(team, stage) {
 
 export function getFormatOptions(event, match) {
     return {
-        event: event.name,
-        event_name: event.name,
-        event_long: event.name,
-        event_short: event.short,
+        event: event?.name,
+        event_name: event?.name,
+        event_long: event?.name,
+        event_short: event?.short,
 
         team_1_code: match?.teams?.[0]?.code,
         team_1_name: match?.teams?.[0]?.name,

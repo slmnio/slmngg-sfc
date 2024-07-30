@@ -49,10 +49,6 @@
                                 <td>MVP</td>
                                 <td><LinkedPlayers :players="[match.mvp]" /></td>
                             </tr>
-                            <tr v-if="replayCodes">
-                                <td>Replay codes</td>
-                                <td>{{ replayCodes }}</td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>

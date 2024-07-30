@@ -118,22 +118,16 @@ export function multiImage(theme, keys, minSize = 30, useResizer = true) {
     return url || null;
 }
 
-export function getMatchContext(match) {
-    const text = [];
-    const out = (match?.event?.short || match?.event?.name || "");
+export function getMatchContext(match, { light } = {}) {
+    let pieces = [];
+    if (light) {
+        pieces = [match?.sub_event].filter(Boolean);
+    } else {
+        pieces = [match?.division, match?.sub_event, match?.round || match?.week_text].filter(Boolean);
+    }
+    const eventPrefix = (match?.event?.short || match?.event?.name || "");
 
-    // sub_event: round
-    // week_text: round
-    // week
-    //
-
-    text.push(match?.sub_event || "");
-    if (!(text.length >= 1 && match.round)) text.push(match?.week_text || "");
-    text.push(match?.round || "");
-    // text.push(match?.sub_event || ""); // round > sub_event
-    text.push((match?.week && (!match?.week_text) && `Week ${match?.week}`) || ""); // basically regular season
-    const pieces = text.filter((t, i, a) => !!t && a.indexOf(t) === i);
-    return out + (pieces.length > 0 ? ": " : "") + pieces.join(" · ");
+    return eventPrefix + (pieces.length ? ": " : "") + pieces.join(" · ");
 }
 
 export function getRoleSVG(name) {
@@ -636,6 +630,7 @@ export function getFormatOptions(event, match) {
         match_group: match?.match_group,
         match_round: match?.round,
         match_number: match?.match_number,
+        match_division: match?.division,
         match_week_text: match?.week_text,
         match_week_number: match?.week,
         match_day: match?.day,

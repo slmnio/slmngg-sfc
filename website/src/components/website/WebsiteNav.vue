@@ -245,7 +245,7 @@ export default {
     }
 }
 
-@media (max-width: 957px) {
+@media (max-width: 767px) {
     .live-matches-text {
         width: 100%;
         text-align: center;

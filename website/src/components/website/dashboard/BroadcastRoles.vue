@@ -5,10 +5,41 @@
                 <tr>
                     <th>Role</th>
                     <th class="text-nowrap">Assigned staff</th>
-                    <th colspan="2">Clients</th>
+                    <th colspan="2">Staff</th>
                 </tr>
             </thead>
             <tbody>
+                <tr key="Caster">
+                    <td class="w-25">Caster</td>
+                    <td>
+                        <linked-players v-if="casters?.length" :players="casters" />
+                    </td>
+                    <td class="form-groups">
+                        <div v-for="i of formData['Caster']?.count" :key="i" class="form-group">
+                            <b-form-select
+                                v-model="formData['Caster'].selected[i-1]"
+                                class="role-selectable opacity-changes"
+                                size="sm"
+                                :class="{'low-opacity': clientsLoading}"
+                                :options="eventCasters"
+                                @keydown.delete="() => formData['Caster'].selected[i-1] = null" />
+                        </div>
+                    </td>
+                    <td style="width: 2em">
+                        <b-button class="role-selectable" size="sm" variant="success" @click="formData['Caster'].count++">
+                            <i class="fa fa-plus"></i>
+                        </b-button>
+                        <b-button
+                            v-for="i of Math.max(0, (formData['Caster']?.count || 0) - 1)"
+                            :key="i"
+                            class="role-selectable"
+                            size="sm"
+                            variant="danger"
+                            @click="removeRow('Caster', i)">
+                            <i class="fa fa-minus"></i>
+                        </b-button>
+                    </td>
+                </tr>
                 <tr v-for="(role) in roles" :key="role">
                     <td class="w-25">{{ role }}</td>
                     <td>
@@ -78,7 +109,8 @@ export default {
         processing: false,
         roles: ["Producer", "Observer", "Observer Director", "Replay Producer", "Lobby Admin"],
         defaultRoleCount: {
-            Observer: 4
+            Observer: 4,
+            Caster: 2
         },
         formData: {},
         test: "",
@@ -117,6 +149,21 @@ export default {
                 })
             })?.player_relationships || [];
         },
+        casters() {
+            return new ReactiveRoot(this.liveMatch?.id, {
+                "casters": ReactiveArray("casters")
+            })?.casters || [];
+        },
+        eventCasters() {
+            return (new ReactiveRoot(this.broadcast?.id, {
+                "event": ReactiveThing("event", {
+                    "casters": ReactiveArray("casters")
+                })
+            })?.event?.casters || []).map((player) => ({
+                text: player?.name,
+                value: player?.id
+            }));
+        },
         clientObserverTeamButtons() {
             return (this.formData["Observer"]?.selected || []).map((playerID, i) => ({
                 clientID: this.clients.find(client => client?.staff?.id === playerID)?.id,
@@ -151,13 +198,17 @@ export default {
                 .filter(rel => rel?.singular_name === roleName)
                 .map(rel => rel.player);
         },
-        updateData(newShit) {
-            if (!newShit) return;
+        updateData(relationships, casters) {
+            console.log("updating data",{ relationships, casters });
             this.clearFormData();
-            console.log("updating data", newShit);
-            for (const relationship of newShit) {
+            for (const relationship of (relationships || this.matchRelationships)) {
                 if (relationship.player?.id) {
                     this.formData[relationship.singular_name].selected.push(relationship.player?.id);
+                }
+            }
+            for (const caster of (casters || this.casters)) {
+                if (caster?.id) {
+                    this.formData["Caster"].selected.push(caster?.id);
                 }
             }
             for (const roleName in this.formData) {
@@ -165,7 +216,7 @@ export default {
             }
         },
         resetFromServer() {
-            this.updateData(this.matchRelationships);
+            this.updateData(this.matchRelationships, this.casters);
         },
         clearFormData() {
             this.roles.forEach(role => {
@@ -174,6 +225,10 @@ export default {
                     selected: []
                 };
             });
+            this.formData["Caster"] = {
+                count: this.defaultRoleCount["Caster"] || 1,
+                selected: []
+            };
         },
         playerClient(playerID) {
             console.log(playerID, this.clients);
@@ -200,9 +255,17 @@ export default {
         matchRelationships: {
             deep: true,
             immediate: true,
-            handler(newShit, oldShit) {
-                const [n, o] = [newShit, oldShit].map(x => (x || []).map(r => `${r?.id}-${r?.player?.name}`).join(","));
-                if (n !== o) this.updateData(newShit, oldShit);
+            handler(newRels, oldRels) {
+                const [n, o] = [newRels, oldRels].map(x => (x || []).map(r => `${r?.id}-${r?.player?.name}`).join(","));
+                if (n !== o) this.updateData(newRels);
+            }
+        },
+        casters: {
+            deep: true,
+            immediate: true,
+            handler(newCasters, oldCasters) {
+                const [n, o] = [newCasters, oldCasters].map(x => (x || []).map(r => `${r?.id}-${r?.player?.name}`).join(","));
+                if (n !== o) this.updateData(null, newCasters);
             }
         },
         "formData.Observer.selected": {

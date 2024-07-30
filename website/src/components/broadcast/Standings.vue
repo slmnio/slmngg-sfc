@@ -57,6 +57,7 @@ export default {
     props: {
         event: Object,
         stage: String,
+        stages: String,
         title: String,
         tieText: String,
         showMapDiff: Boolean,
@@ -84,9 +85,15 @@ export default {
             })(this.event);
         },
         stageMatches() {
-            if (!this.allMatches?.length || !this.stage) return [];
-            if (!this.stage) return this.allMatches;
-            return this.allMatches.filter(match => match.match_group && match.match_group.toLowerCase() === this.stage.toLowerCase());
+            if (!this.allMatches?.length) return [];
+            if (this.stage || this.stages) {
+                if (this.stages) {
+                    return this.allMatches.filter(match => this.stages.some(stage => match.match_group && match.match_group.toLowerCase() === stage.toLowerCase()));
+                } else if (this.stage) {
+                    return this.allMatches.filter(match => match.match_group && match.match_group.toLowerCase() === this.stage.toLowerCase());
+                }
+            }
+            return this.allMatches;
         },
         blocks() {
             if (!this.event?.blocks) return null;
@@ -109,7 +116,10 @@ export default {
             return this.standingsSettings?.sort || [];
         },
         standingsSettings() {
-            return (this.blocks?.standings || []).find(s => s.group?.toLowerCase() === this.stage.toLowerCase() || s.key?.toLowerCase() === this.stage.toLowerCase());
+            return (this.blocks?.standings || []).find(s =>
+                s.group?.toLowerCase() === this.stage?.toLowerCase() ||
+                s.key?.toLowerCase() === this.stage?.toLowerCase()
+            );
         },
         showColumns() {
             return this.overrideShowColumns || this.standingsSettings?.show || [

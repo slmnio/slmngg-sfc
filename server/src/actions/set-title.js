@@ -43,6 +43,7 @@ module.exports = {
             "match_number": match.match_number,
             "match_week_text": match.week_text,
             "match_week_number": match.week,
+            "match_division": match.division,
             "match_day": match.day,
             "match_first_to": match.first_to
         };

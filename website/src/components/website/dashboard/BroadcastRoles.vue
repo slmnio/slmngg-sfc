@@ -273,7 +273,7 @@ export default {
             immediate: true,
             handler(selected) {
                 console.log("obs selected", selected);
-                this.observerTeamButtons = (selected || []).map(observerPlayerID => {;
+                this.observerTeamButtons = (selected || []).map(observerPlayerID => {
                     if (!observerPlayerID) return null;
                     const client = this.clients?.find(c => c?.staff?.id === observerPlayerID);
                     if (!client) return null;

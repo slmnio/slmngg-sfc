@@ -125,6 +125,8 @@ export function getMatchContext(match, { light } = {}) {
     } else {
         pieces = [match?.division, match?.sub_event, match?.round || match?.week_text].filter(Boolean);
     }
+    pieces = pieces.filter((v, i, a) => a.indexOf(v) === i);
+
     const eventPrefix = (match?.event?.short || match?.event?.name || "");
 
     return eventPrefix + (pieces.length ? ": " : "") + pieces.join(" · ");

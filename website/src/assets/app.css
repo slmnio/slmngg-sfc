@@ -233,7 +233,7 @@ a.text-dark-low:focus, a.text-dark-low:hover {
 
 
 .ct-passive { color: var(--theme-passive, #ffffff); }
-.ct-active { color: var(--theme-active, #66d9ff) !important; }
+.ct-active { color: var(--theme-active, #66d9ff); }
 .ct-dark { color: var(--theme-dark, #222222); }
 .ct-ondark { color: var(--theme-ondark, #ffffff); }
 

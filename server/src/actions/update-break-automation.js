@@ -1,6 +1,6 @@
-const { getBroadcast } = require("../action-utils/action-utils");
+import { getBroadcast } from "../action-utils/action-utils.js";
 
-module.exports = {
+export default {
     key: "update-break-automation",
     auth: ["client"],
     requiredParams: ["options"],

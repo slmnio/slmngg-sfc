@@ -1,8 +1,6 @@
-const { getTwitchChannel,
-    getTwitchAPIClient,
-    getTwitchAPIError
-} = require("../action-utils/action-utils");
-module.exports = {
+import { getTwitchAPIClient, getTwitchAPIError, getTwitchChannel } from "../action-utils/action-utils.js";
+
+export default {
     key: "start-commercial",
     auth: ["user", "client"],
     requiredParams: ["commercialDuration"],

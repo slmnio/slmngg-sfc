@@ -1,7 +1,7 @@
-const { getAll, cleanID } = require("../action-utils/action-utils");
-const { canEditMatch } = require("../action-utils/action-permissions");
+import { cleanID, getAll } from "../action-utils/action-utils.js";
+import { canEditMatch } from "../action-utils/action-permissions.js";
 
-module.exports = {
+export default {
     key: "resolve-entire-bracket",
     auth: ["user"],
     requiredParams: ["bracketID"],

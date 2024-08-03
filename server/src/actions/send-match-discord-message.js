@@ -1,7 +1,8 @@
-const { getMatchData, cleanID } = require("../action-utils/action-utils");
-const discordClient = require("../discord/client.js");
-const { MapObject } = require("../discord/managers");
-module.exports = {
+import { cleanID, getMatchData } from "../action-utils/action-utils.js";
+import discordClient from "../discord/client.js";
+import { MapObject } from "../discord/managers.js";
+
+export default {
     key: "send-match-discord-message",
     auth: ["client", "user"],
     /***

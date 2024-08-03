@@ -1,11 +1,7 @@
-const {
-    SlashCommandBuilder,
-    EmbedBuilder
-} = require("discord.js");
-const Cache = require("../../../cache");
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import * as Cache from "../../../cache.js";
 
-
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName("srt")
         .addStringOption(option =>

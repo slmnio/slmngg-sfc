@@ -1,9 +1,7 @@
-const { updateRecord,
-    createRecord
-} = require("./action-utils/action-utils");
-const { exchangeCode, getTokenInfo, StaticAuthProvider
-} = require("@twurple/auth");
-const { ApiClient } = require("@twurple/api");
+import { createRecord, updateRecord } from "./action-utils/action-utils.js";
+import { exchangeCode, getTokenInfo, StaticAuthProvider } from "@twurple/auth";
+import { ApiClient } from "@twurple/api";
+
 
 function cleanID(id) {
     if (!id) return null;
@@ -20,7 +18,7 @@ function niceJoin(array) {
     return array[0];
 }
 
-module.exports = ({ app, Cache, io }) => {
+export default ({ app, Cache, io }) => {
     app.get("/redirect", async (req, res) => {
         try {
             let redirects = await Promise.all(((await Cache.get("Redirects"))?.ids || []).map(id => Cache.get(id)));

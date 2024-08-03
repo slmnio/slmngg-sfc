@@ -1,9 +1,7 @@
-const {
-    getTwitchChannel,
-    getMatchData,
-    getTwitchAPIClient
-} = require("../action-utils/action-utils");
-module.exports = {
+import { getMatchData, getTwitchAPIClient, getTwitchChannel } from "../action-utils/action-utils.js";
+
+
+export default {
     key: "set-marker",
     auth: ["client"],
     optionalParams: ["text"],

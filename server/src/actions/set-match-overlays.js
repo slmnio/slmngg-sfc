@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     key: "set-match-overlays",
     auth: ["user"],
     requiredParams: ["match", "overlayType", "state"],

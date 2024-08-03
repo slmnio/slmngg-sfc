@@ -1,5 +1,5 @@
-const { deAirtable } = require("../action-utils/action-utils");
-module.exports = {
+import { deAirtable } from "../action-utils/action-utils.js";
+export default {
     key: "create-live-guest",
     requiredParams: [],
     auth: ["user"],

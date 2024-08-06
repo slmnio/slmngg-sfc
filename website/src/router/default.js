@@ -116,7 +116,10 @@ export default [
                         path: "companion-module",
                         component: () => import("@/views/sub-views/guide/companion-module/CompanionModuleGuideContainer.vue"),
                         children: [
-                            { path: "", component: () => import("@/views/sub-views/guide/companion-module/CompanionModuleGuideIntro.vue"), name: "companion-module" }
+                            { path: "", component: () => import("@/views/sub-views/guide/companion-module/CompanionModuleGuideIntro.vue"), name: "companion-module" },
+                            { path: "companion-setup", component: () => import("@/views/sub-views/guide/companion-module/CompanionModuleGuideSetupCompanion.vue"), name: "companion-module-companion" },
+                            { path: "module-setup", component: () => import("@/views/sub-views/guide/companion-module/CompanionModuleGuideSetupModule.vue"), name: "companion-module-module" },
+                            { path: "connections-buttons", component: () => import("@/views/sub-views/guide/companion-module/CompanionModuleGuideConnections.vue"), name: "companion-module-connections" }
                         ]
                     },
                 ],

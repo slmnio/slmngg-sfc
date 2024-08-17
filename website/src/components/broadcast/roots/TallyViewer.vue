@@ -36,8 +36,14 @@
             <div v-if="producer" class="prod-info">
                 <div class="prod-name flex-center">Producer: {{ producer.name }}</div>
                 <div class="prod-scenes">
-                    <div class="prod-preview">{{ producerPreviewScene }}</div>
-                    <div class="prod-program">{{ producerProgramScene }}</div>
+                    <div class="prod-preview">
+                        <span class="prod-scene-name">{{ producerPreviewScene }}</span>
+                        <span v-if="producerPreviewPersonName" class="prod-person-name">{{ producerPreviewPersonName }}</span>
+                    </div>
+                    <div class="prod-program">
+                        <span class="prod-scene-name">{{ producerProgramScene }}</span>
+                        <span v-if="producerProgramPersonName" class="prod-person-name">{{ producerProgramPersonName }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -105,6 +111,34 @@ export default {
             ];
             return (this.liveMatch?.player_relationships || [])
                 .filter(rel => !nonProductionRoles.includes(rel.singular_name) && rel.player?.[0] === this.client?.staff?.[0]);
+        },
+        scenePersonMap() {
+            const map = {};
+            const observers = this.liveMatch?.player_relationships?.filter(rel => rel.singular_name === "Observer");
+            const obsDir = this.liveMatch?.player_relationships?.find(rel => rel.singular_name === "Observer Director");
+            const replays = this.liveMatch?.player_relationships?.find(rel => rel.singular_name === "Replay Producer");
+            if (observers?.length > 0) {
+                for (const [i, obs] of observers.entries()) {
+                    map[`Ingame ${i + 1}`] = obs.player_name[0];
+                }
+            }
+            if (obsDir) {
+                map["Obs Director"] = obsDir.player_name[0];
+            }
+            if (replays) {
+                map["Ingame Replays"] = replays.player_name[0];
+                map["Break Replays"] = replays.player_name[0];
+                map["Casters Replays"] = replays.player_name[0];
+                map["Casters Highlights"] = replays.player_name[0];
+            }
+
+            return map;
+        },
+        producerPreviewPersonName() {
+            return this.scenePersonMap[this.producerPreviewScene];
+        },
+        producerProgramPersonName() {
+            return this.scenePersonMap[this.producerProgramScene];
         },
         tallyRolesText() {
             return this.tallyRoles.map(r => r.singular_name === "Observer" ? `Observer ${this.selfObserverNumber}` : r.singular_name).join("/");
@@ -260,10 +294,9 @@ export default {
     font-size: 0.8em;
     flex-grow: 1;
     margin-left: 1em;
-    font-weight: bold;
 }
 .prod-scenes div {
-    border: 1px solid rgba(255,255,255,0.5);
+    border: 1.5px solid rgba(255,255,255,0.5);
     padding: 0.5em .25em;
     margin: 0 0.25em;
     background-color: black;
@@ -272,6 +305,7 @@ export default {
     height: 100%;
     display: flex;
     justify-content: center;
+    flex-direction: column;
     align-items: center;
     text-align: center;
 }
@@ -281,6 +315,15 @@ export default {
     border-color: lime;
     border-radius: .1em;
 }
+
+.prod-scenes .prod-scene-name {
+    font-weight: bold;
+}
+
+.prod-scenes .prod-person-name {
+    font-size: 0.8em;
+}
+
 .prod-scenes .prod-program {
     color: #ff4646;
     border-color: #ff0000;

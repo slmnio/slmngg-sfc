@@ -1,5 +1,10 @@
 <template>
-    <div v-if="player && !player.dummy" class="draft-player" :style="background" :data-player-id="player && player.id || 'empty'">
+    <div
+        v-if="player && !player.dummy"
+        :class="{'highlight': highlight}"
+        class="draft-player"
+        :style="background"
+        :data-player-id="player && player.id || 'empty'">
         <Squeezable class="player-name">
             <div>{{ player.name }}</div>
         </Squeezable>
@@ -8,7 +13,11 @@
             <ThemeLogo class="badge-logo" :theme="badge && badge.theme" icon-padding="0.2em" logo-size="w-50" />
         </div>
     </div>
-    <div v-else class="draft-player dummy" :style="background">
+    <div
+        v-else
+        class="draft-player dummy"
+        :style="background"
+        :class="{'highlight': highlight}">
         <div class="player-name">dummy</div>
     </div>
 </template>
@@ -27,7 +36,8 @@ export default {
         theme: {},
         asStaff: Boolean,
         showIcon: Boolean,
-        badge: { }
+        badge: { },
+        highlight: Boolean
     },
     computed: {
         background() {
@@ -45,11 +55,13 @@ export default {
         border-bottom: 2px solid transparent;
         font-size: 20px;
         width: calc(50% - 4px);
-        margin: 0 2px 2px;
+        margin: 0 0 2px;
         padding: 1px 8px;
         overflow: hidden;
         display: flex;
         align-items: center;
+        opacity: 1;
+        transition: opacity 200ms ease;
     }
     .player-name {
         flex-grow: 1;

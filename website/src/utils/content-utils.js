@@ -24,6 +24,7 @@ import pushIcon from "@/assets/map-type-icons/push.svg";
 import assaultIcon from "@/assets/map-type-icons/assault.svg";
 import flashpointIcon from "@/assets/map-type-icons/flashpoint.svg";
 import clashIcon from "@/assets/map-type-icons/clash.png";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 export function getImage (i) {
     // console.log(i);
@@ -117,22 +118,18 @@ export function multiImage(theme, keys, minSize = 30, useResizer = true) {
     return url || null;
 }
 
-export function getMatchContext(match) {
-    const text = [];
-    const out = (match?.event?.short || match?.event?.name || "");
+export function getMatchContext(match, { light } = {}) {
+    let pieces = [];
+    if (light) {
+        pieces = [match?.sub_event].filter(Boolean);
+    } else {
+        pieces = [match?.division, match?.sub_event, match?.round || match?.week_text].filter(Boolean);
+    }
+    pieces = pieces.filter((v, i, a) => a.indexOf(v) === i);
 
-    // sub_event: round
-    // week_text: round
-    // week
-    //
+    const eventPrefix = (match?.event?.short || match?.event?.name || "");
 
-    text.push(match?.sub_event || "");
-    if (!(text.length >= 1 && match.round)) text.push(match?.week_text || "");
-    text.push(match?.round || "");
-    // text.push(match?.sub_event || ""); // round > sub_event
-    text.push((match?.week && (!match?.week_text) && `Week ${match?.week}`) || ""); // basically regular season
-    const pieces = text.filter((t, i, a) => !!t && a.indexOf(t) === i);
-    return out + (pieces.length > 0 ? ": " : "") + pieces.join(" · ");
+    return eventPrefix + (pieces.length ? ": " : "") + pieces.join(" · ");
 }
 
 export function getRoleSVG(name) {
@@ -410,7 +407,8 @@ function getNoSunAbbreviation(abbrev) {
  * @param {boolean?} use24HourTime - use 24 hour time
  * @returns {string}
  */
-export function formatTime(timeString, { tz, use24HourTime = false, format = "{day-short} {date-ordinal} {month-short} {year} {time} {tz}" }) {
+export function formatTime(timeString, { tz, use24HourTime = false, format = "{day-short} {date-ordinal} {month-short} {year} {time} {tz}" } = {}) {
+    if (!tz) tz = useSettingsStore().timezone;
     const timezone = getTimezone(tz);
     const time = spacetime(timeString).goto(timezone);
     const abbrev = getAbbrev(timezone, time);
@@ -452,15 +450,35 @@ export function getEmbedData(url) {
 
         console.log(ts);
 
-        return { service: "youtube", key: vodURL.searchParams.get("v"), timestamp: ts || null };
+        return {
+            service: "youtube",
+            key: vodURL.searchParams.get("v"),
+            timestamp: ts || null,
+            display: {
+                text: "YouTube",
+                icon: "fab fa-youtube"
+            }
+        };
     }
     if (vodURL.host === "youtu.be") {
-        return { service: "youtube", key: vodURL.pathname.slice(1), timestamp: vodURL.searchParams.get("t") || null };
+        return {
+            service: "youtube",
+            key: vodURL.pathname.slice(1),
+            timestamp: vodURL.searchParams.get("t") || null,
+            display: {
+                text: "YouTube",
+                icon: "fab fa-youtube"
+            }
+        };
     }
     if (["www.twitch.tv", "twitch.tv"].includes(vodURL.host)) {
         const embed = {
             service: (vodURL.pathname.split("/").length === 3 ? "twitch" : "twitch-live"),
-            key: vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1)
+            key: vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1),
+            display: {
+                text: "Twitch",
+                icon: "fab fa-twitch"
+            }
         };
         if (embed.service === "twitch") {
             embed.timestamp = vodURL.searchParams.get("t") || null;
@@ -471,18 +489,33 @@ export function getEmbedData(url) {
     if (url.endsWith(".pdf")) {
         return {
             service: "pdf",
-            url
+            url,
+            display: {
+                text: "PDF",
+                icon: "fas fa-file-pdf"
+            }
         };
     }
 
     if (["mp4", "webm"].some(file => url.endsWith("." + file))) {
         return {
             service: "unknown-video",
-            url
+            url,
+            display: {
+                text: "Video",
+                icon: "fas fa-file-video"
+            }
         };
     }
 
-    return { service: "unknown", url };
+    return {
+        service: "unknown",
+        url,
+        display: {
+            text: "Unknown",
+            icon: "fas fa-file"
+        }
+    };
 }
 
 
@@ -580,4 +613,29 @@ export function autoRecord(team, stage) {
     });
 
     return [wins, losses].join(" - ");
+}
+
+export function getFormatOptions(event, match) {
+    return {
+        event: event?.name,
+        event_name: event?.name,
+        event_long: event?.name,
+        event_short: event?.short,
+
+        team_1_code: match?.teams?.[0]?.code,
+        team_1_name: match?.teams?.[0]?.name,
+        team_2_code: match?.teams?.[1]?.code,
+        team_2_name: match?.teams?.[1]?.name,
+
+        match_custom_name: match?.custom_name,
+        match_sub_event: match?.sub_event,
+        match_group: match?.match_group,
+        match_round: match?.round,
+        match_number: match?.match_number,
+        match_division: match?.division,
+        match_week_text: match?.week_text,
+        match_week_number: match?.week,
+        match_day: match?.day,
+        match_first_to: match?.first_to
+    };
 }

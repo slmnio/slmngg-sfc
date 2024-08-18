@@ -1,5 +1,5 @@
 <template>
-    <div v-if="player && player.name" class="container">
+    <div v-if="player && player.name" class="container profile-page">
         <h1>Profile Page</h1>
         <!--        <b-alert v-model="showAlert" dismissible variant="danger">-->
         <!--            {{ errorMessage }}-->
@@ -347,6 +347,9 @@ export default {
         flex-grow: 1;
     }
     .image-form-group:deep(small) {
+        width: 100%;
+    }
+    .profile-page:deep(.row) {
         width: 100%;
     }
 </style>

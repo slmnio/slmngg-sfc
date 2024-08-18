@@ -24,6 +24,7 @@
                         :tie-text="tieText"
                         :show-columns="showColumns"
                         icon-size="w-60"
+                        :game="event?.game"
                         :use-codes="useCodes" />
                 </div>
             </div>
@@ -39,6 +40,7 @@ import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import StandingsTeam from "@/components/broadcast/StandingsTeam";
 import { sortTeamsIntoStandings } from "@/utils/scenarios";
 import { cleanID } from "@/utils/content-utils";
+import { StandingsShowKeys } from "@/utils/standings";
 
 
 function avg(arr) {
@@ -55,6 +57,7 @@ export default {
     props: {
         event: Object,
         stage: String,
+        stages: String,
         title: String,
         tieText: String,
         showMapDiff: Boolean,
@@ -82,9 +85,15 @@ export default {
             })(this.event);
         },
         stageMatches() {
-            if (!this.allMatches?.length || !this.stage) return [];
-            if (!this.stage) return this.allMatches;
-            return this.allMatches.filter(match => match.match_group && match.match_group.toLowerCase() === this.stage.toLowerCase());
+            if (!this.allMatches?.length) return [];
+            if (this.stage || this.stages) {
+                if (this.stages) {
+                    return this.allMatches.filter(match => this.stages.some(stage => match.match_group && match.match_group.toLowerCase() === stage.toLowerCase()));
+                } else if (this.stage) {
+                    return this.allMatches.filter(match => match.match_group && match.match_group.toLowerCase() === this.stage.toLowerCase());
+                }
+            }
+            return this.allMatches;
         },
         blocks() {
             if (!this.event?.blocks) return null;
@@ -107,7 +116,10 @@ export default {
             return this.standingsSettings?.sort || [];
         },
         standingsSettings() {
-            return (this.blocks?.standings || []).find(s => s.group?.toLowerCase() === this.stage.toLowerCase() || s.key?.toLowerCase() === this.stage.toLowerCase());
+            return (this.blocks?.standings || []).find(s =>
+                s.group?.toLowerCase() === this.stage?.toLowerCase() ||
+                s.key?.toLowerCase() === this.stage?.toLowerCase()
+            );
         },
         showColumns() {
             return this.overrideShowColumns || this.standingsSettings?.show || [
@@ -355,33 +367,9 @@ export default {
     },
     methods: {
         getColumnText(col) {
-            /* eslint-disable quote-props */
-            return ({
-                "MatchWinrate": { header: "W%", title: "Match winrate" },
-                "MapWinrate": { header: "MW%", title: "Map winrate" },
-                "OMatchWinrate": { header: "OW%", title: "Opponents' match winrate" },
-                "OMapWinrate": { header: "OMW%", title: "Opponents' map winrate" },
-                "Matches": { header: "Matches", title: "Matches won and lost" },
-                "MatchDiff": { header: "Match Diff", title: "Matches won - matches lost" },
-                "Maps": { header: "Maps", title: "Maps won and lost" },
-                "MapDiff": { header: "Map Diff", title: "Maps won - maps lost" },
-                "ValorantRounds": { header: "RW-RL", title: "Rounds won - rounds lost" },
-                "ValorantRoundDiff": { header: "ΔR", title: "Round diff" },
-                "Points": { header: "Points", title: "Team points" },
-                "MatchWins": { header: "Wins", title: "Match wins" },
-                "MatchLosses": { header: "Losses", title: "Match losses" },
-                "MatchDiffPoints": { header: "Match diff", title: "Matches won and lost (+ team points)" },
-                "MatchWinsPoints": { header: "Points", title: "Match wins + team points" },
-                "MatchesPoints": { header: "Summit Sorting", title: "Matches won - matches lost + team points" },
-                "Played": { header: "Played", title: "Matches played" },
-                "OPoints": { header: "Opp Pts", title: "Opponent points" },
-                "OMatchWinsPoints": { header: "Opp Pts", title: "Opponent points + match wins" }
-            })[col] || {
+            return (StandingsShowKeys(this.event?.game))[col] || {
                 header: "-", title: col
             };
-
-
-            /* eslint-enable quote-props */
         },
         hasColumns(...cols) {
             // TODO: needs to be either shown columns or has columns? feel like it's getting a little tangled

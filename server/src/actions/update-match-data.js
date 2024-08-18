@@ -11,7 +11,7 @@ module.exports = {
     async handler({ matchID, updatedData }, { user }) {
         let match = await this.helpers.get(matchID);
         if (!(await this.helpers.permissions.canEditMatch(user, { match }))) throw { errorMessage: "You don't have permission to edit this item", errorCode: 403 };
-        if (!match) throw "Couldn't load match data";
+        if (!match?.id) throw "Couldn't load match data";
 
         let validKeysMap = {
             "special_event": "Special Event",
@@ -23,6 +23,7 @@ module.exports = {
             "forfeit_reason": "Forfeit Reason",
             "vod": "VOD",
             "vod_2": "VOD 2",
+            "alternative_vod": "Alternative VOD",
         };
         let validatedData = {};
 

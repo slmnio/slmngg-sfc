@@ -107,7 +107,9 @@ async function dataUpdate(id, data, options) {
 
 const longTextMap = {
     "Events": ["about"],
-    "News": ["content"]
+    "News": ["content"],
+    "Matches": ["show_notes"],
+    "Teams": ["show_notes"],
 };
 
 const slmnggAttachments = {
@@ -234,7 +236,11 @@ async function set(id, data, options) {
         let m = longTextMap[data?.__tableName];
         if (m?.length) {
             m.forEach(key => {
-                if (data[key] === "\n") delete data[key];
+                if (data[key] === "\n") {
+                    delete data[key];
+                } else if (data?.[key]?.endsWith("\n")) {
+                    data[key] = data[key].slice(0, -1);
+                }
             });
         }
     } else {

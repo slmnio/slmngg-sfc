@@ -20,9 +20,10 @@
                 :use-dots="useDots"
                 :first-to="match && match.first_to"
                 :event-info="i === 0 ? eventData : null"
-                :map-info="i === 1 ? mapInformation : null"
+                :show-event-maps="i === 1 ? showMapInformation : null"
+                :match="match"
+                :broadcast="broadcast"
             />
-            <!--   -->
             <Middle
                 v-if="!basicMode"
                 :active="shouldShowMiddle"
@@ -30,6 +31,9 @@
                 :text="middleText"
                 :tiny="broadcast.margin === 0"
                 :borders="middleBorders" />
+            <div class="ingame-promote">
+                <ingame-promotion :broadcast="broadcast" :animation-active="animationActive" :match="match" />
+            </div>
         </div>
         <transition name="fade" mode="out-in">
             <Sponsors
@@ -47,10 +51,17 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import IngameTeam from "@/components/broadcast/IngameTeam";
 import Middle from "@/components/broadcast/Middle";
 import Sponsors from "@/components/broadcast/Sponsors";
+import IngamePromotion from "@/components/broadcast/IngamePromotion.vue";
+import { getFormatOptions } from "@/utils/content-utils";
 
 export default {
     name: "IngameOverlay",
-    components: { IngameTeam, Middle, Sponsors },
+    components: {
+        IngamePromotion,
+        IngameTeam,
+        Middle,
+        Sponsors
+    },
     props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed", "noAnimation", "basicMode"],
     data: () => ({
         flippingTeams: false
@@ -103,7 +114,10 @@ export default {
             return this.broadcast?.broadcast_settings?.includes("Use dots instead of numbers for score");
         },
         autoSmall() {
-            return this.broadcast?.broadcast_settings?.includes("Show match records ingame") ? { show: "record", stage: this.broadcast?.current_stage || this.match?.match_group } : null;
+            return this.broadcast?.broadcast_settings?.includes("Show match records ingame") ? {
+                show: "record",
+                stage: this.broadcast?.current_stage || this.match?.match_group
+            } : null;
         },
         scores() {
             if (!this.teams) return [];
@@ -143,6 +157,17 @@ export default {
         middleText() {
             if (!this.match) return null;
             if (this.match.middle_text) return this.match.middle_text;
+
+            if (this.broadcast?.middle_text_format) {
+                let format = this.broadcast?.middle_text_format;
+                const formatOptions = getFormatOptions(this.broadcast?.event, this.match);
+
+                Object.entries(formatOptions).forEach(([key, val]) => {
+                    format = format.replace(`{${key}}`, val || "");
+                });
+
+                return format.trim();
+            }
 
             if ((this.broadcast?.broadcast_settings || [])?.includes("Use map number in middle text")) {
                 console.log("middle match maps", this.match.maps);
@@ -185,8 +210,12 @@ export default {
                 }
             }
 
-            if (this.match.round && this.match.first_to) { return `${this.match.round.toUpperCase()} - FIRST TO ${this.match.first_to}`; }
-            if (this.match.week_text && this.match.first_to) { return `${this.match.week_text.toUpperCase()} - FIRST TO ${this.match.first_to}`; }
+            if (this.match.round && this.match.first_to) {
+                return `${this.match.round.toUpperCase()} - FIRST TO ${this.match.first_to}`;
+            }
+            if (this.match.week_text && this.match.first_to) {
+                return `${this.match.week_text.toUpperCase()} - FIRST TO ${this.match.first_to}`;
+            }
             return null;
         },
         broadcastMargin() {
@@ -240,24 +269,17 @@ export default {
         },
         eventData() {
             if (!this.showEventData) return [];
-            return [
-                this.broadcast?.event?.name,
-                this.match.round || ""
-            ].filter(Boolean);
+
+            const formatOptions = getFormatOptions(this.broadcast?.event, this.match);
+            const format = this.broadcast?.ingame_details_format || "event_short,event_sub_event,match_round";
+
+            return format.split(",").map(key => {
+                key = key.replaceAll(/[{}]/g,"");
+                return formatOptions[key] || "";
+            }).filter(Boolean);
         },
         showMapInformation() {
             return (this.broadcast?.broadcast_settings || []).includes("Show map information ingame");
-        },
-        mapInformation() {
-            if (!this.showMapInformation) return [];
-            /*
-            [
-                last map with winner,
-                current map with type,
-                next map or type
-            ]
-             */
-            return [];
         }
     },
     methods: {
@@ -366,9 +388,11 @@ export default {
 .itah-enter-active, .itah-leave-active {
     transition: all .5s ease-in-out;
 }
+
 .itah-enter-to, .itah-leave-from {
     max-width: 700px;
 }
+
 .itah-enter-from, .itah-leave-to {
     max-width: 0;
 }
@@ -396,12 +420,21 @@ export default {
 .ingame-fade-sponsors:deep(.break-sponsor-logo) {
     height: calc(100% - 1.5em) !important;
 }
-.ingame-overlay.basic:deep(.small-overlay-text),
+
+.ingame-overlay.basic:deep(.team-small-text),
 .ingame-overlay.basic:deep(.team-score),
-.ingame-overlay.basic:deep(.attack-holder) {
+.ingame-overlay.basic:deep(.attack-holder),
+.ingame-overlay.basic:deep(.event-fly-in) {
     display: none !important;
 }
+
 .ingame-overlay.basic:deep(.ingame-team) {
     --team-expand: 0px !important;
+}
+
+.ingame-promote {
+    position: relative;
+    top: 165px;
+    display: flex;
 }
 </style>

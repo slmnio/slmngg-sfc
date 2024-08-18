@@ -1,5 +1,5 @@
 <template>
-    <div v-if="extended" class="image w-100 h-100 position-absolute" :style="bg(imageURL)"></div>
+    <div v-if="extended" class="image image-overlay-raw w-100 h-100 position-absolute" :style="bg(imageURL)"></div>
     <GenericOverlay v-else-if="!extended" class="image-overlay" :title="title">
         <div class="image w-100 h-100" :style="bg(imageURL)"></div>
     </GenericOverlay>

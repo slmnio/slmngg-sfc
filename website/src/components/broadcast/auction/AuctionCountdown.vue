@@ -24,6 +24,7 @@ export default {
     computed: {
         barWidth() {
             if (!this.countdownMax) return 0;
+            if (["POST_AUCTION"].includes(this.auctionState)) return 0;
             return (this.countdownLeft / this.countdownMax) * 100;
         },
         humanText() {

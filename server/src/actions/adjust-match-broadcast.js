@@ -13,7 +13,7 @@ module.exports = {
         if (!match?.event?.[0]) throw { errorCode: 404, errorMessage: "Couldn't find that match" };
 
         const event = await this.helpers.get(match.event[0]);
-        if (!event) throw { errorCode: 404, errorMessage: "Couldn't find that event" };
+        if (!event?.id) throw { errorCode: 404, errorMessage: "Couldn't find that event" };
 
         if (!(await isEventStaffOrHasRole(
             user,
@@ -23,7 +23,7 @@ module.exports = {
         ))) throw { errorCode: 403, errorMessage: "You don't have permission to edit this match" };
 
         const newBroadcast = await this.helpers.get(newBroadcastID);
-        if (!newBroadcast) throw { errorCode: 404, errorMessage: "Couldn't find that broadcast" };
+        if (!newBroadcast?.id) throw { errorCode: 404, errorMessage: "Couldn't find that broadcast" };
 
 
         const broadcastIDs = (match.scheduled_broadcast || []).map(dirtyID);

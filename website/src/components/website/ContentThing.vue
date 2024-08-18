@@ -60,7 +60,7 @@ export default {
         },
         loading() {
             if (this.thing?.limited) return false;
-            return this.thing.__loading || !this.thing || !this.thing.id;
+            return this.thing.__loading;
         },
         logo () {
             if (!this.theme?.default_logo) return null;

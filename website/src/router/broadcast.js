@@ -162,7 +162,10 @@ export default [
             showStaff: route.query.staff !== "false",
             showLogos: route.query.logos !== "false",
             teamRows: route.query.rows || route.query.teamRows || 1,
-            eachTeam: route.query.eachTeam || route.query.players
+            eachTeam: route.query.eachTeam || route.query.players,
+            category: route.query.category,
+            roleColumns: (route.query.columns || route.query.cols) === "role",
+            highlightOrder: route.query.order || route.query.highlight
         })
     },
     {
@@ -189,7 +192,8 @@ export default [
         path: "bug",
         component: () => import("@/components/broadcast/roots/BugOverlay.vue"),
         props: route => ({
-            small: !!route.query.small
+            small: !!route.query.small,
+            teamNum: route.query.team || route.query.teamNum,
         })
     },
     { path: "l-bar", component: () => import("@/components/broadcast/roots/LBarOverlay") },
@@ -197,7 +201,15 @@ export default [
     { path: "sponsors", component: () => import("@/components/broadcast/roots/SponsorOverlay.vue") },
     { path: "maps", component: () => import("@/components/broadcast/roots/MapsOverlay.vue"), props: route => ({ autoTitle: route.query.auto }) },
     { path: "branding", component: () => import("@/components/broadcast/roots/BrandingOverlay.vue") },
-    { path: "auction", component: () => import("@/components/broadcast/auction/AuctionOverlay.vue"), props: route => ({ category: route.query.category, showCaptainInfo: !!route.query.captain }) },
+    {
+        path: "auction",
+        component: () => import("@/components/broadcast/auction/AuctionOverlay.vue"),
+        props: route => ({
+            category: route.query.category,
+            showCaptainInfo: !!route.query.captain,
+            undraftedText: route.query.undraftedText || route.query.undrafted || route.query.drop
+        })
+    },
     { path: "ad-read", component: () => import("@/components/broadcast/roots/AdReadOverlay.vue"), props: route => ({ extraDelay: route.query.delay }) },
     { path: "logos", component: () => import("@/components/broadcast/roots/LogoAdOverlay.vue") },
     { path: "staff", component: () => import("@/components/broadcast/roots/StaffOverlay.vue") },
@@ -223,8 +235,15 @@ export default [
         })
     },
     { path: "desk-graphics", component: () => import("@/components/broadcast/roots/DeskGraphicsOverlay.vue") },
-    { path: "stinger", alias: "empty", component: () => import("@/components/broadcast/roots/EmptyStingerOverlay.vue") },
-    { path: "broadcasts", component: () => import("@/components/broadcast/roots/OtherBroadcastsOverlay.vue") },
+    {
+        path: "stinger",
+        alias: "empty",
+        component: () => import("@/components/broadcast/roots/EmptyStingerOverlay.vue"),
+        props: route => ({
+            teamNum: route.query.team || route.query.teamNum,
+        })
+    },
+    { path: "broadcasts", alias: ["other-streams", "other-broadcasts"], component: () => import("@/components/broadcast/roots/OtherBroadcastsOverlay.vue") },
     { path: "mvp", component: () => import("@/components/broadcast/roots/MVPOverlay.vue") },
     {
         path: "ingame-comms",

@@ -4,6 +4,8 @@ const { Collection, Events } = require("discord.js");
 
 const client = require("./client.js");
 
+if (!client) return console.warn("Discord slash commands will not be set up because no Discord key is set.");
+
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, "commands");
 const commandFolders = fs.readdirSync(foldersPath);

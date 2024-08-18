@@ -10,7 +10,7 @@ module.exports = {
     // eslint-disable-next-line no-empty-pattern
     async handler({ setting: observerSetting, value: observerSettingValue }, { client }) {
         let broadcast = await this.helpers.get(client?.broadcast?.[0]);
-        if (!broadcast) throw "No broadcast associated";
+        if (!broadcast?.id) throw "No broadcast associated";
 
         let newObserverSettings = broadcast.observer_settings || [];
 

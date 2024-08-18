@@ -9,10 +9,9 @@ module.exports = {
      */
     // eslint-disable-next-line no-empty-pattern
     async handler({ match: matchID, overlayType, state }, { user }) {
-        if (!user.airtable?.website_settings?.includes("Can edit any match")) throw { errorMessage: "You don't have permission to edit this item", errorCode: 403 };
-
-        let match = await this.helpers.get(matchID);
-        if (!match) throw "No match associated";
+        const match = await this.helpers.get(matchID);
+        if (!match?.id) throw "No match associated";
+        if (!(await this.helpers.permissions.canEditMatch(user, { match }))) throw { errorMessage: "You don't have permission to edit this item", errorCode: 403 };
 
         overlayType = overlayType.toLowerCase();
         if (!["primary", "secondary"].includes(overlayType)) throw "Unknown overlay type";

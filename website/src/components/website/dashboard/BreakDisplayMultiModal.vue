@@ -33,9 +33,7 @@
                 <div class="icon-stack">
                     <i class="fas fa-fw fa-text"></i>
                     <i class="fas fa-fw fa-sliders-h top-describer-button"></i>
-                    <squeezable class="icon-text" align="center">
-                        <div style="font-size: 0.75em">{{ broadcast?.title }}</div>
-                    </squeezable>
+                    <div class="icon-text" style="font-size: 0.3em;">{{ broadcast?.title }}</div>
                 </div>
             </b-button>
             <BDropdown
@@ -46,6 +44,9 @@
                 :disabled="processing?.title">
                 <b-dropdown-group header="Quick titles">
                     <b-dropdown-item-button v-for="title in quickTitles" :key="title" :disabled="processing?.title" @click="setTitle(title)">{{ title }}</b-dropdown-item-button>
+                </b-dropdown-group>
+                <b-dropdown-group header="Presets">
+                    <b-dropdown-item-button v-for="preset in presets" :key="preset.title" :disabled="processing?.preset" @click="runPreset(preset)">{{ preset.title }}</b-dropdown-item-button>
                 </b-dropdown-group>
             </BDropdown>
         </b-button-group>
@@ -97,6 +98,29 @@ export default {
             "Be Right Back",
             "Thanks for Watching"
         ],
+        presets: [
+            {
+                title: "Start of stream",
+                getCommands: (ref) => {
+                    console.log(ref);
+                    return [
+                        ref.setTitle(ref.broadcast?.event?.short || this.broadcast?.event?.name || this.broadcast?.name),
+                        ref.setBreakDisplayOption("Automated"),
+                    ];
+                }
+            },
+            {
+                title: "End of stream",
+                getCommands: (ref) => {
+                    console.log(ref);
+                    return [
+                        ref.setTitle("Thanks for watching!"),
+                        ref.setBreakDisplayOption("Staff"),
+                        ref.setCountdownEnd(null),
+                    ];
+                }
+            }
+        ],
         processing: {
 
         }
@@ -111,6 +135,15 @@ export default {
         }
     },
     methods: {
+        async runPreset(preset) {
+            console.log(preset);
+            this.processing.preset = true;
+            try {
+                await Promise.all(preset.getCommands(this));
+            } finally {
+                this.processing.preset = false;
+            }
+        },
         async setTitle(title) {
             this.processing.title = true;
             try {
@@ -120,6 +153,35 @@ export default {
                 }
             } finally {
                 this.processing.title = false;
+            }
+        },
+        async setBreakDisplayOption(option) {
+            this.processing.breakDisplay = true;
+            try {
+                const response = await authenticatedRequest("actions/update-break-display", {
+                    option: option
+                });
+                if (!response.error) {
+                    this.$notyf.success(`Break display set to ${option}`);
+                }
+            } finally {
+                this.processing.breakDisplay = false;
+            }
+        },
+        async setCountdownFromNow(seconds) {
+            return await this.setCountdownEnd(Date.now() + (seconds * 1000));
+        },
+        async setCountdownEnd(date) {
+            this.processing = true;
+            try {
+                await authenticatedRequest("actions/update-broadcast", {
+                    countdownEnd: date
+                });
+            } catch (e) {
+                console.error(e);
+            } finally {
+                this.processing = false;
+                this.manualProcessing = false;
             }
         }
     }

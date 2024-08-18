@@ -2,10 +2,11 @@
     <div class="other-broadcasts w-100">
         <div v-for="broadcast in broadcasts" :key="broadcast.id" class="broadcast">
             <div class="broadcast-top d-flex">
-                <div class="broadcast-name flex-grow-1">{{ broadcast.relative_name || broadcast.name }}</div>
-                <div v-if="broadcast._stream_link" class="broadcast-link">
+                <div class="broadcast-name flex-grow-1 industry-align">{{ broadcast.relative_name || broadcast.name }}</div>
+                <div v-if="broadcast._stream_link" class="broadcast-link industry-align">
                     <i v-if="broadcast._stream_link.includes('twitch.tv')" class="fab fa-twitch"></i>
-                    {{ (broadcast._stream_link).replace("twitch.tv/", "/") }}
+                    <i v-if="broadcast._stream_link.includes('youtube.com')" class="fab fa-youtube"></i>
+                    {{ (broadcast._stream_link).replace("twitch.tv/", "/").replace("youtube.com/", "/").replace('https://').replace('www.') }}
                 </div>
             </div>
             <div class="broadcast-main d-flex">
@@ -16,6 +17,9 @@
                     <!--                        <span class="detail" v-if="broadcast.live_match.round">{{ broadcast.live_match.round}} </span>-->
                     <!--                        <span class="detail" v-if="broadcast.live_match.first_to">First to {{ broadcast.live_match.first_to}} </span>-->
                     <!--                    </div>-->
+                    <div v-if="teamsString(broadcast)" class="teams fw-bold">
+                        {{ teamsString(broadcast) }}
+                    </div>
                     <div v-if="broadcast.live_match && broadcast.live_match.casters" class="casters">
                         Casters: <LinkedPlayers class="caster-names" :players="broadcast.live_match.casters" />
                     </div>
@@ -77,6 +81,14 @@ export default {
                 _stream_link: broadcast?.stream_link || (broadcast?.channel_username?.[0] ? `twitch.tv/${broadcast?.channel_username?.[0]}` : null)
             }));
         }
+    },
+    methods: {
+        teamsString(broadcast) {
+            // this causes double text since the match component will also show the custom name
+            // if (broadcast?.live_match?.special_event && broadcast?.live_match?.custom_name) return broadcast.live_match.custom_name;
+            if (!broadcast?.live_match?.teams?.length) return null;
+            return (broadcast?.live_match?.teams || []).map(t => t?.name).join(" vs ");
+        }
     }
 };
 </script>
@@ -112,7 +124,7 @@ export default {
         flex-grow: 1;
         padding: .25em 0;
     }
-    .broadcast-details > div {
+    .broadcast-details {
         margin-top: .25em;
     }
 
@@ -121,5 +133,8 @@ export default {
     }
     span.detail:last-child {
         margin-right: 0;
+    }
+    .teams {
+        text-align: right;
     }
 </style>

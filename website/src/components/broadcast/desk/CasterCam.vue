@@ -9,7 +9,7 @@
         <transition name="mid-split">
             <!--            <slot v-if="useCam ? !apiVisible : true">-->
             <div v-if="useCam ? !cameraIsOn : true" class="caster-bg flex-center" :style="{backgroundColor: color}">
-                <div v-if="avatar" class="caster-avatar" :class="{'event-fallback': avatar.eventFallback}" :style="avatar"></div>
+                <div v-if="displayAvatar" class="caster-avatar" :class="{'event-fallback': displayAvatar?.eventFallback}" :style="displayAvatar"></div>
             </div>
             <!--            </slot>-->
         </transition>
@@ -28,7 +28,9 @@ export default {
         apiVisible: false,
         // extend iframe timings so it hides under animations
         extendedIframeVisible: false,
-        extendedIframeUse: false
+        extendedIframeUse: false,
+        testedAvatar: null,
+        failed: []
     }),
     computed: {
         manualCamera() {
@@ -55,29 +57,26 @@ export default {
             return this.streamID;
         },
         src() {
-            const vdoDomain = "https://cams.prod.slmn.gg";
+            const vdoDomain = "https://webcam.slmn.gg";
             if (this.streamID.includes("http")) {
                 // custom link
                 return this.streamID + (this.extraParams || "");
             }
             return `${vdoDomain}/?view=${this.streamID}&${this.$root.defaults.camParams || "_"}&` + (this.extraParams || "");
         },
-        avatar() {
-            if (!this.guest) return null;
-            if (!this.guest.avatar) {
-                if (this.fallbackAvatar) return this.fallbackAvatar;
-
-                return {
-                    ...logoBackground1(this.event),
-                    ...resizedImage(this.event?.theme, ["default_logo", "default_wordmark"], "h-200"),
-                    ...logoBackground(this.team?.theme),
-                    ...resizedImage(this.team?.theme, ["default_logo"], "h-200"),
-                    ...logoBackground(this.guest?.theme),
-                    ...resizedImage(this.guest?.theme, ["default_logo"], "h-200"),
-                    eventFallback: true
-                };
-            }
-            return bg(this.guest.avatar);
+        themeAvatar() {
+            return {
+                ...logoBackground1(this.event),
+                ...resizedImage(this.event?.theme, ["default_logo", "default_wordmark"], "h-200"),
+                ...logoBackground(this.team?.theme),
+                ...resizedImage(this.team?.theme, ["default_logo"], "h-200"),
+                ...logoBackground(this.guest?.theme),
+                ...resizedImage(this.guest?.theme, ["default_logo"], "h-200"),
+                eventFallback: true
+            };
+        },
+        displayAvatar() {
+            return this.testedAvatar || this.themeAvatar;
         }
     },
     methods: {
@@ -86,6 +85,26 @@ export default {
             setTimeout(() => {
                 this.extendedIframeUse = false;
             }, 700);
+        },
+        async testImage(url) {
+            if (this.failed.includes(url)) return null;
+            try {
+                const image = await fetch(url);
+                if (!image.ok) this.failed.push(url);
+                return image.ok ? url : null;
+            } catch (e) {
+                console.error(e);
+            }
+            return null;
+        },
+        async testAvatars() {
+            if (!this.guest) this.testedAvatar = null;
+            if (this.guest.avatar && await this.testImage(this.guest.avatar)) {
+                this.testedAvatar = bg(this.guest.avatar);
+            }
+            if (this.fallbackAvatar && await this.testImage(this.fallbackAvatar)) {
+                this.testedAvatar = bg(this.fallbackAvatar);
+            }
         }
     },
     watch: {
@@ -100,17 +119,30 @@ export default {
         cameraIsOn(isVisible) {
             this.$emit("cam_visible", isVisible);
             console.log("cam_visible", isVisible);
+        },
+        guest: {
+            deep: true,
+            immediate: true,
+            handler() {
+                this.testAvatars();
+            }
+        },
+        fallbackAvatar: {
+            immediate: true,
+            handler() {
+                this.testAvatars();
+            }
         }
     },
     mounted() {
         window.addEventListener("message", (e) => {
-            if (e.data?.source?.startsWith("vue-")) return;
+            if (["vue-", "react-"].some(key => e.data?.source?.startsWith(key))) return;
             console.log("[global iframe]", e.data);
             const data = e.data;
 
             console.log("stream ID", this.streamCode, data.streamID);
 
-            if (data.action === "new-track-added" && data.streamID === this.streamCode) {
+            if (data.action === "new-video-track-added" && data.streamID === this.streamCode) {
                 setTimeout(() => {
                     this.apiVisible = true;
                     this.extendedIframeVisible = true;

@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-2">
+    <div>
         <b-button-group>
             <b-button class="label-button"><i class="fas fa-fw fa-dollar-sign"></i> Start Commercial</b-button>
             <b-button :disabled="processing" @click="commercial(30)">30s</b-button>

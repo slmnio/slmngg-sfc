@@ -13,6 +13,7 @@
                 :class="{empty: player.empty, latest: player.latest}"
                 :style="(player.latest ? teamBG : {})">
                 <div v-if="!player.empty" class="player-internal">
+                    <span class="player-role" v-html="getRoleSVG(player.role)"></span>
                     <span class="player-name">{{ player.name }}</span>
                     <span v-if="player.auction_price" class="player-money">{{ money(player.auction_price) }}</span>
                 </div>
@@ -27,7 +28,7 @@
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { logoBackground1 } from "@/utils/theme-styles";
-import { getAuctionMax, money } from "@/utils/content-utils";
+import { getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
 import MoneyBar from "@/components/broadcast/auction/MoneyBar";
 
 export default {
@@ -59,6 +60,7 @@ export default {
         }
     },
     methods: {
+        getRoleSVG,
         money
     }
 };
@@ -109,5 +111,11 @@ export default {
     .money-bar.team-focus-bar {
         font-size: 36px;
         margin-top: 4px;
+    }
+    .player-role {
+        width: 36px;
+        height: 36px;
+        margin-right: 2px;
+        transform: translate(-2px, -4px);
     }
 </style>

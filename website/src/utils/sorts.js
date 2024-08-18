@@ -32,3 +32,18 @@ export function sortAlpha(a, b, key) {
     if (a[key]?.toLowerCase() < b[key]?.toLowerCase()) return -1;
     return 0;
 }
+
+export const PRODUCTION_HIERARCHY = [
+    "Caster",
+    "Desk Host",
+    "Host",
+    "Interviewer",
+    "Director",
+    "Producer",
+    "Observer Director",
+    "Replay Operator",
+    "Observer",
+    "Lobby Admin",
+    "Stream Admin",
+    "Moderator"
+];

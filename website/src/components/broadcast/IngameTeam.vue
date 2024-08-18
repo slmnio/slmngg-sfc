@@ -2,11 +2,9 @@
     <!--    <transition name="ingame-team-anim">-->
     <ThemeTransition
         v-if="loaded"
-        :key="`${team.id}-${right ? '1':'0'}`"
         class="ingame-team-holder"
         :class="{'right': right, 'left': !right}"
         :duration="500"
-        :transition-key="`${team.id}-${right ? '1':'0'}`"
         :use-fit-content="true"
         :active="active"
         :theme="_theme"
@@ -60,10 +58,12 @@
                     </transition>
                 </div>
             </transition>
+
+
             <transition name="fly-in">
-                <div v-if="active && eventInfo?.length" class="event-info">
+                <div v-if="active && eventInfo?.length" class="event-info event-fly-in">
                     <squeezable>
-                        <div class="event-info-text">
+                        <div class="event-info-text industry-align">
                             <div v-for="(item, i) in eventInfo" :key="item" class="text" :style="{order: i * 2}">
                                 {{ item }}
                             </div>
@@ -73,6 +73,7 @@
                         </div>
                     </squeezable>
                 </div>
+                <IngameMaps v-else-if="active && showEventMaps" class="event-maps event-fly-in" :match="match" :broadcast="broadcast" />
             </transition>
         </div>
     </ThemeTransition>
@@ -85,11 +86,12 @@ import Squeezable from "@/components/broadcast/Squeezable.vue";
 import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
 import { logoBackground } from "@/utils/theme-styles";
 import { autoRecord } from "@/utils/content-utils";
+import IngameMaps from "@/components/broadcast/IngameMaps.vue";
 
 export default {
     name: "IngameTeam",
-    components: { Squeezable, ThemeTransition },
-    props: ["team", "active", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo", "colorLogoHolder", "eventInfo"],
+    components: { IngameMaps, Squeezable, ThemeTransition },
+    props: ["team", "active", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo", "colorLogoHolder", "eventInfo", "showEventMaps", "match", "broadcast"],
     data: () => ({
         textureData: {
             url: null,
@@ -463,17 +465,20 @@ export default {
         background-color: white;
     }
 
-    .event-info {
+    .event-fly-in {
         position: absolute;
         bottom: 100%;
         background-color: rgba(0,0,0,0.75);
-        width: 100%;
+        color: white;
+        width: calc(100% - var(--team-expand));
         left: 0;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
+        transition: width 200ms ease;
+        height: 31px;
     }
-    .event-info .event-info-text {
-        height: 30px;
-        padding: 0 20px;
+    .event-fly-in .event-info-text {
+        height: 31px;
+        padding: 0 10px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -481,6 +486,9 @@ export default {
         font-size: 20px;
         text-transform: uppercase;
         min-width: 100%;
+    }
+    .event-info .event-info-text * {
+        transform: none !important;
     }
     .event-info .dash {
         margin: 0 0.5em;
@@ -490,7 +498,7 @@ export default {
     }
 
     .fly-in-enter-active {
-        transition: all .75s ease 1.5s;
+        transition: all .75s ease 1.5s, width 200ms ease;
     }
     .fly-in-enter-from {
         transform: translate(0, -40px);
@@ -500,9 +508,14 @@ export default {
     }
 
     .fly-in-leave-active {
-        transition: opacity .3s ease;
+        transition: opacity .3s ease, width 200ms ease;
     }
     .fly-in-leave-to {
         opacity: 0;
+    }
+
+    .event-maps {
+        left: auto;
+        right: 0;
     }
 </style>

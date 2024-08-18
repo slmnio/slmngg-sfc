@@ -114,7 +114,7 @@ export default {
     beforeUnmount() {
         if (this.connectInterval) clearInterval(this.connectInterval);
     },
-    metaInfo() {
+    head() {
         return {
             title: `Remote Controller | ${this.client?.name || this.client?.key || ""}`
         };

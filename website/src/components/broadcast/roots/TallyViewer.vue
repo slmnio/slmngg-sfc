@@ -36,8 +36,14 @@
             <div v-if="producer" class="prod-info">
                 <div class="prod-name flex-center">Producer: {{ producer.name }}</div>
                 <div class="prod-scenes">
-                    <div class="prod-preview">{{ producerPreviewScene }}</div>
-                    <div class="prod-program">{{ producerProgramScene }}</div>
+                    <div class="prod-preview">
+                        <span class="prod-scene-name">{{ producerPreviewScene }}</span>
+                        <span v-if="producerPreviewPersonName" class="prod-person-name">{{ producerPreviewPersonName }}</span>
+                    </div>
+                    <div class="prod-program">
+                        <span class="prod-scene-name">{{ producerProgramScene }}</span>
+                        <span v-if="producerProgramPersonName" class="prod-person-name">{{ producerProgramPersonName }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -106,6 +112,12 @@ export default {
             return (this.liveMatch?.player_relationships || [])
                 .filter(rel => !nonProductionRoles.includes(rel.singular_name) && rel.player?.[0] === this.client?.staff?.[0]);
         },
+        producerPreviewPersonName() {
+            return this.getTarget(this.producerPreviewScene);
+        },
+        producerProgramPersonName() {
+            return this.getTarget(this.producerProgramScene);
+        },
         tallyRolesText() {
             return this.tallyRoles.map(r => r.singular_name === "Observer" ? `Observer ${this.selfObserverNumber}` : r.singular_name).join("/");
         }
@@ -117,6 +129,31 @@ export default {
                 console.log("Screen Wake Lock released:", this.wakeLock.released);
             });
             console.log("Screen Wake Lock released:", this.wakeLock.released);
+        },
+        getTarget(_sceneName) {
+            const sceneName = _sceneName.toLowerCase().trim();
+            if (["Replay", "Highlight"].some(str => sceneName.includes(str.toLowerCase()))) {
+                const replays = this.liveMatch?.player_relationships?.find(rel => rel.singular_name === "Replay Producer");
+                if (replays) {
+                    return replays.player_name[0];
+                }
+            } else if (["OBSDIR", "Director", "Clean feed"].some(str => sceneName.includes(str.toLowerCase()))) {
+                const obsDir = this.liveMatch?.player_relationships?.find(rel => rel.singular_name === "Observer Director");
+                if (obsDir) {
+                    return obsDir.player_name[0];
+                }
+            } else if (sceneName.includes("stats")) {
+                const statsProducer = this.liveMatch?.player_relationships?.find(rel => rel.singular_name === "Stats Producer");
+                if (statsProducer) {
+                    return statsProducer.player_name[0];
+                }
+            } else if (["Obs", "Game"].some(str => sceneName.includes(str.toLowerCase()))) {
+                const sceneNumber = sceneName.match(/\d+/);
+                const observers = this.liveMatch?.player_relationships?.filter(rel => rel.singular_name === "Observer");
+                if (observers?.length > 0 && sceneNumber) {
+                    return observers[sceneNumber - 1]?.player_name[0];
+                }
+            }
         },
         targetsMe(_sceneName) {
             const sceneName = _sceneName.toLowerCase().trim();
@@ -260,10 +297,9 @@ export default {
     font-size: 0.8em;
     flex-grow: 1;
     margin-left: 1em;
-    font-weight: bold;
 }
 .prod-scenes div {
-    border: 1px solid rgba(255,255,255,0.5);
+    border: 1.5px solid rgba(255,255,255,0.5);
     padding: 0.5em .25em;
     margin: 0 0.25em;
     background-color: black;
@@ -272,6 +308,7 @@ export default {
     height: 100%;
     display: flex;
     justify-content: center;
+    flex-direction: column;
     align-items: center;
     text-align: center;
 }
@@ -281,6 +318,15 @@ export default {
     border-color: lime;
     border-radius: .1em;
 }
+
+.prod-scenes .prod-scene-name {
+    font-weight: bold;
+}
+
+.prod-scenes .prod-person-name {
+    font-size: 0.8em;
+}
+
 .prod-scenes .prod-program {
     color: #ff4646;
     border-color: #ff0000;

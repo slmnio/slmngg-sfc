@@ -112,33 +112,11 @@ export default {
             return (this.liveMatch?.player_relationships || [])
                 .filter(rel => !nonProductionRoles.includes(rel.singular_name) && rel.player?.[0] === this.client?.staff?.[0]);
         },
-        scenePersonMap() {
-            const map = {};
-            const observers = this.liveMatch?.player_relationships?.filter(rel => rel.singular_name === "Observer");
-            const obsDir = this.liveMatch?.player_relationships?.find(rel => rel.singular_name === "Observer Director");
-            const replays = this.liveMatch?.player_relationships?.find(rel => rel.singular_name === "Replay Producer");
-            if (observers?.length > 0) {
-                for (const [i, obs] of observers.entries()) {
-                    map[`Ingame ${i + 1}`] = obs.player_name[0];
-                }
-            }
-            if (obsDir) {
-                map["Obs Director"] = obsDir.player_name[0];
-            }
-            if (replays) {
-                map["Ingame Replays"] = replays.player_name[0];
-                map["Break Replays"] = replays.player_name[0];
-                map["Casters Replays"] = replays.player_name[0];
-                map["Casters Highlights"] = replays.player_name[0];
-            }
-
-            return map;
-        },
         producerPreviewPersonName() {
-            return this.scenePersonMap[this.producerPreviewScene];
+            return this.getTarget(this.producerPreviewScene);
         },
         producerProgramPersonName() {
-            return this.scenePersonMap[this.producerProgramScene];
+            return this.getTarget(this.producerProgramScene);
         },
         tallyRolesText() {
             return this.tallyRoles.map(r => r.singular_name === "Observer" ? `Observer ${this.selfObserverNumber}` : r.singular_name).join("/");
@@ -151,6 +129,31 @@ export default {
                 console.log("Screen Wake Lock released:", this.wakeLock.released);
             });
             console.log("Screen Wake Lock released:", this.wakeLock.released);
+        },
+        getTarget(_sceneName) {
+            const sceneName = _sceneName.toLowerCase().trim();
+            if (["Replay", "Highlight"].some(str => sceneName.includes(str.toLowerCase()))) {
+                const replays = this.liveMatch?.player_relationships?.find(rel => rel.singular_name === "Replay Producer");
+                if (replays) {
+                    return replays.player_name[0];
+                }
+            } else if (["OBSDIR", "Director", "Clean feed"].some(str => sceneName.includes(str.toLowerCase()))) {
+                const obsDir = this.liveMatch?.player_relationships?.find(rel => rel.singular_name === "Observer Director");
+                if (obsDir) {
+                    return obsDir.player_name[0];
+                }
+            } else if (sceneName.includes("stats")) {
+                const statsProducer = this.liveMatch?.player_relationships?.find(rel => rel.singular_name === "Stats Producer");
+                if (statsProducer) {
+                    return statsProducer.player_name[0];
+                }
+            } else if (["Obs", "Game"].some(str => sceneName.includes(str.toLowerCase()))) {
+                const sceneNumber = sceneName.match(/\d+/);
+                const observers = this.liveMatch?.player_relationships?.filter(rel => rel.singular_name === "Observer");
+                if (observers?.length > 0 && sceneNumber) {
+                    return observers[sceneNumber - 1]?.player_name[0];
+                }
+            }
         },
         targetsMe(_sceneName) {
             const sceneName = _sceneName.toLowerCase().trim();

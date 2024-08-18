@@ -17,7 +17,7 @@ let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEG
 if (staffKeysRequired.every(key => process.env[key])) {
     require("./discord/staff.js");
 } else {
-    console.warn("Staff application system won't be set up. Set the required STAFFAPPS keys in server/.env")
+    console.warn("Staff application system won't be set up. Set the required STAFFAPPS keys in server/.env");
 }
 
 let domains = (process.env.CORS_VALID_DOMAINS || "slmn.gg,localhost").split(/, */g).map(d => new RegExp(`(?:^|.*\\.)${d.replace(".", "\\.")}(?:$|\\n)`));
@@ -111,7 +111,7 @@ routes({ app, cors, Cache, io });
 discordAuth({ app, router: express.Router(), cors, Cache, io });
 
 meta({ app, cors, Cache });
-images.main({ app, cors, Cache, corsHandle });
+images({ app, cors, Cache, corsHandle });
 
 webAuction({ app, io });
 

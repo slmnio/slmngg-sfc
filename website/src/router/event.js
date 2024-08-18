@@ -33,7 +33,7 @@ export default (isSubdomain) => [
         children: [
             {
                 path: "",
-                component: () => import("@/views/sub-views/event-settings/EventSettingsGeneral.vue"),
+                component: () => import("@/views/sub-views/event-settings/EventSettingsEditor.vue"),
             },
             {
                 path: "discord",

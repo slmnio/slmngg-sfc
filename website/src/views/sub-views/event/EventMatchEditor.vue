@@ -50,9 +50,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-    .dark-border {
-        border: 1px solid #454d55;
-    }
-</style>

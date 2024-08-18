@@ -68,12 +68,23 @@
                         <router-link :to="`/team/${team.id}`">{{ team.name }}</router-link>
                     </td>
                     <td>
-                        <CopyTextButton :content="`<@&${team._control.get('role_id')}>`">
-                            {{ team._control.get("role_id") ?? "Not set" }}
+                        <CopyTextButton v-if="team._control.get('role_id')" :content="`<@&${team._control.get('role_id')}>`">
+                            {{ team._control.get("role_id") }}
                         </CopyTextButton>
+                        <span v-else>Not set</span>
                     </td>
-                    <td>{{ team._control.get("text_channel_id") ?? "Not set" }}</td>
-                    <td>{{ team._control.get("voice_channel_id") ?? "Not set" }}</td>
+                    <td>
+                        <CopyTextButton v-if="team._control.get('text_channel_id')" :content="`<#${team._control.get('text_channel_id')}>`">
+                            {{ team._control.get("text_channel_id") }}
+                        </CopyTextButton>
+                        <span v-else>Not set</span>
+                    </td>
+                    <td>
+                        <CopyTextButton v-if="team._control.get('voice_channel_id')" :content="`<#${team._control.get('voice_channel_id')}>`">
+                            {{ team._control.get("voice_channel_id") }}
+                        </CopyTextButton>
+                        <span v-else>Not set</span>
+                    </td>
                     <td>
                         <ul>
                             <li v-for="(item, i) in fixes.filter(f => !['player_details_updated', 'discord_id_not_found'].includes(f.type) && f.teamID === `rec` + team.id)" :key="i">

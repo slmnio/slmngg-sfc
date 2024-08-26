@@ -82,7 +82,7 @@ module.exports = {
                             player: targetPlayer,
                             feed: newFeed
                         });
-                        footer = `New remote feed URL updated on ${targetUser.id === interaction.user.id ? "your" : targetPlayer + "'s"} player profile.`;
+                        footer = `New remote feed URL updated on ${targetUser.id === interaction.user.id ? "your" : targetPlayer.name + "'s"} player profile.`;
                     } catch (e) {
                         console.error("Error setting player remote feed", e);
                     }

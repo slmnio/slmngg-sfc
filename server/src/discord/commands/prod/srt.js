@@ -4,6 +4,26 @@ const {
 } = require("discord.js");
 const Cache = require("../../../cache");
 
+const SERVERS = [
+    {
+        name: "EU West",
+        region: "eu",
+        domain: "srt://eu.borpa.business:10000",
+        feeds: {
+            observer: (streamId, latency) => `?streamid=publish/${streamId}&latency=${latency * 1000}`,
+            producer: (streamId, latency) => `?streamid=play/${streamId}&latency=${latency * 1000}`
+        }
+    },
+    {
+        name: "US East",
+        region: "na",
+        domain: "srt://na.borpa.business:10000",
+        feeds: {
+            observer: (streamId, latency) => `?streamid=#!::m=publish,r=${streamId}&latency=${latency * 1000}`,
+            producer: (streamId, latency) => `?streamid=#!::m=request,r=${streamId}&latency=${latency * 1000}`
+        }
+    }
+];
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -15,16 +35,10 @@ module.exports = {
         .addStringOption(option =>
             option.setName("region")
                 .setDescription("SRT server region")
-                .addChoices(
-                    {
-                        name: "EU West (default)",
-                        value: "eu"
-                    },
-                    {
-                        name: "US East",
-                        value: "na"
-                    }
-                ))
+                .addChoices(SERVERS.map(server => ({
+                    name: server.name,
+                    value: server.region
+                }))))
         .addIntegerOption(option =>
             option.setName("latency")
                 .setDescription("Latency of the SRT Feed (in ms)")
@@ -46,21 +60,20 @@ module.exports = {
             feedId = playerClient?.key;
         }
 
-        const region = interaction.options.getString("region") ?? "eu";
-        const latency = interaction.options.getInteger("latency") ?? 500;
-        const obsStreamid = region === "na" ? `#!::m=publish,r=${feedId}` : `publish/${feedId}`
-        const prodStreamid = region === "na" ? `#!::m=request,r=${feedId}` : `play/${feedId}`        
+        const region = interaction.options.getString("region");
+        const selectedServer = region ? SERVERS.find(server => region === server.region) : SERVERS[0];
+        const latencyMs = interaction.options.getInteger("latency") ?? 500;
 
         const embed = new EmbedBuilder()
             .setTitle("SRT Observer URLs")
             .addFields([
                 {
                     name: "Observer",
-                    value: `\`srt://${region}.borpa.business:10000?streamid=${obsStreamid}&latency=${latency * 1000}\``
+                    value: selectedServer.feeds.observer(feedId, latencyMs)
                 },
                 {
                     name: "Producer",
-                    value: `\`srt://${region}.borpa.business:10000?streamid=${prodStreamid}&latency=${latency * 1000}\``
+                    value: selectedServer.feeds.producer(feedId, latencyMs)
                 }
             ]);
 

@@ -3,6 +3,7 @@ const {
     EmbedBuilder
 } = require("discord.js");
 const Cache = require("../../../cache");
+const { getInternalManager } = require("../../../action-utils/action-manager");
 
 const SERVERS = [
     {
@@ -10,8 +11,8 @@ const SERVERS = [
         region: "eu",
         domain: "srt://eu.borpa.business:10000",
         feeds: {
-            observer: (streamId, latency) => `?streamid=publish/${streamId}&latency=${latency * 1000}`,
-            producer: (streamId, latency) => `?streamid=play/${streamId}&latency=${latency * 1000}`
+            push: (streamId, latency) => `?streamid=publish/${streamId}&latency=${latency * 1000}`,
+            view: (streamId, latency) => `?streamid=play/${streamId}&latency=${latency * 1000}`
         }
     },
     {
@@ -19,8 +20,8 @@ const SERVERS = [
         region: "na",
         domain: "srt://na.borpa.business:10000",
         feeds: {
-            observer: (streamId, latency) => `?streamid=#!::m=publish,r=${streamId}&latency=${latency * 1000}`,
-            producer: (streamId, latency) => `?streamid=#!::m=request,r=${streamId}&latency=${latency * 1000}`
+            push: (streamId, latency) => `?streamid=#!::m=publish,r=${streamId}&latency=${latency * 1000}`,
+            view: (streamId, latency) => `?streamid=#!::m=request,r=${streamId}&latency=${latency * 1000}`
         }
     }
 ];
@@ -49,13 +50,15 @@ module.exports = {
         await interaction.deferReply();
 
         let feedId = interaction.options.getString("feed")?.toLocaleLowerCase();
-        let targetUser = interaction.options.getUser("user") ?? interaction.user;
+
+        let targetUser, targetPlayer, playerClient;
 
         if (!feedId) {
-            let targetPlayer = await Cache.auth.getPlayer(targetUser.id);
-            let playerClient = await Cache.get(targetPlayer?.clients?.[0]);
+            targetUser = interaction.options.getUser("user") ?? interaction.user;
+            targetPlayer = await Cache.auth.getPlayer(targetUser.id);
+            playerClient = await Cache.get(targetPlayer?.clients?.[0]);
             if (!playerClient || !playerClient?.key) {
-                return interaction.followUp("Couldn't find a feed");
+                return interaction.followUp("Couldn't find a client for the specified player");
             }
             feedId = playerClient?.key;
         }
@@ -64,18 +67,46 @@ module.exports = {
         const selectedServer = region ? SERVERS.find(server => region === server.region) : SERVERS[0];
         const latencyMs = interaction.options.getInteger("latency") ?? 500;
 
+        let footer;
+
+        if (targetPlayer) {
+            const newFeed = selectedServer.domain + selectedServer.feeds.view(feedId, latencyMs);
+            if (targetPlayer?.remote_feed === newFeed) {
+                footer = `Remote feed URL stored on ${targetUser.id === interaction.user.id ? "your" : targetPlayer + "'s"} player profile.`;
+            } else {
+                const internalManager = getInternalManager();
+
+                if (internalManager) {
+                    try {
+                        await internalManager.runActionAsAutomation("set-player-remote-feed", {
+                            player: targetPlayer,
+                            feed: newFeed
+                        });
+                        footer = `New remote feed URL updated on ${targetUser.id === interaction.user.id ? "your" : targetPlayer + "'s"} player profile.`;
+                    } catch (e) {
+                        console.error("Error setting player remote feed", e);
+                    }
+                } else {
+                    console.warn("Couldn't load internal manager");
+                }
+            }
+        }
+
         const embed = new EmbedBuilder()
             .setTitle("SRT Observer URLs")
             .addFields([
                 {
                     name: "Observer",
-                    value: selectedServer.feeds.observer(feedId, latencyMs)
+                    value: `\`\`\`${selectedServer.domain + selectedServer.feeds.push(feedId, latencyMs)}\`\`\``
                 },
                 {
                     name: "Producer",
-                    value: selectedServer.feeds.producer(feedId, latencyMs)
+                    value: `\`\`\`${selectedServer.domain + selectedServer.feeds.view(feedId, latencyMs)}\`\`\``
                 }
             ]);
+        if (footer) {
+            embed.setFooter({ text: footer });
+        }
 
         return interaction.followUp({
             embeds: [embed]

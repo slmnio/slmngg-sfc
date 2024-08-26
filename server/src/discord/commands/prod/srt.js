@@ -48,17 +48,19 @@ module.exports = {
 
         const region = interaction.options.getString("region") ?? "eu";
         const latency = interaction.options.getInteger("latency") ?? 500;
+        const obsStreamid = region === "na" ? `#!::m=publish,r=${feedId}` : `publish/${feedId}`
+        const prodStreamid = region === "na" ? `#!::m=request,r=${feedId}` : `play/${feedId}`        
 
         const embed = new EmbedBuilder()
             .setTitle("SRT Observer URLs")
             .addFields([
                 {
                     name: "Observer",
-                    value: `\`srt://${region}.borpa.business:10000?streamid=publish/${feedId}&latency=${latency * 1000}\``
+                    value: `\`srt://${region}.borpa.business:10000?streamid=${obsStreamid}&latency=${latency * 1000}\``
                 },
                 {
                     name: "Producer",
-                    value: `\`srt://${region}.borpa.business:10000?streamid=play/${feedId}&latency=${latency * 1000}\``
+                    value: `\`srt://${region}.borpa.business:10000?streamid=${prodStreamid}&latency=${latency * 1000}\``
                 }
             ]);
 

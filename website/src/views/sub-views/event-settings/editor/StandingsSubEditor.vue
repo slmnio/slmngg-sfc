@@ -55,6 +55,15 @@
                 </div>
             </b-form-group>
             <b-form-group
+                label="Title"
+                content-cols="9"
+                label-cols="3"
+                description="Title displayed on standings & overlays">
+                <b-form-input
+                    v-model="internalData.title"
+                    size="sm" />
+            </b-form-group>
+            <b-form-group
                 label="Key"
                 content-cols="9"
                 label-cols="3"

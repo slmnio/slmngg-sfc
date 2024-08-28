@@ -28,7 +28,9 @@ export default {
     .group-content {
         border-top: none;
     }
-
+    .group-title {
+        cursor: pointer;
+    }
 
     .clip-swipe-down-enter-active,
     .clip-swipe-down-leave-active {

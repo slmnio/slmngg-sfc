@@ -24,7 +24,8 @@ type ActionKey = "create-live-guest" |
     "set-player-relationships" |
     "adjust-match-broadcast" |
     "set-event-guild" |
-    "create-event-discord-items"
+    "create-event-discord-items" |
+    "set-event-settings"
 
 type RequestUrl = `actions/${ActionKey}`
 
@@ -212,6 +213,12 @@ interface CreateEventDiscordItemsData {
         voiceChannelRoles?: string
     }
 }
+
+interface SetEventSettingsData {
+    eventID: AnyAirtableID,
+    settings: string
+}
+
 type ActionRequestData<U> =
     U extends "actions/create-live-guest" ? CreateLiveGuestData :
     U extends "actions/manage-prediction" ? ManagePredictionData :
@@ -236,6 +243,7 @@ type ActionRequestData<U> =
     U extends "actions/set-marker" ? SetMarkerData :
     U extends "actions/set-event-guild" ? SetEventGuidData :
     U extends "actions/create-event-discord-items" ? CreateEventDiscordItemsData :
+    U extends "actions/set-event-settings" ? SetEventSettingsData :
     any;
 
 

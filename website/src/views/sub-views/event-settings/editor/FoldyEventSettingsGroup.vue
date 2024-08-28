@@ -1,10 +1,13 @@
 <template>
     <EventSettingsGroup
         class="w-100"
-        title="Foldy"
-        :active="foldyData?.use"
-        @update:active="(val) => updateData('use', val)">
+        title="Foldy">
         <div class="d-flex flex-column gap-2 py-2">
+            <event-settings-checkbox
+                :active="foldyData?.use"
+                @update:active="val => updateData('use', val)">
+                Use foldy sheet
+            </event-settings-checkbox>
             <b-form-group
                 v-if="foldyData.groups"
                 label="Groups"
@@ -76,10 +79,12 @@
 
 <script>
 import EventSettingsGroup from "@/views/sub-views/event-settings/editor/EventSettingsGroup.vue";
+import EventSettingsCheckbox from "@/views/sub-views/event-settings/editor/EventSettingsCheckbox.vue";
 
 export default {
     name: "FoldyEventSettingsGroup",
     components: {
+        EventSettingsCheckbox,
         EventSettingsGroup
     },
     props: {

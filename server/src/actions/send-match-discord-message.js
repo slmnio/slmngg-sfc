@@ -27,7 +27,7 @@ module.exports = {
         if (!channel) throw "No live channel found on this broadcast";
 
         const { match } = await getMatchData(broadcast);
-        if (!match) throw "No live match set on this broadcast";
+        if (!match?.id) throw "No live match set on this broadcast";
 
         await channel.send(`https://slmn.gg/detailed/${cleanID(match.id)}`);
     }

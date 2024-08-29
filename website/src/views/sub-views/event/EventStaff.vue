@@ -2,7 +2,7 @@
     <div class="container">
         <div class="my-2 mx-3 d-flex justify-content-between align-items-center">
             <h2>Staff</h2>
-            <b-button variant="light" class="text-dark" :to="url('event', event, { subPage: 'staff/extended'})">Table view</b-button>
+            <b-button variant="light" class="text-dark" :to="subLink('staff/extended')">Table view</b-button>
         </div>
         <div>
             <ContentRow v-if="event.staff && event.staff.length" title="Staff">
@@ -47,7 +47,7 @@ export default {
     components: {
         ContentThing, ContentRow
     },
-    props: ["event"],
+    props: ["event", "isMinisite"],
     computed: {
         playerRelationshipGroups() {
             if (!this.event?.player_relationships?.length) return [];
@@ -73,6 +73,13 @@ export default {
             return Object.values(groups);
         }
     },
-    methods: { url }
+    methods: {
+        subLink(page) {
+            if (this.isMinisite) {
+                return `/${page}`;
+            }
+            return `/event/${this.event.id}/${page}`;
+        }
+    }
 };
 </script>

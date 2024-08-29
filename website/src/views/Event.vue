@@ -28,7 +28,7 @@
             </li>
         </SubPageNav>
 
-        <router-view :event="event" />
+        <router-view :event="event" :is-minisite="isMinisite" />
     </div>
 </template>
 

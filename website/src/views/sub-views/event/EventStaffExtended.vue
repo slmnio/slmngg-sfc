@@ -2,7 +2,7 @@
     <div class="container">
         <div class="my-2 mx-3 d-flex justify-content-between align-items-center">
             <h2>Staff</h2>
-            <b-button variant="light" class="text-dark" :to="url('event', event, { subPage: 'staff'})">List view</b-button>
+            <b-button variant="light" class="text-dark" :to="subLink('staff')">List view</b-button>
         </div>
         <EventStaffing :event="event" />
     </div>
@@ -15,9 +15,17 @@ export default {
     name: "EventStaffExtended",
     components: { EventStaffing },
     props: {
-        event: {}
+        event: {},
+        isMinisite: Boolean
     },
-    methods: { url }
+    methods: {
+        subLink(page) {
+            if (this.isMinisite) {
+                return `/${page}`;
+            }
+            return `/event/${this.event.id}/${page}`;
+        }
+    }
 };
 </script>
 

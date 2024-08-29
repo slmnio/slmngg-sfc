@@ -4,9 +4,22 @@
         <table class="table table-sm table-dark table-hover table-bordered">
             <thead>
                 <tr>
-                    <th class="px-2">Staff</th>
-                    <th v-for="role in roles" :key="role" class="px-2">{{ role }}</th>
-                    <th><span v-b-tooltip="'Number of matches listed as staff'">Total</span></th>
+                    <th class="px-1">Staff</th>
+                    <th
+                        v-for="role in roles"
+                        :key="role"
+                        :class="{'bg-primary': sort.by === role}"
+                        class="px-1 cursor-pointer"
+                        @click="setSort(role)">
+                        <i v-if="sort.by === role && sort.asc" class="mr-1 fas fa-sort-amount-down fa-fw"></i>
+                        <i v-if="sort.by === role && !sort.asc" class="mr-1 fas fa-sort-amount-up fa-fw"></i>
+                        {{ role }}
+                    </th>
+                    <th :class="{'bg-primary': sort.by === 'Total'}" class="cursor-pointer" @click="setSort('Total')">
+                        <i v-if="sort.by === 'Total' && sort.asc" class="mr-1 fas fa-sort-amount-down fa-fw"></i>
+                        <i v-if="sort.by === 'Total' && !sort.asc" class="mr-1 fas fa-sort-amount-up fa-fw"></i>
+                        <span v-b-tooltip="'Number of matches listed as staff'">Total</span>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -33,11 +46,18 @@
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
+import { PRODUCTION_HIERARCHY } from "@/utils/sorts";
 
 export default {
     name: "EventStaffing",
     components: { CopyTextButton, LinkedPlayers },
     props: ["event"],
+    data: () => ({
+        sort: {
+            by: "Total",
+            asc: true
+        }
+    }),
     computed: {
         matches() {
             if (!this.event?.matches?.length) return [];
@@ -58,7 +78,18 @@ export default {
                     if (!roles.includes(roleText)) roles.push(roleText);
                 });
             });
-            return roles;
+            return roles.sort((a, b) => {
+                const [ha, hb] = [a, b].map(x => PRODUCTION_HIERARCHY.indexOf(x));
+                if (ha === hb) {
+                    console.log(a,b, a > b);
+                    if (a > b) return -1;
+                    if (a < b) return 1;
+                    return 0;
+                }
+                if (ha === -1) return 1;
+                if (hb === -1) return -1;
+                return ha - hb;
+            });
         },
         staff() {
             const staff = [];
@@ -86,7 +117,13 @@ export default {
             return staff;
         },
         appearances() {
-            return [...this.staff].sort((a, b) => b.matches.size - a.matches.size).map(s => {
+            return [...this.staff].sort((a, b) => {
+                if (this.sort.by === "Total") {
+                    return (b.matches.size - a.matches.size) * (this.sort.asc ? 1 : -1);
+                } else {
+                    return ((b.roles[this.sort.by] || 0) - (a.roles[this.sort.by] || 0)) * (this.sort.asc ? 1 : -1);
+                }
+            }).map(s => {
                 s.listed_roles = Object.keys(s.roles).filter(role => this.isListedOnEvent(s.id, role));
                 return s;
             });
@@ -137,11 +174,25 @@ export default {
             if (!this.eventRelationships?.player_relationships?.length) return false;
             const rel = this.eventRelationships.player_relationships.find(r => r.player?.[0] && r.player[0] === "rec" + playerID && r.singular_name === role);
             return !!rel;
+        },
+        setSort(key) {
+            if (this.sort.by === key) {
+                this.sort.asc = !this.sort.asc;
+            } else {
+                this.sort.by = key;
+                this.sort.asc = true;
+            }
         }
     }
 };
 </script>
 
 <style scoped>
-
+    td.ct-active {
+        color: var(--theme-active, #66d9ff) !important;
+    }
+    .cursor-pointer {
+        cursor: pointer;
+        user-select: none;
+    }
 </style>

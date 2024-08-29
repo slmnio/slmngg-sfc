@@ -13,6 +13,7 @@ export default (isSubdomain) => [
     { path: "scenarios", component: () => import("@/views/sub-views/event/EventScenarios2.vue") },
     { path: "draft", component: () => import("@/views/sub-views/event/EventDraft.vue") },
     { path: "staff", component: () => import("@/views/sub-views/event/EventStaff.vue") },
+    { path: "staff/extended", component: () => import("@/views/sub-views/event/EventStaffExtended.vue") },
     { path: "about", component: () => import("@/views/sub-views/event/EventAbout.vue") },
     { path: "standings", component: () => import("@/views/sub-views/event/EventStandings.vue") },
     { path: "theme", component: () => import("@/views/sub-views/ThingTheme.vue") },

@@ -1,10 +1,10 @@
 <template>
     <div class="container">
-        <div class="my-2 mx-3 top">
+        <div class="my-2 mx-3 d-flex justify-content-between align-items-center">
             <h2>Staff</h2>
-            <div v-if="showTableButton" class="btn btn-light" @click="table = !table">{{ table ? 'List' : 'Table' }} view</div>
+            <b-button variant="light" class="text-dark" :to="url('event', event, { subPage: 'staff/extended'})">Table view</b-button>
         </div>
-        <div v-if="!table">
+        <div>
             <ContentRow v-if="event.staff && event.staff.length" title="Staff">
                 <ContentThing
                     v-for="staff in event.staff"
@@ -33,7 +33,6 @@
                     :theme="event.theme" />
             </ContentRow>
         </div>
-        <EventStaffing v-if="table" :event="event" />
     </div>
 </template>
 
@@ -41,20 +40,15 @@
 import ContentThing from "@/components/website/ContentThing.vue";
 import ContentRow from "@/components/website/ContentRow.vue";
 import EventStaffing from "@/components/website/EventStaffing.vue";
+import { url } from "@/utils/content-utils";
 
 export default {
     name: "EventStaff",
     components: {
-        ContentThing, ContentRow, EventStaffing
+        ContentThing, ContentRow
     },
     props: ["event"],
-    data: () => ({
-        table: false
-    }),
     computed: {
-        showTableButton() {
-            return this.event?.player_relationships || this.event?.casters || (this.event?.matches || []).some(match => match.player_relationships?.length);
-        },
         playerRelationshipGroups() {
             if (!this.event?.player_relationships?.length) return [];
             const groups = {};
@@ -78,14 +72,7 @@ export default {
 
             return Object.values(groups);
         }
-    }
+    },
+    methods: { url }
 };
 </script>
-
-<style scoped>
-    .top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-</style>

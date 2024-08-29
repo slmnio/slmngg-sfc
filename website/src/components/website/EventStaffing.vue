@@ -46,7 +46,7 @@
             <b-form-checkbox v-model="paint" switch>Select relationships</b-form-checkbox>
             <b-form-checkbox v-if="paint" v-model="ignoreSet" switch>Ignore already set relationships</b-form-checkbox>
             <b-button-group v-if="paint">
-                <b-button variant="primary" @click="highlightAll">Select all</b-button>
+                <b-button variant="primary" @click="highlightAll(1)">Select all</b-button>
                 <b-button variant="secondary" @click="highlightSome">Select above</b-button>
                 <b-button variant="danger" @click="highlighted = {}">Empty all</b-button>
             </b-button-group>

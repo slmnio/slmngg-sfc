@@ -15,10 +15,54 @@
             </b-form-group>
         </div>
         <div class="settings">
-            <b-form-group label="Team settings" label-for="team-settings" label-cols="2">
+            <b-form-group label="Run settings" label-cols="2">
                 <div class="d-flex gap-2 align-items-start justify-content-between opacity-changes" :class="{'low-opacity': processing['creating'] }">
-                    <b-form-checkbox-group v-model="selectedTeamSettings" stacked :options="teamSettingsOptions" />
-                    <b-form-checkbox-group v-model="selectedRunSettings" stacked :options="runSettingsOptions" />
+                    <div class="settings-group">
+                        <div class="settings-title fw-bold">Team roles</div>
+                        <b-form-checkbox-group v-model="runSelections.roles" stacked :options="runOptions.roles" />
+                    </div>
+                    <div class="settings-group">
+                        <div class="settings-title fw-bold">Team channels</div>
+                        <b-form-checkbox-group v-model="runSelections.textChannels" stacked :options="runOptions.textChannels" />
+
+                        <div v-if="runSelections.textChannels.includes('update_text_channels_permissions')" class="permissions-settings">
+                            <div>
+                                <div>Roles that can access team text channels</div>
+                                <SettingsMultiselect
+                                    v-model="runSettings.textChannels.accessRoleIDs"
+                                    size="sm"
+                                    placeholder="Choose roles"
+                                    :options="roleOptions" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-group">
+                        <div class="settings-title fw-bold">Voice channels</div>
+                        <b-form-checkbox-group v-model="runSelections.voiceChannels" stacked :options="runOptions.voiceChannels" />
+
+                        <div v-if="runSelections.voiceChannels.includes('update_voice_channels_permissions')" class="permissions-settings">
+                            <div>
+                                <div>Roles that can view team voice channels</div>
+                                <SettingsMultiselect
+                                    v-model="runSettings.voiceChannels.viewRoleIDs"
+                                    size="sm"
+                                    placeholder="Choose roles"
+                                    :options="roleOptions" />
+                            </div>
+                            <div class="mt-1">
+                                <div>Roles that can connect to team voice channels</div>
+                                <SettingsMultiselect
+                                    v-model="runSettings.voiceChannels.connectRoleIDs"
+                                    size="sm"
+                                    placeholder="Choose roles"
+                                    :options="roleOptions" />
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    <b-form-checkbox-group v-model="selectedTeamSettings" stacked :options="teamSettingsOptions" />-->
+                    <!--                    <b-form-checkbox-group v-model="selectedRunSettings" stacked :options="runSettingsOptions" />-->
+                </div>
+                <div class="d-flex justify-content-end w-100 mt-3">
                     <b-button
                         class="flex-shrink-0 opacity-changes"
                         variant="info"
@@ -29,18 +73,6 @@
                     </b-button>
                 </div>
             </b-form-group>
-            <b-form-group label="Roles for team channels" label-cols="2" description="Add one role ID per line for roles that should have access to team text or voice channels">
-                <div class="d-flex gap-2">
-                    <div class="flex-grow-1">
-                        <div class="m-2 font-weight-bold text-center">Team text channels</div>
-                        <b-form-textarea v-model="textChannelRoles" />
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="m-2 font-weight-bold text-center">Team voice channels</div>
-                        <b-form-textarea v-model="voiceChannelRoles" />
-                    </div>
-                </div>
-            </b-form-group>
         </div>
 
         <table class="table table-bordered table-dark table-sm">
@@ -48,6 +80,7 @@
                 <tr>
                     <th></th>
                     <th>Team</th>
+                    <th v-if="anyTeamCategories">Category</th>
                     <th>Role</th>
                     <th>Text channel</th>
                     <th>Voice channel</th>
@@ -67,6 +100,7 @@
                     <td>
                         <router-link :to="`/team/${team.id}`">{{ team.name }}</router-link>
                     </td>
+                    <td v-if="anyTeamCategories">{{ team.team_category?.split(";")?.[1] || team.team_category }}</td>
                     <td>
                         <CopyTextButton v-if="team._control.get('role_id')" :content="`<@&${team._control.get('role_id')}>`">
                             {{ team._control.get("role_id") }}
@@ -107,36 +141,97 @@ import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
 import EventSettingsFix from "@/components/website/EventSettingsFix.vue";
 import { useAuthStore } from "@/stores/authStore";
+import { sortAlpha } from "@/utils/sorts";
+import SettingsMultiselect from "@/views/sub-views/event-settings/SettingsMultiselect.vue";
 
 export default {
     name: "EventSettingsDiscord",
-    components: { EventSettingsFix, CopyTextButton, ThemeLogo },
+    components: { EventSettingsFix, CopyTextButton, ThemeLogo, SettingsMultiselect },
     props: {
         event: {}
     },
     data: () => ({
         selectedGuildID: "",
-        selectedTeamSettings: [],
-        selectedRunSettings: [],
-
         fixes: [],
-        textChannelRoles: "",
-        voiceChannelRoles: "",
 
         processing: {},
-        teamSettingsOptions: [
-            { value: "create_roles", text: "Create roles" },
-            { value: "create_text_channels", text: "Create text channels" },
-            { value: "create_voice_channels", text: "Create voice channels" }
-        ],
-        runSettingsOptions: [
-            { value: "update_roles", text: "Update roles" },
-            { value: "delete_recreate_roles", text: "Delete & recreate roles" },
-            { value: "delete_recreate_text_channels", text: "Delete & recreate text channels" },
-            { value: "delete_recreate_voice_channels", text: "Delete & recreate voice channels" }
-        ]
+
+        runSelections: {
+            roles: [],
+            textChannels: [],
+            voiceChannels: []
+        },
+        runSettings: {
+            textChannels: {
+                accessRoleIDs: []
+            },
+            voiceChannels: {
+                viewRoleIDs: [],
+                connectRoleIDs: []
+            }
+        },
+        roleData: null
     }),
     computed: {
+        runOptions() {
+
+
+            let roles = [
+                { value: "delete_roles", text: "Delete roles" },
+            ];
+            if (this.runSelections.roles.includes("delete_roles")) {
+                roles.unshift({ value: "create_roles", text: "Recreate roles" });
+            } else {
+                roles.unshift({ value: "create_roles", text: "Create roles" });
+            }
+            if (!this.runSelections.roles.includes("delete_roles") || this.runSelections.roles.includes("create_roles") ) {
+                roles = [
+                    ...roles,
+                    { value: "edit_roles", text: "Update role (name/color/icon)" },
+                    { value: "assign_roles", text: "Give team members roles" },
+                    { value: "unassign_roles", text: "Remove unknown users from roles" },
+                ];
+            }
+
+
+            let textChannels = [
+                { value: "delete_text_channels", text: "Delete text channels" },
+            ];
+            if (this.runSelections.textChannels.includes("delete_text_channels")) {
+                textChannels.unshift({ value: "create_text_channels", text: "Recreate text channels" });
+            } else {
+                textChannels.unshift({ value: "create_text_channels", text: "Create text channels" });
+            }
+            if (!this.runSelections.textChannels.includes("delete_text_channels") || this.runSelections.textChannels.includes("create_text_channels") ) {
+                textChannels = [
+                    ...textChannels,
+                    { value: "edit_text_channels", text: "Update channel (name/category)" },
+                    { value: "update_text_channels_permissions", text: "Update permissions" }
+                ];
+            }
+
+            let voiceChannels = [
+                { value: "delete_voice_channels", text: "Delete voice channels" },
+            ];
+            if (this.runSelections.voiceChannels.includes("delete_voice_channels")) {
+                voiceChannels.unshift({ value: "create_voice_channels", text: "Recreate voice channels" });
+            } else {
+                voiceChannels.unshift({ value: "create_voice_channels", text: "Create voice channels" });
+            }
+            if (!this.runSelections.voiceChannels.includes("delete_voice_channels") || this.runSelections.voiceChannels.includes("create_voice_channels") ) {
+                voiceChannels = [
+                    ...voiceChannels,
+                    { value: "edit_voice_channels", text: "Update channel (name/category)" },
+                    { value: "update_voice_channels_permissions", text: "Update permissions" }
+                ];
+            }
+
+            return {
+                roles,
+                textChannels,
+                voiceChannels
+            };
+        },
         canEditEventSettings() {
             const { isAuthenticated, user } = useAuthStore();
             if (!isAuthenticated) return false;
@@ -164,7 +259,28 @@ export default {
                     ...t,
                     _control: control
                 };
+            }).sort((a,b) => {
+                if (a.team_category && b.team_category) {
+                    const [aIdx, bIdx] = [a,b].map(x => x.team_category.split(";")[0]);
+                    if (aIdx !== bIdx) {
+                        if (aIdx < bIdx) return -1;
+                        if (aIdx > bIdx) return 1;
+                    }
+                }
+                return sortAlpha(a,b, "name");
             });
+        },
+        anyTeamCategories() {
+            return this.teams.some(t => t.team_category);
+        },
+        roleOptions() {
+            return (this.roleData || []).map(role => ({
+                text: role.name,
+                value: role.id,
+                style: {
+                    "--role-color": this.getHex(role.color)
+                }
+            }));
         }
     },
     methods: {
@@ -176,6 +292,8 @@ export default {
             });
             if (response.error) {
                 console.error(response.error);
+            } else {
+                this.$notyf.success("Discord server set to event");
             }
             this.processing["guild_id"] = false;
         },
@@ -185,12 +303,13 @@ export default {
             const output = await authenticatedRequest("actions/create-event-discord-items", {
                 eventID: this.event.id,
                 guildID: this.selectedGuildID,
-                teamSettings: this.selectedTeamSettings,
-                runSettings: this.selectedRunSettings,
-                settings: {
-                    textChannelRoles: this.textChannelRoles,
-                    voiceChannelRoles: this.voiceChannelRoles
-                }
+
+                actions: [
+                    ...this.runSelections.roles,
+                    ...this.runSelections.textChannels,
+                    ...this.runSelections.voiceChannels,
+                ],
+                settings: this.runSettings
             });
             this.processing["creating"] = false;
             this.selectedRunSettings = [];
@@ -200,6 +319,16 @@ export default {
                 this.fixes = output.data.fixes;
                 console.log("Fixes", output.data.fixes);
             }
+        },
+        async getGuildRoleData() {
+            const { data, error } = await authenticatedRequest("actions/get-discord-server-data", {
+                eventID: this.event.id,
+            });
+            return data.sort((a,b) => b.rawPosition - a.rawPosition);
+        },
+        getHex(colorNum) {
+            if (!colorNum) return null;
+            return "#" + colorNum.toString(16).padStart(6, "0");
         }
     },
     watch: {
@@ -207,6 +336,15 @@ export default {
             immediate: true,
             handler(id) {
                 this.selectedGuildID = id;
+            }
+        },
+        "runSelections.textChannels": {
+            immediate: true,
+            deep: true,
+            async handler(selections) {
+                if (selections.includes("update_text_channels_permissions") && !this.roleData) {
+                    this.roleData = await this.getGuildRoleData();
+                }
             }
         }
     }
@@ -225,5 +363,31 @@ export default {
     }
     ul {
         margin-bottom: 0 !important;
+    }
+
+    .settings:deep(.multiselect__tags) {
+        background-color: #313338;
+        color: white;
+    }
+
+    .settings:deep(.multiselect__tags-wrap) {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        gap: 2px;
+    }
+    .settings:deep(.multiselect__input) {
+        background-color: transparent !important;
+        color: white;
+    }
+
+    .settings:deep(.settings-multiselect .badge) {
+        border: 2px solid var(--role-color, #99aab5);
+        background-color: #313338 !important;
+        color: var(--role-color, white) !important;
+        border-radius: 1em;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 </style>

@@ -13,11 +13,11 @@
             <b-button variant="success" :disabled="processing" @click="() => saveToEvent()"><i class="fas fa-save fa-fw"></i> Save to event</b-button>
         </div>
         <div class="d-flex gap-2 main-content flex-column flex-md-row">
-            <div class="d-flex flex-column gap-2 w-100 w-md-25">
+            <div class="d-flex flex-column gap-2 w-100 w-md-33">
                 <div>Event settings JSON</div>
                 <textarea rows="20" :value="JSON.stringify(editableBlocks, null, 2)" class="bg-dark text-white font-monospace p-2 rounded" @input="e => jsonEdit(e.target.value)"></textarea>
             </div>
-            <div v-if="editableBlocks" class="w-md-75 w-100 d-flex flex-column gap-2 opacity-changes" :class="{'low-opacity': processing}">
+            <div v-if="editableBlocks" class="w-md-67 w-100 d-flex flex-column gap-2 opacity-changes" :class="{'low-opacity': processing}">
                 <FoldyEventSettingsGroup v-model="editableBlocks.foldy" :event="event" :all-settings="editableBlocks" />
                 <StandingsEventSettingsGroup v-model="editableBlocks.standings" :event="event" :all-settings="editableBlocks" />
                 <AuctionEventSettingsGroup v-model="editableBlocks.auction" :event="event" :all-settings="editableBlocks" />

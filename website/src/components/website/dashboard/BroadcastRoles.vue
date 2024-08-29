@@ -123,7 +123,7 @@ export default {
                     staff: ReactiveThing("staff")
                 }),
                 event: ReactiveThing("event")
-            })?.clients;
+            })?.clients || [];
         },
         clientsLoading() {
             return this.clients.some(c => c.__loading);

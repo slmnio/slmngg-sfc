@@ -25,6 +25,7 @@ type ActionKey = "create-live-guest" |
     "adjust-match-broadcast" |
     "set-event-guild" |
     "create-event-discord-items" |
+    "get-discord-server-data" |
     "set-event-settings"
 
 type RequestUrl = `actions/${ActionKey}`
@@ -219,6 +220,10 @@ interface SetEventSettingsData {
     settings: string
 }
 
+interface GetDiscordServerData {
+    eventID: AnyAirtableID
+}
+
 type ActionRequestData<U> =
     U extends "actions/create-live-guest" ? CreateLiveGuestData :
     U extends "actions/manage-prediction" ? ManagePredictionData :
@@ -244,6 +249,7 @@ type ActionRequestData<U> =
     U extends "actions/set-event-guild" ? SetEventGuidData :
     U extends "actions/create-event-discord-items" ? CreateEventDiscordItemsData :
     U extends "actions/set-event-settings" ? SetEventSettingsData :
+    U extends "actions/get-discord-server-data" ? GetDiscordServerData :
     any;
 
 

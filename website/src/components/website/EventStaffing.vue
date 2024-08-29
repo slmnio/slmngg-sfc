@@ -1,7 +1,7 @@
 <template>
     <div v-if="appearances.length" class="event-staffing">
         <!-- Table: staff vs roles, counts of staff in that role -->
-        <table class="table table-sm table-dark table-hover table-bordered">
+        <table class="table table-sm table-dark table-hover table-bordered" :class="{'user-select-none': paint}">
             <thead>
                 <tr>
                     <th class="px-1">Staff</th>
@@ -30,7 +30,9 @@
                     <td
                         v-for="role in roles"
                         :key="role"
-                        :class="{'ct-active': staff.listed_roles.indexOf(role) !== -1}">
+                        :class="{'ct-active': staff.listed_roles.indexOf(role) !== -1, 'highlighted': paint && highlighted[`${staff.id}-${role}`]}"
+                        @mousedown="(e) => {paintMode = !!highlighted[`${staff.id}-${role}`]; highlight(e, { staff, role })}"
+                        @mouseover="(e) => highlight(e, { staff, role })">
                         {{ staff.roles[role] || "-" }}
                     </td>
                     <td>{{ staff.matches.size }}</td>
@@ -39,6 +41,27 @@
         </table>
 
         <CopyTextButton :no-icon="true" class="btn btn-dark" style="white-space: pre" :content="credits">Copy full event credits</CopyTextButton>
+
+        <div class="w-100 mb-2 mt-2 d-flex flex-column gap-1 align-items-start">
+            <b-form-checkbox v-model="paint" switch>Select relationships</b-form-checkbox>
+            <b-form-checkbox v-if="paint" v-model="ignoreSet" switch>Ignore already set relationships</b-form-checkbox>
+            <b-button-group v-if="paint">
+                <b-button variant="primary" @click="highlightAll">Select all</b-button>
+                <b-button variant="secondary" @click="highlightSome">Select above</b-button>
+                <b-button variant="danger" @click="highlighted = {}">Empty all</b-button>
+            </b-button-group>
+            <b-form-checkbox v-if="paint" v-model="copyable" switch>Copyable relationships</b-form-checkbox>
+        </div>
+        <div v-if="paint" class="d-flex gap-2">
+            <div class="w-100">
+                <h3 class="text-center">Casters</h3>
+                <b-form-textarea rows="20" class="bg-dark text-white border-secondary mt-2" :model-value="highlightedCasters" />
+            </div>
+            <div class="w-100">
+                <h3 class="text-center">Player Relationships</h3>
+                <b-form-textarea rows="20" class="bg-dark text-white border-secondary mt-2" :model-value="highlightedPlayerRelationships" />
+            </div>
+        </div>
     </div>
 </template>
 
@@ -56,7 +79,12 @@ export default {
         sort: {
             by: "Total",
             asc: true
-        }
+        },
+        highlighted: {},
+        paint: false,
+        paintMode: null,
+        ignoreSet: false,
+        copyable: true
     }),
     computed: {
         matches() {
@@ -81,9 +109,8 @@ export default {
             return roles.sort((a, b) => {
                 const [ha, hb] = [a, b].map(x => PRODUCTION_HIERARCHY.indexOf(x));
                 if (ha === hb) {
-                    console.log(a,b, a > b);
-                    if (a > b) return -1;
-                    if (a < b) return 1;
+                    if (a < b) return -1;
+                    if (a > b) return 1;
                     return 0;
                 }
                 if (ha === -1) return 1;
@@ -163,6 +190,25 @@ export default {
                 (group.items?.length === 1 ? group.meta.singular_name + ": " : group.meta.plural_name + ":"),
                 group.items?.map(p => p.name + (p.twitter_link ? " " + p.twitter_link : "")).join("\n")
             ].join("\n")).join("\n\n");
+        },
+        highlightedCasters() {
+            return Object.values(this.highlighted).filter(Boolean).filter(({ staff, role }) => role === "Caster" && (this.ignoreSet ? staff.listed_roles.indexOf(role) === -1 : true)).map(({ staff }) => staff.name).join(this.copyable ? ", " : "\n");
+        },
+        highlightedPlayerRelationships() {
+            return Object.values(this.highlighted).filter(Boolean)
+                .filter(({ staff, role }) => role !== "Caster" && (this.ignoreSet ? staff.listed_roles.indexOf(role) === -1 : true))
+                .sort((a, b) => {
+                    const [ha, hb] = [a, b].map(({role}) => PRODUCTION_HIERARCHY.indexOf(role));
+                    if (ha === hb) {
+                        if (a.staff?.name < b.staff?.name) return -1;
+                        if (a.staff?.name > b.staff?.name) return 1;
+                        return 0;
+                    }
+                    if (ha === -1) return 1;
+                    if (hb === -1) return -1;
+                    return ha - hb;
+                })
+                .map(({ staff, role }) => `${role}: ${staff.name}`).join(this.copyable ? ", " : "\n");
         }
     },
     methods: {
@@ -182,6 +228,34 @@ export default {
                 this.sort.by = key;
                 this.sort.asc = true;
             }
+        },
+        highlight(event, { staff, role }) {
+            if (!this.paint) return;
+            if (event.buttons !== 1) return;
+            if (!staff.roles[role]) return;
+
+            const key = [staff.id, role].join("-");
+            if (this.paintMode === true) {
+                this.highlighted[key] = null;
+            } else {
+                this.highlighted[key] = { staff, role };
+            }
+            console.log(staff, role, this.highlighted);
+        },
+        highlightAll(min) {
+            this.appearances.map(staff => {
+                this.roles.forEach(role => {
+                    if (staff.roles[role] >= (min || 1)) {
+                        const key = [staff.id, role].join("-");
+                        this.highlighted[key] = { staff, role };
+                    }
+                });
+            });
+        },
+        highlightSome() {
+            const min = prompt("Select all relationships with this many games or above");
+            if (!min) return;
+            this.highlightAll(min);
         }
     }
 };
@@ -194,5 +268,14 @@ export default {
     .cursor-pointer {
         cursor: pointer;
         user-select: none;
+    }
+    .highlighted,
+    tr:hover .highlighted {
+        --bs-table-bg-state: var(--primary) !important;
+    }
+    .highlighted.ct-active,
+    tr:hover .highlighted.ct-active {
+        --bs-table-bg-state: var(--light) !important;
+        color: var(--dark) !important;
     }
 </style>

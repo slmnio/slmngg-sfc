@@ -41,7 +41,7 @@ export const PRODUCTION_HIERARCHY = [
     "Director",
     "Producer",
     "Observer Director",
-    "Replay Operator",
+    "Replay Producer",
     "Observer",
     "Lobby Admin",
     "Stream Admin",

@@ -72,7 +72,7 @@ module.exports = {
         if (targetPlayer) {
             const newFeed = selectedServer.domain + selectedServer.feeds.view(feedId, latencyMs);
             if (targetPlayer?.remote_feed === newFeed) {
-                footer = `Remote feed URL stored on ${targetUser.id === interaction.user.id ? "your" : targetPlayer + "'s"} player profile.`;
+                footer = `Remote feed URL stored on ${targetUser.id === interaction.user.id ? "your" : targetPlayer.name + "'s"} player profile.`;
             } else {
                 const internalManager = getInternalManager();
 

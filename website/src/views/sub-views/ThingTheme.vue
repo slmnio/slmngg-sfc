@@ -30,7 +30,7 @@
             </div>
         </div>
 
-        <div class="mb-3">
+        <div v-if="colors.length" class="mb-3">
             <b-form-checkbox v-model="removeHashInHex" switch>Remove hash from hex codes</b-form-checkbox>
         </div>
 

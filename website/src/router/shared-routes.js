@@ -62,7 +62,7 @@ export default [
         props: route => ({ id: route.params.id }),
         children: [
             { path: "", component: () => import("@/views/sub-views/MatchVOD.vue") },
-            { path: "history", component: () => import("@/views/sub-views/MatchHistory.vue") },
+            { path: "history", component: () => import("@/views/sub-views/MatchStats.vue") },
             { path: "editor", component: () => import("@/views/sub-views/event/EventMatchEditor.vue"), meta: { requiresAuth: true } }
         ]
     },

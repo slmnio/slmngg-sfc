@@ -72,7 +72,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="showMatchHistory" class="prev-matches-holder d-flex mt-2 flex-column">
+                <div v-if="showMatchHistory" class="prev-matches-holder d-flex flex-column">
                     <!--                    <div class="team-prev-wrapper w-50" v-for="team in match.teams" :key="team.id">-->
                     <!--                        <PreviousMatch v-for="match in teamMatches(team)" :match="match" :team="team" :key="match.id" />-->
                     <!--                    </div>-->
@@ -90,12 +90,12 @@
 
                 <div v-if="showMapStats" class="map-stats mt-4">
                     <h2>Map stats</h2>
-                    <MatchHistory :match="match" :hide-map-display="true" />
+                    <MatchStats :match="match" :hide-map-display="true" />
                 </div>
 
                 <bracket-implications
                     v-if="showImplications && match.brackets"
-                    class="bracket-implications mt-2"
+                    class="bracket-implications mt-4"
                     :match="match"
                     link-to-detailed-match />
 
@@ -247,13 +247,13 @@ import CopyTextButton from "@/components/website/CopyTextButton";
 import BracketImplications from "@/components/website/dashboard/BracketImplications.vue";
 import { getDataServerAddress } from "@/utils/fetch";
 import { canEditMatch } from "@/utils/client-action-permissions";
-import MatchHistory from "@/views/sub-views/MatchHistory.vue";
+import MatchStats from "@/views/sub-views/MatchStats.vue";
 import { useAuthStore } from "@/stores/authStore";
 import CreditCreator from "@/components/website/CreditCreator.vue";
 
 export default {
     name: "DetailedMatch",
-    components: { CreditCreator, MatchHistory, BracketImplications, CopyTextButton, Markdown, PreviousMatch, ThemeLogo, MapDisplay, stat: DetailedMatchStat },
+    components: { CreditCreator, MatchStats, BracketImplications, CopyTextButton, Markdown, PreviousMatch, ThemeLogo, MapDisplay, stat: DetailedMatchStat },
     props: ["id"],
     data: () => ({
         showPlayerInfo: false,
@@ -284,6 +284,7 @@ export default {
                             theme: ReactiveThing("theme")
                         }),
                         maps: ReactiveArray("maps", {
+                            map: ReactiveThing("map"),
                             winner: ReactiveThing("winner", {
                                 theme: ReactiveThing("theme")
                             }),

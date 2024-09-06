@@ -32,6 +32,11 @@ export function sortAlpha(a, b, key) {
     if (a[key]?.toLowerCase() < b[key]?.toLowerCase()) return -1;
     return 0;
 }
+export function sortAlphaRaw(a, b) {
+    if (a?.toLowerCase() > b?.toLowerCase()) return 1;
+    if (a?.toLowerCase() < b?.toLowerCase()) return -1;
+    return 0;
+}
 
 export const PRODUCTION_HIERARCHY = [
     "Caster",
@@ -47,3 +52,12 @@ export const PRODUCTION_HIERARCHY = [
     "Stream Admin",
     "Moderator"
 ];
+export const ROLE_ORDER = [
+    "Tank",
+    "DPS", "Damage",
+    "Support",
+];
+
+export function sortRoles(a, b) {
+    return ROLE_ORDER.indexOf(a) - ROLE_ORDER.indexOf(b);
+}

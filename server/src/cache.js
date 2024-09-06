@@ -303,7 +303,7 @@ async function set(id, data, options) {
     }
     if (data?.__tableName === "Teams") {
         // Limited Players
-        if (data.limited_players) {
+        if (typeof data.limited_players === "string") {
             data.limited_players = generateLimitedPlayers(data.limited_players);
         }
     }

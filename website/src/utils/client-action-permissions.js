@@ -17,7 +17,7 @@ export function canEditMatch(player, { event, match } = {}) {
 }
 export function isEventStaffOrHasRole(user, { event, role, websiteRoles } = {}) {
     if (!user || !event) return false;
-    if ([...websiteRoles, role].some(websiteRole => (user.website_settings || []).includes(websiteRole)) || (event.staff || []).map(x => dirtyID(x?.id) || dirtyID(x)).includes(dirtyID(user.airtableID))) return true;
+    if ([...(websiteRoles || []), role].some(websiteRole => (user.website_settings || []).includes(websiteRole)) || (event.staff || []).map(x => dirtyID(x?.id) || dirtyID(x)).includes(dirtyID(user.airtableID))) return true;
     if ((event.player_relationships || []).some(rel => rel.player?.[0] === dirtyID(user.airtableID) && (rel.permissions || []).includes(role))) return true;
     return false;
 }

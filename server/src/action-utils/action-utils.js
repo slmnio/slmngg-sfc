@@ -105,6 +105,10 @@ function deAirtable(obj) {
             console.log("[Action deAirtable] Skipping", key, val);
             delete data[key];
         }
+        if (key === "limited_players" && typeof data[key] === "object") {
+            // reflatten
+            data[key] = data[key].map(limitedPlayer => Object.entries(limitedPlayer).map(([k, v]) => `${k.replaceAll("_"," ")}=${v}`)).join("\n");
+        }
     });
     data.id = obj.id;
     return data;
@@ -195,8 +199,64 @@ function safeInputNoQuotes(string) {
         .replace(/>/g, "&gt;");
 }
 
+async function findMember(player, team, guild) {
+    let member;
+    let fixes = [];
+    if (player.discord_id) {
+        try {
+            member = await guild.members.fetch(player.discord_id);
+            if (!member) {
+                fixes.push({
+                    type: "discord_id_not_found",
+                    playerID: player.id,
+                    discordID: player.discord_id,
+                    teamID: team.id
+                });
+                console.warn(fixes[fixes.length - 1]);
+            }
+        } catch (e) {
+            console.error(e?.rawError);
+            fixes.push({
+                type: "discord_id_not_found",
+                playerID: player.id,
+                discordID: player.discord_id,
+                teamID: team.id
+            });
+            console.warn(fixes[fixes.length - 1]);
+        }
+    }
+
+    const tag = player.discord_tag.replace("@", "").trim();
+    if (!member && player.discord_tag) {
+        [member] = (await guild.members.fetch({
+            query: tag,
+            limit: 1,
+        })).values();
+
+        console.log({
+            type: "player_search_results",
+            discordID: member?.id,
+            discordTag: member?.user?.username,
+            tag: player.discord_tag
+        });
+    }
+
+    if (!member) {
+        fixes.push({
+            type: "player_discord_not_found",
+            playerID: player.id,
+            discordID: player.discord_id,
+            discordTag: player.discord_tag,
+            teamID: team.id
+        });
+        console.warn(fixes[fixes.length - 1]);
+    }
+    return { member, fixes };
+}
+
 
 module.exports = {
     getSelfClient, cleanID, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord, safeInput, safeInputNoQuotes,
-    getTwitchChannel, getMatchData, getTwitchAPIClient, getTwitchAPIError, getBroadcast, getMaps, getAll
+    getTwitchChannel, getMatchData, getTwitchAPIClient, getTwitchAPIError, getBroadcast, getMaps, getAll,
+    findMember
 };

@@ -110,13 +110,23 @@ async function playerList(Cache) {
     if (!allPlayers.ids) return;
     let players = (await Promise.all(allPlayers.ids.map(id => (Cache.get(id.slice(3))))));
 
+    const lookupPlayers = [];
 
-    players = players.map(p => ({
-        id: p.id,
-        name: p.name,
-        verified: !!p.verified,
-        pro: p.pro
-    })); //.filter(p => p.name);
+    players = players.map(p => {
+        lookupPlayers.push({
+            id: p.id,
+            name: p.name,
+            battletag: p.battletag,
+            discord_tag: p.discord_tag,
+            discord_id: p.discord_id
+        });
+        return {
+            id: p.id,
+            name: p.name,
+            verified: !!p.verified,
+            pro: p.pro
+        };
+    }); //.filter(p => p.name);
 
     const publicPlayers = [];
     const proPlayers = [];
@@ -129,6 +139,7 @@ async function playerList(Cache) {
 
     Cache.set("special:players", { players: publicPlayers, __tableName: "Special Collection" });
     Cache.set("special:pro-players", { players: proPlayers, __tableName: "Special Collection" });
+    Cache.set("internal:lookup-players", { players: lookupPlayers, __tableName: "Special Collection" });
 }
 
 async function teamList(Cache) {

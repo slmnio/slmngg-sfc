@@ -356,3 +356,26 @@ input.no-arrows[type=number] {
 small.text-body-secondary {
     color: white !important;
 }
+
+.opacity-changes {
+    opacity: 1;
+    transition: opacity .3s ease;
+}
+.low-opacity {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: wait;
+}
+
+.dark-border {
+    border: 1px solid #454d55;
+}
+
+@media (min-width: 768px) {
+    .w-md-25 { width: 25% !important; }
+    .w-md-33 { width: 33% !important; }
+    .w-md-50 { width: 50% !important; }
+    .w-md-67 { width: 67% !important; }
+    .w-md-75 { width: 75% !important; }
+    .w-md-100 { width: 100% !important; }
+}

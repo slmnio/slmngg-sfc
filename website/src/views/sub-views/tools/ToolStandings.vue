@@ -102,66 +102,9 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>MatchDiff</td>
-                    <td>Calculates match diff (match wins - match losses)</td>
-                </tr>
-                <tr>
-                    <td>MapDiff</td>
-                    <td>Calculates map diff (map wins - map losses)</td>
-                </tr>
-                <tr>
-                    <td>MatchWinrate</td>
-                    <td>Calculates match winrate (match wins / matches played)</td>
-                </tr>
-                <tr>
-                    <td>MapWinrate</td>
-                    <td>Calculates map winrate (map wins / maps played)</td>
-                </tr>
-                <tr>
-                    <td>HeadToHead</td>
-                    <td>
-                        For 2 teams max - counts the matches aggregate (e.g. if they play each other once, it'll be 1 or -1.
-                        Multiple matches in the same match group could even it out)
-                    </td>
-                </tr>
-                <tr>
-                    <td>MapWins</td>
-                    <td>Sorts only by map wins (not diff)</td>
-                </tr>
-                <tr>
-                    <td>OMW</td>
-                    <td>Averages all opponent's match winrates. Identical to OMatchWinrate (I think)</td>
-                </tr>
-                <tr>
-                    <td>OMatchWinrate</td>
-                    <td>Averages all opponent's match winrates</td>
-                </tr>
-                <tr>
-                    <td>OMapWinrate</td>
-                    <td>Averages all opponent's map winrates</td>
-                </tr>
-                <tr>
-                    <td>MiniLeague</td>
-                    <td>
-                        Creates a standings of the matches for the opponents that are tied, and sorts them by match diff
-                    </td>
-                </tr>
-                <tr>
-                    <td>MiniLeagueMaps</td>
-                    <td>Creates a standings of the matches for the opponents that are tied, and sorts them by map diff</td>
-                </tr>
-                <tr>
-                    <td>MapRoundsDiff</td>
-                    <td>Sorts by map round diff (map score wins - map score losses)</td>
-                </tr>
-                <tr>
-                    <td>MapRoundWins</td>
-                    <td>Sorts by map score wins only (not diff)</td>
-                </tr>
-                <tr>
-                    <td>Points</td>
-                    <td>Sorts by extra points (on team.extra_points)</td>
+                <tr v-for="([key, data]) in Object.entries(standingsSort)" :key="key">
+                    <td>{{ key }}</td>
+                    <td>{{ data.description }}</td>
                 </tr>
             </tbody>
         </table>
@@ -169,7 +112,7 @@
 </template>
 
 <script>
-import { StandingsShowKeys } from "@/utils/standings";
+import { StandingsShowKeys, StandingsSortKeys } from "@/utils/standings";
 import LearnTitleChip from "@/components/website/guide/LearnTitleChip.vue";
 
 export default {
@@ -178,6 +121,9 @@ export default {
     computed: {
         standingsShow() {
             return StandingsShowKeys();
+        },
+        standingsSort() {
+            return StandingsSortKeys();
         }
     },
     head() {

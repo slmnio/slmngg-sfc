@@ -9,6 +9,7 @@ const meta = require("./meta.js");
 const routes = require("./routes.js");
 const images = require("./images.js");
 const discordAuth = require("./discord/auth.js");
+require("./discord/discord-data.js");
 const webAuction = require("./web_auction");
 
 /* The staff module should only run on the server, probably not your local machine. */
@@ -16,7 +17,7 @@ let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEG
 if (staffKeysRequired.every(key => process.env[key])) {
     require("./discord/staff.js");
 } else {
-    console.warn("Staff application system won't be set up. Set the required STAFFAPPS keys in server/.env")
+    console.warn("Staff application system won't be set up. Set the required STAFFAPPS keys in server/.env");
 }
 
 let domains = (process.env.CORS_VALID_DOMAINS || "slmn.gg,localhost").split(/, */g).map(d => new RegExp(`(?:^|.*\\.)${d.replace(".", "\\.")}(?:$|\\n)`));

@@ -25,4 +25,25 @@ export default (isSubdomain) => [
     },
     { path: "streams", name: `event-${isSubdomain? "sub-" : ""}-streams`, component: () => import("@/views/sub-views/event/EventStreamDetails.vue") },
     { path: "stream", alias: ["stream-details"], redirect: { name: `event-${isSubdomain? "sub-" : ""}-streams` } },
+    {
+        path: "settings",
+        component: () => import("@/views/sub-views/event-settings/EventSettings.vue"),
+        meta: {
+            requiresAuth: true
+        },
+        children: [
+            {
+                path: "",
+                component: () => import("@/views/sub-views/event-settings/EventSettingsEditor.vue"),
+            },
+            {
+                path: "discord",
+                component: () => import("@/views/sub-views/event-settings/EventSettingsDiscord.vue"),
+            },
+            {
+                path: "signups",
+                component: () => import("@/views/sub-views/event-settings/EventSettingsSignups.vue"),
+            }
+        ]
+    }
 ];

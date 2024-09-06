@@ -94,7 +94,7 @@ export default {
             }
         },
         useTeamCompositions() {
-            return this.eventSettings?.composition?.use && (this.team?.players || []).some(p => p.composition_tank_sr || p.composition_dps_sr || p.composition_support_sr);
+            return this.eventSettings?.composition?.use;
         }
     },
     methods: {

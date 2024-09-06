@@ -44,6 +44,7 @@ interface Player {
     teams?: DirtyAirtableID[]
     favourite_hero?: DirtyAirtableID[]
     highlighted_on?: DirtyAirtableID[]
+    event_signups?: DirtyAirtableID[]
 }
 interface Client {
     name: string

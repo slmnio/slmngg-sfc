@@ -26,7 +26,6 @@ module.exports = {
 
         if (!allPlayerData?.length) throw "No player data submitted";
 
-        const eventTeams = await Promise.all((event?.teams || []).map(id => this.helpers.get(id)));
         /** @type {DirtyAirtableID[]} */
         const eventTeamIDs = (event?.teams || []).map(id => dirtyID(id));
 
@@ -57,7 +56,7 @@ module.exports = {
 
                 const playerUpdateData = {};
 
-                if (!player.event_signups?.find(id => dirtyID(id) === dirtyID(eventID))) {
+                if (!player.event_signups?.find(id => id === dirtyID(eventID))) {
                     playerUpdateData["Event Signups"] = [...(player.event_signups || []).map(id => dirtyID(id)), dirtyID(eventID)];
                 }
 
@@ -126,7 +125,6 @@ module.exports = {
 
                 alwaysAllowedPlayerUpdate.forEach(({ signupDataKey, airtableKey, data }) => {
                     data = data || playerData?.[signupDataKey];
-                    // TODO: ALLOW THIS TO CLEAR
 
                     // console.log(airtableKey, data, playerData?.[signupDataKey]);
 
@@ -162,8 +160,6 @@ module.exports = {
                 if (playerData?.battletag) airtablePlayerData["Battletag"] = playerData.battletag;
 
                 if (playerData.team_id) airtablePlayerData["Member Of"] = [dirtyID(playerData.team_id)];
-                // TODO: should this deal with changes in teams? Other fields are overwritten, but there's nothing here to detach a team if it's been replaced
-                //   should there be a lookup so only one team from the event can be set here?
 
                 if (playerData?.name) {
                     const playerRecords = await this.helpers.createRecord("Players", airtablePlayerData);

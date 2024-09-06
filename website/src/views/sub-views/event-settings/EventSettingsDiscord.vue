@@ -20,12 +20,54 @@
                     <div class="settings-group">
                         <div class="settings-title fw-bold">Team roles</div>
                         <b-form-checkbox-group v-model="runSelections.roles" stacked :options="runOptions.roles" />
+                        <div v-if="['create_roles', 'edit_roles'].some(x => runSelections.roles.includes(x))" class="extra-settings">
+                            <div class="mt-2">
+                                <b-form-checkbox v-model="useRoleColorOverride" switch>
+                                    Use role color override
+                                </b-form-checkbox>
+
+                                <div class="d-flex gap-1 mb-2">
+                                    <b-form-input
+                                        v-if="useRoleColorOverride"
+                                        v-model="runSettings.roles.roleColorOverride"
+                                        size="sm"
+                                        type="color"
+                                        placeholder="Role color">
+                                        Role color override
+                                    </b-form-input>
+                                    <b-form-input
+                                        v-if="useRoleColorOverride"
+                                        v-model="runSettings.roles.roleColorOverride"
+                                        size="sm"
+                                        type="text"
+                                        placeholder="Role color">
+                                        Role color override
+                                    </b-form-input>
+                                </div>
+                            </div>
+                            <div>
+                                <div>Role position (above selected)</div>
+                                <b-form-select
+                                    v-model="runSettings.roles.rolePosition"
+                                    size="sm"
+                                    placeholder="Choose roles"
+                                    :options="rolePositionOptions" />
+                            </div>
+                        </div>
                     </div>
                     <div class="settings-group">
                         <div class="settings-title fw-bold">Team channels</div>
                         <b-form-checkbox-group v-model="runSelections.textChannels" stacked :options="runOptions.textChannels" />
 
-                        <div v-if="runSelections.textChannels.includes('update_text_channels_permissions')" class="permissions-settings">
+                        <div v-if="['create_text_channels', 'edit_text_channels'].some(x => runSelections.textChannels.includes(x))" class="permissions-settings">
+                            <div class="mt-2">
+                                <b-form-checkbox
+                                    v-model="runSettings.textChannels.useTeamCategories">
+                                    Split text channels by team category
+                                </b-form-checkbox>
+                            </div>
+                        </div>
+                        <div v-if="runSelections.textChannels.includes('update_text_channels_permissions') || runSelections.textChannels.includes('create_text_channels')" class="permissions-settings">
                             <div>
                                 <div>Roles that can access team text channels</div>
                                 <SettingsMultiselect
@@ -40,7 +82,15 @@
                         <div class="settings-title fw-bold">Voice channels</div>
                         <b-form-checkbox-group v-model="runSelections.voiceChannels" stacked :options="runOptions.voiceChannels" />
 
-                        <div v-if="runSelections.voiceChannels.includes('update_voice_channels_permissions')" class="permissions-settings">
+                        <div v-if="['create_voice_channels', 'edit_voice_channels'].some(x => runSelections.voiceChannels.includes(x))" class="permissions-settings">
+                            <div class="mt-2">
+                                <b-form-checkbox
+                                    v-model="runSettings.voiceChannels.useTeamCategories">
+                                    Split voice channels by team category
+                                </b-form-checkbox>
+                            </div>
+                        </div>
+                        <div v-if="runSelections.voiceChannels.includes('update_voice_channels_permissions') || runSelections.voiceChannels.includes('create_voice_channels')" class="permissions-settings mt-2">
                             <div>
                                 <div>Roles that can view team voice channels</div>
                                 <SettingsMultiselect
@@ -155,6 +205,7 @@ export default {
         fixes: [],
 
         processing: {},
+        useRoleColorOverride: false,
 
         runSelections: {
             roles: [],
@@ -163,11 +214,17 @@ export default {
         },
         runSettings: {
             textChannels: {
-                accessRoleIDs: []
+                accessRoleIDs: [],
+                useTeamCategories: false
             },
             voiceChannels: {
                 viewRoleIDs: [],
-                connectRoleIDs: []
+                connectRoleIDs: [],
+                useTeamCategories: false
+            },
+            roles: {
+                rolePosition: null,
+                roleColorOverride: null
             }
         },
         roleData: null
@@ -281,6 +338,20 @@ export default {
                     "--role-color": this.getHex(role.color)
                 }
             }));
+        },
+        rolePositionOptions() {
+            return (this.roleData || []).map((role, i) => {
+
+                const isTopMost = i === this.roleData.findIndex(r => r.rawPosition === role.rawPosition);
+                return {
+                    text: `${isTopMost ? " " : "↑ "}${role.name} (${role.rawPosition})`,
+                    value: role.rawPosition,
+                    style: {
+                        "--role-color": this.getHex(role.color)
+                    },
+                    disabled: !isTopMost
+                };
+            });
         }
     },
     methods: {
@@ -299,25 +370,29 @@ export default {
         },
         async startProcessing() {
             this.processing["creating"] = true;
-            this.fixes = [];
-            const output = await authenticatedRequest("actions/create-event-discord-items", {
-                eventID: this.event.id,
-                guildID: this.selectedGuildID,
+            try {
+                this.fixes = [];
+                const output = await authenticatedRequest("actions/create-event-discord-items", {
+                    eventID: this.event.id,
+                    guildID: this.selectedGuildID,
 
-                actions: [
-                    ...this.runSelections.roles,
-                    ...this.runSelections.textChannels,
-                    ...this.runSelections.voiceChannels,
-                ],
-                settings: this.runSettings
-            });
-            this.processing["creating"] = false;
-            this.selectedRunSettings = [];
+                    actions: [
+                        ...this.runSelections.roles,
+                        ...this.runSelections.textChannels,
+                        ...this.runSelections.voiceChannels,
+                    ],
+                    settings: this.runSettings
+                });
+                this.selectedRunSettings = [];
 
-            if (!output?.error) {
-                this.$notyf.success(output.data.status.replaceAll("\n", "<br>"));
-                this.fixes = output.data.fixes;
-                console.log("Fixes", output.data.fixes);
+                if (!output?.error) {
+                    this.$notyf.success(output.data.status.replaceAll("\n", "<br>"));
+                    this.fixes = output.data.fixes;
+                    console.log("Fixes", output.data.fixes);
+                }
+            } finally {
+                this.processing["creating"] = false;
+                this.roleData = await this.getGuildRoleData();
             }
         },
         async getGuildRoleData() {
@@ -334,17 +409,20 @@ export default {
     watch: {
         dataSelectedGuildId: {
             immediate: true,
-            handler(id) {
-                this.selectedGuildID = id;
-            }
-        },
-        "runSelections.textChannels": {
-            immediate: true,
-            deep: true,
-            async handler(selections) {
-                if (selections.includes("update_text_channels_permissions") && !this.roleData) {
+            async handler(newID, oldID) {
+                this.selectedGuildID = newID;
+                if (newID && oldID && (newID !== oldID)) {
+                    this.roleData = null;
+                }
+                if (!this.roleData && newID) {
                     this.roleData = await this.getGuildRoleData();
                 }
+            }
+        },
+        useRoleColorOverride: {
+            immediate: true,
+            handler() {
+                this.runSettings.roles.roleColorOverride = null;
             }
         }
     }

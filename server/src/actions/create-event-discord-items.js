@@ -36,8 +36,12 @@ module.exports = {
      * @param {{}} settings
      * @param {{}} settings.textChannels
      * @param {Snowflake[]} settings.textChannels.accessRoleIDs
+     * @param {boolean?} settings.textChannels.useTeamCategories
      * @param {Snowflake[]} settings.voiceChannels.viewRoleIDs
      * @param {Snowflake[]} settings.voiceChannels.connectRoleIDs
+     * @param {boolean?} settings.voiceChannels.useTeamCategories
+     * @param {number?} settings.roles.rolePosition
+     * @param {string?} settings.roles.roleColorOverride
      * @param {UserData} user
      * @returns {Promise<void>}
      */
@@ -98,58 +102,62 @@ module.exports = {
 
             let fixes = [];
 
-
-            let textCategory;
-            if (actions.includes("create_text_channels") || actions.includes("update_text_channels_permissions")) {
+            let eventTextCategory;
+            if (actions.includes("create_text_channels") || actions.includes("update_text_channels_permissions") || actions.includes("edit_text_channels")) {
                 // Get or create category
 
                 if (eventControl.get("team_category_id")) {
                     try {
-                        textCategory = await guild.channels.fetch(eventControl.get("team_category_id"));
+                        eventTextCategory = await guild.channels.fetch(eventControl.get("team_category_id"));
                     } catch (e) {
                         console.error(e?.rawError ?? e);
                     }
                 }
 
-                if (!textCategory) {
+                if (!eventTextCategory) {
                     try {
-                        textCategory = await guild.channels.create({
+                        eventTextCategory = await guild.channels.create({
                             type: ChannelType.GuildCategory,
                             name: `${event.name}`,
                             reason: `Creating text category for ${event.name}`
                         });
-                        eventControl.push("team_category_id", textCategory.id);
+                        eventControl.push("team_category_id", eventTextCategory.id);
                     } catch (e) {
                         console.error(e?.rawError ?? e);
                     }
                 }
             }
-
-            let voiceCategory;
-            if (actions.includes("create_voice_channels") || actions.includes("update_voice_channels_permissions"))  {
+            let eventVoiceCategory;
+            if (actions.includes("create_voice_channels") || actions.includes("update_voice_channels_permissions") || actions.includes("edit_voice_channels"))  {
                 if (eventControl.get("team_voice_category_id")) {
                     try {
-                        voiceCategory = await guild.channels.fetch(eventControl.get("team_voice_category_id"));
+                        eventVoiceCategory = await guild.channels.fetch(eventControl.get("team_voice_category_id"));
                     } catch (e) {
                         console.error(e?.rawError ?? e);
                     }
                 }
-                if (!voiceCategory) {
+                if (!eventVoiceCategory) {
                     try {
-                        voiceCategory = await guild.channels.create({
+                        eventVoiceCategory = await guild.channels.create({
                             type: ChannelType.GuildCategory,
                             name: `${event.name} VC`,
                             reason: `Creating voice category for ${event.name}`
                         });
-                        eventControl.push("team_voice_category_id", voiceCategory.id);
+                        eventControl.push("team_voice_category_id", eventVoiceCategory.id);
                     } catch (e) {
                         console.error(e?.rawError ?? e);
                     }
                 }
             }
 
+            let eventTextCategories = new Map();
+            let eventVoiceCategories = new Map();
+
+
             const teams = await getAll(event.teams);
-            await Promise.all(teams.map(async (team, i) => {
+            let i = -1;
+            for (const team of teams) {
+                i++;
                 const theme = await this.helpers.get(team?.theme?.[0]);
                 console.log(`[Discord-Automation] team ${i + 1}/${teams.length}`);
                 const teamControl = new MapObject(team.discord_control);
@@ -168,11 +176,14 @@ module.exports = {
                 if (actions.includes("edit_roles") || actions.includes("create_roles")) {
                     const role = {
                         name: team.name,
-                        color: theme?.color_theme,
+                        color: settings.roles.roleColorOverride || theme?.color_theme,
                         permissions: new PermissionsBitField()
                     };
                     if (theme && guild.features.includes(GuildFeature.RoleIcons)) {
                         role.icon = await getDiscordIcon(theme);
+                    }
+                    if (settings?.roles?.rolePosition) {
+                        role.position = settings.roles.rolePosition;
                     }
 
 
@@ -300,10 +311,82 @@ module.exports = {
                         console.error(e?.rawError ?? e);
                     }
                 }
-                if (actions.includes("create_text_channels") && !teamControl.get("text_channel_id") && textCategory) {
+
+                let teamTextCategoryChannel = eventTextCategory;
+                if (settings.textChannels.useTeamCategories && team.team_category) {
+                    // need to find or create a category channel based on the team.team_category
+                    const split = team.team_category.split(";");
+                    const teamCategory = split.pop();
+                    if (eventTextCategories.has(teamCategory)) {
+                        // already loaded into map
+                        teamTextCategoryChannel = eventTextCategories.get(teamCategory);
+                    } else {
+                        let searchedCategoryChannel;
+                        if (teamControl.get("team_category_text_category_id")) {
+                            // not loaded into map, see if it exists
+                            try {
+                                searchedCategoryChannel = await guild.channels.fetch(teamControl.get("team_category_text_category_id"));
+                                if (searchedCategoryChannel) {
+                                    teamTextCategoryChannel = searchedCategoryChannel;
+                                    eventTextCategories.set(teamCategory, teamTextCategoryChannel);
+                                    teamControl.push("team_category_text_category_id", teamTextCategoryChannel.id);
+                                }
+                            } catch (e) {
+                                console.warn("Couldn't find category channel", teamCategory, teamControl.textMap());
+                            }
+                        }
+                        if (!searchedCategoryChannel) {
+                            // create category
+                            console.log("Creating team category since it doesn't seem to exist");
+                            teamTextCategoryChannel = await guild.channels.create({
+                                name: teamCategory,
+                                type: ChannelType.GuildCategory
+                            });
+                            eventTextCategories.set(teamCategory, teamTextCategoryChannel);
+                            teamControl.push("team_category_text_category_id", teamTextCategoryChannel.id);
+                        }
+                    }
+                }
+                let teamVoiceCategoryChannel = eventVoiceCategory;
+                if (settings.voiceChannels.useTeamCategories && team.team_category) {
+                    // need to find or create a category channel based on the team.team_category
+                    const split = team.team_category.split(";");
+                    const teamCategory = split.pop();
+                    if (eventVoiceCategories.has(teamCategory)) {
+                        // already loaded into map
+                        teamVoiceCategoryChannel = eventVoiceCategories.get(teamCategory);
+                    } else {
+                        let searchedCategoryChannel;
+                        if (teamControl.get("team_category_voice_category_id")) {
+                            // not loaded into map, see if it exists
+                            try {
+                                searchedCategoryChannel = await guild.channels.fetch(teamControl.get("team_category_voice_category_id"));
+                                if (searchedCategoryChannel) {
+                                    teamVoiceCategoryChannel = searchedCategoryChannel;
+                                    eventVoiceCategories.set(teamCategory, teamVoiceCategoryChannel);
+                                    teamControl.push("team_category_voice_category_id", teamVoiceCategoryChannel.id);
+                                }
+                            } catch (e) {
+                                console.warn("Couldn't find category channel", teamCategory, teamControl.textMap);
+                            }
+                        }
+                        if (!searchedCategoryChannel) {
+                            // create category
+                            console.log("Creating team voice category since it doesn't seem to exist");
+                            teamVoiceCategoryChannel = await guild.channels.create({
+                                name: teamCategory,
+                                type: ChannelType.GuildCategory
+                            });
+                            eventVoiceCategories.set(teamCategory, teamVoiceCategoryChannel);
+                            teamControl.push("team_category_voice_category_id", teamVoiceCategoryChannel.id);
+                        }
+                    }
+                }
+
+                if (actions.includes("create_text_channels") && !teamControl.get("text_channel_id") && teamTextCategoryChannel) {
                     // ACTION: create_text_channels
                     const channel = await guild.channels.create({
-                        parent: textCategory,
+                        parent: teamTextCategoryChannel,
                         name: team.name,
                         type: ChannelType.GuildText,
                         permissionOverwrites: textChannelPermissions
@@ -322,8 +405,8 @@ module.exports = {
                         if (actions.includes("edit_text_channels")) {
                             // ACTION: edit_text_channels
                             edit.name = team.name;
-                            if (textCategory) {
-                                edit.parent = textCategory;
+                            if (teamTextCategoryChannel) {
+                                edit.parent = teamTextCategoryChannel;
                             }
                         }
 
@@ -365,10 +448,10 @@ module.exports = {
                         console.error(e?.rawError ?? e);
                     }
                 }
-                if (actions.includes("create_voice_channels") && !teamControl.get("voice_channel_id") && voiceCategory) {
+                if (actions.includes("create_voice_channels") && !teamControl.get("voice_channel_id") && teamVoiceCategoryChannel) {
                     // ACTION: create_voice_channels
                     const channel = await guild.channels.create({
-                        parent: voiceCategory,
+                        parent: teamVoiceCategoryChannel,
                         name: team.name,
                         type: ChannelType.GuildVoice,
                         permissionOverwrites: voiceChannelPermissions
@@ -387,8 +470,8 @@ module.exports = {
                         if (actions.includes("edit_voice_channels")) {
                             // ACTION: edit_voice_channels
                             edit.name = team.name;
-                            if (voiceCategory) {
-                                edit.parent = voiceCategory;
+                            if (teamVoiceCategoryChannel) {
+                                edit.parent = teamVoiceCategoryChannel;
                             }
                         }
 
@@ -404,7 +487,8 @@ module.exports = {
                     responseCounts.teamsUpdated++;
                 }
                 responseCounts.teamsProcessed++;
-            }));
+            }
+
 
             if (actions.includes("delete_text_channels") && !actions.includes("create_text_channels") && eventControl.get("team_category_id")) {
                 // delete text category
@@ -425,6 +509,44 @@ module.exports = {
                 }
             }
 
+            // TODO: delete team category categories
+
+            if (actions.includes("delete_text_channels") && !actions.includes("create_text_channels")) {
+                // delete text category
+                const deleted = new Set();
+
+                for (const team of teams) {
+                    const teamControl = new MapObject(team.discord_control);
+                    try {
+                        const textCatID = teamControl.get("team_category_text_category_id");
+                        if (textCatID && !deleted.has(textCatID)) {
+                            const channel = await guild.channels.fetch(textCatID);
+                            if (channel) await channel.delete("Removing text channels");
+                            deleted.add(textCatID);
+                        }
+                    } catch (e) {
+                        console.error("Failed to delete text team category category", e?.rawError ?? e);
+                    }
+                }
+            }
+            if (actions.includes("delete_voice_channels") && !actions.includes("create_voice_channels")) {
+                // delete voice category
+                const deleted = new Set();
+
+                for (const team of teams) {
+                    const teamControl = new MapObject(team.discord_control);
+                    try {
+                        const voiceCatID = teamControl.get("team_category_voice_category_id");
+                        if (voiceCatID && !deleted.has(voiceCatID)) {
+                            const channel = await guild.channels.fetch(voiceCatID);
+                            if (channel) await channel.delete("Removing voice channels");
+                            deleted.add(voiceCatID);
+                        }
+                    } catch (e) {
+                        console.error("Failed to delete voice team category category", e?.rawError ?? e);
+                    }
+                }
+            }
 
             await this.helpers.updateRecord("Events", event, {
                 "Discord Control": eventControl.textMap

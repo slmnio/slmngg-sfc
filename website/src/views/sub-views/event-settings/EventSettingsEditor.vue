@@ -31,8 +31,22 @@
                         <event-settings-checkbox
                             :active="editableBlocks?.composition?.useCalculator"
                             @update:active="val => updateData('composition', 'useCalculator', val)">
-                            Show link to calculator
+                            Show link to SLMN.io calculator
                         </event-settings-checkbox>
+                        <b-form-group
+                            label="CTA Text"
+                            description="Text for the call-to-action button on composition pages"
+                            label-cols="2"
+                            content-cols="10">
+                            <b-form-textarea :model-value="editableBlocks?.composition?.ctaText" size="sm" @update:model-value="(val) => updateData('composition', 'ctaText', val)" />
+                        </b-form-group>
+                        <b-form-group
+                            label="CTA Link"
+                            description="Link for the call-to-action button"
+                            label-cols="2"
+                            content-cols="10">
+                            <b-form-textarea :model-value="editableBlocks?.composition?.ctaLink" size="sm" @update:model-value="(val) => updateData('composition', 'ctaLink', val)" />
+                        </b-form-group>
                         <b-form-group
                             label="Text"
                             description="Show a link to the auction on the event page."

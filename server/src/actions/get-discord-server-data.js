@@ -27,7 +27,7 @@ module.exports = {
         }
 
         const event = await this.helpers.get(eventID);
-        if (!event) {
+        if (!event?.id) {
             throw {
                 errorCode: 400,
                 errorMessage: "Cannot find that event"

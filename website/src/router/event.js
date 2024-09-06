@@ -38,6 +38,10 @@ export default (isSubdomain) => [
             {
                 path: "discord",
                 component: () => import("@/views/sub-views/event-settings/EventSettingsDiscord.vue"),
+            },
+            {
+                path: "signups",
+                component: () => import("@/views/sub-views/event-settings/EventSettingsSignups.vue"),
             }
         ]
     }

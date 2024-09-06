@@ -9,6 +9,9 @@
             <li class="nav-item">
                 <router-link class="nav-link" :to="subLink('discord')">Discord</router-link>
             </li>
+            <li class="nav-item">
+                <router-link class="nav-link" :to="subLink('signups')">Signups</router-link>
+            </li>
         </SubPageNav>
 
         <router-view :event="event" :is-minisite="isMinisite" />

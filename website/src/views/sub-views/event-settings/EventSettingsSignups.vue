@@ -150,8 +150,8 @@ export default {
                 "signup_data": ReactiveArray("signup_data")
             })(this.event)) || []).map(player => ({
                 ...player,
-                this_event_signup_data: (player.signup_data || []).find(data => cleanID(data?.event?.[0]) === cleanID(this.event?.id)),
-                this_event_teams: (player.member_of || []).filter(team => cleanID(team?.event?.[0]) === cleanID(this.event?.id)),
+                this_event_signup_data: (player.signup_data || []).find(data => cleanID(data?.event?.[0]) === cleanID(this.event?._original_data_id || this.event?.id)),
+                this_event_teams: (player.member_of || []).filter(team => cleanID(team?.event?.[0]) === cleanID(this.event?._original_data_id || this.event?.id)),
             }));
         },
         signupColumns() {
@@ -226,7 +226,7 @@ export default {
                     data,
                     error
                 } = await authenticatedRequest("actions/find-player-data", {
-                    eventID: this.event?.id,
+                    eventID: this.event?._original_data_id || this.event?.id,
                     playerData: this.data.map(p => ({
                         id: p.id,
                         name: p.name,
@@ -236,7 +236,7 @@ export default {
                     }))
                 });
 
-                data.forEach((player, i) => {
+                (data || []).forEach((player, i) => {
                     if (!player) return;
                     this.data[i].id = player.id;
                 });
@@ -263,7 +263,7 @@ export default {
                     data,
                     error
                 } = await authenticatedRequest("actions/set-player-signup-data", {
-                    eventID: this.event?.id,
+                    eventID: this.event?._original_data_id || this.event?.id,
                     playerData: this.data,
                     useSignupData: this.usePlayerSignupData,
                     createPlayers: this.createPlayers

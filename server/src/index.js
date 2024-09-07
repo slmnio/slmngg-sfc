@@ -111,7 +111,7 @@ routes({ app, cors, Cache, io });
 discordAuth({ app, router: express.Router(), cors, Cache, io });
 
 meta({ app, cors, Cache });
-images({ app, cors, Cache, corsHandle });
+images.main({ app, cors, Cache, corsHandle });
 
 webAuction({ app, io });
 

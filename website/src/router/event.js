@@ -27,9 +27,6 @@ export default (isSubdomain) => [
     {
         path: "settings",
         component: () => import("@/views/sub-views/event-settings/EventSettings.vue"),
-        meta: {
-            requiresAuth: true
-        },
         children: [
             {
                 path: "",

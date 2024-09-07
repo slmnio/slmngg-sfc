@@ -155,7 +155,7 @@ module.exports = {
                 }
 
                 if (playerData?.name) airtablePlayerData["Name"] = playerData.name;
-                if (playerData?.discord_tag) airtablePlayerData["Discord Tag"] = playerData.discord_tag;
+                if (playerData?.discord_tag) airtablePlayerData["Discord Tag"] = playerData.discord_tag.replace("@", "").trim();
                 // if (playerData?.discord_id) airtablePlayerData["Discord ID"] = playerData.discord_id;
                 if (playerData?.battletag) airtablePlayerData["Battletag"] = playerData.battletag;
 
@@ -177,7 +177,7 @@ module.exports = {
                 actionResponse.playerID = player.id;
             }
 
-            if (useSignupData) {
+            if (useSignupData && player?.id) {
                 let signupRecord;
                 if (player?.signup_data) {
                     const records = await Promise.all(player.signup_data.map(d => this.helpers.get(d)));
@@ -193,7 +193,7 @@ module.exports = {
                         data: playerData?.eligible_roles?.split(", "),
                     },
                     {
-                        signupDataKey: "main_role",
+                        signupDataKey: "role",
                         airtableKey: "Main Role",
                     },
                     {

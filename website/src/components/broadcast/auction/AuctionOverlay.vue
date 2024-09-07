@@ -43,15 +43,15 @@
                             </div>
                             <div class="player-name">{{ player.name }}</div>
                             <div class="player-extras">
-                                <div v-if="player.role && !player.eligible_roles" class="player-role" v-html="getRoleSVG(player.role)"></div>
+                                <div v-if="player?._draftData?.role && !player?._draftData?.eligible_roles" class="player-role" v-html="getRoleSVG(player?._draftData?.role)"></div>
 
 
                                 <div class="player-eligible-roles d-flex">
                                     <div
-                                        v-for="role in playerRoles(player?.eligible_roles)"
+                                        v-for="role in playerRoles(player?._draftData?.eligible_roles)"
                                         :key="role?.role"
                                         class="role"
-                                        :class="{'ineligible': !role.eligible, 'eligible': role.eligible, 'primary': role.role === player.role}"
+                                        :class="{'ineligible': !role.eligible, 'eligible': role.eligible, 'primary': role.role === player?._draftData?.role}"
                                         v-html="getRoleSVG(role?.role)"></div>
                                 </div>
                                 <div v-if="accolades.length" class="accolades">
@@ -68,7 +68,7 @@
                                 <div v-if="showCaptainInfo" class="player-captain-info">
                                     {{ player.pronouns }}
                                     <br>
-                                    {{ player.draft_data }}
+                                    {{ player?._draftData?.info_for_captains }}
                                 </div>
                                 <div
                                     v-for="group in groupedTeams"
@@ -165,7 +165,7 @@
 import { socket } from "@/socket";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import TeamPlayerList from "./TeamPlayerList";
-import { cleanID, getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
+import { cleanID, decoratePlayerWithDraftData, getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
 import PlayerTeamDisplay from "./PlayerTeamDisplay";
 import { sortEvents } from "@/utils/sorts";
 import SignedTeamList from "@/components/broadcast/auction/SignedTeamList";
@@ -180,6 +180,7 @@ import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import AuctionLeaderboard from "@/components/broadcast/auction/AuctionLeaderboard.vue";
 import AuctionTeamsOverview from "@/components/broadcast/auction/AuctionTeamsOverview.vue";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
+
 
 export default {
     name: "AuctionOverlay",
@@ -206,7 +207,9 @@ export default {
                 team: ReactiveRoot(teamID, {
                     "theme": ReactiveThing("theme")
                 }),
-                player: ReactiveRoot(playerID),
+                player: ReactiveRoot(playerID, {
+                    "signup_data": ReactiveArray("signup_data")
+                }),
             }));
         },
         wideRight() {
@@ -270,7 +273,10 @@ export default {
             const json = this.broadcast?.event?.blocks;
             if (!json) return {};
             try {
-                return JSON.parse(json)?.auction;
+                return {
+                    ...JSON.parse(json)?.auction,
+                    eventID: this.broadcast?.event?.id
+                };
             } catch (e) {
                 console.warn(e);
                 return {};
@@ -290,7 +296,7 @@ export default {
         },
         player() {
             if (!this.playerID) return null;
-            return ReactiveRoot(this.playerID, {
+            return decoratePlayerWithDraftData(ReactiveRoot(this.playerID, {
                 member_of: ReactiveArray("member_of", {
                     theme: ReactiveThing("theme"),
                     event: ReactiveThing("event", {
@@ -307,8 +313,9 @@ export default {
                         theme: ReactiveThing("theme")
                     })
                 }),
-                favourite_hero: ReactiveThing("favourite_hero")
-            });
+                favourite_hero: ReactiveThing("favourite_hero"),
+                signup_data: ReactiveArray("signup_data")
+            }), this.eventID);
         },
         playerHighlightEventTeams() {
             if (!this._broadcast?.highlight_event?.length) return [];
@@ -331,7 +338,9 @@ export default {
         highlightedTeam() {
             if (!this.highlightedTeamID) return;
             return ReactiveRoot(this.highlightedTeamID, {
-                players: ReactiveArray("players"),
+                players: ReactiveArray("players", {
+                    "signup_data": ReactiveArray("signup_data")
+                }),
                 theme: ReactiveThing("theme")
             });
         },
@@ -371,7 +380,9 @@ export default {
                     theme: ReactiveThing("theme"),
                     teams: ReactiveArray("teams", {
                         theme: ReactiveThing("theme"),
-                        players: ReactiveArray("players"),
+                        players: ReactiveArray("players", {
+                            "signup_data": ReactiveArray("signup_data")
+                        }),
                         staff: ReactiveArray("staff"),
                         owners: ReactiveArray("owners"),
                         captains: ReactiveArray("captains")
@@ -409,7 +420,7 @@ export default {
             return teams;
         },
         teams() {
-            if (!this._broadcast?.event?.teams?.length) return null;
+            if (!this._broadcast?.event?.teams?.length) return [];
             let teams = this._broadcast.event.teams;// .filter(t => t.players?.length);
             if (this.category) teams = teams.filter(t => (t.team_category?.includes(";") ? t.team_category.split(";")[1] : t.team_category) === this.category);
 

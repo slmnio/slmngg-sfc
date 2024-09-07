@@ -11,7 +11,7 @@
                 :class="{empty: player.empty, latest: player.latest}"
                 :style="(player.latest ? teamBG : {})">
                 <div v-if="!player.empty" class="player-internal">
-                    <span class="player-role" v-html="getRoleSVG(player.role)"></span>
+                    <span class="player-role" v-html="getRoleSVG(player?._draftData?.role)"></span>
                     <span class="player-name">{{ player.name }}</span>
                     <span v-if="player.auction_price" class="player-money">{{ money(player.auction_price) }}</span>
                 </div>
@@ -26,7 +26,7 @@
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { cleanID, getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
+import { cleanID, decoratePlayerWithDraftData, getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
 import MoneyBar from "@/components/broadcast/auction/MoneyBar";
 
 
@@ -41,7 +41,7 @@ export default {
             if (fill < 0) fill = 0;
 
             return [
-                ...(this.team.players || []),
+                ...(this.team.players || []).map(p =>  decoratePlayerWithDraftData(p, this.auctionSettings?.eventID)),
                 ...(Array(fill).fill({ empty: true }))
             ];
         },

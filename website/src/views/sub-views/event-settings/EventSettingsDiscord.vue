@@ -53,6 +53,7 @@
                                     placeholder="Choose roles"
                                     :options="rolePositionOptions" />
                             </div>
+                            <!-- role hoist -->
                         </div>
                     </div>
                     <div class="settings-group">
@@ -171,7 +172,7 @@
                     </td>
                     <td>
                         <ul>
-                            <li v-for="(item, i) in fixes.filter(f => !['player_details_updated', 'discord_id_not_found'].includes(f.type) && f.teamID === `rec` + team.id)" :key="i">
+                            <li v-for="(item, i) in fixes.filter(f => !['player_details_updated'].includes(f.type) && f.teamID === `rec` + team.id)" :key="i">
                                 <EventSettingsFix :item="item" :teams="teams" />
                             </li>
                         </ul>
@@ -358,7 +359,7 @@ export default {
         async setID() {
             this.processing["guild_id"] = true;
             const response = await authenticatedRequest("actions/set-event-guild", {
-                eventID: this.event.id,
+                eventID: this.event?._original_data_id || this.event?.id,
                 guildID: this.selectedGuildID,
             });
             if (response.error) {
@@ -373,7 +374,7 @@ export default {
             try {
                 this.fixes = [];
                 const output = await authenticatedRequest("actions/create-event-discord-items", {
-                    eventID: this.event.id,
+                    eventID: this.event?._original_data_id || this.event?.id,
                     guildID: this.selectedGuildID,
 
                     actions: [
@@ -397,9 +398,9 @@ export default {
         },
         async getGuildRoleData() {
             const { data, error } = await authenticatedRequest("actions/get-discord-server-data", {
-                eventID: this.event.id,
+                eventID: this.event?._original_data_id || this.event?.id,
             });
-            return data.sort((a,b) => b.rawPosition - a.rawPosition);
+            return (data || []).sort((a,b) => b.rawPosition - a.rawPosition);
         },
         getHex(colorNum) {
             if (!colorNum) return null;

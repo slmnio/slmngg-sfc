@@ -222,7 +222,7 @@ module.exports = {
                 if (actions.includes("assign_roles") || actions.includes("unassign_roles")) {
                     await Promise.all(playersForRole.map(async (player) => {
                         let { member, fixes: newFixes } = await findMember(player, team, guild);
-                        fixes = [...fixes, newFixes];
+                        fixes = [...fixes, ...newFixes];
                         if (member) {
                             membersForRole.push({ member, player });
                         }
@@ -232,8 +232,12 @@ module.exports = {
                     await Promise.all(membersForRole.map(async ({ member, player }) => {
                         try {
                             // ACTION: assign_roles
-                            await member.roles.add(teamControl.get("role_id"), `Team role for ${event.name}`);
-                            console.log("Role success", team.name, teamControl.get("role_id"), member.id, member.user.username, player.name);
+                            if (member.roles?.cache?.has(teamControl.get("role_id"))) {
+                                console.log("Player already has role", team.name, teamControl.get("role_id"), member.id, member.user.username, player.name);
+                            } else {
+                                await member.roles.add(teamControl.get("role_id"), `Team role for ${event.name}`);
+                                console.log("Role success", team.name, teamControl.get("role_id"), member.id, member.user.username, player.name);
+                            }
                         } catch (e) {
                             console.error(e?.rawError ?? e);
                             fixes.push({
@@ -431,15 +435,16 @@ module.exports = {
                     // set up permissions
                     try {
                         voiceChannelPermissions.push({ id: teamControl.get("role_id"), allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Connect]});
-                        voiceChannelPermissions.push({ id: guild.roles.everyone, deny: [PermissionFlagsBits.ViewChannel]});
+                        voiceChannelPermissions.push({ id: guild.roles.everyone, deny: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Connect]});
 
                         (settings?.voiceChannels.viewRoleIDs || []).forEach(roleID => {
-                            voiceChannelPermissions.push({ id: roleID, allow: [PermissionFlagsBits.ViewChannel]});
+                            voiceChannelPermissions.push({ id: roleID, allow: [PermissionFlagsBits.ViewChannel], deny: [PermissionFlagsBits.Connect]});
                         });
                         (settings?.voiceChannels.connectRoleIDs || []).forEach(roleID => {
                             let existing = voiceChannelPermissions.find(perm => perm.id === roleID);
                             if (existing) {
                                 existing.allow.push(PermissionFlagsBits.Connect);
+                                existing.deny = existing.deny.filter(f => f === PermissionFlagsBits.Connect);
                             } else {
                                 voiceChannelPermissions.push({ id: roleID, allow: [PermissionFlagsBits.ViewChannel,PermissionFlagsBits.Connect]});
                             }

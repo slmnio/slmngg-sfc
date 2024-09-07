@@ -1,4 +1,10 @@
 const { isEventStaffOrHasRole } = require("../action-utils/action-permissions");
+
+function norm(text) {
+    if (!text) return null;
+    return text.toLowerCase().trim();
+}
+
 module.exports = {
     key: "find-player-data",
     requiredParams: ["eventID", "playerData"],
@@ -24,15 +30,15 @@ module.exports = {
 
         return playerData.map(({ name, discord_tag, battletag, discord_id, id }) => {
             const player = players.find(p => {
-                if (discord_tag && p.discord_tag === discord_tag) return true;
-                if (battletag && p.battletag === battletag) return true;
-                if (discord_id && p.discord_id === discord_id) return true;
+                if (discord_tag && norm(p.discord_tag) === norm(discord_tag)) return true;
+                if (battletag && norm(p.battletag) === norm(battletag)) return true;
+                if (discord_id && norm(p.discord_id) === norm(discord_id)) return true;
                 if (id && p.id === id) return true;
                 //p.discord_tag === discord_tag || p.battletag === battletag || p.discord_id === discord_id
                 return false;
             });
             if (player) return player;
-            if (name) return players.find(p => p.name === name);
+            if (name) return players.find(p => norm(p.name) === norm(name));
             return null;
         });
     }

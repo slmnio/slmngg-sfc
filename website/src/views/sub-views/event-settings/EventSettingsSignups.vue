@@ -21,6 +21,10 @@
             <b-form-checkbox v-model="usePlayerSignupData" disabled>Use extra signup data fields instead of editing players</b-form-checkbox>
         </div>
         <div class="editor">
+            <div class="mb-2 d-flex flex-column">
+                <b-form-checkbox v-model="customisation.useSplitSR" switch>Split SR by role</b-form-checkbox>
+                <b-form-checkbox v-model="customisation.showAllSR" switch>Show all SR inputs</b-form-checkbox>
+            </div>
             <div class="mb-2 d-flex gap-2 justify-content-between">
                 <div class="d-flex gap-2">
                     <b-button :variant="changed ? 'primary' : 'secondary'" @click="findPlayerData">
@@ -28,7 +32,10 @@
                     </b-button>
                     <b-button @click="useBattletagNames">Generate names</b-button>
                 </div>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 align-items-center">
+                    <div class="px-2">
+                        {{ changeCount }} change{{ changeCount === 1 ? '' : 's' }}
+                    </div>
                     <b-button variant="success" :disabled="processing.signupData" @click="setPlayerSignupData">
                         Save
                         player signup data
@@ -48,6 +55,9 @@
                     :read-only="processing.signupData"
                 />
             </div>
+            <div class="mt-2 d-flex gap-2 justify-content-end">
+                <b-button variant="success" size="sm" @click="addRow"><i class="fas fa-fw fa-plus"></i> Add row to bottom</b-button>
+            </div>
         </div>
     </div>
 </template>
@@ -63,7 +73,25 @@ import { authenticatedRequest } from "@/utils/dashboard";
 import { ReactiveArray } from "@/utils/reactive";
 import { cleanID } from "@/utils/content-utils";
 registerAllModules();
+function empty(element) {
+    let child;
 
+    /* eslint-disable no-cond-assign */
+    while (child = element.lastChild) {
+        element.removeChild(child);
+    }
+}
+function fastInnerText(element, content) {
+    const child = element.firstChild;
+    if (child && child.nodeType === 3 && child.nextSibling === null) {
+        // fast lane - replace existing text node
+        child.textContent = content;
+    } else {
+        // slow lane - empty element and insert a text node
+        empty(element);
+        element.appendChild(element.ownerDocument.createTextNode(content));
+    }
+}
 
 Handsontable.cellTypes.registerCellType("multiselect", {
     editor: MultiSelectEditor,
@@ -81,7 +109,7 @@ Handsontable.cellTypes.registerCellType("multiselect", {
         items.sort(sortAlphaRaw).forEach(item => {
             const div = document.createElement("div");
             div.classList.add("multiselect-option");
-            div.innerText = item;
+            fastInnerText(td, item);
             div.dataset.item = item;
             container.appendChild(div);
         });
@@ -105,16 +133,23 @@ Handsontable.cellTypes.registerCellType("keyvalueselect", {
     editor: KeyValueSelectEditor,
     renderer: (instance, td, row, column, prop, value, cellProperties) => {
         console.log("renderer", { instance, td, row, column, prop, value, cellProperties });
-        td.innerText = cellProperties.selectOptions.find(opt => opt.value === value)?.text || "";
+        fastInnerText(td, cellProperties.selectOptions.find(opt => opt.value === value)?.text || "");
     },
     className: "keyvalueselect-cell",
 });
+
 
 export default {
     name: "EventSettingsSignups",
     components: { HotTable },
     props: ["event"],
     data: () => ({
+        customisation: {
+            useSplitSR: false,
+            showAllSR: false
+        },
+
+
         usePlayerSignupData: true,
         createPlayers: true,
         changed: false,
@@ -131,9 +166,14 @@ export default {
             autoWrapRow: true,
             autoWrapCol: true,
             manualColumnMove: true,
-            columnSorting: true,
+            manualColumnResize: true,
+            columnSorting: {
+                sortEmptyCells: false,
+                indicator: true,
+                headerAction: true,
+            },
             stretchH: "all",
-
+            fixedColumnsStart: 1
         }
     }),
     computed: {
@@ -156,37 +196,36 @@ export default {
         },
         signupColumns() {
             const cols = [];
-            // return [
-            //     { header: "Name", data: "name" },
-            //     { header: "Discord Tag", data: "discord_tag" },
-            //     { header: "Battletag", data: "battletag" },
-            //     { type: "select", selectOptions: ["Tank", "DPS", "Support", "Flex"], header: "Main Role", data: "role" },
-            //     { header: "Pronouns", data: "pronouns" },
-            //     { header: "Pronunciation", data: "pronunciation" },
-            //     { type: "multiselect", selectOptions: ["Tank", "DPS", "Support"], header: "Eligible Roles", data: "eligible_roles" },
-            //     { header: "SR", data: "sr" },
-            //     { header: "Tank", data: "tank_sr" },
-            //     { header: "DPS", data: "dps_sr" },
-            //     { header: "Support", data: "support_sr" },
-            // ];
-            return [
-                { header: "Player", data: "player", readOnly: true },
-                { header: "Player ID", data: "id" },
-                { header: "Name", data: "name" },
-                { header: "Discord Tag", data: "discord_tag" },
-                { header: "Battletag", data: "battletag" },
-                { type: "select", selectOptions: ["Tank", "DPS", "Support", "Flex"], header: "Main Role", data: "role" },
-                { header: "Pronouns", data: "pronouns" },
-                { header: "Pronunciation", data: "pronunciation" },
-                { header: "Info For Captains", data: "info_for_captains" },
-                { type: "multiselect", selectOptions: ["Tank", "DPS", "Support"], header: "Eligible Roles", data: "eligible_roles" },
-                { header: "SR", data: "sr" },
-                { type: "select", header: "Team", data: "team_name", selectOptions: this.teamOptions },
-                { header: "Team ID", data: "team_id", readOnly: true },
-                // { header: "Tank SR", data: "tank_sr" },
-                // { header: "DPS SR", data: "dps_sr" },
-                // { header: "Support SR", data: "support_sr" },
-            ];
+
+            // cols.push({
+            //     header: "Status",
+            //     data: "status",
+            //     readOnly: true
+            // });
+            cols.push({ header: "Player", data: "player", readOnly: true });
+            cols.push({ header: "Player ID", data: "id", renderer: "diffchecker" });
+            cols.push({ header: "Name", data: "name", renderer: "diffchecker" });
+            cols.push({ header: "Discord Tag", data: "discord_tag", renderer: "diffchecker" });
+            cols.push({ header: "Battletag", data: "battletag", renderer: "diffchecker" });
+            cols.push({ type: "select", selectOptions: ["Tank", "DPS", "Support", "Flex"], header: "Main Role", data: "role" });
+            cols.push({ header: "Pronouns", data: "pronouns", renderer: "diffchecker" });
+            cols.push({ header: "Pronunciation", data: "pronunciation", renderer: "diffchecker" });
+            cols.push({ header: "Info For Captains", data: "info_for_captains", renderer: "diffchecker" });
+
+            if (this.customisation.useSplitSR || this.customisation.showAllSR) {
+                cols.push({ header: "Tank SR", data: "tank_sr", renderer: "diffchecker" });
+                cols.push({ header: "DPS SR", data: "dps_sr", renderer: "diffchecker" });
+                cols.push({ header: "Support SR", data: "support_sr", renderer: "diffchecker" });
+            }
+
+            if (!this.customisation.useSplitSR || this.customisation.showAllSR) {
+                cols.push({ header: "SR", data: "sr", renderer: "diffchecker" });
+            }
+
+            cols.push({ type: "multiselect", selectOptions: ["Tank", "DPS", "Support"], header: "Eligible Roles", data: "eligible_roles" });
+            cols.push({ type: "select", renderer: "select-diff", header: "Team", data: "team_name", selectOptions: this.teamOptions });
+            cols.push({ header: "Team ID", data: "team_id", readOnly: true, renderer: "diffchecker" });
+            return cols;
         },
         tablePlayers() {
             return (ReactiveArray("players")({
@@ -195,6 +234,20 @@ export default {
         },
         dataPlayers() {
             return (this.data || []).map(row => this.tablePlayers.find(p => cleanID(p.id) === cleanID(row.id)));
+        },
+        rowStatus() {
+            return this.data.map((row, i) => {
+                for (const rowKey in row) {
+                    if (["player", "status"].includes(rowKey)) continue;
+                    const value = row[rowKey];
+                    if (this.isDifferent(rowKey, value, { row: i })) {
+                        return `Change: ${rowKey}`;
+                    }
+                }
+            });
+        },
+        changeCount() {
+            return this.rowStatus.filter(Boolean).length;
         }
     },
     methods: {
@@ -286,7 +339,7 @@ export default {
         },
         loadFromDraftablePlayers(players) {
             players.forEach((player, i) => {
-                console.log(player, player.this_event_signup_data);
+                // console.log(player, player.this_event_signup_data);
 
                 if (!this.data[i]) this.data[i] = {};
 
@@ -305,7 +358,7 @@ export default {
                 if (this.usePlayerSignupData) {
                     // use player.signup_data that matches this event
                     if (player.this_event_signup_data) {
-                        this.data[i].eligible_roles = player.this_event_signup_data.eligible_roles.join(", ");
+                        this.data[i].eligible_roles = player.this_event_signup_data.eligible_roles?.join(", ");
                         this.data[i].role = player.this_event_signup_data.main_role;
                         this.data[i].sr = player.this_event_signup_data.sr;
                         this.data[i].tank_sr = player.this_event_signup_data.tank_sr;
@@ -317,7 +370,7 @@ export default {
                     // use player data
                     this.data[i].sr = player.manual_sr;
 
-                    this.data[i].eligible_roles = player.eligible_roles.join(", ");
+                    this.data[i].eligible_roles = player.eligible_roles?.join(", ");
                     this.data[i].role = player.role;
                     this.data[i].sr = player.sr;
                     this.data[i].tank_sr = player.composition_tank_sr;
@@ -326,6 +379,32 @@ export default {
                     this.data[i].info_for_captains = player.draft_data;
                 }
             });
+        },
+        addRow() {
+            this.$refs.table?.hotInstance?.alter("insert_row_below");
+            this.$refs.table.$el?.querySelector(".wtHolder")?.scroll({
+                top: 100000000,
+                behavior: "instant"
+            });
+        },
+        isDifferent(prop, value, cellProperties) {
+            const index = cellProperties?.row;
+            const player = this.eventSignups?.[index];
+
+            const dataOverrides = {
+                "sr": this.usePlayerSignupData ? player?.this_event_signup_data?.sr : player?.manual_sr,
+                "support_sr": this.usePlayerSignupData ? player?.this_event_signup_data?.support_sr : player?.composition_support_sr,
+                "tank_sr": this.usePlayerSignupData ? player?.this_event_signup_data?.tank_sr : player?.composition_tank_sr,
+                "dps_sr": this.usePlayerSignupData ? player?.this_event_signup_data?.dps_sr : player?.composition_dps_sr,
+                "eligible_roles": this.usePlayerSignupData ? player?.this_event_signup_data?.eligible_roles?.join(", ") : player?.eligible_roles?.join(", "),
+                "role": this.usePlayerSignupData ? player?.this_event_signup_data?.main_role : player?.role,
+                "info_for_captains": this.usePlayerSignupData ? player?.this_event_signup_data?.info_for_captains : player?.draft_data,
+                "team_id": player?.this_event_teams?.[0]?.id,
+                "team_name": player?.this_event_teams?.[0]?.name
+            };
+
+            const oldVal = (Object.keys(dataOverrides).includes(prop) ? dataOverrides?.[prop] : player?.[prop]);
+            return (oldVal !== value && !(!oldVal && !value));
         }
     },
     watch: {
@@ -335,7 +414,7 @@ export default {
             handler(players) {
                 players.forEach((player, i) => {
                     if (player && cleanID(this.data[i]?.id) === cleanID(player?.id)) {
-                        console.log("set player", i, player.name);
+                        // console.log("set player", i, player.name);
                         this.data[i].player = player.name;
                         this.data[i].team_id = cleanID((player.member_of || []).find(teamID => (this.event?.teams || []).find(eventTeamID => cleanID(eventTeamID) === cleanID(teamID))));
                         this.data[i].team_name = (this.event?.teams || []).find(eventTeamID => cleanID(eventTeamID) === cleanID(this.data[i].team_id))?.name;
@@ -358,6 +437,17 @@ export default {
             handler() {
                 this.loadFromDraftablePlayers(this.eventSignups);
             }
+        },
+        rowStatus: {
+            deep: true,
+            immediate: true,
+            handler(statuses) {
+                statuses.forEach((status, i) => {
+                    if (this.data[i]?.status !== status) {
+                        this.data[i].status = status;
+                    }
+                });
+            }
         }
     },
     mounted() {
@@ -370,8 +460,21 @@ export default {
             preventDefault: true,
             callback: () => {
                 console.log(...arguments);
-                this.$refs.table?.hotInstance.alter("insert_row_below");
+                this.addRow();
             }
+        });
+
+        Handsontable.renderers.registerRenderer("diffchecker", (instance, td, row, column, prop, value, cellProperties) => {
+            if (this.isDifferent(prop, value, cellProperties)) {
+                td.classList.add("diff");
+            }
+            fastInnerText(td, value ?? "");
+        });
+        Handsontable.renderers.registerRenderer("select-diff", (instance, td, row, column, prop, value, cellProperties) => {
+            if (this.isDifferent(prop, value, cellProperties)) {
+                td.classList.add("diff");
+            }
+            return Handsontable.renderers.SelectRenderer(instance, td, row, column, prop, value, cellProperties);
         });
     },
 };
@@ -409,6 +512,9 @@ export default {
 .hot-table:deep(.ht_master) {
     background: white;
 }
+.hot-table:deep(.diff) {
+    background-color: #66D9FF80;
+}
 
 /*.editor {*/
 /*    position: sticky !important;*/
@@ -422,5 +528,14 @@ export default {
 /*.settings-signup {*/
 /*    position: relative;*/
 /*}*/
-
+.hot-wrapper {
+    overflow: hidden;
+    height: max(800px, 75vh);
+    resize: vertical;
+}
+.hot-table:deep(.ht_clone_left),
+.hot-table:deep(.ht_clone_bottom_left_corner),
+.hot-table:deep(.ht_clone_top_left_corner) {
+    border-right: 2px solid rgba(0,0,0,0.4);
+}
 </style>

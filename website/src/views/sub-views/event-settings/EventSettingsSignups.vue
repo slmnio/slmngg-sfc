@@ -24,6 +24,7 @@
             <div class="mb-2 d-flex flex-column">
                 <b-form-checkbox v-model="customisation.useSplitSR" switch>Split SR by role</b-form-checkbox>
                 <b-form-checkbox v-model="customisation.showAllSR" switch>Show all SR inputs</b-form-checkbox>
+                <b-form-checkbox v-model="customisation.showNonCompetitive" switch>Show non-competitive information</b-form-checkbox>
             </div>
             <div class="mb-2 d-flex gap-2 justify-content-between">
                 <div class="d-flex gap-2">
@@ -109,7 +110,7 @@ Handsontable.cellTypes.registerCellType("multiselect", {
         items.sort(sortAlphaRaw).forEach(item => {
             const div = document.createElement("div");
             div.classList.add("multiselect-option");
-            fastInnerText(td, item);
+            fastInnerText(div, item);
             div.dataset.item = item;
             container.appendChild(div);
         });
@@ -146,7 +147,8 @@ export default {
     data: () => ({
         customisation: {
             useSplitSR: false,
-            showAllSR: false
+            showAllSR: false,
+            showNonCompetitive: false
         },
 
 
@@ -208,8 +210,10 @@ export default {
             cols.push({ header: "Discord Tag", data: "discord_tag", renderer: "diffchecker" });
             cols.push({ header: "Battletag", data: "battletag", renderer: "diffchecker" });
             cols.push({ type: "select", selectOptions: ["Tank", "DPS", "Support", "Flex"], header: "Main Role", data: "role" });
-            cols.push({ header: "Pronouns", data: "pronouns", renderer: "diffchecker" });
-            cols.push({ header: "Pronunciation", data: "pronunciation", renderer: "diffchecker" });
+            if (this.customisation.showNonCompetitive) {
+                cols.push({ header: "Pronouns", data: "pronouns", renderer: "diffchecker" });
+                cols.push({ header: "Pronunciation", data: "pronunciation", renderer: "diffchecker" });
+            }
             cols.push({ header: "Info For Captains", data: "info_for_captains", renderer: "diffchecker" });
 
             if (this.customisation.useSplitSR || this.customisation.showAllSR) {

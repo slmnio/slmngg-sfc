@@ -11,7 +11,8 @@
                 <tr>
                     <th v-if="hasFeederEvents" class="text-center"><span v-b-tooltip="'Feeder event eligibility'"><i class="far fa-star"></i></span></th>
                     <th>Name</th>
-                    <th>Battletag</th>
+                    <th class="wide"><i class="fab fa-discord fa-fw"></i> Discord tag</th>
+                    <th class="wide"><i class="fab fa-battle-net fa-fw"></i> Battletag</th>
                     <th v-if="showMainRole">Main Role</th>
                     <th v-if="showEligibleRoles">Eligible Roles</th>
                     <th v-if="showSingleSR">SR</th>
@@ -28,6 +29,9 @@
                     <td>
                         <span v-if="isCaptain(player)" v-b-tooltip="'Captain'" class="mr-1" v-html="getRoleSVG('Captain')"></span>
                         <LinkedPlayers :players="[player]" />
+                    </td>
+                    <td>
+                        <CopyTextButton v-if="player.discord_tag">{{ player.discord_tag }}</CopyTextButton>
                     </td>
                     <td>
                         <CopyTextButton v-if="player.battletag">{{ player.battletag }}</CopyTextButton>

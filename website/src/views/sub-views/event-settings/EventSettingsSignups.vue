@@ -454,6 +454,20 @@ export default {
             }
         }
     },
+    beforeMount() {
+        Handsontable.renderers.registerRenderer("diffchecker", (instance, td, row, column, prop, value, cellProperties) => {
+            if (this.isDifferent(prop, value, cellProperties)) {
+                td.classList.add("diff");
+            }
+            fastInnerText(td, value ?? "");
+        });
+        Handsontable.renderers.registerRenderer("select-diff", (instance, td, row, column, prop, value, cellProperties) => {
+            if (this.isDifferent(prop, value, cellProperties)) {
+                td.classList.add("diff");
+            }
+            return Handsontable.renderers.SelectRenderer(instance, td, row, column, prop, value, cellProperties);
+        });
+    },
     mounted() {
         const ctx = this.$refs.table?.hotInstance?.getShortcutManager().getContext("grid");
         ctx.removeShortcutsByKeys(["shift", "enter"]);
@@ -466,19 +480,6 @@ export default {
                 console.log(...arguments);
                 this.addRow();
             }
-        });
-
-        Handsontable.renderers.registerRenderer("diffchecker", (instance, td, row, column, prop, value, cellProperties) => {
-            if (this.isDifferent(prop, value, cellProperties)) {
-                td.classList.add("diff");
-            }
-            fastInnerText(td, value ?? "");
-        });
-        Handsontable.renderers.registerRenderer("select-diff", (instance, td, row, column, prop, value, cellProperties) => {
-            if (this.isDifferent(prop, value, cellProperties)) {
-                td.classList.add("diff");
-            }
-            return Handsontable.renderers.SelectRenderer(instance, td, row, column, prop, value, cellProperties);
         });
     },
 };

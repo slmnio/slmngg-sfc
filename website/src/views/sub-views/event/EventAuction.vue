@@ -283,7 +283,7 @@
 <script>
 import { socket } from "@/socket";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cleanID, dirtyID, getRoleSVG, money, url } from "@/utils/content-utils";
+import { cleanID, decoratePlayerWithDraftData, dirtyID, getRoleSVG, money, url } from "@/utils/content-utils";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import AuctionCountdown from "@/components/broadcast/auction/AuctionCountdown.vue";
 import AuctionBid from "@/components/website/AuctionBid.vue";
@@ -314,7 +314,7 @@ export default {
     computed: {
         activePlayer() {
             if (!this.activePlayerID) return;
-            return ReactiveRoot(this.activePlayerID, {
+            return decoratePlayerWithDraftData(ReactiveRoot(this.activePlayerID, {
                 member_of: ReactiveArray("member_of", {
                     theme: ReactiveThing("theme"),
                     event: ReactiveThing("event", {
@@ -331,8 +331,9 @@ export default {
                         theme: ReactiveThing("theme")
                     })
                 }),
-                favourite_hero: ReactiveThing("favourite_hero")
-            });
+                favourite_hero: ReactiveThing("favourite_hero"),
+                "signup_data": ReactiveArray("signup_data")
+            }), this.eventID);
         },
         lastStartedTeam() {
             if (!this.lastStartedTeamID) return null;
@@ -837,7 +838,8 @@ export default {
     .role.text-danger {
         opacity: 0.5;
     }
-    .currently-active-player {
+    .currently-active-player,
+    .currently-active-player td {
         background-color: var(--primary);
     }
 

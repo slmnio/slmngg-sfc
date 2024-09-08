@@ -509,7 +509,9 @@ export default {
             if (!this.justSignedTeamID) return null;
             return ReactiveRoot(this.justSignedTeamID, {
                 theme: ReactiveThing("theme"),
-                players: ReactiveArray("players")
+                players: ReactiveArray("players", {
+                    "signup_data": ReactiveArray("signup_data")
+                })
             });
         },
         heroColor() {

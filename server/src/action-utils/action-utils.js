@@ -226,8 +226,8 @@ async function findMember(player, team, guild) {
         }
     }
 
-    const tag = player.discord_tag.replace("@", "").trim();
     if (!member && player.discord_tag) {
+        const tag = player.discord_tag.replace("@", "").trim();
         [member] = (await guild.members.fetch({
             query: tag,
             limit: 1,

@@ -24,13 +24,16 @@
                             <div class="team-code">{{ team.code }}</div>
                             <div class="team-overlay-text">{{ team.small_overlay_text }}</div>
                             <div class="team-logo bg-center" :style="icon(team)"></div>
-                            <router-link :to="url('team', team, match.event)" class="team-name">{{ team.name }}</router-link>
+                            <router-link :to="url('team', team, match.event)" class="team-name" />
                         </div>
                         <div v-if="showRosters" class="team-players f-col p-1">
-                            <div v-for="player in sortPlayers(showLimitedPlayers(team) ? team.limited_players : team.players)" :key="player.id" class="team-player">
+                            <div v-for="player in sortPlayers(teamRoster(team))" :key="player.id" class="team-player">
                                 <div class="player-info player-name flex-center">
-                                    <div v-if="player.role" class="player-role-holder player-icon-holder flex-center">
-                                        <div class="player-role" v-html="getRoleSVG(player.role)"></div>
+                                    <div v-if="!showEligibleRoles && (player?.this_event_signup_data?.main_role || player.role)" class="player-role-holder player-icon-holder flex-center">
+                                        <div class="player-role" v-html="getRoleSVG(player?.this_event_signup_data?.main_role || player.role)"></div>
+                                    </div>
+                                    <div v-if="showEligibleRoles && playerEligibleRoles(player)" class="player-role-holder player-eligible-roles-holder player-icon-holder flex-center">
+                                        <div v-for="role in playerEligibleRoles(player)" :key="role" class="player-role" v-html="getRoleSVG(role)"></div>
                                     </div>
                                     <component :is="player.limited ? 'div' : 'router-link'" class="ct-active" :to="url('player', player)">{{ player.name }} </component>
                                     <span v-if="showCastingInfo && player.pronouns" class="player-pronouns ml-1 badge rounded-pill bg-light text-dark" :data-pronoun="player.pronouns">{{ player.pronouns }}</span>
@@ -133,50 +136,53 @@
                         Match editor
                     </router-link>
 
-                    <div :class="`mt-2 btn btn-block btn-${showRosters ? 'light' : 'secondary'}`" @click="showRosters = !showRosters">
+                    <div :class="`mt-2 btn btn-block btn-${showRosters ? 'primary' : 'secondary'}`" @click="showRosters = !showRosters">
                         <i class="fa-fw fas fa-users"></i> Rosters
                     </div>
+                    <div :class="`btn btn-block btn-${showEligibleRoles ? 'primary' : 'secondary'}`" @click="showEligibleRoles = !showEligibleRoles">
+                        <i class="fa-fw fas fa-swords"></i> Eligible roles
+                    </div>
                     <div
-                        :class="`mb-2 btn btn-block btn-${showManagers ? 'light' : 'secondary'}`"
+                        :class="`mb-2 btn btn-block btn-${showManagers ? 'primary' : 'secondary'}`"
                         @click="showManagers = !showManagers">
                         <i class="fa-fw fas fa-user-tie"></i>
                         Team staff
                     </div>
                     <div
                         v-if="showRosters || showManagers"
-                        :class="`btn btn-block btn-${showCastingInfo ? 'light' : 'secondary'}`"
+                        :class="`btn btn-block btn-${showCastingInfo ? 'primary' : 'secondary'}`"
                         @click="showCastingInfo = !showCastingInfo">
                         <i class="fa-fw fas fa-headset"></i>
                         Casting info
                     </div>
                     <div
                         v-if="showRosters || showManagers"
-                        :class="`mb-2 btn btn-block btn-${showPlayerInfo ? 'light' : 'secondary'}`"
+                        :class="`mb-2 btn btn-block btn-${showPlayerInfo ? 'primary' : 'secondary'}`"
                         @click="showPlayerInfo = !showPlayerInfo">
                         <i class="fa-fw far fa-id-card"></i>
                         Contacts
                     </div>
-                    <div v-if="match.maps" :class="`btn btn-block btn-${showMatchMaps ? 'light' : 'secondary'}`" @click="showMatchMaps = !showMatchMaps">
+                    <div v-if="match.maps" :class="`btn btn-block btn-${showMatchMaps ? 'primary' : 'secondary'}`" @click="showMatchMaps = !showMatchMaps">
                         <i class="fa-fw fas fa-map"></i> Match maps
                     </div>
-                    <div v-if="match.maps && showMatchMaps" :class="`btn btn-block mb-2 btn-${showMapBans ? 'light' : 'secondary'}`" @click="showMapBans = !showMapBans">
+                    <div v-if="match.maps && showMatchMaps" :class="`btn btn-block mb-2 btn-${showMapBans ? 'primary' : 'secondary'}`" @click="showMapBans = !showMapBans">
                         <i class="fa-fw fas fa-ban"></i> Show map bans
                     </div>
-                    <div :class="`btn btn-block btn-${showMapStats ? 'light' : 'secondary'}`" @click="showMapStats = !showMapStats">
+                    <div :class="`btn btn-block btn-${showMapStats ? 'primary' : 'secondary'}`" @click="showMapStats = !showMapStats">
                         <i class="fa-fw fas fa-abacus"></i> Map stats
                     </div>
-                    <div v-if="match.brackets" :class="`btn btn-block btn-${showImplications ? 'light' : 'secondary'}`" @click="showImplications = !showImplications">
+                    <div v-if="match.brackets" :class="`btn btn-block btn-${showImplications ? 'primary' : 'secondary'}`" @click="showImplications = !showImplications">
                         <i class="fa-fw fas fa-sitemap"></i> Bracket implications
                     </div>
                     <div
-                        :class="`btn btn-block btn-${showMatchHistory ? 'light' : 'secondary'}`"
+                        :class="`btn btn-block btn-${showMatchHistory ? 'primary' : 'secondary'}`"
                         @click="showMatchHistory = !showMatchHistory">
                         <i class="fa-fw fas fa-history"></i>
                         Match history
                     </div>
                     <div
                         v-if="showMatchHistory"
-                        :class="`btn btn-block btn-${showNonEventMatches ? 'light' : 'secondary'}`"
+                        :class="`btn btn-block btn-${showNonEventMatches ? 'primary' : 'secondary'}`"
                         title="Show/hide past matches that aren't from this match's event"
                         @click="showNonEventMatches = !showNonEventMatches">
                         <i class="fa-fw far fa-calendar-alt"></i>
@@ -184,12 +190,12 @@
                     </div>
                     <div
                         v-if="anyShowNotes"
-                        :class="`btn btn-block btn-${showShowNotes ? 'light' : 'secondary'}`"
+                        :class="`btn btn-block btn-${showShowNotes ? 'primary' : 'secondary'}`"
                         @click="showShowNotes = !showShowNotes">
                         <i class="fa-fw far fa-file-video"></i>
                         Show notes
                     </div>
-                    <!--                    <div :class="`btn btn-block btn-${showVod ? 'light' : 'secondary'}`" v-if="match.vod"-->
+                    <!--                    <div :class="`btn btn-block btn-${showVod ? 'primary' : 'secondary'}`" v-if="match.vod"-->
                     <!--                         v-on:click="showVod = !showVod">-->
                     <!--                        <i class="fa-fw far fa-desktop-alt"></i> Toggle VOD-->
                     <!--                    </div>-->
@@ -236,7 +242,7 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import MapDisplay from "@/components/website/match/MapDisplay";
-import { getRoleSVG, url } from "@/utils/content-utils";
+import { decoratePlayerWithDraftData, getRoleSVG, url } from "@/utils/content-utils";
 import { logoBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo";
 import PreviousMatch from "@/components/website/match/PreviousMatch";
@@ -250,6 +256,7 @@ import { canEditMatch } from "@/utils/client-action-permissions";
 import MatchStats from "@/views/sub-views/MatchStats.vue";
 import { useAuthStore } from "@/stores/authStore";
 import CreditCreator from "@/components/website/CreditCreator.vue";
+import { sortRoles } from "@/utils/sorts";
 
 export default {
     name: "DetailedMatch",
@@ -262,6 +269,7 @@ export default {
         showNonEventMatches: false,
         showShowNotes: true,
         showRosters: true,
+        showEligibleRoles: false,
         showMatchMaps: true,
         showMapBans: true,
         showVod: false,
@@ -275,7 +283,9 @@ export default {
             return ReactiveRoot(this.id, {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
-                    players: ReactiveArray("players"),
+                    players: ReactiveArray("players", {
+                        signup_data: ReactiveArray("signup_data")
+                    }),
                     captains: ReactiveArray("captains"),
                     owners: ReactiveArray("owners"),
                     matches: ReactiveArray("matches", {
@@ -406,12 +416,16 @@ export default {
         sortPlayers(players) {
             if (!players?.length) return [];
             return players.sort((a, b) => {
-                if (a.role !== b.role) {
+                const [aRole, bRole] = [a,b].map(x => this.getSortingRole(x));
+                if ((aRole) !== bRole) {
                     const order = ["Tank", "DPS", "Support"];
-                    return order.indexOf(a.role) - order.indexOf(b.role);
+                    return order.indexOf(aRole) - order.indexOf(bRole);
                 }
                 return 0;
             });
+        },
+        getSortingRole(player) {
+            return player?.this_event_signup_data ? (player?.this_event_signup_data?.main_role || (player?.this_event_signup_data?.eligible_roles || [])?.sort(sortRoles)?.[0] || player?.role) : player?.role;
         },
         teamMatchGroups(team) {
             const matches = this.teamMatches(team);
@@ -456,6 +470,12 @@ export default {
         },
         showLimitedPlayers(team) {
             return ((team.players || [])?.length === 0) && (team.limited_players || []).length !== 0;
+        },
+        teamRoster(team) {
+            return this.showLimitedPlayers(team) ? team.limited_players : (team.players || []).map(p => decoratePlayerWithDraftData(p, this.match?.event?.id));
+        },
+        playerEligibleRoles(player) {
+            return (player?.this_event_signup_data?.eligible_roles || player.eligible_roles || []).sort(sortRoles);
         },
         matchThumbnailURL(match, size) {
             const dataServerURL = getDataServerAddress();
@@ -559,7 +579,9 @@ export default {
         display: inline-flex;
     }
 
-    .player-icon-holder {width: 1.5em;}
+    .player-icon-holder {
+        width: 1.5em;
+    }
     .btn-primary.text-dark-low {
         color: #343a40
     }

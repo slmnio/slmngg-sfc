@@ -17,7 +17,7 @@
                 :one-color="true">
                 <div class="team-inner" :style="{ borderColor: accentColor }">
                     <div class="team-top flex-center" :style="themeColor(team)">
-                        <div class="team-name flex-center">{{ team.name }}</div>
+                        <div class="team-name flex-center industry-align">{{ team.name }}</div>
                         <div class="team-icon-holder flex-center">
                             <div class="team-icon bg-center" :style="icon(team)"></div>
                         </div>
@@ -29,9 +29,15 @@
                                 :key="player.id"
                                 class="player">
                                 <div
-                                    v-if="showRoles && player.role"
+                                    v-if="showRoles === 'eligible'"
+                                    class="flex-center player-eligible-roles">
+                                    <div v-for="role in playerEligibleRoles(player)" :key="role" class="player-role flex-center" v-html="getRoleSVG(role)"></div>
+                                </div>
+                                <div
+                                    v-else-if="showRoles && (player?.this_event_signup_data?.main_role || player.role)"
                                     class="player-role flex-center"
-                                    v-html="getRoleSVG(player.role)"></div>
+                                    v-html="getRoleSVG(player?.this_event_signup_data?.main_role || player.role)"></div>
+
                                 <span class="player-name">{{ player.name }}</span>
                                 <div v-if="showBadges && getHighlightEventTeam(player)" class="player-badge">
                                     <ThemeLogo class="badge-logo" :theme="getHighlightEventTeam(player) && getHighlightEventTeam(player).theme" icon-padding="0.2em" logo-size="w-100" />
@@ -76,10 +82,11 @@
 <script>
 import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { getRoleSVG } from "@/utils/content-utils";
+import { decoratePlayerWithDraftData, getRoleSVG } from "@/utils/content-utils";
 import { resizedImage } from "@/utils/images";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
 import ThemeLogo from "@/components/website/ThemeLogo";
+import { sortRoles } from "@/utils/sorts";
 
 export default {
     name: "RosterOverlay",
@@ -95,16 +102,19 @@ export default {
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
-                    players: ReactiveArray("players"),
+                    players: ReactiveArray("players", {
+                        "signup_data": ReactiveArray("signup_data")
+                    }),
                     staff: ReactiveArray("staff")
-                })
+                }),
+                "event": ReactiveThing("event")
             });
         },
         teams() {
             if (!this.match) return [];
             return (this.match.teams || []).map(team => {
                 team.showLimitedPlayers = ((team.players || [])?.length === 0) && (team.limited_players || []).length !== 0;
-                team.showablePlayers = team.showLimitedPlayers ? team.limited_players : team.players;
+                team.showablePlayers = team.showLimitedPlayers ? team.limited_players : (team.players || []).map(p => decoratePlayerWithDraftData(p, this.match?.event?.id || this.$root?.broadcast?.event?.id));
                 return team;
             });
         },
@@ -115,7 +125,9 @@ export default {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
-                    players: ReactiveArray("players"),
+                    players: ReactiveArray("players", {
+                        "signup_data": ReactiveArray("signup_data")
+                    }),
                     captains: ReactiveArray("captains")
                 })
             });
@@ -180,6 +192,9 @@ export default {
         getHighlightEventTeam(player) {
             if (!this.highlight_event?.teams?.length) return null;
             return this.highlight_event.teams.find(team => (team.players || []).find(p => p.id === player.id) || (team.captains || []).find(p => p.id === player.id));
+        },
+        playerEligibleRoles(player) {
+            return (player?.this_event_signup_data?.eligible_roles || player.eligible_roles || []).sort(sortRoles);
         }
     },
     head() {
@@ -260,10 +275,17 @@ export default {
 }
 
 
+.player-eligible-roles {
+    height: 1em;
+    margin-right: .2em;
+}
 .player-role {
     height: 1em;
     width: 1em;
     margin-right: .2em;
+}
+.player-eligible-roles .player-role {
+    margin-right: 0;
 }
 .player-role:deep(i) {
      font-size: .75em;

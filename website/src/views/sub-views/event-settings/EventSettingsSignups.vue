@@ -39,7 +39,7 @@
                     <div class="px-2">
                         {{ changeCount }} change{{ changeCount === 1 ? '' : 's' }}
                     </div>
-                    <b-button variant="success" :disabled="processing.signupData" @click="setPlayerSignupData">
+                    <b-button variant="success" :disabled="processing.signupData" @click="confirmModal = !confirmModal">
                         Save
                         player signup data
                     </b-button>
@@ -62,6 +62,22 @@
                 <b-button variant="success" size="sm" @click="addRow"><i class="fas fa-fw fa-plus"></i> Add row to bottom</b-button>
             </div>
         </div>
+
+        <BModal
+            v-model="confirmModal"
+            title="Confirmation"
+            ok-variant="success"
+            ok-title="Save player signup data"
+            @ok="setPlayerSignupData">
+            <b>Ready to submit?</b><br>
+            Table data will be submitted and changed cells will be updated.
+            <ul class="mt-2">
+                <li v-if="team">Only players with the correct team selected on the right will be saved on this team.</li>
+                <li>Players without names will use their player profile, Battletag or Discord tag instead.</li>
+                <li>Rows submitted without existing player IDs will be looked up on the server, using their Battletag or Discord tag.</li>
+            </ul>
+            This system is still in beta, so if something doesn't look right, ping SLMN!
+        </BModal>
     </div>
 </template>
 
@@ -152,6 +168,7 @@ export default {
             showAllSR: false,
             showNonCompetitive: false
         },
+        confirmModal: null,
 
 
         usePlayerSignupData: true,
@@ -328,15 +345,16 @@ export default {
                 }
 
 
-                return [teamMembership, playerStatus].filter(Boolean).join(" / ");
+                const reporting = [teamMembership, playerStatus].filter(Boolean);
+                if (reporting?.length) return reporting.join(" / ");
 
-                // for (const rowKey in row) {
-                //     if (["player", "status"].includes(rowKey)) continue;
-                //     const value = row[rowKey];
-                //     if (this.isDifferent(rowKey, value, { row: i })) {
-                //         return `Change: ${rowKey}`;
-                //     }
-                // }
+                for (const rowKey in row) {
+                    if (["player", "status"].includes(rowKey)) continue;
+                    const value = row[rowKey];
+                    if (this.isDifferent(rowKey, value, { row: i })) {
+                        return `Change: ${rowKey}*`;
+                    }
+                }
             });
         },
         changeCount() {
@@ -426,6 +444,9 @@ export default {
                     }
                 });
 
+                if (!error) {
+                    this.$notyf.success("Data processed.");
+                }
             } finally {
                 this.processing.signupData = false;
             }

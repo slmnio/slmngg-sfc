@@ -3,6 +3,12 @@ const { dirtyID,
     deAirtable,
 } = require("../action-utils/action-utils");
 const working = new Map();
+
+function norm(text) {
+    if (!text) return null;
+    return text.toLowerCase().trim();
+}
+
 module.exports = {
     key: "set-player-signup-data",
     requiredParams: ["eventID", "playerData", "useSignupData", "createPlayers"],
@@ -29,6 +35,8 @@ module.exports = {
         /** @type {DirtyAirtableID[]} */
         const eventTeamIDs = (event?.teams || []).map(id => dirtyID(id));
 
+        const { players } = await this.helpers.get("internal:lookup-players");
+
         /*
         * Player signups processing
         * If useSignupData, use the new Signup Data table, linking event + player with this data
@@ -53,7 +61,25 @@ module.exports = {
             if (playerData?.id) {
                 player = await this.helpers.get(playerData?.id);
                 console.log(player?.name, player?.id);
+            }
 
+            if (!player) {
+                // lookup player here
+                console.log("Looking up a player", {
+                    discord_tag: playerData?.discord_tag,
+                    battletag: playerData?.battletag,
+                    discord_id: playerData?.discord_id,
+                });
+                player = players.find(p => {
+                    if (playerData?.discord_tag && norm(p.discord_tag) === norm(playerData?.discord_tag)) return true;
+                    if (playerData?.battletag && norm(p.battletag) === norm(playerData?.battletag)) return true;
+                    if (playerData?.discord_id && norm(p.discord_id) === norm(playerData?.discord_id)) return true;
+                    return false;
+                });
+                console.log("Player after lookup", player?.name, player?.id);
+            }
+
+            if (player) {
                 const playerUpdateData = {};
 
                 if (!player.event_signups?.find(id => id === dirtyID(eventID))) {
@@ -154,14 +180,19 @@ module.exports = {
                     if (playerData?.info_for_captains) airtablePlayerData["Draft Data"] = playerData.info_for_captains;
                 }
 
-                if (playerData?.name) airtablePlayerData["Name"] = playerData.name;
+                if (playerData?.name) {
+                    airtablePlayerData["Name"] = playerData.name;
+                } else {
+                    // create a name
+                    airtablePlayerData["Name"] = (playerData?.battletag?.split("#")?.[0] || playerData?.discord_tag?.replace(/[._]/g, "") || "").trim();
+                }
                 if (playerData?.discord_tag) airtablePlayerData["Discord Tag"] = playerData.discord_tag.replace("@", "").trim();
                 // if (playerData?.discord_id) airtablePlayerData["Discord ID"] = playerData.discord_id;
                 if (playerData?.battletag) airtablePlayerData["Battletag"] = playerData.battletag;
 
                 if (playerData.team_id) airtablePlayerData["Member Of"] = [dirtyID(playerData.team_id)];
 
-                if (playerData?.name) {
+                if (airtablePlayerData["Name"]) {
                     const playerRecords = await this.helpers.createRecord("Players", airtablePlayerData);
                     if (playerRecords?.error) {
                         actionResponse.errors.push(playerRecords.error.errorMessage);
@@ -218,12 +249,12 @@ module.exports = {
                     }
                 ].forEach(({ signupDataKey, airtableKey, data }) => {
                     data = data || playerData?.[signupDataKey];
-                    console.log(airtableKey, data, signupRecord?.[signupDataKey]);
+                    // console.log(airtableKey, data, signupRecord?.[signupDataKey]);
                     // if (!data) return;
 
                     if (signupRecord) {
                         // check if it matches existing data or not
-                        console.log(signupRecord);
+                        // console.log(signupRecord);
                         if (signupRecord[signupDataKey] === data) return;
                         if (airtableKey === "Eligible Roles") {
                             if (JSON.stringify(signupRecord[signupDataKey]) === JSON.stringify(data)) return;
@@ -244,6 +275,7 @@ module.exports = {
                     }
                     if (!signupRecord) {
                         // create
+                        console.log("Creating player", airtableSignupData);
                         const newSignupRecords = await this.helpers.createRecord("Signup Data", {
                             Player: [dirtyID(player.id)],
                             Event: [dirtyID(eventID)],
@@ -251,8 +283,13 @@ module.exports = {
                         });
                         if (newSignupRecords?.error) {
                             actionResponse.errors.push(newSignupRecords.error.errorMessage);
+                        } else {
+                            signupRecord = deAirtable(newSignupRecords?.[0]);
+                            await this.helpers.updateRecord("Players", player, {
+                                "Signup Data": [...(player.signup_data || []), signupRecord.id]
+                            });
                         }
-                        signupRecord = deAirtable(newSignupRecords?.[0]);
+
                     }
                 } else {
                     console.log("No updates for signup data");

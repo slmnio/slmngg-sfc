@@ -277,7 +277,7 @@ export async function authenticatedRequest<U extends RequestUrl>(url: U, data?: 
             console.error("Fetch error", error);
         });
         console.log(request);
-        if (request.error) {
+        if (request?.error) {
             notyf.error({
                 message: request.errorMessage
             });

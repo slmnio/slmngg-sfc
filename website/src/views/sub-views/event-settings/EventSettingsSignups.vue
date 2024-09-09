@@ -1,21 +1,23 @@
 <template>
-    <div class="settings-signup">
+    <div class="settings-signup" :class="{'team-signups': team, 'event-signups': event}">
         <b-alert variant="warning" :model-value="true" dismissible>
-            <b>This page is in beta.</b> Please be careful, as it gives you access to edit a lot of data at one time.<br>
-            To-do list:
-            <ul>
-                <li>Filtering by division/team category</li>
-                <li>Keeping pasted data when loading player data</li>
-                <li>Make it easier to see what data is saved or not, and what currently exists</li>
-                <li>Work out a process for incoming data changes while you're working on it</li>
-                <li>Add this table on individual team pages</li>
-                <li>Reduce the chances of overwriting player names with feedback & logic</li>
-            </ul>
-            Current known issues:
-            <ul>
-                <li>It's not possible to change a player's name after they've been created</li>
-                <li>Rows with unsaved data will be overwritten when hitting the <b>Find player data</b> button.<br>For batch processing, paste data > find player data & generate names > re-paste data</li>
-            </ul>
+            <p class="m-0"><b>This page is in beta.</b> Please be careful, as it gives you access to edit a lot of data at one time.</p>
+            <p v-if="team" class="m-0">This page lists all players on the team. If they get removed, you can attach them from the event signups page.</p>
+            <p v-if="event" class="m-0">This page lists all players who are signed up to the event. You can add or remove them from teams by changing their set team on the right.</p>
+            <!--            To-do list:-->
+            <!--            <ul>-->
+            <!--                <li>Filtering by division/team category</li>-->
+            <!--                <li>Keeping pasted data when loading player data</li>-->
+            <!--                <li>Make it easier to see what data is saved or not, and what currently exists</li>-->
+            <!--                <li>Work out a process for incoming data changes while you're working on it</li>-->
+            <!--                <li>Add this table on individual team pages</li>-->
+            <!--                <li>Reduce the chances of overwriting player names with feedback & logic</li>-->
+            <!--            </ul>-->
+            <!--            Current known issues:-->
+            <!--            <ul>-->
+            <!--                <li>It's not possible to change a player's name after they've been created</li>-->
+            <!--                <li>Rows with unsaved data will be overwritten when hitting the <b>Find player data</b> button.<br>For batch processing, paste data > find player data & generate names > re-paste data</li>-->
+            <!--            </ul>-->
         </b-alert>
         <div class="mb-2 d-flex flex-column gap-2">
             <b-form-checkbox v-model="usePlayerSignupData" disabled>Use extra signup data fields instead of editing players</b-form-checkbox>
@@ -71,7 +73,7 @@ import Handsontable from "handsontable";
 import { KeyValueSelectEditor, MultiSelectEditor } from "@/views/sub-views/event-settings/editor/multiSelectEditor";
 import { sortAlphaRaw } from "@/utils/sorts";
 import { authenticatedRequest } from "@/utils/dashboard";
-import { ReactiveArray } from "@/utils/reactive";
+import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { cleanID } from "@/utils/content-utils";
 registerAllModules();
 function empty(element) {
@@ -143,7 +145,7 @@ Handsontable.cellTypes.registerCellType("keyvalueselect", {
 export default {
     name: "EventSettingsSignups",
     components: { HotTable },
-    props: ["event"],
+    props: ["event", "team"],
     data: () => ({
         customisation: {
             useSplitSR: false,
@@ -175,7 +177,8 @@ export default {
                 headerAction: true,
             },
             stretchH: "all",
-            fixedColumnsStart: 1
+            fixedColumnsStart: 2,
+            renderAllRows: true
         }
     }),
     computed: {
@@ -183,27 +186,62 @@ export default {
             return this.signupColumns.map(col => col.header);
         },
         teamOptions() {
-            return (this.event?.teams || []).map(t => (t.name));
+            if (this.team) {
+                return [
+                    "",
+                    this.team?.name
+                ];
+            }
+            return [
+                "",
+                (this._event?.teams || []).map(t => (t.name))
+            ];
+        },
+        eventID() {
+            return (this.event?._original_data_id || this.event?.id) || this.team?.event?.id;
+        },
+        _event() {
+            return ReactiveRoot((this.event || this.team?.event)?.id, {
+                "teams": ReactiveArray("teams", {
+                    "players": ReactiveArray("players", {
+                        "signup_data": ReactiveArray("signup_data")
+                    })
+                })
+            });
         },
         eventSignups() {
-            if (!this.event?.draftable_players?.length) return [];
-            return ((ReactiveArray("draftable_players", {
-                "member_of": ReactiveArray("member_of"),
-                "signup_data": ReactiveArray("signup_data")
-            })(this.event)) || []).map(player => ({
-                ...player,
-                this_event_signup_data: (player.signup_data || []).find(data => cleanID(data?.event?.[0]) === cleanID(this.event?._original_data_id || this.event?.id)),
-                this_event_teams: (player.member_of || []).filter(team => cleanID(team?.event?.[0]) === cleanID(this.event?._original_data_id || this.event?.id)),
-            }));
+            if (this.event) {
+                if (!this.event?.draftable_players?.length) return [];
+                return ((ReactiveArray("draftable_players", {
+                    "member_of": ReactiveArray("member_of"),
+                    "signup_data": ReactiveArray("signup_data")
+                })(this.event)) || []).map(player => ({
+                    ...player,
+                    this_event_signup_data: (player.signup_data || []).find(data => cleanID(data?.event?.[0]) === cleanID(this.eventID)),
+                    this_event_teams: (player.member_of || []).filter(team => cleanID(team?.event?.[0]) === cleanID(this.eventID)),
+                }));
+            } else if (this.team) {
+                if (!this.team?.players?.length) return [];
+
+                return ((ReactiveArray("players", {
+                    "member_of": ReactiveArray("member_of"),
+                    "signup_data": ReactiveArray("signup_data")
+                })(this.team)) || []).map(player => ({
+                    ...player,
+                    this_event_signup_data: (player.signup_data || []).find(data => cleanID(data?.event?.[0]) === cleanID(this.eventID)),
+                    this_event_teams: (player.member_of || []).filter(team => cleanID(team?.event?.[0]) === cleanID(this.eventID)),
+                }));
+            }
+            return [];
         },
         signupColumns() {
             const cols = [];
 
-            // cols.push({
-            //     header: "Status",
-            //     data: "status",
-            //     readOnly: true
-            // });
+            cols.push({
+                header: "Actions",
+                data: "status",
+                readOnly: true
+            });
             cols.push({ header: "Player", data: "player", readOnly: true });
             cols.push({ header: "Player ID", data: "id", renderer: "diffchecker" });
             cols.push({ header: "Name", data: "name", renderer: "diffchecker" });
@@ -241,13 +279,64 @@ export default {
         },
         rowStatus() {
             return this.data.map((row, i) => {
-                for (const rowKey in row) {
-                    if (["player", "status"].includes(rowKey)) continue;
-                    const value = row[rowKey];
-                    if (this.isDifferent(rowKey, value, { row: i })) {
-                        return `Change: ${rowKey}`;
+                const player = this.eventSignups?.[i];
+                let teamMembership = "";
+                let playerStatus = "";
+
+                // console.log(row);
+                if (!(row.id || row.name)) {
+                    return "Need name or player";
+                }
+
+                if (this.isDifferent("team_name", row.team_name, { row: i })) {
+                    if (player?.this_event_teams?.[0]?.name && !row.team_name) {
+                        teamMembership = "Will remove from team";
+                    } else if (!player?.this_event_teams?.[0]?.name && row.team_name) {
+                        teamMembership  = "Will add to team";
                     }
                 }
+                if (this.team && !row.team_name && !teamMembership) {
+                    teamMembership = "Will not add to team";
+                }
+                if (this.isDifferent("player_id", row.id, { row: i })) {
+                    const oldID = cleanID(player?.id);
+                    const newID = cleanID(row?.id);
+                    console.log("player id", { oldID, newID });
+                    if (!oldID && newID) {
+                        // ID added
+                        playerStatus = "Link existing player";
+                    } else if (oldID && !newID) {
+                        // ID removed
+                        // playerStatus  = "added";
+                    }
+                }
+                if (this.isDifferent("name", row.name, { row: i })) {
+                    const oldName = player?.name;
+                    const newName = row?.name;
+                    console.log("player name", { oldName, newName });
+                    if (!oldName && newName) {
+                        // name added
+                        if (row?.id) {
+
+                        } else {
+                            playerStatus = "Create new player";
+                        }
+                    } else if (oldName && !newName) {
+                        // name removed
+                        // playerStatus  = "added";
+                    }
+                }
+
+
+                return [teamMembership, playerStatus].filter(Boolean).join(" / ");
+
+                // for (const rowKey in row) {
+                //     if (["player", "status"].includes(rowKey)) continue;
+                //     const value = row[rowKey];
+                //     if (this.isDifferent(rowKey, value, { row: i })) {
+                //         return `Change: ${rowKey}`;
+                //     }
+                // }
             });
         },
         changeCount() {
@@ -266,7 +355,7 @@ export default {
 
                 //             1 -> prop that changed
                 if (changes[i][1] === "team_name") {
-                    const teamID = (this.event?.teams || []).find(t => t.name === changes[i][3])?.id;
+                    const teamID = (this._event?.teams || []).find(t => t.name === changes[i][3])?.id;
                     if (teamID) {
                         changes.push([changes[i][0], "team_id", null, teamID]);
                     } else {
@@ -284,9 +373,9 @@ export default {
                     data,
                     error
                 } = await authenticatedRequest("actions/find-player-data", {
-                    eventID: this.event?._original_data_id || this.event?.id,
+                    eventID: this.eventID,
                     playerData: this.data.map(p => ({
-                        id: p.id,
+                        id: cleanID(p.id),
                         name: p.name,
                         battletag: p.battletag,
                         discord_tag: p.discord_tag,
@@ -296,7 +385,7 @@ export default {
 
                 (data || []).forEach((player, i) => {
                     if (!player) return;
-                    this.data[i].id = player.id;
+                    this.data[i].id = cleanID(player.id);
                 });
 
                 console.log({
@@ -321,7 +410,7 @@ export default {
                     data,
                     error
                 } = await authenticatedRequest("actions/set-player-signup-data", {
-                    eventID: this.event?._original_data_id || this.event?.id,
+                    eventID: this.eventID,
                     playerData: this.data,
                     useSignupData: this.usePlayerSignupData,
                     createPlayers: this.createPlayers
@@ -333,7 +422,7 @@ export default {
 
                 data.forEach((p, i) => {
                     if (p.playerID) {
-                        this.data[i].id = p.playerID;
+                        this.data[i].id = cleanID(p.playerID);
                     }
                 });
 
@@ -347,7 +436,7 @@ export default {
 
                 if (!this.data[i]) this.data[i] = {};
 
-                this.data[i].id = player.id;
+                this.data[i].id = cleanID(player.id);
                 this.data[i].name = player.name;
                 this.data[i].discord_tag = player.discord_tag;
                 this.data[i].battletag = player.battletag;
@@ -390,6 +479,10 @@ export default {
                 top: 100000000,
                 behavior: "instant"
             });
+            if (this.team) {
+                this.data[this.data.length - 1].team_id = cleanID(this.team.id);
+                this.data[this.data.length - 1].team_name = cleanID(this.team.name);
+            }
         },
         isDifferent(prop, value, cellProperties) {
             const index = cellProperties?.row;
@@ -420,8 +513,14 @@ export default {
                     if (player && cleanID(this.data[i]?.id) === cleanID(player?.id)) {
                         // console.log("set player", i, player.name);
                         this.data[i].player = player.name;
-                        this.data[i].team_id = cleanID((player.member_of || []).find(teamID => (this.event?.teams || []).find(eventTeamID => cleanID(eventTeamID) === cleanID(teamID))));
-                        this.data[i].team_name = (this.event?.teams || []).find(eventTeamID => cleanID(eventTeamID) === cleanID(this.data[i].team_id))?.name;
+                        // check for manually entered data
+                        let oldTeamID = this.data[i]?.team_id;
+                        let newTeamID = cleanID((player.member_of || []).find(teamID => (this._event?.teams || []).find(team => cleanID(team?.id) === cleanID(teamID))));
+
+                        if (!(oldTeamID && !newTeamID)) {
+                            this.data[i].team_id = newTeamID;
+                            this.data[i].team_name = (this._event?.teams || []).find(team => cleanID(team?.id) === cleanID(this.data[i].team_id))?.name;
+                        }
                     } else {
                         this.data[i].player = null;
                     }
@@ -432,7 +531,7 @@ export default {
             immediate: true,
             deep: true,
             handler(signupPlayers) {
-                console.log("signups players", signupPlayers, this.event);
+                console.log("signups players", signupPlayers, this._event);
                 this.loadFromDraftablePlayers(signupPlayers);
             }
         },
@@ -533,9 +632,14 @@ export default {
 /*.settings-signup {*/
 /*    position: relative;*/
 /*}*/
-.hot-wrapper {
+.event-signups .hot-wrapper {
     overflow: hidden;
     height: max(800px, 75vh);
+    resize: vertical;
+}
+.team-signups .hot-wrapper {
+    overflow: hidden;
+    min-height: 300px;
     resize: vertical;
 }
 .hot-table:deep(.ht_clone_left),

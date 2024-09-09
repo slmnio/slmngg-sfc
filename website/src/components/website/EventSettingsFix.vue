@@ -4,11 +4,15 @@
             <span><i class="fas fa-user-slash"></i></span>
             <span><b>Player not found:</b></span>
             <span>
-                <linked-players :players="[player]"/>
+                <linked-players :players="[player]" />
             </span>
             <br>
             <CopyTextButton v-if="player.discord_tag" :content="player.discord_tag"><b>Username</b>: {{ player.discord_tag }}</CopyTextButton>
             <CopyTextButton v-if="player.discord_id" :content="player.discord_id"><b>ID</b>: {{ player.discord_id }}</CopyTextButton>
+        </div>
+        <div v-else>
+            {{ item.type }}
+            <pre>{{ item }}</pre>
         </div>
     </div>
 </template>
@@ -23,7 +27,7 @@ export default {
     components: { CopyTextButton, LinkedPlayers },
     props: {
         item: {},
-        teams: []
+        teams: Array
     },
     computed: {
         player() {

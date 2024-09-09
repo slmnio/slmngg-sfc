@@ -12,7 +12,20 @@ export default [
             { path: "theme", component: () => import("@/views/sub-views/ThingTheme.vue") },
             { path: "old-details", component: () => import("@/views/sub-views/team/TeamDetails.vue") },
             { path: "details", alias: ["composition"], component: () => import("@/views/sub-views/team/TeamComposition.vue") },
-            { path: "previous", component: () => import("@/views/sub-views/team/TeamPrevious.vue") }
+            { path: "previous", component: () => import("@/views/sub-views/team/TeamPrevious.vue") },
+            {
+                path: "settings",
+                component: () => import("@/views/sub-views/team-settings/TeamSettings.vue"),
+                meta: {
+                    requiresAuth: true
+                },
+                children: [
+                    {
+                        path: "",
+                        component: () => import("@/views/sub-views/event-settings/EventSettingsSignups.vue"),
+                    }
+                ]
+            }
         ]
     },
     {

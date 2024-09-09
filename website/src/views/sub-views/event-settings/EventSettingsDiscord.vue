@@ -172,7 +172,7 @@
                     </td>
                     <td>
                         <ul>
-                            <li v-for="(item, i) in fixes.filter(f => !['player_details_updated'].includes(f.type) && f.teamID === `rec` + team.id)" :key="i">
+                            <li v-for="(item, i) in fixes.filter(f => !['player_details_updated', 'discord_id_not_found'].includes(f.type) && f.teamID === `rec` + team.id)" :key="i">
                                 <EventSettingsFix :item="item" :teams="teams" />
                             </li>
                         </ul>
@@ -180,6 +180,8 @@
                 </tr>
             </tbody>
         </table>
+
+        <textarea v-if="fixes?.length" rows="15" class="bg-dark text-white font-monospace p-2 rounded" :value="fixText"></textarea>
     </div>
 </template>
 
@@ -194,6 +196,7 @@ import EventSettingsFix from "@/components/website/EventSettingsFix.vue";
 import { useAuthStore } from "@/stores/authStore";
 import { sortAlpha } from "@/utils/sorts";
 import SettingsMultiselect from "@/views/sub-views/event-settings/SettingsMultiselect.vue";
+import { cleanID } from "@/utils/content-utils";
 
 export default {
     name: "EventSettingsDiscord",
@@ -353,6 +356,19 @@ export default {
                     disabled: !isTopMost
                 };
             });
+        },
+        fixText() {
+            console.log(JSON.stringify(this.fixes));
+            return (this.teams || []).map(team => {
+                const teamFixes = (this.fixes || []).filter(f => ["player_discord_not_found"].includes(f.type) && f.teamID === "rec" + team.id);
+                if (!teamFixes?.length) return null;
+                return `- ${team?.name}\n` + teamFixes.map(item => {
+                    const fixPlayer = ReactiveRoot(item?.playerID);
+                    console.log(item?.type, item, fixPlayer);
+                    if (!fixPlayer?.name) return null;
+                    return `  - [${fixPlayer?.name}](<https://slmn.gg/player/${cleanID(fixPlayer?.id)}>)` + (item.discordTag ? ` (\`${item.discordTag}\`)` : "") + (item.discordID ? ` (id: \`${item.discordID}\` <@${item.discordID}>)` : "");
+                }).filter(Boolean).join("\n");
+            }).filter(Boolean).join("\n");
         }
     },
     methods: {

@@ -53,6 +53,14 @@
                                     placeholder="Choose roles"
                                     :options="rolePositionOptions" />
                             </div>
+                            <div class="mt-2">
+                                <b-form-checkbox v-model="runSettings.roles.pingable" switch>
+                                    Roles should be pingable
+                                </b-form-checkbox>
+                                <b-form-checkbox v-model="runSettings.roles.hoist" switch>
+                                    Hoist roles
+                                </b-form-checkbox>
+                            </div>
                             <!-- role hoist -->
                         </div>
                     </div>
@@ -228,7 +236,9 @@ export default {
             },
             roles: {
                 rolePosition: null,
-                roleColorOverride: null
+                roleColorOverride: null,
+                pingable: false,
+                hoist: false
             }
         },
         roleData: null

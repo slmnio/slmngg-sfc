@@ -42,6 +42,8 @@ module.exports = {
      * @param {boolean?} settings.voiceChannels.useTeamCategories
      * @param {number?} settings.roles.rolePosition
      * @param {string?} settings.roles.roleColorOverride
+     * @param {boolean?} settings.roles.pingable
+     * @param {boolean?} settings.roles.hoist
      * @param {UserData} user
      * @returns {Promise<void>}
      */
@@ -177,7 +179,9 @@ module.exports = {
                     const role = {
                         name: team.name,
                         color: settings.roles.roleColorOverride || theme?.color_theme,
-                        permissions: new PermissionsBitField()
+                        permissions: new PermissionsBitField(),
+                        mentionable: !!settings.roles.pingable,
+                        hoist: !!settings.roles.hoist
                     };
                     if (theme && guild.features.includes(GuildFeature.RoleIcons)) {
                         role.icon = await getDiscordIcon(theme);

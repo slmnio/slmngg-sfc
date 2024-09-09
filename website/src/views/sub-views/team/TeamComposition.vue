@@ -28,6 +28,7 @@
                     </td>
                     <td>
                         <span v-if="isCaptain(player)" v-b-tooltip="'Captain'" class="mr-1" v-html="getRoleSVG('Captain')"></span>
+                        <span v-if="isStaff(player)" v-b-tooltip="'Staff'" class="mr-1" v-html="getRoleSVG('Staff')"></span>
                         <LinkedPlayers :players="[player]" />
                     </td>
                     <td>
@@ -64,6 +65,41 @@
             <a v-if="useCalculator" class="btn btn-light text-dark fw-bold" target="_blank" :href="`https://slmn.io/calc?custom=${encodeURIComponent(dataString)}&category=${encodeURIComponent(category)}`">SLMN Calculator <i class="fas fa-chevron-right ml-2 fa-fw"></i></a>
             <a v-if="cta" class="btn btn-light text-dark fw-bold" target="_blank" :href="ctaLink(team)">{{ ctaText }} <i class="fas fa-fw fa-external-link ml-1"></i></a>
         </div>
+
+
+        <div v-if="people?.length" class="mt-3">
+            <h2>Team captains & staff</h2>
+            <table class="table table-bordered table-dark table-sm w-auto">
+                <thead>
+                    <tr>
+                        <th colspan="2">Roles</th>
+                        <th>Name</th>
+                        <th><i class="fab fa-discord fa-fw"></i> Discord tag</th>
+                        <th><i class="fab fa-battle-net fa-fw"></i> Battletag</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="player in people" :key="player.id">
+                        <td>
+                            <span
+                                v-for="role in player.is"
+                                :key="role"
+                                v-b-tooltip="role"
+                                class="mr-1"
+                                v-html="getRoleSVG(role)"></span>
+                        </td>
+                        <td>
+                            {{ niceJoin(player.is) }}
+                        </td>
+                        <td class="wide">
+                            <LinkedPlayers :players="[player]" />
+                        </td>
+                        <td><CopyTextButton v-if="player.discord_tag">{{ player.discord_tag }}</CopyTextButton></td>
+                        <td><CopyTextButton v-if="player.battletag">{{ player.battletag }}</CopyTextButton></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
@@ -74,6 +110,7 @@ import { cleanID, getRoleSVG } from "@/utils/content-utils";
 import RoleIcon from "@/components/website/RoleIcon.vue";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
 import { sortRoles } from "@/utils/sorts";
+
 export default {
     name: "TeamComposition",
     components: { CopyTextButton, RoleIcon, LinkedPlayers },
@@ -169,13 +206,7 @@ export default {
         players() {
             return this.playerData.map(p => {
                 let feederEligible = false;
-                console.log({
-                    player: p,
-                    feeders: this.feederEvents,
-                    events: (p.member_of || []).map(t => t.event)
-                });
 
-                console.log(p.member_of, p.signup_data);
                 if (p.member_of?.length) {
                     feederEligible = p.member_of.some(team => team?.event?.id && this.feederEvents.some(event => event.id === team.event?.id));
                 }
@@ -188,18 +219,56 @@ export default {
                     thisEventSignupData
                 };
             });
+        },
+        people() {
+            return [
+                ...this.team?.owners || [],
+                ...this.team?.captains || [],
+                ...this.team?.staff || [],
+            ].filter((player, index, array) => {
+                return array.findIndex(p => p.id === player.id) === index;
+            }).map(person => {
+                const roles = [];
+
+                if ((this.team.owners || []).find(x => cleanID(x?.id) === cleanID(person.id))) roles.push("Owner");
+                if ((this.team.captains || []).find(x => cleanID(x?.id) === cleanID(person.id))) roles.push("Captain");
+                if ((this.team.staff || []).find(x => cleanID(x?.id) === cleanID(person.id))) {
+                    if (person.staff_role) {
+                        roles.push(person.staff_role);
+                    } else {
+                        roles.push("Staff");
+                    }
+                }
+
+                return {
+                    ...person,
+                    is: roles
+                };
+            });
         }
     },
     methods: {
         sortRoles,
         isCaptain(player) {
-            if (!player?.id || !this.team?.captains) return false;
-            return (this.team.captains.map(c => c.id).includes(player.id));
+            if (!player?.id || !this.team?.captains?.length) return false;
+            return !!((this.team.captains || []).find(p => cleanID(p.id) === cleanID(player.id)));
+        },
+        isStaff(player) {
+            if (!player?.id || !this.team?.staff?.length) return false;
+            return !!((this.team.staff || []).find(p => cleanID(p.id) === cleanID(player.id)));
         },
         getRoleSVG,
         ctaLink(team) {
-            return this.cta.replace("{team_id}", team.id).replace("{team_name}", team.name).replace("{event_id}", this.event?.id);
-        }
+            return this.cta.replace("{team_id}", team.id).replace("{team_name}", team.name).replace("{event_id}", this.team?.event?.id);
+        },
+        niceJoin(array) {
+            const arr = [...array];
+            if (arr.length > 1) {
+                const last = arr.pop();
+                return arr.join(", ") + " and " + last;
+            }
+            return arr[0];
+        },
     }
 };
 </script>
@@ -207,5 +276,10 @@ export default {
 <style scoped>
     .role-icons {
         font-size: 18px;
+    }
+
+    .table.w-auto td,
+    .table.w-auto th {
+        padding: 0.25em 0.5em;
     }
 </style>

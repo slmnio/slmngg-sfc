@@ -194,7 +194,7 @@ export default {
             }
             return [
                 "",
-                (this._event?.teams || []).map(t => (t.name))
+                ...(this._event?.teams || []).map(t => (t.name))
             ];
         },
         eventID() {

@@ -79,9 +79,142 @@ module.exports = {
                 console.log("Player after lookup", player?.name, player?.id);
             }
 
-            if (player) {
-                const playerUpdateData = {};
 
+            if (!player && createPlayers) {
+                const airtablePlayerData = {
+                    "Event Signups": [dirtyID(eventID)]
+                };
+
+                if (!useSignupData) {
+                    if (playerData?.eligible_roles) airtablePlayerData["Eligible Roles"] = playerData.eligible_roles.split(", ");
+                    if (playerData?.role) airtablePlayerData["Role"] = playerData.role;
+                    if (playerData?.sr) airtablePlayerData["Manual SR"] = playerData.sr;
+                    if (playerData?.tank_sr) airtablePlayerData["Composition Tank SR"] = playerData.tank_sr;
+                    if (playerData?.dps_sr) airtablePlayerData["Composition DPS SR"] = playerData.dps_sr;
+                    if (playerData?.support_sr) airtablePlayerData["Composition Support SR"] = playerData.support_sr;
+                    if (playerData?.info_for_captains) airtablePlayerData["Draft Data"] = playerData.info_for_captains;
+                }
+
+                if (playerData?.name) {
+                    airtablePlayerData["Name"] = playerData.name;
+                } else {
+                    // create a name
+                    airtablePlayerData["Name"] = (playerData?.battletag?.split("#")?.[0] || playerData?.discord_tag?.replace(/[._]/g, "") || "").trim();
+                }
+                if (playerData?.discord_tag) airtablePlayerData["Discord Tag"] = playerData.discord_tag.replace("@", "").trim();
+                // if (playerData?.discord_id) airtablePlayerData["Discord ID"] = playerData.discord_id;
+                if (playerData?.battletag) airtablePlayerData["Battletag"] = playerData.battletag;
+
+                if (playerData.team_id) airtablePlayerData["Member Of"] = [dirtyID(playerData.team_id)];
+
+                if (airtablePlayerData["Name"]) {
+                    const playerRecords = await this.helpers.createRecord("Players", airtablePlayerData);
+                    if (playerRecords?.error) {
+                        actionResponse.errors.push(playerRecords.error.errorMessage);
+                    } else {
+                        player = deAirtable(playerRecords?.[0]);
+                    }
+                } else {
+                    actionResponse.errors.push("No name for this player, won't create a new record");
+                }
+            }
+
+            if (player) {
+                actionResponse.playerID = player.id;
+            }
+
+            const playerUpdateData = {};
+
+            if (useSignupData && player?.id) {
+                let signupRecord;
+                if (player?.signup_data) {
+                    const records = await Promise.all(player.signup_data.map(d => this.helpers.get(d)));
+                    signupRecord = records.find(r => dirtyID(r.event?.[0]) === dirtyID(eventID));
+                }
+
+                const airtableSignupData = {};
+
+                [
+                    {
+                        signupDataKey: "eligible_roles",
+                        airtableKey: "Eligible Roles",
+                        data: playerData?.eligible_roles?.split(", "),
+                    },
+                    {
+                        signupDataKey: "role",
+                        airtableKey: "Main Role",
+                    },
+                    {
+                        signupDataKey: "sr",
+                        airtableKey: "SR",
+                    },
+                    {
+                        signupDataKey: "tank_sr",
+                        airtableKey: "Tank SR",
+                    },
+                    {
+                        signupDataKey: "support_sr",
+                        airtableKey: "Support SR",
+                    },
+                    {
+                        signupDataKey: "dps_sr",
+                        airtableKey: "DPS SR",
+                    },
+                    {
+                        signupDataKey: "info_for_captains",
+                        airtableKey: "Info For Captains",
+                    }
+                ].forEach(({ signupDataKey, airtableKey, data }) => {
+                    data = data || playerData?.[signupDataKey];
+                    // console.log(airtableKey, data, signupRecord?.[signupDataKey]);
+                    // if (!data) return;
+
+                    if (signupRecord) {
+                        // check if it matches existing data or not
+                        // console.log(signupRecord);
+                        if (signupRecord[signupDataKey] === data) return;
+                        if (airtableKey === "Eligible Roles") {
+                            if (JSON.stringify(signupRecord[signupDataKey]) === JSON.stringify(data)) return;
+                        }
+                    }
+
+                    airtableSignupData[airtableKey] = data;
+                });
+                console.log(player?.name, airtableSignupData);
+
+                if (Object.keys(airtableSignupData)?.length) {
+                    // data to update/create
+                    if (signupRecord) {
+                        // update
+                        await this.helpers.updateRecord("Signup Data",  signupRecord,{
+                            ...airtableSignupData
+                        });
+                    }
+                    if (!signupRecord) {
+                        // create
+                        console.log("Creating player", airtableSignupData);
+                        const newSignupRecords = await this.helpers.createRecord("Signup Data", {
+                            Player: [dirtyID(player.id)],
+                            Event: [dirtyID(eventID)],
+                            ...airtableSignupData
+                        });
+                        if (newSignupRecords?.error) {
+                            actionResponse.errors.push(newSignupRecords.error.errorMessage);
+                        } else {
+                            signupRecord = deAirtable(newSignupRecords?.[0]);
+                            playerUpdateData["Signup Data"] = [...(player.signup_data || []), signupRecord.id];
+                        }
+
+                    }
+                } else {
+                    console.log("No updates for signup data");
+                }
+
+            } else {
+                actionResponse.errors.push("Can't edit player profiles directly yet");
+            }
+
+            if (player) {
                 if (!player.event_signups?.find(id => id === dirtyID(eventID))) {
                     playerUpdateData["Event Signups"] = [...(player.event_signups || []).map(id => dirtyID(id)), dirtyID(eventID)];
                 }
@@ -164,141 +297,6 @@ module.exports = {
                     await this.helpers.updateRecord("Players", player, playerUpdateData);
                 }
             }
-
-            if (!player && createPlayers) {
-                const airtablePlayerData = {
-                    "Event Signups": [dirtyID(eventID)]
-                };
-
-                if (!useSignupData) {
-                    if (playerData?.eligible_roles) airtablePlayerData["Eligible Roles"] = playerData.eligible_roles.split(", ");
-                    if (playerData?.role) airtablePlayerData["Role"] = playerData.role;
-                    if (playerData?.sr) airtablePlayerData["Manual SR"] = playerData.sr;
-                    if (playerData?.tank_sr) airtablePlayerData["Composition Tank SR"] = playerData.tank_sr;
-                    if (playerData?.dps_sr) airtablePlayerData["Composition DPS SR"] = playerData.dps_sr;
-                    if (playerData?.support_sr) airtablePlayerData["Composition Support SR"] = playerData.support_sr;
-                    if (playerData?.info_for_captains) airtablePlayerData["Draft Data"] = playerData.info_for_captains;
-                }
-
-                if (playerData?.name) {
-                    airtablePlayerData["Name"] = playerData.name;
-                } else {
-                    // create a name
-                    airtablePlayerData["Name"] = (playerData?.battletag?.split("#")?.[0] || playerData?.discord_tag?.replace(/[._]/g, "") || "").trim();
-                }
-                if (playerData?.discord_tag) airtablePlayerData["Discord Tag"] = playerData.discord_tag.replace("@", "").trim();
-                // if (playerData?.discord_id) airtablePlayerData["Discord ID"] = playerData.discord_id;
-                if (playerData?.battletag) airtablePlayerData["Battletag"] = playerData.battletag;
-
-                if (playerData.team_id) airtablePlayerData["Member Of"] = [dirtyID(playerData.team_id)];
-
-                if (airtablePlayerData["Name"]) {
-                    const playerRecords = await this.helpers.createRecord("Players", airtablePlayerData);
-                    if (playerRecords?.error) {
-                        actionResponse.errors.push(playerRecords.error.errorMessage);
-                    } else {
-                        player = deAirtable(playerRecords?.[0]);
-                    }
-                } else {
-                    actionResponse.errors.push("No name for this player, won't create a new record");
-                }
-            }
-
-            if (player) {
-                actionResponse.playerID = player.id;
-            }
-
-            if (useSignupData && player?.id) {
-                let signupRecord;
-                if (player?.signup_data) {
-                    const records = await Promise.all(player.signup_data.map(d => this.helpers.get(d)));
-                    signupRecord = records.find(r => dirtyID(r.event?.[0]) === dirtyID(eventID));
-                }
-
-                const airtableSignupData = {};
-
-                [
-                    {
-                        signupDataKey: "eligible_roles",
-                        airtableKey: "Eligible Roles",
-                        data: playerData?.eligible_roles?.split(", "),
-                    },
-                    {
-                        signupDataKey: "role",
-                        airtableKey: "Main Role",
-                    },
-                    {
-                        signupDataKey: "sr",
-                        airtableKey: "SR",
-                    },
-                    {
-                        signupDataKey: "tank_sr",
-                        airtableKey: "Tank SR",
-                    },
-                    {
-                        signupDataKey: "support_sr",
-                        airtableKey: "Support SR",
-                    },
-                    {
-                        signupDataKey: "dps_sr",
-                        airtableKey: "DPS SR",
-                    },
-                    {
-                        signupDataKey: "info_for_captains",
-                        airtableKey: "Info For Captains",
-                    }
-                ].forEach(({ signupDataKey, airtableKey, data }) => {
-                    data = data || playerData?.[signupDataKey];
-                    // console.log(airtableKey, data, signupRecord?.[signupDataKey]);
-                    // if (!data) return;
-
-                    if (signupRecord) {
-                        // check if it matches existing data or not
-                        // console.log(signupRecord);
-                        if (signupRecord[signupDataKey] === data) return;
-                        if (airtableKey === "Eligible Roles") {
-                            if (JSON.stringify(signupRecord[signupDataKey]) === JSON.stringify(data)) return;
-                        }
-                    }
-
-                    airtableSignupData[airtableKey] = data;
-                });
-                console.log(player?.name, airtableSignupData);
-
-                if (Object.keys(airtableSignupData)?.length) {
-                    // data to update/create
-                    if (signupRecord) {
-                        // update
-                        await this.helpers.updateRecord("Signup Data",  signupRecord,{
-                            ...airtableSignupData
-                        });
-                    }
-                    if (!signupRecord) {
-                        // create
-                        console.log("Creating player", airtableSignupData);
-                        const newSignupRecords = await this.helpers.createRecord("Signup Data", {
-                            Player: [dirtyID(player.id)],
-                            Event: [dirtyID(eventID)],
-                            ...airtableSignupData
-                        });
-                        if (newSignupRecords?.error) {
-                            actionResponse.errors.push(newSignupRecords.error.errorMessage);
-                        } else {
-                            signupRecord = deAirtable(newSignupRecords?.[0]);
-                            await this.helpers.updateRecord("Players", player, {
-                                "Signup Data": [...(player.signup_data || []), signupRecord.id]
-                            });
-                        }
-
-                    }
-                } else {
-                    console.log("No updates for signup data");
-                }
-
-            } else {
-                actionResponse.errors.push("Can't edit player profiles directly yet");
-            }
-
             actionResponses.push(actionResponse);
         }
         return actionResponses;

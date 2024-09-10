@@ -114,6 +114,15 @@ function deAirtable(obj) {
     return data;
 }
 
+function deAirtableRecord(record) {
+    console.log("deAirtableRecord", record.id, record.fields);
+    if (!record?.fields) return null;
+    return {
+        ...deAirtable(record.fields),
+        id: record.id
+    };
+}
+
 async function getValidHeroes() {
     // Get Heroes table
     // Get any OW hero only
@@ -256,7 +265,7 @@ async function findMember(player, team, guild) {
 
 
 module.exports = {
-    getSelfClient, cleanID, dirtyID, deAirtable, updateRecord, getValidHeroes, createRecord, safeInput, safeInputNoQuotes,
+    getSelfClient, cleanID, dirtyID, deAirtable, deAirtableRecord, updateRecord, getValidHeroes, createRecord, safeInput, safeInputNoQuotes,
     getTwitchChannel, getMatchData, getTwitchAPIClient, getTwitchAPIError, getBroadcast, getMaps, getAll,
     findMember
 };

@@ -1,7 +1,5 @@
 const { isEventStaffOrHasRole } = require("../action-utils/action-permissions");
-const { dirtyID,
-    deAirtable,
-} = require("../action-utils/action-utils");
+const { dirtyID, deAirtableRecord } = require("../action-utils/action-utils");
 const working = new Map();
 
 function norm(text) {
@@ -114,7 +112,8 @@ module.exports = {
                         console.error(playerRecords.error.errorMessage);
                         actionResponse.errors.push(playerRecords.error.errorMessage);
                     } else {
-                        player = deAirtable(playerRecords?.[0]?.fields);
+                        player = deAirtableRecord(playerRecords?.[0]);
+                        console.log("new player", player);
                     }
                 } else {
                     actionResponse.errors.push("No name for this player, won't create a new record");
@@ -203,8 +202,12 @@ module.exports = {
                         if (newSignupRecords?.error) {
                             actionResponse.errors.push(newSignupRecords.error.errorMessage);
                         } else {
-                            signupRecord = deAirtable(newSignupRecords?.[0]?.fields);
-                            playerUpdateData["Signup Data"] = [...(player.signup_data || []), signupRecord.id];
+                            signupRecord = deAirtableRecord(newSignupRecords?.[0]);
+                            console.log("signupRecord", signupRecord);
+                            playerUpdateData["Signup Data"] = [
+                                ...(player.signup_data || []),
+                                dirtyID(signupRecord.id)
+                            ];
                         }
 
                     }

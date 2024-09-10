@@ -121,7 +121,14 @@
                     <!--                    <b-form-checkbox-group v-model="selectedTeamSettings" stacked :options="teamSettingsOptions" />-->
                     <!--                    <b-form-checkbox-group v-model="selectedRunSettings" stacked :options="runSettingsOptions" />-->
                 </div>
-                <div class="d-flex justify-content-end w-100 mt-3">
+                <div class="d-flex justify-content-end w-100 mt-3 gap-3 align-items-center">
+                    <div v-if="liveRunData?.text" class="text-monospace">
+                        {{ liveRunData?.text }}
+                    </div>
+                    <div v-if="liveRunData.bar" class="bar-wrapper gap-1">
+                        <div class="bar-text">{{ liveRunData.bar?.current }} /  {{ liveRunData.bar?.total }}</div>
+                        <b-progress striped animated class="w-100" :value="(liveRunData.bar?.current / liveRunData.bar?.total) * 100" />
+                    </div>
                     <b-button
                         class="flex-shrink-0 opacity-changes"
                         variant="info"
@@ -241,7 +248,8 @@ export default {
                 hoist: false
             }
         },
-        roleData: null
+        roleData: null,
+        runOutput: null
     }),
     computed: {
         runOptions() {
@@ -379,6 +387,10 @@ export default {
                     return `  - [${fixPlayer?.name}](<https://slmn.gg/player/${cleanID(fixPlayer?.id)}>)` + (item.discordTag ? ` (\`${item.discordTag}\`)` : "") + (item.discordID ? ` (id: \`${item.discordID}\` <@${item.discordID}>)` : "");
                 }).filter(Boolean).join("\n");
             }).filter(Boolean).join("\n");
+        },
+        liveRunData() {
+            if (!this.event?.id) return null;
+            return ReactiveRoot(`create-event-discord-items-${cleanID(this.event?.id)}`);
         }
     },
     methods: {
@@ -410,13 +422,13 @@ export default {
                     ],
                     settings: this.runSettings
                 });
-                this.selectedRunSettings = [];
 
                 if (!output?.error) {
                     this.$notyf.success(output.data.status.replaceAll("\n", "<br>"));
-                    this.fixes = output.data.fixes;
-                    console.log("Fixes", output.data.fixes);
+                    this.runOutput = output.data;
                 }
+            } catch (e) {
+                console.error(e);
             } finally {
                 this.processing["creating"] = false;
                 this.roleData = await this.getGuildRoleData();
@@ -450,6 +462,26 @@ export default {
             immediate: true,
             handler() {
                 this.runSettings.roles.roleColorOverride = null;
+            }
+        },
+        "liveRunData.working": {
+            immediate: true,
+            handler(isRunning) {
+                this.processing["creating"] = isRunning;
+            }
+        },
+        "liveRunData.output": {
+            immediate: true,
+            deep: true,
+            handler(data) {
+                this.runOutput = data;
+            }
+        },
+        runOutput: {
+            immediate: true,
+            deep: true,
+            handler(data) {
+                this.fixes = data?.fixes || [];
             }
         }
     }
@@ -494,5 +526,16 @@ export default {
         display: flex;
         align-items: center;
         justify-content: space-between;
+    }
+    .bar-wrapper {
+        width: 5em;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    .bar-text {
+        line-height: 1;
     }
 </style>

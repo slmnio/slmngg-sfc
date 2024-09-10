@@ -1,7 +1,8 @@
 const { isEventStaffOrHasRole } = require("../action-utils/action-permissions");
 const { MapObject } = require("../discord/managers");
 const { getAll,
-    findMember
+    findMember,
+    cleanID
 } = require("../action-utils/action-utils");
 const client = require("../discord/client");
 const { getDiscordIcon } = require("../discord/role-icon");
@@ -11,6 +12,8 @@ const { GuildFeature,
 } = require("discord-api-types/v10");
 const { PermissionsBitField,
 } = require("discord.js");
+
+const Cache = require("../cache.js");
 
 function multiple(num, singular, plural) {
     if (num === 1) return num + " " + singular;
@@ -160,6 +163,14 @@ module.exports = {
             let i = -1;
             for (const team of teams) {
                 i++;
+                Cache.set(`create-event-discord-items-${eventID}`, {
+                    working: true,
+                    bar: {
+                        current: i + 1,
+                        total: teams.length
+                    },
+                    text: `Processing ${team?.name}`
+                });
                 const theme = await this.helpers.get(team?.theme?.[0]);
                 console.log(`[Discord-Automation] team ${i + 1}/${teams.length}`);
                 const teamControl = new MapObject(team.discord_control);
@@ -561,7 +572,7 @@ module.exports = {
                 "Discord Control": eventControl.textMap
             });
 
-            return {
+            const output = {
                 status: [
                     multiple(responseCounts.teamsProcessed, "team processed", "teams processed"),
                     multiple(responseCounts.teamsUpdated, "team updated", "teams updated"),
@@ -571,6 +582,12 @@ module.exports = {
                 ].join("\n"),
                 fixes
             };
+            Cache.set(`create-event-discord-items-${cleanID(eventID)}`, {
+                working: false,
+                complete: true,
+                output
+            });
+            return output;
             // eslint-disable-next-line no-useless-catch
         } catch (e) {
             throw e;

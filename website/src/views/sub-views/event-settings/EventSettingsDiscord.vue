@@ -390,7 +390,7 @@ export default {
         },
         liveRunData() {
             if (!this.event?.id) return null;
-            return ReactiveRoot(`create-event-discord-items-${cleanID(this.event?.id)}`);
+            return ReactiveRoot(`create-event-discord-items-${cleanID(this.event?._original_data_id || this.event?.id)}`);
         }
     },
     methods: {

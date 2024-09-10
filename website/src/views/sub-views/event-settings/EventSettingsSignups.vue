@@ -40,8 +40,8 @@
                         {{ changeCount }} change{{ changeCount === 1 ? '' : 's' }}
                     </div>
                     <b-button variant="success" :disabled="processing.signupData" @click="confirmModal = !confirmModal">
-                        Save
-                        player signup data
+                        <i class="fas fa-fw mr-1" :class="processing.signupData ? 'fa-cog fa-spin': 'fa-cogs'"></i>
+                        Save player signup data
                     </b-button>
                 </div>
             </div>

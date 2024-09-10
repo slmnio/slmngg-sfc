@@ -107,12 +107,14 @@ module.exports = {
 
                 if (playerData.team_id) airtablePlayerData["Member Of"] = [dirtyID(playerData.team_id)];
 
-                if (airtablePlayerData["Name"]) {
+                if (airtablePlayerData["Name"] && airtablePlayerData["Name"] !== "") {
+                    console.log("Creating new player", airtablePlayerData);
                     const playerRecords = await this.helpers.createRecord("Players", airtablePlayerData);
                     if (playerRecords?.error) {
+                        console.error(playerRecords.error.errorMessage);
                         actionResponse.errors.push(playerRecords.error.errorMessage);
                     } else {
-                        player = deAirtable(playerRecords?.[0]);
+                        player = deAirtable(playerRecords?.[0]?.fields);
                     }
                 } else {
                     actionResponse.errors.push("No name for this player, won't create a new record");
@@ -192,7 +194,7 @@ module.exports = {
                     }
                     if (!signupRecord) {
                         // create
-                        console.log("Creating player", airtableSignupData);
+                        console.log("Creating signup data", airtableSignupData);
                         const newSignupRecords = await this.helpers.createRecord("Signup Data", {
                             Player: [dirtyID(player.id)],
                             Event: [dirtyID(eventID)],
@@ -201,7 +203,7 @@ module.exports = {
                         if (newSignupRecords?.error) {
                             actionResponse.errors.push(newSignupRecords.error.errorMessage);
                         } else {
-                            signupRecord = deAirtable(newSignupRecords?.[0]);
+                            signupRecord = deAirtable(newSignupRecords?.[0]?.fields);
                             playerUpdateData["Signup Data"] = [...(player.signup_data || []), signupRecord.id];
                         }
 
@@ -294,6 +296,8 @@ module.exports = {
                 });
 
                 if (Object.keys(playerUpdateData)?.length) {
+                    console.log(playerUpdateData);
+                    console.log(player);
                     await this.helpers.updateRecord("Players", player, playerUpdateData);
                 }
             }

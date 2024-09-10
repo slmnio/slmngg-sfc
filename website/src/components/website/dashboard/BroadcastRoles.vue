@@ -78,7 +78,7 @@
             </tbody>
         </table>
         <div class="d-flex justify-content-end p-2 gap-2">
-            <b-button variant="secondary" @click="resetFromServer">
+            <b-button variant="secondary" @click="clearFormData">
                 <i class="fas fa-fw fa-redo"></i> Reset
             </b-button>
             <b-button
@@ -292,10 +292,14 @@ export default {
                     return client?.cams || [];
                 });
             }
+        },
+        "liveMatch.id": {
+            immediate: true,
+            handler(id) {
+                console.log("id change", id);
+                this.resetFromServer();
+            }
         }
-    },
-    mounted() {
-        this.clearFormData();
     }
 };
 </script>

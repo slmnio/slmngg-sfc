@@ -41,7 +41,8 @@
 <script>
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 import MapDisplay from "@/components/website/match/MapDisplay";
-import { getEmbedData } from "@/utils/content-utils";
+import { cleanID, getEmbedData } from "@/utils/content-utils";
+import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 
 export default {
     name: "MatchVOD",
@@ -57,13 +58,40 @@ export default {
             console.log("_match", this.match, !!this.match);
             if (!this.match) return false;
             if (this.match.__loading || !this.match.id) return false;
-            if (this.match && !this.match.vod) return true;
+            if (this.match && !this.vodLink) return true;
             return false;
+        },
+        liveBroadcasts() {
+            if (!this.isAdvertised) return [];
+            return (ReactiveRoot(this.match?.id, {
+                "live_broadcast": ReactiveArray("live_broadcast")
+            })?.live_broadcast) || [];
         },
         vodLink() {
             if (this.useVOD2) return this.match?.vod_2;
             if (this.useAlternativeVOD) return this.match?.alternative_vod;
-            return this.match?.vod;
+            if (this.match?.vod) return this.match?.vod;
+            if (this.isAdvertised && this.liveBroadcasts) {
+                // try and find a broadcast this is on
+                try {
+                    for (const broadcast of this.liveBroadcasts) {
+                        if (broadcast?.stream_url) return broadcast.stream_url;
+                        if (broadcast?.stream_link) {
+                            if (broadcast.stream_link.startsWith("http")) {
+                                return broadcast.stream_link;
+                            } else {
+                                return broadcast.stream_link.replace("twitch.tv", "https://twitch.tv").replace("youtube.com", "https://youtube.com");
+                            }
+                        }
+                        if (broadcast?.channel_username?.[0]) {
+                            return `https://twitch.tv/${broadcast.channel_username[0]}`;
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Broadcast finding failed", e);
+                }
+            }
+            return null;
         },
         theme() {
             return this.match?.event?.theme;
@@ -71,6 +99,10 @@ export default {
         hasBannedMaps() {
             if (!this.match.maps?.length) return false;
             return this.match.maps.some(m => m.banner || m.banned);
+        },
+        isAdvertised() {
+            const liveMatchIDs = (ReactiveRoot("special:live-matches")?.matches || []);
+            return !!(liveMatchIDs.find(id => cleanID(id) === cleanID(this.match?.id)));
         }
     },
     methods: { getEmbedData }

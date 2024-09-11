@@ -196,6 +196,19 @@
             </tbody>
         </table>
 
+        <div>
+            <h3>Copying</h3>
+            <div v-if="anyTeamCategories" class="mb-2">
+                <b-form-checkbox-group v-model="copyCategories" :options="teamCategories" stacked />
+            </div>
+            <b-button-group>
+                <b-button variant="primary" @click="copy(copyTeams.map(t => t?._control?.get('role_id')).filter(Boolean).map(id => `<@&${id}>`).join(' '))">Copy roles</b-button>
+                <b-button variant="primary" @click="copy(copyTeams.map(t => t?._control?.get('text_channel_id')).filter(Boolean).map(id => `<#${id}>`).join('\n'))">Copy text channels</b-button>
+                <b-button variant="primary" @click="copy(copyTeams.map(t => t?._control?.get('voice_channel_id')).filter(Boolean).map(id => `<#${id}>`).join('\n'))">Copy voice channels</b-button>
+            </b-button-group>
+        </div>
+
+
         <textarea v-if="fixes?.length" rows="15" class="bg-dark text-white font-monospace p-2 rounded" :value="fixText"></textarea>
     </div>
 </template>
@@ -222,6 +235,8 @@ export default {
     data: () => ({
         selectedGuildID: "",
         fixes: [],
+
+        copyCategories: [],
 
         processing: {},
         useRoleColorOverride: false,
@@ -340,7 +355,7 @@ export default {
                 };
             }).sort((a,b) => {
                 if (a.team_category && b.team_category) {
-                    const [aIdx, bIdx] = [a,b].map(x => x.team_category.split(";")[0]);
+                    const [aIdx, bIdx] = [a,b].map(x => x.team_category?.split(";")[0]);
                     if (aIdx !== bIdx) {
                         if (aIdx < bIdx) return -1;
                         if (aIdx > bIdx) return 1;
@@ -351,6 +366,20 @@ export default {
         },
         anyTeamCategories() {
             return this.teams.some(t => t.team_category);
+        },
+        teamCategories() {
+            return this.teams.map(t => {
+                const cat = t.team_category?.split(";");
+                return !cat ? null : cat.pop();
+            }).filter((v,i,a) => a.indexOf(v) === i);
+        },
+        copyTeams() {
+            return this.teams.filter(t => {
+                const cat = t.team_category?.split(";");
+                const catCompare = !cat ? null : cat.pop();
+                if (!catCompare) return false;
+                return this.copyCategories.includes(catCompare);
+            });
         },
         roleOptions() {
             return (this.roleData || []).map(role => ({
@@ -382,7 +411,7 @@ export default {
                 if (!teamFixes?.length) return null;
                 return `- ${team?.name}\n` + teamFixes.map(item => {
                     const fixPlayer = ReactiveRoot(item?.playerID);
-                    console.log(item?.type, item, fixPlayer);
+                    // console.log(item?.type, item, fixPlayer);
                     if (!fixPlayer?.name) return null;
                     return `  - [${fixPlayer?.name}](<https://slmn.gg/player/${cleanID(fixPlayer?.id)}>)` + (item.discordTag ? ` (\`${item.discordTag}\`)` : "") + (item.discordID ? ` (id: \`${item.discordID}\` <@${item.discordID}>)` : "");
                 }).filter(Boolean).join("\n");
@@ -443,6 +472,9 @@ export default {
         getHex(colorNum) {
             if (!colorNum) return null;
             return "#" + colorNum.toString(16).padStart(6, "0");
+        },
+        async copy(text) {
+            await navigator.clipboard.writeText(text);
         }
     },
     watch: {
@@ -482,6 +514,13 @@ export default {
             deep: true,
             handler(data) {
                 this.fixes = data?.fixes || [];
+            }
+        },
+        teamCategories: {
+            immediate: true,
+            deep: true,
+            handler(cats) {
+                this.copyCategories = cats;
             }
         }
     }

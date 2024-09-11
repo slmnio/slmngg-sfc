@@ -99,58 +99,67 @@ module.exports = {
             }
 
             const responseCounts = {
-                teamsProcessed: 0,
-                rolesCreated: 0,
-                teamsUpdated: 0,
-                rolesEdited: 0
+                teams: { processed: 0, updated: 0 },
+                roles: { created: 0, edited: 0, deleted: 0, assigned: 0, alreadyAssigned: 0, unassigned: 0 },
+                players: { tagsUpdated: 0 },
+                categories: { created: 0, deleted: 0 },
+                channels: { created: 0, edited: 0, deleted: 0 }
             };
 
             let fixes = [];
 
             let eventTextCategory;
-            if (actions.includes("create_text_channels") || actions.includes("update_text_channels_permissions") || actions.includes("edit_text_channels")) {
+            if (actions.includes("create_text_channels") || actions.includes("edit_text_channels")) {
                 // Get or create category
 
-                if (eventControl.get("team_category_id")) {
-                    try {
-                        eventTextCategory = await guild.channels.fetch(eventControl.get("team_category_id"));
-                    } catch (e) {
-                        console.error(e?.rawError ?? e);
+                if (!settings.textChannels.useTeamCategories) {
+                    if (eventControl.get("team_category_id")) {
+                        try {
+                            eventTextCategory = await guild.channels.fetch(eventControl.get("team_category_id"));
+                            responseCounts.categories.created++;
+                        } catch (e) {
+                            console.error(e?.rawError ?? e);
+                        }
                     }
-                }
 
-                if (!eventTextCategory) {
-                    try {
-                        eventTextCategory = await guild.channels.create({
-                            type: ChannelType.GuildCategory,
-                            name: `${event.name}`,
-                            reason: `Creating text category for ${event.name}`
-                        });
-                        eventControl.push("team_category_id", eventTextCategory.id);
-                    } catch (e) {
-                        console.error(e?.rawError ?? e);
+                    if (!eventTextCategory) {
+                        try {
+                            eventTextCategory = await guild.channels.create({
+                                type: ChannelType.GuildCategory,
+                                name: `${event.name}`,
+                                reason: `Creating text category for ${event.name}`
+                            });
+                            eventControl.push("team_category_id", eventTextCategory.id);
+                            responseCounts.categories.created++;
+                        } catch (e) {
+                            console.error(e?.rawError ?? e);
+                        }
                     }
                 }
             }
             let eventVoiceCategory;
-            if (actions.includes("create_voice_channels") || actions.includes("update_voice_channels_permissions") || actions.includes("edit_voice_channels"))  {
-                if (eventControl.get("team_voice_category_id")) {
-                    try {
-                        eventVoiceCategory = await guild.channels.fetch(eventControl.get("team_voice_category_id"));
-                    } catch (e) {
-                        console.error(e?.rawError ?? e);
+            if (actions.includes("create_voice_channels") || actions.includes("edit_voice_channels"))  {
+                if (!settings.voiceChannels.useTeamCategories) {
+                    if (eventControl.get("team_voice_category_id")) {
+                        try {
+                            eventVoiceCategory = await guild.channels.fetch(eventControl.get("team_voice_category_id"));
+                            responseCounts.categories.created++;
+                        } catch (e) {
+                            console.error(e?.rawError ?? e);
+                        }
                     }
-                }
-                if (!eventVoiceCategory) {
-                    try {
-                        eventVoiceCategory = await guild.channels.create({
-                            type: ChannelType.GuildCategory,
-                            name: `${event.name} VC`,
-                            reason: `Creating voice category for ${event.name}`
-                        });
-                        eventControl.push("team_voice_category_id", eventVoiceCategory.id);
-                    } catch (e) {
-                        console.error(e?.rawError ?? e);
+                    if (!eventVoiceCategory) {
+                        try {
+                            eventVoiceCategory = await guild.channels.create({
+                                type: ChannelType.GuildCategory,
+                                name: `${event.name} VC`,
+                                reason: `Creating voice category for ${event.name}`
+                            });
+                            eventControl.push("team_voice_category_id", eventVoiceCategory.id);
+                            responseCounts.categories.created++;
+                        } catch (e) {
+                            console.error(e?.rawError ?? e);
+                        }
                     }
                 }
             }
@@ -169,7 +178,8 @@ module.exports = {
                         current: i + 1,
                         total: teams.length
                     },
-                    text: `Processing ${team?.name}`
+                    text: `Processing ${team?.name}`,
+                    __tableName: "auto"
                 });
                 const theme = await this.helpers.get(team?.theme?.[0]);
                 console.log(`[Discord-Automation] team ${i + 1}/${teams.length}`);
@@ -181,6 +191,7 @@ module.exports = {
                     try {
                         // ACTION: delete_roles
                         await guild.roles.delete(teamControl.get("role_id"), `Deleting and recreating roles for ${event.name}`);
+                        responseCounts.roles.deleted++;
                     } catch (e) {
                         console.error(e?.rawError ?? e);
                     }
@@ -207,10 +218,10 @@ module.exports = {
                         try {
                             // ACTION: create_roles
                             teamControl.push("role_id", (await guild.roles.create(role))?.id);
+                            responseCounts.roles.created++;
                         } catch (e) {
                             console.error(e?.rawError ?? e);
                         }
-                        responseCounts.rolesCreated++;
                     }
 
                     if (actions.includes("edit_roles") && teamControl.get("role_id")) {
@@ -219,10 +230,10 @@ module.exports = {
                         try {
                             // ACTION: edit_roles
                             await guild.roles.edit(teamControl.get("role_id"), role);
+                            responseCounts.roles.edited++;
                         } catch (e) {
                             console.error(e?.rawError ?? e);
                         }
-                        responseCounts.rolesEdited++;
                     }
                 }
 
@@ -249,9 +260,11 @@ module.exports = {
                             // ACTION: assign_roles
                             if (member.roles?.cache?.has(teamControl.get("role_id"))) {
                                 console.log("Player already has role", team.name, teamControl.get("role_id"), member.id, member.user.username, player.name);
+                                responseCounts.roles.alreadyAssigned++;
                             } else {
                                 await member.roles.add(teamControl.get("role_id"), `Team role for ${event.name}`);
                                 console.log("Role success", team.name, teamControl.get("role_id"), member.id, member.user.username, player.name);
+                                responseCounts.roles.assigned++;
                             }
                         } catch (e) {
                             console.error(e?.rawError ?? e);
@@ -270,6 +283,7 @@ module.exports = {
                                 "Discord ID": member.id,
                                 "Discord Tag": member.user.username
                             });
+                            responseCounts.players.tagsUpdated++;
 
                             fixes.push({
                                 type: "player_details_updated",
@@ -295,6 +309,7 @@ module.exports = {
                                 console.log("[Discord-Automation]", `found member ${roleMember.id} ${roleMember.user.username} who is not a recognised member of ${team.name}`);
                                 // ACTION: unassign_roles
                                 await roleMember.roles.remove(role.id);
+                                responseCounts.roles.unassigned++;
                             }
                         }
                     } catch (e) {
@@ -309,6 +324,7 @@ module.exports = {
                     try {
                         // ACTION: delete_text_channels
                         await guild.channels.delete(teamControl.get("text_channel_id"));
+                        responseCounts.channels.deleted++;
                     } catch (e) {
                         console.error(e?.rawError ?? e);
                     }
@@ -320,6 +336,12 @@ module.exports = {
                 if ((actions.includes("create_text_channels") || actions.includes("update_text_channels_permissions")) && teamControl.get("role_id")) {
                     // set up permissions
                     try {
+                        textChannelPermissions.push({
+                            id: client.user.id, allow: [
+                                PermissionFlagsBits.ViewChannel,
+                                PermissionFlagsBits.ManageChannels
+                            ]
+                        });
                         textChannelPermissions.push({ id: teamControl.get("role_id"), allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages]});
                         textChannelPermissions.push({ id: guild.roles.everyone, deny: [PermissionFlagsBits.ViewChannel]});
 
@@ -363,6 +385,7 @@ module.exports = {
                             });
                             eventTextCategories.set(teamCategory, teamTextCategoryChannel);
                             teamControl.push("team_category_text_category_id", teamTextCategoryChannel.id);
+                            responseCounts.categories.created++;
                         }
                     }
                 }
@@ -398,6 +421,7 @@ module.exports = {
                             });
                             eventVoiceCategories.set(teamCategory, teamVoiceCategoryChannel);
                             teamControl.push("team_category_voice_category_id", teamVoiceCategoryChannel.id);
+                            responseCounts.categories.created++;
                         }
                     }
                 }
@@ -410,6 +434,7 @@ module.exports = {
                         type: ChannelType.GuildText,
                         permissionOverwrites: textChannelPermissions
                     });
+                    responseCounts.channels.created++;
                     teamControl.push("text_channel_id", channel.id);
                 } else if ((actions.includes("update_text_channels_permissions") || actions.includes("edit_text_channels")) && teamControl.get("text_channel_id")) {
                     const channel = await guild.channels.fetch(teamControl.get("text_channel_id"));
@@ -424,13 +449,15 @@ module.exports = {
                         if (actions.includes("edit_text_channels")) {
                             // ACTION: edit_text_channels
                             edit.name = team.name;
-                            if (teamTextCategoryChannel) {
+                            console.log(channel?.parentID, teamTextCategoryChannel?.id);
+                            if (teamTextCategoryChannel && channel?.parentId !== teamTextCategoryChannel?.id) {
                                 edit.parent = teamTextCategoryChannel;
                             }
                         }
 
                         if (edit) {
                             await channel.edit(edit);
+                            responseCounts.channels.edited++;
                         }
                     }
                 }
@@ -440,6 +467,7 @@ module.exports = {
                     try {
                         // ACTION: delete_voice_channels
                         await guild.channels.delete(teamControl.get("voice_channel_id"));
+                        responseCounts.channels.deleted++;
                     } catch (e) {
                         console.error(e?.rawError ?? e);
                     }
@@ -449,6 +477,13 @@ module.exports = {
                 if ((actions.includes("create_voice_channels") || actions.includes("update_voice_channels_permissions")) && teamControl.get("role_id")) {
                     // set up permissions
                     try {
+                        voiceChannelPermissions.push({
+                            id: client.user.id, allow: [
+                                PermissionFlagsBits.ViewChannel,
+                                PermissionFlagsBits.Connect,
+                                PermissionFlagsBits.ManageChannels
+                            ]
+                        });
                         voiceChannelPermissions.push({ id: teamControl.get("role_id"), allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Connect]});
                         voiceChannelPermissions.push({ id: guild.roles.everyone, deny: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Connect]});
 
@@ -476,6 +511,7 @@ module.exports = {
                         type: ChannelType.GuildVoice,
                         permissionOverwrites: voiceChannelPermissions
                     });
+                    responseCounts.channels.created++;
                     teamControl.push("voice_channel_id", channel.id);
                 } else if ((actions.includes("update_voice_channels_permissions") || actions.includes("edit_voice_channels")) && teamControl.get("voice_channel_id")) {
                     const channel = await guild.channels.fetch(teamControl.get("voice_channel_id"));
@@ -496,7 +532,9 @@ module.exports = {
                         }
 
                         if (edit) {
+                            console.log("Editing channel", edit);
                             await channel.edit(edit);
+                            responseCounts.channels.edited++;
                         }
                     }
                 }
@@ -504,9 +542,9 @@ module.exports = {
                     await this.helpers.updateRecord("Teams", team, {
                         "Discord Control": teamControl.textMap
                     });
-                    responseCounts.teamsUpdated++;
+                    responseCounts.teams.updated++;
                 }
-                responseCounts.teamsProcessed++;
+                responseCounts.teams.processed++;
             }
 
 
@@ -514,7 +552,10 @@ module.exports = {
                 // delete text category
                 try {
                     const channel = await guild.channels.fetch(eventControl.get("team_category_id"));
-                    if (channel) await channel.delete("Removing text channels");
+                    if (channel) {
+                        await channel.delete("Removing text channels");
+                        responseCounts.categories.deleted++;
+                    }
                 } catch (e) {
                     console.error("Failed to delete text category", e?.rawError ?? e);
                 }
@@ -523,7 +564,10 @@ module.exports = {
                 // delete text category
                 try {
                     const channel = await guild.channels.fetch(eventControl.get("team_voice_category_id"));
-                    if (channel) await channel.delete("Removing voice channels");
+                    if (channel) {
+                        await channel.delete("Removing voice channels");
+                        responseCounts.categories.deleted++;
+                    }
                 } catch (e) {
                     console.error("Failed to delete text category", e?.rawError ?? e);
                 }
@@ -541,7 +585,10 @@ module.exports = {
                         const textCatID = teamControl.get("team_category_text_category_id");
                         if (textCatID && !deleted.has(textCatID)) {
                             const channel = await guild.channels.fetch(textCatID);
-                            if (channel) await channel.delete("Removing text channels");
+                            if (channel) {
+                                await channel.delete("Removing text channels");
+                                responseCounts.categories.deleted++;
+                            }
                             deleted.add(textCatID);
                         }
                     } catch (e) {
@@ -559,7 +606,10 @@ module.exports = {
                         const voiceCatID = teamControl.get("team_category_voice_category_id");
                         if (voiceCatID && !deleted.has(voiceCatID)) {
                             const channel = await guild.channels.fetch(voiceCatID);
-                            if (channel) await channel.delete("Removing voice channels");
+                            if (channel) {
+                                await channel.delete("Removing voice channels");
+                                responseCounts.categories.deleted++;
+                            }
                             deleted.add(voiceCatID);
                         }
                     } catch (e) {
@@ -574,22 +624,42 @@ module.exports = {
 
             const output = {
                 status: [
-                    multiple(responseCounts.teamsProcessed, "team processed", "teams processed"),
-                    multiple(responseCounts.teamsUpdated, "team updated", "teams updated"),
-                    multiple(responseCounts.rolesCreated, "role created", "roles created"),
-                    multiple(responseCounts.rolesEdited, "role edited", "roles edited"),
+                    responseCounts.teams.processed ? multiple(responseCounts.teams.processed, "team processed", "teams processed") : null,
+                    responseCounts.teams.updated ? multiple(responseCounts.teams.updated, "team updated", "teams updated") : null,
+
+                    responseCounts.roles.created ? multiple(responseCounts.roles.created, "role created", "roles created") : null,
+                    responseCounts.roles.edited ? multiple(responseCounts.roles.edited, "role edited", "roles edited") : null,
+                    responseCounts.roles.deleted ? multiple(responseCounts.roles.deleted, "role deleted", "roles deleted") : null,
+                    responseCounts.roles.assigned ? multiple(responseCounts.roles.assigned, "role assigned", "roles assigned") : null,
+                    responseCounts.roles.alreadyAssigned ? multiple(responseCounts.roles.alreadyAssigned, "roles already assigned", "roless already assigned") : null,
+                    responseCounts.roles.unassigned ? multiple(responseCounts.roles.unassigned, "role unassigned", "roles unassigned") : null,
+
+                    responseCounts.players.tagsUpdated ? multiple(responseCounts.players.tagsUpdated, "player tag updated", "player tags updated") : null,
+
+                    responseCounts.categories.created ? multiple(responseCounts.categories.created, "category created", "categories created") : null,
+                    responseCounts.categories.deleted ? multiple(responseCounts.categories.deleted, "category deleted", "categories deleted") : null,
+
+                    responseCounts.channels.created ? multiple(responseCounts.channels.created, "channel created", "channels created") : null,
+                    responseCounts.channels.deleted ? multiple(responseCounts.channels.deleted, "channel deleted", "channels deleted") : null,
+                    responseCounts.channels.edited ? multiple(responseCounts.channels.edited, "channel edited", "channels edited") : null,
+
                     multiple(fixes.length, "fix", "fixes"),
-                ].join("\n"),
+                ].filter(Boolean).join("\n"),
+                counts: responseCounts,
                 fixes
             };
             Cache.set(`create-event-discord-items-${cleanID(eventID)}`, {
                 working: false,
                 complete: true,
-                output
+                output,
+                __tableName: "auto"
             });
             return output;
-            // eslint-disable-next-line no-useless-catch
         } catch (e) {
+            Cache.set(`create-event-discord-items-${eventID}`, {
+                working: false,
+                __tableName: "auto"
+            });
             throw e;
         } finally {
             working.set(eventID, false);

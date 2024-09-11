@@ -17,12 +17,14 @@ export default {
         checked: {
             immediate: true,
             handler(val) {
+                if (val === null) return;
                 this.$emit("update:active", val);
             }
         },
         active: {
             immediate: true,
             handler(val) {
+                if (val === null) return;
                 this.checked = val;
             }
         }

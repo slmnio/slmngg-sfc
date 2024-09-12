@@ -8,10 +8,11 @@
                 {{ state.toLocaleUpperCase() }}
             </div>
             <div class="metadata d-flex flex-column align-items-center">
-                <div v-if="!customText">
-                    <span v-if="tallyRolesText">{{ tallyRolesText }} </span>
-                    <span v-else><i class="fas fa-exclamation-circle"></i> Not assigned </span>
-                    <span>&middot; {{ client.name }}</span>
+                <div v-if="!customText" class="metadata-text d-flex gap-3">
+                    <span v-if="tallyRolesText">{{ tallyRolesText }}</span>
+                    <span v-else><i class="fas fa-exclamation-circle"></i> Not assigned</span>
+                    <span>&middot;</span>
+                    <span>{{ client.name }}</span>
                 </div>
                 <div v-else>
                     <span>Scenes containing <b>{{ customText }}</b></span>

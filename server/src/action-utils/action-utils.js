@@ -2,6 +2,7 @@ const Airtable = require("airtable");
 const Cache = require("../cache");
 const { StaticAuthProvider } = require("@twurple/auth");
 const { ApiClient } = require("@twurple/api");
+const { verboseLog } = require("../discord/slmngg-log");
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
 const slmngg = airtable.base(process.env.AIRTABLE_APP);
 
@@ -55,6 +56,7 @@ async function updateRecord(Cache, tableName, item, data) {
         ...deAirtable({ ...item, ...data }),
         modified: (new Date((new Date()).getTime() + TimeOffset)).toString()
     };
+    verboseLog(`Editing record on **${tableName}** \`${item.id}\``, slmnggData);
     // Eager update
     Cache.set(cleanID(item.id), slmnggData, { eager: true });
 
@@ -81,7 +83,12 @@ async function updateRecord(Cache, tableName, item, data) {
 async function createRecord(Cache, tableName, records) {
     console.log(`[create record] creating table=${tableName} records=${records.length}`);
     try {
-        let newRecords = await slmngg(tableName).create(records.map(recordData => ({ fields: recordData })));
+        let newRecords = await slmngg(tableName).create(records.map(recordData => {
+            verboseLog(`Creating record on **${tableName}** `, recordData);
+            return {
+                fields: recordData
+            };
+        }));
         newRecords.forEach(record => {
             Cache.set(cleanID(record.id), {
                 ...deAirtable(record.fields),

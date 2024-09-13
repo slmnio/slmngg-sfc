@@ -1,5 +1,8 @@
 const { isEventStaffOrHasRole } = require("../action-utils/action-permissions");
-const { dirtyID, deAirtableRecord } = require("../action-utils/action-utils");
+const { dirtyID, deAirtableRecord,
+    cleanID
+} = require("../action-utils/action-utils");
+const { log } = require("../discord/slmngg-log");
 const working = new Map();
 
 function norm(text) {
@@ -11,6 +14,14 @@ module.exports = {
     key: "set-player-signup-data",
     requiredParams: ["eventID", "playerData", "useSignupData", "createPlayers"],
     auth: ["user"],
+    /**
+     * @param {AnyAirtableID} eventID
+     * @param {object[]} allPlayerData
+     * @param {boolean} useSignupData
+     * @param {boolean} createPlayers
+     * @param {UserData} user
+     * @returns {Promise<*[]>}
+     */
     async handler({ eventID, playerData: allPlayerData, useSignupData, createPlayers }, { user }) {
         if (working.get(eventID)) throw { errorCode: 423, errorMessage: "Currently working on that event, try again later." };
 
@@ -114,6 +125,7 @@ module.exports = {
                     } else {
                         player = deAirtableRecord(playerRecords?.[0]);
                         console.log("new player", player);
+                        await log(`New player created by ${user.airtable.name}: ${player.name} ([SLMN.GG](<https://slmn.gg/player/${cleanID(player.id)}>)) • ([Airtable](<https://airtable.com/apppzANPbAht3LmAQ/tblO3W5VfEglaLwWC/viwQx4cbXGCoCAvzq/${player.id}>)) \n\`\`\`json\n${JSON.stringify(airtablePlayerData, null, 2)}\`\`\``);
                     }
                 } else {
                     actionResponse.errors.push("No name for this player, won't create a new record");

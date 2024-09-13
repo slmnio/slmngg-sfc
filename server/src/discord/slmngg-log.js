@@ -46,7 +46,7 @@ async function log(text) {
 const verboseEmitter = new EventEmitter();
 
 verboseEmitter.on("log", async ({ text, json }) => {
-    const composedText = `${text}\n\`\`\`json\n${JSON.stringify(json,null,2)}\`\`\``;
+    const composedText = `${text}\n\`\`\`json\n${JSON.stringify(json,null,2).slice(0, 1500)}\`\`\``;
     if (process.env.IS_SLMNGG_MAIN_SERVER) {
         text = "[Main] " + composedText;
     }

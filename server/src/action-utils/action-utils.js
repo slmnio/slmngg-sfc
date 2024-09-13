@@ -56,7 +56,7 @@ async function updateRecord(Cache, tableName, item, data) {
         ...deAirtable({ ...item, ...data }),
         modified: (new Date((new Date()).getTime() + TimeOffset)).toString()
     };
-    verboseLog(`Editing record on **${tableName}** \`${item.id}\``, slmnggData);
+    verboseLog(`Editing record on **${tableName}** \`${item.id}\``, data);
     // Eager update
     Cache.set(cleanID(item.id), slmnggData, { eager: true });
 

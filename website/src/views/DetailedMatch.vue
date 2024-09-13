@@ -24,7 +24,7 @@
                             <div class="team-code">{{ team.code }}</div>
                             <div class="team-overlay-text">{{ team.small_overlay_text }}</div>
                             <div class="team-logo bg-center" :style="icon(team)"></div>
-                            <router-link :to="url('team', team, match.event)" class="team-name" />
+                            <router-link :to="url('team', team, match.event)" class="team-name">{{ team.name }}</router-link>
                         </div>
                         <div v-if="showRosters" class="team-players f-col p-1">
                             <div v-for="player in sortPlayers(teamRoster(team))" :key="player.id" class="team-player">
@@ -32,7 +32,7 @@
                                     <div v-if="!showEligibleRoles && (player?.this_event_signup_data?.main_role || player.role)" class="player-role-holder player-icon-holder flex-center">
                                         <div class="player-role" v-html="getRoleSVG(player?.this_event_signup_data?.main_role || player.role)"></div>
                                     </div>
-                                    <div v-if="showEligibleRoles && playerEligibleRoles(player)" class="player-role-holder player-eligible-roles-holder player-icon-holder flex-center">
+                                    <div v-if="showEligibleRoles && playerEligibleRoles(player)" class="player-role-holder player-eligible-roles-holder player-icon-holder flex-center mr-2">
                                         <div v-for="role in playerEligibleRoles(player)" :key="role" class="player-role" v-html="getRoleSVG(role)"></div>
                                     </div>
                                     <component :is="player.limited ? 'div' : 'router-link'" class="ct-active" :to="url('player', player)">{{ player.name }} </component>
@@ -581,6 +581,9 @@ export default {
 
     .player-icon-holder {
         width: 1.5em;
+    }
+    .player-eligible-roles-holder {
+        width: 3em;
     }
     .btn-primary.text-dark-low {
         color: #343a40

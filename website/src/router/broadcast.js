@@ -353,5 +353,10 @@ export default [
             rosterOptions: (route.query.rosterOptions || route.query.roster)?.split(","),
             showMapVideos: !!(route.query.mapVideos || route.query.videos)
         })
+    },
+    {
+        path: "chat",
+        component: () => import("@/components/broadcast/roots/PlatformEmbedder.vue"),
+        props: ({ view: "chat" })
     }
 ];

@@ -44,7 +44,7 @@ module.exports = {
         /** @type {DirtyAirtableID[]} */
         const eventTeamIDs = (event?.teams || []).map(id => dirtyID(id));
 
-        const { players } = await this.helpers.get("internal:lookup-players");
+        const { players: limitedPlayers } = await this.helpers.get("internal:lookup-players");
 
         /*
         * Player signups processing
@@ -79,13 +79,19 @@ module.exports = {
                     battletag: playerData?.battletag,
                     discord_id: playerData?.discord_id,
                 });
-                player = players.find(p => {
+                // THESE PLAYERS ARE
+                let tempPlayer = limitedPlayers.find(p => {
                     if (playerData?.discord_tag && norm(p.discord_tag) === norm(playerData?.discord_tag)) return true;
                     if (playerData?.battletag && norm(p.battletag) === norm(playerData?.battletag)) return true;
                     if (playerData?.discord_id && norm(p.discord_id) === norm(playerData?.discord_id)) return true;
                     return false;
                 });
-                console.log("Player after lookup", player?.name, player?.id);
+                console.log("Player after lookup", tempPlayer?.name, tempPlayer?.id);
+
+                if (tempPlayer?.id) {
+                    player = await this.helpers.get(tempPlayer.id);
+                }
+
             }
 
 

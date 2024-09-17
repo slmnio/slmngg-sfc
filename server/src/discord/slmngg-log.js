@@ -46,7 +46,17 @@ async function log(text) {
 const verboseEmitter = new EventEmitter();
 
 verboseEmitter.on("log", async ({ text, json }) => {
-    const composedText = `${text}\n\`\`\`json\n${JSON.stringify(json,null,2).slice(0, 1500)}\`\`\``;
+
+    const trimmedJSON = structuredClone(json);
+    Object.entries(trimmedJSON).forEach(([key, val]) => {
+        if (Array.isArray(val) && val.length > 15) {
+            trimmedJSON[key] = [
+                `(...) ${val.length} items`
+            ];
+        }
+    });
+
+    const composedText = `${text}\n\`\`\`json\n${JSON.stringify(trimmedJSON,null,2).slice(0, 1500)}\`\`\``;
     if (process.env.IS_SLMNGG_MAIN_SERVER) {
         text = "[Main] " + composedText;
     }

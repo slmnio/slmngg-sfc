@@ -10,6 +10,9 @@
             <CopyTextButton v-if="player.discord_tag" :content="player.discord_tag"><b>Username</b>: {{ player.discord_tag }}</CopyTextButton>
             <CopyTextButton v-if="player.discord_id" :content="player.discord_id"><b>ID</b>: {{ player.discord_id }}</CopyTextButton>
         </div>
+        <div v-else-if="item?.type === 'team_emoji_error'">
+            <i class="fas fa-exclamation fa-fw"></i> {{ item?.errorMessage }}
+        </div>
         <div v-else>
             {{ item.type }}
             <pre>{{ item }}</pre>

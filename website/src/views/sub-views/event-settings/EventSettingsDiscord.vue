@@ -121,6 +121,20 @@
                     <!--                    <b-form-checkbox-group v-model="selectedTeamSettings" stacked :options="teamSettingsOptions" />-->
                     <!--                    <b-form-checkbox-group v-model="selectedRunSettings" stacked :options="runSettingsOptions" />-->
                 </div>
+                <div class="d-flex gap-2 align-items-start justify-content-between opacity-changes mt-3" :class="{'low-opacity': processing['creating'] }">
+                    <div class="settings-group">
+                        <div class="settings-title fw-bold">Team emoji</div>
+                        <b-form-checkbox-group v-model="runSelections.teamEmoji" stacked :options="runOptions.teamEmoji" />
+                        <div v-if="['create_team_emoji', 'edit_team_emoji'].some(x => runSelections.teamEmoji.includes(x))" class="extra-settings">
+                            <div class="mt-2">
+                                <div>Emoji name format</div>
+                                <b-form-input v-model="runSettings.teamEmoji.format" size="sm" placeholder="Emoji name format" />
+                                <span v-for="option in emojiFormatOptions" :key="option" class="mr-1" @click="runSettings.teamEmoji.format += `${runSettings.teamEmoji.format.length ? '_' : ''}{${option}}`">{{ `\{${option}\}` }}</span>
+                                <div v-if="teams?.length">Example from random team: {{ randomTeam?.name }}:  <code>{{ generateEmojiName(randomTeam) }}</code></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="d-flex justify-content-end w-100 mt-3 gap-3 align-items-center">
                     <div v-if="liveRunData?.text" class="text-monospace">
                         {{ liveRunData?.text }}
@@ -150,6 +164,10 @@
                     <th>Role</th>
                     <th>Text channel</th>
                     <th>Voice channel</th>
+                    <th v-if="['create_team_emoji', 'edit_team_emoji'].some(x => runSelections.teamEmoji.includes(x))">
+                        Emoji name
+                    </th>
+                    <th>Emoji</th>
                     <th>Fixes</th>
                 </tr>
             </thead>
@@ -168,20 +186,29 @@
                     </td>
                     <td v-if="anyTeamCategories">{{ team.team_category?.split(";")?.[1] || team.team_category }}</td>
                     <td>
-                        <CopyTextButton v-if="team._control.get('role_id')" :content="`<@&${team._control.get('role_id')}>`">
+                        <CopyTextButton v-if="team._control.get('role_id')" class="snowflake" :content="`<@&${team._control.get('role_id')}>`">
                             {{ team._control.get("role_id") }}
                         </CopyTextButton>
                         <span v-else>Not set</span>
                     </td>
                     <td>
-                        <CopyTextButton v-if="team._control.get('text_channel_id')" :content="`<#${team._control.get('text_channel_id')}>`">
+                        <CopyTextButton v-if="team._control.get('text_channel_id')" class="snowflake" :content="`<#${team._control.get('text_channel_id')}>`">
                             {{ team._control.get("text_channel_id") }}
                         </CopyTextButton>
                         <span v-else>Not set</span>
                     </td>
                     <td>
-                        <CopyTextButton v-if="team._control.get('voice_channel_id')" :content="`<#${team._control.get('voice_channel_id')}>`">
+                        <CopyTextButton v-if="team._control.get('voice_channel_id')" class="snowflake" :content="`<#${team._control.get('voice_channel_id')}>`">
                             {{ team._control.get("voice_channel_id") }}
+                        </CopyTextButton>
+                        <span v-else>Not set</span>
+                    </td>
+                    <td v-if="['create_team_emoji', 'edit_team_emoji'].some(x => runSelections.teamEmoji.includes(x))">
+                        <code>{{ generateEmojiName(team) }}</code>
+                    </td>
+                    <td>
+                        <CopyTextButton v-if="team._control.get('emoji_id')" class="snowflake" :content="team._control.get('emoji_id')">
+                            {{ team._control.get("emoji_id") }}
                         </CopyTextButton>
                         <span v-else>Not set</span>
                     </td>
@@ -196,7 +223,7 @@
             </tbody>
         </table>
 
-        <div>
+        <div v-if="teams?.length">
             <h3>Copying</h3>
             <div v-if="anyTeamCategories" class="mb-2">
                 <b-form-checkbox-group v-model="copyCategories" :options="teamCategories" stacked />
@@ -244,7 +271,8 @@ export default {
         runSelections: {
             roles: [],
             textChannels: [],
-            voiceChannels: []
+            voiceChannels: [],
+            teamEmoji: []
         },
         runSettings: {
             textChannels: {
@@ -261,15 +289,29 @@ export default {
                 roleColorOverride: null,
                 pingable: false,
                 hoist: false
+            },
+            teamEmoji: {
+                format: "{event_short}_{team_name}"
             }
         },
         roleData: null,
-        runOutput: null
+        runOutput: null,
+        emojiFormatOptions: [
+            "team_id",
+            "team_code",
+            "team_name",
+            "team_category",
+            "event_id",
+            "event_name",
+            "event_short"
+        ]
     }),
     computed: {
+        randomTeam() {
+            if (!this.teams?.length) return null;
+            return this.teams?.[Math.floor(Math.random() * this.teams.length)];
+        },
         runOptions() {
-
-
             let roles = [
                 { value: "delete_roles", text: "Delete roles" },
             ];
@@ -320,10 +362,23 @@ export default {
                 ];
             }
 
+            let teamEmoji = [
+                { value: "delete_team_emoji", text: "Delete team emoji" },
+            ];
+            if (this.runSelections.teamEmoji.includes("delete_team_emoji")) {
+                teamEmoji.unshift({ value: "create_team_emoji", text: "Recreate team emoji" });
+            } else {
+                teamEmoji.unshift({ value: "create_team_emoji", text: "Create team emoji" });
+            }
+            if (!(this.runSelections.teamEmoji.includes("delete_team_emoji") || this.runSelections.teamEmoji.includes("create_team_emoji"))) {
+                teamEmoji.push({ value: "edit_team_emoji", text: "Edit team emoji names" });
+            }
+
             return {
                 roles,
                 textChannels,
-                voiceChannels
+                voiceChannels,
+                teamEmoji
             };
         },
         canEditEventSettings() {
@@ -423,6 +478,18 @@ export default {
         }
     },
     methods: {
+        generateEmojiName(team) {
+            return (this.runSettings.teamEmoji.format || "")
+                .replaceAll("{team_id}", team?.id || "")
+                .replaceAll("{team_code}", team?.code || "")
+                .replaceAll("{team_name}", team?.name || "")
+                .replaceAll("{team_category}", (team?.team_category?.includes(";") ? team.team_category.split(";")?.[1] : team?.team_category) || "")
+                .replaceAll("{event_id}", this.event?.id || "")
+                .replaceAll("{event_name}", this.event?.name || "")
+                .replaceAll("{event_short}", this.event?.short || "")
+                .replaceAll(/[^a-zA-Z0-9_]/g, "")
+                .slice(0, 32);
+        },
         async setID() {
             this.processing["guild_id"] = true;
             const response = await authenticatedRequest("actions/set-event-guild", {
@@ -448,6 +515,7 @@ export default {
                         ...this.runSelections.roles,
                         ...this.runSelections.textChannels,
                         ...this.runSelections.voiceChannels,
+                        ...this.runSelections.teamEmoji,
                     ],
                     settings: this.runSettings
                 });
@@ -460,7 +528,7 @@ export default {
                 console.error(e);
             } finally {
                 this.processing["creating"] = false;
-                this.roleData = await this.getGuildRoleData();
+                this.roleData = (await this.getGuildRoleData()) || [];
             }
         },
         async getGuildRoleData() {
@@ -576,5 +644,10 @@ export default {
     }
     .bar-text {
         line-height: 1;
+    }
+    .snowflake {
+        font-family: monospace;
+        font-size: 0.7em;
+        vertical-align: text-top;
     }
 </style>

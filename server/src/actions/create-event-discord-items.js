@@ -23,7 +23,7 @@ function multiple(num, singular, plural) {
 const working = new Map();
 /**
  *
- * @typedef { "edit_roles" | "assign_roles" | "unassign_roles" | "create_roles" | "delete_roles" | "delete_text_channels" | "create_text_channels" | "edit_text_channels" | "update_text_channels_permissions" | "delete_voice_channels" | "create_voice_channels" | "edit_voice_channels" | "update_voice_channels_permissions" } ActionKey
+ * @typedef { "edit_roles" | "assign_roles" | "unassign_roles" | "create_roles" | "delete_roles" | "delete_text_channels" | "create_text_channels" | "edit_text_channels" | "update_text_channels_permissions" | "delete_voice_channels" | "create_voice_channels" | "edit_voice_channels" | "update_voice_channels_permissions", "create_team_emoji", "edit_team_emoji", "delete_team_emoji" } ActionKey
  * */
 module.exports = {
     key: "create-event-discord-items",
@@ -47,6 +47,7 @@ module.exports = {
      * @param {string?} settings.roles.roleColorOverride
      * @param {boolean?} settings.roles.pingable
      * @param {boolean?} settings.roles.hoist
+     * @param {string?} settings.teamEmoji.format
      * @param {UserData} user
      * @returns {Promise<void>}
      */
@@ -100,6 +101,7 @@ module.exports = {
 
             const responseCounts = {
                 teams: { processed: 0, updated: 0 },
+                emoji: { created: 0, edited: 0, deleted: 0 },
                 roles: { created: 0, edited: 0, deleted: 0, assigned: 0, alreadyAssigned: 0, unassigned: 0 },
                 players: { tagsUpdated: 0 },
                 categories: { created: 0, deleted: 0 },
@@ -538,6 +540,77 @@ module.exports = {
                         }
                     }
                 }
+
+
+                /* Team emoji */
+
+                if (actions.includes("delete_team_emoji") && teamControl.get("emoji_id")) {
+                    // delete team emoji
+                    try {
+                        const emoji = await guild.emojis.fetch(teamControl.get("emoji_id"));
+                        if (emoji) {
+                            await emoji.delete("Removing team emoji");
+                            responseCounts.emoji.deleted++;
+                        }
+                    } catch (e) {
+                        console.error(e?.rawError ?? e);
+                    }
+                    teamControl.push("emoji_id", null);
+                }
+                if (actions.includes("edit_team_emoji") || actions.includes("create_team_emoji")) {
+                    const emoji = {};
+                    emoji.name = (settings.teamEmoji.format || "")
+                        .replaceAll("{team_id}", team?.id || "")
+                        .replaceAll("{team_code}", team?.code || "")
+                        .replaceAll("{team_name}", team?.name || "")
+                        .replaceAll("{team_category}", (team?.team_category?.includes(";") ? team.team_category.split(";")?.[1] : team?.team_category) || "")
+                        .replaceAll("{event_id}", event?.id || "")
+                        .replaceAll("{event_name}", event?.name || "")
+                        .replaceAll("{event_short}", event?.short || "")
+                        .replaceAll(/[^a-zA-Z0-9_]/g, "")
+                        .slice(0, 32);
+
+                    if (actions.includes("edit_team_emoji") && teamControl.get("emoji_id") && theme) {
+                        try {
+                            const guildEmoji = await client.emojis.resolve(teamControl.get("emoji_id"));
+                            if (guildEmoji) {
+                                await guildEmoji.edit({
+                                    name: emoji.name
+                                });
+                                responseCounts.emoji.edited++;
+                            }
+                        } catch (e) {
+                            console.error(e?.rawError ?? e);
+                        }
+
+                    } else if (actions.includes("create_team_emoji") && !teamControl.get("emoji_id") && theme) {
+                        // create team emoji
+                        emoji.icon = await getDiscordIcon(theme);
+                        if (emoji.icon) {
+                            try {
+                                console.log(emoji);
+                                const guildEmoji = await guild.emojis.create({
+                                    attachment: emoji.icon,
+                                    name: emoji.name,
+                                    reason: `Creating team emoji for ${team.name}`
+                                }
+                                );
+                                teamControl.push("emoji_id", guildEmoji.id);
+                                responseCounts.emoji.created++;
+                            } catch (e) {
+                                console.error(e?.rawError ?? e);
+                                fixes.push({
+                                    type: "team_emoji_error",
+                                    teamID: team.id,
+                                    errorMessage: e?.rawError?.message,
+                                    errorCode: e?.rawError?.code,
+                                });
+                            }
+                        }
+                    }
+                }
+
+
                 if (starting !== teamControl.textMap) {
                     await this.helpers.updateRecord("Teams", team, {
                         "Discord Control": teamControl.textMap
@@ -642,6 +715,10 @@ module.exports = {
                     responseCounts.channels.created ? multiple(responseCounts.channels.created, "channel created", "channels created") : null,
                     responseCounts.channels.deleted ? multiple(responseCounts.channels.deleted, "channel deleted", "channels deleted") : null,
                     responseCounts.channels.edited ? multiple(responseCounts.channels.edited, "channel edited", "channels edited") : null,
+
+                    responseCounts.emoji.created ? `${responseCounts.emoji.created} emoji created` : null,
+                    responseCounts.emoji.deleted ? `${responseCounts.emoji.deleted} emoji deleted` : null,
+                    responseCounts.emoji.edited ? `${responseCounts.emoji.edited} emoji edited` : null,
 
                     multiple(fixes.length, "fix", "fixes"),
                 ].filter(Boolean).join("\n"),

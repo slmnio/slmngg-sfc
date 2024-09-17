@@ -323,6 +323,7 @@ export default {
             if (!this.nextMatch) slides = slides.filter(s => s !== "Matchup");
             if (!this.currentStage) slides = slides.filter(s => s !== "Standings");
             if (!this.bracket) slides = slides.filter(s => s !== "Bracket");
+            if (!this.hasStaff(this.fullSchedule)) slides = slides.filter(s => s !== "Staff");
             if (this.virtualMatch) slides = slides.filter(s => s !== "Schedule"); // Only going to be 1 match atm so matchup will be fine
             console.log(slides);
 
@@ -334,8 +335,8 @@ export default {
         },
         automatedShow() {
             if (this.breakAutomation?.length && this.lastCountdownTick <= 30 && this.countdownEnd) {
-                if (this.breakAutomation.includes("setting: Always do 30s Schedule")) return "Schedule";
-                if (this.breakAutomation.includes("setting: Always do 30s Matchup") && this.nextMatch) return "Matchup";
+                if (this.breakAutomation.includes("setting: Always do 30s Schedule") && this.schedule?.length) return "Schedule";
+                if (this.breakAutomation.includes("setting: Always do 30s Matchup") && this.nextMatch && this.nextMatch?.teams?.length >= 2) return "Matchup";
             }
             if (this.customBreakAutomation) return this.suggestedShow;
 
@@ -394,7 +395,10 @@ export default {
         countdownTick(x) {
             this.lastCountdownTick = x;
         },
-        resizedImage
+        resizedImage,
+        hasStaff(matches) {
+            return matches.some(match => (match.casters || [])?.length || (match.player_relationships || [])?.length);
+        }
     },
     watch: {
         broadcast() {

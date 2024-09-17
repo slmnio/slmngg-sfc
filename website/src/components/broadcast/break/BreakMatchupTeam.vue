@@ -25,7 +25,7 @@ export default {
         font-size: 3em;
         margin-top: 10px;
         line-height: 0.85;
-        padding: 0 .1em;
-        min-height: 2em;
+        padding: 0 .2em;
+        min-height: 2.25em;
     }
 </style>

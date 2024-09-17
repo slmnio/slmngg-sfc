@@ -22,13 +22,11 @@
                         <b-form-checkbox-group v-model="runSelections.roles" stacked :options="runOptions.roles" />
                         <div v-if="['create_roles', 'edit_roles'].some(x => runSelections.roles.includes(x))" class="extra-settings">
                             <div class="mt-2">
-                                <b-form-checkbox v-model="useRoleColorOverride" switch>
-                                    Use role color override
-                                </b-form-checkbox>
-
-                                <div class="d-flex gap-1 mb-2">
+                                <div>Role color settings</div>
+                                <b-form-select v-model="runSettings.roles.changeColors" :options="changeColorOptions" size="sm" />
+                                <div class="d-flex gap-1 mb-2 mt-1">
                                     <b-form-input
-                                        v-if="useRoleColorOverride"
+                                        v-if="runSettings.roles.changeColors === 'override'"
                                         v-model="runSettings.roles.roleColorOverride"
                                         size="sm"
                                         type="color"
@@ -36,7 +34,7 @@
                                         Role color override
                                     </b-form-input>
                                     <b-form-input
-                                        v-if="useRoleColorOverride"
+                                        v-if="runSettings.roles.changeColors === 'override'"
                                         v-model="runSettings.roles.roleColorOverride"
                                         size="sm"
                                         type="text"
@@ -266,7 +264,6 @@ export default {
         copyCategories: [],
 
         processing: {},
-        useRoleColorOverride: false,
 
         runSelections: {
             roles: [],
@@ -288,7 +285,8 @@ export default {
                 rolePosition: null,
                 roleColorOverride: null,
                 pingable: false,
-                hoist: false
+                hoist: false,
+                changeColors: null
             },
             teamEmoji: {
                 format: "{event_short}_{team_name}"
@@ -307,6 +305,20 @@ export default {
         ]
     }),
     computed: {
+        changeColorOptions() {
+            if (this.runSelections.roles.includes("create_roles")) {
+                return [
+                    { value: null, text: "Use team colors" },
+                    { value: "override", text: "Use color override" },
+                ];
+            } else {
+                return [
+                    { value: null, text: "Don't change role colors" },
+                    { value: "team", text: "Update team colors" },
+                    { value: "override", text: "Update with color override" },
+                ];
+            }
+        },
         randomTeam() {
             if (!this.teams?.length) return null;
             return this.teams?.[Math.floor(Math.random() * this.teams.length)];
@@ -446,8 +458,7 @@ export default {
             }));
         },
         rolePositionOptions() {
-            return (this.roleData || []).map((role, i) => {
-
+            const roles = (this.roleData || []).map((role, i) => {
                 const isTopMost = i === this.roleData.findIndex(r => r.rawPosition === role.rawPosition);
                 return {
                     text: `${isTopMost ? " " : "↑ "}${role.name} (${role.rawPosition})`,
@@ -458,6 +469,13 @@ export default {
                     disabled: !isTopMost
                 };
             });
+            if (roles.length) {
+                return [
+                    { value: null, text: "Don't change role positions" },
+                    ...roles,
+                ];
+            }
+            return [];
         },
         fixText() {
             console.log(JSON.stringify(this.fixes));

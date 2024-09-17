@@ -45,6 +45,7 @@ module.exports = {
      * @param {boolean?} settings.voiceChannels.useTeamCategories
      * @param {number?} settings.roles.rolePosition
      * @param {string?} settings.roles.roleColorOverride
+     * @param {string?} settings.roles.changeColors
      * @param {boolean?} settings.roles.pingable
      * @param {boolean?} settings.roles.hoist
      * @param {string?} settings.teamEmoji.format
@@ -202,7 +203,6 @@ module.exports = {
                 if (actions.includes("edit_roles") || actions.includes("create_roles")) {
                     const role = {
                         name: team.name,
-                        color: settings.roles.roleColorOverride || theme?.color_theme,
                         permissions: new PermissionsBitField(),
                         mentionable: !!settings.roles.pingable,
                         hoist: !!settings.roles.hoist
@@ -212,6 +212,9 @@ module.exports = {
                     }
                     if (settings?.roles?.rolePosition) {
                         role.position = settings.roles.rolePosition;
+                    }
+                    if ((actions.includes("edit_roles") && settings?.roles?.changeColors) || actions.includes("create_roles")) {
+                        role.color = settings.roles.changeColors === "override" ? settings.roles.roleColorOverride : theme?.color_theme;
                     }
 
 

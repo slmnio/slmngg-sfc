@@ -51,13 +51,20 @@
                                     placeholder="Choose roles"
                                     :options="rolePositionOptions" />
                             </div>
-                            <div class="mt-2">
-                                <b-form-checkbox v-model="runSettings.roles.pingable" switch>
-                                    Roles should be pingable
-                                </b-form-checkbox>
-                                <b-form-checkbox v-model="runSettings.roles.hoist" switch>
-                                    Hoist roles
-                                </b-form-checkbox>
+                            <div>
+                                <div class="mt-2">Role pinging</div>
+                                <b-form-select
+                                    v-model="runSettings.roles.pingable"
+                                    size="sm"
+                                    placeholder="Choose roles"
+                                    :options="swapCreateOptions(roleMentionableSettings, runSelections.roles.includes('create_roles'), false)" />
+
+                                <div class="mt-2">Role hoist</div>
+                                <b-form-select
+                                    v-model="runSettings.roles.hoist"
+                                    size="sm"
+                                    placeholder="Choose roles"
+                                    :options="swapCreateOptions(roleHoistSettings, runSelections.roles.includes('create_roles'), false)" />
                             </div>
                             <!-- role hoist -->
                         </div>
@@ -284,8 +291,8 @@ export default {
             roles: {
                 rolePosition: null,
                 roleColorOverride: null,
-                pingable: false,
-                hoist: false,
+                pingable: null,
+                hoist: null,
                 changeColors: null
             },
             teamEmoji: {
@@ -302,6 +309,16 @@ export default {
             "event_id",
             "event_name",
             "event_short"
+        ],
+        roleHoistSettings: [
+            {  value: null, text: "Don't change hoist setting" },
+            {  value: true, text: "Display role members separately from other users" },
+            {  value: false, text: "Don't display role members separately" },
+        ],
+        roleMentionableSettings: [
+            {  value: null, text: "Don't change pingable setting" },
+            {  value: true, text: "Turn role pings on" },
+            {  value: false, text: "Turn role pings off" },
         ]
     }),
     computed: {
@@ -335,7 +352,7 @@ export default {
             if (!this.runSelections.roles.includes("delete_roles") || this.runSelections.roles.includes("create_roles") ) {
                 roles = [
                     ...roles,
-                    { value: "edit_roles", text: "Update role (name/color/icon)" },
+                    { value: "edit_roles", text: "Update role (name/icon)" },
                     { value: "assign_roles", text: "Give team members roles" },
                     { value: "unassign_roles", text: "Remove unknown users from roles" },
                 ];
@@ -496,6 +513,18 @@ export default {
         }
     },
     methods: {
+        swapCreateOptions(options, createActionPresent, defaultBool) {
+            if (!createActionPresent) return options;
+            return options.filter(opt => opt.value !== null).map(opt => {
+                if (opt.value === defaultBool) {
+                    return {
+                        ...opt,
+                        value: null
+                    };
+                }
+                return opt;
+            });
+        },
         generateEmojiName(team) {
             return (this.runSettings.teamEmoji.format || "")
                 .replaceAll("{team_id}", team?.id || "")

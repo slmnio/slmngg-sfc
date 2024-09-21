@@ -4,7 +4,9 @@ import fs from "node:fs";
 import path from "node:path";
 import https from "node:https";
 import { cleanID } from "./action-utils/action-utils.js";
+import { fileURLToPath } from "node:url";
 
+const DIRNAME = path.dirname(fileURLToPath(import.meta.url));
 
 
 function cleanAttID(id) {
@@ -32,7 +34,7 @@ async function heldPromise(parts, promise) {
 }
 
 function getPath(filename, size) {
-    return path.join(import.meta.dirname, "..", "images", size, filename);
+    return path.join(DIRNAME, "..", "images", size, filename);
 }
 
 async function getImage(filename, size) {

@@ -2,11 +2,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { Collection, Events } from "discord.js";
 import client from "./client.js";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+const DIRNAME = path.dirname(fileURLToPath(import.meta.url));
 
 if (client) {
     client.commands = new Collection();
-    const foldersPath = path.join(import.meta.dirname, "commands");
+    const foldersPath = path.join(DIRNAME, "commands");
     const commandFolders = fs.readdirSync(foldersPath);
 
     console.log("[slash] loading slash commands");

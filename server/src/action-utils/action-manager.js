@@ -1,11 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import express from "express";
 import bodyParser from "body-parser";
 import { getSelfClient } from "./action-utils.js";
-
 import { Action, HTTPActionManager, InternalActionManager, SocketActionManager } from "./action-manager-models.js";
+
+const DIRNAME = path.dirname(fileURLToPath(import.meta.url));
 
 let actions = [];
 
@@ -28,7 +29,7 @@ export async function load(expressApp, cors, Cache, io) {
     const actionApp = express.Router();
     actionApp.use(bodyParser.json());
     actionApp.options("/*", cors());
-    actions = (await loadActions(path.join(import.meta.dirname, "..", "actions"))) || [];
+    actions = (await loadActions(path.join(DIRNAME, "..", "actions"))) || [];
 
     /**
      *

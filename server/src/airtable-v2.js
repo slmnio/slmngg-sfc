@@ -2,8 +2,13 @@ import Airtable from "airtable";
 import * as Cache from "./cache.js";
 import customTableUpdate from "./custom-datasets.js";
 import { log } from "./discord/slmngg-log.js";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
 const slmngg = airtable.base(process.env.AIRTABLE_APP);
+
+const DIRNAME = path.dirname(fileURLToPath(import.meta.url));
 
 
 function sortKeys([aKey], [bKey]) {
@@ -345,7 +350,7 @@ export function setup({
         res.send(JSON.stringify(manager.getStatusData(), getCircularReplacer()));
     });
     web.get("/requests", async (req, res) => {
-        res.sendFile(import.meta.dirname + "/request.html");
+        res.sendFile(DIRNAME + "/request.html");
     });
 
     return manager.main(io);

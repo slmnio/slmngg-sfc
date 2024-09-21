@@ -3,9 +3,13 @@ import { REST, Routes } from "discord.js";
 import fs from "node:fs";
 import path from "node:path";
 
+import { fileURLToPath } from "node:url";
+
+const DIRNAME = path.dirname(fileURLToPath(import.meta.url));
+
 const commands = [];
 // Grab all the command files from the commands directory you created earlier
-const foldersPath = path.join(import.meta.dirname, "commands");
+const foldersPath = path.join(DIRNAME, "commands");
 const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {

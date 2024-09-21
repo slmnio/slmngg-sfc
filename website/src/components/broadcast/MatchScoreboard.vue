@@ -1,8 +1,11 @@
 <template>
     <div class="match-scoreboard w-100">
         <transition name="scoreboard-fade">
-            <div v-if="shouldAnimate" class="scoreboard-row scoreboard-header">
-                <div class="scoreboard-team blank"></div>
+            <div v-if="shouldAnimate" class="scoreboard-row scoreboard-header" :style="textBorderColor">
+                <div v-if="scoreboardText" class="scoreboard-team blank text overlay--bg" :style="themeBackground1(broadcast?.event)">
+                    <div class="industry-align">{{ scoreboardText }}</div>
+                </div>
+                <div v-else class="scoreboard-team blank"></div>
                 <div
                     v-for="map in maps"
                     :key="map.id"
@@ -45,7 +48,7 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cleanID, DefaultMapImages, likelyNeededMaps, MapTypeIcons } from "@/utils/content-utils";
+import { cleanID, DefaultMapImages, getFormatOptions, likelyNeededMaps, MapTypeIcons } from "@/utils/content-utils";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import Squeezable from "@/components/broadcast/Squeezable.vue";
@@ -111,6 +114,24 @@ export default {
         mapTypes() {
             if (!this.broadcast?.map_set) return [];
             return this.broadcast.map_set.split(",");
+        },
+        scoreboardText() {
+            if (!this.broadcast?.scoreboard_title_format) return null;
+
+            let format = this.broadcast?.scoreboard_title_format;
+            const formatOptions = getFormatOptions(this.broadcast?.event, this.match);
+
+            Object.entries(formatOptions).forEach(([key, val]) => {
+                format = format.replace(`{${key}}`, val || "");
+            });
+
+            return format.trim();
+        },
+        textBorderColor() {
+            if (!this.scoreboardText) return {};
+            return {
+                borderColor: this.themeBackground1(this.broadcast?.event)?.borderColor
+            };
         }
     },
     methods: {
@@ -252,4 +273,15 @@ export default {
     right: 100%;
     width: 2px;
     height: 60%;
-}</style>
+}
+.scoreboard-team.text {
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    padding: 0 1em;
+}
+.scoreboard-team.text div {
+    font-size: 20px;
+}
+</style>

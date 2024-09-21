@@ -421,6 +421,15 @@ export default {
                 if (!groups[m.type]) groups[m.type] = [];
                 groups[m.type].push({ id: m.id, name: m.name });
             });
+
+            if (this.restrictToMapPool && mapType && Object.keys(groups).length === 0) {
+                // if it finishes with nothing, show all instead
+                this.availableMaps.forEach(m => {
+                    if (!groups[m.type]) groups[m.type] = [];
+                    groups[m.type].push({ id: m.id, name: m.name });
+                });
+            }
+
             return [
                 { id: null, label: "Select a map", text: "Select a map", value: null },
                 ...Object.entries(groups).map(([groupName, maps]) => ({ label: groupName, options: maps.map(m => ({ value: m.id, text: m.name })) }))

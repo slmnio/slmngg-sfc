@@ -17,7 +17,7 @@
 import TeamMapStats from "@/components/website/match/TeamMapStats";
 
 export default {
-    name: "MatchMapHistory",
+    name: "MatchMapStats",
     components: { TeamMapStats },
     props: ["data", "map", "showUnplayedMaps"],
     computed: {

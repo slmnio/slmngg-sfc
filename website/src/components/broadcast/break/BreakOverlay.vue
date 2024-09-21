@@ -137,7 +137,7 @@
                                 v-else-if="automatedShow === 'Staff'"
                                 key="Staff"
                                 class="break-col break-staff-list"
-                                :matches="fullSchedule" />
+                                :matches="staffSchedule" />
                             <BreakMatchup
                                 v-else-if="automatedShow === 'Matchup'"
                                 :key="`Matchup-${nextMatch ? nextMatch.id : ''}`"
@@ -227,6 +227,14 @@ export default {
                     theme: ReactiveThing("theme")
                 })
             });
+        },
+        staffSchedule() {
+            if ((this.broadcast?.broadcast_settings || []).includes("Only show live match staff on break")) {
+                return [this.nextMatch];
+            } else if ((this.broadcast?.broadcast_settings || []).includes("Only show primary matches staff on break")) {
+                return this.fullSchedule.filter(match => match.show_on_overlays);
+            }
+            return this.fullSchedule;
         },
         fullSchedule() {
             if (this.virtualMatch) return [this.virtualMatch];
@@ -319,12 +327,13 @@ export default {
             if (!this.breakAutomation?.length) return null;
 
             let slides = this.breakAutomation.filter(s => s.startsWith("use:")).map(s => s.replace("use: ", ""));
-            console.log(slides);
+            console.log("pre", slides);
             if (!this.nextMatch) slides = slides.filter(s => s !== "Matchup");
             if (!this.currentStage) slides = slides.filter(s => s !== "Standings");
             if (!this.bracket) slides = slides.filter(s => s !== "Bracket");
+            if (!this.hasStaff(this.staffSchedule)) slides = slides.filter(s => s !== "Staff");
             if (this.virtualMatch) slides = slides.filter(s => s !== "Schedule"); // Only going to be 1 match atm so matchup will be fine
-            console.log(slides);
+            console.log("post", slides);
 
             if (slides?.includes("Schedule") && this.countdownEnd && this.lastCountdownTick <= 30) {
                 return "Schedule";
@@ -334,8 +343,8 @@ export default {
         },
         automatedShow() {
             if (this.breakAutomation?.length && this.lastCountdownTick <= 30 && this.countdownEnd) {
-                if (this.breakAutomation.includes("setting: Always do 30s Schedule")) return "Schedule";
-                if (this.breakAutomation.includes("setting: Always do 30s Matchup") && this.nextMatch) return "Matchup";
+                if (this.breakAutomation.includes("setting: Always do 30s Schedule") && this.schedule?.length) return "Schedule";
+                if (this.breakAutomation.includes("setting: Always do 30s Matchup") && this.nextMatch && this.nextMatch?.teams?.length >= 2) return "Matchup";
             }
             if (this.customBreakAutomation) return this.suggestedShow;
 
@@ -394,7 +403,10 @@ export default {
         countdownTick(x) {
             this.lastCountdownTick = x;
         },
-        resizedImage
+        resizedImage,
+        hasStaff(matches) {
+            return matches.some(match => (match.casters || [])?.length || (match.player_relationships || [])?.length);
+        }
     },
     watch: {
         broadcast() {

@@ -20,7 +20,8 @@ export default {
         color: var(--theme);
     }
     .sub-page-nav:deep(.nav-link.active) ,
-    .sub-page-nav:deep(.nav-link.router-link-exact-active) ,
+    .sub-page-nav:deep(.nav-link.router-link-exact-active),
+    .sub-page-nav:deep(.nav-link.rl-active),
     .sub-page-nav:deep(.nav-link:not(.themed):hover)   {
         color: var(--theme-active, #66D9FF);
     }

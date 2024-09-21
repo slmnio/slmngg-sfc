@@ -10,12 +10,14 @@
     "serve-website": "pnpm dev"
   },
   "dependencies": {
+    "@handsontable/vue3": "^14.5.0",
     "@unhead/vue": "^1.9.7",
     "@vueuse/core": "^10.9.0",
     "@vueuse/router": "^10.9.0",
     "bootstrap": "^5.3.3",
     "bootstrap-vue-next": "^0.17.6",
     "client-zip": "^2.4.5",
+    "handsontable": "^14.5.0",
     "howler": "^2.2.4",
     "image-js": "^0.35.3",
     "ini": "^4.1.2",

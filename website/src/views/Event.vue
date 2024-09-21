@@ -15,8 +15,9 @@
             <li v-if="event.theme" class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
             <li v-if="event.about" class="nav-item ct-passive"><router-link class="nav-link" :to="subLink('about')">About</router-link></li>
             <!--            <li class="nav-item" v-if="team.matches"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>-->
-
-
+            <li v-if="canEditEventSettings" class="nav-item ct-passive">
+                <router-link class="nav-link" :to="subLink('settings')" active-class="rl-active">Settings</router-link>
+            </li>
             <ul v-if="event.socials" class="socials d-flex">
                 <li class="nav-item">
                     <Social v-for="social in event.socials" :key="social.id" class="ct-active" :social="social" />
@@ -28,7 +29,7 @@
             </li>
         </SubPageNav>
 
-        <router-view :event="event" />
+        <router-view :event="event" :is-minisite="isMinisite" />
     </div>
 </template>
 
@@ -41,6 +42,8 @@ import Social from "@/components/website/Social";
 import { themeBackground1 } from "@/utils/theme-styles";
 import { resizedImageNoWrap } from "@/utils/images";
 import { cleanID } from "@/utils/content-utils";
+import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
+import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "Event",
@@ -141,6 +144,11 @@ export default {
             } catch (e) {
                 return null;
             }
+        },
+        canEditEventSettings() {
+            const { isAuthenticated, user } = useAuthStore();
+            if (!isAuthenticated) return false;
+            return isEventStaffOrHasRole(user, { event: this.event, websiteRoles: ["Can edit any event"] });
         }
     },
     methods: {

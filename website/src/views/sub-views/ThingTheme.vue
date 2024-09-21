@@ -26,8 +26,12 @@
         <div v-if="colors.length" class="color-list mb-3">
             <div v-for="color in colors" :key="color.name" class="color">
                 <div class="color-swatch" :style="{backgroundColor: color.value}"></div>
-                <div class="color-name">{{ color.name }}: <CopyTextButton><code>{{ color.value }}</code></CopyTextButton> </div>
+                <div class="color-name">{{ color.name }}: <CopyTextButton><code>{{ safeColor(color.value) }}</code></CopyTextButton> </div>
             </div>
+        </div>
+
+        <div v-if="colors.length" class="mb-3">
+            <b-form-checkbox v-model="removeHashInHex" switch>Remove hash from hex codes</b-form-checkbox>
         </div>
 
         <!--        <h3>Hero</h3>-->
@@ -90,6 +94,8 @@ import { bg, resizedImageNoWrap } from "@/utils/images";
 import { getDataServerAddress } from "@/utils/fetch";
 import CopyTextButton from "@/components/website/CopyTextButton";
 import { url } from "@/utils/content-utils";
+import { mapWritableState } from "pinia";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");
@@ -100,6 +106,7 @@ export default {
     components: { CopyTextButton, /* HeroColorControls, RecoloredHero, */ BracketTeam, IngameTeam, ContentRow, ContentThing, StandingsTeam },
     props: ["team", "event"],
     computed: {
+        ...mapWritableState(useSettingsStore, ["removeHashInHex"]),
         // heroes() {
         //     return (ReactiveRoot("Heroes", {
         //         ids: ReactiveArray("ids")
@@ -164,7 +171,12 @@ export default {
         dataServerURL(path) {
             return `${getDataServerAddress()}/${path}`;
         },
-        url
+        url,
+        safeColor(col) {
+            col = col.trim();
+            if (this.removeHashInHex) col = col.replace("#", "");
+            return col;
+        }
     }
 };
 </script>
@@ -202,6 +214,7 @@ export default {
         width: 1em;
         height: 1em;
         margin-right: 4px;
+        flex-shrink: 0;
     }
     .color-name {
         text-transform: uppercase;

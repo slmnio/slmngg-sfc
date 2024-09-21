@@ -1,5 +1,27 @@
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import * as Cache from "../../../cache.js";
+import getInternalManager from "../../../action-utils/action-manager";
+
+const SERVERS = [
+    {
+        name: "EU West",
+        region: "eu",
+        domain: "srt://eu.borpa.business:10000",
+        feeds: {
+            push: (streamId, latency) => `?streamid=publish/${streamId}&latency=${latency * 1000}`,
+            view: (streamId, latency) => `?streamid=play/${streamId}&latency=${latency * 1000}`
+        }
+    },
+    {
+        name: "US East",
+        region: "na",
+        domain: "srt://na.borpa.business:10000",
+        feeds: {
+            push: (streamId, latency) => `?streamid=#!::m=publish,r=${streamId}&latency=${latency * 1000}`,
+            view: (streamId, latency) => `?streamid=#!::m=request,r=${streamId}&latency=${latency * 1000}`
+        }
+    }
+];
 
 export default {
     data: new SlashCommandBuilder()
@@ -11,16 +33,10 @@ export default {
         .addStringOption(option =>
             option.setName("region")
                 .setDescription("SRT server region")
-                .addChoices(
-                    {
-                        name: "EU West (default)",
-                        value: "eu"
-                    },
-                    {
-                        name: "US East",
-                        value: "na"
-                    }
-                ))
+                .addChoices(SERVERS.map(server => ({
+                    name: server.name,
+                    value: server.region
+                }))))
         .addIntegerOption(option =>
             option.setName("latency")
                 .setDescription("Latency of the SRT Feed (in ms)")
@@ -31,32 +47,63 @@ export default {
         await interaction.deferReply();
 
         let feedId = interaction.options.getString("feed")?.toLocaleLowerCase();
-        let targetUser = interaction.options.getUser("user") ?? interaction.user;
+
+        let targetUser, targetPlayer, playerClient;
 
         if (!feedId) {
-            let targetPlayer = await Cache.auth.getPlayer(targetUser.id);
-            let playerClient = await Cache.get(targetPlayer?.clients?.[0]);
+            targetUser = interaction.options.getUser("user") ?? interaction.user;
+            targetPlayer = await Cache.auth.getPlayer(targetUser.id);
+            playerClient = await Cache.get(targetPlayer?.clients?.[0]);
             if (!playerClient || !playerClient?.key) {
-                return interaction.followUp("Couldn't find a feed");
+                return interaction.followUp("Couldn't find a client for the specified player");
             }
             feedId = playerClient?.key;
         }
 
-        const region = interaction.options.getString("region") ?? "eu";
-        const latency = interaction.options.getInteger("latency") ?? 500;
+        const region = interaction.options.getString("region");
+        const selectedServer = region ? SERVERS.find(server => region === server.region) : SERVERS[0];
+        const latencyMs = interaction.options.getInteger("latency") ?? 500;
+
+        let footer;
+
+        if (targetPlayer) {
+            const newFeed = selectedServer.domain + selectedServer.feeds.view(feedId, latencyMs);
+            if (targetPlayer?.remote_feed === newFeed) {
+                footer = `Remote feed URL stored on ${targetUser.id === interaction.user.id ? "your" : targetPlayer.name + "'s"} player profile.`;
+            } else {
+                const internalManager = getInternalManager();
+
+                if (internalManager) {
+                    try {
+                        await internalManager.runActionAsAutomation("set-player-remote-feed", {
+                            player: targetPlayer,
+                            feed: newFeed
+                        });
+                        footer = `New remote feed URL updated on ${targetUser.id === interaction.user.id ? "your" : targetPlayer.name + "'s"} player profile.`;
+                    } catch (e) {
+                        console.error("Error setting player remote feed", e);
+                    }
+                } else {
+                    console.warn("Couldn't load internal manager");
+                }
+            }
+        }
 
         const embed = new EmbedBuilder()
             .setTitle("SRT Observer URLs")
             .addFields([
                 {
                     name: "Observer",
-                    value: `\`srt://${region}.borpa.business:10000?streamid=publish/${feedId}&latency=${latency * 1000}\``
+                    value: `\`\`\`${selectedServer.domain + selectedServer.feeds.push(feedId, latencyMs)}\`\`\``
                 },
                 {
                     name: "Producer",
-                    value: `\`srt://${region}.borpa.business:10000?streamid=play/${feedId}&latency=${latency * 1000}\``
+                    value: `\`\`\`${selectedServer.domain + selectedServer.feeds.view(feedId, latencyMs)}\`\`\``
                 }
             ]);
+        if (footer) {
+            embed.setFooter({ text: footer });
+        }
 
         return interaction.followUp({
             embeds: [embed]

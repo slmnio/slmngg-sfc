@@ -49,10 +49,6 @@
                                 <td>MVP</td>
                                 <td><LinkedPlayers :players="[match.mvp]" /></td>
                             </tr>
-                            <tr v-if="replayCodes">
-                                <td>Replay codes</td>
-                                <td>{{ replayCodes }}</td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -89,7 +85,7 @@ export default {
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme"),
                     player_relationships: ReactiveArray("player_relationships"),
-                    broadcasts: ReactiveThing("broadcasts")
+                    broadcasts: ReactiveArray("broadcasts")
                 }),
                 casters: ReactiveArray("casters"),
                 player_relationships: ReactiveArray("player_relationships", {

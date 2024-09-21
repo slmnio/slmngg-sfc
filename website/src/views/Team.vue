@@ -3,11 +3,11 @@
         <ThingTop :thing="team" type="team" :theme-u-r-l="subLink('theme')" />
         <SubPageNav class="my-2">
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">{{ showPublicTeamDetails === true ? 'Details' : 'Overview' }}</router-link></li>
+            <li v-if="team.players?.length && useTeamCompositions" class="nav-item"><router-link class="nav-link" :to="subLink('details')">Details</router-link></li>
             <li v-if="team.matches" class="nav-item"><router-link class="nav-link" :to="subLink('matches')">Matches</router-link></li>
-            <li v-if="useTeamCompositions" class="nav-item"><router-link class="nav-link" :to="subLink('composition')">Composition</router-link></li>
             <li v-if="team.theme" class="nav-item"><router-link class="nav-link" :to="subLink('theme')">Theme</router-link></li>
-            <li v-if="team.theme" class="nav-item"><router-link class="nav-link" :to="subLink('previous')">Previous Teams</router-link></li>
-            <!--            <li class="nav-item"><router-link class="nav-link" :to="subLink('details')">Details</router-link></li>-->
+            <li v-if="team.players?.length" class="nav-item"><router-link class="nav-link" :to="subLink('previous')">Previous Teams</router-link></li>
+            <li v-if="canEditEventSettings" class="nav-item"><router-link class="nav-link" :to="subLink('settings')">Settings</router-link></li>
 
             <ul v-if="team.socials" class="socials d-flex">
                 <li class="nav-item">
@@ -26,6 +26,8 @@ import SubPageNav from "@/components/website/SubPageNav";
 import Social from "@/components/website/Social";
 import { resizedImageNoWrap } from "@/utils/images";
 import { cleanID } from "@/utils/content-utils";
+import { useAuthStore } from "@/stores/authStore";
+import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 
 export default {
     name: "Team",
@@ -94,7 +96,12 @@ export default {
             }
         },
         useTeamCompositions() {
-            return this.eventSettings?.composition?.use && (this.team?.players || []).some(p => p.composition_tank_sr || p.composition_dps_sr || p.composition_support_sr);
+            return this.eventSettings?.composition?.use;
+        },
+        canEditEventSettings() {
+            const { isAuthenticated, user } = useAuthStore();
+            if (!isAuthenticated || !this.team?.event) return false;
+            return isEventStaffOrHasRole(user, { event: this.team?.event, websiteRoles: ["Can edit any event"] });
         }
     },
     methods: {

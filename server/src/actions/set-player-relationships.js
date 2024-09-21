@@ -43,32 +43,44 @@ export default {
         const matchRelationships = await Promise.all((match.player_relationships || []).map(id => this.helpers.get(id)));
 
         const newToAdd = [];
+        const casterIDs = [];
 
         console.log(roles);
 
         for (const roleKey in roles) {
-            for (const playerID of roles[roleKey].selected) {
-                if (!playerID) continue;
-                const player = await this.helpers.get(playerID);
-                if (!player?.id) continue;
-                const playerRelationships = await Promise.all((player.player_relationships || []).map(id => this.helpers.get(id)));
 
-                const realRelation = playerRelationships.filter((x) => x.singular_name === roleKey);
-                if (realRelation.length) {
-                    newToAdd.push(realRelation[0].id);
-                } else {
-                    const [newRelationship] = await this.helpers.createRecord("Player Relationships", {
-                        "Singular Name": roleKey,
-                        "Player": [dirtyID(player.id)],
-                        ...getLanguage(roleKey),
-                        "Permissions": getPermissions(roleKey)
-                    });
+            if (roleKey === "Caster") {
+                // add as match.caster instead of player relationship
+                for (const playerID of roles[roleKey].selected) {
+                    if (!playerID) continue;
+                    const player = await this.helpers.get(playerID);
+                    if (!player?.id) continue;
+                    casterIDs.push(player.id);
+                }
+            } else {
+                for (const playerID of roles[roleKey].selected) {
+                    if (!playerID) continue;
+                    const player = await this.helpers.get(playerID);
+                    if (!player?.id) continue;
+                    const playerRelationships = await Promise.all((player.player_relationships || []).map(id => this.helpers.get(id)));
 
-                    await this.helpers.updateRecord("Players", player, {
-                        "Player Relationships": [...(player.player_relationships || []), newRelationship.id]
-                    });
+                    const realRelation = playerRelationships.filter((x) => x.singular_name === roleKey);
+                    if (realRelation.length) {
+                        newToAdd.push(realRelation[0].id);
+                    } else {
+                        const [newRelationship] = await this.helpers.createRecord("Player Relationships", {
+                            "Singular Name": roleKey,
+                            "Player": [dirtyID(player.id)],
+                            ...getLanguage(roleKey),
+                            "Permissions": getPermissions(roleKey)
+                        });
 
-                    newToAdd.push(newRelationship.id);
+                        await this.helpers.updateRecord("Players", player, {
+                            "Player Relationships": [...(player.player_relationships || []), newRelationship.id]
+                        });
+
+                        newToAdd.push(newRelationship.id);
+                    }
                 }
             }
         }
@@ -82,7 +94,8 @@ export default {
         const newRelationshipIDs = [...newToAdd, ...nonDashboardRelationships].filter((v, i, a) => a.indexOf(v) === i);
 
         let response = await this.helpers.updateRecord("Matches", match, {
-            "Player Relationships": newRelationshipIDs
+            "Player Relationships": newRelationshipIDs,
+            "Casters": casterIDs
         });
 
         if (response?.error) {

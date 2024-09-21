@@ -10,9 +10,22 @@ export default [
             { path: "", component: () => import("@/views/sub-views/team/TeamMainPage.vue") },
             { path: "matches", component: () => import("@/views/sub-views/team/TeamSchedule.vue") },
             { path: "theme", component: () => import("@/views/sub-views/ThingTheme.vue") },
-            { path: "details", component: () => import("@/views/sub-views/team/TeamDetails.vue") },
-            { path: "composition", component: () => import("@/views/sub-views/team/TeamComposition.vue") },
-            { path: "previous", component: () => import("@/views/sub-views/team/TeamPrevious.vue") }
+            { path: "old-details", component: () => import("@/views/sub-views/team/TeamDetails.vue") },
+            { path: "details", alias: ["composition"], component: () => import("@/views/sub-views/team/TeamComposition.vue") },
+            { path: "previous", component: () => import("@/views/sub-views/team/TeamPrevious.vue") },
+            {
+                path: "settings",
+                component: () => import("@/views/sub-views/team-settings/TeamSettings.vue"),
+                meta: {
+                    requiresAuth: true
+                },
+                children: [
+                    {
+                        path: "",
+                        component: () => import("@/views/sub-views/event-settings/EventSettingsSignups.vue"),
+                    }
+                ]
+            }
         ]
     },
     {
@@ -62,7 +75,7 @@ export default [
         props: route => ({ id: route.params.id }),
         children: [
             { path: "", component: () => import("@/views/sub-views/MatchVOD.vue") },
-            { path: "history", component: () => import("@/views/sub-views/MatchHistory.vue") },
+            { path: "history", component: () => import("@/views/sub-views/MatchStats.vue") },
             { path: "editor", component: () => import("@/views/sub-views/event/EventMatchEditor.vue"), meta: { requiresAuth: true } }
         ]
     },

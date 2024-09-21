@@ -27,7 +27,7 @@ export default {
 <style scoped>
     .team {
         width: 100%;
-        height: 80%;
+        height: 85%;
     }
 
     .break-vs {

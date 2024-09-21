@@ -35,7 +35,7 @@ export class BitCounter {
 }
 
 export function sortByMatchDiff(a, b) {
-    const [aMatchDiff, bMatchDiff] = [a, b].map(x => (x.wins || x.standings.wins) - (x.losses || x.standings.losses));
+    const [aMatchDiff, bMatchDiff] = [a, b].map(x => (x.wins ?? x.standings.wins) - (x.losses ?? x.standings.losses));
 
     if (aMatchDiff < bMatchDiff) return 1;
     if (aMatchDiff > bMatchDiff) return -1;
@@ -46,7 +46,7 @@ export function sortByMatchDiff(a, b) {
 }
 
 export function sortByMatchWins(a, b) {
-    const [aMatchDiff, bMatchDiff] = [a, b].map(x => (x.wins || x.standings.wins));
+    const [aMatchDiff, bMatchDiff] = [a, b].map(x => (x.wins ?? x.standings.wins));
 
     if (aMatchDiff < bMatchDiff) return 1;
     if (aMatchDiff > bMatchDiff) return -1;
@@ -54,7 +54,7 @@ export function sortByMatchWins(a, b) {
 }
 
 export function sortByMatchWinsAndPoints(a, b) {
-    const [aNum, bNum] = [a, b].map(x => (x.wins || x.standings.wins) + (x.extra_points || 0));
+    const [aNum, bNum] = [a, b].map(x => (x.wins ?? x.standings.wins) + (x.extra_points ?? 0));
 
     if (aNum < bNum) return 1;
     if (aNum > bNum) return -1;
@@ -62,7 +62,7 @@ export function sortByMatchWinsAndPoints(a, b) {
 }
 
 export function sortByMatchDiffAndPoints(a, b) {
-    const [aNum, bNum] = [a, b].map(x => (x.wins || x.standings.wins) - (x.losses || x.standings.losses) + (x.extra_points || 0));
+    const [aNum, bNum] = [a, b].map(x => (x.wins ?? x.standings.wins) - (x.losses ?? x.standings.losses) + (x.extra_points ?? 0));
 
     if (aNum < bNum) return 1;
     if (aNum > bNum) return -1;
@@ -166,7 +166,7 @@ export function sortByOMapWinrate(a, b) {
 }
 
 export function sortByExtraPoints(a, b) {
-    const [aPoints, bPoints] = [a, b].map(x => (x.extra_points || 0));
+    const [aPoints, bPoints] = [a, b].map(x => (x.extra_points ?? 0));
     if (aPoints !== bPoints) {
         if (aPoints > bPoints) return -1;
         if (aPoints < bPoints) return 1;
@@ -179,7 +179,7 @@ export function sortByMapDiff(a, b) {
     // if (a.map_losses > b.map_losses) return 1;
     // if (a.map_losses < b.map_losses) return -1;
 
-    const [aMapDiff, bMapDiff] = [a, b].map(x => (x.standings.map_wins || x.map_wins) - (x.standings.map_losses || x.map_losses));
+    const [aMapDiff, bMapDiff] = [a, b].map(x => (x.standings.map_wins ?? x.map_wins) - (x.standings.map_losses ?? x.map_losses));
     if (aMapDiff !== bMapDiff) {
         // console.log("[map diff]", aMapDiff, bMapDiff, a, b, aMapDiff > bMapDiff);
         if (aMapDiff > bMapDiff) return -1;
@@ -188,6 +188,7 @@ export function sortByMapDiff(a, b) {
     return 0;
 }
 export function sortByMapWins(a, b) {
+    console.log("map wins", a, a.standings.map_wins ?? a.map_wins, a.standings.map_wins, a.map_wins);
     /*
     * see: https://cdn.discordapp.com/attachments/747939702341894198/904179166776287293/unknown.png
     * if teams are tied by map diff, they should then be sorted by maps won
@@ -198,8 +199,8 @@ export function sortByMapWins(a, b) {
     * where a team has a bunch more losses - but this is very unlikely to occur
     * AND it's unlikely to ever get to this tiebreaking method
     * */
-    if ((a.standings.map_wins || a.map_wins) > (b.standings.map_wins || b.map_wins)) return -1;
-    if ((a.standings.map_wins || a.map_wins) < (b.standings.map_wins || b.map_wins)) return 1;
+    if ((a.standings.map_wins ?? a.map_wins) > (b.standings.map_wins ?? b.map_wins)) return -1;
+    if ((a.standings.map_wins ?? a.map_wins) < (b.standings.map_wins ?? b.map_wins)) return 1;
     return 0;
 }
 

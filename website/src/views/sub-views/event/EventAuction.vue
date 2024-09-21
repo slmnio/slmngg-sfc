@@ -34,15 +34,15 @@
                             border-width=".15em" />
                         <router-link class="no-link-style player-name-link" :to="url('player', activePlayer)" target="_blank">{{ activePlayer?.name || '&nbsp;' }}</router-link>
                         <div
-                            v-if="activePlayer?.role"
+                            v-if="activePlayer?._draftData?.role"
                             class="player-role"
-                            :title="`Main role: ${activePlayer.role}`"
-                            v-html="getRoleSVG(activePlayer.role)"></div>
+                            :title="`Main role: ${activePlayer?._draftData.role}`"
+                            v-html="getRoleSVG(activePlayer?._draftData.role)"></div>
                     </div>
                     <!--                    <h3 class="player-signed">SIGNED TO</h3>-->
                     <div class="player-roles d-flex mb-1">
                         <div
-                            v-for="role in playerRoles(activePlayer?.eligible_roles)"
+                            v-for="role in playerRoles(activePlayer?._draftData?.eligible_roles)"
                             :key="role?.role"
                             v-b-tooltip
                             class="role"
@@ -56,7 +56,7 @@
                         <div v-if="activePlayer?.pronunciation" class="px-2 bg-secondary rounded small"><i class="fas fa-lips fa-fw"></i> {{ activePlayer?.pronunciation }}</div>
                     </div>
                     <div v-if="activePlayer" class="player-info rounded">
-                        {{ activePlayer?.draft_data }}
+                        {{ activePlayer?._draftData?.info_for_captains }}
                     </div>
                 </div>
                 <div class="bids col-5">
@@ -240,21 +240,21 @@
                             :class="{'striped': i % 2 === 1, 'currently-active-player': activePlayer?.id === player.id}">
                             <td class="player-name">
                                 <div class="player-info-box d-flex align-items-center">
-                                    <div v-if="player.role" class="player-role" v-html="getRoleSVG(player.role)"></div>
+                                    <div v-if="player._draftData.role" class="player-role" v-html="getRoleSVG(player._draftData.role)"></div>
                                     <router-link :to="url('player', player)">{{ player.name }}</router-link>
                                 </div>
                                 <div
                                     v-b-tooltip
                                     class="player-eligible-roles"
-                                    :title="`Eligible for ${niceJoin(eligibleRoles(player.eligible_roles).map(r => r.role))}`">
+                                    :title="`Eligible for ${niceJoin(eligibleRoles(player._draftData.eligible_roles).map(r => r.role))}`">
                                     <div
-                                        v-for="role in eligibleRoles(player.eligible_roles)"
+                                        v-for="role in eligibleRoles(player._draftData.eligible_roles)"
                                         :key="role?.role"
                                         class="role text-success"
                                         v-html="getRoleSVG(role?.role)"></div>
                                 </div>
                             </td>
-                            <td class="draft-data">{{ player.draft_data }}</td>
+                            <td class="draft-data">{{ player._draftData.info_for_captains }}</td>
                             <td class="player-buttons-cell">
                                 <div class="buttons d-flex">
                                     <button
@@ -283,7 +283,7 @@
 <script>
 import { socket } from "@/socket";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cleanID, dirtyID, getRoleSVG, money, url } from "@/utils/content-utils";
+import { cleanID, decoratePlayerWithDraftData, dirtyID, getRoleSVG, money, url } from "@/utils/content-utils";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import AuctionCountdown from "@/components/broadcast/auction/AuctionCountdown.vue";
 import AuctionBid from "@/components/website/AuctionBid.vue";
@@ -314,7 +314,7 @@ export default {
     computed: {
         activePlayer() {
             if (!this.activePlayerID) return;
-            return ReactiveRoot(this.activePlayerID, {
+            return decoratePlayerWithDraftData(ReactiveRoot(this.activePlayerID, {
                 member_of: ReactiveArray("member_of", {
                     theme: ReactiveThing("theme"),
                     event: ReactiveThing("event", {
@@ -331,8 +331,9 @@ export default {
                         theme: ReactiveThing("theme")
                     })
                 }),
-                favourite_hero: ReactiveThing("favourite_hero")
-            });
+                favourite_hero: ReactiveThing("favourite_hero"),
+                "signup_data": ReactiveArray("signup_data")
+            }), this.eventID);
         },
         lastStartedTeam() {
             if (!this.lastStartedTeamID) return null;
@@ -491,16 +492,46 @@ export default {
         },
         allPlayers() {
             if (!this.event?.draftable_players?.length) return [];
-            return ReactiveArray("draftable_players", {
-                teams: ReactiveArray("teams")
-            })(this.event);
+            return (ReactiveArray("draftable_players", {
+                teams: ReactiveArray("teams"),
+                "signup_data": ReactiveArray("signup_data")
+            })(this.event) || []).map(player => {
+                if (!player) return {};
+                const thisSignupData = (player.signup_data || []).find(data => cleanID(data?.event?.[0]) === cleanID(this.event?._original_data_id || this.event?.id));
+                const _draftData = thisSignupData ? {
+                    // signup data
+                    role: thisSignupData.main_role,
+                    sr: thisSignupData.sr,
+                    tank_sr: thisSignupData.tank_sr,
+                    dps_sr: thisSignupData.dps_sr,
+                    support_sr: thisSignupData.support_sr,
+                    info_for_captains: thisSignupData.info_for_captains,
+                    eligible_roles: thisSignupData.eligible_roles,
+                    // auction_price: thisSignupData.auction_price,
+                } : {
+                    // basic
+                    role: player.role,
+                    sr: player.manual_sr,
+                    tank_sr: player.composition_tank_sr,
+                    dps_sr: player.composition_dps_sr,
+                    support_sr: player.composition_support_sr,
+                    info_for_captains: player.draft_data,
+                    eligible_roles: player.eligible_roles,
+                    // auction_price: player.auction_price,
+                };
+                return {
+                    ...player,
+                    this_event_signup_data: thisSignupData,
+                    _draftData
+                };
+            });
         },
         undraftedPlayers() {
             const draftingTeamIDs = this.allEventTeams.map(team => team?.id).filter(Boolean).map(id => dirtyID(id));
-            if (!draftingTeamIDs?.length) return [];
+            // if (!draftingTeamIDs?.length) return [];
             return this.allPlayers.filter(player => {
                 return !(player?.member_of || []).some(teamID => draftingTeamIDs.includes(dirtyID(teamID)));
-            }).sort((a, b) => b.manual_sr - a.manual_sr);
+            }).sort((a, b) => b?._draftData?.sr - a?._draftData?.sr);
         },
         searchedPlayers() {
             if (!this.searchText) return this.undraftedPlayers;
@@ -807,7 +838,8 @@ export default {
     .role.text-danger {
         opacity: 0.5;
     }
-    .currently-active-player {
+    .currently-active-player,
+    .currently-active-player td {
         background-color: var(--primary);
     }
 

@@ -2,6 +2,7 @@ import Airtable from "airtable";
 import * as Cache from "../cache.js";
 import { StaticAuthProvider } from "@twurple/auth";
 import { ApiClient } from "@twurple/api";
+import verboseLog from "../discord/slmngg-log";
 
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
 const slmngg = airtable.base(process.env.AIRTABLE_APP);
@@ -56,6 +57,7 @@ export async function updateRecord(Cache, tableName, item, data) {
         ...deAirtable({ ...item, ...data }),
         modified: (new Date((new Date()).getTime() + TimeOffset)).toString()
     };
+    verboseLog(`Editing record on **${tableName}** \`${item.id}\``, data);
     // Eager update
     Cache.set(cleanID(item.id), slmnggData, { eager: true });
 
@@ -82,7 +84,12 @@ export async function updateRecord(Cache, tableName, item, data) {
 export async function createRecord(Cache, tableName, records) {
     console.log(`[create record] creating table=${tableName} records=${records.length}`);
     try {
-        let newRecords = await slmngg(tableName).create(records.map(recordData => ({ fields: recordData })));
+        let newRecords = await slmngg(tableName).create(records.map(recordData => {
+            verboseLog(`Creating record on **${tableName}** `, recordData);
+            return {
+                fields: recordData
+            };
+        }));
         newRecords.forEach(record => {
             Cache.set(cleanID(record.id), {
                 ...deAirtable(record.fields),
@@ -106,11 +113,24 @@ export function deAirtable(obj) {
             console.log("[Action deAirtable] Skipping", key, val);
             delete data[key];
         }
+        if (key === "limited_players" && typeof data[key] === "object") {
+            // reflatten
+            data[key] = data[key].map(limitedPlayer => Object.entries(limitedPlayer).map(([k, v]) => `${k.replaceAll("_"," ")}=${v}`)).join("\n");
+        }
     });
     data.id = obj.id;
     return data;
 }
 
+
+export function deAirtableRecord(record) {
+    console.log("deAirtableRecord", record.id, record.fields);
+    if (!record?.fields) return null;
+    return {
+        ...deAirtable(record.fields),
+        id: record.id
+    };
+}
 export async function getValidHeroes() {
     // Get Heroes table
     // Get any OW hero only
@@ -194,4 +214,59 @@ export function safeInputNoQuotes(string) {
     return string
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
+}
+
+export async function findMember(player, team, guild) {
+    let member;
+    let fixes = [];
+    if (player.discord_id) {
+        try {
+            member = await guild.members.fetch(player.discord_id);
+            if (!member) {
+                fixes.push({
+                    type: "discord_id_not_found",
+                    playerID: player.id,
+                    discordID: player.discord_id,
+                    teamID: team.id
+                });
+                console.warn(fixes[fixes.length - 1]);
+            }
+        } catch (e) {
+            console.error(e?.rawError);
+            fixes.push({
+                type: "discord_id_not_found",
+                playerID: player.id,
+                discordID: player.discord_id,
+                teamID: team.id
+            });
+            console.warn(fixes[fixes.length - 1]);
+        }
+    }
+
+    if (!member && player.discord_tag) {
+        const tag = player.discord_tag.replace("@", "").trim();
+        [member] = (await guild.members.fetch({
+            query: tag,
+            limit: 1,
+        })).values();
+
+        console.log({
+            type: "player_search_results",
+            discordID: member?.id,
+            discordTag: member?.user?.username,
+            tag: player.discord_tag
+        });
+    }
+
+    if (!member) {
+        fixes.push({
+            type: "player_discord_not_found",
+            playerID: player.id,
+            discordID: player.discord_id,
+            discordTag: player.discord_tag,
+            teamID: team.id
+        });
+        console.warn(fixes[fixes.length - 1]);
+    }
+    return { member, fixes };
 }

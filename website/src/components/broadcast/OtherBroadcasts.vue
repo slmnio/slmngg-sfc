@@ -2,10 +2,11 @@
     <div class="other-broadcasts w-100">
         <div v-for="broadcast in broadcasts" :key="broadcast.id" class="broadcast">
             <div class="broadcast-top d-flex">
-                <div class="broadcast-name flex-grow-1">{{ broadcast.relative_name || broadcast.name }}</div>
-                <div v-if="broadcast._stream_link" class="broadcast-link">
+                <div class="broadcast-name flex-grow-1 industry-align">{{ broadcast.relative_name || broadcast.name }}</div>
+                <div v-if="broadcast._stream_link" class="broadcast-link industry-align">
                     <i v-if="broadcast._stream_link.includes('twitch.tv')" class="fab fa-twitch"></i>
-                    {{ (broadcast._stream_link).replace("twitch.tv/", "/") }}
+                    <i v-if="broadcast._stream_link.includes('youtube.com')" class="fab fa-youtube"></i>
+                    {{ (broadcast._stream_link).replace("twitch.tv/", "/").replace("youtube.com/", "/").replace('https://').replace('www.') }}
                 </div>
             </div>
             <div class="broadcast-main d-flex">
@@ -83,7 +84,8 @@ export default {
     },
     methods: {
         teamsString(broadcast) {
-            if (broadcast?.live_match?.special_event && broadcast?.live_match?.custom_name) return broadcast.live_match.custom_name;
+            // this causes double text since the match component will also show the custom name
+            // if (broadcast?.live_match?.special_event && broadcast?.live_match?.custom_name) return broadcast.live_match.custom_name;
             if (!broadcast?.live_match?.teams?.length) return null;
             return (broadcast?.live_match?.teams || []).map(t => t?.name).join(" vs ");
         }

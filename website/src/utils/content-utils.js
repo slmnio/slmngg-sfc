@@ -118,22 +118,18 @@ export function multiImage(theme, keys, minSize = 30, useResizer = true) {
     return url || null;
 }
 
-export function getMatchContext(match) {
-    const text = [];
-    const out = (match?.event?.short || match?.event?.name || "");
+export function getMatchContext(match, { light } = {}) {
+    let pieces = [];
+    if (light) {
+        pieces = [match?.sub_event].filter(Boolean);
+    } else {
+        pieces = [match?.division, match?.sub_event, match?.round || match?.week_text].filter(Boolean);
+    }
+    pieces = pieces.filter((v, i, a) => a.indexOf(v) === i);
 
-    // sub_event: round
-    // week_text: round
-    // week
-    //
+    const eventPrefix = (match?.event?.short || match?.event?.name || "");
 
-    text.push(match?.sub_event || "");
-    if (!(text.length >= 1 && match.round)) text.push(match?.week_text || "");
-    text.push(match?.round || "");
-    // text.push(match?.sub_event || ""); // round > sub_event
-    text.push((match?.week && (!match?.week_text) && `Week ${match?.week}`) || ""); // basically regular season
-    const pieces = text.filter((t, i, a) => !!t && a.indexOf(t) === i);
-    return out + (pieces.length > 0 ? ": " : "") + pieces.join(" · ");
+    return eventPrefix + (pieces.length ? ": " : "") + pieces.join(" · ");
 }
 
 export function getRoleSVG(name) {
@@ -621,10 +617,10 @@ export function autoRecord(team, stage) {
 
 export function getFormatOptions(event, match) {
     return {
-        event: event.name,
-        event_name: event.name,
-        event_long: event.name,
-        event_short: event.short,
+        event: event?.name,
+        event_name: event?.name,
+        event_long: event?.name,
+        event_short: event?.short,
 
         team_1_code: match?.teams?.[0]?.code,
         team_1_name: match?.teams?.[0]?.name,
@@ -636,9 +632,42 @@ export function getFormatOptions(event, match) {
         match_group: match?.match_group,
         match_round: match?.round,
         match_number: match?.match_number,
+        match_division: match?.division,
         match_week_text: match?.week_text,
         match_week_number: match?.week,
         match_day: match?.day,
         match_first_to: match?.first_to
+    };
+}
+
+
+export function decoratePlayerWithDraftData(player, eventID) {
+    if (!player) return {};
+    const thisSignupData = (player.signup_data || []).find(data => cleanID(data?.event?.[0]) === cleanID(eventID));
+    const _draftData = thisSignupData ? {
+        // signup data
+        role: thisSignupData.main_role,
+        sr: thisSignupData.sr,
+        tank_sr: thisSignupData.tank_sr,
+        dps_sr: thisSignupData.dps_sr,
+        support_sr: thisSignupData.support_sr,
+        info_for_captains: thisSignupData.info_for_captains,
+        eligible_roles: thisSignupData.eligible_roles,
+        // auction_price: thisSignupData.auction_price,
+    } : {
+        // basic
+        role: player.role,
+        sr: player.manual_sr,
+        tank_sr: player.composition_tank_sr,
+        dps_sr: player.composition_dps_sr,
+        support_sr: player.composition_support_sr,
+        info_for_captains: player.draft_data,
+        eligible_roles: player.eligible_roles,
+        // auction_price: player.auction_price,
+    };
+    return {
+        ...player,
+        this_event_signup_data: thisSignupData,
+        _draftData
     };
 }

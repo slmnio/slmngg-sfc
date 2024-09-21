@@ -327,6 +327,10 @@ export default {
                 teams: ReactiveArray("teams")
             })(this.event).filter(match => {
                 // if (!this._matchGroup || !this.activeMatchGroup) return true; - default to any
+                if (this.matchGroupData?.groups) {
+                    console.log(match.match_group, match, this.matchGroupData?.groups);
+                    return this.matchGroupData?.groups.includes(match.match_group);
+                }
                 if (this.activeMatchGroup) return match.match_group === this.activeMatchGroup;
                 if (this._matchGroup) return match.match_group === this.settingMatchGroup;
                 return !this._matchGroups;
@@ -899,6 +903,7 @@ export default {
                 if (count && start == null) start = i;
                 if (count) end = i;
             });
+            if (start === undefined) return "";
             if (start === end) return `#${start + 1} only`;
             return `#${start + 1} to #${end + 1}`;
         },
@@ -1191,9 +1196,11 @@ export default {
     }
     td.incomplete {
         background-color: hsl(188, 40%, 20%);
+        color: white;
     }
     td.incomplete:hover {
         background-color: hsl(188, 40%, 25%);
+        color: white;
     }
     .incomplete-border {
         border-left-width: 3px;

@@ -51,7 +51,7 @@ export async function canEditMatch(user, { match, event }) {
 }
 
 export async function isEventStaffOrHasRole(user, event, role, websiteRoles) {
-    if ([...websiteRoles, role].some(websiteRole => (user.airtable?.website_settings || []).includes(websiteRole))) return true;
+    if ([...(websiteRoles || []), role].some(websiteRole => (user.airtable?.website_settings || []).includes(websiteRole))) return true;
     if (event) {
         if (typeof event === "string") {
             event = await Cache.get(event);

@@ -1,6 +1,6 @@
 import { getDataServerAddress } from "@/utils/fetch";
 import { Notyf } from "notyf";
-import { type AnyAirtableID, useAuthStore } from "@/stores/authStore";
+import { type AnyAirtableID, type Snowflake, useAuthStore } from "@/stores/authStore";
 
 const notyf = new Notyf({ duration: 5000, position: { x: "right", y: "top" }, dismissible: true });
 
@@ -22,7 +22,11 @@ type ActionKey = "create-live-guest" |
     "update-match-data" |
     "update-profile-data" |
     "set-player-relationships" |
-    "adjust-match-broadcast"
+    "adjust-match-broadcast" |
+    "set-event-guild" |
+    "create-event-discord-items" |
+    "get-discord-server-data" |
+    "set-event-settings"
 
 type RequestUrl = `actions/${ActionKey}`
 
@@ -195,6 +199,30 @@ interface SetMarkerData {
     text: string
 }
 
+interface SetEventGuidData {
+    guildID: Snowflake
+    eventID: AnyAirtableID
+}
+
+interface CreateEventDiscordItemsData {
+    guildID: Snowflake
+    eventID: AnyAirtableID
+    teamSettings: string[]
+    runSettings?: string[]
+    settings?: {
+        textChannelRoles?: string
+        voiceChannelRoles?: string
+    }
+}
+
+interface SetEventSettingsData {
+    eventID: AnyAirtableID,
+    settings: string
+}
+
+interface GetDiscordServerData {
+    eventID: AnyAirtableID
+}
 
 type ActionRequestData<U> =
     U extends "actions/create-live-guest" ? CreateLiveGuestData :
@@ -218,6 +246,10 @@ type ActionRequestData<U> =
     U extends "actions/adjust-match-broadcast" ? AdjustMatchBroadcastData :
     U extends "actions/set-player-cams" ? SetPlayerCamsData :
     U extends "actions/set-marker" ? SetMarkerData :
+    U extends "actions/set-event-guild" ? SetEventGuidData :
+    U extends "actions/create-event-discord-items" ? CreateEventDiscordItemsData :
+    U extends "actions/set-event-settings" ? SetEventSettingsData :
+    U extends "actions/get-discord-server-data" ? GetDiscordServerData :
     any;
 
 
@@ -245,7 +277,7 @@ export async function authenticatedRequest<U extends RequestUrl>(url: U, data?: 
             console.error("Fetch error", error);
         });
         console.log(request);
-        if (request.error) {
+        if (request?.error) {
             notyf.error({
                 message: request.errorMessage
             });

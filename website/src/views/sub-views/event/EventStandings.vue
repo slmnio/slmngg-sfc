@@ -6,6 +6,7 @@
             class="standings my-2"
             :event="event"
             :stage="standing.group"
+            :stages="standing.groups"
             :title="standing.title"
             :tie-text="standing.tieText"
             show-map-diff />

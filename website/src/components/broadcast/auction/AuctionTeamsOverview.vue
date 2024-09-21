@@ -8,7 +8,7 @@
             </div>
             <div class="players flex flex-center">
                 <div v-for="p in paddedPlayers(team.players)" :key="p.id" class="player flex-center">
-                    <role-icon :role="p.role" />
+                    <role-icon :role="p?._draftData?.role" />
                 </div>
             </div>
         </div>
@@ -17,7 +17,7 @@
 
 <script>
 import RoleIcon from "@/components/website/RoleIcon.vue";
-import { getAuctionMax, money } from "@/utils/content-utils";
+import { decoratePlayerWithDraftData, getAuctionMax, money } from "@/utils/content-utils";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import MoneyBar from "@/components/broadcast/auction/MoneyBar.vue";
 
@@ -33,7 +33,7 @@ export default {
             if (fill < 0) fill = 0;
 
             return [
-                ...(players || []),
+                ...(players || []).map(p =>  decoratePlayerWithDraftData(p, this.auctionSettings?.eventID)),
                 ...(Array(fill).fill({ empty: true }))
             ];
         }

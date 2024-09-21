@@ -20,7 +20,7 @@
                 <div>
                     <table class="w-100">
                         <tbody>
-                            <MatchMapHistory
+                            <MatchMapStats
                                 v-for="map in mapType.maps"
                                 :key="map.id"
                                 :data="_getTeamMapStats(map)"
@@ -32,8 +32,8 @@
             </div>
         </div>
 
-        <h2 v-if="!hideMapDisplay" class="text-center mt-4">This match</h2>
-        <div v-if="!hideMapDisplay" class="this-match-maps d-flex flex-center align-items-start">
+        <h2 v-if="!hideMapDisplay && match?.maps?.length" class="text-center mt-4">This match</h2>
+        <div v-if="!hideMapDisplay && match?.maps?.length" class="this-match-maps d-flex flex-center align-items-start">
             <MapDisplay v-for="map in match.maps" :key="map.id" :map="map" :match="match" />
         </div>
     </div>
@@ -42,12 +42,12 @@
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { getTeamsMapStats } from "@/utils/content-utils";
-import MatchMapHistory from "@/components/website/match/MatchMapHistory";
+import MatchMapStats from "@/components/website/match/MatchMapStats";
 import MapDisplay from "@/components/website/match/MapDisplay";
 
 export default {
-    name: "MatchHistory",
-    components: { MapDisplay, MatchMapHistory },
+    name: "MatchStats",
+    components: { MapDisplay, MatchMapStats },
     props: ["match", "hideMapDisplay"],
     data: () => ({
         filterSubEvent: false,

@@ -138,3 +138,48 @@ export const StandingsShowKeys = (game) => {
         }
     };
 };
+
+export const StandingsSortKeys = () => ({
+    "MatchDiff": {
+        description: "Calculates match diff (match wins - match losses)"
+    },
+    "MapDiff": {
+        description: "Calculates map diff (map wins - map losses)"
+    },
+    "MatchWinrate": {
+        description: "Calculates match winrate (match wins / matches played)"
+    },
+    "MapWinrate": {
+        description: "Calculates map winrate (map wins / maps played)"
+    },
+    "HeadToHead": {
+        description: "For 2 teams max - counts the matches aggregate (e.g. if they play each other once, it'll be 1 or -1. Multiple matches in the same match group could even it out)"
+    },
+    "MapWins": {
+        description: "Sorts only by map wins (not diff)"
+    },
+    "OMW": {
+        description: "Averages all opponent's match winrates. Identical to OMatchWinrate (I think)"
+    },
+    "OMatchWinrate": {
+        description: "Averages all opponent's match winrates"
+    },
+    "OMapWinrate": {
+        description: "Averages all opponent's map winrates"
+    },
+    "MiniLeague": {
+        description: "Creates a standings of the matches for the opponents that are tied, and sorts them by match diff"
+    },
+    "MiniLeagueMaps": {
+        description: "Creates a standings of the matches for the opponents that are tied, and sorts them by map diff"
+    },
+    "MapRoundsDiff": {
+        description: "Sorts by map round diff (map score wins - map score losses)"
+    },
+    "MapRoundWins": {
+        description: "Sorts by map score wins only (not diff)"
+    },
+    "Points": {
+        description: "Sorts by extra points (on team.extra_points)"
+    },
+});

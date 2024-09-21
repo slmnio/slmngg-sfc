@@ -203,7 +203,7 @@ export default {
             this.clearFormData();
             for (const relationship of (relationships || this.matchRelationships)) {
                 if (relationship.player?.id) {
-                    this.formData[relationship.singular_name].selected.push(relationship.player?.id);
+                    this.formData[relationship.singular_name]?.selected?.push(relationship.player?.id);
                 }
             }
             for (const caster of (casters || this.casters)) {
@@ -212,7 +212,9 @@ export default {
                 }
             }
             for (const roleName in this.formData) {
-                this.formData[roleName].count = Math.max(this.formData[roleName].selected.length, this.defaultRoleCount[roleName] || 1);
+                if (this.formData[roleName]) {
+                    this.formData[roleName].count = Math.max(this.formData[roleName].selected.length, this.defaultRoleCount[roleName] || 1);
+                }
             }
         },
         resetFromServer() {

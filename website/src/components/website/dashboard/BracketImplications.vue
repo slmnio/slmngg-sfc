@@ -53,11 +53,11 @@ export default {
             return this.bracketsIncludingMatch.filter(bracket => !bracket.hide_implications).map(bracket => {
                 if (!bracket?.bracket_layout) return null;
                 try {
-                    const { connections } = JSON.parse(bracket.bracket_layout);
+                    const { connections } = (JSON.parse(bracket.bracket_layout));
                     const thisMatchNumber = bracket.ordered_matches.findIndex(match => match.id === this.match.id);
                     console.log("bracket imp", connections, thisMatchNumber);
 
-                    if (thisMatchNumber === -1) return null;
+                    if (thisMatchNumber === -1 || !connections) return null;
 
                     const matchConnections = {
                         win: this.getMatchDetails(connections[thisMatchNumber + 1].win, bracket.ordered_matches, connections),

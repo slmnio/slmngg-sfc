@@ -1,7 +1,7 @@
-const { isEventStaffOrHasRole } = require("../action-utils/action-permissions");
-const { MapObject } = require("../discord/managers");
+import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
+import { MapObject } from "../discord/managers.js";
 
-module.exports = {
+export default {
     key: "set-event-guild",
     requiredParams: ["guildID", "eventID"],
     auth: ["user"],

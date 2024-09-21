@@ -2,17 +2,18 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
-const app = express();
-const port = 8901;
-const http = createServer(app);
-
 import cors from "cors";
 import meta from "./meta.js";
 import routes from "./routes.js";
 import images from "./images.js";
 import discordAuth from "./discord/auth.js";
-import discordData from "./discord/discord-data.js";
+import "./discord/discord-data.js";
 import webAuction from "./web_auction.js";
+import * as actions from "./action-utils/action-manager.js";
+
+const app = express();
+const port = 8901;
+const http = createServer(app);
 
 /* The staff module should only run on the server, probably not your local machine. */
 let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEGORY_ID", "STAFFAPPS_APPLICATION_CHANNEL_ID", "IS_SLMNGG_MAIN_SERVER"];
@@ -57,7 +58,6 @@ const io = new Server(http, {cors: { origin: corsHandle,  credentials: true}, al
 const Cache = (await import("./cache.js")).setup(io);
 (await import("./airtable-v2.js")).setup({ web: app, io });
 (await import("./discord/bot-controller.js")).setup(io);
-import * as actions from "./action-utils/action-manager.js";
 actions.load(app, localCors, Cache, io);
 
 await import("./discord/slash-commands.js");

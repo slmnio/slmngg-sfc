@@ -1,8 +1,9 @@
-const { isEventStaffOrHasRole } = require("../action-utils/action-permissions");
-const client = require("../discord/client");
-const { MapObject } = require("../discord/managers");
+import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
+import client from "../discord/client.js";
+import { MapObject } from "../discord/managers.js";
 
-module.exports = {
+
+export default {
     key: "get-discord-server-data",
     requiredParams: ["eventID"],
     auth: ["user"],

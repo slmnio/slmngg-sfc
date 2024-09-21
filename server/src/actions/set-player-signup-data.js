@@ -1,8 +1,7 @@
-const { isEventStaffOrHasRole } = require("../action-utils/action-permissions");
-const { dirtyID, deAirtableRecord,
-    cleanID
-} = require("../action-utils/action-utils");
-const { log } = require("../discord/slmngg-log");
+import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
+import { cleanID, deAirtableRecord, dirtyID } from "../action-utils/action-utils.js";
+import { log } from "../discord/slmngg-log.js";
+
 const working = new Map();
 
 function norm(text) {
@@ -10,7 +9,7 @@ function norm(text) {
     return text.toLowerCase().trim();
 }
 
-module.exports = {
+export default {
     key: "set-player-signup-data",
     requiredParams: ["eventID", "playerData", "useSignupData", "createPlayers"],
     auth: ["user"],

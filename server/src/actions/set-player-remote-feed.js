@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     key: "set-player-remote-feed",
     requiredParams: ["discordData"],
     auth: ["user"],

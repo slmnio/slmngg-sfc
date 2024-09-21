@@ -1,5 +1,6 @@
-const { isEventStaffOrHasRole } = require("../action-utils/action-permissions");
-module.exports = {
+import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
+
+export default {
     key: "set-event-settings",
     auth: ["user"],
     requiredParams: ["settings", "eventID"],

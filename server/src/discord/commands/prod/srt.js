@@ -1,6 +1,6 @@
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import * as Cache from "../../../cache.js";
-import getInternalManager from "../../../action-utils/action-manager";
+import { getInternalManager } from "../../../action-utils/action-manager.js";
 
 const SERVERS = [
     {

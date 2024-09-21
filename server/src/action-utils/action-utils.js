@@ -2,7 +2,7 @@ import Airtable from "airtable";
 import * as Cache from "../cache.js";
 import { StaticAuthProvider } from "@twurple/auth";
 import { ApiClient } from "@twurple/api";
-import verboseLog from "../discord/slmngg-log";
+import { verboseLog } from "../discord/slmngg-log.js";
 
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
 const slmngg = airtable.base(process.env.AIRTABLE_APP);

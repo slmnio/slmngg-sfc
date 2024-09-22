@@ -88,6 +88,7 @@ export default ({ app, router, cors, Cache }) => {
         const token = req.body?.token;
         if (!token) return res.status(400).send({ error: true, message: "No token sent to SLMN.GG server for Discord auth" });
 
+        /** @type {AuthUserData} */
         let userData = await Cache.auth.getData(token);
         if (!userData?.user) return res.status(404).send({ error: true, message: "Unknown token", for_a_developer: "No data associated with that token" });
 

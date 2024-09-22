@@ -17,7 +17,7 @@ async function loadActions(directory) {
         console.error(`[actions] trying to load folder but error: [${e.code}] ${e.message}`);
         return [];
     }
-    const files = (await fs.readdir(directory)).filter(file => file.endsWith(".js"));
+    const files = (await fs.readdir(directory)).filter(file => file.endsWith(".js") || file.endsWith(".ts"));
     console.log(`[actions] loading ${files.length} actions`);
     console.log(files.map(filename => ` + ${filename}`).join("\n"));
     return await Promise.all(files.map(file => import(pathToFileURL(path.join(directory, file)))));
@@ -64,6 +64,7 @@ export async function load(expressApp, cors, Cache, io) {
                 }
 
                 if (!isAutomation && action.auth?.includes("user")) {
+                    /** @type {AuthUserData.user} */
                     authObjects.user = (await Cache.auth.getData(token))?.user;
                     if (!authObjects.user) return error(401, "Unauthorized operation. You might have a stale token (try logging in again)");
                 }

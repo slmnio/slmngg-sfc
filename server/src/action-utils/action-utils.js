@@ -45,7 +45,6 @@ const TimeOffset = 3 * 1000;
  * @param {string} tableName - Airtable table name this record belongs to
  * @param {object} item - Full item as requested from Cache
  * @param {AnyAirtableID} item.id - Item must have its Airtable ID
- * @param {*?} item.* -  Item can have any other data
  * @param {*} data - Data to update (can be partial)
  */
 export async function updateRecord(Cache, tableName, item, data) {
@@ -79,7 +78,6 @@ export async function updateRecord(Cache, tableName, item, data) {
  * @param {Cache} Cache
  * @param {string} tableName
  * @param {object[]} records
- * @returns {Promise}
  */
 export async function createRecord(Cache, tableName, records) {
     console.log(`[create record] creating table=${tableName} records=${records.length}`);

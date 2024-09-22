@@ -67,6 +67,9 @@ export class Action {
 
     get helpers() {
         return {
+            /**
+             * @deprecated - Use action-utils/action-cache.js file for type complete
+             */
             get: (...args) => Cache.get(...args),
             createRecord: (tableName, data) => createRecord(Cache, tableName, [data]),
             createRecords: (tableName, items) => createRecord(Cache, tableName, items),

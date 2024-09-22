@@ -10,6 +10,10 @@ import { EventEmitter } from "events";
 
 const store = new Map();
 const hiddenEvents = new Map();
+
+/***
+ @type {Map<string, AuthUserData>}
+ */
 const authMap = new Map();
 const players = new Map();
 const attachments = new Map();
@@ -317,21 +321,16 @@ export async function set(id, data, options) {
         if (newDate.getTime() < oldDate.getTime()) {
             if (oldDate.getTime() - newDate.getTime() > 3000) {
                 // only send a log if it's over 3 seconds
-                console.log(`[old] id=${id} \n     old=${oldDate.toLocaleString()} \n     new=${newDate.toLocaleString()}`);
-                console.warn("     old data is newer, keeping it!");
+                console.log(`[old data newer]\n      id=${id} \n     old=${oldDate.toLocaleString()} \n     new=${newDate.toLocaleString()}`);
             }
-            // console.log("old data:");
-            // console.log(oldData);
-            // console.log("new data:");
-            // console.log(data);
             return;
         }
     }
 
     await dataUpdate(id, data, options);
     store.set(id, data);
-
 }
+
 function cleanID(id) {
     if (!id) return null;
     if (typeof id !== "string") return id.id || null; // no real id oops
@@ -370,9 +369,7 @@ async function authStart(storedData) {
 }
 
 /**
- *
  * @param token
- * @returns {Promise<UserData | null>}
  */
 async function getAuthenticatedData(token) {
     let data = authMap.get(token);

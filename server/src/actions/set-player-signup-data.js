@@ -101,7 +101,7 @@ module.exports = {
                 };
 
                 if (!useSignupData) {
-                    if (playerData?.eligible_roles) airtablePlayerData["Eligible Roles"] = playerData.eligible_roles.split(", ");
+                    if (playerData?.eligible_roles) airtablePlayerData["Eligible Roles"] = playerData.eligible_roles.split(", ").filter(Boolean);
                     if (playerData?.role) airtablePlayerData["Role"] = playerData.role;
                     if (playerData?.sr) airtablePlayerData["Manual SR"] = playerData.sr;
                     if (playerData?.tank_sr) airtablePlayerData["Composition Tank SR"] = playerData.tank_sr;
@@ -157,7 +157,7 @@ module.exports = {
                     {
                         signupDataKey: "eligible_roles",
                         airtableKey: "Eligible Roles",
-                        data: playerData?.eligible_roles?.split(", "),
+                        data: playerData?.eligible_roles?.split(", ")?.filter(Boolean),
                     },
                     {
                         signupDataKey: "role",

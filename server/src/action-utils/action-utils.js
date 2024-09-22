@@ -70,6 +70,7 @@ async function updateRecord(Cache, tableName, item, data) {
         return await slmngg(tableName).update(item.id, data);
     } catch (e) {
         console.error("Airtable update failed", e);
+        verboseLog(`Error updating record on **${tableName}** \`${item.id}\``, e.message);
         return { error: true };
     }
 }
@@ -98,6 +99,7 @@ async function createRecord(Cache, tableName, records) {
         return newRecords;
     } catch (e) {
         console.error("Airtable create failed", e);
+        verboseLog(`Error creating record on **${tableName}** `, e.message);
         return { error: true, errorMessage: e.message };
     }
 }

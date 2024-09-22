@@ -130,7 +130,7 @@ export class MultiSelectEditor extends Handsontable.editors.TextEditor {
                 console.log("adding", clicked);
                 items.push(clicked);
             }
-            const newValue = items.sort(sortAlphaRaw).join(", ");
+            const newValue = items.sort(sortAlphaRaw).filter(Boolean).join(", ");
             this.setValue(newValue);
             this.prepare(row, col, prop, td, newValue, cellProperties);
         };

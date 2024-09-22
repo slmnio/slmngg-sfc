@@ -46,7 +46,7 @@ export async function load(expressApp, cors, Cache, io) {
 
     Object.values(managers).forEach(manager => {
         actions.forEach(action => {
-            action = new Action(action);
+            action = new Action(action.default);
 
             manager.register(action, async ({ token, args, error, execute, isAutomation }) => {
                 let params = {};

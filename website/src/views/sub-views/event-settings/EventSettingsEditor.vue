@@ -18,6 +18,7 @@
                 <textarea rows="20" :value="JSON.stringify(editableBlocks, null, 2)" class="bg-dark text-white font-monospace p-2 rounded" @input="e => jsonEdit(e.target.value)"></textarea>
             </div>
             <div v-if="editableBlocks" class="w-md-67 w-100 d-flex flex-column gap-2 opacity-changes" :class="{'low-opacity': processing}">
+                <ReportingEventSettingsGroup v-model="editableBlocks.reporting" :event="event" :all-settings="editableBlocks" />
                 <FoldyEventSettingsGroup v-model="editableBlocks.foldy" :event="event" :all-settings="editableBlocks" />
                 <StandingsEventSettingsGroup v-model="editableBlocks.standings" :event="event" :all-settings="editableBlocks" />
                 <AuctionEventSettingsGroup v-model="editableBlocks.auction" :event="event" :all-settings="editableBlocks" />
@@ -68,10 +69,11 @@ import StandingsEventSettingsGroup from "@/views/sub-views/event-settings/editor
 import EventSettingsGroup from "@/views/sub-views/event-settings/editor/EventSettingsGroup.vue";
 import EventSettingsCheckbox from "@/views/sub-views/event-settings/editor/EventSettingsCheckbox.vue";
 import { authenticatedRequest } from "@/utils/dashboard";
+import ReportingEventSettingsGroup from "@/views/sub-views/event-settings/editor/ReportingEventSettingsGroup.vue";
 
 export default {
     name: "EventSettingsGeneral",
-    components: { EventSettingsCheckbox, EventSettingsGroup, StandingsEventSettingsGroup, AuctionEventSettingsGroup, FoldyEventSettingsGroup },
+    components: { ReportingEventSettingsGroup, EventSettingsCheckbox, EventSettingsGroup, StandingsEventSettingsGroup, AuctionEventSettingsGroup, FoldyEventSettingsGroup },
     props: {
         event: {}
     },

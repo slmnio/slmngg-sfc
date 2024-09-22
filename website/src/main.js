@@ -143,3 +143,4 @@ router.beforeEach(async (to, from, next) => {
 
 
 router.isReady().then(() => app.mount("#app"));
+router.getRoutes(); // for some reason this triggers minisites to load properly

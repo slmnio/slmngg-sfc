@@ -80,7 +80,6 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { cleanID, url } from "@/utils/content-utils";
 import MatchExplainerList from "@/components/website/dashboard/MatchExplainerList.vue";
 import { authenticatedRequest } from "@/utils/dashboard.ts";
-import StaffOverlay from "@/components/broadcast/roots/StaffOverlay.vue";
 
 /**
  * @typedef {object} Report
@@ -98,7 +97,7 @@ import StaffOverlay from "@/components/broadcast/roots/StaffOverlay.vue";
 
 export default {
     name: "MatchScoreReporting",
-    components: { StaffOverlay, MatchExplainerList, MatchEditor },
+    components: { MatchExplainerList, MatchEditor },
     props: ["match"],
     data: () => ({
         processing: {}

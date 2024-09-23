@@ -1,18 +1,16 @@
-const Cache = require("./cache");
-const { cleanID, dirtyID,
-    updateRecord
-} = require("./action-utils/action-utils");
-const { isEventStaffOrHasRole } = require("./action-utils/action-permissions");
+import * as Cache from "./cache.js";
+import { cleanID, dirtyID, updateRecord } from "./action-utils/action-utils.js";
+import { isEventStaffOrHasRole } from "./action-utils/action-permissions.js";
+
 
 /**
  * @typedef {{ amount: number, teamID: AnyAirtableID }} Bid
  */
-
 function money(num) {
     return `$${num || 0}k`;
 }
 
-module.exports = class Auction {
+export default class Auction {
     constructor(eventData, io, auctionData) {
         this.io = io;
         this.id = cleanID(eventData?.id);

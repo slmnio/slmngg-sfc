@@ -1,9 +1,7 @@
-const crypto = require("crypto");
-const { accessTokenIsExpired,
-    refreshUserToken
-} = require("@twurple/auth");
+import crypto from "node:crypto";
+import { accessTokenIsExpired, refreshUserToken } from "@twurple/auth";
+import { EventEmitter } from "events";
 
-const { EventEmitter } = require("events");
 /*
     - Get and set data
     - Store data
@@ -12,7 +10,11 @@ const { EventEmitter } = require("events");
 
 const store = new Map();
 const hiddenEvents = new Map();
-const auth = new Map();
+
+/***
+ @type {Map<string, AuthUserData>}
+ */
+const authMap = new Map();
 const players = new Map();
 const attachments = new Map();
 
@@ -36,7 +38,7 @@ function getAntiLeakIDs() {
  */
 let io = null;
 
-function setup(_io) {
+export function setup(_io) {
     io = _io;
     return this;
 }
@@ -50,7 +52,7 @@ async function broadcast(room, command, ...data) {
  *
  * @param {function(id: AnyAirtableID, data: {oldData: object, newData: object})} callback
  */
-function onUpdate(callback) {
+export function onUpdate(callback) {
     emitter.on("update", callback);
     // updateFunctions.push(fn);
 }
@@ -229,7 +231,7 @@ function generateLimitedPlayers(longText) {
     });
 }
 
-async function set(id, data, options) {
+export async function set(id, data, options) {
 
     if (data?.__tableName) {
         // Airtable bug where long textboxes that are cleared are just "\n" (and is not falsy)
@@ -254,12 +256,12 @@ async function set(id, data, options) {
     }
 
     if (data?.__tableName === "Channels") {
-        auth.set(`channel_${id}`, data);
+        authMap.set(`channel_${id}`, data);
         return; // not setting it on global requestable store
     }
 
     if (data?.__tableName === "Discord Bots") {
-        auth.set(`bot_${cleanID(id)}`, data);
+        authMap.set(`bot_${cleanID(id)}`, data);
 
         return; // not setting it on global requestable store
     }
@@ -319,28 +321,23 @@ async function set(id, data, options) {
         if (newDate.getTime() < oldDate.getTime()) {
             if (oldDate.getTime() - newDate.getTime() > 3000) {
                 // only send a log if it's over 3 seconds
-                console.log(`[old] id=${id} \n     old=${oldDate.toLocaleString()} \n     new=${newDate.toLocaleString()}`);
-                console.warn("     old data is newer, keeping it!");
+                console.log(`[old data newer]\n      id=${id} \n     old=${oldDate.toLocaleString()} \n     new=${newDate.toLocaleString()}`);
             }
-            // console.log("old data:");
-            // console.log(oldData);
-            // console.log("new data:");
-            // console.log(data);
             return;
         }
     }
 
     await dataUpdate(id, data, options);
     store.set(id, data);
-
 }
+
 function cleanID(id) {
     if (!id) return null;
     if (typeof id !== "string") return id.id || null; // no real id oops
     if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
     return id;
 }
-async function get(id) {
+export async function get(id) {
     id = cleanID(id);
     let data = store.get(id);
     if (data) data = await removeAntiLeak(id, data);
@@ -367,17 +364,15 @@ async function getOrCreateToken() {
 async function authStart(storedData) {
     const token = await createToken();
     // console.log(token, storedData);
-    auth.set(token, storedData);
+    authMap.set(token, storedData);
     return token;
 }
 
 /**
- *
  * @param token
- * @returns {Promise<UserData | null>}
  */
 async function getAuthenticatedData(token) {
-    let data = auth.get(token);
+    let data = authMap.get(token);
 
     // update airtable data
     if (data?.airtableID) {
@@ -392,10 +387,10 @@ async function getPlayer(discordID) {
 }
 
 async function getChannel(airtableID) {
-    return auth.get(`channel_${cleanID(airtableID)}`);
+    return authMap.get(`channel_${cleanID(airtableID)}`);
 }
 async function getBot(airtableID) {
-    return auth.get(`bot_${cleanID(airtableID)}`);
+    return authMap.get(`bot_${cleanID(airtableID)}`);
 }
 async function getChannelByID(channelID) {
     return (await getChannels()).find(channel => channel.channel_id === channelID);
@@ -411,12 +406,12 @@ async function getTwitchAccessToken(channel) {
     // get stored access token, check if it's valid
     // otherwise / or if no token, get from refresh token
     if (!channel) return null;
-    let storedToken = auth.get(`twitch_access_token_${channel.channel_id}`);
+    let storedToken = authMap.get(`twitch_access_token_${channel.channel_id}`);
 
     if (!storedToken || accessTokenIsExpired(storedToken)) {
         // refresh token
         let token = await refreshUserToken(process.env.TWITCH_CLIENT_ID, process.env.TWITCH_CLIENT_SECRET, channel.twitch_refresh_token);
-        auth.set(`twitch_access_token_${channel.channel_id}`, token);
+        authMap.set(`twitch_access_token_${channel.channel_id}`, token);
         return token;
 
     }
@@ -448,17 +443,11 @@ async function startRawDiscordAuth(discordUser) {
     };
 }
 
-module.exports = {
-    set, get, setup, onUpdate,
-    auth: {
-        start: authStart,
-        getData: getAuthenticatedData,
-        startRawDiscordAuth,
-        getPlayer,
-        getChannel,
-        getChannelByID,
-        getTwitchAccessToken,
-        getBots
-    },
-    getAttachment: (id) => attachments.get(id)
+export const auth = {
+    start: authStart, getData: getAuthenticatedData, startRawDiscordAuth,
+    getPlayer, getChannel, getChannelByID,
+    getTwitchAccessToken, getBots
 };
+export function getAttachment(id) {
+    return attachments.get(id);
+}

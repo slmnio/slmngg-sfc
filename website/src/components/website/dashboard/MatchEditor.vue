@@ -48,7 +48,15 @@
                     <b-button size="sm" @click="() => extraMaps++">
                         <i class="fas fa-fw fa-plus"></i> Add map
                     </b-button>
-                    <b-button class="top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save {{ hideMatchExtras ? 'all' : 'maps' }}</b-button>
+                    <b-button
+                        v-if="scoreReporting"
+                        class="top-button flex-shrink-0"
+                        variant="success"
+                        :disabled="!matchData.scores.some(s => s === match.first_to)"
+                        @click="() => scoreReportConfirmModal = true">
+                        <i class="fas fa-save fa-fw"></i> Submit score report
+                    </b-button>
+                    <b-button v-else class="top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save {{ hideMatchExtras ? 'all' : 'maps' }}</b-button>
                 </div>
             </div>
             <div class="maps-table-wrapper">
@@ -61,7 +69,7 @@
                             :key="i"
                             class="map"
                             :class="{'banned': banners[i], 'very-low-opacity': !map.dummy && !map._original_data_id}">
-                            <td class="form-stack number">
+                            <td v-if="!scoreReporting" class="form-stack number">
                                 <div class="form-top d-flex">
                                     <div>#</div>
                                     <div class="flex-grow-1 text-end">
@@ -104,12 +112,14 @@
                                         v-model="score_1s[i]"
                                         class="map-editor"
                                         :team="teams[0]"
+                                        :show-codes="scoreReporting"
                                         @input="(val) => checkAutoWinner(i, val)" />
                                     <MapScoreEditor
                                         v-model="score_2s[i]"
                                         class="map-editor"
                                         :team="teams[1]"
                                         :reverse="true"
+                                        :show-codes="scoreReporting"
                                         @input="(val) => checkAutoWinner(i, val)" />
                                 </div>
                             </td>
@@ -135,11 +145,12 @@
                                 </div>
                             </td>
                             <td v-if="showMapBanButtons">
-                                <TeamPicker v-model="banners[i]" title="Banned by" :teams="teams" />
+                                <TeamPicker v-model="banners[i]" title="Banned by" :teams="teams" :hide-empty="scoreReporting" />
                             </td>
                             <td>
                                 <TeamPicker
                                     v-model="pickers[i]"
+                                    :hide-empty="scoreReporting"
                                     title="Picked by"
                                     :class="{ 'very-low-opacity': banners[i] }"
                                     :teams="teams" />
@@ -147,6 +158,7 @@
                             <td>
                                 <TeamPicker
                                     v-model="winners[i]"
+                                    :hide-empty="scoreReporting"
                                     title="Winner"
                                     :class="{ 'very-low-opacity': banners[i] }"
                                     :teams="teams"
@@ -220,6 +232,7 @@
                 </div>
             </div>
         </b-form>
+        <MatchExplainerModal v-model="scoreReportConfirmModal" :match="match" :edited-map-data="editedMapData" @ok="() => saveScoreReport()" />
     </div>
 </template>
 
@@ -233,11 +246,12 @@ import MapScoreEditor from "@/components/website/dashboard/MapScoreEditor";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { mapWritableState } from "pinia";
+import MatchExplainerModal from "@/components/website/dashboard/MatchExplainerModal.vue";
 
 export default {
     name: "MatchEditor",
-    components: { AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
-    props: ["match", "hideMatchExtras"],
+    components: { MatchExplainerModal, AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
+    props: ["match", "hideMatchExtras", "scoreReporting"],
     data: () => ({
         processing: {},
         matchData: {
@@ -264,7 +278,8 @@ export default {
         errorMessage: null,
         previousAutoData: null,
         scoreDebounceTimeouts: [],
-        showMapBanButtons: false
+        showMapBanButtons: false,
+        scoreReportConfirmModal: false
     }),
     computed: {
         ...mapWritableState(useSettingsStore, ["assumeLoserPicks"]),
@@ -381,7 +396,7 @@ export default {
                     replay_code: this.replayCodes[i]
                 });
             }
-            return data;
+            return data.filter(obj => Object.values(obj).filter(Boolean).length);
         },
         broadcastData() {
             return this.match?.event?.broadcasts;
@@ -561,6 +576,26 @@ export default {
                 });
             }
             this.processing.details = false;
+            return response;
+        },
+        async saveScoreReport() {
+            console.log("map processing");
+            this.processing.map = true;
+
+            const response = await authenticatedRequest("actions/submit-score-report", {
+                matchID: this.match.id,
+                mapData: this.editedMapData
+            });
+            // if (response.error) this.errorMessage = response.errorMessage;
+            console.log(response);
+            this.processing.map = false;
+
+            if (!response.error) {
+                this.$notyf.success({
+                    message: "Score report submitted",
+                    duration: 3000
+                });
+            }
             return response;
         },
         async saveMapAndScores() {

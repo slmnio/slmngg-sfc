@@ -1,7 +1,14 @@
-const Airtable = require("airtable");
+import Airtable from "airtable";
+import * as Cache from "./cache.js";
+import customTableUpdate from "./custom-datasets.js";
+import { log } from "./discord/slmngg-log.js";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
-const Cache = require("./cache.js");
 const slmngg = airtable.base(process.env.AIRTABLE_APP);
+
+const DIRNAME = path.dirname(fileURLToPath(import.meta.url));
 
 
 function sortKeys([aKey], [bKey]) {
@@ -10,7 +17,7 @@ function sortKeys([aKey], [bKey]) {
     return 0;
 }
 
-async function wait(ms){
+async function wait(ms) {
     return new Promise(r => setTimeout(r, ms));
 }
 const getCircularReplacer = () => {
@@ -48,14 +55,32 @@ function sluggify(text) {
 }
 
 async function checkExtraRecord(tableName, item) {
-    if (tableName === "Broadcasts" && item.key) return Cache.set(`broadcast-${item.key}`, { ...item, customKey: true });
-    if (tableName === "Clients" && item.key) return Cache.set(`client-${item.key?.toLowerCase()}`, { ...item, customKey: true });
-    if (tableName === "Events" && item.subdomain) return Cache.set(`subdomain-${item.subdomain}`, { ...item, customKey: true });
-    if (tableName === "News" && item.slug) return Cache.set(`news-${item.slug}`, { ...item, customKey: true });
+    if (tableName === "Broadcasts" && item.key) {
+        return Cache.set(`broadcast-${item.key}`, {
+            ...item,
+            customKey: true
+        });
+    }
+    if (tableName === "Clients" && item.key) {
+        return Cache.set(`client-${item.key?.toLowerCase()}`, {
+            ...item,
+            customKey: true
+        });
+    }
+    if (tableName === "Events" && item.subdomain) {
+        return Cache.set(`subdomain-${item.subdomain}`, {
+            ...item,
+            customKey: true
+        });
+    }
+    if (tableName === "News" && item.slug) {
+        return Cache.set(`news-${item.slug}`, {
+            ...item,
+            customKey: true
+        });
+    }
 }
 
-const customTableUpdate = require("./custom-datasets");
-const { log } = require("./discord/slmngg-log");
 
 class TableManager {
     constructor(tableName) {
@@ -100,7 +125,9 @@ class TableManager {
             this.lastError = {
                 ...e,
                 date: new Date(),
-                timeout: setTimeout(() => { this.lastError = null; }, 10 * 60 * 1000)
+                timeout: setTimeout(() => {
+                    this.lastError = null;
+                }, 10 * 60 * 1000)
             };
 
             console.error("Airtable error", e.statusCode || e.code);
@@ -141,7 +168,9 @@ class TableManager {
             this.lastError = {
                 ...e,
                 date: new Date(),
-                timeout: setTimeout(() => { this.lastError = null; }, 10 * 60 * 1000)
+                timeout: setTimeout(() => {
+                    this.lastError = null;
+                }, 10 * 60 * 1000)
             };
 
             console.error("Airtable error", e.statusCode || e.code);
@@ -195,7 +224,7 @@ function time(secs) {
 
 class AirtableManager {
     constructor() {
-        this.tableNames = ["Maps", "Players", "Teams", "Matches", "Themes", "Live Guests", "Redirects", "Broadcasts", "Clients", "Channels", "Discord Bots", "Events", "GFX", "Event Series", "Signup Data", "Ad Reads", "Ad Read Groups", "News", "Socials", "Accolades", "Player Relationships", "Brackets", "Headlines", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles"];
+        this.tableNames = ["Maps", "Players", "Teams", "Matches", "Themes", "Live Guests", "Redirects", "Broadcasts", "Clients", "Channels", "Discord Bots", "Events", "GFX", "Event Series", "Signup Data", "Reports", "Ad Reads", "Ad Read Groups", "News", "Socials", "Accolades", "Player Relationships", "Brackets", "Headlines", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles"];
         // this.tableNames = ["Redirects", "Broadcasts", "Clients", "Channels", "Discord Bots", "Players", "Live Guests"];
         this.tables = this.tableNames.map(tableName => new TableManager(tableName));
         this.availableRequests = 4;
@@ -251,6 +280,7 @@ class AirtableManager {
         this.websiteFlags.push(flag);
         this.updateFlags();
     }
+
     removeWebsiteFlag(flag) {
         if (this.websiteFlags.indexOf(flag) === -1) return;
         this.websiteFlags.splice(this.websiteFlags.indexOf(flag), 1);
@@ -279,7 +309,7 @@ class AirtableManager {
             const latestRequestDiff = new Date() - table.getLatestRequest(fullLoad);
             return latestRequestDiff >= 7000; // only show tables over Xs old
         }).sort((a, b) => {
-            const [aDate, bDate] = [a,b].map(x => x.getLatestRequest(fullLoad));
+            const [aDate, bDate] = [a, b].map(x => x.getLatestRequest(fullLoad));
             if (aDate > bDate) return 1;
             if (aDate < bDate) return -1;
         })?.[0];
@@ -298,30 +328,30 @@ class AirtableManager {
     }
 }
 
-module.exports = {
-    /**
-     * @param {Express} web
-     * @param {import("socket.io").Server} io
-     */
-    setup: ({
-        web,
-        io
-    }) => {
-        const manager = new AirtableManager();
+export async function update(table, id, data) {
+    return await slmngg(table).update(id, data);
+}
 
-        web.get("/api/requests", async (req, res) => {
-            res.send(JSON.stringify(manager.getStatusData(), getCircularReplacer()));
-        });
-        web.get("/requests", async (req, res) => {
-            res.sendFile(__dirname + "/request.html");
-        });
+export async function select(table, filter) {
+    return await slmngg(table).select(filter).all();
+}
 
-        return manager.main(io);
-    },
-    async update(table, id, data) {
-        return await slmngg(table).update(id, data);
-    },
-    async select(table, filter) {
-        return await slmngg(table).select(filter).all();
-    },
-};
+/**
+ * @param {Express} web
+ * @param {import("socket.io").Server} io
+ */
+export function setup({
+    web,
+    io
+}) {
+    const manager = new AirtableManager();
+
+    web.get("/api/requests", async (req, res) => {
+        res.send(JSON.stringify(manager.getStatusData(), getCircularReplacer()));
+    });
+    web.get("/requests", async (req, res) => {
+        res.sendFile(DIRNAME + "/request.html");
+    });
+
+    return manager.main(io);
+}

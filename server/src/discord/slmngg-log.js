@@ -1,5 +1,5 @@
-const client = require("./client.js");
-const EventEmitter = require("node:events");
+import client from "./client.js";
+import EventEmitter from "node:events";
 
 async function getChannel() {
     if (!process.env.SLMNGG_LOGS_GUILD_ID) return null;
@@ -13,7 +13,7 @@ async function getChannel() {
 
     return channel;
 }
-async function getVerboseChannel() {
+export async function getVerboseChannel() {
     const GUILD_ID = process.env.SLMNGG_LOGS_GUILD_ID || process.env.SLMNGG_LOGS_GUILD_ID;
     if (!(GUILD_ID)) return null;
     if (!process.env.SLMNGG_LOGS_VERBOSE_CHANNEL_ID) return null;
@@ -27,7 +27,7 @@ async function getVerboseChannel() {
     return channel;
 }
 
-async function log(text) {
+export async function log(text) {
     if (process.env.IS_SLMNGG_MAIN_SERVER) {
         text = "[Main] " + text;
     }
@@ -72,13 +72,9 @@ verboseEmitter.on("log", async ({ text, json }) => {
 
 });
 
-function verboseLog(text, json) {
+export function verboseLog(text, json) {
     verboseEmitter.emit("log", {
         text,
         json
     });
 }
-
-module.exports = {
-    log, verboseLog
-};

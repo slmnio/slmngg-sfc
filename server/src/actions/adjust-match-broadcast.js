@@ -1,7 +1,8 @@
-const { isEventStaffOrHasRole } = require("../action-utils/action-permissions");
-const { dirtyID } = require("../action-utils/action-utils");
+import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
+import { dirtyID } from "../action-utils/action-utils.js";
 
-module.exports = {
+
+export default {
     key: "adjust-match-broadcast",
     auth: ["user"],
     requiredParams: ["mode", "broadcastID", "matchID"],

@@ -13,7 +13,17 @@
                     <ul v-if="sidebarItems.length > 1" class="match-sub-nav list-group mb-2">
                         <!-- only because it'd be the only one -->
                         <router-link v-if="sidebarItems.includes('vod')" class="list-group-item ct-passive" exact-active-class="active ct-active" :to="subLink('')">VOD</router-link>
-                        <router-link v-if="sidebarItems.includes('head-to-head')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('history')">Head to head</router-link>
+                        <router-link v-if="sidebarItems.includes('head-to-head')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('history')">Map stats</router-link>
+                        <router-link v-if="sidebarItems.includes('score-reporting')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('score-reporting')">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>Score reporting</div>
+                                <div v-if="!authenticated">
+                                    <span v-b-tooltip="'Requires login'">
+                                        <i class="fa fa-lock"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </router-link>
                         <router-link v-if="sidebarItems.includes('editor')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('editor')">Match editor</router-link>
                     </ul>
 
@@ -157,11 +167,27 @@ export default {
             if (!isAuthenticated) return false;
             return canEditMatch(player, { event: this.match?.event, match: this.match });
         },
+        eventSettings() {
+            if (!this.match?.event?.blocks) return null;
+            return JSON.parse(this.match.event.blocks);
+        },
+        scoreReportingEnabled() {
+            return this.eventSettings?.reporting?.score?.use;
+        },
+        authenticated() {
+            const { isAuthenticated } = useAuthStore();
+            return isAuthenticated;
+        },
+        matchComplete() {
+            if (!this.match?.first_to) return false;
+            return [this.match?.score_1 || 0, this.match?.score_2 || 0].some(x => x === this.match?.first_to);
+        },
         sidebarItems() {
             const items = ["vod"];
 
             if (this.showHeadToHead) items.push("head-to-head");
             if (this.showEditor) items.push("editor");
+            if (this.scoreReportingEnabled && !this.matchComplete) items.push("score-reporting");
 
             return items;
         },
@@ -254,5 +280,8 @@ export default {
 
     td.default-thing {
         background-color: rgba(255, 255, 255, 0.185);
+    }
+    .list-group-item.ct-active {
+        color: white;
     }
 </style>

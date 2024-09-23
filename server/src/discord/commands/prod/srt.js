@@ -1,9 +1,6 @@
-const {
-    SlashCommandBuilder,
-    EmbedBuilder
-} = require("discord.js");
-const Cache = require("../../../cache");
-const { getInternalManager } = require("../../../action-utils/action-manager");
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import * as Cache from "../../../cache.js";
+import { getInternalManager } from "../../../action-utils/action-manager.js";
 
 const SERVERS = [
     {
@@ -26,7 +23,7 @@ const SERVERS = [
     }
 ];
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName("srt")
         .addStringOption(option =>

@@ -1,16 +1,12 @@
-const fs = require("fs/promises");
-const path = require("path");
-const express = require("express");
-const bodyParser = require("body-parser");
+import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import express from "express";
+import bodyParser from "body-parser";
+import { getSelfClient } from "./action-utils.js";
+import { Action, HTTPActionManager, InternalActionManager, SocketActionManager } from "./action-manager-models.js";
 
-const { getSelfClient } = require("./action-utils");
-
-const {
-    HTTPActionManager,
-    SocketActionManager,
-    Action,
-    InternalActionManager
-} = require("./action-manager-models");
+const DIRNAME = path.dirname(fileURLToPath(import.meta.url));
 
 let actions = [];
 
@@ -21,19 +17,19 @@ async function loadActions(directory) {
         console.error(`[actions] trying to load folder but error: [${e.code}] ${e.message}`);
         return [];
     }
-    const files = (await fs.readdir(directory)).filter(file => file.endsWith(".js"));
+    const files = (await fs.readdir(directory)).filter(file => file.endsWith(".js") || file.endsWith(".ts"));
     console.log(`[actions] loading ${files.length} actions`);
     console.log(files.map(filename => ` + ${filename}`).join("\n"));
-    return files.map(file => require(path.join(directory, file)));
+    return await Promise.all(files.map(file => import(pathToFileURL(path.join(directory, file)))));
 }
 
 let managers = {};
 
-async function load(expressApp, cors, Cache, io) {
+export async function load(expressApp, cors, Cache, io) {
     const actionApp = express.Router();
     actionApp.use(bodyParser.json({ limit: "50mb"}));
     actionApp.options("/*", cors());
-    actions = (await loadActions(path.join(__dirname, "..", "actions"))) || [];
+    actions = (await loadActions(path.join(DIRNAME, "..", "actions"))) || [];
 
     /**
      *
@@ -50,7 +46,7 @@ async function load(expressApp, cors, Cache, io) {
 
     Object.values(managers).forEach(manager => {
         actions.forEach(action => {
-            action = new Action(action);
+            action = new Action(action.default);
 
             manager.register(action, async ({ token, args, error, execute, isAutomation }) => {
                 let params = {};
@@ -68,6 +64,7 @@ async function load(expressApp, cors, Cache, io) {
                 }
 
                 if (!isAutomation && action.auth?.includes("user")) {
+                    /** @type {AuthUserData.user} */
                     authObjects.user = (await Cache.auth.getData(token))?.user;
                     if (!authObjects.user) return error(401, "Unauthorized operation. You might have a stale token (try logging in again)");
                 }
@@ -101,13 +98,9 @@ async function load(expressApp, cors, Cache, io) {
     managers.socket.finalSetup(io);
 }
 
-
-module.exports = {
-    load,
-    /**
-     * @returns {InternalActionManager}
-     */
-    getInternalManager() {
-        return managers?.internal;
-    }
-};
+/**
+ * @returns {InternalActionManager}
+ */
+export function getInternalManager() {
+    return managers?.internal;
+}

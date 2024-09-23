@@ -1,11 +1,11 @@
-const { isEventStaffOrHasRole } = require("../action-utils/action-permissions");
+import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
 
 function norm(text) {
     if (!text) return null;
     return text.toLowerCase().trim();
 }
 
-module.exports = {
+export default {
     key: "find-player-data",
     requiredParams: ["eventID", "playerData"],
     auth: ["user"],

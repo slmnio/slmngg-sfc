@@ -1,6 +1,9 @@
 <template>
     <div class="map-score-editor d-flex" :class="{'flex-row-reverse': reverse}">
-        <div class="team-slice" :style="teamSliceBackground"></div>
+        <div v-if="showCodes" class="team-slice team-slice-codes flex-center" :style="teamSliceBackground">
+            {{ team.code }}
+        </div>
+        <div v-else class="team-slice" :style="teamSliceBackground"></div>
         <b-form-input
             class="score-input no-arrows"
             autocomplete="off"
@@ -17,7 +20,7 @@ import { themeBackground1 } from "@/utils/theme-styles";
 
 export default {
     name: "MapScoreEditor",
-    props: ["team", "modelValue", "reverse"],
+    props: ["team", "modelValue", "reverse", "showCodes"],
     emits: ["update:modelValue"],
     computed: {
         teamSliceBackground() {
@@ -33,6 +36,11 @@ export default {
         height: 100%;
         border-radius: .125em;
         margin: 0 .125em;
+    }
+    .team-slice-codes {
+        width: 3em;
+        flex-shrink: 0;
+        border-radius: .25em;
     }
     .score-input {
         min-width: 3em;

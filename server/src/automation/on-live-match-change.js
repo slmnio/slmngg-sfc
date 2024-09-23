@@ -12,7 +12,6 @@ export default {
      */
     async handler({ id, newData, oldData }) {
         if (newData?.__tableName !== "Broadcasts") return;
-        if (!oldData) return;
 
         const settings = newData?.automation_settings || [];
 

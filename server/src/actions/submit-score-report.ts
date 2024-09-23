@@ -45,14 +45,16 @@ export default {
             "Log": `${(new Date()).toLocaleString()}: ${user.airtable.name} reported score as ${actingTeam?.name}`
         });
 
+        console.log(response);
+
         if (response.error) {
             throw `Airtable error: ${response.error.errorMessage}`;
         }
-        if (response?.id) {
+        if (response?.[0]?.id) {
             await this.helpers.updateRecord("Matches", match, {
-                "Reports": [...(match.reports || []), response.id]
+                "Reports": [...(match.reports || []), response?.[0].id]
             });
-            return response.id;
+            return response?.[0].id;
         }
 
     }

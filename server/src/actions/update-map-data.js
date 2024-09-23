@@ -20,9 +20,9 @@ export default {
      * @param {UserData} user
      * @returns {Promise<void>}
      */
-    async handler({ matchID, mapData }, { user }) {
+    async handler({ matchID, mapData }, { user, isAutomation }) {
         const match = await this.helpers.get(matchID);
-        if (!(await this.helpers.permissions.canEditMatch(user, { match }))) throw { errorMessage: "You don't have permission to edit this item", errorCode: 403 };
+        if (!(isAutomation || (await this.helpers.permissions.canEditMatch(user, { match })))) throw { errorMessage: "You don't have permission to edit this item", errorCode: 403 };
         if (!match?.id) throw "Couldn't load match data";
 
         const existingMaps = await Promise.all((match.maps || []).map(m => this.helpers.get(m)));

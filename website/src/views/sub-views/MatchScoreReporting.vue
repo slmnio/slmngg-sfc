@@ -2,10 +2,7 @@
     <div class="match-score-reporting">
         <h2 class="text-center">Score Reporting</h2>
 
-        <div v-if="matchComplete" class="p-2 bg-dark text-center rounded">
-            This match is complete
-        </div>
-        <div v-else-if="scoreReportingEnabled" class="flex-center flex-column gap-4">
+        <div v-if="scoreReportingEnabled" class="flex-center flex-column gap-4">
             <div class="score-reporting-status d-flex flex-column gap-3">
                 <div v-for="step in steps" :key="step.number" class="step d-flex flex-center gap-3" :class="`status-${step.status}`">
                     <div class="step-num fw-bold">{{ step.number }}</div>
@@ -52,6 +49,12 @@
                     Team - wait for staff approval
                 </div>
             </div>
+            <div v-else-if="matchComplete && existingScoreReport" class="p-2 bg-success text-center rounded">
+                This match's score has been approved
+            </div>
+            <div v-else-if="matchComplete" class="p-2 bg-dark text-center rounded">
+                This match is complete.
+            </div>
             <div v-else-if="authStatus?.staff" class="p-2 bg-dark text-center rounded">
                 <div class="mb-2">You can't submit a score report, but you can edit the match directly</div>
                 <router-link class="btn btn-primary text-white" :to="url('match', match, { subPage: 'editor' })">Match editor</router-link>
@@ -60,10 +63,7 @@
                 You don't have access to report scores for this match
             </div>
 
-
-            <div v-if="existingScoreReport?.log">
-                {{ existingScoreReport.log }}
-            </div>
+            <pre v-if="existingScoreReport?.log">{{ existingScoreReport.log }}</pre>
         </div>
         <div v-else class="p-2 bg-dark text-center rounded">
             Team score reporting is not enabled
@@ -110,7 +110,7 @@ export default {
         },
         matchComplete() {
             if (!this.match?.first_to) return false;
-            return [this.match?.score_1 || 0, this.match?.score_2 || 0].some(x => x === this.match?.first_to);
+            return this.match.maps?.length || [this.match?.score_1 || 0, this.match?.score_2 || 0].some(x => x === this.match?.first_to);
         },
         scoreReportingEnabled() {
             return this.eventSettings?.reporting?.score?.use;

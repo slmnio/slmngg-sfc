@@ -93,6 +93,7 @@ export async function createRecord(Cache, tableName, records) {
         newRecords.forEach(record => {
             Cache.set(cleanID(record.id), {
                 ...deAirtable(record.fields),
+                id: record.id,
                 __tableName: tableName
             }, { eager: true });
         });

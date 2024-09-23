@@ -40,7 +40,7 @@ export default {
 
         await this.helpers.updateRecord("Reports", report, {
             "Approved by opponent": true,
-            "Log": (report.log ? report.log + "\n" : "") + `${(new Date()).toLocaleString()}: ${user.airtable.name} reported score as ${actingTeam?.name}`
+            "Log": (report.log ? report.log + "\n" : "") + `${(new Date()).toLocaleString()}: ${user.airtable.name} approved score report as ${actingTeam?.name}`
         });
     }
 } satisfies Action;

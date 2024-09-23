@@ -18,7 +18,8 @@ for (const fileName of files) {
 }
 
 onUpdate(async (id, {oldData, newData}) => {
-    if (newData?.customKey) return;
+    if (!oldData) return;
+    if (newData?.customKey) return; // remove things set multiple times with a custom key (e.g. subdomain-bpl)
     for (const auto of automations) {
         auto.handler({ id, oldData, newData });
     }

@@ -62,7 +62,7 @@ actions.load(app, localCors, Cache, io);
 require("./discord/slash-commands.js");
 require("./automation-manager.js");
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.options("/*", cors());
 
 app.get("/", async (req, res) => {

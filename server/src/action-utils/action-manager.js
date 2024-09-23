@@ -31,7 +31,7 @@ let managers = {};
 
 async function load(expressApp, cors, Cache, io) {
     const actionApp = express.Router();
-    actionApp.use(bodyParser.json());
+    actionApp.use(bodyParser.json({ limit: "50mb"}));
     actionApp.options("/*", cors());
     actions = (await loadActions(path.join(__dirname, "..", "actions"))) || [];
 

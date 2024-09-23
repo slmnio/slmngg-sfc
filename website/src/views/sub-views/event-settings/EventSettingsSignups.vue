@@ -445,7 +445,7 @@ export default {
                 });
 
                 if (!error) {
-                    this.$notyf.success("Data processed.");
+                    this.$notyf.success("Data processed");
                 }
             } finally {
                 this.processing.signupData = false;

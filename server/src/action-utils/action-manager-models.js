@@ -111,7 +111,7 @@ class HTTPActionManager extends ActionManager {
 
     _setup(args) {
         this.app = express.Router();
-        this.app.use(bodyParser.json());
+        this.app.use(bodyParser.json({ limit: "50mb" }));
         this.app.options("/*", args.cors());
     }
 

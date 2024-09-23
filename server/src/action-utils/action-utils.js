@@ -3,6 +3,7 @@ import * as Cache from "../cache.js";
 import { StaticAuthProvider } from "@twurple/auth";
 import { ApiClient } from "@twurple/api";
 import { verboseLog } from "../discord/slmngg-log.js";
+import { get } from "./action-cache.js";
 
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
 const slmngg = airtable.base(process.env.AIRTABLE_APP);
@@ -182,6 +183,40 @@ export async function getMatchData(broadcast, requireAll) {
         team1,
         team2
     };
+}
+
+/**
+ *
+ * @param matchID
+ * @returns {Promise<({report: Report | undefined, match: Match})>}
+ */
+export async function getMatchScoreReporting(matchID) {
+    const match = await get(matchID);
+    let report;
+
+    if (!match?.id) throw "Couldn't load match data";
+
+    if (!match?.event?.[0]) throw "Couldn't load event data for this match";
+    const event = await get(match?.event?.[0]);
+    if (!event?.id) throw "Couldn't load event data for this match";
+
+    // event score reporting must be active
+
+    if (!event?.blocks) throw "Event doesn't have score reporting set up";
+
+    /** @type {EventSettings} */
+    const eventSettings = JSON.parse(event.blocks);
+    if (!eventSettings?.reporting?.score?.use) throw "Score reporting is not enabled on this match";
+
+    // check existing report
+    if (match?.reports?.[0]) {
+        const firstReport = await get(match?.reports?.[0]);
+        if (firstReport?.id) {
+            report = firstReport;
+        }
+    }
+
+    return { match, report };
 }
 
 export async function getTwitchAPIClient(channel) {

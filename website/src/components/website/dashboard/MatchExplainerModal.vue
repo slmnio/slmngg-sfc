@@ -10,47 +10,20 @@
             <b>Ready to submit?</b>
             <br>
             <p>This is the data that you're submitting:</p>
-            <ol class="edit-list">
-                <li v-for="(map, i) in hydratedData" :key="i">
-                    <div>{{ map?.map?.name }}</div>
-                    <div v-if="map.score_1 > map.score_2">Score: {{ teams[0]?.name }} <b>{{ map.score_1 }}-{{ map.score_2 }}</b> {{ teams[1]?.name }}</div>
-                    <div v-else>Score: {{ teams[1]?.name }} <b>{{ map.score_2 }}-{{ map.score_1 }}</b> {{ teams[0]?.name }}</div>
-                    <div>
-                        <div v-if="map.winner?.name">Winner: <b>{{ map.winner.name }}</b></div>
-                        <div v-if="map.picked?.name">Picked by: <b>{{ map.picked.name }}</b></div>
-                        <div v-if="map.banner?.name">Banned by: <b>{{ map.banner.name }}</b></div>
-                        <div v-if="map.draw">Draw</div>
-                    </div>
-                </li>
-            </ol>
+            <MatchExplainerList :edited-map-data="editedMapData" :match="match" />
         </div>
     </BModal>
 </template>
 
 <script>
-import { ReactiveRoot } from "@/utils/reactive";
+import MatchExplainerList from "@/components/website/dashboard/MatchExplainerList.vue";
 
 export default {
     name: "MatchExplainerModal",
+    components: { MatchExplainerList },
     props: ["editedMapData", "match", "modelValue"],
     emits: ["update:modelValue", "ok"],
     computed: {
-        teams() {
-            return this.match.teams;
-        },
-        hydratedData() {
-            return (this.editedMapData || []).map(mapData => {
-                console.log(Object.values(mapData).filter(Boolean), mapData);
-                return ({
-                    ...mapData,
-                    map: ReactiveRoot(mapData.map),
-                    existingID: ReactiveRoot(mapData.existingID),
-                    winner: ReactiveRoot(mapData.winner),
-                    picker: ReactiveRoot(mapData.picker),
-                    banner: ReactiveRoot(mapData.banner),
-                });
-            });
-        },
         eventSettings() {
             if (!this.match?.event?.blocks) return null;
             return JSON.parse(this.match.event.blocks);

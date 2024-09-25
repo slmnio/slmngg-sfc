@@ -19,7 +19,10 @@
             </div>
 
 
-            <div v-if="currentStep?.key === 'report' && authStatus?.team" class="step-action">
+            <div v-if="existingScoreReport?.approved" class="p-2 bg-success text-center rounded">
+                This match's score has been approved
+            </div>
+            <div v-else-if="currentStep?.key === 'report' && authStatus?.team" class="step-action">
                 <MatchEditor :match="match" :score-reporting="true" :hide-match-extras="true" />
             </div>
             <div v-else-if="currentStep?.key === 'opponentApprove'" class="step-action">
@@ -28,7 +31,7 @@
                         Approve or deny {{ existingScoreReport?.team?.name ? existingScoreReport.team.name + "'s" : "your opponent's" }} score report.
                     </div>
 
-                    <MatchExplainerList class="bg-light text-dark-low p-3 rounded" :edited-map-data="existingReportData" :match="match" />
+                    <MatchExplainerList class="bg-light text-dark-low p-3 rounded" :edited-map-data="existingReportData?.mapData" :edited-match-data="existingReportData?.matchData" :match="match" />
 
                     <div class="flex-center">
                         <b-button-group>
@@ -37,19 +40,44 @@
                         </b-button-group>
                     </div>
                 </div>
+                <div v-else-if="authStatus?.staff && !existingScoreReport?.approved_by_staff" class="d-flex flex-column gap-2">
+                    <div class="p-2 bg-dark text-center rounded">
+                        Pre-approve or deny {{ existingScoreReport.team.name }}'s score report.
+                    </div>
+
+                    <MatchExplainerList class="bg-light text-dark-low p-3 rounded" :edited-map-data="existingReportData?.mapData" :edited-match-data="existingReportData?.matchData" :match="match" />
+
+                    <div class="flex-center">
+                        <b-button-group>
+                            <b-button :disabled="processing.approval" variant="success" @click="staffApproveReport('approve')"><i class="fas fa-fw fa-check mr-1"></i> Staff approve</b-button>
+                            <b-button :disabled="processing.approval" variant="danger" @click="staffApproveReport('deny')"><i class="fas fa-fw fa-times mr-1"></i> Staff deny</b-button>
+                        </b-button-group>
+                    </div>
+                </div>
                 <div v-else class="p-2 bg-dark text-center rounded">
                     Waiting for opponent approval
                 </div>
             </div>
             <div v-else-if="currentStep?.key === 'staffApprove' && (authStatus?.staff || authStatus?.team)" class="step-action">
-                <div v-if="authStatus?.staff">
-                    Staff - approve !
+                <div v-if="authStatus?.staff" class="d-flex flex-column gap-2">
+                    <div class="p-2 bg-dark text-center rounded">
+                        Approve or deny {{ existingScoreReport.team.name }}'s score report.
+                    </div>
+
+                    <MatchExplainerList class="bg-light text-dark-low p-3 rounded" :edited-map-data="existingReportData?.mapData" :edited-match-data="existingReportData?.matchData" :match="match" />
+
+                    <div class="flex-center">
+                        <b-button-group>
+                            <b-button :disabled="processing.approval" variant="success" @click="staffApproveReport('approve')"><i class="fas fa-fw fa-check mr-1"></i> Staff approve</b-button>
+                            <b-button :disabled="processing.approval" variant="danger" @click="staffApproveReport('deny')"><i class="fas fa-fw fa-times mr-1"></i> Staff deny</b-button>
+                        </b-button-group>
+                    </div>
                 </div>
                 <div v-else>
                     Team - wait for staff approval
                 </div>
             </div>
-            <div v-else-if="matchComplete && existingScoreReport" class="p-2 bg-success text-center rounded">
+            <div v-else-if="(matchComplete && existingScoreReport) || existingScoreReport?.approved" class="p-2 bg-success text-center rounded">
                 This match's score has been approved
             </div>
             <div v-else-if="matchComplete" class="p-2 bg-dark text-center rounded">
@@ -75,7 +103,7 @@
 
 import MatchEditor from "@/components/website/dashboard/MatchEditor.vue";
 import { useAuthStore } from "@/stores/authStore";
-import { canEditMatch } from "@/utils/client-action-permissions";
+import { canEditMatch, isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { cleanID, url } from "@/utils/content-utils";
 import MatchExplainerList from "@/components/website/dashboard/MatchExplainerList.vue";
@@ -166,7 +194,7 @@ export default {
 
             if (this.controllableTeams?.length) status.team = true;
 
-            const editorPerm = canEditMatch(player, { event: this.match?.event, match: this.match });
+            const editorPerm = isEventStaffOrHasRole(player, { event: this.match?.event, websiteRoles: ["Can edit any match", "Can edit any event"] });
             if (editorPerm) status.staff = true;
             return status;
         },
@@ -256,6 +284,22 @@ export default {
             this.processing.approval = true;
             try {
                 const response = await authenticatedRequest("actions/approve-score-report", {
+                    matchID: this.match.id,
+                    reaction
+                });
+
+                if (!response.error) {
+                    this.$notyf.success("Score report complete");
+                }
+
+            } finally {
+                this.processing.approval = false;
+            }
+        },
+        async staffApproveReport(reaction) {
+            this.processing.approval = true;
+            try {
+                const response = await authenticatedRequest("actions/staff-approve-score-report", {
                     matchID: this.match.id,
                     reaction
                 });

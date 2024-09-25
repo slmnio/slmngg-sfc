@@ -1,7 +1,11 @@
 import { AnyAirtableID, EventSettings, Report } from "../types.js";
 import { get } from "../action-utils/action-cache.js";
 // @ts-expect-error not a ts file
+import * as Cache from "../cache.js";
+// @ts-expect-error not a ts file
 import { getInternalManager } from "../action-utils/action-manager.js";
+// @ts-expect-error not a ts file
+import { updateRecord } from "../action-utils/action-utils.js";
 
 export default {
     /**
@@ -13,6 +17,10 @@ export default {
      */
     async handler({ id, newData: report, oldData }: { id: AnyAirtableID, newData: Report, oldData: Report }) {
         if (report?.__tableName !== "Reports") return;
+        if (report.approved) {
+            console.log("Already approved");
+            return;
+        }
 
         if (!report?.match?.length) return;
         const match = await get(report?.match?.[0]);
@@ -23,12 +31,11 @@ export default {
 
         const eventSettings = JSON.parse(event.blocks) as EventSettings;
         if (!eventSettings?.reporting?.score?.use) return;
-
         if (report.type === "Scores" && report.data) {
             const reportApproved =
-                report.approved_by_team &&
+                (report.approved_by_team &&
                 (eventSettings.reporting.score.opponentApprove ? report.approved_by_opponent : true) &&
-                (eventSettings.reporting.score.staffApprove ? report.approved_by_staff : true);
+                (eventSettings.reporting.score.staffApprove ? report.approved_by_staff : true));
 
             if (reportApproved) {
                 // Process approval
@@ -36,12 +43,30 @@ export default {
                 const manager = getInternalManager();
                 if (!manager) return console.error("No internal manager can run automation action");
                 try {
-                    await manager.runActionAsAutomation("update-map-data", {
-                        matchID: match.id,
-                        mapData: JSON.parse(report.data)
+                    const { matchData, mapData } = JSON.parse(report.data);
+                    console.log({
+                        matchData,
+                        mapData
                     });
+                    if (mapData) {
+                        await manager.runActionAsAutomation("update-map-data", {
+                            matchID: match.id,
+                            mapData
+                        });
+                    }
+                    if (matchData) {
+                        await manager.runActionAsAutomation("update-match-data", {
+                            matchID: match.id,
+                            updatedData: matchData
+                        });
+                    }
                     // Delete record here (not implemented?)
                     console.log("Can now delete the score report");
+
+                    await updateRecord(Cache, "Reports", report, {
+                        "Approved": true
+                    });
+
                 } catch (e) {
                     console.error("Action error - not continuing");
                 }

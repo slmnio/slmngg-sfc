@@ -148,6 +148,7 @@ export interface Report extends Base {
     id: ReportResolvableID;
     __tableName: "Reports";
 
+    approved?: boolean;
     approved_by_team?: boolean;
     approved_by_opponent?: boolean;
     approved_by_staff?: boolean;

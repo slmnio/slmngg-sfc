@@ -671,3 +671,80 @@ export function decoratePlayerWithDraftData(player, eventID) {
         _draftData
     };
 }
+
+
+export function getScoreReportingBadge(state, report, eventSettings) {
+    if (!state.reports_enabled) return null;
+    if (state.is_complete) return null;
+
+    if (state.existing_report && report.approved) {
+        return {
+            variant: "success",
+            text: "Complete"
+        };
+    }
+    if (state.existing_report && report.approved_by_opponent && eventSettings?.reporting?.score?.staffApprove) {
+        // Waiting for staff approval
+        if (state.is_staff) {
+            return {
+                variant: "success",
+                text: "Needs approval",
+                small: "Approve",
+                title: "You can approve the score report of this match"
+            };
+        } else if (state.is_on_teams) {
+            return {
+                variant: "dark",
+                text: "Submitted",
+                small: "Waiting",
+                title: "Waiting for staff approval"
+            };
+        }
+    }
+    if (state.existing_report && report.approved_by_team && eventSettings?.reporting?.score?.opponentApprove) {
+        // Waiting for opponent approval
+        if (state.is_opponent) {
+            return {
+                variant: "success",
+                text: "Needs approval",
+                small: "Approve",
+                title: "You can approve the score report of this match"
+            };
+        } else if (state.is_staff) {
+            if (eventSettings?.reporting?.score?.staffApprove && !report.approved_by_staff) {
+                // waiting for opponent but will need staff
+                return {
+                    variant: "success",
+                    text: "Pre-approve",
+                    small: "Pre",
+                    title: "Pre-approval ready"
+                };
+            } else {
+                // waiting for opponent but staff not needed
+                return {
+                    variant: "dark",
+                    text: "Needs opponent",
+                    title: "Waiting for opponent to approve this report"
+                };
+            }
+        } else if (state.is_on_teams) {
+            return {
+                variant: "dark",
+                text: "Submitted",
+                small: "Waiting",
+                title: "This match is waiting for opponent approval"
+            };
+        }
+    }
+
+    if (!state.existing_report && state.is_on_teams) {
+        return {
+            variant: "primary",
+            text: "Available",
+            small: "Report",
+            title: "You can report the score of this match"
+        };
+    }
+
+    return null;
+}

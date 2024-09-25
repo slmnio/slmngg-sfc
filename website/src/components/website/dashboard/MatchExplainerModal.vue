@@ -10,7 +10,7 @@
             <b>Ready to submit?</b>
             <br>
             <p>This is the data that you're submitting:</p>
-            <MatchExplainerList :edited-map-data="editedMapData" :match="match" />
+            <MatchExplainerList :edited-map-data="editedMapData" :edited-match-data="editedMatchData" :match="match" />
         </div>
     </BModal>
 </template>
@@ -21,7 +21,7 @@ import MatchExplainerList from "@/components/website/dashboard/MatchExplainerLis
 export default {
     name: "MatchExplainerModal",
     components: { MatchExplainerList },
-    props: ["editedMapData", "match", "modelValue"],
+    props: ["editedMapData", "match", "modelValue", "editedMatchData"],
     emits: ["update:modelValue", "ok"],
     computed: {
         eventSettings() {

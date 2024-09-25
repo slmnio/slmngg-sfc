@@ -82,6 +82,7 @@
                 :can-edit-matches="showEditorButton"
                 :can-edit-broadcasts="showBroadcastSettings"
                 :show-batch-checkboxes="showBroadcastSettings && showBatchCheckboxes"
+                :show-score-reporting="scoreReportingEnabled"
                 :selected-broadcast="selectedBroadcast" />
         </div>
     </div>
@@ -156,7 +157,7 @@ export default {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
                 }),
-                maps: ReactiveArray("maps")
+                maps: ReactiveArray("maps"),
             })(this.event);
         },
         pagedMatches() {
@@ -263,7 +264,14 @@ export default {
                 role: "Broadcast Manager",
                 websiteRoles: ["Can edit any match", "Can edit any event", "Full broadcast permissions"]
             });
-        }
+        },
+        eventSettings() {
+            if (!this._event?.blocks) return null;
+            return JSON.parse(this._event.blocks);
+        },
+        scoreReportingEnabled() {
+            return this.eventSettings?.reporting?.score?.use;
+        },
     },
     methods: {
         getMatchClass(thisMatch, lastMatch) {

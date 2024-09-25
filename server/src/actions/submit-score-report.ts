@@ -8,10 +8,10 @@ import { get } from "../action-utils/action-cache.js";
 
 export default {
     key: "submit-score-report",
-    requiredParams: ["matchID", "mapData"],
+    requiredParams: ["matchID", "reportData"],
     auth: ["user"],
     async handler(
-        { matchID, mapData } : { matchID: MatchResolvableID, mapData: object[]},
+        { matchID, reportData } : { matchID: MatchResolvableID, reportData: { mapData: object[], matchData: object[] }},
         { user } : ActionAuth
     ) {
         const { match, report } : { match: Match, report: Report | undefined } = await getMatchScoreReporting(matchID);
@@ -35,12 +35,12 @@ export default {
 
         // no report exists
 
-        const response = this.helpers.createRecord("Reports", {
+        const response = await this.helpers.createRecord("Reports", {
             "Type": "Scores",
             "Player": [dirtyID(user.airtable.id)],
             "Team": [dirtyID(actingTeam.id)],
             "Match": [dirtyID(match.id)],
-            "Data": JSON.stringify(mapData),
+            "Data": JSON.stringify(reportData),
             "Approved by team": true,
             "Log": `${(new Date()).toLocaleString()}: ${user.airtable.name} reported score as ${actingTeam?.name}`
         });

@@ -1,5 +1,14 @@
 <template>
     <div class="edit-list-container">
+        <div v-if="editedMatchData?.score_1 || editedMatchData?.score_2">
+            <div><b>Match score:</b> {{ teams[0]?.name }} <b>{{ editedMatchData?.score_1 || 0 }}-{{ editedMatchData?.score_2 || 0 }}</b> {{ teams[1]?.name }}</div>
+            <div><b>Match winner:</b> {{ teams[(editedMatchData?.score_1 || 0) > (editedMatchData?.score_2 || 0) ? 0 : 1]?.name }}</div>
+            <div><b>Match loser:</b> {{ teams[(editedMatchData?.score_1 || 0) > (editedMatchData?.score_2 || 0) ? 1 : 0]?.name }}</div>
+        </div>
+        <div v-if="editedMatchData?.forfeit">
+            <b>Match forfeit</b> {{ editedMatchData?.forfeit_reason || '' }}
+        </div>
+
         <ol class="edit-list mb-0">
             <li v-for="(map, i) in hydratedData" :key="i">
                 <div>{{ map?.map?.name }}</div>
@@ -27,7 +36,7 @@ import { ReactiveRoot } from "@/utils/reactive.js";
 
 export default {
     name: "MatchExplainerList",
-    props: ["editedMapData", "match"],
+    props: ["editedMapData", "match", "editedMatchData"],
     computed: {
         teams() {
             return this.match.teams;

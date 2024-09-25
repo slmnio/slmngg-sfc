@@ -138,7 +138,7 @@
                                     </b-form-checkbox>
                                 </div>
                             </td>
-                            <td v-if="!hideMatchExtras" class="form-stack number">
+                            <td v-if="scoreReporting || !hideMatchExtras" class="form-stack number">
                                 <div class="form-top">Replay Code</div>
                                 <div class="form-button">
                                     <b-form-input v-model="replayCodes[i]" type="text" />
@@ -232,7 +232,12 @@
                 </div>
             </div>
         </b-form>
-        <MatchExplainerModal v-model="scoreReportConfirmModal" :match="match" :edited-map-data="editedMapData" @ok="() => saveScoreReport()" />
+        <MatchExplainerModal
+            v-model="scoreReportConfirmModal"
+            :match="match"
+            :edited-map-data="editedMapData"
+            :edited-match-data="reportableMatchData"
+            @ok="() => saveScoreReport()" />
     </div>
 </template>
 
@@ -290,6 +295,25 @@ export default {
             if (!this.match?.teams?.length) return [dummy, dummy];
             if (this.match.teams.length === 1) return [this.match.teams[0], dummy];
             return this.match.teams;
+        },
+        reportableMatchData() {
+            const allowedData = {
+                start: this.matchData.start,
+                score_1: (this.matchData.scores?.[0] || 0),
+                score_2: (this.matchData.scores?.[1] || 0),
+                forfeit: this.matchData.forfeit,
+                forfeit_reason: this.matchData.forfeit_reason
+            };
+            const changedData = {};
+
+            if (this?.match.start !== allowedData.start) changedData.start = allowedData.start;
+            if (this?.match.forfeit !== allowedData.forfeit) changedData.forfeit = allowedData.forfeit;
+            if (this?.match.forfeit_reason !== allowedData.forfeit_reason) changedData.forfeit_reason = allowedData.forfeit_reason;
+            if (JSON.stringify(this.matchData?.scores || [0,0]) !== JSON.stringify([this.match?.score_1, this.match?.score_2])) {
+                changedData.score_1 = allowedData.score_1;
+                changedData.score_2 = allowedData.score_2;
+            }
+            return changedData;
         },
         scores() {
             return [this.match.score_1 || 0, this.match.score_2 || 0];
@@ -584,7 +608,10 @@ export default {
 
             const response = await authenticatedRequest("actions/submit-score-report", {
                 matchID: this.match.id,
-                mapData: this.editedMapData
+                reportData: {
+                    mapData: this.editedMapData,
+                    matchData: this.reportableMatchData
+                }
             });
             // if (response.error) this.errorMessage = response.errorMessage;
             console.log(response);

@@ -1,5 +1,5 @@
 <template>
-    <div v-if="contrast !== Infinity" class="contrast-badge" :style="score?.style" :title="score?.text">
+    <div v-if="_contrast !== Infinity" class="contrast-badge" :style="score?.style" :title="score?.text">
         {{ isNaN(_contrast) ? _contrast : _contrast.toFixed(2) }}
     </div>
 </template>

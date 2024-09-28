@@ -151,14 +151,14 @@
                             :thing="team" />
                         <div class="d-flex team-help-text flex-wrap align-items-center">
                             <div class="text money">{{ money(team.balance) }}</div>
-                            <div class="text player-count ml-2">({{ auctionSettings?.each_team - (team.players?.length || 0) }} to draft)</div>
+                            <div class="text player-count ml-2">({{ auctionSettings?.each_team - ((team?.players || [])?.length || 0) }} to draft)</div>
                         </div>
                     </div>
                     <div v-if="lastStartedTeam?.id === team?.id" class="ml-2 badge badge-pill bg-secondary">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>
                     <div v-if="nextTeamToStart?.id === team?.id" class="ml-2 badge badge-pill bg-primary">Next to start</div>
                     <div v-if="actingTeam?.id === team?.id" class="ml-2 badge badge-pill bg-info">Acting as this team</div>
                     <ul>
-                        <li v-for="player in team.players" :key="player.id">
+                        <li v-for="player in (team?.players || [])" :key="player.id">
                             <router-link :to="url('player', player)" target="_blank">{{ player?.name }}</router-link>
                             {{ money(player?.auction_price) }}
                         </li>
@@ -181,7 +181,7 @@
                     <div v-if="lastStartedTeam?.id === team?.id" class="ml-2 badge badge-pill bg-secondary">Started {{ ["PRE_AUCTION", "POST_AUCTION", "IN_ACTION"].includes(auctionState) ? "this" : "last" }} player</div>
                     <div v-if="actingTeam?.id === team?.id" class="ml-2 badge badge-pill bg-info">Acting as this team</div>
                     <ul>
-                        <li v-for="player in team.players" :key="player.id">
+                        <li v-for="player in (team?.players || [])" :key="player.id">
                             <router-link :to="url('player', player)" target="_blank">{{ player?.name }}</router-link>
                             • {{ money(player?.auction_price) }}
                         </li>

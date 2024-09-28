@@ -214,7 +214,7 @@ module.exports = {
                         role.position = settings.roles.rolePosition;
                     }
                     if ((actions.includes("edit_roles") && settings?.roles?.changeColors) || actions.includes("create_roles")) {
-                        role.color = settings.roles.changeColors === "override" ? settings.roles.roleColorOverride : theme?.color_theme;
+                        role.color = settings.roles.changeColors === "override" ? settings.roles.roleColorOverride : (theme?.color_theme_on_dark || theme?.color_theme);
                     }
 
 

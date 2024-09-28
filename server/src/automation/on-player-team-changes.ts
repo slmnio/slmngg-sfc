@@ -95,8 +95,15 @@ export default {
 
             console.log({ teamChanges });
 
-            const addRole = teamChanges.some(({alteration}) => alteration === "added");
-            const removeRole = teamChanges.every(({alteration}) => alteration !== "added");
+            const allTeamPlayerPositions = [
+                ...(team.players || []),
+                ...(team.staff || []),
+                ...(team.owners || []),
+                ...(team.captains || []),
+            ].map(id => cleanID(id));
+
+            const addRole = allTeamPlayerPositions.includes(cleanID(player.id));
+            const removeRole = !addRole;
 
             let playerMember;
             let guild;

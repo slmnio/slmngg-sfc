@@ -5,7 +5,11 @@ import * as Cache from "../cache.js";
 // @ts-expect-error not a ts file
 import { getInternalManager } from "../action-utils/action-manager.js";
 // @ts-expect-error not a ts file
-import { updateRecord } from "../action-utils/action-utils.js";
+import { cleanID, updateRecord } from "../action-utils/action-utils.js";
+// @ts-expect-error not a ts file
+import client from "../discord/client.js";
+// @ts-expect-error not a ts file
+import { MapObject } from "../discord/managers.js";
 
 export default {
     /**
@@ -28,6 +32,20 @@ export default {
         if (!match?.event?.length) return;
         const event = await get(match?.event?.[0]);
         if (!event?.id || !event?.blocks) return;
+
+        const opponentIDs = (match.teams || []).filter(id => cleanID(id) !== cleanID(report.team?.[0]));
+        const opponents = await Promise.all(opponentIDs.map(id => get(id)));
+        const submittingTeam = report.team?.[0] ? await get(report.team?.[0]) : null;
+
+        let subdomain = "";
+
+        if (match?.event?.length) {
+            const event = await Cache.get(match?.event?.[0]);
+            if (event?.subdomain || event?.partial_subdomain) {
+                subdomain = (event.subdomain || event.partial_subdomain || "") + ".";
+            }
+        }
+        const matchLink = `https://${subdomain}slmn.gg/match/${cleanID(match.id)}/score-reporting`;
 
         const eventSettings = JSON.parse(event.blocks) as EventSettings;
         if (!eventSettings?.reporting?.score?.use) return;
@@ -67,6 +85,20 @@ export default {
                         "Approved": true
                     });
 
+                    if (client &&
+                        opponents.length &&
+                        eventSettings?.logging?.staffCompletedScoreReport
+                    ) {
+                        const channel = await client.channels.fetch(eventSettings.logging.staffCompletedScoreReport);
+                        if (channel) {
+                            try {
+                                channel.send(`🎉 A score report has been fully approved and the data is now live.\n${matchLink}\nImagine an embed here.`);
+                            } catch (e) {
+                                console.error("Channel sending error", e);
+                            }
+                        }
+                    }
+
                 } catch (e) {
                     console.error("Action error - not continuing");
                 }
@@ -76,9 +108,66 @@ export default {
                 if (eventSettings.reporting.score.opponentApprove && (!oldData.approved_by_opponent && report.approved_by_opponent)) {
                     // Now approved by opponent
                     console.log("Report not ready for approval but has been approved by opponent");
+                    // Staff can now approve
+
+                    if (client &&
+                        opponents.length &&
+                        eventSettings?.logging?.staffScoreReport &&
+                        eventSettings?.reporting?.score?.staffApprove &&
+                        !report.approved_by_staff
+                    ) {
+                        const channel = await client.channels.fetch(eventSettings.logging.staffScoreReport);
+                        if (channel) {
+                            try {
+                                channel.send(`📣 A score report from ${submittingTeam ? submittingTeam.name : "a team"} has been approved by their opponent and is ready for staff approval\n${matchLink}`);
+                            } catch (e) {
+                                console.error("Channel sending error", e);
+                            }
+                        }
+                    }
+
                 } else if (!oldData.approved_by_team && report.approved_by_team) {
+                    // Opponent can now approve
                     console.log("Report has been approved by initial team");
                     console.log({oldData, newData: report});
+
+
+                    if (client &&
+                        opponents.length &&
+                        eventSettings?.logging?.captainNotifications &&
+                        eventSettings?.reporting?.score?.opponentApprove &&
+                        !report.approved_by_opponent
+                    ) {
+                        const channel = await client.channels.fetch(eventSettings.logging.captainNotifications);
+                        if (channel) {
+                            const opponentPings = opponents.map(opponent => {
+                                const discordControl = new MapObject(opponent?.discord_control);
+                                return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : opponent.name;
+                            });
+                            try {
+                                channel.send(`📣 ${opponentPings.join(" ")}\nA score report from ${submittingTeam ? submittingTeam.name : "your opponent"} is ready for approval\n${matchLink}`);
+                            } catch (e) {
+                                console.error("Channel sending error", e);
+                            }
+                        }
+
+                        // we can also go straight to staff approving if necessary
+                    } else if (client &&
+                        (!eventSettings?.reporting?.score?.opponentApprove || report.approved_by_opponent) && // passed opponent approval
+                        eventSettings?.logging?.staffScoreReport &&
+                        eventSettings?.reporting?.score?.staffApprove &&
+                        !report.approved_by_staff
+                    ) {
+                        const channel = await client.channels.fetch(eventSettings.logging.staffScoreReport);
+                        if (channel) {
+                            try {
+                                channel.send(`📣 A score report from ${submittingTeam ? submittingTeam.name : "a team"} has been approved by their opponent and is ready for staff approval\n${matchLink}`);
+                            } catch (e) {
+                                console.error("Channel sending error", e);
+                            }
+                        }
+                    }
+
                 } else {
                     // other change
                     console.log("Report changed something else");

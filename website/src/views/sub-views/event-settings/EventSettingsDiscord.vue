@@ -581,6 +581,7 @@ export default {
         async getGuildRoleData() {
             const { data, error } = await authenticatedRequest("actions/get-discord-server-data", {
                 eventID: this.event?._original_data_id || this.event?.id,
+                dataType: "roles"
             });
             return (data || []).sort((a,b) => b.rawPosition - a.rawPosition);
         },

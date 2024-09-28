@@ -47,8 +47,9 @@ const TimeOffset = 3 * 1000;
  * @param {object} item - Full item as requested from Cache
  * @param {AnyAirtableID} item.id - Item must have its Airtable ID
  * @param {*} data - Data to update (can be partial)
+ * @param {string} source - Action or source
  */
-export async function updateRecord(Cache, tableName, item, data) {
+export async function updateRecord(Cache, tableName, item, data, source) {
     // see: airtable-interface.js customUpdater
     console.log(`[update record] updating table=${tableName} id=${item.id}`, data);
 
@@ -59,7 +60,7 @@ export async function updateRecord(Cache, tableName, item, data) {
     };
     verboseLog(`Editing record on **${tableName}** \`${item.id}\``, data);
     // Eager update
-    Cache.set(cleanID(item.id), slmnggData, { eager: true });
+    Cache.set(cleanID(item.id), slmnggData, { eager: true, source });
 
     // Update custom keys
     if (tableName === "Broadcasts" && item.key) Cache.set(`broadcast-${item.key}`, { ...slmnggData, customKey: true }, { eager: true });
@@ -252,6 +253,13 @@ export function safeInputNoQuotes(string) {
         .replace(/>/g, "&gt;");
 }
 
+/**
+ *
+ * @param {Player?} player
+ * @param {Team?} team
+ * @param {Guild} guild
+ * @returns {Promise<{member: GuildMember, fixes: *[]}>}
+ */
 export async function findMember(player, team, guild) {
     let member;
     let fixes = [];
@@ -263,7 +271,7 @@ export async function findMember(player, team, guild) {
                     type: "discord_id_not_found",
                     playerID: player.id,
                     discordID: player.discord_id,
-                    teamID: team.id
+                    teamID: team?.id
                 });
                 console.warn(fixes[fixes.length - 1]);
             }
@@ -273,7 +281,7 @@ export async function findMember(player, team, guild) {
                 type: "discord_id_not_found",
                 playerID: player.id,
                 discordID: player.discord_id,
-                teamID: team.id
+                teamID: team?.id
             });
             console.warn(fixes[fixes.length - 1]);
         }
@@ -300,7 +308,7 @@ export async function findMember(player, team, guild) {
             playerID: player.id,
             discordID: player.discord_id,
             discordTag: player.discord_tag,
-            teamID: team.id
+            teamID: team?.id
         });
         console.warn(fixes[fixes.length - 1]);
     }

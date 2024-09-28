@@ -17,10 +17,10 @@ for (const fileName of files) {
     console.log(" ~ ", fileName);
 }
 
-onUpdate(async (id, {oldData, newData}) => {
+onUpdate(async (id, {oldData, newData}, options) => {
     if (!oldData) return;
     if (newData?.customKey) return; // remove things set multiple times with a custom key (e.g. subdomain-bpl)
     for (const auto of automations) {
-        auto.handler({ id, oldData, newData });
+        auto.handler({ id, oldData, newData, options });
     }
 });

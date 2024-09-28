@@ -90,9 +90,9 @@ export type WebsiteSettings =
     | "Can edit any auction"
     | "No profile editing"
 
-/**
- * @property member_of - Teams this player is a player of
- */
+// /**
+//  * @property member_of - Teams this player is a player of
+//  */
 export interface Player extends Base {
     id: PlayerResolvableID;
     __tableName: "Players";
@@ -111,6 +111,8 @@ export interface Player extends Base {
     remote_feed?: string;
     slug_override?: string;
 
+    auction_price?: number;
+
     created?: string;
     favourite_hero?: HeroResolvableID[];
     live_guests?: LiveGuestResolvableID[];
@@ -126,6 +128,8 @@ export interface Player extends Base {
     news?: NewsResolvableID[];
     player_relationships?: PlayerRelationshipResolvableID[];
     team_staff?: TeamResolvableID[];
+    owned_teams?: TeamResolvableID[];
+    captain_of?: TeamResolvableID[];
 
     socials?: SocialResolvableID[];
     controlled_teams?: TeamResolvableID[];
@@ -430,5 +434,15 @@ export type EventSettings = {
             staffApprove?: boolean;
             opponentApprove?: boolean;
         }
+    };
+    logging?: {
+        publicRosterChanges?: Snowflake;
+        matchTimeChanges?: Snowflake;
+        postMatchReports?: Snowflake;
+        captainNotifications?: Snowflake;
+        staffScoreReport?: Snowflake;
+        staffCompletedScoreReport?: Snowflake;
+
+        hideNonStaffRosterChanges?: boolean;
     }
 }

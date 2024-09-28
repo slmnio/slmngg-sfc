@@ -50,15 +50,15 @@ async function broadcast(room, command, ...data) {
 // let updateFunctions = [];
 /**
  *
- * @param {function(id: AnyAirtableID, data: {oldData: object, newData: object})} callback
+ * @param {function(id: AnyAirtableID, data: {oldData: object, newData: object}, options: { custom?: boolean, source?: string})} callback
  */
 export function onUpdate(callback) {
     emitter.on("update", callback);
     // updateFunctions.push(fn);
 }
 
-const updateFunction = function(id, data) {
-    emitter.emit("update", id, data);
+const updateFunction = function(id, data, options) {
+    emitter.emit("update", id, data, options);
     // updateFunctions.forEach(fn => fn(id, data));
 };
 
@@ -103,7 +103,7 @@ async function dataUpdate(id, data, options) {
         if (data) data = await removeAntiLeak(id, data);
         // if (options?.eager) console.log("Sending");
         await broadcast(id, "data_update", id, data);
-        if (!(options && options.custom)) updateFunction(id, { oldData: store.get(id), newData: data });
+        if (!(options && options.custom)) updateFunction(id, { oldData: store.get(id), newData: data }, options);
     }
 }
 

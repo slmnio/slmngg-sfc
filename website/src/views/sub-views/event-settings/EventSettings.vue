@@ -7,7 +7,10 @@
                 <router-link class="nav-link" :to="subLink('')">General</router-link>
             </li>
             <li class="nav-item">
-                <router-link class="nav-link" :to="subLink('discord')">Discord</router-link>
+                <router-link class="nav-link" :to="subLink('discord')">Discord Teams</router-link>
+            </li>
+            <li class="nav-item">
+                <router-link class="nav-link" :to="subLink('discord-logging')">Logging & Messaging</router-link>
             </li>
             <li class="nav-item">
                 <router-link class="nav-link" :to="subLink('signups')">Signups</router-link>

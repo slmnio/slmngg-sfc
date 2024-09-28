@@ -356,14 +356,14 @@ export default class Auction {
                     dirtyID(playerID)
                 ],
                 "Balance": ((team.balance || 0) - amount) + (remainingSpots > 0 ? this.money.unlockAfterSigning : 0)
-            }),
+            },"auction-signed-player"),
             updateRecord(Cache, "Players", player, {
                 "Member Of": [
                     ...((player.member_of || []).map(id => dirtyID(id))),
                     dirtyID(team.id)
                 ],
                 "Auction Price": amount
-            })
+            },"auction-signed-player")
         ]);
     }
 

@@ -79,7 +79,8 @@ export default {
             });
         });
 
-
+        // destructuring innit
+        // eslint-disable-next-line prefer-const
         for (let [teamID, teamChanges] of teams.entries()) {
             const team = await get(teamID);
             if (!team?.id) continue;
@@ -92,18 +93,15 @@ export default {
 
             console.log({ teamChanges });
 
-            const allTeamPlayerPositions = [
-                ...(team.players || []),
-                ...(team.staff || []),
-                ...(team.owners || []),
-                ...(team.captains || []),
-            ].map(id => cleanID(id));
+            // we can't query the team for the player's ID because it might not be updated yet.
+            // we can, however, query they player and see if the team is on the player's relationships
 
-            console.log(allTeamPlayerPositions, playerID);
-            // const addRole = allTeamPlayerPositions.includes(cleanID(player.id));
-            // const removeRole = !addRole;
-            const addRole = teamChanges.some(({alteration}) => alteration === "added");
-            const removeRole = false;
+            const allPlayerTeamPositions: TeamResolvableID[] = [];
+            keys.forEach(k => allPlayerTeamPositions.push(...(player[k] || []).map(id => cleanID(id))));
+
+            console.log(allPlayerTeamPositions, playerID);
+            const addRole = allPlayerTeamPositions.includes(cleanID(team.id));
+            const removeRole = !addRole;
 
             let playerMember;
             let guild;
@@ -173,7 +171,7 @@ export default {
 
                         if (guild) {
                             const logChannel = await guild.channels.fetch(eventSettings.logging.publicRosterChanges);
-                            if (logChannel) {
+                            if (logChannel && logChannel.type === 0) {
                                 const parts : string[] = [];
 
                                 const addedInAll = teamChanges.some(({alteration}) => alteration === "added");

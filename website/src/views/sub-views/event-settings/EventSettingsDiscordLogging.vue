@@ -254,6 +254,7 @@ export default {
         },
         blocks: {
             deep: true,
+            immediate: true,
             handler(blocks) {
                 if (!blocks?.logging) return;
                 Object.entries(blocks.logging).forEach(([key, val]) => {

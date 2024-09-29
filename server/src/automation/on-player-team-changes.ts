@@ -4,8 +4,6 @@ import { MapObject } from "../discord/managers.js";
 import client from "../discord/client.js";
 import { cleanID, findMember } from "../action-utils/action-utils.js";
 
-type PlayerTeamKey = ("member_of" | "captain_of" | "owned_teams" | "team_staff");
-
 const PlayerTeamRoleMap = {
     "member_of": "player",
     "captain_of": "captain",
@@ -35,9 +33,9 @@ export default {
 
         const changes : any = {};
 
-        const keys = ["member_of", "captain_of", "owned_teams", "team_staff"] as PlayerTeamKey[];
+        const PlayerTeamMembershipKeys = ["member_of", "captain_of", "owned_teams", "team_staff"] as const;
 
-        keys.forEach((key) => {
+        PlayerTeamMembershipKeys.forEach((key) => {
             changes[key] = {
                 added: [],
                 removed: []
@@ -66,9 +64,9 @@ export default {
 
         console.log(player?.name, player?.id, changes);
 
-        const teams = new Map<TeamResolvableID, { key: PlayerTeamKey, alteration: keyof Alterations }[]>();
+        const teams = new Map<TeamResolvableID, { key: typeof PlayerTeamMembershipKeys[number], alteration: keyof Alterations }[]>();
 
-        (Object.entries(changes) as [PlayerTeamKey, Alterations][]).forEach(([key, alterations]) => {
+        (Object.entries(changes) as [typeof PlayerTeamMembershipKeys[number], Alterations][]).forEach(([key, alterations]) => {
             (["added", "removed"] as (keyof Alterations)[]).forEach(alteration => {
                 alterations[alteration].forEach(teamID => {
                     teams.set(teamID, [
@@ -97,7 +95,7 @@ export default {
             // we can, however, query they player and see if the team is on the player's relationships
 
             const allPlayerTeamPositions: TeamResolvableID[] = [];
-            keys.forEach(k => allPlayerTeamPositions.push(...(player[k] || []).map(id => cleanID(id))));
+            PlayerTeamMembershipKeys.forEach(k => allPlayerTeamPositions.push(...(player[k] || []).map(id => cleanID(id))));
 
             console.log(allPlayerTeamPositions, playerID);
             const addRole = allPlayerTeamPositions.includes(cleanID(team.id));
@@ -222,7 +220,7 @@ export default {
                                 if (team.discord_control) {
                                     const teamDiscord = new MapObject(team.discord_control);
                                     if (teamDiscord.get("emoji_id")) {
-                                        const emoji = await client.emojis.resolve(teamDiscord.get("emoji_id"));
+                                        const emoji = client.emojis.resolve(teamDiscord.get("emoji_id"));
                                         if (emoji?.id) {
                                             parts.push(`<:${emoji.name}:${emoji.id}>`);
                                         }

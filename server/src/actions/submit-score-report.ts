@@ -1,6 +1,4 @@
-// @ts-expect-error not a ts file
 import { Action } from "../action-utils/action-manager-models.js";
-// @ts-expect-error not a ts file
 import { dirtyID, getMatchScoreReporting } from "../action-utils/action-utils.js";
 
 import { ActionAuth, Match, MatchResolvableID, Report } from "../types.js";

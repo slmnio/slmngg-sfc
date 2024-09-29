@@ -1,6 +1,5 @@
 /* Basic types */
 import { Snowflake } from "discord-api-types/globals";
-// @ts-expect-error not a ts file
 import { MapObject } from "./discord/managers.js";
 
 export type CleanAirtableID = string;

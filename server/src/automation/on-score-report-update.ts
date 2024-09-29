@@ -1,14 +1,9 @@
 import { AnyAirtableID, EventSettings, Report } from "../types.js";
 import { get } from "../action-utils/action-cache.js";
-// @ts-expect-error not a ts file
 import * as Cache from "../cache.js";
-// @ts-expect-error not a ts file
 import { getInternalManager } from "../action-utils/action-manager.js";
-// @ts-expect-error not a ts file
 import { cleanID, updateRecord } from "../action-utils/action-utils.js";
-// @ts-expect-error not a ts file
 import client from "../discord/client.js";
-// @ts-expect-error not a ts file
 import { MapObject } from "../discord/managers.js";
 
 export default {

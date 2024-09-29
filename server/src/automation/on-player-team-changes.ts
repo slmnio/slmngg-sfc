@@ -1,10 +1,7 @@
 import { AnyAirtableID, EventSettings, Player, TeamResolvableID } from "../types.js";
 import { get } from "../action-utils/action-cache.js";
-// @ts-expect-error not a ts file
 import { MapObject } from "../discord/managers.js";
-// @ts-expect-error not a ts file
 import client from "../discord/client.js";
-// @ts-expect-error not a ts file
 import { cleanID, findMember } from "../action-utils/action-utils.js";
 
 type PlayerTeamKey = ("member_of" | "captain_of" | "owned_teams" | "team_staff");
@@ -102,8 +99,11 @@ export default {
                 ...(team.captains || []),
             ].map(id => cleanID(id));
 
-            const addRole = allTeamPlayerPositions.includes(cleanID(player.id));
-            const removeRole = !addRole;
+            console.log(allTeamPlayerPositions, playerID);
+            // const addRole = allTeamPlayerPositions.includes(cleanID(player.id));
+            // const removeRole = !addRole;
+            const addRole = teamChanges.some(({alteration}) => alteration === "added");
+            const removeRole = false;
 
             let playerMember;
             let guild;

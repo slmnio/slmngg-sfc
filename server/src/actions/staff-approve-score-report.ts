@@ -1,10 +1,7 @@
 import { ActionAuth, Match, MatchResolvableID, Report } from "../types.js";
-// @ts-expect-error not a ts file
 import { Action } from "../action-utils/action-manager-models.js";
-// @ts-expect-error not a ts file
 import { getMatchScoreReporting } from "../action-utils/action-utils.js";
 import { get } from "../action-utils/action-cache.js";
-// @ts-expect-error not a ts file
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
 
 export default {

@@ -233,6 +233,7 @@ export default {
         },
         url,
         safeColor(col) {
+            if (!col) return null;
             col = col.trim().toUpperCase();
             if (this.removeHashInHex) col = col.replace("#", "");
             return col;

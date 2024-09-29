@@ -1,7 +1,9 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { createRecord, updateRecord } from "./action-utils.js";
-
+/**
+ * @type {Cache}
+ */
 import * as Cache from "../cache.js";
 import * as permissions from "./action-permissions.js";
 
@@ -73,7 +75,7 @@ export class Action {
             get: (...args) => Cache.get(...args),
             createRecord: (tableName, data) => createRecord(Cache, tableName, [data]),
             createRecords: (tableName, items) => createRecord(Cache, tableName, items),
-            updateRecord: (tableName, item, data) => updateRecord(Cache, tableName, item, data),
+            updateRecord: (tableName, item, data, source) => updateRecord(Cache, tableName, item, data, source),
             auth: Cache.auth,
             permissions
         };

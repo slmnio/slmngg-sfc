@@ -45,8 +45,8 @@ export default {
 
         console.log(response);
 
-        if (response.error) {
-            throw `Airtable error: ${response.error.errorMessage}`;
+        if ("error" in response) {
+            throw `Airtable error: ${response.errorMessage}`;
         }
         if (response?.[0]?.id) {
             await this.helpers.updateRecord("Matches", match, {
@@ -57,4 +57,5 @@ export default {
 
 
     }
+// @ts-expect-error Needs some action refactoring before it can fully satisfy
 } satisfies Action;

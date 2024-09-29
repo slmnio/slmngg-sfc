@@ -47,9 +47,9 @@ const TimeOffset = 3 * 1000;
  * @param {object} item - Full item as requested from Cache
  * @param {AnyAirtableID} item.id - Item must have its Airtable ID
  * @param {*} data - Data to update (can be partial)
- * @param {string} source - Action or source
+ * @param {string?} source - Action or source
  */
-export async function updateRecord(Cache, tableName, item, data, source) {
+export async function updateRecord(Cache, tableName, item, data, source = undefined) {
     // see: airtable-interface.js customUpdater
     console.log(`[update record] updating table=${tableName} id=${item.id}`, data);
 

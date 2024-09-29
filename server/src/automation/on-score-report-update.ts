@@ -85,9 +85,9 @@ export default {
                         eventSettings?.logging?.staffCompletedScoreReport
                     ) {
                         const channel = await client.channels.fetch(eventSettings.logging.staffCompletedScoreReport);
-                        if (channel) {
+                        if (channel?.isTextBased()) {
                             try {
-                                channel.send(`🎉 A score report has been fully approved and the data is now live.\n${matchLink}\nImagine an embed here.`);
+                                await channel.send(`🎉 A score report has been fully approved and the data is now live.\n${matchLink}\nImagine an embed here.`);
                             } catch (e) {
                                 console.error("Channel sending error", e);
                             }
@@ -112,7 +112,7 @@ export default {
                         !report.approved_by_staff
                     ) {
                         const channel = await client.channels.fetch(eventSettings.logging.staffScoreReport);
-                        if (channel) {
+                        if (channel?.isTextBased()) {
                             try {
                                 channel.send(`📣 A score report from ${submittingTeam ? submittingTeam.name : "a team"} has been approved by their opponent and is ready for staff approval\n${matchLink}`);
                             } catch (e) {
@@ -134,7 +134,7 @@ export default {
                         !report.approved_by_opponent
                     ) {
                         const channel = await client.channels.fetch(eventSettings.logging.captainNotifications);
-                        if (channel) {
+                        if (channel?.isTextBased()) {
                             const opponentPings = opponents.map(opponent => {
                                 const discordControl = new MapObject(opponent?.discord_control);
                                 return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : opponent.name;
@@ -154,7 +154,7 @@ export default {
                         !report.approved_by_staff
                     ) {
                         const channel = await client.channels.fetch(eventSettings.logging.staffScoreReport);
-                        if (channel) {
+                        if (channel?.isTextBased()) {
                             try {
                                 channel.send(`📣 A score report from ${submittingTeam ? submittingTeam.name : "a team"} has been approved by their opponent and is ready for staff approval\n${matchLink}`);
                             } catch (e) {

@@ -5,7 +5,7 @@
     "serve-server": "tsx watch src/index.js",
     "register-commands": "node src/discord/register-slash-commands.js",
     "lint": "eslint --fix src",
-    "build": "echo \"No build stage for server - skipping\""
+    "build": "tsc"
   },
   "main": "index.js",
   "type": "module",

@@ -17,16 +17,19 @@ export default {
         {client}: ActionAuth) {
 
         // client.broadcast = array of broadcasts, but first one is the "active" one -> [0] to make it active
-        const broadcasts = client.broadcast.sort((a, b) => {
+        // TODO: this client?.broadcast is unnecessary because having ["client"] in auth guarantees a client object.
+        //       need some typescript wizardry to make this automatic
+        const broadcasts = (client?.broadcast || []).sort((a, b) => {
             if (a === broadcastID) return -1;
             if (b === broadcastID) return 1;
             return 0;
         });
 
-        const response = await this.helpers.updateRecord("Clients", client, {
+        await this.helpers.updateRecord("Clients", client, {
             "Broadcast": broadcasts
         });
 
         throw "Airtable error";
     }
+// @ts-expect-error Needs some action refactoring before it can fully satisfy
 } satisfies Action;

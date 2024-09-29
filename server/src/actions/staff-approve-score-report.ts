@@ -35,4 +35,5 @@ export default {
             "Log": (report.log ? report.log + "\n" : "") + `${(new Date()).toLocaleString()}: ${user.airtable.name} approved score report as staff`
         });
     }
+// @ts-expect-error Needs some action refactoring before it can fully satisfy
 } satisfies Action;

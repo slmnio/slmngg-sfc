@@ -141,8 +141,20 @@ interface Bracket extends Base {
 interface GFX extends Base {
 
 }
-interface MatchMap extends Base {
+export interface MatchMap extends Base {
+    map?: GameMapResolvableID[]
+    match?: MatchResolvableID[]
+    draw?: boolean;
+    mode?: string; // not sure what this does
+    number?: number;
+    replay_code?: string;
+    score_1?: number;
+    score_2?: number;
+    stats?: string;
 
+    banner?: TeamResolvableID[];
+    picker?: TeamResolvableID[];
+    winner?: TeamResolvableID[];
 }
 interface PlayerRelationship extends Base {
 
@@ -155,6 +167,7 @@ export interface Report extends Base {
     approved_by_team?: boolean;
     approved_by_opponent?: boolean;
     approved_by_staff?: boolean;
+    force_approved?: boolean;
 
     data?: string;
     message_data?: string;
@@ -189,7 +202,23 @@ interface Theme extends Base {
 interface Accolade extends Base {
 
 }
-interface GameMap extends Base {
+export interface GameMap extends Base {
+    audio?: CacheAttachment[];
+    audio_volume?: number;
+    big_image?: CacheAttachment[];
+    image?: CacheAttachment[];
+    video?: CacheAttachment[];
+
+    /**
+     * events - as part of a map pool
+     */
+    events?: EventResolvableID[];
+    game?: "Overwatch" | "Valorant" | "League of Legends" | "Counter-Strike";
+    maps?: MatchMapResolvableID[];
+    name?: string;
+    short_name?: string;
+    shorter_name?: string;
+    type?: string;
 
 }
 interface SignupData extends Base {

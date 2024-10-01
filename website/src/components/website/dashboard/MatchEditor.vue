@@ -470,7 +470,7 @@ export default {
             }
 
             return [
-                { id: null, label: "Select a map", text: "Select a map", value: null },
+                { id: "select-map", label: "Select a map", text: "Select a map", value: undefined },
                 ...Object.entries(groups).map(([groupName, maps]) => ({ label: groupName, options: maps.map(m => ({ value: m.id, text: m.name })) }))
             ];
         },
@@ -738,6 +738,7 @@ export default {
                     // console.log("No change in data", newMatch);
                     return;
                 }
+                console.log("watching match deep");
                 this.updateMatchData(newMatch);
             }
         },
@@ -775,6 +776,7 @@ export default {
         // }
     },
     mounted() {
+        console.log("mounted");
         this.updateMatchData(this.match);
     }
 };

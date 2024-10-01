@@ -29,6 +29,8 @@ function money(num: number) {
 export default {
     async handler({ id: playerID, newData: player, oldData, options }: { id: AnyAirtableID, newData: Player, oldData: Player, options?: { source?: string } }) {
         if (player?.__tableName !== "Players") return;
+        // TODO: this doesn't work for people who are created with team memberships (e.g. brand new players straight into teams through signups)
+        //       ATM it is restricted so it doesn't fire when the server starts up. It may only need us to check if the server is rebuilding rather than having no data.
         if (!oldData?.id) return;
 
         const changes : any = {};
@@ -212,7 +214,7 @@ export default {
                                         parts.push("has been removed from");
                                     } else {
                                         // removed as something else
-                                        parts.push(`has been removed as ${teamChanges.filter(({ alteration}) => alteration === "added").map(({ key }) => PlayerTeamRoleMap[key])} from`);
+                                        parts.push(`has been removed as ${teamChanges.filter(({ alteration}) => alteration === "removed").map(({ key }) => PlayerTeamRoleMap[key])} from`);
                                     }
                                 }
 
@@ -220,7 +222,7 @@ export default {
                                 if (team.discord_control) {
                                     const teamDiscord = new MapObject(team.discord_control);
                                     if (teamDiscord.get("emoji_id")) {
-                                        const emoji = client.emojis.resolve(teamDiscord.get("emoji_id"));
+                                        const emoji = await guild.emojis.fetch(teamDiscord.get("emoji_id"));
                                         if (emoji?.id) {
                                             parts.push(`<:${emoji.name}:${emoji.id}>`);
                                         }

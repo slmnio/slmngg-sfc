@@ -193,9 +193,12 @@ export default {
         sidebarItems() {
             const items = ["vod"];
 
+            console.log("route", this.$route);
+
             if (this.showHeadToHead) items.push("head-to-head");
             if (this.showEditor) items.push("editor");
-            if (this.scoreReportingEnabled && !this.matchComplete) items.push("score-reporting");
+            if ((this.scoreReportingEnabled && !this.matchComplete) || (this.$route?.path?.endsWith("/score-reporting"))) items.push("score-reporting");
+
 
             return items;
         },

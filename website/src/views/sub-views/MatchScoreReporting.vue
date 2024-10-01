@@ -27,7 +27,7 @@
             </div>
             <div v-else-if="currentStep?.key === 'opponentApprove'" class="step-action">
                 <div v-if="isOpponent" class="d-flex flex-column gap-2">
-                    <div class="p-2 bg-dark text-center rounded">
+                    <div class="p-2 bg-primary text-center rounded">
                         Approve or deny {{ existingScoreReport?.team?.name ? existingScoreReport.team.name + "'s" : "your opponent's" }} score report.
                     </div>
 
@@ -41,7 +41,7 @@
                     </div>
                 </div>
                 <div v-else-if="authStatus?.staff && !existingScoreReport?.approved_by_staff" class="d-flex flex-column gap-2">
-                    <div class="p-2 bg-dark text-center rounded">
+                    <div class="p-2 bg-primary text-center rounded">
                         Pre-approve or deny {{ existingScoreReport.team.name }}'s score report.
                     </div>
 
@@ -49,8 +49,9 @@
 
                     <div class="flex-center">
                         <b-button-group>
-                            <b-button :disabled="processing.approval" variant="success" @click="staffApproveReport('approve')"><i class="fas fa-fw fa-check mr-1"></i> Staff approve</b-button>
-                            <b-button :disabled="processing.approval" variant="danger" @click="staffApproveReport('deny')"><i class="fas fa-fw fa-times mr-1"></i> Staff deny</b-button>
+                            <b-button v-b-tooltip="'Approve without waiting for opponent approval'" :disabled="processing.approval" variant="primary" @click="staffApproveReport('force-approve')"><i class="fas fa-fw fa-shield-check mr-1"></i> Force approve</b-button>
+                            <b-button v-b-tooltip="'Auto approve this report once the opponent approves'" :disabled="processing.approval" variant="success" @click="staffApproveReport('pre-approve')"><i class="fas fa-fw fa-check mr-1"></i> Pre-approve</b-button>
+                            <b-button :disabled="processing.approval" variant="danger" @click="staffApproveReport('delete')"><i class="fas fa-fw fa-trash mr-1"></i> Deny & delete</b-button>
                         </b-button-group>
                     </div>
                 </div>
@@ -60,7 +61,7 @@
             </div>
             <div v-else-if="currentStep?.key === 'staffApprove' && (authStatus?.staff || authStatus?.team)" class="step-action">
                 <div v-if="authStatus?.staff" class="d-flex flex-column gap-2">
-                    <div class="p-2 bg-dark text-center rounded">
+                    <div class="p-2 bg-primary text-center rounded">
                         Approve or deny {{ existingScoreReport.team.name }}'s score report.
                     </div>
 
@@ -68,8 +69,8 @@
 
                     <div class="flex-center">
                         <b-button-group>
-                            <b-button :disabled="processing.approval" variant="success" @click="staffApproveReport('approve')"><i class="fas fa-fw fa-check mr-1"></i> Staff approve</b-button>
-                            <b-button :disabled="processing.approval" variant="danger" @click="staffApproveReport('deny')"><i class="fas fa-fw fa-times mr-1"></i> Staff deny</b-button>
+                            <b-button :disabled="processing.approval" variant="success" @click="staffApproveReport('approve')"><i class="fas fa-fw fa-check mr-1"></i> Approve</b-button>
+                            <b-button :disabled="processing.approval" variant="danger" @click="staffApproveReport('delete')"><i class="fas fa-fw fa-trash mr-1"></i> Deny & delete</b-button>
                         </b-button-group>
                     </div>
                 </div>
@@ -143,6 +144,11 @@ export default {
             return this.eventSettings?.reporting?.score?.use;
         },
         /** @returns {Report | null} */
+        existingScoreReportRaw() {
+            return (ReactiveRoot(this.match?.id, {
+                "reports": ReactiveArray("reports")
+            })?.reports || []).find(report => report.type === "Scores" && cleanID(report.match?.[0]) === cleanID(this.match?.id));
+        },
         existingScoreReport() {
             return (ReactiveRoot(this.match?.id, {
                 "reports": ReactiveArray("reports", {

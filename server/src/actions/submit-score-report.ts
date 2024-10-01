@@ -1,5 +1,5 @@
 import { Action } from "../action-utils/action-manager-models.js";
-import { dirtyID, getMatchScoreReporting } from "../action-utils/action-utils.js";
+import { deAirtableRecord, dirtyID, getMatchScoreReporting } from "../action-utils/action-utils.js";
 
 import { ActionAuth, Match, MatchResolvableID, Report } from "../types.js";
 import { get } from "../action-utils/action-cache.js";
@@ -39,7 +39,6 @@ export default {
             "Team": [dirtyID(actingTeam.id)],
             "Match": [dirtyID(match.id)],
             "Data": JSON.stringify(reportData),
-            "Approved by team": true,
             "Log": `${(new Date()).toLocaleString()}: ${user.airtable.name} reported score as ${actingTeam?.name}`
         });
 
@@ -51,6 +50,9 @@ export default {
         if (response?.[0]?.id) {
             await this.helpers.updateRecord("Matches", match, {
                 "Reports": [...(match.reports || []), response?.[0].id]
+            });
+            await this.helpers.updateRecord("Reports", deAirtableRecord(response[0]), {
+                "Approved by team": true
             });
             return response?.[0].id;
         }

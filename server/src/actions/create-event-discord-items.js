@@ -699,7 +699,7 @@ export default {
                     responseCounts.roles.edited ? multiple(responseCounts.roles.edited, "role edited", "roles edited") : null,
                     responseCounts.roles.deleted ? multiple(responseCounts.roles.deleted, "role deleted", "roles deleted") : null,
                     responseCounts.roles.assigned ? multiple(responseCounts.roles.assigned, "role assigned", "roles assigned") : null,
-                    responseCounts.roles.alreadyAssigned ? multiple(responseCounts.roles.alreadyAssigned, "roles already assigned", "roless already assigned") : null,
+                    responseCounts.roles.alreadyAssigned ? multiple(responseCounts.roles.alreadyAssigned, "roles already assigned", "roles already assigned") : null,
                     responseCounts.roles.unassigned ? multiple(responseCounts.roles.unassigned, "role unassigned", "roles unassigned") : null,
 
                     responseCounts.players.tagsUpdated ? multiple(responseCounts.players.tagsUpdated, "player tag updated", "player tags updated") : null,

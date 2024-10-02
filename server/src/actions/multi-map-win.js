@@ -1,11 +1,6 @@
-const {
-    getMatchData,
-    getBroadcast,
-    getMaps,
-    dirtyID
-} = require("../action-utils/action-utils");
+import { dirtyID, getBroadcast, getMaps, getMatchData } from "../action-utils/action-utils.js";
 
-module.exports = {
+export default {
     key: "multi-map-win",
     auth: ["client"],
     requiredParams: ["teamNum"],

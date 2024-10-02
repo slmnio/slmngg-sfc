@@ -18,6 +18,10 @@
             <!--                </b-form-input>-->
             <!--                <div class="spacer flex-grow-1"></div>-->
             <!--                <b-button :disabled="processing['map']" class="ml-5 top-button flex-shrink-0" variant="success" @click="() => saveMapAndScores()"><i class="fas fa-save fa-fw"></i> Save all</b-button>-->
+            <div v-if="scoreReporting && proposedData" class="fill-buttons d-flex gap-2 justify-content-center mt-2">
+                <b-button variant="secondary" size="sm" @click="loadProposedData"><i class="fal fa-fw fa-upload"></i> Load proposed score report</b-button>
+                <b-button variant="danger" size="sm" @click="emptyData()"><i class="fas fa-trash fa-fw"></i> Empty editor</b-button>
+            </div>
             <div class="teams-scores pt-2 px-2">
                 <div class="checkboxes">
                     <b-form-checkbox v-if="showRestrictCheckbox" id="map-pool-checkbox" v-model="restrictToMapPool" class="mr-2">Restrict to map pool</b-form-checkbox>
@@ -48,7 +52,15 @@
                     <b-button size="sm" @click="() => extraMaps++">
                         <i class="fas fa-fw fa-plus"></i> Add map
                     </b-button>
-                    <b-button class="top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save {{ hideMatchExtras ? 'all' : 'maps' }}</b-button>
+                    <b-button
+                        v-if="scoreReporting"
+                        class="top-button flex-shrink-0"
+                        variant="success"
+                        :disabled="!matchData.scores.some(s => s === match.first_to)"
+                        @click="() => scoreReportConfirmModal = true">
+                        <i class="fas fa-save fa-fw"></i> {{ scoreReportAction === "counter" ? 'Submit counter report' : "Submit score report" }}
+                    </b-button>
+                    <b-button v-else class="top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save {{ hideMatchExtras ? 'all' : 'maps' }}</b-button>
                 </div>
             </div>
             <div class="maps-table-wrapper">
@@ -61,7 +73,7 @@
                             :key="i"
                             class="map"
                             :class="{'banned': banners[i], 'very-low-opacity': !map.dummy && !map._original_data_id}">
-                            <td class="form-stack number">
+                            <td v-if="!scoreReporting" class="form-stack number">
                                 <div class="form-top d-flex">
                                     <div>#</div>
                                     <div class="flex-grow-1 text-end">
@@ -104,12 +116,14 @@
                                         v-model="score_1s[i]"
                                         class="map-editor"
                                         :team="teams[0]"
+                                        :show-codes="scoreReporting"
                                         @input="(val) => checkAutoWinner(i, val)" />
                                     <MapScoreEditor
                                         v-model="score_2s[i]"
                                         class="map-editor"
                                         :team="teams[1]"
                                         :reverse="true"
+                                        :show-codes="scoreReporting"
                                         @input="(val) => checkAutoWinner(i, val)" />
                                 </div>
                             </td>
@@ -128,18 +142,19 @@
                                     </b-form-checkbox>
                                 </div>
                             </td>
-                            <td v-if="!hideMatchExtras" class="form-stack number">
+                            <td v-if="scoreReporting || !hideMatchExtras" class="form-stack number">
                                 <div class="form-top">Replay Code</div>
                                 <div class="form-button">
                                     <b-form-input v-model="replayCodes[i]" type="text" />
                                 </div>
                             </td>
                             <td v-if="showMapBanButtons">
-                                <TeamPicker v-model="banners[i]" title="Banned by" :teams="teams" />
+                                <TeamPicker v-model="banners[i]" title="Banned by" :teams="teams" :hide-empty="scoreReporting" />
                             </td>
                             <td>
                                 <TeamPicker
                                     v-model="pickers[i]"
+                                    :hide-empty="scoreReporting"
                                     title="Picked by"
                                     :class="{ 'very-low-opacity': banners[i] }"
                                     :teams="teams" />
@@ -147,6 +162,7 @@
                             <td>
                                 <TeamPicker
                                     v-model="winners[i]"
+                                    :hide-empty="scoreReporting"
                                     title="Winner"
                                     :class="{ 'very-low-opacity': banners[i] }"
                                     :teams="teams"
@@ -220,6 +236,12 @@
                 </div>
             </div>
         </b-form>
+        <MatchExplainerModal
+            v-model="scoreReportConfirmModal"
+            :match="match"
+            :edited-map-data="editedMapData"
+            :edited-match-data="reportableMatchData"
+            @ok="() => saveScoreReport()" />
     </div>
 </template>
 
@@ -233,11 +255,12 @@ import MapScoreEditor from "@/components/website/dashboard/MapScoreEditor";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { mapWritableState } from "pinia";
+import MatchExplainerModal from "@/components/website/dashboard/MatchExplainerModal.vue";
 
 export default {
     name: "MatchEditor",
-    components: { AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
-    props: ["match", "hideMatchExtras"],
+    components: { MatchExplainerModal, AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
+    props: ["match", "hideMatchExtras", "scoreReporting", "proposedData", "scoreReportAction"],
     data: () => ({
         processing: {},
         matchData: {
@@ -264,7 +287,8 @@ export default {
         errorMessage: null,
         previousAutoData: null,
         scoreDebounceTimeouts: [],
-        showMapBanButtons: false
+        showMapBanButtons: false,
+        scoreReportConfirmModal: false
     }),
     computed: {
         ...mapWritableState(useSettingsStore, ["assumeLoserPicks"]),
@@ -275,6 +299,25 @@ export default {
             if (!this.match?.teams?.length) return [dummy, dummy];
             if (this.match.teams.length === 1) return [this.match.teams[0], dummy];
             return this.match.teams;
+        },
+        reportableMatchData() {
+            const allowedData = {
+                start: this.matchData.start,
+                score_1: (this.matchData.scores?.[0] || 0),
+                score_2: (this.matchData.scores?.[1] || 0),
+                forfeit: this.matchData.forfeit,
+                forfeit_reason: this.matchData.forfeit_reason
+            };
+            const changedData = {};
+
+            if (this?.match.start !== allowedData.start) changedData.start = allowedData.start;
+            if (this?.match.forfeit !== allowedData.forfeit) changedData.forfeit = allowedData.forfeit;
+            if (this?.match.forfeit_reason !== allowedData.forfeit_reason) changedData.forfeit_reason = allowedData.forfeit_reason;
+            if (JSON.stringify(this.matchData?.scores || [0,0]) !== JSON.stringify([this.match?.score_1, this.match?.score_2])) {
+                changedData.score_1 = allowedData.score_1;
+                changedData.score_2 = allowedData.score_2;
+            }
+            return changedData;
         },
         scores() {
             return [this.match.score_1 || 0, this.match.score_2 || 0];
@@ -381,10 +424,23 @@ export default {
                     replay_code: this.replayCodes[i]
                 });
             }
-            return data;
+            return data.filter(obj => Object.values(obj).filter(Boolean).length);
         },
         broadcastData() {
             return this.match?.event?.broadcasts;
+        },
+        formattedProposedData() {
+            return {
+                maps: (this.proposedData?.mapData || []).map(map => ({
+                    ...map,
+                    map: [map.map],
+                    winner: map.winner ? [map.winner] : null,
+                    picker: map.picker ? [map.picker] : null,
+                    banner: map.banner ? [map.banner] : null,
+                })),
+                score_1: this.proposedData?.matchData?.score_1 || 0,
+                score_2: this.proposedData?.matchData?.score_2 || 0
+            };
         }
         // loadedFully() {
         //     const test = [
@@ -431,7 +487,7 @@ export default {
             }
 
             return [
-                { id: null, label: "Select a map", text: "Select a map", value: null },
+                { id: "select-map", label: "Select a map", text: "Select a map", value: undefined },
                 ...Object.entries(groups).map(([groupName, maps]) => ({ label: groupName, options: maps.map(m => ({ value: m.id, text: m.name })) }))
             ];
         },
@@ -467,7 +523,9 @@ export default {
         },
         emptyData(newID) {
             console.log("New match, emptying data", newID);
-            this.processing.map = true;
+            if (newID) this.processing.map = true;
+
+            this.matchData.scores = [0, 0];
             this.draws = [];
             this.mapChoices = [];
             this.winners = [];
@@ -481,11 +539,25 @@ export default {
             this.extraMaps = 0;
             this.errorMessage = null;
             this.restrictToMapPool = true;
+
+            this.previousAutoData = {
+                draws: Object.assign([], this.draws),
+                existingMapIDs: Object.assign([], this.existingMapIDs),
+                winners: Object.assign([], this.winners),
+                pickers: Object.assign([], this.pickers),
+                banners: Object.assign([], this.banners),
+                score_1s: Object.assign([], this.score_1s),
+                score_2s: Object.assign([], this.score_2s),
+                mapNumbers: Object.assign([], this.mapNumbers),
+                mapChoices: Object.assign([], this.mapChoices),
+                replayCodes: Object.assign([], this.replayCodes)
+            };
         },
         updateMatchData(data) {
             console.log("match data update", data);
 
             Object.entries(this.matchData).forEach(([key]) => {
+                console.log(key, data[key], this.matchData[key]);
                 if (data[key] !== this.matchData[key]) {
                     this.matchData[key] = data[key] || null;
                 }
@@ -512,7 +584,7 @@ export default {
                 this.processing.map = false;
             }
 
-            this.matchData.scores = this.scores;
+            this.matchData.scores = [data.score_1 || 0, data.score_2 || 0];
             this.matchData.custom_name = data.custom_name;
             this.matchData.forfeit = data.forfeit;
             this.matchData.forfeit_reason = data.forfeit_reason;
@@ -561,6 +633,30 @@ export default {
                 });
             }
             this.processing.details = false;
+            return response;
+        },
+        async saveScoreReport() {
+            console.log("map processing");
+            this.processing.map = true;
+
+            const response = await authenticatedRequest("actions/submit-score-report", {
+                matchID: this.match.id,
+                action: this.scoreReportAction,
+                reportData: {
+                    mapData: this.editedMapData,
+                    matchData: this.reportableMatchData
+                }
+            });
+            // if (response.error) this.errorMessage = response.errorMessage;
+            console.log(response);
+            this.processing.map = false;
+
+            if (!response.error) {
+                this.$notyf.success({
+                    message: "Score report submitted",
+                    duration: 3000
+                });
+            }
             return response;
         },
         async saveMapAndScores() {
@@ -663,6 +759,12 @@ export default {
                 if (!loserID) return console.warn("can't find a team", teamID, teamIDs, loserID);
                 this.pickers[i + 1] = loserID;
             }
+        },
+        loadProposedData() {
+            if (this.proposedData?.mapData) {
+                console.log("proposed data", this.proposedData);
+                this.updateMatchData(this.formattedProposedData);
+            }
         }
     },
     watch: {
@@ -676,6 +778,7 @@ export default {
                     // console.log("No change in data", newMatch);
                     return;
                 }
+                console.log("watching match deep");
                 this.updateMatchData(newMatch);
             }
         },
@@ -713,7 +816,12 @@ export default {
         // }
     },
     mounted() {
-        this.updateMatchData(this.match);
+        console.log("mounted");
+        if (this.scoreReporting && this.proposedData) {
+            this.loadProposedData();
+        } else {
+            this.updateMatchData(this.match);
+        }
     }
 };
 </script>

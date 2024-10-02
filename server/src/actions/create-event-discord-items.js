@@ -1,19 +1,11 @@
-const { isEventStaffOrHasRole } = require("../action-utils/action-permissions");
-const { MapObject } = require("../discord/managers");
-const { getAll,
-    findMember,
-    cleanID
-} = require("../action-utils/action-utils");
-const client = require("../discord/client");
-const { getDiscordIcon } = require("../discord/role-icon");
-const { GuildFeature,
-    ChannelType,
-    PermissionFlagsBits
-} = require("discord-api-types/v10");
-const { PermissionsBitField,
-} = require("discord.js");
-
-const Cache = require("../cache.js");
+import client from "../discord/client.js";
+import * as Cache from "../cache.js";
+import { MapObject } from "../discord/managers.js";
+import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
+import { cleanID, findMember, getAll } from "../action-utils/action-utils.js";
+import { getDiscordIcon } from "../discord/role-icon.js";
+import { ChannelType, GuildFeature, PermissionFlagsBits } from "discord-api-types/v10";
+import { PermissionsBitField } from "discord.js";
 
 function multiple(num, singular, plural) {
     if (num === 1) return num + " " + singular;
@@ -25,7 +17,7 @@ const working = new Map();
  *
  * @typedef { "edit_roles" | "assign_roles" | "unassign_roles" | "create_roles" | "delete_roles" | "delete_text_channels" | "create_text_channels" | "edit_text_channels" | "update_text_channels_permissions" | "delete_voice_channels" | "create_voice_channels" | "edit_voice_channels" | "update_voice_channels_permissions", "create_team_emoji", "edit_team_emoji", "delete_team_emoji" } ActionKey
  * */
-module.exports = {
+export default {
     key: "create-event-discord-items",
     requiredParams: ["guildID", "actions", "eventID"],
     optionalParams: ["settings"],
@@ -707,7 +699,7 @@ module.exports = {
                     responseCounts.roles.edited ? multiple(responseCounts.roles.edited, "role edited", "roles edited") : null,
                     responseCounts.roles.deleted ? multiple(responseCounts.roles.deleted, "role deleted", "roles deleted") : null,
                     responseCounts.roles.assigned ? multiple(responseCounts.roles.assigned, "role assigned", "roles assigned") : null,
-                    responseCounts.roles.alreadyAssigned ? multiple(responseCounts.roles.alreadyAssigned, "roles already assigned", "roless already assigned") : null,
+                    responseCounts.roles.alreadyAssigned ? multiple(responseCounts.roles.alreadyAssigned, "roles already assigned", "roles already assigned") : null,
                     responseCounts.roles.unassigned ? multiple(responseCounts.roles.unassigned, "role unassigned", "roles unassigned") : null,
 
                     responseCounts.players.tagsUpdated ? multiple(responseCounts.players.tagsUpdated, "player tag updated", "player tags updated") : null,

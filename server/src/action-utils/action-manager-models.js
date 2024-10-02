@@ -1,12 +1,11 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const {
-    updateRecord,
-    createRecord
-} = require("./action-utils");
-
-const Cache = require("../cache.js");
-const permissions = require("./action-permissions");
+import express from "express";
+import bodyParser from "body-parser";
+import { createRecord, updateRecord } from "./action-utils.js";
+/**
+ * @type {Cache}
+ */
+import * as Cache from "../cache.js";
+import * as permissions from "./action-permissions.js";
 
 function cleanID(id) {
     // console.log(">id", id);
@@ -27,7 +26,7 @@ function cleanUser(user) {
 }
 
 
-class Action {
+export class Action {
     /**
      * @param {string} key
      * @param {function} handler
@@ -70,10 +69,13 @@ class Action {
 
     get helpers() {
         return {
+            /**
+             * @deprecated - Use action-utils/action-cache.js file for type complete
+             */
             get: (...args) => Cache.get(...args),
             createRecord: (tableName, data) => createRecord(Cache, tableName, [data]),
             createRecords: (tableName, items) => createRecord(Cache, tableName, items),
-            updateRecord: (tableName, item, data) => updateRecord(Cache, tableName, item, data),
+            updateRecord: (tableName, item, data, source) => updateRecord(Cache, tableName, item, data, source),
             auth: Cache.auth,
             permissions
         };
@@ -103,7 +105,7 @@ class ActionManager {
     }
 }
 
-class HTTPActionManager extends ActionManager {
+export class HTTPActionManager extends ActionManager {
     constructor({ cors }) {
         super({ cors });
         this.cors = cors;
@@ -184,7 +186,7 @@ class HTTPActionManager extends ActionManager {
 
 }
 
-class SocketActionManager extends ActionManager {
+export class SocketActionManager extends ActionManager {
     constructor(props) {
         super(props);
 
@@ -265,7 +267,7 @@ class SocketActionManager extends ActionManager {
 
 }
 
-class InternalActionManager extends ActionManager {
+export class InternalActionManager extends ActionManager {
 
     constructor(props) {
         super(props);
@@ -305,11 +307,3 @@ class InternalActionManager extends ActionManager {
         });
     }
 }
-
-
-module.exports = {
-    Action,
-    HTTPActionManager,
-    SocketActionManager,
-    InternalActionManager
-};

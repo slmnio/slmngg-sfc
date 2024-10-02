@@ -443,7 +443,7 @@ export default {
         scenarioTeams() {
             const teams = [];
             this.matchesForScenarios.forEach(match => {
-                match.teams.forEach(team => {
+                (match.teams || []).forEach(team => {
                     if (!teams.find(t => t.code === team.code)) {
                         const standings = {
                             wins: 0,

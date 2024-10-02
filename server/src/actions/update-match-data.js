@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     key: "update-match-data",
     requiredParams: ["matchID", "updatedData"],
     auth: ["user"],
@@ -8,9 +8,9 @@ module.exports = {
      * @param {UserData} user
      * @returns {Promise<void>}
      */
-    async handler({ matchID, updatedData }, { user }) {
+    async handler({ matchID, updatedData }, { user, isAutomation }) {
         let match = await this.helpers.get(matchID);
-        if (!(await this.helpers.permissions.canEditMatch(user, { match }))) throw { errorMessage: "You don't have permission to edit this item", errorCode: 403 };
+        if (!(isAutomation || (await this.helpers.permissions.canEditMatch(user, { match })))) throw { errorMessage: "You don't have permission to edit this item", errorCode: 403 };
         if (!match?.id) throw "Couldn't load match data";
 
         let validKeysMap = {
@@ -33,7 +33,7 @@ module.exports = {
             validatedData[map] = val;
         });
 
-        console.log("[match]", user.airtable.name, user.airtable.id, "is setting", validatedData);
+        console.log("[match]", (isAutomation ? "Automation" : user.airtable?.name), "is setting", validatedData);
         let response = await this.helpers.updateRecord("Matches", match, {
             ...validatedData
         });

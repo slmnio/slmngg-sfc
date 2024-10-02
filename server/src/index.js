@@ -1,21 +1,24 @@
-require("dotenv").config();
-const express = require("express");
+import "dotenv/config";
+import express from "express";
+import { createServer } from "node:http";
+import { Server } from "socket.io";
+import cors from "cors";
+import meta from "./meta.js";
+import routes from "./routes.js";
+import images from "./images.js";
+import discordAuth from "./discord/auth.js";
+import "./discord/discord-data.js";
+import webAuction from "./web_auction.js";
+import * as actions from "./action-utils/action-manager.js";
+
 const app = express();
-const bodyParser = require("body-parser");
 const port = 8901;
-const http = require("http").Server(app);
-const cors = require("cors");
-const meta = require("./meta.js");
-const routes = require("./routes.js");
-const images = require("./images.js");
-const discordAuth = require("./discord/auth.js");
-require("./discord/discord-data.js");
-const webAuction = require("./web_auction");
+const http = createServer(app);
 
 /* The staff module should only run on the server, probably not your local machine. */
 let staffKeysRequired = ["DISCORD_TOKEN", "STAFFAPPS_GUILD_ID", "STAFFAPPS_CATEGORY_ID", "STAFFAPPS_APPLICATION_CHANNEL_ID", "IS_SLMNGG_MAIN_SERVER"];
 if (staffKeysRequired.every(key => process.env[key])) {
-    require("./discord/staff.js");
+    await import("./discord/staff.js");
 } else {
     console.warn("Staff application system won't be set up. Set the required STAFFAPPS keys in server/.env");
 }
@@ -43,7 +46,7 @@ function corsHandle(origin, callback) {
 
 const localCors =  () => cors({ origin: corsHandle });
 
-const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials: true}, allowEIO3: true});
+const io = new Server(http, {cors: { origin: corsHandle,  credentials: true}, allowEIO3: true});
 
 // const auction = require("./discord/new_auction.js")({
 //     to: (...a) => io.to(...a),
@@ -52,15 +55,13 @@ const io = require("socket.io")(http, {cors: { origin: corsHandle,  credentials:
 //     test: ["hi"]
 // });
 
-const Cache = (require("./cache.js")).setup(io);
-(require("./airtable-v2.js")).setup({ web: app, io });
-(require("./discord/bot-controller.js")).setup(io);
-
-const actions = require("./action-utils/action-manager.js");
+const Cache = (await import("./cache.js")).setup(io);
+(await import("./airtable-v2.js")).setup({ web: app, io });
+(await import("./discord/bot-controller.js")).setup(io);
 actions.load(app, localCors, Cache, io);
 
-require("./discord/slash-commands.js");
-require("./automation-manager.js");
+await import("./discord/slash-commands.js");
+await import("./automation-manager.js");
 
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.options("/*", cors());
@@ -81,7 +82,7 @@ app.get("/things/:ids", cors({ origin: corsHandle }), async (req, res) => {
     return handleThingsRequest(ids, req, res);
 });
 
-app.post("/things", bodyParser.json(), cors({ origin: corsHandle }), async (req, res) => {
+app.post("/things", express.json(), cors({ origin: corsHandle }), async (req, res) => {
     const ids = req.body?.ids?.split(",");
     if (!ids?.length) return res.status(400).send({ error: true, message: "No IDs supplied" });
     if (ids?.length > 500) return res.status(400).send({ error: true, message: "Too many IDs supplied" });
@@ -111,7 +112,7 @@ routes({ app, cors, Cache, io });
 discordAuth({ app, router: express.Router(), cors, Cache, io });
 
 meta({ app, cors, Cache });
-images.main({ app, cors, Cache, corsHandle });
+images({ app, cors, Cache, corsHandle });
 
 webAuction({ app, io });
 

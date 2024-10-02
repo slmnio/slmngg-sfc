@@ -1,6 +1,7 @@
-const bodyParser = require("body-parser");
-const fetch = require("node-fetch");
-const { updateRecord } = require("../action-utils/action-utils");
+import bodyParser from "body-parser";
+import fetch from "node-fetch";
+import { updateRecord } from "../action-utils/action-utils.js";
+
 
 function discordEnvSet() {
     return ["DISCORD_CLIENT_ID", "DISCORD_CLIENT_SECRET"].every(key => !!process.env[key])
@@ -15,7 +16,7 @@ function getRequestingDomain(origin) {
     return "https://dev.slmn.gg";
 }
 
-module.exports = ({ app, router, cors, Cache }) => {
+export default ({ app, router, cors, Cache }) => {
     if (!discordEnvSet()) {
         const tempAuthApp = router;
         tempAuthApp.options("/*", cors());
@@ -87,6 +88,7 @@ module.exports = ({ app, router, cors, Cache }) => {
         const token = req.body?.token;
         if (!token) return res.status(400).send({ error: true, message: "No token sent to SLMN.GG server for Discord auth" });
 
+        /** @type {AuthUserData} */
         let userData = await Cache.auth.getData(token);
         if (!userData?.user) return res.status(404).send({ error: true, message: "Unknown token", for_a_developer: "No data associated with that token" });
 

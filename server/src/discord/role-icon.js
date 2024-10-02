@@ -1,7 +1,7 @@
-const { getAttachment } = require("../cache");
-const { getResizedImagePath } = require("../images");
+import { getAttachment } from "../cache.js";
+import { getResizedImagePath } from "../images.js";
 
-async function getDiscordIcon(theme) {
+export async function getDiscordIcon(theme) {
     const image = (theme.small_logo || theme.default_logo)?.[0];
     if (!image?.id) return null;
     const attachment = getAttachment(image.id);
@@ -13,5 +13,3 @@ async function getDiscordIcon(theme) {
     });
     return imagePath;
 }
-
-module.exports = { getDiscordIcon };

@@ -1,5 +1,5 @@
-const client = require("./client");
-const Cache = require("../cache");
+import client from "./client.js";
+import * as Cache from "../cache.js";
 
 async function updateGuilds() {
     return Cache.set("discord-guilds", {

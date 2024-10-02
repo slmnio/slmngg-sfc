@@ -1,12 +1,14 @@
-const Airtable = require("airtable");
-const Cache = require("../cache");
-const { StaticAuthProvider } = require("@twurple/auth");
-const { ApiClient } = require("@twurple/api");
-const { verboseLog } = require("../discord/slmngg-log");
+import Airtable from "airtable";
+import * as Cache from "../cache.js";
+import { StaticAuthProvider } from "@twurple/auth";
+import { ApiClient } from "@twurple/api";
+import { verboseLog } from "../discord/slmngg-log.js";
+import { get } from "./action-cache.js";
+
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
 const slmngg = airtable.base(process.env.AIRTABLE_APP);
 
-async function getSelfClient(Cache, token) {
+export async function getSelfClient(Cache, token) {
     let userData = await Cache.auth.getData(token);
     if (!userData) return null;
     let clientID = userData?.user?.airtable?.clients?.[0];
@@ -18,7 +20,7 @@ async function getSelfClient(Cache, token) {
  * @param {AnyAirtableID|null} id
  * @returns {CleanAirtableID|null}
  */
-function cleanID(id) {
+export function cleanID(id) {
     if (!id) return null;
     if (id?.id) return id.id;
     if (typeof id !== "string") return null;
@@ -30,7 +32,7 @@ function cleanID(id) {
  * @param {AnyAirtableID} id
  * @returns {DirtyAirtableID}
  */
-function dirtyID(id) {
+export function dirtyID(id) {
     // add rec
     if (!id) return id;
     if (id.length === 14) return "rec" + id;
@@ -44,10 +46,10 @@ const TimeOffset = 3 * 1000;
  * @param {string} tableName - Airtable table name this record belongs to
  * @param {object} item - Full item as requested from Cache
  * @param {AnyAirtableID} item.id - Item must have its Airtable ID
- * @param {*?} item.* -  Item can have any other data
  * @param {*} data - Data to update (can be partial)
+ * @param {string?} source - Action or source
  */
-async function updateRecord(Cache, tableName, item, data) {
+export async function updateRecord(Cache, tableName, item, data, source = undefined) {
     // see: airtable-interface.js customUpdater
     console.log(`[update record] updating table=${tableName} id=${item.id}`, data);
 
@@ -58,7 +60,7 @@ async function updateRecord(Cache, tableName, item, data) {
     };
     verboseLog(`Editing record on **${tableName}** \`${item.id}\``, data);
     // Eager update
-    Cache.set(cleanID(item.id), slmnggData, { eager: true });
+    Cache.set(cleanID(item.id), slmnggData, { eager: true, source });
 
     // Update custom keys
     if (tableName === "Broadcasts" && item.key) Cache.set(`broadcast-${item.key}`, { ...slmnggData, customKey: true }, { eager: true });
@@ -71,7 +73,7 @@ async function updateRecord(Cache, tableName, item, data) {
     } catch (e) {
         console.error("Airtable update failed", e);
         verboseLog(`Error updating record on **${tableName}** \`${item.id}\``, e.message);
-        return { error: true };
+        return { error: true, errorMessage: e.message };
     }
 }
 
@@ -79,9 +81,8 @@ async function updateRecord(Cache, tableName, item, data) {
  * @param {Cache} Cache
  * @param {string} tableName
  * @param {object[]} records
- * @returns {Promise}
  */
-async function createRecord(Cache, tableName, records) {
+export async function createRecord(Cache, tableName, records) {
     console.log(`[create record] creating table=${tableName} records=${records.length}`);
     try {
         let newRecords = await slmngg(tableName).create(records.map(recordData => {
@@ -93,6 +94,7 @@ async function createRecord(Cache, tableName, records) {
         newRecords.forEach(record => {
             Cache.set(cleanID(record.id), {
                 ...deAirtable(record.fields),
+                id: record.id,
                 __tableName: tableName
             }, { eager: true });
         });
@@ -104,7 +106,7 @@ async function createRecord(Cache, tableName, records) {
     }
 }
 
-function deAirtable(obj) {
+export function deAirtable(obj) {
     const data = {};
     Object.entries(obj).forEach(([key, val]) => {
         data[key.replace(/ +/g, "_").replace(/[:()]/g, "_").replace(/_+/g,"_").toLowerCase()] = val;
@@ -123,7 +125,8 @@ function deAirtable(obj) {
     return data;
 }
 
-function deAirtableRecord(record) {
+
+export function deAirtableRecord(record) {
     console.log("deAirtableRecord", record.id, record.fields);
     if (!record?.fields) return null;
     return {
@@ -131,8 +134,7 @@ function deAirtableRecord(record) {
         id: record.id
     };
 }
-
-async function getValidHeroes() {
+export async function getValidHeroes() {
     // Get Heroes table
     // Get any OW hero only
     let heroIDs = (await Cache.get("Heroes"))?.ids;
@@ -141,21 +143,21 @@ async function getValidHeroes() {
     return heroes.filter(h => h.game === "Overwatch");
 }
 
-async function getBroadcast(client) {
+export async function getBroadcast(client) {
     if (!client?.broadcast?.[0]) throw "No broadcast associated with this client";
     const broadcast = await Cache.get(client?.broadcast?.[0]);
     if (!broadcast) throw "No broadcast associated";
     return broadcast;
 }
 
-async function getAll(ids) {
+export async function getAll(ids) {
     return await Promise.all((ids || []).map(m => Cache.get(m)));
 }
-async function getMaps(match) {
+export async function getMaps(match) {
     return getAll(match.maps);
 }
 
-async function getTwitchChannel(client, requestedScopes, forceBroadcastID) {
+export async function getTwitchChannel(client, requestedScopes, forceBroadcastID) {
     let broadcast = await (forceBroadcastID ? Cache.get(forceBroadcastID) : getBroadcast(client));
     const channel = await Cache.auth.getChannel(broadcast?.channel?.[0]);
     if (!channel?.twitch_refresh_token) throw "No Twitch auth token associated with channel";
@@ -170,7 +172,7 @@ async function getTwitchChannel(client, requestedScopes, forceBroadcastID) {
     };
 }
 
-async function getMatchData(broadcast, requireAll) {
+export async function getMatchData(broadcast, requireAll) {
     const match = await Cache.get(broadcast?.live_match?.[0]);
     if (!match) throw("No match associated");
 
@@ -185,14 +187,48 @@ async function getMatchData(broadcast, requireAll) {
     };
 }
 
-async function getTwitchAPIClient(channel) {
+/**
+ *
+ * @param matchID
+ * @returns {Promise<({report: Report | undefined, match: Match})>}
+ */
+export async function getMatchScoreReporting(matchID) {
+    const match = await get(matchID);
+    let report;
+
+    if (!match?.id) throw "Couldn't load match data";
+
+    if (!match?.event?.[0]) throw "Couldn't load event data for this match";
+    const event = await get(match?.event?.[0]);
+    if (!event?.id) throw "Couldn't load event data for this match";
+
+    // event score reporting must be active
+
+    if (!event?.blocks) throw "Event doesn't have score reporting set up";
+
+    /** @type {EventSettings} */
+    const eventSettings = JSON.parse(event.blocks);
+    if (!eventSettings?.reporting?.score?.use) throw "Score reporting is not enabled on this match";
+
+    // check existing report
+    if (match?.reports?.[0]) {
+        const firstReport = await get(match?.reports?.[0]);
+        if (firstReport?.id) {
+            report = firstReport;
+        }
+    }
+
+    return { match, report };
+}
+
+export async function getTwitchAPIClient(channel) {
     if (!channel) throw("Internal error connecting to Twitch");
     const accessToken = await Cache.auth.getTwitchAccessToken(channel);
     const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, accessToken);
     return new ApiClient({authProvider});
 }
 
-function getTwitchAPIError(error) {
+export function getTwitchAPIError(error) {
     let libError = (error?.message || "").split("\n").shift() || null;
     try {
         if (!error?.body) return libError || null;
@@ -204,20 +240,27 @@ function getTwitchAPIError(error) {
     }
 }
 
-function safeInput(string) {
+export function safeInput(string) {
     return string
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
-function safeInputNoQuotes(string) {
+export function safeInputNoQuotes(string) {
     return string
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
 }
 
-async function findMember(player, team, guild) {
+/**
+ *
+ * @param {Player?} player
+ * @param {Team?} team
+ * @param {Guild} guild
+ * @returns {Promise<{member: GuildMember, fixes: *[]}>}
+ */
+export async function findMember(player, team, guild) {
     let member;
     let fixes = [];
     if (player.discord_id) {
@@ -228,7 +271,7 @@ async function findMember(player, team, guild) {
                     type: "discord_id_not_found",
                     playerID: player.id,
                     discordID: player.discord_id,
-                    teamID: team.id
+                    teamID: team?.id
                 });
                 console.warn(fixes[fixes.length - 1]);
             }
@@ -238,7 +281,7 @@ async function findMember(player, team, guild) {
                 type: "discord_id_not_found",
                 playerID: player.id,
                 discordID: player.discord_id,
-                teamID: team.id
+                teamID: team?.id
             });
             console.warn(fixes[fixes.length - 1]);
         }
@@ -265,16 +308,9 @@ async function findMember(player, team, guild) {
             playerID: player.id,
             discordID: player.discord_id,
             discordTag: player.discord_tag,
-            teamID: team.id
+            teamID: team?.id
         });
         console.warn(fixes[fixes.length - 1]);
     }
     return { member, fixes };
 }
-
-
-module.exports = {
-    getSelfClient, cleanID, dirtyID, deAirtable, deAirtableRecord, updateRecord, getValidHeroes, createRecord, safeInput, safeInputNoQuotes,
-    getTwitchChannel, getMatchData, getTwitchAPIClient, getTwitchAPIError, getBroadcast, getMaps, getAll,
-    findMember
-};

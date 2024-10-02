@@ -2,7 +2,12 @@
     <div class="team-picker">
         <div class="title flex-center text-center">{{ title }}</div>
         <div class="options d-flex">
-            <div class="option option-none" :class="{'selected': !modelValue}" :style="{order: 2}" @click="setTeam(null)">
+            <div
+                v-if="!hideEmpty"
+                class="option option-none"
+                :class="{'selected': !modelValue}"
+                :style="{order: 2}"
+                @click="setTeam(null)">
                 <div class="team-logo none flex-center">
                     <span class="none-text">None</span>
                 </div>
@@ -30,11 +35,11 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 export default {
     name: "TeamPicker",
     components: { ThemeLogo },
-    props: ["title", "modelValue", "teams"],
+    props: ["title", "modelValue", "teams", "hideEmpty"],
     emits: ["update:modelValue"],
     methods: {
         setTeam(id) {
-            this.$emit("update:modelValue", id);
+            this.$emit("update:modelValue", this.modelValue === id ? null : id);
         }
     }
 };

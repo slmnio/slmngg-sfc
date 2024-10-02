@@ -51,12 +51,20 @@
             <router-link
                 v-if="!match.special_event"
                 :to="url('match', this.match)"
-                class="match-center match-vs flex-center text-center ct-passive">
+                class="match-center match-vs flex-center text-center ct-passive flex-column">
                 <div v-if="scores.some(s => s)" class="scores-wrap">
                     <div class="scores">{{ scores[0] }} - {{ scores[1] }}</div>
                     <div v-if="match.forfeit" class="scores-forfeit">Forfeit</div>
                 </div>
                 <div v-else class="vs ct-passive">vs</div>
+                <router-link
+                    v-if="showScoreReporting && scoreReportingBadge"
+                    :to="url('match', this.match, { subPage: 'score-reporting' })"
+                    class="score-reporting-badge text-white rounded"
+                    :class="`bg-${scoreReportingBadge?.variant}`"
+                    :title="scoreReportingBadge?.title">
+                    {{ scoreReportingBadge?.small || scoreReportingBadge?.text }}
+                </router-link>
             </router-link>
             <div class="match-right match-time flex-center">
                 <ScheduleTime :time="match.start" :custom-text="timeCustomText" />
@@ -92,17 +100,20 @@
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { url, cleanID } from "@/utils/content-utils";
+import { url, cleanID, getScoreReportingBadge } from "@/utils/content-utils";
 import ScheduleTime from "@/components/website/schedule/ScheduleTime";
 import { authenticatedRequest } from "@/utils/dashboard";
 import { mapWritableState } from "pinia";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { useAuthStore } from "@/stores/authStore";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
+import { isEventStaffOrHasRole } from "@/utils/client-action-permissions.js";
 
 
 export default {
     name: "ScheduleMatch",
     components: { ScheduleTime, ThemeLogo },
-    props: ["match", "customText", "leftTeam", "canEditMatches", "canEditBroadcasts", "selectedBroadcast", "showEditorButton", "showBatchCheckboxes"],
+    props: ["match", "customText", "leftTeam", "canEditMatches", "canEditBroadcasts", "selectedBroadcast", "showEditorButton", "showBatchCheckboxes", "showScoreReporting"],
     data: () => ({
         processing: {
             match_broadcast: false
@@ -210,6 +221,51 @@ export default {
         isOnSelectedBroadcast() {
             // console.log(this.match?.scheduled_broadcast, this.selectedBroadcast);
             return (this.match?.scheduled_broadcast || [])?.map(cleanID).includes(this.selectedBroadcast?.id);
+        },
+        _event() {
+            if (!this.match?.event?.[0]) return null;
+            return ReactiveRoot(this.match?.event?.[0], { });
+        },
+        eventSettings() {
+            if (!this._event?.blocks) return null;
+            return JSON.parse(this._event.blocks);
+        },
+        controllableTeams() {
+            const { isAuthenticated, player } = useAuthStore();
+            if (!isAuthenticated) return [];
+
+            return (this.match?.teams || []).filter(team => [
+                ...team.players || [],
+                ...team.captains || [],
+                ...team.team_staff || [],
+                ...team.owners || [],
+            ].some(personID => cleanID(player?.id) === cleanID(personID)));
+        },
+        existingScoreReport() {
+            return (ReactiveRoot(this.match?.id, {
+                "reports": ReactiveArray("reports", {
+                    "team": ReactiveThing("team"),
+                    "player": ReactiveThing("player")
+                })
+            })?.reports || []).find(report => report.type === "Scores" && cleanID(report.match?.[0]) === cleanID(this.match?.id));
+        },
+        scoreReportingBadge() {
+            const { isAuthenticated, player } = useAuthStore();
+            if (!isAuthenticated) return null;
+
+            const state = {
+                "reports_enabled": this.showScoreReporting,
+                "existing_report": !!this.existingScoreReport?.id,
+                "is_complete": this.match.first_to && [this.match.score_1, this.match.score_2].some(s => s === this.match.first_to),
+                "is_on_teams": !!this.controllableTeams?.length,
+                "is_opponent": this.existingScoreReport?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) !== cleanID(this.existingScoreReport?.team?.id)) : null,
+                "is_submitter": this.existingScoreReport?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) === cleanID(this.existingScoreReport?.team?.id)) : null,
+                "is_staff": isEventStaffOrHasRole(player, { event: this.match?.event, websiteRoles: ["Can edit any match", "Can edit any event"] }),
+                "settings": this.eventSettings
+            };
+
+            return getScoreReportingBadge(state, this.existingScoreReport, this.eventSettings);
+
         }
     },
     methods: {
@@ -382,5 +438,12 @@ export default {
     .low-opacity {
         opacity: 0.5;
         cursor: wait;
+    }
+
+    .score-reporting-badge {
+        font-weight: bold;
+        font-size: .7em;
+        text-transform: uppercase;
+        padding: 0 0.3em;
     }
 </style>

@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "allowSyntheticDefaultImports": true,
+        "lib": ["ES2022"],
+        "module": "ES2022",
+        "moduleResolution": "node",
+        "target": "ES2022",
+        "strict": true,
+        "allowJs": true
+    },
+    "include": [
+        "./**/*"
+    ],
+    "exclude": [
+        "./dist/**/*",
+        "./src/_deprecated/**/*"
+    ]
+}

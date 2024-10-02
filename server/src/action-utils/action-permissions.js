@@ -1,7 +1,6 @@
-const Cache = require("../cache");
-const { getAll,
-    dirtyID
-} = require("./action-utils");
+import * as Cache from "../cache.js";
+import { dirtyID, getAll } from "./action-utils.js";
+
 /**
  *
  * @param {UserData} user
@@ -9,7 +8,7 @@ const { getAll,
  * @param event
  * @returns {Promise<boolean>}
  */
-async function canEditMatch(user, { match, event }) {
+export async function canEditMatch(user, { match, event }) {
     if ((user.airtable?.website_settings || []).includes("Can edit any match")) return true;
 
     if (match) {
@@ -51,7 +50,7 @@ async function canEditMatch(user, { match, event }) {
     return false;
 }
 
-async function isEventStaffOrHasRole(user, event, role, websiteRoles) {
+export async function isEventStaffOrHasRole(user, event, role, websiteRoles) {
     if ([...(websiteRoles || []), role].some(websiteRole => (user.airtable?.website_settings || []).includes(websiteRole))) return true;
     if (event) {
         if (typeof event === "string") {
@@ -75,11 +74,7 @@ async function isEventStaffOrHasRole(user, event, role, websiteRoles) {
     return false;
 }
 
-function canUpdateUserDetails(user) {
+export function canUpdateUserDetails(user) {
     // TODO: Better / specific permission?
     return (user.airtable?.website_settings ?? []).includes("Full broadcast permissions");
 }
-
-module.exports = {
-    canEditMatch, isEventStaffOrHasRole, canUpdateUserDetails
-};

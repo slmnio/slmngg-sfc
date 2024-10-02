@@ -1,4 +1,4 @@
-const {Client, GatewayIntentBits, Partials} = require("discord.js");
+import { Client, GatewayIntentBits, Partials } from "discord.js";
 
 
 /** @type {Client} */
@@ -13,4 +13,4 @@ if (process.env.DISCORD_TOKEN) {
     client.once("ready", () => console.log(`[discord] Logged in as ${client.user.tag}`));
 }
 
-module.exports = client;
+export default client;

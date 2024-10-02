@@ -1,7 +1,8 @@
-const Cache = require("../cache");
-const { cleanID } = require("../action-utils/action-utils");
-const { getInternalManager } = require("../action-utils/action-manager");
-module.exports = {
+import * as Cache from "../cache.js";
+import { cleanID } from "../action-utils/action-utils.js";
+import { getInternalManager } from "../action-utils/action-manager.js";
+
+export default {
     /**
      *
      * @param {AnyAirtableID} id
@@ -11,7 +12,6 @@ module.exports = {
      */
     async handler({ id, newData, oldData }) {
         if (newData?.__tableName !== "Broadcasts") return;
-        if (!oldData) return;
 
         const settings = newData?.automation_settings || [];
 

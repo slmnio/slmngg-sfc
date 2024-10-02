@@ -41,6 +41,10 @@ export default (isSubdomain) => [
                 component: () => import("@/views/sub-views/event-settings/EventSettingsDiscord.vue"),
             },
             {
+                path: "discord-logging",
+                component: () => import("@/views/sub-views/event-settings/EventSettingsDiscordLogging.vue"),
+            },
+            {
                 path: "signups",
                 component: () => import("@/views/sub-views/event-settings/EventSettingsSignups.vue"),
             }

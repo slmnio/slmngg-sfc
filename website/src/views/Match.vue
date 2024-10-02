@@ -13,7 +13,25 @@
                     <ul v-if="sidebarItems.length > 1" class="match-sub-nav list-group mb-2">
                         <!-- only because it'd be the only one -->
                         <router-link v-if="sidebarItems.includes('vod')" class="list-group-item ct-passive" exact-active-class="active ct-active" :to="subLink('')">VOD</router-link>
-                        <router-link v-if="sidebarItems.includes('head-to-head')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('history')">Head to head</router-link>
+                        <router-link v-if="sidebarItems.includes('head-to-head')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('history')">Map stats</router-link>
+                        <router-link v-if="sidebarItems.includes('score-reporting')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('score-reporting')">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>Score reporting</div>
+
+                                <div class="d-flex flex-wrap align-items-center justify-content-end gap-1">
+                                    <div v-if="scoreReportingBadge" class="badge pill" :class="`bg-${scoreReportingBadge.variant}`" :title="scoreReportingBadge?.title">
+                                        {{ scoreReportingBadge.text }}
+                                    </div>
+
+
+                                    <div v-if="!authenticated">
+                                        <span v-b-tooltip="'Requires login'">
+                                            <i class="fa fa-lock"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </router-link>
                         <router-link v-if="sidebarItems.includes('editor')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('editor')">Match editor</router-link>
                     </ul>
 
@@ -62,9 +80,9 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import MatchHero from "@/components/website/match/MatchHero";
 import MatchScore from "@/components/website/match/MatchScore";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
-import { cleanID, formatTime, getMatchContext, url } from "@/utils/content-utils";
+import { cleanID, formatTime, getMatchContext, getScoreReportingBadge, url } from "@/utils/content-utils";
 import { resizedImageNoWrap } from "@/utils/images";
-import { canEditMatch } from "@/utils/client-action-permissions";
+import { canEditMatch, isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -157,11 +175,30 @@ export default {
             if (!isAuthenticated) return false;
             return canEditMatch(player, { event: this.match?.event, match: this.match });
         },
+        eventSettings() {
+            if (!this.match?.event?.blocks) return null;
+            return JSON.parse(this.match.event.blocks);
+        },
+        scoreReportingEnabled() {
+            return this.eventSettings?.reporting?.score?.use;
+        },
+        authenticated() {
+            const { isAuthenticated } = useAuthStore();
+            return isAuthenticated;
+        },
+        matchComplete() {
+            if (!this.match?.first_to) return false;
+            return [this.match?.score_1 || 0, this.match?.score_2 || 0].some(x => x === this.match?.first_to);
+        },
         sidebarItems() {
             const items = ["vod"];
 
+            console.log("route", this.$route);
+
             if (this.showHeadToHead) items.push("head-to-head");
             if (this.showEditor) items.push("editor");
+            if ((this.scoreReportingEnabled && !this.matchComplete) || (this.$route?.path?.endsWith("/score-reporting"))) items.push("score-reporting");
+
 
             return items;
         },
@@ -172,6 +209,38 @@ export default {
         },
         eventID() {
             return this.match?.event?.id;
+        },
+        controllableTeams() {
+            const { isAuthenticated, player } = useAuthStore();
+            if (!isAuthenticated) return [];
+
+            return (this.match?.teams || []).filter(team => [
+                ...team.players || [],
+                ...team.captains || [],
+                ...team.team_staff || [],
+                ...team.owners || [],
+            ].some(personID => cleanID(player?.id) === cleanID(personID)));
+        },
+        existingScoreReport() {
+            return (ReactiveRoot(this.match?.id, {
+                "reports": ReactiveArray("reports", {
+                    "team": ReactiveThing("team"),
+                    "player": ReactiveThing("player")
+                })
+            })?.reports || []).find(report => report.type === "Scores" && cleanID(report.match?.[0]) === cleanID(this.match?.id));
+        },
+        scoreReportingBadge() {
+            const { player } = useAuthStore();
+            const state = {
+                "reports_enabled": this.scoreReportingEnabled,
+                "existing_report": !!this.existingScoreReport?.id,
+                "is_on_teams": !!this.controllableTeams?.length,
+                "is_opponent": this.existingScoreReport?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) !== cleanID(this.existingScoreReport?.team?.id)) : null,
+                "is_submitter": this.existingScoreReport?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) === cleanID(this.existingScoreReport?.team?.id)) : null,
+                "is_staff": isEventStaffOrHasRole(player, { event: this.match?.event, websiteRoles: ["Can edit any match", "Can edit any event"] })
+            };
+
+            return getScoreReportingBadge(state, this.existingScoreReport, this.eventSettings);
         }
     },
     methods: {
@@ -254,5 +323,8 @@ export default {
 
     td.default-thing {
         background-color: rgba(255, 255, 255, 0.185);
+    }
+    .list-group-item.ct-active {
+        color: white;
     }
 </style>

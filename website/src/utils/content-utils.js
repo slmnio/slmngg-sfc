@@ -747,6 +747,7 @@ export function getScoreReportingBadge(state, report, eventSettings) {
     }
 
     return null;
+}
 /**
  * @param {number} r
  * @param {number} g

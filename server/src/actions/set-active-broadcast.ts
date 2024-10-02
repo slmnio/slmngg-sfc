@@ -1,5 +1,6 @@
 import { ActionAuth, BroadcastResolvableID } from "../types";
 import { Action } from "../action-utils/action-manager-models.js";
+import { dirtyID } from "../action-utils/action-utils.js";
 
 export default {
     key: "set-active-broadcast",
@@ -20,8 +21,8 @@ export default {
         // TODO: this client?.broadcast is unnecessary because having ["client"] in auth guarantees a client object.
         //       need some typescript wizardry to make this automatic
         const broadcasts = (client?.broadcast || []).sort((a, b) => {
-            if (a === broadcastID) return -1;
-            if (b === broadcastID) return 1;
+            if (dirtyID(a) === dirtyID(broadcastID)) return -1;
+            if (dirtyID(b) === dirtyID(broadcastID)) return 1;
             return 0;
         });
 

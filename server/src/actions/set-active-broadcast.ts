@@ -28,8 +28,6 @@ export default {
         await this.helpers.updateRecord("Clients", client, {
             "Broadcast": broadcasts
         });
-
-        throw "Airtable error";
     }
 // @ts-expect-error Needs some action refactoring before it can fully satisfy
 } satisfies Action;

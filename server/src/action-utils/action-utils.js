@@ -73,7 +73,7 @@ export async function updateRecord(Cache, tableName, item, data, source = undefi
     } catch (e) {
         console.error("Airtable update failed", e);
         verboseLog(`Error updating record on **${tableName}** \`${item.id}\``, e.message);
-        return { error: true };
+        return { error: true, errorMessage: e.message };
     }
 }
 

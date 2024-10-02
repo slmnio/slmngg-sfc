@@ -18,6 +18,10 @@
             <!--                </b-form-input>-->
             <!--                <div class="spacer flex-grow-1"></div>-->
             <!--                <b-button :disabled="processing['map']" class="ml-5 top-button flex-shrink-0" variant="success" @click="() => saveMapAndScores()"><i class="fas fa-save fa-fw"></i> Save all</b-button>-->
+            <div v-if="scoreReporting && proposedData" class="fill-buttons d-flex gap-2 justify-content-center mt-2">
+                <b-button variant="secondary" size="sm" @click="loadProposedData"><i class="fal fa-fw fa-upload"></i> Load proposed score report</b-button>
+                <b-button variant="danger" size="sm" @click="emptyData()"><i class="fas fa-trash fa-fw"></i> Empty editor</b-button>
+            </div>
             <div class="teams-scores pt-2 px-2">
                 <div class="checkboxes">
                     <b-form-checkbox v-if="showRestrictCheckbox" id="map-pool-checkbox" v-model="restrictToMapPool" class="mr-2">Restrict to map pool</b-form-checkbox>
@@ -54,7 +58,7 @@
                         variant="success"
                         :disabled="!matchData.scores.some(s => s === match.first_to)"
                         @click="() => scoreReportConfirmModal = true">
-                        <i class="fas fa-save fa-fw"></i> Submit score report
+                        <i class="fas fa-save fa-fw"></i> {{ scoreReportAction === "counter" ? 'Submit counter report' : "Submit score report" }}
                     </b-button>
                     <b-button v-else class="top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save {{ hideMatchExtras ? 'all' : 'maps' }}</b-button>
                 </div>
@@ -256,7 +260,7 @@ import MatchExplainerModal from "@/components/website/dashboard/MatchExplainerMo
 export default {
     name: "MatchEditor",
     components: { MatchExplainerModal, AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
-    props: ["match", "hideMatchExtras", "scoreReporting"],
+    props: ["match", "hideMatchExtras", "scoreReporting", "proposedData", "scoreReportAction"],
     data: () => ({
         processing: {},
         matchData: {
@@ -424,6 +428,19 @@ export default {
         },
         broadcastData() {
             return this.match?.event?.broadcasts;
+        },
+        formattedProposedData() {
+            return {
+                maps: (this.proposedData?.mapData || []).map(map => ({
+                    ...map,
+                    map: [map.map],
+                    winner: map.winner ? [map.winner] : null,
+                    picker: map.picker ? [map.picker] : null,
+                    banner: map.banner ? [map.banner] : null,
+                })),
+                score_1: this.proposedData?.matchData?.score_1 || 0,
+                score_2: this.proposedData?.matchData?.score_2 || 0
+            };
         }
         // loadedFully() {
         //     const test = [
@@ -506,7 +523,9 @@ export default {
         },
         emptyData(newID) {
             console.log("New match, emptying data", newID);
-            this.processing.map = true;
+            if (newID) this.processing.map = true;
+
+            this.matchData.scores = [0, 0];
             this.draws = [];
             this.mapChoices = [];
             this.winners = [];
@@ -520,11 +539,25 @@ export default {
             this.extraMaps = 0;
             this.errorMessage = null;
             this.restrictToMapPool = true;
+
+            this.previousAutoData = {
+                draws: Object.assign([], this.draws),
+                existingMapIDs: Object.assign([], this.existingMapIDs),
+                winners: Object.assign([], this.winners),
+                pickers: Object.assign([], this.pickers),
+                banners: Object.assign([], this.banners),
+                score_1s: Object.assign([], this.score_1s),
+                score_2s: Object.assign([], this.score_2s),
+                mapNumbers: Object.assign([], this.mapNumbers),
+                mapChoices: Object.assign([], this.mapChoices),
+                replayCodes: Object.assign([], this.replayCodes)
+            };
         },
         updateMatchData(data) {
             console.log("match data update", data);
 
             Object.entries(this.matchData).forEach(([key]) => {
+                console.log(key, data[key], this.matchData[key]);
                 if (data[key] !== this.matchData[key]) {
                     this.matchData[key] = data[key] || null;
                 }
@@ -551,7 +584,7 @@ export default {
                 this.processing.map = false;
             }
 
-            this.matchData.scores = this.scores;
+            this.matchData.scores = [data.score_1 || 0, data.score_2 || 0];
             this.matchData.custom_name = data.custom_name;
             this.matchData.forfeit = data.forfeit;
             this.matchData.forfeit_reason = data.forfeit_reason;
@@ -608,6 +641,7 @@ export default {
 
             const response = await authenticatedRequest("actions/submit-score-report", {
                 matchID: this.match.id,
+                action: this.scoreReportAction,
                 reportData: {
                     mapData: this.editedMapData,
                     matchData: this.reportableMatchData
@@ -725,6 +759,12 @@ export default {
                 if (!loserID) return console.warn("can't find a team", teamID, teamIDs, loserID);
                 this.pickers[i + 1] = loserID;
             }
+        },
+        loadProposedData() {
+            if (this.proposedData?.mapData) {
+                console.log("proposed data", this.proposedData);
+                this.updateMatchData(this.formattedProposedData);
+            }
         }
     },
     watch: {
@@ -777,7 +817,11 @@ export default {
     },
     mounted() {
         console.log("mounted");
-        this.updateMatchData(this.match);
+        if (this.scoreReporting && this.proposedData) {
+            this.loadProposedData();
+        } else {
+            this.updateMatchData(this.match);
+        }
     }
 };
 </script>

@@ -23,7 +23,26 @@
                 This match's score has been approved
             </div>
             <div v-else-if="currentStep?.key === 'report' && authStatus?.team" class="step-action">
-                <MatchEditor :match="match" :score-reporting="true" :hide-match-extras="true" />
+                <div class="p-2 bg-primary text-center rounded">
+                    Submit score report
+                </div>
+                <MatchEditor :match="match" :score-reporting="true" :hide-match-extras="true" score-report-action="submit" />
+            </div>
+            <div v-else-if="currentStep?.key === 'opponentApprove' && denyEditor" class="step-action">
+                <div class="d-flex gap-2">
+                    <div class="p-2 bg-primary text-center rounded flex-grow-1">
+                        Denying score report: Submit your own score report
+                    </div>
+                    <b-button variant="danger" @click="denyEditor = false">
+                        <i class="fas fa-fw fa-times"></i> Cancel
+                    </b-button>
+                </div>
+                <MatchEditor
+                    :match="match"
+                    :score-reporting="true"
+                    :hide-match-extras="true"
+                    score-report-action="counter"
+                    :proposed-data="existingReportData" />
             </div>
             <div v-else-if="currentStep?.key === 'opponentApprove'" class="step-action">
                 <div v-if="isOpponent" class="d-flex flex-column gap-2">
@@ -36,7 +55,7 @@
                     <div class="flex-center">
                         <b-button-group>
                             <b-button :disabled="processing.approval" variant="success" @click="approveReport('approve')"><i class="fas fa-fw fa-check mr-1"></i> Approve</b-button>
-                            <b-button :disabled="processing.approval" variant="danger" @click="approveReport('deny')"><i class="fas fa-fw fa-times mr-1"></i> Deny</b-button>
+                            <b-button :disabled="processing.approval" variant="danger" @click="denyEditor = true"><i class="fas fa-fw fa-times mr-1"></i> Deny</b-button>
                         </b-button-group>
                     </div>
                 </div>
@@ -78,11 +97,86 @@
                     Team - wait for staff approval
                 </div>
             </div>
-            <div v-else-if="(matchComplete && existingScoreReport) || existingScoreReport?.approved" class="p-2 bg-success text-center rounded">
+            <div v-else-if="(matchComplete) || existingScoreReport?.approved" class="p-2 bg-success text-center rounded">
                 This match's score has been approved
             </div>
-            <div v-else-if="matchComplete" class="p-2 bg-dark text-center rounded">
-                This match is complete.
+            <div v-else-if="currentStep?.key === 'counterReportApprove' && authStatus?.team">
+                <div v-if="isOpponent" class="d-flex flex-column gap-2">
+                    Counter approval submitted - wait for opponent approval.
+                </div>
+                <div v-else class="d-flex flex-column gap-2">
+                    <div class="p-2 bg-primary text-center rounded">
+                        Approve or deny counter score report.
+                    </div>
+
+                    <MatchExplainerList class="bg-light text-dark-low p-3 rounded" :edited-map-data="existingReportCounterData?.mapData" :edited-match-data="existingReportCounterData?.matchData" :match="match" />
+
+                    <div class="flex-center">
+                        <b-button-group>
+                            <b-button :disabled="processing.approval" variant="success" @click="approveReport('counter-approve')"><i class="fas fa-fw fa-check mr-1"></i> Approve</b-button>
+                            <b-button :disabled="processing.approval" variant="danger" @click="approveReport('counter-deny')"><i class="fas fa-fw fa-times mr-1"></i> Deny</b-button>
+                        </b-button-group>
+                    </div>
+                </div>
+            </div>
+            <div v-else-if="currentStep?.key === 'counterReportApprove' && authStatus?.staff" class="d-flex flex-column gap-2">
+                <div class="lists d-flex gap-2">
+                    <div class="d-flex flex-column gap-2">
+                        <div class="text-center fw-bold">Original report</div>
+                        <MatchExplainerList
+                            class="bg-light text-dark-low p-3 rounded"
+                            :edited-map-data="existingReportData?.mapData"
+                            :edited-match-data="existingReportCounterData?.matchData"
+                            :match="match" />
+                    </div>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="text-center fw-bold">Countered report</div>
+                        <MatchExplainerList
+                            class="bg-light text-dark-low p-3 rounded"
+                            :edited-map-data="existingReportCounterData?.mapData"
+                            :edited-match-data="existingReportCounterData?.matchData"
+                            :match="match" />
+                    </div>
+                </div>
+
+                <div v-if="existingScoreReport?.approved_by_staff" class="p-2 bg-success text-center rounded">
+                    Approved by staff
+                </div>
+                <div>
+                    <div class="flex-center">
+                        <b-button-group class="flex-wrap">
+                            <b-button
+                                v-b-tooltip="'Approve the original report without waiting for opponent approval'"
+                                :disabled="processing.approval"
+                                variant="primary"
+                                @click="staffApproveReport('force-approve')">
+                                <i class="fas fa-fw fa-shield-check mr-1"></i> Force approve original
+                            </b-button>
+                            <b-button
+                                v-if="!existingScoreReport?.approved_by_staff"
+                                v-b-tooltip="'Auto approve this report once both teams agree'"
+                                :disabled="processing.approval"
+                                variant="success"
+                                @click="staffApproveReport('pre-approve')">
+                                <i class="fas fa-fw fa-check mr-1"></i> Pre-approve
+                            </b-button>
+                            <b-button
+                                :disabled="processing.approval"
+                                variant="danger"
+                                @click="staffApproveReport('delete')">
+                                <i class="fas fa-fw fa-trash mr-1"></i> Deny
+                                & delete
+                            </b-button>
+                            <b-button
+                                v-b-tooltip="'Approve the countered report without waiting for opponent approval'"
+                                :disabled="processing.approval"
+                                variant="primary"
+                                @click="staffApproveReport('force-counter-approve')">
+                                <i class="fas fa-fw fa-shield-check mr-1"></i> Force approve counter
+                            </b-button>
+                        </b-button-group>
+                    </div>
+                </div>
             </div>
             <div v-else-if="authStatus?.staff" class="p-2 bg-dark text-center rounded">
                 <div class="mb-2">You can't submit a score report, but you can edit the match directly</div>
@@ -92,7 +186,7 @@
                 You don't have access to report scores for this match
             </div>
 
-            <pre v-if="existingScoreReport?.log">{{ existingScoreReport.log }}</pre>
+            <pre v-if="existingScoreReport?.log" style="white-space: pre-wrap">{{ existingScoreReport.log }}</pre>
         </div>
         <div v-else class="p-2 bg-dark text-center rounded">
             Team score reporting is not enabled
@@ -129,7 +223,8 @@ export default {
     components: { MatchExplainerList, MatchEditor },
     props: ["match"],
     data: () => ({
-        processing: {}
+        processing: {},
+        denyEditor: false
     }),
     computed: {
         eventSettings() {
@@ -144,11 +239,6 @@ export default {
             return this.eventSettings?.reporting?.score?.use;
         },
         /** @returns {Report | null} */
-        existingScoreReportRaw() {
-            return (ReactiveRoot(this.match?.id, {
-                "reports": ReactiveArray("reports")
-            })?.reports || []).find(report => report.type === "Scores" && cleanID(report.match?.[0]) === cleanID(this.match?.id));
-        },
         existingScoreReport() {
             return (ReactiveRoot(this.match?.id, {
                 "reports": ReactiveArray("reports", {
@@ -161,6 +251,15 @@ export default {
             if (!this.existingScoreReport?.data) return null;
             try {
                 return JSON.parse(this.existingScoreReport.data);
+            } catch (e) {
+                console.error(e);
+                return null;
+            }
+        },
+        existingReportCounterData() {
+            if (!this.existingScoreReport?.countered_data) return null;
+            try {
+                return JSON.parse(this.existingScoreReport.countered_data);
             } catch (e) {
                 console.error(e);
                 return null;
@@ -180,6 +279,9 @@ export default {
             // find controllable teams that is not the one that reported this
             if (!this.existingScoreReport?.team?.id) return false;
             return this.controllableTeams.some(t => cleanID(t.id) !== cleanID(this.existingScoreReport?.team?.id));
+        },
+        opponentTeam() {
+            return this.controllableTeams.find(t => cleanID(t.id) !== cleanID(this.existingScoreReport?.team?.id));
         },
         controllableTeams() {
             const { isAuthenticated, player } = useAuthStore();
@@ -219,6 +321,9 @@ export default {
             if (this.existingScoreReport?.approved_by_team) {
                 steps[0].status = "complete";
                 steps[0].icon = "fas fa-check";
+                if (this.existingScoreReport?.player?.name && this.existingScoreReport?.team?.name) {
+                    steps[0].description = `${this.existingScoreReport?.player?.name} reported score for ${this.existingScoreReport?.team?.name}`;
+                }
             }
 
             if (this.eventSettings?.reporting?.score?.opponentApprove) {
@@ -234,6 +339,9 @@ export default {
                 if (this.existingScoreReport?.approved_by_opponent) {
                     newStep.status = "complete";
                     newStep.icon = "fas fa-check";
+                    if (this.opponentTeam?.name) {
+                        newStep.description = `${this.opponentTeam.name} approved the report`;
+                    }
                 }
                 steps.push(newStep);
             } else {
@@ -247,17 +355,40 @@ export default {
                 });
             }
 
+            if (this.existingScoreReport?.countered_by_opponent) {
+                steps[steps.length-1].status = "countered";
+                steps[steps.length-1].icon = "fas fa-exchange";
+                if (this.opponentTeam?.name) {
+                    steps[steps.length-1].description = `${this.opponentTeam.name} submitted a counter report`;
+                }
+                steps.push(
+                    {
+                        key: "counterReportApprove",
+                        number: 3,
+                        title: "Counter approval",
+                        description: `${this.existingScoreReport?.team?.name || "Original team"} approves counter report`,
+                        status: "inactive",
+                        icon: "fas fa-clipboard-list"
+                    }
+                );
+
+            }
+
             if (this.eventSettings?.reporting?.score?.staffApprove) {
                 const newStep = {
                     key: "staffApprove",
-                    number: 3,
+                    number: steps.length + 1,
                     title: "Staff approval",
                     description: "Staff member approves the report",
                     status: "inactive",
                     icon: "fas fa-clipboard-check"
                 };
 
-                if (this.existingScoreReport?.approved_by_staff) {
+                if (this.existingScoreReport?.force_approved) {
+                    newStep.status = "complete";
+                    newStep.icon = "fas fa-shield-check";
+                    newStep.description = "Staff member force approved this report";
+                } else if (this.existingScoreReport?.approved_by_staff) {
                     newStep.status = "complete";
                     newStep.icon = "fas fa-check";
                 }
@@ -265,7 +396,7 @@ export default {
             } else {
                 steps.push({
                     key: "staffApprove",
-                    number: 3,
+                    number: steps.length + 1,
                     title: "Staff approval",
                     description: "Staff approvals not needed on this match",
                     status: "disabled",
@@ -317,7 +448,7 @@ export default {
             } finally {
                 this.processing.approval = false;
             }
-        },
+        }
     },
 };
 </script>
@@ -347,6 +478,10 @@ export default {
     }
     .step.status-complete .step-icon-holder {
         background-color: var(--green);
+    }
+    .step.status-countered .step-icon-holder {
+        background-color: var(--yellow);
+        color: var(--dark);
     }
     .step.status-disabled {
         opacity: 0.5;

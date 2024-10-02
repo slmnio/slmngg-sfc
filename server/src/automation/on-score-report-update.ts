@@ -88,6 +88,17 @@ export default {
                         // Delete record here (not implemented?)
                         console.log("Can now delete the score report");
 
+                        if (messageData.get("staff_notification_message_id") && messageData.get("staff_notification_channel_id")) {
+                            try {
+                                const channel = await client.channels.fetch(messageData.get("staff_notification_channel_id"));
+                                if (channel?.isTextBased()) await channel.messages.delete(messageData.get("staff_notification_message_id"));
+                            } catch (e) {
+                                console.error("Error trying to delete previous staff message", e);
+                            } finally {
+                                messageData.push("staff_notification_message_id", null);
+                                messageData.push("staff_notification_channel_id", null);
+                            }
+                        }
 
                         if (client &&
                             opponents.length &&
@@ -208,6 +219,80 @@ export default {
                                 }
                             }
                         }
+
+                    } else if (!oldData.countered_by_opponent && report.countered_by_opponent) {
+                        // Opponent has counter
+                        console.log("Report has been counted by opposing team");
+                        console.log({oldData, newData: report});
+
+                        if (messageData.get("opponent_captain_notification_message_id") && messageData.get("opponent_captain_notification_channel_id")) {
+                            try {
+                                const channel = await client.channels.fetch(messageData.get("opponent_captain_notification_channel_id"));
+                                if (channel?.isTextBased()) await channel.messages.delete(messageData.get("opponent_captain_notification_message_id"));
+                            } catch (e) {
+                                console.error("Error trying to delete previous opponent captain notification message", e);
+                            } finally {
+                                messageData.push("opponent_captain_notification_message_id", null);
+                                messageData.push("opponent_captain_notification_channel_id", null);
+                            }
+                        }
+
+
+                        // tell opponent
+                        if (client &&
+                            submittingTeam &&
+                            eventSettings?.logging?.captainNotifications &&
+                            !report.approved_by_opponent
+                        ) {
+                            const channel = await client.channels.fetch(eventSettings.logging.captainNotifications);
+                            if (channel?.isTextBased()) {
+
+                                const discordControl = new MapObject(submittingTeam.discord_control);
+                                const originalPing = discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : submittingTeam.name;
+
+                                try {
+                                    const originalNotification = await channel.send(`📣 ${originalPing}\nYour score report has been denied and countered by your opponent. Please check their submission to see if it is correct:\n${matchLink}`);
+                                    messageData.push("original_captain_notification_channel_id", channel.id);
+                                    messageData.push("original_captain_notification_message_id", originalNotification.id);
+                                } catch (e) {
+                                    console.error("Channel sending error", e);
+                                }
+                            }
+
+                        }
+
+                        // tell staff?
+                        if (client &&
+                            eventSettings?.logging?.staffScoreReport &&
+                            !report.approved_by_staff
+                        ) {
+                            if (messageData.get("staff_notification_channel_id") && messageData.get("staff_notification_message_id")) {
+                                try {
+                                    const channel = await client.channels.fetch(messageData.get("staff_notification_channel_id"));
+                                    if (channel?.isTextBased()) await channel.messages.delete(messageData.get("staff_notification_message_id"));
+                                } catch (e) {
+                                    console.error("Error trying to delete previous staff notification message", e);
+                                } finally {
+                                    messageData.push("staff_notification_message_id", null);
+                                    messageData.push("staff_notification_channel_id", null);
+                                }
+                            }
+
+                            const channel = await client.channels.fetch(eventSettings.logging.staffScoreReport);
+                            if (channel?.isTextBased()) {
+                                try {
+                                    const staffNotification = await channel.send(`📣 A score report from ${submittingTeam ? submittingTeam.name : "a team"} has been **denied and countered** by their opponent.\n${matchLink}`);
+                                    messageData.push("staff_notification_channel_id", channel.id);
+                                    messageData.push("staff_notification_message_id", staffNotification.id);
+                                } catch (e) {
+                                    console.error("Channel sending error", e);
+                                }
+                            }
+                        }
+
+                        await updateRecord(Cache, "Reports", report, {
+                            "Message Data": messageData.textMap
+                        });
 
                     } else {
                         // other change

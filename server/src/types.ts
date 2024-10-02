@@ -166,10 +166,12 @@ export interface Report extends Base {
     approved?: boolean;
     approved_by_team?: boolean;
     approved_by_opponent?: boolean;
+    countered_by_opponent?: boolean;
     approved_by_staff?: boolean;
     force_approved?: boolean;
 
     data?: string;
+    countered_data?: string;
     message_data?: string;
     log?: string;
     type?: "Scores" | "Attributes";

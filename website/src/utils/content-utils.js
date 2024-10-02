@@ -747,4 +747,63 @@ export function getScoreReportingBadge(state, report, eventSettings) {
     }
 
     return null;
+/**
+ * @param {number} r
+ * @param {number} g
+ * @param {number} b
+ */
+function luminance(r, g, b) {
+    const RED = 0.2126;
+    const GREEN = 0.7152;
+    const BLUE = 0.0722;
+
+    const GAMMA = 2.4;
+
+    const a = [r, g, b].map((v) => {
+        v /= 255;
+        return v <= 0.03928
+            ? v / 12.92
+            : Math.pow((v + 0.055) / 1.055, GAMMA);
+    });
+    return a[0] * RED + a[1] * GREEN + a[2] * BLUE;
+}
+
+/**
+ * @param {[red: number, blue: number, green: number]} rgb1
+ * @param {[red: number, blue: number, green: number]} rgb2
+ */
+function contrast(rgb1, rgb2) {
+    if (!rgb1?.length || !rgb2?.length) return null;
+    const lum1 = luminance(...rgb1);
+    const lum2 = luminance(...rgb2);
+    const brightest = Math.max(lum1, lum2);
+    const darkest = Math.min(lum1, lum2);
+    return (brightest + 0.05) / (darkest + 0.05);
+}
+
+/**
+ * @param {[red: number, blue: number, green: number]} rgb1
+ * @param {[red: number, blue: number, green: number]} rgb2
+ */
+export function calculateContrastRGB(rgb1, rgb2) {
+    const diff = contrast(rgb1, rgb2);
+    return diff < 1 ? 1/diff: diff;
+}
+
+function deHex(hexString) {
+    if (!hexString) return null;
+    hexString = hexString.replace("#", "");
+    const [r, g, b] = [hexString.slice(0, 2), hexString.slice(2, 4), hexString.slice(4, 6)].map(str => parseInt(str, 16));
+    return [r, g, b];
+}
+
+/**
+ *
+ * @param {string} hex1
+ * @param {string} hex2
+ * @returns {number}
+ */
+export function calculateContrastHex(hex1, hex2) {
+    const diff = contrast(deHex(hex1), deHex(hex2));
+    return diff < 1 ? 1/diff: diff;
 }

@@ -160,6 +160,7 @@
             </b-form-group>
         </div>
 
+        <b-form-checkbox v-model="testDiscordColors" switch>Test Discord role colors</b-form-checkbox>
         <table class="table table-bordered table-dark table-sm">
             <thead>
                 <tr>
@@ -186,8 +187,11 @@
                             border-width="3px"
                             icon-padding="6px" />
                     </td>
-                    <td>
-                        <router-link :to="`/team/${team.id}`">{{ team.name }}</router-link>
+                    <td :class="testDiscordColors ? 'test-discord' : ''">
+                        <router-link :to="`/team/${team.id}`" :style="!testDiscordColors ? {} : {color: (team?.theme?.color_theme_on_dark || team?.theme?.color_theme)}">{{ team.name }}</router-link>
+                        <router-link v-if="testDiscordColors" :to="`/team/${team.id}/theme`">
+                            <contrast-badge class="contrast-badge" :colors="['#2c2e32', team?.theme?.color_theme_on_dark || team?.theme?.color_theme]" />
+                        </router-link>
                     </td>
                     <td v-if="anyTeamCategories">{{ team.team_category?.split(";")?.[1] || team.team_category }}</td>
                     <td>
@@ -257,14 +261,16 @@ import { useAuthStore } from "@/stores/authStore";
 import { sortAlpha } from "@/utils/sorts";
 import SettingsMultiselect from "@/views/sub-views/event-settings/SettingsMultiselect.vue";
 import { cleanID } from "@/utils/content-utils";
+import ContrastBadge from "@/components/website/ContrastBadge.vue";
 
 export default {
     name: "EventSettingsDiscord",
-    components: { EventSettingsFix, CopyTextButton, ThemeLogo, SettingsMultiselect },
+    components: { ContrastBadge, EventSettingsFix, CopyTextButton, ThemeLogo, SettingsMultiselect },
     props: {
         event: {}
     },
     data: () => ({
+        testDiscordColors: false,
         selectedGuildID: "",
         fixes: [],
 
@@ -697,5 +703,17 @@ export default {
         font-family: monospace;
         font-size: 0.7em;
         vertical-align: text-top;
+    }
+    td.test-discord {
+        background-color: #2c2e32;
+    }
+    .contrast-badge {
+        display: inline-block;
+        float: right;
+        padding: 0 0.25em;
+        font-weight: bold;
+        min-width: 3em;
+        text-align: center;
+        font-size: 0.8em;
     }
 </style>

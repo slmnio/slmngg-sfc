@@ -14,25 +14,64 @@
         <h3>Themes</h3>
         <div class="theme-collection mb-3">
             <div class="theme-bar default-thing" :style="mainTheme">
-                Theme
+                <div class="text flex-center flex-grow-1 px-3">Theme</div>
+                <contrast-badge class="contrast-badge" :contrast="calculateContrastHex(mainTheme.color, mainTheme.backgroundColor)" />
             </div>
             <div class="theme-bar default-thing" :style="logoBackground">
-                Logo Background
+                <div class="text flex-center flex-grow-1 px-3">Logo Background</div>
+                <contrast-badge class="contrast-badge" :contrast="calculateContrastHex(logoBackground.color, logoBackground.backgroundColor)" />
             </div>
         </div>
 
 
-        <h3 v-if="colors.length">Colors</h3>
-        <div v-if="colors.length" class="color-list mb-3">
-            <div v-for="color in colors" :key="color.name" class="color">
-                <div class="color-swatch" :style="{backgroundColor: color.value}"></div>
-                <div class="color-name">{{ color.name }}: <CopyTextButton><code>{{ safeColor(color.value) }}</code></CopyTextButton> </div>
+        <div v-if="colors.length" class="colors">
+            <h3>Colors</h3>
+            <div class="color-list mb-3">
+                <div v-for="color in colors" :key="color.name" class="color">
+                    <div class="color-swatch" :style="{backgroundColor: color.value}"></div>
+                    <div class="color-name">{{ color.name }}: <CopyTextButton><code>{{ safeColor(color.value) }}</code></CopyTextButton> </div>
+                </div>
+            </div>
+
+
+            <div class="fw-bold mb-2">Discord test</div>
+
+            <div class="discord-list d-flex flex-column gap-1 mb-3">
+                <div v-for="color in discordColors" :key="color.name" class="discord-test d-flex gap-2">
+                    <contrast-badge class="contrast-badge" :contrast="color.contrast" />
+                    <div class="color-test d-flex gap-2" :style="{color: color.value}">
+                        <div>{{ thing?.name }}</div>
+                        <div class="fw-bold">{{ thing?.name }}</div>
+                    </div>
+                    <div class="color-name"><CopyTextButton><code>{{ safeColor(color.value) }}</code></CopyTextButton></div>
+                    <div v-if="safeColor(theme.color_theme_on_dark || theme.color_theme) === safeColor(color.value)" class="color-chosen">
+                        <i class="fas fa-arrow-left mr-1"></i> Currently active
+                    </div>
+                </div>
+            </div>
+
+            <div class="fw-bold mb-2">Color matrix</div>
+            <div class="color-matrix d-flex flex-column gap-1 mb-3">
+                <div v-for="color in colorMatrix" :key="color.background" class="discord-test d-flex gap-2">
+                    <div class="color-test d-flex gap-2">
+                        <div class="hex-swatch" style="min-width: 6em">
+                            <copy-text-button :no-icon="true">{{ safeColor(color.background) }}</copy-text-button>
+                        </div>
+                        <div v-for="text in color.colors" :key="text.value" class="hex-swatch d-flex justify-content-between gap-1" :style="{ backgroundColor: color.background, color: text.value }">
+                            <div class="color-hex text-center flex-grow-1">
+                                <copy-text-button :no-icon="true">{{ safeColor(text.value) }}</copy-text-button>
+                            </div>
+                            <contrast-badge class="contrast-badge" :contrast="text.contrast" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <b-form-checkbox v-model="removeHashInHex" switch>Remove hash from hex codes</b-form-checkbox>
             </div>
         </div>
 
-        <div v-if="colors.length" class="mb-3">
-            <b-form-checkbox v-model="removeHashInHex" switch>Remove hash from hex codes</b-form-checkbox>
-        </div>
 
         <!--        <h3>Hero</h3>-->
         <!--        <div class="heroes d-flex">-->
@@ -93,7 +132,7 @@ import StandingsTeam from "@/components/broadcast/StandingsTeam";
 import { bg, resizedImageNoWrap } from "@/utils/images";
 import { getDataServerAddress } from "@/utils/fetch";
 import CopyTextButton from "@/components/website/CopyTextButton";
-import { url } from "@/utils/content-utils";
+import { calculateContrastHex, url } from "@/utils/content-utils";
 import { mapWritableState } from "pinia";
 import { useSettingsStore } from "@/stores/settingsStore";
 
@@ -164,16 +203,38 @@ export default {
                 key: cleanKey(k),
                 image: resizedImageNoWrap(this.theme, [k], "orig")
             })).filter(i => i.image);
+        },
+        discordColors() {
+            return (this.colors || []).map(col => ({
+                value: col.value,
+                contrast: calculateContrastHex("#2c2e32", col.value)
+            })).sort((a,b) => b.contrast - a.contrast);
+        },
+        colorMatrix() {
+            const testColors = [...new Set([
+                ...(this.colors || []).map(col => col.value),
+                "#000000",
+                "#FFFFFF"
+            ])];
+            return testColors.map(col1 => ({
+                background: col1,
+                colors: testColors.filter(col2 => col2 !== col1).filter(col2 => ![col1, col2].every(col => col === "#000000" || col === "#FFFFFF")).map(col2 => ({
+                    value: col2,
+                    contrast: calculateContrastHex(col1, col2)
+                }))
+            }));
         }
     },
     methods: {
+        calculateContrastHex,
         bg,
         dataServerURL(path) {
             return `${getDataServerAddress()}/${path}`;
         },
         url,
         safeColor(col) {
-            col = col.trim();
+            if (!col) return null;
+            col = col.trim().toUpperCase();
             if (this.removeHashInHex) col = col.replace("#", "");
             return col;
         }
@@ -200,14 +261,18 @@ export default {
     .theme-bar {
         font-size: 1.25em;
         font-weight: bold;
-        padding: 2px 6px;
         display: inline-flex;
-        min-width: 12em;
-        justify-content: center;
+        min-width: 13em;
+        justify-content: space-between;
         text-transform: uppercase;
         margin-right: 12px;
         border-bottom-width: 4px;
         border-bottom-style: solid;
+    }
+
+    .theme-bar .text {
+        padding-top: calc(1em / 8);
+        padding-bottom: calc(1em / 8);
     }
 
     .color-swatch {
@@ -295,4 +360,29 @@ export default {
     /*.recolored-hero:deep(.color-holder) {*/
     /*    height: 500px;*/
     /*}*/
+
+    .discord-list .color-test {
+        background-color: #2c2e32;
+        padding: 0 0.25em;
+    }
+
+    .hex-swatch {
+        min-width: 9em;
+        text-align: center;
+    }
+
+    .contrast-badge {
+        padding: 0 0.25em;
+        min-width: 3em;
+        font-size: .9em;
+        line-height: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+    }
+
+    .theme-bar .contrast-badge {
+        font-size: .75em;
+    }
 </style>

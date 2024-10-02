@@ -24,7 +24,9 @@ export default {
             if (!this.teams) return [];
             return this.teams.map(t => ReactiveRoot(t, {
                 theme: ReactiveThing("theme"),
-                players: ReactiveArray("players")
+                players: ReactiveArray("players", {
+                    "signup_data": ReactiveArray("signup_data")
+                })
             })).sort((a, b) => {
                 if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
                 return -1;

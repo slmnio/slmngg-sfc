@@ -27,15 +27,15 @@ export default {
     computed: {
         moneyStates() {
             const unlockedPerPlayer = this.auctionSettings?.unlock_player || 10;
-            const starting = this.auctionSettings?.starting || 800;
             const playersPerTeam = this.auctionSettings?.each_team || 7;
+            // This doesn't understand people starting without player captains but that's better than existing
+            const starting = (this.auctionSettings?.starting || 800) - Math.max((playersPerTeam - 1) * unlockedPerPlayer, 0);
 
             const playersSigned = this.team.players?.length || 0;
             const available = this.team.balance || 0;
             const locked = Math.max((playersPerTeam - playersSigned - 1) * unlockedPerPlayer, 0);
             const used = starting - available + (Math.min(playersSigned, playersPerTeam - 1) * unlockedPerPlayer);
             const total = available + locked + used;
-
 
             return {
                 available,

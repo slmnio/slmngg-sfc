@@ -149,6 +149,7 @@
                     key="leaderboard"
                     :players="signedPlayers"
                     :style="background"
+                    :auction-settings="auctionSettings"
                     class="leaderboard w-100 h-100 flex-center" />
                 <AuctionTeamsOverview
                     v-else-if="rightDisplay === 'teams-overview'"
@@ -381,7 +382,7 @@ export default {
                     teams: ReactiveArray("teams", {
                         theme: ReactiveThing("theme"),
                         players: ReactiveArray("players", {
-                            "signup_data": ReactiveArray("signup_data")
+                            signup_data: ReactiveArray("signup_data")
                         }),
                         staff: ReactiveArray("staff"),
                         owners: ReactiveArray("owners"),

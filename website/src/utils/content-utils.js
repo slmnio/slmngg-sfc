@@ -824,6 +824,9 @@ export function recogniseRemoteServer(serverUrl) {
         };
 
 
+        if (output.server.endsWith(".youtube.com")) {
+            output.recognisedServer = "YouTube";
+        }
         if (["na.borpa.business"].includes(output.server)) {
             output.recognisedServer = "NA SRT";
             output.recognisedID = output.streamid.split(",").find(t => t.split("=")[0] === "r").split("=")?.[1];

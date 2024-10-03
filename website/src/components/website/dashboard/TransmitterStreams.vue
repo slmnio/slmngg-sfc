@@ -8,7 +8,7 @@
                 <thead>
                     <tr>
                         <th>Client</th>
-                        <th colspan="2">Scenes</th>
+                        <th>Scenes</th>
                         <th>Uptime</th>
                         <th>Server</th>
                         <th>Pull link</th>
@@ -17,8 +17,10 @@
                 <tbody>
                     <tr v-for="stream in streams" :key="stream.socket">
                         <td :class="{'text-danger fw-bold': stream.status?.outputActive}">{{ stream.clientName }}</td>
-                        <td class="scene-preview">{{ stream.scenes?.preview }}</td>
-                        <td class="scene-program">{{ stream.scenes?.program }}</td>
+                        <td>
+                            <div v-if="stream.scenes?.preview" class="scene-preview">PVW: {{ stream.scenes?.preview }}</div>
+                            <div v-if="stream.scenes?.program" class="scene-program">PGM: {{ stream.scenes?.program }}</div>
+                        </td>
                         <td>{{ stream.status?.outputDuration && formatDuration(stream.status?.outputDuration / 1000) }}</td>
                         <td>{{ stream?.recognisedServer || stream.settings?.service }}</td>
                         <td>
@@ -56,11 +58,14 @@ export default {
 
 <style scoped>
     .scene-preview {
-        border-top: 1px solid lime;
-        border-bottom: 1px solid lime;
+        color: black;
     }
     .scene-program {
-        border-top: 1px solid red;
-        border-bottom: 1px solid red;
+        color: red;
+    }
+
+    .scene-preview, .scene-program {
+        font-size: 0.75em;
+        vertical-align: middle;
     }
 </style>

@@ -2,15 +2,15 @@
     <div>
         <b-button v-b-modal.dashboard-transmitter-modal :variant="buttonVariant" class="dashboard-transmitter d-flex flex-column align-items-end rounded p-0 text-nowrap">
             <div class="title px-2 w-100 d-flex align-items-center justify-content-end gap-1">
-                <div v-if="websocketStreamStatus?.outputActive">
+                <div v-if="normalisedStreamStatus?.outputActive">
                     LIVE &middot;
                 </div>
                 <div>OBS Transmitter </div>
                 <i class="fas fa-fw" :class="websocketConnected ? 'fa-wifi' : 'fa-wifi-slash'"></i>
             </div>
             <div class="content px-2 d-flex gap-2">
-                <div v-if="websocketStreamStatus?.outputActive" style="font-variant-numeric: tabular-nums">
-                    {{ formatDuration(websocketStreamStatus?.outputDuration / 1000) }}
+                <div v-if="normalisedStreamStatus?.outputActive" style="font-variant-numeric: tabular-nums">
+                    {{ formatDuration(normalisedStreamStatus?.outputDuration / 1000) }}
                 </div>
                 <div v-if="twitchStream" class="twitch-stream px-1" :class="{'bg-warning text-dark': twitchStream?.matches === false }">
                     <i v-if="twitchStream.matches === false" class="fas fa-fw fa-exclamation"></i>
@@ -22,6 +22,9 @@
                     <i class="fas fa-fw fa-signal-stream"></i>
                     {{ customServer?.recognisedServer || customServer?.server }}
                     {{ customServer?.recognisedID || customServer?.streamid }}
+                </div>
+                <div v-else-if="matchingStream">
+                    Remote transmitter
                 </div>
                 <div v-else-if="!websocketConnected">
                     Not connected
@@ -37,6 +40,16 @@
 
         <b-modal id="dashboard-transmitter-modal" ref="dashboard-transmitter-modal" title="OBS Websocket Transmitter" hide-footer>
             <b-form-checkbox v-model="useDashboardTransmitter" switch>Use dashboard transmitter</b-form-checkbox>
+
+            <div v-if="matchingStream && !websocketConnected" class="bg-primary p-2 rounded text-white my-2">
+                <div class="mb-1 d-flex justify-content-between">
+                    <div>Connected to remote transmitter</div>
+                    <div class="bg-white text-primary rounded px-2 fw-bold">{{ matchingStream?.clientName }}</div>
+                </div>
+                <div class="bg-white rounded text-dark p-1 px-2 fw-bold">
+                    {{ [matchingStream?.scenes?.preview, matchingStream?.scenes?.program].filter(Boolean).join(" / ") }}
+                </div>
+            </div>
             <div class="d-flex flex-column gap-1 mt-2">
                 <div class="fw-bold mb-1">Websocket settings</div>
                 <b-form-group label-cols="3" label="URL & port">
@@ -57,7 +70,7 @@
                         <tr v-for="([key, val]) in Object.entries(twitchStream || {})" :key="key">
                             <td><span class="text-muted">twitch.</span>{{ key }}</td><td><copy-text-button>{{ val }}</copy-text-button></td>
                         </tr>
-                        <tr v-for="([key, val]) in Object.entries(websocketStreamStatus || {})" :key="key">
+                        <tr v-for="([key, val]) in Object.entries(normalisedStreamStatus || {})" :key="key">
                             <td><span class="text-muted">status.</span>{{ key }}</td>
                             <td><copy-text-button>{{ val }}</copy-text-button></td>
                         </tr>
@@ -75,6 +88,7 @@ import { useStatusStore } from "@/stores/statusStore";
 import WebsocketTransmitter from "@/components/broadcast/roots/WebsocketTransmitter.vue";
 import { formatDuration, recogniseRemoteServer } from "@/utils/content-utils.js";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
+import { ReactiveRoot } from "@/utils/reactive.js";
 
 export default {
     name: "DashboardTransmitter",
@@ -83,16 +97,46 @@ export default {
     computed: {
         ...mapWritableState(useSettingsStore, ["transmitterPassword", "transmitterUrl", "useDashboardTransmitter"]),
         ...mapWritableState(useStatusStore, ["websocketConnected", "websocketStreamSettings", "websocketStreamStatus"]),
+        streams(){
+            return ((ReactiveRoot("special:streams"))?.streams || []).map(stream => ({
+                ...stream,
+                ...recogniseRemoteServer(stream?.settings?.url)
+            }));
+        },
+        matchingStream() {
+            return this.streams.find(s => s.clientName === this.client?.key);
+        },
+        normalisedStreamSettings() {
+            return this.websocketConnected ? this.websocketStreamSettings : this.matchingStream?.settings;
+        },
+        normalisedStreamStatus() {
+            return this.websocketConnected ? this.websocketStreamStatus : this.matchingStream?.status;
+        },
         wsUrl() {
             return this.transmitterUrl?.startsWith("ws://") ? this.transmitterUrl : "ws://" + this.transmitterUrl;
         },
         twitchStream() {
-            const key = this.websocketStreamSettings?.key;
-            if (!key || this.websocketStreamSettings?.service !== "Twitch") return;
-            const [live, id, streamKey] = key.split("_");
-            if (live !== "live") return;
+            let id;
+
+            if (this.websocketConnected) {
+                const key = this.websocketStreamSettings?.key;
+                if (!key || this.websocketStreamSettings?.service !== "Twitch") return;
+                const [live, channelID, streamKey] = key.split("_");
+                if (live !== "live") return;
+                id = channelID;
+            } else if (this.matchingStream) {
+                if (this.matchingStream?.settings?.service !== "Twitch") return;
+                id = this.matchingStream?.settings?.channelID;
+            }
 
             const activeChannelID = this.broadcast?.channel_id?.[0];
+
+            if (id === "sub") {
+                return {
+                    matches: null,
+                    id
+                };
+            }
 
             if (id === activeChannelID) {
                 return {
@@ -116,18 +160,30 @@ export default {
             }
         },
         customServer() {
-            const serverUrl = this.websocketStreamSettings?.server;
-            if (!serverUrl || serverUrl === "auto" || this.websocketStreamSettings.streamServiceType === "rtmp_custom") return;
-            try {
-                return recogniseRemoteServer(serverUrl);
-            } catch (e) {
-                console.warn(e);
-                return null;
+            if (this.websocketConnected) {
+                const serverUrl = this.websocketStreamSettings?.server;
+                if (!serverUrl || serverUrl === "auto" || this.websocketStreamSettings.streamServiceType === "rtmp_custom") return;
+                try {
+                    return recogniseRemoteServer(serverUrl);
+                } catch (e) {
+                    console.warn(e);
+                    return null;
+                }
+            } else {
+                const serverUrl = this.matchingStream?.settings?.url;
+                if (!serverUrl) return;
+                try {
+                    return recogniseRemoteServer(serverUrl);
+                } catch (e) {
+                    console.warn(e);
+                    return null;
+                }
             }
         },
         buttonVariant() {
-            if (this.websocketStreamStatus?.outputActive) return "danger";
+            if (this.normalisedStreamStatus?.outputActive) return "danger";
             if (this.websocketConnected) return "primary";
+            if (this.matchingStream) return "success";
             return "secondary";
         }
     },

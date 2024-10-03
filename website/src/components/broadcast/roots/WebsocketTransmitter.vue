@@ -23,12 +23,19 @@
             <div v-if="customServer?.recognisedServer"><i class="fas fa-fw fa-rss"></i> {{ customServer.recognisedServer }}</div>
             <div v-else-if="customServer?.server"><i class="fas fa-fw fa-rss"></i> {{ customServer.server }}</div>
             <div v-if="customServer?.recognisedID"><i class="fas fa-fw fa-tag"></i> {{ customServer.recognisedID }}</div>
-            <div v-if="websocketStreamStatus?.outputActive" class="broadcast-live px-3 d-flex gap-3">
-                <div>Live</div>
-                <div style="font-variant-numeric: tabular-nums">
-                    {{ formatDuration(websocketStreamStatus?.outputDuration / 1000) }}
+            <div v-if="websocketStreamStatus?.outputActive" class="broadcast-live mt-2">
+                <div class="industry-align px-3 fw-bold d-flex gap-3">
+                    <div>LIVE</div>
+                    <div style="font-variant-numeric: tabular-nums">
+                        {{ formatDuration(websocketStreamStatus?.outputDuration / 1000) }}
+                    </div>
                 </div>
             </div>
+        </div>
+
+
+        <div v-if="isProducer" class="flex-center gap-1">
+            <div><b>Producer</b> - sending tally data</div>
         </div>
 
 
@@ -44,6 +51,7 @@ import OBSWebSocket from "obs-websocket-js";
 import { mapWritableState } from "pinia";
 import { useStatusStore } from "@/stores/statusStore";
 import { formatDuration, recogniseRemoteServer } from "@/utils/content-utils.js";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
 
 async function wait(ms) {
     return new Promise(r => setTimeout(r, ms));
@@ -84,28 +92,29 @@ export default {
                 return null;
             }
         },
+        liveMatch() {
+            const matchID = this.client?.broadcast?.live_match?.[0];
+            if (!matchID) return null;
+            return ReactiveRoot(matchID, {
+                player_relationships: ReactiveArray("player_relationships")
+            });
+        },
+        isProducer() {
+            return this.liveMatch?.player_relationships.some(rel => rel.singular_name === "Producer" && rel.player?.[0] === this.client?.staff?.[0]);
+        }
     },
 
     methods: {
         formatDuration,
         transmit() {
-            socket.emit("obs_data_change", {
-                clientName: this.client?.key,
-                previewScene: this.wsPreview,
-                programScene: this.wsProgram
-            });
-            socket.emit("obs_stream_status", {
-                clientName: this.client?.key,
-                status: this.websocketStreamStatus,
-                settings: {
-                    service: this.websocketStreamSettings?.service || "Custom",
-                    url: this.websocketStreamSettings?.server,
-                },
-                scenes: {
-                    preview: this.wsPreview,
-                    program: this.wsProgram,
-                }
-            });
+            if (this.isProducer) {
+                socket.emit("obs_data_change", {
+                    clientName: this.client?.key,
+                    previewScene: this.wsPreview,
+                    programScene: this.wsProgram
+                });
+            }
+            this.sendStreamStatus(this.websocketStreamStatus, this.websocketStreamSettings);
         },
         async connectWs() {
             if (!this.obsWs) return;
@@ -183,6 +192,22 @@ export default {
         },
         startDataCheckTimer() {
             this.dataCheckInterval = setInterval(this.getStreamData, 1000);
+        },
+        sendStreamStatus(status, settings) {
+            socket.emit("obs_stream_status", {
+                clientName: this.client?.key,
+                status,
+                settings: {
+                    service: settings?.service || "Custom",
+                    url: settings?.server,
+                    channelID: settings?.service === "Twitch" ? (settings?.key?.split("_") || [])?.[1]  : null
+                },
+                scenes: {
+                    preview: this.wsPreview,
+                    program: this.wsProgram,
+                }
+            });
+
         }
     },
     watch: {
@@ -224,36 +249,14 @@ export default {
             immediate: true,
             deep: true,
             handler(status) {
-                socket.emit("obs_stream_status", {
-                    clientName: this.client?.key,
-                    status,
-                    settings: {
-                        service: this.websocketStreamSettings?.service || "Custom",
-                        url: this.websocketStreamSettings?.server,
-                    },
-                    scenes: {
-                        preview: this.wsPreview,
-                        program: this.wsProgram,
-                    }
-                });
+                this.sendStreamStatus(status, this.websocketStreamSettings);
             }
         },
         websocketStreamSettings: {
             immediate: true,
             deep: true,
             handler(settings) {
-                socket.emit("obs_stream_status", {
-                    clientName: this.client?.key,
-                    status: this.websocketStreamStatus,
-                    settings: {
-                        service: settings?.service || "Custom",
-                        url: settings?.server,
-                    },
-                    scenes: {
-                        preview: this.wsPreview,
-                        program: this.wsProgram,
-                    }
-                });
+                this.sendStreamStatus(this.websocketStreamStatus, settings);
             }
         }
     },

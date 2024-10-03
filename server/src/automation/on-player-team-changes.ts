@@ -194,7 +194,7 @@ export default {
 
                                 if (addedInAll && removedInAll) {
                                     // some sort of change
-                                    parts.push(`has been changed: ${teamChanges.map(({ key, alteration }) => `${alteration} as ${PlayerTeamRoleMap[key]}`).join(", ")} from`);
+                                    parts.push(`has been changed: ${teamChanges.map(({ key, alteration }) => `${alteration} as ${PlayerTeamRoleMap[key]}`).join(", ")} for`);
                                 } else if (addedInAll) {
                                     const addedAsPlayer = teamChanges.some(({key, alteration}) => alteration === "added" && key === "member_of");
                                     if (addedAsPlayer && teamChanges.length === 1) {
@@ -205,7 +205,7 @@ export default {
                                         }
                                     } else {
                                         // added as something else
-                                        parts.push(`has been added as ${teamChanges.filter(({ alteration}) => alteration === "added").map(({ key }) => PlayerTeamRoleMap[key])} from`);
+                                        parts.push(`has been added as ${teamChanges.filter(({ alteration}) => alteration === "added").map(({ key }) => PlayerTeamRoleMap[key])} to`);
                                     }
 
                                 } else if (removedInAll) {

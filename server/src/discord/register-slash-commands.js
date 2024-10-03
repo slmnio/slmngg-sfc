@@ -3,7 +3,7 @@ import { REST, Routes } from "discord.js";
 import fs from "node:fs";
 import path from "node:path";
 
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const DIRNAME = path.dirname(fileURLToPath(import.meta.url));
 
@@ -15,11 +15,11 @@ const commandFolders = fs.readdirSync(foldersPath);
 for (const folder of commandFolders) {
     // Grab all the command files from the commands directory you created earlier
     const commandsPath = path.join(foldersPath, folder);
-    const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(".js"));
+    const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(".js") || file.endsWith(".ts"));
     // Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
     for (const file of commandFiles) {
-        const filePath = path.join(commandsPath, file);
-        const command = await import(filePath);
+        const filePath = pathToFileURL(path.join(commandsPath, file));
+        const command = (await import(filePath))?.default;
         if ("data" in command && "execute" in command) {
             commands.push(command.data.toJSON());
         } else {

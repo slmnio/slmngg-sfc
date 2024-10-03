@@ -41,10 +41,10 @@
         <b-modal id="dashboard-transmitter-modal" ref="dashboard-transmitter-modal" title="OBS Websocket Transmitter" hide-footer>
             <b-form-checkbox v-model="useDashboardTransmitter" switch>Use dashboard transmitter</b-form-checkbox>
 
-            <div v-if="matchingStream && !websocketConnected" class="bg-primary p-2 rounded text-white my-2">
+            <div v-if="matchingStream && !websocketConnected" class="bg-success p-2 rounded text-white my-2">
                 <div class="mb-1 d-flex justify-content-between">
                     <div>Connected to remote transmitter</div>
-                    <div class="bg-white text-primary rounded px-2 fw-bold">{{ matchingStream?.clientName }}</div>
+                    <div class="bg-white text-success rounded px-2 fw-bold">{{ matchingStream?.clientName }}</div>
                 </div>
                 <div class="bg-white rounded text-dark p-1 px-2 fw-bold">
                     {{ [matchingStream?.scenes?.preview, matchingStream?.scenes?.program].filter(Boolean).join(" / ") }}

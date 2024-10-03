@@ -107,6 +107,7 @@ export default {
     methods: {
         formatDuration,
         transmit() {
+            if (!this.isConnected) return;
             if (this.isProducer) {
                 socket.emit("obs_data_change", {
                     clientName: this.client?.key,
@@ -169,10 +170,6 @@ export default {
                 this.websocketStreamSettings = streamSettings?.responseData?.streamServiceSettings;
                 this.websocketStreamStatus = streamStatus?.responseData;
             }
-
-            console.log("OBSWS", items);
-
-
         },
         async getStreamData() {
             try {
@@ -194,6 +191,7 @@ export default {
             this.dataCheckInterval = setInterval(this.getStreamData, 1000);
         },
         sendStreamStatus(status, settings) {
+            if (!this.isConnected) return;
             socket.emit("obs_stream_status", {
                 clientName: this.client?.key,
                 status,
@@ -218,6 +216,7 @@ export default {
                 if (!status) {
                     this.websocketStreamSettings = null;
                     this.websocketStreamStatus = null;
+                    socket.emit("obs_disconnect", { clientName: this.client?.key });
                 }
             }
         },

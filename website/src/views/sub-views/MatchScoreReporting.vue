@@ -233,7 +233,7 @@ export default {
         },
         matchComplete() {
             if (!this.match?.first_to) return false;
-            return this.match.maps?.length || [this.match?.score_1 || 0, this.match?.score_2 || 0].some(x => x === this.match?.first_to);
+            return [this.match?.score_1 || 0, this.match?.score_2 || 0].some(x => x === this.match?.first_to);
         },
         scoreReportingEnabled() {
             return this.eventSettings?.reporting?.score?.use;

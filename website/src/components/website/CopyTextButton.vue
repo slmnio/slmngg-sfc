@@ -1,6 +1,6 @@
 <template>
     <span class="parent" @click="copyText">
-        <span ref="copy"><slot></slot></span><i v-if="!noIcon" :class="`ml-1 fas fa-fw ${recentlyCopied ? 'fa-clipboard-check' : 'fa-copy'}`"></i>
+        <span ref="copy"><slot></slot></span><i v-if="!noIcon" :class="`ml-1 fas fa-fw ${recentlyCopied ? 'fa-clipboard-check' : 'fa-copy'} ${alwaysShowIcon ? 'always-show' : ''}`"></i>
     </span>
 </template>
 
@@ -8,7 +8,7 @@
 
 export default {
     name: "CopyTextButton",
-    props: ["content", "noIcon"],
+    props: ["content", "noIcon", "alwaysShowIcon"],
     data: () => ({
         recentlyCopied: false
     }),
@@ -40,5 +40,8 @@ i {
 }
 .parent:hover > i {
     opacity: 100%;
+}
+i.always-show {
+    opacity: 1;
 }
 </style>

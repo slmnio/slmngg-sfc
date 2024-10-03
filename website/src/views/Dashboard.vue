@@ -1,6 +1,12 @@
 <template>
     <div v-if="user && user.name" class="container-fluid container-lg">
-        <h1 class="text-md-start text-center">SLMN.GG Dashboard</h1>
+        <div class="d-flex gap-2 justify-content-between align-items-start">
+            <h1 class="text-md-start text-center">SLMN.GG Dashboard</h1>
+            <div class="d-flex align-items-center gap-3">
+                <TransmitterStreams v-bind="{ broadcast, client, liveMatch }" />
+                <DashboardTransmitter :broadcast="broadcast" :client="client" />
+            </div>
+        </div>
         <div v-if="client && broadcast" class="client-broadcasts d-flex flex-wrap flex-column flex-md-row align-items-center">
             <div class="wrapper mb-2">
                 <BroadcastSwitcher :broadcasts="client.broadcast" />
@@ -163,10 +169,12 @@ import BroadcastRoles from "@/components/website/dashboard/BroadcastRoles.vue";
 import { useAuthStore } from "@/stores/authStore";
 import BroadcastCustomisation from "@/components/website/dashboard/BroadcastCustomisation.vue";
 import PlayerCamsController from "@/components/website/dashboard/PlayerCamsController.vue";
+import DashboardTransmitter from "@/components/website/dashboard/DashboardTransmitter.vue";
+import TransmitterStreams from "@/components/website/dashboard/TransmitterStreams.vue";
 
 export default {
     name: "Dashboard",
-    components: { PlayerCamsController, BroadcastCustomisation, GFXController, BroadcastRoles, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControls, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher },
+    components: { TransmitterStreams, DashboardTransmitter, PlayerCamsController, BroadcastCustomisation, GFXController, BroadcastRoles, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControls, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher },
     data: () => ({
         titleProcessing: false
     }),

@@ -808,3 +808,47 @@ export function calculateContrastHex(hex1, hex2) {
     const diff = contrast(deHex(hex1), deHex(hex2));
     return diff < 1 ? 1/diff: diff;
 }
+
+export function recogniseRemoteServer(serverUrl) {
+    if (!serverUrl) return null;
+
+    try {
+        const url = new URL(serverUrl);
+        const output = {
+            recognisedServer: null,
+            recognisedID: null,
+            recognisedPullLink: null,
+            url: serverUrl,
+            server: url.pathname.split(":")[0].replace("//", ""),
+            streamid: url.searchParams.get("streamid") || url.hash.slice(1).split("&").find((text, i, a) => text.includes("publish"))
+        };
+
+
+        if (["na.borpa.business"].includes(output.server)) {
+            output.recognisedServer = "NA SRT";
+            output.recognisedID = output.streamid.split(",").find(t => t.split("=")[0] === "r").split("=")?.[1];
+            output.recognisedPullLink = output.url.replace("m=publish", "m=request");
+        }
+        if (["eu.borpa.business"].includes(output.server)) {
+            output.recognisedServer = "EU SRT";
+            output.recognisedID = output.streamid.replace("publish/", "");
+            output.recognisedPullLink = output.url.replace("publish/", "play/");
+        }
+
+        return output;
+    } catch (e) {
+        return { url: serverUrl };
+    }
+}
+
+export function formatDuration(duration) {
+    let parts = [];
+
+    if (duration >= 60 * 60) {
+        parts.push(Math.floor(duration / (60 * 60)));
+        duration -= (Math.floor(duration / (60 * 60)) * 60 * 60);
+    }
+    parts.push(Math.floor(duration / 60));
+    parts.push(Math.floor(duration % 60));
+    return parts.map(e => e.toString().padStart(2, "0")).join(":");
+}

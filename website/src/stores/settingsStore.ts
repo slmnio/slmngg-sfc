@@ -11,6 +11,10 @@ export const useSettingsStore = defineStore("settings", () => {
     const gfxButtonCount = ref(6);
     const removeHashInHex = ref(false);
 
+    const transmitterUrl = ref("localhost:4455");
+    const transmitterPassword = ref("");
+    const useDashboardTransmitter = ref(true);
+
 
     const draftNotes = ref<Record<string, { tag: string, notes: string }>>({});
     const openDashboardModules = ref<Record<string, boolean>>({});
@@ -27,6 +31,10 @@ export const useSettingsStore = defineStore("settings", () => {
         restrictToMapPool,
         assumeLoserPicks,
         gfxButtonCount,
-        removeHashInHex
+        removeHashInHex,
+
+        transmitterUrl,
+        transmitterPassword,
+        useDashboardTransmitter
     };
 }, { persist: true });

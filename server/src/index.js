@@ -124,6 +124,15 @@ function cleanID(id) {
 }
 
 let connected = 0;
+const connectedTransmitters = new Map();
+
+function updateTransmitters() {
+    console.log("updating streams", connectedTransmitters.values());
+    Cache.set("special:streams", {
+        __tableName: "Special",
+        streams: [...connectedTransmitters.values()]
+    });
+}
 
 io.on("connection", (socket) => {
     console.log(`[socket] on site: ${++connected}`);
@@ -143,8 +152,13 @@ io.on("connection", (socket) => {
         });
     });
     socket.on("disconnect", () => {
-        if (socket._clientName)
+        if (socket._clientName) {
             io.sockets.to(`prod:client-${socket._clientName?.toLowerCase()}-overview`).emit("prod_disconnect", socket.id);
+        }
+        if (connectedTransmitters.has(socket.id)) {
+            connectedTransmitters.delete(socket.id);
+            updateTransmitters();
+        }
         connected--;
     });
 
@@ -206,8 +220,9 @@ io.on("connection", (socket) => {
         io.sockets.to(`prod:client-${socket._clientName}-overview`).emit("prod_update", data);
     });
 
+
     socket.on("obs_data_change", async ({ clientName, previewScene, programScene }) => {
-        clientName = clientName.toLowerCase();
+        if (!clientName) return;
         let client = await Cache.get(`client-${clientName}`);
         console.log("obs_data_change", { clientName, previewScene, programScene });
 
@@ -218,6 +233,18 @@ io.on("connection", (socket) => {
         if (broadcast && broadcast.key) {
             io.sockets.to(`prod:broadcast-${broadcast.key}`).emit("prod_preview_program_change", { previewScene, programScene, emitSource: "broadcast", clientSource: clientName, broadcastKey: broadcast.key });
         }
+    });
+    socket.on("obs_disconnect", async (data) => {
+        connectedTransmitters.delete(socket.id);
+        updateTransmitters();
+    });
+    socket.on("obs_stream_status", async (data) => {
+        if (!data.clientName) return;
+        socket._clientName = data.clientName.toLowerCase();
+        connectedTransmitters.set(socket.id, { ...data, socket: socket.id });
+        updateTransmitters();
+
+        // console.log("OBS stream status", data);
     });
 
     socket.on("tally_change", ({ clientName, state, data }) => {

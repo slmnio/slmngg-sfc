@@ -6,16 +6,29 @@
             Password: {{ wsPassword }}
         </code>
 
+
         <div v-if="isConnected">
-            <i class="fas fa-check-circle"></i> Connected
+            <i class="fas fa-check-circle"></i> Websocket connected
         </div>
         <div v-else class="text-center">
             <div>
                 <i class="fas fa-wifi-slash"></i> Not Connected
             </div>
-            <code v-if="obsError" class="error">
+            <code v-if="obsError" class="error text-danger">
                 Error: {{ obsError }}
             </code>
+        </div>
+
+        <div v-if="customServer" class="flex-center flex-column gap-1">
+            <div v-if="customServer?.recognisedServer"><i class="fas fa-fw fa-rss"></i> {{ customServer.recognisedServer }}</div>
+            <div v-else-if="customServer?.server"><i class="fas fa-fw fa-rss"></i> {{ customServer.server }}</div>
+            <div v-if="customServer?.recognisedID"><i class="fas fa-fw fa-tag"></i> {{ customServer.recognisedID }}</div>
+            <div v-if="websocketStreamStatus?.outputActive" class="broadcast-live px-3 d-flex gap-3">
+                <div>Live</div>
+                <div style="font-variant-numeric: tabular-nums">
+                    {{ formatDuration(websocketStreamStatus?.outputDuration / 1000) }}
+                </div>
+            </div>
         </div>
 
 
@@ -28,16 +41,24 @@
 <script>
 import { socket } from "@/socket";
 import OBSWebSocket from "obs-websocket-js";
+import { mapWritableState } from "pinia";
+import { useStatusStore } from "@/stores/statusStore";
+import { formatDuration, recogniseRemoteServer } from "@/utils/content-utils.js";
 
+async function wait(ms) {
+    return new Promise(r => setTimeout(r, ms));
+}
 export default {
     name: "WebsocketTransmitter",
     props: ["client", "wsUrl", "wsPassword"],
     data: () => ({
         obsWs: null,
         isConnected: false,
+        isConnecting: false,
         obsError: "",
         wsPreview: false,
         wsProgram: false,
+        pulseInterval: null,
 
         prodData: {
             minor: true
@@ -45,26 +66,55 @@ export default {
         noStinger: true
     }),
     computed: {
+        ...mapWritableState(useStatusStore, ["websocketConnected", "websocketStreamSettings", "websocketStreamStatus"]),
         state() {
             if (this.isConnected) {
                 return this.wsProgram ? "active" : this.wsPreview ? "preview" : "inactive";
             } else {
                 return "inactive";
             }
-        }
+        },
+        customServer() {
+            const serverUrl = this.websocketStreamSettings?.server;
+            if (!serverUrl || serverUrl === "auto" || this.websocketStreamSettings.streamServiceType === "rtmp_custom") return;
+            try {
+                return recogniseRemoteServer(serverUrl);
+            } catch (e) {
+                console.warn(e);
+                return null;
+            }
+        },
     },
 
     methods: {
+        formatDuration,
         transmit() {
             socket.emit("obs_data_change", {
                 clientName: this.client?.key,
                 previewScene: this.wsPreview,
                 programScene: this.wsProgram
             });
+            socket.emit("obs_stream_status", {
+                clientName: this.client?.key,
+                status: this.websocketStreamStatus,
+                settings: {
+                    service: this.websocketStreamSettings?.service || "Custom",
+                    url: this.websocketStreamSettings?.server,
+                },
+                scenes: {
+                    preview: this.wsPreview,
+                    program: this.wsProgram,
+                }
+            });
         },
         async connectWs() {
+            if (!this.obsWs) return;
             if (this.isConnected) return;
+            if (this.isConnecting) return;
             try {
+                this.isConnecting = true;
+                console.log("[OBSWS] Connecting with", this.wsUrl, this.wsPassword, this.isConnecting);
+                this.clearDataCheckTimer();
                 await this.obsWs.connect(this.wsUrl, this.wsPassword);
                 await this.updateWsSceneData();
                 this.isConnected = true;
@@ -74,6 +124,9 @@ export default {
                 this.obsError = e.message;
                 console.error("Failed to connect to OBS WebSocket");
                 console.error(e);
+            } finally {
+                await wait(100);
+                this.isConnecting = false;
             }
         },
         async updateWsSceneData() {
@@ -90,6 +143,118 @@ export default {
             this.wsProgram = programScene;
             this.wsPreview = previewScene;
             console.log(`OBS Websocket: Program Scene: ${programScene}, Preview Scene: ${previewScene}`);
+        },
+        async getOutputData() {
+            const items = await this.obsWs.callBatch([
+                {
+                    requestType: "GetStreamServiceSettings"
+                },
+                {
+                    requestType: "GetStreamStatus"
+                }
+            ]);
+
+            const [streamSettings, streamStatus] = items;
+            if (streamSettings?.requestStatus?.code === 100) {
+                // good
+                this.websocketStreamSettings = streamSettings?.responseData?.streamServiceSettings;
+                this.websocketStreamStatus = streamStatus?.responseData;
+            }
+
+            console.log("OBSWS", items);
+
+
+        },
+        async getStreamData() {
+            try {
+                const streamStatus = await this.obsWs.call("GetStreamStatus");
+                console.log("OBSWS Stream status", streamStatus);
+
+                this.websocketStreamStatus = streamStatus;
+
+            } catch (e) {
+                console.warn("Error getting stream status", e);
+            }
+        },
+        clearDataCheckTimer() {
+            if (this.dataCheckInterval) {
+                clearInterval(this.dataCheckInterval);
+            }
+        },
+        startDataCheckTimer() {
+            this.dataCheckInterval = setInterval(this.getStreamData, 1000);
+        }
+    },
+    watch: {
+        isConnected: {
+            immediate: true,
+            handler(status) {
+                this.websocketConnected = status;
+                if (!status) {
+                    this.websocketStreamSettings = null;
+                    this.websocketStreamStatus = null;
+                }
+            }
+        },
+        "websocketStreamStatus.outputActive": {
+            immediate: true,
+            handler(live, oldData) {
+                if (live === oldData) return;
+                console.log("OBSWS", "Stream live", live);
+                if (live) {
+                    this.startDataCheckTimer();
+                } else {
+                    this.clearDataCheckTimer();
+                }
+            }
+        },
+        wsUrl: {
+            immediate: true,
+            handler(url) {
+                this.connectWs();
+            }
+        },
+        wsPassword: {
+            immediate: true,
+            handler(password) {
+                this.connectWs();
+            }
+        },
+        websocketStreamStatus: {
+            immediate: true,
+            deep: true,
+            handler(status) {
+                socket.emit("obs_stream_status", {
+                    clientName: this.client?.key,
+                    status,
+                    settings: {
+                        service: this.websocketStreamSettings?.service || "Custom",
+                        url: this.websocketStreamSettings?.server,
+                    },
+                    scenes: {
+                        preview: this.wsPreview,
+                        program: this.wsProgram,
+                    }
+                });
+            }
+        },
+        websocketStreamSettings: {
+            immediate: true,
+            deep: true,
+            handler(settings) {
+                socket.emit("obs_stream_status", {
+                    clientName: this.client?.key,
+                    status: this.websocketStreamStatus,
+                    settings: {
+                        service: settings?.service || "Custom",
+                        url: settings?.server,
+                    },
+                    scenes: {
+                        preview: this.wsPreview,
+                        program: this.wsProgram,
+                    }
+                });
+            }
         }
     },
     async mounted() {
@@ -97,6 +262,7 @@ export default {
 
         this.obsWs.on("Identified", () => {
             this.isConnected = true;
+            this.getOutputData();
         });
 
         this.obsWs.on("ConnectionClosed", (error) => {
@@ -113,9 +279,30 @@ export default {
             this.transmit();
         });
 
-        setInterval(() => {
+        this.obsWs.on("CurrentProfileChanged", async(state) => {
+            await this.updateWsSceneData();
+            await this.getOutputData();
+        });
+        this.obsWs.on("StreamStateChanged", async(state) => {
+            await this.getOutputData();
+        });
+        this.obsWs.on("RecordStateChanged", async(state) => {
+            await this.getOutputData();
+        });
+
+        this.connectWs();
+        this.pulseInterval = setInterval(() => {
             this.connectWs();
-        }, 1000);
+        }, 2000);
+    },
+    beforeUnmount() {
+        this.clearDataCheckTimer();
+        clearInterval(this.pulseInterval);
+        this.websocketStreamSettings = null;
+        this.websocketStreamStatus = null;
+        this.websocketConnected = null;
+        socket.emit("obs_disconnect", { clientName: this.client?.key });
+        this.obsWs.disconnect();
     },
     head() {
         return {
@@ -136,7 +323,7 @@ h1 {
     color: #ffffff;
     display: grid;
     place-items: center;
-    font-size: clamp(10px, 5vw, 25vh);
+    font-size: clamp(20px, 3vw, 25vh);
     font-family: "SLMN-Industry", "Industry", sans-serif;
 }
 
@@ -176,7 +363,8 @@ h1 {
     border-radius: .2em;
 }
 
-.error {
-    font-size: 2.5em;
+.broadcast-live {
+    border: 2px solid white;
+    border-radius: .2em;
 }
 </style>

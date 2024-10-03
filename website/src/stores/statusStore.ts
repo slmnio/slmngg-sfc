@@ -10,6 +10,10 @@ export const useStatusStore = defineStore("status", () => {
     const highlightedMatch = ref<string | null>(null);
     const matchHighlights = ref([]);
 
+    const websocketConnected = ref(false);
+    const websocketStreamSettings = ref({});
+    const websocketStreamStatus = ref({});
+
 
     return {
         customStingerText,
@@ -17,6 +21,9 @@ export const useStatusStore = defineStore("status", () => {
         stingerHideText,
         highlightedTeam,
         highlightedMatch,
-        matchHighlights
+        matchHighlights,
+        websocketConnected,
+        websocketStreamSettings,
+        websocketStreamStatus
     };
 });

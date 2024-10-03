@@ -130,6 +130,7 @@ export default {
             }
 
             const activeChannelID = this.broadcast?.channel_id?.[0];
+            if (!id) return null;
 
             if (id === "sub") {
                 return {

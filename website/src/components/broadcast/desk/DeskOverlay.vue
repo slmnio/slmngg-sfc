@@ -115,13 +115,10 @@ export default {
             ];
         },
         casters() {
-            if (!this.guests.length) {
-                return (this.liveMatch?.casters || []).map(caster => ({
-                    ...caster.live_guests,
-                    player: caster
-                }));
-            }
-            return this.guests;
+            return this.guests.length ? this.guests : (this.liveMatch?.casters || []).map(caster => ({
+                ...caster.live_guests,
+                player: caster
+            })).filter(g => g?.name);
         },
         themeColor() {
             if (!this.broadcast?.event?.theme) return {};
@@ -138,7 +135,7 @@ export default {
             return (this.broadcast?.broadcast_settings || []).includes("Show desk pronouns on new lines");
         },
         useScoreboard() {
-            return (this.broadcast?.desk_display) === "Scoreboard";
+            return (this.broadcast?.desk_display) === "Scoreboard" || (this.broadcast?.desk_display) === "Scoreboard Bans";
         }
 
     },

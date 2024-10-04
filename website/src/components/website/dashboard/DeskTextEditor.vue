@@ -62,6 +62,13 @@ export default {
                 }
             },
             {
+                text: "Scoreboard Bans",
+                value: {
+                    hasText: false,
+                    text: "Scoreboard Bans"
+                }
+            },
+            {
                 text: "Predictions",
                 value: {
                     hasText: false,

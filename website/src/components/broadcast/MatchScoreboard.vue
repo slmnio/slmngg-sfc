@@ -1,5 +1,5 @@
 <template>
-    <div class="match-scoreboard w-100">
+    <div :key="`scoreboard-${display}`" class="match-scoreboard w-100">
         <transition name="scoreboard-fade">
             <div v-if="shouldAnimate" class="scoreboard-row scoreboard-header" :style="textBorderColor">
                 <div v-if="scoreboardText" class="scoreboard-team blank text overlay--bg" :style="themeBackground1(broadcast?.event)">
@@ -32,11 +32,15 @@
                 <div
                     v-for="map in maps"
                     :key="map.id"
-                    class="map flex-center map-score"
-                    :class="{ 'map-won': cleanID(map.winner?.[0]) === team.id }">
-                    <div class="industry-align">{{ !map.showNumbers ? "-" : (map[`score_${ti + 1}`] || 0) }}</div>
+                    class="map flex-center"
+                    :class="{ 'map-won': cleanID(map.winner?.[0]) === team.id, 'map-score': !display, 'hero-bans': display === 'bans' }">
+                    <div v-if="!display" class="industry-align">{{ !map.showNumbers ? "-" : (map[`score_${ti + 1}`] || 0) }}</div>
+                    <div v-else-if="display === 'bans' && map[`team_${ti+1}_bans`]?.length" class="hero-bans-container">
+                        <div v-for="hero in (map[`team_${ti+1}_bans`] || [])" :key="hero.id" class="hero-ban bg-center" :style="resizedImage(hero, ['icon'], 's-100')"></div>
+                    </div>
                 </div>
                 <div
+                    v-if="!display"
                     class="match-score flex-center"
                     :style="match[`score_${ti + 1}`] === match.first_to ? themeBackground1(team) : {}">
                     <div class="industry-align">{{ match[`score_${ti + 1}`] || 0 }}</div>
@@ -53,7 +57,7 @@ import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import Squeezable from "@/components/broadcast/Squeezable.vue";
 import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
-import { bg } from "@/utils/images";
+import { bg, resizedImage } from "@/utils/images";
 
 export default {
     name: "MatchScoreboard",
@@ -67,6 +71,12 @@ export default {
         manualAnimate: null
     }),
     computed: {
+        display() {
+            if (this.broadcast?.desk_display === "Scoreboard Bans") {
+                return "bans";
+            }
+            return null;
+        },
         shouldAnimate() {
             if (this.animateOnMount) {
                 if (this.manualAnimate === true || this.manualAnimate === false) return this.manualAnimate;
@@ -76,7 +86,10 @@ export default {
         maps() {
             const maps = (ReactiveRoot(this.match.id, {
                 maps: ReactiveArray("maps", {
-                    map: ReactiveThing("map")
+                    map: ReactiveThing("map"),
+
+                    "team_1_bans": ReactiveArray("team_1_bans"),
+                    "team_2_bans": ReactiveArray("team_2_bans"),
                 })
             })?.maps || []).map(map => ({
                 ...map,
@@ -84,7 +97,6 @@ export default {
             })).filter(map => !map.banner);
 
             const dummyMapCount = likelyNeededMaps(this.match) - maps.length;
-            console.log("extra maps", this.mapCount, dummyMapCount);
             const initialMapCount = maps.length;
 
             if (!this.match?.first_to) return maps;
@@ -135,6 +147,7 @@ export default {
         }
     },
     methods: {
+        resizedImage,
         themeBackground1,
         logoBackground1,
         cleanID,
@@ -283,5 +296,14 @@ export default {
 }
 .scoreboard-team.text div {
     font-size: 20px;
+}
+.hero-ban {
+    width: 3.25em;
+    height: 3.25em;
+}
+.hero-bans-container {
+    padding: .25em;
+    border-radius: .25em;
+    background-color: var(--danger);
 }
 </style>

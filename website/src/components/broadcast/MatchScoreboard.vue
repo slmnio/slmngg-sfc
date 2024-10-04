@@ -81,7 +81,7 @@ export default {
             })?.maps || []).map(map => ({
                 ...map,
                 showNumbers: map.draw || map.winner
-            }));
+            })).filter(map => !map.banner);
 
             const dummyMapCount = likelyNeededMaps(this.match) - maps.length;
             console.log("extra maps", this.mapCount, dummyMapCount);

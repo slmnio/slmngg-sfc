@@ -104,7 +104,7 @@ export default {
 
             const dummyMapCount = this.likelyNeededMaps - maps.length;
             console.log("extra maps", this.mapCount, dummyMapCount);
-            const initialMapCount = maps.length;
+            const initialMapCount = maps.filter(map => !map.banner).length;
 
             const next = maps.find(m => !m.winner && !m.draw && !m.banner);
             console.log({ next, maps });

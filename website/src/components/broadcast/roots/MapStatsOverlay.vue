@@ -58,17 +58,15 @@ export default {
             const matchIsFinished = ((this.match.score_1 || 0) === this.match.first_to) || ((this.match.score_2 || 0) === this.match.first_to);
 
             let maps = [...(this.match?.maps || [])].filter(m => m.map);
-            if (!this.showBannedMaps) {
-                maps = maps.filter(m => !(m.banner || m.banned));
 
-                if (this.match?.first_to) {
-                    maps = maps.slice(0, needMaps);
-                }
+            maps = maps.filter(m => !(m.banner || m.banned));
+
+            if (this.match?.first_to) {
+                maps = maps.slice(0, needMaps);
             }
 
 
             const dummyMapCount = needMaps - maps.length;
-            console.log("extra maps", this.mapCount, dummyMapCount);
             const initialMapCount = maps.length;
 
             const next = maps.find(m => !m.winner && !m.draw && !m.banner);

@@ -2,7 +2,9 @@
     <div v-if="showBannedMaps ? true : !banned" :class="`map ${mapClass} ${condensed ? 'condensed' : ''} ${banned ? 'is-banned' : ''}`">
         <div class="map-image default-thing" :style="imageCSS">
             <div v-if="map?.draw" class="map-color-overlay draw"></div>
-            <div v-if="banned" class="map-color-overlay banned"></div>
+            <div v-if="banned" class="map-color-overlay ban-icon-holder banned">
+                <i class="ban-icon fas fa-ban"></i>
+            </div>
             <div v-if="winner" class="map-color-overlay winner" :style="logoBackground1(winner)"></div>
 
             <div v-if="winner" class="map-winner-image bg-center" :style="resizedImage(winner.theme, ['default_logo', 'small_logo'], 'h-90')"></div>
@@ -263,5 +265,13 @@ export default {
     .hero {
         width: 30px;
         height: 30px;
+    }
+    .ban-icon-holder {
+        display: flex;
+        justify-content: center;
+        font-size: 5em;
+        align-items: center;
+        color: rgba(255, 255, 255, 0.25);
+        overflow: hidden;
     }
 </style>

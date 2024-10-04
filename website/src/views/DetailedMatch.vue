@@ -2,7 +2,15 @@
     <div class="detailed-match container">
         <div class="main-content row">
             <div class="center-holder col-12 col-md-9 mb-4">
-                <div v-if="match.maps && showMatchMaps" class="maps-holder mt-2">
+                <div v-if="match.maps && showMatchMaps" class="maps-controls d-flex gap-4 flex-center">
+                    <div v-if="hasBannedMaps" class="checkbox-holder">
+                        <b-form-checkbox v-model="showBannedMaps" switch> Show banned maps</b-form-checkbox>
+                    </div>
+                    <div v-if="hasPickBanHeroes" class="checkbox-holder">
+                        <b-form-checkbox v-model="showPickBanHeroes" switch> Show picked/banned heroes</b-form-checkbox>
+                    </div>
+                </div>
+                <div v-if="match.maps && showMatchMaps" class="maps-holder">
                     <MapDisplay
                         v-for="(map, i) in match.maps"
                         :key="map.id"
@@ -10,7 +18,8 @@
                         :map="map"
                         :match="match"
                         :theme="_theme"
-                        :show-banned-maps="showMapBans" />
+                        :show-pick-ban-heroes="showPickBanHeroes"
+                        :show-banned-maps="showBannedMaps" />
                 </div>
 
                 <div v-if="match.special_event" class="special-event-notice">
@@ -165,9 +174,6 @@
                     <div v-if="match.maps" :class="`btn btn-block btn-${showMatchMaps ? 'primary' : 'secondary'}`" @click="showMatchMaps = !showMatchMaps">
                         <i class="fa-fw fas fa-map"></i> Match maps
                     </div>
-                    <div v-if="match.maps && showMatchMaps" :class="`btn btn-block mb-2 btn-${showMapBans ? 'primary' : 'secondary'}`" @click="showMapBans = !showMapBans">
-                        <i class="fa-fw fas fa-ban"></i> Show map bans
-                    </div>
                     <div :class="`btn btn-block btn-${showMapStats ? 'primary' : 'secondary'}`" @click="showMapStats = !showMapStats">
                         <i class="fa-fw fas fa-abacus"></i> Map stats
                     </div>
@@ -271,9 +277,11 @@ export default {
         showRosters: true,
         showEligibleRoles: false,
         showMatchMaps: true,
-        showMapBans: true,
         showVod: false,
         showMapStats: false,
+
+        showBannedMaps: false,
+        showPickBanHeroes: true,
 
         showManagers: false,
         showImplications: true
@@ -321,7 +329,11 @@ export default {
                     }),
                     banner: ReactiveThing("banner", {
                         theme: ReactiveThing("theme")
-                    })
+                    }),
+                    team_1_picks: ReactiveArray("team_1_picks"),
+                    team_1_bans: ReactiveArray("team_1_bans"),
+                    team_2_picks: ReactiveArray("team_2_picks"),
+                    team_2_bans: ReactiveArray("team_2_bans"),
                 }),
                 casters: ReactiveArray("casters"),
                 player_relationships: ReactiveArray("player_relationships", {
@@ -330,6 +342,14 @@ export default {
                     })
                 })
             });
+        },
+        hasBannedMaps() {
+            if (!this.match.maps?.length) return false;
+            return this.match.maps.some(m => m.banner || m.banned);
+        },
+        hasPickBanHeroes() {
+            if (!this.match.maps?.length) return false;
+            return this.match.maps.some(m => m.team_1_picks || m.team_2_picks || m.team_1_bans || m.team_2_bans);
         },
         teamsMatchGroups() {
             const groups = {};

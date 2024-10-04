@@ -136,5 +136,7 @@ export default {
         font-size: 1.5em;
         font-weight: bold;
         margin-bottom: .1em;
+        flex-wrap: wrap;
+        row-gap: 0;
     }
 </style>

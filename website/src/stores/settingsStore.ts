@@ -8,6 +8,7 @@ export const useSettingsStore = defineStore("settings", () => {
     const showBatchCheckboxes = ref(false);
     const restrictToMapPool = ref(true);
     const assumeLoserPicks = ref(true);
+    const showHeroPickBans = ref(false);
     const gfxButtonCount = ref(6);
     const removeHashInHex = ref(false);
 
@@ -29,6 +30,7 @@ export const useSettingsStore = defineStore("settings", () => {
         batchSelectedMatches,
         showBatchCheckboxes,
         restrictToMapPool,
+        showHeroPickBans,
         assumeLoserPicks,
         gfxButtonCount,
         removeHashInHex,

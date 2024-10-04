@@ -25,7 +25,8 @@
             <div class="teams-scores pt-2 px-2">
                 <div class="checkboxes">
                     <b-form-checkbox v-if="showRestrictCheckbox" id="map-pool-checkbox" v-model="restrictToMapPool" class="mr-2">Restrict to map pool</b-form-checkbox>
-                    <b-form-checkbox id="map-ban-checkbox" v-model="showMapBanButtons" class="mr-2">Show map bans</b-form-checkbox>
+                    <b-form-checkbox id="map-ban-checkbox" v-model="showMapBanButtons" class="mr-2">Show map banning</b-form-checkbox>
+                    <b-form-checkbox id="show-hero-pickban-checkbox" v-model="showHeroPickBans" class="mr-2">Show hero pick/bans</b-form-checkbox>
                     <b-form-checkbox id="loser-picks-checkbox" v-model="assumeLoserPicks" class="mr-2">Assume loser picks</b-form-checkbox>
                 </div>
                 <div class="spacer" style="order:0"></div>
@@ -69,104 +70,159 @@
                     :class="{'low-opacity': processing['map']}">
                     <tbody>
                         <tr
-                            v-for="(map, i) in maps"
+                            v-for="({map, type, mapI, playedMapI}, i) in tableRows"
                             :key="i"
-                            class="map"
-                            :class="{'banned': banners[i], 'very-low-opacity': !map.dummy && !map._original_data_id}">
-                            <td v-if="!scoreReporting" class="form-stack number">
+                            :class="{'banned': banners[mapI], 'very-low-opacity': !map.dummy && !map._original_data_id, 'map': type === 'map', 'pickban-row': type === 'pickban'}">
+                            <td v-if="type === 'map' && !scoreReporting" class="form-stack number">
                                 <div class="form-top d-flex">
                                     <div>#</div>
                                     <div class="flex-grow-1 text-end">
                                         <i
-                                            v-if="existingMapIDs[i]"
+                                            v-if="existingMapIDs[mapI]"
                                             v-b-tooltip="'Edits an existing map record'"
                                             class="fas fa-pen"></i>
                                         <i
-                                            v-if="!existingMapIDs[i]"
+                                            v-if="!existingMapIDs[mapI]"
                                             v-b-tooltip="'Creates a new map record'"
                                             class="fas fa-plus"></i>
                                     </div>
                                 </div>
                                 <div class="form-button">
                                     <b-form-input
-                                        v-model.number="mapNumbers[i]"
+                                        v-model.number="mapNumbers[mapI]"
                                         type="number"
                                         class="map-number no-arrows"
                                         :min="1"
                                         :max="minMaps" />
                                 </div>
                             </td>
-                            <td class="map form-stack" style="width: 100%;">
+                            <td v-if="type === 'map'" class="map form-stack" style="width: 100%;">
                                 <div class="form-top">
                                     Map
                                 </div>
                                 <div class="form-bottom">
                                     <b-form-select
-                                        v-model="mapChoices[i]"
+                                        v-model="mapChoices[mapI]"
                                         class="no-choice"
-                                        :options="getMapOptions(i)" />
+                                        :options="getMapOptions(playedMapI)" />
                                 </div>
                             </td>
-                            <td class="form-stack">
-                                <div class="form-top text-center">
+                            <td v-if="type === 'map'" class="form-stack">
+                                <div
+                                    class="form-top text-center"
+                                    :class="{ 'very-low-opacity': banners[mapI] }">
                                     Map Score
                                 </div>
-                                <div class="form-bottom map-editors d-flex">
+                                <div
+                                    class="form-bottom map-editors d-flex"
+                                    :class="{ 'very-low-opacity': banners[mapI] }">
                                     <MapScoreEditor
-                                        v-model="score_1s[i]"
+                                        v-model="score_1s[mapI]"
                                         class="map-editor"
                                         :team="teams[0]"
                                         :show-codes="scoreReporting"
-                                        @input="(val) => checkAutoWinner(i, val)" />
+                                        @input="(val) => checkAutoWinner(mapI, val)" />
                                     <MapScoreEditor
-                                        v-model="score_2s[i]"
+                                        v-model="score_2s[mapI]"
                                         class="map-editor"
                                         :team="teams[1]"
                                         :reverse="true"
                                         :show-codes="scoreReporting"
-                                        @input="(val) => checkAutoWinner(i, val)" />
+                                        @input="(val) => checkAutoWinner(mapI, val)" />
                                 </div>
                             </td>
-                            <td class="form-stack">
-                                <div class="form-top text-center">
+                            <td v-if="type === 'map'" class="form-stack">
+                                <div
+                                    class="form-top text-center"
+                                    :class="{ 'very-low-opacity': banners[mapI] }">
                                     Draw
                                 </div>
-                                <div class="form-bottom d-flex draw-checkbox-wrapper">
+                                <div
+                                    class="form-bottom d-flex draw-checkbox-wrapper"
+                                    :class="{ 'very-low-opacity': banners[mapI] }">
                                     <b-form-checkbox
-                                        v-model="draws[i]"
+                                        v-model="draws[mapI]"
                                         button
-                                        :button-variant="draws[i] ? 'primary' : 'light'"
+                                        :button-variant="draws[mapI] ? 'primary' : 'light'"
                                         class="draw-checkbox">
-                                        <i v-if="draws[i]" class="fas fa-check fa-fw"></i>
+                                        <i v-if="draws[mapI]" class="fas fa-check fa-fw"></i>
                                         <i v-else class="fas fa-fw fa-check hoverable"></i>
                                     </b-form-checkbox>
                                 </div>
                             </td>
-                            <td v-if="scoreReporting || !hideMatchExtras" class="form-stack number">
-                                <div class="form-top">Replay Code</div>
-                                <div class="form-button">
-                                    <b-form-input v-model="replayCodes[i]" type="text" />
+                            <td v-if="type === 'map' && (scoreReporting || !hideMatchExtras)" class="form-stack number">
+                                <div
+                                    class="form-top"
+                                    :class="{ 'very-low-opacity': banners[mapI] }">
+                                    Replay Code
+                                </div>
+                                <div
+                                    class="form-button"
+                                    :class="{ 'very-low-opacity': banners[mapI] }">
+                                    <b-form-input v-model="replayCodes[mapI]" type="text" />
                                 </div>
                             </td>
-                            <td v-if="showMapBanButtons">
-                                <TeamPicker v-model="banners[i]" title="Banned by" :teams="teams" :hide-empty="scoreReporting" />
+                            <td v-if="type === 'map' && (showMapBanButtons ? true : banners[mapI])">
+                                <TeamPicker v-model="banners[mapI]" title="Banned by" :teams="teams" :hide-empty="scoreReporting" />
                             </td>
-                            <td>
+                            <td v-if="type === 'map' && (showMapBanButtons ? true : !banners[mapI]) ">
                                 <TeamPicker
-                                    v-model="pickers[i]"
+                                    :key="mapI"
+                                    v-model="pickers[mapI]"
                                     :hide-empty="scoreReporting"
                                     title="Picked by"
-                                    :class="{ 'very-low-opacity': banners[i] }"
+                                    :class="{ 'very-low-opacity': banners[mapI] }"
                                     :teams="teams" />
                             </td>
-                            <td>
+                            <td v-if="type === 'map'">
                                 <TeamPicker
-                                    v-model="winners[i]"
+                                    :key="mapI"
+                                    v-model="winners[mapI]"
                                     :hide-empty="scoreReporting"
                                     title="Winner"
-                                    :class="{ 'very-low-opacity': banners[i] }"
+                                    :class="{ 'very-low-opacity': banners[mapI] }"
                                     :teams="teams"
-                                    @change="(val) => winnerSelected(i, val)" />
+                                    @change="(val) => winnerSelected(mapI, val)" />
+                            </td>
+                            <td v-if="type === 'pickban' && !banners[mapI]" colspan="200" class="bg-dark p-0">
+                                <div class="pickbans d-flex">
+                                    <div class="hero-picks-container ">
+                                        <div class="hero-picks">
+                                            <div class="form-top">
+                                                {{ teams[0]?.name }} Picks
+                                            </div>
+                                            <div class="form-button">
+                                                <heroes-picker v-model="team_1_picks[mapI]" />
+                                            </div>
+                                        </div>
+                                        <div class="hero-picks">
+                                            <div class="form-top">
+                                                {{ teams[1]?.name }} Picks
+                                            </div>
+                                            <div class="form-button">
+                                                <heroes-picker v-model="team_2_picks[mapI]" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="hero-bans-container">
+                                        <div class="hero-bans">
+                                            <div class="form-top">
+                                                {{ teams[0]?.name }} Bans
+                                            </div>
+                                            <div class="form-button">
+                                                <heroes-picker v-model="team_1_bans[mapI]" />
+                                            </div>
+                                        </div>
+                                        <div class="hero-bans">
+                                            <div class="form-top">
+                                                {{ teams[1]?.name }} Bans
+                                            </div>
+                                            <div class="form-button">
+                                                <heroes-picker v-model="team_2_bans[mapI]" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -249,17 +305,18 @@
 import { authenticatedRequest } from "@/utils/dashboard";
 import ContentThing from "@/components/website/ContentThing";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
-import { cleanID, formatTime, textSort } from "@/utils/content-utils";
+import { cleanID, dirtyID, formatTime, textSort } from "@/utils/content-utils";
 import TeamPicker from "@/components/website/dashboard/TeamPicker";
 import MapScoreEditor from "@/components/website/dashboard/MapScoreEditor";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { mapWritableState } from "pinia";
 import MatchExplainerModal from "@/components/website/dashboard/MatchExplainerModal.vue";
+import HeroesPicker from "@/components/website/dashboard/HeroesPicker.vue";
 
 export default {
     name: "MatchEditor",
-    components: { MatchExplainerModal, AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
+    components: { HeroesPicker, MatchExplainerModal, AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
     props: ["match", "hideMatchExtras", "scoreReporting", "proposedData", "scoreReportAction"],
     data: () => ({
         processing: {},
@@ -283,6 +340,10 @@ export default {
         mapNumbers: [],
         existingMapIDs: [],
         replayCodes: [],
+        team_1_picks: [],
+        team_2_picks: [],
+        team_1_bans: [],
+        team_2_bans: [],
         extraMaps: 0,
         errorMessage: null,
         previousAutoData: null,
@@ -291,7 +352,7 @@ export default {
         scoreReportConfirmModal: false
     }),
     computed: {
-        ...mapWritableState(useSettingsStore, ["assumeLoserPicks"]),
+        ...mapWritableState(useSettingsStore, ["assumeLoserPicks", "showHeroPickBans"]),
         ...mapWritableState(useSettingsStore, ["restrictToMapPool"]),
         teams() {
             const dummy = { dummy: true };
@@ -373,6 +434,31 @@ export default {
 
             return maps;
         },
+        tableRows() {
+            const rows = [];
+            let playedMapI = 0;
+
+            (this.maps || []).forEach((map, i) => {
+                rows.push({
+                    type: "map",
+                    map,
+                    mapI: i,
+                    playedMapI
+                });
+                if (this.showHeroPickBans) {
+                    rows.push({
+                        type: "pickban",
+                        map,
+                        mapI: i
+                    });
+                }
+                if (!(map.banner || map.banned)) {
+                    playedMapI++;
+                }
+            });
+
+            return rows;
+        },
         hasMapPool() {
             return this.match?.event?.map_pool?.length;
         },
@@ -421,13 +507,17 @@ export default {
                     score_1: this.score_1s[i],
                     score_2: this.score_2s[i],
                     number: this.mapNumbers[i],
+                    team_1_picks: (this.team_1_picks[i] || []).filter(Boolean),
+                    team_2_picks: (this.team_2_picks[i] || []).filter(Boolean),
+                    team_1_bans: (this.team_1_bans[i] || []).filter(Boolean),
+                    team_2_bans: (this.team_2_bans[i] || []).filter(Boolean),
                     replay_code: this.replayCodes[i]
                 });
             }
             return data.filter(obj => Object.values(obj).filter(Boolean).length);
         },
         broadcastData() {
-            return this.match?.event?.broadcasts;
+            return this.match?.event?.broadcasts?.id ? this.match?.event?.broadcasts : this.match?.event?.broadcasts?.[0];
         },
         formattedProposedData() {
             return {
@@ -533,6 +623,10 @@ export default {
             this.banners = [];
             this.score_1s = [];
             this.score_2s = [];
+            this.team_1_picks = [];
+            this.team_2_picks = [];
+            this.team_1_bans = [];
+            this.team_2_bans = [];
             this.mapNumbers = [];
             this.existingMapIDs = [];
             this.replayCodes = [];
@@ -550,7 +644,11 @@ export default {
                 score_2s: Object.assign([], this.score_2s),
                 mapNumbers: Object.assign([], this.mapNumbers),
                 mapChoices: Object.assign([], this.mapChoices),
-                replayCodes: Object.assign([], this.replayCodes)
+                replayCodes: Object.assign([], this.replayCodes),
+                team_1_picks: Object.assign([], this.team_1_picks),
+                team_2_picks: Object.assign([], this.team_2_picks),
+                team_1_bans: Object.assign([], this.team_1_bans),
+                team_2_bans: Object.assign([], this.team_2_bans),
             };
         },
         updateMatchData(data) {
@@ -567,7 +665,7 @@ export default {
             if (data.maps) {
                 data.maps.forEach((map, i) => {
                     const mapChoice = cleanID(map.map?.id || map.map?.[0]);
-                    // console.log("Map set", !!mapChoice, mapChoice, this.mapChoices[i], map);
+                    console.log("Map set", !!mapChoice, mapChoice, this.mapChoices[i], map);
                     this.setIfNew("mapChoices", i, mapChoice || null);
                     this.setIfNew("draws", i, map.draw);
                     this.setIfNew("existingMapIDs", i, map.id);
@@ -578,6 +676,10 @@ export default {
                     this.setIfNew("score_2s", i, map.score_2);
                     this.setIfNew("replayCodes", i, map.replay_code);
                     this.setIfNew("mapNumbers", i, map.number);
+                    this.setIfNew("team_1_picks", i, (map.team_1_picks || []).map(obj => dirtyID(obj?.id || obj)));
+                    this.setIfNew("team_2_picks", i, (map.team_2_picks || []).map(obj => dirtyID(obj?.id || obj)));
+                    this.setIfNew("team_1_bans", i, (map.team_1_bans || []).map(obj => dirtyID(obj?.id || obj)));
+                    this.setIfNew("team_2_bans", i, (map.team_2_bans || []).map(obj => dirtyID(obj?.id || obj)));
                 });
                 this.processing.map = false;
             } else {
@@ -600,7 +702,11 @@ export default {
                 score_2s: Object.assign([], this.score_2s),
                 mapNumbers: Object.assign([], this.mapNumbers),
                 mapChoices: Object.assign([], this.mapChoices),
-                replayCodes: Object.assign([], this.replayCodes)
+                replayCodes: Object.assign([], this.replayCodes),
+                team_1_picks: Object.assign([], this.team_1_picks),
+                team_2_picks: Object.assign([], this.team_2_picks),
+                team_1_bans: Object.assign([], this.team_1_bans),
+                team_2_bans: Object.assign([], this.team_2_bans)
             };
         },
         async sendMatchDataChange(key, val) {
@@ -841,7 +947,7 @@ export default {
         cursor: wait;
     }
     .very-low-opacity {
-        opacity: 0.2;
+        opacity: 0.1;
         pointer-events: none;
         user-select: none;
         cursor: wait;
@@ -870,6 +976,9 @@ export default {
     }
     tr.map.banned {
         border-left-color: var(--danger)
+    }
+    tr.map.banned td {
+        background-color: color-mix(in srgb,  var(--danger) 20%, transparent)
     }
     td.map {
         min-width: 10em;
@@ -920,5 +1029,34 @@ export default {
         align-items: center;
         gap: .25em;
         flex-wrap: wrap;
+    }
+
+    .pickbans {
+        justify-content: space-evenly;
+        border-bottom: .5em solid transparent;
+    }
+    .hero-picks, .hero-bans {
+        border-bottom: 3px solid transparent;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding-bottom: .5rem;
+        width: 50%;
+    }
+    .hero-picks-container, .hero-bans-container {
+        display: flex;
+        width: 50%;
+        align-items: start;
+    }
+    .pickbans .form-top {
+        font-weight: bold;
+        margin-top: .25rem;
+    }
+    .hero-picks-container {
+        background-color: color-mix(in srgb,  var(--primary) 20%, transparent)
+    }
+    .hero-bans-container {
+        background-color: color-mix(in srgb,  var(--danger) 20%, transparent)
     }
 </style>

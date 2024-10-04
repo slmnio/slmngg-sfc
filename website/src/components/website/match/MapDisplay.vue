@@ -22,6 +22,44 @@
         <div v-if="showSelfPicks && map.picker?.id === self?.id" class="map-self-pick">
             {{ self.code }} PICK
         </div>
+        <div v-if="showPickBanHeroes" class="pick-ban-heroes">
+            <div v-if="map?.team_1_picks?.length || map?.team_2_picks?.length" class="picks">
+                <div class="team-group">
+                    <div
+                        v-for="hero in map.team_1_picks"
+                        :key="hero.id"
+                        v-b-tooltip="`${hero.name} picked by ${match?.teams?.[0]?.name || 'Team 1'}`"
+                        class="hero bg-center hero-picked team-1"
+                        :style="resizedImage(hero, ['icon'], 's-100')"></div>
+                </div>
+                <div class="team-group">
+                    <div
+                        v-for="hero in map.team_2_picks"
+                        :key="hero.id"
+                        v-b-tooltip="`${hero.name} picked by ${match?.teams?.[1]?.name || 'Team 2'}`"
+                        class="hero bg-center hero-picked team-2"
+                        :style="resizedImage(hero, ['icon'], 's-100')"></div>
+                </div>
+            </div>
+            <div v-if="map?.team_1_bans?.length || map?.team_2_bans?.length" class="bans">
+                <div class="team-group">
+                    <div
+                        v-for="hero in map.team_1_bans"
+                        :key="hero.id"
+                        v-b-tooltip="`${hero.name} banned by ${match?.teams?.[0]?.name || 'Team 1'}`"
+                        class="hero bg-center hero-banned team-1"
+                        :style="resizedImage(hero, ['icon'], 's-100')"></div>
+                </div>
+                <div class="team-group">
+                    <div
+                        v-for="hero in map.team_2_bans"
+                        :key="hero.id"
+                        v-b-tooltip="`${hero.name} banned by ${match?.teams?.[1]?.name || 'Team 2'}`"
+                        class="hero bg-center hero-banned team-2"
+                        :style="resizedImage(hero, ['icon'], 's-100')"></div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -34,7 +72,7 @@ import CopyTextButton from "@/components/website/CopyTextButton.vue";
 export default {
     name: "MapDisplay",
     components: { CopyTextButton },
-    props: ["map", "theme", "match", "i", "condensed", "showBannedMaps", "showSelfPicks", "self"],
+    props: ["map", "theme", "match", "i", "condensed", "showBannedMaps", "showSelfPicks", "showPickBanHeroes", "self"],
     computed: {
         mapClass() {
             if (!this.match) return "";
@@ -191,5 +229,39 @@ export default {
         background-color: rgba(0,0,0,0.8);
         font-size: 0.55em;
         font-weight: bold;
+    }
+
+    .pick-ban-heroes {
+        margin-top: .5rem;
+        gap: .5em;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .team-group, .picks, .bans {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .picks, .bans {
+        gap: .25em;
+    }
+
+    .bans .team-group {
+        background-color: var(--danger);
+        padding: .125em;
+        border-radius: .25em;
+    }
+    .picks .team-group {
+        background-color: var(--primary);
+        padding: .125em;
+        border-radius: .25em;
+    }
+
+    .hero {
+        width: 30px;
+        height: 30px;
     }
 </style>

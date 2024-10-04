@@ -120,7 +120,11 @@ export default {
                     }),
                     banner: ReactiveThing("banner", {
                         theme: ReactiveThing("theme")
-                    })
+                    }),
+                    team_1_picks: ReactiveArray("team_1_picks"),
+                    team_1_bans: ReactiveArray("team_1_bans"),
+                    team_2_picks: ReactiveArray("team_2_picks"),
+                    team_2_bans: ReactiveArray("team_2_bans"),
                 }),
                 log_files: ReactiveThing("log_files")
             });

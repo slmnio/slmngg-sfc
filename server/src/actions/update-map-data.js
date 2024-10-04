@@ -88,6 +88,27 @@ export default {
                 if (!recordUpdates[existingMap.id]) recordUpdates[existingMap.id] = {};
                 recordUpdates[existingMap.id]["Replay Code"] = newMap.replay_code.toString();
             }
+
+            const team_1_picks = (newMap.team_1_picks || []).filter(Boolean).map(id => dirtyID(id));
+            if (JSON.stringify(team_1_picks) !== JSON.stringify(existingMap.team_1_picks || [])) {
+                if (!recordUpdates[existingMap.id]) recordUpdates[existingMap.id] = {};
+                recordUpdates[existingMap.id]["Team 1 Picks"] = team_1_picks;
+            }
+            const team_1_bans = (newMap.team_1_bans || []).filter(Boolean).map(id => dirtyID(id));
+            if (JSON.stringify(team_1_bans) !== JSON.stringify(existingMap.team_1_bans || [])) {
+                if (!recordUpdates[existingMap.id]) recordUpdates[existingMap.id] = {};
+                recordUpdates[existingMap.id]["Team 1 Bans"] = team_1_bans;
+            }
+            const team_2_picks = (newMap.team_2_picks || []).filter(Boolean).map(id => dirtyID(id));
+            if (JSON.stringify(team_2_picks) !== JSON.stringify(existingMap.team_2_picks || [])) {
+                if (!recordUpdates[existingMap.id]) recordUpdates[existingMap.id] = {};
+                recordUpdates[existingMap.id]["Team 2 Picks"] = team_2_picks;
+            }
+            const team_2_bans = (newMap.team_2_bans || []).filter(Boolean).map(id => dirtyID(id));
+            if (JSON.stringify(team_2_bans) !== JSON.stringify(existingMap.team_2_bans || [])) {
+                if (!recordUpdates[existingMap.id]) recordUpdates[existingMap.id] = {};
+                recordUpdates[existingMap.id]["Team 2 Bans"] = team_2_bans;
+            }
         });
 
         console.log({ recordUpdates });
@@ -115,6 +136,10 @@ export default {
                 if (map.score_1 != null) fieldData["Score 1"] = map.score_1;
                 if (map.score_2 != null) fieldData["Score 2"] = map.score_2;
                 if (map.replay_code) fieldData["Replay Code"] = map.replay_code;
+                if ((map.team_1_picks || [])?.length) fieldData["Team 1 Picks"] = map.team_1_picks.filter(Boolean).map(id => dirtyID(id));
+                if ((map.team_2_picks || [])?.length) fieldData["Team 2 Picks"] = map.team_2_picks.filter(Boolean).map(id => dirtyID(id));
+                if ((map.team_1_bans || [])?.length) fieldData["Team 1 Bans"] = map.team_1_bans.filter(Boolean).map(id => dirtyID(id));
+                if ((map.team_2_bans || [])?.length) fieldData["Team 2 Bans"] = map.team_2_bans.filter(Boolean).map(id => dirtyID(id));
 
                 return {
                     index: map.index,

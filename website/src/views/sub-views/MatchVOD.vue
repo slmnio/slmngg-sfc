@@ -24,6 +24,9 @@
             <div v-if="hasBannedMaps" class="checkbox-holder flex-center justify-content-end">
                 <b-form-checkbox v-model="showBannedMaps" switch> Show banned maps</b-form-checkbox>
             </div>
+            <div v-if="hasPickBanHeroes" class="checkbox-holder flex-center justify-content-end">
+                <b-form-checkbox v-model="showPickBanHeroes" switch> Show picked/banned heroes</b-form-checkbox>
+            </div>
             <div class="maps-holder flex-center w-100">
                 <MapDisplay
                     v-for="(map, i) in match.maps"
@@ -32,7 +35,9 @@
                     :map="map"
                     :match="match"
                     :theme="theme"
-                    :show-banned-maps="showBannedMaps" />
+                    :show-banned-maps="showBannedMaps"
+                    :show-pick-ban-heroes="showPickBanHeroes"
+                />
             </div>
         </div>
     </div>
@@ -51,7 +56,8 @@ export default {
     data: () => ({
         useVOD2: false,
         useAlternativeVOD: false,
-        showBannedMaps: false
+        showBannedMaps: false,
+        showPickBanHeroes: false
     }),
     computed: {
         showNoVOD() {
@@ -99,6 +105,10 @@ export default {
         hasBannedMaps() {
             if (!this.match.maps?.length) return false;
             return this.match.maps.some(m => m.banner || m.banned);
+        },
+        hasPickBanHeroes() {
+            if (!this.match.maps?.length) return false;
+            return this.match.maps.some(m => m.team_1_picks || m.team_2_picks || m.team_1_bans || m.team_2_bans);
         },
         isAdvertised() {
             const liveMatchIDs = (ReactiveRoot("special:live-matches")?.matches || []);

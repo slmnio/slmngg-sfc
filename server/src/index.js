@@ -126,13 +126,13 @@ function cleanID(id) {
 let connected = 0;
 const connectedTransmitters = new Map();
 
-function updateTransmitters() {
-    console.log("updating streams", connectedTransmitters.values());
+setInterval(() => {
     Cache.set("special:streams", {
         __tableName: "Special",
         streams: [...connectedTransmitters.values()]
     });
-}
+}, 1000);
+
 
 io.on("connection", (socket) => {
     console.log(`[socket] on site: ${++connected}`);
@@ -157,7 +157,6 @@ io.on("connection", (socket) => {
         }
         if (connectedTransmitters.has(socket.id)) {
             connectedTransmitters.delete(socket.id);
-            updateTransmitters();
         }
         connected--;
     });
@@ -236,13 +235,11 @@ io.on("connection", (socket) => {
     });
     socket.on("obs_disconnect", async (data) => {
         connectedTransmitters.delete(socket.id);
-        updateTransmitters();
     });
     socket.on("obs_stream_status", async (data) => {
         if (!data.clientName) return;
         socket._clientName = data.clientName.toLowerCase();
         connectedTransmitters.set(socket.id, { ...data, socket: socket.id });
-        updateTransmitters();
 
         // console.log("OBS stream status", data);
     });

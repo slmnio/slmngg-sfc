@@ -1,5 +1,5 @@
 <template>
-    <div v-if="displayMode === 'together'" class="ingame-hero-bans overlay--bg d-flex flex-column">
+    <div v-if="displayMode === 'together' && bannedHeroes?.length" class="ingame-hero-bans overlay--bg d-flex flex-column">
         <div class="ban-title fw-bold text-center">BANNED</div>
         <div class="bans d-flex">
             <div v-for="hero in bannedHeroes" :key="hero.id" class="hero p-1">

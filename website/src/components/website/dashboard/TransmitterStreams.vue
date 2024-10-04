@@ -14,7 +14,7 @@
                         <th>Pull link</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody v-if="streams.length">
                     <tr v-for="stream in streams" :key="stream.socket">
                         <td :class="{'text-danger fw-bold': stream.status?.outputActive}">{{ stream.clientName }}</td>
                         <td>
@@ -26,6 +26,11 @@
                         <td>
                             <copy-text-button v-if="stream?.recognisedPullLink" :content="stream?.recognisedPullLink" :always-show-icon="true">Copy</copy-text-button>
                         </td>
+                    </tr>
+                </tbody>
+                <tbody>
+                    <tr>
+                        <td colspan="5" class="text-muted text-center">No transmitters connected</td>
                     </tr>
                 </tbody>
             </table>

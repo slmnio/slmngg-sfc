@@ -21,10 +21,10 @@
                             <div v-if="stream.scenes?.preview" class="scene-preview">PVW: {{ stream.scenes?.preview }}</div>
                             <div v-if="stream.scenes?.program" class="scene-program">PGM: {{ stream.scenes?.program }}</div>
                         </td>
-                        <td>{{ stream.status?.outputDuration && formatDuration(stream.status?.outputDuration / 1000) }}</td>
+                        <td style="font-variant-numeric: tabular-nums">{{ stream.status?.outputDuration && formatDuration(stream.status?.outputDuration / 1000) }}</td>
                         <td>{{ stream?.recognisedServer || stream.settings?.service }}</td>
                         <td>
-                            <copy-text-button :content="stream?.recognisedPullLink" :always-show-icon="true">Copy</copy-text-button>
+                            <copy-text-button v-if="stream?.recognisedPullLink" :content="stream?.recognisedPullLink" :always-show-icon="true">Copy</copy-text-button>
                         </td>
                     </tr>
                 </tbody>

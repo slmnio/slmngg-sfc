@@ -51,14 +51,14 @@ import OBSWebSocket from "obs-websocket-js";
 import { mapWritableState } from "pinia";
 import { useStatusStore } from "@/stores/statusStore";
 import { formatDuration, recogniseRemoteServer } from "@/utils/content-utils.js";
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
+import { ReactiveArray, ReactiveRoot } from "@/utils/reactive.js";
 
 async function wait(ms) {
     return new Promise(r => setTimeout(r, ms));
 }
 export default {
     name: "WebsocketTransmitter",
-    props: ["client", "wsUrl", "wsPassword"],
+    props: ["client", "wsUrl", "wsPassword", "embedded"],
     data: () => ({
         obsWs: null,
         isConnected: false,
@@ -106,7 +106,7 @@ export default {
 
     methods: {
         formatDuration,
-        transmit() {
+        async transmit() {
             if (!this.isConnected) return;
             if (this.isProducer) {
                 socket.emit("obs_data_change", {
@@ -115,6 +115,8 @@ export default {
                     programScene: this.wsProgram
                 });
             }
+
+            await this.getOutputData();
             this.sendStreamStatus(this.websocketStreamStatus, this.websocketStreamSettings);
         },
         async connectWs() {
@@ -307,6 +309,7 @@ export default {
         this.obsWs.disconnect();
     },
     head() {
+        if (this.embedded) return;
         return {
             title: `Websocket Transmitter | ${this.client?.name || this.client?.key || ""}`
         };
@@ -327,6 +330,7 @@ h1 {
     place-items: center;
     font-size: clamp(20px, 3vw, 25vh);
     font-family: "SLMN-Industry", "Industry", sans-serif;
+    text-align: center;
 }
 
 .prod-scenes {

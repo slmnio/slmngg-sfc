@@ -34,6 +34,7 @@
                 v-if="useDashboardTransmitter"
                 class="transmitter-view"
                 :ws-password="transmitterPassword"
+                :embedded="true"
                 :ws-url="wsUrl"
                 :client="client" />
         </b-button>
@@ -88,7 +89,8 @@ import { useStatusStore } from "@/stores/statusStore";
 import WebsocketTransmitter from "@/components/broadcast/roots/WebsocketTransmitter.vue";
 import { formatDuration, recogniseRemoteServer } from "@/utils/content-utils.js";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
-import { ReactiveRoot } from "@/utils/reactive.js";
+import { ReactiveArray, ReactiveRoot } from "@/utils/reactive.js";
+import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
     name: "DashboardTransmitter",
@@ -186,10 +188,36 @@ export default {
             if (this.websocketConnected) return "primary";
             if (this.matchingStream) return "success";
             return "secondary";
-        }
+        },
+        liveMatch() {
+            const matchID = this.client?.broadcast?.live_match?.[0];
+            if (!matchID) return null;
+            return ReactiveRoot(matchID, {
+                player_relationships: ReactiveArray("player_relationships")
+            });
+        },
+        isProducer() {
+            return this.liveMatch?.player_relationships.some(rel => rel.singular_name === "Producer" && rel.player?.[0] === this.client?.staff?.[0]);
+        },
     },
     methods: {
         formatDuration
+    },
+    watch: {
+        "normalisedStreamStatus.outputActive": {
+            immediate: true,
+            async handler(isLive, old) {
+                if (old === isLive) return;
+                if (this.twitchStream?.matches !== true) return;
+                if (!this.isProducer) return;
+
+                if (isLive === this.broadcast?.advertise) return;
+
+                await authenticatedRequest("actions/update-broadcast", {
+                    advertise: isLive
+                });
+            }
+        }
     }
 };
 </script>

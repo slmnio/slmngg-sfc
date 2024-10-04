@@ -31,6 +31,15 @@
                 :text="middleText"
                 :tiny="broadcast.margin === 0"
                 :borders="middleBorders" />
+
+            <transition name="fly-in-left" mode="out-in">
+                <ingame-hero-bans
+                    v-if="showBannedHeroes && (noAnimation || shouldShowTeams)"
+                    :broadcast="broadcast"
+                    :match="match"
+                    :display-mode="heroBansDisplayMode"
+                    :style="themeBackground(broadcast?.event?.theme)" />
+            </transition>
             <div class="ingame-promote">
                 <ingame-promotion :broadcast="broadcast" :animation-active="animationActive" :match="match" />
             </div>
@@ -53,6 +62,8 @@ import Middle from "@/components/broadcast/Middle";
 import Sponsors from "@/components/broadcast/Sponsors";
 import IngamePromotion from "@/components/broadcast/IngamePromotion.vue";
 import { getFormatOptions } from "@/utils/content-utils";
+import IngameHeroBans from "@/components/broadcast/IngameHeroBans.vue";
+import { themeBackground } from "@/utils/theme-styles.js";
 
 export default {
     name: "IngameOverlay",
@@ -60,7 +71,8 @@ export default {
         IngamePromotion,
         IngameTeam,
         Middle,
-        Sponsors
+        Sponsors,
+        IngameHeroBans
     },
     props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed", "noAnimation", "basicMode"],
     data: () => ({
@@ -78,7 +90,10 @@ export default {
                         teams: ReactiveArray("teams")
                     })
                 }),
-                maps: ReactiveArray("maps")
+                maps: ReactiveArray("maps", {
+                    "team_1_bans": ReactiveArray("team_1_bans"),
+                    "team_2_bans": ReactiveArray("team_2_bans"),
+                })
             });
         },
         teams() {
@@ -112,6 +127,14 @@ export default {
         },
         useDots() {
             return this.broadcast?.broadcast_settings?.includes("Use dots instead of numbers for score");
+        },
+        showBannedHeroes() {
+            return this.broadcast?.broadcast_settings?.includes("Show banned heroes ingame");
+        },
+        heroBansDisplayMode() {
+            const mode = this.broadcast?.broadcast_settings?.find(setting => setting.startsWith("Display hero bans: "));
+            if (!mode) return;
+            return mode.split(":").pop().trim();
         },
         autoSmall() {
             return this.broadcast?.broadcast_settings?.includes("Show match records ingame") ? {
@@ -283,6 +306,7 @@ export default {
         }
     },
     methods: {
+        themeBackground,
         getAltTheme(team, i) {
             console.log({ team, i });
             if (!(this.broadcast?.broadcast_settings || []).includes("Use coloured team themes")) return team.theme;
@@ -436,5 +460,23 @@ export default {
     position: relative;
     top: 165px;
     display: flex;
+}
+
+
+.fly-in-left-enter-active {
+    transition: all .75s ease 2s, width 200ms ease;
+}
+.fly-in-left-enter-from {
+    transform: translate(-200px, 0px)
+}
+.fly-in-left-enter-to {
+    transform: translate(0, 0);
+}
+
+.fly-in-left-leave-active {
+    transition: opacity .3s ease, width 200ms ease;
+}
+.fly-in-left-leave-to {
+    opacity: 0;
 }
 </style>

@@ -514,7 +514,7 @@ export default {
                     replay_code: this.replayCodes[i]
                 });
             }
-            return data.filter(obj => Object.values(obj).filter(Boolean).length);
+            return data.filter(obj => Object.values(obj).filter(x => (typeof x === "object") ? x?.length : !!x).length);
         },
         broadcastData() {
             return this.match?.event?.broadcasts?.id ? this.match?.event?.broadcasts : this.match?.event?.broadcasts?.[0];

@@ -312,9 +312,7 @@ export default {
             const { isAuthenticated, user } = useAuthStore();
             if (!isAuthenticated) return false;
 
-            let status = {
-                team: true
-            };
+            let status = {};
 
             if (this.controllableTeams?.length) status.team = true;
 

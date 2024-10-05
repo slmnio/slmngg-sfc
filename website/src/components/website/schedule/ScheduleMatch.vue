@@ -250,7 +250,7 @@ export default {
             })?.reports || []).find(report => report.type === "Scores" && cleanID(report.match?.[0]) === cleanID(this.match?.id));
         },
         scoreReportingBadge() {
-            const { isAuthenticated, player } = useAuthStore();
+            const { isAuthenticated, user } = useAuthStore();
             if (!isAuthenticated) return null;
 
             const state = {
@@ -260,7 +260,7 @@ export default {
                 "is_on_teams": !!this.controllableTeams?.length,
                 "is_opponent": this.existingScoreReport?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) !== cleanID(this.existingScoreReport?.team?.id)) : null,
                 "is_submitter": this.existingScoreReport?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) === cleanID(this.existingScoreReport?.team?.id)) : null,
-                "is_staff": isEventStaffOrHasRole(player, { event: this.match?.event, websiteRoles: ["Can edit any match", "Can edit any event"] }),
+                "is_staff": isEventStaffOrHasRole(user, { event: this.match?.event, websiteRoles: ["Can edit any match", "Can edit any event"] }),
                 "settings": this.eventSettings
             };
 

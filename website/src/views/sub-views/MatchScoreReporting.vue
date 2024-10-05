@@ -295,14 +295,14 @@ export default {
             ].some(person => cleanID(player?.id) === cleanID(person?.id)));
         },
         authStatus() {
-            const { isAuthenticated, player } = useAuthStore();
+            const { isAuthenticated, user } = useAuthStore();
             if (!isAuthenticated) return false;
 
             let status = {};
 
             if (this.controllableTeams?.length) status.team = true;
 
-            const editorPerm = isEventStaffOrHasRole(player, { event: this.match?.event, websiteRoles: ["Can edit any match", "Can edit any event"] });
+            const editorPerm = isEventStaffOrHasRole(user, { event: this.match?.event, websiteRoles: ["Can edit any match", "Can edit any event"] });
             if (editorPerm) status.staff = true;
             return status;
         },

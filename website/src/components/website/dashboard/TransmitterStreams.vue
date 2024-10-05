@@ -28,7 +28,7 @@
                         </td>
                     </tr>
                 </tbody>
-                <tbody>
+                <tbody v-else>
                     <tr>
                         <td colspan="5" class="text-muted text-center">No transmitters connected</td>
                     </tr>

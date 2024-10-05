@@ -61,7 +61,7 @@ export default {
     methods: {
         resizedImage,
         setHero(i,id) {
-            const data = [...this.modelValue];
+            const data = [...this.localValue];
             data[i] = (!id || id === "No hero") ? null : id;
             this.$emit("update:modelValue",  data);
         },

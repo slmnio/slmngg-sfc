@@ -452,7 +452,7 @@ export default {
                         mapI: i
                     });
                 }
-                if (!(map.banner || map.banned)) {
+                if (!(map.banner || map.banned || this.banners[i])) {
                     playedMapI++;
                 }
             });
@@ -507,10 +507,10 @@ export default {
                     score_1: this.score_1s[i],
                     score_2: this.score_2s[i],
                     number: this.mapNumbers[i],
-                    team_1_picks: (this.team_1_picks[i] || []).filter(Boolean),
-                    team_2_picks: (this.team_2_picks[i] || []).filter(Boolean),
-                    team_1_bans: (this.team_1_bans[i] || []).filter(Boolean),
-                    team_2_bans: (this.team_2_bans[i] || []).filter(Boolean),
+                    team_1_picks: (this.team_1_picks[i] || []),
+                    team_2_picks: (this.team_2_picks[i] || []),
+                    team_1_bans: (this.team_1_bans[i] || []),
+                    team_2_bans: (this.team_2_bans[i] || []),
                     replay_code: this.replayCodes[i]
                 });
             }

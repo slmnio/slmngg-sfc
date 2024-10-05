@@ -26,7 +26,16 @@
                 <div class="p-2 bg-primary text-center rounded">
                     Submit score report
                 </div>
-                <MatchEditor :match="match" :score-reporting="true" :hide-match-extras="true" score-report-action="submit" />
+                <MatchEditor
+                    :match="match"
+                    :score-reporting="true"
+                    :hide-match-extras="true"
+                    score-report-action="submit"
+                    :lock-controls="true"
+                    :show-hero-picks="eventSettings?.reporting?.score?.showHeroPicks"
+                    :show-hero-bans="eventSettings?.reporting?.score?.showHeroBans"
+                    :show-map-bans="eventSettings?.reporting?.score?.showMapBans"
+                />
             </div>
             <div v-else-if="currentStep?.key === 'opponentApprove' && denyEditor" class="step-action">
                 <div class="d-flex gap-2">
@@ -42,7 +51,12 @@
                     :score-reporting="true"
                     :hide-match-extras="true"
                     score-report-action="counter"
-                    :proposed-data="existingReportData" />
+                    :proposed-data="existingReportData"
+                    :lock-controls="true"
+                    :show-hero-picks="eventSettings?.reporting?.score?.showHeroPicks"
+                    :show-hero-bans="eventSettings?.reporting?.score?.showHeroBans"
+                    :show-map-bans="eventSettings?.reporting?.score?.showMapBans"
+                />
             </div>
             <div v-else-if="currentStep?.key === 'opponentApprove'" class="step-action">
                 <div v-if="isOpponent" class="d-flex flex-column gap-2">
@@ -298,7 +312,9 @@ export default {
             const { isAuthenticated, user } = useAuthStore();
             if (!isAuthenticated) return false;
 
-            let status = {};
+            let status = {
+                team: true
+            };
 
             if (this.controllableTeams?.length) status.team = true;
 
@@ -490,5 +506,10 @@ export default {
     .step .step-icon i[class*="clipboard"] {
         /* optically aligning clipboards */
         transform: translateY(-0.1em)
+    }
+    .step-action {
+        display: flex;
+        flex-direction: column;
+        max-width: 100%;
     }
 </style>

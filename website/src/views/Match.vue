@@ -6,10 +6,10 @@
         </div>
         <div class="container mt-3 large-container">
             <div class="row">
-                <div class="col-12 col-md-9 mb-3">
+                <div class="col-12 col-lg-9 mb-3">
                     <router-view :match="match" />
                 </div>
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-lg-3">
                     <ul v-if="sidebarItems.length > 1" class="match-sub-nav list-group mb-2">
                         <!-- only because it'd be the only one -->
                         <router-link v-if="sidebarItems.includes('vod')" class="list-group-item ct-passive" exact-active-class="active ct-active" :to="subLink('')">VOD</router-link>

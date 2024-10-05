@@ -25,9 +25,9 @@
             <div class="teams-scores pt-2 px-2">
                 <div class="checkboxes">
                     <b-form-checkbox v-if="showRestrictCheckbox" id="map-pool-checkbox" v-model="restrictToMapPool" class="mr-2">Restrict to map pool</b-form-checkbox>
-                    <b-form-checkbox id="map-ban-checkbox" v-model="showMapBanButtons" class="mr-2">Show map banning</b-form-checkbox>
-                    <b-form-checkbox id="show-hero-pickban-checkbox" v-model="showHeroPickBans" class="mr-2">Show hero pick/bans</b-form-checkbox>
-                    <b-form-checkbox id="loser-picks-checkbox" v-model="assumeLoserPicks" class="mr-2">Assume loser picks</b-form-checkbox>
+                    <b-form-checkbox v-if="!lockControls" id="map-ban-checkbox" v-model="showMapBanButtons" class="mr-2">Show map banning</b-form-checkbox>
+                    <b-form-checkbox v-if="!lockControls" id="show-hero-pickban-checkbox" v-model="showHeroPickBans" class="mr-2">Show hero pick/bans</b-form-checkbox>
+                    <b-form-checkbox v-if="!lockControls" id="loser-picks-checkbox" v-model="assumeLoserPicks" class="mr-2">Assume loser picks</b-form-checkbox>
                 </div>
                 <div class="spacer" style="order:0"></div>
                 <div v-for="(team, i) in teams" :key="team.id" class="team" :class="{'end': i === 1}">
@@ -162,10 +162,10 @@
                                     <b-form-input v-model="replayCodes[mapI]" type="text" />
                                 </div>
                             </td>
-                            <td v-if="type === 'map' && (showMapBanButtons ? true : banners[mapI])">
+                            <td v-if="type === 'map' && (controls.showMapBans ? true : banners[mapI])" class="ban-style">
                                 <TeamPicker v-model="banners[mapI]" title="Banned by" :teams="teams" :hide-empty="scoreReporting" />
                             </td>
-                            <td v-if="type === 'map' && (showMapBanButtons ? true : !banners[mapI]) ">
+                            <td v-if="type === 'map' && (controls.showMapBans ? true : !banners[mapI])" class="pick-style">
                                 <TeamPicker
                                     :key="mapI"
                                     v-model="pickers[mapI]"
@@ -186,7 +186,7 @@
                             </td>
                             <td v-if="type === 'pickban' && !banners[mapI]" colspan="200" class="bg-dark p-0">
                                 <div class="pickbans d-flex">
-                                    <div class="hero-picks-container ">
+                                    <div v-if="controls.showHeroPicks" class="hero-picks-container">
                                         <div class="hero-picks">
                                             <div class="form-top">
                                                 {{ teams[0]?.name }} Picks
@@ -204,7 +204,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="hero-bans-container">
+                                    <div v-if="controls.showHeroBans" class="hero-bans-container">
                                         <div class="hero-bans">
                                             <div class="form-top">
                                                 {{ teams[0]?.name }} Bans
@@ -317,7 +317,7 @@ import HeroesPicker from "@/components/website/dashboard/HeroesPicker.vue";
 export default {
     name: "MatchEditor",
     components: { HeroesPicker, MatchExplainerModal, AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
-    props: ["match", "hideMatchExtras", "scoreReporting", "proposedData", "scoreReportAction"],
+    props: ["match", "hideMatchExtras", "scoreReporting", "proposedData", "scoreReportAction", "lockControls", "showHeroPicks", "showHeroBans", "showMapBans"],
     data: () => ({
         processing: {},
         matchData: {
@@ -360,6 +360,25 @@ export default {
             if (!this.match?.teams?.length) return [dummy, dummy];
             if (this.match.teams.length === 1) return [this.match.teams[0], dummy];
             return this.match.teams;
+        },
+        controls() {
+            if (this.lockControls) {
+                // only enable ones set by props
+                return {
+                    showHeroPicks: this.showHeroPicks,
+                    showHeroBans: this.showHeroBans,
+                    showMapBans: this.showMapBans,
+
+                    assumeLoserPicks: false, // hard disabling for now
+                };
+            }
+            return {
+                showHeroPicks: this.showHeroPicks || this.showHeroPickBans,
+                showHeroBans: this.showHeroBans || this.showHeroPickBans,
+                showMapBans: this.showMapBans || this.showMapBanButtons,
+
+                assumeLoserPicks: false, // hard disabling for now
+            };
         },
         reportableMatchData() {
             const allowedData = {
@@ -405,7 +424,13 @@ export default {
                 (this.match.maps?.filter(m => !m.banner && !m.draw))?.length || 0
             );
 
-            mapCount += this.draws.filter(d => d).length + this.banners.filter(d => d).length; // draws and bans need to +1
+
+            for (let i = 0; i < Math.max(this.match?.maps?.length, this.banners.length, this.draws.length); i++) {
+                if (this.match?.maps?.[i]?.banner?.length || this.match?.maps?.[i]?.draw || this.banners[i] || this.draws[i]) {
+                    mapCount++;
+                }
+            }
+
             mapCount += this.extraMaps; // manual adding
 
             // check if match is complete with current amount
@@ -414,6 +439,13 @@ export default {
                 this.mapWinnerScore.every(score => this.match.first_to !== score)) {
                 // match is not complete
                 mapCount++;
+
+                for (let i = 0; i < Math.max(this.match?.maps?.length, this.banners.length, this.draws.length); i++) {
+                    if (this.match?.maps?.[i]?.banner?.length || this.match?.maps?.[i]?.draw || this.banners[i] || this.draws[i]) {
+                        mapCount++;
+                    }
+                }
+
             }
 
 
@@ -445,7 +477,7 @@ export default {
                     mapI: i,
                     playedMapI
                 });
-                if (this.showHeroPickBans) {
+                if (this.controls.showHeroPicks || this.controls.showHeroBans) {
                     rows.push({
                         type: "pickban",
                         map,
@@ -839,7 +871,7 @@ export default {
                     // set left winner
 
                     this.winners[i] = this.teams[0].id;
-                    if (this.assumeLoserPicks && this.maps?.[i + 1]) {
+                    if (this.controls.assumeLoserPicks && this.maps?.[i + 1]) {
                         this.pickers[i + 1] = this.teams[1].id;
                     }
                     this.autoUpdateScore();
@@ -847,7 +879,7 @@ export default {
                     // set right winner
 
                     this.winners[i] = this.teams[1].id;
-                    if (this.assumeLoserPicks && this.maps?.[i + 1]) {
+                    if (this.controls.assumeLoserPicks && this.maps?.[i + 1]) {
                         this.pickers[i + 1] = this.teams[0].id;
                     }
                     this.autoUpdateScore();
@@ -858,7 +890,7 @@ export default {
             console.log("winner selected", i, teamID);
             if (!teamID) return;
 
-            if (this.assumeLoserPicks && this.maps?.[i + 1] && !this.banners?.[i + 1]) {
+            if (this.controls.assumeLoserPicks && this.maps?.[i + 1] && !this.banners?.[i + 1]) {
                 const teamIDs = this.teams.map(t => t?.id).filter(Boolean);
                 const loserID = teamIDs.find(id => id !== teamID);
                 // console.log("loser", loserID);
@@ -974,12 +1006,6 @@ export default {
     tr.map {
         border-left: 4px solid transparent;
     }
-    tr.map.banned {
-        border-left-color: var(--danger)
-    }
-    tr.map.banned td {
-        background-color: color-mix(in srgb,  var(--danger) 20%, transparent)
-    }
     td.map {
         min-width: 10em;
     }
@@ -1030,10 +1056,18 @@ export default {
         gap: .25em;
         flex-wrap: wrap;
     }
+    tr.pickban-row {
+        border-bottom: 1rem solid #202020;
+    }
+    tr.pickban-row.banned {
+        display: none;
+    }
+    tr.pickban-row  td {
+        box-shadow: inset 0 -1px #4d5154;
+    }
 
     .pickbans {
         justify-content: space-evenly;
-        border-bottom: .5em solid transparent;
     }
     .hero-picks, .hero-bans {
         border-bottom: 3px solid transparent;
@@ -1042,21 +1076,33 @@ export default {
         justify-content: center;
         align-items: center;
         padding-bottom: .5rem;
-        width: 50%;
+        min-width: 50%;
+        padding-left: .5rem;
+        padding-right: .5rem;
     }
     .hero-picks-container, .hero-bans-container {
         display: flex;
-        width: 50%;
+        min-width: 50%;
         align-items: start;
+        flex-grow: 1;
+        flex-shrink: 0;
     }
     .pickbans .form-top {
         font-weight: bold;
         margin-top: .25rem;
     }
-    .hero-picks-container {
-        background-color: color-mix(in srgb,  var(--primary) 20%, transparent)
+
+    tr.map.banned {
+        border-left-color: var(--danger)
     }
-    .hero-bans-container {
+    tr.map.banned td,
+    .hero-bans-container,
+    .ban-style {
         background-color: color-mix(in srgb,  var(--danger) 20%, transparent)
+    }
+
+    .hero-picks-container,
+    .pick-style {
+        background-color: color-mix(in srgb,  var(--primary) 20%, transparent)
     }
 </style>

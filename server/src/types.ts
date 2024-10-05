@@ -463,6 +463,10 @@ export type EventSettings = {
             use?: boolean;
             staffApprove?: boolean;
             opponentApprove?: boolean;
+
+            showHeroPicks?: boolean;
+            showHeroBans?: boolean;
+            showMapBans?: boolean;
         }
     };
     logging?: {

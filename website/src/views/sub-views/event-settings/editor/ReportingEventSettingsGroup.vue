@@ -17,6 +17,27 @@
                 Staff must approve
             </event-settings-checkbox>
         </div>
+        <b-form-group label="Editor settings" label-cols="3">
+            <div>
+                <event-settings-checkbox
+                    :active="reportingData?.score?.showHeroPicks"
+                    @update:active="val => updateData('score', 'showHeroPicks', val)">
+                    Show hero picks on maps
+                </event-settings-checkbox>
+
+                <event-settings-checkbox
+                    :active="reportingData?.score?.showHeroBans"
+                    @update:active="val => updateData('score', 'showHeroBans', val)">
+                    Show hero bans on maps
+                </event-settings-checkbox>
+
+                <event-settings-checkbox
+                    :active="reportingData?.score?.showMapBans"
+                    @update:active="val => updateData('score', 'showMapBans', val)">
+                    Show map ban options
+                </event-settings-checkbox>
+            </div>
+        </b-form-group>
     </EventSettingsGroup>
 </template>
 

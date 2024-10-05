@@ -55,7 +55,7 @@
                     <div class="flex-center">
                         <b-button-group>
                             <b-button :disabled="processing.approval" variant="success" @click="approveReport('approve')"><i class="fas fa-fw fa-check mr-1"></i> Approve</b-button>
-                            <b-button :disabled="processing.approval" variant="danger" @click="denyEditor = true"><i class="fas fa-fw fa-times mr-1"></i> Deny</b-button>
+                            <b-button :disabled="processing.approval" variant="danger" @click="denyEditor = true"><i class="fas fa-fw fa-times mr-1"></i> Deny & counter</b-button>
                         </b-button-group>
                     </div>
                 </div>

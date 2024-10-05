@@ -58,7 +58,7 @@
                 </div>
                 <div v-else class="vs ct-passive">vs</div>
                 <router-link
-                    v-if="showScoreReporting && scoreReportingBadge"
+                    v-if="scoreReportingEnabled && scoreReportingBadge"
                     :to="url('match', this.match, { subPage: 'score-reporting' })"
                     class="score-reporting-badge text-white rounded"
                     :class="`bg-${scoreReportingBadge?.variant}`"
@@ -113,7 +113,7 @@ import { isEventStaffOrHasRole } from "@/utils/client-action-permissions.js";
 export default {
     name: "ScheduleMatch",
     components: { ScheduleTime, ThemeLogo },
-    props: ["match", "customText", "leftTeam", "canEditMatches", "canEditBroadcasts", "selectedBroadcast", "showEditorButton", "showBatchCheckboxes", "showScoreReporting"],
+    props: ["match", "customText", "leftTeam", "canEditMatches", "canEditBroadcasts", "selectedBroadcast", "showEditorButton", "showBatchCheckboxes"],
     data: () => ({
         processing: {
             match_broadcast: false
@@ -224,7 +224,7 @@ export default {
         },
         _event() {
             if (!this.match?.event?.[0]) return null;
-            return ReactiveRoot(this.match?.event?.[0], { });
+            return ReactiveRoot(this.match.event[0]);
         },
         eventSettings() {
             if (!this._event?.blocks) return null;
@@ -249,18 +249,21 @@ export default {
                 })
             })?.reports || []).find(report => report.type === "Scores" && cleanID(report.match?.[0]) === cleanID(this.match?.id));
         },
+        scoreReportingEnabled() {
+            return this.eventSettings?.reporting?.score?.use;
+        },
         scoreReportingBadge() {
             const { isAuthenticated, user } = useAuthStore();
             if (!isAuthenticated) return null;
 
             const state = {
-                "reports_enabled": this.showScoreReporting,
+                "reports_enabled": this.scoreReportingEnabled,
                 "existing_report": !!this.existingScoreReport?.id,
                 "is_complete": this.match.first_to && [this.match.score_1, this.match.score_2].some(s => s === this.match.first_to),
                 "is_on_teams": !!this.controllableTeams?.length,
                 "is_opponent": this.existingScoreReport?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) !== cleanID(this.existingScoreReport?.team?.id)) : null,
                 "is_submitter": this.existingScoreReport?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) === cleanID(this.existingScoreReport?.team?.id)) : null,
-                "is_staff": isEventStaffOrHasRole(user, { event: this.match?.event, websiteRoles: ["Can edit any match", "Can edit any event"] }),
+                "is_staff": isEventStaffOrHasRole(user, { event: this._event, websiteRoles: ["Can edit any match", "Can edit any event"] }),
                 "settings": this.eventSettings
             };
 

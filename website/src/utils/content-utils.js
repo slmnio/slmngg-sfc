@@ -716,7 +716,7 @@ export function getScoreReportingBadge(state, report, eventSettings) {
                 return {
                     variant: "success",
                     text: "Pre-approve",
-                    small: "Pre",
+                    small: "Pre-app",
                     title: "Pre-approval ready"
                 };
             } else {

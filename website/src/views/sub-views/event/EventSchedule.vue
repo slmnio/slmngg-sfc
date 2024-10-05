@@ -82,7 +82,6 @@
                 :can-edit-matches="showEditorButton"
                 :can-edit-broadcasts="showBroadcastSettings"
                 :show-batch-checkboxes="showBroadcastSettings && showBatchCheckboxes"
-                :show-score-reporting="scoreReportingEnabled"
                 :selected-broadcast="selectedBroadcast" />
         </div>
     </div>
@@ -268,9 +267,6 @@ export default {
         eventSettings() {
             if (!this._event?.blocks) return null;
             return JSON.parse(this._event.blocks);
-        },
-        scoreReportingEnabled() {
-            return this.eventSettings?.reporting?.score?.use;
         },
     },
     methods: {

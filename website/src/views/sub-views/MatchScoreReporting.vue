@@ -27,6 +27,7 @@
                     Submit score report
                 </div>
                 <MatchEditor
+                    :ignore-remote-updates="true"
                     :match="match"
                     :score-reporting="true"
                     :hide-match-extras="true"
@@ -48,6 +49,7 @@
                 </div>
                 <MatchEditor
                     :match="match"
+                    :ignore-remote-updates="true"
                     :score-reporting="true"
                     :hide-match-extras="true"
                     score-report-action="counter"

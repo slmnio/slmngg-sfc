@@ -1,7 +1,6 @@
 <template>
     <div class="match-editor">
         <!--        <h2>Match Editor</h2>-->
-
         <b-form v-if="match" @submit="(e) => e.preventDefault()">
             <!--            <b-alert variant="danger" :show="!!errorMessage" dismissible @dismissed="() => this.errorMessage = null"><i class="fas fa-exclamation-circle fa-fw"></i> <b>Error</b>: {{ errorMessage }}</b-alert>-->
             <!--            <div class="top px-2 d-flex align-items-center" v-if="!hideMatchExtras">-->
@@ -317,7 +316,7 @@ import HeroesPicker from "@/components/website/dashboard/HeroesPicker.vue";
 export default {
     name: "MatchEditor",
     components: { HeroesPicker, MatchExplainerModal, AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
-    props: ["match", "hideMatchExtras", "scoreReporting", "proposedData", "scoreReportAction", "lockControls", "showHeroPicks", "showHeroBans", "showMapBans"],
+    props: ["match", "hideMatchExtras", "scoreReporting", "proposedData", "scoreReportAction", "lockControls", "showHeroPicks", "showHeroBans", "showMapBans", "ignoreRemoteUpdates"],
     data: () => ({
         processing: {},
         matchData: {
@@ -909,6 +908,7 @@ export default {
         match: {
             deep: true,
             handler(newMatch, oldMatch) {
+                if (this.ignoreRemoteUpdates) return;
                 if (newMatch?.id !== oldMatch?.id) {
                     this.emptyData(newMatch?.id);
                 }

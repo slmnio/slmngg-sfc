@@ -237,7 +237,7 @@ export default {
             return (this.match?.teams || []).filter(team => [
                 ...team.players || [],
                 ...team.captains || [],
-                ...team.team_staff || [],
+                ...team.staff || [],
                 ...team.owners || [],
             ].some(personID => cleanID(player?.id) === cleanID(personID)));
         },

@@ -284,7 +284,7 @@ export default {
                 "teams": ReactiveArray("teams", {
                     "players": ReactiveArray("players"),
                     "captains": ReactiveArray("captains"),
-                    "team_staff": ReactiveArray("team_staff"),
+                    "staff": ReactiveArray("staff"),
                     "owners": ReactiveArray("owners")
                 })
             }))?.teams || [];
@@ -304,7 +304,7 @@ export default {
             return (this.teams || []).filter(team => [
                 ...team.players || [],
                 ...team.captains || [],
-                ...team.team_staff || [],
+                ...team.staff || [],
                 ...team.owners || [],
             ].some(person => cleanID(player?.id) === cleanID(person?.id)));
         },

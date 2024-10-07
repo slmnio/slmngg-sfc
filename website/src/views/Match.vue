@@ -197,12 +197,9 @@ export default {
         sidebarItems() {
             const items = ["vod"];
 
-            console.log("route", this.$route);
-
             if (this.showHeadToHead) items.push("head-to-head");
             if (this.showEditor) items.push("editor");
             if ((this.scoreReportingEnabled && !this.matchComplete) || (this.$route?.path?.endsWith("/score-reporting"))) items.push("score-reporting");
-
 
             return items;
         },
@@ -221,7 +218,7 @@ export default {
             return (this.match?.teams || []).filter(team => [
                 ...team.players || [],
                 ...team.captains || [],
-                ...team.team_staff || [],
+                ...team.staff || [],
                 ...team.owners || [],
             ].some(personID => cleanID(player?.id) === cleanID(personID)));
         },

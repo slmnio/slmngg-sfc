@@ -89,7 +89,7 @@ import { useStatusStore } from "@/stores/statusStore";
 import WebsocketTransmitter from "@/components/broadcast/roots/WebsocketTransmitter.vue";
 import { formatDuration, recogniseRemoteServer } from "@/utils/content-utils.js";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
-import { ReactiveArray, ReactiveRoot } from "@/utils/reactive.js";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
 import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {
@@ -190,11 +190,14 @@ export default {
             return "secondary";
         },
         liveMatch() {
-            const matchID = this.client?.broadcast?.live_match?.[0];
-            if (!matchID) return null;
-            return ReactiveRoot(matchID, {
-                player_relationships: ReactiveArray("player_relationships")
+            const client = ReactiveRoot(this.client?.id, {
+                "broadcast": ReactiveThing("broadcast", {
+                    "live_match": ReactiveThing("live_match", {
+                        "player_relationships": ReactiveArray("player_relationships")
+                    })
+                })
             });
+            return client?.broadcast?.live_match;
         },
         isProducer() {
             return this.liveMatch?.player_relationships.some(rel => rel.singular_name === "Producer" && rel.player?.[0] === this.client?.staff?.[0]);
@@ -207,15 +210,21 @@ export default {
         "normalisedStreamStatus.outputActive": {
             immediate: true,
             async handler(isLive, old) {
-                if (old === isLive) return;
-                if (this.twitchStream?.matches !== true) return;
-                if (!this.isProducer) return;
+                if (old === isLive) return console.warn("[Output automation]", "Same as before");
+                if (this.twitchStream?.matches !== true) return console.warn("[Output automation]", "Not matching Twitch stream");
+                if (!this.isProducer) return console.warn("[Output automation]", "Not producer");
 
-                if (isLive === this.broadcast?.advertise) return;
+                if (isLive === this.broadcast?.advertise) return console.warn("[Output automation]", "Already advertising");
 
-                await authenticatedRequest("actions/update-broadcast", {
-                    advertise: isLive
-                });
+                try {
+                    if (this.processingAdvertise) return;
+                    this.processingAdvertise = true;
+                    await authenticatedRequest("actions/update-broadcast", {
+                        advertise: isLive
+                    });
+                } finally {
+                    this.processingAdvertise = false;
+                }
             }
         }
     }

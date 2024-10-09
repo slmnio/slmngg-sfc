@@ -45,7 +45,13 @@ export default [
             interval: route.query.interval || route.query.headlineInterval
         })
     },
-    { path: "break-schedule", component: () => import("@/components/broadcast/break/BreakScheduleOverlay.vue") },
+    {
+        path: "break-schedule",
+        component: () => import("@/components/broadcast/break/BreakScheduleOverlay.vue"),
+        props: route => ({
+            showSponsors: route.query.sponsors || route.query.showSponsors
+        })
+    },
     { path: "versus", component: () => import("@/components/broadcast/roots/VersusOverlay.vue") },
     {
         path: "winners",
@@ -182,7 +188,8 @@ export default [
         component: () => import("@/components/broadcast/desk/DeskOverlay.vue"),
         props: route => ({
             group: "casters",
-            disableCasters: route.query.disable || route.query.casters === "false"
+            disableCasters: route.query.disable || route.query.casters === "false",
+            ignoreTalentSocket: route.query.ignoreTalentSocket || route.query.ignoreTalent
         })
     },
     { path: "podcast", component: () => import("@/components/broadcast/roots/PodcastOverlay.vue"), props: route => ({ rows: route.query.rows }) },

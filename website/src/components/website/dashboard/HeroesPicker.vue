@@ -43,18 +43,26 @@ export default {
         heroes() {
             return (ReactiveRoot("Heroes", {
                 "ids": ReactiveArray("ids")
-            })?.ids);
+            })?.ids || []).filter(hero => this.game ? hero.game === this.game : true);
         },
         heroOptions() {
             return [
                 { value: null, text: "No hero" },
-                ...["DPS", "Tank", "Support"].map(key => ({
-                    text: key,
-                    options: (this.heroes || []).filter(h => h.role === key).sort((a,b) => sortAlpha(a?.name, b?.name)).map(h => ({
-                        text: h.name,
-                        value: dirtyID(h.id)
-                    }))
-                }))
+                ...(
+                    this.game !== "Overwatch" ?
+                        (this.heroes || []).sort((a,b) => sortAlpha(a?.name, b?.name)).map(h => ({
+                            text: h.name,
+                            value: dirtyID(h.id)
+                        }))
+                        :
+                        ["DPS", "Tank", "Support"].map(key => ({
+                            text: key,
+                            options: (this.heroes || []).filter(h => h.role === key).sort((a,b) => sortAlpha(a?.name, b?.name)).map(h => ({
+                                text: h.name,
+                                value: dirtyID(h.id)
+                            }))
+                        }))
+                )
             ];
         }
     },
@@ -74,10 +82,9 @@ export default {
         modelValue: {
             immediate: true,
             handler(data) {
+                console.log(data);
                 this.count = Math.max(this.count, (data || []).length);
-                if (data?.length) {
-                    this.localValue = data;
-                }
+                this.localValue = data || [];
             }
         }
     }

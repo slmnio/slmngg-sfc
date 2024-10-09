@@ -42,6 +42,7 @@ export const PRODUCTION_HIERARCHY = [
     "Caster",
     "Desk Host",
     "Host",
+    "Analyst",
     "Interviewer",
     "Director",
     "Producer",

@@ -16,6 +16,9 @@
                     <Countdown :key="broadcast.countdown_end" :to="broadcast.countdown_end" />
                 </transition>
             </div>
+            <div v-if="showSponsors" class="break-sponsors-holder">
+                <Sponsors class="break-sponsors" :sponsors="sponsorThemes" />
+            </div>
         </div>
         <div class="right-schedule-block">
             <div class="schedule-title">Schedule</div>
@@ -39,11 +42,12 @@ import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
 import { formatTime } from "@/utils/content-utils";
 import ScheduleTextItem from "@/components/broadcast/break/ScheduleTextItem.vue";
+import Sponsors from "@/components/broadcast/Sponsors.vue";
 
 export default {
     name: "BreakScheduleOverlay",
-    components: { ScheduleTextItem, Countdown },
-    props: ["broadcast", "title"],
+    components: { Sponsors, ScheduleTextItem, Countdown },
+    props: ["broadcast", "title", "showSponsors"],
     computed: {
         eventLogo() {
             return resizedImage(this.broadcast?.event?.theme, ["allmode_logo", "default_wordmark", "default_logo"], "w-1920");
@@ -63,6 +67,12 @@ export default {
         schedule() {
             if (!this.broadcast?.schedule || !this.fullSchedule) return null;
             return this.fullSchedule.filter(m => m.show_on_overlays).sort(sortMatches);
+        },
+        sponsorThemes() {
+            if (!this.broadcast?.sponsors) return null;
+            return ReactiveArray("sponsors", {
+                theme: ReactiveThing("theme")
+            })(this.broadcast);
         }
     },
     methods: {
@@ -123,5 +133,8 @@ export default {
 
     .a--match-enter-to, .a--match-leave-from {
         max-height: 230px;
+    }
+    .break-sponsors-holder {
+        width: 420px;
     }
 </style>

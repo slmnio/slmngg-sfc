@@ -95,21 +95,22 @@ export default {
 
 <style scoped>
     .caster {
+        --internal-padding: 10px;
         flex-grow: 1;
-        padding: 0 10px;
+        padding: 0 var(--internal-padding);
         --theme-color: #2F2F30;
         position: relative;
 
         --caster-width: 810px;
         --caster-height: 570px;
         max-width: var(--caster-width);
-        transition: max-width .4s ease, min-width .4s ease;
+        transition: max-width .4s ease, min-width .4s ease, padding .4s ease;
     }
 
     .caster-cam-box {
         background-color: var(--theme-color);
         border-bottom: 6px solid var(--theme-color);
-        transition: background-color 300ms, border-bottom-color 300ms;
+        transition: background-color 300ms, border-bottom-color 300ms, height .5s ease;
         color: white;
         height: var(--caster-height);
         width: 100%;
@@ -160,12 +161,12 @@ export default {
 
     .caster-lower.cl-traditional {
         bottom: 4px;
-        width: calc(100% - 20px);
+        width: calc(100% - calc(var(--internal-padding) * 2));
         min-height: auto;
     }
     .caster:first-child .caster-lower.cl-traditional,
     .caster:last-child .caster-lower.cl-traditional {
-        width: calc(100% - 10px);
+        width: calc(100% - var(--internal-padding));
     }
 
     .caster-lower.cl-traditional .caster-name {

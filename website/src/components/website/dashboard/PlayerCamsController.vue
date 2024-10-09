@@ -66,7 +66,6 @@ export default {
     components: { RoleIcon },
     props: ["broadcast", "match"],
     data: () => ({
-        camCount: 5,
         setPlayers: [
             [], []
         ],
@@ -76,6 +75,10 @@ export default {
         }
     }),
     computed: {
+        camCount() {
+            if (["Deadlock"].includes(this.match?.event?.game)) return 6;
+            return 5;
+        },
         teams() {
             if (!this.match?.id) return [];
             return ReactiveRoot(this.match?.id, {

@@ -23,6 +23,7 @@
                 :show-event-maps="i === 1 ? showMapInformation : null"
                 :match="match"
                 :broadcast="broadcast"
+                :player-names="teamPlayerNames[i]"
             />
             <Middle
                 v-if="!basicMode"
@@ -124,6 +125,17 @@ export default {
             if (this.match.flip_teams && this.match.teams.length === 2) return [this.match.teams[1], this.match.teams[0]];
             if (this.match.teams.length !== 2) return [];
             return this.match.teams;
+        },
+        teamPlayerNames() {
+            if (!(this.broadcast?.broadcast_settings || [])?.includes("Show all player names")) return [];
+            return [
+                ReactiveArray("team_1_cams", {
+                    "player": ReactiveThing("player")
+                })(this.broadcast),
+                ReactiveArray("team_2_cams", {
+                    "player": ReactiveThing("player")
+                })(this.broadcast)
+            ];
         },
         useDots() {
             return this.broadcast?.broadcast_settings?.includes("Use dots instead of numbers for score");

@@ -1,9 +1,14 @@
 <template>
-    <div class="desk-overlay">
+    <div class="desk-overlay" :data-desk-display="broadcast?.desk_display">
         <div class="top-holder">
             <TourneyBar :left="broadcast.event && broadcast.event.short" :right="broadcast.subtitle" :event="broadcast.event" />
         </div>
-        <transition-group class="casters flex-center" tag="div" name="anim-talent">
+        <transition-group
+            class="casters flex-center"
+            tag="div"
+            name="anim-talent"
+            :data-caster-count="casters.length"
+            :data-visible-caster-count="visibleCasters.length">
             <Caster
                 v-for="(caster, i) in casters"
                 :key="caster.manual ? caster.name : caster.id"
@@ -11,19 +16,12 @@
                 :color="getColor(i)"
                 :event="event"
                 :disable-video="shouldDisableCasterVideo"
-                :class="{'wide-feed': caster.wide_feed}"
+                :class="{'wide-feed': caster.wide_feed, ...(socketIDClasses[caster?.id] || {})}"
                 :show-pronouns="showPronouns"
                 :pronouns-on-newline="pronounsOnNewline" />
         </transition-group>
         <transition tag="div" mode="out-in" name="break-content">
-            <DeskMatch
-                v-if="liveMatch && !useScoreboard"
-                key="desk-match"
-                :broadcast="broadcast"
-                class="w-100"
-                :_match="liveMatch"
-                :theme-color="themeColor"
-                :guests="guests" />
+            <HeroDraft v-if="liveMatch && useHeroDraft" class="hero-draft" :broadcast="broadcast" :match="liveMatch" />
             <MatchScoreboard
                 v-else-if="liveMatch && useScoreboard"
                 key="scoreboard"
@@ -32,6 +30,14 @@
                 :match="liveMatch"
                 :broadcast="broadcast"
                 :animate-on-mount="true" />
+            <DeskMatch
+                v-else-if="liveMatch && !useScoreboard"
+                key="desk-match"
+                :broadcast="broadcast"
+                class="w-100"
+                :_match="liveMatch"
+                :theme-color="themeColor"
+                :guests="guests" />
         </transition>
 
         <div class="preload">
@@ -55,11 +61,17 @@ import DeskMatch from "@/components/broadcast/desk/DeskMatch";
 import { themeBackground1 } from "@/utils/theme-styles";
 import { createGuestObject } from "@/utils/content-utils";
 import MatchScoreboard from "@/components/broadcast/MatchScoreboard.vue";
+import HeroDraft from "@/components/broadcast/HeroDraft.vue";
 
 export default {
     name: "DeskOverlay",
-    components: { MatchScoreboard, DeskMatch, Caster, TourneyBar },
-    props: ["broadcast", "group", "disableCasters", "animationActive"],
+    components: { HeroDraft, MatchScoreboard, DeskMatch, Caster, TourneyBar },
+    props: ["broadcast", "group", "disableCasters", "animationActive", "ignoreTalentSocket"],
+    data: () => ({
+        socketHideIDs: {},
+        socketIDClasses: {},
+        timeouts: {}
+    }),
     computed: {
         event() {
             return this.broadcast?.event;
@@ -136,13 +148,86 @@ export default {
         },
         useScoreboard() {
             return (this.broadcast?.desk_display) === "Scoreboard" || (this.broadcast?.desk_display) === "Scoreboard Bans";
+        },
+        useHeroDraft() {
+            return (this.broadcast?.desk_display) === "Hero Draft";
+        },
+        visibleCasters() {
+            return this.casters.filter(({id}) => this.socketHideIDs[id]);
         }
-
     },
     methods: {
         getColor(index) {
             if (!this.deskColors?.length) return this.broadcast?.event?.theme?.color_logo_background || this.broadcast?.event?.theme?.color_theme;
             return this.deskColors[index % this.deskColors.length];
+        },
+        showTalent(id) {
+            this.socketIDClasses[id] = {"anim-talent-enter-active anim-talent-enter-from": true};
+            requestAnimationFrame(() => {
+                this.socketIDClasses[id] = {"anim-talent-enter-active anim-talent-enter-to": true};
+            });
+            if (this.timeouts[id]) clearTimeout(this.timeouts[id]);
+            this.timeouts[id] = setTimeout(() => {
+                this.socketIDClasses[id] = {};
+            }, 1000);
+
+        },
+        hideTalent(id) {
+            this.socketIDClasses[id] = {"anim-talent-leave-active anim-talent-leave-from": true};
+            requestAnimationFrame(() => {
+                this.socketIDClasses[id] = {"anim-talent-leave-active anim-talent-leave-to": true};
+            });
+            if (this.timeouts[id]) clearTimeout(this.timeouts[id]);
+            this.timeouts[id] = setTimeout(() => {
+                this.socketIDClasses[id] = {"anim-talent-leave-to": true};
+            }, 1000);
+
+        }
+    },
+    sockets: {
+        show_talent([num]) {
+            console.log("show_talent", num);
+            if (this.ignoreTalentSocket) return;
+            try {
+                const id = this.casters?.[parseInt(num) - 1]?.id;
+                if (!id) return;
+                this.showTalent(id);
+                this.socketHideIDs[id] = false;
+            } catch (e) {
+            }
+        },
+        hide_talent([num]) {
+            console.log("hide_talent", num);
+            if (this.ignoreTalentSocket) return;
+            try {
+                const id = this.casters?.[parseInt(num) - 1]?.id;
+                if (!id) return;
+                this.hideTalent(id);
+                this.socketHideIDs[id] = true;
+            } catch (e) {
+                console.warn("talent fail", e);
+            }
+        },
+        toggle_talent([num]) {
+            console.log("toggle_talent", num);
+            if (this.ignoreTalentSocket) return;
+            try {
+                const id = this.casters?.[parseInt(num) - 1]?.id;
+                if (!id) return;
+                this.socketHideIDs[id] = !this.socketHideIDs[id];
+                if (this.socketHideIDs[id]) {
+                    this.hideTalent(id);
+                } else {
+                    this.showTalent(id);
+                }
+            } catch (e) {
+                console.warn("talent fail", e);
+            }
+        },
+        clear_talent() {
+            if (this.ignoreTalentSocket) return;
+            this.socketHideIDs = {};
+            this.socketIDClasses = {};
         }
     },
     head() {
@@ -179,18 +264,25 @@ export default {
 
 
     .anim-talent-enter-active {
-        transition: all .3s ease, opacity .2s ease .2s;
+        transition: all .5s ease, opacity .3s ease .2s, padding .2s ease;
     }
     .anim-talent-leave-active {
-        transition: all .3s ease, opacity .2s ease;
+        transition: all .5s ease .2s, opacity .3s ease;
     }
     .anim-talent-enter-from, .anim-talent-leave-to {
         /* hide */
         max-width: 0;
         min-width: 0 !important;
         opacity: 0;
-        padding: 0 0;
+        padding: 0 0; /* --internal-padding */
     }
+
+    .anim-talent-enter-from .caster-lower,
+    .anim-talent-leave-to .caster-lower {
+        /* animation quirk means it will shrink slightly once padding is added */
+        width: 100%;
+    }
+
     .anim-talent-enter-to, .anim-talent-leave-from {
         /* show */
         opacity: 1;
@@ -228,11 +320,11 @@ export default {
     }
 
     .casters .caster:first-child {
-        padding: 0 10px 0 0 !important;
+        padding: 0 var(--internal-padding) 0 0 !important;
     }
 
     .casters .caster:last-child {
-        padding: 0 0 0 10px !important;
+        padding: 0 0 0 var(--internal-padding) !important;
     }
 
 

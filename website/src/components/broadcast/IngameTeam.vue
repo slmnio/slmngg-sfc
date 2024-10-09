@@ -76,6 +76,15 @@
                 <IngameMaps v-else-if="active && showEventMaps" class="event-maps event-fly-in" :match="match" :broadcast="broadcast" />
             </transition>
         </div>
+        <transition name="clip-swipe-down">
+            <div v-if="playerNames?.length" class="player-names">
+                <div v-for="guest in playerNames" :key="guest.id" class="player">
+                    <transition name="fade">
+                        <span :key="guest?.name">{{ guest?.name }}</span>
+                    </transition>
+                </div>
+            </div>
+        </transition>
     </ThemeTransition>
 <!--    </transition>-->
 </template>
@@ -91,7 +100,7 @@ import IngameMaps from "@/components/broadcast/IngameMaps.vue";
 export default {
     name: "IngameTeam",
     components: { IngameMaps, Squeezable, ThemeTransition },
-    props: ["team", "active", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo", "colorLogoHolder", "eventInfo", "showEventMaps", "match", "broadcast"],
+    props: ["team", "active", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo", "colorLogoHolder", "eventInfo", "showEventMaps", "match", "broadcast", "playerNames"],
     data: () => ({
         textureData: {
             url: null,
@@ -517,5 +526,30 @@ export default {
     .event-maps {
         left: auto;
         right: 0;
+    }
+
+    .player-names {
+        display: flex;
+    }
+    .player-names .player {
+        text-align: center;
+        flex: 1;
+    }
+
+
+    .clip-swipe-down-enter-active,
+    .clip-swipe-down-leave-active {
+        transition: clip-path 200ms ease, max-height 200ms ease;
+    }
+
+    .clip-swipe-down-enter-to,
+    .clip-swipe-down-leave-from {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+        max-height: var(--height, 50vh);
+    }
+    .clip-swipe-down-enter-from,
+    .clip-swipe-down-leave-to {
+        clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+        max-height: 0;
     }
 </style>

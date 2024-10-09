@@ -191,7 +191,7 @@
                                                 {{ teams[0]?.name }} Picks
                                             </div>
                                             <div class="form-button">
-                                                <heroes-picker v-model="team_1_picks[mapI]" />
+                                                <heroes-picker v-model="team_1_picks[mapI]" :game="match?.game || match?.event?.game" />
                                             </div>
                                         </div>
                                         <div class="hero-picks">
@@ -199,7 +199,7 @@
                                                 {{ teams[1]?.name }} Picks
                                             </div>
                                             <div class="form-button">
-                                                <heroes-picker v-model="team_2_picks[mapI]" />
+                                                <heroes-picker v-model="team_2_picks[mapI]" :game="match?.game || match?.event?.game" />
                                             </div>
                                         </div>
                                     </div>
@@ -209,7 +209,7 @@
                                                 {{ teams[0]?.name }} Bans
                                             </div>
                                             <div class="form-button">
-                                                <heroes-picker v-model="team_1_bans[mapI]" />
+                                                <heroes-picker v-model="team_1_bans[mapI]" :game="match?.game || match?.event?.game" />
                                             </div>
                                         </div>
                                         <div class="hero-bans">
@@ -217,7 +217,7 @@
                                                 {{ teams[1]?.name }} Bans
                                             </div>
                                             <div class="form-button">
-                                                <heroes-picker v-model="team_2_bans[mapI]" />
+                                                <heroes-picker v-model="team_2_bans[mapI]" :game="match?.game || match?.event?.game" />
                                             </div>
                                         </div>
                                     </div>

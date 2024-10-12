@@ -10,14 +10,14 @@
         </div>
 
         <ol class="edit-list mb-0">
-            <li v-for="(map, i) in hydratedData" :key="i" class="mb-2">
-                <div>{{ map?.map?.name }}</div>
+            <li v-for="(map, i) in hydratedData" :key="i" class="mb-3">
+                <div v-if="map?.map?.name" class="fw-bold" :class="{'text-danger': map.banner?.id}">{{ map?.map?.name }}</div>
                 <div v-if="map.score_1 > map.score_2">
                     Score: {{ teams[0]?.name }} <b>{{ map.score_1 }}-{{
                         map.score_2
                     }}</b> {{ teams[1]?.name }}
                 </div>
-                <div v-else>
+                <div v-else-if="map.score_1 || map.score_2">
                     Score: {{ teams[1]?.name }} <b>{{ map.score_2 }}-{{ map.score_1 }}</b> {{ teams[0]?.name }}
                 </div>
                 <div>
@@ -90,5 +90,12 @@ export default {
 <style scoped>
     ol.edit-list {
         padding-left: 1em;
+    }
+    .ban-style {
+        background-color: color-mix(in srgb,  var(--danger) 20%, transparent)
+    }
+
+    .pick-style {
+        background-color: color-mix(in srgb,  var(--primary) 20%, transparent)
     }
 </style>

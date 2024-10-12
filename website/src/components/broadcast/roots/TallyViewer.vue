@@ -132,6 +132,7 @@ export default {
             console.log("Screen Wake Lock released:", this.wakeLock.released);
         },
         getTarget(_sceneName) {
+            if (!_sceneName) return null;
             const sceneName = _sceneName.toLowerCase().trim();
             if (["Replay", "Highlight"].some(str => sceneName.includes(str.toLowerCase()))) {
                 const replays = this.liveMatch?.player_relationships?.find(rel => rel.singular_name === "Replay Producer");
@@ -157,6 +158,7 @@ export default {
             }
         },
         targetsMe(_sceneName) {
+            if (!_sceneName) return false;
             const sceneName = _sceneName.toLowerCase().trim();
             if (this.customText) {
                 return sceneName.includes(this.customText.toLowerCase());

@@ -11,7 +11,7 @@
         <router-link v-if="!useCodes" :to="url('team', team)" class="team-name team-code ct-passive flex-grow-1 text-start d-md-none">{{ team.code }}</router-link>
         <router-link v-if="useCodes" :to="url('team', team)" class="team-name team-code ct-passive flex-grow-1 text-start">{{ team.code }}</router-link>
         <div class="team-stats d-flex">
-            <div v-for="(stat, i) in stats" :key="stat + i" class="team-stat text-center">
+            <div v-for="(stat, i) in stats" :key="stat + i" class="team-stat text-center" :title="stat.hoverText ? stat.hoverText(team) : null">
                 {{ stat.display(team) }}
             </div>
         </div>

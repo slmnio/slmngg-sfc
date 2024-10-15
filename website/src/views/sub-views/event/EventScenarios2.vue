@@ -213,6 +213,13 @@ import { ReactiveArray } from "@/utils/reactive";
 import { BitCounter, sortTeamsIntoStandings } from "@/utils/scenarios";
 
 
+function avg(arr) {
+    if (!arr?.length) return null;
+    const sum = arr.reduce((a, b) => a + b, 0);
+    const avg = (sum / arr.length) || 0;
+    return avg;
+}
+
 function generateScoreline(firstTo) {
     const scorelines = [];
     for (let i = 0; i < firstTo; i++) {
@@ -696,6 +703,12 @@ export default {
                         // console.log(team, otherTeam);
                         // todo: error here when not all data is loaded properly
 
+                        team.standings.played++;
+                        if (team.standings.matches) team.standings.matches.played++;
+                        if (!match.maps) {
+                            team.standings.maps_played += match.score_1 + match.score_2;
+                        }
+
                         // const teamWonThisMatch = match.first_to === outcome.scores[ti];
                         const teamWonThisMatch = match.first_to === outcome.scores[ti];
                         if (teamWonThisMatch) {
@@ -710,9 +723,29 @@ export default {
                         }
                         team.standings.map_wins += outcome.scores[ti];
                         team.standings.map_losses += outcome.scores[+!ti];
+                        team.standings.map_diff += (outcome.scores[ti] - outcome.scores[+!ti]);
 
                         if (!team.standings.h2h_maps[otherTeam.id]) team.standings.h2h_maps[otherTeam.id] = 0;
                         team.standings.h2h_maps[otherTeam.id] += outcome.scores[ti] - outcome.scores[+!ti];
+
+
+                        if (match.maps?.length) {
+                            match.maps.forEach(map => {
+                                if (!map.id) return;
+                                if (map.score_1 == null || map.score_2 == null) return;
+                                const mapScores = [map.score_1, map.score_2];
+                                team.standings.map_round_wins += mapScores[ti];
+                                team.standings.map_round_losses += mapScores[+!ti];
+                            });
+                        }
+
+                        if (this.settings?.points) {
+                            team.standings.points += (this.settings.points.map_wins * team.standings.map_wins);
+                            team.standings.points += (this.settings.points.map_losses * team.standings.map_losses);
+                        }
+
+                        team.standings.winrate = team.standings.wins / team.standings.played;
+                        team.standings.map_winrate = team.standings.map_wins / (team.standings.map_losses + team.standings.map_wins);
                     });
                 });
 
@@ -777,6 +810,43 @@ export default {
                 // scenario.teams.sort(sortFunction);
 
                 // console.log("sort", i + 1, this.blocks.standingsSort);
+
+
+                console.log("sorting methods", this.sortingMethods);
+                if (["OMapWinrate", "OMatchWinrate", "OMatchWinsPoints", "OPoints"].some(s => this.sortingMethods.includes(s))) {
+                    console.log("preparing opponent winrates");
+                    scenario.teams.map(team => {
+                        team.standings.opponentWinrates = [];
+                        team.standings.opponentMapWinrates = [];
+                        team.standings.opponentPoints = [];
+                        team.standings.opponentPointsMatchWins = [];
+
+                        scenario.outcomes.forEach((outcome, i) => {
+                            const match = scenario.matches[i];
+                            // console.log("- - match", match, outcome);
+                            if (!(match.teams || []).some(t => t.id === team.id)) return;
+                            if (!outcome.scores.some(score => score === match.first_to)) return; // console.warn("match", match, "not finished"); // not finished
+                            const opponent = match.teams.find(t => t.id !== team.id);
+                            if (!opponent) return; // console.warn("match", match, "no opponent found");
+                            const localOpponent = scenario.teams.find(t => t.id === opponent.id);
+                            if (!localOpponent) return;  //console.warn("match", opponent.id, "no local opponent found");
+                            team.standings.opponentWinrates.push(localOpponent.standings.winrate);
+                            team.standings.opponentMapWinrates.push(localOpponent.standings.map_winrate);
+                            team.standings.opponentPoints.push(localOpponent.extra_points || 0);
+                            team.standings.opponentPointsMatchWins.push(localOpponent.standings.wins + (localOpponent.extra_points || 0));
+                        });
+
+                        // console.log(team.standings.opponentWinrates, avg(team.standings.opponentWinrates));
+                        team.standings.opponent_winrate = avg(team.standings.opponentWinrates);
+                        team.standings.opponent_map_winrate = avg(team.standings.opponentMapWinrates);
+                        team.standings.opponent_points = team.standings.opponentPoints.reduce((c, v) => c + v, 0);
+                        team.standings.opponent_points_wins = team.standings.opponentPointsMatchWins.reduce((c, v) => c + v, 0);
+                        // console.log("= team", team.standings);
+                        return team;
+                    });
+                }
+
+
                 if (this.sortingMethods) {
                     scenario.standings = sortTeamsIntoStandings(scenario.teams, {
                         sort: this.sortingMethods

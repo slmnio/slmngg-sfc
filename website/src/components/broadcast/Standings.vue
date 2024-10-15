@@ -245,7 +245,7 @@ export default {
             });
 
 
-            if (this.useOMW || this.standingsSort.includes("OMapWinrate")) {
+            if (this.useOMW || this.standingsSort.includes("OMapWinrate") || this.standingsSort.includes("OMatchWinrate")) {
                 teams.map(team => {
                     team.standings.opponentWinrates = [];
                     team.standings.opponentMapWinrates = [];

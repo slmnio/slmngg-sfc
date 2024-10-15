@@ -28,6 +28,7 @@ function money(num: number) {
 
 export default {
     async handler({ id: playerID, newData: player, oldData, options }: { id: AnyAirtableID, newData: Player, oldData: Player, options?: { source?: string } }) {
+        if (!process.env.IS_SLMNGG_MAIN_SERVER) return;
         if (player?.__tableName !== "Players") return;
         // TODO: this doesn't work for people who are created with team memberships (e.g. brand new players straight into teams through signups)
         //       ATM it is restricted so it doesn't fire when the server starts up. It may only need us to check if the server is rebuilding rather than having no data.

@@ -11,6 +11,7 @@ export default {
      * @returns {Promise<void>}
      */
     async handler({ id, newData, oldData }) {
+        if (!process.env.IS_SLMNGG_MAIN_SERVER) return;
         if (newData?.__tableName !== "Broadcasts") return;
 
         const settings = newData?.automation_settings || [];

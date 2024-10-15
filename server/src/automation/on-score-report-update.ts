@@ -18,6 +18,7 @@ export default {
      * @returns {Promise<void>}
      */
     async handler({ id, newData: report, oldData }: { id: AnyAirtableID, newData: Report, oldData: Report }) {
+        if (!process.env.IS_SLMNGG_MAIN_SERVER) return;
         if (report?.__tableName !== "Reports") return;
         if (report.approved) {
             console.log("Already approved");

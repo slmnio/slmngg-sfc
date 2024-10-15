@@ -1,13 +1,13 @@
 <template>
     <div class="bug-overlay">
-        <div class="bug-holder" :style="broadcastMargin">
+        <div class="bug-holder" :style="broadcastMargin" :class="`animate-${animate || 'left'}`">
             <ThemeTransition
                 :theme="themeObject?.theme"
                 :active="animationActive"
-                start="right"
-                end="right"
+                :start="animate || 'right'"
+                :end="animate || 'right'"
                 :border-width="6"
-                border="right"
+                :border="animate || 'right'"
                 :duration="400"
                 :inner-delay="200"
                 use-fit-content
@@ -33,7 +33,7 @@ import { useStatusStore } from "@/stores/statusStore";
 export default {
     name: "BugOverlay",
     components: { ThemeTransition },
-    props: ["broadcast", "title", "animationActive", "small", "teamNum"],
+    props: ["broadcast", "title", "animationActive", "small", "teamNum", "animate"],
     computed: {
         match() {
             if (!this.broadcast?.live_match) return null;
@@ -108,6 +108,10 @@ export default {
     position: absolute;
     left: 0;
     top: calc(170px + var(--broadcast-margin-px));
+}
+.bug-holder.animate-left {
+    left: auto;
+    right: 0;
 }
 
 .bug-text {

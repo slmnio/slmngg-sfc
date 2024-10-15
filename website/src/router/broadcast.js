@@ -201,6 +201,7 @@ export default [
         props: route => ({
             small: !!route.query.small,
             teamNum: route.query.team || route.query.teamNum,
+            animate: route.query.animate
         })
     },
     { path: "l-bar", component: () => import("@/components/broadcast/roots/LBarOverlay") },

@@ -14,23 +14,34 @@
                     <div class="team-name">{{ team.name }}</div>
                 </div>
                 <div class="team-bans">
-                    <div v-for="ban in (currentMap?.[`team_${ti+1}_bans`] || [])" :key="ban.id" class="ban bg-danger flex-center">
-                        <transition name="fade" mode="out-in">
-                            <div v-if="ban" :key="ban?.id" class="bg-center ban-icon  flex-center" :style="resizedImage(ban, ['icon'], 's-500')"></div>
+                    <div v-for="(ban, num) in (bans[ti] || [])" :key="num" class="ban bg-danger flex-center">
+                        <transition name="fade" mode="out-in" :duration="250">
+                            <div v-if="ban?.name" class="bg-center ban-icon ban flex-center" :style="resizedImage(ban, ['icon'], 's-500')">
+                                <div class="ban-number">{{ getPickBanItem(pickBanOrder, "ban", ti+1, num - 1)?.num }}</div>
+                            </div>
+                            <div v-else class="ban ban-placeholder text-center" :class="{'ban-next': ban?.orderItem?.num === (currentPickBan + 1) }">
+                            </div>
                         </transition>
                     </div>
                     <transition name="fade" mode="out-in">
-                        <div v-if="(currentMap?.[`team_${ti+1}_bans`] || [])?.length" class="bans-text">BANS</div>
+                        <transition name="fade" mode="out-in" :duration="250">
+                            <div v-if="(bans[ti] || [])?.length === 1" class="bans-text">BAN</div>
+                            <div v-else-if="(bans[ti] || [])?.length" class="bans-text">BANS</div>
+                        </transition>
                     </transition>
                 </div>
             </div>
             <div class="players">
                 <div v-for="num of maxPlayers" :key="num" class="player">
-                    <transition name="fade" mode="out-in">
-                        <div v-if="picks[ti]?.[num-1]?.name" :key="picks[ti]?.[num-1]?.id" class="pick bg-center flex-center" :style="resizedImage(picks[ti][num-1], ['main_image', 'icon'], 'h-500')">
+                    <transition name="fade" mode="out-in" :duration="250">
+                        <div v-if="picks[ti]?.[num-1]?.name" :key="picks[ti]?.[num-1]?.id" class="pick flex-center">
+                            <div class="pick-number">{{ getPickBanItem(pickBanOrder, "pick", ti+1, num - 1)?.countOfType }}</div>
+                            <div class="pick-image bg-center" :style="resizedImage(picks[ti][num-1], ['main_image', 'icon'], 'h-500')"></div>
                             <div class="pick-text" :style="themeBackground1(broadcast?.event)">{{ picks[ti]?.[num-1]?.name }}</div>
                         </div>
-                        <div v-else class="placeholder"></div>
+                        <div v-else class="pick pick-placeholder flex-center" :class="{'pick-next': picks[ti]?.[num-1]?.orderItem?.num === (currentPickBan + 1) }">
+                            <div class="pick-number">{{ picks[ti]?.[num-1]?.orderItem?.countOfType }}</div>
+                        </div>
                     </transition>
                 </div>
             </div>
@@ -54,10 +65,15 @@
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles.js";
 import { resizedImage } from "@/utils/images.js";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
+import { getPickBanItem, processPickBanOrder } from "@/utils/content-utils.js";
 
 export default {
     name: "HeroDraft",
-    props: ["broadcast", "match"],
+    props: ["broadcast", "match", "showAll"],
+    data: () => ({
+        currentPickBan: 0,
+        manualDraftAdvancing: true
+    }),
     computed: {
         middle() {
             // if (!this.match) return "vs";
@@ -104,19 +120,46 @@ export default {
                 number: map.number || i + 1
             })).filter(map => !map.banner);
 
-            let currentMap = maps.find(map => !(map.draw || map.winner));
+            let currentMap = maps.find(map => !(map.draw || map.winner)) || maps[maps.length - 1];
 
             console.log(currentMap);
 
             return currentMap;
         },
+        pickBanOrder() {
+            return processPickBanOrder(this.match?.pick_ban_order, this.currentMap?.flip_pick_ban_order);
+        },
         picks() {
             if (!this.currentMap?.id) return [[], []];
 
-            return [
-                (this.currentMap?.team_1_picks || []),
-                (this.currentMap?.team_2_picks || []),
-            ];
+            if (this.pickBanOrder?.length) {
+                // pad
+                return [
+                    this.padPickBans(this.currentMap?.team_1_picks || [], this.pickBanOrder.filter(o => o.type === "pick" && o.team === 1).length, "pick", 1, this.currentPickBan),
+                    this.padPickBans(this.currentMap?.team_2_picks || [], this.pickBanOrder.filter(o => o.type === "pick" && o.team === 2).length, "pick", 2, this.currentPickBan),
+                ];
+            } else {
+                return [
+                    (this.currentMap?.team_1_picks || []),
+                    (this.currentMap?.team_2_picks || []),
+                ];
+            }
+        },
+        bans() {
+            if (!this.currentMap?.id) return [[], []];
+
+            if (this.pickBanOrder?.length) {
+                // pad
+                return [
+                    this.padPickBans(this.currentMap?.team_1_bans || [], this.pickBanOrder.filter(o => o.type === "ban" && o.team === 1).length, "ban", 1, this.currentPickBan),
+                    this.padPickBans(this.currentMap?.team_2_bans || [], this.pickBanOrder.filter(o => o.type === "ban" && o.team === 2).length, "ban", 2, this.currentPickBan),
+                ];
+            } else {
+                return [
+                    (this.currentMap?.team_1_bans || []),
+                    (this.currentMap?.team_2_bans || []),
+                ];
+            }
         },
         draftText() {
             const items = [];
@@ -136,7 +179,59 @@ export default {
             return items.join(" - ");
         }
     },
-    methods: { logoBackground1, resizedImage, themeBackground1 },
+    methods: {
+        getPickBanItem,
+        padPickBans(arr, count, type, team, manualAdvanceIndex) {
+            console.log("pad pick ban", { arr, count, type, team });
+
+            const out = [];
+
+            for (let i = 0; i < Math.max(arr.length, count); i++) {
+                let placeholder = { id: `placeholder-${i}`, placeholder: true, orderItem: getPickBanItem(this.pickBanOrder, type, team, i) };
+
+                if (this.manualDraftAdvancing && !this.showAll) {
+                    // make sure order item calculated num is above or equal to this.currentPickBan
+                    console.log("manual draft advancing", placeholder.orderItem, manualAdvanceIndex);
+
+                    if (placeholder.orderItem?.num <= manualAdvanceIndex) {
+                        out.push(arr[i] ?? placeholder);
+                    } else {
+                        out.push(placeholder);
+                    }
+
+                } else {
+                    out.push(arr[i] ?? placeholder);
+                }
+            }
+
+            console.log(out);
+            return out;
+        },
+        resetPickBan() {
+            console.log("reset pick ban");
+            this.currentPickBan = 0;
+            this.manualDraftAdvancing = true;
+        },
+        logoBackground1, resizedImage, themeBackground1
+    },
+    watch: {
+        "match.id": {
+            immediate: true,
+            handler(id, oldId) {
+                console.log("match ID change", id, oldId);
+                this.resetPickBan();
+            }
+        }
+    },
+    sockets: {
+        advance_draft() {
+            this.currentPickBan++;
+            console.log(this.currentPickBan);
+        },
+        reset_draft() {
+            this.resetPickBan();
+        }
+    }
 };
 </script>
 
@@ -216,6 +311,17 @@ export default {
     height: 100%;
     background-size: cover;
     position: relative;
+    background-image: radial-gradient(transparent, rgba(0,0,0,0.2));
+    align-items: flex-start;
+}
+.pick-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+}
+.pick-number {
+    z-index: 1;
 }
 .ban-icon {
     width: 90%;
@@ -256,4 +362,10 @@ export default {
 .right .team-bans {
     flex-direction: row-reverse;
 }
+
+.pick-placeholder {
+    width: 100%;
+    height: 100%;
+}
+
 </style>

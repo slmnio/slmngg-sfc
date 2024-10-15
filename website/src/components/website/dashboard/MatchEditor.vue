@@ -191,7 +191,22 @@
                                                 {{ teams[0]?.name }} Picks
                                             </div>
                                             <div class="form-button">
-                                                <heroes-picker v-model="team_1_picks[mapI]" :game="match?.game || match?.event?.game" />
+                                                <heroes-picker
+                                                    v-model="team_1_picks[mapI]"
+                                                    :game="match?.game || match?.event?.game"
+                                                    :pick-ban-order="pickBanOrder[mapI]"
+                                                    :current-action="{ team: 1, type: 'pick' }" />
+                                            </div>
+                                        </div>
+                                        <div v-if="hideMatchExtras && pickBanOrder[mapI]?.length" class="flip-controls flex-center flex-column h-100">
+                                            <div>
+                                                <i v-b-tooltip="'Flip pick/ban order'" class="fas fa-exchange"></i>
+                                            </div>
+                                            <div>
+                                                <b-form-checkbox
+                                                    v-model="flip_pick_ban_order[mapI]"
+                                                    size="lg"
+                                                />
                                             </div>
                                         </div>
                                         <div class="hero-picks">
@@ -199,7 +214,11 @@
                                                 {{ teams[1]?.name }} Picks
                                             </div>
                                             <div class="form-button">
-                                                <heroes-picker v-model="team_2_picks[mapI]" :game="match?.game || match?.event?.game" />
+                                                <heroes-picker
+                                                    v-model="team_2_picks[mapI]"
+                                                    :game="match?.game || match?.event?.game"
+                                                    :pick-ban-order="pickBanOrder[mapI]"
+                                                    :current-action="{ team: 2, type: 'pick' }" />
                                             </div>
                                         </div>
                                     </div>
@@ -209,7 +228,11 @@
                                                 {{ teams[0]?.name }} Bans
                                             </div>
                                             <div class="form-button">
-                                                <heroes-picker v-model="team_1_bans[mapI]" :game="match?.game || match?.event?.game" />
+                                                <heroes-picker
+                                                    v-model="team_1_bans[mapI]"
+                                                    :game="match?.game || match?.event?.game"
+                                                    :pick-ban-order="pickBanOrder[mapI]"
+                                                    :current-action="{ team: 1, type: 'ban' }" />
                                             </div>
                                         </div>
                                         <div class="hero-bans">
@@ -217,7 +240,11 @@
                                                 {{ teams[1]?.name }} Bans
                                             </div>
                                             <div class="form-button">
-                                                <heroes-picker v-model="team_2_bans[mapI]" :game="match?.game || match?.event?.game" />
+                                                <heroes-picker
+                                                    v-model="team_2_bans[mapI]"
+                                                    :game="match?.game || match?.event?.game"
+                                                    :pick-ban-order="pickBanOrder[mapI]"
+                                                    :current-action="{ team: 2, type: 'ban' }" />
                                             </div>
                                         </div>
                                     </div>
@@ -304,7 +331,7 @@
 import { authenticatedRequest } from "@/utils/dashboard";
 import ContentThing from "@/components/website/ContentThing";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
-import { cleanID, dirtyID, formatTime, textSort } from "@/utils/content-utils";
+import { cleanID, dirtyID, formatTime, processPickBanOrder, textSort } from "@/utils/content-utils";
 import TeamPicker from "@/components/website/dashboard/TeamPicker";
 import MapScoreEditor from "@/components/website/dashboard/MapScoreEditor";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";
@@ -339,6 +366,7 @@ export default {
         mapNumbers: [],
         existingMapIDs: [],
         replayCodes: [],
+        flip_pick_ban_order: [],
         team_1_picks: [],
         team_2_picks: [],
         team_1_bans: [],
@@ -538,6 +566,7 @@ export default {
                     score_1: this.score_1s[i],
                     score_2: this.score_2s[i],
                     number: this.mapNumbers[i],
+                    flip_pick_ban_order: this.flip_pick_ban_order[i],
                     team_1_picks: (this.team_1_picks[i] || []),
                     team_2_picks: (this.team_2_picks[i] || []),
                     team_1_bans: (this.team_1_bans[i] || []),
@@ -562,7 +591,13 @@ export default {
                 score_1: this.proposedData?.matchData?.score_1 || 0,
                 score_2: this.proposedData?.matchData?.score_2 || 0
             };
-        }
+        },
+        pickBanOrder() {
+            return this.maps.map((map, i) => {
+                return processPickBanOrder(this.match?.pick_ban_order, this.flip_pick_ban_order[i]);
+            });
+
+        },
         // loadedFully() {
         //     const test = [
         //         this.match.__loading,
@@ -654,6 +689,7 @@ export default {
             this.banners = [];
             this.score_1s = [];
             this.score_2s = [];
+            this.flip_pick_ban_order = [];
             this.team_1_picks = [];
             this.team_2_picks = [];
             this.team_1_bans = [];
@@ -676,6 +712,7 @@ export default {
                 mapNumbers: Object.assign([], this.mapNumbers),
                 mapChoices: Object.assign([], this.mapChoices),
                 replayCodes: Object.assign([], this.replayCodes),
+                flip_pick_ban_order: Object.assign([], this.flip_pick_ban_order),
                 team_1_picks: Object.assign([], this.team_1_picks),
                 team_2_picks: Object.assign([], this.team_2_picks),
                 team_1_bans: Object.assign([], this.team_1_bans),
@@ -707,6 +744,7 @@ export default {
                     this.setIfNew("score_2s", i, map.score_2);
                     this.setIfNew("replayCodes", i, map.replay_code);
                     this.setIfNew("mapNumbers", i, map.number);
+                    this.setIfNew("flip_pick_ban_order", i, map.flip_pick_ban_order);
                     this.setIfNew("team_1_picks", i, (map.team_1_picks || []).map(obj => dirtyID(obj?.id || obj)));
                     this.setIfNew("team_2_picks", i, (map.team_2_picks || []).map(obj => dirtyID(obj?.id || obj)));
                     this.setIfNew("team_1_bans", i, (map.team_1_bans || []).map(obj => dirtyID(obj?.id || obj)));
@@ -734,6 +772,7 @@ export default {
                 mapNumbers: Object.assign([], this.mapNumbers),
                 mapChoices: Object.assign([], this.mapChoices),
                 replayCodes: Object.assign([], this.replayCodes),
+                flip_pick_ban_order: Object.assign([], this.flip_pick_ban_order),
                 team_1_picks: Object.assign([], this.team_1_picks),
                 team_2_picks: Object.assign([], this.team_2_picks),
                 team_1_bans: Object.assign([], this.team_1_bans),
@@ -1076,9 +1115,9 @@ export default {
         justify-content: center;
         align-items: center;
         padding-bottom: .5rem;
-        min-width: 50%;
         padding-left: .5rem;
         padding-right: .5rem;
+        flex-grow: 1;
     }
     .hero-picks-container, .hero-bans-container {
         display: flex;

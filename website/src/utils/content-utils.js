@@ -855,3 +855,32 @@ export function formatDuration(duration) {
     parts.push(Math.floor(duration % 60));
     return parts.map(e => e.toString().padStart(2, "0")).join(":");
 }
+
+export function processPickBanOrder(order, flip) {
+    if (!order) return null;
+    let counts = {};
+    return order.split(",").map((text, i) => {
+        const item = {
+            type: (text.startsWith("pick") ? "pick" : (text.startsWith("ban") ? "ban" : null)),
+            team: (text.endsWith("1") ? (flip ? 2 : 1) : (text.endsWith("2") ? (flip ? 1 : 2) : null)),
+            num: i + 1
+        };
+
+        if (item.type && item.team) {
+            if (!counts?.[item.type]) {
+                counts[item.type] = {};
+            }
+            if (!counts?.[item.type]?.[item.team]) {
+                counts[item.type][item.team] = 0;
+            }
+            counts[item.type][item.team]++;
+            item.countOfType = counts[item.type][item.team];
+        }
+        return item;
+    });
+
+}
+
+export function getPickBanItem(order, type, team, index) {
+    return order.find(o => o.team === team && o.type === type && o.countOfType === (index + 1));
+}

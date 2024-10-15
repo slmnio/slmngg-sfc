@@ -1,11 +1,15 @@
 <template>
     <div class="heroes-picker d-flex flex-column gap-1">
         <div v-for="i of count" :key="i" class="form-group d-flex align-items-center">
+            <div v-if="pickBanOrder?.length && currentAction" class="draft-number">
+                {{ getPickBanItem(pickBanOrder, currentAction?.type, currentAction?.team, i - 1)?.num }}
+            </div>
             <div class="hero-icon bg-center" :style="resizedImage(getHero(localValue[i - 1]), ['icon', 'main_image'], 's-100')">
             </div>
             <b-form-select
                 v-model="localValue[i - 1]"
                 :options="heroOptions"
+                :state="checkState(i-1)"
                 size="sm"
                 @keydown.delete="() => {localValue[i - 1] = null; setHero(i-1, null)}"
                 @change="(e) => setHero(i-1, e.target.value)" />
@@ -17,29 +21,20 @@
 </template>
 
 <script>
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
-import { dirtyID } from "@/utils/content-utils.js";
+import { ReactiveArray, ReactiveRoot } from "@/utils/reactive.js";
+import { dirtyID, getPickBanItem } from "@/utils/content-utils.js";
 import { resizedImage } from "@/utils/images.js";
 import { sortAlpha } from "@/utils/sorts.js";
 
 export default {
     name: "HeroesPicker",
-    props: ["title", "modelValue", "game"],
+    props: ["title", "modelValue", "game", "pickBanOrder", "currentAction"],
     emits: ["update:modelValue"],
     data: () => ({
         count: 1,
         localValue: []
     }),
     computed: {
-        // getheroOptions() {
-        //     // Get Heroes table
-        //     // Get any OW hero only
-        //     let heroIDs = (await Cache.get("Heroes"))?.ids;
-        //     if (!heroIDs?.length) return [];
-        //     let heroes = await Promise.all(heroIDs.map(async id => await Cache.get(id)));
-        //     return heroes.filter(h => h.game === "Overwatch");
-        // }
-
         heroes() {
             return (ReactiveRoot("Heroes", {
                 "ids": ReactiveArray("ids")
@@ -67,6 +62,7 @@ export default {
         }
     },
     methods: {
+        getPickBanItem,
         resizedImage,
         setHero(i,id) {
             const data = [...this.localValue];
@@ -76,7 +72,17 @@ export default {
         getHero(id) {
             if (!id) return null;
             return (this.heroes || []).find(h => dirtyID(h?.id) === id);
-        }
+        },
+        checkState(index) {
+            // return false for invalid state
+            // no duplicates
+
+            // this is an airtable limitation regardless of how games work
+            if (!this.localValue?.[index]) return null;
+            if (this.localValue.filter(x => x === this.localValue[index]).length > 1) return false;
+
+            return null;
+        },
     },
     watch: {
         modelValue: {
@@ -98,5 +104,11 @@ export default {
     height: calc(2em - 1px);
     flex-shrink: 0;
     border-radius: .25em;
+}
+.draft-number {
+    font-weight: bold;
+    min-width: 1.5em;
+    flex-shrink: 0;
+    text-align: center;
 }
 </style>

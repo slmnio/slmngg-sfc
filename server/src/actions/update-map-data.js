@@ -72,6 +72,10 @@ export default {
                 if (!recordUpdates[existingMap.id]) recordUpdates[existingMap.id] = {};
                 recordUpdates[existingMap.id].Draw = newMap.draw;
             }
+            if (newMap.flip_pick_ban_order !== existingMap.flip_pick_ban_order) {
+                if (!recordUpdates[existingMap.id]) recordUpdates[existingMap.id] = {};
+                recordUpdates[existingMap.id]["Flip Pick Ban Order"] = newMap.flip_pick_ban_order;
+            }
             if (newMap.score_1 !== existingMap.score_1) {
                 if (!recordUpdates[existingMap.id]) recordUpdates[existingMap.id] = {};
                 recordUpdates[existingMap.id]["Score 1"] = newMap.score_1;

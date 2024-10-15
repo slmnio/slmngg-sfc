@@ -69,6 +69,13 @@ export default {
                 }
             },
             {
+                text: "Hero Draft",
+                value: {
+                    hasText: false,
+                    text: "Hero Draft"
+                }
+            },
+            {
                 text: "Predictions",
                 value: {
                     hasText: false,

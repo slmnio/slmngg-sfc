@@ -21,7 +21,11 @@
                 :pronouns-on-newline="pronounsOnNewline" />
         </transition-group>
         <transition tag="div" mode="out-in" name="break-content">
-            <HeroDraft v-if="liveMatch && useHeroDraft" class="hero-draft" :broadcast="broadcast" :match="liveMatch" />
+            <HeroDraft
+                v-if="liveMatch && useHeroDraft"
+                class="hero-draft"
+                :broadcast="broadcast"
+                :match="liveMatch" />
             <MatchScoreboard
                 v-else-if="liveMatch && useScoreboard"
                 key="scoreboard"

@@ -403,14 +403,14 @@ function getNoSunAbbreviation(abbrev) {
  *
  * @param {ParsableDate | Date | number | Array<number> | string} timeString - spacetime parsable date/time string
  * @param {string?} tz - site timezone from store
- * @param {string?} format - override for format
+ * @param {string} format - override for format
  * @param {boolean?} use24HourTime - use 24 hour time
  * @returns {string}
  */
 export function formatTime(timeString, { tz, use24HourTime = false, format = "{day-short} {date-ordinal} {month-short} {year} {time} {tz}" } = {}) {
     if (!tz) tz = useSettingsStore().timezone;
     const timezone = getTimezone(tz);
-    const time = spacetime(timeString).goto(timezone);
+    const time = spacetime((new Date(timeString)).getTime()).goto(timezone);
     const abbrev = getAbbrev(timezone, time);
     return time.format(
         format

@@ -126,7 +126,9 @@ export default {
 
     .team-text-box {
         width: 515px;
+        position: absolute;
         line-height: 1;
+        top: calc(100% - 150px);
         height: 300px;
         display: flex;
         justify-content: center;
@@ -147,6 +149,7 @@ export default {
         text-align: center;
         padding: 0.25em 0.5em;
         line-height: 1;
+        width: 515px;
     }
     .team-text-vertical {
         background-color: #333;
@@ -165,6 +168,7 @@ export default {
         background-color: white;
         width: 3em;
         text-align: center;
+        z-index: 1;
     }
     .vs-vertical {
         font-size: 5em;

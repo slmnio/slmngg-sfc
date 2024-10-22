@@ -2,6 +2,21 @@
     <div class="mvp-overlay">
         <div v-if="mvp">
             <div class="text-container">
+
+                <!-- <div class="sponsor-holder" v-if="sponsor">
+                    <ThemeTransition
+                        start="right"
+                        :theme="themeBackground"
+                        :active="animationActive"
+                        :starting-delay="200"
+                        :duration="300">
+                        <div class="sponsor-name-holder" :style="themeBackground">
+                            <div class="sponsor-name">Presented by</div>
+                        </div>
+                    </ThemeTransition>
+                </div> -->
+                <div class="break-sponsor-logo bg-center" :style="logo(sponsor)"></div>
+
                 <div class="title-holder">
                     <ThemeTransition
                         start="right"
@@ -43,11 +58,12 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 import { themeBackground1 } from "@/utils/theme-styles";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
 import { useStatusStore } from "@/stores/statusStore";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "MVPOverlay",
     components: { ThemeTransition, ThemeLogo, RecoloredHero },
-    props: ["broadcast", "title", "animationActive"],
+    props: ["broadcast", "title", "animationActive", "sponsor"],
     computed: {
         match() {
             return ReactiveRoot(this.broadcast?.live_match?.[0], {
@@ -89,7 +105,18 @@ export default {
         },
         themeBackground() {
             return themeBackground1(this.mvpTeam);
-        }
+        },
+        sponsor() {
+            if (!this.broadcast?.sponsors) return null;
+            return ReactiveArray("sponsors", {
+                theme: ReactiveThing("theme"),
+            })(this.broadcast)[0];
+        },
+    },
+    methods: {
+        logo (theme) {
+            return resizedImage(theme, ["default_wordmark", "default_logo"], "h-300");
+        },
     },
     watch: {
         mvpTeam: {
@@ -117,10 +144,17 @@ export default {
         right: -5vw;
         top: -12vh;
     }
+    /* .hero {
+        filter: blur(10px);
+        opacity: 40%;
+        z-index: -1;
+    } */
     .text-container {
         position: absolute;
         width: 60vw;
+        /* width: 100%; */
         height: 100vh;
+        /* right: 200px; */
         text-align: center;
         justify-content: center;
         align-items: center;
@@ -132,6 +166,27 @@ export default {
     }
     .title-holder {
         min-height: 168px;
+    }
+    .sponsor-holder {
+        padding-top: 80px;
+        min-height: 64px;
+    }
+    .sponsor-name-holder {
+        display: flex;
+        flex-direction: column;
+        border-bottom: 8px solid transparent;
+    }
+    .sponsor-name {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        font-size: 2em;
+        padding: 0 0.5em;
+    }
+    .break-sponsor-logo {
+        position: relative;
+        width: 300px;
+        height: 150px;
     }
     .title {
         display: flex;

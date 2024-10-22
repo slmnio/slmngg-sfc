@@ -52,8 +52,7 @@ export default [
             showSponsors: route.query.sponsors || route.query.showSponsors
         })
     },
-    { path: "versus", component: () => import("@/components/broadcast/roots/VersusOverlay.vue") },
-    { path: "vertical-versus", component: () => import("@/components/broadcast/roots/VerticalVersusOverlay.vue") },
+    { path: "versus", component: () => import("@/components/broadcast/roots/VersusOverlay.vue"), props: route => ({ vertical: route.query.vertical}) },
     {
         path: "winners",
         component: () => import("@/components/broadcast/roots/WinnersOverlay.vue"),

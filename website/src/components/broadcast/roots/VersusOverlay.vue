@@ -1,20 +1,24 @@
 <template>
     <div class="versus-overlay d-flex flex-column">
-        <transition name="fly-down">
+        <transition v-if="!vertical" name="fly-down">
             <div v-if="animationActive" class="top-logo-holder flex-center">
                 <div class="logo bg-center" :style="eventLogo"></div>
             </div>
         </transition>
         <transition name="fly-sides">
-            <div v-if="animationActive" class="versus-block-holder flex-center">
-                <div v-for="team in teams" :key="team.id" class="team" :style="getTeamStyle(team)">
-                    <div class="team-logo bg-center" :style="getTeamLogo(team)"></div>
-                    <div class="team-text-box">
+            <div v-if="animationActive" class="flex-center" :class="vertical ? 'versus-block-holder-vertical' : 'versus-block-holder'">
+                <div v-if="animationActive && vertical" class="header-vertical slant">
+                    <div class="reverse-slant">UP NEXT</div>
+                </div>
+                <div v-for="(team, i) in teams" :key="team.id" :class="vertical ? 'team-text-box-vertical' : 'team'" :style="{...getTeamStyle(team), order: i * 2}">
+                    <div v-if="!vertical" class="team-logo bg-center" :style="getTeamLogo(team)"></div>
+                    <div v-if="!vertical" class="team-text-box">
                         <div class="team-text">{{ team.name }}</div>
                     </div>
+                    <div v-if="vertical" class="team-text-vertical">{{ team.name }}</div>
                 </div>
                 <transition name="slide-out">
-                    <div v-if="animationActive" class="vs slant">
+                    <div v-if="animationActive" class="slant" :class="vertical ? 'vs-vertical' : 'vs'">
                         <div class="reverse-slant">{{ versusText }}</div>
                     </div>
                 </transition>
@@ -31,7 +35,8 @@ export default {
     name: "VersusOverlay",
     props: {
         broadcast: {},
-        animationActive: Boolean
+        animationActive: Boolean,
+        vertical: Boolean
     },
     computed: {
         match() {
@@ -107,6 +112,13 @@ export default {
         position: relative;
     }
 
+    .versus-block-holder-vertical {
+        height: 100%;
+        position: relative;
+        flex-direction: column;
+        row-gap: 2em;
+    }
+
     .team-logo {
         height: 100%;
         width: 100%;
@@ -114,10 +126,14 @@ export default {
 
     .team-text-box {
         width: 515px;
-        position: absolute;
         line-height: 1;
-        top: calc(100% - 150px);
         height: 300px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .team-text-box-vertical {
+        line-height: 1;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -130,8 +146,16 @@ export default {
         font-size: 42px;
         text-align: center;
         padding: 0.25em 0.5em;
-        width: 515px;
-        position: absolute;
+        line-height: 1;
+    }
+    .team-text-vertical {
+        background-color: #333;
+        color: white;
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 84px;
+        text-align: center;
+        padding: 0.25em 0.5em;
         line-height: 1;
     }
     .vs {
@@ -140,6 +164,20 @@ export default {
         font-weight: bold;
         background-color: white;
         width: 3em;
+        text-align: center;
+    }
+    .vs-vertical {
+        font-size: 5em;
+        font-weight: bold;
+        background-color: white;
+        width: 3em;
+        text-align: center;
+    }
+    .header-vertical {
+        font-size: 5em;
+        font-weight: bold;
+        background-color: white;
+        width: 5em;
         text-align: center;
     }
 

@@ -18,6 +18,7 @@
                     :timezone="broadcast?.timezone"
                     :match="match"
                     :expanded="false"
+                    :times="true"
                     :theme-color="themeColor" />
             </div>
         </div>
@@ -40,25 +41,30 @@
                     v-html="nbr(title || broadcast.title)"></span>
             </transition>
         </div>
+        <div v-if="showSponsors" class="lbar-sponsors-holder">
+            <Sponsors class="lbar-sponsors" :sponsors="sponsorThemes" />
+        </div>
     </div>
 </template>
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import BreakMatch from "@/components/broadcast/break/BreakMatch.vue";
-import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
+import { ReactiveArray, ReactiveThing, ReactiveRoot } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
-import { themeBackground1 } from "@/utils/theme-styles";
+import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import Countdown from "@/components/broadcast/Countdown.vue";
+import Sponsors from "@/components/broadcast/Sponsors.vue";
 
 export default {
     name: "LBarOverlay",
-    components: { Countdown, BreakMatch, ThemeLogo },
+    components: { Countdown, BreakMatch, ThemeLogo, Sponsors },
     props: {
         broadcast: {},
         client: {},
         virtualMatch: {},
-        title: String
+        title: String,
+        showSponsors: String
     },
     computed: {
         fullSchedule() {
@@ -81,16 +87,27 @@ export default {
         },
         countdownText() {
             if (!this.broadcast.countdown_end) return "LOCAL TIME";
-            if (this.schedule && this.schedule.filter(s => [s.score_1, s.score_2].some(_s => _s)).length === 0) { return "STARTING IN"; }
+            if (this.schedule && this.schedule.filter(s => [s.score_1, s.score_2].some((_s) => _s)).length === 0) { return "STARTING IN"; }
             return "BACK IN";
-        }
+        },
+        sponsorThemes() {
+            if (!this.broadcast?.sponsors) return null;
+            return ReactiveArray("sponsors", {
+                theme: ReactiveThing("theme"),
+            })(this.broadcast);
+        },
     },
     methods: {
         nbr(text) {
             if (!text) return "";
             return text.replace(/\\n/g, "<br>");
-        }
-    }
+        },
+        getTeamStyle(team) {
+            return {
+                ...logoBackground1(team),
+            };
+        },
+    },
 };
 </script>
 
@@ -104,7 +121,6 @@ export default {
         grid-template-rows: repeat(2, 1fr);
     }
 
-
     .content {
         --content-width: 1504px;
         width: var(--content-width);
@@ -115,7 +131,7 @@ export default {
         width: 100%;
         font-size: 48px;
         line-height: 1;
-        padding: 0.25em 0
+        padding: 0.25em 0;
     }
     .countdown-group .countdown-timer {
         font-size: 2.5em;

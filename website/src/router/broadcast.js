@@ -52,7 +52,7 @@ export default [
             showSponsors: route.query.sponsors || route.query.showSponsors
         })
     },
-    { path: "versus", component: () => import("@/components/broadcast/roots/VersusOverlay.vue") },
+    { path: "versus", component: () => import("@/components/broadcast/roots/VersusOverlay.vue"), props: route => ({ vertical: route.query.vertical}) },
     {
         path: "winners",
         component: () => import("@/components/broadcast/roots/WinnersOverlay.vue"),
@@ -204,7 +204,7 @@ export default [
             animate: route.query.animate
         })
     },
-    { path: "l-bar", component: () => import("@/components/broadcast/roots/LBarOverlay") },
+    { path: "l-bar", component: () => import("@/components/broadcast/roots/LBarOverlay"), props: route => ({ showSponsors: route.query.sponsors}) },
     { path: "background", component: () => import("@/components/broadcast/BroadcastBackground.vue"), props: route => ({ index: route.query.index }) },
     { path: "sponsors", component: () => import("@/components/broadcast/roots/SponsorOverlay.vue") },
     { path: "maps", component: () => import("@/components/broadcast/roots/MapsOverlay.vue"), props: route => ({ autoTitle: route.query.auto }) },
@@ -252,7 +252,9 @@ export default [
         })
     },
     { path: "broadcasts", alias: ["other-streams", "other-broadcasts"], component: () => import("@/components/broadcast/roots/OtherBroadcastsOverlay.vue") },
-    { path: "mvp", component: () => import("@/components/broadcast/roots/MVPOverlay.vue") },
+    { path: "mvp", component: () => import("@/components/broadcast/roots/MVPOverlay.vue"), props: route => ({
+        showSponsor: route.query.sponsor
+    }) },
     {
         path: "ingame-comms",
         component: () => import("@/components/broadcast/roots/IngameCommsOverlay.vue"),

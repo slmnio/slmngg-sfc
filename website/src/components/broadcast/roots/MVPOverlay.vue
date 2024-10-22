@@ -2,6 +2,8 @@
     <div class="mvp-overlay">
         <div v-if="mvp">
             <div class="text-container">
+                <div v-if="showSponsor" class="break-sponsor-logo bg-center" :style="logo(sponsor)"></div>
+
                 <div class="title-holder">
                     <ThemeTransition
                         start="right"
@@ -43,11 +45,12 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 import { themeBackground1 } from "@/utils/theme-styles";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
 import { useStatusStore } from "@/stores/statusStore";
+import { resizedImage } from "@/utils/images";
 
 export default {
     name: "MVPOverlay",
     components: { ThemeTransition, ThemeLogo, RecoloredHero },
-    props: ["broadcast", "title", "animationActive"],
+    props: ["broadcast", "title", "animationActive", "showSponsor"],
     computed: {
         match() {
             return ReactiveRoot(this.broadcast?.live_match?.[0], {
@@ -89,7 +92,18 @@ export default {
         },
         themeBackground() {
             return themeBackground1(this.mvpTeam);
-        }
+        },
+        sponsor() {
+            if (!this.broadcast?.sponsors) return null;
+            return ReactiveArray("sponsors", {
+                theme: ReactiveThing("theme"),
+            })(this.broadcast)[0];
+        },
+    },
+    methods: {
+        logo (theme) {
+            return resizedImage(theme, ["default_wordmark", "default_logo"], "h-300");
+        },
     },
     watch: {
         mvpTeam: {
@@ -132,6 +146,11 @@ export default {
     }
     .title-holder {
         min-height: 168px;
+    }
+    .break-sponsor-logo {
+        position: relative;
+        width: 300px;
+        height: 150px;
     }
     .title {
         display: flex;

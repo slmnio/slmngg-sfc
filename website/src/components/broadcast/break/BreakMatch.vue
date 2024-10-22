@@ -2,7 +2,7 @@
     <div class="break-match flex-center" :class="{'expanded': expanded, 'has-scores': hasScore}" :data-center="centerShow">
         <div v-if="!expanded" class="match-next-details">
             <transition name="fade" mode="out-in">
-                <span :key="match ? match.round : 'empty'">{{ hasFinished ? 'FINAL SCORE:' : 'UP NEXT:' }} {{ match && match.round }}</span>
+                <span :key="match ? match.round : 'empty'">{{ textPrefix }} {{ match && match.round }}</span>
             </transition>
         </div>
         <!--
@@ -67,7 +67,7 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "BreakMatch",
-    props: ["match", "expanded", "timezone", "live", "themeColor"],
+    props: ["match", "expanded", "timezone", "live", "themeColor", "times"],
     computed: {
         teams() {
             if (this.match?.special_event) return [];
@@ -144,6 +144,12 @@ export default {
 
 
             // return null;
+        },
+        textPrefix() {
+            if (this.times && this.start) {
+                return `${this.start}:`
+            }
+            return this.hasFinished ? 'FINAL SCORE:' : 'UP NEXT:'
         }
     },
     methods: {

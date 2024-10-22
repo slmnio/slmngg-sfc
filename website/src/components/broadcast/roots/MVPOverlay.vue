@@ -2,19 +2,6 @@
     <div class="mvp-overlay">
         <div v-if="mvp">
             <div class="text-container">
-
-                <!-- <div class="sponsor-holder" v-if="sponsor">
-                    <ThemeTransition
-                        start="right"
-                        :theme="themeBackground"
-                        :active="animationActive"
-                        :starting-delay="200"
-                        :duration="300">
-                        <div class="sponsor-name-holder" :style="themeBackground">
-                            <div class="sponsor-name">Presented by</div>
-                        </div>
-                    </ThemeTransition>
-                </div> -->
                 <div class="break-sponsor-logo bg-center" :style="logo(sponsor)"></div>
 
                 <div class="title-holder">
@@ -144,17 +131,10 @@ export default {
         right: -5vw;
         top: -12vh;
     }
-    /* .hero {
-        filter: blur(10px);
-        opacity: 40%;
-        z-index: -1;
-    } */
     .text-container {
         position: absolute;
         width: 60vw;
-        /* width: 100%; */
         height: 100vh;
-        /* right: 200px; */
         text-align: center;
         justify-content: center;
         align-items: center;

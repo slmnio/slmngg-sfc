@@ -146,7 +146,7 @@ export default {
             // return null;
         },
         textPrefix() {
-            if (this.times && this.match.start) {
+            if (this.times && this.start) {
                 return `${this.start}:`
             }
             return this.hasFinished ? 'FINAL SCORE:' : 'UP NEXT:'

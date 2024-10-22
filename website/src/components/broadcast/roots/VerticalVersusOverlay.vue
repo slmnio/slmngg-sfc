@@ -68,32 +68,7 @@ export default {
     .versus-overlay {
         width: 100vw;
         height: 100vh;
-        /* background-color: gray; */
     }
-
-    /* .top-logo-holder {
-        height: 192px;
-        background-size: 340px;
-        background-repeat: no-repeat;
-        margin-top: 40px;
-        margin-bottom: 10px;
-    }
-
-    .logo {
-        height: 80%;
-        width: 100%;
-    } */
-
-    /* .team {
-        width: 100%;
-        height: 100%;
-        padding: 75px 50px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-    } */
 
     .versus-block-holder {
         margin: 210px 210px 0 210px;
@@ -103,13 +78,7 @@ export default {
         row-gap: 8em;
     }
 
-    /* .team-logo {
-        height: 100%;
-        width: 100%;
-    } */
-
     .team-text-box {
-        /* width: 100%; */
         line-height: 1;
         display: flex;
         justify-content: center;
@@ -123,7 +92,6 @@ export default {
         font-size: 84px;
         text-align: center;
         padding: 0.25em 0.5em;
-        /* width: 100%; */
         line-height: 1;
     }
     .vs {
@@ -151,67 +119,4 @@ export default {
     .reverse-slant {
         transform: skewX(calc(var(--skew) * -1));
     }
-
-    /* .fly-down-enter-active {
-        transition: 1s ease;
-    }
-    .fly-down-enter-from,
-    .fly-down-leave-to {
-        transform: translate(0, -232px);
-    }
-
-
-    .fly-sides-enter-active {
-        transition: all 5s ease;
-    }
-
-
-    .fly-sides-enter-to .team {
-        transform: translateX(0);
-    }
-
-
-    @keyframes left-in {
-        0%, 25% { transform: translateX(-1000px); }
-        100% { transform: translateX(0) }
-    }
-
-    .fly-sides-enter-active .team:nth-child(1) {
-        animation: left-in forwards 2.5s ease;
-    }
-
-
-    @keyframes right-in {
-        0%, 25% { transform: translateX(1000px); }
-        100% { transform: translateX(0) }
-    }
-    .fly-sides-enter-active .team:nth-child(2) {
-        animation: right-in forwards 2.5s ease;
-    }
-
-    @keyframes split-middle-out {
-        0%, 85% {
-            clip-path: polygon(50% 0, 50% 100%, 50% 100%, 50% 0%, 50% 0%, 50% 100%, 50% 100%, 50% 0);
-        }
-        100% {
-            clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 100% 100%, 100% 0%);
-        }
-    }
-    .fly-sides-enter-active .vs {
-        animation: split-middle-out forwards 3s ease;
-    }
-
-    @keyframes split-middle-out-text {
-        0%, 90% {
-            clip-path: polygon(50% 0, 50% 100%, 50% 100%, 50% 0%, 50% 0%, 50% 100%, 50% 100%, 50% 0);
-        }
-        100% {
-            clip-path: polygon(0% 0%, 0% 100%, 50% 100%, 50% 0, 50% 0, 50% 100%, 100% 100%, 100% 0%);
-        }
-    }
-
-    .fly-sides-enter-active .team .team-text {
-        animation: split-middle-out forwards 3.5s ease;
-    } */
-
 </style>

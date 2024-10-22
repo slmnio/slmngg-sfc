@@ -1,25 +1,14 @@
 <template>
     <div class="l-bar-overlay">
         <div class="left-bar flex-center flex-column text-center">
-            <div
-                class="countdown-group flex-center flex-column"
-                :style="themeColor"
-            >
-                <transition
-                    name="fade"
-                    mode="out-in"
-                    class="countdown-text"
-                    tag="div"
-                >
+            <div class="countdown-group flex-center flex-column" :style="themeColor">
+                <transition name="fade" mode="out-in" class="countdown-text" tag="div">
                     <span :key="countdownText" class="industry-align">
                         {{ countdownText }}
                     </span>
                 </transition>
                 <div class="countdown-timer">
-                    <Countdown
-                        :timezone="broadcast?.timezone"
-                        :to="broadcast?.countdown_end"
-                    />
+                    <Countdown :timezone="broadcast?.timezone" :to="broadcast?.countdown_end" />
                 </div>
             </div>
             <div class="schedule flex-grow-1 flex-center flex-column">
@@ -30,8 +19,7 @@
                     :match="match"
                     :expanded="false"
                     :times="true"
-                    :theme-color="themeColor"
-                />
+                    :theme-color="themeColor" />
             </div>
         </div>
         <div class="content">
@@ -42,21 +30,15 @@
                 class="event-logo w-100 h-100"
                 icon-padding="75px"
                 logo-size="w-500"
-                border-width="0"
-            />
+                border-width="0" />
         </div>
         <div class="lower-bar overlay--bg title flex-center text-center">
             <transition name="fade" mode="out-in">
                 <span
                     :key="title || broadcast.title"
                     class="title-text"
-                    :class="{
-                        'has-br': (title || broadcast.title || '').includes(
-                            '\\n'
-                        ),
-                    }"
-                    v-html="nbr(title || broadcast.title)"
-                ></span>
+                    :class="{'has-br': (title || broadcast.title || '').includes('\\n')}"
+                    v-html="nbr(title || broadcast.title)"></span>
             </transition>
         </div>
         <div v-if="showSponsors" class="lbar-sponsors-holder">

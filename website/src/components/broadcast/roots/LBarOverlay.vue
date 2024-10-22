@@ -101,23 +101,6 @@ export default {
             }
             return "BACK IN";
         },
-        teams() {
-            return this.match?.teams || [];
-        },
-        teamOne() {
-            this.teams?.[0]
-        },
-        teamTwo() {
-            this.teams?.[1]
-        },
-        match() {
-            if (!this.broadcast?.live_match?.[0]) return null;
-            return ReactiveRoot(this.broadcast?.live_match?.[0], {
-                teams: ReactiveArray("teams", {
-                    theme: ReactiveThing("theme"),
-                }),
-            });
-        },
         sponsorThemes() {
             if (!this.broadcast?.sponsors) return null;
             return ReactiveArray("sponsors", {

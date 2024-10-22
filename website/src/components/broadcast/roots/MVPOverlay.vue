@@ -50,7 +50,7 @@ import { resizedImage } from "@/utils/images";
 export default {
     name: "MVPOverlay",
     components: { ThemeTransition, ThemeLogo, RecoloredHero },
-    props: ["broadcast", "title", "animationActive", "sponsor"],
+    props: ["broadcast", "title", "animationActive", "showSponsor"],
     computed: {
         match() {
             return ReactiveRoot(this.broadcast?.live_match?.[0], {

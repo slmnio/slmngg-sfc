@@ -147,22 +147,6 @@ export default {
     .title-holder {
         min-height: 168px;
     }
-    .sponsor-holder {
-        padding-top: 80px;
-        min-height: 64px;
-    }
-    .sponsor-name-holder {
-        display: flex;
-        flex-direction: column;
-        border-bottom: 8px solid transparent;
-    }
-    .sponsor-name {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        font-size: 2em;
-        padding: 0 0.5em;
-    }
     .break-sponsor-logo {
         position: relative;
         width: 300px;

@@ -78,7 +78,7 @@ export default {
         },
         schedule() {
             if (!this.broadcast?.schedule || !this.fullSchedule) return null;
-            return this.fullSchedule.filter((m) => {
+            return this.fullSchedule.filter(m => {
                 return this.secondary ? m.show_on_secondary_overlays : m.show_on_overlays;
             }).sort(sortMatches);
         },
@@ -87,7 +87,7 @@ export default {
         },
         countdownText() {
             if (!this.broadcast.countdown_end) return "LOCAL TIME";
-            if (this.schedule && this.schedule.filter((s) => [s.score_1, s.score_2].some((_s) => _s)).length === 0) { return "STARTING IN"; }
+            if (this.schedule && this.schedule.filter(s => [s.score_1, s.score_2].some((_s) => _s)).length === 0) { return "STARTING IN"; }
             return "BACK IN";
         },
         sponsorThemes() {
@@ -146,35 +146,5 @@ export default {
     .title-text {
         font-size: 120px;
         line-height: 1.2;
-    }
-
-    .team-text-box {
-        width: 515px;
-        /* position: absolute; */
-        line-height: 1;
-        /* top: calc(100% - 150px); */
-        height: 79px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .team-text {
-        background-color: #333;
-        color: white;
-        text-transform: uppercase;
-        font-weight: bold;
-        font-size: 42px;
-        text-align: center;
-        padding: 0.25em 0.5em;
-        width: 515px;
-        position: absolute;
-        line-height: 1;
-    }
-    .teams-holder {
-        max-width: 100%;
-        justify-content: center;
-        align-items: center;
-        display: flex;
-        flex-direction: column;
     }
 </style>

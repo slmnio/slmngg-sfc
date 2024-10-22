@@ -64,7 +64,7 @@ export default {
         client: {},
         virtualMatch: {},
         title: String,
-        showSponsors: String,
+        showSponsors: String
     },
     computed: {
         fullSchedule() {
@@ -72,33 +72,22 @@ export default {
             if (!this.broadcast?.schedule) return null;
             return ReactiveArray("schedule", {
                 teams: ReactiveArray("teams", {
-                    theme: ReactiveThing("theme"),
-                }),
+                    theme: ReactiveThing("theme")
+                })
             })(this.broadcast).sort(sortMatches);
         },
         schedule() {
             if (!this.broadcast?.schedule || !this.fullSchedule) return null;
-            return this.fullSchedule
-                .filter((m) => {
-                    return this.secondary
-                        ? m.show_on_secondary_overlays
-                        : m.show_on_overlays;
-                })
-                .sort(sortMatches);
+            return this.fullSchedule.filter((m) => {
+                return this.secondary ? m.show_on_secondary_overlays : m.show_on_overlays;
+            }).sort(sortMatches);
         },
         themeColor() {
             return themeBackground1(this.broadcast?.event);
         },
         countdownText() {
             if (!this.broadcast.countdown_end) return "LOCAL TIME";
-            if (
-                this.schedule &&
-                this.schedule.filter((s) =>
-                    [s.score_1, s.score_2].some((_s) => _s)
-                ).length === 0
-            ) {
-                return "STARTING IN";
-            }
+            if (this.schedule && this.schedule.filter((s) => [s.score_1, s.score_2].some((_s) => _s)).length === 0) { return "STARTING IN"; }
             return "BACK IN";
         },
         sponsorThemes() {
@@ -123,69 +112,69 @@ export default {
 </script>
 
 <style scoped>
-.l-bar-overlay {
-    display: grid;
-    height: 100vh;
-    width: 100vw;
+    .l-bar-overlay {
+        display: grid;
+        height: 100vh;
+        width: 100vw;
 
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-}
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+    }
 
-.content {
-    --content-width: 1504px;
-    width: var(--content-width);
-    height: calc(var(--content-width) * (9 / 16));
-}
+    .content {
+        --content-width: 1504px;
+        width: var(--content-width);
+        height: calc(var(--content-width) * (9 / 16));
+    }
 
-.countdown-group {
-    width: 100%;
-    font-size: 48px;
-    line-height: 1;
-    padding: 0.25em 0;
-}
-.countdown-group .countdown-timer {
-    font-size: 2.5em;
-}
-.schedule {
-    gap: 1em;
-}
-.title-text.has-br {
-    font-size: 80px;
-    line-height: 1.2;
-}
-.title-text {
-    font-size: 120px;
-    line-height: 1.2;
-}
+    .countdown-group {
+        width: 100%;
+        font-size: 48px;
+        line-height: 1;
+        padding: 0.25em 0;
+    }
+    .countdown-group .countdown-timer {
+        font-size: 2.5em;
+    }
+    .schedule {
+        gap: 1em;
+    }
+    .title-text.has-br {
+        font-size: 80px;
+        line-height: 1.2;
+    }
+    .title-text {
+        font-size: 120px;
+        line-height: 1.2;
+    }
 
-.team-text-box {
-    width: 515px;
-    /* position: absolute; */
-    line-height: 1;
-    /* top: calc(100% - 150px); */
-    height: 79px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.team-text {
-    background-color: #333;
-    color: white;
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: 42px;
-    text-align: center;
-    padding: 0.25em 0.5em;
-    width: 515px;
-    position: absolute;
-    line-height: 1;
-}
-.teams-holder {
-    max-width: 100%;
-    justify-content: center;
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-}
+    .team-text-box {
+        width: 515px;
+        /* position: absolute; */
+        line-height: 1;
+        /* top: calc(100% - 150px); */
+        height: 79px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .team-text {
+        background-color: #333;
+        color: white;
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 42px;
+        text-align: center;
+        padding: 0.25em 0.5em;
+        width: 515px;
+        position: absolute;
+        line-height: 1;
+    }
+    .teams-holder {
+        max-width: 100%;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+    }
 </style>

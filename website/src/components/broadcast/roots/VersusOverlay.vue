@@ -6,11 +6,11 @@
             </div>
         </transition>
         <transition name="fly-sides">
-            <div v-if="animationActive" class="flex-center" :class="[vertical ? 'versus-block-holder-vertical' : 'versus-block-holder']">
+            <div v-if="animationActive" class="flex-center" :class="vertical ? 'versus-block-holder-vertical' : 'versus-block-holder'">
                 <div v-if="animationActive && vertical" class="header-vertical slant">
                     <div class="reverse-slant">UP NEXT</div>
                 </div>
-                <div v-for="team in teams" :key="team.id" :class="[vertical ? 'team-text-box-vertical' : 'team']" :style="getTeamStyle(team)">
+                <div v-for="team in teams" :key="team.id" :class="vertical ? 'team-text-box-vertical' : 'team'" :style="getTeamStyle(team)">
                     <div v-if="!vertical" class="team-logo bg-center" :style="getTeamLogo(team)"></div>
                     <div v-if="!vertical" class="team-text-box">
                         <div class="team-text">{{ team.name }}</div>
@@ -18,7 +18,7 @@
                     <div v-if="vertical" class="team-text-vertical">{{ team.name }}</div>
                 </div>
                 <transition name="slide-out">
-                    <div v-if="animationActive" class="slant" :class="[vertical ? 'vs-vertical' : 'vs']">
+                    <div v-if="animationActive" class="slant" :class="vertical ? 'vs-vertical' : 'vs'">
                         <div class="reverse-slant">{{ versusText }}</div>
                     </div>
                 </transition>

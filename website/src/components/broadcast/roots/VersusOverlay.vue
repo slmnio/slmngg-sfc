@@ -10,7 +10,7 @@
                 <div v-if="animationActive && vertical" class="header-vertical slant">
                     <div class="reverse-slant">UP NEXT</div>
                 </div>
-                <div v-for="team in teams" :key="team.id" :class="vertical ? 'team-text-box-vertical' : 'team'" :style="getTeamStyle(team)">
+                <div v-for="(team, i) in teams" :key="team.id" :class="vertical ? 'team-text-box-vertical' : 'team'" :style="{...getTeamStyle(team), order: i * 2}">
                     <div v-if="!vertical" class="team-logo bg-center" :style="getTeamLogo(team)"></div>
                     <div v-if="!vertical" class="team-text-box">
                         <div class="team-text">{{ team.name }}</div>
@@ -113,11 +113,10 @@ export default {
     }
 
     .versus-block-holder-vertical {
-        margin: 210px 210px 0 210px;
         height: 100%;
         position: relative;
         flex-direction: column;
-        row-gap: 8em;
+        row-gap: 2em;
     }
 
     .team-logo {
@@ -127,9 +126,7 @@ export default {
 
     .team-text-box {
         width: 515px;
-        position: absolute;
         line-height: 1;
-        top: calc(100% - 150px);
         height: 300px;
         display: flex;
         justify-content: center;
@@ -149,8 +146,6 @@ export default {
         font-size: 42px;
         text-align: center;
         padding: 0.25em 0.5em;
-        width: 515px;
-        position: absolute;
         line-height: 1;
     }
     .team-text-vertical {
@@ -172,7 +167,6 @@ export default {
         text-align: center;
     }
     .vs-vertical {
-        position: absolute;
         font-size: 5em;
         font-weight: bold;
         background-color: white;
@@ -180,8 +174,6 @@ export default {
         text-align: center;
     }
     .header-vertical {
-        position: absolute;
-        top: calc(100% / 2 - 325px);
         font-size: 5em;
         font-weight: bold;
         background-color: white;

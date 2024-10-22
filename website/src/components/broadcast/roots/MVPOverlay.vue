@@ -2,7 +2,7 @@
     <div class="mvp-overlay">
         <div v-if="mvp">
             <div class="text-container">
-                <div class="break-sponsor-logo bg-center" :style="logo(sponsor)"></div>
+                <div v-if="showSponsor" class="break-sponsor-logo bg-center" :style="logo(sponsor)"></div>
 
                 <div class="title-holder">
                     <ThemeTransition

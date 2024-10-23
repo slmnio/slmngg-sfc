@@ -222,7 +222,7 @@ export default {
             })?.ids || []);
             return [
                 { value: null, text: "No hero" },
-                ...["DPS", "Tank", "Support"].map(key => ({
+                ...["DPS", "Tank", "Support", "Deadlock"].map(key => ({
                     text: key,
                     options: heroes.filter(h => h.role === key).sort((a,b) => sortAlpha(a?.name, b?.name)).map(h => ({
                         text: h.name,

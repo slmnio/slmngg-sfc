@@ -2,31 +2,48 @@
     <div class="mvp-overlay">
         <div v-if="mvp">
             <div class="text-container">
-                <div v-if="showSponsor" class="break-sponsor-logo bg-center" :style="logo(sponsor)"></div>
+                <div class="all-text-holder">
+                    <div v-if="sponsor" class="sponsor-theme-holder">
+                        <ThemeTransition
+                            class="sponsor-theme-transition"
+                            start="right"
+                            :theme="sponsor"
+                            :active="animationActive"
+                            :starting-delay="200"
+                            :duration="300">
+                            <div v-if="showSponsor" class="sponsor-logo-holder flex-center">
+                                <div class="sponsor-logo bg-center" :style="logo(sponsor)"></div>
+                            </div>
+                        </ThemeTransition>
+                    </div>
+                    <div class="title-holder">
+                        <ThemeTransition
+                            start="right"
+                            :theme="themeBackground(broadcast?.event?.theme)"
+                            :active="animationActive"
+                            :starting-delay="100"
+                            :duration="500">
+                            <div class="title" :style="themeBackground(broadcast?.event?.theme)">{{ title || 'MVP' }}</div>
+                        </ThemeTransition>
+                    </div>
 
-                <div class="title-holder">
-                    <ThemeTransition
-                        start="right"
-                        :theme="themeBackground"
-                        :active="animationActive"
-                        :starting-delay="100"
-                        :duration="500">
-                        <div class="title" :style="borderColor">{{ title || 'MVP' }}</div>
-                    </ThemeTransition>
-                </div>
-
-                <div class="text-holder">
-                    <ThemeTransition
-                        start="right"
-                        :theme="themeBackground"
-                        :active="animationActive"
-                        :starting-delay="400"
-                        :duration="300">
-                        <div class="player-name-holder" :style="themeBackground">
-                            <ThemeLogo icon-padding="20%" border-width="0" :theme="mvpTeam && mvpTeam.theme" class="player-team-logo" />
-                            <div class="player-name">{{ mvp.name }}</div>
-                        </div>
-                    </ThemeTransition>
+                    <div class="text-holder">
+                        <ThemeTransition
+                            start="right"
+                            :theme="theme"
+                            :active="animationActive"
+                            :starting-delay="400"
+                            :duration="300">
+                            <div class="player-name-holder" :style="themeBackground(theme)">
+                                <ThemeLogo
+                                    icon-padding="20%"
+                                    border-width="0"
+                                    :theme="mvpTeam && mvpTeam.theme"
+                                    class="player-team-logo" />
+                                <div class="player-name">{{ mvp.name }}</div>
+                            </div>
+                        </ThemeTransition>
+                    </div>
                 </div>
             </div>
             <transition name="hero-move">
@@ -42,7 +59,7 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { themeBackground1 } from "@/utils/theme-styles";
+import { themeBackground } from "@/utils/theme-styles";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
 import { useStatusStore } from "@/stores/statusStore";
 import { resizedImage } from "@/utils/images";
@@ -90,8 +107,8 @@ export default {
                 borderColor: this.mvpTeam?.theme?.color_theme
             };
         },
-        themeBackground() {
-            return themeBackground1(this.mvpTeam);
+        theme() {
+            return (this.mvpTeam || this.broadcast?.event)?.theme;
         },
         sponsor() {
             if (!this.broadcast?.sponsors) return null;
@@ -104,6 +121,7 @@ export default {
         logo (theme) {
             return resizedImage(theme, ["default_wordmark", "default_logo"], "h-300");
         },
+        themeBackground
     },
     watch: {
         mvpTeam: {
@@ -141,16 +159,35 @@ export default {
         display: flex;
         flex-direction: column;
     }
+    .all-text-holder {
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
     .text-holder {
         min-height: 168px;
     }
     .title-holder {
         min-height: 168px;
     }
-    .break-sponsor-logo {
-        position: relative;
-        width: 300px;
-        height: 150px;
+    .sponsor-theme-transition {
+        margin-bottom: 2em;
+    }
+    .sponsor-logo-holder {
+        width: 350px;
+        height: 120px;
+    }
+    .sponsor-theme-holder {
+        position: absolute;
+        bottom: 100%;
+    }
+    .sponsor-logo {
+        width: 80%;
+        height: 80%;
     }
     .title {
         display: flex;

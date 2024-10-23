@@ -220,7 +220,10 @@ export default {
             const heroes = (ReactiveRoot("Heroes", {
                 "ids": ReactiveArray("ids")
             })?.ids || []);
-            return [
+            return this.hydratedBroadcast?.event?.game !== "Overwatch" ? [{ value: null, text: "No hero" }, ...heroes.filter(h => h.game === this.hydratedBroadcast?.event?.game).map((h) => ({
+                text: h.name,
+                value: h.id
+            }))] : [
                 { value: null, text: "No hero" },
                 ...["DPS", "Tank", "Support"].map(key => ({
                     text: key,

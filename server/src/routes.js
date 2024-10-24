@@ -74,6 +74,10 @@ export default ({ app, Cache, io }) => {
         broadcast = broadcast.data;
 
         if (!broadcast.live_match || broadcast.live_match.length === 0) return { "error": true, "message": "No match is live." };
+
+        /**
+         * @type {Match}
+         */
         let live_match = await Cache.get(cleanID(broadcast.live_match[0]));
         if (!live_match) return { "error": true, "message": "No match is live." };
         return { "error": false, data: live_match};
@@ -124,6 +128,48 @@ export default ({ app, Cache, io }) => {
                 }
                 return `${group.singular_name}: ${group.items[0]}`;
             }).join(" / "));
+
+        } catch (e) {
+            console.error(e);
+            return res.send("An error occurred loading data");
+        }
+    });
+
+    app.get("/hero-bans", async (req, res) => {
+        try {
+            if (!req.query.stream) return res.send("The 'stream' query is required.");
+
+            let live_match = await getLiveMatch(req.query.stream);
+            if (live_match.error) return res.send(live_match.message);
+            live_match = live_match.data;
+
+            /**
+             * @type {MatchMap[]}
+             */
+            const maps = await Promise.all((live_match.maps || []).map(id => Cache.get(cleanID(id))));
+
+            const eligibleMaps = maps.filter(map => !map.banner);
+            const currentMap = eligibleMaps.find(map => !(map.draw || map.winner));
+            if (!currentMap?.id) return res.send("No hero ban information is available right now.");
+            /** @type {Team[]} */
+            const teams = await Promise.all((live_match.teams || []).map(id => Cache.get(cleanID(id))));
+
+            if (!teams.every(team => team.name)) return res.send("No hero ban information is available right now.");
+
+            const bans = [
+                (await Promise.all((currentMap.team_1_bans || []).map(id => Cache.get(cleanID(id))))).map(hero => hero.name),
+                (await Promise.all((currentMap.team_2_bans || []).map(id => Cache.get(cleanID(id))))).map(hero => hero.name),
+            ];
+
+            if (!bans.some(teamBans => teamBans.length)) return res.send("No hero ban information is available right now.");
+
+            let banText = [1,2].map((num, i) => `${teams[i].name} banned ${bans[i].join(", ")}.`);
+
+            if (currentMap.flip_pick_ban_order) {
+                banText = banText.reverse();
+            }
+            const mapIndex = eligibleMaps.findIndex(map => map.id === currentMap.id) + 1;
+            return res.send(`⬥ Hero bans${live_match?.first_to !== 1 && mapIndex ? ` for map ${mapIndex}` : ""}: ${banText.join(" ")}`);
 
         } catch (e) {
             console.error(e);

@@ -155,6 +155,12 @@ export interface MatchMap extends Base {
     banner?: TeamResolvableID[];
     picker?: TeamResolvableID[];
     winner?: TeamResolvableID[];
+
+    team_1_bans?: HeroResolvableID[];
+    team_2_bans?: HeroResolvableID[];
+    team_1_picks?: HeroResolvableID[];
+    team_2_picks?: HeroResolvableID[];
+    flip_pick_ban_order?: boolean;
 }
 interface PlayerRelationship extends Base {
 

@@ -56,7 +56,15 @@
 
             <td :class="{'active-time': table.fullRequest?.status === 'active'}" style="font-family: monospace">{{ time(Math.floor((now - new Date(table.lastFullRequest)) / 1000)) }}</td>
             <td :class="table.fullRequest?.status">{{ table.fullRequest?.status }}</td>
-            <td>{{ table.fullRequest?.itemCount != null ? `${table.fullRequest.itemCount} item${table.fullRequest.itemCount === 1 ? '': 's'}` : null}}</td>
+<!--            <td>{{ table.fullRequest?.itemCount != null ? `${table.fullRequest.itemCount} item${table.fullRequest.itemCount === 1 ? '': 's'}` : null}}</td>-->
+            <td :title="table.fullRequest?.status === 'errored' && table.lastError ? table?.lastError?.message : ''">{{
+                    (table.fullRequest?.status === 'errored' && table.lastError ? table.lastError?.code || table.lastError?.errno : (
+                            table.fullRequest?.itemCount != null ?
+                                    `${table.fullRequest.itemCount} item${table.fullRequest.itemCount === 1 ? '' : 's'}` : ''
+                    ))
+                }}
+            </td>
+            
             <td style="font-family: monospace">
                 <span v-if="table.fullRequest?.type === 'all' && table.fullRequest?.status === 'finished'">{{ ((table.fullRequest.duration / 1000) / table.airtableRequestCount).toFixed(2) }} s/r</span>
             </td>
@@ -64,7 +72,13 @@
 
             <td :class="{'active-time': table.changesRequest?.status === 'active'}" style="font-family: monospace">{{ time(Math.floor((now - new Date(table.lastChangesRequest)) / 1000)) }}</td>
             <td :class="table.changesRequest?.status">{{ table.changesRequest?.status }}</td>
-            <td>{{ table.changesRequest?.itemCount != null ? `${table.changesRequest.itemCount} item${table.changesRequest.itemCount === 1 ? '': 's'}` : null}}</td>
+            <td :title="table.changesRequest?.status === 'errored' && table.lastError ? table?.lastError?.message : ''">{{
+                    (table.changesRequest?.status === 'errored' && table.lastError ? table.lastError?.code || table.lastError?.errno : (
+                            table.changesRequest?.itemCount != null ?
+                                    `${table.changesRequest.itemCount} item${table.changesRequest.itemCount === 1 ? '' : 's'}` : ''
+                    ))
+                }}
+            </td>
 
 <!--            <td :class="{'active-time': table.request?.status === 'active'}" style="font-family: monospace">{{ time(Math.floor((now - new Date(table.lastRequest)) / 1000)) }}</td>-->
 <!--            <td :class="{'active-time': table.request?.status === 'active'}" style="font-family: monospace">{{ time(Math.floor((now - new Date(table.lastFullRequest)) / 1000)) }}</td>-->

@@ -350,7 +350,7 @@ export function setup({
         res.send(JSON.stringify(manager.getStatusData(), getCircularReplacer()));
     });
     web.get("/requests", async (req, res) => {
-        res.sendFile(DIRNAME + "/request.html");
+        res.sendFile(path.join(DIRNAME, "/request.html"));
     });
 
     return manager.main(io);

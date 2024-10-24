@@ -1,4 +1,4 @@
-import { getMatchData, getTwitchAPIClient, getTwitchChannel } from "../action-utils/action-utils.js";
+import { getMatchData, getTwitchAPIClient, getTwitchAPIError, getTwitchChannel } from "../action-utils/action-utils.js";
 
 
 export default {
@@ -61,16 +61,21 @@ export default {
             "F1": "F1 23"
         };
 
-        if (event.game && gameMap[event.game]) {
-            const game = await api.games.getGameByName(gameMap[event.game]);
-            await api.channels.updateChannelInfo(channel.channel_id, {
-                title: newTitle,
-                gameId: game.id
-            });
-        } else {
-            await api.channels.updateChannelInfo(channel.channel_id, {
-                title: newTitle
-            });
+        try {
+            if (event.game && gameMap[event.game]) {
+                const game = await api.games.getGameByName(gameMap[event.game]);
+                await api.channels.updateChannelInfo(channel.channel_id, {
+                    title: newTitle,
+                    gameId: game.id
+                });
+            } else {
+                await api.channels.updateChannelInfo(channel.channel_id, {
+                    title: newTitle
+                });
+            }
+        } catch (e) {
+            console.error(getTwitchAPIError(e), e);
+            throw { errorCode: 500, errorMessage: `Twitch error: ${getTwitchAPIError(e)}` };
         }
         return `Updated ${channel.name}'s title to "${newTitle}"`;
     }

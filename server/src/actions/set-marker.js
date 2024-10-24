@@ -1,4 +1,4 @@
-import { getMatchData, getTwitchAPIClient, getTwitchChannel } from "../action-utils/action-utils.js";
+import { getMatchData, getTwitchAPIClient, getTwitchAPIError, getTwitchChannel } from "../action-utils/action-utils.js";
 
 
 export default {
@@ -23,7 +23,11 @@ export default {
 
         const markerText = text || (match.special_event ? match.custom_name : [team1, team2].map(t => t.name).join(" vs "));
 
-        await api.streams.createStreamMarker(channel.channel_id, markerText);
+        try {
+            await api.streams.createStreamMarker(channel.channel_id, markerText);
+        } catch (e) {
+            throw { errorCode: 500, errorMessage: `Error creating marker: ${getTwitchAPIError(e)}` };
+        }
 
         return `Added a stream marker: "${markerText}"`;
     }

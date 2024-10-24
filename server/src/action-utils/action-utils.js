@@ -223,9 +223,14 @@ export async function getMatchScoreReporting(matchID) {
 
 export async function getTwitchAPIClient(channel) {
     if (!channel) throw("Internal error connecting to Twitch");
-    const accessToken = await Cache.auth.getTwitchAccessToken(channel);
-    const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, accessToken);
-    return new ApiClient({authProvider});
+    try {
+        const accessToken = await Cache.auth.getTwitchAccessToken(channel);
+        const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, accessToken);
+        return new ApiClient({authProvider});
+    } catch (e) {
+        console.error(getTwitchAPIError(e), e);
+        throw { errorCode: 500, errorMessage: `Twitch error: ${getTwitchAPIError(e)}` };
+    }
 }
 
 export function getTwitchAPIError(error) {

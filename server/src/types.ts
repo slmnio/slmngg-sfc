@@ -473,6 +473,7 @@ export type EventSettings = {
             showHeroPicks?: boolean;
             showHeroBans?: boolean;
             showMapBans?: boolean;
+            allowForfeits?: boolean;
         }
     };
     logging?: {

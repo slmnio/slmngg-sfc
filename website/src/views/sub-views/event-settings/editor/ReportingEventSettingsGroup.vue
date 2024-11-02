@@ -36,6 +36,11 @@
                     @update:active="val => updateData('score', 'showMapBans', val)">
                     Show map ban options
                 </event-settings-checkbox>
+                <event-settings-checkbox
+                    :active="reportingData?.score?.allowForfeits"
+                    @update:active="val => updateData('score', 'allowForfeits', val)">
+                    Allow forfeit reporting
+                </event-settings-checkbox>
             </div>
         </b-form-group>
     </EventSettingsGroup>

@@ -63,6 +63,23 @@
                     <b-button v-else class="top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save {{ hideMatchExtras ? 'all' : 'maps' }}</b-button>
                 </div>
             </div>
+            <div v-if="scoreReporting && showScoreReportForfeit" class="score-reporting-extras py-2">
+                <b-form-group
+                    label="Forfeit"
+                    description="If this match is a forfeit, check this box and set the match score above. Don't submit empty maps below."
+                    label-for="details-forfeit"
+                    label-cols-lg="2"
+                    label-cols-md="3">
+                    <div class="d-flex align-items-center checkbox-realign">
+                        <b-form-checkbox
+                            id="details-forfeit"
+                            v-model="matchData.forfeit"
+                            class="mt-1"
+                            size="lg" />
+                        <b-form-input id="details-forfeit-reason" v-model.trim="matchData.forfeit_reason" type="text" placeholder="Forfeit reason" />
+                    </div>
+                </b-form-group>
+            </div>
             <div class="maps-table-wrapper">
                 <table
                     class="teams-maps table table-bordered table-sm table-dark mt-2 mb-0 opacity-changes"
@@ -70,12 +87,11 @@
                     <tbody>
                         <tr
                             v-for="({map, type, mapI, playedMapI}, i) in tableRows"
-                            :key="i"
-                            :class="{'banned': banners[mapI], 'very-low-opacity': !map.dummy && !map._original_data_id, 'map': type === 'map', 'pickban-row': type === 'pickban'}">
+                            :key="`${type}-${i}`"
+                            :class="{'banned': banners[mapI], 'very-low-opacity': !map.dummy && !map._original_data_id, 'map': type === 'map', 'pickban-row': type === 'pickban', 'pickban-hide': hideHeroBanUI[mapI]}">
                             <td v-if="type === 'map' && !scoreReporting" class="form-stack number">
                                 <div class="form-top d-flex">
-                                    <div>#</div>
-                                    <div class="flex-grow-1 text-end">
+                                    <div class="flex-grow-1 text-center">
                                         <i
                                             v-if="existingMapIDs[mapI]"
                                             v-b-tooltip="'Edits an existing map record'"
@@ -87,17 +103,19 @@
                                     </div>
                                 </div>
                                 <div class="form-button">
-                                    <b-form-input
-                                        v-model.number="mapNumbers[mapI]"
-                                        type="number"
-                                        class="map-number no-arrows"
-                                        :min="1"
-                                        :max="minMaps" />
+                                    <b-button
+                                        v-if="controls.showHeroPicks && !banners[mapI]"
+                                        size="sm"
+                                        style="min-height: 38px;"
+                                        @click="hideHeroBanUI[mapI] = !hideHeroBanUI[mapI]"
+                                        @click.ctrl="setAllBanUI(hideHeroBanUI[mapI])">
+                                        <i class="fas" :class="hideHeroBanUI[mapI] ? 'fa-angle-down' : 'fa-angle-up'"></i>
+                                    </b-button>
                                 </div>
                             </td>
                             <td v-if="type === 'map'" class="map form-stack" style="width: 100%;">
                                 <div class="form-top">
-                                    Map
+                                    Map {{ banners[mapI] ? 'banned' : '' }}
                                 </div>
                                 <div class="form-bottom">
                                     <b-form-select
@@ -343,7 +361,7 @@ import HeroesPicker from "@/components/website/dashboard/HeroesPicker.vue";
 export default {
     name: "MatchEditor",
     components: { HeroesPicker, MatchExplainerModal, AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
-    props: ["match", "hideMatchExtras", "scoreReporting", "proposedData", "scoreReportAction", "lockControls", "showHeroPicks", "showHeroBans", "showMapBans", "ignoreRemoteUpdates"],
+    props: ["match", "hideMatchExtras", "scoreReporting", "proposedData", "scoreReportAction", "lockControls", "showHeroPicks", "showHeroBans", "showMapBans", "ignoreRemoteUpdates", "showScoreReportForfeit"],
     data: () => ({
         processing: {},
         matchData: {
@@ -371,6 +389,7 @@ export default {
         team_2_picks: [],
         team_1_bans: [],
         team_2_bans: [],
+        hideHeroBanUI: [],
         extraMaps: 0,
         errorMessage: null,
         previousAutoData: null,
@@ -452,22 +471,28 @@ export default {
             );
 
 
-            for (let i = 0; i < Math.max(this.match?.maps?.length, this.banners.length, this.draws.length); i++) {
-                if (this.match?.maps?.[i]?.banner?.length || this.match?.maps?.[i]?.draw || this.banners[i] || this.draws[i]) {
-                    mapCount++;
-                }
-            }
+            // console.log("existing map count", mapCount);
+            // console.log("min maps", this.match?.maps?.length, this.banners?.length, this.draws?.length);
+            // for (let i = 0; i < Math.max(this.match?.maps?.length || 0, this.banners.length || 0, this.draws.length || 0); i++) {
+            //     console.log(i, this.match?.maps?.[i]?.banner, this.banners[i]);
+            //     if (this.match?.maps?.[i]?.banner?.length || this.match?.maps?.[i]?.draw || this.banners[i] || this.draws[i]) {
+            //         // mapCount++;
+            //         // console.log("maps +1 ban/draw", i);
+            //     }
+            // }
 
+            // console.log("adding manual extra", this.extraMaps);
             mapCount += this.extraMaps; // manual adding
 
+            // console.log("check not complete", this.match.first_to, this.mapWinnerScore);
             // check if match is complete with current amount
             if (this.match.first_to &&
-                this.mapWinnerScore.reduce((a, val) => a + val, 0) === mapCount &&
+                // this.mapWinnerScore.reduce((a, val) => a + val, 0) === mapCount &&
                 this.mapWinnerScore.every(score => this.match.first_to !== score)) {
                 // match is not complete
-                mapCount++;
-
-                for (let i = 0; i < Math.max(this.match?.maps?.length, this.banners.length, this.draws.length); i++) {
+                // mapCount++;
+                // console.log("adding more since not complete");
+                for (let i = 0; i < Math.max(this.match?.maps?.length || 0, this.banners.length || 0, this.draws.length || 0); i++) {
                     if (this.match?.maps?.[i]?.banner?.length || this.match?.maps?.[i]?.draw || this.banners[i] || this.draws[i]) {
                         mapCount++;
                     }
@@ -628,7 +653,11 @@ export default {
             }
 
             this.availableMaps.forEach(m => {
-                if (this.restrictToMapPool && mapType && mapType !== m.type) return;
+                if (this.restrictToMapPool && mapType && mapType.includes("/")) {
+                    if (mapType.split("/").map(t => t.trim()).some(t => t === m.type)) return;
+                } else {
+                    if (mapType !== m.type) return;
+                }
 
                 if (!groups[m.type]) groups[m.type] = [];
                 groups[m.type].push({ id: m.id, name: m.name });
@@ -697,6 +726,8 @@ export default {
             this.mapNumbers = [];
             this.existingMapIDs = [];
             this.replayCodes = [];
+
+            this.hideHeroBanUI = [];
             this.extraMaps = 0;
             this.errorMessage = null;
             this.restrictToMapPool = true;
@@ -941,6 +972,11 @@ export default {
                 console.log("proposed data", this.proposedData);
                 this.updateMatchData(this.formattedProposedData);
             }
+        },
+        setAllBanUI(set) {
+            (this.maps || []).forEach((map, i) => {
+                this.hideHeroBanUI[i] = set;
+            });
         }
     },
     watch: {
@@ -1103,6 +1139,9 @@ export default {
     }
     tr.pickban-row  td {
         box-shadow: inset 0 -1px #4d5154;
+    }
+    tr.pickban-row.pickban-hide {
+        display: none;
     }
 
     .pickbans {

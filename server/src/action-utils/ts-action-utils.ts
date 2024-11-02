@@ -135,10 +135,10 @@ export async function generateMatchReportText(match: Match) {
                 for (const teamI of [0, 1]) {
                     const team = teams[teamI];
                     const bannedHeroes = await Promise.all(([map.team_1_bans, map.team_2_bans][teamI] || []).map(id => get(id)));
-                    teamBans.push(`${team.code || team.name} ban: ${bannedHeroes.map(hero => hero.icon_emoji_text || hero.name).join(" | ")}`);
+                    teamBans.push(`${team.code || team.name} ban: ${bannedHeroes.map(hero => hero.icon_emoji_text || hero.name).join(" ")}`);
                 }
 
-                lines.push(`> ${teamBans.join("")}`);
+                lines.push(`> ${teamBans.join(" | ")}`);
             }
         }
 

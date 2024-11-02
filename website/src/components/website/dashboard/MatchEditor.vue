@@ -654,8 +654,8 @@ export default {
 
             this.availableMaps.forEach(m => {
                 if (this.restrictToMapPool && mapType && mapType.includes("/")) {
-                    if (mapType.split("/").map(t => t.trim()).some(t => t === m.type)) return;
-                } else {
+                    if (mapType.split("/").map(t => t.trim()).every(t => t !== m.type)) return;
+                } else if (this.restrictToMapPool && mapType) {
                     if (mapType !== m.type) return;
                 }
 

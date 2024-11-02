@@ -89,6 +89,8 @@ export type WebsiteSettings =
     | "Can edit any auction"
     | "No profile editing"
 
+export type Game = "Overwatch" | "Valorant" | "League of Legends" | "Counter-Strike" | "Deadlock";
+
 // /**
 //  * @property member_of - Teams this player is a player of
 //  */
@@ -189,8 +191,29 @@ export interface Report extends Base {
 interface LogFile extends Base {
 
 }
-interface Hero extends Base {
+export interface Hero extends Base {
+    id: HeroResolvableID;
+    __tableName: "Heroes";
 
+    name?: string;
+    role?: string;
+    game?: Game;
+    icon_emoji_text?: string;
+
+    broadcasts?: BroadcastResolvableID[];
+    players?: PlayerResolvableID[];
+
+    maps?: MatchMapResolvableID[];
+    maps_2?: MatchMapResolvableID[];
+    maps_3?: MatchMapResolvableID[];
+    maps_4?: MatchMapResolvableID[];
+
+    icon?: CacheAttachment[];
+    symbol?: CacheAttachment[];
+    main_image?: CacheAttachment[];
+    alternate_set_image?: CacheAttachment[];
+    recolor_base?: CacheAttachment[];
+    recolor_layers?: CacheAttachment[];
 }
 interface Social extends Base {
 
@@ -221,7 +244,7 @@ export interface GameMap extends Base {
      * events - as part of a map pool
      */
     events?: EventResolvableID[];
-    game?: "Overwatch" | "Valorant" | "League of Legends" | "Counter-Strike";
+    game?: Game;
     maps?: MatchMapResolvableID[];
     name?: string;
     short_name?: string;

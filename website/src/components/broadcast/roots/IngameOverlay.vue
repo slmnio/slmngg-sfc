@@ -128,7 +128,7 @@ export default {
         },
         teamPlayerNames() {
             if (!(this.broadcast?.broadcast_settings || [])?.includes("Show all player names")) return [];
-            return [
+            const names = [
                 ReactiveArray("team_1_cams", {
                     "player": ReactiveThing("player")
                 })(this.broadcast),
@@ -136,6 +136,21 @@ export default {
                     "player": ReactiveThing("player")
                 })(this.broadcast)
             ];
+            if (this.flippingTeams) {
+                // hold old ones for a second
+                const teams = [...names];
+                if (this.match.flip_teams) {
+                    // do invert
+                    console.log("holding 0,1", teams[0]);
+                    return [teams[0], teams[1]];
+                } else {
+                    console.log("holding 1,0", teams[0]);
+                    return [teams[1], teams[0]];
+                }
+            }
+            if (this.match.flip_teams && this.match.teams.length === 2) return [names[1], names[0]];
+            if (this.match.teams.length !== 2) return [];
+            return names;
         },
         useDots() {
             return this.broadcast?.broadcast_settings?.includes("Use dots instead of numbers for score");

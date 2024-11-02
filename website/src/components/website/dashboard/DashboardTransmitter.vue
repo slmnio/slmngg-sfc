@@ -222,6 +222,9 @@ export default {
                     await authenticatedRequest("actions/update-broadcast", {
                         advertise: isLive
                     });
+                    if ((this.broadcast?.broadcast_settings || []).includes("Set title when going live")) {
+                        await authenticatedRequest("actions/set-title");
+                    }
                 } finally {
                     this.processingAdvertise = false;
                 }

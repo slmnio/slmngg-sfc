@@ -18,7 +18,7 @@
                             <div class="player-index">
                                 <span v-if="isSelected(player.id, teamI)">{{ getIndex(player.id, teamI) + 1 }}</span>
                             </div>
-                            <RoleIcon class="mx-2" :role="player.role" />
+                            <RoleIcon :role="player.role" />
                             <div class="player-name">{{ player?.name }}</div>
                             <div v-if="!player?.live_guests?.length" v-b-tooltip="'Player does not have a Live Guest record'" class="mx-2"><i class="fas fa-video-slash"></i></div>
                         </div>
@@ -193,6 +193,7 @@ export default {
         padding: .1em;
         cursor: pointer;
         user-select: none;
+        gap: .5em;
     }
     .team-player:hover {
         background-color: rgba(255,255,255,0.1);
@@ -226,7 +227,6 @@ export default {
         user-select: none;
     }
     .cam:hover {
-
         background-color: rgba(255,255,255,0.1);
     }
 </style>

@@ -121,9 +121,14 @@
                 </div>
             </div>
             <div class="group text-end">
-                <div class="group-top">Marker</div>
+                <div class="group-top">Twitch Title & Marker</div>
                 <div class="group-bottom">
-                    <div class="fake-btn-group">
+                    <div class="btn-group">
+                        <b-button class="quick-button" :disabled="processing?.twitchTitle" @click="setTwitchTitle">
+                            <div class="icon-stack">
+                                <i class="fas fa-text"></i>
+                            </div>
+                        </b-button>
                         <b-button class="quick-button" :disabled="processing?.setMarker" @click="setMarker">
                             <div class="icon-stack">
                                 <i class="fas fa-marker"></i>

@@ -118,7 +118,7 @@ export default [
         component: () => import("@/components/broadcast/roots/BoxedHeroRosterOverlay.vue"),
         props: route => ({
             teamNum: route.query.team || route.query.teamNum,
-            playerCount: route.query.count || route.query.players || route.query.playerCount,
+            playerCount: route.query.count || route.query.players || route.query.playerCount || route.query.max,
             showRoles: !!route.query.role || !!route.query.roles || !!route.query.icons,
             showPronouns: !!route.query.pronouns,
             subtitle: route.query.subtitle,

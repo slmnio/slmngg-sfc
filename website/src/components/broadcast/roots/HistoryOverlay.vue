@@ -2,7 +2,7 @@
     <GenericTeamsOverlay class="history-overlay" :broadcast="broadcast" :title="title || 'Match History'" :match-schema="matchSchema">
         <template #team-content="{ team }">
             <TeamMatchHistory
-                class="team-roster flex-center flex-column overlay--bg w-100"
+                class="team-roster flex-center flex-column w-100"
                 :team="team"
                 :match="match"
                 :max="max"

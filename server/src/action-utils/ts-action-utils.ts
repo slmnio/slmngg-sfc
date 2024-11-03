@@ -87,9 +87,12 @@ export async function generateMatchReportText(match: Match) {
         });
 
         lines.push(teamText.join(` ${scores.join("-")} `));
+        if (match.forfeit) {
+            lines.push("*Match forfeited*");
+        }
 
-
-        maps.filter(map => !map.banner).forEach((map, i) => {
+        for (const map of maps.filter(map => !map.banner)) {
+            const i = maps.filter(map => !map.banner).indexOf(map);
             const mapLine : string[] = [];
             mapLine.push(`Map ${i+1}`);
             if (map.map?.name) mapLine.push(map.map.name);
@@ -125,7 +128,19 @@ export async function generateMatchReportText(match: Match) {
 
 
             lines.push(mapLine.join(" - "));
-        });
+
+            if (map.team_1_bans?.length || map.team_2_bans?.length) {
+                const teamBans = [];
+
+                for (const teamI of [0, 1]) {
+                    const team = teams[teamI];
+                    const bannedHeroes = await Promise.all(([map.team_1_bans, map.team_2_bans][teamI] || []).map(id => get(id)));
+                    teamBans.push(`${team.code || team.name} ban: ${bannedHeroes.map(hero => hero.icon_emoji_text || hero.name).join(" ")}`);
+                }
+
+                lines.push(`> ${teamBans.join(" | ")}`);
+            }
+        }
 
 
         lines.push(`<${matchLink}>`);

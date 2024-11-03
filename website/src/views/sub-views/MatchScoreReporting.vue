@@ -36,6 +36,7 @@
                     :show-hero-picks="eventSettings?.reporting?.score?.showHeroPicks"
                     :show-hero-bans="eventSettings?.reporting?.score?.showHeroBans"
                     :show-map-bans="eventSettings?.reporting?.score?.showMapBans"
+                    :show-score-report-forfeit="eventSettings?.reporting?.score?.allowForfeits"
                 />
             </div>
             <div v-else-if="currentStep?.key === 'opponentApprove' && denyEditor" class="step-action">
@@ -58,6 +59,7 @@
                     :show-hero-picks="eventSettings?.reporting?.score?.showHeroPicks"
                     :show-hero-bans="eventSettings?.reporting?.score?.showHeroBans"
                     :show-map-bans="eventSettings?.reporting?.score?.showMapBans"
+                    :show-score-report-forfeit="eventSettings?.reporting?.score?.allowForfeits"
                 />
             </div>
             <div v-else-if="currentStep?.key === 'opponentApprove'" class="step-action">

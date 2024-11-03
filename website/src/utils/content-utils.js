@@ -724,6 +724,7 @@ export function getScoreReportingBadge(state, report, eventSettings) {
                 return {
                     variant: "dark",
                     text: "Needs opponent",
+                    small: "Need opp",
                     title: "Waiting for opponent to approve this report"
                 };
             }

@@ -88,7 +88,6 @@ export default {
         modelValue: {
             immediate: true,
             handler(data) {
-                console.log(data);
                 this.count = Math.max(this.count, (data || []).length);
                 this.localValue = data || [];
             }

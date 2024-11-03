@@ -1,4 +1,5 @@
 <template>
+    <!--  eslint-disable no-irregular-whitespace -->
     <div class="map d-flex position-relative" :class="{'next-map': map._next, 'map-dummy': map.dummy, 'drafted-map': draftedStyle, 'upcoming-map': draftedStyle && !complete && !map._next }">
         <div v-if="mapVideo" class="map-bg map-video w-100 h-100 bg-center" :class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground">
             <video :src="mapVideo" autoplay muted loop></video>
@@ -41,14 +42,14 @@
                 </div>
             </div>
             <div v-if="!draftedStyle" class="map-lower flex-center flex-column" :style="accent">
-                <div class="map-lower-name flex-center"><span class="industry-align">{{ name }}</span></div>
+                <div class="map-lower-name flex-center"><span class="industry-align">{{ name?.replaceAll("/", "​/​") }}</span></div>
                 <div v-if="type" class="map-lower-type"><span class="industry-align">{{ type }}</span></div>
             </div>
 
             <div v-if="draftedStyle" class="map-draft-top flex-center" :class="{'complete': complete, 'next': map._next, 'draw': map.draw}" :style="winnerBG">
                 <div class="draft-map-data flex-grow-1 fw-bold">
                     <div class="draft-map-type">{{ map.mode || map.type?.[0] }}</div>
-                    <div class="draft-map-name">{{ name }}</div>
+                    <div class="draft-map-name">{{ name?.replaceAll("/", "​/​") }}</div>
                 </div>
                 <div class="draft-map-status">
                     <div v-if="complete" class="status-complete flex-center flex-column">

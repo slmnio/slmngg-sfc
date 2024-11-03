@@ -1,6 +1,6 @@
 <template>
     <div class="bug-overlay">
-        <div class="bug-holder" :style="broadcastMargin" :class="`animate-${animate || 'left'}`">
+        <div class="bug-holder" :style="broadcastMargin" :class="`animate-${animate || 'right'}`">
             <ThemeTransition
                 :theme="themeObject?.theme"
                 :active="animationActive"

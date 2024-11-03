@@ -23,7 +23,7 @@
                         </div>
                     </slot>
 
-                    <div class="team-bottom flex-center flex-grow-1 w-100">
+                    <div class="team-bottom flex-center flex-grow-1 w-100 overlay--bg">
                         <slot name="team-content" :team="team"></slot>
                     </div>
                 </slot>

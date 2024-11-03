@@ -120,7 +120,7 @@
                             v-if="twitchChannelName"
                             class="no-link-style d-inline-block"
                             variant="outline-secondary"
-                            :href="`https://dashboard.twitch.tv/u/${twitchChannelName}`"
+                            :href="`https://dashboard.twitch.tv/u/${twitchChannelName}/stream-manager`"
                             target="_blank">
                             <i class="fab mr-1 fa-twitch"></i> Dashboard <i class="fas fa-fw fa-external-link"></i>
                         </b-button>

@@ -35,7 +35,7 @@ import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import { themeBackground1 } from "@/utils/theme-styles";
-import { getRoleSVG } from "@/utils/content-utils";
+import { decoratePlayerWithDraftData, getRoleSVG } from "@/utils/content-utils";
 import { useStatusStore } from "@/stores/statusStore";
 
 export default {
@@ -52,7 +52,8 @@ export default {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
                     players: ReactiveArray("players", {
-                        favourite_hero: ReactiveThing("favourite_hero")
+                        favourite_hero: ReactiveThing("favourite_hero"),
+                        signup_data: ReactiveArray("signup_data")
                     }),
                     staff: ReactiveArray("staff")
                 })
@@ -80,7 +81,7 @@ export default {
             return this.match?.teams?.[0];
         },
         players() {
-            const players = this.team?.players || this.team?.limited_players;
+            const players = (this.team?.players || this.team?.limited_players || []).map(p => decoratePlayerWithDraftData(p, this.broadcast?.event?.id));
             if (!this.team?.players && this.team?.limited_players) {
                 players.forEach(player => {
                     // set hero from lookup

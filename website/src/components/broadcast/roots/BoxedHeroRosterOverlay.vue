@@ -5,8 +5,8 @@
                 <div class="team-logo bg-center" :style="teamLogo"></div>
             </div>
             <div class="team-text">
-                <div class="team-name">{{ team?.name }}</div>
-                <div v-if="decoratedSubtitle" class="team-subtitle">{{ decoratedSubtitle }}</div>
+                <div class="team-name industry-align">{{ team?.name }}</div>
+                <div v-if="decoratedSubtitle" class="team-subtitle industry-align">{{ decoratedSubtitle }}</div>
             </div>
         </div>
 
@@ -33,7 +33,7 @@
                     <div class="player-name-holder" :style="themeBackground1(team)">
                         <div class="player-name flex-center text-center">
                             <span class="player-name-internal">{{ player.name }}</span>
-                            <span v-if="showRoles" class="player-role" v-html="getRoleSVG(player.role)"></span>
+                            <span v-if="showRoles" class="player-role" v-html="getRoleSVG(player?._draftData?.role)"></span>
                             <span
                                 v-if="showPronouns"
                                 :style="themeBackground1(team)"
@@ -50,7 +50,7 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
-import { autoRecord, getRoleSVG } from "@/utils/content-utils";
+import { autoRecord, decoratePlayerWithDraftData, getRoleSVG } from "@/utils/content-utils";
 import { bg, resizedAttachment, resizedImage } from "@/utils/images";
 import { useStatusStore } from "@/stores/statusStore";
 
@@ -75,7 +75,8 @@ export default {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
                     players: ReactiveArray("players", {
-                        favourite_hero: ReactiveThing("favourite_hero")
+                        favourite_hero: ReactiveThing("favourite_hero"),
+                        signup_data: ReactiveArray("signup_data")
                     }),
                     matches: ReactiveArray("matches", {
                         teams: ReactiveArray("teams")
@@ -111,7 +112,7 @@ export default {
                 console.log("auto small text", this.team, this.team.matches);
                 text = autoRecord(this.team, this.broadcast?.current_stage || this.match?.match_group);
             }
-            return (this.subtitle || "").replace("{small}", (this.team.small_overlay_text || text || ""));
+            return (this.subtitle || "").replace("{small}", (this.team?.small_overlay_text || text || ""));
         },
         teamLogo() {
             return resizedImage(this.team?.theme, ["default_logo", "small_logo"], "w-200");
@@ -130,12 +131,12 @@ export default {
             if (this.playerCount) players = (players || []).slice(0, this.playerCount);
             return (players || []).sort((a, b) => {
                 console.log(a, b);
-                if (a.role !== b.role) {
+                if (a._draftData?.role !== b._draftData?.role) {
                     const order = ["DPS", "Tank", "Support"];
-                    return order.indexOf(a.role) - order.indexOf(b.role);
+                    return order.indexOf(a._draftData?.role) - order.indexOf(b._draftData?.role);
                 }
                 return 0;
-            });
+            }).map(p => decoratePlayerWithDraftData(p, this.broadcast?.event?.id));
         },
         titleStyle() {
             return themeBackground1(this.team);

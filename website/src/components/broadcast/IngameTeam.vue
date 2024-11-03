@@ -18,6 +18,16 @@
                     <img :src="texture" alt="">
                 </div>
             </div>
+            <div v-if="displayedHeroBans" class="ingame-hero-bans">
+                <div class="bans-text">
+                    <div class="bans-text-rotate">
+                        <div class="industry-align">{{ displayedHeroBans.length === 1 ? 'BAN' : 'BANS' }}</div>
+                    </div>
+                </div>
+                <div v-for="hero in displayedHeroBans" :key="hero.id" class="hero-ban flex-center">
+                    <div class="hero-image bg-center" :style="resizedImage(hero, ['icon', 'main_image'], 's-100')"></div>
+                </div>
+            </div>
             <div v-if="smallText" class="flex-center team-small-text">
                 <transition name="fade" mode="out-in">
                     <span v-if="smallText" :key="smallText">
@@ -100,7 +110,7 @@ import IngameMaps from "@/components/broadcast/IngameMaps.vue";
 export default {
     name: "IngameTeam",
     components: { IngameMaps, Squeezable, ThemeTransition },
-    props: ["team", "active", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo", "colorLogoHolder", "eventInfo", "showEventMaps", "match", "broadcast", "playerNames"],
+    props: ["team", "active", "right", "score", "hideScores", "width", "codes", "event", "autoSmall", "theme", "mapAttack", "extendIcons", "useDots", "firstTo", "colorLogoHolder", "eventInfo", "showEventMaps", "match", "broadcast", "playerNames", "heroBansDisplayMode"],
     data: () => ({
         textureData: {
             url: null,
@@ -194,9 +204,24 @@ export default {
         teamWidthCSS() {
             if (!this.teamWidth) return {};
             return { width: `calc(${this.teamWidth}px + var(--team-expand, 0px) - var(--side-margins, 0px))` };
+        },
+        displayedHeroBans() {
+            if (!this.match?.id) return null;
+            if (this.heroBansDisplayMode !== "on ingame teams") return null;
+
+            const maps = (this.match?.maps || []).map((map, i) => ({
+                ...map,
+                number: map.number || i + 1
+            })).filter(map => !map.banner);
+
+            const thisTeamNum = (this.match?.teams || []).findIndex(t => t.id === this.team.id);
+            const currentMap = maps.find(map => !(map.draw || map.winner)) || maps[maps.length - 1];
+            if (!currentMap) return null;
+            return [currentMap.team_1_bans || [], currentMap.team_2_bans || []]?.[thisTeamNum];
         }
     },
     methods: {
+        resizedImage,
         logoBackground,
         async loadSVG(url) {
             console.log("Load SVG", url);
@@ -551,5 +576,37 @@ export default {
     .clip-swipe-down-leave-to {
         clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
         max-height: 0;
+    }
+
+    .ingame-hero-bans {
+        display: flex;
+    }
+    .hero-ban {
+        width: var(--team-height);
+        height: var(--team-height);
+        background-color: var(--danger);
+    }
+    .bans-text {
+        background-color: var(--danger);
+        color: white;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 1.5em;
+    }
+    .bans-text-rotate {
+        transform: rotate(-90deg);
+    }
+    .right .bans-text-rotate {
+        transform: rotate(90deg);
+    }
+    .right .bans-text {
+        order: 10;
+    }
+    .hero-image {
+        width: 90%;
+        height: 90%;
+        border-radius: .5em;
     }
 </style>

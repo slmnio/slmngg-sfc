@@ -24,6 +24,7 @@
                 :match="match"
                 :broadcast="broadcast"
                 :player-names="teamPlayerNames[i]"
+                :hero-bans-display-mode="showBannedHeroes ? heroBansDisplayMode : null"
             />
             <Middle
                 v-if="!basicMode"

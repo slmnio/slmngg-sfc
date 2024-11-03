@@ -42,7 +42,7 @@ export default {
             const setMaps = (this.hydratedMatch?.maps || []).filter(m => !m?.banner);
 
             for (let i = 0; i < Math.max(this.mapTypes.length, setMaps?.length); i++) {
-                const presetType = this.mapTypes?.[i];
+                const presetType = (this.mapTypes?.[i])?.replaceAll("/", "​/​");
                 const setMap = setMaps?.[i];
                 console.log(presetType, setMap);
 

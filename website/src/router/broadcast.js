@@ -307,6 +307,7 @@ export default [
     { path: "tester", component: () => import("@/components/broadcast/roots/ThemeTransitionTester.vue") },
     { path: "admin", component: () => import("@/components/broadcast/roots/ClientOverview.vue") },
     { path: "syncer", component: () => import("@/components/broadcast/roots/SyncerOverlay.vue") },
+    { path: "ros", component: () => import("@/components/broadcast/roots/RunOfShow.vue") },
     { path: "tally", redirect: { name: "tally-viewer" } },
     {
         path: "tally-viewer",

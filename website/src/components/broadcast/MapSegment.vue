@@ -1,4 +1,5 @@
 <template>
+    <!--  eslint-disable no-irregular-whitespace -->
     <div class="map d-flex position-relative" :class="{'next-map': map._next, 'map-dummy': map.dummy, 'drafted-map': draftedStyle, 'upcoming-map': draftedStyle && !complete && !map._next }">
         <div v-if="mapVideo" class="map-bg map-video w-100 h-100 bg-center" :class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground">
             <video :src="mapVideo" autoplay muted loop></video>

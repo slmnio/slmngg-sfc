@@ -100,7 +100,7 @@ export default {
             });
         },
         isProducer() {
-            return this.liveMatch?.player_relationships.some(rel => rel.singular_name === "Producer" && rel.player?.[0] === this.client?.staff?.[0]);
+            return (this.liveMatch?.player_relationships || []).some(rel => rel?.singular_name === "Producer" && rel?.player?.[0] === this.client?.staff?.[0]);
         }
     },
 

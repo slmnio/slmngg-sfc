@@ -820,7 +820,7 @@ export function recogniseRemoteServer(serverUrl) {
             recognisedID: null,
             recognisedPullLink: null,
             url: serverUrl,
-            server: url.pathname.split(":")[0].replace("//", ""),
+            server: url.hostname.split(":")[0].replace("//", ""),
             streamid: url.searchParams.get("streamid") || url.hash.slice(1).split("&").find((text, i, a) => text.includes("publish"))
         };
 

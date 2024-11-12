@@ -223,7 +223,16 @@ export default {
                         advertise: isLive
                     });
                     if ((this.broadcast?.broadcast_settings || []).includes("Set title when going live")) {
-                        await authenticatedRequest("actions/set-title");
+                        if (isLive) {
+                            await authenticatedRequest("actions/set-title");
+                            this.$notyf.success("Detected going live - setting title & advertise");
+                        }
+                    } else {
+                        if (isLive) {
+                            this.$notyf.success("Detected going live - turning on advertise");
+                        } else {
+                            this.$notyf.success("Detected going offline - turning off advertise");
+                        }
                     }
                 } finally {
                     this.processingAdvertise = false;

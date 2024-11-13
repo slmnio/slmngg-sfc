@@ -2,7 +2,8 @@ import { dirtyID } from "../action-utils/action-utils.js";
 
 function getPermissions(role) {
     const permissions = {
-        "Match Editor": ["Producer", "Lobby Admin", "Commissioner", "Admin", "Event Director", "Tournament Director"]
+        "Broadcast Manager": ["Producer", "Commissioner", "Event Director", "Tournament Director"],
+        "Match Editor": ["Lobby Admin", "Admin", "Producer", "Commissioner", "Event Director", "Tournament Director"]
     };
 
     return Object.entries(permissions).filter(([permissionName, roles]) => roles.includes(role)).map(([permissionName, roles]) => permissionName) || [];

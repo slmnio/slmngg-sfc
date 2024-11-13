@@ -26,6 +26,7 @@
                 </div>
                 <div class="match-team-logo-holder flex-center" :style="teamTheme(team)">
                     <div class="match-team-logo bg-center" :style="teamLogo(team)"></div>
+                    <div v-if="smallNames" class="match-team-small-name">{{ team.name }}</div>
                 </div>
                 <div v-if="expanded" class="match-team-logo-spacer"></div>
             </div>
@@ -67,7 +68,7 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "BreakMatch",
-    props: ["match", "expanded", "timezone", "live", "themeColor", "times"],
+    props: ["match", "expanded", "timezone", "live", "themeColor", "times", "smallNames"],
     computed: {
         teams() {
             if (this.match?.special_event) return [];
@@ -147,9 +148,9 @@ export default {
         },
         textPrefix() {
             if (this.times && this.start) {
-                return `${this.start}:`
+                return `${this.start}:`;
             }
-            return this.hasFinished ? 'FINAL SCORE:' : 'UP NEXT:'
+            return this.hasFinished ? "FINAL SCORE:" : "UP NEXT:";
         }
     },
     methods: {
@@ -351,5 +352,13 @@ export default {
         flex-grow: 1;
         line-height: 1;
         text-align: center;
+    }
+    .match-team-small-name {
+        position: absolute;
+        font-size: 0.4em;
+        line-height: 1;
+        top: 100%;
+        white-space: nowrap;
+        margin: 0.25em 0;
     }
 </style>

@@ -19,7 +19,9 @@
                     :match="match"
                     :expanded="false"
                     :times="true"
-                    :theme-color="themeColor" />
+                    :theme-color="themeColor"
+                    :small-names="true"
+                />
             </div>
         </div>
         <div class="content">

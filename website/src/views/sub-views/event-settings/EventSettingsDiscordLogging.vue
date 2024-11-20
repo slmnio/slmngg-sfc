@@ -200,8 +200,8 @@ export default {
 
             const groups = {};
 
-            data.filter(c => [0, 4].includes(c.type)).forEach(channel => {
-                if (channel.type === 0) {
+            data.filter(c => [0, 4, 5].includes(c.type)).forEach(channel => {
+                if ([0,5].includes(channel.type)) {
                     if (!groups[channel.parentId || "Text channels"]) {
                         groups[channel.parentId || "Text channels"] = {
                             parent: null,

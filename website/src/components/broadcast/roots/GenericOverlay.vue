@@ -14,7 +14,7 @@
                 end="middle"
                 :duration="500"
                 :inner-delay="150">
-                <div class="generic-overlay-title g-title overlay--bg flex-center" :style="{borderColor: _accentColor, ...(titleStyle || {})}">
+                <div class="generic-overlay-title g-title overlay--bg flex-center flex-column" :style="{borderColor: _accentColor, ...(titleStyle || {})}">
                     <Squeezable align="middle" :disabled="(title || '').includes('\\n')" class="w-100 flex-center industry-align">
                         <transition name="fade" mode="out-in">
                             <div
@@ -22,6 +22,15 @@
                                 class="title-text"
                                 :class="{'has-br': title?.includes('\\n') }"
                                 v-html="nbr(title)"></div>
+                        </transition>
+                    </Squeezable>
+                    <Squeezable align="middle" :disabled="(subtitle || '').includes('\\n')" class="w-100 flex-center industry-align">
+                        <transition name="fade" mode="out-in">
+                            <div
+                                :key="subtitle"
+                                class="subtitle-text"
+                                :class="{'has-br': subtitle?.includes('\\n') }"
+                                v-html="nbr(subtitle)"></div>
                         </transition>
                     </Squeezable>
                 </div>
@@ -55,7 +64,7 @@ import Squeezable from "@/components/broadcast/Squeezable.vue";
 export default {
     name: "GenericOverlay",
     components: { Squeezable, ThemeTransition, TourneyBar },
-    props: ["title", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "titleStyle", "customTheme", "full", "hideTitle"],
+    props: ["title", "subtitle", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "titleStyle", "customTheme", "full", "hideTitle"],
     computed: {
         theme() {
             return this.customTheme || this.$root?.broadcast?.event?.theme;
@@ -178,5 +187,11 @@ span.industry-align {
 }
 .generic-overlay-body.broadcast-mid-split-enter-active {
     transition-delay: 200ms !important;
+}
+
+.subtitle-text {
+    font-size: 0.3em;
+    margin-top: 0.1em;
+    font-weight: 400;
 }
 </style>

@@ -35,16 +35,18 @@
                 border-width="0" />
         </div>
         <div class="lower-bar overlay--bg title flex-center text-center">
-            <transition name="fade" mode="out-in">
-                <span
-                    :key="title || broadcast.title"
-                    class="title-text"
-                    :class="{'has-br': (title || broadcast.title || '').includes('\\n')}"
-                    v-html="nbr(title || broadcast.title)"></span>
-            </transition>
-        </div>
-        <div v-if="showSponsors" class="lbar-sponsors-holder">
-            <Sponsors class="lbar-sponsors" :sponsors="sponsorThemes" />
+            <Squeezable align="middle" :disabled="(overlayTitle)?.includes('\\n')" class="w-100 flex-center">
+                <transition name="fade" mode="out-in">
+                    <span
+                        :key="overlayTitle"
+                        class="title-text"
+                        :class="{'has-br': (overlayTitle || '')?.includes('\\n')}"
+                        v-html="nbr(overlayTitle)"></span>
+                </transition>
+            </Squeezable>
+            <div v-if="showSponsors" class="l-bar-sponsors-holder flex-center">
+                <Sponsors class="l-bar-sponsors" :sponsors="sponsorThemes" />
+            </div>
         </div>
     </div>
 </template>
@@ -52,21 +54,23 @@
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import BreakMatch from "@/components/broadcast/break/BreakMatch.vue";
-import { ReactiveArray, ReactiveThing, ReactiveRoot } from "@/utils/reactive";
+import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortMatches } from "@/utils/sorts";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import Countdown from "@/components/broadcast/Countdown.vue";
 import Sponsors from "@/components/broadcast/Sponsors.vue";
+import Squeezable from "@/components/broadcast/Squeezable.vue";
 
 export default {
     name: "LBarOverlay",
-    components: { Countdown, BreakMatch, ThemeLogo, Sponsors },
+    components: { Squeezable, Countdown, BreakMatch, ThemeLogo, Sponsors },
     props: {
         broadcast: {},
         client: {},
         virtualMatch: {},
         title: String,
-        showSponsors: String
+        showSponsors: String,
+        secondary: Boolean
     },
     computed: {
         fullSchedule() {
@@ -98,6 +102,9 @@ export default {
                 theme: ReactiveThing("theme"),
             })(this.broadcast);
         },
+        overlayTitle() {
+            return this.title || this.broadcast?.title;
+        }
     },
     methods: {
         nbr(text) {
@@ -110,6 +117,11 @@ export default {
             };
         },
     },
+    head() {
+        return {
+            title: `L-Bar ${this.secondary ? " (Secondary)" : ""}| ${this.broadcast?.code || this.broadcast?.name || ""}`
+        };
+    }
 };
 </script>
 
@@ -121,12 +133,46 @@ export default {
 
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(2, 1fr);
+        --content-width: 1504px;
+        --content-height: calc(var(--content-width) * 9/16);
+        --left-bar-width: calc(100vw - var(--content-width));
+        --lower-bar-height: calc(100vh - var(--content-height))
     }
 
     .content {
-        --content-width: 1504px;
         width: var(--content-width);
-        height: calc(var(--content-width) * (9 / 16));
+        height: var(--content-height);
+    }
+
+    .l-bar-sponsors-holder {
+        width: var(--left-bar-width);
+        height: var(--lower-bar-height);
+        flex-shrink: 0;
+    }
+    .l-bar-sponsors {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+    }
+    .l-bar-sponsors-holder:deep(.sponsors-holder) {
+        height: 100% !important;
+    }
+    .l-bar-sponsors-holder:deep(.break-sponsor-logo) {
+        width: 75%;
+        height: 75%;
+    }
+
+    .left-bar {
+        width: var(--left-bar-width);
+        height: var(--content-height)
+    }
+    .lower-bar {
+        width: var(--content-width);
+        height: var(--lower-bar-height)
+    }
+    .bottom-left-bar {
+        width: var(--left-bar-width);
+        height: var(--lower-bar-height)
     }
 
     .countdown-group {
@@ -148,5 +194,7 @@ export default {
     .title-text {
         font-size: 120px;
         line-height: 1.2;
+        padding: 0 0.25em;
+        white-space: wrap;
     }
 </style>

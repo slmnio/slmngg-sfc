@@ -39,11 +39,6 @@ export default {
     },
     methods: {
         bg
-    },
-    head() {
-        return {
-            title: `Background${this.index ? ` #${this.index}` : ""} | ${this.broadcast?.code || this.broadcast?.name || ""}`
-        };
     }
 };
 </script>

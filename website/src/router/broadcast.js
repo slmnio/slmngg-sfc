@@ -204,7 +204,14 @@ export default [
             animate: route.query.animate
         })
     },
-    { path: "l-bar", component: () => import("@/components/broadcast/roots/LBarOverlay"), props: route => ({ showSponsors: route.query.sponsors}) },
+    {
+        path: "l-bar",
+        component: () => import("@/components/broadcast/roots/LBarOverlay"),
+        props: route => ({
+            showSponsors: route.query.sponsors || route.query.sponsor,
+            secondary: !!route.query.secondary
+        })
+    },
     { path: "background", component: () => import("@/components/broadcast/BroadcastBackground.vue"), props: route => ({ index: route.query.index }) },
     { path: "sponsors", component: () => import("@/components/broadcast/roots/SponsorOverlay.vue") },
     { path: "maps", component: () => import("@/components/broadcast/roots/MapsOverlay.vue"), props: route => ({ autoTitle: route.query.auto }) },

@@ -102,11 +102,13 @@ export default {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
                     staff: ReactiveArray("staff"),
-                    players: ReactiveArray("players"),
+                    players: ReactiveArray("players", {
+                        signup_data: ReactiveArray("signup_data")
+                    }),
                     captains: ReactiveArray("captains")
                 }),
                 draftable_players: ReactiveArray("draftable_players", {
-                    "signup_data": ReactiveArray("signup_data")
+                    signup_data: ReactiveArray("signup_data")
                 })
             });
         },
@@ -186,7 +188,10 @@ export default {
             if (!this.event?.teams) return [];
             let teams = this.event.teams.filter(team => team.draft_order !== undefined).sort((a, b) => a.draft_order - b.draft_order);
             if (this.category) teams = teams.filter(t => !this.category || (t.team_category?.includes(";") ? t.team_category.split(";")[1] : t.team_category) === this.category);
-            return teams;
+            return teams.map(t => {
+                t.players = (t.players || []).map(p => decoratePlayerWithDraftData(p, this.event?.id));
+                return t;
+            });
         },
         draftRows() {
             if (!this.draftTeams) return [];

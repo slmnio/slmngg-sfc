@@ -85,6 +85,7 @@ import DraftTeam from "@/components/broadcast/DraftTeam";
 import DraftPlayer from "@/components/broadcast/DraftPlayer";
 import { logoBackground, logoBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo";
+import { decoratePlayerWithDraftData } from "@/utils/content-utils.js";
 
 export default {
     name: "DraftOverlay",
@@ -104,7 +105,9 @@ export default {
                     players: ReactiveArray("players"),
                     captains: ReactiveArray("captains")
                 }),
-                draftable_players: ReactiveArray("draftable_players")
+                draftable_players: ReactiveArray("draftable_players", {
+                    "signup_data": ReactiveArray("signup_data")
+                })
             });
         },
         highlight_event() {
@@ -145,40 +148,13 @@ export default {
                 }
                 if (!player.name) return false;
                 return true;
-            }).map(player => {
+            }).map(_p => {
+                let player = decoratePlayerWithDraftData(_p, this.event?.id);
                 // attempt to get SR
                 if (this.useHighlightEventBadges) {
                     // get team from highlight event
                     player._highlight_team = this.getHighlightEventTeam(player) || null;
                 }
-
-                try {
-                    const ow = JSON.parse(player.overwatch_data);
-                    if (ow?.ratings && player.role) {
-                        let sr = ow.ratings.find(r => r.role === player.role.toLowerCase())?.level;
-                        if (sr) return { ...player, rating: { level: sr, note: "Pulled from their Battletag" } };
-                        sr = Math.floor(ow.ratings.reduce((p, c) => p + c.level, 0) / ow.ratings.length);
-                        // console.log(sr);
-                        if (sr) return { ...player, rating: { level: sr, note: "Average of other roles" } };
-                    }
-                    if (player.manual_sr) {
-                        return { ...player, rating: { level: parseInt(player.manual_sr), note: "Manually added" } };
-                    }
-                } catch (e) {
-                    if (player.manual_sr) {
-                        return { ...player, rating: { level: parseInt(player.manual_sr), note: "Manually added" } };
-                    }
-                    return player;
-                }
-
-
-                return player;
-            }).map(player => {
-                try {
-                    const draftData = JSON.parse(player.draft_data);
-                    player._draftData = draftData;
-                } catch (e) { return player; }
-
                 return player;
             }).sort((a, b) => {
                 if (this.game === "Valorant") {
@@ -199,9 +175,11 @@ export default {
             if (!this.availablePlayers) return [];
             const groups = {};
             this.availablePlayers.forEach(player => {
-                if (!groups[player?.role]) groups[player.role] = [];
-                groups[player.role].push(player);
+                const role = player?._draftData?.role || player?.role;
+                if (!groups[role]) groups[role] = [];
+                groups[role].push(player);
             });
+            console.log(groups);
             return Object.values(groups);
         },
         draftTeams() {
@@ -225,7 +203,7 @@ export default {
         },
         draftPlayerStyle() {
             return {
-                width: `calc(100% / ${this.columns} - 4px)`
+                width: `calc(100% / ${this.columns})`
             };
         },
         highlightPlace() {
@@ -408,7 +386,7 @@ export default {
         width: 100%;
         margin: 0 0 8px;
         padding: 2px 8px;
-        width: calc(100% - 4px);
+        width: calc(100%);
         text-transform: uppercase;
     }
 
@@ -521,7 +499,7 @@ export default {
     }
     .event-logo {
         margin-bottom: 8px;
-        width: calc(100% - 4px) !important;
+        width: calc(100%) !important;
         height: 200px;
     }
 
@@ -552,7 +530,8 @@ export default {
     }
 
     .role-column .draft-player {
-        width: 196px;
+        /*width: 196px;*/
+        width: 100%;
         margin: 1px 0;
         font-size: 18px;
         padding: 0 8px;

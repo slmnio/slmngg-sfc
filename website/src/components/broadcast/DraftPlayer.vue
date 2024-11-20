@@ -8,7 +8,7 @@
         <Squeezable class="player-name">
             <div>{{ player.name }}</div>
         </Squeezable>
-        <div v-if="showIcon" class="player-role flex-center" v-html="getSVG(player.role)"></div>
+        <div v-if="showIcon" class="player-role flex-center" v-html="getSVG(player?._draftData?.role || player?.role)"></div>
         <div v-if="badge" class="player-badge">
             <ThemeLogo class="badge-logo" :theme="badge && badge.theme" icon-padding="0.2em" logo-size="w-50" />
         </div>

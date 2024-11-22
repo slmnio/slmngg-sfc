@@ -12,7 +12,7 @@
             v-bind="overlayProps"
             :player="gfx.players?.[0]"
             :team="gfx.teams?.[0]"
-            :hero="gfx.heroes?.[0]" />
+            :custom-hero="gfx.heroes?.[0]" />
         <StatsGFXOverlay v-if="gfx?.type?.startsWith('Stats: ')" v-bind="overlayProps" />
         <v-style>
             {{ gfx?.custom_css }}

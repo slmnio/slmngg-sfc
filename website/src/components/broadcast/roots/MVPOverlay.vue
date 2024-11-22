@@ -66,7 +66,7 @@ import { cleanID } from "@/utils/content-utils.js";
 export default {
     name: "MVPOverlay",
     components: { ThemeTransition, ThemeLogo, RecoloredHero },
-    props: ["broadcast", "title", "animationActive", "showSponsor", "player", "team", "hero"],
+    props: ["broadcast", "title", "animationActive", "showSponsor", "player", "team", "customHero"],
     computed: {
         match() {
             return ReactiveRoot(this.broadcast?.live_match?.[0], {
@@ -121,7 +121,7 @@ export default {
             return (this.mvp.member_of || []).find(team => (this.match?.teams || []).some(t => t.id === team.id));
         },
         hero() {
-            return this.hero || this.broadcast?.highlight_hero || this.mvp?.favourite_hero;
+            return this.customHero || this.broadcast?.highlight_hero || this.mvp?.favourite_hero;
         },
         borderColor() {
             return {

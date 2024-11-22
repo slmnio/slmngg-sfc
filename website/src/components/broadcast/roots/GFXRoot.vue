@@ -82,7 +82,8 @@ export default {
                 }),
                 "teams": ReactiveArray("teams", {
                     "theme": ReactiveThing("theme")
-                })
+                }),
+                "heroes": ReactiveArray("heroes")
             });
         }
     }

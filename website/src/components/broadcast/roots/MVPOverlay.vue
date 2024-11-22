@@ -1,57 +1,55 @@
 <template>
-    <div class="mvp-overlay">
-        <div v-if="mvp">
-            <div class="text-container">
-                <div class="all-text-holder">
-                    <div v-if="sponsor" class="sponsor-theme-holder">
-                        <ThemeTransition
-                            class="sponsor-theme-transition"
-                            start="right"
-                            :theme="sponsor"
-                            :active="animationActive"
-                            :starting-delay="200"
-                            :duration="300">
-                            <div v-if="showSponsor" class="sponsor-logo-holder flex-center">
-                                <div class="sponsor-logo bg-center" :style="logo(sponsor)"></div>
-                            </div>
-                        </ThemeTransition>
-                    </div>
-                    <div class="title-holder">
-                        <ThemeTransition
-                            start="right"
-                            :theme="themeBackground(broadcast?.event?.theme)"
-                            :active="animationActive"
-                            :starting-delay="100"
-                            :duration="500">
-                            <div class="title" :style="themeBackground(broadcast?.event?.theme)">{{ title || 'MVP' }}</div>
-                        </ThemeTransition>
-                    </div>
+    <div v-if="mvp" class="mvp-overlay">
+        <div class="text-container">
+            <div class="all-text-holder">
+                <div v-if="sponsor" class="sponsor-theme-holder">
+                    <ThemeTransition
+                        class="sponsor-theme-transition"
+                        start="right"
+                        :theme="sponsor"
+                        :active="animationActive"
+                        :starting-delay="200"
+                        :duration="300">
+                        <div v-if="showSponsor" class="sponsor-logo-holder flex-center">
+                            <div class="sponsor-logo bg-center" :style="logo(sponsor)"></div>
+                        </div>
+                    </ThemeTransition>
+                </div>
+                <div class="title-holder">
+                    <ThemeTransition
+                        start="right"
+                        :theme="themeBackground(broadcast?.event?.theme)"
+                        :active="animationActive"
+                        :starting-delay="100"
+                        :duration="500">
+                        <div class="title" :style="themeBackground(broadcast?.event?.theme)">{{ title || 'MVP' }}</div>
+                    </ThemeTransition>
+                </div>
 
-                    <div class="text-holder">
-                        <ThemeTransition
-                            start="right"
-                            :theme="theme"
-                            :active="animationActive"
-                            :starting-delay="400"
-                            :duration="300">
-                            <div class="player-name-holder" :style="themeBackground(theme)">
-                                <ThemeLogo
-                                    icon-padding="20%"
-                                    border-width="0"
-                                    :theme="mvpTeam && mvpTeam.theme"
-                                    class="player-team-logo" />
-                                <div class="player-name">{{ mvp.name }}</div>
-                            </div>
-                        </ThemeTransition>
-                    </div>
+                <div class="text-holder">
+                    <ThemeTransition
+                        start="right"
+                        :theme="theme"
+                        :active="animationActive"
+                        :starting-delay="400"
+                        :duration="300">
+                        <div class="player-name-holder" :style="themeBackground(theme)">
+                            <ThemeLogo
+                                icon-padding="20%"
+                                border-width="0"
+                                :theme="mvpTeam && mvpTeam.theme"
+                                class="player-team-logo" />
+                            <div class="player-name">{{ mvp.name }}</div>
+                        </div>
+                    </ThemeTransition>
                 </div>
             </div>
-            <transition name="hero-move">
-                <div v-show="animationActive && mvpTeam && mvpTeam.theme" class="hero-container">
-                    <recolored-hero v-if="mvpTeam && mvpTeam.theme" class="hero" :theme="mvpTeam.theme" :hero="hero" />
-                </div>
-            </transition>
         </div>
+        <transition name="hero-move">
+            <div v-show="animationActive && mvpTeam && mvpTeam.theme" class="hero-container">
+                <recolored-hero v-if="mvpTeam && mvpTeam.theme" class="hero" :theme="mvpTeam.theme" :hero="hero" />
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -63,11 +61,12 @@ import { themeBackground } from "@/utils/theme-styles";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
 import { useStatusStore } from "@/stores/statusStore";
 import { resizedImage } from "@/utils/images";
+import { cleanID } from "@/utils/content-utils.js";
 
 export default {
     name: "MVPOverlay",
     components: { ThemeTransition, ThemeLogo, RecoloredHero },
-    props: ["broadcast", "title", "animationActive", "showSponsor"],
+    props: ["broadcast", "title", "animationActive", "showSponsor", "player", "team", "hero"],
     computed: {
         match() {
             return ReactiveRoot(this.broadcast?.live_match?.[0], {
@@ -82,25 +81,47 @@ export default {
             });
         },
         broadcastData() {
-            return ReactiveRoot(this.broadcast?.id, {
-                highlight_player: ReactiveThing("highlight_player"),
-                highlight_team: ReactiveThing("highlight_team", {
-                    theme: ReactiveThing("theme")
-                })
-            });
+            if (this.player) {
+                // Load all event data if a player is passed (i.e. GFX or something)
+                return ReactiveRoot(this.broadcast?.id, {
+                    highlight_player: ReactiveThing("highlight_player"),
+                    highlight_team: ReactiveThing("highlight_team", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    event: ReactiveThing("event", {
+                        teams: ReactiveArray("teams", {
+                            players: ReactiveArray("players"),
+                            theme: ReactiveThing("theme")
+                        })
+                    })
+                });
+            } else {
+                return ReactiveRoot(this.broadcast?.id, {
+                    highlight_player: ReactiveThing("highlight_player"),
+                    highlight_team: ReactiveThing("highlight_team", {
+                        theme: ReactiveThing("theme")
+                    })
+                });
+
+            }
         },
         mvp() {
-            return this.match?.mvp || this.broadcastData?.highlight_player;
+            return this.player || this.match?.mvp || this.broadcastData?.highlight_player;
         },
         mvpTeam() {
             return this.relatedMvpTeam || this.broadcastData?.highlight_team;
         },
         relatedMvpTeam() {
+            if (this.team) return this.team;
+            if (this.player) {
+                let playerTeam = (this.broadcastData?.event?.teams || []).find(team => (team?.players || []).find(player => cleanID(player.id) === cleanID(this.player?.id)));
+                if (playerTeam) return playerTeam;
+            }
             if (!this.mvp) return null;
             return (this.mvp.member_of || []).find(team => (this.match?.teams || []).some(t => t.id === team.id));
         },
         hero() {
-            return this.broadcast?.highlight_hero || this.mvp?.favourite_hero;
+            return this.hero || this.broadcast?.highlight_hero || this.mvp?.favourite_hero;
         },
         borderColor() {
             return {

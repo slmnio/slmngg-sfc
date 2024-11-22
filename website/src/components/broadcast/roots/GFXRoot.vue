@@ -7,6 +7,12 @@
         <StandingsOverlay v-if="gfx?.type === 'Standings'" v-bind="overlayProps" :stage="overlayProps.identifier" />
         <TextOverlay v-if="gfx?.type === 'Text'" v-bind="overlayProps" />
         <MultiStandingsOverlay v-if="gfx?.type === 'Multi Standings'" v-bind="overlayProps" :stage-codes="gfx?.identifier?.split(',')" />
+        <MVPOverlay
+            v-if="gfx?.type === 'MVP'"
+            v-bind="overlayProps"
+            :player="gfx.players?.[0]"
+            :team="gfx.teams?.[0]"
+            :hero="gfx.heroes?.[0]" />
         <StatsGFXOverlay v-if="gfx?.type?.startsWith('Stats: ')" v-bind="overlayProps" />
         <v-style>
             {{ gfx?.custom_css }}
@@ -24,15 +30,17 @@ import StandingsOverlay from "@/components/broadcast/roots/StandingsOverlay.vue"
 import TextOverlay from "@/components/broadcast/roots/TextOverlay.vue";
 import MultiStandingsOverlay from "@/components/broadcast/roots/MultiStandingsOverlay.vue";
 import StatsGFXOverlay from "@/components/broadcast/roots/StatsGFXOverlay.vue";
+import MVPOverlay from "@/components/broadcast/roots/MVPOverlay.vue";
 
 export default {
     name: "GFXRoot",
-    components: { StatsGFXOverlay, MultiStandingsOverlay, TextOverlay, StandingsOverlay, IframeOverlay, ImageOverlay, BracketOverlay, ScheduleOverlay },
+    components: { MVPOverlay, StatsGFXOverlay, MultiStandingsOverlay, TextOverlay, StandingsOverlay, IframeOverlay, ImageOverlay, BracketOverlay, ScheduleOverlay },
     props: {
         index: Number,
         broadcast: Object,
         client: Object,
         title: String,
+        animationActive: Boolean,
     },
     computed: {
         overlayProps() {
@@ -40,6 +48,7 @@ export default {
                 broadcast: this.broadcast,
                 client: this.client,
                 gfx: this.gfx,
+                animationActive: this.animationActive,
 
                 matches: this.gfx?.matches || [],
                 title: this.title || this.gfx?.title,

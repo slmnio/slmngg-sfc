@@ -78,7 +78,8 @@ export default {
                 "players": ReactiveArray("players", {
                     "member_of": ReactiveArray("member_of", {
                         "theme": ReactiveThing("theme")
-                    })
+                    }),
+                    "favourite_hero": ReactiveThing("favourite_hero")
                 }),
                 "teams": ReactiveArray("teams", {
                     "theme": ReactiveThing("theme")

@@ -119,6 +119,13 @@ export default [
                             { path: "", component: () => import("@/views/sub-views/guide/companion-module/CompanionModuleGuideIntro.vue"), name: "companion-module" }
                         ]
                     },
+                    {
+                        path: "producing",
+                        component: () => import("@/views/sub-views/guide/producing/ProducingGuideContainer.vue"),
+                        children: [
+                            { path: "", component: () => import("@/views/sub-views/guide/producing/ProducingGuideIntro.vue"), name: "producing-guide" }
+                        ]
+                    },
                 ],
             },
             {

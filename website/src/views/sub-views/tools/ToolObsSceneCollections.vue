@@ -8,7 +8,7 @@
                     :disabled="!(broadcast === '' || !broadcast)"
                     @update:model-value="(v) => client = cleanString(v)" />
                 <template #description>
-                    <div v-if="!clientExists && client && client !== ''" class="text-white d-flex align-items-center gap-1 mt-1">
+                    <div v-if="!clientExists && client" class="text-white d-flex align-items-center gap-1 mt-1">
                         <b>⚠️ The client key you entered does not (yet) exist in the SLMN.GG system. Please double check your spelling, or ask an admin to create it for you.</b>
                     </div>
                     <div class="text-white">

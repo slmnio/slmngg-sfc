@@ -20,11 +20,14 @@ const attachments = new Map();
 
 const emitter = new EventEmitter();
 
+/**
+ * @returns {Set<AnyAirtableID>}
+ */
 function getAntiLeakIDs() {
-    if (process.env.DISABLE_ANTILEAK === "true") return []; // don't hide anything on local
-    let ids = [];
+    if (process.env.DISABLE_ANTILEAK === "true") return null; // don't hide anything on local
+    let ids = new Set();
     hiddenEvents.forEach((val) => {
-        if (val?.length) val.forEach(id => ids.push(id));
+        if (val?.length) val.forEach(id => ids.add(id));
     });
     return ids;
 }
@@ -64,14 +67,16 @@ const updateFunction = function(id, data, options) {
 
 async function removeAntiLeak(id, data) {
     let antiLeakIDs = getAntiLeakIDs();
-    if (antiLeakIDs.includes(id)) {
+    if (!antiLeakIDs) return data;
+
+    if (antiLeakIDs.has(id)) {
         // console.log("antileak", antiLeakIDs, id);
         return null;
     }
 
     Object.entries(data).forEach(([key, val]) => {
         if (typeof val === "object" && val?.length) {
-            data[key] = val.filter(id => !antiLeakIDs.includes(cleanID(id)));
+            data[key] = val.filter(id => !antiLeakIDs.has(cleanID(id)));
             if (data[key].length === 0) delete data[key];
         }
     });

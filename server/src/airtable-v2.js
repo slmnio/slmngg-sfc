@@ -101,18 +101,23 @@ class TableManager {
         this.lastFullRequest = this.fullRequest.start;
 
         try {
-            const data = await slmngg(this.tableName).select().all();
+            const ids = [];
+
+            await slmngg(this.tableName).select().eachPage(async (records, next) => {
+                await this.processData(records);
+                records.forEach(rec => ids.push(rec.id));
+                // TODO: process custom table updates in chunks here
+
+                this.fullRequest.itemCount = ids.length;
+                next();
+            });
 
             this.fullRequest.status = "finished";
             this.fullRequest.duration = this.endTimer();
-            this.fullRequest.itemCount = data.length;
-
-            await this.processData(data);
-
 
             await Cache.set(this.tableName, {
                 id: this.tableName,
-                ids: data.map(d => d.id),
+                ids: ids,
                 __tableName: "Table"
             });
             customTableUpdate(this.tableName, Cache);
@@ -186,7 +191,7 @@ class TableManager {
     }
 
     async processData(data) {
-        this.airtableRequestCount += (Math.floor(data.length / 100) + 1);
+        this.airtableRequestCount += (Math.ceil(data.length / 100));
         for (const item of data.map(deAirtable)) {
             item.__tableName = this.tableName;
             if (this.tableName === "News") item.slug = sluggify(item.name);
@@ -307,7 +312,7 @@ class AirtableManager {
 
             if (!fullLoad && table.changesRequest?.status === "active") return false;
             const latestRequestDiff = new Date() - table.getLatestRequest(fullLoad);
-            return latestRequestDiff >= 7000; // only show tables over Xs old
+            return latestRequestDiff >= (fullLoad ? 60000 : 7000); // only show tables over Xs old
         }).sort((a, b) => {
             const [aDate, bDate] = [a, b].map(x => x.getLatestRequest(fullLoad));
             if (aDate > bDate) return 1;

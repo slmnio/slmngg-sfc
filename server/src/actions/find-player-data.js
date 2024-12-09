@@ -28,7 +28,7 @@ export default {
 
         const { players } = await this.helpers.get("internal:lookup-players");
 
-        return playerData.map(({ name, discord_tag, battletag, discord_id, id }) => {
+        return playerData.map(({ discord_tag, battletag, discord_id, id }) => {
             const player = players.find(p => {
                 if (discord_tag && norm(p.discord_tag) === norm(discord_tag)) return true;
                 if (battletag && norm(p.battletag) === norm(battletag)) return true;
@@ -38,7 +38,7 @@ export default {
                 return false;
             });
             if (player) return player;
-            if (name) return players.find(p => norm(p.name) === norm(name));
+            // if (name) return players.find(p => norm(p.name) === norm(name));
             return null;
         });
     }

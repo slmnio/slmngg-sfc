@@ -16,6 +16,10 @@ export const useSettingsStore = defineStore("settings", () => {
     const transmitterPassword = ref("");
     const useDashboardTransmitter = ref(true);
 
+    const splitSrByRole = ref(false);
+    const showAllSrInputs = ref(false);
+    const showNonCompetitive = ref(true);
+
 
     const draftNotes = ref<Record<string, { tag: string, notes: string }>>({});
     const openDashboardModules = ref<Record<string, boolean>>({});
@@ -34,6 +38,9 @@ export const useSettingsStore = defineStore("settings", () => {
         assumeLoserPicks,
         gfxButtonCount,
         removeHashInHex,
+        splitSrByRole,
+        showAllSrInputs,
+        showNonCompetitive,
 
         transmitterUrl,
         transmitterPassword,

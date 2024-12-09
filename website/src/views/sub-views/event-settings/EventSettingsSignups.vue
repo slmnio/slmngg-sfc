@@ -24,9 +24,9 @@
         </div>
         <div class="editor">
             <div class="mb-2 d-flex flex-column">
-                <b-form-checkbox v-model="customisation.useSplitSR" switch>Split SR by role</b-form-checkbox>
-                <b-form-checkbox v-model="customisation.showAllSR" switch>Show all SR inputs</b-form-checkbox>
-                <b-form-checkbox v-model="customisation.showNonCompetitive" switch>Show non-competitive information</b-form-checkbox>
+                <b-form-checkbox v-model="splitSrByRole" switch>Split SR by role</b-form-checkbox>
+                <b-form-checkbox v-model="showAllSrInputs" switch>Show all SR inputs</b-form-checkbox>
+                <b-form-checkbox v-model="showNonCompetitive" switch>Show non-competitive information</b-form-checkbox>
             </div>
             <div class="mb-2 d-flex gap-2 justify-content-between">
                 <div class="d-flex gap-2">
@@ -39,7 +39,7 @@
                     <div class="px-2">
                         {{ changeCount }} change{{ changeCount === 1 ? '' : 's' }}
                     </div>
-                    <b-button variant="success" :disabled="processing.signupData" @click="confirmModal = !confirmModal">
+                    <b-button variant="success" :disabled="processing.signupData" @click.ctrl="setPlayerSignupData" @click.exact="confirmModal = !confirmModal">
                         <i class="fas fa-fw mr-1" :class="processing.signupData ? 'fa-cog fa-spin': 'fa-cogs'"></i>
                         Save player signup data
                     </b-button>
@@ -91,6 +91,9 @@ import { sortAlphaRaw } from "@/utils/sorts";
 import { authenticatedRequest } from "@/utils/dashboard";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { cleanID } from "@/utils/content-utils";
+import { mapWritableState } from "pinia";
+import { useSettingsStore } from "@/stores/settingsStore.ts";
+
 registerAllModules();
 function empty(element) {
     let child;
@@ -163,11 +166,6 @@ export default {
     components: { HotTable },
     props: ["event", "team"],
     data: () => ({
-        customisation: {
-            useSplitSR: false,
-            showAllSR: false,
-            showNonCompetitive: false
-        },
         confirmModal: null,
 
 
@@ -199,6 +197,11 @@ export default {
         }
     }),
     computed: {
+        ...mapWritableState(useSettingsStore, [
+            "splitSrByRole",
+            "showAllSrInputs",
+            "showNonCompetitive",
+        ]),
         columnHeaders() {
             return this.signupColumns.map(col => col.header);
         },
@@ -265,19 +268,19 @@ export default {
             cols.push({ header: "Discord Tag", data: "discord_tag", renderer: "diffchecker" });
             cols.push({ header: "Battletag", data: "battletag", renderer: "diffchecker" });
             cols.push({ type: "select", selectOptions: ["Tank", "DPS", "Support", "Flex"], header: "Main Role", data: "role" });
-            if (this.customisation.showNonCompetitive) {
+            if (this.showNonCompetitive) {
                 cols.push({ header: "Pronouns", data: "pronouns", renderer: "diffchecker" });
                 cols.push({ header: "Pronunciation", data: "pronunciation", renderer: "diffchecker" });
             }
             cols.push({ header: "Info For Captains", data: "info_for_captains", renderer: "diffchecker" });
 
-            if (this.customisation.useSplitSR || this.customisation.showAllSR) {
+            if (this.splitSrByRole || this.showAllSrInputs) {
                 cols.push({ header: "Tank SR", data: "tank_sr", renderer: "diffchecker" });
                 cols.push({ header: "DPS SR", data: "dps_sr", renderer: "diffchecker" });
                 cols.push({ header: "Support SR", data: "support_sr", renderer: "diffchecker" });
             }
 
-            if (!this.customisation.useSplitSR || this.customisation.showAllSR) {
+            if (!this.splitSrByRole || this.showAllSrInputs) {
                 cols.push({ header: "SR", data: "sr", renderer: "diffchecker" });
             }
 
@@ -302,7 +305,7 @@ export default {
 
                 // console.log(row);
                 if (!(row.id || row.name)) {
-                    return "Need name or player";
+                    return "Need name or player ID";
                 }
 
                 if (this.isDifferent("team_name", row.team_name, { row: i })) {
@@ -369,7 +372,28 @@ export default {
                 // console.log(changes[i]);
 
                 //             3 -> new val
-                if (changes[i][3]?.includes("Damage")) changes[i][3] = changes[i][3].replace("Damage", "DPS");
+                if (changes[i][1] === "pronouns") {
+                    changes[i][3] = changes[i][3]?.toLowerCase()?.trim();
+                }
+
+                if (changes[i][1] === "role" || changes[i][1] === "eligible_roles") {
+                    if (changes[i][3]?.includes("Damage")) {
+                        changes[i][3] = changes[i][3].replace("Damage", "DPS");
+                    }
+                }
+                if (changes[i][1] === "role") {
+
+                    // normalise
+                    if (changes[i][3]?.toLowerCase()?.includes("Support".toLowerCase())) {
+                        changes[i][3] = "Support";
+                    }
+                    if (changes[i][3]?.toLowerCase()?.includes("Tank".toLowerCase())) {
+                        changes[i][3] = "Tank";
+                    }
+                    if (changes[i][3]?.toLowerCase()?.includes("DPS".toLowerCase())) {
+                        changes[i][3] = "DPS";
+                    }
+                }
 
                 //             1 -> prop that changed
                 if (changes[i][1] === "team_name") {
@@ -500,10 +524,6 @@ export default {
                 top: 100000000,
                 behavior: "instant"
             });
-            if (this.team) {
-                this.data[this.data.length - 1].team_id = cleanID(this.team.id);
-                this.data[this.data.length - 1].team_name = cleanID(this.team.name);
-            }
         },
         isDifferent(prop, value, cellProperties) {
             const index = cellProperties?.row;
@@ -599,6 +619,14 @@ export default {
             callback: () => {
                 console.log(...arguments);
                 this.addRow();
+            }
+        });
+
+        this.$refs.table?.hotInstance?.addHook("afterCreateRow", (index, amount, source) => {
+            console.log("rows created", { index, amount, source });
+            if (this.team) {
+                this.data[index].team_id = cleanID(this.team.id);
+                this.data[index].team_name = cleanID(this.team.name);
             }
         });
     },

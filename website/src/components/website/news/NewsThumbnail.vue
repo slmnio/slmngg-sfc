@@ -4,17 +4,22 @@
             <i v-if="item.redirect_url" class="fa-fw fas fa-external-link"></i>
         </div>
         <div v-if="customThumbnail" class="news-custom-thumbnail w-100 bg-center" :style="customThumbnail"></div>
-        <div v-else class="news-generated-thumbnail w-100 flex-center" :style="{ backgroundColor: generatedThumbnail.backgroundColor }">
+        <div v-else class="news-generated-thumbnail w-100 flex-center flex-column" :class="{'has-thumbnail-text': !!item?.thumbnail_text}" :style="{ backgroundColor: generatedThumbnail.backgroundColor }">
             <div class="news-generated-thumbnail-logo bg-center" :style="{backgroundImage: generatedThumbnail.backgroundImage}"></div>
+            <Squeezable v-if="item.thumbnail_text" class="news-thumbnail-text flex-center" align="center">
+                <div class="industry-align">{{ item?.thumbnail_text }}</div>
+            </Squeezable>
         </div>
     </div>
 </template>
 
 <script>
 import { bg, resizedImage } from "@/utils/images";
+import Squeezable from "@/components/broadcast/Squeezable.vue";
 
 export default {
     name: "NewsThumbnail",
+    components: { Squeezable },
     props: ["item"],
     computed: {
         border() {
@@ -78,6 +83,31 @@ export default {
     .news-generated-thumbnail-logo {
         width: calc(100% - 16px);
         height: calc(100% - 24px);
+    }
+
+    .news-generated-thumbnail.has-thumbnail-text {
+        justify-content: flex-end;
+    }
+    .news-generated-thumbnail.has-thumbnail-text .news-generated-thumbnail-logo {
+        height: 100%;
+        margin-top: .5em;
+        margin-bottom: .1em;
+        flex-grow: 0;
+    }
+
+    .news-thumbnail-text {
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 2em;
+        width: 100%;
+        flex-shrink: 0;
+        margin-top: 0.1em;
+        margin-bottom: 0.1em;
+        height: 1.25em;
+    }
+    .news-thumbnail-text div {
+        text-align: center;
+        padding: 0 0.3em;
     }
 
     .icons {

@@ -79,6 +79,8 @@
                 </b-navbar-nav>
 
                 <b-navbar-nav>
+                    <div v-if="siteMode && siteMode !== 'production' && !isRebuilding" v-b-modal.force-auth-modal class="nav-link text-left justify-content-start">Force Auth</div>
+
                     <router-link v-if="!user && !isRebuilding" class="nav-link" to="/login">Login</router-link>
                     <LoggedInUser v-if="user" />
                 </b-navbar-nav>
@@ -89,6 +91,41 @@
             <div class="live-matches-text">🔴 LIVE</div>
             <NavLiveMatch v-for="match in liveMatches" :key="match.id" :match="match" />
         </div>
+
+        <b-modal
+            v-if="siteMode !== 'production'"
+            id="force-auth-modal"
+            ref="force-auth-modal"
+            title="Force auth token"
+            hide-footer>
+            <div class="d-flex flex-column gap-2">
+                <div class="bg-warning p-2 rounded">
+                    <i class="fas fa-exclamation-triangle mr-1"></i> <b>For development use only</b>
+                </div>
+                <div>Force authentication using an existing auth token from the data server.</div>
+                <b-form @submit.prevent="forceToken(forceTokenInput)">
+                    <b-form-group>
+                        <div class="d-flex gap-2">
+                            <b-form-input
+                                v-model="forceTokenInput"
+                                type="text"
+                                class="fake-pw"
+                                autocomplete="off"
+                                placeholder="Token from data server" />
+                            <b-button variant="success" type="submit">
+                                Force
+                            </b-button>
+                        </div>
+                    </b-form-group>
+                </b-form>
+                <div>Data server: <code>{{ getDataServerAddress() }}</code></div>
+
+                <div class="bg-dark text-light rounded border rounded p-2">
+                    <b>Loaded user data</b>
+                    <pre class="mb-0  bg-dark text-light">{{ user || 'no valid data' }}</pre>
+                </div>
+            </div>
+        </b-modal>
 
         <b-modal id="timezone-swapper-modal" ref="timezone-swapper-modal" title="Timezone swapper" hide-footer>
             <p>Change your timezone for dates and times across SLMN.GG:</p>
@@ -111,7 +148,7 @@ import WebsiteNavBanner from "@/components/website/WebsiteNavBanner";
 import { resizedImageNoWrap } from "@/utils/images";
 import LoggedInUser from "@/components/website/LoggedInUser";
 import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
-import { getMainDomain } from "@/utils/fetch";
+import { getDataServerAddress, getMainDomain } from "@/utils/fetch";
 import { mapState, mapWritableState } from "pinia";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -129,7 +166,8 @@ export default {
         pageNoLongerNew: false,
         resizeObserver: null,
         height: 0,
-        reloadAfterRebuild: false
+        reloadAfterRebuild: false,
+        forceTokenInput: null
     }),
     computed: {
         ...mapWritableState(useAuthStore, ["user"]),
@@ -211,11 +249,26 @@ export default {
         }
     },
     methods: {
+        getDataServerAddress,
         slmnggURL(page) {
             return `${this.slmnggDomain}/${page}`;
         },
         onResize() {
             this.height = this.$el.offsetHeight;
+        },
+        async forceToken(token) {
+            if (!token) {
+                this.$notyf.error("No token supplied. You can force a logout from the user dropdown.");
+                return;
+            }
+            const auth = useAuthStore();
+            const response = await auth.authenticateWithToken(token);
+            console.log(response);
+            if (response.error) {
+                this.$notyf.error(response.errorMessage);
+            } else {
+                this.$notyf.success("New token authenticated and stored");
+            }
         }
     },
     watch: {
@@ -295,5 +348,9 @@ export default {
 }
 .toggler.navbar-toggler {
     --bs-navbar-toggler-border-color: rgba(255,255,255,0.15);
+}
+.fake-pw {
+    text-security: disc;
+    -webkit-text-security: disc;
 }
 </style>

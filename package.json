@@ -8,7 +8,8 @@
     "globals": "^15.1.0",
     "postcss-html": "^1.6.0",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.8.0"
+    "typescript-eslint": "^7.8.0",
+    "@vue/language-server": "^2.1.10"
   },
   "packageManager": "pnpm@9.1.0"
 }

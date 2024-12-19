@@ -75,7 +75,7 @@ export class Action {
             get: (...args) => Cache.get(...args),
             createRecord: (tableName, data) => createRecord(Cache, tableName, [data]),
             createRecords: (tableName, items) => createRecord(Cache, tableName, items),
-            updateRecord: (tableName, item, data, source) => updateRecord(Cache, tableName, item, data, source),
+            updateRecord: (tableName, item, data, source) => updateRecord(Cache, tableName, item, data, source || `actions/${this.key}`),
             auth: Cache.auth,
             permissions
         };

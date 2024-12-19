@@ -32,6 +32,24 @@
                                 </div>
                             </div>
                         </router-link>
+                        <router-link v-if="sidebarItems.includes('rescheduling')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('rescheduling')">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>{{ match.start ? 'Rescheduling' : 'Scheduling' }}</div>
+
+                                <div class="d-flex flex-wrap align-items-center justify-content-end gap-1">
+                                    <div v-if="reschedulingBadge" class="badge pill" :class="`bg-${reschedulingBadge.variant}`" :title="reschedulingBadge?.title">
+                                        {{ reschedulingBadge.text }}
+                                    </div>
+
+
+                                    <div v-if="!authenticated">
+                                        <span v-b-tooltip="'Requires login'">
+                                            <i class="fa fa-lock"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </router-link>
                         <router-link v-if="sidebarItems.includes('editor')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('editor')">Match editor</router-link>
                     </ul>
 
@@ -186,6 +204,9 @@ export default {
         scoreReportingEnabled() {
             return this.eventSettings?.reporting?.score?.use;
         },
+        reschedulingEnabled() {
+            return this.eventSettings?.reporting?.rescheduling?.use && this.match?.earliest_start && this.match?.latest_start;
+        },
         authenticated() {
             const { isAuthenticated } = useAuthStore();
             return isAuthenticated;
@@ -200,6 +221,7 @@ export default {
             if (this.showHeadToHead) items.push("head-to-head");
             if (this.showEditor) items.push("editor");
             if ((this.scoreReportingEnabled && !this.matchComplete) || (this.$route?.path?.endsWith("/score-reporting"))) items.push("score-reporting");
+            if ((this.reschedulingEnabled && !this.matchComplete) || (this.$route?.path?.endsWith("/rescheduling"))) items.push("rescheduling");
 
             return items;
         },
@@ -230,6 +252,14 @@ export default {
                 })
             })?.reports || []).find(report => report.type === "Scores" && cleanID(report.match?.[0]) === cleanID(this.match?.id));
         },
+        reschedulingScoreReport() {
+            return (ReactiveRoot(this.match?.id, {
+                "reports": ReactiveArray("reports", {
+                    "team": ReactiveThing("team"),
+                    "player": ReactiveThing("player")
+                })
+            })?.reports || []).find(report => report.type === "Rescheduling" && !report.approved && cleanID(report.match?.[0]) === cleanID(this.match?.id));
+        },
         scoreReportingBadge() {
             const { user } = useAuthStore();
             const state = {
@@ -242,6 +272,19 @@ export default {
             };
 
             return getScoreReportingBadge(state, this.existingScoreReport, this.eventSettings);
+        },
+        reschedulingBadge() {
+            const { user } = useAuthStore();
+            const state = {
+                "reports_enabled": this.reschedulingEnabled,
+                "existing_report": !!this.reschedulingScoreReport?.id,
+                "is_on_teams": !!this.controllableTeams?.length,
+                "is_opponent": this.reschedulingScoreReport?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) !== cleanID(this.reschedulingScoreReport?.team?.id)) : null,
+                "is_submitter": this.reschedulingScoreReport?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) === cleanID(this.reschedulingScoreReport?.team?.id)) : null,
+                "is_staff": isEventStaffOrHasRole(user, { event: this.match?.event, websiteRoles: ["Can edit any match", "Can edit any event"] })
+            };
+
+            return getScoreReportingBadge(state, this.reschedulingScoreReport, this.eventSettings, "rescheduling");
         }
     },
     methods: {

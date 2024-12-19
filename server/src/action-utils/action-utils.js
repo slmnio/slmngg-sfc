@@ -4,6 +4,7 @@ import { StaticAuthProvider } from "@twurple/auth";
 import { ApiClient } from "@twurple/api";
 import { verboseLog } from "../discord/slmngg-log.js";
 import { get } from "./action-cache.js";
+import client from "../discord/client.js";
 
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
 const slmngg = airtable.base(process.env.AIRTABLE_APP);
@@ -51,7 +52,7 @@ const TimeOffset = 3 * 1000;
  */
 export async function updateRecord(Cache, tableName, item, data, source = undefined) {
     // see: airtable-interface.js customUpdater
-    console.log(`[update record] updating table=${tableName} id=${item.id}`, data);
+    console.log(`[update record] ${source ? `{${source}} ` : ""}updating table=${tableName} id=${item.id}`, data);
 
     let slmnggData = {
         __tableName: tableName,
@@ -211,8 +212,44 @@ export async function getMatchScoreReporting(matchID) {
     if (!eventSettings?.reporting?.score?.use) throw "Score reporting is not enabled on this match";
 
     // check existing report
-    if (match?.reports?.[0]) {
-        const firstReport = await get(match?.reports?.[0]);
+    if (match?.reports.length) {
+        const reports = await Promise.all((match?.reports || []).map(rID => get(rID)));
+        const firstReport = reports.find(r => r.type === "Scores");
+        if (firstReport?.id) {
+            report = firstReport;
+        }
+    }
+
+    return { match, report };
+}
+/**
+ *
+ * @param matchID
+ * @returns {Promise<({report: Report | undefined, match: Match})>}
+ */
+export async function getMatchRescheduling(matchID, { excludeCompleted } = {}) {
+    const match = await get(matchID);
+    let report;
+
+    if (!match?.id) throw "Couldn't load match data";
+
+    if (!match?.event?.[0]) throw "Couldn't load event data for this match";
+    const event = await get(match?.event?.[0]);
+    if (!event?.id) throw "Couldn't load event data for this match";
+
+    // event score reporting must be active
+
+    if (!event?.blocks) throw "Event doesn't have rescheduling set up";
+
+    /** @type {EventSettings} */
+    const eventSettings = JSON.parse(event.blocks);
+    if (!eventSettings?.reporting?.rescheduling?.use) throw "Rescheduling is not enabled on this event";
+    if (!(match?.earliest_start || match?.latest_start)) throw "Rescheduling is not set up on this match";
+
+    // check existing report
+    if (match?.reports?.length) {
+        const reports = await Promise.all((match?.reports || []).map(rID => get(rID)));
+        const firstReport = reports.find(r => r.type === "Rescheduling" && (excludeCompleted ? !r.approved : true));
         if (firstReport?.id) {
             report = firstReport;
         }
@@ -318,4 +355,71 @@ export async function findMember(player, team, guild) {
         console.warn(fixes[fixes.length - 1]);
     }
     return { member, fixes };
+}
+
+/**
+ *
+ * @param {MapObject} mapObject
+ * @param {string} keyPrefix
+ * @returns {Promise<MapObject>}
+ */
+export async function looseDeleteMessage(mapObject, keyPrefix) {
+    console.log(mapObject.data);
+    if (mapObject.get(`${keyPrefix}_message_id`) && mapObject.get(`${keyPrefix}_channel_id`)) {
+        try {
+            const channel = await client.channels.fetch(mapObject.get(`${keyPrefix}_channel_id`));
+            if (channel?.isTextBased()) await channel.messages.delete(mapObject.get(`${keyPrefix}_message_id`));
+        } catch (e) {
+            console.error(`Error trying to delete ${keyPrefix} message`, e);
+        } finally {
+            mapObject.push(`${keyPrefix}_message_id`, null);
+            mapObject.push(`${keyPrefix}_channel_id`, null);
+        }
+    }
+    return mapObject;
+}
+
+/**
+ * @param {object} options
+ * @param {string} options.key
+ * @param {MapObject} options.mapObject
+ * @param {(Snowflake | null)=} options.channelID
+ * @param {(string | null)=} options.content
+ * @param {Function=} options.success
+ * @returns {Promise<MapObject>}
+ */
+export async function sendMessage({
+    key,
+    mapObject,
+    channelID,
+    content,
+    success,
+}) {
+    if (!channelID) {
+        console.warn(`Can't send ${key} message without a channel`);
+        return mapObject;
+    }
+    if (!content) {
+        console.warn(`Can't send ${key} message without content`);
+        return mapObject;
+    }
+    const channel = await client.channels.fetch(channelID);
+    if (channel?.isTextBased()) {
+        try {
+            const message = await channel.send(content);
+            mapObject.push(`${key}_channel_id`, channel.id);
+            mapObject.push(`${key}_message_id`, message.id);
+            if (success) await success({
+                mapObject
+            });
+        } catch (e) {
+            console.error(`Sending error ${key}`, e);
+        }
+    }
+    return mapObject;
+}
+
+export function hammerTime(timeString) {
+    let start = new Date(timeString).getTime();
+    return `<t:${Math.floor(start / 1000)}:F>`;
 }

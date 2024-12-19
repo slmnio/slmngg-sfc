@@ -48,7 +48,6 @@ export default {
         if (reaction === "approve") {
             // opponent approves original's report
 
-
             const messageData = new MapObject(report.message_data);
             // Remove previous captain notification
             console.log(messageData.data);

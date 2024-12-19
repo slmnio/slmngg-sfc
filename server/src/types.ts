@@ -174,15 +174,17 @@ export interface Report extends Base {
     approved?: boolean;
     approved_by_team?: boolean;
     approved_by_opponent?: boolean;
+    denied_by_opponent?: boolean;
     countered_by_opponent?: boolean;
     approved_by_staff?: boolean;
+    denied_by_staff?: boolean;
     force_approved?: boolean;
 
     data?: string;
     countered_data?: string;
     message_data?: string;
     log?: string;
-    type?: "Scores" | "Attributes";
+    type?: "Scores" | "Attributes" | "Rescheduling";
 
     match?: MatchResolvableID[];
     player?: PlayerResolvableID[];
@@ -306,6 +308,8 @@ export interface Match extends Base {
     show_on_secondary_overlays?: boolean;
     special_event?: boolean;
     start?: string;
+    earliest_start?: string;
+    latest_start?: string;
     stats?: string;
     stream_code?: string;
     sub_event?: string;
@@ -497,6 +501,11 @@ export type EventSettings = {
             showHeroBans?: boolean;
             showMapBans?: boolean;
             allowForfeits?: boolean;
+        },
+        rescheduling: {
+            use?: boolean;
+            staffApprove?: boolean;
+            opponentApprove?: boolean;
         }
     };
     logging?: {

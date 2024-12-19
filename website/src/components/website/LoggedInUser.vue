@@ -20,6 +20,7 @@
         <b-dropdown-divider v-if="isProduction" />
         <b-dropdown-item v-if="isProduction" v-b-modal.token-modal variant="dark">Token</b-dropdown-item>
         <b-dropdown-item v-if="isProduction" variant="dark" to="/login">Re-authenticate</b-dropdown-item>
+        <b-dropdown-item v-if="siteMode && siteMode !== 'production'" variant="dark" @click="handleLogout">Logout</b-dropdown-item>
         <TokenModal />
     </b-nav-item-dropdown>
 </template>
@@ -44,6 +45,9 @@ export default {
         },
         avatar() {
             return bg(this.user.avatar);
+        },
+        siteMode() {
+            return import.meta.env.VITE_DEPLOY_MODE || import.meta.env.NODE_ENV;
         }
     },
     methods: {
@@ -58,6 +62,11 @@ export default {
         },
         rootLinkRouter(url) {
             return isOnMainDomain() ? url : null;
+        },
+        handleLogout() {
+            const auth = useAuthStore();
+            auth.logout();
+            this.$router.push("/");
         }
 
     }

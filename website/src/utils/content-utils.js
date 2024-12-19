@@ -673,7 +673,7 @@ export function decoratePlayerWithDraftData(player, eventID) {
 }
 
 
-export function getScoreReportingBadge(state, report, eventSettings) {
+export function getScoreReportingBadge(state, report, eventSettings, type = "score-reporting") {
     if (!state.reports_enabled) return null;
     if (state.is_complete) return null;
 

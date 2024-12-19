@@ -11,7 +11,9 @@ export const socket = io(getDataServerAddress(), { transports: ["websocket", "po
 
 socket.on("connect", () => {
     state.connected = true;
-    socket.emit("subscribe-multiple", store.state.subscribed_ids);
+    if (store.state.subscribed_ids?.length) {
+        socket.emit("subscribe-multiple", store.state.subscribed_ids);
+    }
 });
 
 socket.on("disconnect", () => {

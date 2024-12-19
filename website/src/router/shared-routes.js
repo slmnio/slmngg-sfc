@@ -77,6 +77,7 @@ export default [
             { path: "", component: () => import("@/views/sub-views/MatchVOD.vue") },
             { path: "history", component: () => import("@/views/sub-views/MatchStats.vue") },
             { path: "score-reporting", component: () => import("@/views/sub-views/MatchScoreReporting.vue"), meta: { requiresAuth: true } },
+            { path: "rescheduling", component: () => import("@/views/sub-views/MatchRescheduling.vue"), meta: { requiresAuth: true } },
             { path: "editor", component: () => import("@/views/sub-views/event/EventMatchEditor.vue"), meta: { requiresAuth: true } }
         ]
     },

@@ -273,7 +273,11 @@ export async function authenticatedRequest<U extends RequestUrl>(url: U, data?: 
             },
             body: JSON.stringify(data ?? {})
         }).then(async res => await res.json()).catch((error: Error) => {
-            notyf.error({ message: `Request error: ${error.message}` });
+            if (error.message === "Failed to fetch") {
+                notyf.error({ message: "Request failed: connection error" });
+            } else {
+                notyf.error({ message: `Request error: ${error.message}` });
+            }
             console.error("Fetch error", error);
         });
         console.log(request);

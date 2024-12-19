@@ -216,7 +216,7 @@
 
 import MatchEditor from "@/components/website/dashboard/MatchEditor.vue";
 import { useAuthStore } from "@/stores/authStore";
-import { canEditMatch, isEventStaffOrHasRole } from "@/utils/client-action-permissions";
+import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { cleanID, url } from "@/utils/content-utils";
 import MatchExplainerList from "@/components/website/dashboard/MatchExplainerList.vue";

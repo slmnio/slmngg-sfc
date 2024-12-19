@@ -2,7 +2,7 @@ import { AnyAirtableID, EventSettings, Report } from "../types.js";
 import { get } from "../action-utils/action-cache.js";
 import * as Cache from "../cache.js";
 import { getInternalManager } from "../action-utils/action-manager.js";
-import { cleanID, updateRecord } from "../action-utils/action-utils.js";
+import { cleanID, hammerTime, looseDeleteMessage, sendMessage, updateRecord } from "../action-utils/action-utils.js";
 import client from "../discord/client.js";
 import { MapObject } from "../discord/managers.js";
 import { generateMatchReportText } from "../action-utils/ts-action-utils.js";
@@ -10,15 +10,8 @@ import { generateMatchReportText } from "../action-utils/ts-action-utils.js";
 const processing = new Set<AnyAirtableID>();
 
 export default {
-    /**
-     *
-     * @param {AnyAirtableID} id
-     * @param {object} newData
-     * @param {object?} oldData
-     * @returns {Promise<void>}
-     */
     async handler({ id, newData: report, oldData }: { id: AnyAirtableID, newData: Report, oldData: Report }) {
-        if (!process.env.IS_SLMNGG_MAIN_SERVER) return;
+        // if (!process.env.IS_SLMNGG_MAIN_SERVER) return;
         if (report?.__tableName !== "Reports") return;
         if (report.approved) {
             console.log("Already approved");
@@ -40,19 +33,16 @@ export default {
             const opponentIDs = (match.teams || []).filter(id => cleanID(id) !== cleanID(report.team?.[0]));
             const opponents = await Promise.all(opponentIDs.map(id => get(id)));
             const submittingTeam = report.team?.[0] ? await get(report.team?.[0]) : null;
+            const allTeams = await Promise.all((match.teams || []).map(id => get(id)));
 
             let subdomain = "";
-
-            if (match?.event?.length) {
-                const event = await Cache.get(match?.event?.[0]);
-                if (event?.subdomain || event?.partial_subdomain) {
-                    subdomain = (event.subdomain || event.partial_subdomain || "") + ".";
-                }
+            if (event?.subdomain || event?.partial_subdomain) {
+                subdomain = (event.subdomain || event.partial_subdomain || "") + ".";
             }
-            const matchLink = `https://${subdomain}slmn.gg/match/${cleanID(match.id)}/score-reporting`;
+            const matchLink = `https://${subdomain}slmn.gg/match/${cleanID(match.id)}`;
             const eventSettings = JSON.parse(event.blocks) as EventSettings;
 
-            const messageData = new MapObject(report.message_data);
+            let messageData = new MapObject(report.message_data);
 
             if (report.type === "Scores" && report.data) {
                 if (!eventSettings?.reporting?.score?.use) return;
@@ -89,47 +79,26 @@ export default {
                         // Delete record here (not implemented?)
                         console.log("Can now delete the score report");
 
-                        if (messageData.get("staff_notification_message_id") && messageData.get("staff_notification_channel_id")) {
-                            try {
-                                const channel = await client.channels.fetch(messageData.get("staff_notification_channel_id"));
-                                if (channel?.isTextBased()) await channel.messages.delete(messageData.get("staff_notification_message_id"));
-                            } catch (e) {
-                                console.error("Error trying to delete previous staff message", e);
-                            } finally {
-                                messageData.push("staff_notification_message_id", null);
-                                messageData.push("staff_notification_channel_id", null);
-                            }
-                        }
+                        messageData = await looseDeleteMessage(messageData, "staff_notification");
 
                         if (client &&
                             opponents.length &&
                             eventSettings?.logging?.staffCompletedScoreReport
                         ) {
-                            const channel = await client.channels.fetch(eventSettings.logging.staffCompletedScoreReport);
-                            if (channel?.isTextBased()) {
-                                try {
-                                    const scoreReportMessage = await channel.send(`🎉 Score report approved\n${report.log}\n${matchLink}`);
-                                    messageData.push("staff_confirmation_channel_id", channel.id);
-                                    messageData.push("staff_confirmation_message_id", scoreReportMessage.id);
-                                } catch (e) {
-                                    console.error("Channel sending error", e);
-                                }
-                            }
+                            messageData = await sendMessage({
+                                key: "staff_confirmation",
+                                mapObject: messageData,
+                                channelID: eventSettings.logging.staffCompletedScoreReport,
+                                content: `🎉 Score report approved\n${report.log}\n${matchLink}/score-reporting`
+                            });
                         }
                         if (client && eventSettings?.logging?.postMatchReports) {
-                            const channel = await client.channels.fetch(eventSettings.logging.postMatchReports);
-                            if (channel?.isTextBased()) {
-                                try {
-                                    const reportText = await generateMatchReportText(await get(match.id));
-                                    if (reportText) {
-                                        const scoreReportMessage = await channel.send(reportText);
-                                        messageData.push("score_report_channel_id", channel.id);
-                                        messageData.push("score_report_message_id", scoreReportMessage.id);
-                                    }
-                                } catch (e) {
-                                    console.error("Channel sending error", e);
-                                }
-                            }
+                            messageData = await sendMessage({
+                                key: "score_report",
+                                mapObject: messageData,
+                                channelID: eventSettings.logging.postMatchReports,
+                                content: await generateMatchReportText(await get(match.id))
+                            });
                         }
 
                         await updateRecord(Cache, "Reports", report, {
@@ -154,19 +123,17 @@ export default {
                             eventSettings?.reporting?.score?.staffApprove &&
                             !report.approved_by_staff
                         ) {
-                            const channel = await client.channels.fetch(eventSettings.logging.staffScoreReport);
-                            if (channel?.isTextBased()) {
-                                try {
-                                    const staffNotification = await channel.send(`📣 A score report from ${submittingTeam ? submittingTeam.name : "a team"} has been approved by their opponent and is ready for staff approval\n${matchLink}`);
-                                    messageData.push("staff_notification_channel_id", channel.id);
-                                    messageData.push("staff_notification_message_id", staffNotification.id);
+                            messageData = await sendMessage({
+                                key: "staff_notification",
+                                mapObject: messageData,
+                                channelID: eventSettings.logging.staffScoreReport,
+                                content: `📣 A score report from ${submittingTeam ? submittingTeam.name : "a team"} has been approved by their opponent and is ready for staff approval\n${matchLink}/score-reporting`,
+                                success: async (mapObject : MapObject) => {
                                     await updateRecord(Cache, "Reports", report, {
-                                        "Message Data": messageData.textMap
+                                        "Message Data": mapObject.textMap
                                     });
-                                } catch (e) {
-                                    console.error("Channel sending error", e);
                                 }
-                            }
+                            });
                         }
 
                     } else if (!oldData.approved_by_team && report.approved_by_team) {
@@ -181,23 +148,21 @@ export default {
                             eventSettings?.reporting?.score?.opponentApprove &&
                             !report.approved_by_opponent
                         ) {
-                            const channel = await client.channels.fetch(eventSettings.logging.captainNotifications);
-                            if (channel?.isTextBased()) {
-                                const opponentPings = opponents.map(opponent => {
-                                    const discordControl = new MapObject(opponent?.discord_control);
-                                    return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : opponent.name;
-                                });
-                                try {
-                                    const opponentNotification = await channel.send(`📣 ${opponentPings.join(" ")}\nA score report from ${submittingTeam ? submittingTeam.name : "your opponent"} is ready for approval\n${matchLink}`);
-                                    messageData.push("opponent_captain_notification_channel_id", channel.id);
-                                    messageData.push("opponent_captain_notification_message_id", opponentNotification.id);
+                            const opponentPings = opponents.map(opponent => {
+                                const discordControl = new MapObject(opponent?.discord_control);
+                                return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : opponent.name;
+                            });
+                            messageData = await sendMessage({
+                                key: "opponent_captain_notification",
+                                mapObject: messageData,
+                                channelID: eventSettings.logging.captainNotifications,
+                                content: `📣 ${opponentPings.join(" ")}\nA score report from ${submittingTeam ? submittingTeam.name : "your opponent"} is ready for approval\n${matchLink}/score-reporting`,
+                                success: async (mapObject : MapObject) => {
                                     await updateRecord(Cache, "Reports", report, {
-                                        "Message Data": messageData.textMap
+                                        "Message Data": mapObject.textMap
                                     });
-                                } catch (e) {
-                                    console.error("Channel sending error", e);
                                 }
-                            }
+                            });
 
                             // we can also go straight to staff approving if necessary
                         } else if (client &&
@@ -206,19 +171,18 @@ export default {
                             eventSettings?.reporting?.score?.staffApprove &&
                             !report.approved_by_staff
                         ) {
-                            const channel = await client.channels.fetch(eventSettings.logging.staffScoreReport);
-                            if (channel?.isTextBased()) {
-                                try {
-                                    const staffNotification = await channel.send(`📣 A score report from ${submittingTeam ? submittingTeam.name : "a team"} has been approved by their opponent and is ready for staff approval\n${matchLink}`);
-                                    messageData.push("staff_notification_channel_id", channel.id);
-                                    messageData.push("staff_notification_message_id", staffNotification.id);
+                            messageData = await sendMessage({
+                                key: "staff_notification",
+                                mapObject: messageData,
+                                channelID: eventSettings.logging.staffScoreReport,
+                                content: `📣 A score report from ${submittingTeam ? submittingTeam.name : "a team"} has been approved by their opponent and is ready for staff approval\n${matchLink}/score-reporting`,
+                                success: async (mapObject : MapObject) => {
                                     await updateRecord(Cache, "Reports", report, {
-                                        "Message Data": messageData.textMap
+                                        "Message Data": mapObject.textMap
                                     });
-                                } catch (e) {
-                                    console.error("Channel sending error", e);
                                 }
-                            }
+                            });
+
                         }
 
                     } else if (!oldData.countered_by_opponent && report.countered_by_opponent) {
@@ -226,18 +190,7 @@ export default {
                         console.log("Report has been counted by opposing team");
                         console.log({oldData, newData: report});
 
-                        if (messageData.get("opponent_captain_notification_message_id") && messageData.get("opponent_captain_notification_channel_id")) {
-                            try {
-                                const channel = await client.channels.fetch(messageData.get("opponent_captain_notification_channel_id"));
-                                if (channel?.isTextBased()) await channel.messages.delete(messageData.get("opponent_captain_notification_message_id"));
-                            } catch (e) {
-                                console.error("Error trying to delete previous opponent captain notification message", e);
-                            } finally {
-                                messageData.push("opponent_captain_notification_message_id", null);
-                                messageData.push("opponent_captain_notification_channel_id", null);
-                            }
-                        }
-
+                        messageData = await looseDeleteMessage(messageData, "opponent_captain_notification");
 
                         // tell opponent
                         if (client &&
@@ -245,21 +198,15 @@ export default {
                             eventSettings?.logging?.captainNotifications &&
                             !report.approved_by_opponent
                         ) {
-                            const channel = await client.channels.fetch(eventSettings.logging.captainNotifications);
-                            if (channel?.isTextBased()) {
+                            const discordControl = new MapObject(submittingTeam.discord_control);
+                            const originalPing = discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : submittingTeam.name;
 
-                                const discordControl = new MapObject(submittingTeam.discord_control);
-                                const originalPing = discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : submittingTeam.name;
-
-                                try {
-                                    const originalNotification = await channel.send(`📣 ${originalPing}\nYour score report has been denied and countered by your opponent. Please check their submission to see if it is correct:\n${matchLink}`);
-                                    messageData.push("original_captain_notification_channel_id", channel.id);
-                                    messageData.push("original_captain_notification_message_id", originalNotification.id);
-                                } catch (e) {
-                                    console.error("Channel sending error", e);
-                                }
-                            }
-
+                            messageData = await sendMessage({
+                                key: "original_captain_notification",
+                                mapObject: messageData,
+                                channelID: eventSettings.logging.captainNotifications,
+                                content: `📣 ${originalPing}\nYour score report has been denied and countered by your opponent. Please check their submission to see if it is correct:\n${matchLink}/score-reporting`
+                            });
                         }
 
                         // tell staff?
@@ -267,33 +214,19 @@ export default {
                             eventSettings?.logging?.staffScoreReport &&
                             !report.approved_by_staff
                         ) {
-                            if (messageData.get("staff_notification_channel_id") && messageData.get("staff_notification_message_id")) {
-                                try {
-                                    const channel = await client.channels.fetch(messageData.get("staff_notification_channel_id"));
-                                    if (channel?.isTextBased()) await channel.messages.delete(messageData.get("staff_notification_message_id"));
-                                } catch (e) {
-                                    console.error("Error trying to delete previous staff notification message", e);
-                                } finally {
-                                    messageData.push("staff_notification_message_id", null);
-                                    messageData.push("staff_notification_channel_id", null);
+                            messageData = await looseDeleteMessage(messageData, "staff_notification");
+                            messageData = await sendMessage({
+                                key: "staff_notification",
+                                mapObject: messageData,
+                                channelID: eventSettings.logging.staffScoreReport,
+                                content: `📣 A score report from ${submittingTeam ? submittingTeam.name : "a team"} has been **denied and countered** by their opponent.\n${matchLink}/score-reporting`,
+                                success: async (mapObject : MapObject) => {
+                                    await updateRecord(Cache, "Reports", report, {
+                                        "Message Data": mapObject.textMap
+                                    });
                                 }
-                            }
-
-                            const channel = await client.channels.fetch(eventSettings.logging.staffScoreReport);
-                            if (channel?.isTextBased()) {
-                                try {
-                                    const staffNotification = await channel.send(`📣 A score report from ${submittingTeam ? submittingTeam.name : "a team"} has been **denied and countered** by their opponent.\n${matchLink}`);
-                                    messageData.push("staff_notification_channel_id", channel.id);
-                                    messageData.push("staff_notification_message_id", staffNotification.id);
-                                } catch (e) {
-                                    console.error("Channel sending error", e);
-                                }
-                            }
+                            });
                         }
-
-                        await updateRecord(Cache, "Reports", report, {
-                            "Message Data": messageData.textMap
-                        });
 
                     } else {
                         // other change
@@ -305,7 +238,120 @@ export default {
 
                         console.log({oldData, newData: report});
                         console.log(changes);
+                    }
+                }
+            }
+            else if (report.type === "Rescheduling" && report.data) {
+                if (!eventSettings?.reporting?.rescheduling?.use) return;
+                const { start: proposedStart } = JSON.parse(report.data);
 
+                const reportApproved =
+                    report.force_approved || (
+                        (report.approved_by_team &&
+                            (eventSettings.reporting.rescheduling.opponentApprove ? report.approved_by_opponent : true) &&
+                            (eventSettings.reporting.rescheduling.staffApprove ? report.approved_by_staff : true))
+                    );
+
+                if (reportApproved) {
+                    // Process approval
+                    console.log("Reschedule request is now ready for approval");
+                    const manager = getInternalManager();
+                    if (!manager) return console.error("No internal manager can run automation action");
+
+                    messageData = await looseDeleteMessage(messageData, "opponent_reschedule_request");
+
+                    try {
+                        const { start } = JSON.parse(report.data);
+                        if (start) {
+                            await manager.runActionAsAutomation("update-match-data", {
+                                matchID: match.id,
+                                updatedData: {
+                                    start
+                                }
+                            });
+                        }
+
+                        // Delete record here (not implemented?)
+                        console.log("Can now delete the score report");
+
+                        messageData = await looseDeleteMessage(messageData, "staff_reschedule_notification");
+
+                        // #3 Teams pinged about reschedule
+
+                        const teamPings = allTeams.map(opponent => {
+                            const discordControl = new MapObject(opponent?.discord_control);
+                            return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : opponent.name;
+                        });
+                        messageData = await sendMessage({
+                            key: "reschedule_log",
+                            mapObject: messageData,
+                            channelID: eventSettings.logging?.matchTimeChanges,
+                            content: `⌚ Match reschedule ${teamPings.join(" ")}: ${opponents.map(t => t.name || t.code).join(" vs ")} ${match.start ? "rescheduled to" : "scheduled for"} ${hammerTime(proposedStart)}.\n${matchLink}`
+                        });
+                        await updateRecord(Cache, "Reports", report, {
+                            "Approved": true,
+                            "Message Data": messageData.textMap
+                        });
+
+                    } catch (e) {
+                        console.error("Action error - not continuing");
+                    }
+
+                } else {
+                    // Not ready to approve - see what changed though
+
+                    if (
+                        (!oldData.approved_by_team && report.approved_by_team) &&   // just submitted
+                        eventSettings.reporting.rescheduling.opponentApprove &&     // opponent approval required
+                        !report.approved_by_opponent                                // not yet approved by opponent
+                    ) {
+                        // #1 Opponent pinged about request
+
+                        const opponentPings = opponents.map(opponent => {
+                            const discordControl = new MapObject(opponent?.discord_control);
+                            return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : opponent.name;
+                        });
+                        messageData = await sendMessage({
+                            key: "opponent_reschedule_request",
+                            mapObject: messageData,
+                            channelID: eventSettings.logging?.captainNotifications,
+                            content: `📣 ${opponentPings.join(" ")}\n${submittingTeam?.name || "Your opponent"} ${match.start ? "has requested a reschedule to" : "requested a start time of"} ${hammerTime(proposedStart)}\n${matchLink}/rescheduling`,
+                            success: async (mapObject : MapObject) => {
+                                await updateRecord(Cache, "Reports", report, {
+                                    "Message Data": mapObject.textMap
+                                });
+                            }
+                        });
+                    } else if (
+                        (
+                            (!oldData.approved_by_team && report.approved_by_team && !eventSettings.reporting.rescheduling.opponentApprove) ||   // just submitted and opponent not required
+                            (!oldData.approved_by_opponent && report.approved_by_opponent) // or opponent approval just completed
+                        ) &&
+                        eventSettings.reporting.rescheduling.staffApprove &&     // staff approval required
+                        !report.approved_by_staff                                // not yet approved by staff
+                    ) {
+                        // #2 Staff prompted about request
+                        console.log("Staff prompt for request");
+
+                        messageData = await sendMessage({ mapObject: messageData,
+                            key: "staff_reschedule_notification",
+                            channelID: eventSettings.logging?.staffScoreReport,
+                            content: `📣 A reschedule request from ${submittingTeam ? submittingTeam.name : "a team"} requires staff approval\n${matchLink}/rescheduling`,
+                            success: async (mapObject : MapObject) => {
+                                await updateRecord(Cache, "Reports", report, {
+                                    "Message Data": mapObject.textMap
+                                });
+                            }
+                        });
+                    } else {
+                        console.log("Reschedule report changed something else");
+                        const keys = Object.keys({...report,...structuredClone(oldData)}) as (keyof Report)[];
+                        const changes = keys
+                            .map(key => ({ key, newVal: report[key], oldVal: structuredClone(oldData[key])}))
+                            .filter(({ oldVal, newVal}) => JSON.stringify(oldVal) !== JSON.stringify(newVal));
+
+                        console.log({oldData, newData: report});
+                        console.log(changes);
                     }
                 }
             }

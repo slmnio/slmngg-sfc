@@ -2229,7 +2229,7 @@
                 "shutdown": false,
                 "restart_when_active": false,
                 "webpage_control_level": 1,
-                "css": "body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; overflow: hidden; }\n",
+                "css": "body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; overflow: hidden; }",
                 "reroute_audio": false
             },
             "mixers": 193,
@@ -3018,7 +3018,7 @@
                 "shutdown": false,
                 "restart_when_active": false,
                 "webpage_control_level": 1,
-                "css": "body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; overflow: hidden; }\n\n\n.standings-team {\n    padding: 2px 0 !important;\n}\n\n.team-logo {\n    border-width: 4px !important;\n    height: 1em !important;\n}\n\n.teams {\n    font-size: 44px !important;\n    font-size: 38px !important;\n}\n\n.standings-header {\n    line-height: 0.8;\n    margin-bottom: 6px;\n    display: none !important;\n}",
+                "css": "body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; overflow: hidden; }",
                 "reroute_audio": false
             },
             "mixers": 193,

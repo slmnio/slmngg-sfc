@@ -25,7 +25,7 @@
                 <div class="checkboxes">
                     <b-form-checkbox v-if="showRestrictCheckbox" id="map-pool-checkbox" v-model="restrictToMapPool" class="mr-2">Restrict to map pool</b-form-checkbox>
                     <b-form-checkbox v-if="!lockControls" id="map-ban-checkbox" v-model="showMapBanButtons" class="mr-2">Show map banning</b-form-checkbox>
-                    <b-form-checkbox v-if="!lockControls" id="show-hero-pickban-checkbox" v-model="showHeroPickBans" class="mr-2">Show hero pick/bans</b-form-checkbox>
+                    <b-form-checkbox v-if="!lockControls" id="show-hero-pickban-checkbox" v-model="showHeroPickBans" class="mr-2">Show {{ gameOverride?.lang?.hero?.toLowerCase() || "hero" }} pick/bans</b-form-checkbox>
                     <b-form-checkbox v-if="!lockControls" id="loser-picks-checkbox" v-model="assumeLoserPicks" class="mr-2">Assume loser picks</b-form-checkbox>
                 </div>
                 <div class="spacer" style="order:0"></div>
@@ -124,7 +124,7 @@
                                         :options="getMapOptions(playedMapI)" />
                                 </div>
                             </td>
-                            <td v-if="type === 'map'" class="form-stack">
+                            <td v-if="type === 'map' && !gameOverride?.disableMapScore" class="form-stack">
                                 <div
                                     class="form-top text-center"
                                     :class="{ 'very-low-opacity': banners[mapI] }">
@@ -171,7 +171,7 @@
                                 <div
                                     class="form-top"
                                     :class="{ 'very-low-opacity': banners[mapI] }">
-                                    Replay Code
+                                    {{ gameOverride?.lang?.replay_code || "Replay Code" }}
                                 </div>
                                 <div
                                     class="form-button"
@@ -179,10 +179,10 @@
                                     <b-form-input v-model="replayCodes[mapI]" type="text" />
                                 </div>
                             </td>
-                            <td v-if="type === 'map' && (controls.showMapBans ? true : banners[mapI])" class="ban-style">
+                            <td v-if="type === 'map' && (controls.showMapBans ? true : banners[mapI]) && !gameOverride?.disableMapBans" class="ban-style">
                                 <TeamPicker v-model="banners[mapI]" title="Banned by" :teams="teams" :hide-empty="scoreReporting" />
                             </td>
-                            <td v-if="type === 'map' && (controls.showMapBans ? true : !banners[mapI])" class="pick-style">
+                            <td v-if="type === 'map' && (controls.showMapBans ? true : !banners[mapI]) && !gameOverride?.disableMapPicks" class="pick-style">
                                 <TeamPicker
                                     :key="mapI"
                                     v-model="pickers[mapI]"
@@ -213,10 +213,12 @@
                                                     v-model="team_1_picks[mapI]"
                                                     :game="match?.game || match?.event?.game"
                                                     :pick-ban-order="pickBanOrder[mapI]"
-                                                    :current-action="{ team: 1, type: 'pick' }" />
+                                                    :current-action="{ team: 1, type: 'pick' }"
+                                                    :start-open="gameOverride?.defaultHeroPickCount || 5"
+                                                />
                                             </div>
                                         </div>
-                                        <div v-if="hideMatchExtras && pickBanOrder[mapI]?.length" class="flip-controls flex-center flex-column h-100">
+                                        <div v-if="pickBanOrder[mapI]?.length" class="flip-controls flex-center flex-column h-100">
                                             <div>
                                                 <i v-b-tooltip="'Flip pick/ban order'" class="fas fa-exchange"></i>
                                             </div>
@@ -236,7 +238,9 @@
                                                     v-model="team_2_picks[mapI]"
                                                     :game="match?.game || match?.event?.game"
                                                     :pick-ban-order="pickBanOrder[mapI]"
-                                                    :current-action="{ team: 2, type: 'pick' }" />
+                                                    :current-action="{ team: 2, type: 'pick' }"
+                                                    :start-open="gameOverride?.defaultHeroPickCount || 5"
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -250,7 +254,9 @@
                                                     v-model="team_1_bans[mapI]"
                                                     :game="match?.game || match?.event?.game"
                                                     :pick-ban-order="pickBanOrder[mapI]"
-                                                    :current-action="{ team: 1, type: 'ban' }" />
+                                                    :current-action="{ team: 1, type: 'ban' }"
+                                                    :start-open="gameOverride?.defaultHeroBanCount || 0"
+                                                />
                                             </div>
                                         </div>
                                         <div class="hero-bans">
@@ -262,7 +268,9 @@
                                                     v-model="team_2_bans[mapI]"
                                                     :game="match?.game || match?.event?.game"
                                                     :pick-ban-order="pickBanOrder[mapI]"
-                                                    :current-action="{ team: 2, type: 'ban' }" />
+                                                    :current-action="{ team: 2, type: 'ban' }"
+                                                    :start-open="gameOverride?.defaultHeroBanCount || 0"
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -293,7 +301,7 @@
                         label-for="details-special-event"
                         label-cols-lg="2"
                         label-cols-md="3">
-                        <div class="d-flex">
+                        <div class="d-flex align-items-center">
                             <b-form-checkbox id="details-special-event" v-model="matchData.special_event" class="mt-1" size="lg" />
                             <b-form-input id="details-custom-name" v-model.trim="matchData.custom_name" type="text" placeholder="Match custom name" />
                         </div>
@@ -304,7 +312,7 @@
                         label-for="details-forfeit"
                         label-cols-lg="2"
                         label-cols-md="3">
-                        <div class="d-flex">
+                        <div class="d-flex align-items-center">
                             <b-form-checkbox id="details-forfeit" v-model="matchData.forfeit" class="mt-1" size="lg" />
                             <b-form-input id="details-forfeit-reason" v-model.trim="matchData.forfeit_reason" type="text" placeholder="Forfeit reason" />
                         </div>
@@ -357,6 +365,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { mapWritableState } from "pinia";
 import MatchExplainerModal from "@/components/website/dashboard/MatchExplainerModal.vue";
 import HeroesPicker from "@/components/website/dashboard/HeroesPicker.vue";
+import { GameOverrides } from "@/utils/games.ts";
 
 export default {
     name: "MatchEditor",
@@ -619,9 +628,13 @@ export default {
         },
         pickBanOrder() {
             return this.maps.map((map, i) => {
-                return processPickBanOrder(this.match?.pick_ban_order, this.flip_pick_ban_order[i]);
+                return processPickBanOrder(this.match?.pick_ban_order || this.gameOverride?.defaultPickBanOrder, this.flip_pick_ban_order[i]);
             });
 
+        },
+        gameOverride() {
+            if (this.match?.game || this.match?.event?.game) return GameOverrides[this.match?.game || this.match?.event?.game];
+            return null;
         },
         // loadedFully() {
         //     const test = [
@@ -791,6 +804,13 @@ export default {
             this.matchData.forfeit = data.forfeit;
             this.matchData.forfeit_reason = data.forfeit_reason;
             this.matchData.vod = data.vod;
+
+            this.maps.forEach((map, i) => {
+                console.log("map choices", i, this.availableMaps.length);
+                if (this.availableMaps.length === 1) {
+                    this.mapChoices[i] = this.availableMaps[0].id;
+                }
+            });
 
             this.previousAutoData = {
                 draws: Object.assign([], this.draws),

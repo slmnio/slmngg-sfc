@@ -13,8 +13,10 @@
                 size="sm"
                 @keydown.delete="() => {localValue[i - 1] = null; setHero(i-1, null)}"
                 @change="(e) => setHero(i-1, e.target.value)" />
-            <b-button variant="success" size="sm" @click="count++">
-                <i class="fas fa-plus fa-fw"></i>
+        </div>
+        <div class="d-flex w-100 justify-content-end" style="margin-top:1px">
+            <b-button variant="success" size="sm" style="font-size:10px" @click="count++">
+                <i class="fas fa-plus fa-fw"></i> Add row
             </b-button>
         </div>
     </div>
@@ -25,10 +27,11 @@ import { ReactiveArray, ReactiveRoot } from "@/utils/reactive.js";
 import { dirtyID, getPickBanItem } from "@/utils/content-utils.js";
 import { resizedImage } from "@/utils/images.js";
 import { sortAlpha } from "@/utils/sorts.js";
+import { GameOverrides } from "@/utils/games.ts";
 
 export default {
     name: "HeroesPicker",
-    props: ["title", "modelValue", "game", "pickBanOrder", "currentAction"],
+    props: ["title", "modelValue", "game", "pickBanOrder", "currentAction", "startOpen"],
     emits: ["update:modelValue"],
     data: () => ({
         count: 1,
@@ -40,12 +43,18 @@ export default {
                 "ids": ReactiveArray("ids")
             })?.ids || []).filter(hero => this.game ? hero.game === this.game : true);
         },
+        gameOverride() {
+            return GameOverrides[this.game];
+        },
+        emptyValue() {
+            return `No ${this.gameOverride?.lang?.hero?.toLowerCase() || "hero"}`;
+        },
         heroOptions() {
             return [
-                { value: null, text: "No hero" },
+                { value: null, text: this.emptyValue },
                 ...(
                     this.game !== "Overwatch" ?
-                        (this.heroes || []).sort((a,b) => sortAlpha(a?.name, b?.name)).map(h => ({
+                        (this.heroes || []).sort((a,b) => sortAlpha(a, b, "name")).map(h => ({
                             text: h.name,
                             value: dirtyID(h.id)
                         }))
@@ -66,7 +75,7 @@ export default {
         resizedImage,
         setHero(i,id) {
             const data = [...this.localValue];
-            data[i] = (!id || id === "No hero") ? null : id;
+            data[i] = (!id || id === this.emptyValue) ? null : id;
             this.$emit("update:modelValue",  data);
         },
         getHero(id) {
@@ -92,6 +101,9 @@ export default {
                 this.localValue = data || [];
             }
         }
+    },
+    mounted() {
+        if (this.startOpen && this.startOpen > 1) this.count = this.startOpen;
     }
 };
 </script>

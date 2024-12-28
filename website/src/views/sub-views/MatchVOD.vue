@@ -25,7 +25,7 @@
                 <b-form-checkbox v-model="showBannedMaps" switch> Show banned maps</b-form-checkbox>
             </div>
             <div v-if="hasPickBanHeroes" class="checkbox-holder flex-center justify-content-end">
-                <b-form-checkbox v-model="showPickBanHeroes" switch> Show picked/banned heroes</b-form-checkbox>
+                <b-form-checkbox v-model="showPickBanHeroes" switch> Show picked/banned {{ gameOverride?.lang?.heroes?.toLowerCase() || 'heroes' }}</b-form-checkbox>
             </div>
             <div class="maps-holder flex-center w-100">
                 <MapDisplay
@@ -48,6 +48,7 @@ import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 import MapDisplay from "@/components/website/match/MapDisplay";
 import { cleanID, getEmbedData } from "@/utils/content-utils";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
+import { GameOverrides } from "@/utils/games.ts";
 
 export default {
     name: "MatchVOD",
@@ -113,7 +114,11 @@ export default {
         isAdvertised() {
             const liveMatchIDs = (ReactiveRoot("special:live-matches")?.matches || []);
             return !!(liveMatchIDs.find(id => cleanID(id) === cleanID(this.match?.id)));
-        }
+        },
+        gameOverride() {
+            if (this.match?.game || this.match?.event?.game) return GameOverrides[this.match?.game || this.match?.event?.game];
+            return null;
+        },
     },
     methods: { getEmbedData }
 };

@@ -17,7 +17,7 @@
                     <div v-for="(ban, num) in (bans[ti] || [])" :key="num" class="ban bg-danger flex-center">
                         <transition name="fade" mode="out-in" :duration="250">
                             <div v-if="ban?.name" class="bg-center ban-icon ban flex-center" :style="resizedImage(ban, ['icon'], 's-500')">
-                                <div class="ban-number">{{ getPickBanItem(pickBanOrder, "ban", ti+1, num - 1)?.num }}</div>
+                                <!-- <div class="ban-number">{{ getPickBanItem(pickBanOrder, "ban", ti+1, num - 1)?.num }}</div>-->
                             </div>
                             <div v-else class="ban ban-placeholder text-center" :class="{'ban-next': ban?.orderItem?.num === (currentPickBan + 1) }">
                             </div>
@@ -66,6 +66,7 @@ import { logoBackground1, themeBackground1 } from "@/utils/theme-styles.js";
 import { resizedImage } from "@/utils/images.js";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
 import { getPickBanItem, processPickBanOrder } from "@/utils/content-utils.js";
+import { GameOverrides } from "@/utils/games.ts";
 
 export default {
     name: "HeroDraft",
@@ -126,8 +127,12 @@ export default {
 
             return currentMap;
         },
+        gameOverride() {
+            if (this.match?.game || this.match?.event?.game) return GameOverrides[this.match?.game || this.match?.event?.game];
+            return null;
+        },
         pickBanOrder() {
-            return processPickBanOrder(this.match?.pick_ban_order, this.currentMap?.flip_pick_ban_order);
+            return processPickBanOrder(this.match?.pick_ban_order || this.gameOverride?.defaultPickBanOrder, this.currentMap?.flip_pick_ban_order);
         },
         picks() {
             if (!this.currentMap?.id) return [[], []];

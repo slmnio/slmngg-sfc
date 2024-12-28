@@ -805,13 +805,16 @@ export default {
             this.matchData.forfeit_reason = data.forfeit_reason;
             this.matchData.vod = data.vod;
 
-            this.maps.forEach((map, i) => {
-                console.log("map choices", i, this.availableMaps.length);
-                if (this.availableMaps.length === 1) {
-                    this.mapChoices[i] = this.availableMaps[0].id;
+            if (this.availableMaps.length === 1) {
+                console.log("map choices", this.availableMaps.length);
+                if (this.maps.length) {
+                    this.maps.forEach((map, i) => {
+                        this.mapChoices[i] = this.availableMaps[0].id;
+                    });
+                } else {
+                    this.mapChoices[0] = this.availableMaps[0].id;
                 }
-            });
-
+            }
             this.previousAutoData = {
                 draws: Object.assign([], this.draws),
                 existingMapIDs: Object.assign([], this.existingMapIDs),
@@ -1036,6 +1039,22 @@ export default {
             deep: true,
             handler() {
 
+            }
+        },
+        availableMaps: {
+            deep: true,
+            immediate: true,
+            handler(maps) {
+                if (maps.length === 1) {
+                    console.log("map choices", maps.length);
+                    if (this.maps.length) {
+                        this.maps.forEach((map, i) => {
+                            if (!this.mapChoices[i]) this.mapChoices[i] = maps[0].id;
+                        });
+                    } else {
+                        if (!this.mapChoices[0]) this.mapChoices[0] = maps[0].id;
+                    }
+                }
             }
         }
         // loadedFully: {

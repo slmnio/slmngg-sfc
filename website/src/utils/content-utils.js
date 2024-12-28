@@ -875,7 +875,8 @@ export function processPickBanOrder(order, flip) {
                 counts[item.type][item.team] = 0;
             }
             counts[item.type][item.team]++;
-            item.countOfType = counts[item.type][item.team];
+            item.countOfTeamType = counts[item.type][item.team];
+            item.countOfType = Object.values(counts[item.type]).reduce((a, b) => a + b, 0);
         }
         return item;
     });
@@ -883,5 +884,5 @@ export function processPickBanOrder(order, flip) {
 }
 
 export function getPickBanItem(order, type, team, index) {
-    return order.find(o => o.team === team && o.type === type && o.countOfType === (index + 1));
+    return order.find(o => o.team === team && o.type === type && o.countOfTeamType === (index + 1));
 }

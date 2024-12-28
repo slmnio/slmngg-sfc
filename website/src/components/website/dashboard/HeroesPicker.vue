@@ -2,7 +2,7 @@
     <div class="heroes-picker d-flex flex-column gap-1">
         <div v-for="i of count" :key="i" class="form-group d-flex align-items-center">
             <div v-if="pickBanOrder?.length && currentAction" class="draft-number">
-                {{ getPickBanItem(pickBanOrder, currentAction?.type, currentAction?.team, i - 1)?.num }}
+                {{ getPickBanItem(pickBanOrder, currentAction?.type, currentAction?.team, i - 1)?.countOfType }}
             </div>
             <div class="hero-icon bg-center" :style="resizedImage(getHero(localValue[i - 1]), ['icon', 'main_image'], 's-100')">
             </div>

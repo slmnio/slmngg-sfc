@@ -35,12 +35,12 @@
                 <div v-for="num of maxPlayers" :key="num" class="player">
                     <transition name="fade" mode="out-in" :duration="250">
                         <div v-if="picks[ti]?.[num-1]?.name" :key="picks[ti]?.[num-1]?.id" class="pick flex-center">
-                            <div class="pick-number">{{ getPickBanItem(pickBanOrder, "pick", ti+1, num - 1)?.countOfType }}</div>
+                            <div class="pick-number">{{ getPickBanItem(pickBanOrder, "pick", ti+1, num - 1)?.countOfTeamType }}</div>
                             <div class="pick-image bg-center" :style="resizedImage(picks[ti][num-1], ['main_image', 'icon'], 'h-500')"></div>
                             <div class="pick-text" :style="themeBackground1(broadcast?.event)">{{ picks[ti]?.[num-1]?.name }}</div>
                         </div>
                         <div v-else class="pick pick-placeholder flex-center" :class="{'pick-next': picks[ti]?.[num-1]?.orderItem?.num === (currentPickBan + 1) }">
-                            <div class="pick-number">{{ picks[ti]?.[num-1]?.orderItem?.countOfType }}</div>
+                            <div class="pick-number">{{ picks[ti]?.[num-1]?.orderItem?.countOfTeamType }}</div>
                         </div>
                     </transition>
                 </div>

@@ -163,6 +163,7 @@ export default {
                     wins: 0,
                     losses: 0,
                     played: 0,
+                    scheduled: 0,
 
                     map_wins: 0,
                     map_losses: 0,
@@ -187,6 +188,7 @@ export default {
                     if (!match.teams.some(t => t.id === team.id)) return;
                     // one of the teams is current loop team
                     const scores = [match.score_1, match.score_2];
+                    team.standings.scheduled++;
                     if (!scores.some(score => score === match.first_to)) return; // not finished
 
                     const opponent = match.teams.find(t => t.id !== team.id);

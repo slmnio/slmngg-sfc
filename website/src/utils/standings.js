@@ -116,6 +116,11 @@ export const StandingsShowKeys = (game) => {
             title: "Matches played",
             display: (team) => team.standings.played
         },
+        "Scheduled": {
+            header: "Sched",
+            title: "Matches scheduled",
+            display: (team) => team.standings.scheduled
+        },
 
         "MatchDiffPoints": {
             header: "Match diff",

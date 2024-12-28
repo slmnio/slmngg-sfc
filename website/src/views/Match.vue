@@ -53,7 +53,7 @@
                             <tr v-if="match.forfeit"><td colspan="2"><b><i>Match was forfeited</i></b><span v-if="match.forfeit_reason"><br>{{ match.forfeit_reason }}</span></td></tr>
                             <tr v-if="lowerText"><td colspan="2">{{ lowerText }}</td></tr>
                             <tr v-if="match.first_to">
-                                <td>First to</td><td>{{ match.first_to }}</td>
+                                <td>{{ gameOverride?.useBestOf ? 'Best of' : 'First to' }}</td><td>{{ gameOverride?.useBestOf ? (match.first_to * 2) - 1 : match.first_to }}</td>
                             </tr>
                             <tr v-if="match.casters">
                                 <td>{{ match.casters.length === 1 ? 'Caster' : 'Casters' }}</td>
@@ -85,6 +85,7 @@ import { resizedImageNoWrap } from "@/utils/images";
 import { canEditMatch, isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useAuthStore } from "@/stores/authStore";
+import { GameOverrides } from "@/utils/games.ts";
 
 export default {
     name: "Match",
@@ -95,6 +96,10 @@ export default {
     },
     props: ["id"],
     computed: {
+        gameOverride() {
+            if (this.match?.game || this.match?.event?.game) return GameOverrides[this.match?.game || this.match?.event?.game];
+            return null;
+        },
         match() {
             return ReactiveRoot(this.id, {
                 teams: ReactiveArray("teams", {

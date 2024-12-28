@@ -222,6 +222,8 @@
                     <stat :match="match" data="vod" :external-link="true">VOD Link</stat>
                     <stat :match="match" data="clean_feed" :external-link="true">Clean Feed</stat>
                     <stat :match="match" data="first_to">First to</stat>
+
+                    <stat :match="match" data="best_of" :override="gameOverride?.useBestOf ? (match.first_to * 2) - 1 : match.first_to">{{ gameOverride?.useBestOf ? 'Best of' : 'First to' }}</stat>
                     <stat
                         v-for="relGroup in playerRelationshipGroups"
                         :key="relGroup.meta.singular_name"
@@ -263,6 +265,7 @@ import MatchStats from "@/views/sub-views/MatchStats.vue";
 import { useAuthStore } from "@/stores/authStore";
 import CreditCreator from "@/components/website/CreditCreator.vue";
 import { sortRoles } from "@/utils/sorts";
+import { GameOverrides } from "@/utils/games.ts";
 
 export default {
     name: "DetailedMatch",
@@ -287,6 +290,10 @@ export default {
         showImplications: true
     }),
     computed: {
+        gameOverride() {
+            if (this.match?.game || this.match?.event?.game) return GameOverrides[this.match?.game || this.match?.event?.game];
+            return null;
+        },
         match () {
             return ReactiveRoot(this.id, {
                 teams: ReactiveArray("teams", {

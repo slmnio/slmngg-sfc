@@ -50,8 +50,9 @@
             <Sponsors
                 v-if="showFadeSponsors && !basicMode"
                 class="ingame-fade-sponsors"
+                :class="{'show-background': showSponsorBackgrounds}"
                 :sponsors="fadeSponsors"
-                mode="out-in"
+                :mode="showSponsorBackgrounds ? 'in-out': 'out-in'"
                 :speed="sponsorFadeSpeed" />
         </transition>
     </div>
@@ -194,6 +195,9 @@ export default {
         },
         showFadeSponsors() {
             return (this.broadcast?.broadcast_settings || [])?.includes("Fade ingame sponsors");
+        },
+        showSponsorBackgrounds() {
+            return (this.broadcast?.broadcast_settings || [])?.includes("Show backgrounds on ingame sponsors");
         },
         sponsorData() {
             if (!this.broadcast.id) return {};
@@ -465,7 +469,7 @@ export default {
     width: 320px !important;
 }
 
-.ingame-fade-sponsors:deep(.break-sponsor) {
+.ingame-fade-sponsors:not(.show-background):deep(.break-sponsor) {
     background-color: transparent !important;
 }
 

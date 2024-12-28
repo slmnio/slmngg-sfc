@@ -47,7 +47,7 @@
                 <DeskEditor :broadcast="broadcast" />
             </DashboardModule>
             <DashboardModule class="mb-2" title="Desk Display" icon-class="far fa-comment-alt-dots">
-                <DeskTextEditor :broadcast="broadcast" />
+                <DeskTextEditor :broadcast="broadcast" :show-draft-control-buttons="gameOverride?.showDraftControlButtons" />
             </DashboardModule>
             <DashboardModule v-if="broadcast?.gfx?.length" class="mb-2" title="GFX" icon-class="fas fa-palette">
                 <GFXController :broadcast="broadcast" :client="client" />
@@ -171,6 +171,7 @@ import BroadcastCustomisation from "@/components/website/dashboard/BroadcastCust
 import PlayerCamsController from "@/components/website/dashboard/PlayerCamsController.vue";
 import DashboardTransmitter from "@/components/website/dashboard/DashboardTransmitter.vue";
 import TransmitterStreams from "@/components/website/dashboard/TransmitterStreams.vue";
+import { GameOverrides } from "@/utils/games.ts";
 
 export default {
     name: "Dashboard",
@@ -179,6 +180,10 @@ export default {
         titleProcessing: false
     }),
     computed: {
+        gameOverride() {
+            if (this.liveMatch?.game || this.broadcast?.event?.game) return GameOverrides[this.liveMatch?.game || this.broadcast?.event?.game];
+            return null;
+        },
         user() {
             const { user } = useAuthStore();
             if (!user?.airtableID) return {};

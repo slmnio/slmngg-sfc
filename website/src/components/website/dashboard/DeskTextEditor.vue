@@ -20,26 +20,37 @@
             <b-button class="flex-shrink-0" :disabled="processing" :variant="!dataDeskMode ? 'primary' : 'secondary'" @click="saveData({ mode: 'show'})"><i class="fas fa-fw fa-eye"></i> Show</b-button>
             <b-button class="flex-shrink-0" :disabled="processing" :variant="!dataDeskMode ? 'secondary' : 'primary'" @click="saveData({ mode: 'hide'})"><i class="fas fa-eye-slash"></i> Hide</b-button>
         </div>
-        <div class="d-flex gap-2 align-items-center justify-content-center flex-wrap">
-            <b-button
-                v-for="option in noTextDisplayOptions"
-                :key="option?.text"
-                :disabled="processing"
-                :variant="(broadcast?.desk_display === option?.value?.text) ? 'primary' : 'secondary'"
-                @click="chosenDisplayOption = option?.value; saveData({ mode: 'show' })">
-                {{ option?.text }}
-            </b-button>
+        <div class="d-flex gap-2 flex-center align-items-start">
+            <div class="d-flex gap-2 align-items-center justify-content-center flex-wrap">
+                <b-button
+                    v-for="option in noTextDisplayOptions"
+                    :key="option?.text"
+                    :disabled="processing"
+                    :variant="(broadcast?.desk_display === option?.value?.text) ? 'primary' : 'secondary'"
+                    @click="chosenDisplayOption = option?.value; saveData({ mode: 'show' })">
+                    {{ option?.text }}
+                </b-button>
+            </div>
+            <div v-if="showDraftControlButtons" class="d-flex flex-column flex-center">
+                <div class="small mb-1">Draft controls</div>
+                <b-button-group>
+                    <b-button variant="warning" @click="prodTrigger('reset_draft')">Reset</b-button>
+                    <b-button variant="primary" @click="prodTrigger('advance_draft')">Advance</b-button>
+                </b-button-group>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 import { authenticatedRequest } from "@/utils/dashboard";
+import { socket } from "@/socket.js";
 
 export default {
     name: "DeskTextEditor",
     props: {
-        broadcast: {}
+        broadcast: {},
+        showDraftControlButtons: Boolean
     },
     data: () => ({
         processing: false,
@@ -196,6 +207,10 @@ export default {
                 if (i === 1) text = text.reverse();
                 return text.join(" ");
             }).join("-");
+        },
+        prodTrigger(event, data) {
+            console.log(event, data);
+            socket.emit("prod_trigger", event, data);
         }
     },
     watch: {

@@ -7,6 +7,7 @@ export const GameOverrides = {
         disableMapBans: true,
         disableMapScore: true,
         defaultHeroBanCount: 5,
+        showDraftControlButtons: true,
         lang: {
             "hero": "Champion",
             "heroes": "Champions",
@@ -32,6 +33,7 @@ export const GameOverrides = {
         disableMapScore: true,
         defaultHeroBanCount: 1,
         defaultHeroPickCount: 6,
+        showDraftControlButtons: true,
         lang: {
             "replay_code": "Match ID"
         },

@@ -21,18 +21,21 @@
                 class="mb-2"
                 name="datetime-editor"
                 type="datetime-local"
+                :min="earliestTime ? safeTime(earliestTime, '{year}-{iso-month}-{date-pad}T{hour-pad}:{minute-pad}') : null"
+                :max="latestTime ? safeTime(latestTime, '{year}-{iso-month}-{date-pad}T{hour-pad}:{minute-pad}') : null"
+                step="300"
                 :model-value="temporaryTime || safeSavedTime"
                 @update:model-value="(val) => temporaryTime = val" />
 
-            <div class="earliest-latest-warning py-2 flex-center text-center my-2 border border-primary rounded" :class="{'bg-danger text-white': isValid === false}">
+            <div v-if="earliestTime || latestTime" class="earliest-latest-warning py-2 flex-center text-center my-2 border border-primary rounded" :class="{'bg-danger text-white': isValid === false}">
                 <div v-if="earliestTime && !latestTime">
-                    This match must start at or after <b>{{ formatTime(earliestTime) }}</b>
+                    This match must start at or after <b>{{ safeTime(earliestTime, "{day-short} {date-ordinal} {month-short} {year} {time} {tz}") }}</b>
                 </div>
                 <div v-else-if="!earliestTime && latestTime">
-                    This match must start at or before <b>{{ formatTime(latestTime) }}</b>
+                    This match must start at or before <b>{{ safeTime(latestTime, "{day-short} {date-ordinal} {month-short} {year} {time} {tz}") }}</b>
                 </div>
                 <div v-else-if="earliestTime && latestTime">
-                    This match must start between <b>{{ formatTime(earliestTime) }}</b> and<br><b>{{ formatTime(latestTime) }}</b>
+                    This match must start between <b>{{ safeTime(earliestTime, "{day-short} {date-ordinal} {month-short} {year} {time} {tz}") }}</b> and<br><b>{{ safeTime(latestTime, "{day-short} {date-ordinal} {month-short} {year} {time} {tz}") }}</b>
                 </div>
             </div>
 
@@ -129,13 +132,13 @@ export default {
     },
     methods: {
         formatTime, spacetime,
-        safeTime(timeString) {
+        safeTime(timeString, customFormat) {
             if (!timeString || typeof timeString !== "string") return null;
             return this.formatTime(
                 timeString,
                 {
                     tz: this.editTimeInSiteTimezone ? this.siteTimezone : this.localTimezone,
-                    format: SafeTimeFormat,
+                    format: customFormat || SafeTimeFormat,
                     use24HourTime: this.$store.state.use24HourTime }
             );
         }

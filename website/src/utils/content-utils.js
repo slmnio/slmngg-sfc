@@ -789,7 +789,7 @@ export function getReschedulingBadge({ state, report }, eventSettings) {
     const reschedule = state.has_start ? "Reschedule" : "Schedule";
 
     console.log("existing report", state.has_existing_report, "is staff", state.is_staff);
-    if (!state.has_existing_report && !state.is_staff) {
+    if (!state.has_existing_report && state.is_on_teams) {
         // no report but could make one
         console.log("could make", JSON.stringify(report), state.has_existing_report);
         return {

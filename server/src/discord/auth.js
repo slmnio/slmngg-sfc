@@ -151,7 +151,7 @@ export default ({ app, router, cors, Cache }) => {
 
         if (airtable && ![discord.username, `${discord.username}#${discord.discriminator}`].includes(airtable.discord_tag)) {
             const updatedUsername = discord.discriminator === "0" ? discord.username : `${discord.username}#${discord.discriminator}`;
-            await updateRecord(Cache, "Players", airtable, { "Discord Tag": updatedUsername });
+            await updateRecord(Cache, "Players", airtable, { "Discord Tag": updatedUsername }, "discord/auth");
         }
 
         return { discord, airtable };

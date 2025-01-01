@@ -672,18 +672,30 @@ export function decoratePlayerWithDraftData(player, eventID) {
     };
 }
 
-
-export function getScoreReportingBadge(state, report, eventSettings, type = "score-reporting") {
+/**
+ *
+ * @param {Object} state - The state object
+ * @param {boolean} state.reports_enabled - Indicates if reports are enabled
+ * @param {boolean} state.has_existing_report - Indicates if there is an existing report
+ * @param {boolean} state.is_on_teams - Indicates if the user is on teams
+ * @param {boolean} state.is_opponent - Indicates if the user is an opponent
+ * @param {boolean} state.is_submitter - Indicates if the user is a submitter
+ * @param {boolean} state.is_staff - Indicates if the user is staff
+ * @param {Object} report - The report object
+ * @param {Object} eventSettings - The event settings object
+ * @returns {{small: string, variant: string, text: string, title: string}|{variant: string, text: string}|null}
+ */
+export function getScoreReportingBadge({ state, report }, eventSettings) {
     if (!state.reports_enabled) return null;
-    if (state.is_complete) return null;
+    if (report?.approved || state.match_complete) return null;
 
-    if (state.existing_report && report.approved) {
+    if (state.has_existing_report && report.approved) {
         return {
             variant: "success",
             text: "Complete"
         };
     }
-    if (state.existing_report && report.approved_by_opponent && eventSettings?.reporting?.score?.staffApprove) {
+    if (state.has_existing_report && report.approved_by_opponent && eventSettings?.reporting?.score?.staffApprove) {
         // Waiting for staff approval
         if (state.is_staff) {
             return {
@@ -701,7 +713,7 @@ export function getScoreReportingBadge(state, report, eventSettings, type = "sco
             };
         }
     }
-    if (state.existing_report && report.approved_by_team && eventSettings?.reporting?.score?.opponentApprove) {
+    if (state.has_existing_report && report.approved_by_team && eventSettings?.reporting?.score?.opponentApprove) {
         // Waiting for opponent approval
         if (state.is_opponent) {
             return {
@@ -716,7 +728,7 @@ export function getScoreReportingBadge(state, report, eventSettings, type = "sco
                 return {
                     variant: "success",
                     text: "Pre-approve",
-                    small: "Pre-app",
+                    small: "Pre-approve",
                     title: "Pre-approval ready"
                 };
             } else {
@@ -738,7 +750,7 @@ export function getScoreReportingBadge(state, report, eventSettings, type = "sco
         }
     }
 
-    if (!state.existing_report && state.is_on_teams) {
+    if (!state.has_existing_report && state.is_on_teams) {
         return {
             variant: "primary",
             text: "Available",
@@ -749,6 +761,126 @@ export function getScoreReportingBadge(state, report, eventSettings, type = "sco
 
     return null;
 }
+
+
+/**
+ *
+ * @param {Object} state - The state object
+ * @param {boolean} state.reports_enabled - Indicates if reports are enabled
+ * @param {boolean} state.has_existing_report - Indicates if there is an existing report
+ * @param {boolean} state.is_on_teams - Indicates if the user is on teams
+ * @param {boolean} state.is_opponent - Indicates if the user is an opponent
+ * @param {boolean} state.is_submitter - Indicates if the user is a submitter
+ * @param {boolean} state.is_staff - Indicates if the user is staff
+ * @param {boolean} state.reports_loading
+ * @param {boolean} state.has_start
+ * @param {boolean} state.match_complete
+ * @param {Report} report - The report object
+ * @param {Object} eventSettings - The event settings object
+ * @returns {{small: string, variant: string, text: string, title: string}|{variant: string, text: string}|null}
+ */
+export function getReschedulingBadge({ state, report }, eventSettings) {
+    console.log("rescheduling", { state, report });
+    if (state.reports_loading) return null;
+    if (!state.reports_enabled) return null;
+    if (!(state.is_on_teams || state.is_staff)) return null;
+    if (report?.approved || state.match_complete) return null;
+
+    const reschedule = state.has_start ? "Reschedule" : "Schedule";
+
+    console.log("existing report", state.has_existing_report, "is staff", state.is_staff);
+    if (!state.has_existing_report && !state.is_staff) {
+        // no report but could make one
+        console.log("could make", JSON.stringify(report), state.has_existing_report);
+        return {
+            variant: "primary",
+            text: "Available",
+            small: reschedule,
+            title: `You can submit a ${reschedule.toLowerCase()} request for this match`
+        };
+    }
+
+    if (state.has_existing_report) {
+        // some sort of state
+
+        if (report.denied_by_staff) {
+            return {
+                variant: "danger",
+                text: "Denied",
+                small: "Denied",
+                title: `Staff have denied this ${reschedule.toLowerCase()} request`
+            };
+        }
+        if (report.denied_by_opponent) {
+            return {
+                variant: "danger",
+                text: "Denied",
+                small: "Denied",
+                title: `${reschedule} request was denied by ${state.is_opponent ? "you" : "opponent"}`
+            };
+        }
+
+        if (report.approved_by_team) {
+            if (eventSettings?.reporting?.rescheduling?.opponentApprove) {
+                if (!report.approved_by_opponent) {
+                    if (state.is_submitter) {
+                        return {
+                            variant: "dark",
+                            text: "Submitted",
+                            small: "Submitted",
+                            title: `Waiting for opponent to approve this ${reschedule.toLowerCase()} request`
+                        };
+                    } else if (state.is_opponent) {
+                        return {
+                            variant: "success",
+                            text: "Needs approval",
+                            small: "Needs approval",
+                            title: `You can approve this ${reschedule.toLowerCase()} request`
+                        };
+                    } else if (state.is_staff) {
+                        if (eventSettings?.reporting?.rescheduling?.staffApprove) {
+                            return {
+                                variant: "primary",
+                                text: "Pre-approve",
+                                small: "Pre-app",
+                                title: "Pre-approval ready"
+                            };
+                        } else {
+                            return {
+                                variant: "dark",
+                                text: "Needs opponent",
+                                small: "Need opp",
+                                title: `Waiting for opponent to approve this ${reschedule.toLowerCase()} request`
+                            };
+                        }
+                    }
+                }
+            }
+
+            if (eventSettings?.reporting?.rescheduling?.staffApprove) {
+                if (!report.approved_by_staff) {
+                    if (state.is_staff) {
+                        return {
+                            variant: "success",
+                            text: "Needs approval",
+                            small: "Needs approval",
+                            title: `You can approve this ${reschedule.toLowerCase()} request`
+                        };
+                    } else if (state.is_on_teams) {
+                        return {
+                            variant: "dark",
+                            text: "Submitted",
+                            small: "Waiting",
+                            title: "Waiting for staff approval"
+                        };
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 /**
  * @param {number} r
  * @param {number} g

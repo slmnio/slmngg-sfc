@@ -1,21 +1,7 @@
 <template>
     <div class="match-rescheduling">
-        <h2 class="text-center">{{ reschedule.slice(0, -1) }}ing</h2>
         <div v-if="reschedulingEnabled && reschedulingAvailable && !matchComplete" class="flex-center flex-column gap-4">
-            <div class="score-reporting-status d-flex flex-column gap-3">
-                <div v-for="step in steps" :key="step.number" class="step d-flex flex-center gap-3" :class="`status-${step.status}`">
-                    <div class="step-num fw-bold">{{ step.number }}</div>
-                    <div class="step-content flex-grow-1">
-                        <div class="step-title fw-bold">{{ step.title }}</div>
-                        <div class="step-description">{{ step.description }}</div>
-                    </div>
-                    <div class="step-icon-holder flex-center">
-                        <div class="step-icon">
-                            <i :class="`fa-fw ${step.icon}`"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <ReportStepsTop :steps="steps" :title="`Match ${reschedule.slice(0, -1).toLowerCase()}ing`" />
             <div v-if="currentAction" class="step-action action-container text-left opacity-changes" :class="{'low-opacity': processing}">
                 <div v-if="currentAction?.title?.text" class="action-title" :class="`bg-${currentAction?.title?.variant || 'dark'} fw-bold h5 mb-0`">
                     {{ currentAction?.title?.text }}
@@ -28,9 +14,17 @@
                 </div>
                 <div v-if="(currentAction?.content || [])?.length" class="action-content bg-dark gap-2">
                     <div v-if="(currentAction?.content || [])?.includes('information')">
-                        <div><b>Earliest start:</b> {{ formatTime(match.earliest_start) }}</div>
-                        <div><b>Latest start:</b> {{ formatTime(match.latest_start) }}</div>
-                        <div v-if="match.start"><b>Current scheduled start:</b> {{ formatTime(match.start) }}</div>
+                        <div v-if="match.earliest_start && match.latest_start">
+                            <b>This match can be scheduled between: </b> <span class="time-text">{{ formatTime(match.earliest_start, { format: '{day-short} {date-ordinal} {month-short} {time}' }) }}</span> and <span class="time-text">{{ formatTime(match.latest_start, { format: '{day-short} {date-ordinal} {month-short} {time} {tz}' }) }}</span>
+                        </div>
+                        <div v-else-if="match.earliest_start">
+                            <b>This match must be scheduled at or after: </b><span class="time-text">{{ formatTime(match.earliest_start) }}</span>
+                        </div>
+                        <div v-else-if="match.latest_start">
+                            <b>This match must be scheduled at or before: </b><span class="time-text">{{ formatTime(match.latest_start) }}</span>
+                        </div>
+
+                        <div v-if="match.start"><b>Currently scheduled start:</b> {{ formatTime(match.start) }}</div>
                         <div v-else>This match does not currently have a scheduled start time</div>
                     </div>
                     <div v-if="(currentAction?.content || [])?.includes('match start')" class="border border-success p-2 rounded px-3">
@@ -55,7 +49,7 @@
                     </div>
 
                     <div v-if="(currentAction?.content || [])?.includes('staff editor link')" class="d-flex flex-column align-items-start gap-1 mb-1">
-                        <div>You can't submit a {{ this.reschedule.toLowerCase() }} request, but you can edit the match directly:</div>
+                        <div>You can't submit a {{ this.reschedule.toLowerCase() }} request, but you can edit the match time directly:</div>
                         <router-link class="btn btn-primary text-white" :to="url('match', match, { subPage: 'editor' })">Match editor</router-link>
                     </div>
                     <div v-if="(currentAction?.content || [])?.includes('log')">
@@ -88,14 +82,19 @@
                 </div>
             </div>
         </div>
-        <div v-else-if="matchComplete" class="p-2 bg-dark text-center rounded">
-            This match is complete
+        <div v-else-if="matchComplete" class="text-center rounded action-container flex-column bg-dark">
+            <div class="action-title h5 mb-0 border-0 fw-bold bg-dark d-flex align-items-center">
+                <i class="fas fa-check fa-fw mr-1"></i>This match is complete
+            </div>
+            <div v-if="existingScoreReport?.log" class="action-content text-left">
+                <ReportLog v-if="existingScoreReport?.log" :log="existingScoreReport.log" />
+            </div>
         </div>
         <div v-else-if="!reschedulingAvailable" class="p-2 bg-dark text-center rounded">
-            Match {{ reschedule.slice(0,-1) }}ing is not set up for this match
+            Match {{ reschedule.slice(0,-1).toLowerCase() }}ing is not set up for this match
         </div>
         <div v-else class="p-2 bg-dark text-center rounded">
-            Match {{ reschedule.slice(0,-1) }}ing is not enabled
+            Match {{ reschedule.slice(0,-1).toLowerCase() }}ing is not enabled
         </div>
 
         <!--
@@ -118,10 +117,12 @@ import { useAuthStore } from "@/stores/authStore.ts";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions.js";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";
 import { authenticatedRequest } from "@/utils/dashboard.ts";
+import ReportStepsTop from "@/components/website/ReportStepsTop.vue";
+import ReportLog from "@/components/website/ReportLog.vue";
 
 export default {
     name: "MatchRescheduling",
-    components: { AdvancedDateEditor },
+    components: { ReportLog, AdvancedDateEditor, ReportStepsTop },
     props: ["match"],
     data: () => ({
         proposedTime: null,
@@ -160,26 +161,40 @@ export default {
         reschedulingAvailable() {
             return this.match?.earliest_start && this.match?.latest_start;
         },
+        needsNoApproval() {
+            return this.eventSettings?.reporting?.rescheduling &&
+                !this.eventSettings?.reporting?.rescheduling?.opponentApprove &&
+                !this.eventSettings?.reporting?.rescheduling?.staffApprove;
+        },
         steps() {
-            const warningFooter = this.approvalWarning?.short ? [{ icon: "fas fa-exclamation-circle", heading: `This event requires ${this.approvalWarning.short} approval`, description: `The match will not be ${this.reschedule.toLowerCase()}d until ${this.approvalWarning.people} ${this.approvalWarning.types.length === 1 ? "has" : "have"} approved the request.` }] : [];
+            const warningFooter = this.approvalWarning?.short ? [{
+                icon: "fas fa-exclamation-circle",
+                heading: `This event requires ${this.approvalWarning.short} approval`,
+                description: `The match will not be ${this.reschedule.toLowerCase()}d until ${this.approvalWarning.people} ${this.approvalWarning.types.length === 1 ? "has" : "have"} approved the request.`
+            }] : (this.needsNoApproval ? [{
+                icon: "fas fa-check",
+                heading: `This event does not require any approval for ${this.reschedule.toLowerCase().slice(0,-1)}ing`,
+            }] : []);
+
+
             const steps = [
                 {
                     key: "report",
                     number: 1,
-                    title: "Score report",
-                    description: `Team submits ${this.reschedule.slice(0,-1)}ing request`,
+                    title: `${this.reschedule} request`,
+                    description: `Either team submits a ${this.reschedule.slice(0,-1).toLowerCase()}ing request`,
                     status: "inactive",
                     icon: "fas fa-user-clock",
                     actions: {
                         submitter: {
-                            title: { text: `Submit a ${this.reschedule.toLowerCase()} request`, variant: "primary" },
+                            title: { text: (this.needsNoApproval ? `${this.reschedule} this match` : `Submit a ${this.reschedule.toLowerCase()} request`), variant: "primary" },
                             content: ["information", "datetime picker", "proposed-local", "proposed-report"],
                             buttons: [{
                                 click: () => this.submitRequest(),
                                 disabled: !this.proposedTime || this.processing,
                                 style: {
                                     variant: "success",
-                                    text: "Submit request",
+                                    text: this.needsNoApproval ? "Change time" : "Submit request",
                                     icon: "fas fa-cloud-upload"
                                 },
                                 successToast: `${this.reschedule} request submitted`
@@ -196,6 +211,11 @@ export default {
                     }
                 },
             ];
+
+            if (this.needsNoApproval) {
+                steps[0].title = `Match ${this.reschedule.toLowerCase()}`;
+                steps[0].description = `Either team can ${this.reschedule.toLowerCase()} the match`;
+            }
 
             if (this.existingScoreReport?.approved_by_team) {
                 steps[0].status = "complete";
@@ -261,11 +281,11 @@ export default {
                         actions: {
                             submitter: {
                                 title: { text: `${this.reschedule} request in progress` },
-                                buttons: [
-                                    {
-                                        reaction: "cancel", action: "approve-match-reschedule", style: { variant: "danger", icon: "fas fa-trash", text: "Cancel request" }, successToast: `${this.reschedule} request cancelled`
-                                    }
-                                ],
+                                // buttons: [
+                                //     {
+                                //         reaction: "delete", action: "approve-match-reschedule", style: { variant: "danger", icon: "fas fa-trash", text: "Cancel request" }, successToast: `${this.reschedule} request cancelled`
+                                //     }
+                                // ],
                                 content: ["information", "proposed-report"],
                                 footer: [{ heading: "Waiting for an opponent's response", icon: "fas fa-clock" }, ...warningFooter].filter(Boolean)
                             },
@@ -305,7 +325,8 @@ export default {
                                 }
                                 : {
                                     title: {
-                                        text: this.eventSettings?.reporting?.rescheduling?.staffApprove ? `Pre-approve match ${this.reschedule.toLowerCase()}` : `${this.reschedule} request waiting for opponent approval`
+                                        text: this.eventSettings?.reporting?.rescheduling?.staffApprove ? `Pre-approve match ${this.reschedule.toLowerCase()}` : `${this.reschedule} request waiting for opponent approval`,
+                                        variant: "primary"
                                     },
                                     content: ["information", "proposed-report"],
                                     buttons: [
@@ -386,13 +407,24 @@ export default {
                         icon: "fas fa-business-time",
 
                         actions: {
-                            teams: {
+                            submitter: {
                                 title: { text: "Waiting for staff approval" },
                                 content: ["information", "proposed-report"],
                                 // buttons: [
                                 //     { reaction: "cancel", action: "approve-match-reschedule", style: { variant: "danger", icon: "fas fa-trash", text: "Cancel request" } },
                                 // ],
                                 footer: warningFooter
+                            },
+                            opponent: {
+                                title: { text: "Waiting for staff approval" },
+                                content: ["information", "proposed-report"],
+                                // buttons: [
+                                //     { reaction: "cancel", action: "approve-match-reschedule", style: { variant: "danger", icon: "fas fa-trash", text: "Cancel request" } },
+                                // ],
+                                footer: !this.eventSettings?.reporting?.rescheduling?.opponentApprove ? [
+                                    { heading: "Waiting for staff approval", icon: "fas fa-info-circle", description: `This event does not require opponent approval, a staff member will approve or deny this ${this.reschedule.toLowerCase()} request.` },
+                                    warningFooter
+                                ].filter(Boolean) : warningFooter
                             },
                             staff: {
                                 title: {
@@ -410,14 +442,6 @@ export default {
                         }
                     };
 
-                    if (this.existingScoreReport?.force_approved) {
-                        newStep.status = "complete";
-                        newStep.icon = "fas fa-shield-check";
-                        newStep.description = "Staff member force approved this request";
-                    } else if (this.existingScoreReport?.approved_by_staff) {
-                        newStep.status = "complete";
-                        newStep.icon = "fas fa-check";
-                    }
                     steps.push(newStep);
                 }
             } else {
@@ -431,13 +455,36 @@ export default {
                 });
             }
 
-            let firstAvailable = steps.findIndex(s => s.status === "inactive");
-            if (firstAvailable !== -1) {
-                steps[firstAvailable].status = "active";
+
+            if (this.existingScoreReport?.force_approved) {
+                steps[steps.length-1].status = "complete";
+                steps[steps.length-1].icon = "fas fa-shield-check";
+                steps[steps.length-1].description = "Staff member force approved this request";
+            } else if (this.existingScoreReport?.approved_by_staff) {
+                steps[steps.length-1].status = "complete";
+                steps[steps.length-1].icon = "fas fa-check";
             }
 
+            const noFurtherActions =
+                this.existingScoreReport?.approved ||
+                this.existingScoreReport?.denied_by_staff ||
+                this.existingScoreReport?.denied_by_opponent;
+
+            if (!noFurtherActions) {
+                let firstAvailable = steps.findIndex(s => s.status === "inactive");
+                if (firstAvailable !== -1) {
+                    steps[firstAvailable].status = "active";
+                }
+            }
+
+
             console.log(steps);
-            return steps;
+            return steps.sort((a,b) => {
+                if (a.status === "disabled" && b.status === "disabled") return a.number - b.number;
+                if (a.status === "disabled") return 1;
+                if (b.status === "disabled") return -1;
+                return a.number - b.number;
+            });
         },
         teams() {
             return (ReactiveRoot(this.match?.id, {
@@ -601,6 +648,7 @@ export default {
                 }
             } finally {
                 this.processing = false;
+                this.proposedTime = null;
             }
         },
         async actionButtonPress(button) {
@@ -617,104 +665,13 @@ export default {
 
             } finally {
                 this.processing = false;
+                this.proposedTime = null;
             }
-
         }
     }
 };
 </script>
 
 <style scoped>
-    .score-reporting-status {
-        max-width: min(500px, 75%)
-    }
-    .step-num {
-        font-size: 1.5em;
-        width: .75em;
-        text-align: center;
-    }
-    .step-icon {
-        font-size: 2em;
-    }
-    .step-icon-holder {
-        background-color: rgba(255,255,255,0.1);
-        width:  4em;
-        height: 4em;
-        border-radius: 50%;
-        flex-shrink: 0;
-    }
-
-    .step.status-active .step-icon-holder {
-        background-color: var(--primary);
-    }
-    .step.status-complete .step-icon-holder {
-        background-color: var(--green);
-    }
-    .step.status-denied .step-icon-holder,
-    .step.status-blocking .step-icon-holder {
-        background-color: var(--red);
-    }
-    .step.status-countered .step-icon-holder {
-        background-color: var(--yellow);
-        color: var(--dark);
-    }
-    .step.status-disabled {
-        opacity: 0.5;
-    }
-
-    .step .step-icon i {
-        transform: translateY(-0.1em)
-    }
-    .step-action {
-        display: flex;
-        flex-direction: column;
-        max-width: 100%;
-    }
-
-
-    .action-container {
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: .5em;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-    }
-    .action-title, .action-footer, .action-content {
-        display: flex;
-        padding: 0.5em 0.75em;
-        width: 100%;
-    }
-    .action-content {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 1em;
-    }
-    .action-footer-buttons {
-        align-items: flex-end;
-    }
-    .action-title {
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        position: relative;
-    }
-    .action-footer {
-        border-top: 1px solid rgba(255,255,255,0.1);
-    }
-    .action-footer small {
-        padding: 0.25em 0;
-        line-height: 1.1;
-        display: block;
-    }
-    .title-spinner {
-        position: absolute;
-        top: 0;
-        right: 0;
-        height: 100%;
-        padding: 0 0.5em;
-        font-size: 0.8em;
-        font-weight: 400;
-    }
+    @import "match-editors.css";
 </style>

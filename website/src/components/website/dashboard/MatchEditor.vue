@@ -18,8 +18,11 @@
             <!--                <div class="spacer flex-grow-1"></div>-->
             <!--                <b-button :disabled="processing['map']" class="ml-5 top-button flex-shrink-0" variant="success" @click="() => saveMapAndScores()"><i class="fas fa-save fa-fw"></i> Save all</b-button>-->
             <div v-if="scoreReporting && proposedData" class="fill-buttons d-flex gap-2 justify-content-center mt-2">
-                <b-button variant="secondary" size="sm" @click="loadProposedData"><i class="fal fa-fw fa-upload"></i> Load proposed score report</b-button>
+                <b-button variant="primary" size="sm" @click="loadProposedData"><i class="fal fa-fw fa-upload"></i> Load proposed score report</b-button>
                 <b-button variant="danger" size="sm" @click="emptyData()"><i class="fas fa-trash fa-fw"></i> Empty editor</b-button>
+                <b-button v-if="scoreReporting" size="sm" @click="() => extraMaps++">
+                    <i class="fas fa-fw fa-plus"></i> Add map
+                </b-button>
             </div>
             <div class="teams-scores pt-2 px-2">
                 <div class="checkboxes">
@@ -48,19 +51,19 @@
                     :max="match.first_to"
                     class="opacity-changes score-input" />
                 <div class="spacer" style="order:10"></div>
-                <div class="right-buttons" style="order:11">
+                <div v-if="!scoreReporting" class="right-buttons" style="order:11">
                     <b-button size="sm" @click="() => extraMaps++">
                         <i class="fas fa-fw fa-plus"></i> Add map
                     </b-button>
-                    <b-button
-                        v-if="scoreReporting"
-                        class="top-button flex-shrink-0"
-                        variant="success"
-                        :disabled="!matchData.scores.some(s => s === match.first_to)"
-                        @click="() => scoreReportConfirmModal = true">
-                        <i class="fas fa-save fa-fw"></i> {{ scoreReportAction === "counter" ? 'Submit counter report' : "Submit score report" }}
-                    </b-button>
-                    <b-button v-else class="top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save {{ hideMatchExtras ? 'all' : 'maps' }}</b-button>
+                    <!--                    <b-button-->
+                    <!--                        v-if="scoreReporting"-->
+                    <!--                        class="top-button flex-shrink-0"-->
+                    <!--                        variant="success"-->
+                    <!--                        :disabled="!matchData.scores.some(s => s === match.first_to)"-->
+                    <!--                        @click="() => scoreReportConfirmModal = true">-->
+                    <!--                        <i class="fas fa-save fa-fw"></i> {{ scoreReportAction === "counter" ? 'Submit counter report' : "Submit score report" }}-->
+                    <!--                    </b-button>-->
+                    <b-button class="top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save {{ hideMatchExtras ? 'all' : 'maps' }}</b-button>
                 </div>
             </div>
             <div v-if="scoreReporting && showScoreReportForfeit" class="score-reporting-extras py-2">

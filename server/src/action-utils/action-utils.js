@@ -59,7 +59,7 @@ export async function updateRecord(Cache, tableName, item, data, source = undefi
         ...deAirtable({ ...item, ...data }),
         modified: (new Date((new Date()).getTime() + TimeOffset)).toString()
     };
-    verboseLog(`Editing record on **${tableName}** \`${item.id}\``, data);
+    verboseLog(`Editing record on **${tableName}** \`${item.id}\`${source ? ` {${source}}` : ""}`, data);
     // Eager update
     Cache.set(cleanID(item.id), slmnggData, { eager: true, source });
 
@@ -82,12 +82,13 @@ export async function updateRecord(Cache, tableName, item, data, source = undefi
  * @param {Cache} Cache
  * @param {string} tableName
  * @param {object[]} records
+ * @param {string | null} source
  */
-export async function createRecord(Cache, tableName, records) {
-    console.log(`[create record] creating table=${tableName} records=${records.length}`);
+export async function createRecord(Cache, tableName, records, source = null) {
+    console.log(`[create record] ${source ? `{${source}} ` : ""}creating table=${tableName} records=${records.length}`);
     try {
         let newRecords = await slmngg(tableName).create(records.map(recordData => {
-            verboseLog(`Creating record on **${tableName}** `, recordData);
+            verboseLog(`Creating record on **${tableName}**${source ? ` {${source}}` : ""}`, recordData);
             return {
                 fields: recordData
             };
@@ -194,6 +195,7 @@ export async function getMatchData(broadcast, requireAll) {
  * @returns {Promise<({report: Report | undefined, match: Match})>}
  */
 export async function getMatchScoreReporting(matchID) {
+    /** @type {Match} */
     const match = await get(matchID);
     let report;
 
@@ -212,7 +214,7 @@ export async function getMatchScoreReporting(matchID) {
     if (!eventSettings?.reporting?.score?.use) throw "Score reporting is not enabled on this match";
 
     // check existing report
-    if (match?.reports.length) {
+    if ((match?.reports || []).length) {
         const reports = await Promise.all((match?.reports || []).map(rID => get(rID)));
         const firstReport = reports.find(r => r.type === "Scores");
         if (firstReport?.id) {
@@ -357,14 +359,7 @@ export async function findMember(player, team, guild) {
     return { member, fixes };
 }
 
-/**
- *
- * @param {MapObject} mapObject
- * @param {string} keyPrefix
- * @returns {Promise<MapObject>}
- */
-export async function looseDeleteMessage(mapObject, keyPrefix) {
-    console.log(mapObject.data);
+export async function checkDeleteMessage(mapObject, keyPrefix) {
     if (mapObject.get(`${keyPrefix}_message_id`) && mapObject.get(`${keyPrefix}_channel_id`)) {
         try {
             const channel = await client.channels.fetch(mapObject.get(`${keyPrefix}_channel_id`));
@@ -376,7 +371,6 @@ export async function looseDeleteMessage(mapObject, keyPrefix) {
             mapObject.push(`${keyPrefix}_channel_id`, null);
         }
     }
-    return mapObject;
 }
 
 /**
@@ -384,9 +378,10 @@ export async function looseDeleteMessage(mapObject, keyPrefix) {
  * @param {string} options.key
  * @param {MapObject} options.mapObject
  * @param {(Snowflake | null)=} options.channelID
- * @param {(string | null)=} options.content
+ * @param {(string | null | object)=} options.content
  * @param {Function=} options.success
  * @returns {Promise<MapObject>}
+ * @deprecated Use keyed sendRecordedMessage instead
  */
 export async function sendMessage({
     key,
@@ -409,11 +404,10 @@ export async function sendMessage({
             const message = await channel.send(content);
             mapObject.push(`${key}_channel_id`, channel.id);
             mapObject.push(`${key}_message_id`, message.id);
-            if (success) await success({
-                mapObject
-            });
+            if (success) await success(mapObject);
         } catch (e) {
             console.error(`Sending error ${key}`, e);
+            console.dir(e?.rawError?.errors, { depth: null, colors: true });
         }
     }
     return mapObject;

@@ -29,6 +29,14 @@ export default {
 
         if (!actingTeam) throw "You don't have permission to report the score of this match";
 
+        if (match.start) {
+            const startTimeDate = new Date(startTime);
+            const matchTimeDate = new Date(match.start);
+            if (startTimeDate.getTime() === matchTimeDate.getTime()) {
+                throw "The match is already scheduled for this time";
+            }
+        }
+
         const response = await this.helpers.createRecord("Reports", {
             "Type": "Rescheduling",
             "Player": [dirtyID(user.airtable.id)],
@@ -37,7 +45,13 @@ export default {
             "Data": JSON.stringify({
                 start: startTime
             }),
-            "Log": `${(new Date()).toLocaleString()}: ${user.airtable.name} requested reschedule as ${actingTeam?.name}`
+            "Log": [
+                `date=${(new Date()).getTime()}`,
+                `user=${user.airtable.id}`,
+                `team=${actingTeam?.id}`,
+                `text=Requested ${match.start ? "schedule" : "reschedule"}`,
+                "key=submitted_request"
+            ].join("|")
         });
         if ("error" in response) {
             throw `Airtable error: ${response.errorMessage}`;

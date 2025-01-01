@@ -441,7 +441,7 @@ export default ({ app, Cache, io }) => {
                     "Channel ID": tokenInfo.userId,
                     "Name": tokenInfo.userName,
                     "Stream Key": streamKey || undefined
-                });
+                }, "routes/twitch_callback");
 
             } else {
                 airtableResponse = await createRecord(Cache, "Channels", [{
@@ -450,7 +450,7 @@ export default ({ app, Cache, io }) => {
                     "Channel ID": tokenInfo.userId,
                     "Name": tokenInfo.userName,
                     "Stream Key": streamKey || undefined
-                }]);
+                }], "routes/twitch_callback");
             }
 
             // console.log(airtableResponse);

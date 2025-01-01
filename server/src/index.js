@@ -61,6 +61,7 @@ const Cache = (await import("./cache.js")).setup(io);
 actions.load(app, localCors, Cache, io);
 
 await import("./discord/slash-commands.js");
+await import("./discord/interactions.ts");
 await import("./automation-manager.js");
 
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));

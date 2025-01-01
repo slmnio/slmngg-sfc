@@ -24,7 +24,7 @@
                 :model-value="temporaryTime || safeSavedTime"
                 @update:model-value="(val) => temporaryTime = val" />
 
-            <div class="earliest-latest-warning py-2 flex-center text-center bg-secondary my-2 text-white rounded" :class="{'bg-danger': isValid === false}">
+            <div class="earliest-latest-warning py-2 flex-center text-center my-2 border border-primary rounded" :class="{'bg-danger text-white': isValid === false}">
                 <div v-if="earliestTime && !latestTime">
                     This match must start at or after <b>{{ formatTime(earliestTime) }}</b>
                 </div>

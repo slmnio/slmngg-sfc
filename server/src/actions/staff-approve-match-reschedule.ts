@@ -1,9 +1,10 @@
-import { ActionAuth, Match, MatchResolvableID, Report } from "../types.js";
+import { ActionAuth, Match, MatchResolvableID, Report, ReschedulingReportKeys } from "../types.js";
 import { Action } from "../action-utils/action-manager-models.js";
-import { getMatchRescheduling, looseDeleteMessage } from "../action-utils/action-utils.js";
+import { dirtyID, getMatchRescheduling } from "../action-utils/action-utils.js";
 import { get } from "../action-utils/action-cache.js";
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
 import { MapObject } from "../discord/managers.js";
+import { looseDeleteRecordedMessages } from "../action-utils/ts-action-utils.js";
 
 export default {
     key: "staff-approve-match-reschedule",
@@ -29,47 +30,85 @@ export default {
         let messageData = new MapObject(report.message_data);
 
         // Remove previous notifications
-        messageData = await looseDeleteMessage(messageData, "staff_reschedule_notification");
+        // messageData = await looseDeleteRecordedMessage<ReschedulingReportKeys>(messageData, "staff_reschedule_notification");
 
         if (reaction === "pre-approve") {
-            await this.helpers.updateRecord("Reports", report, {
-                "Approved by staff": true,
-                "Log": (report.log ? report.log + "\n" : "") + `${(new Date()).toLocaleString()}: ${user.airtable.name} pre-approved match reschedule request as staff`,
-                "Message Data": messageData.textMap
-            }, "actions/staff-approve-match-reschedule");
-        } else if (reaction === "approve") {
-            await this.helpers.updateRecord("Reports", report, {
-                "Approved by staff": true,
-                "Log": (report.log ? report.log + "\n" : "") + `${(new Date()).toLocaleString()}: ${user.airtable.name} approved match reschedule request as staff`,
-                "Message Data": messageData.textMap
-            }, "actions/staff-approve-match-reschedule");
-        } else if (reaction === "force-approve") {
-            messageData = await looseDeleteMessage(messageData, "opponent_captain_notification");
+            messageData = await looseDeleteRecordedMessages<ReschedulingReportKeys>(messageData, ["reschedule_staff_approval", "reschedule_staff_preapproval"]);
 
+            await this.helpers.updateRecord("Reports", report, {
+                "Approved by staff": true,
+                "Log": (report.log ? report.log + "\n" : "") + [
+                    `date=${(new Date()).getTime()}`,
+                    `user=${user.airtable.id}`,
+                    "staff=true",
+                    "text=Pre-approved match reschedule",
+                    "key=staff_preapproved"
+                ].join("|"),
+                "Message Data": messageData.textMap
+            });
+        } else if (reaction === "approve") {
+            messageData = await looseDeleteRecordedMessages<ReschedulingReportKeys>(messageData, ["reschedule_staff_approval", "reschedule_staff_preapproval"]);
+
+            await this.helpers.updateRecord("Reports", report, {
+                "Approved by staff": true,
+                "Log": (report.log ? report.log + "\n" : "") + [
+                    `date=${(new Date()).getTime()}`,
+                    `user=${user.airtable.id}`,
+                    "staff=true",
+                    "text=Approved match reschedule",
+                    "key=staff_approved"
+                ].join("|"),
+                "Message Data": messageData.textMap
+            });
+        } else if (reaction === "force-approve") {
+            messageData = await looseDeleteRecordedMessages<ReschedulingReportKeys>(messageData, ["reschedule_staff_approval", "reschedule_staff_preapproval", "reschedule_opponent_approval"]);
             await this.helpers.updateRecord("Reports", report, {
                 "Approved by staff": true,
                 "Force approved": true,
-                "Log": (report.log ? report.log + "\n" : "") + `${(new Date()).toLocaleString()}: ${user.airtable.name} force-approved match reschedule as staff`,
+                "Log": (report.log ? report.log + "\n" : "") + [
+                    `date=${(new Date()).getTime()}`,
+                    `user=${user.airtable.id}`,
+                    "staff=true",
+                    "text=Force-approved match reschedule",
+                    "key=staff_force_approved"
+                ].join("|"),
                 "Message Data": messageData.textMap
-            }, "actions/staff-approve-match-reschedule");
+            });
         } else if (reaction === "deny") {
-            messageData = await looseDeleteMessage(messageData, "opponent_captain_notification");
+            // approval messages that need to be deleted
+            messageData = await looseDeleteRecordedMessages<ReschedulingReportKeys>(messageData, ["reschedule_opponent_approval", "reschedule_staff_approval", "reschedule_staff_preapproval"]);
 
             await this.helpers.updateRecord("Reports", report, {
                 "Denied by staff": true,
-                "Log": (report.log ? report.log + "\n" : "") + `${(new Date()).toLocaleString()}: ${user.airtable.name} denied match reschedule as staff`,
+                "Log": (report.log ? report.log + "\n" : "") + [
+                    `date=${(new Date()).getTime()}`,
+                    `user=${user.airtable.id}`,
+                    "staff=true",
+                    "text=Denied match reschedule",
+                    "key=staff_denied"
+                ].join("|"),
                 "Message Data": messageData.textMap
-            }, "actions/staff-approve-match-reschedule");
+            });
         } else if (reaction === "delete") {
-            messageData = await looseDeleteMessage(messageData, "opponent_captain_notification");
+            // any messages from a previous approval that was denied
+            messageData = await looseDeleteRecordedMessages<ReschedulingReportKeys>(messageData, ["reschedule_staff_denial", "reschedule_opponent_denial", "reschedule_team_cancel", "reschedule_opponent_cancel"]);
+            // approval messages that need to be deleted
+            messageData = await looseDeleteRecordedMessages<ReschedulingReportKeys>(messageData, ["reschedule_opponent_approval", "reschedule_staff_approval", "reschedule_staff_preapproval"]);
 
             await this.helpers.updateRecord("Reports", report, {
-                "Log": (report.log ? report.log + "\n" : "") + `${(new Date()).toLocaleString()}: ${user.airtable.name} deleted match reschedule as staff`,
+                "Log": (report.log ? report.log + "\n" : "") + [
+                    `date=${(new Date()).getTime()}`,
+                    `user=${user.airtable.id}`,
+                    "staff=true",
+                    "text=Deleted match reschedule",
+                    "key=staff_deleted"
+                ].join("|"),
                 "Message Data": messageData.textMap
-            }, "actions/staff-approve-match-reschedule");
+            });
             await this.helpers.updateRecord("Matches", match, {
-                "Reports": []
-            }, "actions/staff-approve-match-reschedule");
+                "Reports": [],
+                "Report History": [...(match.report_history || []), report.id].map(x => dirtyID(x))
+            });
         } else {
             throw {
                 errorCode: 501,

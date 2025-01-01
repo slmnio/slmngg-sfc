@@ -190,6 +190,42 @@ export interface Report extends Base {
     player?: PlayerResolvableID[];
     team?: TeamResolvableID[];
 }
+
+// export type ReschedulingReportMessageTypes =
+//       "reschedule_opponent_approval"
+//     | "reschedule_staff_preapproval"
+//     | "reschedule_staff_approval"
+//
+//     | "reschedule_completed"
+//
+//     | "reschedule_opponent_denial"
+//     | "reschedule_staff_denial"
+//     | "reschedule_team_cancel"
+//     | "reschedule_opponent_cancel" // unlikely to use this
+
+const ReschedulingReportMessageTypes = [
+    "reschedule_opponent_approval",
+    "reschedule_staff_preapproval",
+    "reschedule_staff_approval",
+    "reschedule_completed",
+    "reschedule_opponent_denial",
+    "reschedule_staff_denial",
+    "reschedule_team_cancel",
+    "reschedule_opponent_cancel",
+] as const;
+
+export type ReschedulingReportKeys = (typeof ReschedulingReportMessageTypes)[number];
+
+
+const ScoreReportingMessageTypes = [
+    "report_staff_notification",
+    "report_opponent_notification",
+    "report_completed_public",
+    "report_completed_staff"
+] as const;
+
+export type ScoreReportingReportKeys = (typeof ScoreReportingMessageTypes)[number];
+
 interface LogFile extends Base {
 
 }
@@ -229,8 +265,53 @@ interface AdRead extends Base {
 interface LiveGuest extends Base {
 
 }
-interface Theme extends Base {
+export interface Theme extends Base {
+    id: ThemeResolvableID;
+    __tableName: "Themes";
 
+    event?: EventResolvableID[];
+    events_as_title_sponsor?: EventResolvableID[];
+    live_guests?: LiveGuestResolvableID[];
+    team?: TeamResolvableID[];
+
+    team_blue?: TeamResolvableID[];
+    team_red?: TeamResolvableID[];
+    players?: PlayerResolvableID[];
+
+    name?: string;
+    description?: string;
+    desk_colors?: string;
+    available_for_factboxes?: boolean;
+
+    color_accent?: `#${string}`;
+    color_alt?: `#${string}`;
+    color_body?: `#${string}`;
+    color_dark?: `#${string}`;
+    color_gradient?: `#${string}`;
+    color_hero_recolor_primary?: `#${string}`;
+    color_hero_recolor_secondary?: `#${string}`;
+    color_logo_accent?: `#${string}`;
+    color_logo_background?: `#${string}`;
+    color_navbar?: `#${string}`;
+    color_text_on_body?: `#${string}`;
+    color_text_on_dark?: `#${string}`;
+    color_text_on_logo_background?: `#${string}`;
+    color_text_on_theme?: `#${string}`;
+    color_theme?: `#${string}`;
+    color_theme_on_dark?: `#${string}`;
+    color_website_active?: `#${string}`;
+    color_website_passive?: `#${string}`;
+
+    default_logo?: CacheAttachment[];
+    default_wordmark?: CacheAttachment[];
+    small_logo?: CacheAttachment[];
+
+    logo_on_dark?: CacheAttachment[];
+    logo_on_light?: CacheAttachment[];
+    logo_on_theme?: CacheAttachment[];
+    wordmark_on_dark?: CacheAttachment[];
+    wordmark_on_light?: CacheAttachment[];
+    wordmark_on_theme?: CacheAttachment[];
 }
 interface Accolade extends Base {
 
@@ -298,6 +379,7 @@ export interface Match extends Base {
     placeholder_teams?: string;
     player_relationships?: PlayerRelationshipResolvableID[];
     reports?: ReportResolvableID[];
+    report_history?: ReportResolvableID[];
     round?: string;
     schedule_text?: string;
     scheduled_broadcast?: string;
@@ -513,9 +595,12 @@ export type EventSettings = {
         matchTimeChanges?: Snowflake;
         postMatchReports?: Snowflake;
         captainNotifications?: Snowflake;
+
+        staffApprovalNotifications?: Snowflake;
         staffScoreReport?: Snowflake;
         staffCompletedScoreReport?: Snowflake;
 
+        sendStaffPreapprovalNotifications?: boolean;
         hideNonStaffRosterChanges?: boolean;
     }
 }

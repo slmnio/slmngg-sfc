@@ -4,7 +4,7 @@ export default {
     requiredParams: ["match", "overlayType", "state"],
     /***
      * @param {Object?} params
-     * @param {ClientData} client
+     * @param {ActionAuth["user"]} user
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern

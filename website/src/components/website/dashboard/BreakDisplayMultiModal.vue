@@ -78,10 +78,11 @@ import BreakTextTab from "@/components/website/dashboard/BreakTextTab.vue";
 import BreakTimeControls from "@/components/website/dashboard/BreakTimeControls.vue";
 import Squeezable from "@/components/broadcast/Squeezable.vue";
 import { authenticatedRequest } from "@/utils/dashboard";
+import Countdown from "@/components/broadcast/Countdown.vue";
 
 export default {
     name: "BreakDisplayMultiModal",
-    components: { Squeezable, BreakTimeControls, BreakTextTab, BreakAutomationTab, BreakDisplayTab },
+    components: { Countdown, Squeezable, BreakTimeControls, BreakTextTab, BreakAutomationTab, BreakDisplayTab },
     props: {
         broadcast: Object
     },

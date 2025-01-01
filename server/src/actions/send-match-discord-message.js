@@ -7,8 +7,9 @@ export default {
     auth: ["client", "user"],
     /***
      * @param {Object?} params
-     * @param {ClientData} client
-     * @param {CacheGetFunction} get
+     * @param {ActionAuth["user"]} user
+     * @param {ActionAuth["client"]} client
+     * @param {ActionAuth["isAutomation"]} isAutomation
      * @returns {Promise<string>}
      */
     // eslint-disable-next-line no-empty-pattern

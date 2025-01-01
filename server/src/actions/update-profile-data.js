@@ -7,7 +7,7 @@ export default {
     auth: ["user"],
     /***
      * @param {object} profileData
-     * @param {UserData} user
+     * @param {ActionAuth["user"]} user
      * @returns {Promise<void>}
      */
     async handler({ profileData }, { user }) {

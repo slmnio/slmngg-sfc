@@ -15,11 +15,11 @@
         <div class="theme-collection mb-3">
             <div class="theme-bar default-thing" :style="mainTheme">
                 <div class="text flex-center flex-grow-1 px-3">Theme</div>
-                <contrast-badge class="contrast-badge" :contrast="calculateContrastHex(mainTheme.color, mainTheme.backgroundColor)" />
+                <ContrastBadge class="contrast-badge" :contrast="calculateContrastHex(mainTheme.color, mainTheme.backgroundColor)" />
             </div>
             <div class="theme-bar default-thing" :style="logoBackground">
                 <div class="text flex-center flex-grow-1 px-3">Logo Background</div>
-                <contrast-badge class="contrast-badge" :contrast="calculateContrastHex(logoBackground.color, logoBackground.backgroundColor)" />
+                <ContrastBadge class="contrast-badge" :contrast="calculateContrastHex(logoBackground.color, logoBackground.backgroundColor)" />
             </div>
         </div>
 
@@ -38,7 +38,7 @@
 
             <div class="discord-list d-flex flex-column gap-1 mb-3">
                 <div v-for="color in discordColors" :key="color.name" class="discord-test d-flex gap-2">
-                    <contrast-badge class="contrast-badge" :contrast="color.contrast" />
+                    <ContrastBadge class="contrast-badge" :contrast="color.contrast" />
                     <div class="color-test d-flex gap-2" :style="{color: color.value}">
                         <div>{{ thing?.name }}</div>
                         <div class="fw-bold">{{ thing?.name }}</div>
@@ -61,7 +61,7 @@
                             <div class="color-hex text-center flex-grow-1">
                                 <copy-text-button :no-icon="true">{{ safeColor(text.value) }}</copy-text-button>
                             </div>
-                            <contrast-badge class="contrast-badge" :contrast="text.contrast" />
+                            <ContrastBadge class="contrast-badge" :contrast="text.contrast" />
                         </div>
                     </div>
                 </div>
@@ -135,6 +135,7 @@ import CopyTextButton from "@/components/website/CopyTextButton";
 import { calculateContrastHex, url } from "@/utils/content-utils";
 import { mapWritableState } from "pinia";
 import { useSettingsStore } from "@/stores/settingsStore";
+import ContrastBadge from "@/components/website/ContrastBadge.vue";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");
@@ -142,7 +143,7 @@ function cleanKey(key) {
 
 export default {
     name: "ThingTheme",
-    components: { CopyTextButton, /* HeroColorControls, RecoloredHero, */ BracketTeam, IngameTeam, ContentRow, ContentThing, StandingsTeam },
+    components: { ContrastBadge, CopyTextButton, /* HeroColorControls, RecoloredHero, */ BracketTeam, IngameTeam, ContentRow, ContentThing, StandingsTeam },
     props: ["team", "event"],
     computed: {
         ...mapWritableState(useSettingsStore, ["removeHashInHex"]),

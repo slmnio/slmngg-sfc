@@ -1,11 +1,12 @@
 import { deAirtable } from "../action-utils/action-utils.js";
+
 export default {
     key: "create-live-guest",
     requiredParams: [],
     auth: ["user"],
     /***
      * @param {Object?} params
-     * @param {UserData} user
+     * @param {ActionAuth["user"]} user
      * @returns {Promise<{}>}
      */
     async handler(params, { user }) {

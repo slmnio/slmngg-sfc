@@ -39,8 +39,6 @@
 <script>
 import ContentThing from "@/components/website/ContentThing.vue";
 import ContentRow from "@/components/website/ContentRow.vue";
-import EventStaffing from "@/components/website/EventStaffing.vue";
-import { url } from "@/utils/content-utils";
 
 export default {
     name: "EventStaff",

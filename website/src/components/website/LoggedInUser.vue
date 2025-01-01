@@ -30,7 +30,7 @@ import { url } from "@/utils/content-utils.js";
 import { getMainDomain, isOnMainDomain } from "@/utils/fetch";
 import { bg } from "@/utils/images";
 import TokenModal from "@/components/website/dashboard/TokenModal.vue";
-import { mapState, mapWritableState } from "pinia";
+import { mapState } from "pinia";
 import { useAuthStore } from "@/stores/authStore";
 
 export default {

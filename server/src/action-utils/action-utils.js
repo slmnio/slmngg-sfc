@@ -227,6 +227,7 @@ export async function getMatchScoreReporting(matchID) {
 /**
  *
  * @param matchID
+ * @param {boolean} excludeCompleted
  * @returns {Promise<({report: Report | undefined, match: Match})>}
  */
 export async function getMatchRescheduling(matchID, { excludeCompleted } = {}) {
@@ -264,6 +265,7 @@ export async function getTwitchAPIClient(channel) {
     if (!channel) throw("Internal error connecting to Twitch");
     try {
         const accessToken = await Cache.auth.getTwitchAccessToken(channel);
+        // this warning is because the twitch auth data is thrown into the general auth map but it shouldn't actually cause an error here
         const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, accessToken);
         return new ApiClient({authProvider});
     } catch (e) {

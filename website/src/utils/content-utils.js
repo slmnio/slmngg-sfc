@@ -119,7 +119,7 @@ export function multiImage(theme, keys, minSize = 30, useResizer = true) {
 }
 
 export function getMatchContext(match, { light } = {}) {
-    let pieces = [];
+    let pieces;
     if (light) {
         pieces = [match?.sub_event].filter(Boolean);
     } else {

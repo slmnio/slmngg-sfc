@@ -5,7 +5,8 @@ export default {
     /***
      * @param {AnyAirtableID} matchID
      * @param {object?} updatedData
-     * @param {UserData} user
+     * @param {ActionAuth["user"]} user
+     * @param {ActionAuth["isAutomation"]} isAutomation
      * @returns {Promise<void>}
      */
     async handler({ matchID, updatedData }, { user, isAutomation }) {

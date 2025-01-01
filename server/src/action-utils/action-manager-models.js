@@ -33,6 +33,7 @@ export class Action {
      * @param {string[]} auth
      * @param {string[]} requiredParams
      * @param {string[]} optionalParams
+     * @param {function} registerFunction
      */
     constructor({
         key,

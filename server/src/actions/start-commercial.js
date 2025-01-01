@@ -6,8 +6,8 @@ export default {
     requiredParams: ["commercialDuration"],
     /***
      * @param {30 | 60 | 90 | 120 | 150 | 180} commercialDuration
-     * @param {UserData} user
-     * @param {ClientData} client
+     * @param {ActionAuth["user"]} user
+     * @param {ActionAuth["client"]} client
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern

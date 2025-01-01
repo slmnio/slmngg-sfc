@@ -18,7 +18,7 @@ export default {
      * @param {object[]} allPlayerData
      * @param {boolean} useSignupData
      * @param {boolean} createPlayers
-     * @param {UserData} user
+     * @param {ActionAuth["user"]} user
      * @returns {Promise<*[]>}
      */
     async handler({ eventID, playerData: allPlayerData, useSignupData, createPlayers }, { user }) {

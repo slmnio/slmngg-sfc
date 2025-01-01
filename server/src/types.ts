@@ -539,9 +539,10 @@ export type AuthUserData = {
         airtable: Player;
     }
 }
+export type UserData = AuthUserData["user"];
 
 export type ActionAuth = {
-    user: AuthUserData["user"];
+    user: UserData;
     client?: Client;
     isAutomation?: boolean;
 }

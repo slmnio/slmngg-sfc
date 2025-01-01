@@ -17,7 +17,8 @@ export default {
      * @param {number?} mapData.score_2
      * @param {boolean?} mapData.draw
      *
-     * @param {UserData} user
+     * @param {ActionAuth["user"]} user
+     * @param {ActionAuth["isAutomation"]} isAutomation
      * @returns {Promise<void>}
      */
     async handler({ matchID, mapData }, { user, isAutomation }) {

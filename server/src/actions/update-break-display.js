@@ -6,7 +6,7 @@ export default {
     requiredParams: ["option"],
     /***
      * @param {string} option
-     * @param {ClientData} client
+     * @param {ActionAuth["client"]} client
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern

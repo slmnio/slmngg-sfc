@@ -21,7 +21,6 @@
 </template>
 
 <script>
-import Match from "@/components/website/match/Match.vue";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortEvents, sortMatches } from "@/utils/sorts";
 import { formatTime, url } from "@/utils/content-utils";

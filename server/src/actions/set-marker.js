@@ -7,8 +7,7 @@ export default {
     optionalParams: ["text"],
     /***
      * @param {Object?} params
-     * @param {ClientData} client
-     * @param {CacheGetFunction} get
+     * @param {ActionAuth["client"]} client
      * @returns {Promise<string>}
      */
     // eslint-disable-next-line no-empty-pattern

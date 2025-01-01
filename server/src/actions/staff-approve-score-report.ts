@@ -107,7 +107,7 @@ export default {
 
             if (client && eventSettings?.logging?.staffScoreReport) {
                 const channel = await client.channels.fetch(eventSettings.logging.staffScoreReport);
-                if (channel?.isTextBased()) {
+                if (channel?.isSendable()) {
                     try {
                         await channel.send(`🗑️ **Denied & deleted**: Score report removed by ${user.airtable.name}.\n${matchLink}`);
                     } catch (e) {

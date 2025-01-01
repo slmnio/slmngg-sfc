@@ -363,7 +363,7 @@ export async function checkDeleteMessage(mapObject, keyPrefix) {
     if (mapObject.get(`${keyPrefix}_message_id`) && mapObject.get(`${keyPrefix}_channel_id`)) {
         try {
             const channel = await client.channels.fetch(mapObject.get(`${keyPrefix}_channel_id`));
-            if (channel?.isTextBased()) await channel.messages.delete(mapObject.get(`${keyPrefix}_message_id`));
+            if (channel?.isSendable()) await channel.messages.delete(mapObject.get(`${keyPrefix}_message_id`));
         } catch (e) {
             console.error(`Error trying to delete ${keyPrefix} message`, e);
         } finally {
@@ -399,7 +399,7 @@ export async function sendMessage({
         return mapObject;
     }
     const channel = await client.channels.fetch(channelID);
-    if (channel?.isTextBased()) {
+    if (channel?.isSendable()) {
         try {
             const message = await channel.send(content);
             mapObject.push(`${key}_channel_id`, channel.id);

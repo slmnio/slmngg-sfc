@@ -1,12 +1,10 @@
-import { Interaction, InteractionType, } from "discord.js";
 import { MatchResolvableID } from "../../../types.js";
 import * as Cache from "../../../cache.js";
 import { getInternalManager } from "../../../action-utils/action-manager.js";
+import { InteractionHandler } from "../../interactions.js";
 
 export default {
-    execute: async (interaction: Interaction, args: string[]) => {
-        if (interaction.type !== InteractionType.MessageComponent) return;
-
+    execute: async (interaction, args) => {
         // auth through discord
         const { token } = await Cache.auth.startRawDiscordAuth(interaction.user);
         if (!token) throw "Could not authenticate you with SLMN.GG.";
@@ -29,4 +27,4 @@ export default {
             return managerResponse;
         }
     }
-};
+} satisfies InteractionHandler;

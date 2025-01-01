@@ -179,7 +179,7 @@ export async function checkDeleteMessage<KeyType extends string>(mapObject: MapO
             } else {
                 console.warn(`${keyPrefix} - No channel`);
             }
-            if (channel?.isTextBased()) await channel.messages.delete(mapObject.get(`${keyPrefix}_message_id`));
+            if (channel?.isSendable()) await channel.messages.delete(mapObject.get(`${keyPrefix}_message_id`));
         } catch (e) {
             console.error(`Error trying to delete ${keyPrefix} message`, e);
         } finally {

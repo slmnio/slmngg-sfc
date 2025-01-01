@@ -6,8 +6,13 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const DIRNAME = path.dirname(fileURLToPath(import.meta.url));
 
+export type InteractionHandler = {
+    name?: string;
+    execute: (interaction: MessageComponentInteraction, args: string[]) => Promise<string | { error: string } | void>;
+}
+
 if (client) {
-    const interactions = new Collection();
+    const interactions = new Collection<string, InteractionHandler>();
     const foldersPath = path.join(DIRNAME, "interactions");
     const commandFolders = fs.readdirSync(foldersPath);
 
@@ -18,10 +23,11 @@ if (client) {
         const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(".js") || file.endsWith(".ts"));
         for (const file of commandFiles) {
             const filePath = path.join(commandsPath, file);
-            const { default: command } = await import(pathToFileURL(filePath));
+            // @ts-expect-error esm import requires a url here
+            const { default: command } = await import(pathToFileURL(filePath)) as { default: InteractionHandler };
             // Set a new item in the Collection with the key as the command name and the value as the exported module
             if ("execute" in command) {
-                const commandName = command?.data?.name || [folder, (path.basename(filePath).replace(/\.(js|ts)$/, ""))].join("_");
+                const commandName = command?.name || [folder, (path.basename(filePath).replace(/\.(js|ts)$/, ""))].join("_");
                 console.log("~/", commandName);
 
                 interactions.set(commandName, command);
@@ -72,9 +78,9 @@ if (client) {
         try {
             const response = await command.execute(interaction, args);
             // console.log("Interaction execute response", response, response.error);
-            if (response?.error) {
+            if (typeof response === "object" && response.error) {
                 throw response.error;
-            } else if (response) {
+            } else if (typeof response === "string") {
                 await respond(interaction, response);
             }
             // console.log({ replied: interaction.replied, deferred: interaction.deferred });

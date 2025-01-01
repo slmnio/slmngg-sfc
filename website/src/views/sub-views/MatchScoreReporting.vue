@@ -94,7 +94,7 @@
                     </div>
                     <div v-if="(currentAction?.content || [])?.includes('log')">
                         <div class="mb-1 fw-bold">Request log</div>
-                        <pre class="mb-1">{{ existingScoreReport.log }}</pre>
+                        <ReportLog v-if="existingScoreReport?.log" :log="existingScoreReport.log" />
                     </div>
                 </div>
                 <div v-if="currentAction?.footer?.length" class="action-footer action-footer-footers bg-dark flex-column gap-2">

@@ -227,7 +227,7 @@ export async function getMatchScoreReporting(matchID) {
 /**
  *
  * @param matchID
- * @param {boolean} excludeCompleted
+ * @param { {excludeCompleted: Boolean } } settings
  * @returns {Promise<({report: Report | undefined, match: Match})>}
  */
 export async function getMatchRescheduling(matchID, { excludeCompleted } = {}) {

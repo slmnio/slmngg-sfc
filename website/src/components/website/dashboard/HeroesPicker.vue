@@ -45,7 +45,7 @@ export default {
                 { value: null, text: "No hero" },
                 ...(
                     this.game !== "Overwatch" ?
-                        (this.heroes || []).sort((a,b) => sortAlpha(a,b,"name")).map(h => ({
+                        (this.heroes || []).sort((a,b) => sortAlpha(a, b, "name")).map(h => ({
                             text: h.name,
                             value: dirtyID(h.id)
                         }))

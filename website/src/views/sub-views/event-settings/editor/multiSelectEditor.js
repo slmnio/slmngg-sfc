@@ -15,7 +15,7 @@ export class MultiSelectEditor extends Handsontable.editors.TextEditor {
         this.registerHooks();
 
         this.updateFunction = () => {};
-        this.localValue;
+        this.localValue = null;
 
         this.select.addEventListener("change", (e) => {
             console.log("select change", e.target.value);

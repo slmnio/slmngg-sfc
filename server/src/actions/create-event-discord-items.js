@@ -41,7 +41,7 @@ export default {
      * @param {boolean?} settings.roles.pingable
      * @param {boolean?} settings.roles.hoist
      * @param {string?} settings.teamEmoji.format
-     * @param {UserData} user
+     * @param {ActionAuth["user"]} user
      * @returns {Promise<void>}
      */
     async handler({ eventID, guildID, actions, settings }, { user }) {

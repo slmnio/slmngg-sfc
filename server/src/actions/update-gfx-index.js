@@ -7,7 +7,7 @@ export default {
     /***
      * @param {AnyAirtableID} gfxID
      * @param {number} index
-     * @param {ClientData} client
+     * @param {ActionAuth["client"]} client
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern

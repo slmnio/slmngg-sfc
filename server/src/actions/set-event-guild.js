@@ -8,7 +8,7 @@ export default {
     /***
      * @param {Snowflake} guildID
      * @param {AnyAirtableID} eventID
-     * @param {UserData} user
+     * @param {ActionAuth["user"]} user
      * @returns {Promise<void>}
      */
     async handler({ eventID, guildID }, { user }) {

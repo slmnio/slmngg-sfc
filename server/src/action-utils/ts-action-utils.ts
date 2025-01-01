@@ -1,9 +1,10 @@
+import type { Snowflake } from "discord-api-types/globals";
 import { Match } from "../types.js";
 import { get } from "./action-cache.js";
 import { MapObject } from "../discord/managers.js";
 import client from "../discord/client.js";
-import { Guild } from "discord.js";
-import { cleanID } from "./action-utils.js";
+import { ChannelType, Guild, MessageCreateOptions, MessagePayload } from "discord.js";
+import { cleanID, sendMessage } from "./action-utils.js";
 
 
 export async function generateMatchReportText(match: Match) {
@@ -126,9 +127,19 @@ export async function generateMatchReportText(match: Match) {
                 mapLine.push(map.replay_code);
             }
 
-
             lines.push(mapLine.join(" - "));
 
+            if (map.team_1_picks?.length || map.team_2_picks?.length) {
+                const teamPicks = [];
+
+                for (const teamI of [0, 1]) {
+                    const team = teams[teamI];
+                    const bannedHeroes = await Promise.all(([map.team_1_picks, map.team_2_picks][teamI] || []).map(id => get(id)));
+                    teamPicks.push(`${team.code || team.name} ban: ${bannedHeroes.map(hero => hero.icon_emoji_text || hero.name).join(" ")}`);
+                }
+
+                lines.push(`Picks: ${teamPicks.join(" / ")}`);
+            }
             if (map.team_1_bans?.length || map.team_2_bans?.length) {
                 const teamBans = [];
 
@@ -138,8 +149,16 @@ export async function generateMatchReportText(match: Match) {
                     teamBans.push(`${team.code || team.name} ban: ${bannedHeroes.map(hero => hero.icon_emoji_text || hero.name).join(" ")}`);
                 }
 
-                lines.push(`> ${teamBans.join(" | ")}`);
+                const banCount = (map.team_1_bans?.length || 0) + (map.team_2_bans?.length || 0);
+                // if there are only 2 bans and no picks, add to the current line
+                if (banCount <= 2 && !map.team_1_picks?.length && !map.team_2_picks?.length) {
+                    lines[lines.length - 1] += ` - Bans: ${teamBans.join(" / ")}`;
+                } else {
+                    lines.push(`Bans: ${teamBans.join(" / ")}`);
+                }
+
             }
+
         }
 
 
@@ -149,4 +168,49 @@ export async function generateMatchReportText(match: Match) {
         console.error("Error generating match report text", e);
         return null;
     }
+}
+
+export async function checkDeleteMessage<KeyType extends string>(mapObject: MapObject, keyPrefix: KeyType) {
+    if (mapObject.get(`${keyPrefix}_message_id`) && mapObject.get(`${keyPrefix}_channel_id`)) {
+        try {
+            const channel = await client.channels.fetch(mapObject.get(`${keyPrefix}_channel_id`));
+            if (channel) {
+                console.log(`${keyPrefix} - ${channel.id} ${channel.type !== ChannelType.DM ? channel.name : ""}`);
+            } else {
+                console.warn(`${keyPrefix} - No channel`);
+            }
+            if (channel?.isSendable()) await channel.messages.delete(mapObject.get(`${keyPrefix}_message_id`));
+        } catch (e) {
+            console.error(`Error trying to delete ${keyPrefix} message`, e);
+        } finally {
+            mapObject.push(`${keyPrefix}_message_id`, null);
+            mapObject.push(`${keyPrefix}_channel_id`, null);
+        }
+    }
+}
+
+export async function looseDeleteRecordedMessage<KeyType extends string>(mapObject: MapObject, keyPrefix: KeyType) {
+    console.log("Loose delete", mapObject.data, keyPrefix);
+    await checkDeleteMessage(mapObject, keyPrefix);
+    return mapObject;
+}
+export async function looseDeleteRecordedMessages<KeyType extends string>(mapObject: MapObject, keyPrefixes: KeyType[]) {
+    console.log("Loose delete multiple", mapObject.data, keyPrefixes);
+    if (!mapObject?.data) return mapObject;
+    console.log(mapObject.data);
+    await Promise.all(keyPrefixes.map(async keyPrefix => checkDeleteMessage(mapObject, keyPrefix)));
+    return mapObject;
+}
+
+export async function sendRecordedMessage<KeyType extends string>({ key, mapObject, channelID, content, success } :
+    {
+        key: KeyType;
+        mapObject: MapObject;
+        channelID?: Snowflake;
+        content?: null | string | MessagePayload | MessageCreateOptions;
+        success?: (updatedMapObject: MapObject) => void;
+    }
+): Promise<MapObject> {
+    console.log("Recorded message", key, mapObject.data);
+    return sendMessage({ key, mapObject, channelID, content, success });
 }

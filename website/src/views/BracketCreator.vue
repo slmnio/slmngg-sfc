@@ -101,7 +101,7 @@
                                             class="connection-button"
                                             :class="{
                                                 'active': activeConnectionMatches(bi, ci, mi, 'win') || getConnection(bi, ci, mi, 'win'),
-                                                'champion':getConnection(bi, ci, mi, 'win') === 'champion',
+                                                'champion':getConnection(bi, ci, mi, 'win') === 'champion'
                                             }"
                                             @mouseenter="showConnection(bi, ci, mi, 'win')"
                                             @mouseleave="hideConnection()"
@@ -113,7 +113,7 @@
                                             class="connection-button"
                                             :class="{
                                                 'active': activeConnectionMatches(bi, ci, mi, 'lose') || getConnection(bi, ci, mi, 'lose'),
-                                                'eliminated':getConnection(bi, ci, mi, 'lose') === 'eliminated',
+                                                'eliminated':getConnection(bi, ci, mi, 'lose') === 'eliminated'
                                             }"
                                             @mouseenter="showConnection(bi, ci, mi, 'lose')"
                                             @mouseleave="hideConnection()"

@@ -42,7 +42,7 @@ export default {
         },
         stringify(obj) {
             if (!obj) return "";
-            return "&" + Object.entries(obj).map(item => item.filter(x => x).join("=")).join("&");
+            return "&" + Object.entries(obj).map(item => item.filter(Boolean).join("=")).join("&");
         }
     }
 };

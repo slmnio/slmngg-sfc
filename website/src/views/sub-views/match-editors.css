@@ -1,0 +1,52 @@
+.step-action {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+}
+
+
+.action-container {
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: .5em;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+.action-title, .action-footer, .action-content {
+    display: flex;
+    padding: 0.5em 0.75em;
+    width: 100%;
+}
+.action-content {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1em;
+}
+.action-footer-buttons {
+    align-items: flex-end;
+}
+.action-title {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+}
+.action-footer {
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+.action-footer small {
+    padding: 0.25em 0;
+    line-height: 1.1;
+    display: block;
+}
+.title-spinner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    padding: 0 0.5em;
+    font-size: 0.8em;
+    font-weight: 400;
+}

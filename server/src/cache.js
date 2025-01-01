@@ -411,6 +411,7 @@ async function getTwitchAccessToken(channel) {
     // get stored access token, check if it's valid
     // otherwise / or if no token, get from refresh token
     if (!channel) return null;
+    // TODO: put this in a different map to help with typing
     let storedToken = authMap.get(`twitch_access_token_${channel.channel_id}`);
 
     if (!storedToken || accessTokenIsExpired(storedToken)) {

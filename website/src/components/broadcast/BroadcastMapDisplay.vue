@@ -52,6 +52,9 @@ export default {
         audioStatus: "not playing"
     }),
     computed: {
+        /**
+         * @returns {Match|null}
+         */
         match() {
             if (this.virtualMatch) return this.virtualMatch;
             if (!this.broadcast?.live_match) return null;
@@ -137,7 +140,7 @@ export default {
             // maximum: current maps + however many to get a win
             //          or current + 1 if no winner
             // if (!this.match.maps) return this.match.first_to;
-            const scores = [this.match.score_1, this.match.score_2].map(s => s || 0);
+            const scores = [this.match.score_1, this.match.score_2].map(s => s);
 
             if (scores.some(s => s === this.match.first_to)) {
                 // match complete

@@ -18,7 +18,7 @@ export default {
      * @param {object[]} allPlayerData
      * @param {boolean} useSignupData
      * @param {boolean} createPlayers
-     * @param {UserData} user
+     * @param {ActionAuth["user"]} user
      * @returns {Promise<*[]>}
      */
     async handler({ eventID, playerData: allPlayerData, useSignupData, createPlayers }, { user }) {
@@ -118,6 +118,8 @@ export default {
                 if (playerData?.discord_tag) airtablePlayerData["Discord Tag"] = playerData.discord_tag.replace("@", "").trim();
                 // if (playerData?.discord_id) airtablePlayerData["Discord ID"] = playerData.discord_id;
                 if (playerData?.battletag) airtablePlayerData["Battletag"] = playerData.battletag;
+                if (playerData?.pronouns) airtablePlayerData["Pronouns"] = playerData.pronouns.toLowerCase().trim();
+                if (playerData?.pronunciation) airtablePlayerData["Pronunciation"] = playerData.pronunciation;
 
                 if (playerData.team_id) airtablePlayerData["Member Of"] = [dirtyID(playerData.team_id)];
 
@@ -159,7 +161,8 @@ export default {
                         data: playerData?.eligible_roles?.split(", ")?.filter(Boolean),
                     },
                     {
-                        signupDataKey: "role",
+                        playerDataKey: "role",
+                        signupDataKey: "main_role",
                         airtableKey: "Main Role",
                     },
                     {
@@ -182,9 +185,8 @@ export default {
                         signupDataKey: "info_for_captains",
                         airtableKey: "Info For Captains",
                     }
-                ].forEach(({ signupDataKey, airtableKey, data }) => {
-                    data = data || playerData?.[signupDataKey];
-                    // console.log(airtableKey, data, signupRecord?.[signupDataKey]);
+                ].forEach(({ signupDataKey, playerDataKey, airtableKey, data }) => {
+                    data = data || playerData?.[playerDataKey || signupDataKey];
                     // if (!data) return;
 
                     if (signupRecord) {
@@ -302,11 +304,16 @@ export default {
                     { signupDataKey: "discord_tag", airtableKey: "Discord Tag", },
                     // { signupDataKey: "discord_id", airtableKey: "Discord ID", },
                     { signupDataKey: "battletag", airtableKey: "Battletag", },
+                    { signupDataKey: "pronouns", airtableKey: "Pronouns", validation: (str) => str?.toLowerCase()?.trim() },
+                    { signupDataKey: "pronunciation", airtableKey: "Pronunciation", },
                 ];
 
-                alwaysAllowedPlayerUpdate.forEach(({ signupDataKey, airtableKey, data }) => {
+                alwaysAllowedPlayerUpdate.forEach(({ signupDataKey, airtableKey, data, validation }) => {
                     data = data || playerData?.[signupDataKey];
 
+                    if (validation) {
+                        data = validation(data);
+                    }
                     // console.log(airtableKey, data, playerData?.[signupDataKey]);
 
                     if (player[signupDataKey] === data) return;
@@ -317,7 +324,6 @@ export default {
 
                 if (Object.keys(playerUpdateData)?.length) {
                     console.log(playerUpdateData);
-                    console.log(player);
                     await this.helpers.updateRecord("Players", player, playerUpdateData);
                 }
             }

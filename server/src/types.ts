@@ -174,20 +174,58 @@ export interface Report extends Base {
     approved?: boolean;
     approved_by_team?: boolean;
     approved_by_opponent?: boolean;
+    denied_by_opponent?: boolean;
     countered_by_opponent?: boolean;
     approved_by_staff?: boolean;
+    denied_by_staff?: boolean;
     force_approved?: boolean;
 
     data?: string;
     countered_data?: string;
     message_data?: string;
     log?: string;
-    type?: "Scores" | "Attributes";
+    type?: "Scores" | "Attributes" | "Rescheduling";
 
     match?: MatchResolvableID[];
     player?: PlayerResolvableID[];
     team?: TeamResolvableID[];
 }
+
+// export type ReschedulingReportMessageTypes =
+//       "reschedule_opponent_approval"
+//     | "reschedule_staff_preapproval"
+//     | "reschedule_staff_approval"
+//
+//     | "reschedule_completed"
+//
+//     | "reschedule_opponent_denial"
+//     | "reschedule_staff_denial"
+//     | "reschedule_team_cancel"
+//     | "reschedule_opponent_cancel" // unlikely to use this
+
+const ReschedulingReportMessageTypes = [
+    "reschedule_opponent_approval",
+    "reschedule_staff_preapproval",
+    "reschedule_staff_approval",
+    "reschedule_completed",
+    "reschedule_opponent_denial",
+    "reschedule_staff_denial",
+    "reschedule_team_cancel",
+    "reschedule_opponent_cancel",
+] as const;
+
+export type ReschedulingReportKeys = (typeof ReschedulingReportMessageTypes)[number];
+
+
+const ScoreReportingMessageTypes = [
+    "report_staff_notification",
+    "report_opponent_notification",
+    "report_completed_public",
+    "report_completed_staff"
+] as const;
+
+export type ScoreReportingReportKeys = (typeof ScoreReportingMessageTypes)[number];
+
 interface LogFile extends Base {
 
 }
@@ -227,8 +265,53 @@ interface AdRead extends Base {
 interface LiveGuest extends Base {
 
 }
-interface Theme extends Base {
+export interface Theme extends Base {
+    id: ThemeResolvableID;
+    __tableName: "Themes";
 
+    event?: EventResolvableID[];
+    events_as_title_sponsor?: EventResolvableID[];
+    live_guests?: LiveGuestResolvableID[];
+    team?: TeamResolvableID[];
+
+    team_blue?: TeamResolvableID[];
+    team_red?: TeamResolvableID[];
+    players?: PlayerResolvableID[];
+
+    name?: string;
+    description?: string;
+    desk_colors?: string;
+    available_for_factboxes?: boolean;
+
+    color_accent?: `#${string}`;
+    color_alt?: `#${string}`;
+    color_body?: `#${string}`;
+    color_dark?: `#${string}`;
+    color_gradient?: `#${string}`;
+    color_hero_recolor_primary?: `#${string}`;
+    color_hero_recolor_secondary?: `#${string}`;
+    color_logo_accent?: `#${string}`;
+    color_logo_background?: `#${string}`;
+    color_navbar?: `#${string}`;
+    color_text_on_body?: `#${string}`;
+    color_text_on_dark?: `#${string}`;
+    color_text_on_logo_background?: `#${string}`;
+    color_text_on_theme?: `#${string}`;
+    color_theme?: `#${string}`;
+    color_theme_on_dark?: `#${string}`;
+    color_website_active?: `#${string}`;
+    color_website_passive?: `#${string}`;
+
+    default_logo?: CacheAttachment[];
+    default_wordmark?: CacheAttachment[];
+    small_logo?: CacheAttachment[];
+
+    logo_on_dark?: CacheAttachment[];
+    logo_on_light?: CacheAttachment[];
+    logo_on_theme?: CacheAttachment[];
+    wordmark_on_dark?: CacheAttachment[];
+    wordmark_on_light?: CacheAttachment[];
+    wordmark_on_theme?: CacheAttachment[];
 }
 interface Accolade extends Base {
 
@@ -296,6 +379,7 @@ export interface Match extends Base {
     placeholder_teams?: string;
     player_relationships?: PlayerRelationshipResolvableID[];
     reports?: ReportResolvableID[];
+    report_history?: ReportResolvableID[];
     round?: string;
     schedule_text?: string;
     scheduled_broadcast?: string;
@@ -306,6 +390,8 @@ export interface Match extends Base {
     show_on_secondary_overlays?: boolean;
     special_event?: boolean;
     start?: string;
+    earliest_start?: string;
+    latest_start?: string;
     stats?: string;
     stream_code?: string;
     sub_event?: string;
@@ -453,9 +539,10 @@ export type AuthUserData = {
         airtable: Player;
     }
 }
+export type UserData = AuthUserData["user"];
 
 export type ActionAuth = {
-    user: AuthUserData["user"];
+    user: UserData;
     client?: Client;
     isAutomation?: boolean;
 }
@@ -497,6 +584,11 @@ export type EventSettings = {
             showHeroBans?: boolean;
             showMapBans?: boolean;
             allowForfeits?: boolean;
+        },
+        rescheduling: {
+            use?: boolean;
+            staffApprove?: boolean;
+            opponentApprove?: boolean;
         }
     };
     logging?: {
@@ -504,9 +596,12 @@ export type EventSettings = {
         matchTimeChanges?: Snowflake;
         postMatchReports?: Snowflake;
         captainNotifications?: Snowflake;
+
+        staffApprovalNotifications?: Snowflake;
         staffScoreReport?: Snowflake;
         staffCompletedScoreReport?: Snowflake;
 
+        sendStaffPreapprovalNotifications?: boolean;
         hideNonStaffRosterChanges?: boolean;
     }
 }

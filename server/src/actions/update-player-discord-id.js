@@ -12,7 +12,7 @@ export default {
     /***
      * @param {import("discord.js").User} discordData
      * @param {string} slmnggId
-     * @param {UserData} user
+     * @param {ActionAuth["user"]} user
      * @returns {Promise<string>}
      */
     async handler({ discordData, slmnggId }, { user }) {

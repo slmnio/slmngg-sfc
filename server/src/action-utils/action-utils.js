@@ -4,6 +4,7 @@ import { StaticAuthProvider } from "@twurple/auth";
 import { ApiClient } from "@twurple/api";
 import { verboseLog } from "../discord/slmngg-log.js";
 import { get } from "./action-cache.js";
+import client from "../discord/client.js";
 
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
 const slmngg = airtable.base(process.env.AIRTABLE_APP);
@@ -51,14 +52,14 @@ const TimeOffset = 3 * 1000;
  */
 export async function updateRecord(Cache, tableName, item, data, source = undefined) {
     // see: airtable-interface.js customUpdater
-    console.log(`[update record] updating table=${tableName} id=${item.id}`, data);
+    console.log(`[update record] ${source ? `{${source}} ` : ""}updating table=${tableName} id=${item.id}`, data);
 
     let slmnggData = {
         __tableName: tableName,
         ...deAirtable({ ...item, ...data }),
         modified: (new Date((new Date()).getTime() + TimeOffset)).toString()
     };
-    verboseLog(`Editing record on **${tableName}** \`${item.id}\``, data);
+    verboseLog(`Editing record on **${tableName}** \`${item.id}\`${source ? ` {${source}}` : ""}`, data);
     // Eager update
     Cache.set(cleanID(item.id), slmnggData, { eager: true, source });
 
@@ -81,12 +82,13 @@ export async function updateRecord(Cache, tableName, item, data, source = undefi
  * @param {Cache} Cache
  * @param {string} tableName
  * @param {object[]} records
+ * @param {string | null} source
  */
-export async function createRecord(Cache, tableName, records) {
-    console.log(`[create record] creating table=${tableName} records=${records.length}`);
+export async function createRecord(Cache, tableName, records, source = null) {
+    console.log(`[create record] ${source ? `{${source}} ` : ""}creating table=${tableName} records=${records.length}`);
     try {
         let newRecords = await slmngg(tableName).create(records.map(recordData => {
-            verboseLog(`Creating record on **${tableName}** `, recordData);
+            verboseLog(`Creating record on **${tableName}**${source ? ` {${source}}` : ""}`, recordData);
             return {
                 fields: recordData
             };
@@ -193,6 +195,7 @@ export async function getMatchData(broadcast, requireAll) {
  * @returns {Promise<({report: Report | undefined, match: Match})>}
  */
 export async function getMatchScoreReporting(matchID) {
+    /** @type {Match} */
     const match = await get(matchID);
     let report;
 
@@ -211,8 +214,45 @@ export async function getMatchScoreReporting(matchID) {
     if (!eventSettings?.reporting?.score?.use) throw "Score reporting is not enabled on this match";
 
     // check existing report
-    if (match?.reports?.[0]) {
-        const firstReport = await get(match?.reports?.[0]);
+    if ((match?.reports || []).length) {
+        const reports = await Promise.all((match?.reports || []).map(rID => get(rID)));
+        const firstReport = reports.find(r => r.type === "Scores");
+        if (firstReport?.id) {
+            report = firstReport;
+        }
+    }
+
+    return { match, report };
+}
+/**
+ *
+ * @param matchID
+ * @param { {excludeCompleted: Boolean } } settings
+ * @returns {Promise<({report: Report | undefined, match: Match})>}
+ */
+export async function getMatchRescheduling(matchID, { excludeCompleted } = {}) {
+    const match = await get(matchID);
+    let report;
+
+    if (!match?.id) throw "Couldn't load match data";
+
+    if (!match?.event?.[0]) throw "Couldn't load event data for this match";
+    const event = await get(match?.event?.[0]);
+    if (!event?.id) throw "Couldn't load event data for this match";
+
+    // event score reporting must be active
+
+    if (!event?.blocks) throw "Event doesn't have rescheduling set up";
+
+    /** @type {EventSettings} */
+    const eventSettings = JSON.parse(event.blocks);
+    if (!eventSettings?.reporting?.rescheduling?.use) throw "Rescheduling is not enabled on this event";
+    if (!(match?.earliest_start || match?.latest_start)) throw "Rescheduling is not set up on this match";
+
+    // check existing report
+    if (match?.reports?.length) {
+        const reports = await Promise.all((match?.reports || []).map(rID => get(rID)));
+        const firstReport = reports.find(r => r.type === "Rescheduling" && (excludeCompleted ? !r.approved : true));
         if (firstReport?.id) {
             report = firstReport;
         }
@@ -225,6 +265,7 @@ export async function getTwitchAPIClient(channel) {
     if (!channel) throw("Internal error connecting to Twitch");
     try {
         const accessToken = await Cache.auth.getTwitchAccessToken(channel);
+        // this warning is because the twitch auth data is thrown into the general auth map but it shouldn't actually cause an error here
         const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, accessToken);
         return new ApiClient({authProvider});
     } catch (e) {
@@ -318,4 +359,63 @@ export async function findMember(player, team, guild) {
         console.warn(fixes[fixes.length - 1]);
     }
     return { member, fixes };
+}
+
+export async function checkDeleteMessage(mapObject, keyPrefix) {
+    if (mapObject.get(`${keyPrefix}_message_id`) && mapObject.get(`${keyPrefix}_channel_id`)) {
+        try {
+            const channel = await client.channels.fetch(mapObject.get(`${keyPrefix}_channel_id`));
+            if (channel?.isSendable()) await channel.messages.delete(mapObject.get(`${keyPrefix}_message_id`));
+        } catch (e) {
+            console.error(`Error trying to delete ${keyPrefix} message`, e);
+        } finally {
+            mapObject.push(`${keyPrefix}_message_id`, null);
+            mapObject.push(`${keyPrefix}_channel_id`, null);
+        }
+    }
+}
+
+/**
+ * @param {object} options
+ * @param {string} options.key
+ * @param {MapObject} options.mapObject
+ * @param {(Snowflake | null)=} options.channelID
+ * @param {(string | null | object)=} options.content
+ * @param {Function=} options.success
+ * @returns {Promise<MapObject>}
+ * @deprecated Use keyed sendRecordedMessage instead
+ */
+export async function sendMessage({
+    key,
+    mapObject,
+    channelID,
+    content,
+    success,
+}) {
+    if (!channelID) {
+        console.warn(`Can't send ${key} message without a channel`);
+        return mapObject;
+    }
+    if (!content) {
+        console.warn(`Can't send ${key} message without content`);
+        return mapObject;
+    }
+    const channel = await client.channels.fetch(channelID);
+    if (channel?.isSendable()) {
+        try {
+            const message = await channel.send(content);
+            mapObject.push(`${key}_channel_id`, channel.id);
+            mapObject.push(`${key}_message_id`, message.id);
+            if (success) await success(mapObject);
+        } catch (e) {
+            console.error(`Sending error ${key}`, e);
+            console.dir(e?.rawError?.errors, { depth: null, colors: true });
+        }
+    }
+    return mapObject;
+}
+
+export function hammerTime(timeString) {
+    let start = new Date(timeString).getTime();
+    return `<t:${Math.floor(start / 1000)}:F>`;
 }

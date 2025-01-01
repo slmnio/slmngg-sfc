@@ -67,7 +67,7 @@
                 </router-link>
             </router-link>
             <div class="match-right match-time flex-center">
-                <ScheduleTime :time="match.start" :custom-text="timeCustomText" />
+                <ScheduleTime :time="match.start" :custom-text="timeCustomText" :badge="reschedulingBadge" :match="match" />
             </div>
         </div>
 
@@ -100,7 +100,7 @@
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { url, cleanID, getScoreReportingBadge } from "@/utils/content-utils";
+import { url, cleanID, getScoreReportingBadge, getReschedulingBadge } from "@/utils/content-utils";
 import ScheduleTime from "@/components/website/schedule/ScheduleTime";
 import { authenticatedRequest } from "@/utils/dashboard";
 import { mapWritableState } from "pinia";
@@ -241,35 +241,36 @@ export default {
                 ...team.owners || [],
             ].some(personID => cleanID(player?.id) === cleanID(personID)));
         },
-        existingScoreReport() {
-            return (ReactiveRoot(this.match?.id, {
-                "reports": ReactiveArray("reports", {
-                    "team": ReactiveThing("team"),
-                    "player": ReactiveThing("player")
-                })
-            })?.reports || []).find(report => report.type === "Scores" && cleanID(report.match?.[0]) === cleanID(this.match?.id));
-        },
         scoreReportingEnabled() {
             return this.eventSettings?.reporting?.score?.use;
         },
         scoreReportingBadge() {
             const { isAuthenticated, user } = useAuthStore();
             if (!isAuthenticated) return null;
+            if (!(this.controllableTeams?.length || isEventStaffOrHasRole(user, { event: this._event, websiteRoles: ["Can edit any match", "Can edit any event"] }))) return null;
 
-            const state = {
-                "reports_enabled": this.scoreReportingEnabled,
-                "existing_report": !!this.existingScoreReport?.id,
-                "is_complete": this.match.first_to && [this.match.score_1, this.match.score_2].some(s => s === this.match.first_to),
-                "is_on_teams": !!this.controllableTeams?.length,
-                "is_opponent": this.existingScoreReport?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) !== cleanID(this.existingScoreReport?.team?.id)) : null,
-                "is_submitter": this.existingScoreReport?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) === cleanID(this.existingScoreReport?.team?.id)) : null,
-                "is_staff": isEventStaffOrHasRole(user, { event: this._event, websiteRoles: ["Can edit any match", "Can edit any event"] }),
-                "settings": this.eventSettings
-            };
+            const reports = (ReactiveRoot(this.match?.id, {
+                "reports": ReactiveArray("reports", {
+                    "team": ReactiveThing("team"),
+                    "player": ReactiveThing("player")
+                })
+            })?.reports || []);
+            return getScoreReportingBadge(this.scoreReportState(reports, "Scores"), this.eventSettings);
+        },
+        reschedulingBadge() {
+            const { isAuthenticated, user } = useAuthStore();
+            if (!isAuthenticated) return null;
+            if (!(this.controllableTeams?.length || isEventStaffOrHasRole(user, { event: this._event, websiteRoles: ["Can edit any match", "Can edit any event"] }))) return null;
 
-            return getScoreReportingBadge(state, this.existingScoreReport, this.eventSettings);
+            const reports = (ReactiveRoot(this.match?.id, {
+                "reports": ReactiveArray("reports", {
+                    "team": ReactiveThing("team"),
+                    "player": ReactiveThing("player")
+                })
+            })?.reports || []);
 
-        }
+            return getReschedulingBadge(this.scoreReportState(reports, "Rescheduling"), this.eventSettings);
+        },
     },
     methods: {
         url,
@@ -293,7 +294,35 @@ export default {
             if (response.error) {
                 console.error(":(", response.error);
             }
-        }
+        },
+        scoreReportState(reports, type) {
+            const { isAuthenticated, user } = useAuthStore();
+            if (!isAuthenticated) return null;
+
+
+            const report = reports.find(report => report.type === type && cleanID(report.match?.[0]) === cleanID(this.match?.id));
+            console.log("reporting report", report, reports);
+
+            let loading = false;
+            if (reports.some(r => r.__loading || !r.id)) loading = true;
+
+            console.log("score report state", report);
+            return {
+                report,
+                state: {
+                    "reports_enabled": this.scoreReportingEnabled,
+                    "has_existing_report": report?.id,
+                    "reports_loading": loading,
+                    "is_complete": this.match.first_to && [this.match.score_1, this.match.score_2].some(s => s === this.match.first_to),
+                    "is_on_teams": !!this.controllableTeams?.length,
+                    "is_opponent": report?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) !== cleanID(report?.team?.id)) : null,
+                    "is_submitter": report?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) === cleanID(report?.team?.id)) : null,
+                    "is_staff": isEventStaffOrHasRole(user, { event: this._event, websiteRoles: ["Can edit any match", "Can edit any event"] }),
+                    "settings": this.eventSettings,
+                    "match_complete": [this.match.score_1 || 0, this.match.score_2 || 0].some(score => this.match.first_to === score)
+                }
+            };
+        },
     }
 };
 </script>

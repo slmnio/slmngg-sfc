@@ -1,8 +1,11 @@
 import {
     ActionRowBuilder,
-    ApplicationCommandType, ButtonBuilder, ButtonStyle,
+    ApplicationCommandType,
+    ButtonBuilder,
+    ButtonStyle,
     ContextMenuCommandBuilder,
-    StringSelectMenuBuilder, StringSelectMenuOptionBuilder,
+    StringSelectMenuBuilder,
+    StringSelectMenuOptionBuilder,
     userMention
 } from "discord.js";
 import * as Cache from "../../../cache.js";
@@ -85,7 +88,7 @@ export default {
 
         const internalManager = getInternalManager();
         if (!internalManager) {
-            return interaction.followUp({ ephemeral, content: "No action handlers can process your request." });
+            return interaction.followUp({ ephemeral, content: "Could not handle this request (no internal system available)" });
         }
 
         const potentials = await internalManager.runAction("match-discord-slmngg-player", { discordData: interaction.targetUser }, token);

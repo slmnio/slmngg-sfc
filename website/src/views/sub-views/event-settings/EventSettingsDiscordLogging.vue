@@ -4,7 +4,7 @@
             <b-form-group
                 label="Server"
                 label-for="server-input"
-                label-cols="2"
+                label-cols="3"
                 class="opacity-changes"
                 :class="{'low-opacity': processing['guild_id'] }">
                 <div class="d-flex gap-2">
@@ -17,85 +17,117 @@
             </b-form-group>
         </div>
 
-        <div>
-            <h3>Logging</h3>
-            <div class="logging settings-group d-flex flex-column gap-4">
-                <div class="d-flex flex-column gap-1">
-                    <b-form-group
-                        label="Public roster changes"
-                        label-cols="2"
-                        description="A public message when someone is added to or removed from teams.">
-                        <b-form-select
-                            v-model="logging.publicRosterChanges"
-                            :options="[{value:null,text:'Do not log'},...(channelData||[])]" />
-                    </b-form-group>
-                    <b-form-group
-                        label="Hide non-staff roster changes"
-                        label-cols="2"
-                        description="Don't log any changes about team members who aren't players.">
-                        <b-form-checkbox
-                            v-model="logging.hideNonStaffRosterChanges" />
-                    </b-form-group>
-                    <b-form-group
-                        disabled
-                        label="Match time changes"
-                        label-cols="2"
-                        description="A public message when the start time of a match changes.">
-                        <b-form-select
-                            v-model="logging.matchTimeChanges"
-                            :options="[{value:null,text:'Do not log'},...(channelData||[])]" />
-                    </b-form-group>
+
+        <div class="border border-secondary bg-dark rounded p-2 px-3 d-flex flex-column gap-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="m-0">Logging & notification channels</h2>
+                <b-button variant="success" :disabled="processing.save" @click="saveToEvent">
+                    <i class="fas fa-save fa-fw"></i>
+                    Save logging channels
+                </b-button>
+            </div>
+
+            <div>
+                <h3>Public</h3>
+
+                <div class="logging settings-group d-flex flex-column gap-4">
+                    <div class="d-flex flex-column gap-2">
+                        <b-form-group
+                            label="Public roster changes"
+                            label-cols="3"
+                            :label-class="logging.publicRosterChanges ? 'active-channel' : ''"
+                            description="A public message when someone is added to or removed from teams.">
+                            <b-form-select
+                                v-model="logging.publicRosterChanges"
+                                :options="[{value:null,text:'Do not log'},...(channelData||[])]" />
+                        </b-form-group>
+                        <b-form-group
+                            label="Hide non-staff roster changes"
+                            label-cols="3"
+                            description="Don't log any changes about team members who aren't players.">
+                            <b-form-checkbox
+                                v-model="logging.hideNonStaffRosterChanges" />
+                        </b-form-group>
+                        <b-form-group
+                            label="Match time changes"
+                            :label-class="logging.matchTimeChanges ? 'active-channel' : ''"
+                            label-cols="3"
+                            description="A public message when the start time of a match changes.">
+                            <b-form-select
+                                v-model="logging.matchTimeChanges"
+                                :options="[{value:null,text:'Do not log'},...(channelData||[])]" />
+                        </b-form-group>
+                        <b-form-group
+                            label="Post-match reports"
+                            :label-class="logging.postMatchReports ? 'active-channel' : ''"
+                            label-cols="3"
+                            description="A public message with match details once a match has been completed.">
+                            <b-form-select
+                                v-model="logging.postMatchReports"
+                                :options="[{value:null,text:'Do not log'},...(channelData||[])]" />
+                        </b-form-group>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div>
-            <h3>Score reporting</h3>
-            <div class="logging settings-group d-flex flex-column gap-4">
-                <div class="d-flex flex-column gap-1">
-                    <b-form-group
-                        label="Captain notifications"
-                        label-cols="2"
-                        description="A message in a captains channel notifying teams that a score needs approval">
-                        <b-form-select
-                            v-model="logging.captainNotifications"
-                            :options="[{value:null,text:'Do not log'},...(channelData||[])]" />
-                    </b-form-group>
-                    <b-form-group
-                        label="Post-match reports"
-                        label-cols="2"
-                        description="A public message with match details once a match has been completed.">
-                        <b-form-select
-                            v-model="logging.postMatchReports"
-                            :options="[{value:null,text:'Do not log'},...(channelData||[])]" />
-                    </b-form-group>
-                </div>
-                <div class="d-flex flex-column gap-2">
-                    <b-form-group
-                        label="Staff score report notifications"
-                        label-cols="2"
-                        description="A staff message prompting staff approval of a score report.">
-                        <b-form-select
-                            v-model="logging.staffScoreReport"
-                            :options="[{value:null,text:'Do not log'},...(channelData||[])]" />
-                    </b-form-group>
-                    <b-form-group
-                        label="Score report completions"
-                        label-cols="2"
-                        description="A staff message detailing a completed score report.">
-                        <b-form-select
-                            v-model="logging.staffCompletedScoreReport"
-                            :options="[{value:null,text:'Do not log'},...(channelData||[])]" />
-                    </b-form-group>
+
+            <div>
+                <h3>Staff</h3>
+                <div class="logging settings-group d-flex flex-column gap-4">
+                    <div class="d-flex flex-column gap-2">
+                        <b-form-group
+                            label="Staff notifications"
+                            :label-class="logging.staffApprovalNotifications ? 'active-channel' : ''"
+                            label-cols="3"
+                            description="A staff channel for notifications.">
+                            <b-form-select
+                                v-model="logging.staffApprovalNotifications"
+                                :options="[{value:null,text:'Do not log'},...(channelData||[])]" />
+                        </b-form-group>
+                        <b-form-group
+                            label="Send staff pre-approval notifications"
+                            label-cols="3"
+                            :label-class="logging.sendStaffPreapprovalNotifications ? 'active-channel' : ''"
+                            description="Send pre-approval notifications to staff notification channel">
+                            <b-form-checkbox
+                                v-model="logging.sendStaffPreapprovalNotifications" />
+                        </b-form-group>
+                        <b-form-group
+                            label="Staff score report notifications"
+                            :label-class="logging.staffScoreReport ? 'active-channel' : ''"
+                            label-cols="3"
+                            description="A staff message prompting staff approval of a score report.">
+                            <b-form-select
+                                v-model="logging.staffScoreReport"
+                                :options="[{value:null,text:'Do not log'},...(channelData||[])]" />
+                        </b-form-group>
+                        <b-form-group
+                            label="Score report completions"
+                            :label-class="logging.staffCompletedScoreReport ? 'active-channel' : ''"
+                            label-cols="3"
+                            description="A staff message detailing a completed score report.">
+                            <b-form-select
+                                v-model="logging.staffCompletedScoreReport"
+                                :options="[{value:null,text:'Do not log'},...(channelData||[])]" />
+                        </b-form-group>
+                    </div>
                 </div>
             </div>
-        </div>
-
-
-        <div class="d-flex justify-content-end">
-            <b-button variant="success" :disabled="processing.save" @click="saveToEvent">
-                <i class="fas fa-save fa-fw"></i>
-                Save logging channels
-            </b-button>
+            <div>
+                <h3>Captains</h3>
+                <div class="logging settings-group d-flex flex-column gap-4">
+                    <div class="d-flex flex-column gap-2">
+                        <b-form-group
+                            label="Captain notifications"
+                            :label-class="logging.captainNotifications ? 'active-channel' : ''"
+                            label-cols="3"
+                            description="A channel for contacting team staff for reschedules or score reports.">
+                            <b-form-select
+                                v-model="logging.captainNotifications"
+                                :options="[{value:null,text:'Do not log'},...(channelData||[])]" />
+                        </b-form-group>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -122,9 +154,12 @@ export default {
             postMatchReports: null,
             captainNotifications: null,
 
+            staffApprovalNotifications: null,
+
             staffScoreReport: null,
             staffCompletedScoreReport: null,
 
+            sendStaffPreapprovalNotifications: false,
             hideNonStaffRosterChanges: false
         }
     }),
@@ -278,5 +313,8 @@ export default {
 </script>
 
 <style scoped>
-
+    :deep(.active-channel) {
+        color: var(--success);
+        font-weight: bold;
+    }
 </style>

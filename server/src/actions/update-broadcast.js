@@ -6,7 +6,7 @@ export default {
     optionalParams: ["match", "advertise", "playerCams", "mapAttack", "title", "manualGuests", "deskDisplayMode", "deskDisplayText", "showLiveMatch", "countdownEnd", "highlightTeamID", "highlightHeroID", "highlightPlayerID", "highlightMediaID"],
     /***
      * @param {AnyAirtableID} match
-     * @param {ClientData} client
+     * @param {ActionAuth["client"]} client
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern

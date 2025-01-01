@@ -42,7 +42,13 @@ export default {
                 "Team": [dirtyID(actingTeam.id)],
                 "Match": [dirtyID(match.id)],
                 "Data": JSON.stringify(reportData),
-                "Log": `${(new Date()).toLocaleString()}: ${user.airtable.name} reported score as ${actingTeam?.name}`
+                "Log": [
+                    `date=${(new Date()).getTime()}`,
+                    `user=${user.airtable.id}`,
+                    `team=${actingTeam?.id}`,
+                    "text=Reported score",
+                    "key=submitted_score_report"
+                ].join("|"),
             });
 
             console.log(response);
@@ -79,7 +85,13 @@ export default {
             if (!actingTeam) throw "You don't have permission to counter the score report of this match";
 
             const response = await this.helpers.updateRecord("Reports", report, {
-                "Log": report.log + "\n" + `${(new Date()).toLocaleString()}: ${user.airtable.name} countered score report as ${actingTeam?.name}`,
+                "Log": report.log + "\n" + [
+                    `date=${(new Date()).getTime()}`,
+                    `user=${user.airtable.id}`,
+                    `team=${actingTeam?.id}`,
+                    "text=Coutered score report",
+                    "key=countered_score_report"
+                ].join("|"),
                 "Countered Data": JSON.stringify(reportData),
                 "Countered by opponent": true
             });

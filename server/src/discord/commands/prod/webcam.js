@@ -41,7 +41,7 @@ export default {
 
         const internalManager = getInternalManager();
         if (!internalManager) {
-            return interaction.editReply(startingPing + "No action handlers can process your request.");
+            return interaction.editReply(startingPing + "Could not handle this request (no internal system available)");
         }
 
         await internalManager.runAction("create-live-guest", {}, token)

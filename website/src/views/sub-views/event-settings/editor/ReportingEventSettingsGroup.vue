@@ -1,48 +1,73 @@
 <template>
     <EventSettingsGroup title="Reporting">
-        <div class="py-2">
-            <event-settings-checkbox
-                :active="reportingData?.score?.use"
-                @update:active="val => updateData('score', 'use', val)">
-                Allow map score reporting
-            </event-settings-checkbox>
-            <event-settings-checkbox
-                :active="reportingData?.score?.opponentApprove"
-                @update:active="val => updateData('score', 'opponentApprove', val)">
-                Opponents must approve
-            </event-settings-checkbox>
-            <event-settings-checkbox
-                :active="reportingData?.score?.staffApprove"
-                @update:active="val => updateData('score', 'staffApprove', val)">
-                Staff must approve
-            </event-settings-checkbox>
-        </div>
-        <b-form-group label="Editor settings" label-cols="3">
-            <div>
-                <event-settings-checkbox
-                    :active="reportingData?.score?.showHeroPicks"
-                    @update:active="val => updateData('score', 'showHeroPicks', val)">
-                    Show hero picks on maps
-                </event-settings-checkbox>
+        <div class="d-flex">
+            <div class="w-50 p-2">
+                <b>Match score reporting</b>
+                <div class="py-2">
+                    <event-settings-checkbox
+                        :active="reportingData?.score?.use"
+                        @update:active="val => updateData('score', 'use', val)">
+                        Allow map score reporting
+                    </event-settings-checkbox>
+                    <event-settings-checkbox
+                        :active="reportingData?.score?.opponentApprove"
+                        @update:active="val => updateData('score', 'opponentApprove', val)">
+                        Opponents must approve
+                    </event-settings-checkbox>
+                    <event-settings-checkbox
+                        :active="reportingData?.score?.staffApprove"
+                        @update:active="val => updateData('score', 'staffApprove', val)">
+                        Staff must approve
+                    </event-settings-checkbox>
+                </div>
+                <b-form-group label="Editor settings" label-cols="3">
+                    <div class="py-2">
+                        <event-settings-checkbox
+                            :active="reportingData?.score?.showHeroPicks"
+                            @update:active="val => updateData('score', 'showHeroPicks', val)">
+                            Show hero picks on maps
+                        </event-settings-checkbox>
 
-                <event-settings-checkbox
-                    :active="reportingData?.score?.showHeroBans"
-                    @update:active="val => updateData('score', 'showHeroBans', val)">
-                    Show hero bans on maps
-                </event-settings-checkbox>
+                        <event-settings-checkbox
+                            :active="reportingData?.score?.showHeroBans"
+                            @update:active="val => updateData('score', 'showHeroBans', val)">
+                            Show hero bans on maps
+                        </event-settings-checkbox>
 
-                <event-settings-checkbox
-                    :active="reportingData?.score?.showMapBans"
-                    @update:active="val => updateData('score', 'showMapBans', val)">
-                    Show map ban options
-                </event-settings-checkbox>
-                <event-settings-checkbox
-                    :active="reportingData?.score?.allowForfeits"
-                    @update:active="val => updateData('score', 'allowForfeits', val)">
-                    Allow forfeit reporting
-                </event-settings-checkbox>
+                        <event-settings-checkbox
+                            :active="reportingData?.score?.showMapBans"
+                            @update:active="val => updateData('score', 'showMapBans', val)">
+                            Show map ban options
+                        </event-settings-checkbox>
+                        <event-settings-checkbox
+                            :active="reportingData?.score?.allowForfeits"
+                            @update:active="val => updateData('score', 'allowForfeits', val)">
+                            Allow forfeit reporting
+                        </event-settings-checkbox>
+                    </div>
+                </b-form-group>
             </div>
-        </b-form-group>
+            <div class="w-50 p-2">
+                <b>Rescheduling</b>
+                <div class="py-2">
+                    <event-settings-checkbox
+                        :active="reportingData?.rescheduling?.use"
+                        @update:active="val => updateData('rescheduling', 'use', val)">
+                        Allow rescheduling
+                    </event-settings-checkbox>
+                    <event-settings-checkbox
+                        :active="reportingData?.rescheduling?.opponentApprove"
+                        @update:active="val => updateData('rescheduling', 'opponentApprove', val)">
+                        Opponents must approve
+                    </event-settings-checkbox>
+                    <event-settings-checkbox
+                        :active="reportingData?.rescheduling?.staffApprove"
+                        @update:active="val => updateData('rescheduling', 'staffApprove', val)">
+                        Staff must approve
+                    </event-settings-checkbox>
+                </div>
+            </div>
+        </div>
     </EventSettingsGroup>
 </template>
 
@@ -83,7 +108,8 @@ export default {
                 if (JSON.stringify(data) === JSON.stringify(this.reportingData)) return;
                 this.reportingData = data || {
                     attributes: {},
-                    score: {}
+                    score: {},
+                    rescheduling: {}
                 };
 
             }

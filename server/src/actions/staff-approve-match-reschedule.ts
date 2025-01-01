@@ -1,23 +1,22 @@
-import { ActionAuth, EventSettings, Match, MatchResolvableID, Report, ScoreReportingReportKeys } from "../types.js";
+import { ActionAuth, Match, MatchResolvableID, Report, ReschedulingReportKeys } from "../types.js";
 import { Action } from "../action-utils/action-manager-models.js";
-import { cleanID, dirtyID, getMatchScoreReporting } from "../action-utils/action-utils.js";
+import { dirtyID, getMatchRescheduling } from "../action-utils/action-utils.js";
 import { get } from "../action-utils/action-cache.js";
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
 import { MapObject } from "../discord/managers.js";
-import client from "../discord/client.js";
-import { looseDeleteRecordedMessage, looseDeleteRecordedMessages } from "../action-utils/ts-action-utils.js";
+import { looseDeleteRecordedMessages } from "../action-utils/ts-action-utils.js";
 
 export default {
-    key: "staff-approve-score-report",
+    key: "staff-approve-match-reschedule",
     requiredParams: ["matchID", "reaction"],
     auth: ["user"],
     async handler(
-        { matchID, reaction }: { matchID: MatchResolvableID, reaction: "approve" | "pre-approve" | "force-approve" | "delete" | "force-counter-approve" },
+        { matchID, reaction }: { matchID: MatchResolvableID, reaction: "approve" | "pre-approve" | "force-approve" | "deny" | "delete" },
         { user }: ActionAuth
     ) {
-        const { match, report } : { match: Match, report: Report | undefined } = await getMatchScoreReporting(matchID);
+        const { match, report } : { match: Match, report: Report | undefined } = await getMatchRescheduling(matchID);
         if (!report) {
-            throw "There is no score report on this match";
+            throw "There is no match rescheduling request on this match";
         }
 
         if (!match?.event?.[0]) throw "Event couldn't be loaded for this match";
@@ -25,41 +24,44 @@ export default {
         if (!event?.id) throw "Event couldn't be loaded for this match";
 
         if (!(await isEventStaffOrHasRole(user, event, null, ["Can edit any match", "Can edit any event", "Full broadcast permissions"]))) {
-            throw "You don't have permission to edit this match, including score reporting.";
+            throw "You don't have permission to edit this match, including match rescheduling.";
         }
 
         let messageData = new MapObject(report.message_data);
 
-        console.log(messageData.data);
-        // Remove previous staff notifications
-        messageData = await looseDeleteRecordedMessage<ScoreReportingReportKeys>(messageData, "report_staff_notification");
+        // Remove previous notifications
+        // messageData = await looseDeleteRecordedMessage<ReschedulingReportKeys>(messageData, "staff_reschedule_notification");
 
         if (reaction === "pre-approve") {
+            messageData = await looseDeleteRecordedMessages<ReschedulingReportKeys>(messageData, ["reschedule_staff_approval", "reschedule_staff_preapproval"]);
+
             await this.helpers.updateRecord("Reports", report, {
                 "Approved by staff": true,
                 "Log": (report.log ? report.log + "\n" : "") + [
                     `date=${(new Date()).getTime()}`,
                     `user=${user.airtable.id}`,
                     "staff=true",
-                    "text=Pre-approved score report",
+                    "text=Pre-approved match reschedule",
                     "key=staff_preapproved"
                 ].join("|"),
                 "Message Data": messageData.textMap
             });
         } else if (reaction === "approve") {
+            messageData = await looseDeleteRecordedMessages<ReschedulingReportKeys>(messageData, ["reschedule_staff_approval", "reschedule_staff_preapproval"]);
+
             await this.helpers.updateRecord("Reports", report, {
                 "Approved by staff": true,
                 "Log": (report.log ? report.log + "\n" : "") + [
                     `date=${(new Date()).getTime()}`,
                     `user=${user.airtable.id}`,
                     "staff=true",
-                    "text=Approved score report",
+                    "text=Approved match reschedule",
                     "key=staff_approved"
                 ].join("|"),
                 "Message Data": messageData.textMap
             });
         } else if (reaction === "force-approve") {
-            messageData = await looseDeleteRecordedMessage<ScoreReportingReportKeys>(messageData, "report_opponent_notification");
+            messageData = await looseDeleteRecordedMessages<ReschedulingReportKeys>(messageData, ["reschedule_staff_approval", "reschedule_staff_preapproval", "reschedule_opponent_approval"]);
             await this.helpers.updateRecord("Reports", report, {
                 "Approved by staff": true,
                 "Force approved": true,
@@ -67,54 +69,46 @@ export default {
                     `date=${(new Date()).getTime()}`,
                     `user=${user.airtable.id}`,
                     "staff=true",
-                    "text=Force-approved score report",
+                    "text=Force-approved match reschedule",
                     "key=staff_force_approved"
                 ].join("|"),
                 "Message Data": messageData.textMap
             });
-        } else if (reaction === "force-counter-approve") {
+        } else if (reaction === "deny") {
+            // approval messages that need to be deleted
+            messageData = await looseDeleteRecordedMessages<ReschedulingReportKeys>(messageData, ["reschedule_opponent_approval", "reschedule_staff_approval", "reschedule_staff_preapproval"]);
 
             await this.helpers.updateRecord("Reports", report, {
-                "Approved by staff": true,
-                "Force approved": true,
-
-                "Data": report.countered_data,
-                "Countered Data": "",
-
-                "Log": (report.log ? report.log + "\n" : "")  + [
+                "Denied by staff": true,
+                "Log": (report.log ? report.log + "\n" : "") + [
                     `date=${(new Date()).getTime()}`,
                     `user=${user.airtable.id}`,
                     "staff=true",
-                    "text=Force-approved counter report",
-                    "key=staff_force_approved_counter"
+                    "text=Denied match reschedule",
+                    "key=staff_denied"
                 ].join("|"),
                 "Message Data": messageData.textMap
             });
         } else if (reaction === "delete") {
-            messageData = await looseDeleteRecordedMessages<ScoreReportingReportKeys>(messageData, ["report_opponent_notification", "report_staff_notification", "report_completed_staff", "report_completed_public"]);
+            // any messages from a previous approval that was denied
+            messageData = await looseDeleteRecordedMessages<ReschedulingReportKeys>(messageData, ["reschedule_staff_denial", "reschedule_opponent_denial", "reschedule_team_cancel", "reschedule_opponent_cancel"]);
+            // approval messages that need to be deleted
+            messageData = await looseDeleteRecordedMessages<ReschedulingReportKeys>(messageData, ["reschedule_opponent_approval", "reschedule_staff_approval", "reschedule_staff_preapproval"]);
 
+            await this.helpers.updateRecord("Reports", report, {
+                "Log": (report.log ? report.log + "\n" : "") + [
+                    `date=${(new Date()).getTime()}`,
+                    `user=${user.airtable.id}`,
+                    "staff=true",
+                    "text=Deleted match reschedule",
+                    "key=staff_deleted"
+                ].join("|"),
+                "Message Data": messageData.textMap
+            });
             await this.helpers.updateRecord("Matches", match, {
                 "Reports": [],
                 "Report History": [...(match.report_history || []), report.id].map(x => dirtyID(x))
             });
-
-            const eventSettings = JSON.parse(event.blocks || "") as EventSettings;
-            let subdomain = "";
-            if (event?.subdomain || event?.partial_subdomain) {
-                subdomain = (event.subdomain || event.partial_subdomain || "") + ".";
-            }
-            const matchLink = `https://${subdomain}slmn.gg/match/${cleanID(match.id)}`;
-
-            if (client && eventSettings?.logging?.staffScoreReport) {
-                const channel = await client.channels.fetch(eventSettings.logging.staffScoreReport);
-                if (channel?.isSendable()) {
-                    try {
-                        await channel.send(`🗑️ **Denied & deleted**: Score report removed by ${user.airtable.name}.\n${matchLink}`);
-                    } catch (e) {
-                        console.error("Channel sending error", e);
-                    }
-                }
-            }
         } else {
             throw {
                 errorCode: 501,

@@ -1,9 +1,9 @@
-import { ActionAuth, Match, MatchResolvableID, Report } from "../types.js";
+import { ActionAuth, Match, MatchResolvableID, Report, ScoreReportingReportKeys } from "../types.js";
 import { Action } from "../action-utils/action-manager-models.js";
 import { cleanID, dirtyID, getMatchScoreReporting } from "../action-utils/action-utils.js";
 import { get } from "../action-utils/action-cache.js";
-import client from "../discord/client.js";
 import { MapObject } from "../discord/managers.js";
+import { looseDeleteRecordedMessage } from "../action-utils/ts-action-utils.js";
 
 export default {
     key: "approve-score-report",
@@ -48,25 +48,20 @@ export default {
         if (reaction === "approve") {
             // opponent approves original's report
 
-
-            const messageData = new MapObject(report.message_data);
+            let messageData = new MapObject(report.message_data);
             // Remove previous captain notification
             console.log(messageData.data);
-            if (messageData.get("opponent_captain_notification_message_id") && messageData.get("opponent_captain_notification_channel_id")) {
-                try {
-                    const channel = await client.channels.fetch(messageData.get("opponent_captain_notification_channel_id"));
-                    if (channel?.isTextBased()) await channel.messages.delete(messageData.get("opponent_captain_notification_message_id"));
-                } catch (e) {
-                    console.error("Error trying to delete previous opponent captain notification message", e);
-                } finally {
-                    messageData.push("opponent_captain_notification_message_id", null);
-                    messageData.push("opponent_captain_notification_channel_id", null);
-                }
-            }
 
+            messageData = await looseDeleteRecordedMessage<ScoreReportingReportKeys>(messageData, "report_opponent_notification");
             await this.helpers.updateRecord("Reports", report, {
                 "Approved by opponent": true,
-                "Log": (report.log ? report.log + "\n" : "") + `${(new Date()).toLocaleString()}: ${user.airtable.name} approved score report as ${actingTeam?.name}`,
+                "Log": (report.log ? report.log + "\n" : "") + [
+                    `date=${(new Date()).getTime()}`,
+                    `user=${user.airtable.id}`,
+                    `team=${actingTeam?.id}`,
+                    "text=Approved score report",
+                    "key=approved_by_opponent"
+                ].join("|"),
                 "Message Data": messageData.textMap
             });
 
@@ -74,21 +69,11 @@ export default {
         } else if (reaction === "counter-approve") {
             // original approves opponent's counter report
 
-            const messageData = new MapObject(report.message_data);
+            let messageData = new MapObject(report.message_data);
             // Remove previous captain notification
             console.log(messageData.data);
-            if (messageData.get("original_captain_notification_message_id") && messageData.get("original_captain_notification_channel_id")) {
-                try {
-                    const channel = await client.channels.fetch(messageData.get("original_captain_notification_channel_id"));
-                    if (channel?.isTextBased()) await channel.messages.delete(messageData.get("original_captain_notification_message_id"));
-                } catch (e) {
-                    console.error("Error trying to delete previous opponent captain notification message", e);
-                } finally {
-                    messageData.push("original_captain_notification_message_id", null);
-                    messageData.push("original_captain_notification_channel_id", null);
-                }
-            }
 
+            messageData = await looseDeleteRecordedMessage<ScoreReportingReportKeys>(messageData, "report_opponent_notification");
 
             await this.helpers.updateRecord("Reports", report, {
                 "Approved by opponent": true,
@@ -96,7 +81,14 @@ export default {
                 "Countered by opponent": false,
                 "Data": report.countered_data,
                 "Countered Data": "",
-                "Log": (report.log ? report.log + "\n" : "") + `${(new Date()).toLocaleString()}: ${user.airtable.name} approved counter report as ${actingTeam?.name}`
+                "Log": (report.log ? report.log + "\n" : "") + [
+                    `date=${(new Date()).getTime()}`,
+                    `user=${user.airtable.id}`,
+                    `team=${actingTeam?.id}`,
+                    "text=Approved counter report",
+                    "key=approved_counter_report"
+                ].join("|"),
+                // `${(new Date()).toLocaleString()}: ${user.airtable.name} approved counter report as ${actingTeam?.name}`
             });
         }
     }

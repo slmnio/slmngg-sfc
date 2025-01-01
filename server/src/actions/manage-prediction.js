@@ -46,7 +46,7 @@ export default {
      * @param {"create"|"lock"|"resolve"|"cancel"} predictionAction
      * @param {"match"|"map"} predictionType
      * @param {number?} autoLockAfter
-     * @param {ClientData} client
+     * @param {Client} client
      * @returns {Promise<void>}
      */
     // eslint-disable-next-line no-empty-pattern

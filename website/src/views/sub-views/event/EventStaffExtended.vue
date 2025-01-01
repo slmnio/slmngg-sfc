@@ -9,7 +9,6 @@
 </template>
 <script>
 import EventStaffing from "@/components/website/EventStaffing.vue";
-import { url } from "@/utils/content-utils";
 
 export default {
     name: "EventStaffExtended",

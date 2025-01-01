@@ -165,6 +165,12 @@ export const useAuthStore = defineStore("auth", () => {
         };
     }
 
+    function logout() {
+        token.value = null;
+        user.value = null;
+        authNext.value = null;
+    }
+
     return {
         token,
         authNext,
@@ -178,7 +184,8 @@ export const useAuthStore = defineStore("auth", () => {
         authenticateWithDiscord,
         setAuthNext,
         getAuthNext,
-        authenticateWithToken
+        authenticateWithToken,
+        logout
     };
 }, {
     persist: {

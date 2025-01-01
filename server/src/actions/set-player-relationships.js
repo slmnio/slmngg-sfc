@@ -30,7 +30,7 @@ export default {
      * @typedef {"Team 1" | "Team 2" | "None"} Cams
      * @typedef {{ clientID: AnyAirtableID, cams: Cams[] }[]} CamsData
      * @param {Object?} params
-     * @param {ClientData} client
+     * @param {ActionAuth["user"]} user
      * @param {CamsData} clientCams
      * @returns {Promise<void>}
      */

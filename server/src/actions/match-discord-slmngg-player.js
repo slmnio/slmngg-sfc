@@ -7,7 +7,7 @@ export default {
     auth: ["user"],
     /***
      * @param {import("discord.js").User} discordData
-     * @param {UserData} user
+     * @param {ActionAuth["user"]} user
      * @returns {Promise<UserData[]>}
      */
     async handler({ discordData }, { user }) {

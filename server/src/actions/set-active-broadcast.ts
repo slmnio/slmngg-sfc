@@ -9,8 +9,7 @@ export default {
     /***
      * @param {DirtyAirtableID} broadcastID
      * @param {DirtyAirtableID} clientID
-     * @param {UserData} user
-     * @param {ClientData} client
+     * @param {ActionAuth["client"]} client
      * @returns {Promise<void>}
      */
     async handler(

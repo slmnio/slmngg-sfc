@@ -172,7 +172,7 @@ export default {
 
                         if (guild) {
                             const logChannel = await guild.channels.fetch(eventSettings.logging.publicRosterChanges);
-                            if (logChannel && logChannel.type === 0) {
+                            if (logChannel && logChannel.isSendable()) {
                                 const parts : string[] = [];
 
                                 const addedInAll = teamChanges.some(({alteration}) => alteration === "added");

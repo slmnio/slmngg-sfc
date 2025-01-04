@@ -4,6 +4,7 @@
         title="Reporting Score"
         ok-variant="success"
         :ok-title="successMethod"
+        :ok-disabled="proposedIsSame"
         @ok="$emit('ok')"
         @update:model-value="(val) => $emit('update:modelValue', val)">
         <div class="match-explainer-modal">
@@ -12,6 +13,13 @@
             <p>This is the data that you're submitting:</p>
             <MatchExplainerList :edited-map-data="editedMapData" :edited-match-data="editedMatchData" :match="match" />
         </div>
+
+        <b-alert v-if="proposedIsSame" :model-value="true" variant="danger">
+            <div>
+                <b><i class="fas fa-exclamation-triangle mr-1"></i>No changes</b>
+                <div>There are no differences to the initial report. You can approve the initial report by cancelling the counter edit.</div>
+            </div>
+        </b-alert>
     </BModal>
 </template>
 
@@ -21,7 +29,7 @@ import MatchExplainerList from "@/components/website/dashboard/MatchExplainerLis
 export default {
     name: "MatchExplainerModal",
     components: { MatchExplainerList },
-    props: ["editedMapData", "match", "modelValue", "editedMatchData"],
+    props: ["editedMapData", "match", "modelValue", "editedMatchData", "proposedData"],
     emits: ["update:modelValue", "ok"],
     computed: {
         eventSettings() {
@@ -34,6 +42,13 @@ export default {
             } else {
                 return "Submit match data";
             }
+        },
+        comparableData() {
+            return { mapData: this.editedMapData, matchData: this.editedMatchData };
+        },
+        proposedIsSame() {
+            if (!this.proposedData) return false;
+            return JSON.stringify(this.proposedData) === JSON.stringify(this.comparableData);
         }
     },
 };

@@ -352,6 +352,7 @@
             :match="match"
             :edited-map-data="editedMapData"
             :edited-match-data="reportableMatchData"
+            :proposed-data="proposedData"
             @ok="() => saveScoreReport()" />
     </div>
 </template>

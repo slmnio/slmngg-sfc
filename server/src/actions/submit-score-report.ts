@@ -89,7 +89,7 @@ export default {
                     `date=${(new Date()).getTime()}`,
                     `user=${user.airtable.id}`,
                     `team=${actingTeam?.id}`,
-                    "text=Coutered score report",
+                    "text=Countered score report",
                     "key=countered_score_report"
                 ].join("|"),
                 "Countered Data": JSON.stringify(reportData),

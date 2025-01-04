@@ -16,16 +16,18 @@ import {
     generateMatchReportText,
     looseDeleteRecordedMessage,
     looseDeleteRecordedMessages,
+    readableMatchLog,
     sendRecordedMessage
 } from "../action-utils/ts-action-utils.js";
 import { ButtonBuilder, ButtonStyle } from "discord.js";
+import emoji from "../discord/emoji.js";
 
 const processing = new Set<AnyAirtableID>();
 const dataServer = process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg";
 
 export default {
     async handler({ id, newData: report, oldData }: { id: AnyAirtableID, newData: Report, oldData: Report }) {
-        if (!process.env.IS_SLMNGG_MAIN_SERVER) return;
+        // if (!process.env.IS_SLMNGG_MAIN_SERVER) return;
         if (report?.__tableName !== "Reports") return;
         if (report.approved) {
             console.log("Already approved");
@@ -104,12 +106,13 @@ export default {
 
                         messageData = await looseDeleteRecordedMessage<ScoreReportingReportKeys>(messageData, "report_staff_notification");
 
-                        if (client && eventSettings?.logging?.staffCompletedScoreReport) {
+                        if (client && eventSettings?.logging?.staffCompletedScoreReport && report?.log) {
+                            const readableLog = await readableMatchLog(report.log);
                             messageData = await sendRecordedMessage<ScoreReportingReportKeys>({
                                 key: "report_completed_staff",
                                 mapObject: messageData,
                                 channelID: eventSettings.logging.staffCompletedScoreReport,
-                                content: `🎉 Score report approved\n${report.log}\n${matchLink}/score-reporting`
+                                content: `${emoji.circle.success_check} **Score report approved**\n${readableLog}\n${matchLink}/score-reporting`
                             });
                         }
                         if (client && eventSettings?.logging?.postMatchReports) {
@@ -362,17 +365,17 @@ export default {
                                         components: [
                                             new ButtonBuilder()
                                                 .setLabel("Pre-approve")
-                                                .setEmoji("<:shield_check:1322375448260247632>")
+                                                .setEmoji(emoji.transparent.shield_check)
                                                 .setStyle(ButtonStyle.Primary)
                                                 .setCustomId(`reschedule_staff_approval/${cleanID(match.id)}/pre-approve`),
                                             new ButtonBuilder()
                                                 .setLabel("Force approve")
-                                                .setEmoji("<:checksolidsq:1322072500082839623>")
+                                                .setEmoji(emoji.transparent.check)
                                                 .setStyle(ButtonStyle.Success)
                                                 .setCustomId(`reschedule_staff_approval/${cleanID(match.id)}/force-approve`),
                                             new ButtonBuilder()
                                                 .setLabel("Deny")
-                                                .setEmoji("<:timessolidsq:1322072513697808504>")
+                                                .setEmoji(emoji.transparent.times)
                                                 .setStyle(ButtonStyle.Danger)
                                                 .setCustomId(`reschedule_staff_approval/${cleanID(match.id)}/deny`),
                                             new ButtonBuilder()
@@ -444,12 +447,12 @@ export default {
                                             components: [
                                                 new ButtonBuilder()
                                                     .setLabel("Approve")
-                                                    .setEmoji("<:checksolidsq:1322072500082839623>")
+                                                    .setEmoji(emoji.transparent.check)
                                                     .setStyle(ButtonStyle.Success)
                                                     .setCustomId(`reschedule_opponent_approval/${cleanID(match.id)}/approve`),
                                                 new ButtonBuilder()
                                                     .setLabel("Deny")
-                                                    .setEmoji("<:timessolidsq:1322072513697808504>")
+                                                    .setEmoji(emoji.transparent.times)
                                                     .setStyle(ButtonStyle.Danger)
                                                     .setCustomId(`reschedule_opponent_approval/${cleanID(match.id)}/deny`),
                                                 new ButtonBuilder()
@@ -514,12 +517,12 @@ export default {
                                         components: [
                                             new ButtonBuilder()
                                                 .setLabel("Approve")
-                                                .setEmoji("<:checksolidsq:1322072500082839623>")
+                                                .setEmoji(emoji.transparent.check)
                                                 .setStyle(ButtonStyle.Success)
                                                 .setCustomId(`reschedule_staff_approval/${cleanID(match.id)}/approve`),
                                             new ButtonBuilder()
                                                 .setLabel("Deny")
-                                                .setEmoji("<:timessolidsq:1322072513697808504>")
+                                                .setEmoji(emoji.transparent.times)
                                                 .setStyle(ButtonStyle.Danger)
                                                 .setCustomId(`reschedule_staff_approval/${cleanID(match.id)}/deny`),
                                             new ButtonBuilder()
@@ -562,7 +565,7 @@ export default {
                                 embeds:  match.start ? [{
                                     title: `Reschedule request denied: ${allTeams.map(t => t.name || t.code).join(" vs ")}`,
                                     url: `${matchLink}/rescheduling`,
-                                    description: `<:danger_exclamation_circle:1322072455346655334> ${opponentNames ? `${opponentNames} have` : "Your opponent has"} denied a reschedule for the match.\nYou can start a new request on SLMN.GG.`,
+                                    description: `${emoji.circle.danger_exclamation} ${opponentNames ? `${opponentNames} have` : "Your opponent has"} denied a reschedule for the match.\nYou can start a new request on SLMN.GG.`,
                                     fields: [
                                         {
                                             name: "Match start time",
@@ -582,7 +585,7 @@ export default {
                                 }] : [{
                                     title: `Schedule request denied: ${allTeams.map(t => t.name || t.code).join(" vs ")}`,
                                     url: `${matchLink}/rescheduling`,
-                                    description: `<:danger_exclamation_circle:1322072455346655334> ${opponentNames ? `${opponentNames} have` : "Your opponent has"} denied the requested start time for the match.\nYou can start a new request on SLMN.GG.`,
+                                    description: `${emoji.circle.danger_exclamation} ${opponentNames ? `${opponentNames} have` : "Your opponent has"} denied the requested start time for the match.\nYou can start a new request on SLMN.GG.`,
                                     fields: [
                                         {
                                             name: "Match start time",
@@ -643,7 +646,7 @@ export default {
                                 embeds:  match.start ? [{
                                     title: `Reschedule request denied: ${allTeams.map(t => t.name || t.code).join(" vs ")}`,
                                     url: `${matchLink}/rescheduling`,
-                                    description: "<:danger_exclamation_circle:1322072455346655334> Staff have denied a reschedule for the match.\nRescheduling for this match has been locked, contact staff for more information.",
+                                    description: "${emoji.circle.danger_exclamation} Staff have denied a reschedule for the match.\nRescheduling for this match has been locked, contact staff for more information.",
                                     fields: [
                                         {
                                             name: "Match start time",
@@ -663,7 +666,7 @@ export default {
                                 }] : [{
                                     title: `Schedule request denied: ${allTeams.map(t => t.name || t.code).join(" vs ")}`,
                                     url: `${matchLink}/rescheduling`,
-                                    description: "<:danger_exclamation_circle:1322072455346655334> Staff have denied the requested start time for the match.\nScheduling for this match has been locked, contact staff for more information.",
+                                    description: "${emoji.circle.danger_exclamation} Staff have denied the requested start time for the match.\nScheduling for this match has been locked, contact staff for more information.",
                                     fields: [
                                         {
                                             name: "Match start time",

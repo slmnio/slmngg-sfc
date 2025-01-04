@@ -1,10 +1,11 @@
 import type { Snowflake } from "discord-api-types/globals";
-import { Match } from "../types.js";
+import { Match, Player, PlayerResolvableID, Team, TeamResolvableID } from "../types.js";
 import { get } from "./action-cache.js";
 import { MapObject } from "../discord/managers.js";
 import client from "../discord/client.js";
 import { ChannelType, Guild, MessageCreateOptions, MessagePayload } from "discord.js";
-import { cleanID, sendMessage } from "./action-utils.js";
+import { cleanID, hammerTime, sendMessage } from "./action-utils.js";
+import emoji from "../discord/emoji.js";
 
 
 export async function generateMatchReportText(match: Match) {
@@ -213,4 +214,91 @@ export async function sendRecordedMessage<KeyType extends string>({ key, mapObje
 ): Promise<MapObject> {
     console.log("Recorded message", key, mapObject.data);
     return sendMessage({ key, mapObject, channelID, content, success });
+}
+
+type StepTypeImport = {
+    date: `${number}`;
+    time: Date;
+    key: string;
+    text: string;
+
+    user?: PlayerResolvableID;
+    team?: TeamResolvableID;
+    staff?: boolean;
+}
+type StepType = {
+    date: `${number}`;
+    time: Date;
+    key: string;
+    text: string;
+
+    user?: Player;
+    team?: Team;
+    staff?: boolean;
+}
+
+export async function parseMatchLog(log: string) {
+
+    const steps = log.split("\n").map(step => Object.fromEntries(step.split("|").map(pair => pair.split("=")))) as StepTypeImport[];
+
+    for (const step of steps) {
+        step.time = new Date(parseInt(step.date));
+        if (step.user) step.user = await get(step.user as string);
+        if (step.team) step.team = await get(step.team as string);
+        if (step.staff) step.staff = true;
+    }
+    return steps as StepType[];
+}
+
+
+export async function readableMatchLog(log: string) {
+    const steps = await parseMatchLog(log);
+
+    const emojiKeyMap : {[key: StepType["key"]]: string} = {
+        "approved_by_opponent": emoji.transparent.check,
+        "staff_preapproved": emoji.transparent.check,
+        "staff_approved": emoji.transparent.check,
+        "staff_force_approved": emoji.transparent.shield_check,
+        "staff_force_approved_counter": emoji.transparent.shield_check,
+        "approved_counter_report": emoji.transparent.check,
+
+        "deleted": emoji.circle.danger_times,
+        "staff_deleted": emoji.circle.danger_times,
+
+        "denied_by_opponent": emoji.transparent.times,
+        "staff_denied": emoji.transparent.times,
+
+        "submitted_request": emoji.transparent.check,
+        "submitted_score_report": emoji.transparent.check,
+        "countered_score_report": emoji.transparent.exchange,
+    };
+    const userTypeMap : {[key: StepType["key"]]: string} = {
+        "approved_by_opponent": "Opponent",
+        "staff_preapproved": "Staff",
+        "staff_approved": "Staff",
+        "staff_force_approved": "Staff",
+        "staff_force_approved_counter": "Staff",
+        "approved_counter_report": "Team",
+
+        "deleted": "Team",
+        "staff_deleted": "Staff",
+
+        "denied_by_opponent": "Opponent",
+        "staff_denied": "Staff",
+
+        "submitted_request": "Team",
+        "submitted_score_report": "Team",
+        "countered_score_report": "Opponent",
+    };
+
+    return steps.map(step => {
+        return [
+            hammerTime(parseInt(step.date), "f"),
+            emojiKeyMap[step.key] || emoji.blank,
+            step.user?.name ? `**[${step.user.name}](<https://slmn.gg/player/${step.user.id}>)**` : userTypeMap[step.key] || "",
+            step.text.slice(0,1).toLowerCase() + step.text.slice(1),
+            step?.team?.name ? `as **[${step.team.name}](<https://slmn.gg/team/${step.team.id}>)**` :
+                (step?.staff ? "as staff" : ""),
+        ].filter(Boolean).join(" ");
+    }).join("\n");
 }

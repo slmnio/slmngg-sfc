@@ -3,6 +3,7 @@ import { get } from "../action-utils/action-cache.js";
 import { MapObject } from "../discord/managers.js";
 import client from "../discord/client.js";
 import { cleanID, findMember } from "../action-utils/action-utils.js";
+import emoji from "../discord/emoji.js";
 
 const PlayerTeamRoleMap = {
     "member_of": "player",
@@ -16,11 +17,6 @@ type Alterations = {
     removed: TeamResolvableID[]
 }
 
-const emotes = {
-    transfer_in: "<:transfer_in:485964607916212264>",
-    transfer_out: "<:transfer_out:485964606913773579>",
-    transfer_change: "<:transfer_change:486586258470993930>",
-};
 
 function money(num: number) {
     return `$${num || 0}k`;
@@ -180,12 +176,12 @@ export default {
 
                                 if (addedInAll && removedInAll) {
                                     // some sort of change
-                                    parts.push(emotes.transfer_change);
+                                    parts.push(emoji.transfer.transfer_change);
                                 } else if (addedInAll) {
-                                    parts.push(emotes.transfer_in);
+                                    parts.push(emoji.transfer.transfer_in);
 
                                 } else if (removedInAll) {
-                                    parts.push(emotes.transfer_out);
+                                    parts.push(emoji.transfer.transfer_out);
                                 }
 
 

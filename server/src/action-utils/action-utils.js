@@ -415,7 +415,13 @@ export async function sendMessage({
     return mapObject;
 }
 
-export function hammerTime(timeString) {
+/**
+ *
+ * @param {number | string | Date} timeString
+ * @param {"d"|"D"|"t"|"T"|"f"|"F"|"R"} format
+ * @returns {string}
+ */
+export function hammerTime(timeString, format = "F") {
     let start = new Date(timeString).getTime();
-    return `<t:${Math.floor(start / 1000)}:F>`;
+    return `<t:${Math.floor(start / 1000)}:${format}>`;
 }

@@ -3,6 +3,7 @@ import path from "node:path";
 import { Collection, Events, InteractionType, MessageComponentInteraction } from "discord.js";
 import client from "./client.js";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import emoji from "./emoji.js";
 
 const DIRNAME = path.dirname(fileURLToPath(import.meta.url));
 
@@ -39,9 +40,9 @@ if (client) {
 
     async function respond(interaction: MessageComponentInteraction, response: string, isError = false) {
         if (isError) {
-            response = `<:danger_exclamation_circle:1322072455346655334> ${response}`;
+            response = `${emoji.circle.danger_exclamation} ${response}`;
         } else {
-            response = `<:success_check_circle:1322072439718416466> ${response}`;
+            response = `${emoji.circle.success_check} ${response}`;
         }
         if (!response.trim().endsWith(".")) response += ".";
 

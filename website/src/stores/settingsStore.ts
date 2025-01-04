@@ -25,6 +25,8 @@ export const useSettingsStore = defineStore("settings", () => {
     const openDashboardModules = ref<Record<string, boolean>>({});
     const batchSelectedMatches = ref<Record<string, boolean>>({}); // I wish this could be a Set
 
+    const denyEditor = ref(false);
+
     return {
         timezone,
         use24HourTime,
@@ -44,6 +46,7 @@ export const useSettingsStore = defineStore("settings", () => {
 
         transmitterUrl,
         transmitterPassword,
-        useDashboardTransmitter
+        useDashboardTransmitter,
+        denyEditor
     };
 }, { persist: true });

@@ -411,8 +411,7 @@ export default {
         scoreReportConfirmModal: false
     }),
     computed: {
-        ...mapWritableState(useSettingsStore, ["assumeLoserPicks", "showHeroPickBans"]),
-        ...mapWritableState(useSettingsStore, ["restrictToMapPool"]),
+        ...mapWritableState(useSettingsStore, ["assumeLoserPicks", "showHeroPickBans", "restrictToMapPool", "denyEditor"]),
         teams() {
             const dummy = { dummy: true };
 
@@ -870,7 +869,7 @@ export default {
             return response;
         },
         async saveScoreReport() {
-            console.log("map processing");
+            console.log("saveScoreReport", this.scoreReportAction);
             this.processing.map = true;
 
             const response = await authenticatedRequest("actions/submit-score-report", {
@@ -882,7 +881,7 @@ export default {
                 }
             });
             // if (response.error) this.errorMessage = response.errorMessage;
-            console.log(response);
+            console.log("saveScoreReport complete", this.scoreReportAction, response);
             this.processing.map = false;
 
             if (!response.error) {
@@ -890,6 +889,7 @@ export default {
                     message: "Score report submitted",
                     duration: 3000
                 });
+                this.denyEditor = false;
             }
             return response;
         },

@@ -52,7 +52,7 @@
                             :show-score-report-forfeit="eventSettings?.reporting?.score?.allowForfeits"
                         />
                     </div>
-                    <div v-if="!denyEditor && ['proposed-report', 'proposed-counter-report'].some(text => (currentAction?.content || [])?.includes(text))" class="editor-holder d-flex gap-2 flex-center w-100">
+                    <div v-if="!denyEditor && ['proposed-report', 'proposed-counter-report'].some(text => (currentAction?.content || [])?.includes(text))" class="editor-holder d-flex gap-2 flex-center align-items-start w-100">
                         <div v-if="(currentAction?.content || [])?.includes('proposed-report')" class="match-explainer">
                             <div v-if="(currentAction?.content || [])?.includes('proposed-counter-report')" class="match-explainer-title p-1 w-100 text-center fw-bold">Original report</div>
                             <MatchExplainerList
@@ -302,7 +302,7 @@
 </template>
 
 <script>
-
+import { mapWritableState } from "pinia";
 import MatchEditor from "@/components/website/dashboard/MatchEditor.vue";
 import { useAuthStore } from "@/stores/authStore";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
@@ -312,6 +312,7 @@ import MatchExplainerList from "@/components/website/dashboard/MatchExplainerLis
 import { authenticatedRequest } from "@/utils/dashboard.ts";
 import ReportStepsTop from "@/components/website/ReportStepsTop.vue";
 import ReportLog from "@/components/website/ReportLog.vue";
+import { useSettingsStore } from "@/stores/settingsStore.ts";
 
 /**
  * @typedef {object} Report
@@ -333,9 +334,9 @@ export default {
     props: ["match"],
     data: () => ({
         processing: false,
-        denyEditor: false
     }),
     computed: {
+        ...mapWritableState(useSettingsStore, ["denyEditor"]),
         eventSettings() {
             if (!this.match?.event?.blocks) return null;
             return JSON.parse(this.match.event.blocks);
@@ -520,7 +521,7 @@ export default {
                             footer: [{ heading: "Waiting for an opponent's response", icon: "fas fa-clock" }, ...warningFooter].filter(Boolean)
                         },
                         opponent: {
-                            title: { text: "Approve or deny score report", variant: "primary" },
+                            title: { text: this.denyEditor ? "Submit counter score report" : "Approve or deny score report", variant: "primary" },
                             content: ["proposed-report", "deny-editor"],
                             footer: warningFooter,
                             buttons: this.denyEditor ? [

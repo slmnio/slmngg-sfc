@@ -67,6 +67,7 @@
                                 class="bg-light text-dark-low p-3 rounded"
                                 :edited-map-data="existingReportCounterData?.mapData"
                                 :edited-match-data="existingReportCounterData?.matchData"
+                                :comparison-data="existingReportData"
                                 :match="match" />
                         </div>
                     </div>
@@ -1002,5 +1003,8 @@ export default {
 
     .score-reporting-container>div:not(.report-steps-top):not(.action-container) {
         outline: 3px solid red;
+    }
+    .match-explainer {
+        flex: 1 0;
     }
 </style>

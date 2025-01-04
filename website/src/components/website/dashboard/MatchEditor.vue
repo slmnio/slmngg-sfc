@@ -473,10 +473,11 @@ export default {
                 Minimum: match.first_to
                 Should automatically increase based on whatever would be needed to complete the match
              */
+            const potentialScores = this.scores.map((score, i) => Math.max(score, this.mapWinnerScore?.[i] || 0, this.matchData?.scores?.[i] || 0));
 
             let mapCount = Math.max(
                 this.scores[0] + this.scores[1], // match score on record
-                (this.matchData.scores?.[0] || 0) + (this.matchData.scores?.[1] || 0), // match score as staged data
+                (potentialScores?.[0] || 0) + (potentialScores?.[1] || 0), // match score as staged data
                 this.winners.length,
                 this.match.first_to || 0,
                 (this.match.maps?.filter(m => !m.banner && !m.draw))?.length || 0
@@ -499,16 +500,18 @@ export default {
             // console.log("check not complete", this.match.first_to, this.mapWinnerScore);
             // check if match is complete with current amount
             if (this.match.first_to &&
-                // this.mapWinnerScore.reduce((a, val) => a + val, 0) === mapCount &&
-                this.mapWinnerScore.every(score => this.match.first_to !== score)) {
+                potentialScores.reduce((a, val) => a + val, 0) === mapCount && // run out of space
+                !potentialScores.every(score => score === 0)  && // not all 0s
+                potentialScores.every(score => this.match.first_to !== score) // not a completed match
+            ) {
                 // match is not complete
-                // mapCount++;
-                // console.log("adding more since not complete");
-                for (let i = 0; i < Math.max(this.match?.maps?.length || 0, this.banners.length || 0, this.draws.length || 0); i++) {
-                    if (this.match?.maps?.[i]?.banner?.length || this.match?.maps?.[i]?.draw || this.banners[i] || this.draws[i]) {
-                        mapCount++;
-                    }
-                }
+                mapCount++;
+                console.log("adding more since not complete");
+                // for (let i = 0; i < Math.max(this.match?.maps?.length || 0, this.banners.length || 0, this.draws.length || 0); i++) {
+                //     if (this.match?.maps?.[i]?.banner?.length || this.match?.maps?.[i]?.draw || this.banners[i] || this.draws[i]) {
+                //         mapCount++;
+                //     }
+                // }
 
             }
 

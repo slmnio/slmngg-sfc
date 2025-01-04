@@ -11,7 +11,11 @@
             <b>Ready to submit?</b>
             <br>
             <p>This is the data that you're submitting:</p>
-            <MatchExplainerList :edited-map-data="editedMapData" :edited-match-data="editedMatchData" :match="match" />
+            <MatchExplainerList
+                :edited-map-data="editedMapData"
+                :edited-match-data="editedMatchData"
+                :match="match"
+                :comparison-data="proposedData" />
         </div>
 
         <b-alert v-if="proposedIsSame" :model-value="true" variant="danger">

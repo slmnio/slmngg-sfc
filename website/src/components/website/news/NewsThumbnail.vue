@@ -4,7 +4,7 @@
             <i v-if="item.redirect_url" class="fa-fw fas fa-external-link"></i>
         </div>
         <div v-if="customThumbnail" class="news-custom-thumbnail w-100 bg-center" :style="customThumbnail"></div>
-        <div v-else class="news-generated-thumbnail w-100 flex-center flex-column" :class="{'has-thumbnail-text': !!item?.thumbnail_text}" :style="{ backgroundColor: generatedThumbnail.backgroundColor }">
+        <div v-else class="news-generated-thumbnail w-100 flex-center flex-column" :class="{'has-thumbnail-text': !!item?.thumbnail_text}" :style="{ backgroundColor: generatedThumbnail.backgroundColor, color: generatedThumbnail.color }">
             <div class="news-generated-thumbnail-logo bg-center" :style="{backgroundImage: generatedThumbnail.backgroundImage}"></div>
             <Squeezable v-if="item.thumbnail_text" class="news-thumbnail-text flex-center" align="center">
                 <div class="industry-align">{{ item?.thumbnail_text }}</div>
@@ -56,6 +56,7 @@ export default {
 
             return {
                 backgroundColor: this.connectionTheme.color_logo_background,
+                color: this.connectionTheme.color_text_on_logo_background,
                 ...resizedImage(this.connectionTheme, ["default_wordmark", "default_logo"], "h-200")
             };
         }

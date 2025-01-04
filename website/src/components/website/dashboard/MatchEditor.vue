@@ -17,8 +17,8 @@
             <!--                </b-form-input>-->
             <!--                <div class="spacer flex-grow-1"></div>-->
             <!--                <b-button :disabled="processing['map']" class="ml-5 top-button flex-shrink-0" variant="success" @click="() => saveMapAndScores()"><i class="fas fa-save fa-fw"></i> Save all</b-button>-->
-            <div v-if="scoreReporting && proposedData" class="fill-buttons d-flex gap-2 justify-content-center mt-2">
-                <b-button variant="primary" size="sm" @click="loadProposedData"><i class="fal fa-fw fa-upload"></i> Load proposed score report</b-button>
+            <div v-if="scoreReporting" class="fill-buttons d-flex gap-2 justify-content-center mt-2">
+                <b-button v-if="proposedData" variant="primary" size="sm" @click="loadProposedData"><i class="fal fa-fw fa-upload"></i> Load proposed score report</b-button>
                 <b-button variant="danger" size="sm" @click="emptyData()"><i class="fas fa-trash fa-fw"></i> Empty editor</b-button>
                 <b-button v-if="scoreReporting" size="sm" @click="() => extraMaps++">
                     <i class="fas fa-fw fa-plus"></i> Add map

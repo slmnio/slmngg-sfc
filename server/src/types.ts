@@ -252,6 +252,9 @@ export interface Hero extends Base {
     alternate_set_image?: CacheAttachment[];
     recolor_base?: CacheAttachment[];
     recolor_layers?: CacheAttachment[];
+
+    pick_audio?: CacheAttachment[];
+    ban_audio?: CacheAttachment[];
 }
 interface Social extends Base {
 

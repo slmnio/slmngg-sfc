@@ -128,7 +128,7 @@ const slmnggAttachments = {
     "Map Data": ["image", "big_image", "video", "audio"],
     "Maps": ["image", "big_image"],
     "Log Files": ["log_file"],
-    "Heroes": ["icon", "main_image", "recolor_base", "recolor_layers", "alternate_set_image"],
+    "Heroes": ["icon", "main_image", "recolor_base", "recolor_layers", "alternate_set_image", "pick_audio", "ban_audio"],
     "Ad Reads": ["audio", "image"],
     "Tracks": ["file"],
     "Teams": ["icon", "images"],

@@ -1,61 +1,96 @@
 <template>
-    <div class="hero-draft" :style="themeBackground1(broadcast?.event)">
-        <div
-            v-for="(team, ti) in teams"
-            :key="team.id"
-            class="team"
-            :style="{order: ti * 2}"
-            :class="{'left': ti === 0, 'right': ti === 1}">
-            <div class="team-top" :style="themeBackground1(team)">
-                <div class="team-main">
-                    <div class="team-logo-holder flex-center" :style="logoBackground1(team)">
-                        <div class="team-logo bg-center" :style="resizedImage(team?.theme, ['small_logo', 'default_logo', 'default_wordmark'], 'w-200')"></div>
-                    </div>
-                    <div class="team-name">{{ team.name }}</div>
-                </div>
-                <div class="team-bans">
-                    <div v-for="(ban, num) in (bans[ti] || [])" :key="num" class="ban bg-danger flex-center">
-                        <transition name="fade" mode="out-in" :duration="250">
-                            <div v-if="ban?.name" class="bg-center ban-icon ban flex-center" :style="resizedImage(ban, ['icon'], 's-500')">
-                                <!-- <div class="ban-number">{{ getPickBanItem(pickBanOrder, "ban", ti+1, num - 1)?.num }}</div>-->
-                            </div>
-                            <div v-else class="ban ban-placeholder text-center" :class="{'ban-next': ban?.orderItem?.num === (currentPickBan + 1) }">
-                            </div>
-                        </transition>
-                    </div>
-                    <transition name="fade" mode="out-in">
-                        <transition name="fade" mode="out-in" :duration="250">
-                            <div v-if="(bans[ti] || [])?.length === 1" class="bans-text">BAN</div>
-                            <div v-else-if="(bans[ti] || [])?.length" class="bans-text">BANS</div>
-                        </transition>
-                    </transition>
-                </div>
-            </div>
-            <div class="players">
-                <div v-for="num of maxPlayers" :key="num" class="player">
-                    <transition name="fade" mode="out-in" :duration="250">
-                        <div v-if="picks[ti]?.[num-1]?.name" :key="picks[ti]?.[num-1]?.id" class="pick flex-center">
-                            <div class="pick-number">{{ getPickBanItem(pickBanOrder, "pick", ti+1, num - 1)?.countOfTeamType }}</div>
-                            <div class="pick-image bg-center" :style="resizedImage(picks[ti][num-1], ['main_image', 'icon'], 'h-500')"></div>
-                            <div class="pick-text" :style="themeBackground1(broadcast?.event)">{{ picks[ti]?.[num-1]?.name }}</div>
-                        </div>
-                        <div v-else class="pick pick-placeholder flex-center" :class="{'pick-next': picks[ti]?.[num-1]?.orderItem?.num === (currentPickBan + 1) }">
-                            <div class="pick-number">{{ picks[ti]?.[num-1]?.orderItem?.countOfTeamType }}</div>
-                        </div>
-                    </transition>
-                </div>
-            </div>
+    <div class="hero-draft-container d-flex flex-column" :style="themeBackground1(broadcast?.event)">
+        <div class="timing-bar-container" :class="{'auto-active': !!autoDraftLast}">
+            <transition name="fade" :duration="500" mode="out-in">
+                <div v-if="timingBarStyle" :key="timingBarKey" class="timing-bar" :style="{...(timingBarStyle || {}), backgroundColor: themeBackground1(this?.broadcast?.event)?.borderColor}"></div>
+            </transition>
         </div>
-        <div class="center" :style="{order: 1, ...themeBackground1(broadcast?.event)}">
-            <div class="bg-center event-logo" :style="resizedImage(broadcast?.event?.theme, ['default_logo', 'default_wordmark'], 'w-500')"></div>
-            <div class="score">
-                <div v-if="middle === 'score'" class="middle scores">
-                    {{ [(match.score_1 || 0), (match.score_2 || 0)].join(" - ") }}
+        <div class="hero-draft w-100 h-100">
+            <div
+                v-for="(team, ti) in teams"
+                :key="team.id"
+                class="team"
+                :style="{order: ti * 2}"
+                :class="{'left': ti === 0, 'right': ti === 1}">
+                <div class="team-top" :style="themeBackground1(team)">
+                    <div class="team-main">
+                        <div class="team-logo-holder flex-center" :style="logoBackground1(team)">
+                            <div
+                                class="team-logo bg-center"
+                                :style="resizedImage(team?.theme, ['small_logo', 'default_logo', 'default_wordmark'], 'w-200')"></div>
+                        </div>
+                        <div class="team-name">{{ team.name }}</div>
+                    </div>
+                    <div class="team-bans">
+                        <div v-for="(ban, num) in (bans[ti] || [])" :key="num" class="ban bg-danger flex-center">
+                            <transition name="fade" mode="out-in" :duration="250">
+                                <div
+                                    v-if="ban?.name"
+                                    class="bg-center ban flex-center"
+                                    :class="{'audio-playing': audioPlaying[`ban/${ti+1}/${num+1}`]}">
+                                    <div class="ban-image flex-center">
+                                        <transition name="fade">
+                                            <img v-show="loaded[bans[ti][num-1]?.id]" class="image-center" :src="resizedImageNoWrap(ban, ['icon'], 's-500')" @load="() => loaded[bans[ti][num-1]?.id] = true">
+                                        </transition>
+                                    </div>
+
+                                    <!-- <div class="ban-number">{{ getPickBanItem(pickBanOrder, "ban", ti+1, num - 1)?.num }}</div>-->
+                                </div>
+                                <div
+                                    v-else
+                                    class="ban ban-placeholder text-center"
+                                    :class="{'ban-next': !hideNextPick && ban?.orderItem?.num === (currentPickBan + 1) }">
+                                </div>
+                            </transition>
+                        </div>
+                        <transition name="fade" mode="out-in">
+                            <transition name="fade" mode="out-in" :duration="250">
+                                <div v-if="(bans[ti] || [])?.length === 1" class="bans-text">BAN</div>
+                                <div v-else-if="(bans[ti] || [])?.length" class="bans-text">BANS</div>
+                            </transition>
+                        </transition>
+                    </div>
                 </div>
-                <div v-if="middle === 'vs'" class="middle vs">VS</div>
+                <div class="players">
+                    <div v-for="num of maxPlayers" :key="num" class="player">
+                        <transition name="fade" mode="out-in" :duration="250">
+                            <div v-if="picks[ti]?.[num-1]?.name" :key="picks[ti]?.[num-1]?.id" class="pick flex-center" :class="{'audio-playing': audioPlaying[`pick/${ti+1}/${num}`]}">
+                                <div class="pick-number">
+                                    {{ getPickBanItem(pickBanOrder, "pick", ti + 1, num - 1)?.countOfTeamType }}
+                                </div>
+                                <div
+                                    class="pick-image bg-center">
+                                    <transition name="fade">
+                                        <img v-show="loaded[picks[ti][num-1]?.id]" class="image-center" :src="resizedImageNoWrap(picks[ti][num-1], ['main_image', 'icon'], 'h-500')" @load="() => loaded[picks[ti][num-1]?.id] = true">
+                                    </transition>
+                                </div>
+                                <div v-show="loaded[picks[ti][num-1]?.id]" class="pick-text" :style="themeBackground1(broadcast?.event)">
+                                    {{ picks[ti]?.[num - 1]?.name }}
+                                </div>
+                            </div>
+                            <div
+                                v-else
+                                class="pick pick-placeholder flex-center"
+                                :class="{'pick-next': !hideNextPick && picks[ti]?.[num-1]?.orderItem?.num === (currentPickBan + 1) }">
+                                <div class="pick-number">{{ picks[ti]?.[num - 1]?.orderItem?.countOfTeamType }}</div>
+                            </div>
+                        </transition>
+                    </div>
+                </div>
             </div>
-            <div v-if="draftText" class="draft-text">
-                {{ draftText }}
+            <div class="center" :style="{order: 1, ...themeBackground1(broadcast?.event)}">
+                <div
+                    class="bg-center event-logo"
+                    :style="resizedImage(broadcast?.event?.theme, ['default_logo', 'default_wordmark'], 'w-500')"></div>
+                <div class="score">
+                    <div v-if="middle === 'score'" class="middle scores">
+                        {{ [(match.score_1 || 0), (match.score_2 || 0)].join(" - ") }}
+                    </div>
+                    <div v-if="middle === 'vs'" class="middle vs">VS</div>
+                </div>
+                <div v-if="draftText" class="draft-text">
+                    {{ draftText }}
+                </div>
             </div>
         </div>
     </div>
@@ -63,17 +98,32 @@
 
 <script>
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles.js";
-import { resizedImage } from "@/utils/images.js";
+import { getNewURL, resizedImage, resizedImageNoWrap } from "@/utils/images.js";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
 import { getPickBanItem, processPickBanOrder } from "@/utils/content-utils.js";
 import { GameOverrides } from "@/utils/games.ts";
+import { Howl } from "howler";
 
 export default {
     name: "HeroDraft",
     props: ["broadcast", "match", "showAll"],
     data: () => ({
+        manualDraftAdvancing: true,
+        usePickBanAudio: true,
+
         currentPickBan: 0,
-        manualDraftAdvancing: true
+        timingBarKey: 0,
+
+        autoDraftInterval: null,
+        autoDraftDuration: null,
+        autoDraftLast: null,
+        now: null,
+
+        pickBanJustChanged: false,
+        pickBanTimeout: false,
+
+        loaded: {},
+        audioPlaying: {}
     }),
     computed: {
         middle() {
@@ -182,9 +232,23 @@ export default {
 
             if (!items?.length) return null;
             return items.join(" - ");
+        },
+        timingBarStyle() {
+            if (!this.autoDraftDuration || !this.autoDraftLast) return null;
+            const target = (this.autoDraftDuration) * 1000;
+            const ms = (this.autoDraftLast.getTime() + (target)) - this.now.getTime();
+            const width = Math.max(0, (Math.max(0, ms) / (target)) * 100);
+            if (!width) return null;
+            return {
+                width: `${width}%`
+            };
+        },
+        hideNextPick() {
+            return this.pickBanJustChanged || Object.values(this.audioPlaying).some(Boolean);
         }
     },
     methods: {
+        resizedImageNoWrap,
         getPickBanItem,
         padPickBans(arr, count, type, team, manualAdvanceIndex) {
             console.log("pad pick ban", { arr, count, type, team });
@@ -216,6 +280,41 @@ export default {
             console.log("reset pick ban");
             this.currentPickBan = 0;
             this.manualDraftAdvancing = true;
+            this.resetAutoDraft();
+            this.loaded = {};
+        },
+        resetAutoDraft() {
+            this.timingBarKey = 0;
+            if (this.autoDraftInterval) {
+                clearInterval(this.autoDraftInterval);
+            }
+            this.autoDraftLast = null;
+        },
+        runAutoDraft(seconds) {
+            this.timingBarKey = 0;
+
+
+            this.autoDraftDuration = parseInt(seconds);
+            if (this.autoDraftInterval) {
+                clearInterval(this.autoDraftInterval);
+            }
+            if (this.currentPickBan >= this.pickBanOrder?.length) return;
+
+            this.autoDraftLast = new Date();
+            this.autoDraftInterval = setInterval(() => {
+                this.currentPickBan++;
+
+                setTimeout(() => {
+                    this.timingBarKey++;
+                    if (this.currentPickBan >= this.pickBanOrder?.length) {
+                        // finished
+                        this.autoDraftLast = null;
+                        clearInterval(this.autoDraftInterval);
+                    } else {
+                        this.autoDraftLast = new Date();
+                    }
+                }, 500);
+            }, (this.autoDraftDuration + 1) * 1000);
         },
         logoBackground1, resizedImage, themeBackground1
     },
@@ -226,18 +325,72 @@ export default {
                 console.log("match ID change", id, oldId);
                 this.resetPickBan();
             }
+        },
+        currentPickBan(newNum, oldNum) {
+            this.pickBanJustChanged = true;
+            if (this.pickBanTimeout) clearTimeout(this.pickBanTimeout);
+            this.pickBanTimeout = setTimeout(() => {
+                this.pickBanJustChanged = false;
+            }, 1000);
+
+            if (!this.usePickBanAudio || !this.pickBanOrder?.length) return;
+            console.log("~~ PICK BAN", oldNum, this.pickBanOrder?.length, this.pickBanOrder[oldNum]?.type);
+
+            const pickBan = this.pickBanOrder[oldNum];
+            if (!pickBan) return;
+            const pickBanType = pickBan?.type;
+            const item = (pickBanType === "pick" ? this.picks : this.bans)[pickBan.team - 1][pickBan.countOfTeamType - 1];
+            console.log("~~", pickBan, pickBanType === "pick" ? this.picks : this.bans, item, pickBan.team - 1, pickBan.countOfTeamType - 1);
+            const itemAudio = item?.[`${pickBanType}_audio`]?.[0];
+
+            console.log("~~", item, itemAudio);
+            if (!itemAudio) return console.warn("No audio found", item);
+            const audio = new Howl({
+                src: [getNewURL(itemAudio, "orig")],
+                onplay: () => {
+                    console.log("playing", pickBan);
+                    this.audioPlaying[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = true;
+                },
+                onend: () => {
+                    console.log("ending", pickBan);
+                    this.audioPlaying[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = false;
+                }
+            });
+            setTimeout(() => {
+                audio.play();
+            }, 400);
         }
     },
     sockets: {
         advance_draft() {
+            this.resetAutoDraft();
             this.currentPickBan++;
             console.log(this.currentPickBan);
         },
         reset_draft() {
             this.resetPickBan();
+        },
+        auto_draft(seconds) {
+            this.runAutoDraft(seconds);
+        }
+    },
+    mounted() {
+        setInterval(() => this.now = new Date(), 100);
+        if (this.autoDraftInterval) {
+            clearInterval(this.autoDraftInterval);
         }
     }
 };
+
+
+class HeroAudioPlayer {
+    constructor(trackData) {
+        this.loaded = false;
+        this.audio =
+        console.log(this.audio);
+        this.audio.play();
+    }
+}
 </script>
 
 <style scoped>
@@ -373,4 +526,67 @@ export default {
     height: 100%;
 }
 
+.timing-bar-container {
+    height: 8px;
+    width: 100%;
+    display: flex;
+    background-color: rgba(255,255,255,0.1);
+    justify-content: center;
+    transition: height .3s ease;
+}
+.timing-bar-container:not(.auto-active) {
+    height: 0;
+}
+.timing-bar {
+    height: 100%;
+    width: 0;
+    transition: width 200ms linear, opacity .5s ease;
+}
+.timing-bar.fade-leave-active {
+    width: 0 !important;
+}
+
+img.image-center {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+.ban-image {
+    height: 36px;
+    width: 100%;
+}
+.ban img.image-center {
+    height: 36px;
+    object-fit: contain;
+}
+
+.pick.audio-playing,
+.ban.audio-playing .ban-image {
+    background-color: var(--highlight, #ffefd740);
+}
+.pick, .ban-image {
+    transition: background-color 300ms ease;
+}
+.pick {
+    overflow: hidden;
+}
+
+
+.pick .pick-image,
+.ban img {
+    transition: transform 300ms ease;
+    transform: scale(1);
+}
+
+.pick.audio-playing .pick-image {
+    transform: scale(1.1)
+}
+.ban.audio-playing img {
+    transform: scale(1.25)
+}
+
+.pick-number {
+    opacity: 0.2;
+}
 </style>

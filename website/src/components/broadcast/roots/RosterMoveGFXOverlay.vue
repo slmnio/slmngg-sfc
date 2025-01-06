@@ -5,7 +5,7 @@
         body-color="transparent !important"
         no-bottom="true"
         no-bottom-animate="true">
-        <div v-for="(team, i) in teams" :key="team.id" class="team">
+        <div v-for="(team, i) in teams" :key="team.id" class="team" :class="[`team-${i}`]">
             <ThemeTransition
                 :border-width="0"
                 :theme="team.theme"

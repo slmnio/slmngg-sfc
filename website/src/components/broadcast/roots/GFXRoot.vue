@@ -14,6 +14,7 @@
             :team="gfx.teams?.[0]"
             :custom-hero="gfx.heroes?.[0]" />
         <StatsGFXOverlay v-if="gfx?.type?.startsWith('Stats: ')" v-bind="overlayProps" />
+        <RosterMoveGFXOverlay v-if="gfx?.type === 'Rosters'" v-bind="overlayProps" />
         <v-style>
             {{ gfx?.custom_css }}
         </v-style>
@@ -30,11 +31,12 @@ import StandingsOverlay from "@/components/broadcast/roots/StandingsOverlay.vue"
 import TextOverlay from "@/components/broadcast/roots/TextOverlay.vue";
 import MultiStandingsOverlay from "@/components/broadcast/roots/MultiStandingsOverlay.vue";
 import StatsGFXOverlay from "@/components/broadcast/roots/StatsGFXOverlay.vue";
+import RosterMoveGFXOverlay from "@/components/broadcast/roots/RosterMoveGFXOverlay.vue";
 import MVPOverlay from "@/components/broadcast/roots/MVPOverlay.vue";
 
 export default {
     name: "GFXRoot",
-    components: { MVPOverlay, StatsGFXOverlay, MultiStandingsOverlay, TextOverlay, StandingsOverlay, IframeOverlay, ImageOverlay, BracketOverlay, ScheduleOverlay },
+    components: { MVPOverlay, StatsGFXOverlay, MultiStandingsOverlay, TextOverlay, StandingsOverlay, IframeOverlay, ImageOverlay, BracketOverlay, ScheduleOverlay, RosterMoveGFXOverlay },
     props: {
         index: Number,
         broadcast: Object,
@@ -82,7 +84,10 @@ export default {
                     "favourite_hero": ReactiveThing("favourite_hero")
                 }),
                 "teams": ReactiveArray("teams", {
-                    "theme": ReactiveThing("theme")
+                    "theme": ReactiveThing("theme"),
+                    players: ReactiveArray("players", {
+                        "signup_data": ReactiveArray("signup_data")
+                    }),
                 }),
                 "heroes": ReactiveArray("heroes")
             });

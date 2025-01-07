@@ -201,4 +201,19 @@ export const StandingsSortKeys = () => ({
     "Points": {
         description: "Sorts by extra points (on team.extra_points)"
     },
+    "MatchWins": {
+        description: "Match wins only"
+    },
+    "MatchWinsPoints": {
+        description: "Match wins + extra points)"
+    },
+    "MatchDiffPoints": {
+        description: "Match diff (wins - losses) + extra points"
+    },
+    "OPoints": {
+        description: "Sum of all opponent's extra points"
+    },
+    "OMatchWinsPoints": {
+        description: "Sum of all opponent's MatchWinPoints (match wins + extra points)"
+    },
 });

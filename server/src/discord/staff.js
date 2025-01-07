@@ -2,11 +2,12 @@
 /* BPL Staff Automation */
 
 import client from "./client.js";
-if (!client) return console.warn("Staff application system will not be set up because no Discord key is set.");
 import Airtable from "airtable";
 import { EmbedBuilder, Permissions } from "discord.js";
 import { MapHandler } from "./managers.js";
 import { log } from "./slmngg-log.js";
+
+if (!client) return console.warn("Staff application system will not be set up because no Discord key is set.");
 
 const airtable = new Airtable({apiKey: process.env.AIRTABLE_KEY});
 const base = airtable.base("appQd7DO7rDiMUIEj");
@@ -97,7 +98,7 @@ async function setupEvent(event) {
         //             type: "GUILD_CATEGORY",
         //             permissionOverwrites: [
         //                 { id: eventRoles.find(r => r.role === "Staff").id, allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.CONNECT] },
-        //                 { id: guild.roles.everyone, deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] }
+        //                 { id: guild.roles.everyone.id, deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] }
         //             ]
         //         }))
         //     };
@@ -119,7 +120,7 @@ async function setupEvent(event) {
                                 if (!id) return null;
                                 return { id, allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT]};
                             }).filter(i => i)),
-                            { id: guild.roles.everyone, deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT]}
+                            { id: guild.roles.everyone.id, deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT]}
                         ]
                     }))
                 };
@@ -146,7 +147,7 @@ async function setupEvent(event) {
                                 if (!id) return null;
                                 return { id, allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT]};
                             }).filter(i => i)),
-                            { id: guild.roles.everyone, deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] }
+                            { id: guild.roles.everyone.id, deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] }
                         ],
                         ...(category ? { parent: category.id } : {})
                     }))
@@ -222,7 +223,7 @@ async function setupEvent(event) {
         let channel = await guild.channels.create(`${event.slug}-staff`, {
             permissionOverwrites: [
                 { id: event.staff_role_id, allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES] },
-                { id: guild.roles.everyone, deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] }
+                { id: guild.roles.everyone.id, deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] }
                 // this might not work but we'll see
             ],
             parent: category
@@ -266,7 +267,7 @@ async function setupEvent(event) {
             type: "GUILD_CATEGORY",
             permissionOverwrites: [
                 { id: event.staff_role_id, allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.CONNECT] },
-                { id: guild.roles.everyone, deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] }
+                { id: guild.roles.everyone.id, deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] }
             ]
         });
 
@@ -274,14 +275,14 @@ async function setupEvent(event) {
             parent: eventCategory,
             permissionOverwrites: [
                 { id: event.talent_role_id, allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES] },
-                { id: guild.roles.everyone, deny: [Permissions.FLAGS.VIEW_CHANNEL] }
+                { id: guild.roles.everyone.id, deny: [Permissions.FLAGS.VIEW_CHANNEL] }
             ]
         });
         await guild.channels.create(`${event.slug}-production`, {
             parent: eventCategory,
             permissionOverwrites: [
                 { id: event.production_role_id, allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES] },
-                { id: guild.roles.everyone, deny: [Permissions.FLAGS.VIEW_CHANNEL] }
+                { id: guild.roles.everyone.id, deny: [Permissions.FLAGS.VIEW_CHANNEL] }
             ]
         });
 
@@ -291,7 +292,7 @@ async function setupEvent(event) {
             permissionOverwrites: [
                 { id: event.staff_role_id, allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] },
                 { id: event.talent_role_id, allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] },
-                { id: guild.roles.everyone, deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] }
+                { id: guild.roles.everyone.id, deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] }
             ]
         });
 
@@ -299,7 +300,7 @@ async function setupEvent(event) {
             type: "GUILD_VOICE",
             parent: eventCategory,
             permissionOverwrites: [
-                { id: guild.roles.everyone, allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] }
+                { id: guild.roles.everyone.id, allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.CONNECT] }
             ]
         });
     }

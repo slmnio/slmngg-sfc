@@ -340,7 +340,7 @@ export default {
                             ]
                         });
                         textChannelPermissions.push({ id: teamControl.get("role_id"), allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages]});
-                        textChannelPermissions.push({ id: guild.roles.everyone, deny: [PermissionFlagsBits.ViewChannel]});
+                        textChannelPermissions.push({ id: guild.roles.everyone.id, deny: [PermissionFlagsBits.ViewChannel]});
 
                         (settings?.textChannels.accessRoleIDs || []).forEach(roleID => {
                             textChannelPermissions.push({ id: roleID, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages]});
@@ -482,7 +482,7 @@ export default {
                             ]
                         });
                         voiceChannelPermissions.push({ id: teamControl.get("role_id"), allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Connect]});
-                        voiceChannelPermissions.push({ id: guild.roles.everyone, deny: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Connect]});
+                        voiceChannelPermissions.push({ id: guild.roles.everyone.id, deny: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Connect]});
 
                         (settings?.voiceChannels.viewRoleIDs || []).forEach(roleID => {
                             voiceChannelPermissions.push({ id: roleID, allow: [PermissionFlagsBits.ViewChannel], deny: [PermissionFlagsBits.Connect]});

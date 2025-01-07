@@ -317,7 +317,7 @@ export default {
                     // console.log(airtableKey, data, playerData?.[signupDataKey]);
 
                     if (player[signupDataKey] === data) return;
-                    if (!data && !player?.[signupDataKey]) return; // both nullish
+                    if (!player?.[signupDataKey]) return; // both nullish
 
                     playerUpdateData[airtableKey] = data;
                 });

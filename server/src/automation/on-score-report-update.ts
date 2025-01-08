@@ -310,7 +310,7 @@ export default {
                             key: "reschedule_completed",
                             mapObject: messageData,
                             channelID: eventSettings.logging?.matchTimeChanges,
-                            content: `⌚ Match reschedule ${teamPings.join(" ")}: \n${opponents.map(t => t.name || t.code).join(" vs ")} ${match.start ? "rescheduled to" : "scheduled for"} ${hammerTime(proposedStart)}.\n${matchLink}`
+                            content: `⌚ Match reschedule ${teamPings.join(" ")}: \n${allTeams.map(t => t.name || t.code).join(" vs ")} ${match.start ? "rescheduled to" : "scheduled for"} ${hammerTime(proposedStart)}.\n${matchLink}`
                         });
                         await updateRecord(Cache, "Reports", report, {
                             "Approved": true,

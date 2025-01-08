@@ -220,6 +220,7 @@ export default {
             if (this.existingScoreReport?.approved_by_team) {
                 steps[0].status = "complete";
                 steps[0].icon = "fas fa-check";
+
                 if (this.existingScoreReport?.player?.name && this.existingScoreReport?.team?.name) {
                     steps[0].description = `${this.existingScoreReport?.player?.name} submitted request for ${this.existingScoreReport?.team?.name}`;
                 }
@@ -353,7 +354,11 @@ export default {
                     if (this.existingScoreReport?.approved_by_opponent) {
                         newStep.status = "complete";
                         newStep.icon = "fas fa-check";
-                        if (this.opponentTeam?.name) {
+
+                        const completeLogItem = this.logSteps.find(step => step.key === "approved_by_opponent");
+                        if (completeLogItem?.user?.name) {
+                            newStep.description = `${completeLogItem?.user?.name} approved the request as ${completeLogItem?.team?.name}`;
+                        } else if (this.opponentTeam?.name) {
                             newStep.description = `${this.opponentTeam.name} approved the request`;
                         }
                     }
@@ -459,10 +464,26 @@ export default {
             if (this.existingScoreReport?.force_approved) {
                 steps[steps.length-1].status = "complete";
                 steps[steps.length-1].icon = "fas fa-shield-check";
-                steps[steps.length-1].description = "Staff member force approved this request";
+                const completeLogItem = this.logSteps.find(step => step.key === "staff_force_approved");
+                if (completeLogItem?.user?.name) {
+                    steps[steps.length - 1].description = `${completeLogItem?.user?.name} force-approved the request as staff`;
+                } else  {
+                    steps[steps.length - 1].description = "Staff member force-approved the request";
+                }
             } else if (this.existingScoreReport?.approved_by_staff) {
                 steps[steps.length-1].status = "complete";
                 steps[steps.length-1].icon = "fas fa-check";
+
+                const approveLogItem = this.logSteps.find(step => step.key === "staff_approved");
+                const preApproveLogItem = this.logSteps.find(step => step.key === "staff_preapproved");
+
+                if (approveLogItem?.user?.name) {
+                    steps[steps.length - 1].description = `${approveLogItem?.user?.name} approved the request as staff`;
+                } else if (preApproveLogItem?.user?.name) {
+                    steps[steps.length - 1].description = `${preApproveLogItem?.user?.name} pre-approved the request as staff`;
+                } else {
+                    steps[steps.length - 1].description = "Staff member approved the request";
+                }
             }
 
             const noFurtherActions =
@@ -621,6 +642,15 @@ export default {
         reschedule() {
             if (this.match?.id && !this.match?.start) return "Schedule";
             return "Reschedule";
+        },
+        logSteps() {
+            if (!this.existingScoreReport?.log?.length) return [];
+            return this.existingScoreReport.log.split("\n").map(step => Object.fromEntries(step.split("|").map(pair => pair.split("=")))).map(step => {
+                if (step.user) step.user = ReactiveRoot(step.user);
+                if (step.team) step.team = ReactiveRoot(step.team);
+                if (step.staff) step.staff = true;
+                return step;
+            });
         }
     },
     methods: {

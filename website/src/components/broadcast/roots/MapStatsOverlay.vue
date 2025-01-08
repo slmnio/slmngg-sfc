@@ -46,9 +46,12 @@ export default {
                 })
             });
         },
+        broadcastPriorityMapSet() {
+            return this.broadcast?.map_set || this.match?.map_set;
+        },
         mapTypes() {
-            if (!this.broadcast?.map_set) return [];
-            return this.broadcast.map_set.split(",");
+            if (!this.broadcastPriorityMapSet) return [];
+            return this.broadcastPriorityMapSet.split(",");
         },
         mapSlots() {
             if (!this.match) return [];

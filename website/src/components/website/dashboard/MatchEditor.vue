@@ -562,7 +562,10 @@ export default {
             return this.match?.event?.map_pool?.length;
         },
         showRestrictCheckbox() {
-            return this.hasMapPool || this.broadcastData?.map_set;
+            return this.hasMapPool || this.mapSet;
+        },
+        mapSet() {
+            return this.match?.map_set || this.broadcastData?.map_set;
         },
         availableMaps() {
             const mapData = (ReactiveRoot("Map Data", {
@@ -666,8 +669,8 @@ export default {
             const groups = {};
             let mapType = null;
 
-            if (this.broadcastData?.map_set) {
-                const maps = this.broadcastData?.map_set.split(",");
+            if (this.mapSet) {
+                const maps = this.mapSet.split(",");
                 mapType = maps[mapIndex];
             }
 

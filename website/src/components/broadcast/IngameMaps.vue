@@ -19,9 +19,12 @@ export default {
     name: "IngameMaps",
     props: ["match", "broadcast"],
     computed: {
+        broadcastPriorityMapSet() {
+            return this.broadcast?.map_set || this.hydratedMatch?.map_set;
+        },
         mapTypes() {
-            if (!this.broadcast?.map_set) return [];
-            return this.broadcast.map_set.split(",").slice(0, likelyNeededMaps(this.hydratedMatch));
+            if (!this.broadcastPriorityMapSet) return [];
+            return this.broadcastPriorityMapSet.split(",").slice(0, likelyNeededMaps(this.hydratedMatch));
         },
         hydratedMatch() {
             if (!this.match?.id) return null;

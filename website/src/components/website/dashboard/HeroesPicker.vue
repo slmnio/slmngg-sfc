@@ -61,7 +61,7 @@ export default {
                         :
                         ["DPS", "Tank", "Support"].map(key => ({
                             text: key,
-                            options: (this.heroes || []).filter(h => h.role === key).sort((a,b) => sortAlpha(a?.name, b?.name)).map(h => ({
+                            options: (this.heroes || []).filter(h => h.role === key).sort((a,b) => sortAlpha(a, b, "name")).map(h => ({
                                 text: h.name,
                                 value: dirtyID(h.id)
                             }))

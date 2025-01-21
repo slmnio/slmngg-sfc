@@ -163,7 +163,7 @@ export default ({ app, Cache, io }) => {
 
             if (!bans.some(teamBans => teamBans.length)) return res.send("No hero ban information is available right now.");
 
-            let banText = [1,2].map((num, i) => `${teams[i].name} banned ${bans[i].join(", ")}.`);
+            let banText = [1,2].map((num, i) => `${teams[i].name} banned ${niceJoin(bans[i])}.`);
 
             if (currentMap.flip_pick_ban_order) {
                 banText = banText.reverse();

@@ -12,7 +12,14 @@
             <div :key="`${name}-${twitter}-${lowerType}`" class="caster-lower flex-center" :class="{'cl-traditional': lowerType === 'traditional'}">
                 <div class="caster-name flex-center">
                     <div class="c-name industry-align">{{ name }}</div>
-                    <div v-if="twitter" class="c-twitter industry-align">{{ twitter }}</div>
+                    <div v-if="bluesky" class="c-twitter c-bluesky c-social-icon-stack">
+                        <BlueSkyIcon class="mr-1 c-social-icon" />
+                        <div class="c-social-text industry-align">{{ bluesky }}</div>
+                    </div>
+                    <div v-else-if="twitter" class="c-twitter c-social-icon-stack">
+                        <i class="fab fa-twitter c-social-icon mr-1"></i>
+                        <div class="c-social-text industry-align">{{ twitter }}</div>
+                    </div>
                     <div v-if="pronouns && showPronouns && !pronounsOnNewline" class="c-pronouns industry-align">{{ pronouns }}</div>
                     <div v-if="pronouns && showPronouns && pronounsOnNewline" class="c-pronouns industry-align" v-html="breakUp(pronouns)"></div>
                 </div>
@@ -23,10 +30,11 @@
 
 <script>
 import CasterCam from "@/components/broadcast/desk/CasterCam";
+import BlueSkyIcon from "@/assets/BlueskyIcon.vue";
 
 export default {
     name: "Caster",
-    components: { CasterCam },
+    components: {BlueSkyIcon, CasterCam },
     props: ["caster", "guest", "color", "disableVideo", "event", "showPronouns", "pronounsOnNewline"],
     computed: {
         align() {
@@ -60,6 +68,12 @@ export default {
             const twitter = this.player.socials.find(s => s.type === "Twitter");
             if (!twitter) return "";
             return twitter.name;
+        },
+        bluesky() {
+            if (!this.player?.socials) return "";
+            const account = this.player.socials.find(s => s.type === "Bluesky");
+            if (!account) return "";
+            return account.name.replace(".bsky.social", "");
         },
         liveGuestData() {
             return this.caster?.live_guests || this.guest;
@@ -195,4 +209,10 @@ export default {
 
     .caster-cam-box.align-right { justify-content: flex-end; }
     .caster-cam-box.align-left { justify-content: flex-start; }
+
+    .c-social-icon-stack {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+    }
 </style>

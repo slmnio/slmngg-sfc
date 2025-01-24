@@ -62,3 +62,17 @@ export const ROLE_ORDER = [
 export function sortRoles(a, b) {
     return ROLE_ORDER.indexOf(a) - ROLE_ORDER.indexOf(b);
 }
+
+export const SOCIALS_ORDER = [
+    "Twitter",
+    "Bluesky",
+    "Twitch",
+    "YouTube",
+    "Discord",
+    "Liquipedia",
+    "Merch"
+];
+
+export function sortSocials(a, b) {
+    return SOCIALS_ORDER.indexOf(a?.type) - SOCIALS_ORDER.indexOf(b?.type);
+}

@@ -16,7 +16,7 @@
                         </div>
                     </div>
                     <div v-if="player.socials" class="player-socials" :style="{ marginLeft: profilePictureTheme?.backgroundImage ? '84px' : '16px'}">
-                        <Social v-for="social in player.socials" :key="social.id" class="ct-active" :social="social" />
+                        <Social v-for="social in player.socials.sort(sortSocials)" :key="social.id" class="ct-active" :social="social" />
                     </div>
                 </div>
                 <div class="spacer flex-grow-1"></div>
@@ -63,7 +63,7 @@ import { url } from "@/utils/content-utils";
 import { bg, resizedImage } from "@/utils/images";
 import { logoBackground } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
-import { sortEvents } from "@/utils/sorts";
+import { sortEvents, sortSocials } from "@/utils/sorts";
 
 export default {
     name: "Player",
@@ -175,6 +175,7 @@ export default {
         }
     },
     methods: {
+        sortSocials,
         url,
         logoBackground,
         resizedImage,

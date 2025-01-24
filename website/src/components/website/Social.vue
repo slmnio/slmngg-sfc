@@ -5,13 +5,17 @@
         class="social-link"
         target="_blank"
         :title="social.name">
-        <i :class="icon"></i>
+        <BlueskyIcon v-if="social.type === 'Bluesky'" />
+        <i v-else :class="icon"></i>
     </a>
 </template>
 
 <script>
+import BlueskyIcon from "@/assets/BlueskyIcon";
+
 export default {
     name: "Social",
+    components: { BlueskyIcon },
     props: ["social"],
     computed: {
         icon() {

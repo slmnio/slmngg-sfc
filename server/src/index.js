@@ -5,6 +5,7 @@ import { Server } from "socket.io";
 import cors from "cors";
 import meta from "./meta.js";
 import routes from "./routes.js";
+import tsRoutes from "./ts-routes.js";
 import images from "./images.js";
 import discordAuth from "./discord/auth.js";
 import "./discord/discord-data.js";
@@ -109,6 +110,7 @@ async function handleThingsRequest(ids, req, res) {
 }
 
 routes({ app, cors, Cache, io });
+tsRoutes({ app });
 
 discordAuth({ app, router: express.Router(), cors, Cache, io });
 

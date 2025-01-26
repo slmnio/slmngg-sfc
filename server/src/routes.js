@@ -83,24 +83,6 @@ export default ({ app, Cache, io }) => {
         return { "error": false, data: live_match};
     }
 
-    app.get("/casters", async (req, res) => {
-        try {
-            if (!req.query.stream) return res.send("The 'stream' query is required.");
-
-            let live_match = await getLiveMatch(req.query.stream);
-            if (live_match.error) return res.send(live_match.message);
-            live_match = live_match.data;
-
-            if (!live_match.casters || live_match.casters.length === 0) return res.send("No casters are linked to this match.");
-            let casters = (await Promise.all(live_match.casters.map(id => Cache.get(cleanID(id))))).map(caster => caster.name + (caster.twitter_link?.length ? ": " + caster.twitter_link[0].replace("https://", "").toLowerCase() + " ": ""));
-            return res.send(`Your casters for this match are ${niceJoin(casters)}`);
-
-        } catch (e) {
-            console.error(e);
-            return res.send("An error occurred loading data");
-        }
-    });
-
     app.get("/production", async (req, res) => {
         try {
             if (!req.query.stream) return res.send("The 'stream' query is required.");

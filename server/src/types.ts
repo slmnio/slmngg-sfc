@@ -56,6 +56,7 @@ IDType extends GameMapResolvableID ? GameMap :
 IDType extends SignupDataResolvableID ? SignupData :
 IDType extends EventSeriesResolvableID ? EventSeries :
 IDType extends InterviewResolvableID ? Interview :
+IDType extends BroadcastResolvableID ? Broadcast :
 any;
 
 export type LimitedPlayer = string;
@@ -256,7 +257,56 @@ export interface Hero extends Base {
     pick_audio?: CacheAttachment[];
     ban_audio?: CacheAttachment[];
 }
-interface Social extends Base {
+
+
+interface BaseSocial extends Base {
+    id: SocialResolvableID;
+    __tableName: "Socials";
+}
+
+interface GenericSocial {
+    type?: "Liquipedia" | "Discord" | "Merch";
+    name?: string;
+    url?: string;
+}
+
+interface TwitterSocial<Handle extends string> {
+    type: "Twitter";
+    name?: `@${Handle}`;
+    url?: `https://twitter.com/${Handle}`;
+}
+interface BlueskySocial<Handle extends string> {
+    type: "Bluesky";
+    name?: `@${Handle}`;
+    url?: `https://bsky.app/profile/${Handle}`;
+}
+interface TwitchSocial<Handle extends string> {
+    type: "Twitch";
+    name?: `/${Handle}`;
+    url?: `https://twitch.tv/${Handle}`;
+}
+interface YouTubeSocial {
+    type: "YouTube";
+    name?: string;
+    url?: `https://youtube.com/${string}`;
+}
+
+export type Social = BaseSocial & (
+    TwitterSocial<string> |
+    BlueskySocial<string> |
+    TwitchSocial<string> |
+    YouTubeSocial |
+    GenericSocial)
+
+
+interface Broadcast extends Base {
+    id: BroadcastResolvableID;
+    __tableName: "Broadcasts";
+
+    active?: boolean;
+    live_match?: MatchResolvableID[];
+
+    stream_link?: string;
 
 }
 interface News extends Base {

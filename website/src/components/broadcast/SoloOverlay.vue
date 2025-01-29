@@ -224,7 +224,6 @@
                 <IngameTeam
                     v-for="(team, i) in teams"
                     :key="`${team.id}-${i}`"
-                    :data-key="`${team.id}-${i}`"
                     class="team-stacked"
                     :color-logo-holder="colorLogoHolder"
                     :team="team"
@@ -683,8 +682,16 @@ export default {
 
     .ingame-team-holder.team-stacked {
         right: auto;
-        position: relative;
+        /*position: relative;*/
         /*margin-top: .33em;*/
+        top: 122px;
+    }
+    .ingame-team-holder.team-stacked:last-child {
+        right: auto;
+        /*position: relative;*/
+        /*margin-top: .33em;*/
+        /*top: calc(122px + var(--team-height));*/
+        top: calc(122px + 48px);
     }
     .ingame-team-holder.team-stacked:deep(.ingame-team) {
         width: 400px !important;

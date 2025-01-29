@@ -1,7 +1,10 @@
 <template>
     <div class="solo-overlay flex-center" :class="{'show-guides': showGuides}">
         <div class="solo-part solo--ingame">
-            <div class="solo-pixel-info">200px</div>
+            <div class="solo-pixel-info">
+                <div class="pixel-size">Module: ingame (200px)</div>
+                <div v-if="cropGuides['ingame']" class="pixel-crop"><pre><div class="mb-2">OBS cropping</div>Top:    {{ cropGuides['ingame']?.top }}px<br>Bottom: {{ cropGuides['ingame']?.bottom }}px</pre></div>
+            </div>
             <transition-group name="fade" mode="out-in">
                 <IngameTeam
                     v-for="(team, i) in teams"
@@ -27,7 +30,10 @@
 
 
         <div class="solo-part solo--controls">
-            <div class="solo-pixel-info">200px / {{ controlMode }}</div>
+            <div class="solo-pixel-info">
+                <div class="pixel-size">Module: controls (200px) / Page: {{ controlMode }}</div>
+                <div v-if="cropGuides['controls']" class="pixel-crop"><pre><div class="mb-2">OBS cropping</div>Top:    {{ cropGuides['controls']?.top }}px<br>Bottom: {{ cropGuides['controls']?.bottom }}px</pre></div>
+            </div>
             <!--            <div class="solo-pixel-info d-flex">{{ controlMode }}</div>-->
             <div v-if="controlMode === 'default'" class="control-group">
                 <SoloControlButton noclick left rotate>SLMN.GG</SoloControlButton>
@@ -208,26 +214,63 @@
             </div>
         </div>
 
+        <div v-if="showModule('stacked')" class="solo-part solo--ingame-stacked">
+            <div class="solo-pixel-info">
+                <div class="pixel-size">Module: ingame-stacked (230px)</div>
+                <div v-if="cropGuides['ingame-stacked']" class="pixel-crop"><pre><div class="mb-2">OBS cropping</div>Top:    {{ cropGuides['ingame-stacked']?.top }}px<br>Bottom: {{ cropGuides['ingame-stacked']?.bottom }}px</pre></div>
+            </div>
+            <div class="event-logo bg-center" :style="resizedImage(event?.theme, ['default_logo', 'small_logo'], 'w-200')"></div>
+            <transition-group name="fade" mode="out-in">
+                <IngameTeam
+                    v-for="(team, i) in teams"
+                    :key="`${team.name}-${i}`"
+                    class="team-stacked"
+                    :color-logo-holder="colorLogoHolder"
+                    :team="team"
+                    :score="scores[i]"
+                    :active="true" />
+            </transition-group>
+
+
+            <transition name="fade" mode="out-in">
+                <Middle
+                    v-if="autoMiddle && showModule('middle-stacked')"
+                    class="middle-stacked"
+                    :text="autoMiddle"
+                    :active="true"
+                    :tiny="true" />
+            </transition>
+        </div>
 
         <div v-if="showModule('desk')" class="solo-part solo--desk flex-center">
+            <div class="solo-pixel-info">
+                <div class="pixel-size">Module: desk (200px)</div>
+                <div v-if="cropGuides['desk']" class="pixel-crop"><pre><div class="mb-2">OBS cropping</div>Top:    {{ cropGuides['desk']?.top }}px<br>Bottom: {{ cropGuides['desk']?.bottom }}px</pre></div>
+            </div>
             <div class="solo-pixel-info">200px</div>
             <DeskMatch class="w-100" :_match="virtualMatch" />
         </div>
 
         <div v-if="showModule('rosters')" class="solo-part solo--rosters">
-            <div class="solo-pixel-info">1080px</div>
+            <div class="solo-pixel-info">
+                <div class="pixel-size">Module: rosters (1080px)</div>
+                <div v-if="cropGuides['rosters']" class="pixel-crop"><pre><div class="mb-2">OBS cropping</div>Top:    {{ cropGuides['rosters']?.top }}px<br>Bottom: {{ cropGuides['rosters']?.bottom }}px</pre></div>
+            </div>
             <RosterOverlay
                 :virtual-match="virtualMatch"
                 :broadcast="broadcast"
                 :client="client"
                 :title="title"
                 :animation-active="true"
-                :show-roles="rosterOptions.includes('roles')"
-                :sort="rosterOptions.includes('sort')"
-                :show-badges="rosterOptions.includes('badges')" />
+                :show-roles="(rosterOptions || []).includes('roles')"
+                :sort="(rosterOptions || []).includes('sort')"
+                :show-badges="(rosterOptions || []).includes('badges')" />
         </div>
         <div v-if="showModule('break')" class="solo-part solo--break">
-            <div class="solo-pixel-info">1080px</div>
+            <div class="solo-pixel-info">
+                <div class="pixel-size">Module: break (1080px)</div>
+                <div v-if="cropGuides['break']" class="pixel-crop"><pre><div class="mb-2">OBS cropping</div>Top:    {{ cropGuides['break']?.top }}px<br>Bottom: {{ cropGuides['break']?.bottom }}px</pre></div>
+            </div>
             <BreakOverlay
                 :virtual-match="virtualMatch"
                 :broadcast="broadcast"
@@ -237,7 +280,10 @@
                 :custom-break-automation="breakAutomation" />
         </div>
         <div v-if="showModule('overview')" class="solo-part solo--overview">
-            <div class="solo-pixel-info">1080px</div>
+            <div class="solo-pixel-info">
+                <div class="pixel-size">Module: overview (1080px)</div>
+                <div v-if="cropGuides['overview']" class="pixel-crop"><pre><div class="mb-2">OBS cropping</div>Top:    {{ cropGuides['overview']?.top }}px<br>Bottom: {{ cropGuides['overview']?.bottom }}px</pre></div>
+            </div>
             <OverviewOverlay :broadcast="broadcast" :virtual-match="virtualMatch" :no-map-videos="!showMapVideos" />
         </div>
         <div class="solo-loader d-none">
@@ -258,6 +304,7 @@ import BreakOverlay from "@/components/broadcast/break/BreakOverlay";
 import OverviewOverlay from "@/components/broadcast/roots/OverviewOverlay";
 import SoloMapButton from "@/components/broadcast/SoloMapButton";
 import SoloMapToggleButton from "@/components/broadcast/SoloMapToggleButton.vue";
+import { resizedImage } from "@/utils/images.js";
 
 export default {
     name: "SoloOverlay",
@@ -292,7 +339,8 @@ export default {
         showGuides: false,
         firstTo: 3,
 
-        noStinger: true
+        noStinger: true,
+        cropGuides: {}
     }),
     computed: {
         autoMiddle() {
@@ -414,6 +462,7 @@ export default {
             // defaults
             height += 200; // control panel
             height += 200; // ingame
+            if (this.showModule("stacked")) height += 230;
             if (this.showModule("desk")) height += 200; // full
             if (this.showModule("rosters")) height += 1080; // full
             if (this.showModule("break")) height += 1080; // full
@@ -443,6 +492,7 @@ export default {
         }
     },
     methods: {
+        resizedImage,
         flipTeams() {
             this.teams = this.teams.reverse();
             this.scores = this.scores.reverse();
@@ -529,6 +579,23 @@ export default {
     watch: {
         controlMode(newMode) {
             this.controlPage = 0;
+        },
+        showGuides: {
+            immediate: true,
+            handler(check) {
+                if (!check) return;
+
+                const els = [...document.querySelectorAll(".solo-part")];
+                els.forEach(el => {
+                    const key = el.className.replace("solo-part solo--", "");
+                    const bounds = el.getBoundingClientRect();
+
+                    this.cropGuides[key] = {
+                        top: bounds.top, bottom: (window.innerHeight - bounds.bottom)
+                    };
+                });
+
+            }
         }
     }
 };
@@ -611,5 +678,53 @@ export default {
         height: 150px;
         width: 100%;
         text-transform: uppercase;
+    }
+
+    .ingame-team-holder.team-stacked {
+        right: auto;
+        position: relative;
+        /*margin-top: .33em;*/
+    }
+    .ingame-team-holder.team-stacked:deep(.ingame-team) {
+        width: 400px !important;
+    }
+    .event-logo {
+        width: 200px;
+        background-position: left center;
+        height: 100px;
+        margin-top: 10px;
+        margin-left: 20px;
+    }
+    .solo-part.solo--ingame-stacked {
+        height: 230px;
+    }
+
+    .team-stacked:deep(.team-logo-holder) {
+        margin: 0 7px 0 0 !important;
+    }
+
+    .team-stacked:deep(.team-score) {
+        font-size: 38px !important;
+    }
+
+    .team-stacked:deep(.team-name) {
+        margin: 0 8px 0 18px !important;
+        font-size: 30px !important;
+    }
+
+    .middle-stacked.centerer {
+        width: 400px;
+        justify-content: flex-end;
+        top: 90px !important;
+        opacity: 0.9 !important;
+    }
+
+    .pixel-crop pre {
+        overflow: hidden;
+        margin-top: 0.2em;
+        margin-bottom: 0.2em;
+        background-color: black;
+        color: white;
+        padding: 0.5em;
     }
 </style>

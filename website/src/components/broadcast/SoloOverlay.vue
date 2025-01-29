@@ -223,7 +223,8 @@
             <transition-group name="fade" mode="out-in">
                 <IngameTeam
                     v-for="(team, i) in teams"
-                    :key="`${team.name}-${i}`"
+                    :key="`${team.id}-${i}`"
+                    :data-key="`${team.id}-${i}`"
                     class="team-stacked"
                     :color-logo-holder="colorLogoHolder"
                     :team="team"

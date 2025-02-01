@@ -193,6 +193,7 @@ export default [
         })
     },
     { path: "podcast", component: () => import("@/components/broadcast/roots/PodcastOverlay.vue"), props: route => ({ rows: route.query.rows }) },
+    { path: "podcast-sides", component: () => import("@/components/broadcast/roots/PodcastSidesOverlay.vue") },
     { path: "custom", component: () => import("@/components/broadcast/roots/CustomOverlay.vue") },
     { path: "info", component: () => import("@/components/broadcast/roots/InfoOverlay.vue") },
     {

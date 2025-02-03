@@ -198,6 +198,11 @@ export default {
                         }
                     }
 
+                    // custom override for single selects
+                    if (["Main Role"].includes(airtableKey)) {
+                        if (data === "") data = null;
+                    }
+
                     airtableSignupData[airtableKey] = data;
                 });
                 console.log(player?.name, airtableSignupData);

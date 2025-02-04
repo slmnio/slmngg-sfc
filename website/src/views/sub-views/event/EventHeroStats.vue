@@ -156,8 +156,12 @@ export default {
                         return x.stats[this.activeSortBy] || 0;
                     }
                 });
-                console.log({ by: this.activeSortBy, aStat, bStat });
-                return (aStat - bStat) * (this.sort.asc ? 1 : -1);
+
+                let diff = (aStat - bStat);
+                if (this.activeSortBy?.includes("pct") && diff === 0) {
+                    diff = a.stats[this.activeSortBy?.replace("_pct", "")] - b.stats[this.activeSortBy?.replace("_pct", "")];
+                }
+                return diff * (this.sort.asc ? 1 : -1);
             });
         },
         stats() {

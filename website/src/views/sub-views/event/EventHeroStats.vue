@@ -100,7 +100,7 @@ export default {
         activeSortBy() {
             if (!this.sort.by) return null;
 
-            if (this.sortWinrate) {
+            if (!this.sortWinrate) {
                 return this.sort.by.replace("_pct", "");
             }
             return this.sort.by;

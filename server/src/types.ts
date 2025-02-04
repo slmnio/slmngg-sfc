@@ -437,6 +437,7 @@ export interface Team extends Base {
     matches?: MatchResolvableID[];
     minor_team?: boolean;
     name?: string;
+    safe_twitch_name?: string;
     news_items?: NewsResolvableID[];
     owners?: PlayerResolvableID[];
     player_relationships?: PlayerRelationshipResolvableID[];

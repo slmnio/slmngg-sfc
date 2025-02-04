@@ -30,9 +30,9 @@ export default {
             "event_short": event.short,
 
             "team_1_code": team1.code,
-            "team_1_name": team1.name,
+            "team_1_name": team1.safe_twitch_name || team1.name,
             "team_2_code": team2.code,
-            "team_2_name": team2.name,
+            "team_2_name": team2.safe_twitch_name || team2.name,
 
             "match_custom_name": match.custom_name,
             "match_sub_event": match.sub_event,

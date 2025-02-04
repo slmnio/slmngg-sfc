@@ -13,7 +13,7 @@
                     <th colspan="100">
                         <div class="top-bar">
                             <div>{{ filteredMatches?.length }} matches, {{ this.stats?.totalMaps }} maps</div>
-                            <div>
+                            <div class="d-flex gap-3 mr-1">
                                 <b-form-checkbox v-model="doColouring" switch>Show colours</b-form-checkbox>
                             </div>
                         </div>
@@ -25,7 +25,12 @@
                         {{ stats?.usesPriority ? 'Full draft' : 'Stats' }}
                     </th>
                     <th v-if="stats?.usesPriority" class="text-center" :colspan="(((stats?.hasPicks && stats?.hasBans)) + stats?.hasPicks + stats?.hasBans) * 2">First round</th>
-                    <th class="text-center" :colspan="(stats?.hasPicks + stats?.hasBans) * 2">Winrate</th>
+                    <th :colspan="(stats?.hasPicks + stats?.hasBans) * 2">
+                        <div class="d-flex flex-center mx-1">
+                            <div class="flex-grow-1 text-center">Winrate</div>
+                            <b-form-checkbox v-model="sortWinrate" right switch>Sort by %</b-form-checkbox>
+                        </div>
+                    </th>
                 </tr>
                 <tr>
                     <th @click="setSort(null)">Hero</th>
@@ -34,10 +39,10 @@
                         :key="col.key"
                         colspan="2"
                         class="sort-col"
-                        :class="{'bg-primary': sort.by === col.key }"
-                        @click="setSort(col.key)">
-                        <i v-if="sort.by === col.key && sort.asc" class="mr-1 fas fa-sort-amount-up fa-fw"></i>
-                        <i v-if="sort.by === col.key && !sort.asc" class="mr-1 fas fa-sort-amount-down fa-fw"></i>
+                        :class="{'bg-primary': sort.by === (col.sortKey || col.key) }"
+                        @click="setSort(col.sortKey || col.key)">
+                        <i v-if="sort.by === (col.sortKey || col.key) && sort.asc" class="mr-1 fas fa-sort-amount-up fa-fw"></i>
+                        <i v-if="sort.by === (col.sortKey || col.key) && !sort.asc" class="mr-1 fas fa-sort-amount-down fa-fw"></i>
                         {{ col.text }}
                     </th>
                 </tr>
@@ -75,7 +80,8 @@ export default {
             by: null,
             asc: true
         },
-        doColouring: true
+        doColouring: true,
+        sortWinrate: true,
     }),
     computed: {
         matches() {
@@ -90,6 +96,14 @@ export default {
                 })
             });
             return matches?.filter(m => !m?.special_event);
+        },
+        activeSortBy() {
+            if (!this.sort.by) return null;
+
+            if (this.sortWinrate) {
+                return this.sort.by.replace("_pct", "");
+            }
+            return this.sort.by;
         },
         filterTypes() {
             return [
@@ -134,9 +148,16 @@ export default {
                 ...hero,
                 stats: this.generateStats(this.stats?.[hero.id] || {})
             })).sort((a,b) => {
-                console.log(this.sort, a.stats, b.stats);
-                if (!this.sort.by) return sortAlpha(a,b, "name");
-                return ((a.stats[this.sort.by] || 0) - (b.stats[this.sort.by] || 0)) * (this.sort.asc ? 1 : -1);
+                if (!this.activeSortBy) return sortAlpha(a,b, "name");
+                const [aStat, bStat] = [a,b].map(x => {
+                    if (this.activeSortBy?.includes("pct")) {
+                        return parseFloat((x.stats[this.activeSortBy] || "0").replace("%", ""));
+                    } else {
+                        return x.stats[this.activeSortBy] || 0;
+                    }
+                });
+                console.log({ by: this.activeSortBy, aStat, bStat });
+                return (aStat - bStat) * (this.sort.asc ? 1 : -1);
             });
         },
         stats() {
@@ -162,8 +183,8 @@ export default {
                 ...(this.stats?.usesPriority && this.stats?.hasPicks && this.stats?.hasBans) ? [{ key: "prio_pickban", text: "Pick/ban"}] : [],
                 ...(this.stats?.usesPriority && this.stats?.hasPicks) ? [{ key: "prio_picks", text: "Picks"}] : [],
                 ...(this.stats?.usesPriority && this.stats?.hasBans) ? [{ key: "prio_bans", text: "Bans"}] : [],
-                ...this.stats?.hasPicks ? [{ key: "pick_wins", text: "Pick wins"}] : [],
-                ...this.stats?.hasBans ?  [{ key: "ban_wins", text: "Ban wins"}] : [],
+                ...this.stats?.hasPicks ? [{ key: "pick_wins", text: "Pick wins", sortKey: "pick_wins_pct"}] : [],
+                ...this.stats?.hasBans ?  [{ key: "ban_wins", text: "Ban wins", sortKey: "ban_wins_pct"}] : [],
             ];
         }
     },

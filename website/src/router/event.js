@@ -18,6 +18,7 @@ export default (isSubdomain) => [
     { path: "standings", component: () => import("@/views/sub-views/event/EventStandings.vue") },
     { path: "theme", component: () => import("@/views/sub-views/ThingTheme.vue") },
     { path: "brands", component: () => import("@/views/sub-views/event/EventBrands.vue") },
+    { path: "stats", component: () => import("@/views/sub-views/event/EventHeroStats.vue") },
     {
         path: "auction",
         component: () => import("@/views/sub-views/event/EventAuction.vue"),

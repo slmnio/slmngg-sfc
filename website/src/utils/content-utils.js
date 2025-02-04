@@ -1018,3 +1018,177 @@ export function processPickBanOrder(order, flip) {
 export function getPickBanItem(order, type, team, index) {
     return order.find(o => o.team === team && o.type === type && o.countOfTeamType === (index + 1));
 }
+
+
+export function countStats(matches) {
+    console.log(matches);
+    const stats = {
+        totalMaps: 0,
+        hasPicks: false,
+        hasBans: false,
+        hasPriority: false,
+        usesPriority: false,
+        teamMaps: {}
+    };
+
+    matches.forEach(match => {
+
+        let prioritySlots = {
+            team_1: {
+                picks: 1,
+                bans: 1,
+            },
+            team_2: {
+                picks: 1,
+                bans: 1,
+            }
+        };
+
+        if (match.pick_ban_order) {
+            prioritySlots = {
+                team_1: {
+                    picks: 0,
+                    bans: 0,
+                },
+                team_2: {
+                    picks: 0,
+                    bans: 0,
+                }
+            };
+
+            let completeTokens = [];
+            // check if is priority (first picks/bans for each side)
+            const order = match.pick_ban_order.split(",");
+            for (let i = 0; i < order.length; i++) {
+                const action = order[i];
+                if (completeTokens.includes(action)) continue;
+
+                const nextAction = order[i+1];
+
+                if (nextAction && nextAction !== action) {
+                    completeTokens.push(action);
+                }
+
+                if (action.startsWith("ban")) {
+                    if (action.endsWith("1")) {
+                        prioritySlots.team_1.bans++;
+                    } else if (action.endsWith("2")) {
+                        prioritySlots.team_2.bans++;
+                    }
+                } else if (action.startsWith("pick")) {
+                    if (action.endsWith("1")) {
+                        prioritySlots.team_1.picks++;
+                    } else if (action.endsWith("2")) {
+                        prioritySlots.team_2.picks++;
+                    }
+                }
+            }
+        }
+        console.log("prioritySlots", prioritySlots);
+
+        (match.maps || []).forEach(map => {
+            if (!map.winner) return; // only completed
+            const team1Won = map?.winner?.[0] === match?.teams?.[0];
+            console.log(map, map?.winner?.[0], match?.teams?.[0]);
+
+            stats.totalMaps++;
+            (match?.teams || []).forEach(teamID => {
+                const id = cleanID(teamID);
+                if (!stats.teamMaps[id]) stats.teamMaps[id] = 0;
+                stats.teamMaps[id]++;
+            });
+
+            const baseStats = {
+                picks: {
+                    total: 0,
+                    wins: 0,
+                    losses: 0,
+                    priority: 0,
+                    byTeam: {}
+                },
+                bans: {
+                    total: 0,
+                    wins: 0,
+                    losses: 0,
+                    priority: 0,
+                    byTeam: {}
+                }
+            };
+
+            console.log(map);
+
+            ["team_1", "team_2"].forEach((k, i) => {
+                const team = cleanID(match?.teams?.[i]);
+
+                (map[`${k}_picks`] || []).forEach((hero, pickI) => {
+                    if (!stats.hasPicks) stats.hasPicks = true;
+                    if (!stats[hero.id]) stats[hero.id] = structuredClone(baseStats);
+
+                    if (!stats[hero.id].picks.byTeam[team]) {
+                        stats[hero.id].picks.byTeam[team] = {
+                            total: 0,
+                            wins: 0,
+                            losses: 0,
+                            priority: 0
+                        };
+                    }
+                    stats[hero.id].picks.total++;
+                    stats[hero.id].picks.byTeam[team].total++;
+
+                    // check priority
+
+                    const prioPicks = prioritySlots[map.flip_pick_ban_order ? (k === "team_1" ? "team_2" : "team_1") : k].picks;
+                    if ((pickI + 1) <= prioPicks) {
+                        if (!stats.hasPriority) stats.hasPriority = true;
+                        stats[hero.id].picks.priority++;
+                        stats[hero.id].picks.byTeam[team].priority++;
+                    } else {
+                        if (stats.hasPriority && !stats.usesPriority) stats.usesPriority = true;
+                    }
+
+                    if (i !== +team1Won) {
+                        stats[hero.id].picks.wins++;
+                        stats[hero.id].picks.byTeam[team].wins++;
+                    } else {
+                        stats[hero.id].picks.losses++;
+                        stats[hero.id].picks.byTeam[team].losses++;
+                    }
+                });
+                (map[`${k}_bans`] || []).forEach((hero, banI) => {
+                    if (!stats.hasBans) stats.hasBans = true;
+                    if (!stats[hero.id]) stats[hero.id] = structuredClone(baseStats);
+
+                    if (!stats[hero.id].bans.byTeam[team]) {
+                        stats[hero.id].bans.byTeam[team] = {
+                            total: 0,
+                            wins: 0,
+                            losses: 0
+                        };
+                    }
+                    stats[hero.id].bans.total++;
+                    stats[hero.id].bans.byTeam[team].total++;
+
+                    // check priority
+                    const prioBans = prioritySlots[map.flip_pick_ban_order ? (k === "team_1" ? "team_2" : "team_1") : k].bans;
+                    if ((banI + 1) <= prioBans) {
+                        if (!stats.hasPriority) stats.hasPriority = true;
+                        stats[hero.id].bans.priority++;
+                        stats[hero.id].bans.byTeam[team].priority++;
+                    } else {
+                        if (stats.hasPriority && !stats.usesPriority) stats.usesPriority = true;
+                    }
+
+                    if (i !== +team1Won) {
+                        stats[hero.id].bans.wins++;
+                        stats[hero.id].bans.byTeam[team].wins++;
+                    } else {
+                        stats[hero.id].bans.losses++;
+                        stats[hero.id].bans.byTeam[team].losses++;
+                    }
+                });
+            });
+        });
+    });
+
+    return stats;
+}

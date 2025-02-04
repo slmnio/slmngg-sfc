@@ -151,7 +151,7 @@ export default {
             immediate: true,
             deep: true,
             handler(selections) {
-                console.log(selections);
+                // console.log(selections);
                 Object.entries(selections).forEach(([filterKey, values]) => {
                     if (!filterKey) return;
                     const filter = this.filterGroups.find(f => f.key === filterKey);
@@ -167,8 +167,8 @@ export default {
             immediate: true,
             handler(matches, oldMatches) {
                 if (JSON.stringify(matches) === JSON.stringify(oldMatches)) return;
-                console.log(matches, oldMatches);
-                console.log("update:filteredMatches", matches);
+                // console.log(matches, oldMatches);
+                // console.log("update:filteredMatches", matches);
                 this.$emit("update:filteredMatches", matches);
             }
         }

@@ -1084,12 +1084,12 @@ export function countStats(matches) {
                 }
             }
         }
-        console.log("prioritySlots", prioritySlots);
+        // console.log("prioritySlots", prioritySlots);
 
         (match.maps || []).forEach(map => {
             if (!map.winner) return; // only completed
             const team1Won = map?.winner?.[0] === match?.teams?.[0];
-            console.log(map, map?.winner?.[0], match?.teams?.[0]);
+            // console.log(map, map?.winner?.[0], match?.teams?.[0]);
 
             stats.totalMaps++;
             (match?.teams || []).forEach(teamID => {
@@ -1115,7 +1115,7 @@ export function countStats(matches) {
                 }
             };
 
-            console.log(map);
+            // console.log(map);
 
             ["team_1", "team_2"].forEach((k, i) => {
                 const team = cleanID(match?.teams?.[i]);

@@ -186,12 +186,15 @@ export default {
                 ...(this.stats?.usesPriority && this.stats?.hasPicks) ? { "prio_picks": (stats?.picks?.priority || 0) }:  {},
                 ...(this.stats?.usesPriority && this.stats?.hasBans) ? { "prio_bans": (stats?.bans?.priority || 0) }:  {},
                 ...this.stats?.hasPicks ? { "pick_wins": (stats?.picks?.wins || 0) }:  {},
-                ...this.stats?.hasBans ? { "ban_wins": (stats?.bans?.wins || 0) }:  {}
+                ...this.stats?.hasPicks ? { "pick_wins_pct": `${!stats?.picks?.total ? "0" : (((stats?.picks?.wins || 0) / stats?.picks?.total) * 100).toFixed(0)}%` }:  {},
+                ...this.stats?.hasBans ? { "ban_wins": (stats?.bans?.wins || 0) }:  {},
+                ...this.stats?.hasBans ? { "ban_wins_pct": `${!stats?.bans?.total ? "0" :(((stats?.bans?.wins || 0) / stats?.bans?.total) * 100).toFixed(0)}%` }:  {},
             };
 
             const out = {};
             for (const [key, val] of Object.entries(cols)) {
                 out[key] = val;
+                if (key.endsWith("pct")) continue;
                 if (!cols[`${key}_pct`]) {
                     out[`${key}_pct`] = this.stats?.totalMaps ? `${((val / this.stats?.totalMaps) * 100).toFixed(0)}%` : "-";
                 }

@@ -54,7 +54,15 @@
                 <div class="players">
                     <div v-for="num of maxPlayers" :key="num" class="player">
                         <transition name="fade" mode="out-in" :duration="250">
-                            <div v-if="picks[ti]?.[num-1]?.name" :key="picks[ti]?.[num-1]?.id" class="pick flex-center" :class="{'audio-playing': audioPlaying[`pick/${ti+1}/${num}`]}">
+                            <div
+                                v-if="picks[ti]?.[num-1]?.name"
+                                :key="picks[ti]?.[num-1]?.id"
+                                class="pick flex-center"
+                                :class="{
+                                    'audio-playing': audioPlaying[`pick/${ti+1}/${num}`],
+                                    'show-stats': showStats[`pick/${ti+1}/${num}`],
+                                    'show-stats-2': showStats[`pick/${ti+1}/${num}`] === 2
+                                }">
                                 <div class="pick-number">
                                     {{ getPickBanItem(pickBanOrder, "pick", ti + 1, num - 1)?.countOfTeamType }}
                                 </div>
@@ -66,6 +74,56 @@
                                 </div>
                                 <div v-show="loaded[picks[ti][num-1]?.id]" class="pick-text" :style="themeBackground1(broadcast?.event)">
                                     {{ picks[ti]?.[num - 1]?.name }}
+                                </div>
+                                <div class="pick-stats flex-center w-100 text-white flex-column stats-page-1" :style="themeBackground1(broadcast?.event)">
+                                    <div class="main-stats-row w-100 stats-page">
+                                        <div class="stat-row stat--pickban">
+                                            <div class="stat-text">PICK/BAN %</div>
+                                            <div class="stat-stat">{{ ((((stats?.[picks[ti]?.[num - 1]?.id]?.picks?.total || 0) + (stats?.[picks[ti]?.[num - 1]?.id]?.bans?.total || 0)) / stats?.totalMaps) * 100).toFixed(0) }}%</div>
+                                        </div>
+                                        <div class="stat-row stat--prio-pickban">
+                                            <div class="stat-text">FIRST ROUND</div>
+                                            <div class="stat-stat">{{ ((((stats?.[picks[ti]?.[num - 1]?.id]?.picks?.priority || 0) + (stats?.[picks[ti]?.[num - 1]?.id]?.bans?.priority || 0)) / stats?.totalMaps) * 100).toFixed(0) }}%</div>
+                                        </div>
+                                        <div class="stat-row all-center stat--winrate">
+                                            <Squeezable align="left">
+                                                <div class="stat-stat w-full text-center">
+                                                    {{ stats?.[picks[ti]?.[num - 1]?.id]?.picks?.wins || '0' }}W&nbsp;&nbsp;{{ stats?.[picks[ti]?.[num - 1]?.id]?.picks?.losses || '0' }}L
+                                                </div>
+                                            </Squeezable>
+                                        </div>
+                                        <!--                                        <div class="spacer"></div>-->
+                                        <div class="stats-title division-stats-title">
+                                            {{ match?.division }} Stats
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pick-stats flex-center w-100 text-white flex-column stats-page-2" :style="themeBackground1(broadcast?.event)">
+                                    <div class="team-stats-row w-100 stats-page">
+                                        <ThemeLogo
+                                            class="stats-team-icon"
+                                            :theme="team?.theme"
+                                            logo-size="w-200"
+                                            border-width="4px"
+                                            icon-padding="6px" />
+
+                                        <div class="stats-title team-stats-title">
+                                            TEAM STATS
+                                        </div>
+                                        <div class="team-stats-stat w-100">
+                                            <div class="stat-row">
+                                                <div class="stat-text">PICK</div>
+                                                <div class="stat-stat">{{ (((stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.total || 0) / stats?.teamMaps?.[team?.id]) * 100).toFixed(0) }}%</div>
+                                            </div>
+                                            <div class="stat-row">
+                                                <div class="stat-text">BAN</div>
+                                                <div class="stat-stat">{{ (((stats?.[picks[ti]?.[num - 1]?.id]?.bans?.byTeam?.[team?.id]?.total || 0) / stats?.teamMaps?.[team?.id]) * 100).toFixed(0) }}%</div>
+                                            </div>
+                                            <div class="stat-row stat--team-winloss">
+                                                <div class="stat-stat">{{ stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.wins || '0' }}W&nbsp;&nbsp;{{ stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.losses || '0' }}L</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div
@@ -100,12 +158,14 @@
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles.js";
 import { getNewURL, resizedImage, resizedImageNoWrap } from "@/utils/images.js";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
-import { getPickBanItem, processPickBanOrder } from "@/utils/content-utils.js";
+import { countStats, getPickBanItem, processPickBanOrder } from "@/utils/content-utils.js";
 import { GameOverrides } from "@/utils/games.ts";
 import { Howl } from "howler";
+import Squeezable from "@/components/broadcast/Squeezable.vue";
 
 export default {
     name: "HeroDraft",
+    components: { Squeezable },
     props: ["broadcast", "match", "showAll"],
     data: () => ({
         manualDraftAdvancing: true,
@@ -123,7 +183,8 @@ export default {
         pickBanTimeout: false,
 
         loaded: {},
-        audioPlaying: {}
+        audioPlaying: {},
+        showStats: {}
     }),
     computed: {
         middle() {
@@ -215,6 +276,25 @@ export default {
                     (this.currentMap?.team_2_bans || []),
                 ];
             }
+        },
+        stats() {
+            const { matches } = ReactiveRoot(this.broadcast?.event?.id, {
+                "matches": ReactiveArray("matches", {
+                    "maps": ReactiveArray("maps", {
+                        "team_1_picks": ReactiveArray("team_1_picks"),
+                        "team_2_picks": ReactiveArray("team_2_picks"),
+                        "team_1_bans": ReactiveArray("team_1_bans"),
+                        "team_2_bans": ReactiveArray("team_2_bans")
+                    })
+                })
+            });
+
+            const stageMatches = matches.filter(match => match?.division === this.match?.division);
+
+            const stats = countStats(stageMatches);
+            console.log("stats", stats);
+
+            return stats;
         },
         draftText() {
             const items = [];
@@ -316,7 +396,9 @@ export default {
                 }, 500);
             }, (this.autoDraftDuration + 1) * 1000);
         },
-        logoBackground1, resizedImage, themeBackground1
+        logoBackground1, resizedImage, themeBackground1,
+
+
     },
     watch: {
         "match.id": {
@@ -327,13 +409,33 @@ export default {
             }
         },
         currentPickBan(newNum, oldNum) {
+            const statsTiming = {
+                afterVoiceline: 1000,
+                afterManual: 3000,
+                page1: 10000,
+                page2: 10000,
+            };
+
+
             this.pickBanJustChanged = true;
             if (this.pickBanTimeout) clearTimeout(this.pickBanTimeout);
             this.pickBanTimeout = setTimeout(() => {
                 this.pickBanJustChanged = false;
             }, 1000);
 
-            if (!this.usePickBanAudio || !this.pickBanOrder?.length) return;
+            if (!this.usePickBanAudio || !this.pickBanOrder?.length) {
+                // send stats straight away
+                setTimeout(() => {
+                    this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 1;
+                    setTimeout(() => {
+                        this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 2;
+                        setTimeout(() => {
+                            this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 0;
+                        }, statsTiming.page2);
+                    }, statsTiming.page1);
+                }, statsTiming.afterManual);
+                return;
+            }
             console.log("~~ PICK BAN", oldNum, this.pickBanOrder?.length, this.pickBanOrder[oldNum]?.type);
 
             const pickBan = this.pickBanOrder[oldNum];
@@ -354,6 +456,17 @@ export default {
                 onend: () => {
                     console.log("ending", pickBan);
                     this.audioPlaying[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = false;
+
+
+                    setTimeout(() => {
+                        this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 1;
+                        setTimeout(() => {
+                            this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 2;
+                            setTimeout(() => {
+                                this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 0;
+                            }, statsTiming.page2);
+                        }, statsTiming.page1);
+                    }, statsTiming.afterVoiceline);
                 }
             });
             setTimeout(() => {
@@ -506,6 +619,7 @@ class HeroAudioPlayer {
     text-align: center;
     font-weight: bold;
     font-size: 1.25em;
+    z-index: 2;
 }
 
 .right .team-top {
@@ -589,4 +703,127 @@ img.image-center {
 .pick-number {
     opacity: 0.2;
 }
+
+
+.pick-stats {
+    z-index: 1;
+    padding: 0.25em;
+    justify-content: space-evenly !important;
+}
+
+.stat-stat {
+    font-size: 1.5em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    line-height: 1;
+}
+
+.stat-text {
+    line-height: 1;
+    font-size: 1em;
+}
+
+.stat-row {
+    width: 100%;
+    line-height: 1;
+    padding: 0 0.5em;
+}
+
+.pick-number {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+}
+
+.team-stats-row .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.1em 0.2em;
+}
+
+.team-stats-row .stat-stat {
+    font-size: 1.5em;
+    text-align: right;
+    width: 100%;
+}
+.team-stats-row .stat-row:last-child .stat-stat {
+    text-align: center;
+}
+.stat--pickban .stat-stat {
+    font-size: 2.5em;
+}
+.stat--team-winloss {
+    font-size: 1.1em;
+}
+.stats-title {
+    text-align: center;
+    letter-spacing: 0.5px;
+    font-size: 1em;
+    text-transform: uppercase;
+}
+
+/*.team-stats-row {*/
+/*    background-color: #ffffff30 !important;*/
+/*    border-radius: .25em;*/
+/*    border: 1px solid #ffffff40;*/
+/*    margin-top: .25em;*/
+/*}*/
+
+.pick {
+    --pick-text-height: 30px;
+}
+
+.pick-text {
+    transition: bottom .25s ease;
+    bottom: 0;
+}
+.pick-stats {
+    transition: top .25s ease;
+    position: absolute;
+    top: 100%;
+    height: calc(100% - var(--pick-text-height))
+}
+
+
+.pick.show-stats .pick-text {
+    bottom: calc(100% - var(--pick-text-height)) !important;
+}
+.pick.show-stats .pick-stats.stats-page-1 {
+    top: var(--pick-text-height) !important;
+}
+.pick.show-stats-2 .pick-stats.stats-page-2 {
+    top: var(--pick-text-height) !important;
+}
+.spacer {
+    flex-grow: 1;
+}
+
+.stats-page {
+    height: 100%;
+    gap: .2em;
+    /*padding: 0.2em 0;*/
+    display: flex;
+    /*justify-content: flex-start;*/
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.stats-team-icon {
+    width: 55px;
+    height: 45px;
+}
+.stat--prio-pickban {
+    font-size: 1.25em;
+}
+.stat--prio-pickban .stat-text {
+    font-size: 11px;
+}
+.stat--winrate {
+    font-size: 1.25em;
+    text-align: center;
+    display: flex;
+}
+
 </style>

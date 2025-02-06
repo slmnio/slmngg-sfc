@@ -646,7 +646,7 @@ export default {
                                 embeds:  match.start ? [{
                                     title: `Reschedule request denied: ${allTeams.map(t => t.name || t.code).join(" vs ")}`,
                                     url: `${matchLink}/rescheduling`,
-                                    description: "${emoji.circle.danger_exclamation} Staff have denied a reschedule for the match.\nRescheduling for this match has been locked, contact staff for more information.",
+                                    description: `${emoji.circle.danger_exclamation} Staff have denied a reschedule for the match.\nRescheduling for this match has been locked, contact staff for more information.`,
                                     fields: [
                                         {
                                             name: "Match start time",
@@ -666,7 +666,7 @@ export default {
                                 }] : [{
                                     title: `Schedule request denied: ${allTeams.map(t => t.name || t.code).join(" vs ")}`,
                                     url: `${matchLink}/rescheduling`,
-                                    description: "${emoji.circle.danger_exclamation} Staff have denied the requested start time for the match.\nScheduling for this match has been locked, contact staff for more information.",
+                                    description: `${emoji.circle.danger_exclamation} Staff have denied the requested start time for the match.\nScheduling for this match has been locked, contact staff for more information.`,
                                     fields: [
                                         {
                                             name: "Match start time",

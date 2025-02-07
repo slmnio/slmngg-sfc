@@ -123,7 +123,8 @@ export default [
             showPronouns: !!route.query.pronouns,
             subtitle: route.query.subtitle,
             alternate: route.query.alternate ? parseInt(route.query.alternate) : null,
-            showStaff: !!route.query.staff
+            showStaff: !!route.query.staff,
+            fill: (route.query.fill || "").split(/[,/]/g)
         })
     },
     {

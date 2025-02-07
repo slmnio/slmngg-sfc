@@ -133,9 +133,9 @@ export default {
 <style scoped>
     .player:deep(.color-holder) {
         height: 100%;
-        --over: 350%;
-        width: calc(100% + var(--over));
-        margin-left: calc(-0.5 * var(--over));
+        --oversize-width: 350%;
+        width: calc(100% + var(--oversize-width));
+        margin-left: calc(-0.5 * var(--oversize-width));
     }
 
     .player {

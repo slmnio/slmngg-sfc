@@ -1,10 +1,8 @@
 <template>
     <div class="boxed-hero-roster-overlay">
-        <div class="contenders-team-header">
-            <div class="team-logo-holder flex-center" :style="logoBackground1(team)">
-                <div class="team-logo bg-center" :style="teamLogo"></div>
-            </div>
-            <div class="team-text">
+        <div class="team-header">
+            <theme-logo :theme="team?.theme" logo-size="w-200" border-width="8px" />
+            <div class="team-text overlay--text-on-bg">
                 <div class="team-name industry-align">{{ team?.name }}</div>
                 <div v-if="decoratedSubtitle" class="team-subtitle industry-align">{{ decoratedSubtitle }}</div>
             </div>
@@ -17,29 +15,43 @@
         <div class="player-wrapper">
             <div class="players h-100 d-flex flex-center">
                 <div
-                    v-for="player in players"
+                    v-for="(player, i) in players"
                     :key="player.id"
-                    class="player h-100"
+                    class="player-holder w-100 h-100"
                     :class="{'has-role-icon': showRoles}">
-                    <div
-                        v-if="alternate"
-                        class="alternate bg-center hero h-100 w-100"
-                        :style="alternateHeroBG(player.favourite_hero, alternate)"></div>
-                    <RecoloredHero
-                        v-else
-                        class="hero"
-                        :hero="player.favourite_hero"
-                        :theme="team.theme" />
-                    <div class="player-name-holder" :style="themeBackground1(team)">
-                        <div class="player-name flex-center text-center">
-                            <span class="player-name-internal">{{ player.name }}</span>
-                            <span v-if="showRoles" class="player-role" v-html="getRoleSVG(player?._draftData?.role)"></span>
-                            <span
-                                v-if="showPronouns"
-                                :style="themeBackground1(team)"
-                                class="player-pronouns">{{ player.pronouns }}</span>
+                    <theme-transition
+                        :active="animationActive"
+                        :theme="team?.theme"
+                        start="top"
+                        end="bottom"
+                        inner-class="player"
+                        :starting-delay="i * 100"
+                        :leaving-delay="0"
+                    >
+                        <div
+                            v-if="alternate"
+                            class="alternate bg-center hero w-100"
+                            :style="alternateHeroBG(player.favourite_hero, alternate)"></div>
+                        <div v-else class="recolored-hero-holder hero w-100">
+                            <RecoloredHero
+                                v-if="team?.theme"
+                                :hero="player.favourite_hero"
+                                :theme="team?.theme" />
                         </div>
-                    </div>
+                        <div class="player-name-holder" :style="themeBackground1(team)">
+                            <div class="player-name flex-center text-center px-1">
+                                <span class="player-name-internal">{{ player.name }}</span>
+                                <span
+                                    v-if="showRoles"
+                                    class="player-role"
+                                    v-html="getRoleSVG(player?._draftData?.role)"></span>
+                                <span
+                                    v-if="showPronouns"
+                                    :style="themeBackground1(team)"
+                                    class="player-pronouns">{{ player.pronouns }}</span>
+                            </div>
+                        </div>
+                    </theme-transition>
                 </div>
             </div>
         </div>
@@ -50,9 +62,11 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
-import { autoRecord, decoratePlayerWithDraftData, getRoleSVG } from "@/utils/content-utils";
+import { autoRecord, cleanID, decoratePlayerWithDraftData, getRoleSVG } from "@/utils/content-utils";
 import { bg, resizedAttachment, resizedImage } from "@/utils/images";
 import { useStatusStore } from "@/stores/statusStore";
+import ThemeLogo from "@/components/website/ThemeLogo.vue";
+import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
 
 function niceJoin(array, and = "and") {
     if (array.length > 1) {
@@ -65,9 +79,11 @@ function niceJoin(array, and = "and") {
 export default {
     name: "BoxedHeroRosterOverlay",
     components: {
-        RecoloredHero
+        ThemeLogo,
+        RecoloredHero,
+        ThemeTransition
     },
-    props: ["broadcast", "title", "playerCount", "teamNum", "showRoles", "showPronouns", "active", "animationActive", "subtitle", "alternate", "showStaff"],
+    props: ["broadcast", "title", "playerCount", "teamNum", "showRoles", "showPronouns", "active", "animationActive", "subtitle", "alternate", "showStaff", "fill"],
     computed: {
         match() {
             if (!this.broadcast?.live_match) return null;
@@ -100,6 +116,9 @@ export default {
                         theme: ReactiveThing("theme"),
                         players: ReactiveArray("players", {
                             favourite_hero: ReactiveThing("favourite_hero")
+                        }),
+                        "matches": ReactiveArray("matches", {
+                            "teams": ReactiveArray("teams")
                         })
                     })
                 })?.highlight_team;
@@ -109,7 +128,7 @@ export default {
         decoratedSubtitle() {
             let text;
             if ((this.broadcast?.broadcast_settings || [])?.includes("Show match records ingame")) {
-                console.log("auto small text", this.team, this.team.matches);
+                console.log("auto small text", this.team, this.team?.matches);
                 text = autoRecord(this.team, this.broadcast?.current_stage || this.match?.match_group);
             }
             return (this.subtitle || "").replace("{small}", (this.team?.small_overlay_text || text || ""));
@@ -129,6 +148,37 @@ export default {
                 });
             }
             if (this.playerCount) players = (players || []).slice(0, this.playerCount);
+
+            if ((this.match?.teams || []).some(team => cleanID(team?.id) === cleanID(this.team?.id))) {
+                // only work with teams on broadcast live match
+                const isSecondTeam = cleanID(this.team?.id) === cleanID(this.match?.teams?.[1]?.id);
+
+                const broadcast = ReactiveRoot(this.broadcast?.id, {
+                    "team_1_cams": ReactiveArray("team_1_cams", {
+                        "player": ReactiveThing("player", {
+                            "favourite_hero": ReactiveThing("favourite_hero")
+                        })
+                    }),
+                    "team_2_cams": ReactiveArray("team_2_cams", {
+                        "player": ReactiveThing("player", {
+                            "favourite_hero": ReactiveThing("favourite_hero")
+                        })
+                    })
+                });
+
+                const cams = broadcast?.[isSecondTeam ? "team_2_cams" : "team_1_cams"] || [];
+                if (cams.length) {
+                    players = cams.map(cam => cam?.player);
+                }
+            }
+
+            // const heroes = (this.heroes || [])?.filter(h => h.game === "Overwatch");
+            //
+            // const page = 2;
+            // players = heroes.slice(page * 6, (page + 1) * 6).map(x => ({ ...x, favourite_hero: x }));
+
+            const fillingHeroes = (this.fill || []).map(str => this.getFavouriteHero(str));
+
             return (players || []).sort((a, b) => {
                 console.log(a, b);
                 if (a._draftData?.role !== b._draftData?.role) {
@@ -136,7 +186,14 @@ export default {
                     return order.indexOf(a._draftData?.role) - order.indexOf(b._draftData?.role);
                 }
                 return 0;
-            }).map(p => decoratePlayerWithDraftData(p, this.broadcast?.event?.id));
+            }).map(p => {
+                const player = decoratePlayerWithDraftData(p, this.broadcast?.event?.id);
+
+                if (!player?.favourite_hero) {
+                    player.favourite_hero = fillingHeroes.shift();
+                }
+                return player;
+            });
         },
         titleStyle() {
             return themeBackground1(this.team);
@@ -196,15 +253,15 @@ export default {
 </script>
 
 <style scoped>
-.player:deep(.color-holder) {
-    height: 100%;
-    --over: 350%;
-    width: calc(100% + var(--over));
-    margin-left: calc(-0.5 * var(--over));
+.players:deep(.player) {
+    width: 100%;
+    justify-content: flex-end;
+    display: flex;
+    flex-direction: column;
 }
 
-.player {
-    width: 100%;
+.hero {
+    flex-grow: 1;
 }
 
 .players {
@@ -212,19 +269,29 @@ export default {
     gap: 6px;
 }
 
-.player:deep(.color-holder div),
-.player:deep(.color-holder canvas) {
+.players:deep(.color-holder div),
+.players:deep(.color-holder canvas) {
     object-fit: contain !important;
 }
 
-.player:deep(.hero-image-base) {
+.players:deep(.hero-image-base) {
     background-size: contain !important;
 }
-
-.recolored-hero {
-    /*height: calc(100% - 2em) !important;*/
+.players:deep(.recolored-hero) {
+    --oversize-scale: 50%;
+    --oversize-width: 400%;
+    height: calc(100% + var(--oversize-scale)) !important;
+    margin-top: calc(var(--oversize-scale) * -0.75);
+    width: calc(100% + var(--oversize-width));
+    margin-left: calc(-0.5 * var(--oversize-width));
+}
+.recolored-hero-holder {
+    overflow: hidden;
 }
 
+.recolored-hero-holder, .alternate {
+    background-color: rgba(0,0,0,0.2);
+}
 .player-name {
     z-index: 2;
     display: flex;
@@ -233,6 +300,7 @@ export default {
     flex-shrink: 0;
     flex-grow: 0;
     font-size: 2em;
+    gap: 0.1em;
 }
 
 .hero-roster-overlay:deep(.g-body) {
@@ -246,10 +314,6 @@ export default {
 
 .player-role {
     width: 2em;
-}
-
-.player.has-role-icon .recolored-hero {
-    /*height: calc(100% - 6em) !important;*/
 }
 
 .player-pronouns {
@@ -288,13 +352,30 @@ export default {
     font-size: 0.33em;
     margin-top: .25em;
     font-weight: bold;
+    margin-left: .15em;
+    text-transform: uppercase;
 }
 
 
-.player-wrapper {
+.contenders-player-wrapper {
     margin: 0 270px;
     margin-top: 65px;
     height: 655px;
+}
+
+.boxed-hero-roster-overlay {
+    padding: 80px 240px;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+}
+.team-header {
+    display: flex;
+    margin-bottom: 60px;
+}
+.player-wrapper {
+    flex-grow: 1;
 }
 
 
@@ -305,11 +386,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.player {
-    display: flex;
-    flex-direction: column;
+    border-bottom: 6px solid transparent;
 }
 
 .player, .player-name-holder {
@@ -332,4 +409,38 @@ export default {
     width: 100%;
     justify-content: center;
 }
+
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Torbjörn"]) { transform: translate(3%, -5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Roadhog"]) { transform: translate(0%, -6%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Junker Queen"]) { transform: translate(0.5%, 2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Brigitte"]) { transform: translate(0%, -5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Wrecking Ball"]) { transform: translate(0%, 5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Mauga"]) { transform: translate(-4%, 5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Echo"]) { transform: translate(0%, -1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Reaper"]) { transform: translate(0%, -3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Reinhardt"]) { transform: translate(4%, 5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Ana"]) { transform: translate(0%, -7%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Symmetra"]) { transform: translate(0%, -7%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Sombra"]) { transform: translate(0%, -7%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Genji"]) { transform: translate(-2.5%, -10%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Juno"]) { transform: translate(1%, -2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Widowmaker"]) { transform: translate(0.5%, 3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Ashe"]) { transform: translate(0%, -5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Illari"]) { transform: translate(1.5%, -1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Cassidy"]) { transform: translate(1%, 1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Junkrat"]) { transform: translate(1%, -3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Mei"]) { transform: translate(1.5%, -5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Mercy"]) { transform: translate(0%, -5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Ramattra"]) { transform: translate(-1%, 7%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Soldier: 76"]) { transform: translate(0%, -5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Winston"]) { transform: translate(5%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Orisa"]) { transform: translate(-1%, 9%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Pharah"]) { transform: translate(-0.5%, -5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Sigma"]) { transform: translate(2%, 11%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Kiriko"]) { transform: translate(2.5%, -5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Zarya"]) { transform: translate(3%, -2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Lúcio"]) { transform: translate(0%, -8%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Venture"]) { transform: translate(5%, -8%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Doomfist"]) { transform: translate(-1%, 2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Moira"]) { transform: translate(-1%, -2%); }
 </style>

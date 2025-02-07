@@ -129,6 +129,12 @@ export default {
                             "Message Data": messageData.textMap
                         }, "automation/on-score-report-update");
 
+                        if (match.brackets) {
+                            for (const bracketID of match.brackets) {
+                                await manager.runActionAsAutomation("resolve-entire-bracket", { bracketID });
+                            }
+                        }
+
                     } catch (e) {
                         console.error("Action error - not continuing");
                     }
@@ -316,6 +322,13 @@ export default {
                             "Approved": true,
                             "Message Data": messageData.textMap
                         }, "automation/on-score-report-update");
+
+
+                        if (match.brackets) {
+                            for (const bracketID of match.brackets) {
+                                await manager.runActionAsAutomation("resolve-entire-bracket", { bracketID });
+                            }
+                        }
 
                     } catch (e) {
                         console.error("Action error - not continuing");

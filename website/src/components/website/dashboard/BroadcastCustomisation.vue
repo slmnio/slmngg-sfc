@@ -2,6 +2,45 @@
     <div class="broadcast-customisation p-2 d-flex flex-column gap-2">
         <b-form-checkbox v-model="changeInstantly" switch>Change instantly</b-form-checkbox>
 
+
+        <div class="form-row row flex-nowrap flex-center">
+            <div class="label text-nowrap flex-shrink-0 fw-bold col-2">
+                <span>MVP</span>
+            </div>
+            <div class="col-10 d-flex gap-2">
+                <div class="flex-shrink-0 bg-center player-name text-center flex-center">
+                    <div>{{ hydratedBroadcast.live_match?.mvp?.name }}</div>
+                </div>
+                <b-form-select
+                    v-model="liveMatchMVPID"
+                    :class="{'low-opacity': processing.mvp}"
+                    :disabled="processing.mvp || !hydratedBroadcast?.live_match?.id"
+                    class="opacity-changes"
+                    :options="mvpPlayers"
+                    size="sm"
+                    @update:model-value="h => setMVP(h, changeInstantly)" />
+                <b-button
+                    :class="{'low-opacity': processing.mvp}"
+                    class="opacity-changes text-nowrap flex-shrink-0 disabled-low-opacity"
+                    :disabled="changeInstantly || processing.mvp || !hydratedBroadcast?.live_match?.id"
+                    variant="success"
+                    size="sm"
+                    @click="setMVP(liveMatchMVPID, true)">
+                    <i class="fas fa-save fa-fw"></i> {{ changeInstantly ? "Autosave" : "Save" }}
+                </b-button>
+                <b-button
+                    :class="{'low-opacity': processing.mvp}"
+                    :disabled="processing.mvp || !hydratedBroadcast?.live_match?.id"
+                    class="opacity-changes text-nowrap flex-shrink-0"
+                    variant="danger"
+                    size="sm"
+                    @click="setMVP(null, true)">
+                    <i class="fas fa-times fa-fw"></i> Clear
+                </b-button>
+            </div>
+        </div>
+
+
         <div class="form-row row flex-nowrap flex-center">
             <div class="label text-nowrap flex-shrink-0 fw-bold col-2">
                 <span class="d-none d-lg-inline">Highlight team</span>
@@ -177,6 +216,7 @@ export default {
         selectedHighlightHeroID: null,
         selectedHighlightPlayerID: null,
         selectedHighlightMediaID: null,
+        liveMatchMVPID: null,
         processing: { }
     }),
     computed: {
@@ -195,7 +235,13 @@ export default {
                 }),
                 "highlight_hero": ReactiveThing("highlight_hero"),
                 "highlight_player": ReactiveThing("highlight_player"),
-                "highlight_media": ReactiveThing("highlight_media")
+                "highlight_media": ReactiveThing("highlight_media"),
+                "live_match": ReactiveThing("live_match", {
+                    "teams": ReactiveArray("teams", {
+                        "players": ReactiveArray("players")
+                    }),
+                    "mvp": ReactiveThing("mvp")
+                })
             });
         },
         teams() {
@@ -238,9 +284,32 @@ export default {
             if (!this.hydratedBroadcast?.event?.id) return [
                 { value: null, text: "No player" }
             ];
+
+            let allOtherTeams = (this.hydratedBroadcast?.event?.teams || [])
+                ?.filter(team => !(this.hydratedBroadcast?.live_match?.teams || []).find(t => t?.id === team?.id))
+                ?.sort((a,b) => sortAlpha(a,b, "name"));
+
             return [
                 { value: null, text: "No player" },
-                ...(this.hydratedBroadcast?.event?.teams || []).map(team => ({
+                ...([
+                    ...(this.hydratedBroadcast?.live_match?.teams || []),
+                    ...allOtherTeams
+                ]).map(team => ({
+                    text: team?.name,
+                    options: (team?.players || []).sort((a,b) => sortAlpha(a,b,"name")).map(p => ({
+                        text: p.name,
+                        value: p.id
+                    }))
+                }))
+            ];
+        },
+        mvpPlayers() {
+            if (!this.hydratedBroadcast?.event?.id) return [
+                { value: null, text: "No player" }
+            ];
+            return [
+                { value: null, text: "No player" },
+                ...(this.hydratedBroadcast?.live_match?.teams || []).map(team => ({
                     text: team?.name,
                     options: (team.players || []).sort((a,b) => sortAlpha(a,b,"name")).map(p => ({
                         text: p.name,
@@ -297,6 +366,21 @@ export default {
                 this.processing.highlight_player = false;
             }
         },
+        async setMVP(playerID, instant) {
+            if (!this.hydratedBroadcast?.live_match?.id) return;
+            if (!instant) return;
+            this.processing.mvp = true;
+            try {
+                await authenticatedRequest("actions/update-match-data", {
+                    matchID: this.hydratedBroadcast?.live_match?.id,
+                    updatedData: {
+                        mvpPlayerID: playerID
+                    }
+                });
+            } finally {
+                this.processing.mvp = false;
+            }
+        },
         async setMedia(mediaID, instant) {
             if (!instant) return;
             this.processing.highlight_media = true;
@@ -336,6 +420,13 @@ export default {
             handler(media) {
                 console.log("hydrate update", media);
                 this.selectedHighlightMediaID = media?.id || null;
+            }
+        },
+        "hydratedBroadcast.live_match.mvp": {
+            immediate: true,
+            handler(player) {
+                console.log("hydrate update", player);
+                this.liveMatchMVPID = player?.id || null;
             }
         }
     },

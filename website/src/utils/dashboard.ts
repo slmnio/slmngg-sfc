@@ -162,6 +162,7 @@ interface UpdateMatchDataData {
         vod?: string
         vod_2?: string
         alternative_vod?: string
+        mvpPlayerID?: AnyAirtableID
     }
 }
 

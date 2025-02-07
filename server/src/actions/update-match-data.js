@@ -1,3 +1,5 @@
+import { dirtyID } from "../action-utils/action-utils.js";
+
 export default {
     key: "update-match-data",
     requiredParams: ["matchID", "updatedData"],
@@ -25,13 +27,23 @@ export default {
             "vod": "VOD",
             "vod_2": "VOD 2",
             "alternative_vod": "Alternative VOD",
+            "mvpPlayerID": "MVP",
         };
         let validatedData = {};
 
         Object.entries(updatedData).forEach(([key, val]) => {
             let map = validKeysMap[key];
             if (!map) return;
-            validatedData[map] = val;
+
+            if (map === "MVP") {
+                if (!val) {
+                    validatedData[map] = [];
+                } else {
+                    validatedData[map] = [dirtyID(val)];
+                }
+            } else {
+                validatedData[map] = val;
+            }
         });
 
         console.log("[match]", (isAutomation ? "Automation" : user.airtable?.name), "is setting", validatedData);

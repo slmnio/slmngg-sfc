@@ -259,7 +259,7 @@ export default {
                 ...(this.hydratedBroadcast?.event?.teams || []).map(t => ({
                     text: t.name,
                     value: t.id
-                })).sort((a,b) => sortAlpha(a,b,"name"))
+                })).sort((a,b) => sortAlpha(a,b,"text"))
             ];
         },
         heroes() {

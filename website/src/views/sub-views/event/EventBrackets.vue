@@ -5,7 +5,7 @@
                 <h1 class="bracket-name mb-3">{{ bracket.name }}</h1>
                 <BracketResolveButton class="resolve-button" :bracket="bracket" />
             </div>
-            <div class="event-bracket-container mb-4">
+            <div class="event-bracket-container dark-scrollbar mb-4">
                 <Bracket class="event-bracket row" :bracket="bracket" :event="event" />
             </div>
         </div>
@@ -56,28 +56,6 @@ export default {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-    }
-
-    .event-bracket-container::-webkit-scrollbar-track {
-        border-radius: 4px;
-        background-color: transparent;
-    }
-
-    .event-bracket-container::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-        background-color: transparent;
-    }
-
-    .event-bracket-container::-webkit-scrollbar-thumb {
-        border-radius: 4px;
-        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-        background-color: #222;
-        transition: background-color 300ms ease;
-    }
-
-    .event-bracket-container:hover::-webkit-scrollbar-thumb, .event-bracket-container:active::-webkit-scrollbar-thumb {
-        background-color: #333;
     }
 
     .bracket-name {

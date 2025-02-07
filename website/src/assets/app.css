@@ -379,3 +379,27 @@ small.text-body-secondary {
     .w-md-75 { width: 75% !important; }
     .w-md-100 { width: 100% !important; }
 }
+
+
+.dark-scrollbar::-webkit-scrollbar-track {
+    border-radius: 4px;
+    background-color: transparent;
+}
+
+.dark-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: transparent;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #222;
+    transition: background-color 300ms ease;
+}
+
+.dark-scrollbar:hover::-webkit-scrollbar-thumb,
+.dark-scrollbar:active::-webkit-scrollbar-thumb {
+    background-color: #333;
+}

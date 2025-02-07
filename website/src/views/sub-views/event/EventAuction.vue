@@ -55,7 +55,7 @@
                         <div v-if="activePlayer?.pronouns" class="px-2 bg-secondary rounded small">{{ activePlayer?.pronouns }}</div>
                         <div v-if="activePlayer?.pronunciation" class="px-2 bg-secondary rounded small"><i class="fas fa-lips fa-fw"></i> {{ activePlayer?.pronunciation }}</div>
                     </div>
-                    <div v-if="activePlayer" class="player-info rounded">
+                    <div v-if="activePlayer" class="player-info dark-scrollbar rounded">
                         {{ activePlayer?._draftData?.info_for_captains }}
                     </div>
                 </div>
@@ -867,29 +867,6 @@ export default {
         overflow-y: scroll;
         background-color: rgba(64,64,64,0.2);
         padding: .5em;
-    }
-
-    .player-info::-webkit-scrollbar-track {
-        border-radius: 4px;
-        background-color: transparent;
-    }
-
-    .player-info::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-        background-color: transparent;
-    }
-
-    .player-info::-webkit-scrollbar-thumb {
-        border-radius: 4px;
-        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.5);
-        background-color: #222;
-        transition: background-color 300ms ease;
-    }
-
-    .player-info:hover::-webkit-scrollbar-thumb,
-    .player-info:active::-webkit-scrollbar-thumb {
-        background-color: #333;
     }
 
     .active-player {

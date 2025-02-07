@@ -14,7 +14,7 @@
             <div
                 v-show="showDropdown"
                 ref="content"
-                class="module-content bg-dark"
+                class="module-content bg-dark dark-scrollbar"
                 :class="(contentClass || '') + (noContentBorder ? ' no-border' : '')"
                 :style="moduleContentCSS">
                 <slot v-if="loadDropdown"></slot>

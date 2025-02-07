@@ -12,7 +12,7 @@
                         All
                     </b-form-checkbox>
                 </div>
-                <div class="filter-options bg-dark rounded p-1">
+                <div class="filter-options dark-scrollbar bg-dark rounded p-1">
                     <b-form-checkbox-group v-model="filterSelections[filter?.key]" stacked>
                         <b-form-checkbox v-for="option in filter.options" :key="option.option" :value="option.option">
                             {{ option.display || option.option }} ({{ option.count }})
@@ -214,29 +214,5 @@ export default {
     .filter-options {
         max-height: 10em;
         overflow-y: scroll
-    }
-
-
-    .filter-options::-webkit-scrollbar-track {
-        border-radius: 4px;
-        background-color: transparent;
-    }
-
-    .filter-options::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-        background-color: transparent;
-    }
-
-    .filter-options::-webkit-scrollbar-thumb {
-        border-radius: 4px;
-        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.5);
-        background-color: #222;
-        transition: background-color 300ms ease;
-    }
-
-    .filter:hover::-webkit-scrollbar-thumb,
-    .filter:active::-webkit-scrollbar-thumb {
-        background-color: #333;
     }
 </style>

@@ -9,7 +9,7 @@
                     <th>Title</th>
                     <th @click="changeMatrixCount()">
                         Matrix
-                        <i v-b-tooltip="'Click to set GFX count'" class="fas fa-question-circle opacity-50 ml-1"></i>
+                        <i v-b-tooltip="'Click to set GFX count'" class="fas fa-cog opacity-50 ml-1"></i>
                     </th>
                     <th></th>
                 </tr>
@@ -92,5 +92,8 @@ export default {
     }
     td.button-matrix {
         padding: 0.125em 0.25em;
+    }
+    table th {
+        white-space: nowrap;
     }
 </style>

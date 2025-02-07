@@ -162,7 +162,7 @@ export default {
                 const players = [...team.showablePlayers];
 
                 return players.sort((a, b) => {
-                    const [oa, ob] = [a, b].map(x => order.indexOf(x.role));
+                    const [oa, ob] = [a, b].map(x => order.indexOf(x.this_event_signup_data?.main_role || x.role));
                     if (oa === ob) return 0;
                     if (oa === -1) return 1;
                     if (ob === -1) return -1;

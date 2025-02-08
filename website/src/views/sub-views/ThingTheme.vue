@@ -86,8 +86,8 @@
             </div>
         </div>
 
-        <h3 v-if="theme && theme.id">Generated images</h3>
-        <div v-if="theme && theme.id" class="logo-list mb-3">
+        <h3 v-if="theme && theme.id && !noImages">Generated images</h3>
+        <div v-if="theme && theme.id && !noImages" class="logo-list mb-3">
             <div class="logo-holder square-logo-holder flex-center" :style="logoBackground">
                 <a :href="dataServerURL(`theme.png?id=${theme.id}&size=500&padding=20`)" target="_blank" class="bg-center square-logo logo" :style="bg(dataServerURL(`theme.png?id=${theme.id}&size=500&padding=20`))"></a>
             </div>
@@ -144,7 +144,7 @@ function cleanKey(key) {
 export default {
     name: "ThingTheme",
     components: { ContrastBadge, CopyTextButton, /* HeroColorControls, RecoloredHero, */ BracketTeam, IngameTeam, ContentRow, ContentThing, StandingsTeam },
-    props: ["team", "event"],
+    props: ["team", "event", "noImages"],
     computed: {
         ...mapWritableState(useSettingsStore, ["removeHashInHex"]),
         // heroes() {
@@ -198,6 +198,7 @@ export default {
             return colors;
         },
         logos() {
+            if (this.noImages) return [];
             if (!this.theme) return [];
             const keys = ["small_logo", "default_logo", "default_wordmark"];
             return keys.map(k => ({

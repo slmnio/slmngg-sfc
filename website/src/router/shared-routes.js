@@ -69,6 +69,7 @@ export default [
         }
     },
     { path: "cams", component: () => import("@/views/sub-views/Cams.vue") },
+    { path: "theme-creator", component: () => import("@/views/sub-views/ThemeCreator.vue") },
     {
         path: "/match/:id",
         component: () => import("@/views/Match.vue"),

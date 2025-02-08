@@ -6,6 +6,7 @@ export function bg(url) {
 }
 
 export function getNewURL(attachment, size) {
+    if (attachment.custom_url) return attachment.custom_url;
     if (!attachment) {
         console.warn("No attachment");
         return "";

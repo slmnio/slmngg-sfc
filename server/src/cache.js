@@ -434,6 +434,7 @@ async function startRawDiscordAuth(discordUser) {
         console.error(`No player for ID ${discordUser.id}`);
         return {};
     }
+    console.log(`Discord auth -> mapped ${discordUser?.id} to player ${player?.name} ${player?.id}`);
     const userData = {
         discordID: discordUser.id,
         airtableID: player.id,

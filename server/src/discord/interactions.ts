@@ -77,6 +77,7 @@ if (client) {
         }
 
         try {
+            console.log("interaction user", interaction.user);
             const response = await command.execute(interaction, args);
             // console.log("Interaction execute response", response, response.error);
             if (typeof response === "object" && response.error) {

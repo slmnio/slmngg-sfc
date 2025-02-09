@@ -5,14 +5,14 @@ export default {
     key: "resolve-entire-bracket",
     auth: ["user"],
     requiredParams: ["bracketID"],
-    async handler({ bracketID }, { user }) {
+    async handler({ bracketID }, { user, isAutomation }) {
 
         let bracket = await this.helpers.get(bracketID);
 
         if (bracket.events) {
             // Bracket attached to event, use event permissions
             let event = await this.helpers.get(bracket.events?.[0]);
-            if (!await canEditMatch(user, { event })) {
+            if (!(isAutomation || await canEditMatch(user, { event }))) {
                 throw {
                     errorMessage: "You don't have permission to resolve brackets",
                     errorCode: 403
@@ -21,7 +21,7 @@ export default {
 
         } else {
             // Bracket is not attached to an event, use global permissions
-            if (!user.airtable?.website_settings?.includes("Can edit any match")) {
+            if (!(isAutomation || user.airtable?.website_settings?.includes("Can edit any match"))) {
                 throw {
                     errorMessage: "You don't have permission to resolve brackets",
                     errorCode: 403

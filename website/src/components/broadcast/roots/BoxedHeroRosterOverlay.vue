@@ -42,9 +42,14 @@
                             <div class="player-name flex-center text-center px-1">
                                 <span class="player-name-internal">{{ player.name }}</span>
                                 <span
-                                    v-if="showRoles"
+                                    v-if="showRoles === 'eligible'"
+                                    class="flex-center player-eligible-roles">
+                                    <span v-for="role in playerEligibleRoles(player)" :key="role" class="player-role flex-center" v-html="getRoleSVG(role)"></span>
+                                </span>
+                                <span
+                                    v-else-if="showRoles && (player?.this_event_signup_data?.main_role || player.role)"
                                     class="player-role"
-                                    v-html="getRoleSVG(player?._draftData?.role)"></span>
+                                    v-html="getRoleSVG(player?.this_event_signup_data?.main_role || player.role)"></span>
                                 <span
                                     v-if="showPronouns"
                                     :style="themeBackground1(team)"
@@ -67,6 +72,7 @@ import { bg, resizedAttachment, resizedImage } from "@/utils/images";
 import { useStatusStore } from "@/stores/statusStore";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
+import { sortRoles } from "@/utils/sorts.js";
 
 function niceJoin(array, and = "and") {
     if (array.length > 1) {
@@ -226,6 +232,9 @@ export default {
             const style = bg(resizedAttachment(file, "orig"));
             // console.log(style);
             return style;
+        },
+        playerEligibleRoles(player) {
+            return (player?.this_event_signup_data?.eligible_roles || player.eligible_roles || []).sort(sortRoles);
         }
     },
     watch: {

@@ -260,6 +260,19 @@ io.on("connection", (socket) => {
         console.log("[Prod Trigger]", socket._clientName, event);
         io.to(`prod:client-${socket._clientName}`).emit(event, args);
     });
+
+    socket.on("match_draft", (event, matchId, ...args) => {
+        console.log(event, matchId, args);
+        if (event === "join") {
+            if (socket._draftRoom) {
+                socket.leave(`match:draft-${socket._draftRoom}`);
+            }
+            socket._draftRoom = matchId;
+            socket.join(`match:draft-${matchId}`);
+            return;
+        }
+        io.to(`match:draft-${matchId}`).emit(event, ...args);
+    });
 });
 
 http.listen(port, () => {

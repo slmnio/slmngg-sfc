@@ -79,7 +79,8 @@ export default [
             { path: "history", component: () => import("@/views/sub-views/MatchStats.vue") },
             { path: "score-reporting", component: () => import("@/views/sub-views/MatchScoreReporting.vue"), meta: { requiresAuth: true } },
             { path: "rescheduling", component: () => import("@/views/sub-views/MatchRescheduling.vue"), meta: { requiresAuth: true } },
-            { path: "editor", component: () => import("@/views/sub-views/event/EventMatchEditor.vue"), meta: { requiresAuth: true } }
+            { path: "editor", component: () => import("@/views/sub-views/event/EventMatchEditor.vue"), meta: { requiresAuth: true } },
+            { path: "draft", component: () => import("@/views/sub-views/event/MatchDraft.vue"), meta: { requiresAuth: true } }
         ]
     },
     { path: "/detailed/:id", component: () => import("@/views/DetailedMatch.vue"), props: route => ({ id: route.params.id }) },

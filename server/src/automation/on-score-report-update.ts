@@ -27,7 +27,7 @@ const dataServer = process.env.NODE_ENV === "development" ? "http://localhost:89
 
 export default {
     async handler({ id, newData: report, oldData }: { id: AnyAirtableID, newData: Report, oldData: Report }) {
-        // if (!process.env.IS_SLMNGG_MAIN_SERVER) return;
+        if (!process.env.IS_SLMNGG_MAIN_SERVER) return;
         if (report?.__tableName !== "Reports") return;
         if (report.approved) {
             console.log("Already approved");

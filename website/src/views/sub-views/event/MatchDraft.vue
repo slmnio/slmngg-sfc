@@ -50,7 +50,7 @@
         </div>
         <div v-else class="buttonRow">
             <b-button @click.prevent="toggleReady()">{{ readyChecks[ownTeam.id] ? "Unready" : "Ready Up" }}</b-button>
-            <b-button :disabled="readyChecks.length !== 2" @click.prevent="start()">Start Draft</b-button>
+            <b-button :disabled="Object.values(readyChecks).filter((r) => r).length !== 2" @click.prevent="start()">Start Draft</b-button>
         </div>
     </div>
     <div v-else class="p-2 bg-dark text-center rounded">
@@ -205,7 +205,8 @@ export default {
         themeBackground1,
         toggleReady() {
             this.readyChecks[this.ownTeam.id] = !(this.readyChecks[this.ownTeam.id] || false);
-            socket.emit("match_draft", "team_ready", this.match.id, this.team.id, this.readyChecks[this.ownTeam.id]);
+            console.log({ team: this.ownTeam.id, status: this.readyChecks[this.ownTeam.id] });
+            socket.emit("match_draft", "team_ready", this.match.id, { team: this.ownTeam.id, status: this.readyChecks[this.ownTeam.id]});
         },
         start() {
             this.draftStarted = true;
@@ -246,7 +247,7 @@ export default {
         },
         team_ready({ team, status }) {
             this.readyChecks[team] = status;
-            console.log(`Team ${team} ready`);
+            console.log(`Team ${team} ${status}`);
         },
         team_hover({ team, hero }) {
             console.log(team, hero);

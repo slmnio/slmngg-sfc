@@ -108,16 +108,17 @@
                                             icon-padding="6px" />
 
                                         <div class="stats-title team-stats-title">
-                                            TEAM STATS
+                                            <div>TEAM STATS</div>
+                                            <div style="font-size: 0.8em">({{ stats?.teamMaps?.[team?.id] || '0' }} Map{{ stats?.teamMaps?.[team?.id] === 1 ? '' : 's' }})</div>
                                         </div>
                                         <div class="team-stats-stat w-100">
                                             <div class="stat-row">
                                                 <div class="stat-text">PICK</div>
-                                                <div class="stat-stat">{{ (((stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.total || 0) / stats?.teamMaps?.[team?.id]) * 100).toFixed(0) }}%</div>
+                                                <div class="stat-stat">{{ (((stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.total || 0) / (stats?.teamMaps?.[team?.id] || 1)) * 100).toFixed(0) }}%</div>
                                             </div>
                                             <div class="stat-row">
                                                 <div class="stat-text">BAN</div>
-                                                <div class="stat-stat">{{ (((stats?.[picks[ti]?.[num - 1]?.id]?.bans?.byTeam?.[team?.id]?.total || 0) / stats?.teamMaps?.[team?.id]) * 100).toFixed(0) }}%</div>
+                                                <div class="stat-stat">{{ (((stats?.[picks[ti]?.[num - 1]?.id]?.bans?.byTeam?.[team?.id]?.total || 0) / (stats?.teamMaps?.[team?.id] || 1)) * 100).toFixed(0) }}%</div>
                                             </div>
                                             <div class="stat-row stat--team-winloss">
                                                 <div class="stat-stat">{{ stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.wins || '0' }}W&nbsp;&nbsp;{{ stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.losses || '0' }}L</div>
@@ -410,10 +411,10 @@ export default {
         },
         currentPickBan(newNum, oldNum) {
             const statsTiming = {
-                afterVoiceline: 1000,
+                afterVoiceline: 3000,
                 afterManual: 3000,
-                page1: 10000,
-                page2: 10000,
+                page1: 12000,
+                page2: 8000,
             };
 
 
@@ -707,7 +708,7 @@ img.image-center {
 
 .pick-stats {
     z-index: 1;
-    padding: 0.25em;
+    padding: 0.25em 0;
     justify-content: space-evenly !important;
 }
 
@@ -754,7 +755,7 @@ img.image-center {
     font-size: 2.5em;
 }
 .stat--team-winloss {
-    font-size: 1.1em;
+    font-size: 1em;
 }
 .stats-title {
     text-align: center;
@@ -762,7 +763,13 @@ img.image-center {
     font-size: 1em;
     text-transform: uppercase;
 }
-
+.team-stats-stat {
+    padding: 0 0.1em;
+}
+.stats-title.team-stats-title {
+    line-height: 1;
+    font-size: 1.1em;
+}
 /*.team-stats-row {*/
 /*    background-color: #ffffff30 !important;*/
 /*    border-radius: .25em;*/
@@ -779,7 +786,7 @@ img.image-center {
     bottom: 0;
 }
 .pick-stats {
-    transition: top .25s ease;
+    transition: top .25s ease, opacity .25s ease .25s;
     position: absolute;
     top: 100%;
     height: calc(100% - var(--pick-text-height))
@@ -811,8 +818,8 @@ img.image-center {
 }
 
 .stats-team-icon {
-    width: 55px;
-    height: 45px;
+    width: 50px;
+    height: 40px;
 }
 .stat--prio-pickban {
     font-size: 1.25em;

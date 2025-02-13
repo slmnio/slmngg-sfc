@@ -58,8 +58,8 @@ export default {
                 "denied_by_opponent": "fas fa-times",
                 "staff_denied": "fas fa-times-octagon",
 
-                "submitted_request": "fas fa-check",
-                "submitted_score_report": "fas fa-check",
+                "submitted_request": "fas fa-calendar-alt",
+                "submitted_score_report": "fas fa-file-alt",
                 "countered_score_report": "fas fa-exchange",
             };
         }

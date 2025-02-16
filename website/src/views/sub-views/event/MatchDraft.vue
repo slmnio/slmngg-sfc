@@ -1,25 +1,24 @@
 <template>
     <div v-if="draftingEnabled && ownTeam" class="draftContainer p-2 bg-dark text-center rounded">
         <div class="draftHeader">
+            <div>Game {{ (match.maps?.length || 0) + ([STATES.preDraft, STATES.readyForNext].includes(state) ? 1 : 0) }} draft</div>
             <div class="teamNames w-100">
                 <div class="teamName">Picking First:<h1>{{ orderedTeams[0].name }}</h1></div>
                 <div v-if="currentPickBan"><h1 class="pt-3">{{ currentPBSide === 1 ? "<" : ">" }}</h1></div>
                 <div class="teamName">Picking Second:<h1>{{ orderedTeams[1].name }}</h1></div>
             </div>
-            <div v-if="draftStarted" class="bansAndTimer w-100">
-                <div class="bans">{{ (flip ? currentMap.team_2_bans : currentMap.team_1_bans).map(p => p.name).join(", ") }}</div>
-                <div><h1>{{ timerLabel }}</h1></div>
-                <div class="bans">{{ (flip ? currentMap.team_1_bans : currentMap.team_2_bans).map(p => p.name).join(", ") }}</div>
+            <div v-if="draftStarted || state === STATES.finished" class="bansAndTimer w-100">
+                <div class="bans">Bans: {{ ((flip ? processedPickBans.teamTwoBans : processedPickBans.teamOneBans) || []).map(p => p.name).join(", ") }}</div>
+                <div v-if="state !== STATES.finished"><h1>{{ timerLabel }}</h1></div>
+                <div class="bans">Bans: {{ ((flip ? processedPickBans.teamOneBans : processedPickBans.teamTwoBans) || []).map(p => p.name).join(", ") }}</div>
             </div>
-            <div v-else class="bansAndTimer w-100">
+            <div v-else-if="[STATES.preDraft, STATES.readyForNext].includes(state)" class="bansAndTimer w-100">
                 <div class="bans">{{ readyChecks[orderedTeams[0].id] ? "Ready" : "Not Ready" }}</div>
                 <div class="bans">{{ readyChecks[orderedTeams[1].id] ? "Ready" : "Not Ready" }}</div>
             </div>
         </div>
 
-        <!-- <b-button @click.prevent="start()">Start</b-button>
-        <b-button @click.prevent="currentPickBanIdx++">Skip</b-button> -->
-        <div v-if="draftStarted">
+        <div v-if="draftStarted && state !== STATES.finished">
             <form @submit.prevent="lockIn(selectedHero)">
                 <div class="pickbanContainer p-2">
                     <div
@@ -45,11 +44,37 @@
                         </div>
                     </div>
                 </div>
-                <b-button type="submit" :disabled="!canLockIn">Lock in</b-button>
+                <b-button type="submit" :disabled="!canLockIn">Lock in {{ this.currentPickBan.type }}</b-button>
             </form>
         </div>
-        <div v-else class="buttonRow">
+        <div v-else-if="state === STATES.finished">
+            <div class="pickbanContainer p-2">
+                <div
+                    v-for="pick in totalAvailablePicks"
+                    :key="pick.id"
+                    class="flex-center pick"
+                    :class="{
+                        'pick-hover': currentHover?.id === pick.id && !isOwnTeamPick,
+                        'pick-selected': selectedHero?.id === pick.id && isOwnTeamPick,
+                        'pick-picked-t1': teamOnePicks.has(pick.id),
+                        'pick-picked-t2': teamTwoPicks.has(pick.id),
+                        'pick-banned': bannedPicks.has(pick.id),
+                    }"
+                >
+                    <div class="pickImageContainer">
+                        <transition name="fade">
+                            <img v-show="loaded[pick.id]" class="image-center" :src="resizedImageNoWrap(pick, ['main_image', 'icon'], 'h-70')" @load="() => loaded[pick.id] = true">
+                        </transition>
+                    </div>
+                    <div v-show="loaded[pick.id]" class="pick-text" :style="themeBackground1(broadcast?.event)">
+                        {{ pick.name }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-else-if="[STATES.preDraft, STATES.readyForNext].includes(state)" class="buttonRow">
             <b-button @click.prevent="toggleReady()">{{ readyChecks[ownTeam.id] ? "Unready" : "Ready Up" }}</b-button>
+            <b-button @click.prevent="swapSide()">Swap Sides</b-button>
             <b-button :disabled="Object.values(readyChecks).filter((r) => r).length !== 2" @click.prevent="start()">Start Draft</b-button>
         </div>
     </div>
@@ -72,6 +97,13 @@ import {
 import { useInterval } from "@vueuse/core";
 import { themeBackground1 } from "@/utils/theme-styles";
 
+const STATES = Object.freeze({
+    preDraft: "preDraft",
+    inProgress: "inProgress",
+    finished: "finished",
+    readyForNext: "readyForNext",
+});
+
 export default {
     name: "MatchDraft",
     props: ["match"],
@@ -91,6 +123,23 @@ export default {
         draftCounterResume: () => {},
     }),
     computed: {
+        draftComplete() {
+            return this.currentPickBanIdx >= this.pickBanOrder.length;
+        },
+        readyForNextDraft() {
+            if (!this.currentMap) return true;
+            return (this.currentMap.winner || this.currentMap.draw) !== undefined;
+        },
+        STATES() {
+            return STATES;
+        },
+        state() {
+            if (!this.currentMap) return STATES.preDraft;
+            if (this.currentMap && !this.currentMap.winner && !this.currentMap.draw && this.availablePicks.length === this.totalAvailablePicks.length) return STATES.preDraft;
+            if (this.readyForNextDraft) return STATES.readyForNext;
+            if (this.draftComplete) return STATES.finished;
+            return STATES.inProgress;
+        },
         orderedTeams() {
             const t = this.hydratedMatch.teams;
             return this.flip ? t.reverse() : t;
@@ -181,20 +230,28 @@ export default {
             let currentMap = maps.find((map) => !(map.draw || map.winner)) || maps[maps.length - 1];
             return currentMap;
         },
+        processedPickBans() {
+            return {
+                teamOnePicks: this.currentMap?.team_1_picks || [],
+                teamTwoPicks: this.currentMap?.team_2_picks || [],
+                teamOneBans: this.currentMap?.team_1_bans || [],
+                teamTwoBans: this.currentMap?.team_2_bans || [],
+            };
+        },
         canLockIn() {
             return (this.selectedHero && this.isOwnTeamPick);
         },
         pickedPicks() {
-            return new Set([...this.currentMap.team_1_picks, ...this.currentMap.team_2_picks].map((h) => h.id));
+            return new Set([...this.processedPickBans.teamOnePicks, ...this.processedPickBans.teamTwoPicks].map((h) => h.id));
         },
         teamOnePicks() {
-            return new Set((this.flip ? this.currentMap.team_2_picks : this.currentMap.team_1_picks).map((h) => h.id));
+            return new Set((this.flip ? this.processedPickBans.teamTwoPicks : this.processedPickBans.teamOnePicks).map((h) => h.id));
         },
         teamTwoPicks() {
-            return new Set((this.flip ? this.currentMap.team_1_picks : this.currentMap.team_2_picks).map((h) => h.id));
+            return new Set((this.flip ? this.processedPickBans.teamOnePicks : this.processedPickBans.teamTwoPicks).map((h) => h.id));
         },
         bannedPicks() {
-            return new Set([...this.currentMap.team_1_bans, ...this.currentMap.team_2_bans].map((h) => h.id));
+            return new Set([...this.processedPickBans.teamOneBans, ...this.processedPickBans.teamTwoBans].map((h) => h.id));
         },
         availablePicks() {
             return this.totalAvailablePicks.filter((h) => !this.pickedPicks.has(h.id) && !this.bannedPicks.has(h.id));
@@ -207,6 +264,9 @@ export default {
             this.readyChecks[this.ownTeam.id] = !(this.readyChecks[this.ownTeam.id] || false);
             console.log({ team: this.ownTeam.id, status: this.readyChecks[this.ownTeam.id] });
             socket.emit("match_draft", "team_ready", this.match.id, { team: this.ownTeam.id, status: this.readyChecks[this.ownTeam.id]});
+        },
+        swapSide() {
+            socket.emit("match_draft", "swap_sides", this.match.id);
         },
         start() {
             this.draftStarted = true;
@@ -237,9 +297,15 @@ export default {
             console.log(`Locking in ${hero.name}`);
             socket.emit("match_draft", "team_lock", this.match.id, {
                 team: this.ownTeam.id,
+                pickBan: this.currentPickBan,
                 hero,
             });
         },
+    },
+    watch: {
+        "match.maps": {
+            deep: true,
+        }
     },
     sockets: {
         draft_start() {
@@ -260,13 +326,19 @@ export default {
             this.currentHover = null;
             this.selectedHero = null;
             this.currentPickBanIdx++;
-        },
-        set_first_pick({ team }) {
-            console.log(`Team ${team} set as 1st pick.`);
+            this.draftCounterReset();
         },
     },
     mounted() {
         socket.emit("match_draft", "join", this.match.id);
+        if (this.state === STATES.inProgress) {
+            // Map exists, check if draft is complete;
+            const totalProcessed = Object.values(this.processedPickBans).reduce((a, b) => a + b.length, 0);
+            console.log("[tp]", totalProcessed);
+            console.log(this.currentPickBanIdx);
+            this.currentPickBanIdx = totalProcessed;
+            console.log(this.currentPickBanIdx);
+        }
     },
 };
 </script>

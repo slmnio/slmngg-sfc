@@ -1,7 +1,7 @@
 <template>
     <div v-if="draftingEnabled && ownTeam" class="draftContainer p-2 bg-dark text-center rounded">
         <div class="draftHeader">
-            <div>Game {{ (match.maps?.length || 0) + ([STATES.preDraft, STATES.readyForNext].includes(state) ? 1 : 0) }} draft</div>
+            <div>Game {{ (match.maps?.length || 0) + ([STATES.preDraft, STATES.readyForNext].includes(state) ? 1 : 0) }} draft: {{ stateLabel }}</div>
             <div class="teamNames w-100">
                 <div class="teamName">Picking First:<h1>{{ orderedTeams[0].name }}</h1></div>
                 <div v-if="currentPickBan"><h1 class="pt-3">{{ currentPBSide === 1 ? "<" : ">" }}</h1></div>
@@ -96,6 +96,7 @@ import {
 } from "@/utils/reactive.js";
 import { useInterval } from "@vueuse/core";
 import { themeBackground1 } from "@/utils/theme-styles";
+import { GameOverrides } from "@/utils/games";
 
 const STATES = Object.freeze({
     preDraft: "preDraft",
@@ -124,7 +125,8 @@ export default {
     }),
     computed: {
         draftComplete() {
-            return this.currentPickBanIdx >= this.pickBanOrder.length;
+            const donePickBans = this.totalAvailablePicks.length - this.availablePicks.length;
+            return donePickBans >= this.pickBanOrder.length;
         },
         readyForNextDraft() {
             if (!this.currentMap) return true;
@@ -139,6 +141,13 @@ export default {
             if (this.readyForNextDraft) return STATES.readyForNext;
             if (this.draftComplete) return STATES.finished;
             return STATES.inProgress;
+        },
+        stateLabel() {
+            if (this.state === STATES.preDraft) return "Ready to start";
+            if (this.state === STATES.inProgress) return "In progress";
+            if (this.state === STATES.finished) return "Finished";
+            if (this.state === STATES.readyForNext) return "Ready to start";
+            return "Unknown state";
         },
         orderedTeams() {
             const t = this.hydratedMatch.teams;
@@ -177,6 +186,10 @@ export default {
         },
         game() {
             return this.match?.event?.game;
+        },
+        gameOverride() {
+            if (this.match?.game || this.match?.event?.game) return GameOverrides[this.match?.game || this.match?.event?.game];
+            return null;
         },
         maxPlayers() {
             if (this.game === "Deadlock") return 6;
@@ -331,14 +344,6 @@ export default {
     },
     mounted() {
         socket.emit("match_draft", "join", this.match.id);
-        if (this.state === STATES.inProgress) {
-            // Map exists, check if draft is complete;
-            const totalProcessed = Object.values(this.processedPickBans).reduce((a, b) => a + b.length, 0);
-            console.log("[tp]", totalProcessed);
-            console.log(this.currentPickBanIdx);
-            this.currentPickBanIdx = totalProcessed;
-            console.log(this.currentPickBanIdx);
-        }
     },
 };
 </script>
@@ -369,7 +374,7 @@ export default {
 .pickbanContainer {
     display: grid;
     gap: 0.3em;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .pickImageContainer {

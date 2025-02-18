@@ -8,6 +8,36 @@ import { cleanID, hammerTime, sendMessage } from "./action-utils.js";
 import emoji from "../discord/emoji.js";
 
 
+export async function getTeamEmojiText(team: Team | null) {
+    if (!team) return null;
+
+    if (!team?.event?.[0]) return null;
+    const event = await get(team.event?.[0]);
+    let guild: Guild | null = null;
+
+    if (event.discord_control) {
+        const eventDiscord = new MapObject(event.discord_control);
+        if (eventDiscord.get("guild_id")) {
+            const testGuild = await client.guilds.fetch(eventDiscord.get("guild_id"));
+            if (testGuild?.available) {
+                guild = testGuild;
+            }
+        }
+    }
+
+    if (guild && team.discord_control) {
+        const teamDiscord = new MapObject(team.discord_control);
+        if (teamDiscord.get("emoji_id")) {
+            const emoji = await guild.emojis.fetch(teamDiscord.get("emoji_id"));
+            if (emoji?.id) {
+                return (`<:${emoji.name}:${emoji.id}> `);
+            }
+        }
+    }
+    return null;
+}
+
+
 export async function generateMatchReportText(match: Match) {
     try {
         if (!match?.event?.[0]) return null;

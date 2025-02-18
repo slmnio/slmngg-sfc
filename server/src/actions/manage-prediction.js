@@ -24,7 +24,7 @@ function generatePredictionTitle(map, predictionType) {
 function getTargetPrediction(predictions, teams) {
     return predictions.find(p =>
         ["ACTIVE", "LOCKED"].includes(p.status) &&
-        p.outcomes.every(outcome => [...teams.map(t => t.name), "Draw"].includes(outcome.title)) &&
+        p.outcomes.every(outcome => [...teams.map(t => t.safe_twitch_name || t.name), "Draw"].includes(outcome.title)) &&
         p.title.startsWith(automaticPredictionTitleStartCharacter)
     );
 }
@@ -91,7 +91,7 @@ export default {
                     if (targetPrediction) throw ("Prediction already exists");
                     const predictionTitle = generatePredictionTitle(currentMap, predictionType);
 
-                    let outcomes = [team1.name, team2.name];
+                    let outcomes = [team1.safe_twitch_name || team1.name, team2.safe_twitch_name || team2.name];
 
                     if (predictionType === "map" &&
                         !(currentMap && currentMap.map?.type === "Control") &&
@@ -126,7 +126,7 @@ export default {
 
                 if (targetPredictionType === "match") {
                     if (!matchWinner) throw ("Match has not been won yet");
-                    await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === matchWinner.name).id);
+                    await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => [matchWinner.safe_twitch_name, matchWinner.name].includes(o.title)).id);
                 } else {
                     const lastMap = maps.filter(m => !m.dummy && !m.banner && (m.winner || m.draw)).pop();
                     if (!lastMap) {
@@ -139,7 +139,7 @@ export default {
                             throw "Prediction cannot be resolved because map draw predictions were not enabled.";
                         }
                     } else {
-                        await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => o.title === lastMap.winner.name).id);
+                        await api.predictions.resolvePrediction(channel.channel_id, targetPrediction.id, targetPrediction.outcomes.find(o => [lastMap.winner.safe_twitch_name, lastMap.winner.name].includes(o.title)).id);
                     }
                 }
 

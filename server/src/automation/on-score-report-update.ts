@@ -14,6 +14,7 @@ import client from "../discord/client.js";
 import { MapObject } from "../discord/managers.js";
 import {
     generateMatchReportText,
+    getTeamEmojiText,
     looseDeleteRecordedMessage,
     looseDeleteRecordedMessages,
     readableMatchLog,
@@ -57,6 +58,7 @@ export default {
             const opponents = await Promise.all(opponentIDs.map(id => get(id)));
             const submittingTeam = report.team?.[0] ? await get(report.team?.[0]) : null;
             const allTeams = await Promise.all((match.teams || []).map(id => get(id)));
+            const allTeamsDisplay = (await Promise.all(allTeams.map(async (t) => (await getTeamEmojiText(t) || "") + (t.name || t.code || "")))).join(" vs ");
 
             let subdomain = "";
             if (event?.subdomain || event?.partial_subdomain) {
@@ -179,7 +181,7 @@ export default {
                         ) {
                             const opponentPings = opponents.map(opponent => {
                                 const discordControl = new MapObject(opponent?.discord_control);
-                                return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : opponent.name;
+                                return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : "";
                             });
                             messageData = await sendRecordedMessage<ScoreReportingReportKeys>({
                                 key: "report_opponent_notification",
@@ -307,7 +309,7 @@ export default {
 
                         const teamPings = allTeams.map(opponent => {
                             const discordControl = new MapObject(opponent?.discord_control);
-                            return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : opponent.name;
+                            return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : "";
                         });
 
                         // remove old completion message
@@ -316,7 +318,7 @@ export default {
                             key: "reschedule_completed",
                             mapObject: messageData,
                             channelID: eventSettings.logging?.matchTimeChanges,
-                            content: `⌚ Match reschedule ${teamPings.join(" ")}: \n${allTeams.map(t => t.name || t.code).join(" vs ")} ${match.start ? "rescheduled to" : "scheduled for"} ${hammerTime(proposedStart)}.\n${matchLink}`
+                            content: `⌚ Match reschedule ${teamPings.join(" ")}: \n${allTeamsDisplay} ${match.start ? "rescheduled to" : "scheduled for"} ${hammerTime(proposedStart)}.\n${matchLink}`
                         });
                         await updateRecord(Cache, "Reports", report, {
                             "Approved": true,
@@ -352,7 +354,7 @@ export default {
                             content: {
                                 content: "",
                                 embeds: [{
-                                    title: `${match.start ? "Reschedule" : "Schedule"} request: ${allTeams.map(t => t.name || t.code).join(" vs ")}`,
+                                    title: `${match.start ? "Reschedule" : "Schedule"} request: ${allTeamsDisplay}`,
                                     url: `${matchLink}/rescheduling`,
                                     description: `${submittingTeam?.name ? `${submittingTeam.name} have` : "An opponent has"} ${match.start ? "requested a reschedule" : "requested a start time"} for the match.\nStaff approval is required, pre-approval is available now.`,
                                     fields: [
@@ -417,7 +419,7 @@ export default {
 
                         const opponentPings = opponents.map(opponent => {
                             const discordControl = new MapObject(opponent?.discord_control);
-                            return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : opponent.name;
+                            return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : "";
                         });
 
 
@@ -429,7 +431,7 @@ export default {
                                 content: {
                                     content: `📣 ${opponentPings.join(" ")}`,
                                     embeds: [{
-                                        title: `${match.start ? "Reschedule" : "Schedule"} request: ${allTeams.map(t => t.name || t.code).join(" vs ")}`,
+                                        title: `${match.start ? "Reschedule" : "Schedule"} request: ${allTeamsDisplay}`,
                                         url: `${matchLink}/rescheduling`,
                                         description: `${submittingTeam?.name ? `${submittingTeam.name} have` : "Your opponent has"} ${match.start ? "requested a reschedule" : "requested a start time"} for the match.`,
                                         fields: [
@@ -504,7 +506,7 @@ export default {
                             content: {
                                 content: "",
                                 embeds: [{
-                                    title: `${match.start ? "Reschedule" : "Schedule"} request: ${allTeams.map(t => t.name || t.code).join(" vs ")}`,
+                                    title: `${match.start ? "Reschedule" : "Schedule"} request: ${allTeamsDisplay}`,
                                     url: `${matchLink}/rescheduling`,
                                     description: `${submittingTeam?.name ? `${submittingTeam.name} have` : "An opponent has"} ${match.start ? "requested a reschedule" : "requested a start time"} for the match.\nStaff approval is required.`,
                                     fields: [
@@ -563,7 +565,7 @@ export default {
 
                         const teamPings = allTeams.map(opponent => {
                             const discordControl = new MapObject(opponent?.discord_control);
-                            return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : opponent.name;
+                            return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : "";
                         });
 
                         const opponentNames = opponents.map(opponent => opponent.name || opponent.code).join(" & ");
@@ -576,7 +578,7 @@ export default {
                             content: {
                                 content: `📣 ${teamPings.join(" ")}`,
                                 embeds:  match.start ? [{
-                                    title: `Reschedule request denied: ${allTeams.map(t => t.name || t.code).join(" vs ")}`,
+                                    title: `Reschedule request denied: ${allTeamsDisplay}`,
                                     url: `${matchLink}/rescheduling`,
                                     description: `${emoji.circle.danger_exclamation} ${opponentNames ? `${opponentNames} have` : "Your opponent has"} denied a reschedule for the match.\nYou can start a new request on SLMN.GG.`,
                                     fields: [
@@ -596,7 +598,7 @@ export default {
                                     },
                                     color: parseInt("dc3545", 16)
                                 }] : [{
-                                    title: `Schedule request denied: ${allTeams.map(t => t.name || t.code).join(" vs ")}`,
+                                    title: `Schedule request denied: ${allTeamsDisplay}`,
                                     url: `${matchLink}/rescheduling`,
                                     description: `${emoji.circle.danger_exclamation} ${opponentNames ? `${opponentNames} have` : "Your opponent has"} denied the requested start time for the match.\nYou can start a new request on SLMN.GG.`,
                                     fields: [
@@ -646,7 +648,7 @@ export default {
 
                         const teamPings = allTeams.map(opponent => {
                             const discordControl = new MapObject(opponent?.discord_control);
-                            return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : opponent.name;
+                            return discordControl.get("role_id") ? `<@&${discordControl.get("role_id")}>` : "";
                         });
 
                         console.log("Message send start");
@@ -657,7 +659,7 @@ export default {
                             content: {
                                 content: `📣 ${teamPings.join(" ")}`,
                                 embeds:  match.start ? [{
-                                    title: `Reschedule request denied: ${allTeams.map(t => t.name || t.code).join(" vs ")}`,
+                                    title: `Reschedule request denied: ${allTeamsDisplay}`,
                                     url: `${matchLink}/rescheduling`,
                                     description: `${emoji.circle.danger_exclamation} Staff have denied a reschedule for the match.\nRescheduling for this match has been locked, contact staff for more information.`,
                                     fields: [
@@ -677,7 +679,7 @@ export default {
                                     },
                                     color: parseInt("dc3545", 16)
                                 }] : [{
-                                    title: `Schedule request denied: ${allTeams.map(t => t.name || t.code).join(" vs ")}`,
+                                    title: `Schedule request denied: ${allTeamsDisplay}`,
                                     url: `${matchLink}/rescheduling`,
                                     description: `${emoji.circle.danger_exclamation} Staff have denied the requested start time for the match.\nScheduling for this match has been locked, contact staff for more information.`,
                                     fields: [

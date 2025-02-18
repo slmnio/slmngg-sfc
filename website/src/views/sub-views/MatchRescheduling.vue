@@ -54,7 +54,7 @@
                     </div>
                     <div v-if="(currentAction?.content || [])?.includes('log')">
                         <div class="mb-1 fw-bold">Request log</div>
-                        <ReportLog v-if="existingScoreReport?.log" :log="existingScoreReport.log" />
+                        <ReportLog v-if="existingScoreReport?.log" :report="existingScoreReport" :log="existingScoreReport.log" />
                     </div>
                 </div>
                 <div v-if="currentAction?.footer?.length" class="action-footer action-footer-footers bg-dark flex-column gap-2">
@@ -87,7 +87,10 @@
                 <i class="fas fa-check fa-fw mr-1"></i>This match is complete
             </div>
             <div v-if="existingScoreReport?.log" class="action-content text-left">
-                <ReportLog v-if="existingScoreReport?.log" :log="existingScoreReport.log" />
+                <ReportLog v-if="existingScoreReport?.log" :report="existingScoreReport" :log="existingScoreReport.log" />
+            </div>
+            <div v-if="reportHistory?.length" class="action-content text-left">
+                <ReportLog v-for="report in reportHistory" :key="report.id" :report="report" :log="report.log" />
             </div>
         </div>
         <div v-else-if="!reschedulingAvailable" class="p-2 bg-dark text-center rounded">
@@ -150,6 +153,14 @@ export default {
                 console.error(e);
                 return null;
             }
+        },
+        reportHistory() {
+            return (ReactiveRoot(this.match?.id, {
+                "report_history": ReactiveArray("report_history", {
+                    "team": ReactiveThing("team"),
+                    "player": ReactiveThing("player")
+                })
+            })?.report_history || []).filter(report => report.type === "Rescheduling").reverse();
         },
         matchComplete() {
             if (!this.match?.first_to) return false;

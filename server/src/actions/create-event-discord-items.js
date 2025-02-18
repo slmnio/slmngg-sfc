@@ -12,6 +12,12 @@ function multiple(num, singular, plural) {
     return num + " " + plural;
 }
 
+function determinate(val) {
+    if (val === true) return true;
+    if (val === false) return false;
+    return null;
+}
+
 const working = new Map();
 /**
  *
@@ -196,8 +202,8 @@ export default {
                     const role = {
                         name: team.name,
                         permissions: new PermissionsBitField(),
-                        mentionable: !!settings.roles.pingable,
-                        hoist: !!settings.roles.hoist
+                        mentionable: determinate(settings.roles.pingable),
+                        hoist: determinate(settings.roles.hoist)
                     };
                     if (theme && guild.features.includes(GuildFeature.RoleIcons)) {
                         role.icon = await getDiscordIcon(theme);

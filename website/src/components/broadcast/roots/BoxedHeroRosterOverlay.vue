@@ -8,7 +8,7 @@
             </div>
         </div>
 
-        <div v-if="showStaff" class="staff-wrapper">
+        <div v-if="showStaff" class="staff-wrapper overlay--text-on-bg">
             <div v-if="managers" class="staff manager">{{ managers }}</div>
             <div v-if="coaches" class="staff coach">{{ coaches }}</div>
         </div>
@@ -42,9 +42,14 @@
                             <div class="player-name flex-center text-center px-1">
                                 <span class="player-name-internal">{{ player.name }}</span>
                                 <span
-                                    v-if="showRoles"
+                                    v-if="showRoles === 'eligible'"
+                                    class="flex-center player-eligible-roles">
+                                    <span v-for="role in playerEligibleRoles(player)" :key="role" class="player-role flex-center" v-html="getRoleSVG(role)"></span>
+                                </span>
+                                <span
+                                    v-else-if="showRoles && (player?.this_event_signup_data?.main_role || player.role)"
                                     class="player-role"
-                                    v-html="getRoleSVG(player?._draftData?.role)"></span>
+                                    v-html="getRoleSVG(player?.this_event_signup_data?.main_role || player.role)"></span>
                                 <span
                                     v-if="showPronouns"
                                     :style="themeBackground1(team)"
@@ -67,6 +72,7 @@ import { bg, resizedAttachment, resizedImage } from "@/utils/images";
 import { useStatusStore } from "@/stores/statusStore";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
+import { sortRoles } from "@/utils/sorts.js";
 
 function niceJoin(array, and = "and") {
     if (array.length > 1) {
@@ -198,13 +204,19 @@ export default {
         titleStyle() {
             return themeBackground1(this.team);
         },
+        staffPlayers() {
+            return [
+                ...(this.allPlayers || []),
+                ...(this.team?.staff || [])
+            ].filter((val, pos, arr) => arr.findIndex((p) => p.id === val.id) === pos);
+        },
         managers() {
-            const staff = (this.allPlayers || []).filter(p => (p.role?.toLowerCase() || "").includes("manager")).map(p => p.name).filter(Boolean);
+            const staff = (this.staffPlayers || []).filter(p => (p.staff_role?.toLowerCase() || p.role?.toLowerCase() || "").includes("manager")).map(p => p.name).filter(Boolean);
             if (!staff.length) return "";
             return `Manager${staff.length === 1 ? "" : "s"}: ${niceJoin(staff, "&")}`;
         },
         coaches() {
-            const staff = (this.allPlayers || []).filter(p => (p.role?.toLowerCase() || "").includes("coach")).map(p => p.name).filter(Boolean);
+            const staff = (this.staffPlayers || []).filter(p => (p.staff_role?.toLowerCase() || p.role?.toLowerCase() || "").includes("coach")).map(p => p.name).filter(Boolean);
             if (!staff.length) return "";
             return `Coach${staff.length === 1 ? "" : "es"}: ${niceJoin(staff, "&")}`;
         }
@@ -226,6 +238,9 @@ export default {
             const style = bg(resizedAttachment(file, "orig"));
             // console.log(style);
             return style;
+        },
+        playerEligibleRoles(player) {
+            return (player?.this_event_signup_data?.eligible_roles || player.eligible_roles || []).sort(sortRoles);
         }
     },
     watch: {
@@ -407,7 +422,7 @@ export default {
     gap: 1em;
     align-items: center;
     width: 100%;
-    justify-content: center;
+    justify-content: flex-end;
 }
 
 .recolored-hero-holder:deep(.recolored-hero[data-hero="Torbjörn"]) { transform: translate(3%, -5%); }
@@ -443,4 +458,31 @@ export default {
 .recolored-hero-holder:deep(.recolored-hero[data-hero="Venture"]) { transform: translate(5%, -8%); }
 .recolored-hero-holder:deep(.recolored-hero[data-hero="Doomfist"]) { transform: translate(-1%, 2%); }
 .recolored-hero-holder:deep(.recolored-hero[data-hero="Moira"]) { transform: translate(-1%, -2%); }
+
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Mirage"]) { transform: translate(-1%, 2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Dynamo"]) { transform: translate(-17%, -5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Sinclair"]) { transform: translate(-11%, -2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Mo and Krill"]) { transform: translate(-5.5%, -1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Lash"]) { transform: translate(5%, -1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Wraith"]) { transform: translate(-4.5%, 2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Paradox"]) { transform: translate(1%, -3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Infernus"]) { transform: translate(-12%, 8%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Bebop"]) { transform: translate(4%, 2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Seven"]) { transform: translate(-11%, 1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Holliday"]) { transform: translate(-5%, 1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Grey Talon"]) { transform: translate(13%, -9%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Calico"]) { transform: translate(1%, 5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Kelvin"]) { transform: translate(4%, -2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Abrams"]) { transform: translate(-4%, -1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Viscous"]) { transform: translate(2%, -5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="McGinnis"]) { transform: translate(15%, -1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Haze"]) { transform: translate(12%, -3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Ivy"]) { transform: translate(-3%, -2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Pocket"]) { transform: translate(-0.5%, 1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Shiv"]) { transform: translate(1%, 2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Warden"]) { transform: translate(0%, 4%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Lady Geist"]) { transform: translate(2%, 2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Yamato"]) { transform: translate(0.6%, 4%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Vindicta"]) { transform: translate(-3%, 3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Vyper"]) { transform: translate(3%, -5%); }
 </style>

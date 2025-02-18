@@ -614,7 +614,7 @@ export default {
                     team_2_picks: (this.team_2_picks[i] || []),
                     team_1_bans: (this.team_1_bans[i] || []),
                     team_2_bans: (this.team_2_bans[i] || []),
-                    replay_code: this.replayCodes[i]
+                    replay_code: this.replayCodes[i]?.toUpperCase()
                 });
             }
             return data.filter(obj => Object.values(obj).filter(x => (typeof x === "object") ? x?.length : !!x).length);
@@ -795,7 +795,7 @@ export default {
                     this.setIfNew("banners", i, map.banner?.id || map.banner?.[0]);
                     this.setIfNew("score_1s", i, map.score_1);
                     this.setIfNew("score_2s", i, map.score_2);
-                    this.setIfNew("replayCodes", i, map.replay_code);
+                    this.setIfNew("replayCodes", i, map.replay_code?.toUpperCase());
                     this.setIfNew("mapNumbers", i, map.number);
                     this.setIfNew("flip_pick_ban_order", i, map.flip_pick_ban_order);
                     this.setIfNew("team_1_picks", i, (map.team_1_picks || []).map(obj => dirtyID(obj?.id || obj)));

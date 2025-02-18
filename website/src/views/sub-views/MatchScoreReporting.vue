@@ -23,7 +23,7 @@
                     <i class="fas fa-check-circle fa-fw mr-1"></i>Score report approved
                 </div>
                 <div class="action-content text-left">
-                    <ReportLog v-if="existingScoreReport?.log" :log="existingScoreReport.log" />
+                    <ReportLog v-if="existingScoreReport?.log" :report="existingScoreReport" :log="existingScoreReport.log" />
                 </div>
             </div>
             <div v-else-if="currentAction" class="step-action action-container text-left opacity-changes" :class="{'low-opacity': processing}">
@@ -95,7 +95,7 @@
                     </div>
                     <div v-if="(currentAction?.content || [])?.includes('log')">
                         <div class="mb-1 fw-bold">Request log</div>
-                        <ReportLog v-if="existingScoreReport?.log" :log="existingScoreReport.log" />
+                        <ReportLog v-if="existingScoreReport?.log" :report="existingScoreReport" :log="existingScoreReport.log" />
                     </div>
                 </div>
                 <div v-if="currentAction?.footer?.length" class="action-footer action-footer-footers bg-dark flex-column gap-2">
@@ -284,7 +284,7 @@
                     <i class="fas fa-stopwatch fa-fw mr-1"></i>No action available at this time
                 </div>
                 <div class="action-content text-left">
-                    <ReportLog v-if="existingScoreReport?.log" :log="existingScoreReport.log" />
+                    <ReportLog v-if="existingScoreReport?.log" :report="existingScoreReport" :log="existingScoreReport.log" />
                 </div>
             </div>
             <div v-else class="p-2 bg-dark text-center rounded action-container h5 mb-0 fw-bold">

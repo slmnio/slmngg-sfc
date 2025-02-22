@@ -170,16 +170,16 @@
                                     </b-form-checkbox>
                                 </div>
                             </td>
-                            <td v-if="type === 'map' && (scoreReporting || !hideMatchExtras)" class="form-stack number">
+                            <td v-if="type === 'map' && (showReplayCodeInput)" class="form-stack number">
                                 <div
-                                    class="form-top"
+                                    class="form-top text-center"
                                     :class="{ 'very-low-opacity': banners[mapI] }">
                                     {{ gameOverride?.lang?.replay_code || "Replay Code" }}
                                 </div>
                                 <div
                                     class="form-button"
                                     :class="{ 'very-low-opacity': banners[mapI] }">
-                                    <b-form-input v-model="replayCodes[mapI]" type="text" />
+                                    <b-form-input v-model="replayCodes[mapI]" :style="gameOverride?.formStyles?.replay_code || {}" type="text" />
                                 </div>
                             </td>
                             <td v-if="type === 'map' && (controls.showMapBans ? true : banners[mapI]) && !gameOverride?.disableMapBans" class="ban-style">
@@ -644,6 +644,13 @@ export default {
         gameOverride() {
             if (this.match?.game || this.match?.event?.game) return GameOverrides[this.match?.game || this.match?.event?.game];
             return null;
+        },
+        showReplayCodeInput() {
+            if (this.scoreReporting) return true;
+            if ((this.gameOverride?.showForProduction || []).includes("replay_code")) return true;
+            if (this.hideMatchExtras) return false;
+
+            return true;
         },
         // loadedFully() {
         //     const test = [

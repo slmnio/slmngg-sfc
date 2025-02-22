@@ -37,7 +37,15 @@ export const GameOverrides = {
         lang: {
             "replay_code": "Match ID"
         },
-        defaultPickBanOrder: "ban1,ban2,pick1,pick2,pick2,pick1,pick1,pick2,pick1,pick2,pick1,pick2,pick1,pick2"
+        defaultPickBanOrder: "ban1,ban2,pick1,pick2,pick2,pick1,pick1,pick2,pick1,pick2,pick1,pick2,pick1,pick2",
+        showForProduction: [
+            "replay_code"
+        ],
+        formStyles: {
+            "replay_code": {
+                "min-width": "6em"
+            }
+        }
     }
 };
 

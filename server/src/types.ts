@@ -468,7 +468,7 @@ export type CacheAttachment = {
     fileExtension: string;
 }
 
-export type GameOption = "Overwatch" | "Valorant" | "League of Legends" | "F1" | "Counter-Strike";
+export type GameOption = "Overwatch" | "Valorant" | "League of Legends" | "F1" | "Counter-Strike" | "Deadlock";
 export type EventTag = "BPL community event" | "White-label" | "Tier 2" | "Tier 2/3" | "Production value example";
 export type EventTier = `${"S"|"A"|"B"|"C"} Tier` | "Unranked";
 

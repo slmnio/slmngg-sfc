@@ -9,7 +9,7 @@ import images from "./images.js";
 import discordAuth from "./discord/auth.js";
 import "./discord/discord-data.js";
 import webAuction from "./web_auction.js";
-import draftRoom from "./draftRoom.js";
+import * as draftRoom from "./draft-room.ts";
 import * as actions from "./action-utils/action-manager.js";
 
 const app = express();
@@ -262,18 +262,7 @@ io.on("connection", (socket) => {
         io.to(`prod:client-${socket._clientName}`).emit(event, args);
     });
 
-    socket.on("match_draft", async (event, matchId, ...args) => {
-        if (event === "join") {
-            if (socket._draftRoom) {
-                socket.leave(`match:draft-${socket._draftRoom}`);
-            }
-            socket._draftRoom = matchId;
-            socket.join(`match:draft-${matchId}`);
-            return;
-        }
-        await draftRoom(event, matchId, ...args);
-        io.to(`match:draft-${matchId}`).emit(event, ...args);
-    });
+    draftRoom.socketConnection(socket, io);
 });
 
 http.listen(port, () => {

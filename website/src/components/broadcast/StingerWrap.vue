@@ -1,5 +1,5 @@
 <template>
-    <div class="stinger-wrap" :class="{'s-active': active, 's-show': showStinger}">
+    <div class="stinger-wrap" :class="{'s-active': active, 's-show': showStinger, 'custom': !!customStingerTheme }">
         <theme-transition
             class="stinger-transition"
             start="left"

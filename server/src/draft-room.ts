@@ -1,7 +1,7 @@
 import * as Cache from "./cache.js";
 import { createRecord, dirtyID, updateRecord } from "./action-utils/action-utils";
 import { get } from "./action-utils/action-cache.js";
-import { MatchMapResolvableID, MatchResolvableID } from "./types.js";
+import { MatchResolvableID } from "./types.js";
 import { Server, Socket } from "socket.io";
 
 type DraftRoomEvent = "team_ready" | "swap_sides" | "draft_start" | "team_hover" | "team_lock" | "join";
@@ -17,6 +17,8 @@ export function socketConnection(socket: (Socket & { _draftRoom?: MatchResolvabl
             return;
         }
         await handleEvent(event, matchId, ...args);
+
+        // TODO: these events need to be emitted inside the event handler
         io.to(`match:draft-${matchId}`).emit(event, ...args);
     });
 }
@@ -53,7 +55,7 @@ export async function handleEvent(event: Omit<DraftRoomEvent, "join">, matchID: 
         if ("error" in res) {
             throw "Airtable Error";
         }
-        currentMap = await get(res[0]?.id as MatchMapResolvableID);
+        currentMap = res[0];
     }
 
     if (!currentMap) return console.warn("[draft] No currentMap even after creation attempt");
@@ -77,6 +79,7 @@ export async function handleEvent(event: Omit<DraftRoomEvent, "join">, matchID: 
     }
 
     if (currentMap && Object.keys(updates).length) {
+        // TODO: some sort of auth needed here
         await updateRecord(Cache, "Maps", currentMap, updates);
     } else {
         console.warn("[draft] Can't update map", updates);

@@ -178,11 +178,9 @@ export default {
                 }
             }
 
-            // const heroes = (this.heroes || [])?.filter(h => h.game === "Overwatch");
-            //
-            // const page = 2;
+            // const heroes = (this.heroes || [])?.filter(h => h.game === "Marvel Rivals");
+            // const page = 5;
             // players = heroes.slice(page * 6, (page + 1) * 6).map(x => ({ ...x, favourite_hero: x }));
-
             const fillingHeroes = (this.fill || []).map(str => this.getFavouriteHero(str));
 
             return (players || []).sort((a, b) => {
@@ -485,4 +483,43 @@ export default {
 .recolored-hero-holder:deep(.recolored-hero[data-hero="Yamato"]) { transform: translate(0.6%, 4%); }
 .recolored-hero-holder:deep(.recolored-hero[data-hero="Vindicta"]) { transform: translate(-3%, 3%); }
 .recolored-hero-holder:deep(.recolored-hero[data-hero="Vyper"]) { transform: translate(3%, -5%); }
+
+
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Psylocke"]) { transform: translate(-1%, 2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Magneto"]) { transform: translate(8%, 1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Squirrel Girl"]) { transform: translate(-3%, 3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Doctor Strange"]) { transform: translate(-5%, 3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Spider-Man"]) { transform: translate(-1%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Human Torch"]) { transform: translate(1%, 8%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Luna Snow"]) { transform: translate(1%, -1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Black Panther"]) { transform: translate(0%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Captain America"]) { transform: translate(0%, 10%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Hawkeye"]) { transform: translate(2.5%, 1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Venom"]) { transform: translate(-3%, 9%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Storm"]) { transform: translate(-18%, 1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Winter Soldier"]) { transform: translate(0%, 11%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Iron Fist"]) { transform: translate(-1%, 5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="The Thing"]) { transform: translate(-2%, 3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="The Punisher"]) { transform: translate(1%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Groot"]) { transform: translate(-2%, 7%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Hela"]) { transform: translate(-11%, 4%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Magik"]) { transform: translate(14%, 3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Iron Man"]) { transform: translate(1%, 3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Hulk"]) { transform: translate(-4%, 7%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Black Widow"]) { transform: translate(1%, 4%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Scarlet Witch"]) { transform: translate(0%, 2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Invisible Woman"]) { transform: translate(0%, 4%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Moon Knight"]) { transform: translate(7%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Mister Fantastic"]) { transform: translate(-2%, 5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Thor"]) { transform: translate(-2.5%, 7%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Rocket Raccoon"]) { transform: translate(1%, -8%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Namor"]) { transform: translate(-1%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Star-Lord"]) { transform: translate(0.5%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Cloak & Dagger"]) { transform: translate(-21%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Adam Warlock"]) { transform: translate(-1.5%, 12%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Wolverine"]) { transform: translate(0%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Loki"]) { transform: translate(-1%, 7%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Jeff the Land Shark"]) { transform: translate(-4%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Mantis"]) { transform: translate(0.5%, 3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Peni Parker"]) { transform: translate(-4%, 7%); }
 </style>

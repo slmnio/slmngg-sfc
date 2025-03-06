@@ -186,6 +186,10 @@ C13.888,14.756,13.487,14.83,13.065,14.847z"/>
     if (name === "Manager") return "<i style'color:currentColor' class=\"fas fa-clipboard-list fa-fw\"></i>";
     if (name === "Coach") return "<i style'color:currentColor' class=\"fas fa-whistle fa-fw\"></i>";
 
+    if (name === "Duelist") return "<img class='temp-img-icon icon-marvel icon-duelist' src='https://media.slmn.io/Duelist_Icon.png'>";
+    if (name === "Strategist") return "<img class='temp-img-icon icon-marvel icon-strategist' src='https://media.slmn.io/Strategist_Icon.png'>";
+    if (name === "Vanguard") return "<img class='temp-img-icon icon-marvel icon-vanguard' src='https://media.slmn.io/Vanguard_Icon.png'>";
+
     return "";
 }
 

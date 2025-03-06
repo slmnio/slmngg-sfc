@@ -5,7 +5,7 @@
             <video :src="mapVideo" autoplay muted loop></video>
         </div>
 
-        <div v-else class="map-bg w-100 h-100 bg-center" :class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner)}" :style="mapBackground"></div>
+        <div v-else class="map-bg w-100 h-100 bg-center" :class="{'grayscale': !!winnerBG || (map && map.draw) || (map && map.banner), 'no-bg': !mapBackground?.backgroundImage}" :style="mapBackground"></div>
         <div class="map-gel w-100 h-100 position-absolute" :style="winnerBG"></div>
         <div v-if="map && map.draw" class="map-gel w-100 h-100 position-absolute draw-gel"></div>
         <div v-if="map && map.banner" class="map-gel w-100 h-100 position-absolute ban-gel flex-center"></div>
@@ -103,9 +103,10 @@ export default {
         mapBackground() {
             console.log("background", this.map.name, { submap_big: this.map?.map?.big_image, submap_image: this.map?.map?.image, parent_big: this.map?.big_image, parent_image: this.map?.image });
             const image = (this.map?.map?.big_image || this.map?.map?.image || this.map?.big_image || this.map?.image)?.[0];
-            if (!(image)) return {};
+            if (!(image?.url || image?.id)) return {};
 
             try {
+                console.log("background", image?.url, image);
                 return bg(image?.url || getNewURL(image, this.small ? "w-400" : "orig"));
             } catch (e) {
                 return {};

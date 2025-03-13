@@ -1,5 +1,5 @@
 <template>
-    <div class="ingame-overlay" :class="{'basic': basicMode}">
+    <div class="ingame-overlay" :class="{'basic': basicMode}" :data-map-type="currentMap?.map?.type">
         <div class="top-overlay" :style="broadcastMargin">
             <IngameTeam
                 v-for="(team, i) in teams"
@@ -94,6 +94,7 @@ export default {
                     })
                 }),
                 maps: ReactiveArray("maps", {
+                    "map": ReactiveThing("map"),
                     "team_1_bans": ReactiveArray("team_1_bans"),
                     "team_2_bans": ReactiveArray("team_2_bans"),
                 })
@@ -208,6 +209,19 @@ export default {
         },
         fadeSponsors() {
             return this.sponsorData?.persistent_sponsors || this.sponsorData?.sponsors;
+        },
+        currentMap() {
+            const maps = (this.match?.maps || []).map((map, i) => ({
+                ...map,
+                number: map.number || i + 1
+            })).filter(map => !map.banner);
+
+            let currentMap = maps.find(map => !(map.draw || map.winner));
+
+            if (!currentMap && maps.length) {
+                currentMap = maps[maps.length - 1];
+            }
+            return currentMap;
         },
         middleText() {
             if (!this.match) return null;

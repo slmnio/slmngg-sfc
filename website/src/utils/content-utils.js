@@ -640,7 +640,11 @@ export function getFormatOptions(event, match) {
         match_week_text: match?.week_text,
         match_week_number: match?.week,
         match_day: match?.day,
-        match_first_to: match?.first_to
+        match_first_to: match?.first_to,
+        match_first_to_short: match.first_to ? `FT${match.first_to}` : null,
+        match_first_to_long: match.first_to ? `First to ${match.first_to}` : null,
+        match_best_of_short: match.first_to ? `BO${(match.first_to * 2) - 1}` : null,
+        match_best_of_long: match.first_to ? `Best of ${(match.first_to * 2) - 1}` : null
     };
 }
 

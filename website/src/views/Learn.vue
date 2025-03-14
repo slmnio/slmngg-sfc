@@ -13,6 +13,9 @@
                 <router-link :to="{ name: 'observing-tech-guide' }">Observer Tech Guide</router-link>
             </li>
             <li>
+                <router-link :to="{ name: 'producing-guide' }">Producing Guide</router-link>
+            </li>
+            <li>
                 <router-link :to="{ name: 'overwatch-settings' }">Overwatch Settings Guide</router-link>
             </li>
             <li style="opacity: 0.8">

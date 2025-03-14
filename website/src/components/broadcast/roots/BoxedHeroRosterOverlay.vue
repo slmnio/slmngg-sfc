@@ -31,11 +31,11 @@
                         <div
                             v-if="alternate"
                             class="alternate bg-center hero w-100"
-                            :style="alternateHeroBG(player.favourite_hero, alternate)"></div>
+                            :style="alternateHeroBG(player.favourite_hero_data || player.favourite_hero, alternate)"></div>
                         <div v-else class="recolored-hero-holder hero w-100">
                             <RecoloredHero
                                 v-if="team?.theme"
-                                :hero="player.favourite_hero"
+                                :hero="player.favourite_hero_data || player.favourite_hero"
                                 :theme="team?.theme" />
                         </div>
                         <div class="player-name-holder" :style="themeBackground1(team)">
@@ -150,7 +150,8 @@ export default {
             if (!this.team?.players && this.team?.limited_players) {
                 players.forEach(player => {
                     // set hero from lookup
-                    player.favourite_hero = this.getFavouriteHero(player.favourite_hero);
+                    console.log("lookup", player, player.favourite_hero);
+                    player.favourite_hero_data = this.getFavouriteHero(player.favourite_hero);
                 });
             }
             if (this.playerCount) players = (players || []).slice(0, this.playerCount);
@@ -192,9 +193,10 @@ export default {
                 return 0;
             }).map(p => {
                 const player = decoratePlayerWithDraftData(p, this.broadcast?.event?.id);
+                console.log("decorate", player);
 
                 if (!player?.favourite_hero) {
-                    player.favourite_hero = fillingHeroes.shift();
+                    player.favourite_hero_data = fillingHeroes.shift();
                 }
                 return player;
             });

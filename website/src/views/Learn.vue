@@ -35,6 +35,9 @@
                 <router-link :to="{ name: 'bracket-creator' }">Bracket Creator</router-link>
             </li>
             <li>
+                <router-link :to="{ name: 'theme-creator' }">Theme Creator</router-link>
+            </li>
+            <li>
                 <router-link :to="{ name: 'twitch-auth' }">Connect Twitch channel to SLMN.GG</router-link>
             </li>
         </ul>

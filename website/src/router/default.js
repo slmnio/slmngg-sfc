@@ -148,12 +148,21 @@ export default [
                 path: "/tools/bracket-creator",
                 name: "bracket-creator",
                 component: BracketCreator
-            }
+            },
+            {
+                path: "/tools/theme-creator",
+                name: "theme-creator",
+                component: () => import("@/views/sub-views/ThemeCreator.vue")
+            },
         ]
     },
     {
         path: "/bracket-creator",
         redirect: "/tools/bracket-creator"
+    },
+    {
+        path: "/theme-creator",
+        redirect: "/tools/theme-creator"
     },
     {
         path: "/twitch-auth",

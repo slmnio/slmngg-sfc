@@ -15,9 +15,9 @@
                 @click="selectedBroadcast = broadcast"
             />
         </div>
-        <div v-else class="mb-3">
+        <b-alert v-else variant="warning" class="mb-3" :model-value="true">
             <b>No events are enabled for the solo overlay right now.</b>
-        </div>
+        </b-alert>
 
         <p v-if="selectedBroadcast">
             The overlay link for <b>{{ selectedBroadcast?.event?.name }}</b> is: <code><copy-text-button>{{ overlayURL }}</copy-text-button></code>

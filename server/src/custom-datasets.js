@@ -40,7 +40,7 @@ async function matchUpdate(Cache) {
     let liveMatches = allMatchData.filter(match => match.live);
     Cache.set("internal:live-matches", { matches: liveMatches.map(m => m.id), __tableName: "Internal Collection" });
 
-    let allLiveMatchIDs = (await Cache.get("special:live-matches")).matches;
+    let allLiveMatchIDs = ((await Cache.get("special:live-matches"))?.matches || []);
 
     const eventCache = {};
 
@@ -101,6 +101,15 @@ async function broadcastUpdate(Cache) {
     }
 
     Cache.set("special:live-matches", { matches: matchIDs, __tableName: "Special Collection" });
+
+    let soloBroadcasts = (await Promise.all(broadcasts.map(async b => {
+        const broadcastEvent = await Cache.get(b.event?.[0]);
+        // console.log({ broadcast: b, event: broadcastEvent, in_progress: broadcastEvent?.in_progress, solo_available: b?.available_for_solo });
+        if (!broadcastEvent?.in_progress) return { ...b, _solo_enabled: false };
+        return { ...b, _solo_enabled: b.available_for_solo };
+    }))).filter(b => b._solo_enabled);
+
+    Cache.set("special:solo-broadcasts", { broadcasts: soloBroadcasts.map(b => b.id), __tableName: "Special Collection" });
 }
 
 async function playerList(Cache) {

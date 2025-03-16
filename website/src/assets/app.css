@@ -403,3 +403,10 @@ small.text-body-secondary {
 .dark-scrollbar:active::-webkit-scrollbar-thumb {
     background-color: #333;
 }
+
+.guide-image {
+    border-radius: .25em;
+    border: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: .5em;
+    max-width: 100%;
+}

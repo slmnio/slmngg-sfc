@@ -119,6 +119,16 @@ export default [
                             { path: "", component: () => import("@/views/sub-views/guide/companion-module/CompanionModuleGuideIntro.vue"), name: "companion-module" }
                         ]
                     },
+                    {
+                        path: "solo-overlay",
+                        component: () => import("@/views/sub-views/guide/solo-overlay/SoloOverlayGuideContainer.vue"),
+                        children: [
+                            { path: "", component: () => import("@/views/sub-views/guide/solo-overlay/SoloOverlayGuideIntro.vue"), name: "solo-overlay-guide" },
+                            { path: "installation", component: () => import("@/views/sub-views/guide/solo-overlay/SoloOverlayGuideInstallation.vue"), name: "solo-overlay-installation" },
+                            { path: "setup", component: () => import("@/views/sub-views/guide/solo-overlay/SoloOverlayGuideSetup.vue"), name: "solo-overlay-setup" },
+                            { path: "usage", component: () => import("@/views/sub-views/guide/solo-overlay/SoloOverlayGuideUsage.vue"), name: "solo-overlay-usage" },
+                        ]
+                    },
                 ],
             },
             {

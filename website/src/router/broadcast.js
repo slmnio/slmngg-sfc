@@ -190,6 +190,7 @@ export default [
         props: route => ({
             group: "casters",
             disableCasters: route.query.disable || route.query.casters === "false",
+            disableLower: route.query.lower === "false",
             ignoreTalentSocket: route.query.ignoreTalentSocket || route.query.ignoreTalent
         })
     },

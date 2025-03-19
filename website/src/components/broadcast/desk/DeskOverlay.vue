@@ -22,12 +22,12 @@
         </transition-group>
         <transition tag="div" mode="out-in" name="break-content">
             <HeroDraft
-                v-if="liveMatch && useHeroDraft"
+                v-if="liveMatch && useHeroDraft && !disableLower"
                 class="hero-draft"
                 :broadcast="broadcast"
                 :match="liveMatch" />
             <MatchScoreboard
-                v-else-if="liveMatch && useScoreboard"
+                v-else-if="liveMatch && useScoreboard && !disableLower"
                 key="scoreboard"
                 :active="animationActive"
                 class="scoreboard"
@@ -35,7 +35,7 @@
                 :broadcast="broadcast"
                 :animate-on-mount="true" />
             <DeskMatch
-                v-else-if="liveMatch && !useScoreboard"
+                v-else-if="liveMatch && !useScoreboard && !disableLower"
                 key="desk-match"
                 :broadcast="broadcast"
                 class="w-100"
@@ -46,7 +46,7 @@
 
         <div class="preload">
             <DeskMatch
-                v-if="liveMatch"
+                v-if="liveMatch && !disableLower"
                 key="desk-match"
                 class="w-100"
                 :broadcast="broadcast"
@@ -70,7 +70,7 @@ import HeroDraft from "@/components/broadcast/HeroDraft.vue";
 export default {
     name: "DeskOverlay",
     components: { HeroDraft, MatchScoreboard, DeskMatch, Caster, TourneyBar },
-    props: ["broadcast", "group", "disableCasters", "animationActive", "ignoreTalentSocket"],
+    props: ["broadcast", "group", "disableCasters", "disableLower", "animationActive", "ignoreTalentSocket"],
     data: () => ({
         socketHideIDs: {},
         socketIDClasses: {},

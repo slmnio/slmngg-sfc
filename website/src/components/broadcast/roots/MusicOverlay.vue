@@ -146,39 +146,44 @@ export default {
             this.mainPlayer = new Track(next, this.loopSongs);
             this.mainPlayer.play(this.volume);
         },
-        startCrossfade() {
+        startCrossfade(overrideDuration) {
+            const duration = overrideDuration || this.crossfadeDuration;
             if (this.crossfading || this.crossfadePlayer) return;
-            console.log(`Crossfading (${this.crossfadeDuration}s) - ${this.mainPlayer.id} - ${this.mainPlayer.title}`);
+            console.log(`Crossfading (${duration}s) - ${this.mainPlayer.id} - ${this.mainPlayer.title}`);
             this.crossfading = true;
             const next = this.getNextTrack();
 
             this.crossfadePlayer = new Track(next, this.loopSongs);
             this.crossfadePlayer.play(0);
 
-            this.mainPlayer.rampVolume(this.volume, 0, this.crossfadeDuration);
-            this.crossfadePlayer.rampVolume(0, this.volume, this.crossfadeDuration);
+            this.mainPlayer.rampVolume(this.volume, 0, duration);
+            this.crossfadePlayer.rampVolume(0, this.volume, duration);
 
             setTimeout(() => {
                 console.log("Crossfade at middle point, players are swapped");
                 [this.mainPlayer, this.crossfadePlayer] = [this.crossfadePlayer, this.mainPlayer];
-            }, this.crossfadeDuration * 500);
+            }, duration * 500);
 
             setTimeout(() => {
                 console.log("Crossfade finished, ending old player");
                 this.crossfading = false;
                 this.crossfadePlayer.stop();
                 this.crossfadePlayer = null;
-            }, this.crossfadeDuration * 1000);
+            }, duration * 1000);
         },
-        startNewSong(isActive) {
+        startNewSong(isActive, fade) {
             if (this.crossfading) return; // already crossfading, dw about it
             if (isActive) {
-                this.mainPlayer?.stop();
-                this.mainPlayer = null;
-                this.start();
-                setTimeout(() => {
-                    this.visible = true;
-                }, this.broadcast?.transition_offset + 500 || 500);
+                if (fade) {
+                    this.startCrossfade(1);
+                } else {
+                    this.mainPlayer?.stop();
+                    this.mainPlayer = null;
+                    this.start();
+                    setTimeout(() => {
+                        this.visible = true;
+                    }, this.broadcast?.transition_offset + 500 || 500);
+                }
             } else {
                 this.visible = false;
             }
@@ -220,9 +225,15 @@ export default {
     },
     sockets: {
         skip_song([group]) {
-            console.log(group, this.role);
+            console.log("skip_song", group, this.role);
             if (group === this.role) {
                 this.startNewSong(true);
+            }
+        },
+        fade_skip_song([group]) {
+            console.log("fade_skip_song", group, this.role);
+            if (group === this.role) {
+                this.startNewSong(true, true);
             }
         }
     },

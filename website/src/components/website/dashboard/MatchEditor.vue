@@ -151,6 +151,23 @@
                                         @input="(val) => checkAutoWinner(mapI, val)" />
                                 </div>
                             </td>
+                            <td v-if="type === 'map' && (showPublicInput)" class="form-stack">
+                                <div
+                                    class="form-top text-center">
+                                    Public
+                                </div>
+                                <div
+                                    class="form-bottom d-flex draw-checkbox-wrapper">
+                                    <b-form-checkbox
+                                        v-model="publics[mapI]"
+                                        button
+                                        :button-variant="publics[mapI] ? 'primary' : 'light'"
+                                        class="draw-checkbox">
+                                        <i v-if="publics[mapI]" class="fas fa-check fa-fw"></i>
+                                        <i v-else class="fas fa-fw fa-check hoverable"></i>
+                                    </b-form-checkbox>
+                                </div>
+                            </td>
                             <td v-if="type === 'map'" class="form-stack">
                                 <div
                                     class="form-top text-center"
@@ -388,6 +405,7 @@ export default {
             alternative_vod: null
         },
         draws: [],
+        publics: [],
         mapChoices: [],
         winners: [],
         pickers: [],
@@ -601,6 +619,7 @@ export default {
             for (let i = 0; i < this.minMaps; i++) {
                 data.push({
                     draw: this.draws[i],
+                    public: this.publics[i],
                     map: this.mapChoices[i],
                     existingID: this.existingMapIDs[i],
                     winner: this.winners[i],
@@ -651,6 +670,11 @@ export default {
             if (this.hideMatchExtras) return false;
 
             return true;
+        },
+        showPublicInput() {
+            if (this.scoreReporting) return false;
+            if ((this.gameOverride?.showForProduction || []).includes("public")) return true;
+            return false;
         },
         // loadedFully() {
         //     const test = [
@@ -741,6 +765,7 @@ export default {
 
             this.matchData.scores = [0, 0];
             this.draws = [];
+            this.publics = [];
             this.mapChoices = [];
             this.winners = [];
             this.pickers = [];
@@ -763,6 +788,7 @@ export default {
 
             this.previousAutoData = {
                 draws: Object.assign([], this.draws),
+                publics: Object.assign([], this.publics),
                 existingMapIDs: Object.assign([], this.existingMapIDs),
                 winners: Object.assign([], this.winners),
                 pickers: Object.assign([], this.pickers),
@@ -796,6 +822,7 @@ export default {
                     console.log("Map set", !!mapChoice, mapChoice, this.mapChoices[i], map);
                     this.setIfNew("mapChoices", i, mapChoice || null);
                     this.setIfNew("draws", i, map.draw);
+                    this.setIfNew("publics", i, map.public);
                     this.setIfNew("existingMapIDs", i, map.id);
                     this.setIfNew("winners", i, map.winner?.id || map.winner?.[0]);
                     this.setIfNew("pickers", i, map.picker?.id || map.picker?.[0]);
@@ -833,6 +860,7 @@ export default {
             }
             this.previousAutoData = {
                 draws: Object.assign([], this.draws),
+                publics: Object.assign([], this.publics),
                 existingMapIDs: Object.assign([], this.existingMapIDs),
                 winners: Object.assign([], this.winners),
                 pickers: Object.assign([], this.pickers),

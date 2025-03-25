@@ -143,6 +143,8 @@ export default ({ app, Cache, io }) => {
             if (live_match.error) return res.send(live_match.message);
             live_match = live_match.data;
 
+            const event = live_match?.event?.[0] ? await Cache.get(live_match?.event?.[0]) : null;
+
             /**
              * @type {MatchMap[]}
              */
@@ -151,6 +153,10 @@ export default ({ app, Cache, io }) => {
             const eligibleMaps = maps.filter(map => !map.banner);
             const currentMap = eligibleMaps.find(map => !(map.draw || map.winner));
             if (!currentMap?.id) return res.send("No hero ban information is available right now.");
+            if (event?.game === "Deadlock" && !currentMap.public) {
+                return res.send("No hero ban information is available right now.");
+            }
+
             /** @type {Team[]} */
             const teams = await Promise.all((live_match.teams || []).map(id => Cache.get(cleanID(id))));
 

@@ -163,6 +163,7 @@ export interface MatchMap extends Base {
     team_1_picks?: HeroResolvableID[];
     team_2_picks?: HeroResolvableID[];
     flip_pick_ban_order?: boolean;
+    public?: boolean;
 }
 interface PlayerRelationship extends Base {
 

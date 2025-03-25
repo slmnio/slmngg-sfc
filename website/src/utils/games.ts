@@ -39,7 +39,8 @@ export const GameOverrides = {
         },
         defaultPickBanOrder: "ban1,ban2,pick1,pick2,pick2,pick1,pick1,pick2,pick1,pick2,pick1,pick2,pick1,pick2",
         showForProduction: [
-            "replay_code"
+            "replay_code",
+            "public"
         ],
         formStyles: {
             "replay_code": {

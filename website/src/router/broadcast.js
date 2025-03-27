@@ -9,6 +9,10 @@ export default [
         })
     },
     {
+        path: "ingame-pickban",
+        component: () => import("@/components/broadcast/roots/IngamePickBan.vue")
+    },
+    {
         path: "cams",
         component: () => import("@/components/broadcast/cams/CamsWrapper.vue"),
         props: route => ({ params: route.query.params?.split(",") }),

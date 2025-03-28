@@ -18,7 +18,7 @@
                         <div v-for="(map, mi) in (match.maps || [])" :key="map.id" class="map d-flex flex-center flex-column">
                             <div class="pickbans d-flex gap-1">
                                 <div v-for="p in pickBanOrder.filter(p => p.team === (i + 1))" :key="`${p.type}-${p.countOfType}`" class="pickban" :class="p?.type">
-                                    <div class="pickban-image bg-center" :style="resizedImage(map?.[`team_${p.team}_${p.type}s`]?.[p.countOfTeamType - 1], ['icon'], 's-200')"></div>
+                                    <div class="pickban-image bg-center" :style="resizedImage(map?.[`team_${(match.flip_teams ? +!(i) : i) + 1}_${p.type}s`]?.[p.countOfTeamType - 1], ['icon'], 's-200')"></div>
                                 </div>
                             </div>
                             <div class="map-number">

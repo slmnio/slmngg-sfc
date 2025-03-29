@@ -289,8 +289,9 @@
                                                     :heroes="heroes"
                                                     :pick-ban-order="pickBanOrder[mapI]"
                                                     :current-action="{ team: 1, type: 'ban' }"
-                                                    :max="dashboardView && dashboardPickBanVisibility === 'order' ? getPickBanMax(pickBanOrder[mapI], 'ban', 1) : gameOverride?.defaultHeroBanCount || 0"
+                                                    :max="(dashboardView && dashboardPickBanVisibility === 'order' ? (getPickBanMax(pickBanOrder[mapI], 'ban', 1)) : gameOverride?.defaultHeroBanCount) || gameOverride?.defaultHeroBanCount || (getPickBanMax(pickBanOrder[mapI], 'ban', 1)) || 0"
                                                 />
+                                                <!-- these hero picker max are just setting priority then falling back -->
                                             </div>
                                         </div>
                                         <div class="hero-bans">
@@ -304,7 +305,7 @@
                                                     :heroes="heroes"
                                                     :pick-ban-order="pickBanOrder[mapI]"
                                                     :current-action="{ team: 2, type: 'ban' }"
-                                                    :max="dashboardView && dashboardPickBanVisibility === 'order' ? getPickBanMax(pickBanOrder[mapI], 'ban', 2) : gameOverride?.defaultHeroBanCount || 0"
+                                                    :max="(dashboardView && dashboardPickBanVisibility === 'order' ? (getPickBanMax(pickBanOrder[mapI], 'ban', 2)) : gameOverride?.defaultHeroBanCount) || gameOverride?.defaultHeroBanCount || (getPickBanMax(pickBanOrder[mapI], 'ban', 2)) || 0"
                                                 />
                                             </div>
                                         </div>

@@ -17,6 +17,7 @@ import BracketCreator from "@/views/BracketCreator.vue";
 import NotFoundPage from "@/views/NotFoundPage";
 import Learn from "@/views/Learn.vue";
 import Cookies from "universal-cookie";
+import CommunityStreams from "@/views/lists/CommunityStreams.vue";
 
 export default [
     {
@@ -40,6 +41,10 @@ export default [
             {
                 path: "/players",
                 component: Players
+            },
+            {
+                path: "/streams",
+                component: CommunityStreams
             },
             ...SharedRoutes,
             {

@@ -19,6 +19,7 @@ const players = new Map();
 const attachments = new Map();
 
 const emitter = new EventEmitter();
+export const cacheStatusEmitter = new EventEmitter();
 
 /**
  * @returns {Set<AnyAirtableID>}

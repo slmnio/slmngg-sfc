@@ -92,7 +92,6 @@
             <!--                </div>-->
             <!--            </div>-->
         </div>
-        <div class="spacer flex-grow-1"></div>
         <div class="area right-area">
             <div class="group text-end">
                 <div v-b-tooltip="'Show live match on break'" class="group-top">Break match</div>
@@ -311,6 +310,8 @@ export default {
     .area {
         display: flex;
         gap: .5em;
+        flex-wrap: wrap;
+        justify-content: center;
     }
     .right-area {
         margin-left: auto;

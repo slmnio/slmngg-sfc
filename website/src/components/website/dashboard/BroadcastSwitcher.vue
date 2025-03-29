@@ -4,7 +4,7 @@
             <BroadcastDisplay :broadcast="activeBroadcast" />
         </div>
 
-        <b-modal id="broadcast-switcher" ref="broadcast-switcher" title="Broadcast Switcher">
+        <b-modal id="broadcast-switcher" ref="broadcast-switcher" title="Broadcast Switcher" @show="showing = true">
             <div class="broadcasts flex-center flex-column">
                 <BroadcastDisplay
                     v-for="broadcast in broadcastGroups.active"
@@ -47,19 +47,32 @@
 <script>
 import BroadcastDisplay from "@/components/website/dashboard/BroadcastDisplay";
 import { authenticatedRequest } from "@/utils/dashboard";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
 
 export default {
     name: "BroadcastSwitcher",
     components: { BroadcastDisplay },
-    props: ["broadcasts"],
+    props: ["client"],
     data: () => ({
         setting: false,
         attemptedFirst: null,
-        showInactive: false
+        showInactive: false,
+        showing: false
     }),
     computed: {
+        broadcasts() {
+            if (!this.showing) return [];
+            if (!this.client?.id) return [];
+            return ReactiveRoot(this.client?.id, {
+                broadcast: ReactiveArray("broadcast", {
+                    event: ReactiveThing("event", {
+                        theme: ReactiveThing("theme")
+                    })
+                })
+            })?.broadcast;
+        },
         activeBroadcast() {
-            return this.broadcasts?.[0];
+            return this.client?.broadcast;
         },
         broadcastGroups() {
             const groups = {

@@ -23,7 +23,6 @@
 </template>
 
 <script>
-import { ReactiveArray, ReactiveRoot } from "@/utils/reactive.js";
 import { dirtyID, getPickBanItem } from "@/utils/content-utils.js";
 import { resizedImage } from "@/utils/images.js";
 import { sortAlpha } from "@/utils/sorts.js";
@@ -31,18 +30,13 @@ import { GameOverrides } from "@/utils/games.ts";
 
 export default {
     name: "HeroesPicker",
-    props: ["title", "modelValue", "game", "pickBanOrder", "currentAction", "startOpen"],
+    props: ["title", "modelValue", "game", "pickBanOrder", "currentAction", "max", "heroes"],
     emits: ["update:modelValue"],
     data: () => ({
         count: 1,
         localValue: []
     }),
     computed: {
-        heroes() {
-            return (ReactiveRoot("Heroes", {
-                "ids": ReactiveArray("ids")
-            })?.ids || []).filter(hero => this.game ? hero.game === this.game : true);
-        },
         gameOverride() {
             return GameOverrides[this.game];
         },
@@ -100,10 +94,19 @@ export default {
                 this.count = Math.max(this.count, (data || []).length);
                 this.localValue = data || [];
             }
+        },
+        max(newVal, oldVal) {
+            if (oldVal === newVal) return;
+            if (newVal > this.count) {
+                this.count = newVal;
+            } else {
+                // lower
+                this.count = Math.max(this.localValue.length, newVal);
+            }
         }
     },
     mounted() {
-        if (this.startOpen && this.startOpen > 1) this.count = this.startOpen;
+        if (this.max && this.max > 1) this.count = this.max;
     }
 };
 </script>

@@ -9,7 +9,7 @@
         </div>
         <div v-if="client && broadcast" class="client-broadcasts d-flex flex-wrap flex-column flex-md-row align-items-center">
             <div class="wrapper mb-2">
-                <BroadcastSwitcher :broadcasts="client.broadcast" />
+                <BroadcastSwitcher :client="client" />
                 <router-link v-if="liveMatch" :to="url('detailed', liveMatch)">
                     <MatchThumbnail class="mini-thumbnail" :match="liveMatch" stripe-height="2px" />
                 </router-link>
@@ -40,7 +40,7 @@
                 icon-class="fas fa-pennant"
                 class="broadcast-match-editor mb-2"
                 start-opened>
-                <MatchEditor :hide-match-extras="true" :match="liveMatch" />
+                <MatchEditor :dashboard-view="true" :match="liveMatch" />
             </DashboardModule>
             <DashboardModule title="Desk Guests" icon-class="fas fa-users" class="desk-editor mb-2">
                 <template v-if="deskGuestSource" #header>Desk guests pulled from: {{ deskGuestSource }}</template>
@@ -189,7 +189,7 @@ export default {
             if (!user?.airtableID) return {};
             return ReactiveRoot(user.airtableID, {
                 clients: ReactiveArray("clients", {
-                    broadcast: ReactiveArray("broadcast", {
+                    broadcast: ReactiveThing("broadcast", {
                         event: ReactiveThing("event", {
                             theme: ReactiveThing("theme")
                         })
@@ -211,8 +211,8 @@ export default {
             return client;
         },
         broadcast() {
-            if (!this.client?.broadcast?.[0]?.id) return null;
-            return ReactiveRoot(this.client?.broadcast?.[0]?.id, {
+            if (!this.client?.broadcast?.id) return null;
+            return ReactiveRoot(this.client?.broadcast?.id, {
                 event: ReactiveThing("event", {
                     theme: ReactiveThing("theme")
                 }),

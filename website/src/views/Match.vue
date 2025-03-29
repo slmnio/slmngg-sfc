@@ -259,7 +259,7 @@ export default {
         scoreReportingBadge() {
             const { isAuthenticated, user } = useAuthStore();
             if (!isAuthenticated) return null;
-            if (!(this.controllableTeams?.length || isEventStaffOrHasRole(user, { event: this.match?.event, websiteRoles: ["Can edit any match", "Can edit any event"] }))) return null;
+            if (!(this.controllableTeams?.length || isEventStaffOrHasRole(user, this.match?.event, ["Can edit any match", "Can edit any event"] ))) return null;
 
             const reports = (ReactiveRoot(this.match?.id, {
                 "reports": ReactiveArray("reports", {
@@ -273,7 +273,7 @@ export default {
         reschedulingBadge() {
             const { isAuthenticated, user } = useAuthStore();
             if (!isAuthenticated) return null;
-            if (!(this.controllableTeams?.length || isEventStaffOrHasRole(user, { event: this.match?.event, websiteRoles: ["Can edit any match", "Can edit any event"] }))) return null;
+            if (!(this.controllableTeams?.length || isEventStaffOrHasRole(user, this.match?.event, ["Can edit any match", "Can edit any event"] ))) return null;
 
             const reports = (ReactiveRoot(this.match?.id, {
                 "reports": ReactiveArray("reports", {
@@ -309,7 +309,7 @@ export default {
                     "is_on_teams": !!this.controllableTeams?.length,
                     "is_opponent": report?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) !== cleanID(report?.team?.id)) : null,
                     "is_submitter": report?.team?.id ? this.controllableTeams.some(t => cleanID(t.id) === cleanID(report?.team?.id)) : null,
-                    "is_staff": isEventStaffOrHasRole(user, { event: this.match?.event, websiteRoles: ["Can edit any match", "Can edit any event"] }),
+                    "is_staff": isEventStaffOrHasRole(user, this.match?.event, ["Can edit any match", "Can edit any event"]),
                     "settings": this.eventSettings,
                     "match_complete": [this.match.score_1 || 0, this.match.score_2 || 0].some(score => this.match.first_to === score)
                 }

@@ -77,6 +77,7 @@
                 v-for="(match, i) in groupMatches"
                 :key="match.id"
                 :match="match"
+                :event="event"
                 :class="i > 0 && getMatchClass(match, groupMatches[i-1])"
                 :custom-text="showAll && match.match_group ? match.match_group : null"
                 :can-edit-matches="showEditorButton"
@@ -258,11 +259,10 @@ export default {
         showBroadcastSettings() {
             const { isAuthenticated, user } = useAuthStore();
             if (!isAuthenticated) return false;
-            return isEventStaffOrHasRole(user, {
-                event: this.event,
-                role: "Broadcast Manager",
-                websiteRoles: ["Can edit any match", "Can edit any event", "Full broadcast permissions"]
-            });
+            return isEventStaffOrHasRole(user, this.event,
+                ["Can edit any match", "Can edit any event", "Full broadcast permissions"],
+                ["Broadcast Manager", "Match Editor"],
+            );
         },
         eventSettings() {
             if (!this._event?.blocks) return null;

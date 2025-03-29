@@ -369,7 +369,11 @@ export default {
         },
         isAdmin() {
             const { user } = useAuthStore();
-            return isEventStaffOrHasRole(user, { event: this.event, role: "Auction Admin", websiteRoles: ["Full broadcast permissions", "Can edit any auction"] });
+            return isEventStaffOrHasRole(user,
+                this.event,
+                ["Full broadcast permissions", "Can edit any auction"],
+                ["Auction Admin"]
+            );
         },
         auctionSettings() {
             return this.eventSettings?.auction;

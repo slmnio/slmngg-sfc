@@ -9,7 +9,7 @@ export const useSettingsStore = defineStore("settings", () => {
     const restrictToMapPool = ref(true);
     const assumeLoserPicks = ref(true);
     const showHeroPickBans = ref(false);
-    const dashboardPickBanVisibility = ref("hidden");
+    const dashboardPickBanVisibility = ref("order");
     const gfxButtonCount = ref(6);
     const removeHashInHex = ref(false);
 

@@ -26,7 +26,7 @@
             </div>
             <div class="teams-scores pt-2 px-2">
                 <div class="checkboxes">
-                    <div class="fw-bold" style="font-size:16px">Editor settings</div>
+                    <div v-if="dashboardView" class="fw-bold" style="font-size:16px">Editor settings</div>
                     <b-form-checkbox v-if="showRestrictCheckbox" id="map-pool-checkbox" v-model="restrictToMapPool" class="mr-2">Restrict to map pool</b-form-checkbox>
                     <b-form-checkbox v-if="!lockControls" id="map-ban-checkbox" v-model="showMapBanButtons" class="mr-2">Show map banning</b-form-checkbox>
                     <b-form-checkbox v-if="!lockControls && !dashboardView" id="show-hero-pickban-checkbox" v-model="showHeroPickBans" class="mr-2">Show {{ gameOverride?.lang?.hero?.toLowerCase() || "hero" }} pick/bans</b-form-checkbox>
@@ -34,12 +34,11 @@
                         v-if="!lockControls"
                         id="loser-picks-checkbox"
                         v-model="assumeLoserPicks"
-                        disabled
                         class="mr-2">
                         Assume loser picks
                     </b-form-checkbox>
                 </div>
-                <div v-if="dashboardView" class="checkboxes ml-3 mr-2">
+                <div v-if="dashboardView" class="checkboxes dashboard-checkboxes ml-3 mr-2">
                     <div class="fw-bold" style="font-size:16px">Pick ban settings</div>
                     <b-form-radio-group v-model="dashboardPickBanVisibility" stacked :options="pickBanVisibilityOptions" />
                 </div>
@@ -235,7 +234,7 @@
                             </td>
                             <td v-if="type === 'pickban' && !banners[mapI]" colspan="200" class="bg-dark p-0">
                                 <div class="pickbans d-flex">
-                                    <div v-if="controls.showHeroPicks" class="hero-picks-container">
+                                    <div v-if="controls.showHeroPicks && !((getPickBanMax(pickBanOrder[mapI], 'pick') === 0) && dashboardPickBanVisibility === 'order')" class="hero-picks-container">
                                         <div class="hero-picks">
                                             <div class="form-top">
                                                 {{ teams[0]?.name }} Picks
@@ -278,7 +277,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div v-if="controls.showHeroBans" class="hero-bans-container">
+                                    <div v-if="controls.showHeroBans && !((getPickBanMax(pickBanOrder[mapI], 'ban') === 0) && dashboardPickBanVisibility === 'order')" class="hero-bans-container">
                                         <div class="hero-bans">
                                             <div class="form-top">
                                                 {{ teams[0]?.name }} Bans
@@ -476,6 +475,7 @@ export default {
                     showHeroPicks: this.showHeroPicks || visible,
                     showHeroBans: this.showHeroBans || visible,
                     showMapBans: this.showMapBans || this.showMapBanButtons,
+                    assumeLoserPicks: this.assumeLoserPicks
                 };
             }
             return {
@@ -483,7 +483,7 @@ export default {
                 showHeroBans: this.showHeroBans || this.showHeroPickBans,
                 showMapBans: this.showMapBans || this.showMapBanButtons,
 
-                assumeLoserPicks: false, // hard disabling for now
+                assumeLoserPicks: this.assumeLoserPicks
             };
         },
         reportableMatchData() {
@@ -732,7 +732,7 @@ export default {
     },
     methods: {
         getPickBanMax(order, type, team) {
-            return Math.max(...order.filter(p => p.team === team && p.type === type).map(p => p.countOfTeamType), 0);
+            return Math.max(...order.filter(p => (team ? p.team === team : true) && p.type === type).map(p => p.countOfTeamType), 0);
         },
         getMapOptions(mapIndex) {
             if (!this.availableMaps?.length) return [];
@@ -1038,9 +1038,9 @@ export default {
             this.matchData.scores = score;
         },
         checkAutoWinner(i, val) {
-            console.log("checkAutoWinner", { val, i }, this.score_1s[i], this.score_2s[i]);
+            console.log("checkAutoWinner", { val, i }, this.score_1s[i], this.score_2s[i], this.pickers, this.controls);
 
-            if (this.teams?.length !== 2) return;
+            if (this.teams?.length !== 2) return console.warn("checkAutoWinner", "team length invalid");
 
             if (this.score_1s[i] !== undefined && this.score_2s[i] !== undefined) {
                 if (this.score_1s[i] > this.score_2s[i]) {
@@ -1060,6 +1060,8 @@ export default {
                     }
                     this.autoUpdateScore();
                 }
+            } else {
+                return console.warn("checkAutoWinner", "scores failed", this.score_1s[i], this.score_2s[i]);
             }
         },
         winnerSelected(i, teamID) {

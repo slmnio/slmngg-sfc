@@ -5,13 +5,16 @@ import { get } from "../action-utils/action-cache.js";
 import { EventResolvableID, Match, Player, TeamResolvableID } from "../types.js";
 import { MapObject } from "./managers.js";
 import { auth, cacheStatusEmitter, set } from "../cache.js";
-import { Activity, Presence } from "discord.js";
+import { Activity, Collection, GuildMember, Presence } from "discord.js";
 
+const playerPresences = new Map<Snowflake, Presence>();
 const playerStreams = new Map<Snowflake, any>();
+
 
 cacheStatusEmitter.on("flags", (flags) => {
     console.log("#### Flags emitter", flags);
     if (flags.length === 0) {
+        // load everything
         processAllCachedPresences();
     }
 });
@@ -23,6 +26,49 @@ client.on("ready", () => {
 
     [...client.guilds.cache.values()].forEach(guild => console.log(`${guild.id} ${guild.name}`));
 });
+
+setInterval(() => processStoredPresences(), 15 * 1000);
+
+async function processStoredPresences() {
+    console.log(`[streaming] Processing ${playerPresences.size} presences`);
+    for (const presence of playerPresences.values()) {
+
+        const streaming = presence?.activities?.filter(activity => [ActivityType.Streaming, ActivityType.Competing].includes(activity?.type));
+        if (!streaming.length) {
+            if (playerStreams.has(presence.userId)) {
+                console.log(`[streaming] deleting stream (no stream) ${presence.user?.username}`, presence);
+            }
+            playerStreams.delete(presence.userId);
+            playerPresences.delete(presence.userId);
+            continue;
+        }
+        // const stream = streaming[0];
+        // console.log(`Processing presence ${presence?.userId} ${presence?.user?.username}`, stream?.url, stream?.details, stream?.state);
+
+        const newMatch = await getMatchFromPresence(presence);
+        if (newMatch?.match?.id) {
+            playerStreams.set(presence.userId, newMatch);
+        } else {
+            if (playerStreams.has(presence.userId)) {
+                console.log(`[streaming] deleting stream (no match) ${presence.user?.username}`, presence);
+            }
+            playerStreams.delete(presence.userId);
+            playerPresences.delete(presence.userId);
+        }
+    }
+    console.log(`[streaming] Player stream count: ${playerStreams.size}`);
+    await set("special:player-streams", {
+        streams: [...playerStreams.values()].map(({ match, player, event, teamID, user, url }) => ({
+            match: match?.id,
+            event: event?.id,
+            player: player?.id,
+            team: teamID,
+            url
+        })),
+        __tableName: "Special Collection"
+    });
+}
+
 
 async function getEventFromGuild(guildID: Snowflake) {
     const eventIDs = ((await get("Events"))?.ids || []) as EventResolvableID[];
@@ -74,6 +120,7 @@ async function detectLiveMatch(matches: Match[], streaming: Activity[]) {
                 return match;
             }
         }
+        console.log(`[streaming] Too many matches ${twitchTitle}`);
     }
 }
 
@@ -89,7 +136,7 @@ async function getMatchFromPresence(presence: Presence) {
     if (!event) return;
 
     const player = await auth.getPlayer(presence.userId) as Player | undefined;
-    if (!player) return;
+    if (!player) return console.log(`[streaming] No player for user in event ${event.name} ${presence.userId} ${presence?.user?.username}`, streaming?.[0]?.state, streaming?.[0]?.details, streaming?.[0]?.url);
 
     const playerEventTeams = ([
         ...(player.member_of || []),
@@ -118,54 +165,44 @@ async function getMatchFromPresence(presence: Presence) {
 }
 
 export async function processAllCachedPresences() {
-    console.log("Processing presences");
-    client.guilds.cache.each(guild => {
-        guild.members.cache.each((member) => {
-            const stream = (member.presence?.activities || []).find(a => a.type === ActivityType.Streaming);
-            if (member.presence && stream) {
-                console.log(`Processing presence ${member?.id} ${member?.user?.username}`, stream?.url, stream?.details, stream?.state);
+    console.log(client.users.cache.size);
+
+    const guilds = client.guilds.cache;
+    for (const guild of guilds.values()) {
+        const event = await getEventFromGuild(guild.id);
+        if (!event) {
+            console.log(`[streaming] No live event for ${guild.id} ${guild.name}`);
+            continue;
+        }
+        console.log(`[streaming] Processing presences for ${event.name} ${guild.name}`);
+
+        let members = new Collection<string, GuildMember>;
+
+        // try {
+        //     members = await guild.members.fetch(); // { withPresences: true }
+        //     console.log(`[streaming] ${members.size} members in ${guild.name}`);
+        // } catch (e) {
+        //     console.warn(e);
+        members = guild.members.cache;
+        console.log(`[streaming] fallback ${members.size} cached members in ${guild.name}`);
+        // }
+        for (const m of members) {
+            const [member] = (await guild.members.fetch({
+                user: m,
+                withPresences: true
+            })).values();
+            if (member.presence) {
                 return processPresences(null, member.presence);
             }
-        });
-    });
+
+        }
+    }
+    console.log(client.users.cache.size);
+
 }
 
 async function processPresences(oldPresence: Presence | null, newPresence: Presence) {
-    const oldMatch = oldPresence ? await getMatchFromPresence(oldPresence) : null;
-    const newMatch = await getMatchFromPresence(newPresence);
-
-
-    if (oldMatch?.match?.id !== newMatch?.match?.id) {
-        // unset old, set new
-        console.log(`setting ${oldMatch?.match?.id} to ${newMatch?.match?.id}`, oldPresence?.userId || newPresence.userId);
-        playerStreams.delete(oldPresence?.userId || newPresence.userId);
-
-        await set("special:player-streams", {
-            streams: [...playerStreams.values()].map(({ match, player, event, teamID, user, url }) => ({
-                match: match?.id,
-                event: event?.id,
-                player: player?.id,
-                team: teamID,
-                url
-            })),
-            __tableName: "Special Collection"
-        });
-    }
-
-    if (newMatch?.match?.id && newMatch?.user?.id) {
-        playerStreams.set(newMatch.user.id, newMatch);
-        console.log(playerStreams.size);
-        await set("special:player-streams", {
-            streams: [...playerStreams.values()].map(({ match, player, event, teamID, user, url }) => ({
-                match: match?.id,
-                event: event?.id,
-                player: player?.id,
-                team: teamID,
-                url
-            })),
-            __tableName: "Special Collection"
-        });
-    }
+    playerPresences.set(newPresence.userId, newPresence);
 }
 
 client.on("presenceUpdate", async (oldPresence, newPresence) => {

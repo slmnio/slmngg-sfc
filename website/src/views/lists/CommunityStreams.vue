@@ -37,6 +37,7 @@
             </div>
         </div>
         <div class="mt-4">Streams are listed here if someone has a streaming status on a SLMN.GG enabled Discord server and it is within the match time for a team they're part of.<br>If you don't see your stream listed here, make sure you can log into SLMN.GG with your Discord account, and you have Discord Streamer Mode enabled, giving you the purple streaming status.</div>
+        <div class="mt-2">Some events have overlays that players can use on their streams. See more on the <router-link :to="{ name: 'solo-overlay-guide' }">SLMN.GG learn page</router-link>.</div>
     </div>
 </template>
 
@@ -93,6 +94,11 @@ export default {
             return "";
         }
     },
+    head() {
+        return {
+            title: "Community Streams"
+        };
+    }
 };
 </script>
 

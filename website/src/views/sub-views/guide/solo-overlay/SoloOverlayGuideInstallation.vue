@@ -8,7 +8,7 @@
             <BroadcastDisplay
                 v-for="broadcast in broadcasts"
                 :key="broadcast.id"
-                class="broadcast"
+                class="broadcast my-2"
                 :broadcast="broadcast"
                 :text="broadcast?.event?.name"
                 :class="{'selected': selectedBroadcast?.id === broadcast?.id}"

@@ -7,7 +7,7 @@ import { MapObject } from "./managers.js";
 import { auth, cacheStatusEmitter, set } from "../cache.js";
 import { Activity, Collection, GuildMember, Presence } from "discord.js";
 
-const playerPresences = new Map<Snowflake, Presence>();
+const playerPresences = new Map<`${Snowflake}-${Snowflake}`, Presence>();
 const playerStreams = new Map<Snowflake, any>();
 
 
@@ -20,26 +20,23 @@ cacheStatusEmitter.on("flags", (flags) => {
 });
 
 client.on("ready", () => {
-    console.log("Ready to calculate streaming");
-
-    console.log(client.users.cache.size);
-
-    [...client.guilds.cache.values()].forEach(guild => console.log(`${guild.id} ${guild.name}`));
+    console.log("[streaming] Ready to calculate streaming");
 });
 
 setInterval(() => processStoredPresences(), 15 * 1000);
 
 async function processStoredPresences() {
     console.log(`[streaming] Processing ${playerPresences.size} presences`);
-    for (const presence of playerPresences.values()) {
+    playerStreams.clear();
+
+    for (const data of playerPresences.entries()) {
+        const [key, presence] = data;
 
         const streaming = presence?.activities?.filter(activity => [ActivityType.Streaming, ActivityType.Competing].includes(activity?.type));
         if (!streaming.length) {
-            if (playerStreams.has(presence.userId)) {
-                console.log(`[streaming] deleting stream (no stream) ${presence.user?.username}`, presence);
-            }
-            playerStreams.delete(presence.userId);
-            playerPresences.delete(presence.userId);
+            // playerStreams.delete(presence.userId);
+            // console.log(`[streaming] deleting stream (no stream) ${presence.user?.username}`);
+            playerPresences.delete(key);
             continue;
         }
         // const stream = streaming[0];
@@ -49,11 +46,9 @@ async function processStoredPresences() {
         if (newMatch?.match?.id) {
             playerStreams.set(presence.userId, newMatch);
         } else {
-            if (playerStreams.has(presence.userId)) {
-                console.log(`[streaming] deleting stream (no match) ${presence.user?.username}`, presence);
-            }
-            playerStreams.delete(presence.userId);
-            playerPresences.delete(presence.userId);
+            // playerStreams.delete(presence.userId);
+            // console.log(`[streaming] deleting stream (no match) ${presence.user?.username}`, { status: presence.status, url: stream?.url, details: stream?.details, state: stream?.state });
+            playerPresences.delete(key);
         }
     }
     console.log(`[streaming] Player stream count: ${playerStreams.size}`);
@@ -202,7 +197,8 @@ export async function processAllCachedPresences() {
 }
 
 async function processPresences(oldPresence: Presence | null, newPresence: Presence) {
-    playerPresences.set(newPresence.userId, newPresence);
+    if (!newPresence.guild?.id) return;
+    playerPresences.set(`${newPresence.guild.id}-${newPresence.userId}`, newPresence);
 }
 
 client.on("presenceUpdate", async (oldPresence, newPresence) => {

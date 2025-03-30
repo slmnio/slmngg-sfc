@@ -217,7 +217,7 @@ export default {
                                 text: `No ${this.reschedule.toLowerCase()} request active`,
                                 variant: "secondary"
                             },
-                            content: ["staff editor link"]
+                            content: ["information", "staff editor link"]
                         },
                     }
                 },

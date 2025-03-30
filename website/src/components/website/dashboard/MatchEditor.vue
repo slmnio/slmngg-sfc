@@ -733,6 +733,7 @@ export default {
     },
     methods: {
         getPickBanMax(order, type, team) {
+            if (!order) return;
             return Math.max(...order.filter(p => (team ? p.team === team : true) && p.type === type).map(p => p.countOfTeamType), 0);
         },
         getMapOptions(mapIndex) {

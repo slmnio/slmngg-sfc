@@ -15,7 +15,7 @@
                 @click="selectedBroadcast = broadcast"
             />
         </div>
-        <b-alert v-else variant="warning" class="mb-3" :model-value="true">
+        <b-alert v-else-if="broadcasts && broadcasts.length === 0" variant="warning" class="mb-3" :model-value="true">
             <b>No events are enabled for the solo overlay right now.</b>
         </b-alert>
 

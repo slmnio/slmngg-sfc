@@ -1,5 +1,6 @@
 import Airtable from "airtable";
 import * as Cache from "./cache.js";
+import { cacheStatusEmitter } from "./cache.js";
 import customTableUpdate from "./custom-datasets.js";
 import { log } from "./discord/slmngg-log.js";
 import path from "node:path";
@@ -294,6 +295,7 @@ class AirtableManager {
 
     updateFlags() {
         this.ioServer.emit("website_flags", this.websiteFlags);
+        cacheStatusEmitter.emit("flags", this.websiteFlags);
     }
 
     startNextOldestTable(fullLoad) {

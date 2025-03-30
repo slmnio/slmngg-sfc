@@ -355,6 +355,7 @@ export interface Match extends Base {
     modified: string;
     __tableName: "Matches";
 
+    name: string;
     alternative_vod?: string;
     brackets?: BracketResolvableID[];
     casters?: PlayerResolvableID[];

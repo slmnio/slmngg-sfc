@@ -1,6 +1,8 @@
 import spacetime from "spacetime";
 import informal from "spacetime-informal";
-import { sortEvents, sortTeams } from "@/utils/sorts";
+import { sortAlphaRaw, sortEvents, sortTeams } from "@/utils/sorts";
+
+import { computed } from "vue";
 
 import assault from "@/assets/default-map-images/assault.png";
 import escort from "@/assets/default-map-images/escort.png";
@@ -25,6 +27,7 @@ import assaultIcon from "@/assets/map-type-icons/assault.svg";
 import flashpointIcon from "@/assets/map-type-icons/flashpoint.svg";
 import clashIcon from "@/assets/map-type-icons/clash.png";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
 
 export function getImage (i) {
     // console.log(i);
@@ -118,7 +121,7 @@ export function multiImage(theme, keys, minSize = 30, useResizer = true) {
     return url || null;
 }
 
-export function getMatchContext(match, { light } = {}) {
+export function getMatchContext(match, { light, split } = {}) {
     let pieces;
     if (light) {
         pieces = [match?.sub_event].filter(Boolean);
@@ -128,8 +131,11 @@ export function getMatchContext(match, { light } = {}) {
     pieces = pieces.filter((v, i, a) => a.indexOf(v) === i);
 
     const eventPrefix = (match?.event?.short || match?.event?.name || "");
+    const matchDetails = pieces.join(" · ");
 
-    return eventPrefix + (pieces.length ? ": " : "") + pieces.join(" · ");
+    if (split) return [eventPrefix, matchDetails];
+
+    return eventPrefix + (pieces.length ? ": " : "") + matchDetails;
 }
 
 export function getRoleSVG(name) {
@@ -458,6 +464,7 @@ export function getEmbedData(url) {
             service: "youtube",
             key: vodURL.searchParams.get("v"),
             timestamp: ts || null,
+            thumbnail: `http://img.youtube.com/vi/${vodURL.searchParams.get("v")}/hqdefault.jpg`,
             display: {
                 text: "YouTube",
                 icon: "fab fa-youtube"
@@ -469,6 +476,7 @@ export function getEmbedData(url) {
             service: "youtube",
             key: vodURL.pathname.slice(1),
             timestamp: vodURL.searchParams.get("t") || null,
+            thumbnail: `http://img.youtube.com/vi/${vodURL.pathname.slice(1)}/hqdefault.jpg`,
             display: {
                 text: "YouTube",
                 icon: "fab fa-youtube"
@@ -479,6 +487,7 @@ export function getEmbedData(url) {
         const embed = {
             service: (vodURL.pathname.split("/").length === 3 ? "twitch" : "twitch-live"),
             key: vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1),
+            thumbnail: `https://static-cdn.jtvnw.net/previews-ttv/live_user_${vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1).toLowerCase()}-1280x720.jpg`,
             display: {
                 text: "Twitch",
                 icon: "fab fa-twitch"
@@ -1199,4 +1208,24 @@ export function countStats(matches) {
     });
 
     return stats;
+}
+
+export function hydratedCommunityStreams() {
+    return computed(() => {
+        return ((ReactiveRoot("special:player-streams"))?.streams || []).map(stream => ({
+            ...stream,
+            match: ReactiveThing("match", {
+                "teams": ReactiveArray("teams", {
+                    "theme": ReactiveThing("theme")
+                })
+            })(stream),
+            "event": ReactiveThing("event", {
+                "theme": ReactiveThing("theme")
+            })(stream),
+            "player": ReactiveThing("player")(stream),
+            "team": ReactiveThing("team", {
+                "theme": ReactiveThing("theme")
+            })(stream)
+        })).sort((a,b) => sortAlphaRaw(a.match?.id, b.match?.id));
+    });
 }

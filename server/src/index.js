@@ -62,6 +62,7 @@ actions.load(app, localCors, Cache, io);
 
 await import("./discord/slash-commands.js");
 await import("./discord/interactions.js");
+await import("./discord/streaming.js");
 await import("./automation-manager.js");
 
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));

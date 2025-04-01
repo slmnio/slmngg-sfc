@@ -108,9 +108,11 @@ export default {
             });
         },
         heroes() {
-            return ReactiveRoot("Heroes", {
+            const heroes = ReactiveRoot("Heroes", {
                 ids: ReactiveArray("ids")
             })?.ids;
+            if (this.broadcast?.event?.game) return heroes.filter(h => h.game === this.broadcast.event.game);
+            return heroes;
         },
         team() {
             if ([2, "2", "right", "alt"].includes(this.teamNum)) {

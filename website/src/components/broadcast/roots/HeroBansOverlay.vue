@@ -93,7 +93,6 @@ export default {
 
             (this.liveMatch?.maps || []).forEach(map => {
                 if (map.banner) return;
-                if (!map.team_1_bans?.length) return;
                 const isCurrentlyBanned = this.currentMap?.id === map?.id;
 
                 (map.team_1_bans || []).forEach(bannedHero => {

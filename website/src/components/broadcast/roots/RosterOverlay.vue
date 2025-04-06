@@ -86,7 +86,7 @@ import { decoratePlayerWithDraftData, getRoleSVG } from "@/utils/content-utils";
 import { resizedImage } from "@/utils/images";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { sortRoles } from "@/utils/sorts";
+import { ROLE_ORDER, sortRoles } from "@/utils/sorts";
 
 export default {
     name: "RosterOverlay",
@@ -158,7 +158,7 @@ export default {
         sortedTeamPlayers(team) {
             if (!team?.showablePlayers) return [];
             try {
-                const order = ["Tank", "DPS", "Support", "Flex"];
+                const order = ROLE_ORDER;
                 const players = [...team.showablePlayers];
 
                 return players.sort((a, b) => {

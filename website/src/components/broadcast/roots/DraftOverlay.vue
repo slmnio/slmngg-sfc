@@ -86,6 +86,7 @@ import DraftPlayer from "@/components/broadcast/DraftPlayer";
 import { logoBackground, logoBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo";
 import { decoratePlayerWithDraftData } from "@/utils/content-utils.js";
+import { ROLE_ORDER } from "@/utils/sorts.js";
 
 export default {
     name: "DraftOverlay",
@@ -165,7 +166,7 @@ export default {
 
                 if (!a.role) return 1; if (!b.role) return -1;
                 if (a.role !== b.role) {
-                    const order = ["Tank", "DPS", "Support"];
+                    const order = ROLE_ORDER;
                     return order.indexOf(a.role) - order.indexOf(b.role);
                 }
 

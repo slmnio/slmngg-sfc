@@ -54,9 +54,10 @@ export const PRODUCTION_HIERARCHY = [
     "Moderator"
 ];
 export const ROLE_ORDER = [
-    "Tank",
-    "DPS", "Damage",
-    "Support",
+    "Tank", "Vanguard",
+    "DPS", "Damage", "Offense", "Defense", "Duelist",
+    "Support", "Strategist",
+    "Flex"
 ];
 
 export function sortRoles(a, b) {

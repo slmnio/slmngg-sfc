@@ -66,12 +66,13 @@ export default {
         Squeezable,
         ThemeLogo
     },
-    props: ["match", "active", "broadcast", "animateOnMount"],
+    props: ["match", "active", "broadcast", "animateOnMount", "customDisplay"],
     data: () => ({
         manualAnimate: null
     }),
     computed: {
         display() {
+            if (this.customDisplay) return this.customDisplay;
             if (this.broadcast?.desk_display === "Scoreboard Bans") {
                 return "bans";
             }

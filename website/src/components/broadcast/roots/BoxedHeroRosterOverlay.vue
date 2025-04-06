@@ -72,7 +72,7 @@ import { bg, resizedAttachment, resizedImage } from "@/utils/images";
 import { useStatusStore } from "@/stores/statusStore";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
-import { sortRoles } from "@/utils/sorts.js";
+import { ROLE_ORDER, sortRoles } from "@/utils/sorts.js";
 
 function niceJoin(array, and = "and") {
     if (array.length > 1) {
@@ -189,7 +189,7 @@ export default {
             return (players || []).sort((a, b) => {
                 console.log(a, b);
                 if (a._draftData?.role !== b._draftData?.role) {
-                    const order = ["DPS", "Tank", "Support"];
+                    const order = ROLE_ORDER;
                     return order.indexOf(a._draftData?.role) - order.indexOf(b._draftData?.role);
                 }
                 return 0;

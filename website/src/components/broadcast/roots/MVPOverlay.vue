@@ -47,7 +47,11 @@
         </div>
         <transition name="hero-move">
             <div v-show="animationActive && mvpTeam && mvpTeam.theme" class="hero-container">
-                <recolored-hero v-if="mvpTeam && mvpTeam.theme" class="hero" :theme="mvpTeam.theme" :hero="hero" />
+                <div
+                    v-if="alternate"
+                    class="alternate bg-center hero w-100 h-100"
+                    :style="alternateHeroBG(hero, alternate)"></div>
+                <recolored-hero v-else-if="mvpTeam && mvpTeam.theme" class="hero" :theme="mvpTeam.theme" :hero="hero" />
             </div>
         </transition>
     </div>
@@ -60,13 +64,13 @@ import ThemeLogo from "@/components/website/ThemeLogo";
 import { themeBackground } from "@/utils/theme-styles";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
 import { useStatusStore } from "@/stores/statusStore";
-import { resizedImage } from "@/utils/images";
+import { bg, resizedAttachment, resizedImage } from "@/utils/images";
 import { cleanID } from "@/utils/content-utils.js";
 
 export default {
     name: "MVPOverlay",
     components: { ThemeTransition, ThemeLogo, RecoloredHero },
-    props: ["broadcast", "title", "animationActive", "showSponsor", "player", "team", "customHero"],
+    props: ["broadcast", "title", "animationActive", "showSponsor", "player", "team", "customHero", "alternate"],
     computed: {
         match() {
             return ReactiveRoot(this.broadcast?.live_match?.[0], {
@@ -142,7 +146,13 @@ export default {
         logo (theme) {
             return resizedImage(theme, ["default_wordmark", "default_logo"], "h-300");
         },
-        themeBackground
+        themeBackground,
+        alternateHeroBG(hero, alternateNum) {
+            if (!hero) return {};
+            const file = hero.alternate_set_image?.[alternateNum - 1];
+            if (!file) return {};
+            return bg(resizedAttachment(file, "orig"));
+        },
     },
     watch: {
         mvpTeam: {

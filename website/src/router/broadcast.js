@@ -267,7 +267,8 @@ export default [
     },
     { path: "broadcasts", alias: ["other-streams", "other-broadcasts"], component: () => import("@/components/broadcast/roots/OtherBroadcastsOverlay.vue") },
     { path: "mvp", component: () => import("@/components/broadcast/roots/MVPOverlay.vue"), props: route => ({
-        showSponsor: route.query.sponsor
+        showSponsor: route.query.sponsor,
+        alternate: route.query.alternate ? parseInt(route.query.alternate) : null,
     }) },
     {
         path: "ingame-comms",

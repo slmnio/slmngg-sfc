@@ -96,7 +96,7 @@ export default {
                 if (!map.team_1_bans?.length) return;
                 const isCurrentlyBanned = this.currentMap?.id === map?.id;
 
-                map.team_1_bans.forEach(bannedHero => {
+                (map.team_1_bans || []).forEach(bannedHero => {
                     if (!bannedHero.id) return;
 
                     console.log(bannedHero);
@@ -113,7 +113,7 @@ export default {
                     }
                 });
 
-                map.team_2_bans.forEach(bannedHero => {
+                (map.team_2_bans || []).forEach(bannedHero => {
                     if (!bannedHero.id) return;
 
                     console.log(bannedHero);
@@ -141,7 +141,6 @@ export default {
                     groups[hero.role].push(hero);
                 }
             });
-            console.log(groups, Object.entries(groups));
             return Object.entries(groups).map(([role, heroes]) => ({
                 role,
                 heroes: heroes.sort((a, b) => sortAlpha(a, b, "name"))

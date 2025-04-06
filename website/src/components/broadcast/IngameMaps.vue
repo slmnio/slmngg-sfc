@@ -1,5 +1,5 @@
 <template>
-    <div class="ingame-maps flex-center" :class="{'small' : maps.length > 4}">
+    <div class="ingame-maps flex-center" :class="`${maps.length > 4 ? 'small' : ''} ig-ft${match.first_to || 'X'}`">
         <div v-for="map in maps" :key="map.id" class="map flex-center" :class="{'ig-dummy': map?.dummy, 'ig-logo': map?.boxImageCSS?.backgroundImage }">
             <div class="box flex-center default-thing" :style="map?.boxCSS">
                 <div class="box-image bg-center" :style="map?.boxImageCSS"></div>

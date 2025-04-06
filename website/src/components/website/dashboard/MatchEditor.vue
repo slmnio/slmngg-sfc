@@ -250,17 +250,6 @@
                                                 />
                                             </div>
                                         </div>
-                                        <div v-if="pickBanOrder[mapI]?.length" class="flip-controls flex-center flex-column h-100">
-                                            <div>
-                                                <i v-b-tooltip="'Flip pick/ban order'" class="fas fa-exchange"></i>
-                                            </div>
-                                            <div>
-                                                <b-form-checkbox
-                                                    v-model="flip_pick_ban_order[mapI]"
-                                                    size="lg"
-                                                />
-                                            </div>
-                                        </div>
                                         <div class="hero-picks">
                                             <div class="form-top">
                                                 {{ teams[1]?.name }} Picks
@@ -275,6 +264,17 @@
                                                     :max="dashboardView && dashboardPickBanVisibility === 'order' ? getPickBanMax(pickBanOrder[mapI], 'pick', 2) : gameOverride?.defaultHeroPickCount || 5"
                                                 />
                                             </div>
+                                        </div>
+                                    </div>
+                                    <div v-if="match?.pick_ban_order && (controls.showHeroBans || controls.showHeroPicks)" class="flip-controls flex-center flex-column h-100">
+                                        <div class="pt-2">
+                                            <i v-b-tooltip="'Flip pick/ban order'" class="fas fa-exchange"></i>
+                                        </div>
+                                        <div>
+                                            <b-form-checkbox
+                                                v-model="flip_pick_ban_order[mapI]"
+                                                size="lg"
+                                            />
                                         </div>
                                     </div>
                                     <div v-if="controls.showHeroBans && !((getPickBanMax(pickBanOrder[mapI], 'ban') === 0) && dashboardPickBanVisibility === 'order')" class="hero-bans-container">
@@ -1287,7 +1287,7 @@ export default {
     }
     .hero-picks-container, .hero-bans-container {
         display: flex;
-        min-width: 50%;
+        min-width: calc(50% - 30px);
         align-items: start;
         flex-grow: 1;
         flex-shrink: 0;

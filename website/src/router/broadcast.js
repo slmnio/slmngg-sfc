@@ -83,6 +83,7 @@ export default [
     { path: "schedule", component: () => import("@/components/broadcast/roots/ScheduleOverlay.vue"), props: route => ({ secondary: !!route.query.secondary }) },
     { path: "iframe", component: () => import("@/components/broadcast/roots/IframeOverlay.vue"), props: route => ({ url: route.query.url }) },
     { path: "standings", component: () => import("@/components/broadcast/roots/StandingsOverlay.vue"), props: route => ({ stage: route.query.stage || route.query.group }) },
+    { path: "bans", component: () => import("@/components/broadcast/roots/HeroBansOverlay.vue") },
     {
         path: "multi-standings",
         alias: "multistandings",

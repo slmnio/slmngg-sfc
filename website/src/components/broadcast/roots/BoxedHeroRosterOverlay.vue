@@ -110,7 +110,7 @@ export default {
         heroes() {
             const heroes = ReactiveRoot("Heroes", {
                 ids: ReactiveArray("ids")
-            })?.ids;
+            })?.ids || [];
             if (this.broadcast?.event?.game) return heroes.filter(h => h.game === this.broadcast.event.game);
             return heroes;
         },

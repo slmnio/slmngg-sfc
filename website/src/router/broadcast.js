@@ -196,7 +196,8 @@ export default [
             group: "casters",
             disableCasters: route.query.disable || route.query.casters === "false",
             disableLower: route.query.lower === "false",
-            ignoreTalentSocket: route.query.ignoreTalentSocket || route.query.ignoreTalent
+            ignoreTalentSocket: route.query.ignoreTalentSocket || route.query.ignoreTalent,
+            displayOverride: route.query.display
         })
     },
     { path: "podcast", component: () => import("@/components/broadcast/roots/PodcastOverlay.vue"), props: route => ({ rows: route.query.rows }) },

@@ -58,6 +58,7 @@
                 <MatchScoreboard
                     v-if="liveMatch"
                     key="scoreboard"
+                    :desk-display="broadcast?.desk_display"
                     :active="animationActive"
                     class="scoreboard"
                     :match="liveMatch"

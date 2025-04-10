@@ -266,7 +266,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div v-if="match?.pick_ban_order && (controls.showHeroBans || controls.showHeroPicks)" class="flip-controls flex-center flex-column h-100">
+                                    <div v-if="(match?.pick_ban_order || gameOverride?.defaultPickBanOrder) && (controls.showHeroBans || controls.showHeroPicks)" class="flip-controls flex-center flex-column h-100">
                                         <div class="pt-2">
                                             <i v-b-tooltip="'Flip pick/ban order'" class="fas fa-exchange"></i>
                                         </div>
@@ -689,7 +689,6 @@ export default {
             return this.maps.map((map, i) => {
                 return processPickBanOrder(this.match?.pick_ban_order || this.gameOverride?.defaultPickBanOrder, this.flip_pick_ban_order[i]);
             });
-
         },
         gameOverride() {
             if (this.match?.game || this.match?.event?.game) return GameOverrides[this.match?.game || this.match?.event?.game];

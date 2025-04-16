@@ -9,6 +9,7 @@ import images from "./images.js";
 import discordAuth from "./discord/auth.js";
 import "./discord/discord-data.js";
 import webAuction from "./web_auction.js";
+import * as draftRoom from "./draft-room.ts";
 import * as actions from "./action-utils/action-manager.js";
 
 const app = express();
@@ -261,6 +262,8 @@ io.on("connection", (socket) => {
         console.log("[Prod Trigger]", socket._clientName, event);
         io.to(`prod:client-${socket._clientName}`).emit(event, args);
     });
+
+    draftRoom.socketConnection(socket, io);
 });
 
 http.listen(port, () => {

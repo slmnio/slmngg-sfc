@@ -2,7 +2,7 @@
     <div class="break-match flex-center" :class="{'expanded': expanded, 'has-scores': hasScore}" :data-center="centerShow">
         <div v-if="!expanded" class="match-next-details">
             <transition name="fade" mode="out-in">
-                <span :key="match ? match.round : 'empty'">{{ textPrefix }} {{ match && match.round }}</span>
+                <span :key="matchNextText || 'empty'">{{ matchNextText }}</span>
             </transition>
         </div>
         <!--
@@ -65,10 +65,11 @@
 import spacetime from "spacetime";
 import { logoBackground1 } from "@/utils/theme-styles";
 import { resizedImage } from "@/utils/images";
+import { formatText } from "@/utils/content-utils.js";
 
 export default {
     name: "BreakMatch",
-    props: ["match", "expanded", "timezone", "live", "themeColor", "times", "smallNames"],
+    props: ["match", "expanded", "timezone", "live", "themeColor", "times", "smallNames", "broadcast", "event"],
     computed: {
         teams() {
             if (this.match?.special_event) return [];
@@ -151,6 +152,12 @@ export default {
                 return `${this.start}:`;
             }
             return this.hasFinished ? "FINAL SCORE:" : "UP NEXT:";
+        },
+        matchNextText() {
+            if (this.broadcast?.match_next_format) {
+                return `${this.textPrefix} ${formatText(this.broadcast.match_next_format, this.event || this.match?.event || this.broadcast?.event, this.match)}`;
+            }
+            return `${this.textPrefix} ${this.match ? this.match.round : ""}`;
         }
     },
     methods: {

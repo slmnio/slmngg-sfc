@@ -657,6 +657,15 @@ export function getFormatOptions(event, match) {
     };
 }
 
+export function formatText(format, event, match) {
+    if (!format) return "";
+    const formatOptions = getFormatOptions(event, match);
+    Object.entries(formatOptions).forEach(([key, val]) => {
+        format = format.replace(`{${key}}`, val || "");
+    });
+    return format.trim();
+}
+
 
 export function decoratePlayerWithDraftData(player, eventID) {
     if (!player) return {};

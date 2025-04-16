@@ -43,7 +43,13 @@
                         <div class="break-col break-left-col">
                             <transition name="anim-break-next">
                                 <div v-if="nextMatch" class="break-next">
-                                    <BreakMatch :match="nextMatch" :expanded="false" :theme-color="themeColor" />
+                                    <BreakMatch
+                                        :match="nextMatch"
+                                        :expanded="false"
+                                        :theme-color="themeColor"
+                                        :broadcast="broadcast"
+                                        :event="event"
+                                    />
                                 </div>
                             </transition>
                             <transition name="anim-break-next">

@@ -156,7 +156,7 @@ export default ({ app, Cache, io }) => {
             }
             const currentMap = eligibleMaps.find(map => !(map.draw || map.winner)) || eligibleMaps[eligibleMaps.length - 1];
             if (!currentMap?.id) return res.send("No hero ban information is available right now.");
-            if (event?.game === "Deadlock" && !currentMap.public) {
+            if (["Deadlock", "Marvel Rivals"].includes(event?.game) && !currentMap.public) {
                 return res.send("No hero ban information is available right now.");
             }
 

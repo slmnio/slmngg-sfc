@@ -274,6 +274,15 @@ export default {
         animationActive(isActive) {
             this.showNextMap = false;
 
+            try {
+                [...document.querySelectorAll("video")].forEach(video => {
+                    video.currentTime = 0;
+                    console.log("Restarting video", video);
+                });
+            } catch (e) {
+                console.error("Video restarting failed", e);
+            }
+
             console.log("animation active", isActive, this.isInMapsScene);
 
             if (isActive && this.nextMap?.map) {

@@ -186,14 +186,7 @@ export default {
             // players = heroes.slice(page * 6, (page + 1) * 6).map(x => ({ ...x, favourite_hero: x }));
             const fillingHeroes = (this.fill || []).map(str => this.getFavouriteHero(str));
 
-            return (players || []).sort((a, b) => {
-                console.log(a, b);
-                if (a._draftData?.role !== b._draftData?.role) {
-                    const order = ROLE_ORDER;
-                    return order.indexOf(a._draftData?.role) - order.indexOf(b._draftData?.role);
-                }
-                return 0;
-            }).map(p => {
+            return (players || []).map(p => {
                 const player = decoratePlayerWithDraftData(p, this.broadcast?.event?.id);
                 console.log("decorate", player);
 
@@ -201,6 +194,15 @@ export default {
                     player.favourite_hero_data = fillingHeroes.shift();
                 }
                 return player;
+            }).sort((a, b) => {
+                console.log(a, b);
+                const [aRole, bRole] = [a, b].map(x => x._draftData?.role || x?.role);
+
+                if (aRole !== bRole) {
+                    const order = ROLE_ORDER;
+                    return order.indexOf(aRole) - order.indexOf(bRole);
+                }
+                return 0;
             });
         },
         titleStyle() {

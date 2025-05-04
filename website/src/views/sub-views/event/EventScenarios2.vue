@@ -53,10 +53,11 @@
                 </div>
             </div>
         </div>
-        <div class="container-fluid">
+        <div class="container-fluid d-flex" style="justify-content: safe center">
             <table
                 v-if="counts && counts[0] && counts[0].positions"
-                class="table table-bordered text-light table-dark w-auto mb-1">
+                class="table table-bordered text-light table-dark w-auto mb-1"
+                @mouseleave="highlightHover = { team: null, pos: null }">
                 <thead>
                     <tr v-if="counts" class="fw-bold">
                         <th class="p-2 border-dark text-end" style="min-width: 8.5em">
@@ -68,7 +69,10 @@
                             v-for="(x, i) in (counts[0].positions).slice(0, -1)"
                             :key="i"
                             class="p-2 border-dark"
-                            :class="tableBorderLine(i)">
+                            :class="{
+                                [tableBorderLine(i)]: true,
+                                'highlight-hover-pos': i === highlightHover.pos,
+                            }">
                             #{{ i + 1 }}
                         </th>
                         <th class="p-2 border-dark incomplete-border">
@@ -84,7 +88,14 @@
                 </thead>
                 <tbody>
                     <tr v-for="team in sortedCounts" :key="team.code">
-                        <td class="p-2 border-dark text-end fw-bold">{{ team.code }}</td>
+                        <td
+                            class="p-2 border-dark text-end fw-bold"
+                            :title="team.name"
+                            :class="{
+                                'highlight-hover-team': (team?.code || team?.name) === highlightHover.team,
+                            }">
+                            <CopyTextButton class="team-copy-text" :content="team.name">{{ team.code }}</CopyTextButton>
+                        </td>
                         <td
                             v-for="(pos, posi) in team.positions"
                             :key="posi"
@@ -95,12 +106,18 @@
                                 'text-low': pos === 0,
                                 'incomplete': pos !== 0 && posi === team.positions?.length - 1,
                                 'incomplete-border': posi === team.positions?.length - 1,
+                                'highlight-hover-this': posi === highlightHover.pos && (team?.code || team?.name) === highlightHover.team,
+                                'highlight-hover-pos': posi === highlightHover.pos,
+                                'highlight-hover-team': (team?.code || team?.name) === highlightHover.team,
                                 [tableBorderLine(posi)]: true
                             }"
+                            @mouseenter="setHighlightHover(team, posi)"
                             @click="() => showWhen(team.id, posi)"
                         >
                             <div class="d-flex flex-column flex-center">
-                                <span v-if="showCountsAsPercentages">{{ perc(pos / currentScenarioView.length) }}</span>
+                                <span v-if="showCountsAsPercentages">{{
+                                    perc(pos / currentScenarioView.length)
+                                }}</span>
                                 <span v-else>{{ pos }}</span>
 
                                 <span
@@ -121,7 +138,7 @@
                         <!--                        </div>-->
                         <!--                    </td>-->
                         <td
-                            class="p-2 border-dark incomplete-border"
+                            class="p-2 border-dark incomplete-border text-nowrap"
                             :class="{'text-warning': analyseIncompletePositions(team.positions.slice(0, -1), team.incompletePositions)?.includes('only') }">
                             {{ analyseIncompletePositions(team.positions.slice(0, -1), team.incompletePositions) }}
                         </td>
@@ -236,6 +253,7 @@
 import { ReactiveArray } from "@/utils/reactive";
 import { BitCounter, sortTeamsIntoStandings } from "@/utils/scenarios";
 import { cleanID } from "@/utils/content-utils.js";
+import CopyTextButton from "@/components/website/CopyTextButton.vue";
 
 
 function avg(arr) {
@@ -257,6 +275,7 @@ function generateScoreline(firstTo) {
 
 export default {
     name: "EventScenarios2",
+    components: { CopyTextButton },
     props: ["event"],
     data: () => ({
         activeMatchGroup: "null", // this works for now
@@ -265,9 +284,13 @@ export default {
         showOnlyPossible: true,
         showOnlyIncomplete: false,
         showTiesInScenarioFilter: true,
-        sortTeamsByPerformance: false,
+        sortTeamsByPerformance: true,
         manualScenarioFilters: [],
-        manualScorelineFilters: []
+        manualScorelineFilters: [],
+        highlightHover: {
+            team: null,
+            pos: null
+        }
     }),
     computed: {
         blocks() {
@@ -494,6 +517,7 @@ export default {
                         };
                         teams.push({
                             id: team.id,
+                            name: team.name,
                             code: team.code,
                             extra_points: team.extra_points,
                             standings
@@ -943,6 +967,11 @@ export default {
         }
     },
     methods: {
+        setHighlightHover(team, pos) {
+            console.log(team, pos);
+            this.highlightHover.team = team?.code || team?.name;
+            this.highlightHover.pos = pos;
+        },
         tableBorderLine(i) {
             if (!this.calculate?.length) return "";
             const classes = [];
@@ -1309,6 +1338,18 @@ export default {
         background-color: hsl(188, 40%, 25%);
         color: white;
     }
+
+
+    .highlight-hover-this,
+    .highlight-hover-pos,
+    .highlight-hover-team {
+        background-color: hsl(188, 20%, 25%);
+    }
+    .highlight-hover-this {
+        outline: 2px solid hsl(188, 50%, 50%);
+    }
+
+
     .incomplete-border {
         border-left-width: 3px;
     }
@@ -1341,4 +1382,10 @@ export default {
     .line-bottom-left {
         border-left-color: rgba(220, 53, 69, 0.75) !important;
     }
+    .team-copy-text:deep(i){
+        right: 100%;
+        margin-left: 0;
+        margin-right: .5em;
+    }
+
 </style>

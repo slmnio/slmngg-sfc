@@ -1,12 +1,20 @@
 <template>
     <div class="heroes-picker d-flex flex-column gap-1">
-        <div v-for="i of count" :key="i" class="form-group d-flex align-items-center">
+        <div v-for="i of (single ? 1 : (count || 1))" :key="i" class="form-group d-flex align-items-center">
             <div v-if="pickBanOrder?.length && currentAction" class="draft-number">
-                {{ getPickBanItem(pickBanOrder, currentAction?.type, currentAction?.team, i - 1)?.countOfType }}
+                {{ single ? currentAction?.countOfType : getPickBanItem(pickBanOrder, currentAction?.type, currentAction?.team, i - 1)?.countOfType }}
             </div>
-            <div class="hero-icon bg-center" :style="resizedImage(getHero(localValue[i - 1]), ['icon', 'main_image'], 's-100')">
+            <div class="hero-icon bg-center" :style="resizedImage(getHero(single ? localValue : localValue[i - 1]), ['icon', 'main_image'], 's-100')">
             </div>
             <b-form-select
+                v-if="single"
+                v-model="localValue"
+                :options="heroOptions"
+                size="sm"
+                @keydown.delete="() => {localValue = null; setHero(i-1, null)}"
+                @change="(e) => setHero(i-1, e.target.value)" />
+            <b-form-select
+                v-else
                 v-model="localValue[i - 1]"
                 :options="heroOptions"
                 :state="checkState(i-1)"
@@ -14,7 +22,7 @@
                 @keydown.delete="() => {localValue[i - 1] = null; setHero(i-1, null)}"
                 @change="(e) => setHero(i-1, e.target.value)" />
         </div>
-        <div class="d-flex w-100 justify-content-end" style="margin-top:1px">
+        <div v-if="!single" class="d-flex w-100 justify-content-end" style="margin-top:1px">
             <b-button variant="success" size="sm" style="font-size:10px" @click="count++">
                 <i class="fas fa-plus fa-fw"></i> Add row
             </b-button>
@@ -30,7 +38,7 @@ import { GameOverrides } from "@/utils/games.ts";
 
 export default {
     name: "HeroesPicker",
-    props: ["title", "modelValue", "game", "pickBanOrder", "currentAction", "max", "heroes"],
+    props: ["title", "modelValue", "game", "pickBanOrder", "currentAction", "max", "heroes", "single"],
     emits: ["update:modelValue"],
     data: () => ({
         count: 1,
@@ -68,6 +76,10 @@ export default {
         getPickBanItem,
         resizedImage,
         setHero(i,id) {
+            if (this.single) {
+                this.$emit("update:modelValue",  id);
+                return;
+            }
             const data = [...this.localValue];
             data[i] = (!id || id === this.emptyValue) ? null : id;
             this.$emit("update:modelValue",  data);
@@ -77,6 +89,7 @@ export default {
             return (this.heroes || []).find(h => dirtyID(h?.id) === id);
         },
         checkState(index) {
+            if (this.single) return null;
             // return false for invalid state
             // no duplicates
 

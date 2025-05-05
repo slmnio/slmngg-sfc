@@ -25,22 +25,46 @@
                 </b-button>
             </div>
             <div class="teams-scores pt-2 px-2">
-                <div class="checkboxes">
-                    <div v-if="dashboardView" class="fw-bold" style="font-size:16px">Editor settings</div>
-                    <b-form-checkbox v-if="showRestrictCheckbox" id="map-pool-checkbox" v-model="restrictToMapPool" class="mr-2">Restrict to map pool</b-form-checkbox>
-                    <b-form-checkbox v-if="!lockControls" id="map-ban-checkbox" v-model="showMapBanButtons" class="mr-2">Show map banning</b-form-checkbox>
-                    <b-form-checkbox v-if="!lockControls && !dashboardView" id="show-hero-pickban-checkbox" v-model="showHeroPickBans" class="mr-2">Show {{ gameOverride?.lang?.hero?.toLowerCase() || "hero" }} pick/bans</b-form-checkbox>
-                    <b-form-checkbox
-                        v-if="!lockControls"
-                        id="loser-picks-checkbox"
-                        v-model="assumeLoserPicks"
-                        class="mr-2">
-                        Assume loser picks
-                    </b-form-checkbox>
-                </div>
-                <div v-if="dashboardView" class="checkboxes dashboard-checkboxes ml-3 mr-2">
-                    <div class="fw-bold" style="font-size:16px">Pick ban settings</div>
-                    <b-form-radio-group v-model="dashboardPickBanVisibility" stacked :options="pickBanVisibilityOptions" />
+                <div class="d-flex">
+                    <div class="checkboxes">
+                        <div v-if="dashboardView" class="fw-bold" style="font-size:16px">Editor settings</div>
+                        <b-form-checkbox
+                            v-if="showRestrictCheckbox"
+                            id="map-pool-checkbox"
+                            v-model="restrictToMapPool"
+                            class="mr-2">
+                            Restrict to map pool
+                        </b-form-checkbox>
+                        <b-form-checkbox
+                            v-if="!lockControls"
+                            id="map-ban-checkbox"
+                            v-model="showMapBanButtons"
+                            class="mr-2">
+                            Show map banning
+                        </b-form-checkbox>
+                        <b-form-checkbox
+                            v-if="!lockControls && !dashboardView"
+                            id="show-hero-pickban-checkbox"
+                            v-model="showHeroPickBans"
+                            class="mr-2">
+                            Show
+                            {{ gameOverride?.lang?.hero?.toLowerCase() || "hero" }} pick/bans
+                        </b-form-checkbox>
+                        <b-form-checkbox
+                            v-if="!lockControls"
+                            id="loser-picks-checkbox"
+                            v-model="assumeLoserPicks"
+                            class="mr-2">
+                            Assume loser picks
+                        </b-form-checkbox>
+                    </div>
+                    <div v-if="dashboardView" class="checkboxes dashboard-checkboxes ml-3 mr-2">
+                        <div class="fw-bold" style="font-size:16px">Pick ban settings</div>
+                        <b-form-radio-group
+                            v-model="dashboardPickBanVisibility"
+                            stacked
+                            :options="pickBanVisibilityOptions" />
+                    </div>
                 </div>
                 <div class="spacer" style="order:0"></div>
                 <div v-for="(team, i) in teams" :key="team.id" class="team" :class="{'end': i === 1}">
@@ -233,8 +257,48 @@
                                     @change="(val) => winnerSelected(mapI, val)" />
                             </td>
                             <td v-if="type === 'pickban' && !banners[mapI]" colspan="200" class="bg-dark p-0">
-                                <div class="pickbans d-flex">
-                                    <div v-if="controls.showHeroPicks && !((getPickBanMax(pickBanOrder[mapI], 'pick') === 0) && dashboardPickBanVisibility === 'order')" class="hero-picks-container">
+                                <div v-if="dashboardPickBanVisibility === 'inline' && (match?.pick_ban_order || gameOverride?.defaultPickBanOrder)" class="pickbans d-flex pickbans-inline">
+                                    <div v-if="(match?.pick_ban_order || gameOverride?.defaultPickBanOrder) && (controls.showHeroBans || controls.showHeroPicks)" class="flip-controls flex-center flex-column h-100">
+                                        <div class="pt-2">
+                                            <i v-b-tooltip="'Flip pick/ban order'" class="fas fa-exchange"></i>
+                                        </div>
+                                        <div>
+                                            <b-form-checkbox
+                                                v-model="flip_pick_ban_order[mapI]"
+                                                size="lg"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column flex-center flex-grow-1 pickban-inline-container">
+                                        <div
+                                            v-for="row in pickBanOrder[mapI]"
+                                            :key="row.num"
+                                            class="pickban-inline-row d-flex gap-2 px-3 w-100 flex-center"
+                                            :class="`${row.type}-style pickban-inline-team-${row.team}`">
+                                            <ThemeLogo
+                                                logo-size="w-50"
+                                                class="pickban-inline-team-logo"
+                                                icon-padding=".25em"
+                                                border-width="3px"
+                                                :theme="teams[row.team - 1] && teams[row.team - 1]?.theme" />
+                                            <div class="pickban-inline-text mr-2">
+                                                {{ teams[row.team - 1]?.code || teams[row.team - 1]?.name }}
+                                                {{ row.type === "ban" ? "Ban" : (row.type === "pick" ? "Pick" : "") }} {{ row.countOfTeamType }}
+                                            </div>
+                                            <heroes-picker
+                                                v-model="({ 'pick': { 1: team_1_picks, 2: team_2_picks }, 'ban': { 1: team_1_bans, 2: team_2_bans } }[row.type][row.team])[mapI][row.countOfTeamType - 1]"
+                                                :single="true"
+                                                :game="match?.game || match?.event?.game"
+                                                :heroes="heroes"
+                                                :pick-ban-order="pickBanOrder[mapI]"
+                                                :current-action="row"
+                                                :max="1"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-else class="pickbans d-flex">
+                                    <div v-if="controls.showHeroPicks && !((getPickBanMax(pickBanOrder[mapI], 'pick') === 0) && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline'))" class="hero-picks-container">
                                         <div class="hero-picks">
                                             <div class="form-top">
                                                 {{ teams[0]?.name }} Picks
@@ -246,7 +310,7 @@
                                                     :heroes="heroes"
                                                     :pick-ban-order="pickBanOrder[mapI]"
                                                     :current-action="{ team: 1, type: 'pick' }"
-                                                    :max="dashboardView && dashboardPickBanVisibility === 'order' ? getPickBanMax(pickBanOrder[mapI], 'pick', 1) : gameOverride?.defaultHeroPickCount || 5"
+                                                    :max="dashboardView && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline') ? getPickBanMax(pickBanOrder[mapI], 'pick', 1) : gameOverride?.defaultHeroPickCount || 5"
                                                 />
                                             </div>
                                         </div>
@@ -261,7 +325,7 @@
                                                     :heroes="heroes"
                                                     :pick-ban-order="pickBanOrder[mapI]"
                                                     :current-action="{ team: 2, type: 'pick' }"
-                                                    :max="dashboardView && dashboardPickBanVisibility === 'order' ? getPickBanMax(pickBanOrder[mapI], 'pick', 2) : gameOverride?.defaultHeroPickCount || 5"
+                                                    :max="dashboardView && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline') ? getPickBanMax(pickBanOrder[mapI], 'pick', 2) : gameOverride?.defaultHeroPickCount || 5"
                                                 />
                                             </div>
                                         </div>
@@ -277,7 +341,7 @@
                                             />
                                         </div>
                                     </div>
-                                    <div v-if="controls.showHeroBans && !((getPickBanMax(pickBanOrder[mapI], 'ban') === 0) && dashboardPickBanVisibility === 'order')" class="hero-bans-container">
+                                    <div v-if="controls.showHeroBans && !((getPickBanMax(pickBanOrder[mapI], 'ban') === 0) && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline'))" class="hero-bans-container">
                                         <div class="hero-bans">
                                             <div class="form-top">
                                                 {{ teams[0]?.name }} Bans
@@ -289,7 +353,7 @@
                                                     :heroes="heroes"
                                                     :pick-ban-order="pickBanOrder[mapI]"
                                                     :current-action="{ team: 1, type: 'ban' }"
-                                                    :max="(dashboardView && dashboardPickBanVisibility === 'order' ? (getPickBanMax(pickBanOrder[mapI], 'ban', 1)) : gameOverride?.defaultHeroBanCount) || gameOverride?.defaultHeroBanCount || (getPickBanMax(pickBanOrder[mapI], 'ban', 1)) || 0"
+                                                    :max="(dashboardView && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline') ? (getPickBanMax(pickBanOrder[mapI], 'ban', 1)) : gameOverride?.defaultHeroBanCount) || gameOverride?.defaultHeroBanCount || (getPickBanMax(pickBanOrder[mapI], 'ban', 1)) || 0"
                                                 />
                                                 <!-- these hero picker max are just setting priority then falling back -->
                                             </div>
@@ -305,7 +369,7 @@
                                                     :heroes="heroes"
                                                     :pick-ban-order="pickBanOrder[mapI]"
                                                     :current-action="{ team: 2, type: 'ban' }"
-                                                    :max="(dashboardView && dashboardPickBanVisibility === 'order' ? (getPickBanMax(pickBanOrder[mapI], 'ban', 2)) : gameOverride?.defaultHeroBanCount) || gameOverride?.defaultHeroBanCount || (getPickBanMax(pickBanOrder[mapI], 'ban', 2)) || 0"
+                                                    :max="(dashboardView && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline') ? (getPickBanMax(pickBanOrder[mapI], 'ban', 2)) : gameOverride?.defaultHeroBanCount) || gameOverride?.defaultHeroBanCount || (getPickBanMax(pickBanOrder[mapI], 'ban', 2)) || 0"
                                                 />
                                             </div>
                                         </div>
@@ -403,10 +467,11 @@ import { mapWritableState } from "pinia";
 import MatchExplainerModal from "@/components/website/dashboard/MatchExplainerModal.vue";
 import HeroesPicker from "@/components/website/dashboard/HeroesPicker.vue";
 import { GameOverrides } from "@/utils/games.ts";
+import ThemeLogo from "@/components/website/ThemeLogo.vue";
 
 export default {
     name: "MatchEditor",
-    components: { HeroesPicker, MatchExplainerModal, AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
+    components: { ThemeLogo, HeroesPicker, MatchExplainerModal, AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
     props: ["match", "hideMatchExtras", "scoreReporting", "proposedData", "scoreReportAction", "lockControls", "showHeroPicks", "showHeroBans", "showMapBans", "ignoreRemoteUpdates", "showScoreReportForfeit", "dashboardView"],
     data: () => ({
         processing: {},
@@ -447,6 +512,7 @@ export default {
         pickBanVisibilityOptions: [
             { value: "hidden", text: "Hide all" },
             { value: "order", text: "Show game specific" },
+            { value: "inline", text: "Show in order" },
             { value: "show", text: "Show all" },
         ]
     }),
@@ -1308,5 +1374,21 @@ export default {
     .hero-picks-container,
     .pick-style {
         background-color: color-mix(in srgb,  var(--primary) 20%, transparent)
+    }
+    .pickban-inline-text {
+        min-width: 5em;
+    }
+    .pickban-inline-team-logo {
+        width: 2.5em;
+        height: 2em;
+    }
+    .pickban-inline-row {
+         padding: .25em;
+    }
+    .pickban-inline-container > .pickban-inline-row:first-child {
+        padding-top: .5em;
+    }
+    .pickban-inline-container > .pickban-inline-row:last-child {
+        padding-bottom: .5em;
     }
 </style>

@@ -5,21 +5,21 @@
             <b-form-input
                 v-model="numQuestions"
                 class="opacity-changes disabled-low-opacity"
-                type="text"
+                type="number"
                 placeholder="# of questions"
                 @keydown.ctrl.enter="saveData({ mode: 'show' })"
             />
             <b-form-input
                 v-model="timePerQuestion"
                 class="opacity-changes disabled-low-opacity"
-                type="text"
+                type="number"
                 placeholder="seconds per question"
                 @keydown.ctrl.enter="saveData({ mode: 'show' })"
             />
             <b-form-input
                 v-model="timePerAnswer"
                 class="opacity-changes disabled-low-opacity"
-                type="text"
+                type="number"
                 placeholder="seconds per answer"
                 @keydown.ctrl.enter="saveData({ mode: 'show' })"
             />
@@ -28,7 +28,8 @@
                 <b-form-checkbox v-model="showManuals" class="mx-2" />
             </div>
             Total time: {{ totalTime }} seconds
-            <b-button class="flex-shrink-0" @click="saveSettings()">Save</b-button>
+            <b-button class="flex-shrink-0" @click="saveSettings()">Save</b-button
+            >
         </div>
     </div>
 </template>
@@ -51,12 +52,44 @@ export default {
     computed: {
         totalTime() {
             return (
-                this.numQuestions * (this.timePerQuestion + this.timePerAnswer)
+                parseInt(this.numQuestions) * (parseInt(this.timePerQuestion) + parseInt(this.timePerAnswer))
             );
         },
     },
     methods: {
-        saveSettings() {
+        async saveSettings() {
+            await authenticatedRequest("actions/update-broadcast", {
+                triviaSettings: {
+                    questions: parseInt(this.numQuestions),
+                    timePerQuestion: parseInt(this.timePerQuestion),
+                    timePerAnswer: parseInt(this.timePerAnswer),
+                    includeManuals: this.showManuals,
+                },
+            });
+            this.$notyf["success"]("Settings updated");
+        },
+    },
+    watch: {
+        broadcast: {
+            deep: true,
+            handler() {
+                if (this.broadcast.trivia_settings) {
+                    const settings = JSON.parse(this.broadcast.trivia_settings);
+                    this.showManuals = settings.includeManuals;
+                    this.numQuestions = settings.questions;
+                    this.timePerQuestion = settings.timePerQuestion;
+                    this.timePerAnswer = settings.timePerAnswer;
+                }
+            },
+        },
+    },
+    mounted() {
+        if (this.broadcast.trivia_settings) {
+            const settings = JSON.parse(this.broadcast.trivia_settings);
+            this.showManuals = settings.includeManuals;
+            this.numQuestions = settings.questions;
+            this.timePerQuestion = settings.timePerQuestion;
+            this.timePerAnswer = settings.timePerAnswer;
         }
     },
 };

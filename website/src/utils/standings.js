@@ -1,3 +1,6 @@
+import { cleanID } from "./content-utils";
+import { sortTeamsIntoStandings } from "./scenarios";
+
 function winrateText(num, toFixed = 0) {
     return isNaN(num) ? "-" : (num * 100).toFixed(toFixed) + "%";
 }
@@ -217,3 +220,233 @@ export const StandingsSortKeys = () => ({
         description: "Sum of all opponent's MatchWinPoints (match wins + extra points)"
     },
 });
+
+function avg(arr) {
+    if (!arr?.length) return null;
+    const sum = arr.reduce((a, b) => a + b, 0);
+    const avg = (sum / arr.length) || 0;
+    return avg;
+}
+
+export function calculateStandings(stageMatches, event, settings, useOMW, standingsSort, standingsSettings) {
+    if (!stageMatches || !event) return [];
+    if (!stageMatches.some(m => m.match_group)) return []; // make sure there's matches to analyse
+
+    const teamMap = new Map();
+    stageMatches.forEach(match => {
+        match.teams?.forEach(team => {
+            teamMap.set(team.id, team);
+        });
+    });
+    let teams = [];
+    if (teamMap.size === 0) {
+        teams = event.teams;
+    } else {
+        teams = [...teamMap.values()];
+    }
+
+    if (!teams) return [];
+
+    // console.log(this.settings);
+
+    teams.map(team => {
+        team.standings = {
+            matches: {
+                wins: 0,
+                losses: 0,
+                played: 0
+            },
+            maps: {
+                wins: 0,
+                losses: 0,
+                played: 0
+            },
+
+            wins: 0,
+            losses: 0,
+            played: 0,
+            scheduled: 0,
+
+            map_wins: 0,
+            map_losses: 0,
+            maps_played: 0,
+            map_round_wins: 0,
+            map_round_losses: 0,
+
+            rank: null,
+            h2h: {},
+            h2h_maps: {}
+        };
+
+        // if (this.hasColumns("MatchWinrate", "OMatchWinrate")) {
+        //     team.standings.matches = { wins: 0, losses: 0, played: 0 };
+        // }
+
+
+        if (settings?.points) team.standings.points = 0;
+        // get matches here
+        stageMatches.forEach(match => {
+            if (!match.teams) return;
+            if (!match.teams.some(t => t.id === team.id)) return;
+            // one of the teams is current loop team
+            const scores = [match.score_1, match.score_2];
+            team.standings.scheduled++;
+            if (!scores.some(score => score === match.first_to)) return; // not finished
+
+            const opponent = match.teams.find(t => t.id !== team.id);
+
+            team.standings.played++;
+            if (team.standings.matches) team.standings.matches.played++;
+
+            if (!match.maps) {
+                team.standings.maps_played += match.score_1 + match.score_2;
+            }
+
+            const teamIndex = match.teams[0].id === team.id ? 0 : 1;
+            team.standings.map_wins += scores[teamIndex];
+            team.standings.map_losses += scores[+!teamIndex];
+            team.standings.map_diff = team.standings.map_wins - team.standings.map_losses; //+= (scores[teamIndex] - scores[+!teamIndex]);
+
+            if (match.maps?.length) {
+                match.maps.forEach(map => {
+                    if (!map.id) return;
+                    if (map.score_1 == null || map.score_2 == null) return;
+                    const mapScores = [map.score_1, map.score_2];
+                    team.standings.map_round_wins += mapScores[teamIndex];
+                    team.standings.map_round_losses += mapScores[+!teamIndex];
+                });
+            }
+
+            if (settings?.points) {
+                team.standings.points += (settings.points.map_wins * team.standings.map_wins);
+                team.standings.points += (settings.points.map_losses * team.standings.map_losses);
+            }
+
+            const winIndex = match.score_1 === match.first_to ? 0 : 1;
+            const winner = match.teams[winIndex];
+
+            if (!team.standings.h2h[opponent.id]) team.standings.h2h[opponent.id] = 0;
+
+            if (winner.id === team.id) {
+                team.standings.wins++;
+                if (settings?.points) team.standings.points += settings.points.wins;
+
+                // update win/loss h2h against opponent
+                team.standings.h2h[opponent.id]++;
+            } else {
+                team.standings.losses++;
+                if (settings?.points) team.standings.points += settings.points.losses;
+                team.standings.h2h[opponent.id]--;
+            }
+            if (!team.standings.h2h_maps[opponent.id]) team.standings.h2h_maps[opponent.id] = 0;
+            team.standings.h2h_maps[opponent.id] += scores[teamIndex] - scores[+!teamIndex];
+        });
+
+        team.standings.winrate = team.standings.wins / team.standings.played;
+        team.standings.map_winrate = team.standings.map_wins / (team.standings.map_losses + team.standings.map_wins);
+
+        return team;
+    });
+
+
+    if (useOMW || standingsSort.includes("OMapWinrate") || standingsSort.includes("OMatchWinrate")) {
+        teams.map(team => {
+            team.standings.opponentWinrates = [];
+            team.standings.opponentMapWinrates = [];
+
+            stageMatches.forEach(match => {
+                if (!(match.teams || []).some(t => t.code === team.code)) return;
+                const scores = [match.score_1, match.score_2];
+                if (!scores.some(score => score === match.first_to)) return; // not finished
+                const opponent = match.teams.find(t => t.code !== team.code);
+                if (!opponent) return null;
+                const localOpponent = teams.find(t => t.code === opponent.code);
+                team.standings.opponentWinrates.push(localOpponent.standings.winrate);
+                team.standings.opponentMapWinrates.push(localOpponent.standings.map_winrate);
+            });
+
+            // console.log(team.standings.opponentWinrates, avg(team.standings.opponentWinrates));
+            team.standings.opponent_winrate = avg(team.standings.opponentWinrates);
+            team.standings.opponent_map_winrate = avg(team.standings.opponentMapWinrates);
+            return team;
+        });
+    }
+    console.log("preparing standings sort", standingsSort);
+    if (["OMatchWinsPoints", "OPoints"].some(s => standingsSort.includes(s))) {
+        console.log("preparing opponent points");
+        teams.map(team => {
+            team.standings.opponentPoints = [];
+            team.standings.opponentPointsMatchWins = [];
+
+            stageMatches.forEach(match => {
+                if (!(match.teams || []).some(t => t.code === team.code)) return;
+                const scores = [match.score_1, match.score_2];
+                if (!scores.some(score => score === match.first_to)) return; // not finished
+                const opponent = match.teams.find(t => t.code !== team.code);
+                if (!opponent) return null;
+                const localOpponent = teams.find(t => t.code === opponent.code);
+                team.standings.opponentPoints.push(localOpponent.extra_points || 0);
+                team.standings.opponentPointsMatchWins.push(localOpponent.standings.wins + (localOpponent.extra_points || 0));
+            });
+
+            // console.log(team.standings.opponentWinrates, avg(team.standings.opponentWinrates));
+            team.standings.opponent_points = team.standings.opponentPoints.reduce((c, v) => c + v, 0);
+            team.standings.opponent_points_wins = team.standings.opponentPointsMatchWins.reduce((c, v) => c + v, 0);
+            return team;
+        });
+    }
+
+    const sortFunction = (a, b) => {
+        if (a.standings.points > b.standings.points) return -1;
+        if (a.standings.points < b.standings.points) return 1;
+
+        if (a.standings.wins > b.standings.wins) return -1;
+        if (a.standings.wins < b.standings.wins) return 1;
+
+        if (a.standings.losses > b.standings.losses) return 1;
+        if (a.standings.losses < b.standings.losses) return -1;
+
+        if (a.standings.map_diff > b.standings.map_diff) return -1;
+        if (a.standings.map_diff < b.standings.map_diff) return 1;
+
+
+        if (a.standings.map_wins > b.standings.map_wins) return -1;
+        if (a.standings.map_wins < b.standings.map_wins) return 1;
+
+        if (a.standings.map_losses > b.standings.map_losses) return 1;
+        if (a.standings.map_losses < b.standings.map_losses) return -1;
+    };
+
+    if (standingsSettings?.hide?.length) {
+        teams = teams.filter(team => !standingsSettings.hide.find(id => cleanID(id) === cleanID(team.id)));
+    }
+
+    teams = teams.sort(sortFunction);
+
+    // console.log("[standings teams]", teams);
+    const { standings, warnings } = sortTeamsIntoStandings(teams.map(t => ({ ...t, ...t.standings })), {
+        useOMW: useOMW,
+        sort: standingsSort
+    });
+    // console.log("[new standings]", standings);
+
+    let rank = 1; let display = 1; let teamNum = 1;
+    standings.forEach(group => {
+        group.forEach((team, i) => {
+            team.standings.rank = display;
+            team.standings.tie_show_number = i === 0;
+            team.standings.teamNum = teamNum++;
+
+            if (standings.length === 1) {
+                team.standings.tie_show_number = false;
+            }
+            rank++;
+        });
+        display = rank;
+    });
+
+    return {
+        standings,
+        warnings
+    };
+}

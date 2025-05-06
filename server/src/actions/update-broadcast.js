@@ -3,7 +3,7 @@ import { safeInput, safeInputNoQuotes } from "../action-utils/action-utils.js";
 export default {
     key: "update-broadcast",
     auth: ["client"],
-    optionalParams: ["match", "advertise", "playerCams", "mapAttack", "title", "manualGuests", "deskDisplayMode", "deskDisplayText", "showLiveMatch", "countdownEnd", "highlightTeamID", "highlightHeroID", "highlightPlayerID", "highlightMediaID"],
+    optionalParams: ["match", "advertise", "playerCams", "mapAttack", "title", "manualGuests", "deskDisplayMode", "deskDisplayText", "showLiveMatch", "countdownEnd", "highlightTeamID", "highlightHeroID", "highlightPlayerID", "highlightMediaID", "triviaSettings"],
     /***
      * @param {AnyAirtableID} match
      * @param {ActionAuth["client"]} client
@@ -24,7 +24,8 @@ export default {
         highlightTeamID,
         highlightHeroID,
         highlightPlayerID,
-        highlightMediaID
+        highlightMediaID,
+        triviaSettings
     }, { client }) {
         let broadcast = await this.helpers.get(client?.broadcast?.[0]);
         if (!broadcast?.id) throw ("No broadcast associated");
@@ -112,6 +113,9 @@ export default {
         }
         if (countdownEnd !== undefined) {
             validatedData["Countdown End"] = countdownEnd ? new Date(countdownEnd) : countdownEnd;
+        }
+        if (triviaSettings !== undefined) {
+            validatedData["Trivia Settings"] = (typeof(triviaSettings) === typeof({})) ? JSON.stringify(triviaSettings) : triviaSettings;
         }
 
         console.log(validatedData);

@@ -12,7 +12,7 @@
                 :style="{ borderColor }"
                 :class="{ correct: state === 'answer' && option.c }"
             >
-                <div class="c-name">{{ option.q }}</div>
+                <div class="c-name">{{ option.q }}<span v-if="state === 'answer' && option.v"> - {{ option.v }}</span></div>
             </div>
         </div>
     </div>
@@ -124,7 +124,8 @@ export default {
                     }
                     this.options = this.shuffleArray(res.map((option) => ({
                         q: option.display_value,
-                        c: option.value === cor_value
+                        c: option.value === cor_value,
+                        v: option.value
                     })));
                 } else if (type === "standings") {
                     const [standings_key, value_key] = data.split(";");
@@ -139,7 +140,8 @@ export default {
                         for (const team of group) {
                             teams.push({
                                 q: team.name,
-                                c: standingsIdx === 0
+                                c: standingsIdx === 0,
+                                v: team.standings[value_key]
                             });
                         }
                         standingsIdx += 1;

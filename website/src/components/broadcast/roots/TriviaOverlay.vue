@@ -100,6 +100,9 @@ export default {
     data: () => ({
         activeQuestionIndex: 0,
 
+        optionsCache: {},
+        shownQuestions: new Set(),
+
         options: [],
         state: "question",
 
@@ -194,21 +197,26 @@ export default {
         bg,
         async getOptions() {
             if (!this.activeQuestion) return;
+            console.log(this.optionsCache[this.activeQuestion.id]);
+            if (this.optionsCache[this.activeQuestion.id]) return this.optionsCache[this.activeQuestion.id];
             if (this.activeQuestion.type === "Manual") {
-                this.options = this.activeQuestion.options
+                const opts = this.activeQuestion.options
                     .split("\n")
                     .map((option) => ({
                         q: option,
                         c: option === this.activeQuestion.answer,
                     }));
+                this.options = opts;
+                this.optionsCache[this.activeQuestion.id] = opts;
             } else {
                 const [type, data] = this.activeQuestion.options.split("|");
 
                 if (type === "api") {
-
                     const url = new URL(data);
                     if (!["api.dfns.lotu.dev", "localhost"].includes(url.host)) return;
                     const res = await fetch(url).then(async r => await r.json());
+                    // Multiple requests can be fired, and they would all shuffle. This SHOULD prevent that
+                    if (this.optionsCache[this.activeQuestion.id]) return this.optionsCache[this.activeQuestion.id];
                     const answer = this.activeQuestion.answer;
                     let cor_value;
                     if (answer === "max") {
@@ -216,12 +224,13 @@ export default {
                     } else {
                         cor_value = null;
                     }
-                    this.options = this.shuffleArray(res.map((option) => ({
+                    const opts = this.shuffleArray(res.map((option) => ({
                         q: option.display_value,
                         c: option.value === cor_value,
                         v: option.value
                     })));
-
+                    this.options = opts;
+                    this.optionsCache[this.activeQuestion.id] = opts;
                 } else if (type === "standings") {
 
                     const [standings_key, value_key] = data.split(";");
@@ -242,7 +251,9 @@ export default {
                         }
                         standingsIdx += 1;
                     }
-                    this.options = this.shuffleArray(teams);
+                    const opts = this.shuffleArray(teams);
+                    this.options = opts;
+                    this.optionsCache[this.activeQuestion.id] = opts;
                 }
             }
         },

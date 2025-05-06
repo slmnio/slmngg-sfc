@@ -1,33 +1,101 @@
 <template>
-    <div class="f-col">
-        <div class="qt-row">
-            <div class="question-container">{{ activeQuestion?.question }}</div>
-            <div class="timer-container">{{ counterLabel }}</div>
-        </div>
-        <div class="answers-container" :style="themeColor">
-            <div
-                v-for="option in options"
-                :key="option.q"
-                class="caster-cam-box flex-center flex-column"
-                :style="{ borderColor }"
-                :class="{ correct: state === 'answer' && option.c }"
-            >
-                <div class="c-name">{{ option.q }}<span v-if="state === 'answer' && option.v"> - {{ option.v }}</span></div>
-            </div>
-        </div>
+    <div class="trivia-overlay-holder">
+        <GenericOverlay
+            class="trivia-overlay"
+            :class="{
+                'content-question': !!activeQuestion?.question_content
+            }"
+            body-color="transparent !important"
+            no-bottom="true"
+            clear-bottom-style="true"
+            no-bottom-animate="true"
+            :broadcast="broadcast">
+            <template #title>
+                <div v-if="activeQuestion?.question" class="trivia-question-title w-100 d-flex">
+                    <transition name="fade" mode="out-in">
+                        <div :key="activeQuestion?.question" class="question-text flex-center f-col">
+                            <div class="question-title">{{ activeQuestion?.question }}</div>
+                            <div class="question-subtitle subtitle-text">{{ activeQuestion?.subtitle }}</div>
+                        </div>
+                    </transition>
+                    <div class="timer-container flex-center">
+                        <div
+                            class="timer-circle flex-center text-center"
+                            :style="{
+                                backgroundColor: borderColor,
+                                background: `conic-gradient(${themeColor?.backgroundColor} ${state === 'question' ? ((1-counterPercentage) * 100) : 100}%, 0, ${themeColor?.borderColor})`
+                            }">
+                            <div class="timer-circle-inner flex-center" :style="themeColor">
+                                <div class="timer-circle-text industry-align">{{ counterLabel }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <transition name="fade" mode="out-in">
+                <div :key="activeQuestion?.question" class="trivia-container d-flex w-100 h-100">
+                    <div class="trivia-content d-flex w-100 h-100">
+                        <div
+                            class="answers-container w-100 h-100"
+                            :class="{
+                                'use-column': activeQuestion?.question_content
+                            }">
+                            <div
+                                v-for="option in options"
+                                :key="option.q"
+                                class="flex-center flex-column default-thing option"
+                                :style="{
+                                    ...themeColor,
+                                    backgroundColor: state === 'answer' && option.c ? 'green' : themeColor.backgroundColor
+                                }"
+                                :class="{ correct: state === 'answer' && option.c }"
+                            >
+                                <div class="c-name f-col flex-center text-center industry-align">
+                                    <div class="option-q">{{ option.q }}</div>
+                                    <transition name="answer-reveal">
+                                        <div v-if="state === 'answer' && option.v" class="option-v">
+                                            {{ option.v }}
+                                        </div>
+                                    </transition>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div v-if="questionContent" class="question-content-holder h-100">
+                        <div
+                            v-if="questionContent.type === 'image'"
+                            class="image-content w-100 h-100 full bg-center"
+                            :style="{
+                                ...bg(questionContent.url),
+                                borderColor
+                            }"></div>
+                        <div v-if="questionContent.type === 'video'" class="video-content w-100 h-100 full flex-center">
+                            <video :src="questionContent.url" loop autoplay muted></video>
+                        </div>
+                    </div>
+                </div>
+            </transition>
+        </GenericOverlay>
     </div>
 </template>
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { resizedImage } from "@/utils/images";
-import { logoBackground1 } from "@/utils/theme-styles";
 import { useInterval } from "@vueuse/core";
 import { calculateStandings } from "@/utils/standings";
+import GenericOverlay from "@/components/broadcast/roots/GenericOverlay.vue";
+import { bg, getNewURL } from "@/utils/images.js";
+import { themeBackground } from "@/utils/theme-styles.js";
 
 export default {
     name: "TriviaOverlay",
+    components: { GenericOverlay },
     props: {
         broadcast: {},
+        active: Boolean,
+        animationActive: Boolean
     },
     data: () => ({
         activeQuestionIndex: 0,
@@ -39,6 +107,7 @@ export default {
         counterRunning: false,
         resetCounter: () => {},
         stopTimer: () => {},
+        resumeTimer: () => {},
     }),
     computed: {
         event() {
@@ -55,17 +124,39 @@ export default {
             if (!this.questions?.length) return null;
             return this.questions[this.activeQuestionIndex];
         },
+        questionContent() {
+            // this needs to handle reveal content at some point
+            // possibly also wrapped in some of the download + display logic
+            const content = this.activeQuestion?.question_content?.[0];
+            if (!content) return null;
+            return {
+                type: content.type.split("/")[0],
+                url: getNewURL(content, "orig")
+            };
+        },
         triviaSettings() {
             if (!this.broadcast.trivia_settings) return null;
             return JSON.parse(this.broadcast.trivia_settings);
         },
         counterLabel() {
             if (!this.triviaSettings) return 0;
-            if (this.state === "question") return Math.max(0, this.triviaSettings?.timePerQuestion - this.counter.value);
-            else return Math.max(0, this.triviaSettings?.timePerAnswer - this.counter.value);
+            if (this.state === "question") {
+                return Math.max(0, this.triviaSettings?.timePerQuestion - this.counter.value);
+            } else {
+                return Math.max(0, this.triviaSettings?.timePerAnswer - this.counter.value);
+            }
+        },
+        counterPercentage() {
+            if (!this.triviaSettings) return 0;
+            if (this.state === "question") {
+                return (Math.max(0, this.triviaSettings?.timePerQuestion - this.counter.value) / this.triviaSettings?.timePerQuestion);
+            } else {
+                return (Math.max(0, this.triviaSettings?.timePerAnswer - this.counter.value) / this.triviaSettings?.timePerAnswer);
+            }
         },
         themeColor() {
             return {
+                ...themeBackground(this.broadcast?.event?.theme),
                 "--theme-color": this.broadcast?.event?.theme?.color_logo_background || this.broadcast?.event?.theme?.color_theme
             };
         },
@@ -100,6 +191,7 @@ export default {
         },
     },
     methods: {
+        bg,
         async getOptions() {
             if (!this.activeQuestion) return;
             if (this.activeQuestion.type === "Manual") {
@@ -111,7 +203,9 @@ export default {
                     }));
             } else {
                 const [type, data] = this.activeQuestion.options.split("|");
+
                 if (type === "api") {
+
                     const url = new URL(data);
                     if (!["api.dfns.lotu.dev", "localhost"].includes(url.host)) return;
                     const res = await fetch(url).then(async r => await r.json());
@@ -127,7 +221,9 @@ export default {
                         c: option.value === cor_value,
                         v: option.value
                     })));
+
                 } else if (type === "standings") {
+
                     const [standings_key, value_key] = data.split(";");
                     const standingSettings = this.standingsSettings(standings_key);
                     const matches = this.getMatches(standingSettings.group, standingSettings.groups);
@@ -160,6 +256,7 @@ export default {
                     this.activeQuestionIndex += 1;
                     this.resetCounter();
                 } else {
+                    // this.state = "finished";
                     this.stopTimer();
                 }
             }
@@ -197,10 +294,30 @@ export default {
             handler() {
                 this.getOptions();
             }
+        },
+        animationActive: {
+            immediate: true,
+            handler(isActive) {
+                if (isActive) {
+                    console.log("active");
+                    this.resetCounter?.();
+                    this.activeQuestionIndex = 0;
+                    this.state = "question";
+                    this.resumeTimer?.();
+                } else {
+                    console.log("inactive");
+                }
+            }
         }
     },
     mounted() {
-        const { counter, isActive, reset, pause } = useInterval(1000, {
+        const {
+            counter,
+            isActive,
+            reset,
+            pause,
+            resume
+        } = useInterval(1000, {
             controls: true,
             callback: this.intervalCalled,
         });
@@ -208,6 +325,7 @@ export default {
         this.counterRunning = isActive;
         this.resetCounter = reset;
         this.stopTimer = pause;
+        this.resumeTimer = resume;
     },
 };
 </script>
@@ -215,7 +333,7 @@ export default {
 .qt-row {
     display: flex;
     justify-content: center;
-    align-items: flex-center;
+    align-items: center;
     width: 100%;
 }
 
@@ -223,116 +341,110 @@ export default {
     background-color: green;
 }
 
+
 .answers-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
+    font-size: 6em;
 }
 
-.caster {
-    min-height: 200px;
-    --internal-padding: 10px;
+.answers-container.use-column {
+    grid-template-columns: 1fr;
+    font-size: 4.5em;
+}
+
+.timer-container {
+    width: 2em;
+    flex-shrink: 0;
+}
+
+.trivia-overlay:deep(.g-title-wrapper) {
+    height: 13em;
+    transition: height .5s ease-in-out;
+}
+
+.trivia-overlay.content-question:deep(.g-title-wrapper) {
+    /*height: 600px;*/
+}
+
+.trivia-overlay:deep(.g-title) {
+    padding: 0 0.1em;
+}
+
+.question-title {
+    font-size: 0.8em;
+}
+
+.option, .image-content {
+    border-bottom: 8px solid;
+}
+
+.trivia-content {
+    flex-shrink: 1;
+}
+
+.question-content-holder {
+    width: 50%;
+    flex-shrink: 0;
+}
+
+.question-text {
     flex-grow: 1;
-    padding: 0 var(--internal-padding);
-    --theme-color: #2f2f30;
-    position: relative;
-
-    --caster-width: 810px;
-    --caster-height: 570px;
-    max-width: var(--caster-width);
-    transition: max-width 0.4s ease, min-width 0.4s ease, padding 0.4s ease;
-}
-
-.caster-cam-box {
-    background-color: var(--theme-color);
-    border-bottom: 6px solid var(--theme-color);
-    transition: background-color 300ms, border-bottom-color 300ms,
-        height 0.5s ease;
-    color: white;
-    height: var(--caster-height);
     width: 100%;
-    /*border-radius: 20px;*/
-    overflow: hidden;
-}
-.caster-lower {
-    position: absolute;
-    bottom: 15px;
-    min-height: 80px;
-}
-.caster-name {
-    background-color: var(--theme-color);
-    color: white;
-
-    background-color: #fff;
-    color: var(--theme-color);
-
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: 32px;
-    padding: 7px 20px;
-    /*border-radius: 4px;*/
-    line-height: 1;
-    box-shadow: 0 0 4px 0 #00000080;
-    flex-direction: column;
-    transition: color 0.5s ease;
 }
 
-.c-twitter {
-    font-size: 0.8em;
-    margin-bottom: 0.15em;
+.question-content-holder .image-content {
+    background-size: cover;
 }
 
-.c-pronouns {
-    font-size: 0.8em;
-    margin-bottom: 0.15em;
-}
-
-.caster-cam-box {
+.trivia-question-title {
     position: relative;
-}
-.caster-cam-wrapper {
-    width: calc(var(--caster-height) * (16 / 9));
-    height: 100%;
-    position: absolute;
+    gap: 0.1em;
 }
 
-.caster-lower.cl-traditional {
-    bottom: 4px;
-    width: calc(100% - calc(var(--internal-padding) * 2));
-    min-height: auto;
-}
-.caster:first-child .caster-lower.cl-traditional,
-.caster:last-child .caster-lower.cl-traditional {
-    width: calc(100% - var(--internal-padding));
+.trivia-container {
+    gap: 20px;
 }
 
-.caster-lower.cl-traditional .caster-name {
-    box-shadow: none;
-    width: 100%;
-    padding: 10px 15px;
-    flex-direction: row;
-    flex-wrap: wrap;
+.timer-circle {
+    background-color: white;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+}
+
+.timer-circle-inner {
+    font-size: 0.75em;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+}
+
+.trivia-overlay {
+    padding: 60px 180px;
+}
+
+.option-v {
+    font-size: 0.75em;
+    height: 1.5em;
+    display: flex;
     justify-content: center;
+    align-items: center;
 }
 
-.caster-lower.cl-traditional .c-name,
-.caster-lower.cl-traditional .c-twitter,
-.caster-lower.cl-traditional .c-pronouns {
-    text-align: center;
-    margin: 0 20px;
+.answer-reveal-enter-active, .answer-reveal-leave-active {
+    transition: height 500ms ease, opacity 500ms ease;
+    overflow: hidden
 }
 
-.caster-lower.cl-traditional .c-pronouns {
-    order: -1;
+.answer-reveal-enter-from, .answer-reveal-leave-to {
+    height: 0;
+    opacity: 0;
 }
 
-/*.caster-lower.cl-traditional .c-name { text-align: left; }*/
-/*.caster-lower.cl-traditional .c-twitter { text-align: right; }*/
-
-.caster-cam-box.align-right {
-    justify-content: flex-end;
-}
-.caster-cam-box.align-left {
-    justify-content: flex-start;
+.answer-reveal-enter-to, .answer-reveal-leave-from {
+    height: 1.5em;
+    opacity: 1;
 }
 </style>

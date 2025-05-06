@@ -15,7 +15,8 @@
                 :duration="500"
                 :inner-delay="150">
                 <div class="generic-overlay-title g-title overlay--bg flex-center flex-column" :style="{borderColor: _accentColor, ...(titleStyle || {})}">
-                    <Squeezable align="middle" :disabled="(title || '').includes('\\n')" class="w-100 flex-center industry-align">
+                    <slot name="title"></slot>
+                    <Squeezable v-if="!$slots.title" align="middle" :disabled="(title || '').includes('\\n')" class="w-100 flex-center industry-align">
                         <transition name="fade" mode="out-in">
                             <div
                                 :key="title"
@@ -24,7 +25,7 @@
                                 v-html="nbr(title)"></div>
                         </transition>
                     </Squeezable>
-                    <Squeezable align="middle" :disabled="(subtitle || '').includes('\\n')" class="w-100 flex-center industry-align">
+                    <Squeezable v-if="!$slots.title" align="middle" :disabled="(subtitle || '').includes('\\n')" class="w-100 flex-center industry-align">
                         <transition name="fade" mode="out-in">
                             <div
                                 :key="subtitle"
@@ -46,6 +47,7 @@
                 one-color
                 :theme="theme"
                 :starting-delay="100"
+                :clear-style-after-entered="clearBottomStyle"
                 end="middle"
                 :duration="500"
                 :inner-delay="150">
@@ -64,7 +66,7 @@ import Squeezable from "@/components/broadcast/Squeezable.vue";
 export default {
     name: "GenericOverlay",
     components: { Squeezable, ThemeTransition, TourneyBar },
-    props: ["title", "subtitle", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "titleStyle", "customTheme", "full", "hideTitle"],
+    props: ["title", "subtitle", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "clearBottomStyle", "titleStyle", "customTheme", "full", "hideTitle"],
     computed: {
         theme() {
             return this.customTheme || this.$root?.broadcast?.event?.theme;
@@ -189,7 +191,7 @@ span.industry-align {
     transition-delay: 200ms !important;
 }
 
-.subtitle-text {
+.subtitle-text, .g-title:deep(.subtitle-text) {
     font-size: 0.3em;
     margin-top: 0.1em;
     font-weight: 400;

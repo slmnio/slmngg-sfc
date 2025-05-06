@@ -1,5 +1,5 @@
 <template>
-    <div class="trivia-controller">
+    <div class="trivia-controller p-2">
         <div class="flex-grow-1">Total questions in system: 10 Bla: ?/</div>
         <div class="flex-grow-1 f-col">
             <b-form-input

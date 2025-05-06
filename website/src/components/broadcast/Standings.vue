@@ -57,7 +57,7 @@ export default {
     props: {
         event: Object,
         stage: String,
-        stages: String,
+        stages: Array,
         title: String,
         tieText: String,
         showMapDiff: Boolean,

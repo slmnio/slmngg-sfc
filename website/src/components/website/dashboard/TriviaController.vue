@@ -34,7 +34,6 @@
     </div>
 </template>
 <script>
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {

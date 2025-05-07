@@ -76,9 +76,9 @@
             <DashboardModule v-if="liveMatch" class="mb-2" title="Broadcast Roles" icon-class="fas fa-users-class">
                 <BroadcastRoles :broadcast="broadcast" :live-match="liveMatch" />
             </DashboardModule>
-            <DashboardModule v-if="liveMatch" class="mb-2" title="Trivia Controls" icon-class="fas fa-question">
-                <TriviaController :broadcast="broadcast" :live-match="liveMatch" />
-            </DashboardModule>
+            <!--<DashboardModule v-if="liveMatch" class="mb-2" title="Trivia Controls" icon-class="fas fa-question">-->
+            <!--    <TriviaController :broadcast="broadcast" :live-match="liveMatch" />-->
+            <!--</DashboardModule>-->
             <DashboardModule
                 v-if="broadcast && broadcast.channel"
                 class="mb-2"
@@ -175,11 +175,11 @@ import PlayerCamsController from "@/components/website/dashboard/PlayerCamsContr
 import DashboardTransmitter from "@/components/website/dashboard/DashboardTransmitter.vue";
 import TransmitterStreams from "@/components/website/dashboard/TransmitterStreams.vue";
 import { GameOverrides } from "@/utils/games.ts";
-import TriviaController from "@/components/website/dashboard/TriviaController.vue";
+// import TriviaController from "@/components/website/dashboard/TriviaController.vue";
 
 export default {
     name: "Dashboard",
-    components: { TransmitterStreams, TriviaController, DashboardTransmitter, PlayerCamsController, BroadcastCustomisation, GFXController, BroadcastRoles, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControls, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher },
+    components: { TransmitterStreams, /* TriviaController, */ DashboardTransmitter, PlayerCamsController, BroadcastCustomisation, GFXController, BroadcastRoles, ThemeLogo, DeskTextEditor, DeskEditor, Bracket, PreviewProgramDisplay, BracketImplications, DashboardModule, DashboardClock, ScheduleEditor, BroadcastEditor, CommsControls, Commercials, Predictions, MatchEditor, MatchThumbnail, BroadcastSwitcher },
     data: () => ({
         titleProcessing: false
     }),

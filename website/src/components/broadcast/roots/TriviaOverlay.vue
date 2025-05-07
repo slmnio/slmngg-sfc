@@ -123,9 +123,12 @@ export default {
                 trivia: ReactiveArray("trivia"),
             }).trivia?.filter((x) => x.active);
         },
+        availableQuestions() {
+            return (this.questions || []).filter((q) => !this.shownQuestions.has(q.id));
+        },
         activeQuestion() {
-            if (!this.questions?.length) return null;
-            return this.questions[this.activeQuestionIndex];
+            if (!this.availableQuestions?.length) return null;
+            return this.availableQuestions[this.activeQuestionIndex] || this.availableQuestions[0];
         },
         questionContent() {
             // this needs to handle reveal content at some point
@@ -264,7 +267,10 @@ export default {
             } else if (this.state === "answer" && this.counter.value > this.triviaSettings?.timePerAnswer) {
                 if (this.activeQuestionIndex < this.triviaSettings?.questions && this.activeQuestionIndex !== this.questions.length - 1) {
                     this.state = "question";
-                    this.activeQuestionIndex += 1;
+                    if (!this.shownQuestions.has(this.activeQuestion.id)) {
+                        this.shownQuestions.add(this.activeQuestion.id);
+                    }
+                    this.activeQuestionIndex = Math.floor(Math.random() * this.availableQuestions.length);
                     this.resetCounter();
                 } else {
                     // this.state = "finished";

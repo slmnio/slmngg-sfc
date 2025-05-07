@@ -9,6 +9,8 @@
             no-bottom="true"
             clear-bottom-style="true"
             no-bottom-animate="true"
+            override-active="true"
+            :custom-active="(!!activeQuestion?.question) && animationActive"
             :broadcast="broadcast">
             <template #title>
                 <div v-if="activeQuestion?.question" class="trivia-question-title w-100 d-flex">
@@ -32,9 +34,8 @@
                     </div>
                 </div>
             </template>
-
             <transition name="fade" mode="out-in">
-                <div :key="activeQuestion?.question" class="trivia-container d-flex w-100 h-100">
+                <div v-if="activeQuestion?.question" :key="activeQuestion?.question" class="trivia-container d-flex w-100 h-100">
                     <div class="trivia-content d-flex w-100 h-100">
                         <div
                             class="answers-container w-100 h-100"
@@ -134,7 +135,7 @@ export default {
         },
         activeQuestion() {
             if (!this.availableQuestions?.length) return null;
-            return this.availableQuestions[this.activeQuestionIndex] || this.availableQuestions[0];
+            return this.availableQuestions[this.activeQuestionIndex] || null;
         },
         questionContent() {
             // this needs to handle reveal content at some point
@@ -208,7 +209,7 @@ export default {
         bg,
         async getOptions() {
             if (!this.activeQuestion) return;
-            console.log(this.optionsCache[this.activeQuestion.id]);
+            // console.log(this.optionsCache[this.activeQuestion.id]);
             if (this.optionsCache[this.activeQuestion.id]) return this.optionsCache[this.activeQuestion.id];
             if (this.activeQuestion.type === "Manual") {
                 const opts = this.activeQuestion.options
@@ -275,7 +276,7 @@ export default {
             } else if (this.state === "answer" && this.counter.value > this.triviaSettings?.timePerAnswer) {
                 if (this.activeQuestionIndex < this.triviaSettings?.questions && this.activeQuestionIndex !== this.questions.length - 1) {
                     this.state = "question";
-                    if (!this.shownQuestions.has(this.activeQuestion.id)) {
+                    if (this.activeQuestion?.id && !this.shownQuestions.has(this.activeQuestion.id)) {
                         this.shownQuestions.add(this.activeQuestion.id);
                     }
                     this.activeQuestionIndex = Math.floor(Math.random() * this.availableQuestions.length);
@@ -329,8 +330,15 @@ export default {
                     this.activeQuestionIndex = 0;
                     this.state = "question";
                     this.resumeTimer?.();
-                } else {
+                }
+            }
+        },
+        active: {
+            immediate: true,
+            handler(isActive) {
+                if (!isActive) {
                     console.log("inactive");
+                    this.stopTimer();
                 }
             }
         }
@@ -352,6 +360,11 @@ export default {
         this.stopTimer = pause;
         this.resumeTimer = resume;
     },
+    head() {
+        return {
+            title: "Trivia"
+        };
+    }
 };
 </script>
 <style scoped>

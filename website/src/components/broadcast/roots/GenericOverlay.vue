@@ -9,7 +9,7 @@
         <div v-if="!hideTitle" class="g-title-wrapper">
             <theme-transition
                 :theme="theme"
-                :active="$root.animationActive"
+                :active="overrideActive ? customActive : $root.animationActive"
                 one-color
                 end="middle"
                 :duration="500"
@@ -43,7 +43,7 @@
             </div>
             <theme-transition
                 v-else
-                :active="$root.animationActive"
+                :active="overrideActive ? customActive : $root.animationActive"
                 one-color
                 :theme="theme"
                 :starting-delay="100"
@@ -66,7 +66,7 @@ import Squeezable from "@/components/broadcast/Squeezable.vue";
 export default {
     name: "GenericOverlay",
     components: { Squeezable, ThemeTransition, TourneyBar },
-    props: ["title", "subtitle", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "clearBottomStyle", "titleStyle", "customTheme", "full", "hideTitle"],
+    props: ["title", "subtitle", "accentColor", "bodyColor", "top", "broadcast", "noBottom", "noBottomAnimate", "clearBottomStyle", "titleStyle", "customTheme", "full", "hideTitle", "overrideActive", "customActive"],
     computed: {
         theme() {
             return this.customTheme || this.$root?.broadcast?.event?.theme;

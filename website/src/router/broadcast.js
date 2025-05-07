@@ -13,6 +13,10 @@ export default [
         component: () => import("@/components/broadcast/roots/IngamePickBan.vue")
     },
     {
+        path: "trivia",
+        component: () => import("@/components/broadcast/roots/TriviaOverlay.vue")
+    },
+    {
         path: "cams",
         component: () => import("@/components/broadcast/cams/CamsWrapper.vue"),
         props: route => ({ params: route.query.params?.split(",") }),

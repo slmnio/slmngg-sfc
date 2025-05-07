@@ -133,7 +133,8 @@ const slmnggAttachments = {
     "Ad Reads": ["audio", "image"],
     "Tracks": ["file"],
     "Teams": ["icon", "images"],
-    "GFX": ["image"]
+    "GFX": ["image"],
+    "Trivia": ["question_content", "reveal_content"]
 };
 
 function generateAttachmentURL(str, attachment) {

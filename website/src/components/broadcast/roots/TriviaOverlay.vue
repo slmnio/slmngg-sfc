@@ -65,16 +65,22 @@
 
 
                     <div v-if="questionContent" class="question-content-holder h-100">
-                        <div
-                            v-if="questionContent.type === 'image'"
-                            class="image-content w-100 h-100 full bg-center"
-                            :style="{
-                                ...bg(questionContent.url),
-                                borderColor
-                            }"></div>
-                        <div v-if="questionContent.type === 'video'" class="video-content w-100 h-100 full flex-center">
-                            <video :src="questionContent.url" loop autoplay muted></video>
-                        </div>
+                        <transition name="fade" mode="out-in">
+                            <div
+                                v-if="questionContent.type === 'image'"
+                                :key="`image-${questionContent.url}`"
+                                class="image-content w-100 h-100 full bg-center"
+                                :style="{
+                                    ...bg(questionContent.url),
+                                    borderColor }">
+                            </div>
+                            <div
+                                v-else-if="questionContent.type === 'video'"
+                                :key="`video-${questionContent.url}`"
+                                class="video-content w-100 h-100 full flex-center">
+                                <video :src="questionContent.url" loop autoplay muted></video>
+                            </div>
+                        </transition>
                     </div>
                 </div>
             </transition>
@@ -133,7 +139,9 @@ export default {
         questionContent() {
             // this needs to handle reveal content at some point
             // possibly also wrapped in some of the download + display logic
-            const content = this.activeQuestion?.question_content?.[0];
+            const questionContent = this.activeQuestion?.question_content?.[0];
+            const revealContent = this.activeQuestion?.reveal_content?.[0];
+            const content = (this.state === "answer" ? revealContent : questionContent) || questionContent;
             if (!content) return null;
             return {
                 type: content.type.split("/")[0],

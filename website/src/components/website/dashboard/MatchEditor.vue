@@ -285,7 +285,12 @@
                                                 {{ teams[row.team - 1]?.code || teams[row.team - 1]?.name }}
                                                 {{ row.type === "ban" ? "Ban" : (row.type === "pick" ? "Pick" : "") }} {{ row.countOfTeamType }}
                                             </div>
+                                            <div
+                                                v-if="({ 'pick': { 1: team_1_picks, 2: team_2_picks }, 'ban': { 1: team_1_bans, 2: team_2_bans } }[row.type][row.team])?.[mapI]?.length === undefined">
+                                                <b-button size="sm" @click="forceSetup(`team_${row.team}_${row.type}s`, mapI)"><i class="fas fa-pencil mr-1"></i> Edit map {{ mapI+1 }}</b-button>
+                                            </div>
                                             <heroes-picker
+                                                v-else
                                                 v-model="({ 'pick': { 1: team_1_picks, 2: team_2_picks }, 'ban': { 1: team_1_bans, 2: team_2_bans } }[row.type][row.team])[mapI][row.countOfTeamType - 1]"
                                                 :single="true"
                                                 :game="match?.game || match?.event?.game"
@@ -797,6 +802,20 @@ export default {
         // }
     },
     methods: {
+        forceSetup(setupKey, mapI) {
+            [
+                "team_1_picks",
+                "team_2_picks",
+                "team_1_bans",
+                "team_2_bans"
+            ].forEach(key => {
+                console.log(key, mapI, this[key], this[key]?.[mapI]);
+                const data = this[key];
+                if (data?.[mapI] === undefined) {
+                    this[key][mapI] = [];
+                }
+            });
+        },
         getPickBanMax(order, type, team) {
             if (!order) return;
             return Math.max(...order.filter(p => (team ? p.team === team : true) && p.type === type).map(p => p.countOfTeamType), 0);

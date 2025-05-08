@@ -531,6 +531,30 @@ export function getEmbedData(url) {
     };
 }
 
+export function renderEmbed(embed) {
+    if (embed.service === "youtube") {
+        return `<iframe src="https://youtube.com/embed/${embed.key}?autoplay=true${embed.timestamp ? `&start=${embed.timestamp}` : ""}" allowfullscreen="true"></iframe>`;
+    }
+    if (embed.service === "twitch") {
+        return `<iframe src="https://player.twitch.tv/?video=${embed.key}&parent=${window.location.hostname}${embed.timestamp ? `&t=${embed.timestamp}` : ""}" allowfullscreen="true"></iframe>`;
+    }
+    if (embed.service === "twitch-live") {
+        return `<iframe src="https://player.twitch.tv/?channel=${embed.key}&parent=${window.location.hostname}${embed.timestamp ? `&t=${embed.timestamp}` : ""}" allowfullscreen="true"></iframe>`;
+    }
+    if (embed.service === "twitch-clip") {
+        return `<iframe src="https://clips.twitch.tv/embed?clip=${embed.key}&parent=${window.location.hostname}" allowfullscreen="true"></iframe>`;
+    }
+    if (embed.service === "unknown-video") {
+        return `<video src="${embed.url}" autoplay controls></video>`;
+    }
+    if (embed.service === "pdf") {
+        return `<iframe src="https://docs.google.com/gview?embedded=true&url=${embed.url}" class="embed-pdf"></iframe>`;
+    }
+    if (embed.service === "unknown") {
+        return `<iframe src="${embed.url}" class="embed-iframe"></iframe>`;
+    }
+}
+
 
 export function unescapeText(text) {
     if (!text) return "";

@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { getEmbedData } from "@/utils/content-utils";
+import { getEmbedData, renderEmbed } from "@/utils/content-utils";
 
 export default {
     name: "EmbeddedVideo",
@@ -13,25 +13,7 @@ export default {
             return getEmbedData(this.src);
         },
         renderEmbed() {
-            if (this.embed.service === "youtube") {
-                return `<iframe src="https://youtube.com/embed/${this.embed.key}?autoplay=true${this.embed.timestamp ? `&start=${this.embed.timestamp}` : ""}" allowfullscreen="true"></iframe>`;
-            }
-            if (this.embed.service === "twitch") {
-                return `<iframe src="https://player.twitch.tv/?video=${this.embed.key}&parent=${window.location.hostname}${this.embed.timestamp ? `&t=${this.embed.timestamp}` : ""}" allowfullscreen="true"></iframe>`;
-            }
-            if (this.embed.service === "twitch-live") {
-                return `<iframe src="https://player.twitch.tv/?channel=${this.embed.key}&parent=${window.location.hostname}${this.embed.timestamp ? `&t=${this.embed.timestamp}` : ""}" allowfullscreen="true"></iframe>`;
-            }
-            if (this.embed.service === "unknown-video") {
-                return `<video src="${this.embed.url}" autoplay controls></video>`;
-            }
-            if (this.embed.service === "pdf") {
-                return `<iframe src="https://docs.google.com/gview?embedded=true&url=${this.embed.url}" class="embed-pdf"></iframe>`;
-            }
-            if (this.embed.service === "unknown") {
-                return `<iframe src="${this.embed.url}" class="embed-iframe"></iframe>`;
-            }
-            return `<div class="embed-fail">The VOD couldn't be embedded here. Head to the full link on the external website.<br><a href="${this.src}" target="_blank"></a></div>`;
+            return renderEmbed(this.embed) || `<div class="embed-fail">The VOD couldn't be embedded here. Head to the full link on the external website.<br><a href="${this.src}" target="_blank"></a></div>`;
         }
     }
 };

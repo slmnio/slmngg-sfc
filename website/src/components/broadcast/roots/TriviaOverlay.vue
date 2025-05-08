@@ -45,21 +45,23 @@
                             <div
                                 v-for="option in options"
                                 :key="option.q"
-                                class="flex-center flex-column default-thing option"
+                                class="flex-center flex-column default-thing option py-1 px-4"
                                 :style="{
                                     ...themeColor,
                                     backgroundColor: state === 'answer' && option.c ? 'green' : themeColor.backgroundColor
                                 }"
                                 :class="{ correct: state === 'answer' && option.c }"
                             >
-                                <div class="c-name f-col flex-center text-center industry-align">
-                                    <div class="option-q">{{ option.q }}</div>
+                                <squeezable class="c-name w-100 f-col flex-center text-center industry-align" align="center">
+                                    <div class="option-q">
+                                        {{ option.q }}
+                                    </div>
                                     <transition name="answer-reveal">
                                         <div v-if="state === 'answer' && option.v" class="option-v">
                                             {{ option.v }}
                                         </div>
                                     </transition>
-                                </div>
+                                </squeezable>
                             </div>
                         </div>
                     </div>
@@ -95,10 +97,11 @@ import { calculateStandings } from "@/utils/standings";
 import GenericOverlay from "@/components/broadcast/roots/GenericOverlay.vue";
 import { bg, getNewURL } from "@/utils/images.js";
 import { themeBackground } from "@/utils/theme-styles.js";
+import Squeezable from "@/components/broadcast/Squeezable.vue";
 
 export default {
     name: "TriviaOverlay",
-    components: { GenericOverlay },
+    components: { Squeezable, GenericOverlay },
     props: {
         broadcast: {},
         active: Boolean,
@@ -134,6 +137,7 @@ export default {
             return (this.questions || []).filter((q) => !this.shownQuestions.has(q.id));
         },
         activeQuestion() {
+            if (this.state === "finished") return null;
             if (!this.availableQuestions?.length) return null;
             return this.availableQuestions[this.activeQuestionIndex] || null;
         },
@@ -274,7 +278,7 @@ export default {
                 this.state = "answer";
                 this.resetCounter();
             } else if (this.state === "answer" && this.counter.value > this.triviaSettings?.timePerAnswer) {
-                if (this.activeQuestionIndex < this.triviaSettings?.questions && this.activeQuestionIndex !== this.questions.length - 1) {
+                if ((this.shownQuestions.size ?? 0) < this.triviaSettings?.questions && this.availableQuestions.length > 0) {
                     this.state = "question";
                     if (this.activeQuestion?.id && !this.shownQuestions.has(this.activeQuestion.id)) {
                         this.shownQuestions.add(this.activeQuestion.id);
@@ -282,7 +286,7 @@ export default {
                     this.activeQuestionIndex = Math.floor(Math.random() * this.availableQuestions.length);
                     this.resetCounter();
                 } else {
-                    // this.state = "finished";
+                    this.state = "finished";
                     this.stopTimer();
                 }
             }
@@ -382,14 +386,27 @@ export default {
 
 .answers-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    --gap: 20px;
+    grid-template-columns: repeat(2, calc(50% - (var(--gap) / 2)));
+    grid-template-rows: repeat(2, calc(50% - (var(--gap) / 2)));
+    gap: var(--gap);
     font-size: 6em;
 }
 
 .answers-container.use-column {
     grid-template-columns: 1fr;
     font-size: 4.5em;
+}
+.answers-container .option {
+    flex-shrink: 0;
+}
+.c-name {
+    white-space: normal !important;
+    justify-content: flex-start;
+    text-wrap-style: pretty;
+}
+.option-q {
+    line-height: 1.1;
 }
 
 .timer-container {

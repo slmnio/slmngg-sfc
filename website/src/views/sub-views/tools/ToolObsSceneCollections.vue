@@ -8,6 +8,9 @@
                     :disabled="!(broadcast === '' || !broadcast)"
                     @update:model-value="(v) => client = cleanString(v)" />
                 <template #description>
+                    <div v-if="!clientExists && client" class="text-white d-flex align-items-center gap-1 mt-1">
+                        <b>⚠️ The client key you entered does not (yet) exist in the SLMN.GG system. Please double check your spelling, or ask an admin to create it for you.</b>
+                    </div>
                     <div class="text-white">
                         Clients identify production staff and will dynamically change your setup to whichever broadcast you're
                         working on.<br>
@@ -161,7 +164,7 @@ import timelessProd from "./collections/timeless_prod.json";
 import prodBeta from "./collections/24.0 prod.json";
 import { useAuthStore } from "@/stores/authStore";
 import { mapState } from "pinia";
-import { ReactiveRoot } from "@/utils/reactive";
+import { ReactiveList, ReactiveRoot } from "@/utils/reactive";
 import LearnTitleChip from "@/components/website/guide/LearnTitleChip.vue";
 
 const OBS = {
@@ -346,6 +349,12 @@ export default {
         authBroadcast() {
             if (!this.authClient?.broadcast?.length) return null;
             return ReactiveRoot(this.authClient?.broadcast?.[0]);
+        },
+        allClients() {
+            return new Set(ReactiveList("Clients").map((c) => c.key));
+        },
+        clientExists() {
+            return this.allClients.has(this.client);
         },
         output() {
             if (!this.json) return;

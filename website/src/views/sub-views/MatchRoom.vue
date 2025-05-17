@@ -1,7 +1,5 @@
 <template>
     <div class="match-room">
-        <pre class="d-none">{{ { roomState, serverStatus, socketStatus, viewerIDs, matchRoomsEnabled, currentStepAddress, currentStep, currentStepData } }}</pre>
-
         <div v-if="!matchRoomsEnabled" class="p-2 bg-dark text-center rounded">
             Match rooms disabled
         </div>
@@ -305,7 +303,7 @@ export default {
                 status.teams = teams.map(t => cleanID(t.id));
             }
 
-            const editorPerm = isEventStaffOrHasRole(user, { event: this.match?.event, websiteRoles: ["Can edit any match", "Can edit any event"] });
+            const editorPerm = isEventStaffOrHasRole(user, this.match?.event, ["Can edit any match", "Can edit any event"]);
             if (editorPerm) status.staff = true;
             return status;
         },

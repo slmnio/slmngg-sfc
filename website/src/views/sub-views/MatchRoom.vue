@@ -10,7 +10,7 @@
 
             <h3>In room</h3>
             <ul>
-                <li v-for="viewer in viewers">{{ viewer?.name || '...' }} {{ viewer._authStatus }}</li>
+                <li v-for="viewer in viewers" :key="viewer.id">{{ viewer?.name || '...' }} {{ viewer._authStatus }}</li>
             </ul>
 
             <b-button v-if="canWakeServer && serverStatus === 'wakeable'" variant="success" @click="wakeServer">Start match room</b-button>

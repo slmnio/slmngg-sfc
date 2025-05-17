@@ -9,7 +9,8 @@ import images from "./images.js";
 import discordAuth from "./discord/auth.js";
 import "./discord/discord-data.js";
 import webAuction from "./web_auction.js";
-import * as draftRoom from "./draft-room.ts";
+import matchRooms from "./match-rooms.js";
+// import * as draftRoom from "./draft-room.ts";
 import * as actions from "./action-utils/action-manager.js";
 
 const app = express();
@@ -117,6 +118,7 @@ meta({ app, cors, Cache });
 images({ app, cors, Cache, corsHandle });
 
 webAuction({ app, io });
+matchRooms({ app, io, cors: localCors });
 
 function cleanID(id) {
     if (!id) return null;
@@ -142,6 +144,9 @@ io.on("connection", (socket) => {
     socket.on("subscribe", (id) => {
         id = cleanID(id);
         socket.join(id);
+    });
+    socket.on("associate_token", (token) => {
+        socket._token = token;
     });
     socket.on("unsubscribe", (id) => {
         id = cleanID(id);
@@ -262,7 +267,7 @@ io.on("connection", (socket) => {
         io.to(`prod:client-${socket._clientName}`).emit(event, args);
     });
 
-    draftRoom.socketConnection(socket, io);
+    // draftRoom.socketConnection(socket, io);
 });
 
 http.listen(port, () => {

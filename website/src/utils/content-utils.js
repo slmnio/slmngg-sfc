@@ -994,7 +994,7 @@ export function processPickBanOrder(order, flip) {
     let counts = {};
     return order.split(",").map((text, i) => {
         const item = {
-            type: (text.startsWith("pick") ? "pick" : (text.startsWith("ban") ? "ban" : null)),
+            type: (text.startsWith("pick") ? "pick" : (text.startsWith("ban") ? "ban" : (text.startsWith("protect") ? "protect" : null))),
             team: (text.endsWith("1") ? (flip ? 2 : 1) : (text.endsWith("2") ? (flip ? 1 : 2) : null)),
             num: i + 1
         };

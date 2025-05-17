@@ -162,6 +162,8 @@ export interface MatchMap extends Base {
     team_2_bans?: HeroResolvableID[];
     team_1_picks?: HeroResolvableID[];
     team_2_picks?: HeroResolvableID[];
+    team_1_protects?: HeroResolvableID[];
+    team_2_protects?: HeroResolvableID[];
     flip_pick_ban_order?: boolean;
 }
 interface PlayerRelationship extends Base {
@@ -348,6 +350,8 @@ interface EventSeries extends Base {
 interface Interview extends Base {
 
 }
+type PickBan = `${"pick" | "protect" | "ban"}${"1" | "2"}`;
+type PickBanOrder = `${PickBan},${PickBan}, ...`
 
 export interface Match extends Base {
     id: MatchResolvableID;
@@ -376,11 +380,13 @@ export interface Match extends Base {
     maps?: MatchMapResolvableID[];
     match_group?: string;
     match_number?: number;
+    match_room_config?: JSONString;
     middle_text?: string;
     mvp?: PlayerResolvableID[];
     placeholder_right?: boolean;
     placeholder_teams?: string;
     player_relationships?: PlayerRelationshipResolvableID[];
+    pick_ban_order: PickBanOrder;
     reports?: ReportResolvableID[];
     report_history?: ReportResolvableID[];
     round?: string;
@@ -551,6 +557,10 @@ export type ActionAuth = {
     isAutomation?: boolean;
 }
 
+export type MatchRoomStep = {
+    type: string
+};
+
 
 export type EventSettings = {
     foldy?: {
@@ -607,5 +617,12 @@ export type EventSettings = {
 
         sendStaffPreapprovalNotifications?: boolean;
         hideNonStaffRosterChanges?: boolean;
+    };
+    matchrooms?: {
+        enabled?: boolean;
+        prematch?: MatchRoomStep[];
+        premap?: MatchRoomStep[];
+        postmap?: MatchRoomStep[];
+        postmatch?: MatchRoomStep[];
     }
 }

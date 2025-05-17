@@ -1,5 +1,5 @@
 import type { Snowflake } from "discord-api-types/globals";
-import { Match, Player, PlayerResolvableID, Team, TeamResolvableID } from "../types.js";
+import { Match, MatchMap, Player, PlayerResolvableID, Team, TeamResolvableID } from "../types.js";
 import { get } from "./action-cache.js";
 import { MapObject } from "../discord/managers.js";
 import client from "../discord/client.js";
@@ -331,4 +331,38 @@ export async function readableMatchLog(log: string) {
                 (step?.staff ? "as staff" : ""),
         ].filter(Boolean).join(" ");
     }).join("\n");
+}
+
+type MapPickBanType = "pick" | "ban" | "protect";
+type MapPickBanTeamNumber = 1 | 2
+type MapPickBanOrderItem = `${MapPickBanType}${MapPickBanTeamNumber}`
+
+export function processPickBanOrder(order: Match["pick_ban_order"], flip: MatchMap["flip_pick_ban_order"]) {
+    if (!order) return null;
+    // const counts: { [key: MapPickBanType]: { [key: MapPickBanTeamNumber]: number } } = {};
+
+    const counts: { [key: string]: { [key: number]: number } } = {};
+    return order.split(",").map((text, i) => {
+        const item = {
+            type: (text.startsWith("pick") ? "pick" : (text.startsWith("ban") ? "ban" : (text.startsWith("protect") ? "protect" : null))),
+            team: (text.endsWith("1") ? (flip ? 2 : 1) : (text.endsWith("2") ? (flip ? 1 : 2) : null)),
+            num: i + 1,
+            countOfTeamType: 0,
+            countOfType: 0
+        };
+
+        if (item.type && item.team) {
+            if (!counts?.[item.type]) {
+                counts[item.type] = {};
+            }
+            if (!counts?.[item.type]?.[item.team]) {
+                counts[item.type][item.team] = 0;
+            }
+            counts[item.type][item.team]++;
+            item.countOfTeamType = counts[item.type][item.team];
+            item.countOfType = Object.values(counts[item.type]).reduce((a, b) => a + b, 0);
+        }
+        return item;
+    });
+
 }

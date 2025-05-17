@@ -12,6 +12,33 @@
                 class="team"
                 :style="{order: ti * 2}"
                 :class="{'left': ti === 0, 'right': ti === 1}">
+                <div v-if="fearless && fearlessMaps.length" class="team-fearless bg-danger d-flex flex-center gap-3">
+                    <div class="fearless-text">Fearless bans</div>
+                    <div class="fearless-maps">
+                        <div v-for="map in fearlessMaps" :key="map.id" class="fearless-map d-flex flex-center">
+                            <div
+                                v-for="hero in map[`team_${ti+1}_picks`]"
+                                :key="hero.id"
+                                class="fearless-hero flex-center d-flex">
+                                <transition name="fade" mode="out-in" :duration="250">
+                                    <div
+                                        v-if="hero?.name"
+                                        class="bg-center fearless square flex-center">
+                                        <div class="fearless-image square-image flex-center">
+                                            <img
+                                                class="image-center"
+                                                :src="resizedImageNoWrap(hero, ['icon'], 's-500')">
+                                        </div>
+                                    </div>
+                                    <div
+                                        v-else
+                                        class="fearless fearless-placeholder square text-center">
+                                    </div>
+                                </transition>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="team-top" :style="themeBackground1(team)">
                     <div class="team-main">
                         <div class="team-logo-holder flex-center" :style="logoBackground1(team)">
@@ -21,14 +48,14 @@
                         </div>
                         <div class="team-name">{{ team.name }}</div>
                     </div>
-                    <div class="team-bans">
-                        <div v-for="(ban, num) in (bans[ti] || [])" :key="num" class="ban bg-danger flex-center">
+                    <div v-if="bans?.[ti]?.length" class="team-bans team-squares">
+                        <div v-for="(ban, num) in (bans[ti] || [])" :key="num" class="square bg-danger flex-center">
                             <transition name="fade" mode="out-in" :duration="250">
                                 <div
                                     v-if="ban?.name"
-                                    class="bg-center ban flex-center"
+                                    class="bg-center ban square flex-center"
                                     :class="{'audio-playing': audioPlaying[`ban/${ti+1}/${num+1}`]}">
-                                    <div class="ban-image flex-center">
+                                    <div class="square-image flex-center">
                                         <transition name="fade">
                                             <img v-show="loaded[bans[ti][num-1]?.id]" class="image-center" :src="resizedImageNoWrap(ban, ['icon'], 's-500')" @load="() => loaded[bans[ti][num-1]?.id] = true">
                                         </transition>
@@ -38,15 +65,44 @@
                                 </div>
                                 <div
                                     v-else
-                                    class="ban ban-placeholder text-center"
+                                    class="ban square square-placeholder text-center"
                                     :class="{'ban-next': !hideNextPick && ban?.orderItem?.num === (currentPickBan + 1) }">
                                 </div>
                             </transition>
                         </div>
                         <transition name="fade" mode="out-in">
                             <transition name="fade" mode="out-in" :duration="250">
-                                <div v-if="(bans[ti] || [])?.length === 1" class="bans-text">BAN</div>
-                                <div v-else-if="(bans[ti] || [])?.length" class="bans-text">BANS</div>
+                                <div v-if="(bans[ti] || [])?.length === 1" class="squares-text ban-text">BAN</div>
+                                <div v-else-if="(bans[ti] || [])?.length" class="squares-text ban-text">BANS</div>
+                            </transition>
+                        </transition>
+                    </div>
+                    <div v-if="protects?.[ti]?.length" class="team-protects team-squares">
+                        <div v-for="(protect, num) in (protects[ti] || [])" :key="num" class="protect square bg-info flex-center">
+                            <transition name="fade" mode="out-in" :duration="250">
+                                <div
+                                    v-if="protect?.name"
+                                    class="bg-center protect square flex-center"
+                                    :class="{'audio-playing': audioPlaying[`protect/${ti+1}/${num+1}`]}">
+                                    <div class="protect-image square-image flex-center">
+                                        <transition name="fade">
+                                            <img v-show="loaded[protects[ti][num-1]?.id]" class="image-center" :src="resizedImageNoWrap(protect, ['icon'], 's-500')" @load="() => loaded[protects[ti][num-1]?.id] = true">
+                                        </transition>
+                                    </div>
+
+                                    <!-- <div class="protect-number">{{ getPickProtectItem(pickProtectOrder, "protect", ti+1, num - 1)?.num }}</div>-->
+                                </div>
+                                <div
+                                    v-else
+                                    class="protect protect-placeholder text-center"
+                                    :class="{'protect-next': !hideNextPick && protect?.orderItem?.num === (currentPickBan + 1) }">
+                                </div>
+                            </transition>
+                        </div>
+                        <transition name="fade" mode="out-in">
+                            <transition name="fade" mode="out-in" :duration="250">
+                                <div v-if="(protects[ti] || [])?.length === 1" class="squares-text protect-text">PROTECT</div>
+                                <div v-else-if="(protects[ti] || [])?.length" class="squares-text protect-text">PROTECTS</div>
                             </transition>
                         </transition>
                     </div>
@@ -137,7 +193,7 @@
                     </div>
                 </div>
             </div>
-            <div class="center" :style="{order: 1, ...themeBackground1(broadcast?.event)}">
+            <div class="center text-center" :style="{order: 1, ...themeBackground1(broadcast?.event)}">
                 <div
                     class="bg-center event-logo"
                     :style="resizedImage(broadcast?.event?.theme, ['default_logo', 'default_wordmark'], 'w-500')"></div>
@@ -163,11 +219,12 @@ import { countStats, getPickBanItem, processPickBanOrder } from "@/utils/content
 import { GameOverrides } from "@/utils/games.ts";
 import { Howl } from "howler";
 import Squeezable from "@/components/broadcast/Squeezable.vue";
+import ThemeLogo from "@/components/website/ThemeLogo.vue";
 
 export default {
     name: "HeroDraft",
-    components: { Squeezable },
-    props: ["broadcast", "match", "showAll"],
+    components: { ThemeLogo, Squeezable },
+    props: ["broadcast", "match"],
     data: () => ({
         manualDraftAdvancing: true,
         usePickBanAudio: true,
@@ -194,13 +251,17 @@ export default {
             return "score";
             // return this.broadcast?.broadcast_settings?.includes("Use dots instead of numbers for score") ? "dots" : "score";
         },
+        showAll() {
+            return (this.broadcast?.broadcast_settings || [])?.includes("Always show all heroes on desk hero draft");
+        },
+        fearless() {
+            return (this.broadcast?.broadcast_settings || [])?.includes("Show previous picks as fearless bans");
+        },
         game() {
             return this.broadcast?.event?.game;
         },
         maxPlayers() {
-            if (this.game === "Deadlock") return 6;
-
-            return 5;
+            return this.gameOverride?.playerCount || 5;
         },
         teams() {
             return this.match.teams || [];
@@ -221,8 +282,10 @@ export default {
                     }),
                     team_1_picks: ReactiveArray("team_1_picks"),
                     team_1_bans: ReactiveArray("team_1_bans"),
+                    team_1_protects: ReactiveArray("team_1_protects"),
                     team_2_picks: ReactiveArray("team_2_picks"),
                     team_2_bans: ReactiveArray("team_2_bans"),
+                    team_2_protects: ReactiveArray("team_2_protects"),
                 })
 
             });
@@ -238,6 +301,13 @@ export default {
             console.log(currentMap);
 
             return currentMap;
+        },
+        fearlessMaps() {
+            const maps = (this.hydratedMatch?.maps || []).map((map, i) => ({
+                ...map,
+                number: map.number || i + 1
+            })).filter(map => !map.banner);
+            return maps.filter(map => (map.draw || map.winner) && map.id !== this.currentMap?.id);
         },
         gameOverride() {
             if (this.match?.game || this.match?.event?.game) return GameOverrides[this.match?.game || this.match?.event?.game];
@@ -278,6 +348,22 @@ export default {
                 ];
             }
         },
+        protects() {
+            if (!this.currentMap?.id) return [[], []];
+
+            if (this.pickBanOrder?.length) {
+                // pad
+                return [
+                    this.padPickBans(this.currentMap?.team_1_protects || [], this.pickBanOrder.filter(o => o.type === "protect" && o.team === 1).length, "protect", 1, this.currentPickBan),
+                    this.padPickBans(this.currentMap?.team_2_protects || [], this.pickBanOrder.filter(o => o.type === "protect" && o.team === 2).length, "protect", 2, this.currentPickBan),
+                ];
+            } else {
+                return [
+                    (this.currentMap?.team_1_protects || []),
+                    (this.currentMap?.team_2_protects || []),
+                ];
+            }
+        },
         stats() {
             const { matches } = ReactiveRoot(this.broadcast?.event?.id, {
                 "matches": ReactiveArray("matches", {
@@ -285,7 +371,9 @@ export default {
                         "team_1_picks": ReactiveArray("team_1_picks"),
                         "team_2_picks": ReactiveArray("team_2_picks"),
                         "team_1_bans": ReactiveArray("team_1_bans"),
-                        "team_2_bans": ReactiveArray("team_2_bans")
+                        "team_2_bans": ReactiveArray("team_2_bans"),
+                        "team_1_protects": ReactiveArray("team_1_protects"),
+                        "team_2_protects": ReactiveArray("team_2_protects")
                     })
                 })
             });
@@ -332,7 +420,7 @@ export default {
         resizedImageNoWrap,
         getPickBanItem,
         padPickBans(arr, count, type, team, manualAdvanceIndex) {
-            console.log("pad pick ban", { arr, count, type, team });
+            console.log("pad pick ban", { arr, count, type, team }, { manual: this.manualDraftAdvancing, showAll: this.showAll });
 
             const out = [];
 
@@ -350,6 +438,7 @@ export default {
                     }
 
                 } else {
+                    console.log("auto draft advancing", arr[i], placeholder);
                     out.push(arr[i] ?? placeholder);
                 }
             }
@@ -600,17 +689,17 @@ class HeroAudioPlayer {
     height: 90%;
 }
 
-.ban {
+.square {
     height: 100%;
     width: 2em;
 }
 
-.team-bans {
+.team-bans, .team-squares {
     height: 100%;
     display: flex;
 }
 
-.bans-text {
+.squares-text {
     padding: 0 0.5em;
 }
 .pick-text {
@@ -632,7 +721,8 @@ class HeroAudioPlayer {
 .right .players {
     flex-direction: row-reverse;
 }
-.right .team-bans {
+.right .team-bans,
+.right .team-protects {
     flex-direction: row-reverse;
 }
 
@@ -667,11 +757,11 @@ img.image-center {
     object-fit: cover;
     object-position: center;
 }
-.ban-image {
+.square-image {
     height: 36px;
     width: 100%;
 }
-.ban img.image-center {
+.ban img.image-center, .square-image img {
     height: 36px;
     object-fit: contain;
 }
@@ -680,7 +770,7 @@ img.image-center {
 .ban.audio-playing .ban-image {
     background-color: var(--highlight, #ffefd740);
 }
-.pick, .ban-image {
+.pick, .square-image {
     transition: background-color 300ms ease;
 }
 .pick {

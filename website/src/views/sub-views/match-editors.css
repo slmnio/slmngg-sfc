@@ -26,7 +26,8 @@
     flex-direction: column;
     gap: 1em;
 }
-.action-footer-buttons {
+.action-footer-buttons,
+.action-footer-right {
     align-items: flex-end;
 }
 .action-title {

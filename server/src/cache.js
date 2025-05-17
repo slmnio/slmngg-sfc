@@ -375,6 +375,7 @@ async function authStart(storedData) {
 
 /**
  * @param token
+ * @returns {AuthUserData}
  */
 async function getAuthenticatedData(token) {
     let data = authMap.get(token);
@@ -451,7 +452,10 @@ async function startRawDiscordAuth(discordUser) {
 }
 
 export const auth = {
-    start: authStart, getData: getAuthenticatedData, startRawDiscordAuth,
+    start: authStart,
+    /** @returns {AuthUserData} */
+    getData: getAuthenticatedData,
+    startRawDiscordAuth,
     getPlayer, getChannel, getChannelByID,
     getTwitchAccessToken, getBots
 };

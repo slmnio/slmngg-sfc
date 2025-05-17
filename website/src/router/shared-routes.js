@@ -76,6 +76,7 @@ export default [
         props: route => ({ id: route.params.id }),
         children: [
             { path: "", component: () => import("@/views/sub-views/MatchVOD.vue") },
+            { path: "room", component: () => import("@/views/sub-views/MatchRoom.vue") },
             { path: "history", component: () => import("@/views/sub-views/MatchStats.vue") },
             { path: "score-reporting", component: () => import("@/views/sub-views/MatchScoreReporting.vue"), meta: { requiresAuth: true } },
             { path: "rescheduling", component: () => import("@/views/sub-views/MatchRescheduling.vue"), meta: { requiresAuth: true } },

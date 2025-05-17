@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { getDataServerAddress, getMainDomain } from "@/utils/fetch";
 import { ReactiveRoot } from "@/utils/reactive";
 import Cookies from "universal-cookie";
+import { socket } from "@/socket.js";
 
 export type Snowflake = string;
 export type DiscordID = Snowflake;
@@ -170,6 +171,13 @@ export const useAuthStore = defineStore("auth", () => {
         user.value = null;
         authNext.value = null;
     }
+
+    watch(token, (t) => {
+        if (!t) return;
+        socket.emit("associate_token", t);
+    }, {
+        immediate: true
+    });
 
     return {
         token,

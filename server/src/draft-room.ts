@@ -55,6 +55,7 @@ export async function handleEvent(event: Omit<DraftRoomEvent, "join">, matchID: 
         if ("error" in res) {
             throw "Airtable Error";
         }
+        // @ts-expect-error not using this file
         currentMap = res[0];
     }
 

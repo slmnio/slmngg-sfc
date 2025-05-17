@@ -13,6 +13,7 @@
                     <ul v-if="sidebarItems.length > 1" class="match-sub-nav list-group mb-2">
                         <!-- only because it'd be the only one -->
                         <router-link v-if="sidebarItems.includes('vod')" class="list-group-item ct-passive" exact-active-class="active ct-active" :to="subLink('')">VOD</router-link>
+                        <router-link v-if="sidebarItems.includes('room')" class="list-group-item ct-passive" exact-active-class="active ct-active" :to="subLink('room')">Match room</router-link>
                         <router-link v-if="sidebarItems.includes('head-to-head')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('history')">Map stats</router-link>
                         <router-link v-if="sidebarItems.includes('score-reporting')" class="list-group-item ct-passive" active-class="active ct-active" :to="subLink('score-reporting')">
                             <div class="d-flex justify-content-between align-items-center">
@@ -219,6 +220,9 @@ export default {
         reschedulingEnabled() {
             return this.eventSettings?.reporting?.rescheduling?.use && this.match?.earliest_start && this.match?.latest_start;
         },
+        matchroomsEnabled() {
+            return this.eventSettings?.matchrooms?.enabled && this.match?.match_room_config;
+        },
         authenticated() {
             const { isAuthenticated } = useAuthStore();
             return isAuthenticated;
@@ -230,6 +234,7 @@ export default {
         sidebarItems() {
             const items = ["vod"];
 
+            if (this.matchroomsEnabled) items.push("room");
             if (this.showHeadToHead) items.push("head-to-head");
             if (this.showEditor) items.push("editor");
             if ((this.scoreReportingEnabled) || (this.$route?.path?.endsWith("/score-reporting"))) items.push("score-reporting");

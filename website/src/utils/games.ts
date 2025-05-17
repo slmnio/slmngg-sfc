@@ -50,10 +50,17 @@ export const GameOverrides = {
         disableMapScore: true,
         defaultHeroBanCount: 2,
         defaultHeroPickCount: 6,
+        playerCount: 6,
         showDraftControlButtons: true,
         lang: {
             "replay_code": "Match ID"
         },
+        defaultPickBanOrder: "ban1,ban2,pick1,pick2,pick2,pick1,pick1,pick2,pick1,pick2,pick1,pick2,pick1,pick2"
+    },
+    "Marvel Rivals": {
+        playerCount: 6,
+        defaultHeroBanCount: 2,
+        defaultHeroPickCount: 3,
         defaultPickBanOrder: "ban1,ban2,pick1,pick2,pick2,pick1,pick1,pick2,ban2,ban1,pick2,pick1,pick1,pick2,pick2,pick1",
         showForProduction: [
             "replay_code",

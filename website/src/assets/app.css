@@ -411,3 +411,12 @@ small.text-body-secondary {
     margin-bottom: .5em;
     max-width: 100%;
 }
+
+pre.dev {
+    background-color: #222;
+    color: white;
+    top: 0;
+    left: 0;
+    padding: .5em;
+    font-size: 12px;
+}

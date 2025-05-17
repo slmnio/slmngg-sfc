@@ -31,11 +31,11 @@
                         <div
                             v-if="alternate"
                             class="alternate bg-center hero w-100"
-                            :style="alternateHeroBG(player.favourite_hero, alternate)"></div>
+                            :style="alternateHeroBG(player.favourite_hero_data || player.favourite_hero, alternate)"></div>
                         <div v-else class="recolored-hero-holder hero w-100">
                             <RecoloredHero
                                 v-if="team?.theme"
-                                :hero="player.favourite_hero"
+                                :hero="player.favourite_hero_data || player.favourite_hero"
                                 :theme="team?.theme" />
                         </div>
                         <div class="player-name-holder" :style="themeBackground1(team)">
@@ -72,7 +72,7 @@ import { bg, resizedAttachment, resizedImage } from "@/utils/images";
 import { useStatusStore } from "@/stores/statusStore";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
-import { sortRoles } from "@/utils/sorts.js";
+import { ROLE_ORDER, sortRoles } from "@/utils/sorts.js";
 
 function niceJoin(array, and = "and") {
     if (array.length > 1) {
@@ -108,9 +108,11 @@ export default {
             });
         },
         heroes() {
-            return ReactiveRoot("Heroes", {
+            const heroes = ReactiveRoot("Heroes", {
                 ids: ReactiveArray("ids")
-            })?.ids;
+            })?.ids || [];
+            if (this.broadcast?.event?.game) return heroes.filter(h => h.game === this.broadcast.event.game);
+            return heroes;
         },
         team() {
             if ([2, "2", "right", "alt"].includes(this.teamNum)) {
@@ -150,7 +152,8 @@ export default {
             if (!this.team?.players && this.team?.limited_players) {
                 players.forEach(player => {
                     // set hero from lookup
-                    player.favourite_hero = this.getFavouriteHero(player.favourite_hero);
+                    console.log("lookup", player, player.favourite_hero);
+                    player.favourite_hero_data = this.getFavouriteHero(player.favourite_hero);
                 });
             }
             if (this.playerCount) players = (players || []).slice(0, this.playerCount);
@@ -178,27 +181,28 @@ export default {
                 }
             }
 
-            // const heroes = (this.heroes || [])?.filter(h => h.game === "Overwatch");
-            //
-            // const page = 2;
+            // const heroes = (this.heroes || [])?.filter(h => h.game === "Marvel Rivals");
+            // const page = 5;
             // players = heroes.slice(page * 6, (page + 1) * 6).map(x => ({ ...x, favourite_hero: x }));
-
             const fillingHeroes = (this.fill || []).map(str => this.getFavouriteHero(str));
 
-            return (players || []).sort((a, b) => {
-                console.log(a, b);
-                if (a._draftData?.role !== b._draftData?.role) {
-                    const order = ["DPS", "Tank", "Support"];
-                    return order.indexOf(a._draftData?.role) - order.indexOf(b._draftData?.role);
-                }
-                return 0;
-            }).map(p => {
+            return (players || []).map(p => {
                 const player = decoratePlayerWithDraftData(p, this.broadcast?.event?.id);
+                console.log("decorate", player);
 
                 if (!player?.favourite_hero) {
-                    player.favourite_hero = fillingHeroes.shift();
+                    player.favourite_hero_data = fillingHeroes.shift();
                 }
                 return player;
+            }).sort((a, b) => {
+                console.log(a, b);
+                const [aRole, bRole] = [a, b].map(x => x._draftData?.role || x?.role);
+
+                if (aRole !== bRole) {
+                    const order = ROLE_ORDER;
+                    return order.indexOf(aRole) - order.indexOf(bRole);
+                }
+                return 0;
             });
         },
         titleStyle() {
@@ -485,4 +489,43 @@ export default {
 .recolored-hero-holder:deep(.recolored-hero[data-hero="Yamato"]) { transform: translate(0.6%, 4%); }
 .recolored-hero-holder:deep(.recolored-hero[data-hero="Vindicta"]) { transform: translate(-3%, 3%); }
 .recolored-hero-holder:deep(.recolored-hero[data-hero="Vyper"]) { transform: translate(3%, -5%); }
+
+
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Psylocke"]) { transform: translate(-1%, 2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Magneto"]) { transform: translate(8%, 1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Squirrel Girl"]) { transform: translate(-3%, 3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Doctor Strange"]) { transform: translate(-5%, 3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Spider-Man"]) { transform: translate(-1%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Human Torch"]) { transform: translate(1%, 8%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Luna Snow"]) { transform: translate(1%, -1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Black Panther"]) { transform: translate(0%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Captain America"]) { transform: translate(0%, 10%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Hawkeye"]) { transform: translate(2.5%, 1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Venom"]) { transform: translate(-3%, 9%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Storm"]) { transform: translate(-18%, 1%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Winter Soldier"]) { transform: translate(0%, 11%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Iron Fist"]) { transform: translate(-1%, 5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="The Thing"]) { transform: translate(-2%, 3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="The Punisher"]) { transform: translate(1%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Groot"]) { transform: translate(-2%, 7%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Hela"]) { transform: translate(-11%, 4%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Magik"]) { transform: translate(14%, 3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Iron Man"]) { transform: translate(1%, 3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Hulk"]) { transform: translate(-4%, 7%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Black Widow"]) { transform: translate(1%, 4%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Scarlet Witch"]) { transform: translate(0%, 2%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Invisible Woman"]) { transform: translate(0%, 4%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Moon Knight"]) { transform: translate(7%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Mister Fantastic"]) { transform: translate(-2%, 5%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Thor"]) { transform: translate(-2.5%, 7%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Rocket Raccoon"]) { transform: translate(1%, -8%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Namor"]) { transform: translate(-1%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Star-Lord"]) { transform: translate(0.5%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Cloak & Dagger"]) { transform: translate(-21%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Adam Warlock"]) { transform: translate(-1.5%, 12%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Wolverine"]) { transform: translate(0%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Loki"]) { transform: translate(-1%, 7%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Jeff the Land Shark"]) { transform: translate(-4%, 0%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Mantis"]) { transform: translate(0.5%, 3%); }
+.recolored-hero-holder:deep(.recolored-hero[data-hero="Peni Parker"]) { transform: translate(-4%, 7%); }
 </style>

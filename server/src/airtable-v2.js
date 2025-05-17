@@ -1,5 +1,6 @@
 import Airtable from "airtable";
 import * as Cache from "./cache.js";
+import { cacheStatusEmitter } from "./cache.js";
 import customTableUpdate from "./custom-datasets.js";
 import { log } from "./discord/slmngg-log.js";
 import path from "node:path";
@@ -229,7 +230,7 @@ function time(secs) {
 
 class AirtableManager {
     constructor() {
-        this.tableNames = ["Maps", "Players", "Teams", "Matches", "Themes", "Live Guests", "Redirects", "Broadcasts", "Clients", "Channels", "Discord Bots", "Events", "GFX", "Event Series", "Signup Data", "Reports", "Ad Reads", "Ad Read Groups", "News", "Socials", "Accolades", "Player Relationships", "Brackets", "Headlines", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles"];
+        this.tableNames = ["Maps", "Players", "Teams", "Matches", "Themes", "Live Guests", "Redirects", "Broadcasts", "Clients", "Channels", "Discord Bots", "Events", "GFX", "Event Series", "Signup Data", "Reports", "Ad Reads", "Ad Read Groups", "News", "Socials", "Accolades", "Player Relationships", "Brackets", "Headlines", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles", "Trivia"];
         // this.tableNames = ["Redirects", "Broadcasts", "Clients", "Channels", "Discord Bots", "Players", "Live Guests"];
         this.tables = this.tableNames.map(tableName => new TableManager(tableName));
         this.availableRequests = 4;
@@ -294,6 +295,7 @@ class AirtableManager {
 
     updateFlags() {
         this.ioServer.emit("website_flags", this.websiteFlags);
+        cacheStatusEmitter.emit("flags", this.websiteFlags);
     }
 
     startNextOldestTable(fullLoad) {

@@ -1,5 +1,5 @@
 <template>
-    <div class="desk-overlay" :data-desk-display="broadcast?.desk_display">
+    <div class="desk-overlay" :data-desk-display="deskDisplay">
         <div class="top-holder">
             <TourneyBar :left="broadcast.event && broadcast.event.short" :right="broadcast.subtitle" :event="broadcast.event" />
         </div>
@@ -22,22 +22,24 @@
         </transition-group>
         <transition tag="div" mode="out-in" name="break-content">
             <HeroDraft
-                v-if="liveMatch && useHeroDraft"
+                v-if="liveMatch && useHeroDraft && !disableLower"
                 class="hero-draft"
                 :broadcast="broadcast"
                 :match="liveMatch" />
             <MatchScoreboard
-                v-else-if="liveMatch && useScoreboard"
+                v-else-if="liveMatch && useScoreboard && !disableLower"
                 key="scoreboard"
+                :desk-display="deskDisplay"
                 :active="animationActive"
                 class="scoreboard"
                 :match="liveMatch"
                 :broadcast="broadcast"
                 :animate-on-mount="true" />
             <DeskMatch
-                v-else-if="liveMatch && !useScoreboard"
+                v-else-if="liveMatch && !useScoreboard && !disableLower"
                 key="desk-match"
                 :broadcast="broadcast"
+                :desk-display="deskDisplay"
                 class="w-100"
                 :_match="liveMatch"
                 :theme-color="themeColor"
@@ -46,7 +48,7 @@
 
         <div class="preload">
             <DeskMatch
-                v-if="liveMatch"
+                v-if="liveMatch && !disableLower"
                 key="desk-match"
                 class="w-100"
                 :broadcast="broadcast"
@@ -70,7 +72,7 @@ import HeroDraft from "@/components/broadcast/HeroDraft.vue";
 export default {
     name: "DeskOverlay",
     components: { HeroDraft, MatchScoreboard, DeskMatch, Caster, TourneyBar },
-    props: ["broadcast", "group", "disableCasters", "animationActive", "ignoreTalentSocket"],
+    props: ["broadcast", "group", "disableCasters", "disableLower", "animationActive", "ignoreTalentSocket", "displayOverride"],
     data: () => ({
         socketHideIDs: {},
         socketIDClasses: {},
@@ -150,11 +152,14 @@ export default {
         pronounsOnNewline() {
             return (this.broadcast?.broadcast_settings || []).includes("Show desk pronouns on new lines");
         },
+        deskDisplay() {
+            return this.displayOverride || this.broadcast?.desk_display;
+        },
         useScoreboard() {
-            return (this.broadcast?.desk_display) === "Scoreboard" || (this.broadcast?.desk_display) === "Scoreboard Bans";
+            return (this.deskDisplay) === "Scoreboard" || (this.deskDisplay) === "Scoreboard Bans";
         },
         useHeroDraft() {
-            return (this.broadcast?.desk_display) === "Hero Draft";
+            return (this.deskDisplay) === "Hero Draft";
         },
         visibleCasters() {
             return this.casters.filter(({id}) => this.socketHideIDs[id]);

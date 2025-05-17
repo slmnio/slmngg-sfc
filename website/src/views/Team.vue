@@ -101,7 +101,7 @@ export default {
         canEditEventSettings() {
             const { isAuthenticated, user } = useAuthStore();
             if (!isAuthenticated || !this.team?.event) return false;
-            return isEventStaffOrHasRole(user, { event: this.team?.event, websiteRoles: ["Can edit any event"] });
+            return isEventStaffOrHasRole(user, this.team?.event, ["Can edit any event"]);
         }
     },
     methods: {

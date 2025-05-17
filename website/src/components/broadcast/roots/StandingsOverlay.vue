@@ -3,7 +3,8 @@
         <Standings
             class="standings"
             :event="event"
-            :stage="_stage"
+            :stage="standingsSettings?.group"
+            :stages="standingsSettings?.groups"
             :tie-text="standingsSettings && standingsSettings.tieText"
             use-auto-font-size />
     </GenericOverlay>

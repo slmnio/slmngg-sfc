@@ -9,6 +9,14 @@ export default [
         })
     },
     {
+        path: "ingame-pickban",
+        component: () => import("@/components/broadcast/roots/IngamePickBan.vue")
+    },
+    {
+        path: "trivia",
+        component: () => import("@/components/broadcast/roots/TriviaOverlay.vue")
+    },
+    {
         path: "cams",
         component: () => import("@/components/broadcast/cams/CamsWrapper.vue"),
         props: route => ({ params: route.query.params?.split(",") }),
@@ -79,6 +87,7 @@ export default [
     { path: "schedule", component: () => import("@/components/broadcast/roots/ScheduleOverlay.vue"), props: route => ({ secondary: !!route.query.secondary }) },
     { path: "iframe", component: () => import("@/components/broadcast/roots/IframeOverlay.vue"), props: route => ({ url: route.query.url }) },
     { path: "standings", component: () => import("@/components/broadcast/roots/StandingsOverlay.vue"), props: route => ({ stage: route.query.stage || route.query.group }) },
+    { path: "bans", component: () => import("@/components/broadcast/roots/HeroBansOverlay.vue") },
     {
         path: "multi-standings",
         alias: "multistandings",
@@ -190,7 +199,9 @@ export default [
         props: route => ({
             group: "casters",
             disableCasters: route.query.disable || route.query.casters === "false",
-            ignoreTalentSocket: route.query.ignoreTalentSocket || route.query.ignoreTalent
+            disableLower: route.query.lower === "false",
+            ignoreTalentSocket: route.query.ignoreTalentSocket || route.query.ignoreTalent,
+            displayOverride: route.query.display
         })
     },
     { path: "podcast", component: () => import("@/components/broadcast/roots/PodcastOverlay.vue"), props: route => ({ rows: route.query.rows }) },
@@ -262,7 +273,8 @@ export default [
     },
     { path: "broadcasts", alias: ["other-streams", "other-broadcasts"], component: () => import("@/components/broadcast/roots/OtherBroadcastsOverlay.vue") },
     { path: "mvp", component: () => import("@/components/broadcast/roots/MVPOverlay.vue"), props: route => ({
-        showSponsor: route.query.sponsor
+        showSponsor: route.query.sponsor,
+        alternate: route.query.alternate ? parseInt(route.query.alternate) : null,
     }) },
     {
         path: "ingame-comms",

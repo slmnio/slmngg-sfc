@@ -1,6 +1,8 @@
 import spacetime from "spacetime";
 import informal from "spacetime-informal";
-import { sortEvents, sortTeams } from "@/utils/sorts";
+import { sortAlphaRaw, sortEvents, sortTeams } from "@/utils/sorts";
+
+import { computed } from "vue";
 
 import assault from "@/assets/default-map-images/assault.png";
 import escort from "@/assets/default-map-images/escort.png";
@@ -25,6 +27,7 @@ import assaultIcon from "@/assets/map-type-icons/assault.svg";
 import flashpointIcon from "@/assets/map-type-icons/flashpoint.svg";
 import clashIcon from "@/assets/map-type-icons/clash.png";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
 
 export function getImage (i) {
     // console.log(i);
@@ -118,7 +121,7 @@ export function multiImage(theme, keys, minSize = 30, useResizer = true) {
     return url || null;
 }
 
-export function getMatchContext(match, { light } = {}) {
+export function getMatchContext(match, { light, split } = {}) {
     let pieces;
     if (light) {
         pieces = [match?.sub_event].filter(Boolean);
@@ -128,8 +131,11 @@ export function getMatchContext(match, { light } = {}) {
     pieces = pieces.filter((v, i, a) => a.indexOf(v) === i);
 
     const eventPrefix = (match?.event?.short || match?.event?.name || "");
+    const matchDetails = pieces.join(" · ");
 
-    return eventPrefix + (pieces.length ? ": " : "") + pieces.join(" · ");
+    if (split) return [eventPrefix, matchDetails];
+
+    return eventPrefix + (pieces.length ? ": " : "") + matchDetails;
 }
 
 export function getRoleSVG(name) {
@@ -185,6 +191,10 @@ C13.888,14.756,13.487,14.83,13.065,14.847z"/>
     if (name === "Captain") return "<i style'color:currentColor' class=\"fas fa-user-crown fa-fw\"></i>";
     if (name === "Manager") return "<i style'color:currentColor' class=\"fas fa-clipboard-list fa-fw\"></i>";
     if (name === "Coach") return "<i style'color:currentColor' class=\"fas fa-whistle fa-fw\"></i>";
+
+    if (name === "Duelist") return "<img class='temp-img-icon icon-marvel icon-duelist' src='https://media.slmn.io/Duelist_Icon.png'>";
+    if (name === "Strategist") return "<img class='temp-img-icon icon-marvel icon-strategist' src='https://media.slmn.io/Strategist_Icon.png'>";
+    if (name === "Vanguard") return "<img class='temp-img-icon icon-marvel icon-vanguard' src='https://media.slmn.io/Vanguard_Icon.png'>";
 
     return "";
 }
@@ -454,6 +464,7 @@ export function getEmbedData(url) {
             service: "youtube",
             key: vodURL.searchParams.get("v"),
             timestamp: ts || null,
+            thumbnail: `http://img.youtube.com/vi/${vodURL.searchParams.get("v")}/hqdefault.jpg`,
             display: {
                 text: "YouTube",
                 icon: "fab fa-youtube"
@@ -465,6 +476,7 @@ export function getEmbedData(url) {
             service: "youtube",
             key: vodURL.pathname.slice(1),
             timestamp: vodURL.searchParams.get("t") || null,
+            thumbnail: `http://img.youtube.com/vi/${vodURL.pathname.slice(1)}/hqdefault.jpg`,
             display: {
                 text: "YouTube",
                 icon: "fab fa-youtube"
@@ -475,6 +487,7 @@ export function getEmbedData(url) {
         const embed = {
             service: (vodURL.pathname.split("/").length === 3 ? "twitch" : "twitch-live"),
             key: vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1),
+            thumbnail: `https://static-cdn.jtvnw.net/previews-ttv/live_user_${vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1).toLowerCase()}-1280x720.jpg`,
             display: {
                 text: "Twitch",
                 icon: "fab fa-twitch"
@@ -516,6 +529,30 @@ export function getEmbedData(url) {
             icon: "fas fa-file"
         }
     };
+}
+
+export function renderEmbed(embed) {
+    if (embed.service === "youtube") {
+        return `<iframe src="https://youtube.com/embed/${embed.key}?autoplay=true${embed.timestamp ? `&start=${embed.timestamp}` : ""}" allowfullscreen="true"></iframe>`;
+    }
+    if (embed.service === "twitch") {
+        return `<iframe src="https://player.twitch.tv/?video=${embed.key}&parent=${window.location.hostname}${embed.timestamp ? `&t=${embed.timestamp}` : ""}" allowfullscreen="true"></iframe>`;
+    }
+    if (embed.service === "twitch-live") {
+        return `<iframe src="https://player.twitch.tv/?channel=${embed.key}&parent=${window.location.hostname}${embed.timestamp ? `&t=${embed.timestamp}` : ""}" allowfullscreen="true"></iframe>`;
+    }
+    if (embed.service === "twitch-clip") {
+        return `<iframe src="https://clips.twitch.tv/embed?clip=${embed.key}&parent=${window.location.hostname}" allowfullscreen="true"></iframe>`;
+    }
+    if (embed.service === "unknown-video") {
+        return `<video src="${embed.url}" autoplay controls></video>`;
+    }
+    if (embed.service === "pdf") {
+        return `<iframe src="https://docs.google.com/gview?embedded=true&url=${embed.url}" class="embed-pdf"></iframe>`;
+    }
+    if (embed.service === "unknown") {
+        return `<iframe src="${embed.url}" class="embed-iframe"></iframe>`;
+    }
 }
 
 
@@ -636,8 +673,21 @@ export function getFormatOptions(event, match) {
         match_week_text: match?.week_text,
         match_week_number: match?.week,
         match_day: match?.day,
-        match_first_to: match?.first_to
+        match_first_to: match?.first_to,
+        match_first_to_short: match.first_to ? `FT${match.first_to}` : null,
+        match_first_to_long: match.first_to ? `First to ${match.first_to}` : null,
+        match_best_of_short: match.first_to ? `BO${(match.first_to * 2) - 1}` : null,
+        match_best_of_long: match.first_to ? `Best of ${(match.first_to * 2) - 1}` : null
     };
+}
+
+export function formatText(format, event, match) {
+    if (!format) return "";
+    const formatOptions = getFormatOptions(event, match);
+    Object.entries(formatOptions).forEach(([key, val]) => {
+        format = format.replace(`{${key}}`, val || "");
+    });
+    return format.trim();
 }
 
 
@@ -1191,4 +1241,24 @@ export function countStats(matches) {
     });
 
     return stats;
+}
+
+export function hydratedCommunityStreams() {
+    return computed(() => {
+        return ((ReactiveRoot("special:player-streams"))?.streams || []).map(stream => ({
+            ...stream,
+            match: ReactiveThing("match", {
+                "teams": ReactiveArray("teams", {
+                    "theme": ReactiveThing("theme")
+                })
+            })(stream),
+            "event": ReactiveThing("event", {
+                "theme": ReactiveThing("theme")
+            })(stream),
+            "player": ReactiveThing("player")(stream),
+            "team": ReactiveThing("team", {
+                "theme": ReactiveThing("theme")
+            })(stream)
+        })).sort((a,b) => sortAlphaRaw(a.match?.id, b.match?.id));
+    });
 }

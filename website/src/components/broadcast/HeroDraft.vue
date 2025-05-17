@@ -47,6 +47,7 @@
                                 :style="resizedImage(team?.theme, ['small_logo', 'default_logo', 'default_wordmark'], 'w-200')"></div>
                         </div>
                         <div class="team-name">{{ team.name }}</div>
+                        <div v-if="firstPick?.team === (ti+1)" class="team-is-first-pick team-pill">1st pick</div>
                     </div>
                     <div v-if="bans?.[ti]?.length" class="team-bans team-squares">
                         <div v-for="(ban, num) in (bans[ti] || [])" :key="num" class="square bg-danger flex-center">
@@ -197,6 +198,8 @@
                 <div
                     class="bg-center event-logo"
                     :style="resizedImage(broadcast?.event?.theme, ['default_logo', 'default_wordmark'], 'w-500')"></div>
+                <div class="draft-details draft-title">{{ draftTitle }}</div>
+                <div class="draft-details draft-subtitle">{{ draftSubtitle }}</div>
                 <div class="score">
                     <div v-if="middle === 'score'" class="middle scores">
                         {{ [(match.score_1 || 0), (match.score_2 || 0)].join(" - ") }}
@@ -215,7 +218,7 @@
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles.js";
 import { getNewURL, resizedImage, resizedImageNoWrap } from "@/utils/images.js";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
-import { countStats, getPickBanItem, processPickBanOrder } from "@/utils/content-utils.js";
+import { countStats, formatText, getPickBanItem, processPickBanOrder } from "@/utils/content-utils.js";
 import { GameOverrides } from "@/utils/games.ts";
 import { Howl } from "howler";
 import Squeezable from "@/components/broadcast/Squeezable.vue";
@@ -316,6 +319,9 @@ export default {
         pickBanOrder() {
             return processPickBanOrder(this.match?.pick_ban_order || this.gameOverride?.defaultPickBanOrder, this.currentMap?.flip_pick_ban_order);
         },
+        firstPick() {
+            return this.pickBanOrder.find(b => b.type === "pick");
+        },
         picks() {
             if (!this.currentMap?.id) return [[], []];
 
@@ -401,6 +407,12 @@ export default {
 
             if (!items?.length) return null;
             return items.join(" - ");
+        },
+        draftTitle() {
+            return formatText(this.broadcast?.draft_title_format, this.broadcast?.event, this.match) || this.match?.sub_event;
+        },
+        draftSubtitle() {
+            return formatText(this.broadcast?.draft_subtitle_format, this.broadcast?.event, this.match) || this.match?.round;
         },
         timingBarStyle() {
             if (!this.autoDraftDuration || !this.autoDraftLast) return null;
@@ -922,5 +934,15 @@ img.image-center {
     text-align: center;
     display: flex;
 }
-
+.team-pill {
+    font-size: 0.75em;
+    line-height: 1em;
+    padding: 3px 6px;
+    border: 2px solid;
+    border-radius: 1em;
+}
+.draft-details.draft-title {
+    font-weight: bold;
+    font-size: 1.1em;
+}
 </style>

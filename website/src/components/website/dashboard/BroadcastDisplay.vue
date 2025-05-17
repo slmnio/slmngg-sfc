@@ -4,7 +4,7 @@
             <div class="event-logo flex-center">
                 <div class="event-logo-inner bg-center" :style="logo"></div>
             </div>
-            <div class="broadcast-name text-left">{{ broadcast.name }}</div>
+            <div class="broadcast-name text-left">{{ text || broadcast.name }}</div>
         </template>
         <LoadingIcon v-else />
     </b-button>
@@ -17,7 +17,7 @@ import { resizedImage } from "@/utils/images";
 export default {
     name: "BroadcastDisplay",
     components: { LoadingIcon },
-    props: ["broadcast", "disabled"],
+    props: ["broadcast", "disabled", "text"],
     computed: {
         theme() {
             return this.broadcast?.theme_override ?? this.broadcast?.event?.theme;

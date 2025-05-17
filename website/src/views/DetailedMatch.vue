@@ -264,7 +264,7 @@ import { canEditMatch } from "@/utils/client-action-permissions";
 import MatchStats from "@/views/sub-views/MatchStats.vue";
 import { useAuthStore } from "@/stores/authStore";
 import CreditCreator from "@/components/website/CreditCreator.vue";
-import { sortRoles } from "@/utils/sorts";
+import { ROLE_ORDER, sortRoles } from "@/utils/sorts";
 import { GameOverrides } from "@/utils/games.ts";
 
 export default {
@@ -445,7 +445,7 @@ export default {
             return players.sort((a, b) => {
                 const [aRole, bRole] = [a,b].map(x => this.getSortingRole(x));
                 if ((aRole) !== bRole) {
-                    const order = ["Tank", "DPS", "Support"];
+                    const order = ROLE_ORDER;
                     return order.indexOf(aRole) - order.indexOf(bRole);
                 }
                 return 0;

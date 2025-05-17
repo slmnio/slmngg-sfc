@@ -17,6 +17,7 @@ import BracketCreator from "@/views/BracketCreator.vue";
 import NotFoundPage from "@/views/NotFoundPage";
 import Learn from "@/views/Learn.vue";
 import Cookies from "universal-cookie";
+import CommunityStreams from "@/views/lists/CommunityStreams.vue";
 
 export default [
     {
@@ -40,6 +41,10 @@ export default [
             {
                 path: "/players",
                 component: Players
+            },
+            {
+                path: "/streams",
+                component: CommunityStreams
             },
             ...SharedRoutes,
             {
@@ -119,6 +124,16 @@ export default [
                             { path: "", component: () => import("@/views/sub-views/guide/companion-module/CompanionModuleGuideIntro.vue"), name: "companion-module" }
                         ]
                     },
+                    {
+                        path: "solo-overlay",
+                        component: () => import("@/views/sub-views/guide/solo-overlay/SoloOverlayGuideContainer.vue"),
+                        children: [
+                            { path: "", component: () => import("@/views/sub-views/guide/solo-overlay/SoloOverlayGuideIntro.vue"), name: "solo-overlay-guide" },
+                            { path: "installation", component: () => import("@/views/sub-views/guide/solo-overlay/SoloOverlayGuideInstallation.vue"), name: "solo-overlay-installation" },
+                            { path: "setup", component: () => import("@/views/sub-views/guide/solo-overlay/SoloOverlayGuideSetup.vue"), name: "solo-overlay-setup" },
+                            { path: "usage", component: () => import("@/views/sub-views/guide/solo-overlay/SoloOverlayGuideUsage.vue"), name: "solo-overlay-usage" },
+                        ]
+                    },
                 ],
             },
             {
@@ -148,12 +163,21 @@ export default [
                 path: "/tools/bracket-creator",
                 name: "bracket-creator",
                 component: BracketCreator
-            }
+            },
+            {
+                path: "/tools/theme-creator",
+                name: "theme-creator",
+                component: () => import("@/views/sub-views/ThemeCreator.vue")
+            },
         ]
     },
     {
         path: "/bracket-creator",
         redirect: "/tools/bracket-creator"
+    },
+    {
+        path: "/theme-creator",
+        redirect: "/tools/theme-creator"
     },
     {
         path: "/twitch-auth",

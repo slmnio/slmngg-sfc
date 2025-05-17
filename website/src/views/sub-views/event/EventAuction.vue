@@ -369,7 +369,11 @@ export default {
         },
         isAdmin() {
             const { user } = useAuthStore();
-            return isEventStaffOrHasRole(user, { event: this.event, role: "Auction Admin", websiteRoles: ["Full broadcast permissions", "Can edit any auction"] });
+            return isEventStaffOrHasRole(user,
+                this.event,
+                ["Full broadcast permissions", "Can edit any auction"],
+                ["Auction Admin"]
+            );
         },
         auctionSettings() {
             return this.eventSettings?.auction;
@@ -393,7 +397,7 @@ export default {
         },
         canBid() {
             return this.actingTeam?.id && ["IN_ACTION"].includes(this.auctionState) && !this.isLeading &&
-                (this.actingTeam?.players?.length < (this.auctionSettings?.each_team ?? 7));
+                ((this.actingTeam?.players || [])?.length < (this.auctionSettings?.each_team ?? 7));
         },
         biddingStatus() {
             if (this.auctionState === "PRE_AUCTION") {
@@ -401,7 +405,7 @@ export default {
             } else if (this.auctionState === "POST_AUCTION") {
                 return this.isLeading ? "You won the player!" : "Auction is over";
             } else if (this.auctionState === "IN_ACTION") {
-                if (this.actingTeam?.players?.length >= (this.auctionSettings?.each_team ?? 7)) {
+                if ((this.actingTeam?.players || [])?.length >= (this.auctionSettings?.each_team ?? 7)) {
                     return "Your team is complete - you cannot bid";
                 }
                 const bidError = this.customBidError;
@@ -443,7 +447,7 @@ export default {
             if (!this.teams?.length) return groups;
             (this.teams || []).forEach(team => {
                 // eslint-disable-next-line no-constant-binary-expression
-                if (team?.players?.length === this.auctionSettings?.each_team ?? 7) {
+                if ((team?.players || [])?.length === this.auctionSettings?.each_team ?? 7) {
                     // Finished
                     groups.finished.push(team);
                 } else {

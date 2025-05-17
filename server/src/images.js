@@ -381,12 +381,83 @@ export default ({ app, cors, Cache }) => {
                     return res.status(500).send("Not all teams have theme data");
                 }
 
+                let eventLogo;
+                let eventTheme;
+
+                const sizing = {
+                    eventLogo: {
+                        height: 0.20,
+                        width: 0.25,
+                        bottom: 0.03
+                    },
+                    teamLogo: {
+                        height: size,
+                        width: halfWidth
+                    }
+                };
+
+
+                if (match.event) {
+                    try {
+                        let event = await Cache.get(match?.event?.[0]);
+                        eventTheme = event?.theme?.length ? await Cache.get(event?.theme?.[0]) : null;
+                        const logo = await Cache.getAttachment(eventTheme?.default_logo?.[0]?.id);
+                        if (!logo) return null;
+                        let eventLogoFilePath = await fullGetURL(logo, "orig", null);
+
+                        if (cleanID(event.id) === "vk8TXJYqDgAqSt") {
+                            // deadlock fight night
+                            sizing.teamLogo.height *= 0.8;
+                            sizing.eventLogo = {
+                                height: 0.18,
+                                width: 0.5,
+                                bottom: 0.04
+                            };
+                        }
+                        if (cleanID(event.id) === "91YDSMZbknSkBG") {
+                            // rivals fight night
+                            sizing.teamLogo.height *= 0.85;
+                            sizing.eventLogo = {
+                                height: 0.3,
+                                width: 0.5,
+                                bottom: 0
+                            };
+                        }
+
+
+                        eventLogo = {
+                            input: await sharp(eventLogoFilePath).resize({
+                                height: Math.floor(size * sizing.eventLogo.height),
+                                width: Math.floor(size * sizing.eventLogo.width),
+                                fit: "contain",
+                                background: {
+                                    r: 0,
+                                    g: 0,
+                                    b: 0,
+                                    alpha: 0
+                                }
+                            }).png().toBuffer(),
+                            top: Math.floor(size * (1 - sizing.eventLogo.height - sizing.eventLogo.bottom)),
+                            left: Math.floor(halfWidth - (Math.floor(size * sizing.eventLogo.width) / 2)),
+                            background: {
+                                r: 0,
+                                g: 0,
+                                b: 0,
+                                alpha: 0
+                            }
+                        };
+                    } catch (e) {
+                        eventLogo = null;
+                        eventTheme = null;
+                    }
+                }
+
                 let thumb = await sharp({
                     create: {
                         width: width,
                         height: size,
                         channels: 3,
-                        background: "#222222"
+                        background: eventTheme?.color_logo_background || "#222222"
                     }
                 });
 
@@ -397,8 +468,8 @@ export default ({ app, cors, Cache }) => {
                     let themeColor = team.theme.color_logo_background || team.theme.color_theme || "#222222";
 
                     let resizedLogo = await sharp(filePath).resize({
-                        width: halfWidth - padding,
-                        height: size - padding,
+                        width: sizing.teamLogo.width - padding,
+                        height: sizing.teamLogo.height - padding,
                         fit: "contain",
                         background: {
                             r: 0,
@@ -410,8 +481,8 @@ export default ({ app, cors, Cache }) => {
 
                     return await sharp({
                         create: {
-                            width: halfWidth,
-                            height: size,
+                            width: sizing.teamLogo.width,
+                            height: sizing.teamLogo.height,
                             channels: 4,
                             background: themeColor
                         }
@@ -423,49 +494,13 @@ export default ({ app, cors, Cache }) => {
                     return res.status(500).send("Team theme error");
                 }
 
-                let eventLogo;
-
-                if (match.event) {
-                    try {
-                        let event = await Cache.get(match?.event?.[0]);
-                        let eventTheme = event?.theme?.length ? await Cache.get(event?.theme?.[0]) : null;
-                        const logo = await Cache.getAttachment(eventTheme?.default_logo?.[0]?.id);
-                        if (!logo) return null;
-                        let eventLogoFilePath = await fullGetURL(logo, "orig", null);
-                        eventLogo = await sharp(eventLogoFilePath).resize({
-                            height: Math.floor(size * 0.20),
-                            width: Math.floor(size * 0.25),
-                            fit: "contain",
-                            background: {
-                                r: 0,
-                                g: 0,
-                                b: 0,
-                                alpha: 0
-                            }
-                        }).png().toBuffer();
-                    } catch (e) {
-                        eventLogo = null;
-                    }
-                }
-
                 thumb.composite([
                     ...logos.map((shp, i) => ({
                         input: shp,
                         left: i * halfWidth,
                         top: 0
                     })),
-                    eventLogo ?
-                        {
-                            input: eventLogo,
-                            top: Math.floor(size * 0.77),
-                            left: Math.floor(halfWidth - (Math.floor(size * 0.25) / 2)),
-                            background: {
-                                r: 0,
-                                g: 0,
-                                b: 0,
-                                alpha: 0
-                            }
-                        } : {}
+                    eventLogo ? eventLogo : {}
                 ]);
 
                 let thumbBuffer = await thumb.png().toBuffer();

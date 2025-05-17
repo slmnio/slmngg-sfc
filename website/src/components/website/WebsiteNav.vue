@@ -40,6 +40,7 @@
                     <router-link active-class="active" class="nav-link" to="/events">Events</router-link>
                     <router-link active-class="active" class="nav-link" to="/teams">Teams</router-link>
                     <router-link active-class="active" class="nav-link" to="/players">Players</router-link>
+                    <router-link active-class="active" class="nav-link" to="/streams">{{ streamsTitle }}</router-link>
                     <router-link active-class="active" class="nav-link" to="/learn">Learn</router-link>
                     <router-link v-if="isAuthenticated" active-class="active" class="nav-link" to="/profile">Profile</router-link>
                     <router-link v-if="isProduction" active-class="active" class="nav-link" to="/dashboard">Dashboard</router-link>
@@ -151,6 +152,7 @@ import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 import { getDataServerAddress, getMainDomain } from "@/utils/fetch";
 import { mapState, mapWritableState } from "pinia";
 import { useAuthStore } from "@/stores/authStore";
+import { hydratedCommunityStreams } from "@/utils/content-utils.js";
 
 
 export default {
@@ -246,6 +248,15 @@ export default {
         productionClient() {
             if (!this.isProduction) return false;
             return ReactiveRoot(this.user.clients?.[0]);
+        },
+        communityStreams() {
+            return hydratedCommunityStreams().value || [];
+        },
+        streamsTitle() {
+            const liveMatches = ReactiveRoot("special:live-matches");
+            const count = (liveMatches?.matches?.length || 0) + (this.communityStreams?.length || 0);
+            if (!count) return "Streams";
+            return `🔴 Streams (${count})`;
         }
     },
     methods: {

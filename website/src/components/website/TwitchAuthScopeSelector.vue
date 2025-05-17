@@ -13,6 +13,10 @@
         </b-form-group>
 
         <b-button variant="primary" class="text-white mt-2" :href="twitchAuthURL" :class="{'disabled': selected.length === 0}">Authorize</b-button>
+
+        <div class="mt-2">
+            By clicking <b>Authorize</b>, you agree to let the SLMN.GG platform perform the selected actions on your Twitch account automatically or directed by a member of production staff at any time for any reason. You can revoke permissions in the Other Connections section of your <a href="https://twitch.tv/settings/connections" target="_blank">Twitch connections settings</a>.
+        </div>
     </div>
 </template>
 

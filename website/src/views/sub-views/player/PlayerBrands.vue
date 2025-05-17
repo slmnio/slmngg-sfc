@@ -28,8 +28,8 @@ export default {
                     return new Date(aDate) - new Date(bDate);
                 }
 
-                if (aDate) return -1;
-                if (bDate) return 1;
+                if (aDate) return 1;
+                if (bDate) return -1;
                 return 0;
             });
         }

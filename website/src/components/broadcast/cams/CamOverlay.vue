@@ -25,7 +25,7 @@
             </div>
         </div>
         <div v-if="showShield && activeTeam" class="team-shield-holder d-flex flex-center">
-            <div class="team-shield" :style="logoBackground1(activeTeam)">
+            <div class="team-shield" :style="logoBackground(getColouredTheme(activeTeam))">
                 <div class="shield-triangle"></div>
                 <ThemeLogo
                     small="true"
@@ -33,7 +33,7 @@
                     icon-padding="2px"
                     border-width="0"
                     class="shield-logo"
-                    :theme="activeTeam.theme" />
+                    :theme="getColouredTheme(activeTeam)" />
             </div>
         </div>
     </div>
@@ -41,7 +41,7 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
+import { logoBackground, logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import CasterCam from "@/components/broadcast/desk/CasterCam";
 import ThemeLogo from "@/components/website/ThemeLogo";
 
@@ -96,7 +96,9 @@ export default {
             if (!this.broadcast?.live_match) return null;
             return ReactiveRoot(this.broadcast.live_match[0], {
                 teams: ReactiveArray("teams", {
-                    theme: ReactiveThing("theme")
+                    theme: ReactiveThing("theme"),
+                    red_theme: ReactiveThing("red_theme"),
+                    blue_theme: ReactiveThing("blue_theme")
                 })
             });
         },
@@ -126,11 +128,14 @@ export default {
             }
             return this.guests[0][this.number - 1];
         },
-        activeTeam() {
+        activeTeamIndex() {
             if (this.number >= 7) {
-                return this.teams[this.match?.flip_teams ? 0 : 1];
+                return this.match?.flip_teams ? 0 : 1;
             }
-            return this.teams[this.match?.flip_teams ? 1 : 0];
+            return this.match?.flip_teams ? 1 : 0;
+        },
+        activeTeam() {
+            return this.teams[this.activeTeamIndex];
         },
         theme() {
             if (!this.activeTeam) return {};
@@ -153,7 +158,27 @@ export default {
         }
     },
     methods: {
-        logoBackground1
+        logoBackground,
+        logoBackground1,
+        getColouredTheme(team) {
+            if (!(this.broadcast?.broadcast_settings || []).includes("Use coloured team themes")) return team?.theme;
+
+            if (this.activeTeamIndex === 0) {
+                if (team.blue_theme && !team.blue_theme?.__loading) {
+                    return {
+                        ...team.theme,
+                        ...team.blue_theme
+                    };
+                }
+            } else if (this.activeTeamIndex === 1) {
+                if (team.red_theme && !team.red_theme?.__loading) {
+                    return {
+                        ...team.theme,
+                        ...team.red_theme
+                    };
+                }
+            }
+        }
     },
     head() {
         return {

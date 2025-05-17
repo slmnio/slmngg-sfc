@@ -154,7 +154,7 @@ export default {
         DeskTeamName,
         BroadcastMapDisplay
     },
-    props: ["_match", "themeColor", "matchID", "broadcast", "guests", "forceMode"],
+    props: ["_match", "themeColor", "matchID", "broadcast", "guests", "forceMode", "deskDisplay"],
     computed: {
         matchData() {
             return this._match || ReactiveRoot(this.matchID, {
@@ -202,7 +202,7 @@ export default {
         },
         middleMode() {
             if (this.forceMode) return this.forceMode;
-            let display = this.broadcast?.desk_display || "";
+            let display = this.deskDisplay || "";
 
             if (display.indexOf("(") !== -1) {
                 display = display.slice(0, display.indexOf("(") - 1).trim();
@@ -210,7 +210,7 @@ export default {
             return display || "Match";
         },
         middleTheme() {
-            const display = this.broadcast?.desk_display || "";
+            const display = this.deskDisplay || "";
             if (!display) return this.lowerBackground;
             try {
                 if (display.includes("Team 1")) return logoBackground1(this.matchData.teams[0]);
@@ -223,7 +223,7 @@ export default {
             return logoBackground1(this.broadcast.event);
         },
         altTheme() {
-            const display = this.broadcast?.desk_display || "";
+            const display = this.deskDisplay || "";
             if (!display) return themeBackground1(this.broadcast.event);
             try {
                 if (display.includes("Team 1")) return themeBackground1(this.matchData.teams[0]);

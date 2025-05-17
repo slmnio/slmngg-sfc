@@ -4,6 +4,7 @@
 
 <script>
 import { marked } from "marked";
+import { getEmbedData, renderEmbed } from "@/utils/content-utils.js";
 // const renderer = {};
 // renderer.image = (href, title, text) => {
 //     console.log("[image]", href, title, text);
@@ -27,6 +28,7 @@ function getClipEmbed(url) {
     // console.log({ url });
     const clipURL = new URL(url);
     console.log(clipURL);
+
 
     if (clipURL.href.startsWith("https://clips.twitch.tv/embed")) {
         // already embedd link aa
@@ -67,9 +69,17 @@ const renderer = {
         if (html.trim().startsWith("<clip")) {
             try {
                 console.log("clip html", html);
-                const url = getClipEmbed(getURL(html));
+                const url = getClipEmbed(getURL(html)) || getURL(html);
                 const caption = getAttribute("caption", html);
-                if (url) return `<div class="clip-holder"><div class="clip embed ratio ratio-16x9"><iframe src="${url}"></iframe></div>${caption ? `<div class="clip-caption">${caption}</div>` : ""}</div>`;
+                const title = getAttribute("title", html);
+                const embed = getEmbedData(url);
+                const clipHtml = renderEmbed(embed);
+                console.log({ url, caption, embed, clipHtml });
+                if (clipHtml) return `<div class="clip-holder">
+    ${title ? `<div class="clip-title">${title}</div>` : ""}
+    <div class="clip embed ratio ratio-16x9">${clipHtml}</div>
+    ${caption ? `<div class="clip-caption">${caption}</div>` : ""}
+</div>`;
             } catch (e) { console.error("Clip rendering error", e); }
             return "<div class=\"clip clip-error\">An error prevented this clip from rendering</div>";
         }
@@ -123,7 +133,11 @@ export default {
         text-align: center;
         padding: 10px 20px;
     }
-    .markdown:deep(.clip-caption) {
+    .markdown:deep(.clip-caption),
+    .markdown:deep(.clip-title) {
         padding: 10px 15px;
+    }
+    .markdown:deep(.clip-title) {
+        font-weight: bold;
     }
 </style>

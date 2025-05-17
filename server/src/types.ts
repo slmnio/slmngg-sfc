@@ -165,6 +165,7 @@ export interface MatchMap extends Base {
     team_1_protects?: HeroResolvableID[];
     team_2_protects?: HeroResolvableID[];
     flip_pick_ban_order?: boolean;
+    public?: boolean;
 }
 interface PlayerRelationship extends Base {
 
@@ -358,6 +359,7 @@ export interface Match extends Base {
     modified: string;
     __tableName: "Matches";
 
+    name: string;
     alternative_vod?: string;
     brackets?: BracketResolvableID[];
     casters?: PlayerResolvableID[];

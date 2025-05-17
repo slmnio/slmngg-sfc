@@ -163,8 +163,8 @@ importers:
         specifier: ^4.0.1
         version: 4.7.5
       spacetime:
-        specifier: ^7.6.2
-        version: 7.6.2
+        specifier: ^7.8.0
+        version: 7.8.0
       spacetime-informal:
         specifier: ^0.6.1
         version: 0.6.1
@@ -2872,8 +2872,8 @@ packages:
   spacetime-informal@0.6.1:
     resolution: {integrity: sha512-fOA+RMi2mpCbkLkjBIzWQttmkYE/v9VfdbbrvE2Pus/WoiQNmHO20YGNEqJOuFADsrrZOd/hJVuBwAkV3s6BHg==}
 
-  spacetime@7.6.2:
-    resolution: {integrity: sha512-x5Qr2yiG5wy/0IBeaNeYG9OLigePKTj1/liF9j5xWNbb1psi5Q2AuZTh9SpIT+QZqpKCWX0OCdvwJIm9FlJouA==}
+  spacetime@7.8.0:
+    resolution: {integrity: sha512-H9kwMYcFycuW6VHN3NZ9V3RMafdrU/zkbD7digwhtKNDmCIbl0Oal0M1MhVR7FIEc7tQQHDP01ryrS1i3sp1CA==}
 
   spdx-correct@3.2.0:
     resolution: {integrity: sha512-kN9dJbvnySHULIluDHy32WHRUu3Og7B9sbY7tsFLctQkIqnMh3hErYgdMjTYuqmcXX+lK5T1lnUt3G7zNswmZA==}
@@ -6245,7 +6245,7 @@ snapshots:
     dependencies:
       efrt-unpack: 2.2.0
 
-  spacetime@7.6.2: {}
+  spacetime@7.8.0: {}
 
   spdx-correct@3.2.0:
     dependencies:

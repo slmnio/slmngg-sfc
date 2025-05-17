@@ -419,7 +419,7 @@ export default {
         canEditEventSettings() {
             const { isAuthenticated, user } = useAuthStore();
             if (!isAuthenticated) return false;
-            return isEventStaffOrHasRole(user, { event: this.event, websiteRoles: ["Can edit any event"] });
+            return isEventStaffOrHasRole(user, this.event, ["Can edit any event"]);
         },
         availableGuilds() {
             return [

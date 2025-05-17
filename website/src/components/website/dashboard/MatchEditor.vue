@@ -25,11 +25,46 @@
                 </b-button>
             </div>
             <div class="teams-scores pt-2 px-2">
-                <div class="checkboxes">
-                    <b-form-checkbox v-if="showRestrictCheckbox" id="map-pool-checkbox" v-model="restrictToMapPool" class="mr-2">Restrict to map pool</b-form-checkbox>
-                    <b-form-checkbox v-if="!lockControls" id="map-ban-checkbox" v-model="showMapBanButtons" class="mr-2">Show map banning</b-form-checkbox>
-                    <b-form-checkbox v-if="!lockControls" id="show-hero-pickban-checkbox" v-model="showHeroPickBans" class="mr-2">Show {{ gameOverride?.lang?.hero?.toLowerCase() || "hero" }} pick/bans</b-form-checkbox>
-                    <b-form-checkbox v-if="!lockControls" id="loser-picks-checkbox" v-model="assumeLoserPicks" class="mr-2">Assume loser picks</b-form-checkbox>
+                <div class="d-flex">
+                    <div class="checkboxes">
+                        <div v-if="dashboardView" class="fw-bold" style="font-size:16px">Editor settings</div>
+                        <b-form-checkbox
+                            v-if="showRestrictCheckbox"
+                            id="map-pool-checkbox"
+                            v-model="restrictToMapPool"
+                            class="mr-2">
+                            Restrict to map pool
+                        </b-form-checkbox>
+                        <b-form-checkbox
+                            v-if="!lockControls"
+                            id="map-ban-checkbox"
+                            v-model="showMapBanButtons"
+                            class="mr-2">
+                            Show map banning
+                        </b-form-checkbox>
+                        <b-form-checkbox
+                            v-if="!lockControls && !dashboardView"
+                            id="show-hero-pickban-checkbox"
+                            v-model="showHeroPickBans"
+                            class="mr-2">
+                            Show
+                            {{ gameOverride?.lang?.hero?.toLowerCase() || "hero" }} pick/bans
+                        </b-form-checkbox>
+                        <b-form-checkbox
+                            v-if="!lockControls"
+                            id="loser-picks-checkbox"
+                            v-model="assumeLoserPicks"
+                            class="mr-2">
+                            Assume loser picks
+                        </b-form-checkbox>
+                    </div>
+                    <div v-if="dashboardView" class="checkboxes dashboard-checkboxes ml-3 mr-2">
+                        <div class="fw-bold" style="font-size:16px">Pick ban settings</div>
+                        <b-form-radio-group
+                            v-model="dashboardPickBanVisibility"
+                            stacked
+                            :options="pickBanVisibilityOptions" />
+                    </div>
                 </div>
                 <div class="spacer" style="order:0"></div>
                 <div v-for="(team, i) in teams" :key="team.id" class="team" :class="{'end': i === 1}">
@@ -63,7 +98,7 @@
                     <!--                        @click="() => scoreReportConfirmModal = true">-->
                     <!--                        <i class="fas fa-save fa-fw"></i> {{ scoreReportAction === "counter" ? 'Submit counter report' : "Submit score report" }}-->
                     <!--                    </b-button>-->
-                    <b-button class="top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save {{ hideMatchExtras ? 'all' : 'maps' }}</b-button>
+                    <b-button class="top-button flex-shrink-0" variant="success" @click="() => sendMapDataChange()"><i class="fas fa-save fa-fw"></i> Save {{ (hideMatchExtras || dashboardView) ? 'all' : 'maps' }}</b-button>
                 </div>
             </div>
             <div v-if="scoreReporting && showScoreReportForfeit" class="score-reporting-extras py-2">
@@ -151,6 +186,23 @@
                                         @input="(val) => checkAutoWinner(mapI, val)" />
                                 </div>
                             </td>
+                            <td v-if="type === 'map' && (showPublicInput)" class="form-stack">
+                                <div
+                                    class="form-top text-center">
+                                    Public
+                                </div>
+                                <div
+                                    class="form-bottom d-flex draw-checkbox-wrapper">
+                                    <b-form-checkbox
+                                        v-model="publics[mapI]"
+                                        button
+                                        :button-variant="publics[mapI] ? 'primary' : 'light'"
+                                        class="draw-checkbox">
+                                        <i v-if="publics[mapI]" class="fas fa-check fa-fw"></i>
+                                        <i v-else class="fas fa-fw fa-check hoverable"></i>
+                                    </b-form-checkbox>
+                                </div>
+                            </td>
                             <td v-if="type === 'map'" class="form-stack">
                                 <div
                                     class="form-top text-center"
@@ -170,16 +222,16 @@
                                     </b-form-checkbox>
                                 </div>
                             </td>
-                            <td v-if="type === 'map' && (scoreReporting || !hideMatchExtras)" class="form-stack number">
+                            <td v-if="type === 'map' && (showReplayCodeInput)" class="form-stack number">
                                 <div
-                                    class="form-top"
+                                    class="form-top text-center"
                                     :class="{ 'very-low-opacity': banners[mapI] }">
                                     {{ gameOverride?.lang?.replay_code || "Replay Code" }}
                                 </div>
                                 <div
                                     class="form-button"
                                     :class="{ 'very-low-opacity': banners[mapI] }">
-                                    <b-form-input v-model="replayCodes[mapI]" type="text" />
+                                    <b-form-input v-model="replayCodes[mapI]" :style="gameOverride?.formStyles?.replay_code || {}" type="text" />
                                 </div>
                             </td>
                             <td v-if="type === 'map' && (controls.showMapBans ? true : banners[mapI]) && !gameOverride?.disableMapBans" class="ban-style">
@@ -205,8 +257,53 @@
                                     @change="(val) => winnerSelected(mapI, val)" />
                             </td>
                             <td v-if="type === 'pickban' && !banners[mapI]" colspan="200" class="bg-dark p-0">
-                                <div class="pickbans d-flex">
-                                    <div v-if="controls.showHeroPicks" class="hero-picks-container">
+                                <div v-if="dashboardPickBanVisibility === 'inline' && (match?.pick_ban_order || gameOverride?.defaultPickBanOrder)" class="pickbans d-flex pickbans-inline">
+                                    <div v-if="(match?.pick_ban_order || gameOverride?.defaultPickBanOrder) && (controls.showHeroBans || controls.showHeroPicks)" class="flip-controls flex-center flex-column h-100">
+                                        <div class="pt-2">
+                                            <i v-b-tooltip="'Flip pick/ban order'" class="fas fa-exchange"></i>
+                                        </div>
+                                        <div>
+                                            <b-form-checkbox
+                                                v-model="flip_pick_ban_order[mapI]"
+                                                size="lg"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column flex-center flex-grow-1 pickban-inline-container">
+                                        <div
+                                            v-for="row in pickBanOrder[mapI]"
+                                            :key="row.num"
+                                            class="pickban-inline-row d-flex gap-2 px-3 w-100 flex-center"
+                                            :class="`${row.type}-style pickban-inline-team-${row.team}`">
+                                            <ThemeLogo
+                                                logo-size="w-50"
+                                                class="pickban-inline-team-logo"
+                                                icon-padding=".25em"
+                                                border-width="3px"
+                                                :theme="teams[row.team - 1] && teams[row.team - 1]?.theme" />
+                                            <div class="pickban-inline-text mr-2">
+                                                {{ teams[row.team - 1]?.code || teams[row.team - 1]?.name }}
+                                                {{ row.type === "ban" ? "Ban" : (row.type === "pick" ? "Pick" : "") }} {{ row.countOfTeamType }}
+                                            </div>
+                                            <div
+                                                v-if="({ 'pick': { 1: team_1_picks, 2: team_2_picks }, 'ban': { 1: team_1_bans, 2: team_2_bans } }[row.type][row.team])?.[mapI]?.length === undefined">
+                                                <b-button size="sm" @click="forceSetup(`team_${row.team}_${row.type}s`, mapI)"><i class="fas fa-pencil mr-1"></i> Edit map {{ mapI+1 }}</b-button>
+                                            </div>
+                                            <heroes-picker
+                                                v-else
+                                                v-model="({ 'pick': { 1: team_1_picks, 2: team_2_picks }, 'ban': { 1: team_1_bans, 2: team_2_bans } }[row.type][row.team])[mapI][row.countOfTeamType - 1]"
+                                                :single="true"
+                                                :game="match?.game || match?.event?.game"
+                                                :heroes="heroes"
+                                                :pick-ban-order="pickBanOrder[mapI]"
+                                                :current-action="row"
+                                                :max="1"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-else class="pickbans d-flex">
+                                    <div v-if="controls.showHeroPicks && !((getPickBanMax(pickBanOrder[mapI], 'pick') === 0) && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline'))" class="hero-picks-container">
                                         <div class="hero-picks">
                                             <div class="form-top">
                                                 {{ teams[0]?.name }} Picks
@@ -215,20 +312,10 @@
                                                 <heroes-picker
                                                     v-model="team_1_picks[mapI]"
                                                     :game="match?.game || match?.event?.game"
+                                                    :heroes="heroes"
                                                     :pick-ban-order="pickBanOrder[mapI]"
                                                     :current-action="{ team: 1, type: 'pick' }"
-                                                    :start-open="gameOverride?.defaultHeroPickCount || 5"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div v-if="pickBanOrder[mapI]?.length" class="flip-controls flex-center flex-column h-100">
-                                            <div>
-                                                <i v-b-tooltip="'Flip pick/ban order'" class="fas fa-exchange"></i>
-                                            </div>
-                                            <div>
-                                                <b-form-checkbox
-                                                    v-model="flip_pick_ban_order[mapI]"
-                                                    size="lg"
+                                                    :max="dashboardView && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline') ? getPickBanMax(pickBanOrder[mapI], 'pick', 1) : gameOverride?.defaultHeroPickCount || 5"
                                                 />
                                             </div>
                                         </div>
@@ -240,14 +327,26 @@
                                                 <heroes-picker
                                                     v-model="team_2_picks[mapI]"
                                                     :game="match?.game || match?.event?.game"
+                                                    :heroes="heroes"
                                                     :pick-ban-order="pickBanOrder[mapI]"
                                                     :current-action="{ team: 2, type: 'pick' }"
-                                                    :start-open="gameOverride?.defaultHeroPickCount || 5"
+                                                    :max="dashboardView && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline') ? getPickBanMax(pickBanOrder[mapI], 'pick', 2) : gameOverride?.defaultHeroPickCount || 5"
                                                 />
                                             </div>
                                         </div>
                                     </div>
-                                    <div v-if="controls.showHeroBans" class="hero-bans-container">
+                                    <div v-if="(match?.pick_ban_order || gameOverride?.defaultPickBanOrder) && (controls.showHeroBans || controls.showHeroPicks)" class="flip-controls flex-center flex-column h-100">
+                                        <div class="pt-2">
+                                            <i v-b-tooltip="'Flip pick/ban order'" class="fas fa-exchange"></i>
+                                        </div>
+                                        <div>
+                                            <b-form-checkbox
+                                                v-model="flip_pick_ban_order[mapI]"
+                                                size="lg"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div v-if="controls.showHeroBans && !((getPickBanMax(pickBanOrder[mapI], 'ban') === 0) && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline'))" class="hero-bans-container">
                                         <div class="hero-bans">
                                             <div class="form-top">
                                                 {{ teams[0]?.name }} Bans
@@ -256,10 +355,12 @@
                                                 <heroes-picker
                                                     v-model="team_1_bans[mapI]"
                                                     :game="match?.game || match?.event?.game"
+                                                    :heroes="heroes"
                                                     :pick-ban-order="pickBanOrder[mapI]"
                                                     :current-action="{ team: 1, type: 'ban' }"
-                                                    :start-open="gameOverride?.defaultHeroBanCount || 0"
+                                                    :max="(dashboardView && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline') ? (getPickBanMax(pickBanOrder[mapI], 'ban', 1)) : gameOverride?.defaultHeroBanCount) || gameOverride?.defaultHeroBanCount || (getPickBanMax(pickBanOrder[mapI], 'ban', 1)) || 0"
                                                 />
+                                                <!-- these hero picker max are just setting priority then falling back -->
                                             </div>
                                         </div>
                                         <div class="hero-bans">
@@ -270,9 +371,10 @@
                                                 <heroes-picker
                                                     v-model="team_2_bans[mapI]"
                                                     :game="match?.game || match?.event?.game"
+                                                    :heroes="heroes"
                                                     :pick-ban-order="pickBanOrder[mapI]"
                                                     :current-action="{ team: 2, type: 'ban' }"
-                                                    :start-open="gameOverride?.defaultHeroBanCount || 0"
+                                                    :max="(dashboardView && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline') ? (getPickBanMax(pickBanOrder[mapI], 'ban', 2)) : gameOverride?.defaultHeroBanCount) || gameOverride?.defaultHeroBanCount || (getPickBanMax(pickBanOrder[mapI], 'ban', 2)) || 0"
                                                 />
                                             </div>
                                         </div>
@@ -283,7 +385,7 @@
                     </tbody>
                 </table>
             </div>
-            <div v-if="!hideMatchExtras" class="details-wrapper p-2 mt-3">
+            <div v-if="!(hideMatchExtras || dashboardView)" class="details-wrapper p-2 mt-3">
                 <div class="d-flex mb-2">
                     <h3 class="mb-0">Match Details</h3>
                     <div class="spacer flex-grow-1"></div>
@@ -370,11 +472,12 @@ import { mapWritableState } from "pinia";
 import MatchExplainerModal from "@/components/website/dashboard/MatchExplainerModal.vue";
 import HeroesPicker from "@/components/website/dashboard/HeroesPicker.vue";
 import { GameOverrides } from "@/utils/games.ts";
+import ThemeLogo from "@/components/website/ThemeLogo.vue";
 
 export default {
     name: "MatchEditor",
-    components: { HeroesPicker, MatchExplainerModal, AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
-    props: ["match", "hideMatchExtras", "scoreReporting", "proposedData", "scoreReportAction", "lockControls", "showHeroPicks", "showHeroBans", "showMapBans", "ignoreRemoteUpdates", "showScoreReportForfeit"],
+    components: { ThemeLogo, HeroesPicker, MatchExplainerModal, AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
+    props: ["match", "hideMatchExtras", "scoreReporting", "proposedData", "scoreReportAction", "lockControls", "showHeroPicks", "showHeroBans", "showMapBans", "ignoreRemoteUpdates", "showScoreReportForfeit", "dashboardView"],
     data: () => ({
         processing: {},
         matchData: {
@@ -388,6 +491,7 @@ export default {
             alternative_vod: null
         },
         draws: [],
+        publics: [],
         mapChoices: [],
         winners: [],
         pickers: [],
@@ -408,10 +512,17 @@ export default {
         previousAutoData: null,
         scoreDebounceTimeouts: [],
         showMapBanButtons: false,
-        scoreReportConfirmModal: false
+        scoreReportConfirmModal: false,
+
+        pickBanVisibilityOptions: [
+            { value: "hidden", text: "Hide all" },
+            { value: "order", text: "Show game specific" },
+            { value: "inline", text: "Show in order" },
+            { value: "show", text: "Show all" },
+        ]
     }),
     computed: {
-        ...mapWritableState(useSettingsStore, ["assumeLoserPicks", "showHeroPickBans", "restrictToMapPool", "denyEditor"]),
+        ...mapWritableState(useSettingsStore, ["assumeLoserPicks", "showHeroPickBans", "restrictToMapPool", "denyEditor", "dashboardPickBanVisibility"]),
         teams() {
             const dummy = { dummy: true };
 
@@ -430,12 +541,21 @@ export default {
                     assumeLoserPicks: false, // hard disabling for now
                 };
             }
+            if (this.dashboardView) {
+                const visible = this.dashboardPickBanVisibility !== "hidden";
+                return {
+                    showHeroPicks: this.showHeroPicks || visible,
+                    showHeroBans: this.showHeroBans || visible,
+                    showMapBans: this.showMapBans || this.showMapBanButtons,
+                    assumeLoserPicks: this.assumeLoserPicks
+                };
+            }
             return {
                 showHeroPicks: this.showHeroPicks || this.showHeroPickBans,
                 showHeroBans: this.showHeroBans || this.showHeroPickBans,
                 showMapBans: this.showMapBans || this.showMapBanButtons,
 
-                assumeLoserPicks: false, // hard disabling for now
+                assumeLoserPicks: this.assumeLoserPicks
             };
         },
         reportableMatchData() {
@@ -601,6 +721,7 @@ export default {
             for (let i = 0; i < this.minMaps; i++) {
                 data.push({
                     draw: this.draws[i],
+                    public: this.publics[i],
                     map: this.mapChoices[i],
                     existingID: this.existingMapIDs[i],
                     winner: this.winners[i],
@@ -639,11 +760,28 @@ export default {
             return this.maps.map((map, i) => {
                 return processPickBanOrder(this.match?.pick_ban_order || this.gameOverride?.defaultPickBanOrder, this.flip_pick_ban_order[i]);
             });
-
         },
         gameOverride() {
             if (this.match?.game || this.match?.event?.game) return GameOverrides[this.match?.game || this.match?.event?.game];
             return null;
+        },
+        showReplayCodeInput() {
+            if (this.scoreReporting) return true;
+            if ((this.gameOverride?.showForProduction || []).includes("replay_code")) return true;
+            if (this.hideMatchExtras || this.dashboardView) return false;
+
+            return true;
+        },
+        showPublicInput() {
+            if (this.scoreReporting) return false;
+            if ((this.gameOverride?.showForProduction || []).includes("public")) return true;
+            return false;
+        },
+        heroes() {
+            const game = this.match?.game || this.match?.event?.game;
+            return (ReactiveRoot("Heroes", {
+                "ids": ReactiveArray("ids")
+            })?.ids || []).filter(hero => game ? hero.game === game : true);
         },
         // loadedFully() {
         //     const test = [
@@ -664,6 +802,24 @@ export default {
         // }
     },
     methods: {
+        forceSetup(setupKey, mapI) {
+            [
+                "team_1_picks",
+                "team_2_picks",
+                "team_1_bans",
+                "team_2_bans"
+            ].forEach(key => {
+                console.log(key, mapI, this[key], this[key]?.[mapI]);
+                const data = this[key];
+                if (data?.[mapI] === undefined) {
+                    this[key][mapI] = [];
+                }
+            });
+        },
+        getPickBanMax(order, type, team) {
+            if (!order) return;
+            return Math.max(...order.filter(p => (team ? p.team === team : true) && p.type === type).map(p => p.countOfTeamType), 0);
+        },
         getMapOptions(mapIndex) {
             if (!this.availableMaps?.length) return [];
             const groups = {};
@@ -734,6 +890,7 @@ export default {
 
             this.matchData.scores = [0, 0];
             this.draws = [];
+            this.publics = [];
             this.mapChoices = [];
             this.winners = [];
             this.pickers = [];
@@ -756,6 +913,7 @@ export default {
 
             this.previousAutoData = {
                 draws: Object.assign([], this.draws),
+                publics: Object.assign([], this.publics),
                 existingMapIDs: Object.assign([], this.existingMapIDs),
                 winners: Object.assign([], this.winners),
                 pickers: Object.assign([], this.pickers),
@@ -789,6 +947,7 @@ export default {
                     console.log("Map set", !!mapChoice, mapChoice, this.mapChoices[i], map);
                     this.setIfNew("mapChoices", i, mapChoice || null);
                     this.setIfNew("draws", i, map.draw);
+                    this.setIfNew("publics", i, map.public);
                     this.setIfNew("existingMapIDs", i, map.id);
                     this.setIfNew("winners", i, map.winner?.id || map.winner?.[0]);
                     this.setIfNew("pickers", i, map.picker?.id || map.picker?.[0]);
@@ -826,6 +985,7 @@ export default {
             }
             this.previousAutoData = {
                 draws: Object.assign([], this.draws),
+                publics: Object.assign([], this.publics),
                 existingMapIDs: Object.assign([], this.existingMapIDs),
                 winners: Object.assign([], this.winners),
                 pickers: Object.assign([], this.pickers),
@@ -964,9 +1124,9 @@ export default {
             this.matchData.scores = score;
         },
         checkAutoWinner(i, val) {
-            console.log("checkAutoWinner", { val, i }, this.score_1s[i], this.score_2s[i]);
+            console.log("checkAutoWinner", { val, i }, this.score_1s[i], this.score_2s[i], this.pickers, this.controls);
 
-            if (this.teams?.length !== 2) return;
+            if (this.teams?.length !== 2) return console.warn("checkAutoWinner", "team length invalid");
 
             if (this.score_1s[i] !== undefined && this.score_2s[i] !== undefined) {
                 if (this.score_1s[i] > this.score_2s[i]) {
@@ -986,6 +1146,8 @@ export default {
                     }
                     this.autoUpdateScore();
                 }
+            } else {
+                return console.warn("checkAutoWinner", "scores failed", this.score_1s[i], this.score_2s[i]);
             }
         },
         winnerSelected(i, teamID) {
@@ -1209,7 +1371,7 @@ export default {
     }
     .hero-picks-container, .hero-bans-container {
         display: flex;
-        min-width: 50%;
+        min-width: calc(50% - 30px);
         align-items: start;
         flex-grow: 1;
         flex-shrink: 0;
@@ -1231,5 +1393,21 @@ export default {
     .hero-picks-container,
     .pick-style {
         background-color: color-mix(in srgb,  var(--primary) 20%, transparent)
+    }
+    .pickban-inline-text {
+        min-width: 5em;
+    }
+    .pickban-inline-team-logo {
+        width: 2.5em;
+        height: 2em;
+    }
+    .pickban-inline-row {
+         padding: .25em;
+    }
+    .pickban-inline-container > .pickban-inline-row:first-child {
+        padding-top: .5em;
+    }
+    .pickban-inline-container > .pickban-inline-row:last-child {
+        padding-bottom: .5em;
     }
 </style>

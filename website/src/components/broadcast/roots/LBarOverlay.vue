@@ -21,6 +21,8 @@
                     :times="true"
                     :theme-color="themeColor"
                     :small-names="true"
+                    :show-first-to="showFirstToUpcoming"
+                    :broadcast="broadcast"
                 />
             </div>
         </div>
@@ -95,6 +97,9 @@ export default {
             if (!this.broadcast.countdown_end) return "LOCAL TIME";
             if (this.schedule && this.schedule.filter(s => [s.score_1, s.score_2].some((_s) => _s)).length === 0) { return "STARTING IN"; }
             return "BACK IN";
+        },
+        showFirstToUpcoming() {
+            return (this.broadcast?.broadcast_settings || []).includes("Show first to on upcoming match");
         },
         sponsorThemes() {
             if (!this.broadcast?.sponsors) return null;

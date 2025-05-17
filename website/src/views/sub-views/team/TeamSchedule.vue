@@ -23,6 +23,7 @@
                 v-for="match in matches"
                 :key="match.id"
                 :match="match"
+                :event="hydratedEvent"
                 :left-team="team"
                 :show-editor-button="showEditorButton" />
         </div>

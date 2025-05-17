@@ -143,14 +143,23 @@ export default ({ app, Cache, io }) => {
             if (live_match.error) return res.send(live_match.message);
             live_match = live_match.data;
 
+            const event = live_match?.event?.[0] ? await Cache.get(live_match?.event?.[0]) : null;
+
             /**
              * @type {MatchMap[]}
              */
             const maps = await Promise.all((live_match.maps || []).map(id => Cache.get(cleanID(id))));
 
             const eligibleMaps = maps.filter(map => !map.banner);
-            const currentMap = eligibleMaps.find(map => !(map.draw || map.winner));
+            if (!eligibleMaps.length) {
+                return res.send("No hero ban information is available right now.");
+            }
+            const currentMap = eligibleMaps.find(map => !(map.draw || map.winner)) || eligibleMaps[eligibleMaps.length - 1];
             if (!currentMap?.id) return res.send("No hero ban information is available right now.");
+            if (["Deadlock", "Marvel Rivals"].includes(event?.game) && !currentMap.public) {
+                return res.send("No hero ban information is available right now.");
+            }
+
             /** @type {Team[]} */
             const teams = await Promise.all((live_match.teams || []).map(id => Cache.get(cleanID(id))));
 
@@ -161,15 +170,47 @@ export default ({ app, Cache, io }) => {
                 (await Promise.all((currentMap.team_2_bans || []).map(id => Cache.get(cleanID(id))))).map(hero => hero.name),
             ];
 
+            let picks = [[],[]];
+            if (req.query.picks) {
+                picks = [
+                    (await Promise.all((currentMap.team_1_picks || []).map(id => Cache.get(cleanID(id))))).map(hero => hero.name),
+                    (await Promise.all((currentMap.team_2_picks || []).map(id => Cache.get(cleanID(id))))).map(hero => hero.name),
+                ];
+            }
+
             if (!bans.some(teamBans => teamBans.length)) return res.send("No hero ban information is available right now.");
 
-            let banText = [1,2].map((num, i) => `${teams[i].name} banned ${bans[i].join(", ")}.`);
+            let banText = [1,2].map((num, i) => `${teams[i].name} banned ${niceJoin(bans[i])}${req.query.picks ? `, and ${req.query.picks === "protect" ? "protected" : "picked"} ${niceJoin(picks[i])}` : ""}.`);
 
             if (currentMap.flip_pick_ban_order) {
                 banText = banText.reverse();
             }
             const mapIndex = eligibleMaps.findIndex(map => map.id === currentMap.id) + 1;
-            return res.send(`⬥ Hero bans${live_match?.first_to !== 1 && mapIndex ? ` for map ${mapIndex}` : ""}: ${banText.join(" ")}`);
+            return res.send(`⬥ Hero bans${live_match?.first_to !== 1 && mapIndex ? ` for map ${mapIndex}` : ""}: ${banText.join(" / ")}`);
+
+        } catch (e) {
+            console.error(e);
+            return res.send("An error occurred loading data");
+        }
+    });
+
+    app.get("/match-ids", async (req, res) => {
+        try {
+            if (!req.query.stream) return res.send("The 'stream' query is required.");
+
+            let live_match = await getLiveMatch(req.query.stream);
+            if (live_match.error) return res.send(live_match.message);
+            live_match = live_match.data;
+            /**
+             * @type {MatchMap[]}
+             */
+            const maps = await Promise.all((live_match.maps || []).map(id => Cache.get(cleanID(id))));
+
+            const eligibleMaps = maps.filter(map => !map.banner && map.replay_code);
+            if (!eligibleMaps.length) {
+                return res.send("No match IDs from this game are available right now.");
+            }
+            return res.send(`⬥ Match IDs from this game: ${eligibleMaps.map((map, i) => `Map ${i+1}: ${map.replay_code}`).join(" / ")}`);
 
         } catch (e) {
             console.error(e);

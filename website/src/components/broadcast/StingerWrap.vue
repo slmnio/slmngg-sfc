@@ -1,5 +1,5 @@
 <template>
-    <div class="stinger-wrap" :class="{'s-active': active, 's-show': showStinger}">
+    <div class="stinger-wrap" :class="{'s-active': active, 's-show': showStinger, 'custom': !!customStingerTheme }" :style="themeVariables">
         <theme-transition
             class="stinger-transition"
             start="left"
@@ -37,10 +37,16 @@
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { logoBackground } from "@/utils/theme-styles";
+import { logoBackground, themeBackground } from "@/utils/theme-styles";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
 import { useStatusStore } from "@/stores/statusStore";
 import { mapState } from "pinia";
+
+function wrapVariables(prefix, css) {
+    const out = {};
+    Object.entries(css || {}).forEach(([k, v]) => out[`--${prefix}-${k}`] = v);
+    return out;
+}
 
 export default {
     name: "StingerWrap",
@@ -56,6 +62,12 @@ export default {
         },
         bg() {
             return logoBackground(this.useTheme);
+        },
+        themeVariables() {
+            return ({
+                ...wrapVariables("stinger-logo", logoBackground(this.useTheme)),
+                ...wrapVariables("stinger-theme", themeBackground(this.useTheme)),
+            });
         },
         stingerText() {
             if (this.stingerHideText) return;

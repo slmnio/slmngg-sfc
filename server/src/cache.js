@@ -19,6 +19,7 @@ const players = new Map();
 const attachments = new Map();
 
 const emitter = new EventEmitter();
+export const cacheStatusEmitter = new EventEmitter();
 
 /**
  * @returns {Set<AnyAirtableID>}
@@ -132,7 +133,8 @@ const slmnggAttachments = {
     "Ad Reads": ["audio", "image"],
     "Tracks": ["file"],
     "Teams": ["icon", "images"],
-    "GFX": ["image"]
+    "GFX": ["image"],
+    "Trivia": ["question_content", "reveal_content"]
 };
 
 function generateAttachmentURL(str, attachment) {

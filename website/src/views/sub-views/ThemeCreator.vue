@@ -1,6 +1,6 @@
 <template>
     <div class="theme-creator container d-flex flex-column gap-3">
-        <h1>Theme Creator</h1>
+        <LearnTitleChip title="Tools" subtitle="Theme Creator" />
 
         <div class="top-bar d-flex gap-3">
             <div ref="dropZoneRef" class="dropzone flex-center image-box image-box-size" :class="{'hovered': isOverDropZone}">
@@ -132,10 +132,11 @@ import { useSettingsStore } from "@/stores/settingsStore.ts";
 import { calculateContrastHex } from "@/utils/content-utils.js";
 import ThingTheme from "@/views/sub-views/ThingTheme.vue";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
+import LearnTitleChip from "@/components/website/guide/LearnTitleChip.vue";
 
 export default {
     name: "ThemeCreator",
-    components: { CopyTextButton, ThingTheme, ContrastBadge, ThemeEyeDropper },
+    components: { LearnTitleChip, CopyTextButton, ThingTheme, ContrastBadge, ThemeEyeDropper },
     setup() {
         const loadedFiles = ref([]);
         const dropZoneRef = ref();

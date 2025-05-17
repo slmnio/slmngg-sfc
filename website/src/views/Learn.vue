@@ -15,6 +15,9 @@
             <li>
                 <router-link :to="{ name: 'overwatch-settings' }">Overwatch Settings Guide</router-link>
             </li>
+            <li>
+                <router-link :to="{ name: 'solo-overlay-guide' }">Solo Overlay Guide</router-link>
+            </li>
             <li style="opacity: 0.8">
                 SLMN.GG Companion Module Guide (coming soon)
                 <!-- <router-link :to="{ name: 'companion-module' }">SLMN.GG Companion Module Guide</router-link> -->
@@ -33,6 +36,9 @@
             </li>
             <li>
                 <router-link :to="{ name: 'bracket-creator' }">Bracket Creator</router-link>
+            </li>
+            <li>
+                <router-link :to="{ name: 'theme-creator' }">Theme Creator</router-link>
             </li>
             <li>
                 <router-link :to="{ name: 'twitch-auth' }">Connect Twitch channel to SLMN.GG</router-link>

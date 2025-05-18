@@ -55,8 +55,8 @@ export async function isEventStaffOrHasRole(user, event, role, websiteRoles) {
     const userPlayerRelationships = user?.player_relationships || user?.airtable?.player_relationships;
     const userWebsiteSettings = user?.airtable?.website_settings || user?.website_settings;
 
-    console.log({ userID, userPlayerRelationships, userWebsiteSettings });
-    console.log({ user, websiteRoles, role });
+    // console.log({ userID, userPlayerRelationships, userWebsiteSettings });
+    // console.log({ user, websiteRoles, role });
     if ([...(websiteRoles || []), role].some(websiteRole => (userWebsiteSettings || []).includes(websiteRole))) return true;
     if (event) {
         if (typeof event === "string") {

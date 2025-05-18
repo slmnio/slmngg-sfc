@@ -127,9 +127,9 @@
             <ActionCard v-if="authStatus?.staff" class="mt-3" title="Staff panel">
                 <b-button variant="danger" @click="check('Confirm full room reset') ? roomEmit('staff:reset') : {}">Full reset</b-button>
                 <b-button variant="warning" @click="check('Advance to next room step') ? roomEmit('staff:advance') : {}">Advance to next step</b-button>
-                <b-button variant="primary" @click="roomEmit('staff:set_pick_ban_index', { index: currentStepData.pickBanIndex - 1 })">PB index --</b-button>
-                <b-button variant="primary" @click="roomEmit('staff:set_pick_ban_index', { index: 0 })">Set pick ban index to 0</b-button>
-                <b-button variant="primary" @click="roomEmit('staff:set_pick_ban_index', { index: currentStepData.pickBanIndex + 1 })">PB index ++</b-button>
+                <b-button variant="primary" @click="() => roomEmit('staff:set_pick_ban_index', { index: currentStepData.pickBanIndex - 1 })">PB index --</b-button>
+                <b-button variant="primary" @click="() => roomEmit('staff:set_pick_ban_index', { index: 0 })">Set pick ban index to 0</b-button>
+                <b-button variant="primary" @click="() => roomEmit('staff:set_pick_ban_index', { index: currentStepData.pickBanIndex + 1 })">PB index ++</b-button>
 
 
                 <b-button variant="info" @click="check('Confirm room freeze') ? roomEmit('staff:freeze') : {}">Freeze</b-button>
@@ -308,7 +308,7 @@ export default {
             return status;
         },
         async roomEmit(command, data) {
-            if (this.processing[command]) return;
+            if (this.processing[command] && !command.includes("staff:")) return;
             console.log("sending room_command", cleanID(this.match.id), command, data);
             this.processing[command] = true;
             this.error[command] = null;

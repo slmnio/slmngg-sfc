@@ -289,7 +289,7 @@ class MatchRoom {
             console.log("Making a new map");
 
             const existingMap = this.currentSectionData.mapID ? await get(this.currentSectionData.mapID as MatchMapResolvableID) : null;
-            console.log(existingMap);
+            console.log("checking existing map:", existingMap);
 
             if (!existingMap || existingMap?.map) {
                 // TODO: Check if we need to create a new map - potentially can fill from pre-set map
@@ -303,7 +303,7 @@ class MatchRoom {
                 }
 
                 this.currentSectionData.mapID = map[0].id;
-                console.log(map[0]);
+                console.log("new map created", map[0]);
                 this.roomBroadcast("match_room:info", null);
             }
         }
@@ -402,7 +402,7 @@ class MatchRoom {
     }
 
     roomBroadcast(event: string, ...rest: any[]) {
-        console.log({ event, rest });
+        console.log("broadcasting", event);
         socketServer.to(this.socketRoomID).emit(event, this.id, ...rest, 45);
     }
 
@@ -548,12 +548,17 @@ class MatchRoom {
 
                 if (existing.some(id => dirtyID(id) === dirtyID(data.heroID))) {
                     this.sempahores.delete(command);
+                    console.warn("duplicate hero", data.heroID);
                     return {error: true, errorMessage: "Duplicate hero ID"};
                 }
+
+                console.log("updating", airtableKey)
 
                 await updateRecord(Cache, "Maps", map, {
                     [airtableKey]: [...existing, dirtyID(data.heroID)]
                 }, "match-rooms/hero-draft:lock-hero");
+            } else {
+                console.warn("pick ban team number error", { pickBanTeamNum, teamID })
             }
             this.sempahores.delete(command);
             const nextIndex = this.currentStepData.pickBanIndex + 1;
@@ -573,7 +578,7 @@ class MatchRoom {
             if (!playerAuthStatus.team) return {error: true, errorMessage: "No permission"};
             await this.advanceToNextStep();
         } else {
-            console.log("[match-room] handle room command", this.id, command, player?.name, playerAuthStatus, this.currentStep?.type, this.state);
+            console.log("[match-room] handle room command", command, player?.name, playerAuthStatus, this.currentStep?.type, this.state);
             return { error: true, errorMessage: "Unknown command" };
         }
 

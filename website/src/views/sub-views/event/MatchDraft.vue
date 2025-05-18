@@ -548,8 +548,11 @@ export default {
                 if (heroLocations.includes(`${opponentTeam}_protects`)) return { result: false, reason: "Protected by opponent" };
                 if (heroLocations.includes(`${ownTeam}_bans`)) return { result: false, reason: "Banned by own team" };
                 if (heroLocations.includes(`${opponentTeam}_bans`)) return { result: false, reason: "Banned by opponent" };
-                if (heroLocations.includes(`${ownTeam}_picks`)) return { result: false, reason: "Picked by own team", icon: "fa-check"  };
-                if (heroLocations.includes(`${opponentTeam}_picks`)) return { result: false, reason: "Picked by opponent" };
+
+                if (!this.step?.settings?.allowBansAnywhere) {
+                    if (heroLocations.includes(`${ownTeam}_picks`)) return { result: false, reason: "Picked by own team", icon: "fa-check"  };
+                    if (heroLocations.includes(`${opponentTeam}_picks`)) return { result: false, reason: "Picked by opponent" };
+                }
 
 
                 if (this.step?.settings?.fearlessBans) {
@@ -565,6 +568,21 @@ export default {
                         return { result: false, reason: "Fearless banned", style: "ban" };
                     } else {
                         return { result: true, reason: "Not picked previously" };
+                    }
+                }
+
+
+                if (this.step?.settings?.onlyBanOnce) {
+                    const checkTeams = `${ownTeam}_bans`;
+                    const previouslyPicked = this.fearlessMaps.some(map =>
+                        checkTeams.some(key =>
+                            (map?.[key] || []).find(h =>
+                                cleanID(h?.id || h) === cleanID(hero.id))));
+
+                    if (previouslyPicked) {
+                        return { result: false, reason: "Already banned this series", style: "ban" };
+                    } else {
+                        return { result: true, reason: "Not banned this series" };
                     }
                 }
 

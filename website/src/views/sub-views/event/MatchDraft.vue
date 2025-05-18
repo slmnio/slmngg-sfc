@@ -84,7 +84,7 @@
             <!--                    </div>-->
             <!--                </div>-->
             <!--            </div>-->
-
+            <div v-if="state !== STATES.finished" class="timer"><h1 class="mb-0">{{ timerLabel }}</h1></div>
             <div v-if="draftStarted && state !== STATES.finished" class="w-100">
                 <!--                <pre>{{ { ownIndex: this.ownTeamIndex, team: this.ownTeam?.id, teams: (hydratedMatch.teams || []).map(t => t.id) } }}</pre>-->
                 <form class="w-100" @submit.prevent="lockIn(selectedHero)">
@@ -458,7 +458,7 @@ export default {
                 isActive,
                 reset,
                 pause
-            } = useInterval(10000, {
+            } = useInterval(1000, {
                 controls: true,
                 callback: this.intervalCalled
             });
@@ -528,6 +528,15 @@ export default {
 
                 // TODO: Fearless here
                 if (this.step?.settings?.fearlessBans) {
+
+                    if (this.step?.settings?.protectsBypassFearless) {
+                        if (this.step?.settings?.pickAgnostic) {
+                            if (heroLocations.includes(`${ownTeam}_protects`)) return { result: true, reason: "Protected by own team", icon: "fa-check"  };
+                        } else {
+                            if (heroLocations.includes(`${ownTeam}_protects`)) return { result: true, reason: "Protected by own team", icon: "fa-check"  };
+                            if (heroLocations.includes(`${opponentTeam}_protects`)) return { result: true, reason: "Protected by opponent", icon: "fa-check"  };
+                        }
+                    }
                     // check previous maps, see if they should be bans or not
 
                     const checkTeams = this.step?.settings?.fearlessBans === "team_previous_picks" ? [`${ownTeam}_picks`] : ["team_1_picks", "team_2_picks"];

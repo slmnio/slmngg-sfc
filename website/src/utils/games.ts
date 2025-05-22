@@ -20,6 +20,7 @@ export const GameOverrides = {
             "pick2,pick1,pick1,pick2"
     },
     "Marvel Rivals": {
+        playerCount: 6,
         showForProduction: [
             "replay_code",
             "public"
@@ -55,13 +56,7 @@ export const GameOverrides = {
         lang: {
             "replay_code": "Match ID"
         },
-        defaultPickBanOrder: "ban1,ban2,pick1,pick2,pick2,pick1,pick1,pick2,pick1,pick2,pick1,pick2,pick1,pick2"
-    },
-    "Marvel Rivals": {
-        playerCount: 6,
-        defaultHeroBanCount: 2,
-        defaultHeroPickCount: 3,
-        defaultPickBanOrder: "ban1,ban2,pick1,pick2,pick2,pick1,pick1,pick2,ban2,ban1,pick2,pick1,pick1,pick2,pick2,pick1",
+        defaultPickBanOrder: "ban1,ban2,pick1,pick2,pick2,pick1,pick1,pick2,pick1,pick2,pick1,pick2,pick1,pick2",
         showForProduction: [
             "replay_code",
             "public"

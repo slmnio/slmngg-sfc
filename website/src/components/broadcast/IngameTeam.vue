@@ -21,7 +21,13 @@
             <div v-if="displayedHeroBans" class="ingame-hero-bans">
                 <div class="bans-text">
                     <div class="bans-text-rotate">
-                        <div class="industry-align">{{ displayedHeroBans.length === 1 ? 'BAN' : 'BANS' }}</div>
+                        <span class="industry-align bans-text-basic">{{ displayedHeroBans.length === 1 ? 'BAN' : 'BANS' }}</span>
+                        <span class="industry-align bans-text-space">&nbsp;</span>
+                        <span v-if="heroBansDisplayMode === 'on ingame teams (asymmetric)' && team?.code" class="industry-align bans-text-for">
+                            <span class="bans-team-for-text">FOR</span>
+                            <span class="industry-align bans-text-for-space">&nbsp;</span>
+                            <span class="bans-team-for-code">{{ team?.code }}</span>
+                        </span>
                     </div>
                 </div>
                 <div v-for="hero in displayedHeroBans" :key="hero.id" class="hero-ban flex-center">
@@ -207,14 +213,19 @@ export default {
         },
         displayedHeroBans() {
             if (!this.match?.id) return null;
-            if (this.heroBansDisplayMode !== "on ingame teams") return null;
+            if (!this.heroBansDisplayMode.includes("on ingame teams")) return null;
 
             const maps = (this.match?.maps || []).map((map, i) => ({
                 ...map,
                 number: map.number || i + 1
             })).filter(map => !map.banner);
 
-            const thisTeamNum = (this.match?.teams || []).findIndex(t => t.id === this.team.id);
+            let thisTeamNum = (this.match?.teams || []).findIndex(t => t.id === this.team.id);
+            if (this.heroBansDisplayMode === "on ingame teams (asymmetric)") {
+                // team 1 bans affect team 2 etc
+                // i.e. flip
+                thisTeamNum = +!thisTeamNum;
+            }
             const currentMap = maps.find(map => !(map.draw || map.winner)) || maps[maps.length - 1];
             if (!currentMap) return null;
             return [currentMap.team_1_bans || [], currentMap.team_2_bans || []]?.[thisTeamNum];
@@ -593,7 +604,9 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        text-align: center;
         width: 1.5em;
+        line-height: 1;
     }
     .bans-text-rotate {
         transform: rotate(-90deg);

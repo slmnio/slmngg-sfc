@@ -157,7 +157,7 @@ export default {
             if (this.broadcast?.match_next_format) {
                 return `${this.textPrefix} ${formatText(this.broadcast.match_next_format, this.event || this.match?.event || this.broadcast?.event, this.match)}`;
             }
-            return `${this.textPrefix} ${this.match ? this.match.round : ""}`;
+            return `${this.textPrefix} ${this.match?.round || ""}`.trim();
         }
     },
     methods: {

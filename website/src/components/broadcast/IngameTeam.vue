@@ -213,7 +213,7 @@ export default {
         },
         displayedHeroBans() {
             if (!this.match?.id) return null;
-            if (!this.heroBansDisplayMode.includes("on ingame teams")) return null;
+            if (!this.heroBansDisplayMode?.includes("on ingame teams")) return null;
 
             const maps = (this.match?.maps || []).map((map, i) => ({
                 ...map,

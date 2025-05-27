@@ -9,6 +9,10 @@ export default [
         })
     },
     {
+        path: "ingame-tester",
+        component: () => import("@/components/broadcast/roots/IngameThemeTester.vue")
+    },
+    {
         path: "ingame-pickban",
         component: () => import("@/components/broadcast/roots/IngamePickBan.vue")
     },

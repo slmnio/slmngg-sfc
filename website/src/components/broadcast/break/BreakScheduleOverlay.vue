@@ -1,5 +1,5 @@
 <template>
-    <div class="break-schedule-overlay d-flex">
+    <div class="break-schedule-overlay d-flex overlay--text-on-bg">
         <div class="left-logo-block flex-center flex-column">
             <div class="event-logo bg-center" :style="eventLogo"></div>
             <div class="lower-text">
@@ -113,6 +113,12 @@ export default {
         display: flex;
         flex-direction: column;
         padding-top: 2em;
+    }
+
+    .schedule {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
     }
 
     .schedule-title {

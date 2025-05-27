@@ -1,6 +1,6 @@
 <template>
     <div class="l-bar-overlay">
-        <div class="left-bar flex-center flex-column text-center">
+        <div class="left-bar flex-center flex-column text-center" :style="boxColours">
             <div class="countdown-group flex-center flex-column" :style="themeColor">
                 <transition name="fade" mode="out-in" class="countdown-text" tag="div">
                     <span :key="countdownText" class="industry-align">
@@ -36,12 +36,12 @@
                 logo-size="w-500"
                 border-width="0" />
         </div>
-        <div class="lower-bar overlay--bg title flex-center text-center">
+        <div class="lower-bar overlay--bg title flex-center text-center" :style="boxColours">
             <Squeezable align="middle" :disabled="(overlayTitle)?.includes('\\n')" class="w-100 flex-center">
                 <transition name="fade" mode="out-in">
                     <span
                         :key="overlayTitle"
-                        class="title-text"
+                        class="title-text industry-align"
                         :class="{'has-br': (overlayTitle || '')?.includes('\\n')}"
                         v-html="nbr(overlayTitle)"></span>
                 </transition>
@@ -109,6 +109,12 @@ export default {
         },
         overlayTitle() {
             return this.title || this.broadcast?.title;
+        },
+        boxColours() {
+            return {
+                backgroundColor: this.broadcast?.event?.theme?.color_body || "#333333",
+                color: this.broadcast?.event?.theme?.color_text_on_body || "#ffffff",
+            };
         }
     },
     methods: {

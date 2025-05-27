@@ -1,16 +1,16 @@
 <template>
     <div class="schedule-item">
-        <div class="match-round">
+        <div class="match-round industry-align">
             <transition name="fade" mode="out-in">
-                <span :key="match.round">{{ match.round }}</span>
+                <span :key="scheduleText">{{ scheduleText }}</span>
             </transition>
         </div>
-        <div class="match-teams">
+        <div class="match-teams industry-align">
             <transition name="fade" mode="out-in">
                 <span :key="teamsVs" v-html="teamsVs"></span>
             </transition>
         </div>
-        <div class="match-schedule">
+        <div class="match-schedule industry-align">
             <transition name="fade" mode="out-in">
                 <span :key="scheduleTime">{{ scheduleTime }}</span>
             </transition>
@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { formatTime } from "@/utils/content-utils";
+import { formatText, formatTime } from "@/utils/content-utils";
 
 export default {
     name: "ScheduleTextItem",
@@ -35,7 +35,10 @@ export default {
                 tz: this.broadcast.timezone,
                 format: "{day-short} {month-short} {date} @ {hour}:{minute-pad}{ampm} {tz-no-sun}"
             });
-        }
+        },
+        scheduleText() {
+            return formatText(this.broadcast?.break_schedule_format, this.broadcast?.event, this.match) || this.match?.round;
+        },
     },
     methods: {
         formatTime
@@ -46,5 +49,16 @@ export default {
 <style scoped>
     .match-teams:deep(.no-wrap) {
         white-space: nowrap;
+    }
+    .match-round {
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.9em;
+    }
+    .match-schedule {
+        font-size: 0.75em;
+    }
+    .schedule-item {
+        line-height: 1.1;
     }
 </style>

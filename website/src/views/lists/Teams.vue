@@ -26,6 +26,7 @@ import { searchInCollection } from "@/utils/search";
 import LoadingIcon from "@/components/website/LoadingIcon";
 import EventTeamsDisplay from "@/views/lists/EventTeamsDisplay.vue";
 import { useRouteQuery } from "@vueuse/router";
+import { cleanID } from "@/utils/content-utils.js";
 
 export default {
     name: "Teams",
@@ -62,8 +63,8 @@ export default {
             const events = [];
 
             teamSearchResults.forEach(team => {
-                if (!team.event) return;
-                let existing = events.find(e => e.eventID === team.event);
+                if (!team?.event?.length) return;
+                let existing = events.find(e => cleanID(e.eventID) === cleanID(team.event?.[0]));
                 if (!existing) {
                     existing = events[events.push({
                         eventID: team.event?.[0],

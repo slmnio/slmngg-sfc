@@ -59,6 +59,10 @@
                                 class="bg-light text-dark-low p-3 rounded"
                                 :edited-map-data="existingReportData?.mapData"
                                 :edited-match-data="existingReportData?.matchData"
+                                :comparison-data="authStatus?.staff ? {
+                                    matchData: match,
+                                    mapData: match.maps
+                                } : null"
                                 :match="match" />
                         </div>
                         <div v-if="(currentAction?.content || [])?.includes('proposed-counter-report')" class="match-explainer">

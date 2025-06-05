@@ -385,7 +385,7 @@ export default {
                 });
             });
             return Object.entries(groups).sort(([aSubEvent, aData], [bSubEvent, bData]) => {
-                return bData.earliest - aData.earliest;
+                return ((new Date(aData.earliest))?.getTime() || 0) - ((new Date(bData.earliest))?.getTime() || 0);
             });
         },
         _theme() {

@@ -25,6 +25,7 @@
                         :show-columns="showColumns"
                         icon-size="w-60"
                         :game="event?.game"
+                        :highlight="teamIsInHighlightMatch(team)"
                         :use-codes="useCodes" />
                 </div>
             </div>
@@ -38,9 +39,8 @@
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import StandingsTeam from "@/components/broadcast/StandingsTeam";
-import { sortTeamsIntoStandings } from "@/utils/scenarios";
-import { cleanID } from "@/utils/content-utils";
 import { calculateStandings, StandingsShowKeys } from "@/utils/standings";
+import { cleanID } from "@/utils/content-utils.js";
 
 
 function avg(arr) {
@@ -63,7 +63,8 @@ export default {
         showMapDiff: Boolean,
         useCodes: Boolean,
         overrideShowColumns: Array,
-        useAutoFontSize: Boolean
+        useAutoFontSize: Boolean,
+        highlightMatch: Object
     },
     computed: {
         autoFontSize() {
@@ -140,6 +141,10 @@ export default {
             // TODO: needs to be either shown columns or has columns? feel like it's getting a little tangled
             console.log("cols", cols, this.showColumns);
             return this.showColumns.some(col => cols.includes(col));
+        },
+        teamIsInHighlightMatch(team) {
+            if (!this.highlightMatch?.teams?.length) return false;
+            return this.highlightMatch.teams.some(t => cleanID(t?.id || t) === (team?.id || team));
         }
     }
 };

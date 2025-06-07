@@ -6,6 +6,7 @@
             :stage="standingsSettings?.group"
             :stages="standingsSettings?.groups"
             :tie-text="standingsSettings && standingsSettings.tieText"
+            :highlight-match="liveMatch"
             use-auto-font-size />
     </GenericOverlay>
 </template>

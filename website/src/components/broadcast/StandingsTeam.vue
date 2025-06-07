@@ -1,5 +1,5 @@
 <template>
-    <div class="standings-team d-flex" :data-team-num="team.standings.teamNum" :class="{'team-odd': team.standings.teamNum % 2 === 1, 'team-even': team.standings.teamNum % 2 === 0}">
+    <div class="standings-team d-flex" :data-team-num="team.standings.teamNum" :class="{'team-odd': team.standings.teamNum % 2 === 1, 'team-even': team.standings.teamNum % 2 === 0, 'highlight': highlight}">
         <div class="team-rank flex-shrink-0">{{ tieText && !team?.standings?.tie_show_number ? tieText : team?.standings?.rank }}</div>
         <ThemeLogo
             class="team-logo flex-shrink-0"
@@ -32,7 +32,7 @@ function diffString(val) {
 export default {
     name: "StandingsTeam",
     components: { ThemeLogo },
-    props: ["team", "tieText", "showColumns", "iconSize", "useCodes", "game"],
+    props: ["team", "tieText", "showColumns", "iconSize", "useCodes", "game", "highlight"],
     data: () => ({
         // stats: ["diff", "map_diff"/*, "points" */]
 
@@ -114,5 +114,8 @@ export default {
     .team-rank {
         width: 2em;
         text-align: center;
+    }
+    .standings-team.highlight .team-name {
+        font-weight: bold;
     }
 </style>

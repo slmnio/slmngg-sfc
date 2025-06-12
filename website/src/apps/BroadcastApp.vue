@@ -9,6 +9,7 @@
                 :broadcast="broadcast"
                 :client="client"
                 :title="title"
+                :subtitle="subtitle"
                 :top="top"
                 :active="active"
                 :animation-active="animationActive"
@@ -54,7 +55,7 @@ export default {
         BroadcastBackground,
         StingerWrap
     },
-    props: ["id", "title", "top", "code", "client", "noAnimation", "noStinger", "bodyClass", "full", "clientName", "backgroundIndex", "stingerText", "stingerThemeOverride"],
+    props: ["id", "title", "subtitle", "top", "code", "client", "noAnimation", "noStinger", "bodyClass", "full", "clientName", "backgroundIndex", "stingerText", "stingerThemeOverride"],
     data: () => ({
         active: false,
         animationActive: true,

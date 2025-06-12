@@ -93,6 +93,13 @@ export default [
     { path: "standings", component: () => import("@/components/broadcast/roots/StandingsOverlay.vue"), props: route => ({ stage: route.query.stage || route.query.group }) },
     { path: "bans", component: () => import("@/components/broadcast/roots/HeroBansOverlay.vue") },
     {
+        path: "priority",
+        component: () => import("@/components/broadcast/roots/HeroPriorityOverlay.vue"),
+        props: route => ({
+            mode: route.query.mode
+        })
+    },
+    {
         path: "multi-standings",
         alias: "multistandings",
         component: () => import("@/components/broadcast/roots/MultiStandingsOverlay.vue"),

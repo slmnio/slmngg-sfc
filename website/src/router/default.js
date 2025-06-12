@@ -195,6 +195,7 @@ export default [
         props: route => ({
             code: route.params.broadcastCode,
             title: route.query.title,
+            subtitle: route.query.subtitle,
             stingerText: route.query.stingerText,
             stingerThemeOverride: route.query.stingerThemeOverride || route.query.stingerTheme,
             top: route.query.top,
@@ -212,6 +213,7 @@ export default [
         props: route => ({
             client: route.params.clientID.toLowerCase(),
             title: route.query.title,
+            subtitle: route.query.subtitle,
             stingerText: route.query.stingerText,
             stingerThemeOverride: route.query.stingerThemeOverride || route.query.stingerTheme,
             noAnimation: (route.query.noAnimate || route.query.dontAnimate || route.query.noAnimation),

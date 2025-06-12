@@ -3,6 +3,7 @@
         v-if="broadcastID"
         :id="broadcastID"
         :title="title"
+        :subtitle="subtitle"
         :client="_client"
         :no-animation="noAnimation"
         :no-stinger="noStinger"
@@ -22,7 +23,7 @@ import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 export default {
     name: "ClientApp",
     components: { BroadcastApp },
-    props: ["client", "title", "noAnimation", "noStinger", "bodyClass", "full", "backgroundIndex", "stingerText", "stingerThemeOverride"],
+    props: ["client", "title", "subtitle", "noAnimation", "noStinger", "bodyClass", "full", "backgroundIndex", "stingerText", "stingerThemeOverride"],
     computed: {
         _client() {
             return ReactiveRoot(`client-${this.client}`, {

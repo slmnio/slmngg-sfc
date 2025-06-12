@@ -678,6 +678,7 @@ export default {
             this.processing["lock_hero_long"] = false;
             this.currentHover = null;
             this.selectedHero = null;
+            this.draftCounterReset();
         }
     },
     sockets: {

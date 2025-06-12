@@ -12,7 +12,7 @@
             <div class="left w-75 px-2">
                 <div class="big-logo w-100 h-100 flex-center" :style="teamBG">
                     <transition name="fade" mode="out-in">
-                        <div :key="focusedLogoCSS.backgroundImage" class="logo-inner bg-center" :style="focusedLogoCSS"></div>
+                        <div :key="focusedLogoCSS?.backgroundImage" class="logo-inner bg-center" :style="focusedLogoCSS || {}"></div>
                     </transition>
                 </div>
             </div>
@@ -28,6 +28,9 @@
                 </div>
                 <div v-if="designers" class="designers mb-3 px-2 py-3 text-center" :style="teamBG">
                     <div class="industry-align">Designed by: {{ designers }}</div>
+                </div>
+                <div v-if="captains" class="designers mb-3 px-2 py-3 text-center" :style="teamBG">
+                    <div class="industry-align">Captain{{ highlightTeam?.captains?.length === 1 ? '' : 's' }}: {{ captains }}</div>
                 </div>
                 <div class="logos flex-grow-1 d-flex flex-column mb-3">
                     <div v-for="logo in logos" :key="logo.key" class="logo-holder w-100 flex-grow-1 my-2 flex-center" :style="teamBG">
@@ -65,6 +68,7 @@ export default {
             if (!this.broadcast?.highlight_team?.length) return null;
             return ReactiveRoot(this.broadcast.highlight_team[0], {
                 theme: ReactiveThing("theme"),
+                captains: ReactiveArray("captains"),
                 brand_designers: ReactiveArray("brand_designers"),
                 sister_teams: ReactiveArray("sister_teams", {
                     theme: ReactiveThing("theme")
@@ -109,11 +113,16 @@ export default {
 
             return colors;
         },
+        captains() {
+            if (!this.highlightTeam?.captains) return "";
+            return this.highlightTeam.captains.map(p => p.name).join(", ");
+        },
         designers() {
             if (!this.highlightTeam?.brand_designers) return "";
             return this.highlightTeam.brand_designers.map(p => p.name).join(", ");
         },
         focusedLogoCSS() {
+            if (!this.bigLogos[this.logoI]?.item) return;
             return bg(resizedAttachment(this.bigLogos[this.logoI]?.item));
         }
     },

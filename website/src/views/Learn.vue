@@ -43,6 +43,9 @@
             <li>
                 <router-link :to="{ name: 'twitch-auth' }">Connect Twitch channel to SLMN.GG</router-link>
             </li>
+            <li>
+                <a href="https://cams.coathar.com" target="_blank">Overwatch Static Camera Setup Utility <i class="fas fa-external-link ml-1"></i></a>
+            </li>
         </ul>
 
         <h2>Reference</h2>

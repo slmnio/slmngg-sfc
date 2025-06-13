@@ -218,7 +218,7 @@
                                         :button-variant="draws[mapI] ? 'primary' : 'light'"
                                         class="draw-checkbox">
                                         <i v-if="draws[mapI]" class="fas fa-check fa-fw"></i>
-                                        <i v-else class="fas fa-fw fa-check hoverable"></i>
+                                        <i v-else class="fas fa-fw fa-check"></i>
                                     </b-form-checkbox>
                                 </div>
                             </td>

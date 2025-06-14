@@ -2,8 +2,9 @@
     <GenericOverlay :title="title || 'Schedule'" class="schedule-overlay" :top="top" :broadcast="broadcast">
         <transition-group class="break-col break-schedule" name="a--match" tag="div">
             <BreakMatch
-                v-for="match in schedule"
+                v-for="(match, i) in schedule"
                 :key="match.id"
+                :class="{'schedule-next-diff': scheduleTimeDiffs[i]}"
                 :timezone="broadcast.timezone"
                 :match="match"
                 :expanded="true"
@@ -37,6 +38,10 @@ export default {
             })(this.broadcast).filter(m => {
                 return this.secondary ? m.show_on_secondary_overlays : m.show_on_overlays;
             }).sort(sortMatches);
+        },
+        scheduleTimeDiffs() {
+            const schedule = (this.schedule || []);
+            return schedule.map((match, i) => schedule[i + 1] && schedule[i + 1]?.start !== match?.start);
         },
         themeColor() {
             if (!this.broadcast?.event?.theme) return {};

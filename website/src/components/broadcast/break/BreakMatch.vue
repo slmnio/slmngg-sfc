@@ -1,5 +1,5 @@
 <template>
-    <div class="break-match flex-center" :class="{'expanded': expanded, 'has-scores': hasScore}" :data-center="centerShow">
+    <div class="break-match flex-center" :class="{'expanded': expanded, 'has-scores': hasScore}" :data-center="centerShow" :data-stream="match?.stream_code">
         <div v-if="!expanded" class="match-next-details">
             <transition name="fade" mode="out-in">
                 <span :key="matchNextText || 'empty'">{{ matchNextText }}</span>

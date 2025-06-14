@@ -33,6 +33,7 @@ import MultiStandingsOverlay from "@/components/broadcast/roots/MultiStandingsOv
 import StatsGFXOverlay from "@/components/broadcast/roots/StatsGFXOverlay.vue";
 import RosterMoveGFXOverlay from "@/components/broadcast/roots/RosterMoveGFXOverlay.vue";
 import MVPOverlay from "@/components/broadcast/roots/MVPOverlay.vue";
+import { sortMatches } from "@/utils/sorts";
 
 export default {
     name: "GFXRoot",
@@ -52,7 +53,7 @@ export default {
                 gfx: this.gfx,
                 animationActive: this.animationActive,
 
-                matches: this.gfx?.matches || [],
+                matches: (this.gfx?.graphics_settings || [])?.includes("Don't sort schedule") ? (this.gfx?.matches || []) : (this.gfx?.matches || []).sort(sortMatches),
                 title: this.title || this.gfx?.title,
                 extended: this.gfx?.extended,
                 forceBracket: this.gfx?.bracket,

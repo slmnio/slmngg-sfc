@@ -19,7 +19,7 @@
         <div v-if="scores" class="map-lower-text map-scores">{{ scores }}</div>
         <div v-if="!condensed && (banText || pickText)" class="map-lower-text map-pick">{{ banText || pickText || '' }}</div>
         <div v-if="!condensed && map?.replay_code" class="map-lower-text map-replay-code">
-            <i v-b-tooltip="'Replay Code'" class="fas fa-history fa-fw"></i> <CopyTextButton>{{ map.replay_code }}</CopyTextButton>
+            <i v-b-tooltip="gameOverride?.lang?.replay_code || 'Replay Code'" class="fas fa-history fa-fw"></i> <CopyTextButton>{{ map.replay_code }}</CopyTextButton>
         </div>
         <div v-if="showSelfPicks && map.picker?.id === self?.id" class="map-self-pick">
             {{ self.code }} PICK
@@ -70,6 +70,7 @@ import { cleanID } from "@/utils/content-utils";
 import { logoBackground1, themeBackground } from "@/utils/theme-styles";
 import { resizedImage } from "@/utils/images";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
+import { GameOverrides } from "@/utils/games";
 
 export default {
     name: "MapDisplay",
@@ -129,7 +130,10 @@ export default {
         banText() {
             if (!this.map?.banner) return null;
             return `banned by ${this.map.banner.code || this.map.banner.name}`;
-        }
+        },
+        gameOverride() {
+            return GameOverrides[this.match?.event?.game];
+        },
     },
     methods: {
         logoBackground1,

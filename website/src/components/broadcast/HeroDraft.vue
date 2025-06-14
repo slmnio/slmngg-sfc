@@ -398,7 +398,7 @@ export default {
                 items.push(`Map ${this.currentMap.number}`);
             }
             if (this.match?.first_to) {
-                if (["Deadlock", "League of Legends", "Valorant"].includes(this.match?.event?.game)) {
+                if (this.gameOverride?.useBestOf) {
                     items.push(`Best of ${(this.match.first_to * 2)-1}`);
                 } else {
                     items.push(`First to ${this.match.first_to}`);

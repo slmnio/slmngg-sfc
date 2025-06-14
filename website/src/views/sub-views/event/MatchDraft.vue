@@ -128,7 +128,7 @@
                                     <img
                                         v-show="loaded[pick.id]"
                                         class="image-center"
-                                        :src="resizedImageNoWrap(pick, game === 'Marvel Rivals' ? ['icon', 'main_image'] :['main_image', 'icon'], 'h-200')"
+                                        :src="resizedImageNoWrap(pick, gameOverride?.imageSets?.matchDraftPick || ['main_image', 'icon'], 'h-200')"
                                         @load="() => loaded[pick.id] = true">
                                 </transition>
                                 <div v-if="pick._isPickable?.result === false && pick._isPickable?.reason" class="pick-image-reason">
@@ -333,9 +333,7 @@ export default {
             return null;
         },
         maxPlayers() {
-            if (this.game === "Deadlock") return 6;
-
-            return 5;
+            return this.gameOverride?.playerCount || 5;
         },
         totalAvailableHeroes() {
             return ReactiveList("Heroes").filter(

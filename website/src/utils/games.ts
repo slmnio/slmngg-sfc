@@ -11,7 +11,9 @@ export const GameOverrides = {
         lang: {
             "hero": "Champion",
             "heroes": "Champions",
-            "replay_code": "Match ID"
+            "replay_code": "Match ID",
+            "map": "Game",
+            "maps": "Games"
         },
         defaultPickBanOrder:
             "ban1,ban2,ban1,ban2,ban1,ban2," +
@@ -35,6 +37,9 @@ export const GameOverrides = {
             "replay_code": {
                 "min-width": "6em"
             }
+        },
+        imageSets: {
+            "matchDraftPick": ["icon", "main_image"]
         }
     },
     "Valorant": {

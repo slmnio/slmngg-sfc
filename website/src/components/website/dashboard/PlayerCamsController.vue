@@ -60,6 +60,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import RoleIcon from "@/components/website/RoleIcon.vue";
 import { authenticatedRequest } from "@/utils/dashboard";
 import { cleanID } from "@/utils/content-utils";
+import { GameOverrides } from "@/utils/games";
 
 export default {
     name: "PlayerCamsController",
@@ -75,9 +76,12 @@ export default {
         }
     }),
     computed: {
+        gameOverride() {
+            if (this.match?.game || this.match?.event?.game) return GameOverrides[this.match?.game || this.match?.event?.game];
+            return null;
+        },
         camCount() {
-            if (["Deadlock"].includes(this.match?.event?.game)) return 6;
-            return 5;
+            return this.gameOverride?.playerCount || 5;
         },
         teams() {
             if (!this.match?.id) return [];

@@ -1,5 +1,6 @@
 import { cleanID } from "./content-utils";
 import { sortTeamsIntoStandings } from "./scenarios";
+import { GameOverrides } from "@/utils/games.js";
 
 function winrateText(num, toFixed = 0) {
     return isNaN(num) ? "-" : (num * 100).toFixed(toFixed) + "%";
@@ -14,7 +15,7 @@ function diffString(val) {
     return val;
 }
 export const StandingsShowKeys = (game) => {
-    const gameForMap = ["League of Legends"].includes(game);
+    const gameOverride = GameOverrides[game];
     return {
         "MatchWinrate": {
             header: "W%",
@@ -24,11 +25,11 @@ export const StandingsShowKeys = (game) => {
             hoverText: (team) => `${winrateText(team.standings.winrate, 2)} of matches won`
         },
         "MapWinrate": {
-            header: gameForMap ? "GW%" : "MW%",
-            title: gameForMap ? "Game winrate" : "Map winrate",
+            header: `${(gameOverride?.lang?.map || "Map").slice(0, 1)}W%`,
+            title: `${gameOverride?.lang?.map || "Map"} winrate`,
             display: (team) => winrateText(team.standings.map_winrate),
-            description: gameForMap ? "% of maps won (game wins ÷ games played)" : "% of maps won (map wins ÷ maps played)",
-            hoverText: (team) => `${winrateText(team.standings.map_winrate, 2)} of maps won`
+            description: `% of ${(gameOverride?.lang?.maps || "maps").toLowerCase()} won (${(gameOverride?.lang?.map || "map").toLowerCase()} wins ÷ ${(gameOverride?.lang?.maps || "maps").toLowerCase()} played)`,
+            hoverText: (team) => `${winrateText(team.standings.map_winrate, 2)} of ${(gameOverride?.lang?.maps || "maps").toLowerCase()} won`
         },
         "OMatchWinrate": {
             header: "OW%",
@@ -38,11 +39,11 @@ export const StandingsShowKeys = (game) => {
             hoverText: (team) => `Average of opponents' winrates: ${winrateText(team.standings.opponent_winrate, 2)}`
         },
         "OMapWinrate": {
-            header: gameForMap ? "OGW%" : "OMW%",
-            title: gameForMap ?"Opponents' game winrate" : "Opponents' map winrate",
+            header: `O${(gameOverride?.lang?.map || "Map").slice(0, 1)}W%`,
+            title: `Opponents' ${(gameOverride?.lang?.map || "map").toLowerCase()} winrate`,
             display: (team) => winrateText(team.standings.opponent_map_winrate),
-            description: gameForMap ? "Average of all opponents' game winrates" : "Average of all opponents' map winrates",
-            hoverText: (team) => `Average of opponents' map winrates: ${winrateText(team.standings.opponent_map_winrate, 2)}`
+            description: `Average of all opponents' ${(gameOverride?.lang?.map || "map").toLowerCase()} winrates`,
+            hoverText: (team) => `Average of opponents' ${(gameOverride?.lang?.map || "map").toLowerCase()} winrates: ${winrateText(team.standings.opponent_map_winrate, 2)}`
         },
         "Matches": {
             header: "Matches",
@@ -58,16 +59,16 @@ export const StandingsShowKeys = (game) => {
             hoverText: (team) => `${multiple(team.standings.wins, "win")} - ${multiple(team.standings.losses, "loss", "losses")}`
         },
         "Maps": {
-            header: gameForMap ? "Games" : "Maps",
-            title: gameForMap ? "Games won and lost" : "Maps won and lost",
+            header: gameOverride?.lang?.maps || "Maps",
+            title: `${gameOverride?.lang?.maps || "Maps"} won and lost`,
             display: (team) => `${team.standings.map_wins}-${team.standings.map_losses}`,
-            description: gameForMap ? "X-X games (won & lots)" : "X-X maps (won & lost)"
+            description: `X-X ${(gameOverride?.lang?.maps || "maps").toLowerCase()} (won & lost)`
         },
         "MapDiff": {
-            header: gameForMap ? "Game Diff" : "Map Diff",
-            title: gameForMap ? "Games won - games lost" : "Maps won - maps lost",
+            header: `${gameOverride?.lang?.map || "Map"} Diff`,
+            title: `${gameOverride?.lang?.maps || "Maps"} won - ${(gameOverride?.lang?.maps || "Maps").toLowerCase()} lost`,
             display: (team) => diffString(team.standings.map_wins - team.standings.map_losses),
-            description: gameForMap ? "Games won - games lost (± game delta)" : "Maps won - maps lost (± map delta)",
+            description: `${gameOverride?.lang?.maps || "Maps"} won - ${(gameOverride?.lang?.maps || "Maps").toLowerCase()} lost (± ${(gameOverride?.lang?.map || "Map").toLowerCase()} delta)`,
             hoverText: (team) => `${multiple(team.standings.map_wins, "map win")} - ${multiple(team.standings.map_losses, "map loss", "map losses")}`
         },
         "Points": {

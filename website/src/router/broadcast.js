@@ -96,7 +96,8 @@ export default [
         path: "priority",
         component: () => import("@/components/broadcast/roots/HeroPriorityOverlay.vue"),
         props: route => ({
-            mode: route.query.mode
+            mode: route.query.mode,
+            skip: route.query.skip,
         })
     },
     {

@@ -65,6 +65,9 @@ export const GameOverrides = {
             "replay_code": {
                 "min-width": "6em"
             }
+        },
+        imageSets: {
+            "heroPriority": ["main_image", "icon"]
         }
     }
 };

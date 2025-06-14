@@ -88,7 +88,15 @@ export default [
             small: !!route.query.small
         })
     },
-    { path: "schedule", component: () => import("@/components/broadcast/roots/ScheduleOverlay.vue"), props: route => ({ secondary: !!route.query.secondary }) },
+    {
+        path: "schedule",
+        component: () => import("@/components/broadcast/roots/ScheduleOverlay.vue"),
+        props: route => ({ secondary: !!route.query.secondary })
+    },
+    {
+        path: "head-to-head",
+        component: () => import("@/components/broadcast/roots/HeadToHeadScheduleOverlay.vue"),
+    },
     { path: "iframe", component: () => import("@/components/broadcast/roots/IframeOverlay.vue"), props: route => ({ url: route.query.url }) },
     { path: "standings", component: () => import("@/components/broadcast/roots/StandingsOverlay.vue"), props: route => ({ stage: route.query.stage || route.query.group }) },
     { path: "bans", component: () => import("@/components/broadcast/roots/HeroBansOverlay.vue") },

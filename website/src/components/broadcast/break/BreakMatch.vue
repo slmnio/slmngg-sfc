@@ -53,9 +53,9 @@
         </div>
         <!--        </transition-group>-->
 
-        <div v-if="expanded && match.schedule_text" class="match-schedule-text w-100 flex-center">
+        <div v-if="expanded && (scheduleText || match.schedule_text)" class="match-schedule-text w-100 flex-center">
             <transition name="fade" mode="out-in">
-                <div :key="match.schedule_text" class="industry-align">{{ match.schedule_text }}</div>
+                <div :key="(scheduleText || match.schedule_text)" class="industry-align">{{ (scheduleText || match.schedule_text) }}</div>
             </transition>
         </div>
     </div>
@@ -69,7 +69,7 @@ import { formatText } from "@/utils/content-utils";
 
 export default {
     name: "BreakMatch",
-    props: ["match", "expanded", "timezone", "live", "themeColor", "times", "smallNames", "broadcast", "event"],
+    props: ["match", "expanded", "timezone", "live", "themeColor", "times", "smallNames", "broadcast", "event", "scheduleText"],
     computed: {
         teams() {
             if (this.match?.special_event) return [];
@@ -185,7 +185,7 @@ export default {
 
 <style scoped>
     .break-match {
-        font-size: 48px;
+        font-size: var(--auto-font-size, 48px);
         width: 100%;
         box-sizing: border-box;
         display: flex;

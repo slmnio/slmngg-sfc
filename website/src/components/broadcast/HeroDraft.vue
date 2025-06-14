@@ -215,11 +215,11 @@
 </template>
 
 <script>
-import { logoBackground1, themeBackground1 } from "@/utils/theme-styles.js";
+import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import { getNewURL, resizedImage, resizedImageNoWrap } from "@/utils/images.js";
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
-import { countStats, formatText, getPickBanItem, processPickBanOrder } from "@/utils/content-utils.js";
-import { GameOverrides } from "@/utils/games.ts";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { countStats, formatText, getPickBanItem, processPickBanOrder } from "@/utils/content-utils";
+import { GameOverrides } from "@/utils/games";
 import { Howl } from "howler";
 import Squeezable from "@/components/broadcast/Squeezable.vue";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";

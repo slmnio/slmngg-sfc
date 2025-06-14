@@ -21,7 +21,7 @@
 import { useEyeDropper } from "@vueuse/core";
 import { watch, computed } from "vue";
 import { storeToRefs } from "pinia";
-import { calculateContrastHex } from "@/utils/content-utils.js";
+import { calculateContrastHex } from "@/utils/content-utils";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
 import { useSettingsStore } from "@/stores/settingsStore.js";
 

@@ -162,7 +162,7 @@
 </template>
 
 <script>
-import { ReactiveArray, ReactiveRoot } from "@/utils/reactive.js";
+import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 
 export default {
     name: "MatchExplainerList",

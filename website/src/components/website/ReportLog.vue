@@ -13,8 +13,8 @@
 </template>
 
 <script>
-import { ReactiveRoot } from "@/utils/reactive.js";
-import { formatTime, url } from "@/utils/content-utils.js";
+import { ReactiveRoot } from "@/utils/reactive";
+import { formatTime, url } from "@/utils/content-utils";
 
 export default {
     name: "ReportLog",

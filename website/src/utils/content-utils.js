@@ -27,7 +27,7 @@ import assaultIcon from "@/assets/map-type-icons/assault.svg";
 import flashpointIcon from "@/assets/map-type-icons/flashpoint.svg";
 import clashIcon from "@/assets/map-type-icons/clash.png";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export function getImage (i) {
     // console.log(i);

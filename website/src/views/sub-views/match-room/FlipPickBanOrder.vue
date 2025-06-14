@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { cleanID, processPickBanOrder } from "@/utils/content-utils.js";
+import { cleanID, processPickBanOrder } from "@/utils/content-utils";
 import { socket } from "@/socket.js";
 import LoadingIcon from "@/components/website/LoadingIcon.vue";
 

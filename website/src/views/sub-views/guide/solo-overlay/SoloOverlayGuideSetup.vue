@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 import obsInteractSource from "@/assets/guide/solo/OBS-interact-source.png";
 import obsTransform from "@/assets/guide/solo/OBS-tranform-window.png";

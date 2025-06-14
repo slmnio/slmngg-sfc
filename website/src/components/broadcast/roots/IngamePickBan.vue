@@ -34,9 +34,9 @@
 
 <script>
 import IngameTeam from "@/components/broadcast/IngameTeam.vue";
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
-import { processPickBanOrder } from "@/utils/content-utils.js";
-import { GameOverrides } from "@/utils/games.ts";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { processPickBanOrder } from "@/utils/content-utils";
+import { GameOverrides } from "@/utils/games";
 import { bg, resizedImage } from "@/utils/images.js";
 
 export default {

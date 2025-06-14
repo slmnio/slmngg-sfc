@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 import soloSetTeams from "@/assets/guide/solo/solo-set-teams.png";
 import soloScores from "@/assets/guide/solo/solo-scores.png";

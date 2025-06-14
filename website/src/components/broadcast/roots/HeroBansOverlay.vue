@@ -71,11 +71,11 @@
 </template>
 
 <script>
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
-import { sortAlpha, sortRoles } from "@/utils/sorts.js";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { sortAlpha, sortRoles } from "@/utils/sorts";
 import MatchScoreboard from "@/components/broadcast/MatchScoreboard.vue";
 import { resizedImage } from "@/utils/images.js";
-import { logoBackground, logoBackground1 } from "@/utils/theme-styles.js";
+import { logoBackground, logoBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 
 export default {

@@ -45,9 +45,9 @@
 </template>
 
 <script>
-import { getEmbedData, getMatchContext, hydratedCommunityStreams, url } from "@/utils/content-utils.js";
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
-import { logoBackground, themeBackground, themeBackground1 } from "@/utils/theme-styles.js";
+import { getEmbedData, getMatchContext, hydratedCommunityStreams, url } from "@/utils/content-utils";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
+import { logoBackground, themeBackground, themeBackground1 } from "@/utils/theme-styles";
 import { bg } from "@/utils/images.js";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 

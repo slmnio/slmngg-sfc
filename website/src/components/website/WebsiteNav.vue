@@ -152,7 +152,7 @@ import TimezoneSwapper from "@/components/website/schedule/TimezoneSwapper";
 import { getDataServerAddress, getMainDomain } from "@/utils/fetch";
 import { mapState, mapWritableState } from "pinia";
 import { useAuthStore } from "@/stores/authStore";
-import { hydratedCommunityStreams } from "@/utils/content-utils.js";
+import { hydratedCommunityStreams } from "@/utils/content-utils";
 
 
 export default {

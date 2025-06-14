@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { url } from "@/utils/content-utils.js";
+import { url } from "@/utils/content-utils";
 import { getMainDomain, isOnMainDomain } from "@/utils/fetch";
 import { bg } from "@/utils/images";
 import TokenModal from "@/components/website/dashboard/TokenModal.vue";

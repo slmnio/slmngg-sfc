@@ -66,7 +66,7 @@ import Sponsors from "@/components/broadcast/Sponsors";
 import IngamePromotion from "@/components/broadcast/IngamePromotion.vue";
 import { getFormatOptions } from "@/utils/content-utils";
 import IngameHeroBans from "@/components/broadcast/IngameHeroBans.vue";
-import { themeBackground } from "@/utils/theme-styles.js";
+import { themeBackground } from "@/utils/theme-styles";
 
 export default {
     name: "IngameOverlay",

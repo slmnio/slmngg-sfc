@@ -63,12 +63,12 @@
 </template>
 
 <script>
-import { ReactiveArray, ReactiveRoot } from "@/utils/reactive.js";
+import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { sortAlpha } from "@/utils/sorts";
 import MatchFilters from "@/components/website/MatchFilters.vue";
 import { resizedImage } from "@/utils/images.js";
-import { GameOverrides } from "@/utils/games.ts";
-import { countStats } from "@/utils/content-utils.js";
+import { GameOverrides } from "@/utils/games";
+import { countStats } from "@/utils/content-utils";
 
 export default {
     name: "EventHeroStats",

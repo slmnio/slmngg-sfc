@@ -1,6 +1,6 @@
 import { cleanID } from "./content-utils";
 import { sortTeamsIntoStandings } from "./scenarios";
-import { GameOverrides } from "@/utils/games.js";
+import { GameOverrides } from "@/utils/games";
 
 function winrateText(num, toFixed = 0) {
     return isNaN(num) ? "-" : (num * 100).toFixed(toFixed) + "%";

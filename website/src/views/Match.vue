@@ -110,7 +110,7 @@ import { resizedImageNoWrap } from "@/utils/images";
 import { canEditMatch, isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useAuthStore } from "@/stores/authStore";
-import { GameOverrides } from "@/utils/games.ts";
+import { GameOverrides } from "@/utils/games";
 
 export default {
     name: "Match",

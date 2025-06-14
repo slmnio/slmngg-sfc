@@ -31,10 +31,10 @@
 </template>
 
 <script>
-import { dirtyID, getPickBanItem } from "@/utils/content-utils.js";
+import { dirtyID, getPickBanItem } from "@/utils/content-utils";
 import { resizedImage } from "@/utils/images.js";
-import { sortAlpha } from "@/utils/sorts.js";
-import { GameOverrides } from "@/utils/games.ts";
+import { sortAlpha } from "@/utils/sorts";
+import { GameOverrides } from "@/utils/games";
 
 export default {
     name: "HeroesPicker",

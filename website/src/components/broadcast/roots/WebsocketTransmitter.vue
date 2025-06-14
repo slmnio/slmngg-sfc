@@ -50,8 +50,8 @@ import { socket } from "@/socket";
 import OBSWebSocket from "obs-websocket-js";
 import { mapWritableState } from "pinia";
 import { useStatusStore } from "@/stores/statusStore";
-import { formatDuration, recogniseRemoteServer } from "@/utils/content-utils.js";
-import { ReactiveArray, ReactiveRoot } from "@/utils/reactive.js";
+import { formatDuration, recogniseRemoteServer } from "@/utils/content-utils";
+import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 
 async function wait(ms) {
     return new Promise(r => setTimeout(r, ms));

@@ -252,7 +252,7 @@
 <script>
 import { ReactiveArray } from "@/utils/reactive";
 import { BitCounter, sortTeamsIntoStandings } from "@/utils/scenarios";
-import { cleanID } from "@/utils/content-utils.js";
+import { cleanID } from "@/utils/content-utils";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
 
 

@@ -72,7 +72,7 @@ import { bg, resizedAttachment, resizedImage } from "@/utils/images";
 import { useStatusStore } from "@/stores/statusStore";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import ThemeTransition from "@/components/broadcast/ThemeTransition.vue";
-import { ROLE_ORDER, sortRoles } from "@/utils/sorts.js";
+import { ROLE_ORDER, sortRoles } from "@/utils/sorts";
 
 function niceJoin(array, and = "and") {
     if (array.length > 1) {

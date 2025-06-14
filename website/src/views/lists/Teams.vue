@@ -26,7 +26,7 @@ import { searchInCollection } from "@/utils/search";
 import LoadingIcon from "@/components/website/LoadingIcon";
 import EventTeamsDisplay from "@/views/lists/EventTeamsDisplay.vue";
 import { useRouteQuery } from "@vueuse/router";
-import { cleanID } from "@/utils/content-utils.js";
+import { cleanID } from "@/utils/content-utils";
 
 export default {
     name: "Teams",

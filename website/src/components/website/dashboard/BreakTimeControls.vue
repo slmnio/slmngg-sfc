@@ -90,7 +90,7 @@
 import { authenticatedRequest } from "@/utils/dashboard";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";
 import Countdown from "@/components/broadcast/Countdown.vue";
-import { formatTime } from "@/utils/content-utils.js";
+import { formatTime } from "@/utils/content-utils";
 
 export default {
     name: "BreakTimeControls",

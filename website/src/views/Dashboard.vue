@@ -174,7 +174,7 @@ import BroadcastCustomisation from "@/components/website/dashboard/BroadcastCust
 import PlayerCamsController from "@/components/website/dashboard/PlayerCamsController.vue";
 import DashboardTransmitter from "@/components/website/dashboard/DashboardTransmitter.vue";
 import TransmitterStreams from "@/components/website/dashboard/TransmitterStreams.vue";
-import { GameOverrides } from "@/utils/games.ts";
+import { GameOverrides } from "@/utils/games";
 // import TriviaController from "@/components/website/dashboard/TriviaController.vue";
 
 export default {

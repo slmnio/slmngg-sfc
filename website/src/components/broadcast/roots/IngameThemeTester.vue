@@ -14,7 +14,7 @@
 
 <script>
 import IngameTeam from "@/components/broadcast/IngameTeam.vue";
-import { ReactiveArray, ReactiveThing } from "@/utils/reactive.js";
+import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "IngameThemeTester",

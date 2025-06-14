@@ -65,7 +65,7 @@
 import spacetime from "spacetime";
 import { logoBackground1 } from "@/utils/theme-styles";
 import { resizedImage } from "@/utils/images";
-import { formatText } from "@/utils/content-utils.js";
+import { formatText } from "@/utils/content-utils";
 
 export default {
     name: "BreakMatch",

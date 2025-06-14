@@ -471,7 +471,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { mapWritableState } from "pinia";
 import MatchExplainerModal from "@/components/website/dashboard/MatchExplainerModal.vue";
 import HeroesPicker from "@/components/website/dashboard/HeroesPicker.vue";
-import { GameOverrides } from "@/utils/games.ts";
+import { GameOverrides } from "@/utils/games";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 
 export default {

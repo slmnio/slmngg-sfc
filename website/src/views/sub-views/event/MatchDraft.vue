@@ -193,11 +193,11 @@ import { socket } from "@/socket";
 import { useAuthStore } from "@/stores/authStore";
 import { bg, resizedImage, resizedImageNoWrap } from "@/utils/images.js";
 import { cleanID, dirtyID, processPickBanOrder } from "@/utils/content-utils";
-import { ReactiveArray, ReactiveList, ReactiveRoot, ReactiveThing, } from "@/utils/reactive.js";
+import { ReactiveArray, ReactiveList, ReactiveRoot, ReactiveThing, } from "@/utils/reactive";
 import { useInterval } from "@vueuse/core";
 import { themeBackground1 } from "@/utils/theme-styles";
 import { GameOverrides } from "@/utils/games";
-import { sortAlpha } from "@/utils/sorts.js";
+import { sortAlpha } from "@/utils/sorts";
 import PickBanDisplay from "@/views/sub-views/match-room/PickBanDisplay.vue";
 import LoadingIcon from "@/components/website/LoadingIcon.vue";
 

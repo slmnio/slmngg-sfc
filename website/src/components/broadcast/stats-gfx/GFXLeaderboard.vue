@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { cleanID } from "@/utils/content-utils.js";
+import { cleanID } from "@/utils/content-utils";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 
 export default {

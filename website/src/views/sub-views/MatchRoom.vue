@@ -141,12 +141,12 @@
 
 <script>
 import { useAuthStore } from "@/stores/authStore.ts";
-import { cleanID } from "@/utils/content-utils.js";
+import { cleanID } from "@/utils/content-utils";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions.js";
 import { getDataServerAddress } from "@/utils/fetch.js";
 import { socket } from "@/socket.js";
 import { authenticatedRequest } from "@/utils/dashboard.ts";
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import ActionCard from "@/components/website/ActionCard.vue";
 import LoadingIcon from "@/components/website/LoadingIcon.vue";
 import FlipPickBanOrder from "@/views/sub-views/match-room/FlipPickBanOrder.vue";

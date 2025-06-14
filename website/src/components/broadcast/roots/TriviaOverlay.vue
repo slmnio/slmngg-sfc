@@ -96,7 +96,7 @@ import { useInterval } from "@vueuse/core";
 import { calculateStandings } from "@/utils/standings";
 import GenericOverlay from "@/components/broadcast/roots/GenericOverlay.vue";
 import { bg, getNewURL } from "@/utils/images.js";
-import { themeBackground } from "@/utils/theme-styles.js";
+import { themeBackground } from "@/utils/theme-styles";
 import Squeezable from "@/components/broadcast/Squeezable.vue";
 
 export default {

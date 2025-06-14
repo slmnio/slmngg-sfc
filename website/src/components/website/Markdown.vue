@@ -4,7 +4,7 @@
 
 <script>
 import { marked } from "marked";
-import { getEmbedData, renderEmbed } from "@/utils/content-utils.js";
+import { getEmbedData, renderEmbed } from "@/utils/content-utils";
 // const renderer = {};
 // renderer.image = (href, title, text) => {
 //     console.log("[image]", href, title, text);

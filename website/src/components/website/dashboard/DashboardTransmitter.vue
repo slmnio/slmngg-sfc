@@ -87,9 +87,9 @@ import { mapWritableState } from "pinia";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useStatusStore } from "@/stores/statusStore";
 import WebsocketTransmitter from "@/components/broadcast/roots/WebsocketTransmitter.vue";
-import { formatDuration, recogniseRemoteServer } from "@/utils/content-utils.js";
+import { formatDuration, recogniseRemoteServer } from "@/utils/content-utils";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { authenticatedRequest } from "@/utils/dashboard";
 
 export default {

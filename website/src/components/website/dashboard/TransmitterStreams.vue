@@ -39,8 +39,8 @@
 </template>
 
 <script lang="ts">
-import { ReactiveRoot } from "@/utils/reactive.js";
-import { formatDuration, recogniseRemoteServer } from "@/utils/content-utils.js";
+import { ReactiveRoot } from "@/utils/reactive";
+import { formatDuration, recogniseRemoteServer } from "@/utils/content-utils";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
 
 export default {

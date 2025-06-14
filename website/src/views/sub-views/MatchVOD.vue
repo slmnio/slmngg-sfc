@@ -76,8 +76,8 @@ import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 import MapDisplay from "@/components/website/match/MapDisplay";
 import { cleanID, getEmbedData, hydratedCommunityStreams } from "@/utils/content-utils";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
-import { GameOverrides } from "@/utils/games.ts";
-import { themeBackground1 } from "@/utils/theme-styles.js";
+import { GameOverrides } from "@/utils/games";
+import { themeBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 
 export default {

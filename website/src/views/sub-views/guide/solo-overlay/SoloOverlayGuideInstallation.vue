@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import BroadcastDisplay from "@/components/website/dashboard/BroadcastDisplay.vue";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
 

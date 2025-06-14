@@ -47,7 +47,7 @@
 <script>
 import BroadcastDisplay from "@/components/website/dashboard/BroadcastDisplay";
 import { authenticatedRequest } from "@/utils/dashboard";
-import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
 export default {
     name: "BroadcastSwitcher",

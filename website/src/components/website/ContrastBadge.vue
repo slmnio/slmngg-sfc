@@ -6,7 +6,7 @@
 
 <script>
 
-import { calculateContrastHex } from "@/utils/content-utils.js";
+import { calculateContrastHex } from "@/utils/content-utils";
 
 export default {
     name: "ContrastBadge",

@@ -265,7 +265,7 @@ import MatchStats from "@/views/sub-views/MatchStats.vue";
 import { useAuthStore } from "@/stores/authStore";
 import CreditCreator from "@/components/website/CreditCreator.vue";
 import { ROLE_ORDER, sortRoles } from "@/utils/sorts";
-import { GameOverrides } from "@/utils/games.ts";
+import { GameOverrides } from "@/utils/games";
 
 export default {
     name: "DetailedMatch",

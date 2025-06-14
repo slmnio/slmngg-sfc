@@ -85,8 +85,8 @@ import DraftTeam from "@/components/broadcast/DraftTeam";
 import DraftPlayer from "@/components/broadcast/DraftPlayer";
 import { logoBackground, logoBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { decoratePlayerWithDraftData } from "@/utils/content-utils.js";
-import { ROLE_ORDER } from "@/utils/sorts.js";
+import { decoratePlayerWithDraftData } from "@/utils/content-utils";
+import { ROLE_ORDER } from "@/utils/sorts";
 
 export default {
     name: "DraftOverlay",

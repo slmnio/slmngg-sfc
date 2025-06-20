@@ -5,7 +5,7 @@ import { getInternalManager } from "../../../action-utils/action-manager.js";
 
 function generateWebcamLink(code) {
     if (code.includes("http")) return code.replace("view=", "push=");
-    return `https://webcam.slmn.gg/?push=${code}&webcam&cb=0&nmb=0&hideaudio=1`;
+    return `https://webcam.slmn.gg/?push=${code}&webcam&meshcast&meshcastbitrate=1000&meshcastscale=50&cb=0&nmb=0&hideaudio=1`;
 }
 
 export default {

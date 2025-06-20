@@ -5,6 +5,7 @@
                 class="caster-cam-wrapper"
                 :guest="liveGuestData"
                 :disable-video="disableVideo"
+                extra-params="&nomeshcast"
                 :color="color"
                 :event="event" />
         </div>

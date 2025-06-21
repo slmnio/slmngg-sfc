@@ -45,6 +45,11 @@ export default {
                         type: "account"
                     },
                     {
+                        title: "Reticle for other Players",
+                        description: "Their Custom Settings",
+                        type: "account"
+                    },
+                    {
                         title: "Snap Death Camera to Killer",
                         description: "Off",
                         type: "account"

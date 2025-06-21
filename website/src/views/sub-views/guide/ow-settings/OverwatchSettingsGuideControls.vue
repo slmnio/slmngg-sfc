@@ -11,6 +11,10 @@
 
         <img class="mb-2" :src="defaultCrosshair" width="600">
 
+        <p>
+            We've been migrating over to showing player's crosshairs instead of a generic one. In this
+            case, you can leave the crosshairs however you want them.
+        </p>
 
         <h3>Suggested Controls</h3>
         <b-alert variant="warning" :model-value="true">

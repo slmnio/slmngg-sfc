@@ -197,7 +197,7 @@ export const useAuthStore = defineStore("auth", () => {
     };
 }, {
     persist: {
-        paths: ["token", "authNext"],
+        pick: ["token", "authNext"],
         storage: {
             getItem(key) {
                 return cookies.get(key, {

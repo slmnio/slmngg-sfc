@@ -458,13 +458,14 @@ export function getEmbedData(url) {
             }
         }
 
+        const code = vodURL.searchParams.get("v") ?? /\/live\/([^?&/]{11})/g.exec(vodURL.href)?.[1];
         console.log(ts);
 
         return {
             service: "youtube",
-            key: vodURL.searchParams.get("v"),
+            key: code,
             timestamp: ts || null,
-            thumbnail: `http://img.youtube.com/vi/${vodURL.searchParams.get("v")}/hqdefault.jpg`,
+            thumbnail: `http://img.youtube.com/vi/${code}/hqdefault.jpg`,
             display: {
                 text: "YouTube",
                 icon: "fab fa-youtube"

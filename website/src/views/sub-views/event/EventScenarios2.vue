@@ -13,9 +13,11 @@
 
                 <!--            <BFormCheckbox class="mr-3" v-model="showOnlyPossible">Show only possible</BFormCheckbox>-->
                 <BFormCheckbox v-model="showOnlyIncomplete">Show only tied scenarios</BFormCheckbox>
+                <BFormCheckbox v-model="showGridColors">Show grid colors</BFormCheckbox>
                 <BFormCheckbox v-model="showCountsAsPercentages">Show counts as percentages</BFormCheckbox>
                 <BFormCheckbox v-model="showTiesInScenarioFilter">Show ties in scenario filter</BFormCheckbox>
                 <BFormCheckbox v-model="sortTeamsByPerformance">Sort teams by performance</BFormCheckbox>
+                <BFormCheckbox v-model="showStandingsBelow">Show all valid standings below</BFormCheckbox>
 
                 <!--            <div class="btn btn-secondary" v-if="showCountsAsPercentages" @click="showCountsAsPercentages = false">View as numbers</div>-->
                 <!--            <div class="btn btn-secondary" v-if="!showCountsAsPercentages" @click="showCountsAsPercentages = true">View as percentages</div>-->
@@ -51,6 +53,9 @@
                 <div v-if="sortingMethods" class="mt-1">
                     Sorting methods: {{ sortingMethods.join(" / ") }}
                 </div>
+                <div class="mt-2">
+                    <b-button v-if="scenarioCount?.mode === 'static'" variant="success" :disabled="!activeMatchGroup" @click="calculateSheet()">Generate ({{ scenarioCount?.scenarioCount }})</b-button>
+                </div>
             </div>
         </div>
         <div class="container-fluid d-flex" style="justify-content: safe center">
@@ -62,7 +67,7 @@
                     <tr v-if="counts" class="fw-bold">
                         <th class="p-2 border-dark text-end" style="min-width: 8.5em">
                             {{
-                                showCountsAsPercentages ? `% of ${currentScenarioView.length} scenarios` : `/${currentScenarioView.length} scenarios`
+                                showCountsAsPercentages ? `% of ${viewableScenarioCount} scenarios` : `/${viewableScenarioCount} scenarios`
                             }}
                         </th>
                         <th
@@ -102,7 +107,7 @@
                             class="p-2 border-dark cell-num"
                             :class="{
                                 'selected': manualScenarioFilters.find((f) => f.team === team.id && f.position === posi),
-                                'pos-locked': pos !== 0 && pos === currentScenarioView.length,
+                                'pos-locked': pos !== 0 && pos === viewableScenarioCount,
                                 'text-low': pos === 0,
                                 'incomplete': pos !== 0 && posi === team.positions?.length - 1,
                                 'incomplete-border': posi === team.positions?.length - 1,
@@ -111,19 +116,22 @@
                                 'highlight-hover-team': (team?.code || team?.name) === highlightHover.team,
                                 [tableBorderLine(posi)]: true
                             }"
+                            :style="showGridColors ? {
+                                '--grid-color': pos === 0 ? 'rgba(0,0,0,0.1)' : `rgba(0,63,255,${perc(pos / viewableScenarioCount)})`
+                            } : {}"
                             @mouseenter="setHighlightHover(team, posi)"
                             @click="() => showWhen(team.id, posi)"
                         >
                             <div class="d-flex flex-column flex-center">
                                 <span v-if="showCountsAsPercentages">{{
-                                    perc(pos / currentScenarioView.length)
+                                    perc(pos / viewableScenarioCount)
                                 }}</span>
                                 <span v-else>{{ pos }}</span>
 
                                 <span
                                     v-if="showCountsAsPercentages && team?.incompletePositions?.[posi]"
                                     class="incomplete-cell-num text-info">
-                                    {{ perc(team?.incompletePositions?.[posi] / currentScenarioView?.length) }}
+                                    {{ perc(team?.incompletePositions?.[posi] / viewableScenarioCount) }}
                                 </span>
                                 <span
                                     v-else-if="team?.incompletePositions?.[posi]"
@@ -166,6 +174,16 @@
                     Since they are tied, the positional counts overlap. The total number of tied scenarios per team is displayed in the "Tied" column.
                 </div>
             </div>
+            <div
+                v-if="(scenarios?.staticMode)"
+                class="d-flex"
+            >
+                <div
+                    class="px-2 py-1 mb-1 text-warning"
+                    style="background-color: #5c4500; font-size: 14px">
+                    Too many scenarios for a dynamic foldy sheet. Using static counts only.
+                </div>
+            </div>
 
             <table v-if="scenarios && matchCounts?.length" class="table table-bordered text-light mt-3 mb-3 border-dark table-dark w-auto">
                 <thead>
@@ -189,6 +207,9 @@
                             :key="scoreline"
                             class="p-2 border-dark text-center cell-num"
                             :class="{'selected': scorelineFilterHas(match.id, scoreline), 'text-low': count === 0}"
+                            :style="showGridColors ? {
+                                '--grid-color': count === 0 ? 'rgba(0,0,0,0.1)' : `rgba(0,63,255,${perc(count / viewableScenarioCount)})`
+                            } : {}"
                             @click="showMatchScoreline(match.id, scoreline)">
                             {{ count }}
                         </td>
@@ -202,7 +223,7 @@
                 </tbody>
             </table>
 
-            <table v-if="scenarios" class="table text-white table-dark mt-3">
+            <table v-if="scenarios && showStandingsBelow" class="table text-white table-dark mt-3">
                 <thead>
                     <tr class="sticky-top bg-dark">
                         <td>#</td>
@@ -251,10 +272,36 @@
 
 <script>
 import { ReactiveArray } from "@/utils/reactive";
-import { BitCounter, sortTeamsIntoStandings } from "@/utils/scenarios";
+import { BitCounter, calculateFoldySheet, calculateScenarioCount, sortTeamsIntoStandings } from "@/utils/scenarios";
 import { cleanID } from "@/utils/content-utils";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
 
+
+const isEqual = function(obj1, obj2) {
+    const obj1Keys = Object.keys(obj1);
+    const obj2Keys = Object.keys(obj2);
+
+    if(obj1Keys.length !== obj2Keys.length) {
+        return false;
+    }
+
+    for (let objKey of obj1Keys) {
+        if (obj1[objKey] !== obj2[objKey]) {
+            if(typeof obj1[objKey] == "object" && typeof obj2[objKey] == "object") {
+                if(!isEqual(obj1[objKey], obj2[objKey])) {
+                    console.log("Difference", objKey, obj1[objKey], obj2[objKey]);
+                    return false;
+                }
+            }
+            else {
+                console.log("Difference", objKey, obj1[objKey], obj2[objKey]);
+                return false;
+            }
+        }
+    }
+
+    return true;
+};
 
 function avg(arr) {
     if (!arr?.length) return null;
@@ -283,6 +330,8 @@ export default {
         showCountsAsPercentages: false,
         showOnlyPossible: true,
         showOnlyIncomplete: false,
+        showGridColors: false,
+        showStandingsBelow: false,
         showTiesInScenarioFilter: true,
         sortTeamsByPerformance: true,
         manualScenarioFilters: [],
@@ -290,7 +339,10 @@ export default {
         highlightHover: {
             team: null,
             pos: null
-        }
+        },
+
+        lastCalculateInput: null,
+        lastScenarioOutput: null
     }),
     computed: {
         blocks() {
@@ -305,6 +357,14 @@ export default {
         settings() {
             if (!this.blocks?.foldy) return null;
             return this.blocks.foldy;
+        },
+        matchScorelineFilters() {
+            const matches = {};
+            this.manualScorelineFilters.forEach(({ matchID, scoreline }) => {
+                if (!matches[matchID]) matches[matchID] = { matchID, scorelines: [] };
+                matches[matchID].scorelines.push(scoreline);
+            });
+            return Object.values(matches);
         },
         currentScenarioView() {
             if (!this.scenarios) return [];
@@ -354,10 +414,14 @@ export default {
                             return s.standings?.standings[position]?.some(t => t.id === teamID);
                         }
                     });
-                    const scorelineFilter = this.manualScorelineFilters.some(({ matchID, scoreline }) => {
-                        console.log("scoreline filter", s, matchID, scoreline);
-                        return s.outcomes.find(outcome => outcome.id === matchID && outcome.scores.join("-") === scoreline);
+                    const scorelineFilter = !this.matchScorelineFilters.length ? false : this.matchScorelineFilters.every(({ matchID, scorelines }) => {
+                        return scorelines.some((scoreline) => {
+                            console.log("scoreline filter", s, matchID, scoreline);
+                            return s.outcomes.find(outcome => outcome.id === matchID && outcome.scores.join("-") === scoreline);
+                        });
                     });
+
+                    console.log({ scorelineFilter, scenarioFilter, scoreline: this.matchScorelineFilters });
 
                     if (this.manualScenarioFilters.length && this.manualScorelineFilters.length) {
                         return scenarioFilter && scorelineFilter;
@@ -378,6 +442,9 @@ export default {
         },
         standingsGroup() {
             return (this.blocks?.standings || []).find(s => s.group === this.activeMatchGroup);
+        },
+        viewableScenarioCount() {
+            return (this.scenarios?.staticMode ? this.scenarios?.scenarioCount : this.currentScenarioView.length);
         },
         matches() {
             if (!this.event?.matches) return [];
@@ -533,6 +600,7 @@ export default {
             });
         },
         counts() {
+            if (this.scenarios?.staticMode) return this.scenarios?.teamCounts;
             let teams = JSON.parse(JSON.stringify(this.scenarioTeams));
             const teamMap = {};
             teams.forEach((team, i) => {
@@ -666,309 +734,40 @@ export default {
             return this.matchGroupData?.calculate || this.settings?.calculate;
         },
         scenarios() {
-            if (!this.matchesForScenarios?.length) return null;
-            if (!this.scenarioTeams?.length) return null;
-            console.log("teams", this.scenarioTeams);
-            const allMatches = this.scenarioMatchesWithOutcomes;
-            let matches = allMatches.filter(m => ![m.score_1, m.score_2].includes(m.first_to));
-            if (matches.length === 0) matches = allMatches;
-            // const remainingMatches = JSON.stringify(allMatches.filter(m => [m.score_1, m.score_2].includes(m.first_to)));
-            const maxBits = matches.map(m => m.outcomes.length);
-            const scenarioCount = maxBits.reduce((last, curr) => last * curr, 1);
-            // const scenarioCount = 1;
-            const _json = { teams: JSON.stringify(this.historicalTeams), matches: JSON.stringify(this.matchesForScenarios) };
-            const scenarios = [];
-
-
-            const scenarioMax = 2 ** 13;
-            if (scenarioCount > scenarioMax) {
-                console.warn({ error: "too many computations required", scenarioCount, max: scenarioMax });
-                return [];
+            if (this.scenarioCount?.mode === "dynamic") {
+                this.calculateSheet();
             }
-
-            // const bitCounter = maxBits.map(() => 0);
-            console.log({ maxBits, matches, scenarioCount });
-            const bitCounter = new BitCounter({ bits: maxBits });
-
-            for (let i = 0; i < scenarioCount; i++) {
-                const scenario = {
-                    teams: JSON.parse(_json.teams),
-                    matches: JSON.parse(_json.matches),
-                    i,
-                    impossible: false,
-                    outcomes: []
-                };
-
-                // let outcomes = allMatches.forEach()
-
-                // loop through all matches to add them
-                // if they're complete then find the outcome that works (see below ↓)
-                // if they're not complete then pop one off the bit counter (might need to copy it) and use that outcome instead
-                const bits = [...bitCounter.bits];
-
-                allMatches.forEach(match => {
-                    if ([match.score_1, match.score_2].includes(match.first_to)) {
-                        // if they're complete then find the outcome that works (see below ↓)
-                        scenario.outcomes.push({
-                            ...match.outcomes.find(outcome => JSON.stringify(outcome.scores) === JSON.stringify([match.score_1, match.score_2])),
-                            completed: true,
-                            id: match.id
-                        });
-                    } else {
-                        // if they're not complete then pop one off the bit counter (might need to copy it) and use that outcome instead
-                        scenario.outcomes.push({
-                            ...match.outcomes[bits.shift()],
-                            completed: false,
-                            id: match.id
-                        });
-                    }
-                });
-
-                // scenario.outcomes = bitCounter.bits.map((bit, i) => {
-                //     return matches[i].outcomes[bit];
-                //     /*
-                //     const match = scenario.matches[i];
-                //     match.outcome = matches[i].outcomes[bit];
-                //     delete match.outcomes;
-                //     return match;
-                //      */
-                // });
-                //
-                // console.log("scenario creation", bitCounter.bits, i, scenario.outcomes, matches);
-                // scenario.outcomes = [
-                //     ...scenario.outcomes,
-                //     // here ↓
-                //     ...JSON.parse(remainingMatches)?.map(m => m.outcomes.find(outcome => JSON.stringify(outcome.scores) === JSON.stringify([m.score_1, m.score_2])))
-                // ];
-
-                console.log("scenario creation", bitCounter.bits, i, scenario.outcomes, matches);
-                scenario.outcomes.forEach((outcome, i) => {
-                    const match = scenario.matches[i];
-                    // console.log("match", match, match.completed, match.scores, outcome.scores);
-                    if (match.completed && (match.scores[0] !== outcome.scores[0] || match.scores[1] !== outcome.scores[1])) {
-                        // if anything is incorrect
-                        console.log("impossible match", match, match.completed, match.scores, outcome.scores);
-                        scenario.impossible = true;
-                    }
-
-
-                    match.teams.forEach((_team, ti) => {
-                        const team = scenario.teams.find(t => t.id === _team.id);
-                        const otherTeam = scenario.teams.find(t => t.id === match.teams[+!ti].id);
-
-                        // console.log(team, otherTeam);
-                        // todo: error here when not all data is loaded properly
-
-                        team.standings.played++;
-                        if (team.standings.matches) team.standings.matches.played++;
-                        if (!match.maps) {
-                            team.standings.maps_played += match.score_1 + match.score_2;
-                        }
-
-                        // const teamWonThisMatch = match.first_to === outcome.scores[ti];
-                        const teamWonThisMatch = match.first_to === outcome.scores[ti];
-                        if (teamWonThisMatch) {
-                            team.standings.wins++;
-
-                            if (!team.standings.h2h[otherTeam.id]) team.standings.h2h[otherTeam.id] = 0;
-                            team.standings.h2h[otherTeam.id]++;
-                        } else {
-                            team.standings.losses++;
-                            if (!team.standings.h2h[otherTeam.id]) team.standings.h2h[otherTeam.id] = 0;
-                            team.standings.h2h[otherTeam.id]--;
-                        }
-                        team.standings.map_wins += outcome.scores[ti];
-                        team.standings.map_losses += outcome.scores[+!ti];
-                        team.standings.map_diff += (outcome.scores[ti] - outcome.scores[+!ti]);
-
-                        if (!team.standings.h2h_maps[otherTeam.id]) team.standings.h2h_maps[otherTeam.id] = 0;
-                        team.standings.h2h_maps[otherTeam.id] += outcome.scores[ti] - outcome.scores[+!ti];
-
-
-                        if (match.maps?.length) {
-                            match.maps.forEach(map => {
-                                if (!map.id) return;
-                                if (map.score_1 == null || map.score_2 == null) return;
-                                const mapScores = [map.score_1, map.score_2];
-                                team.standings.map_round_wins += mapScores[ti];
-                                team.standings.map_round_losses += mapScores[+!ti];
-                            });
-                        }
-
-                        if (this.settings?.points) {
-                            team.standings.points += (this.settings.points.map_wins * team.standings.map_wins);
-                            team.standings.points += (this.settings.points.map_losses * team.standings.map_losses);
-                        }
-
-                        team.standings.winrate = team.standings.wins / team.standings.played;
-                        team.standings.map_winrate = team.standings.map_wins / (team.standings.map_losses + team.standings.map_wins);
-                    });
-                });
-
-                scenario.standings = [];
-
-                /*
-                scenario.teams.forEach(team => {
-                    if (!scenario.standings.length) return scenario.standings.push([team]);
-
-                    // first check match score
-
-                    let isIn = false;
-                    for (const [groupIndex, standingGroup] of scenario.standings.entries()) {
-                        const groupTeam = standingGroup[0];
-
-                        const sortResult = sortByMatch(team, groupTeam);
-
-                        if (sortResult === 1) {
-                            scenario.standings.splice(groupIndex, 0, [team]);
-                            isIn = true;
-                            break;
-                        } else if (sortResult === 0) {
-                            standingGroup.push(team);
-                            isIn = true;
-                            break;
-                        }
-                    }
-                    if (!isIn) {
-                        // console.log("last place so far", team.code, team.standings.wins);
-                        scenario.standings.push([team]);
-                    }
-                });
-                */
-
-                scenario.sorts = 1;
-
-                // sortMatches(scenario.i, sortByMatchWins, scenario.teams, scenario.standings);
-                // console.log(scenario);
-
-                // const sortFunction = (a, b) => {
-                //     if (a.standings.points > b.standings.points) return -1;
-                //     if (a.standings.points < b.standings.points) return 1;
-                //
-                //     if (a.standings.wins > b.standings.wins) return -1;
-                //     if (a.standings.wins < b.standings.wins) return 1;
-                //
-                //     if (a.standings.losses > b.standings.losses) return 1;
-                //     if (a.standings.losses < b.standings.losses) return -1;
-                //
-                //     if (a.standings.map_diff > b.standings.map_diff) return -1;
-                //     if (a.standings.map_diff < b.standings.map_diff) return 1;
-                //
-                //
-                //     if (a.standings.map_wins > b.standings.map_wins) return -1;
-                //     if (a.standings.map_wins < b.standings.map_wins) return 1;
-                //
-                //     if (a.standings.map_losses > b.standings.map_losses) return 1;
-                //     if (a.standings.map_losses < b.standings.map_losses) return -1;
-                // };
-                //
-                // // quick default sort
-                // scenario.teams.sort(sortFunction);
-
-                // console.log("sort", i + 1, this.blocks.standingsSort);
-
-
-                console.log("sorting methods", this.sortingMethods);
-                if (["OMapWinrate", "OMatchWinrate", "OMatchWinsPoints", "OPoints"].some(s => this.sortingMethods.includes(s))) {
-                    console.log("preparing opponent winrates");
-                    scenario.teams.map(team => {
-                        team.standings.opponentWinrates = [];
-                        team.standings.opponentMapWinrates = [];
-                        team.standings.opponentPoints = [];
-                        team.standings.opponentPointsMatchWins = [];
-
-                        scenario.outcomes.forEach((outcome, i) => {
-                            const match = scenario.matches[i];
-                            // console.log("- - match", match, outcome);
-                            if (!(match.teams || []).some(t => t.id === team.id)) return;
-                            if (!outcome.scores.some(score => score === match.first_to)) return; // console.warn("match", match, "not finished"); // not finished
-                            const opponent = match.teams.find(t => t.id !== team.id);
-                            if (!opponent) return; // console.warn("match", match, "no opponent found");
-                            const localOpponent = scenario.teams.find(t => t.id === opponent.id);
-                            if (!localOpponent) return;  //console.warn("match", opponent.id, "no local opponent found");
-                            team.standings.opponentWinrates.push(localOpponent.standings.winrate);
-                            team.standings.opponentMapWinrates.push(localOpponent.standings.map_winrate);
-                            team.standings.opponentPoints.push(localOpponent.extra_points || 0);
-                            team.standings.opponentPointsMatchWins.push(localOpponent.standings.wins + (localOpponent.extra_points || 0));
-                        });
-
-                        // console.log(team.standings.opponentWinrates, avg(team.standings.opponentWinrates));
-                        team.standings.opponent_winrate = avg(team.standings.opponentWinrates);
-                        team.standings.opponent_map_winrate = avg(team.standings.opponentMapWinrates);
-                        team.standings.opponent_points = team.standings.opponentPoints.reduce((c, v) => c + v, 0);
-                        team.standings.opponent_points_wins = team.standings.opponentPointsMatchWins.reduce((c, v) => c + v, 0);
-                        // console.log("= team", team.standings);
-                        return team;
-                    });
-                }
-
-                let teams = scenario.teams;
-                if (this.standingsGroup?.hide?.length) {
-                    teams = teams.filter(team => !this.standingsGroup.hide.find(id => cleanID(id) === cleanID(team.id)));
-                }
-
-
-                if (this.sortingMethods) {
-                    scenario.standings = sortTeamsIntoStandings(teams, {
-                        sort: this.sortingMethods
-                    });
-                } else {
-                    scenario.standings = sortTeamsIntoStandings(teams);
-                }
-                // console.log(scenario.standings);
-                //
-                // scenario.standings = sortIntoGroups2(sortByMapWins, [scenario.teams]);
-                // if (i === 4050) console.log(i, scenario.standings);
-                // // sortMatches(sortByMatchWins, scenario.teams, scenario.standings);
-                //
-                //
-                // if (!scenario.standings.every(s => s.length === 1)) {
-                //     scenario.sorts++;
-                //     // console.log(scenario.i + 1);
-                //     scenario.standings = sortIntoGroups2(sortByMapWins, scenario.standings);
-                //
-                //     // console.log("sorting");
-                //     // scenario.standings = scenario.standings.map(group => {
-                //     //     group.sort((...a) => -sortByMapWins(...a));
-                //     //     console.log("group", group);
-                //     //     return group;
-                //     // });
-                // }
-                //
-                // if (!scenario.standings.every(s => s.length === 1)) {
-                //     scenario.sorts++;
-                //     scenario.standings = sortIntoGroups2(sortByHeadToHead, scenario.standings, 2);
-                //     // sortIntoGroups2(scenario.i, sortByHeadToHead, scenario.standings, 2);
-                // }
-                //
-                // if (!scenario.standings.every(s => s.length === 1)) {
-                //     scenario.sorts++;
-                // }
-                scenario.incomplete = teams?.length !== scenario.standings?.length;
-                scenarios.push(scenario);
-                bitCounter.add();
-            }
-
-            console.log({
-                scenarios, // .filter(s => s.sorts >= 4),
-                possibleScenarios: scenarios.filter(s => !s.impossible),
-                incompleteScenarios: scenarios.filter(s => !s.impossible && s.standings.length !== s.teams.length)
+            return this.lastScenarioOutput;
+        },
+        scenarioCount() {
+            return calculateScenarioCount({
+                matchesForScenarios: this.matchesForScenarios,
+                scenarioMatchesWithOutcomes: this.scenarioMatchesWithOutcomes,
             });
-
+        },
+        scenarioInput() {
             return {
-                maxBits,
-                scenarioCount,
-                bitCounter,
-                scenarios // .filter(s => s.sorts >= 4),
-                // possibleScenarios: scenarios.filter(s => !s.impossible),
-                // incompleteScenarios: scenarios.filter(s => s.standings.length !== s.teams.length),
-                // possiblencompleteScenarios: scenarios.filter(s => s.standings.length !== s.teams.length)
+                matchesForScenarios: this.matchesForScenarios,
+                scenarioTeams: this.scenarioTeams,
+                scenarioMatchesWithOutcomes: this.scenarioMatchesWithOutcomes,
+                historicalTeams: this.historicalTeams,
+                settings: this.settings,
+                sortingMethods: this.sortingMethods,
+                standingsGroup: this.standingsGroup
             };
         }
     },
     methods: {
+        calculateSheet() {
+            if (JSON.stringify(this.lastCalculateInput) === JSON.stringify(structuredClone(this.scenarioInput))) {
+                console.log("same!");
+                return;
+            }
+            this.lastCalculateInput = structuredClone(this.scenarioInput);
+            this.lastScenarioOutput = calculateFoldySheet(this.scenarioInput);
+        },
         setHighlightHover(team, pos) {
-            console.log(team, pos);
+            // console.log(team, pos);
             this.highlightHover.team = team?.code || team?.name;
             this.highlightHover.pos = pos;
         },
@@ -1045,7 +844,8 @@ export default {
         },
         perc(x) {
             if (isNaN(x)) return "-";
-            return (x * 100).toFixed(1) + "%";
+            const num = x * 100;
+            return (num).toFixed(num < 10 && num !== 0 ? 1 : 0) + "%";
         },
         sign(num) {
             if (num > 0) return "+" + num;
@@ -1300,6 +1100,9 @@ export default {
 </script>
 
 <style scoped>
+    tbody {
+        background-color: var(--dark)
+    }
     td {
         border-bottom: 1px solid #555;
     }
@@ -1311,6 +1114,7 @@ export default {
         text-align: center;
         cursor: pointer;
         user-select: none;
+        background-color: var(--grid-color, var(--dark));
     }
     .cell-num:hover {
         background-color: hsl(210, 10%, 28%)

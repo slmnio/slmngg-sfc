@@ -40,7 +40,7 @@ function themeSquare(id, size = 500) {
 function matchWide(id, size = 500) {
     if (!id) return null;
     return {
-        width: size * 2,
+        width: Math.floor(size * (16 / 9)),
         height: size,
         type: "image/png",
         url: `${dataServer}/match.png?id=${id}&size=${size}&padding=30`

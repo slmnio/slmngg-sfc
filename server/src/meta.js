@@ -1,4 +1,5 @@
 import "dotenv/config";
+
 function cleanID(id) {
     if (!id) return null;
     if (typeof id !== "string") return id.id || null; // no real id oops
@@ -409,13 +410,18 @@ export default ({ app, Cache }) => {
                     const path = req.params.path || "";
                     let parts = path.split("/");
 
+                    let isUniqueToEvent = false;
                     let route = eventRoutes.find(r => (typeof r.url === "object" ? r.url.includes(parts[0]) : r.url === parts[0]));
+                    if (route) isUniqueToEvent = true;
                     if (!route) route = routes.find(r => (typeof r.url === "object" ? r.url.includes(parts[0]) : r.url === parts[0]));
 
                     if (route) {
                         let data = await route.handle({ event, path, parts });
                         if (!data) return res.status(500).send({ error: true, message: "router handler error" });
-                        return res.send(data);
+                        return res.send({
+                            ...data,
+                            useRootCanonical: !isUniqueToEvent
+                        });
                     }
                     return res.status(500).send({ error: true, message: "no event router handler found" });
 

@@ -19,7 +19,7 @@
                                 <span v-if="isSelected(player.id, teamI)">{{ getIndex(player.id, teamI) + 1 }}</span>
                             </div>
                             <RoleIcon :role="player.role" />
-                            <div class="player-name">{{ player?.name }}</div>
+                            <div class="player-name">{{ player?.name }}{{ usernameDiscriminator(player) }}</div>
                             <div v-if="!player?.live_guests?.length" v-b-tooltip="'Player does not have a Live Guest record'" class="mx-2"><i class="fas fa-video-slash"></i></div>
                         </div>
                     </div>
@@ -34,7 +34,8 @@
                                 :class="{'flex-row-reverse': teamI === (match?.flip_teams ? 1 : 0)}"
                                 @click="setPlayers[teamI][i-1] = null">
                                 <div class="player-index">{{ i }}</div>
-                                <div class="player-name">{{ getPlayer(teamI, i - 1)?.name }}</div>
+                                <div v-if="getPlayer(teamI, i - 1)?.name" class="player-name">{{ getPlayer(teamI, i - 1)?.name }}</div>
+                                <div v-else class="player-name d-flex flex-center gap-2" :class="{'flex-row-reverse': teamI === (match?.flip_teams ? 1 : 0)}"><i title="Not part of this team" class="fas fa-exclamation-triangle fa-fw"></i><span>{{ cams[`team_${teamI + 1}_cams`][i]?.name || setPlayers[teamI][i-1] }}</span></div>
                                 <!--                                <div v-if="getPlayer(teamI, i - 1)?.live_guests?.length"><i class="fas fa-video"></i></div>-->
                             </div>
                         </div>
@@ -164,6 +165,14 @@ export default {
             const id = this.setPlayers?.[teamI]?.[playerI];
             if (!id) return null;
             return this.teams?.[teamI]?.players?.find(p => p.id === id);
+        },
+        usernameDiscriminator(player) {
+            const gameUsername = player?.[this.gameOverride?.usernameKey || "battletag"]?.split("#")?.[0];
+            if (!gameUsername) return null;
+            const different = gameUsername?.normalize("NFD").toLowerCase().trim() !== player?.name.normalize("NFD")?.toLowerCase().trim();
+            if (different) {
+                return ` (${gameUsername})`;
+            }
         }
     },
     watch: {

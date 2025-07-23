@@ -19,7 +19,8 @@ export const GameOverrides = {
             "ban1,ban2,ban1,ban2,ban1,ban2," +
             "pick1,pick2,pick2,pick1,pick1,pick2," +
             "ban2,ban1,ban2,ban1," +
-            "pick2,pick1,pick1,pick2"
+            "pick2,pick1,pick1,pick2",
+        usernameKey: "riot_id"
     },
     "Marvel Rivals": {
         playerCount: 6,
@@ -40,14 +41,16 @@ export const GameOverrides = {
         },
         imageSets: {
             "matchDraftPick": ["icon", "main_image"]
-        }
+        },
+        usernameKey: "marvel_rivals_username"
     },
     "Valorant": {
         useBestOf: true,
         lang: {
             "hero": "Agent",
             "heroes": "Agents",
-        }
+        },
+        usernameKey: "riot_id"
     },
     "Deadlock": {
         useBestOf: true,
@@ -73,7 +76,8 @@ export const GameOverrides = {
         },
         imageSets: {
             "heroPriority": ["main_image", "icon"]
-        }
+        },
+        usernameKey: "steam_id"
     }
 };
 

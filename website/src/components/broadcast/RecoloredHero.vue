@@ -57,7 +57,9 @@ async function recolorImage(imageURL, toColor, fromColor) {
 }
 
 function getHexBrightness(hexString) {
-    const [r, g, b] = deHex(hexString);
+    const color = deHex(hexString);
+    if (!color?.length) return 0;
+    const [r, g, b] = color;
     return ((0.299 * r) + (0.587 * g) + (0.114 * b)) / 255;
 }
 

@@ -37,6 +37,9 @@ export default {
     components: { ThemeLogo, MapSegment, MapStatsBar },
     props: ["map", "broadcast", "match"],
     computed: {
+        lookupMapTypes() {
+            return this.map?.map?.type?.split("/") || [];
+        },
         pool() {
             if (!this.match?.event?.map_pool) return [];
             return ReactiveArray("map_pool")(this.match.event);
@@ -55,13 +58,22 @@ export default {
         },
         mapGroup() {
             if (!this.map || !this.mapGroups.length) return null;
-            const group = this.mapGroups.find(group => group.name === this.map.map?.type);
-            if (!group) return null;
-            if (!this.map.dummy) {
-                group.maps = group.maps.sort((a, b) => a.name === this.map.name?.[0] ? -1 : (b.name === this.map.name?.[0] ? 1 : 0));
-                group.thisMap = true;
-            }
+
+            const group = {
+                name: this.lookupMapTypes.join("/"),
+                maps: this.pool.filter(m => this.lookupMapTypes.includes(m.type))
+            };
+
             return group;
+
+
+            // const group = this.mapGroups.find(group => group.name === this.map.map?.type);
+            // if (!group) return null;
+            // if (!this.map.dummy) {
+            //     group.maps = group.maps.sort((a, b) => a.name === this.map.name?.[0] ? -1 : (b.name === this.map.name?.[0] ? 1 : 0));
+            //     group.thisMap = true;
+            // }
+            // return group;
         }
     },
     methods: {

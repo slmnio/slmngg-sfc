@@ -35,7 +35,10 @@
                                 @click="setPlayers[teamI][i-1] = null">
                                 <div class="player-index">{{ i }}</div>
                                 <div v-if="getPlayer(teamI, i - 1)?.name" class="player-name">{{ getPlayer(teamI, i - 1)?.name }}</div>
-                                <div v-else class="player-name d-flex flex-center gap-2" :class="{'flex-row-reverse': teamI === (match?.flip_teams ? 1 : 0)}"><i title="Not part of this team" class="fas fa-exclamation-triangle fa-fw"></i><span>{{ cams[`team_${teamI + 1}_cams`][i]?.name || setPlayers[teamI][i-1] }}</span></div>
+                                <div v-else-if="cams[`team_${teamI + 1}_cams`]?.[i]?.name || setPlayers[teamI]?.[i-1]" class="player-name d-flex flex-center gap-2" :class="{'flex-row-reverse': teamI === (match?.flip_teams ? 1 : 0)}">
+                                    <i title="Not part of this team" class="fas fa-exclamation-triangle fa-fw"></i>
+                                    <span>{{ cams[`team_${teamI + 1}_cams`]?.[i]?.name || setPlayers[teamI]?.[i-1] }}</span>
+                                </div>
                                 <!--                                <div v-if="getPlayer(teamI, i - 1)?.live_guests?.length"><i class="fas fa-video"></i></div>-->
                             </div>
                         </div>

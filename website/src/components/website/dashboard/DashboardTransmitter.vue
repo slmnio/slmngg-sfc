@@ -75,6 +75,14 @@
                             <td><span class="text-muted">status.</span>{{ key }}</td>
                             <td><copy-text-button>{{ val }}</copy-text-button></td>
                         </tr>
+                        <tr v-for="([key, val]) in Object.entries(websocketStreamSettings?.video_settings || {})" :key="key">
+                            <td><span class="text-muted">video.</span>{{ key }}</td>
+                            <td><copy-text-button>{{ val }}</copy-text-button></td>
+                        </tr>
+                        <tr v-for="([key, val]) in Object.entries(websocketStreamSettings?.output_settings || {})" :key="key">
+                            <td><span class="text-muted">output.</span>{{ key }}</td>
+                            <td><copy-text-button>{{ val }}</copy-text-button></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

@@ -420,3 +420,7 @@ pre.dev {
     padding: .5em;
     font-size: 12px;
 }
+
+.text-monospace {
+    font-family: var(--font-family-monospace), monospace;
+}

@@ -163,14 +163,49 @@ export default {
                 },
                 {
                     requestType: "GetStreamStatus"
+                },
+                {
+                    requestType: "GetProfileParameter",
+                    requestData: {
+                        parameterCategory: "Output",
+                        parameterName: "DelaySec"
+                    }
+                },
+                {
+                    requestType: "GetProfileParameter",
+                    requestData: {
+                        parameterCategory: "Output",
+                        parameterName: "DelayEnable"
+                    }
+                },
+                {
+                    requestType: "GetVideoSettings"
                 }
             ]);
+            const outputSettings = Object.fromEntries(await Promise.all([
+                ["video_encoder", "AdvOut", "Encoder"]
+            ].map(([key, cat, name]) => (this.obsWs.call("GetProfileParameter", {
+                parameterCategory: cat,
+                parameterName: name
+            })).then(res => [key, res?.parameterValue]))));
 
-            const [streamSettings, streamStatus] = items;
+
+            console.log("outputSettings", outputSettings);
+
+            console.log("Output Data", items);
+            const [streamSettings, streamStatus, delaySettings, delayEnable, videoSettings] = items;
             if (streamSettings?.requestStatus?.code === 100) {
                 // good
-                this.websocketStreamSettings = streamSettings?.responseData?.streamServiceSettings;
+                this.websocketStreamSettings = {
+                    ...streamSettings?.responseData?.streamServiceSettings,
+                    stream_delay_enabled: delayEnable?.responseData?.parameterValue === "true",
+                    stream_delay_seconds: parseInt(delaySettings?.responseData?.parameterValue),
+                    video_settings: videoSettings?.responseData,
+                    output_settings: outputSettings
+                };
                 this.websocketStreamStatus = streamStatus?.responseData;
+
+                console.log("output settings/status", this.websocketStreamSettings, this.websocketStreamStatus);
             }
         },
         async getStreamData() {
@@ -200,7 +235,11 @@ export default {
                 settings: {
                     service: settings?.service || "Custom",
                     url: settings?.server,
-                    channelID: settings?.service === "Twitch" ? (settings?.key?.split("_") || [])?.[1]  : null
+                    channelID: settings?.service === "Twitch" ? (settings?.key?.split("_") || [])?.[1]  : null,
+                    stream_delay_enabled: settings?.stream_delay_enabled,
+                    stream_delay_seconds: settings?.stream_delay_seconds,
+                    video_settings: settings?.video_settings,
+                    output_settings: settings?.output_settings,
                 },
                 scenes: {
                     preview: this.wsPreview,

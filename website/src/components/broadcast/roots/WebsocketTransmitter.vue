@@ -35,7 +35,7 @@
 
 
         <div v-if="isProducer" class="flex-center gap-1">
-            <div><b>Producer</b> - sending tally data</div>
+            <div><b>{{ isProducer }}</b> - sending tally data</div>
         </div>
 
 
@@ -100,7 +100,7 @@ export default {
             });
         },
         isProducer() {
-            return (this.liveMatch?.player_relationships || []).some(rel => rel?.singular_name === "Producer" && rel?.player?.[0] === this.client?.staff?.[0]);
+            return (this.liveMatch?.player_relationships || []).filter(rel => rel?.player?.[0] === this.client?.staff?.[0] && ["Producer", "Observer Director"].includes(rel?.singular_name)).map(rel => rel?.singular_name).join(" / ");
         }
     },
 

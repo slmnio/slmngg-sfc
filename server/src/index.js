@@ -12,6 +12,7 @@ import webAuction from "./web_auction.js";
 import matchRooms from "./match-rooms.js";
 // import * as draftRoom from "./draft-room.ts";
 import * as actions from "./action-utils/action-manager.js";
+import { dirtyID } from "./action-utils/action-utils.js";
 
 const app = express();
 const port = 8901;
@@ -233,12 +234,20 @@ io.on("connection", (socket) => {
         let client = await Cache.get(`client-${clientName}`);
         console.log("obs_data_change", { clientName, previewScene, programScene });
 
+        const player = await Cache.get(client?.staff?.[0]);
+        const broadcast = await Cache.get(client?.broadcast?.[0]);
+        const match = await Cache.get(broadcast?.live_match?.[0]);
+        const relationships = await Promise.all((match.player_relationships || []).map(id => Cache.get(id)));
+
+        const clientPositions = relationships.filter(rel => dirtyID(player?.id) === dirtyID(rel.player?.[0])).map(rel => rel.singular_name);
+
+        console.log(clientPositions);
+
         if (clientName && client) {
-            io.sockets.to(`prod:client-${clientName}`).emit("prod_preview_program_change", { previewScene, programScene, emitSource: "client", clientSource: clientName });
+            io.sockets.to(`prod:client-${clientName}`).emit("prod_preview_program_change", { previewScene, programScene, emitSource: "client", clientSource: clientName, clientPlayerName: player.name, clientPositions });
         }
-        let broadcast = await Cache.get(client.broadcast?.[0]);
         if (broadcast && broadcast.key) {
-            io.sockets.to(`prod:broadcast-${broadcast.key}`).emit("prod_preview_program_change", { previewScene, programScene, emitSource: "broadcast", clientSource: clientName, broadcastKey: broadcast.key });
+            io.sockets.to(`prod:broadcast-${broadcast.key}`).emit("prod_preview_program_change", { previewScene, programScene, emitSource: "broadcast", clientSource: clientName, clientPlayerName: player.name, broadcastKey: broadcast.key, clientPositions });
         }
     });
     socket.on("obs_disconnect", async (data) => {

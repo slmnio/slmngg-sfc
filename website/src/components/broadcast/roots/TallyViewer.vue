@@ -1,11 +1,11 @@
 <template>
     <div
         class="tally-block"
-        :class="{ preview: state === 'preview', active: state === 'active' }"
+        :class="{ preview: tallyState === 'preview', active: tallyState === 'active', standby: tallyState === 'LIVE OBSDIR' }"
         @click="showProducerInfo = !showProducerInfo">
         <div class="d-flex flex-column align-items-center">
             <div class="state">
-                {{ state.toLocaleUpperCase() }}
+                {{ tallyState.toLocaleUpperCase() }}
             </div>
             <div class="metadata d-flex flex-column align-items-center">
                 <div v-if="!customText" class="metadata-text d-flex gap-3">
@@ -31,19 +31,38 @@
                         logo-size="w-200" />
                     <div class="team-score">{{ scores[i] }}</div>
                 </div>
-                <div class="first-to">{{ liveMatch.first_to ? `FT${liveMatch.first_to}` : 'vs' }}</div>
+                <div class="first-to">{{ liveMatch.first_to ? `FT${liveMatch.first_to}` : "vs" }}</div>
             </div>
             <div class="spacer h-100"></div>
-            <div v-if="producer" class="prod-info">
-                <div class="prod-name flex-center">Producer: {{ producer.name }}</div>
-                <div class="prod-scenes">
-                    <div class="prod-preview">
-                        <span class="prod-scene-name">{{ producerPreviewScene }}</span>
-                        <span v-if="producerPreviewPersonName" class="prod-person-name">{{ producerPreviewPersonName }}</span>
+            <div v-if="Object.values(scenes)?.length" class="prod-info">
+                <div v-for="prod in scenes" :key="prod.clientSource" class="prod-row">
+                    <div class="prod-name flex-center">
+                        {{ prod.clientPositions.join("/") }}:
+                        {{ prod.clientPlayerName || prod.clientSource }}
                     </div>
-                    <div class="prod-program">
-                        <span class="prod-scene-name">{{ producerProgramScene }}</span>
-                        <span v-if="producerProgramPersonName" class="prod-person-name">{{ producerProgramPersonName }}</span>
+                    <div class="prod-scenes">
+                        <div v-if="prod.previewScene" class="prod-preview" :class="{'targets-me': targetsMe(prod.previewScene) }">
+                            <span class="prod-scene-name">{{ prod.previewScene }}</span>
+                            <span
+                                v-if="getTarget(prod.previewScene)"
+                                class="prod-person-name">{{ getTarget(prod.previewScene) }}</span>
+                            <span
+                                v-else-if="prod.previewScene?.toLowerCase().includes('break')"
+                                class="prod-person-name"><Countdown
+                                    class="countdown"
+                                    :to="client?.broadcast?.countdown_end" /></span>
+                        </div>
+                        <div v-if="prod.programScene" class="prod-program" :class="{'targets-me': targetsMe(prod.programScene) }">
+                            <span class="prod-scene-name">{{ prod.programScene }}</span>
+                            <span
+                                v-if="getTarget(prod.programScene)"
+                                class="prod-person-name">{{ getTarget(prod.programScene) }}</span>
+                            <span
+                                v-else-if="prod.programScene?.toLowerCase().includes('break')"
+                                class="prod-person-name"><Countdown
+                                    class="countdown"
+                                    :to="client?.broadcast?.countdown_end" /></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -54,18 +73,24 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
+import { dirtyID } from "@/utils/content-utils.js";
+import Countdown from "@/components/broadcast/Countdown.vue";
 
 export default {
     name: "TallyViewer",
-    components: { ThemeLogo },
+    components: {
+        Countdown,
+        ThemeLogo
+    },
     props: ["client", "scene", "customText"],
     data: () => ({
-        state: "inactive",
+        // state: "inactive",
         number: null,
         wakeLock: null,
         producerClientKey: null,
         producerPreviewScene: null,
         producerProgramScene: null,
+        scenes: {},
         showProducerInfo: true,
 
         noBroadcastStyle: true,
@@ -80,7 +105,9 @@ export default {
             const matchID = this.client?.broadcast?.live_match?.[0];
             if (!matchID) return null;
             return ReactiveRoot(matchID, {
-                player_relationships: ReactiveArray("player_relationships"),
+                player_relationships: ReactiveArray("player_relationships", {
+                    player: ReactiveThing("player")
+                }),
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
                 })
@@ -99,7 +126,7 @@ export default {
             return scores;
         },
         selfObserverNumber() {
-            return (this.liveMatch?.player_relationships || []).filter(rel => rel.singular_name === "Observer").findIndex(rel => rel.player?.[0] === this.client?.staff?.[0]) + 1;
+            return (this.liveMatch?.player_relationships || []).filter(rel => rel.singular_name === "Observer").findIndex(rel => dirtyID(rel.player?.id) === dirtyID(this.client?.staff?.[0])) + 1;
         },
         tallyRoles() {
             const nonProductionRoles = [
@@ -111,16 +138,96 @@ export default {
                 "Preshow Guest"
             ];
             return (this.liveMatch?.player_relationships || [])
-                .filter(rel => !nonProductionRoles.includes(rel.singular_name) && rel.player?.[0] === this.client?.staff?.[0]);
-        },
-        producerPreviewPersonName() {
-            return this.getTarget(this.producerPreviewScene);
-        },
-        producerProgramPersonName() {
-            return this.getTarget(this.producerProgramScene);
+                .filter(rel => !nonProductionRoles.includes(rel.singular_name) && dirtyID(rel.player?.id) === dirtyID(this.client?.staff?.[0]));
         },
         tallyRolesText() {
             return this.tallyRoles.map(r => r.singular_name === "Observer" ? `Observer ${this.selfObserverNumber}` : r.singular_name).join("/");
+        },
+        tallyState() {
+            const scenes = Object.values(this.scenes || {});
+
+            if (scenes.some(s => (s.clientPositions || []).includes("Producer") && this.targetsMe(s.programScene))) {
+                return "active";
+            }
+            if (scenes.some(s => (s.clientPositions || []).includes("Observer Director") && this.targetsMe(s.programScene))) {
+                // in program with obs director
+
+                // check if obs director is live with producer
+                const producer = scenes.find(s => (s.clientPositions || []).includes("Producer") && (!((s.clientPositions || []).includes("Observer Director"))));
+                console.log("obs director prod scene", producer, producer?.programScene, ["OBSDIR", "Director", "Clean feed"].some(str => producer.programScene.toLowerCase().includes(str.toLowerCase())));
+                if (producer) {
+                    if (producer?.programScene && ["OBSDIR", "Director", "Clean feed"].some(str => producer.programScene.toLowerCase().includes(str.toLowerCase()))) {
+                        // obs is in program
+                        // obsdir is in program
+                        // fully live
+                        return "active";
+                    } else if (producer?.previewScene && ["OBSDIR", "Director", "Clean feed"].some(str => producer.previewScene.toLowerCase().includes(str.toLowerCase()))) {
+                        // obs is in program
+                        // obsdir is in preview
+                        return "preview";
+                    } else {
+                        // obs is in program
+                        // obsdir is none
+                        // return "LIVE OBSDIR";
+                    }
+                } else {
+                    return "active";
+                }
+            }
+
+            if (scenes.some(s => (s.clientPositions || []).includes("Producer") && this.targetsMe(s.previewScene))) {
+                return "preview";
+            }
+            if (scenes.some(s => (s.clientPositions || []).includes("Observer Director") && this.targetsMe(s.programScene))) {
+                // in program with obs director
+
+                // check if obs director is live with producer
+                const producer = scenes.find(s => (s.clientPositions || []).includes("Producer") && (!((s.clientPositions || []).includes("Observer Director"))));
+                if (producer) {
+                    if (producer?.programScene && ["OBSDIR", "Director", "Clean feed"].some(str => producer.programScene.toLowerCase().includes(str.toLowerCase()))) {
+                    } else if (producer?.previewScene && ["OBSDIR", "Director", "Clean feed"].some(str => producer.previewScene.toLowerCase().includes(str.toLowerCase()))) {
+                    } else {
+                        // obs is in program
+                        // obsdir is none
+                        return "LIVE OBSDIR";
+                    }
+                }
+            }
+
+            if (scenes.some(s => (s.clientPositions || []).includes("Observer Director") && this.targetsMe(s.previewScene))) {
+                // in preview with obs director
+
+                // check if obs director is live with producer
+                const producer = scenes.find(s => (s.clientPositions || []).includes("Producer") && (!((s.clientPositions || []).includes("Observer Director"))));
+                if (producer) {
+                    if (producer?.programScene && ["OBSDIR", "Director", "Clean feed"].some(str => producer.programScene.toLowerCase().includes(str.toLowerCase()))) {
+                        // obs is in preview
+                        // obsdir is in program
+                        return "preview";
+                    } else if (producer?.previewScene && ["OBSDIR", "Director", "Clean feed"].some(str => producer.previewScene.toLowerCase().includes(str.toLowerCase()))) {
+                        // obs is in preview
+                        // obsdir is in preview
+                        return "inactive";
+                    } else {
+                        // obs is in preview
+                        // obsdir is none
+                        return "inactive";
+                    }
+                }
+                return "preview";
+            }
+
+            for (const stream of Object.values(this.scenes || {})) {
+                if (this.targetsMe(stream.programScene)) {
+                    return "active";
+                }
+            }
+            for (const stream of Object.values(this.scenes || {})) {
+                if (this.targetsMe(stream.previewScene)) {
+                    return "preview";
+                }
+            }
+            return "inactive";
         }
     },
     methods: {
@@ -178,25 +285,29 @@ export default {
                 return false;
             });
         }
-
     },
     sockets: {
-        tally_change({ state }) {
-            this.state = state;
-        },
+        // tally_change({ state }) {
+        //     this.state = state;
+        // },
         prod_preview_program_change(data) {
             console.log(data);
-            this.producerClientKey = data.clientSource;
-            this.producerPreviewScene = data.previewScene;
-            this.producerProgramScene = data.programScene;
 
-            if (this.targetsMe(this.producerProgramScene)) {
-                this.state = "active";
-            } else if (this.targetsMe(this.producerPreviewScene)) {
-                this.state = "preview";
-            } else {
-                this.state = "inactive";
-            }
+            this.scenes[data.clientSource] = {
+                clientSource: data.clientSource,
+                clientPositions: data.clientPositions,
+                previewScene: data.previewScene,
+                programScene: data.programScene,
+                clientPlayerName: data.clientPlayerName,
+            };
+
+            // if (this.targetsMe(this.producerProgramScene)) {
+            //     this.state = "active";
+            // } else if (this.targetsMe(this.producerPreviewScene)) {
+            //     this.state = "preview";
+            // } else {
+            //     this.state = "inactive";
+            // }
         }
     },
     async mounted() {
@@ -220,52 +331,75 @@ export default {
 
 <style scoped>
 .tally-block {
-  height: 100vh;
-  width: 100vw;
-  background-color: #000000;
-  color: #ffffff;
-  display: grid;
-  place-items: center;
-  font-size: clamp(10px, 8vw, 25vh);
-  transition: background-color 0.2s ease;
-  font-family: "SLMN-Industry", "Industry", sans-serif;
+    height: 100vh;
+    width: 100vw;
+    background-color: #000000;
+    color: #ffffff;
+    display: grid;
+    place-items: center;
+    font-size: clamp(10px, 8vw, 25vh);
+    transition: background-color 0.2s ease;
+    font-family: "SLMN-Industry", "Industry", sans-serif;
 }
 
 .state {
-  font-size: 1.25em;
+    font-size: 1.25em;
 }
 
 .metadata {
-  font-size: .6em;
+    font-size: .6em;
 }
 
 
-.tally-block.preview {
-  background-color: #00ff00;
-  color: #000000;
+.tally-block.preview,
+.prod-scenes .prod-preview.targets-me  {
+    background-color: #00ff00;
+    color: #000000;
+}
+
+.tally-block.standby {
+    background-color: #0000ff;
+    color: #ffffff;
 }
 
 .tally-block.active,
-.tally-block.program {
-  background-color: #ff0000;
+.tally-block.program,
+
+.prod-scenes .prod-program.targets-me {
+    background-color: #ff0000;
+    color: white;
+}
+
+.prod-row {
+    width: 100%;
+    display: flex;
+    gap: .5em
 }
 
 .prod-info, .team-info {
     display: flex;
     text-align: center;
     font-size: 0.4em;
-    background-color: rgba(32,32,32,0.5);
+    background-color: rgba(32, 32, 32, 0.5);
     color: white;
     padding: .5em 1em;
     width: 100%;
 }
 
+.prod-info {
+    flex-direction: column;
+    gap: .5em;
+    font-size: 0.33em;
+}
+
 .team-info {
     padding: 0;
 }
+
 .team-name {
     padding: .5em 1em;
 }
+
 .team-score {
     padding: .2em 1em;
 }
@@ -276,14 +410,17 @@ export default {
     justify-content: center;
     align-items: center;
 }
+
 .team-info .team:nth-child(2) {
     flex-direction: row-reverse;
 }
+
 .team-name {
     flex-grow: 1;
     text-align: center;
     line-height: 1.2;
 }
+
 .team-logo {
     height: 100%;
     width: 3em;
@@ -293,6 +430,7 @@ export default {
     font-weight: bold;
     padding: 0.1em .5em;
 }
+
 .prod-scenes {
     display: flex;
     justify-content: center;
@@ -301,8 +439,9 @@ export default {
     flex-grow: 1;
     margin-left: 1em;
 }
+
 .prod-scenes div {
-    border: 1.5px solid rgba(255,255,255,0.5);
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
     padding: 0.5em .25em;
     margin: 0 0.25em;
     background-color: black;
@@ -357,5 +496,11 @@ export default {
     align-items: center;
     text-align: center;
     font-weight: bold;
+}
+
+.prod-scenes .countdown {
+    border: none;
+    padding: 0;
+    margin: 0;
 }
 </style>

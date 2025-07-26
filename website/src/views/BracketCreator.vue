@@ -65,62 +65,72 @@
                                     :key="mi"
                                     class="game"
                                     :class="{'empty': game.empty}">
-                                    <div class="game-teams">
-                                        <div
-                                            class="game-team"
-                                            :class="{
-                                                'highlight': activeConnection,
-                                                'hover-active': highlightConnectionMatches(bi, ci, mi, 1),
-                                                'has-lose-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'lose',
-                                                'has-win-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'win'
-                                            }"
-                                            @mouseup="endConnection(bi, ci, mi, 1)">
-                                            {{ getReverseConnectionText(bi, ci, mi, 1) }}
+                                    <div class="game-row">
+                                        <div class="game-teams">
+                                            <div
+                                                class="game-team"
+                                                :class="{
+                                                    'highlight': activeConnection,
+                                                    'hover-active': highlightConnectionMatches(bi, ci, mi, 1),
+                                                    'has-lose-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'lose',
+                                                    'has-win-connection': getReverseConnection(bi, ci, mi, 1)?.mode === 'win'
+                                                }"
+                                                @mouseup="endConnection(bi, ci, mi, 1)">
+                                                {{ getReverseConnectionText(bi, ci, mi, 1) }}
+                                            </div>
+                                            <div v-if="!game.empty" class="match-number">
+                                                {{
+                                                    getMatchNum(bi, ci, mi)
+                                                }}
+                                            </div>
+                                            <div
+                                                class="game-team"
+                                                :class="{
+                                                    'highlight': activeConnection,
+                                                    'hover-active': highlightConnectionMatches(bi, ci, mi, 2),
+                                                    'has-lose-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'lose',
+                                                    'has-win-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'win'
+                                                }"
+                                                @mouseup="endConnection(bi, ci, mi, 2)">
+                                                {{ getReverseConnectionText(bi, ci, mi, 2) }}
+                                            </div>
                                         </div>
-                                        <div v-if="!game.empty" class="match-number">{{ getMatchNum(bi,ci,mi) }}</div>
-                                        <div
-                                            class="game-team"
-                                            :class="{
-                                                'highlight': activeConnection,
-                                                'hover-active': highlightConnectionMatches(bi, ci, mi, 2),
-                                                'has-lose-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'lose',
-                                                'has-win-connection': getReverseConnection(bi, ci, mi, 2)?.mode === 'win'
-                                            }"
-                                            @mouseup="endConnection(bi, ci, mi, 2)">
-                                            {{ getReverseConnectionText(bi, ci, mi, 2) }}
+                                        <div class="game-buttons">
+                                            <div class="game-button remove" @click="column.games.splice(mi,1)">
+                                                <i class="fas fa-trash"></i>
+                                            </div>
+                                        </div>
+                                        <div class="connection-buttons">
+                                            <div
+                                                class="connection-button"
+                                                :class="{
+                                                    'active': activeConnectionMatches(bi, ci, mi, 'win') || getConnection(bi, ci, mi, 'win'),
+                                                    'champion':getConnection(bi, ci, mi, 'win') === 'champion'
+                                                }"
+                                                @mouseenter="showConnection(bi, ci, mi, 'win')"
+                                                @mouseleave="hideConnection()"
+                                                @mousedown="startConnection(bi, ci, mi, 'win')"
+                                            >
+                                                W
+                                            </div>
+                                            <div
+                                                class="connection-button"
+                                                :class="{
+                                                    'active': activeConnectionMatches(bi, ci, mi, 'lose') || getConnection(bi, ci, mi, 'lose'),
+                                                    'eliminated':getConnection(bi, ci, mi, 'lose') === 'eliminated'
+                                                }"
+                                                @mouseenter="showConnection(bi, ci, mi, 'lose')"
+                                                @mouseleave="hideConnection()"
+                                                @mousedown="startConnection(bi, ci, mi, 'lose')"
+                                            >
+                                                L
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="game-buttons">
-                                        <div class="game-button remove" @click="column.games.splice(mi,1)">
-                                            <i
-                                                class="fas fa-trash"></i>
-                                        </div>
-                                    </div>
-                                    <div class="connection-buttons">
-                                        <div
-                                            class="connection-button"
-                                            :class="{
-                                                'active': activeConnectionMatches(bi, ci, mi, 'win') || getConnection(bi, ci, mi, 'win'),
-                                                'champion':getConnection(bi, ci, mi, 'win') === 'champion'
-                                            }"
-                                            @mouseenter="showConnection(bi, ci, mi, 'win')"
-                                            @mouseleave="hideConnection()"
-                                            @mousedown="startConnection(bi, ci, mi, 'win')"
-                                        >
-                                            W
-                                        </div>
-                                        <div
-                                            class="connection-button"
-                                            :class="{
-                                                'active': activeConnectionMatches(bi, ci, mi, 'lose') || getConnection(bi, ci, mi, 'lose'),
-                                                'eliminated':getConnection(bi, ci, mi, 'lose') === 'eliminated'
-                                            }"
-                                            @mouseenter="showConnection(bi, ci, mi, 'lose')"
-                                            @mouseleave="hideConnection()"
-                                            @mousedown="startConnection(bi, ci, mi, 'lose')"
-                                        >
-                                            L
-                                        </div>
+
+                                    <div v-if="calculateRankings && !game.empty && ranking[(getMatchNum(bi,ci,mi)).toString()]" class="game-row game-ranking">
+                                        <div v-if="ranking[(getMatchNum(bi,ci,mi)).toString()]?.winnerRank?.text" class="rank-text rank-text-win">Win: {{ ranking[(getMatchNum(bi,ci,mi)).toString()]?.winnerRank?.text }}</div>
+                                        <div v-if="ranking[(getMatchNum(bi,ci,mi)).toString()]?.loserRank?.text" class="rank-text rank-text-lose">Lose: {{ ranking[(getMatchNum(bi,ci,mi)).toString()]?.loserRank?.text }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -151,10 +161,11 @@
                 style="white-space: normal;"
                 contenteditable
                 @keydown.ctrl.enter="updateCustomFormat()"></textarea>
-            <div class="button flex w-100 d-flex flex-row-reverse mb-3">
+            <div class="button flex w-100 d-flex flex-row-reverse mb-3 gap-1">
                 <b-button variant="success" size="sm" @click="updateCustomFormat()">
                     <i class="fas fa-save fa-fw"></i> Update data
                 </b-button>
+                <b-form-checkbox v-model="calculateRankings" switch class="p-1 px-2">Calculate rankings</b-form-checkbox>
             </div>
 
             <h3>Bracket Preview</h3>
@@ -188,6 +199,7 @@ export default {
         highlightedConnection: null,
         customFormat: "",
         selectedPreset: null,
+        calculateRankings: true,
         presetOptions: [
             {
                 value: null,
@@ -223,7 +235,7 @@ export default {
                 text: "8-team double elimination"
             },
             {
-                value: {"brackets":[{"name":"Upper Bracket","columns":[{"header":"UB Round 1","games":[1,2,3,4]},{"header":"UB Round 2","games":[5,6,7,8]},{"games":[]},{"header":"UB Semifinals","games":[15,null,16]},{"header":"UB Finals","games":[19]},{"games":[]},{"header":"Grand Finals","games":[22]}]},{"name":"Lower Bracket","columns":[{"games":[]},{"header":"LB Round 1","games":[9,10,11,12]},{"header":"LB Round 2","games":[13,null,14]},{"header":"LB Round 3","games":[17,18]},{"header":"LB Semifinals","games":[20]},{"header":"LB Finals","games":[21]},{"games":[]}]}],"connections":{"1":{"win":"5.2","lose":"12.2"},"2":{"win":"6.2","lose":"11.2"},"3":{"win":"7.2","lose":"10.2"},"4":{"win":"8.2","lose":"9.2"},"5":{"win":"15.1","lose":"9.1"},"6":{"win":"15.2","lose":"10.1"},"7":{"win":"16.1","lose":"11.1"},"8":{"win":"16.2","lose":"12.1"},"9":{"win":"13.1","lose":"eliminated"},"10":{"win":"13.2","lose":"eliminated"},"11":{"win":"14.1","lose":"eliminated"},"12":{"win":"14.2","lose":"eliminated"},"13":{"win":"17.2","lose":"eliminated"},"14":{"win":"18.2","lose":"eliminated"},"15":{"win":"19.1","lose":"18.1"},"16":{"win":"19.2","lose":"17.1"},"17":{"win":"20.1","lose":"eliminated"},"18":{"win":"20.2","lose":"eliminated"},"19":{"win":"22.1","lose":"21.1"},"20":{"win":"21.2","lose":"eliminated"},"21":{"win":"22.2","lose":"elminated"},"22":{"win":"champion","lose":"elminated"}}},
+                value: {"brackets":[{"name":"Upper Bracket","columns":[{"header":"UB Round 1","games":[1,2,3,4]},{"header":"UB Round 2","games":[5,6,7,8]},{"games":[]},{"header":"UB Semifinals","games":[15,null,16]},{"header":"UB Finals","games":[19]},{"games":[]},{"header":"Grand Finals","games":[22]}]},{"name":"Lower Bracket","columns":[{"games":[]},{"header":"LB Round 1","games":[9,10,11,12]},{"header":"LB Round 2","games":[13,null,14]},{"header":"LB Round 3","games":[17,18]},{"header":"LB Semifinals","games":[20]},{"header":"LB Finals","games":[21]},{"games":[]}]}],"connections":{"1":{"win":"5.2","lose":"12.2"},"2":{"win":"6.2","lose":"11.2"},"3":{"win":"7.2","lose":"10.2"},"4":{"win":"8.2","lose":"9.2"},"5":{"win":"15.1","lose":"9.1"},"6":{"win":"15.2","lose":"10.1"},"7":{"win":"16.1","lose":"11.1"},"8":{"win":"16.2","lose":"12.1"},"9":{"win":"13.1","lose":"eliminated"},"10":{"win":"13.2","lose":"eliminated"},"11":{"win":"14.1","lose":"eliminated"},"12":{"win":"14.2","lose":"eliminated"},"13":{"win":"17.2","lose":"eliminated"},"14":{"win":"18.2","lose":"eliminated"},"15":{"win":"19.1","lose":"18.1"},"16":{"win":"19.2","lose":"17.1"},"17":{"win":"20.1","lose":"eliminated"},"18":{"win":"20.2","lose":"eliminated"},"19":{"win":"22.1","lose":"21.1"},"20":{"win":"21.2","lose":"eliminated"},"21":{"win":"22.2","lose":"eliminated"},"22":{"win":"champion","lose":"eliminated"}}},
                 text: "12-team double elimination"
             }
         ]
@@ -233,10 +245,65 @@ export default {
             return {
                 bracket_layout: JSON.stringify({
                     brackets: this.numberedBrackets,
-                    connections: this.numberedConnections
+                    connections: this.rankedNumberedConnections
                 }),
                 ordered_matches: []
             };
+        },
+        ranking() {
+            const nums = [...Object.entries(this.numberedConnections)].reverse();
+
+            // need to group elimination matches by column
+            console.log([...this.numberedBrackets]);
+
+            const eliminations = nums.filter(([num, cons]) => cons.win === "champion" || cons.lose === "eliminated");
+            let eliminationGroups = [];
+
+            [...this.numberedBrackets].forEach((bracket, bi) => {
+                bracket.columns.forEach((column, ci) => {
+                    console.log(bi, column, ci);
+                    const elimsInColumn = [...column.games].map(num => eliminations.find(([n, c]) => num === parseInt(n))).filter(Boolean);
+                    console.log("column", column.games, elimsInColumn);
+                    if (elimsInColumn.length > 0) {
+                        eliminationGroups.push({
+                            games: elimsInColumn,
+                            bracket: bi,
+                            column: ci,
+                        });
+                    }
+                });
+            });
+
+            eliminationGroups = eliminationGroups.sort((a,b) => Math.max(...b.games.map(([num, cons]) => parseInt(num))) - Math.max(...a.games.map(([num, cons]) => parseInt(num))));
+
+            const matchRankings = [];
+
+            let resultCounter = 1;
+            eliminationGroups.forEach(group => {
+                let groupEliminationCount = group.games.filter(([numString, cons]) => cons.lose === "eliminated")?.length;
+                console.log("eliminationGroup", group, { groupEliminationCount });
+                group.games.forEach(([numString, cons]) => {
+                    if (cons.win === "champion") {
+                        if (!matchRankings[numString]) matchRankings[numString] = {};
+                        matchRankings[numString].winnerRank = {
+                            sort: resultCounter++,
+                            text: "#1"
+                        };
+                    }
+                    if (cons.lose === "eliminated") {
+                        if (!matchRankings[numString]) matchRankings[numString] = {};
+                        matchRankings[numString].loserRank = {
+                            sort: resultCounter,
+                            text: `#${resultCounter}${groupEliminationCount > 2 ? "-" : (groupEliminationCount > 1 ? "/" : "")}${groupEliminationCount > 1 ? resultCounter + (groupEliminationCount - 1) : ""}`
+                        };
+                    }
+                });
+                resultCounter += groupEliminationCount;
+            });
+
+            console.log("elims", eliminations, eliminationGroups);
+
+            return matchRankings;
         },
         numberedBrackets() {
             let gameNum = 1;
@@ -264,7 +331,7 @@ export default {
         numberedConnections() {
             const connections = {};
             Object.entries(this.connections).forEach(([start, end]) => {
-                console.log({ start, end });
+                // console.log({ start, end });
                 let [bracketNum, columnNum, gameNum, mode] = start.split("-");
                 [bracketNum, columnNum, gameNum] = [bracketNum, columnNum, gameNum].map(e => parseInt(e));
 
@@ -283,6 +350,15 @@ export default {
                 return 0;
             });
             return connections;
+        },
+        rankedNumberedConnections() {
+            if (!this.calculateRankings) return this.numberedConnections;
+            return Object.fromEntries(Object.entries(this.numberedConnections).map(([matchNum, connections]) => {
+                return [matchNum, {
+                    ...connections,
+                    ...(this.ranking[parseInt(matchNum)] || {})
+                }];
+            }));
         }
     },
     methods: {
@@ -415,7 +491,7 @@ export default {
                         if (!destinationMatch.includes(".")) {
                             // text specific
                             if (sourceMatchNum === "null" || !sourceMatchNum) return;
-                            console.log(destinationMatch, sourceMatchNum, sourceMatchKey, mode);
+                            console.log("d1", destinationMatch, sourceMatchNum, sourceMatchKey, mode);
                             newConnections[[
                                 ...Object.values(sourceMatchKey), mode
                             ].join("-")] = destinationMatch;
@@ -485,12 +561,18 @@ export default {
         width: 100%;
         outline: 1px solid rgba(255,255,255,0.2);
         margin: 10px 0;
-        height: 40px;
+        min-height: 40px;
         background-color: rgba(0,0,0,1);
+        display: flex;
+        flex-direction: column;
     }
     .game.empty {
         background-color: rgba(0,0,0,0.25);
         outline: none;
+    }
+    .game-row {
+        display: flex;
+        width: 100%;
     }
     .game-area {
         height: 100%;
@@ -617,6 +699,17 @@ export default {
 
     .game-teams {
         position: relative;
+    }
+
+
+    .game-ranking {
+        font-size: 0.75em;
+        display: flex;
+        justify-content: center;
+        text-align: center;
+        align-items: center;
+        white-space: nowrap;
+        gap: 1.5em;
     }
 
 </style>

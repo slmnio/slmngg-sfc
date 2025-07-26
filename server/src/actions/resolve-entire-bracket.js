@@ -105,7 +105,7 @@ export default {
 
             correctTeams = correctTeams.filter(c => c);
 
-            if (correctTeams.length === 0) {
+            if (correctTeams.length === 0 || feeders.length === 0) {
                 // no updates
             } else if (correctTeams.length === 1) {
                 let placeholderRight = parseInt(correctTeams[0]._position) === 1; // (not 2)

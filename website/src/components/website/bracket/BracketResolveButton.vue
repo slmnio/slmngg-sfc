@@ -58,7 +58,7 @@ export default {
                     bracketID: bracket.id
                 });
                 console.log(data);
-                this.$notyf[data.hasError ? "error" : "success"](data.message);
+                this.$notyf[data.hasError ? "error" : "success"](data.message.replaceAll("\n", "<br>"));
             } finally {
                 this.isResolving = false;
             }

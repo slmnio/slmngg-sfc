@@ -69,10 +69,46 @@ export default {
 
         let responses = [];
 
+        const teamResponses = [];
+
         for (const [matchNum, connects] of Object.entries(connections)) {
             let match = matches[parseInt(matchNum) - 1];
 
-            if (match?.teams?.length === 2) continue; // ignore if it's already got 2 teams
+            if (match?.teams?.length === 2) {
+                console.log("match has 2 teams", match.score_1, match.score_2, `FT${match.first_to}`, connects);
+                if (match?.first_to && [match?.score_1 || 0, match?.score_2 || 0].some(x => x === match?.first_to)) {
+                    // match is complete
+
+                    const [winner, loser] = match.score_1 === match.first_to ? [...match.teams] : [...match.teams].reverse();
+                    if (winner && connects.winnerRank) {
+                        const teamUpdate = {};
+                        if (winner.ranking_text !== connects.winnerRank.text) {
+                            teamUpdate["Ranking Text"] = connects.winnerRank.text;
+                        }
+                        if (winner.ranking_sort !== connects.winnerRank.sort) {
+                            teamUpdate["Ranking Sort"] = connects.winnerRank.sort;
+                        }
+                        if (Object.keys(teamUpdate)?.length !== 0) {
+                            console.log(teamUpdate, connects);
+                            teamResponses.push(await this.helpers.updateRecord("Teams", winner, teamUpdate, "actions/resolve-entire-bracket"));
+                        }
+                    }
+                    if (loser && connects.loserRank) {
+                        const teamUpdate = {};
+                        if (loser.ranking_text !== connects.loserRank.text) {
+                            teamUpdate["Ranking Text"] = connects.loserRank.text;
+                        }
+                        if (loser.ranking_sort !== connects.loserRank.sort) {
+                            teamUpdate["Ranking Sort"] = connects.loserRank.sort;
+                        }
+                        if (Object.keys(teamUpdate)?.length !== 0) {
+                            console.log(teamUpdate, connects);
+                            teamResponses.push(await this.helpers.updateRecord("Teams", loser, teamUpdate, "actions/resolve-entire-bracket"));
+                        }
+                    }
+                }
+                continue;  // ignore resolving if it's already got 2 teams
+            }
 
             let correctTeams = [null, null];
 
@@ -154,9 +190,17 @@ export default {
         if (error) output.push(`${error} match${error === 1 ? "" : "es"} errored`);
         if (!output.length) output.push("No matches updated");
 
+        // teamResponses
+        let teamSuccess = teamResponses.filter(response => !response.error).length;
+        let teamError = teamResponses.filter(response => response.error).length;
+        let teamOutput = [];
+        if (teamSuccess) teamOutput.push(`${teamSuccess} team${teamSuccess === 1 ? "" : "s"} updated with ranks`);
+        if (teamError) teamOutput.push(`${teamError} team${teamError === 1 ? "" : "s"} updated with ranks`);
+        if (!teamOutput.length) output.push("No teams ranked");
+
         return {
             hasError: !!error,
-            message: output.join(", ")
+            message: output.join(", ") + "\n" + teamOutput.join(", ")
         };
     }
 };

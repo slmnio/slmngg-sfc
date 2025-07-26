@@ -1,7 +1,7 @@
 <template>
     <div
         class="tally-block"
-        :class="{ preview: tallyState === 'preview', active: tallyState === 'active', standby: tallyState === 'LIVE OBSDIR' }"
+        :class="{ preview: tallyState === 'preview', active: (tallyState === 'active' || tallyState === 'active PiP'), standby: tallyState === 'LIVE OBSDIR' }"
         @click="showProducerInfo = !showProducerInfo">
         <div class="d-flex flex-column align-items-center">
             <div class="state">
@@ -92,6 +92,7 @@ export default {
         producerProgramScene: null,
         scenes: {},
         showProducerInfo: true,
+        pipActive: false,
 
         noBroadcastStyle: true,
         noStinger: true
@@ -145,6 +146,8 @@ export default {
         },
         tallyState() {
             const scenes = Object.values(this.scenes || {});
+
+            if (this.pipActive) return "active PiP";
 
             if (scenes.some(s => (s.clientPositions || []).includes("Producer") && this.targetsMe(s.programScene))) {
                 return "active";
@@ -286,6 +289,11 @@ export default {
             });
         }
     },
+    watch: {
+        selfObserverNumber() {
+            this.pipActive = false;
+        }
+    },
     sockets: {
         // tally_change({ state }) {
         //     this.state = state;
@@ -308,6 +316,11 @@ export default {
             // } else {
             //     this.state = "inactive";
             // }
+        },
+        pip_announce({ active, number }) {
+            if (number === this.selfObserverNumber) {
+                this.pipActive = active;
+            }
         }
     },
     async mounted() {
@@ -349,7 +362,6 @@ export default {
 .metadata {
     font-size: .6em;
 }
-
 
 .tally-block.preview,
 .prod-scenes .prod-preview.targets-me  {

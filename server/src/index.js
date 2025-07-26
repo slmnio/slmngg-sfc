@@ -232,7 +232,6 @@ io.on("connection", (socket) => {
     socket.on("obs_data_change", async ({ clientName, previewScene, programScene }) => {
         if (!clientName) return;
         let client = await Cache.get(`client-${clientName}`);
-        console.log("obs_data_change", { clientName, previewScene, programScene });
 
         const player = await Cache.get(client?.staff?.[0]);
         const broadcast = await Cache.get(client?.broadcast?.[0]);
@@ -240,14 +239,29 @@ io.on("connection", (socket) => {
         const relationships = await Promise.all((match.player_relationships || []).map(id => Cache.get(id)));
 
         const clientPositions = relationships.filter(rel => dirtyID(player?.id) === dirtyID(rel.player?.[0])).map(rel => rel.singular_name);
-
-        console.log(clientPositions);
+        console.log("obs_data_change", { clientName, previewScene, programScene }, { clientPositions });
 
         if (clientName && client) {
             io.sockets.to(`prod:client-${clientName}`).emit("prod_preview_program_change", { previewScene, programScene, emitSource: "client", clientSource: clientName, clientPlayerName: player.name, clientPositions });
         }
         if (broadcast && broadcast.key) {
             io.sockets.to(`prod:broadcast-${broadcast.key}`).emit("prod_preview_program_change", { previewScene, programScene, emitSource: "broadcast", clientSource: clientName, clientPlayerName: player.name, broadcastKey: broadcast.key, clientPositions });
+        }
+    });
+    socket.on("pip_announce", async ({ clientName, active, number }) => {
+        if (!clientName) return;
+        active = active === "true" ? true : (active === "false" ? false : active);
+        number = parseInt(number);
+
+        console.log(`[pip] ${clientName} ${number} ${active ? "active" : "inactive"}`);
+        let client = await Cache.get(`client-${clientName}`);
+        const broadcast = await Cache.get(client?.broadcast?.[0]);
+
+        if (clientName && client) {
+            io.sockets.to(`prod:client-${clientName}`).emit("pip_announce", { clientName, active, number });
+        }
+        if (broadcast && broadcast.key) {
+            io.sockets.to(`prod:broadcast-${broadcast.key}`).emit("pip_announce", { clientName, active, number });
         }
     });
     socket.on("obs_disconnect", async (data) => {

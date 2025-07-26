@@ -10,6 +10,9 @@
             <div class="box-text">
                 {{ imp.special.toUpperCase() }}
             </div>
+            <div v-if="imp.special && rank?.text" class="box-text">
+                finishes <b>{{ rank?.text }}</b>
+            </div>
         </div>
         <div v-if="imp.otherMatch" class="other-match">
             {{ relation === "Winner" ? 'advances' : 'drops' }} to <router-link :to="url(linkToDetailedMatch ? 'detailed' : 'match', imp.otherMatch)">
@@ -75,7 +78,7 @@ import { resizedImage } from "@/utils/images";
 
 export default {
     name: "BracketImplicationMatch",
-    props: ["imp", "relation", "team", "linkToDetailedMatch"],
+    props: ["imp", "relation", "team", "linkToDetailedMatch", "rank"],
     computed: {
         facingTeamTheme() {
             return this.getTheme(this.imp.facingTeam);

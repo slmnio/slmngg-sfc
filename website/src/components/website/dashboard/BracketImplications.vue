@@ -7,12 +7,14 @@
                 <BracketImplicationMatch
                     class="flex-grow-1"
                     :imp="imps.win"
+                    :rank="imps?.winnerRank"
                     relation="Winner"
                     :team="matchWinner"
                     :link-to-detailed-match="linkToDetailedMatch" />
                 <BracketImplicationMatch
                     class="flex-grow-1"
                     :imp="imps.lose"
+                    :rank="imps?.loserRank"
                     relation="Loser"
                     :team="matchLoser"
                     :link-to-detailed-match="linkToDetailedMatch" />
@@ -61,7 +63,9 @@ export default {
 
                     const matchConnections = {
                         win: this.getMatchDetails(connections[thisMatchNumber + 1].win, bracket.ordered_matches, connections),
-                        lose: this.getMatchDetails(connections[thisMatchNumber + 1].lose, bracket.ordered_matches, connections)
+                        winnerRank: connections[thisMatchNumber + 1].winnerRank,
+                        lose: this.getMatchDetails(connections[thisMatchNumber + 1].lose, bracket.ordered_matches, connections),
+                        loserRank: connections[thisMatchNumber + 1].loserRank,
                     };
 
                     console.log("bracket imp", thisMatchNumber, matchConnections);

@@ -19,22 +19,25 @@
                 <div class="group-top">Attacker Side</div>
                 <div class="group-bottom">
                     <b-button-group>
+                        <b-button
+                            right
+                            class="quick-button"
+                            :variant="{other: 'secondary', 'Left': 'primary', 'Right': 'danger', 'Both': 'warning'}[broadcast.map_attack || 'other']"
+                            :disabled="updateData?.mapAttack !== undefined"
+                            @click="autoAttack">
+                            <div class="icon-stack">
+                                <i class="fa-fw" :class="sword(broadcast?.map_attack)"></i>
+                                <div v-if="broadcast.map_attack" class="icon-text industry-align">
+                                    {{ broadcast.map_attack }}
+                                </div>
+                            </div>
+                        </b-button>
                         <BDropdown
                             right
                             split
-                            class="quick-button"
+                            class="quick-button no-main-button"
                             variant="secondary"
-                            :disabled="updateData?.mapAttack !== undefined"
-                            :split-variant="{other: 'secondary', 'Left': 'primary', 'Right': 'danger', 'Both': 'warning'}[broadcast.map_attack || 'other']"
-                            @click="autoAttack">
-                            <template #button-content>
-                                <div class="icon-stack">
-                                    <i class="fa-fw" :class="sword(broadcast?.map_attack)"></i>
-                                    <div v-if="broadcast.map_attack" class="icon-text industry-align">
-                                        {{ broadcast.map_attack }}
-                                    </div>
-                                </div>
-                            </template>
+                            :disabled="updateData?.mapAttack !== undefined">
                             <b-dropdown-item-button
                                 v-for="side in ['Left', 'Right', 'Both']"
                                 :key="side"

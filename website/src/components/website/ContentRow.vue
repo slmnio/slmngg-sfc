@@ -1,5 +1,5 @@
 <template>
-    <div class="content-row d-flex">
+    <div class="content-row d-flex" :title="hoverTitle">
         <div v-if="title" class="content-title fw-bold">{{ title }}</div>
         <div class="content-item-list">
             <slot></slot>
@@ -10,7 +10,7 @@
 <script>
 export default {
     name: "ContentRow",
-    props: ["title"]
+    props: ["title", "hoverTitle"]
 };
 </script>
 

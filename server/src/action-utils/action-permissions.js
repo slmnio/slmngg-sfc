@@ -4,7 +4,7 @@ import { dirtyID, getAll } from "./action-utils.js";
 /**
  *
  * @param {UserData} user
- * @param match
+ * @param {Match} match
  * @param event
  * @returns {Promise<boolean>}
  */

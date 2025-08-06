@@ -8,9 +8,7 @@
             </b-button>
         </div>
 
-        <b-modal id="date-editor-modal" :ok-disabled="isValid === false" @ok="$emit('submit', airtableSafeDate)">
-            <template #modal-title>Time editor</template>
-
+        <b-modal id="date-editor-modal" title="Time editor" :ok-disabled="isValid === false" @ok="$emit('submit', airtableSafeDate)">
             <div class="d-flex mb-3 flex-center">
                 <TimezoneSwapper align="left" />
             </div>

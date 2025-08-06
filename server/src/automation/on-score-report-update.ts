@@ -314,6 +314,8 @@ export default {
 
                         // remove old completion message
                         messageData = await looseDeleteRecordedMessage<ReschedulingReportKeys>(messageData, "reschedule_completed");
+
+                        /* NOTE: Any changes to the match reschedule message, please also update actions/send-reschedule-message.ts */
                         messageData = await sendRecordedMessage<ReschedulingReportKeys>({
                             key: "reschedule_completed",
                             mapObject: messageData,

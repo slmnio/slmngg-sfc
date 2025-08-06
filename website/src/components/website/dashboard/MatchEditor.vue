@@ -523,6 +523,17 @@ export default {
     }),
     computed: {
         ...mapWritableState(useSettingsStore, ["assumeLoserPicks", "showHeroPickBans", "restrictToMapPool", "denyEditor", "dashboardPickBanVisibility"]),
+        settings() {
+            if (!this.match?.event?.blocks) return null;
+            try {
+                return JSON.parse(this.match.event.blocks);
+            } catch (e) {
+                return null;
+            }
+        },
+        promptForRescheduleMessage() {
+            return !!this.settings?.logging?.matchTimeChanges;
+        },
         teams() {
             const dummy = { dummy: true };
 
@@ -876,7 +887,29 @@ export default {
         async setMatchStart(timeString) {
             const response = await this.sendMatchDataChange("start", timeString);
             if (!response.error) {
-                this.$notyf.success(`Set match start to: ${formatTime(timeString, { tz: useSettingsStore().timezone, use24HourTime: useSettingsStore().use24HourTime })}`);
+                if (!this.promptForRescheduleMessage) {
+                    this.$notyf.success(`Set match start to: ${formatTime(timeString, {
+                        tz: useSettingsStore().timezone,
+                        use24HourTime: useSettingsStore().use24HourTime
+                    })}`);
+                } else {
+                    if (confirm(`Match start has been changed to: ${formatTime(timeString, { tz: useSettingsStore().timezone, use24HourTime: useSettingsStore().use24HourTime })}\nSend a reschedule message to Discord?`)) {
+                        const rescheduleMessage = await authenticatedRequest("actions/send-reschedule-message", {
+                            matchID: this.match.id,
+                            newTime: timeString
+                        });
+                        if (!rescheduleMessage.error) {
+                            this.$notyf.success("Reschedule message sent to Discord");
+                        }
+                    }
+                    // show toast after confirm since it's blocking
+                    this.$notyf.success(`Set match start to: ${formatTime(timeString, {
+                        tz: useSettingsStore().timezone,
+                        use24HourTime: useSettingsStore().use24HourTime
+                    })}`);
+
+                }
+
             }
         },
         setIfNew(key, index, value) {

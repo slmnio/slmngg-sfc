@@ -25,7 +25,7 @@
                         <TimezoneSwapper align="left" :inline="true" />
                         <b-form-group label-cols="auto" label-size="sm" label="Sort">
                             <b-form-select
-                                v-model="matchesSort"
+                                v-model="scheduleMatchesSort"
                                 :options="['Default', 'Chronological']"
                                 size="sm"
                                 class="w-auto" />
@@ -72,7 +72,7 @@
             </div>
         </div>
 
-        <div v-if="activeScheduleGroup" class="schedule-matches mt-3" :class="{'no-gaps': matchesSort !== 'Default'}">
+        <div v-if="activeScheduleGroup" class="schedule-matches mt-3" :class="{'no-gaps': scheduleMatchesSort !== 'Default'}">
             <ScheduleMatch
                 v-for="(match, i) in groupMatches"
                 :key="match.id"
@@ -110,12 +110,12 @@ export default {
         hideCompleted: false,
         hideNoVods: false,
         selectedBroadcastID: null,
-        showSettings: false,
-        matchesSort: "Default"
+        showSettings: false
     }),
     computed: {
         ...mapWritableState(useSettingsStore, ["batchSelectedMatches"]),
         ...mapWritableState(useSettingsStore, ["showBatchCheckboxes"]),
+        ...mapWritableState(useSettingsStore, ["scheduleMatchesSort"]),
         selectedMatches() {
             return Object.entries(this.batchSelectedMatches || {}).filter(([id, selected]) => selected).map(([id, selected]) => id);
         },
@@ -211,7 +211,7 @@ export default {
                     if (a.start < b.start) return -1;
                 }
 
-                if (this.matchesSort === "Default") {
+                if (this.scheduleMatchesSort === "Default") {
                     if (a.week > b.week) return 1;
                     if (a.week < b.week) return -1;
 

@@ -13,6 +13,7 @@ export const useSettingsStore = defineStore("settings", () => {
     const gfxButtonCount = ref(6);
     const removeHashInHex = ref(false);
     const rankTeamsOnEvents = ref(null);
+    const scheduleMatchesSort = ref("Default");
 
     const transmitterUrl = ref("localhost:4455");
     const transmitterPassword = ref("");
@@ -43,6 +44,7 @@ export const useSettingsStore = defineStore("settings", () => {
         gfxButtonCount,
         removeHashInHex,
         rankTeamsOnEvents,
+        scheduleMatchesSort,
         splitSrByRole,
         showAllSrInputs,
         showNonCompetitive,

@@ -12,6 +12,7 @@ export const useSettingsStore = defineStore("settings", () => {
     const dashboardPickBanVisibility = ref("order");
     const gfxButtonCount = ref(6);
     const removeHashInHex = ref(false);
+    const rankTeamsOnEvents = ref(null);
 
     const transmitterUrl = ref("localhost:4455");
     const transmitterPassword = ref("");
@@ -41,6 +42,7 @@ export const useSettingsStore = defineStore("settings", () => {
         assumeLoserPicks,
         gfxButtonCount,
         removeHashInHex,
+        rankTeamsOnEvents,
         splitSrByRole,
         showAllSrInputs,
         showNonCompetitive,

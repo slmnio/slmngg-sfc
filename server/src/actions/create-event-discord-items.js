@@ -21,7 +21,7 @@ function determinate(val) {
 const working = new Map();
 /**
  *
- * @typedef { "edit_roles" | "assign_roles" | "unassign_roles" | "create_roles" | "delete_roles" | "delete_text_channels" | "create_text_channels" | "edit_text_channels" | "update_text_channels_permissions" | "delete_voice_channels" | "create_voice_channels" | "edit_voice_channels" | "update_voice_channels_permissions", "create_team_emoji", "edit_team_emoji", "delete_team_emoji" } ActionKey
+ * @typedef { "edit_roles" | "assign_roles" | "assign_custom_roles" | "unassign_roles" | "create_roles" | "delete_roles" | "delete_text_channels" | "create_text_channels" | "edit_text_channels" | "update_text_channels_permissions" | "delete_voice_channels" | "create_voice_channels" | "edit_voice_channels" | "update_voice_channels_permissions", "create_team_emoji", "edit_team_emoji", "delete_team_emoji" } ActionKey
  * */
 export default {
     key: "create-event-discord-items",
@@ -47,6 +47,10 @@ export default {
      * @param {boolean?} settings.roles.pingable
      * @param {boolean?} settings.roles.hoist
      * @param {string?} settings.teamEmoji.format
+     * @param {("player"|"staff"|"captain")[]} settings.customRoles.teamRoles
+     * @param {string[]} settings.customRoles.teamCategories
+     * @param {string} settings.customRoles.name
+     * @param {string?} settings.customRoles.roleID
      * @param {ActionAuth["user"]} user
      * @returns {Promise<void>}
      */
@@ -108,6 +112,29 @@ export default {
             };
 
             let fixes = [];
+
+            if (settings.customRoles?.length) {
+                // Create new custom roles if required
+                // sync with json field on event discord_control
+                // let existingCustomRoles = [];
+                // try {
+                //     existingCustomRoles = JSON.parse(eventControl.get("custom_roles"));
+                // } catch (e) {
+                //     console.warn(e);
+                // }
+
+                for (const role of settings.customRoles) {
+                    if (!role?.roleID) {
+                        console.log(`[Discord-Automation] Creating custom role ${role.name} ${role}`);
+                        const newRole = await guild.roles.create({ name: role.name });
+                        responseCounts.roles.created++;
+                        role.roleID = newRole.id;
+                        console.log(`[Discord-Automation] Custom role ${role.name} ${newRole.id}`);
+                    }
+                }
+
+                eventControl.push("custom_roles", JSON.stringify(settings.customRoles));
+            }
 
             let eventTextCategory;
             if (actions.includes("create_text_channels") || actions.includes("edit_text_channels")) {
@@ -187,6 +214,9 @@ export default {
                 const teamControl = new MapObject(team.discord_control);
                 const starting = teamControl.textMap;
 
+                const split = (team.team_category || "").split(";");
+                const teamCategory = split.pop().trim();
+
                 if (actions.includes("delete_roles") && teamControl.get("role_id")) {
                     console.log(`[Discord-Automation] deleting role ${teamControl.get("role_id")}`);
                     try {
@@ -248,26 +278,64 @@ export default {
                 ])]);
 
                 let membersForRole = [];
-                if (actions.includes("assign_roles") || actions.includes("unassign_roles")) {
+                if (actions.includes("assign_roles") || actions.includes("unassign_roles") || actions.includes("assign_custom_roles")) {
                     await Promise.all(playersForRole.map(async (player) => {
                         let { member, fixes: newFixes } = await findMember(player, team, guild);
                         fixes = [...fixes, ...newFixes];
                         if (member) {
-                            membersForRole.push({ member, player });
+                            membersForRole.push({
+                                member,
+                                player,
+                                playerTeamRoles: {
+                                    _isPlayer: (team.players || []).some(p => cleanID(p) === cleanID(player.id)),
+                                    _isCaptain: (team.captains || []).some(p => cleanID(p) === cleanID(player.id)),
+                                    _isStaff: (team.staff || []).some(p => cleanID(p) === cleanID(player.id)),
+                                }
+                            });
                         }
                     }));
                 }
-                if (actions.includes("assign_roles") && teamControl.get("role_id")) {
-                    await Promise.all(membersForRole.map(async ({ member, player }) => {
+                if ((actions.includes("assign_roles") || actions.includes("assign_custom_roles")) && teamControl.get("role_id")) {
+                    await Promise.all(membersForRole.map(async ({ member, player, playerTeamRoles }) => {
                         try {
                             // ACTION: assign_roles
-                            if (member.roles?.cache?.has(teamControl.get("role_id"))) {
-                                console.log("Player already has role", team.name, teamControl.get("role_id"), member.id, member.user.username, player.name);
-                                responseCounts.roles.alreadyAssigned++;
-                            } else {
-                                await member.roles.add(teamControl.get("role_id"), `Team role for ${event.name}`);
-                                console.log("Role success", team.name, teamControl.get("role_id"), member.id, member.user.username, player.name);
-                                responseCounts.roles.assigned++;
+                            if (actions.includes("assign_roles")) {
+                                if (member.roles?.cache?.has(teamControl.get("role_id"))) {
+                                    console.log("Player already has role", team.name, teamControl.get("role_id"), member.id, member.user.username, player.name);
+                                    responseCounts.roles.alreadyAssigned++;
+                                } else {
+                                    await member.roles.add(teamControl.get("role_id"), `Team role for ${event.name}`);
+                                    console.log("Role success", team.name, teamControl.get("role_id"), member.id, member.user.username, player.name);
+                                    responseCounts.roles.assigned++;
+                                }
+                            }
+                            if (actions.includes("assign_custom_roles")) {
+                                for (const customRole of (settings.customRoles || [])) {
+                                    // console.log("Categories", teamCategory, customRole.teamCategories.filter(Boolean));
+                                    if (!customRole.teamCategories?.filter(Boolean)?.length || customRole.teamCategories.includes(teamCategory)) {
+                                        // none specified or we hit this
+
+                                        // console.log("Roles", playerTeamRoles, customRole.teamRoles.filter(Boolean));
+                                        if (!customRole.teamRoles?.filter(Boolean)?.length || (
+                                            (customRole.teamRoles.includes("player") && playerTeamRoles._isPlayer) ||
+                                            (customRole.teamRoles.includes("captain") && playerTeamRoles._isCaptain) ||
+                                            (customRole.teamRoles.includes("staff") && playerTeamRoles._isStaff)
+                                        )) {
+                                            // add role here
+
+                                            console.log("Adding custom role to player", customRole, member.id, member.user.username, player.name, playerTeamRoles);
+
+                                            if (member.roles?.cache?.has(customRole.roleID)) {
+                                                console.log("Player already has custom role", customRole.name, customRole.roleID, member.id, member.user.username, player.name);
+                                                responseCounts.roles.alreadyAssigned++;
+                                            } else {
+                                                await member.roles.add(customRole.roleID, `Custom role for ${event.name}`);
+                                                console.log("Custom role success", customRole.name, customRole.roleID, member.id, member.user.username, player.name);
+                                                responseCounts.roles.assigned++;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         } catch (e) {
                             console.error(e?.rawError ?? e);
@@ -359,8 +427,6 @@ export default {
                 let teamTextCategoryChannel = eventTextCategory;
                 if (settings.textChannels.useTeamCategories && team.team_category) {
                     // need to find or create a category channel based on the team.team_category
-                    const split = team.team_category.split(";");
-                    const teamCategory = split.pop();
                     if (eventTextCategories.has(teamCategory)) {
                         // already loaded into map
                         teamTextCategoryChannel = eventTextCategories.get(teamCategory);
@@ -395,8 +461,6 @@ export default {
                 let teamVoiceCategoryChannel = eventVoiceCategory;
                 if (settings.voiceChannels.useTeamCategories && team.team_category) {
                     // need to find or create a category channel based on the team.team_category
-                    const split = team.team_category.split(";");
-                    const teamCategory = split.pop();
                     if (eventVoiceCategories.has(teamCategory)) {
                         // already loaded into map
                         teamVoiceCategoryChannel = eventVoiceCategories.get(teamCategory);

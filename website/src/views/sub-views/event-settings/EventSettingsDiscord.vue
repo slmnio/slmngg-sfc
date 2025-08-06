@@ -140,6 +140,32 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="d-flex gap-2 align-items-start justify-content-between opacity-changes mt-3" :class="{'low-opacity': processing['creating'] }">
+                    <div class="settings-group">
+                        <div class="settings-title fw-bold">Custom roles</div>
+                        <div class="custom-role-container d-flex gap-2 py-1 flex-wrap">
+                            <div v-for="(role, i) in runSettings.customRoles" :key="i" class="custom-role bg-dark p-2 rounded">
+                                <div class="role-name">
+                                    <b-form-input v-model="role.name" size="sm" placeholder="Custom role name" />
+                                </div>
+                                <div class="role-id pt-1">
+                                    <b-form-input v-model="role.roleID" size="sm" placeholder="Role ID" style="font-family: monospace" />
+                                </div>
+                                <div class="role-options">
+                                    <div class="role-options-title" style="font-style: italic">Team positions</div>
+                                    <b-form-checkbox-group v-model="role.teamRoles" class="ml-2" stacked :options="runOptions.customRoleOptions.teamRoles" />
+                                </div>
+                                <div v-if="anyTeamCategories" class="role-options">
+                                    <div class="role-options-title" style="font-style: italic">Categories</div>
+                                    <b-form-checkbox-group v-model="role.teamCategories" class="ml-2" stacked :options="teamCategories" />
+                                </div>
+                                <b-button class="mt-1" variant="danger" size="sm" @click="runSettings.customRoles.splice(i, 1)"><i class="fas fa-trash fa-fw"></i> Remove</b-button>
+                            </div>
+                        </div>
+                        <b-button variant="success" size="sm" @click="runSettings.customRoles.push({ teamRoles: ['player', 'staff', 'captain'], teamCategories: [...teamCategories], name: 'Custom role', roleID: null })"><i class="fas fa-plus fa-fw"></i> Add custom role</b-button>
+                    </div>
+                </div>
                 <div class="d-flex justify-content-end w-100 mt-3 gap-3 align-items-center">
                     <div v-if="liveRunData?.text" class="text-monospace">
                         {{ liveRunData?.text }}
@@ -154,7 +180,7 @@
                         :class="{'low-opacity': processing['creating'] }"
                         :disabled="processing['creating']"
                         @click="startProcessing">
-                        <i class="fas  fa-fw mr-1" :class="processing['creating'] ? 'fa-cog fa-spin': 'fa-cogs'"></i> Start processing
+                        <i class="fas fa-fw mr-1" :class="processing['creating'] ? 'fa-cog fa-spin': 'fa-cogs'"></i> Start processing
                     </b-button>
                 </div>
             </b-form-group>
@@ -303,7 +329,8 @@ export default {
             },
             teamEmoji: {
                 format: "{event_short}_{team_name}"
-            }
+            },
+            customRoles: []
         },
         roleData: null,
         runOutput: null,
@@ -360,6 +387,7 @@ export default {
                     ...roles,
                     { value: "edit_roles", text: "Update role (name/icon)" },
                     { value: "assign_roles", text: "Give team members roles" },
+                    { value: "assign_custom_roles", text: "Give custom roles" },
                     { value: "unassign_roles", text: "Remove unknown users from roles" },
                 ];
             }
@@ -409,11 +437,20 @@ export default {
                 teamEmoji.push({ value: "edit_team_emoji", text: "Edit team emoji names" });
             }
 
+            const customRoleOptions = {
+                teamRoles: [
+                    { value: "player", text: "Players" },
+                    { value: "staff", text: "Staff" },
+                    { value: "captain", text: "Captains" },
+                ]
+            };
+
             return {
                 roles,
                 textChannels,
                 voiceChannels,
-                teamEmoji
+                teamEmoji,
+                customRoleOptions
             };
         },
         canEditEventSettings() {
@@ -460,7 +497,7 @@ export default {
         teamCategories() {
             return this.teams.map(t => {
                 const cat = t.team_category?.split(";");
-                return !cat ? null : cat.pop();
+                return !cat ? null : cat.pop().trim();
             }).filter((v,i,a) => a.indexOf(v) === i);
         },
         copyTeams() {
@@ -643,6 +680,14 @@ export default {
             deep: true,
             handler(cats) {
                 this.copyCategories = cats;
+            }
+        },
+        "event.discord_control": {
+            immediate: true,
+            deep: true,
+            handler(discordControl) {
+                const control = new MapObject(discordControl);
+                this.runSettings.customRoles = JSON.parse(control.get("custom_roles") || "[]");
             }
         }
     }

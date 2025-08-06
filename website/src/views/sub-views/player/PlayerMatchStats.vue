@@ -41,7 +41,7 @@
             </thead>
             <tbody>
                 <tr v-for="team in showedTeams" :key="team.id" class="team">
-                    <td :style="eventStyle(team)">
+                    <td :style="eventStyle(team)" class="default-thing">
                         <div v-if="team.event">
                             <router-link class="d-flex align-items-center no-link-style" :to="url('event', team.event)">
                                 <ThemeLogo :theme="team.event.theme" border-width="0" logo-size="s-76" class="logo" />
@@ -49,7 +49,7 @@
                             </router-link>
                         </div>
                     </td>
-                    <td :style="teamStyle(team)">
+                    <td :style="teamStyle(team)" class="default-thing">
                         <router-link class="d-flex align-items-center no-link-style" :to="url('team', team)">
                             <ThemeLogo :theme="team.theme" border-width="0" logo-size="s-76" class="logo" />
                             <div class="p-1 team-name"><b>{{ team.name }}</b></div>

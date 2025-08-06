@@ -63,7 +63,7 @@ export default {
         ...mapWritableState(useSettingsStore, ["rankTeamsOnEvents"]),
         useRankings() {
             if (this.rankTeamsOnEvents !== null) return !!this.rankTeamsOnEvents;
-            return this.event?.in_progress;
+            return !this.event?.in_progress;
         },
         showRankingCheckbox() {
             return this.event?.teams?.some(t => t?.ranking_sort);

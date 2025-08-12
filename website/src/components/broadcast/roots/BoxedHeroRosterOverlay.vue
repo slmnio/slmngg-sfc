@@ -32,6 +32,11 @@
                             v-if="alternate"
                             class="alternate bg-center hero w-100"
                             :style="alternateHeroBG(player.favourite_hero_data || player.favourite_hero, alternate)"></div>
+                        <div
+                            v-if="video && alternateHeroVideo(player.favourite_hero_data || player.favourite_hero, video)"
+                            class="video bg-center hero w-100">
+                            <video loop muted autoplay :src="alternateHeroVideo(player.favourite_hero_data || player.favourite_hero, video)"></video>
+                        </div>
                         <div v-else class="recolored-hero-holder hero w-100">
                             <RecoloredHero
                                 v-if="team?.theme"
@@ -89,7 +94,7 @@ export default {
         RecoloredHero,
         ThemeTransition
     },
-    props: ["broadcast", "title", "playerCount", "teamNum", "showRoles", "showPronouns", "active", "animationActive", "subtitle", "alternate", "showStaff", "fill"],
+    props: ["broadcast", "title", "playerCount", "teamNum", "showRoles", "showPronouns", "active", "animationActive", "subtitle", "alternate", "video", "showStaff", "fill"],
     computed: {
         match() {
             if (!this.broadcast?.live_match) return null;
@@ -243,6 +248,12 @@ export default {
             // console.log(style);
             return style;
         },
+        alternateHeroVideo(hero, alternateNum) {
+            if (!hero) return null;
+            const file = hero.video?.[alternateNum - 1];
+            if (!file) return null;
+            return resizedAttachment(file, "orig");
+        },
         playerEligibleRoles(player) {
             return (player?.this_event_signup_data?.eligible_roles || player.eligible_roles || []).sort(sortRoles);
         }
@@ -261,6 +272,9 @@ export default {
         },
         animationActive(a) {
             console.log("animation active", a);
+            document.querySelectorAll("video").forEach(el => {
+                el.currentTime = 0;
+            });
         }
     },
     head() {
@@ -427,6 +441,12 @@ export default {
     align-items: center;
     width: 100%;
     justify-content: flex-end;
+}
+
+.video video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .recolored-hero-holder:deep(.recolored-hero[data-hero="Torbjörn"]) { transform: translate(3%, -5%); }

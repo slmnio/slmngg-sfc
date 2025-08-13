@@ -202,7 +202,9 @@
                 <div class="draft-details draft-subtitle">{{ draftSubtitle }}</div>
                 <div class="score">
                     <div v-if="middle === 'score'" class="middle scores">
-                        {{ [(match.score_1 || 0), (match.score_2 || 0)].join(" - ") }}
+                        <div class="middle-score">{{ match.score_1 || 0 }}</div>
+                        <div class="middle-dash">-</div>
+                        <div class="middle-score">{{ match.score_2 || 0 }}</div>
                     </div>
                     <div v-if="middle === 'vs'" class="middle vs">VS</div>
                 </div>
@@ -944,5 +946,12 @@ img.image-center {
 .draft-details.draft-title {
     font-weight: bold;
     font-size: 1.1em;
+}
+.middle.scores {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .25em;
+    text-align: center;
 }
 </style>

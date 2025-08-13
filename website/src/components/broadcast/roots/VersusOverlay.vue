@@ -19,7 +19,12 @@
                 </div>
                 <transition name="slide-out">
                     <div v-if="animationActive" class="slant" :class="vertical ? 'vs-vertical' : 'vs'">
-                        <div class="reverse-slant">{{ versusText }}</div>
+                        <div v-if="versusText === 'VS'" class="reverse-slant vs-text-vs">{{ versusText }}</div>
+                        <div v-else class="reverse-slant vs-text-score">
+                            <div class="vs-score">{{ match.score_1 || 0 }}</div>
+                            <div class="vs-dash">-</div>
+                            <div class="vs-score">{{ match.score_2 || 0 }}</div>
+                        </div>
                     </div>
                 </transition>
             </div>
@@ -254,5 +259,9 @@ export default {
     .fly-sides-enter-active .team .team-text {
         animation: split-middle-out forwards 3.5s ease;
     }
-
+    .vs-text-score {
+        display: flex;
+        justify-content: center;
+        gap: .25em;
+    }
 </style>

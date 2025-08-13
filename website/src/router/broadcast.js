@@ -5,7 +5,18 @@ export default [
         props: route => ({
             codes: route.query.codes,
             sponsorFadeSpeed: (route.query.sponsorSpeed || route.query.sponsorFadeSpeed),
-            basicMode: !!route.query.basic
+            basicMode: !!route.query.basic,
+            costreamerMode: !!route.query.costreamer
+        })
+    },
+    {
+        path: "costream",
+        alias: "costreamer",
+        component: () => import("@/components/broadcast/roots/IngameOverlay.vue"),
+        props: route => ({
+            basicMode: !!route.query.basic,
+            costreamerMode: true,
+            noAnimation: true
         })
     },
     {

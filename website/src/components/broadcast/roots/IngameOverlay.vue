@@ -1,5 +1,5 @@
 <template>
-    <div class="ingame-overlay" :class="{'basic': basicMode}" :data-map-type="currentMap?.map?.type">
+    <div class="ingame-overlay" :class="{'basic': basicMode, 'costreamer': costreamerMode}" :data-map-type="currentMap?.map?.type">
         <div class="top-overlay" :style="broadcastMargin">
             <IngameTeam
                 v-for="(team, i) in teams"
@@ -77,7 +77,7 @@ export default {
         Sponsors,
         IngameHeroBans
     },
-    props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed", "noAnimation", "basicMode"],
+    props: ["broadcast", "codes", "animationActive", "mapattack", "sponsorFadeSpeed", "noAnimation", "basicMode", "costreamerMode"],
     data: () => ({
         flippingTeams: false
     }),

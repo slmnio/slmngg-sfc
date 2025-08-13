@@ -171,6 +171,21 @@ export default {
                 this.crossfadePlayer = null;
             }, duration * 1000);
         },
+        startFadeOut(overrideDuration) {
+            const duration = overrideDuration || this.crossfadeDuration;
+            if (this.crossfading) return;
+            console.log(`Crossfading (${duration}s) - ${this.mainPlayer.id} - ${this.mainPlayer.title}`);
+            this.crossfading = true;
+
+            this.mainPlayer.rampVolume(this.volume, 0, duration);
+
+            setTimeout(() => {
+                console.log("Crossfade finished, ending player");
+                this.crossfading = false;
+                this.mainPlayer?.stop();
+                this.mainPlayer = null;
+            }, duration * 1000);
+        },
         startNewSong(isActive, fade) {
             if (this.crossfading) return; // already crossfading, dw about it
             if (isActive) {
@@ -234,6 +249,12 @@ export default {
             console.log("fade_skip_song", group, this.role);
             if (group === this.role) {
                 this.startNewSong(true, true);
+            }
+        },
+        fade_stop_song([group]) {
+            console.log("fade_stop_song", group, this.role);
+            if (group === this.role) {
+                this.startFadeOut();
             }
         }
     },

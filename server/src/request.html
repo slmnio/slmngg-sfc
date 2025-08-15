@@ -29,6 +29,13 @@
         .active-time {
             font-weight: bold;
         }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #222;
+                color: #ddd;
+            }
+        }
     </style>
 </head>
 <body>
@@ -64,7 +71,7 @@
                     ))
                 }}
             </td>
-            
+
             <td style="font-family: monospace">
                 <span v-if="table.fullRequest?.type === 'all' && table.fullRequest?.status === 'finished'">{{ ((table.fullRequest.duration / 1000) / table.airtableRequestCount).toFixed(2) }} s/r</span>
             </td>

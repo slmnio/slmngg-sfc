@@ -401,20 +401,20 @@ export default ({ app, cors, Cache }) => {
                     try {
                         let event = await Cache.get(match?.event?.[0]);
                         eventTheme = event?.theme?.length ? await Cache.get(event?.theme?.[0]) : null;
-                        const logo = await Cache.getAttachment(eventTheme?.default_logo?.[0]?.id);
-                        if (!logo) return null;
-                        let eventLogoFilePath = await fullGetURL(logo, "orig", null);
+                        let logoType = "default_logo";
 
-                        if (cleanID(event.id) === "vk8TXJYqDgAqSt") {
+
+                        if (cleanID(event.id) === "Oe05DyWZpgueqk") {
                             // deadlock fight night
                             sizing.teamLogo.height *= 0.8;
                             sizing.eventLogo = {
-                                height: 0.18,
+                                height: 0.25,
                                 width: 0.5,
                                 bottom: 0.04
                             };
+                            logoType = "default_wordmark";
                         }
-                        if (cleanID(event.id) === "91YDSMZbknSkBG") {
+                        if (cleanID(event.id) === "YD0qBga0FS6dfu") {
                             // rivals fight night
                             sizing.teamLogo.height *= 0.85;
                             sizing.eventLogo = {
@@ -423,6 +423,11 @@ export default ({ app, cors, Cache }) => {
                                 bottom: 0
                             };
                         }
+
+
+                        const logo = await Cache.getAttachment(eventTheme?.[logoType]?.[0]?.id);
+                        if (!logo) return null;
+                        let eventLogoFilePath = await fullGetURL(logo, "orig", null);
 
 
                         eventLogo = {

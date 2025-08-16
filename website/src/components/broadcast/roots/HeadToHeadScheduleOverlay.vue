@@ -10,7 +10,7 @@
                 :expanded="true"
                 :live="true"
                 :style="{'--auto-font-size': `${Math.min(48, 192 / matches.length)}px`}"
-                :schedule-text="formatText(broadcast?.head_to_head_schedule_text_format || '{match_sub_event} - {match_round}', broadcast?.event, match)"
+                :schedule-text="getMatchScheduleText(match)"
                 :theme-color="themeColor" />
         </transition-group>
     </GenericOverlay>
@@ -71,7 +71,15 @@ export default {
             return themeBackground1(this.broadcast.event);
         }
     },
-    methods: { formatText }
+    methods: {
+        formatText,
+        getMatchScheduleText(match) {
+            if (this.broadcast?.head_to_head_schedule_text_format) {
+                return formatText(this.broadcast.head_to_head_schedule_text_format, this.broadcast?.event, match);
+            }
+            return [match?.sub_event, match?.round].filter(Boolean).join(" - ");
+        }
+    }
 };
 </script>
 

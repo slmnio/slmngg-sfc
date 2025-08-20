@@ -203,8 +203,9 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import { authenticatedRequest } from "@/utils/dashboard";
-import { sortAlpha } from "@/utils/sorts";
+import { sortAlpha, sortAlphaRaw } from "@/utils/sorts";
 import { resizedImage } from "@/utils/images";
+import { GameOverrides } from "@/utils/games.js";
 
 export default {
     name: "BroadcastCustomisation",
@@ -262,23 +263,33 @@ export default {
                 })).sort((a,b) => sortAlpha(a,b,"text"))
             ];
         },
+        gameOverride() {
+            return GameOverrides[this.hydratedBroadcast?.event?.game];
+        },
         heroes() {
             const heroes = (ReactiveRoot("Heroes", {
                 "ids": ReactiveArray("ids")
             })?.ids || []);
-            return this.hydratedBroadcast?.event?.game !== "Overwatch" ? [{ value: null, text: "No hero" }, ...heroes.filter(h => h.game === this.hydratedBroadcast?.event?.game).map((h) => ({
-                text: h.name,
-                value: h.id
-            }))] : [
-                { value: null, text: "No hero" },
-                ...["DPS", "Tank", "Support"].map(key => ({
-                    text: key,
-                    options: heroes.filter(h => h.role === key).sort((a,b) => sortAlpha(a?.name, b?.name)).map(h => ({
-                        text: h.name,
-                        value: h.id
+            return this.gameOverride?.heroRoles?.length ?
+                [
+                    { value: null, text: "No hero" },
+                    ...(this.gameOverride?.heroRoles || []).map(key => ({
+                        text: key,
+                        options: heroes.filter(h => h.role === key).sort((a,b) => sortAlphaRaw(a?.name, b?.name)).map(h => ({
+                            text: h.name,
+                            value: h.id
+                        }))
                     }))
-                }))
-            ];
+                ] :
+                [
+                    { value: null, text: "No hero" },
+                    ...heroes.filter(h => h.game === this.hydratedBroadcast?.event?.game)
+                        .sort((a,b) => sortAlphaRaw(a?.name, b?.name))
+                        .map((h) => ({
+                            text: h.name,
+                            value: h.id
+                        }))
+                ];
         },
         players() {
             if (!this.hydratedBroadcast?.event?.id) return [

@@ -42,7 +42,8 @@ export const GameOverrides = {
         imageSets: {
             "matchDraftPick": ["icon", "main_image"]
         },
-        usernameKey: "marvel_rivals_username"
+        usernameKey: "marvel_rivals_username",
+        heroRoles: ["Duelist", "Vanguard", "Strategist"]
     },
     "Valorant": {
         useBestOf: true,
@@ -78,6 +79,9 @@ export const GameOverrides = {
             "heroPriority": ["main_image", "icon"]
         },
         usernameKey: "steam_id"
+    },
+    "Overwatch": {
+        heroRoles: ["DPS", "Tank", "Support"]
     }
 };
 

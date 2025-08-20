@@ -33,7 +33,7 @@
 <script>
 import { dirtyID, getPickBanItem } from "@/utils/content-utils";
 import { resizedImage } from "@/utils/images.js";
-import { sortAlpha } from "@/utils/sorts";
+import { sortAlphaRaw } from "@/utils/sorts";
 import { GameOverrides } from "@/utils/games";
 
 export default {
@@ -52,24 +52,26 @@ export default {
             return `No ${this.gameOverride?.lang?.hero?.toLowerCase() || "hero"}`;
         },
         heroOptions() {
-            return [
-                { value: null, text: this.emptyValue },
-                ...(
-                    this.game !== "Overwatch" ?
-                        (this.heroes || []).sort((a,b) => sortAlpha(a, b, "name")).map(h => ({
+            return this.gameOverride?.heroRoles?.length ?
+                [
+                    { value: null, text: this.emptyValue },
+                    ...(this.gameOverride?.heroRoles || []).map(key => ({
+                        text: key,
+                        options: this.heroes.filter(h => h.role === key).sort((a,b) => sortAlphaRaw(a?.name, b?.name)).map(h => ({
                             text: h.name,
                             value: dirtyID(h.id)
                         }))
-                        :
-                        ["DPS", "Tank", "Support"].map(key => ({
-                            text: key,
-                            options: (this.heroes || []).filter(h => h.role === key).sort((a,b) => sortAlpha(a, b, "name")).map(h => ({
-                                text: h.name,
-                                value: dirtyID(h.id)
-                            }))
+                    }))
+                ] :
+                [
+                    { value: null, text: this.emptyValue },
+                    ...this.heroes.filter(h => h.game === this.game)
+                        .sort((a,b) => sortAlphaRaw(a?.name, b?.name))
+                        .map((h) => ({
+                            text: h.name,
+                            value: dirtyID(h.id)
                         }))
-                )
-            ];
+                ];
         }
     },
     methods: {

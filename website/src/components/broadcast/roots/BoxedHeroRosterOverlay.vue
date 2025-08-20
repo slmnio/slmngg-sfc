@@ -28,6 +28,7 @@
                         :starting-delay="i * 100"
                         :leaving-delay="0"
                     >
+                        <div v-if="(player.favourite_hero_data || player.favourite_hero)?.background?.[0]" class="hero-background" :style="resizedImage((player.favourite_hero_data || player.favourite_hero), ['background'], 'orig')"></div>
                         <div
                             v-if="alternate"
                             class="alternate bg-center hero w-100"
@@ -238,6 +239,7 @@ export default {
         },
         themeBackground1,
         getRoleSVG,
+        resizedImage,
         alternateHeroBG(hero, alternateNum) {
             // console.log(hero, alternateNum);
             if (!hero) return {};
@@ -447,6 +449,17 @@ export default {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .recolored-hero-holder:deep(.recolored-hero[data-hero="Torbjörn"]) { transform: translate(3%, -5%); }

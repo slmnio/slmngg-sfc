@@ -3,7 +3,7 @@
     <ThemeTransition
         v-if="loaded"
         class="ingame-team-holder"
-        :class="{'right': right, 'left': !right}"
+        :class="{'right': right, 'left': !right, 'has-player-names': !!playerNames?.length}"
         :duration="500"
         :use-fit-content="true"
         :active="active"

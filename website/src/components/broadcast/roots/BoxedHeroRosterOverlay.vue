@@ -34,7 +34,7 @@
                             class="alternate bg-center hero w-100"
                             :style="alternateHeroBG(player.favourite_hero_data || player.favourite_hero, alternate)"></div>
                         <div
-                            v-if="video && alternateHeroVideo(player.favourite_hero_data || player.favourite_hero, video)"
+                            v-else-if="video && alternateHeroVideo(player.favourite_hero_data || player.favourite_hero, video)"
                             class="video bg-center hero w-100">
                             <video loop muted autoplay :src="alternateHeroVideo(player.favourite_hero_data || player.favourite_hero, video)"></video>
                         </div>

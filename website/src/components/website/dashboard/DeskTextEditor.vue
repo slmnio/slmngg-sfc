@@ -34,7 +34,8 @@
             <div v-if="showDraftControlButtons" class="d-flex flex-column flex-center">
                 <div class="small mb-1">Draft controls</div>
                 <b-button-group>
-                    <b-button variant="warning" @click="prodTrigger('reset_draft')">Reset</b-button>
+                    <b-button variant="danger" @click="prodTrigger('reset_draft')">Reset</b-button>
+                    <b-button variant="warning" @click="prodTrigger('show_full_draft')">Show all</b-button>
                     <b-button variant="info" @click="askAutoDraft()">Auto</b-button>
                     <b-button variant="primary" @click="prodTrigger('advance_draft')">Advance</b-button>
                 </b-button-group>

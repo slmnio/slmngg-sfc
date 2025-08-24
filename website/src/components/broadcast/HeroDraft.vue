@@ -589,6 +589,9 @@ export default {
         },
         auto_draft(seconds) {
             this.runAutoDraft(seconds);
+        },
+        show_full_draft() {
+            this.manualDraftAdvancing = false;
         }
     },
     mounted() {

@@ -35,6 +35,7 @@
                 <div class="small mb-1">Draft controls</div>
                 <b-button-group>
                     <b-button variant="warning" @click="prodTrigger('reset_draft')">Reset</b-button>
+                    <b-button variant="info" @click="askAutoDraft()">Auto</b-button>
                     <b-button variant="primary" @click="prodTrigger('advance_draft')">Advance</b-button>
                 </b-button-group>
             </div>
@@ -45,6 +46,8 @@
 <script>
 import { authenticatedRequest } from "@/utils/dashboard";
 import { socket } from "@/socket.js";
+import { formatDuration } from "@/utils/content-utils.js";
+import { GameOverrides } from "@/utils/games.js";
 
 export default {
     name: "DeskTextEditor",
@@ -167,6 +170,9 @@ export default {
         },
         noTextDisplayOptions() {
             return this.displayOptions.filter(option => !option?.value?.hasText);
+        },
+        gameOverride() {
+            return GameOverrides[this.broadcast?.event?.game];
         }
     },
     methods: {
@@ -211,6 +217,17 @@ export default {
         prodTrigger(event, data) {
             console.log(event, data);
             socket.emit("prod_trigger", event, data);
+        },
+        askAutoDraft() {
+            const num = parseInt(prompt("How many seconds between each pick/ban?"));
+            if (!num || isNaN(num)) return;
+            this.prodTrigger("auto_draft", num);
+            const estimatedLength = (this.broadcast?.live_match?.pick_ban_order || this.gameOverride?.defaultPickBanOrder || "").split(",")?.length;
+            if (estimatedLength) {
+                this.$notyf.success(`Starting auto draft with ${num}s intervals, ~${formatDuration(estimatedLength * (num + 1))} to completion`);
+            } else {
+                this.$notyf.success(`Starting auto draft with ${num}s intervals`);
+            }
         }
     },
     watch: {

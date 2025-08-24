@@ -257,7 +257,7 @@
                                     @change="(val) => winnerSelected(mapI, val)" />
                             </td>
                             <td v-if="type === 'pickban' && !banners[mapI]" colspan="200" class="bg-dark p-0">
-                                <div v-if="dashboardPickBanVisibility === 'inline' && (match?.pick_ban_order || gameOverride?.defaultPickBanOrder)" class="pickbans d-flex pickbans-inline">
+                                <div v-if="pickBanVisibility === 'inline' && (match?.pick_ban_order || gameOverride?.defaultPickBanOrder)" class="pickbans d-flex pickbans-inline">
                                     <div v-if="(match?.pick_ban_order || gameOverride?.defaultPickBanOrder) && (controls.showHeroBans || controls.showHeroPicks)" class="flip-controls flex-center flex-column h-100">
                                         <div class="pt-2">
                                             <i v-b-tooltip="'Flip pick/ban order'" class="fas fa-exchange"></i>
@@ -303,7 +303,7 @@
                                     </div>
                                 </div>
                                 <div v-else class="pickbans d-flex">
-                                    <div v-if="controls.showHeroPicks && !((getPickBanMax(pickBanOrder[mapI], 'pick') === 0) && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline'))" class="hero-picks-container">
+                                    <div v-if="controls.showHeroPicks && !((getPickBanMax(pickBanOrder[mapI], 'pick') === 0) && (pickBanVisibility === 'order' || pickBanVisibility === 'inline'))" class="hero-picks-container">
                                         <div class="hero-picks">
                                             <div class="form-top">
                                                 {{ teams[0]?.name }} Picks
@@ -315,7 +315,7 @@
                                                     :heroes="heroes"
                                                     :pick-ban-order="pickBanOrder[mapI]"
                                                     :current-action="{ team: 1, type: 'pick' }"
-                                                    :max="dashboardView && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline') ? getPickBanMax(pickBanOrder[mapI], 'pick', 1) : gameOverride?.defaultHeroPickCount || 5"
+                                                    :max="dashboardView && (pickBanVisibility === 'order' || pickBanVisibility === 'inline') ? getPickBanMax(pickBanOrder[mapI], 'pick', 1) : gameOverride?.defaultHeroPickCount || 5"
                                                 />
                                             </div>
                                         </div>
@@ -330,7 +330,7 @@
                                                     :heroes="heroes"
                                                     :pick-ban-order="pickBanOrder[mapI]"
                                                     :current-action="{ team: 2, type: 'pick' }"
-                                                    :max="dashboardView && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline') ? getPickBanMax(pickBanOrder[mapI], 'pick', 2) : gameOverride?.defaultHeroPickCount || 5"
+                                                    :max="dashboardView && (pickBanVisibility === 'order' || pickBanVisibility === 'inline') ? getPickBanMax(pickBanOrder[mapI], 'pick', 2) : gameOverride?.defaultHeroPickCount || 5"
                                                 />
                                             </div>
                                         </div>
@@ -346,7 +346,7 @@
                                             />
                                         </div>
                                     </div>
-                                    <div v-if="controls.showHeroBans && !((getPickBanMax(pickBanOrder[mapI], 'ban') === 0) && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline'))" class="hero-bans-container">
+                                    <div v-if="controls.showHeroBans && !((getPickBanMax(pickBanOrder[mapI], 'ban') === 0) && (pickBanVisibility === 'order' || pickBanVisibility === 'inline'))" class="hero-bans-container">
                                         <div class="hero-bans">
                                             <div class="form-top">
                                                 {{ teams[0]?.name }} Bans
@@ -358,7 +358,7 @@
                                                     :heroes="heroes"
                                                     :pick-ban-order="pickBanOrder[mapI]"
                                                     :current-action="{ team: 1, type: 'ban' }"
-                                                    :max="(dashboardView && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline') ? (getPickBanMax(pickBanOrder[mapI], 'ban', 1)) : gameOverride?.defaultHeroBanCount) || gameOverride?.defaultHeroBanCount || (getPickBanMax(pickBanOrder[mapI], 'ban', 1)) || 0"
+                                                    :max="(dashboardView && (pickBanVisibility === 'order' || pickBanVisibility === 'inline') ? (getPickBanMax(pickBanOrder[mapI], 'ban', 1)) : gameOverride?.defaultHeroBanCount) || gameOverride?.defaultHeroBanCount || (getPickBanMax(pickBanOrder[mapI], 'ban', 1)) || 0"
                                                 />
                                                 <!-- these hero picker max are just setting priority then falling back -->
                                             </div>
@@ -374,7 +374,7 @@
                                                     :heroes="heroes"
                                                     :pick-ban-order="pickBanOrder[mapI]"
                                                     :current-action="{ team: 2, type: 'ban' }"
-                                                    :max="(dashboardView && (dashboardPickBanVisibility === 'order' || dashboardPickBanVisibility === 'inline') ? (getPickBanMax(pickBanOrder[mapI], 'ban', 2)) : gameOverride?.defaultHeroBanCount) || gameOverride?.defaultHeroBanCount || (getPickBanMax(pickBanOrder[mapI], 'ban', 2)) || 0"
+                                                    :max="(dashboardView && (pickBanVisibility === 'order' || pickBanVisibility === 'inline') ? (getPickBanMax(pickBanOrder[mapI], 'ban', 2)) : gameOverride?.defaultHeroBanCount) || gameOverride?.defaultHeroBanCount || (getPickBanMax(pickBanOrder[mapI], 'ban', 2)) || 0"
                                                 />
                                             </div>
                                         </div>
@@ -540,6 +540,13 @@ export default {
             if (!this.match?.teams?.length) return [dummy, dummy];
             if (this.match.teams.length === 1) return [this.match.teams[0], dummy];
             return this.match.teams;
+        },
+        pickBanVisibility() {
+            if (this.dashboardView) {
+                return this.dashboardPickBanVisibility;
+            } else {
+                return "inline";
+            }
         },
         controls() {
             if (this.lockControls) {

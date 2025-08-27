@@ -61,7 +61,7 @@ export default {
         },
         versusText() {
             const scores = [this.match?.score_1 || 0, this.match?.score_2 || 0];
-            if (scores.some(s => s > 0)) {
+            if (scores.some(s => s > 0) || (this.broadcast?.broadcast_settings || [])?.includes("Force zeros on versus")) {
                 return scores.join(" - ");
             }
             return "VS";

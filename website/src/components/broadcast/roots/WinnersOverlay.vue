@@ -19,6 +19,8 @@
                     <div v-for="player in teamRoster.staff" :key="player" class="player">{{ player }}</div>
                 </div>
             </div>
+            <div v-if="extraInfo && winner?.name" class="extra-team-name">{{ winner?.name }}</div>
+            <div v-if="extraInfo && broadcast?.match_description_format" class="extra-match-description">{{ formatText(broadcast?.match_description_format, broadcast?.event, match) }}</div>
         </div>
     </div>
 </template>
@@ -27,6 +29,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { resizedImage } from "@/utils/images";
 import { logoBackground1 } from "@/utils/theme-styles";
 import ConfettiOverlay from "@/components/broadcast/roots/ConfettiOverlay.vue";
+import { formatText } from "@/utils/content-utils.js";
 
 export default {
     name: "WinnersOverlay",
@@ -35,7 +38,8 @@ export default {
         broadcast: {},
         title: String,
         useConfetti: Boolean,
-        animationActive: Boolean
+        animationActive: Boolean,
+        extraInfo: Boolean
     },
     computed: {
         match() {
@@ -76,6 +80,7 @@ export default {
             return { players: players.map(p => p.name), staff: staff.map(p => p.name) };
         }
     },
+    methods: { formatText },
     watch: {
         animationActive: {
             immediate: true,

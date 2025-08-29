@@ -75,12 +75,20 @@ export default [
             showSponsors: route.query.sponsors || route.query.showSponsors
         })
     },
-    { path: "versus", component: () => import("@/components/broadcast/roots/VersusOverlay.vue"), props: route => ({ vertical: route.query.vertical}) },
+    {
+        path: "versus",
+        component: () => import("@/components/broadcast/roots/VersusOverlay.vue"),
+        props: route => ({
+            vertical: route.query.vertical,
+            extraInfo: !!route.query.extra
+        })
+    },
     {
         path: "winners",
         component: () => import("@/components/broadcast/roots/WinnersOverlay.vue"),
         props: route => ({
-            useConfetti: !!route.query.confetti
+            useConfetti: !!route.query.confetti,
+            extraInfo: !!route.query.extra
         })
     },
     { path: "map-bump", component: () => import("@/components/broadcast/roots/MapBumpOverlay.vue") },

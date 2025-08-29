@@ -14,7 +14,13 @@
                     :class="{'has-role-icon': showRoles}"
                     :data-image-width="widths[i]"
                     :style="{flexGrow: widths[i], zIndex: animationActive ? Math.max(...widths) - widths[i] : 1}">
-                    <RecoloredHero class="h-100" :hero="player.favourite_hero" :theme="team.theme" @recolor_width="(w) => handleWidth(i, w)" />
+                    <RecoloredHero
+                        v-if="player.favourite_hero?.recolor_layers"
+                        class="h-100"
+                        :hero="player.favourite_hero"
+                        :theme="team.theme"
+                        @recolor_width="(w) => handleWidth(i, w)" />
+                    <div v-else class="player-static h-100 w-100 bg-center" :style="resizedImage(player.favourite_hero, ['recolor_base', 'main_image'], 'h-800')"></div>
                 </div>
             </div>
             <div class="player-names flex-center w-100 mt-4 justify-content-around" :class="{'has-role-icon': showRoles}">
@@ -37,6 +43,7 @@ import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import { themeBackground1 } from "@/utils/theme-styles";
 import { decoratePlayerWithDraftData, getRoleSVG } from "@/utils/content-utils";
 import { useStatusStore } from "@/stores/statusStore";
+import { bg, resizedImage } from "@/utils/images.js";
 
 export default {
     name: "HeroRosterOverlay",
@@ -96,6 +103,8 @@ export default {
         }
     },
     methods: {
+        resizedImage,
+        bg,
         getFavouriteHero(heroName) {
             if (!heroName || !(this.heroes || []).length) return null;
             return this.heroes.find(h => h.name && h.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() === heroName.toLowerCase());

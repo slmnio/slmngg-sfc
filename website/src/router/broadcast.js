@@ -262,6 +262,7 @@ export default [
         component: () => import("@/components/broadcast/roots/LBarOverlay"),
         props: route => ({
             showSponsors: route.query.sponsors || route.query.sponsor,
+            sponsorAnimationMode: route.query.sponsorAnimationMode || route.query.sponsorAnim,
             secondary: !!route.query.secondary
         })
     },

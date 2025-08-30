@@ -47,7 +47,7 @@
                 </transition>
             </Squeezable>
             <div v-if="showSponsors" class="l-bar-sponsors-holder flex-center">
-                <Sponsors class="l-bar-sponsors" :sponsors="sponsorThemes" />
+                <Sponsors class="l-bar-sponsors" :sponsors="sponsorThemes" :mode="sponsorAnimationMode" />
             </div>
         </div>
     </div>
@@ -72,7 +72,8 @@ export default {
         virtualMatch: {},
         title: String,
         showSponsors: String,
-        secondary: Boolean
+        secondary: Boolean,
+        sponsorAnimationMode: String
     },
     computed: {
         fullSchedule() {

@@ -104,7 +104,7 @@ export default {
             validatedData["Manual Guests"] = safeInput(manualGuests);
         }
         if (deskDisplayMode !== undefined) {
-            let eligibleModes = [null, "Match", "Predictions", "Maps", "Notice (Team 1)", "Notice (Team 2)", "Notice (Event)", "Scoreboard", "Drafted Maps", "Interview", "Hidden", "Casters", "Scoreboard Bans", "Hero Draft"];
+            let eligibleModes = [null, "Match", "Predictions", "Maps", "Notice (Team 1)", "Notice (Team 2)", "Notice (Event)", "Scoreboard", "Drafted Maps", "Drafted Maps (Reveal)", "Interview", "Hidden", "Casters", "Scoreboard Bans", "Hero Draft"];
             if (!eligibleModes.includes(deskDisplayMode)) throw ("Invalid display mode");
             validatedData["Desk Display"] = deskDisplayMode;
         }

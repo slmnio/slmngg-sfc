@@ -12,7 +12,7 @@
         <div v-if="draftedStyle && !complete && !map._next" class="map-gel w-100 h-100 position-absolute upcoming-gel flex-center"></div>
         <div class="map-main d-flex flex-column h-100 w-100 position-absolute">
             <div v-if="!small">
-                <div v-if="map.picker || map.banner" class="map-upper flex-center" :style="accent">
+                <div v-if="map.picker || map.banner" class="map-upper flex-center" :class="{'map-upper-picker': !!map.picker,'map-upper-banner': !!map.banner}" :style="accent">
                     <ThemeLogo
                         class="pick-ban-team"
                         :theme="pickBanTheme"
@@ -59,11 +59,23 @@
                     <div v-else-if="map._next" class="status-up-next text-center flex-center">
                         <div class="text">UP NEXT</div>
                     </div>
-                    <div v-else class="status-up-later text-center flex-center">
+                    <div v-else-if="map._number" class="status-up-later text-center flex-center">
                         <div class="text">MAP {{ map._number }}</div>
                     </div>
                 </div>
             </div>
+            <div v-if="draftedStyle && map.attack_side" class="map-attack-side" :data-attack="map.attack_side">
+                <div class="map-attack-choice">
+                    <ThemeLogo
+                        class="pick-ban-team"
+                        :theme="oppositePickBanTheme"
+                        border-width="4px"
+                        logo-size="w-100"
+                        icon-padding="2" />
+                </div>
+                <div class="map-attack-side-text">{{ map.attack_side }}</div>
+            </div>
+            <div v-else-if="draftedStyle" class="map-attack-side map-attack-side-dummy"></div>
         </div>
     </div>
 </template>
@@ -72,14 +84,14 @@
 import { logoBackground } from "@/utils/theme-styles";
 import { bg, getNewURL, resizedImage } from "@/utils/images";
 import ThemeLogo from "@/components/website/ThemeLogo";
-
+import { cleanID } from "@/utils/content-utils.js";
 
 export default {
     name: "MapSegment",
     components: {
         ThemeLogo
     },
-    props: ["broadcast", "map", "accentColor", "showMapVideo", "firstTo", "useShorterNames", "small", "draftedStyle"],
+    props: ["broadcast", "match", "map", "accentColor", "showMapVideo", "firstTo", "useShorterNames", "small", "draftedStyle"],
     computed: {
         complete() {
             return this.map.winner || this.map.draw;
@@ -94,6 +106,11 @@ export default {
         },
         pickBanTheme() {
             return (this.map.banner || this.map.picker)?.theme;
+        },
+        oppositePickBanTheme() {
+            const main = this.map?.banner || this.map?.picker;
+            const other = this.match.teams.find(t => cleanID(t?.id || t) !== cleanID(main?.id || main));
+            return other?.theme;
         },
         pickBanBorder() {
             return {
@@ -177,7 +194,8 @@ export default {
         filter: grayscale(1);
     }
     .map-lower,
-    .map-upper {
+    .map-upper,
+    .map-attack-side{
         font-size: 36px;
         text-align: center;
         padding: 10px 5px;
@@ -189,10 +207,13 @@ export default {
         background-color: #333333;
         color: #ffffff;
     }
-    .map-upper, .map-upper-spacer {
+    .map-upper, .map-upper-spacer, .map-attack-side, .map-attack-side-dummy {
         font-size: 24px;
         min-height: 2em;
         padding: 0;
+    }
+    .map-attack-side-dummy {
+        background-color: transparent;
     }
     .pick-ban-text {
         padding: 10px 5px;

@@ -279,7 +279,7 @@ export default [
             undraftedText: route.query.undraftedText || route.query.undrafted || route.query.drop
         })
     },
-    { path: "ad-read", component: () => import("@/components/broadcast/roots/AdReadOverlay.vue"), props: route => ({ extraDelay: route.query.delay }) },
+    { path: "ad-read", component: () => import("@/components/broadcast/roots/AdReadOverlay.vue"), props: route => ({ extraDelay: route.query.delay, startDelay: route.query.start }) },
     { path: "logos", component: () => import("@/components/broadcast/roots/LogoAdOverlay.vue") },
     { path: "staff", component: () => import("@/components/broadcast/roots/StaffOverlay.vue") },
     { path: "player-history", component: () => import("@/components/broadcast/PlayerHistory.vue"), props: route => ({ showMinor: route.query.minor }) },

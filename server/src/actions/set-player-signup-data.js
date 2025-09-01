@@ -1,6 +1,6 @@
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
 import { cleanID, deAirtableRecord, dirtyID } from "../action-utils/action-utils.js";
-import { log } from "../discord/slmngg-log.js";
+import { verboseLog } from "../discord/slmngg-log.js";
 
 const working = new Map();
 
@@ -132,7 +132,7 @@ export default {
                     } else {
                         player = deAirtableRecord(playerRecords?.[0]);
                         console.log("new player", player);
-                        await log(`New player created by ${user.airtable.name}: ${player.name} ([SLMN.GG](<https://slmn.gg/player/${cleanID(player.id)}>)) • ([Airtable](<https://airtable.com/apppzANPbAht3LmAQ/tblO3W5VfEglaLwWC/viwQx4cbXGCoCAvzq/${player.id}>)) \n\`\`\`json\n${JSON.stringify(airtablePlayerData, null, 2)}\`\`\``);
+                        verboseLog(`New player created via set-player-signup-data on ${event?.name || event?.id || eventID} by ${user.airtable.name}: ${player.name} ([SLMN.GG](<https://slmn.gg/player/${cleanID(player.id)}>)) • ([Airtable](<https://airtable.com/apppzANPbAht3LmAQ/tblO3W5VfEglaLwWC/viwQx4cbXGCoCAvzq/${player.id}>)) \n\`\`\`json\n${JSON.stringify(airtablePlayerData, null, 2)}\`\`\``);
                     }
                 } else {
                     actionResponse.errors.push("No name for this player, won't create a new record");
@@ -227,7 +227,7 @@ export default {
                             actionResponse.errors.push(newSignupRecords.error.errorMessage);
                         } else {
                             signupRecord = deAirtableRecord(newSignupRecords?.[0]);
-                            console.log("signupRecord", signupRecord);
+                            // console.log("signupRecord", signupRecord);
                             playerUpdateData["Signup Data"] = [
                                 ...(player.signup_data || []),
                                 dirtyID(signupRecord.id)
@@ -319,10 +319,12 @@ export default {
                     if (validation) {
                         data = validation(data);
                     }
+                    if (!data) return console.warn(`[always allowed] skipping update - empty - for ${signupDataKey}/${airtableKey} ${data}`); // don't allow blanks
+
                     // console.log(airtableKey, data, playerData?.[signupDataKey]);
 
-                    if (player[signupDataKey] === data) return;
-                    if (!player?.[signupDataKey]) return; // both nullish
+                    if (player[signupDataKey] === data) return console.warn(`[always allowed] skipping update - already existing - for ${signupDataKey}/${airtableKey} ${data}`);
+                    if (!player?.[signupDataKey]) return console.warn(`[always allowed] skipping update - empty2 - for ${signupDataKey}/${airtableKey} P=${player?.[signupDataKey]}:D=${data}`); // both nullish
 
                     playerUpdateData[airtableKey] = data;
                 });

@@ -129,7 +129,7 @@ export function deAirtable(obj) {
 
 
 export function deAirtableRecord(record) {
-    console.log("deAirtableRecord", record.id, record.fields);
+    // console.log("deAirtableRecord", record.id, record.fields);
     if (!record?.fields) return null;
     return {
         ...deAirtable(record.fields),

@@ -488,6 +488,7 @@ export default {
                     console.log("source match key", numberMap, sourceMatchKey, sourceMatchNum);
 
                     Object.entries(sourceMatchConnections).forEach(([mode, destinationMatch]) => {
+                        if (!["win", "lose"].includes(mode)) return;
                         if (!destinationMatch.includes(".")) {
                             // text specific
                             if (sourceMatchNum === "null" || !sourceMatchNum) return;

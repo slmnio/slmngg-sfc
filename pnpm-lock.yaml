@@ -80,6 +80,9 @@ importers:
       ora:
         specifier: ^5.4.0
         version: 5.4.1
+      shared:
+        specifier: workspace:^
+        version: link:../shared
       sharp:
         specifier: ^0.33.4
         version: 0.33.4
@@ -102,6 +105,8 @@ importers:
       tsx:
         specifier: ^4.19.1
         version: 4.19.1
+
+  shared: {}
 
   website:
     dependencies:

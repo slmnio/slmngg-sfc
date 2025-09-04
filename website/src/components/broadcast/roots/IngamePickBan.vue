@@ -11,7 +11,6 @@
                         :team="team"
                         :right="i === 1"
                         :active="true"
-                        :hide-scores="true"
                         class="pickban-team"
                     />
                     <div class="pickban-history d-flex">

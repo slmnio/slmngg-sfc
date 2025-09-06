@@ -38,6 +38,11 @@
                             class="video bg-center hero w-100">
                             <video loop muted autoplay :src="alternateHeroVideo(player.favourite_hero_data || player.favourite_hero, video)"></video>
                         </div>
+                        <div
+                            v-else-if="showHeadshots"
+                            :style="resizedImage(player, ['headshot'], 'orig')"
+                            class="headshot bg-center hero w-100">
+                        </div>
                         <div v-else class="recolored-hero-holder hero w-100">
                             <RecoloredHero
                                 v-if="team?.theme"
@@ -95,7 +100,7 @@ export default {
         RecoloredHero,
         ThemeTransition
     },
-    props: ["broadcast", "title", "playerCount", "teamNum", "showRoles", "showPronouns", "active", "animationActive", "subtitle", "alternate", "video", "showStaff", "fill"],
+    props: ["broadcast", "title", "playerCount", "teamNum", "showRoles", "showPronouns", "active", "animationActive", "subtitle", "alternate", "video", "showStaff", "fill", "showHeadshots"],
     computed: {
         match() {
             if (!this.broadcast?.live_match) return null;

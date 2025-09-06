@@ -173,6 +173,7 @@ export default [
             alternate: route.query.alternate ? parseInt(route.query.alternate) : null,
             video: route.query.video ? parseInt(route.query.video) : null,
             showStaff: !!route.query.staff,
+            showHeadshots: !!route.query.headshot || !!route.query.headshots,
             fill: (route.query.fill || "").split(/[,/]/g)
         })
     },

@@ -11,6 +11,7 @@
                         :team="team"
                         :right="i === 1"
                         :active="true"
+                        :score="scores[i]"
                         class="pickban-team"
                     />
                     <div class="pickban-history d-flex">
@@ -60,6 +61,10 @@ export default {
                     "team_2_bans": ReactiveArray("team_2_bans")
                 })
             });
+        },
+        scores() {
+            if (!this.match?.id) return [];
+            return [this.match.score_1, this.match.score_2];
         },
         teams() {
             console.warn("Teams", this.match?.teams);

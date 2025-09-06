@@ -162,7 +162,7 @@ export default {
             const diffFromNow = new Date(this.match.start) - new Date();
 
             // if (diffFromNow <= 0) return null; // don't show on past matches (could be disabled)
-            if ((this.scores || []).some(s => s === this.match?.first_to || 2)) return null; // don't show on matches in progress / completed
+            if ((this.scores || []).some(s => s === (this.match?.first_to || 2))) return null; // don't show on matches in progress / completed
 
             const clarifyDate = diffFromNow <= 0 || diffFromNow >= 1000 * 60 * 60 * 24 * 7;
 

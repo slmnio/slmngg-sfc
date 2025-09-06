@@ -15,7 +15,8 @@ import { Server, Socket } from "socket.io";
 import { Express, Request, Router } from "express";
 import { get } from "./action-utils/action-cache.js";
 import * as Cache from "./cache.js";
-import { cleanID, createRecord, dirtyID, updateRecord } from "./action-utils/action-utils.js";
+import { createRecord, dirtyID, updateRecord } from "./action-utils/action-utils.js";
+import { cleanID } from "shared";
 import { isEventStaffOrHasRole } from "./action-utils/action-permissions.js";
 import { processPickBanOrder } from "./action-utils/ts-action-utils.js";
 
@@ -552,13 +553,13 @@ class MatchRoom {
                     return {error: true, errorMessage: "Duplicate hero ID"};
                 }
 
-                console.log("updating", airtableKey)
+                console.log("updating", airtableKey);
 
                 await updateRecord(Cache, "Maps", map, {
                     [airtableKey]: [...existing, dirtyID(data.heroID)]
                 }, "match-rooms/hero-draft:lock-hero");
             } else {
-                console.warn("pick ban team number error", { pickBanTeamNum, teamID })
+                console.warn("pick ban team number error", { pickBanTeamNum, teamID });
             }
             this.sempahores.delete(command);
             const nextIndex = this.currentStepData.pickBanIndex + 1;

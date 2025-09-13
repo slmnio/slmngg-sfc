@@ -52,12 +52,31 @@
 
             <div class="fw-bold mb-2">Color matrix</div>
             <div class="color-matrix d-flex flex-column gap-1 mb-3">
+                <div class="color-matrix-header">
+                    <div class="color-test d-flex gap-2">
+                        <div class="hex-swatch" style="min-width:6em"></div>
+                        <div v-for="color in colorMatrix?.[0]?.colors" :key="color.value" class="hex-swatch gap-1 d-flex">
+                            <div class="dot-holder">
+                                <i class="fa fa-circle fa-fw" :style="{color: color.value}"></i>
+                            </div>
+                            <copy-text-button :no-icon="true">{{ safeColor(color.value) }}</copy-text-button>
+                        </div>
+                    </div>
+                </div>
                 <div v-for="color in colorMatrix" :key="color.background" class="discord-test d-flex gap-2">
                     <div class="color-test d-flex gap-2">
                         <div class="hex-swatch" style="min-width: 6em">
-                            <copy-text-button :no-icon="true">{{ safeColor(color.background) }}</copy-text-button>
+                            <div class="dot-holder">
+                                <i class="fa fa-square fa-fw" :style="{color: color.background}"></i>
+                            </div>
+                            <copy-text-button class="hex-swatch-text" :no-icon="true">{{ safeColor(color.background) }}</copy-text-button>
                         </div>
-                        <div v-for="text in color.colors" :key="text.value" class="hex-swatch d-flex justify-content-between gap-1" :style="{ backgroundColor: color.background, color: text.value }">
+                        <div
+                            v-for="text in color.colors"
+                            :key="text.value"
+                            class="hex-swatch d-flex justify-content-between gap-1"
+                            :style="{ backgroundColor: color.background, color: text.value }"
+                            :class="{'same': color.background === text.value}">
                             <div class="color-hex text-center flex-grow-1">
                                 <copy-text-button :no-icon="true">{{ safeColor(text.value) }}</copy-text-button>
                             </div>
@@ -186,6 +205,7 @@ export default {
             attrs.forEach(([key, val]) => {
                 if (!key.startsWith("color_")) return;
                 if (val) val = val.toUpperCase();
+                if (!val) return;
                 const u = colors.find(c => c.value === val);
                 key = cleanKey(key.replace("color_", ""));
                 if (u) {
@@ -217,10 +237,11 @@ export default {
                 ...(this.colors || []).map(col => col.value),
                 "#000000",
                 "#FFFFFF"
-            ])];
+            ])].filter(Boolean);
+            console.log({testColors});
             return testColors.map(col1 => ({
                 background: col1,
-                colors: testColors.filter(col2 => col2 !== col1).filter(col2 => ![col1, col2].every(col => col === "#000000" || col === "#FFFFFF")).map(col2 => ({
+                colors: testColors/*.filter(col2 => col2 !== col1).filter(col2 => ![col1, col2].every(col => col === "#000000" || col === "#FFFFFF"))*/.map(col2 => ({
                     value: col2,
                     contrast: calculateContrastHex(col1, col2)
                 }))
@@ -371,7 +392,13 @@ export default {
     .hex-swatch {
         min-width: 9em;
         text-align: center;
+        display: flex;
+        justify-content: center;
     }
+    .hex-swatch-text {
+        flex-grow: 1;
+    }
+
 
     .contrast-badge {
         padding: 0 0.25em;
@@ -386,5 +413,11 @@ export default {
 
     .theme-bar .contrast-badge {
         font-size: .75em;
+    }
+    .hex-swatch.same {
+        opacity: 0;
+    }
+    .hex-swatch.same .contrast-badge {
+        display: none;
     }
 </style>

@@ -323,8 +323,8 @@ export default {
 
                     // console.log(airtableKey, data, playerData?.[signupDataKey]);
 
-                    if (player[signupDataKey] === data) return console.warn(`[always allowed] skipping update - already existing - for ${signupDataKey}/${airtableKey} ${data}`);
-                    if (!player?.[signupDataKey]) return console.warn(`[always allowed] skipping update - empty2 - for ${signupDataKey}/${airtableKey} P=${player?.[signupDataKey]}:D=${data}`); // both nullish
+                    if (player[signupDataKey] === data) return; // console.warn(`[always allowed] skipping update - already existing - for ${signupDataKey}/${airtableKey} ${data}`);
+                    if (!player?.[signupDataKey] && !data) return; // console.warn(`[always allowed] skipping update - empty2 - for ${signupDataKey}/${airtableKey} P=${player?.[signupDataKey]}:D=${data}`); // both nullish
 
                     playerUpdateData[airtableKey] = data;
                 });

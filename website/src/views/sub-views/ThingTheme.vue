@@ -44,9 +44,17 @@
                         <div class="fw-bold">{{ thing?.name }}</div>
                     </div>
                     <div class="color-name"><CopyTextButton><code>{{ safeColor(color.value) }}</code></CopyTextButton></div>
-                    <div v-if="safeColor(theme.color_theme_on_dark || theme.color_theme) === safeColor(color.value)" class="color-chosen">
+                    <div v-if="safeColor(theme.color_theme_on_dark || theme.color_theme) === safeColor(color.value)" :class="{'low-opacity': processing['discord-color']}" class="color-chosen opacity-changes">
                         <i class="fas fa-arrow-left mr-1"></i> Currently active
                     </div>
+                    <b-button
+                        v-else-if="team?.id && team?.event?.id"
+                        size="sm"
+                        class="py-0 opacity-changes"
+                        :class="{'low-opacity': processing['discord-color']}"
+                        @click="setDiscordColor(this.team, color.value)">
+                        Set active
+                    </b-button>
                 </div>
             </div>
 
@@ -155,6 +163,7 @@ import { calculateContrastHex, url } from "@/utils/content-utils";
 import { mapWritableState } from "pinia";
 import { useSettingsStore } from "@/stores/settingsStore";
 import ContrastBadge from "@/components/website/ContrastBadge.vue";
+import { authenticatedRequest } from "@/utils/dashboard.js";
 
 function cleanKey(key) {
     return key.replace(/_/g, " ");
@@ -164,6 +173,9 @@ export default {
     name: "ThingTheme",
     components: { ContrastBadge, CopyTextButton, /* HeroColorControls, RecoloredHero, */ BracketTeam, IngameTeam, ContentRow, ContentThing, StandingsTeam },
     props: ["team", "event", "noImages"],
+    data: () => ({
+        processing: {}
+    }),
     computed: {
         ...mapWritableState(useSettingsStore, ["removeHashInHex"]),
         // heroes() {
@@ -246,9 +258,20 @@ export default {
                     contrast: calculateContrastHex(col1, col2)
                 }))
             }));
-        }
+        },
     },
     methods: {
+        async setDiscordColor(team, hex) {
+            this.processing["discord-color"] = true;
+            try {
+                await authenticatedRequest("actions/update-discord-color", {
+                    teamID: team.id,
+                    color: hex
+                });
+            } finally {
+                this.processing["discord-color"] = false;
+            }
+        },
         calculateContrastHex,
         bg,
         dataServerURL(path) {

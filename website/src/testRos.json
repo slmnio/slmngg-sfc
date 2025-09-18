@@ -1,0 +1,46 @@
+[
+    {
+        "id": "bla",
+        "ros": "",
+        "title": "Countdown",
+        "notes": "",
+        "scene": "Break L-bar",
+        "mics": null,
+        "audio": { "type": "Break" },
+        "duration": 0.5,
+        "startType": { "type": "time" }
+    },
+    {
+        "id": "bla2",
+        "ros": "",
+        "title": "Countdown - Recap",
+        "notes": "",
+        "scene": "Break L-bar",
+        "mics": null,
+        "audio": { "type": "Break" },
+        "duration": 10,
+        "startType": { "type": "seq" }
+    },
+    {
+        "id": "bla3",
+        "ros": "",
+        "title": "Countdown",
+        "notes": "",
+        "scene": "Break L-bar",
+        "mics": null,
+        "audio": { "type": "Break" },
+        "duration": 2.5,
+        "startType": { "type": "seq" }
+    },
+    {
+        "id": "bla4",
+        "ros": "",
+        "title": "Intro",
+        "notes": "",
+        "scene": "Casters",
+        "mics": { "type": "Casters" },
+        "audio": { "type": "Desk" },
+        "duration": 2.5,
+        "startType": { "type": "obs" }
+    }
+]

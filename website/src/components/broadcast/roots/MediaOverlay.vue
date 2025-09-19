@@ -4,7 +4,7 @@
         style="height: 100vh; width: 100vw;"
         :class="{'black-out': ended }">
         <yt-player
-            v-if="media"
+            v-if="media && videoId"
             ref="youtube"
             class="player"
             :videoid="videoId"

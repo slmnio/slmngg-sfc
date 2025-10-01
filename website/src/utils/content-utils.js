@@ -1295,20 +1295,10 @@ export function getTeamsWithPlaceholders(match, bracketData) {
         text = [text[0], text[1]];
     }
 
-    if (match.id === "CzbjokPncKo7hl") {
-        console.log({
-            text,
-            extraText,
-            teams: match.teams
-        });
-    }
-
     if (!match.teams || match.teams.length === 0) {
         if (text.length === 2) {
             return text.map((t, i) => ({
                 ...dummies[i],
-                text: t,
-                short: extraText[i],
                 ...(t ? { text: t } : {}),
                 ...(extraText[i] ? { short: extraText[i] } : {}),
             }));

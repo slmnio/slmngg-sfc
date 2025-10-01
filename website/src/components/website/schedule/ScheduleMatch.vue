@@ -100,7 +100,13 @@
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { url, cleanID, getScoreReportingBadge, getReschedulingBadge } from "@/utils/content-utils";
+import {
+    url,
+    cleanID,
+    getScoreReportingBadge,
+    getReschedulingBadge,
+    getTeamsWithPlaceholders
+} from "@/utils/content-utils";
 import ScheduleTime from "@/components/website/schedule/ScheduleTime";
 import { authenticatedRequest } from "@/utils/dashboard";
 import { mapWritableState } from "pinia";
@@ -161,44 +167,7 @@ export default {
         },
         teams() {
             if (this.match?.special_event) return [];
-            const dummy = { text: "TBD", dummy: true, id: null };
-            if (!this.match) return [{ ...dummy, _empty: true }, { ...dummy, _empty: true }];
-
-            let text = (this.match.placeholder_teams || "").trim().split("|").filter(t => t !== "");
-            let extraText = null;
-
-            if (text.length === 4) {
-                extraText = [text[2], text[3]];
-                text = [text[0], text[1]];
-            }
-
-            if (!this.match.teams || this.match.teams.length === 0) {
-                if (text.length === 2) {
-                    return text.map((t, ti) => ({ ...dummy, text: t, ...(extraText ? { code: extraText[ti] } : {}) }));
-                } else if (text.length === 1) {
-                    if (this.match.placeholder_right) return [dummy, { ...dummy, text: text[0], ...(extraText ? { code: extraText[0] } : {}) }];
-                    return [{ ...dummy, text: text[0], ...(extraText ? { code: extraText[0] } : {}) }, dummy];
-                } else if (text.length === 0) {
-                    // no text, just use TBDs
-                    return [dummy, dummy];
-                }
-            }
-            if (this.match.teams.length === 1) {
-                if (text.length === 2) {
-                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[1], ...(extraText ? { code: extraText[1] } : {}) }];
-                    return [{ ...dummy, text: text[0], ...(extraText ? { code: extraText[0] } : {}) }, this.match.teams[0]];
-                } else if (text.length === 1) {
-                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[0], ...(extraText ? { code: extraText[0] } : {}) }];
-                    return [{ ...dummy, text: text[0], ...(extraText ? { code: extraText[0] } : {}) }, this.match.teams[0]];
-                } else if (text.length === 0) {
-                    // no text, just use TBDs
-                    if (this.match.placeholder_right) return [this.match.teams[0], dummy];
-                    return [dummy, this.match.teams[0]];
-                }
-            }
-
-            if (this.match.teams.length === 2) return this.match.teams;
-            return [];
+            return getTeamsWithPlaceholders(this.match);
         },
         details() {
             if (!this.match) return "";

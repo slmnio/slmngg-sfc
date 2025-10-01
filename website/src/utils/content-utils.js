@@ -1263,3 +1263,147 @@ export function hydratedCommunityStreams() {
         })).sort((a,b) => sortAlphaRaw(a.match?.id, b.match?.id));
     });
 }
+
+
+export function getTeamsWithPlaceholders(match, bracketData) {
+    // bracketData can be used to generate updated match text with context from previous matches
+
+    const dummy = {
+        text: "TBD",
+        dummy: true,
+        id: null
+    };
+    const dummies = bracketData ? generateDummies(dummy, match, bracketData) : [dummy, dummy];
+    if (!match) {
+        return [{
+            ...dummies[0],
+            _empty: true
+        }, {
+            ...dummies[1],
+            _empty: true
+        }];
+    }
+    // console.log("dummies", match._bracket_data.num, dummies);
+
+    let text = (match.placeholder_teams || "").trim();
+    text = text ? text.split("|").map(x => !x ? null : x) : [];
+
+    let extraText = [null, null];
+
+    if (text.length === 4) {
+        extraText = [text[2], text[3]];
+        text = [text[0], text[1]];
+    }
+
+    if (match.id === "CzbjokPncKo7hl") {
+        console.log({
+            text,
+            extraText,
+            teams: match.teams
+        });
+    }
+
+    if (!match.teams || match.teams.length === 0) {
+        if (text.length === 2) {
+            return text.map((t, i) => ({
+                ...dummies[i],
+                text: t,
+                short: extraText[i],
+                ...(t ? { text: t } : {}),
+                ...(extraText[i] ? { short: extraText[i] } : {}),
+            }));
+        } else if (text.length === 1) {
+            if (match.placeholder_right) {
+                return [dummies[0], {
+                    ...dummies[1],
+                    ...(text[0] ? { text: text[0] } : {}),
+                }];
+            }
+            return [{
+                ...dummies[0],
+                ...(text[0] ? { text: text[0] } : {}),
+                ...(extraText[0] ? { short: extraText[0] } : {}),
+            }, dummies[1]];
+        } else if (text.length === 0) {
+            // no text, just use TBDs
+            return dummies;
+        }
+    }
+    if (match.teams.length === 1) {
+        if (text.length === 2) {
+
+            if (match.placeholder_right) {
+                return [match.teams[0], {
+                    ...dummies[1],
+                    ...(text[1] ? { text: text[1] } : {}),
+                    ...(extraText[1] ? { short: extraText[1] } : {}),
+                }];
+            }
+            return [{
+                ...dummies[0],
+                ...(text[0] ? { text: text[0] } : {}),
+                ...(extraText[0] ? { short: extraText[0] } : {}),
+            }, match.teams[0]];
+
+        } else if (text.length === 1) {
+
+            if (match.placeholder_right) {
+                return [match.teams[0], {
+                    ...dummies[1],
+                    ...(text[0] ? { text: text[0] } : {}),
+                    ...(extraText[0] ? { short: extraText[0] } : {}),
+                }];
+            }
+
+            return [{
+                ...dummies[0],
+                ...(text[0] ? { text: text[0] } : {}),
+                ...(extraText[0] ? { short: extraText[0] } : {}),
+            }, match.teams[0]];
+        } else if (text.length === 0) {
+            // no text, just use TBDs
+            if (match.placeholder_right) return [match.teams[0], dummies[1]];
+            return [dummies[0], match.teams[0]];
+        }
+    }
+
+    if (match.teams.length === 2) return match.teams;
+    return [];
+
+}
+
+function generateDummies(dummy, match, bracketData) {
+    // "1" and "2" come from the dot notation (eg "winner": "7.2")
+    // so 1 is top/left, 2 is bottom/right
+
+    const feederMatches = bracketData?.connections?.feederMatches;
+    // console.log("cons", match?._bracket_data?.num, match?._bracket_data?.connections);
+    if (!feederMatches || (!feederMatches["1"] && !feederMatches["2"])) return [dummy, dummy];
+    const dummies = [dummy, dummy];
+    if (feederMatches["1"]) {
+        // console.log("f1", feederMatches["1"]);
+        dummies[0] = {
+            ...dummy,
+            text: generateDummyText(feederMatches["1"])
+        };
+    }
+
+    if (feederMatches["2"]) {
+        // console.log("f2", feederMatches["2"]);
+        dummies[1] = {
+            ...dummy,
+            text: generateDummyText(feederMatches["2"])
+        };
+    }
+
+    // console.log("dummies", match._bracket_data.num, dummies);
+
+    return dummies;
+}
+
+function generateDummyText(match) {
+    if (match?.teams?.length === 2 && match.teams.every(team => team.code)) {
+        return `${match._m} of ${match.teams.map(team => team.code).join(" vs ")}`;
+    }
+    return `${match._m} M${(match.match_number || match.side)}`;
+}

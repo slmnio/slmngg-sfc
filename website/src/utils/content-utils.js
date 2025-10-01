@@ -29,13 +29,13 @@ import clashIcon from "@/assets/map-type-icons/clash.png";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 
-export function getImage (i) {
+export function getImage(i) {
     // console.log(i);
     if (!i) return null;
     return i[0].url;
 }
 
-export function url (page, record, options = {}) {
+export function url(page, record, options = {}) {
     if (record && record.id) record.id = cleanID(record.id);
 
     if (this.$root.minisiteEvent &&
@@ -72,7 +72,7 @@ export function url (page, record, options = {}) {
     return `/${page}/${record.id}${(options && options.subPage) ? `/${options.subPage}` : ""}`;
 }
 
-export function image (theme, key) {
+export function image(theme, key) {
     return `url(${getImage(theme[key])})`;
 }
 
@@ -87,7 +87,7 @@ function resizedImage(theme, key, minSize = 30) {
     return image.url;
 }
 
-export function cleanID (id) {
+export function cleanID(id) {
     if (id?.id) return id.id;
     // console.log(">id", id);
     if (!id) return null;
@@ -95,6 +95,7 @@ export function cleanID (id) {
     if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
     return id;
 }
+
 export function dirtyID(id) {
     // add rec
     if (!id) return id;
@@ -121,7 +122,10 @@ export function multiImage(theme, keys, minSize = 30, useResizer = true) {
     return url || null;
 }
 
-export function getMatchContext(match, { light, split } = {}) {
+export function getMatchContext(match, {
+    light,
+    split
+} = {}) {
     let pieces;
     if (light) {
         pieces = [match?.sub_event].filter(Boolean);
@@ -254,7 +258,12 @@ export function likelyNeededMaps(match) {
 
     // currently played + 1 (tiebreakers, draws etc)
 
-    console.log({ playedMaps, toWin, withoutDraws, draws });
+    console.log({
+        playedMaps,
+        toWin,
+        withoutDraws,
+        draws
+    });
 
     return withoutDraws + draws;
 }
@@ -322,7 +331,10 @@ export function getTeamsMapStats(teams, requestMatch, requestMap, filters) {
 
                 if (requestMatch?.maps?.length) {
                     const scheduledMap = requestMatch.maps.find(m => m.name?.length && matchMap.name?.length && (m.name[0] === matchMap.name[0]));
-                    console.log(matchMap.name, { scheduledMap, matchMap });
+                    console.log(matchMap.name, {
+                        scheduledMap,
+                        matchMap
+                    });
                     if (scheduledMap) stat.scheduled_for_match = true;
                 }
 
@@ -356,7 +368,10 @@ export function getTeamsMapStats(teams, requestMatch, requestMap, filters) {
         });
 
         stat.score = stat.wins + (stat.losses * -0.25);
-        return { stats: stat, team };
+        return {
+            stats: stat,
+            team
+        };
     });
 
     if (stats?.[0]?.stats?.score > stats?.[1]?.stats?.score) {
@@ -417,7 +432,11 @@ function getNoSunAbbreviation(abbrev) {
  * @param {boolean?} use24HourTime - use 24 hour time
  * @returns {string}
  */
-export function formatTime(timeString, { tz, use24HourTime = false, format = "{day-short} {date-ordinal} {month-short} {year} {time} {tz}" } = {}) {
+export function formatTime(timeString, {
+    tz,
+    use24HourTime = false,
+    format = "{day-short} {date-ordinal} {month-short} {year} {time} {tz}"
+} = {}) {
     if (!tz) tz = useSettingsStore().timezone;
     const timezone = getTimezone(tz);
     const time = spacetime((new Date(timeString)).getTime()).goto(timezone);
@@ -622,9 +641,27 @@ export function getAssociatedThemeOptions(player, valueFn) {
     });
 
     return [
-        { value: null, disabled: true, text: "Choose a theme" },
-        { label: "Teams", options: teams.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortTeams).map((t) => ({ ...t, text: t.name, value: valueFn ? valueFn(t) : t.id })) },
-        { label: "Events", options: events.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortEvents).map((e) => ({ ...e, text: e.name, value: valueFn ? valueFn(e) : e.id })) }
+        {
+            value: null,
+            disabled: true,
+            text: "Choose a theme"
+        },
+        {
+            label: "Teams",
+            options: teams.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortTeams).map((t) => ({
+                ...t,
+                text: t.name,
+                value: valueFn ? valueFn(t) : t.id
+            }))
+        },
+        {
+            label: "Events",
+            options: events.filter((i, p, a) => a.map(x => x.id).indexOf(i.id) === p).sort(sortEvents).map((e) => ({
+                ...e,
+                text: e.name,
+                value: valueFn ? valueFn(e) : e.id
+            }))
+        }
     ];
 }
 
@@ -736,7 +773,10 @@ export function decoratePlayerWithDraftData(player, eventID) {
  * @param {Object} eventSettings - The event settings object
  * @returns {{small: string, variant: string, text: string, title: string}|{variant: string, text: string}|null}
  */
-export function getScoreReportingBadge({ state, report }, eventSettings) {
+export function getScoreReportingBadge({
+    state,
+    report
+}, eventSettings) {
     if (!state.reports_enabled) return null;
     if (report?.approved || state.match_complete) return null;
 
@@ -830,8 +870,14 @@ export function getScoreReportingBadge({ state, report }, eventSettings) {
  * @param {Object} eventSettings - The event settings object
  * @returns {{small: string, variant: string, text: string, title: string}|{variant: string, text: string}|null}
  */
-export function getReschedulingBadge({ state, report }, eventSettings) {
-    console.log("rescheduling", { state, report });
+export function getReschedulingBadge({
+    state,
+    report
+}, eventSettings) {
+    console.log("rescheduling", {
+        state,
+        report
+    });
     if (state.reports_loading) return null;
     if (!state.reports_enabled) return null;
     if (!(state.is_on_teams || state.is_staff)) return null;
@@ -972,7 +1018,7 @@ function contrast(rgb1, rgb2) {
  */
 export function calculateContrastRGB(rgb1, rgb2) {
     const diff = contrast(rgb1, rgb2);
-    return diff < 1 ? 1/diff: diff;
+    return diff < 1 ? 1 / diff : diff;
 }
 
 function deHex(hexString) {
@@ -990,7 +1036,7 @@ function deHex(hexString) {
  */
 export function calculateContrastHex(hex1, hex2) {
     const diff = contrast(deHex(hex1), deHex(hex2));
-    return diff < 1 ? 1/diff: diff;
+    return diff < 1 ? 1 / diff : diff;
 }
 
 export function recogniseRemoteServer(serverUrl) {
@@ -1114,7 +1160,7 @@ export function countStats(matches) {
                 const action = order[i];
                 if (completeTokens.includes(action)) continue;
 
-                const nextAction = order[i+1];
+                const nextAction = order[i + 1];
 
                 if (nextAction && nextAction !== action) {
                     completeTokens.push(action);
@@ -1260,7 +1306,7 @@ export function hydratedCommunityStreams() {
             "team": ReactiveThing("team", {
                 "theme": ReactiveThing("theme")
             })(stream)
-        })).sort((a,b) => sortAlphaRaw(a.match?.id, b.match?.id));
+        })).sort((a, b) => sortAlphaRaw(a.match?.id, b.match?.id));
     });
 }
 

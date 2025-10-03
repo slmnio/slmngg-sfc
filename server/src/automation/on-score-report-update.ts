@@ -238,7 +238,12 @@ export default {
                                 key: "report_opponent_notification",
                                 mapObject: messageData,
                                 channelID: eventSettings.logging.captainNotifications,
-                                content: `📣 ${originalPing}\nYour score report has been denied and countered by your opponent. Please check their submission to see if it is correct:\n${matchLink}/score-reporting`
+                                content: `📣 ${originalPing}\nYour score report has been denied and countered by your opponent. Please check their submission to see if it is correct:\n${matchLink}/score-reporting`,
+                                success: async (mapObject : MapObject) => {
+                                    await updateRecord(Cache, "Reports", report, {
+                                        "Message Data": mapObject.textMap
+                                    }, "automation/on-score-report-update");
+                                }
                             });
                         }
 

@@ -210,7 +210,7 @@ function keyDeAirtable(key) {
 }
 
 function generateLimitedPlayers(longText) {
-    return longText.split("\n").filter(e => e).map(line => {
+    return longText.split(/[\n;]/g).filter(e => e).map(line => {
         let player = {
             limited: true
         };

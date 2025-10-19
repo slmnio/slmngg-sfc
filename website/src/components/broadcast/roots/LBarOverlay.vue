@@ -1,7 +1,7 @@
 <template>
     <div class="l-bar-overlay">
         <div class="left-bar flex-center flex-column text-center" :style="boxColours">
-            <div class="countdown-group flex-center flex-column" :style="themeColor">
+            <div class="countdown-group flex-center flex-column" :class="{'counting-down': !!broadcast.countdown_end}" :style="themeColor">
                 <transition name="fade" mode="out-in" class="countdown-text" tag="div">
                     <span :key="countdownText" class="industry-align">
                         {{ countdownText }}

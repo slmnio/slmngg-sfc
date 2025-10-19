@@ -40,7 +40,7 @@
                     :inner-delay="150"
                     :duration="500">
                     <div class="break-main event-theme-border overlay--bg" :style="eventBorder">
-                        <div class="break-col break-left-col">
+                        <div class="break-col break-left-col" :class="{'counting-down': !!broadcast.countdown_end}">
                             <transition name="anim-break-next">
                                 <div v-if="nextMatch" class="break-next">
                                     <BreakMatch

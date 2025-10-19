@@ -48,7 +48,7 @@
             </transition>
             <transition name="seg">
                 <div v-if="showSegment('Countdown')" :key="'Countdown'" class="segment-wrapper">
-                    <div class="overlay--bg bar-segment segment-countdown flex-center flex-column">
+                    <div class="overlay--bg bar-segment segment-countdown flex-center flex-column" :class="{'counting-down': !!broadcast.countdown_end}">
                         <div class="segment-title">
                             <span class="industry-align">
                                 {{ countdownText }}

@@ -218,6 +218,8 @@ export default {
     .broadcast-app, #overlay, body.overlay {
         overflow: hidden;
         font-family: "SLMN-Industry", "Industry", sans-serif;
+        width: 100vw;
+        height: 100vh;
     }
     body.overlay #slmngg-app {
         padding-bottom: 0 !important;

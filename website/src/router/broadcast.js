@@ -69,6 +69,14 @@ export default [
         })
     },
     {
+        path: "break-content",
+        component: () => import("@/components/broadcast/break/BreakContent.vue"),
+        props: route => ({
+            secondary: !!route.query.secondary,
+            interval: route.query.interval || route.query.headlineInterval
+        })
+    },
+    {
         path: "break-schedule",
         component: () => import("@/components/broadcast/break/BreakScheduleOverlay.vue"),
         props: route => ({

@@ -73,7 +73,8 @@ export default [
         component: () => import("@/components/broadcast/break/BreakContent.vue"),
         props: route => ({
             secondary: !!route.query.secondary,
-            interval: route.query.interval || route.query.headlineInterval
+            interval: route.query.interval || route.query.headlineInterval,
+            fullView: true
         })
     },
     {
@@ -355,7 +356,8 @@ export default [
         path: "gfx/:index",
         component: () => import("@/components/broadcast/roots/GFXRoot.vue"),
         props: route => ({
-            index: parseInt(route.params.index) || parseInt(route.query.index ?? route.query.number) || 1
+            index: parseInt(route.params.index) || parseInt(route.query.index ?? route.query.number) || 1,
+            forceExtended: !!route.query.extended || !!route.query.expanded || !!route.query.full,
         })
     },
     {

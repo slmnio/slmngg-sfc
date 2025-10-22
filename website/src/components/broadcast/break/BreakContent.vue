@@ -1,5 +1,5 @@
 <template>
-    <div class="break-main break-main-content event-theme-border overlay--bg" :style="eventBorder">
+    <div class="break-main break-main-content" :class="{'full': fullView, 'event-theme-border overlay--bg': !fullView}" :style="eventBorder">
         <transition name="break-content" mode="out-in">
             <transition-group
                 v-if="automatedShow === 'Schedule'"
@@ -47,8 +47,7 @@
                 :event="event"
                 :bracket="bracket"
                 use-overlay-scale
-                small
-                :scale="0.85" />
+                :small="forceGfxSmall" />
             <div
                 v-else-if="automatedShow === 'Other Streams'"
                 key="Other-Streams"
@@ -73,6 +72,13 @@
                 :key="`Matchup-${nextMatch ? nextMatch.id : ''}`"
                 class="break-col break-matchup"
                 :match="nextMatch" />
+            <GFXRoot
+                v-else-if="automatedShow?.startsWith('gfx:')"
+                :key="`GFX-${automatedShow}`"
+                :broadcast="broadcast"
+                class="break-col break-gfx"
+                :force-extended="forceGfxSmall"
+                :gfx-i-d="getGFX(automatedShow)" />
         </transition>
     </div>
 </template>
@@ -90,12 +96,15 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js"
 import { themeBackground1 } from "@/utils/theme-styles.js";
 import { sortMatches } from "@/utils/sorts.js";
 import { resizedImage, resizedImageNoWrap } from "@/utils/images.js";
+import { cleanID } from "@/utils/content-utils.js";
+import GFXRoot from "@/components/broadcast/roots/GFXRoot.vue";
 
 const tickTime = 20;
 
 export default {
     name: "BreakContent",
     components: {
+        GFXRoot,
         BreakMatch,
         OtherBroadcasts,
         Bracket,
@@ -110,8 +119,10 @@ export default {
         virtualMatch: {},
         customBreakAutomation: String,
         title: String,
+        fullView: Boolean,
         animationActive: Boolean,
         secondary: Boolean,
+        forceGfxSmall: Boolean,
     },
     data: () => ({
         tick: 0,
@@ -189,9 +200,14 @@ export default {
             if (!this.hasStaff(this.staffSchedule)) slides = slides.filter(s => s !== "Staff");
             if (this.virtualMatch) slides = slides.filter(s => s !== "Schedule"); // Only going to be 1 match atm so matchup will be fine
 
+            if (this.broadcast?.break_gfx?.length) {
+                slides = [...(this.broadcast?.break_gfx || []).map(x => `gfx:${cleanID(x)}`), ...slides];
+            }
+
             if (slides?.includes("Schedule") && this.countdownEnd && this.lastCountdownTick <= 30) {
                 return "Schedule";
             }
+            console.log("post", slides);
 
             return slides[(this.tick % slides.length)];
         },
@@ -279,6 +295,11 @@ export default {
         },
     },
     methods: {
+        getGFX(gfxString) {
+            const [g, id] = gfxString.split("gfx:");
+            return id;
+            // return this.broadcast.break_gfx.find(gfx => cleanID(gfx) === cleanID(id));
+        },
         nbr(text) {
             if (!text) return "";
             return text.replace(/\\n/g, "<br>");
@@ -360,6 +381,9 @@ export default {
 
     height: 100%;
     margin-top: 0;
+}
+.break-main.full {
+    background-color: transparent;
 }
 .break-image {
     /*background-color: rgba(0,0,0,0.2);*/
@@ -513,5 +537,14 @@ export default {
 
 .a--match-enter-to, .a--match-leave-from {
     max-height: 180px;
+}
+
+.break-gfx {
+    position: relative;
+    padding: 20px;
+}
+
+.break-main-content:not(.full) :deep(.image-overlay-raw) {
+    padding: 40px;
 }
 </style>

@@ -14,3 +14,9 @@ export default {
     props: ["broadcast", "title", "markdown", "extended"]
 };
 </script>
+
+<style scoped>
+.overlay-markdown {
+    text-align: left;
+}
+</style>

@@ -157,7 +157,8 @@ export default {
 
                 // check if obs director is live with producer
                 const producer = scenes.find(s => (s.clientPositions || []).includes("Producer") && (!((s.clientPositions || []).includes("Observer Director"))));
-                console.log("obs director prod scene", producer, producer?.programScene, ["OBSDIR", "Director", "Clean feed"].some(str => producer.programScene.toLowerCase().includes(str.toLowerCase())));
+
+                console.log("obs director prod scene", producer, producer?.programScene, ["OBSDIR", "Director", "Clean feed"].some(str => producer.programScene && producer.programScene.toLowerCase().includes(str.toLowerCase())));
                 if (producer) {
                     if (producer?.programScene && ["OBSDIR", "Director", "Clean feed"].some(str => producer.programScene.toLowerCase().includes(str.toLowerCase()))) {
                         // obs is in program

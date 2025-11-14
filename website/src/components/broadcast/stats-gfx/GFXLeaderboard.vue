@@ -6,15 +6,19 @@
         :style="{ fontSize: leaderboardFontSize }">
         <table class="w-100">
             <tbody>
-                <tr v-for="(thing, i) in things" :key="thing?.id" class="leaderboard-row" :class="{'multi-item': leaderboardData?.[i]?.length > 1}">
+                <tr
+                    v-for="(thing, i) in things"
+                    :key="thing?.id"
+                    class="leaderboard-row"
+                    :class="{'multi-item': rawLeaderboardData?.[i]?.values?.length > 1}">
                     <td class="position-number">
-                        <div class="industry-align">{{ i+1 }}</div>
+                        <div class="industry-align">{{ i + 1 }}</div>
                     </td>
                     <div
                         v-if="showBarGraph"
                         class="bar"
                         :style="{
-                            width: `${parseInt(leaderboardData?.[i]?.[leaderboardData?.[i]?.length - 1]) / parseInt(leaderboardData?.[0]?.[leaderboardData?.[0]?.length - 1]) * 100}%`,
+                            width: `${parseInt(rawLeaderboardData?.[i]?.values?.[rawLeaderboardData?.[i]?.values?.length - 1]) / parseInt(rawLeaderboardData?.[0]?.values?.[rawLeaderboardData?.[i]?.values?.length - 1]) * 100}%`,
                             animationDuration: `${1.5 + (i * 0.1)}s`
                         }"></div>
                     <td class="logo-container">
@@ -24,16 +28,21 @@
                             class="player-team-logo"
                             :theme="getRelevantTeam(thing)?.theme"
                             logo-size="w-500" />
+                        <div
+                            v-else-if="thing.image"
+                            class="player-team-logo"
+                            style="background-size: contain"
+                            :style="{ backgroundImage: `url(${thing.image})` }"></div>
                         <div v-else class="player-team-logo default-thing player-team-logo-placeholder"></div>
                     </td>
                     <td class="player-name">
                         <div class="industry-align">{{ thing.name }}</div>
                     </td>
                     <td
-                        v-for="(item, itemNum) in (leaderboardData?.[i] || [])"
+                        v-for="(item, itemNum) in (rawLeaderboardData?.[i]?.values || [])"
                         :key="item"
                         class="leaderboard-item text-right"
-                        :class="{'nums': numeric(item), 'data-item': itemNum === leaderboardData?.[i]?.length - 1}"
+                        :class="{'nums': numeric(item), 'data-item': itemNum === rawLeaderboardData?.[i]?.values?.length - 1}"
                         :data-item-num="(itemNum)">
                         <div class="industry-align">{{ item }}</div>
                     </td>
@@ -58,11 +67,33 @@ export default {
         things() {
             if (this.gfx?.teams?.length) return this.gfx.teams;
             if (this.gfx?.players?.length) return this.gfx.players;
+            if (this.rawLeaderboardData?.length) return this.rawLeaderboardData;
             return [];
         },
-        leaderboardData() {
+        rawLeaderboardData() {
             if (!this.gfx?.markdown?.length) return [];
-            return this.gfx.markdown.split("\n").filter(Boolean).map(line => line.split("|"));
+            return this.gfx.markdown.split("\n").filter(Boolean).map(line => {
+                const lineData = {
+                    values: []
+                };
+                const values = line.split("|");
+
+                values.forEach(value => {
+                    if (!value.includes("=")) return lineData.values.push(value);
+
+                    const [k, v] = value.split("=");
+
+                    if (k.toLowerCase() === "image") {
+                        lineData.image = v;
+                    } else if (k.toLowerCase() === "name") {
+                        lineData.name = v;
+                    } else {
+                        lineData.values.push(value);
+                    }
+                });
+
+                return lineData;
+            });
         },
         leaderboardFontSize() {
             const thingCount = this.things?.length;

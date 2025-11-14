@@ -6,7 +6,7 @@
         :style="{ fontSize: leaderboardFontSize }">
         <table class="w-100">
             <tbody>
-                <tr v-for="(thing, i) in things" :key="thing?.id" class="leaderboard-row" :class="{'multi-item': leaderboardData?.[i]?.length > 1}">
+                <tr v-for="(thing, i) in things" :key="thing?.id" class="leaderboard-row" :class="{'multi-item': cleanLeaderboardData?.[i]?.length > 1}">
                     <td class="position-number">
                         <div class="industry-align">{{ i+1 }}</div>
                     </td>
@@ -14,7 +14,7 @@
                         v-if="showBarGraph"
                         class="bar"
                         :style="{
-                            width: `${parseInt(leaderboardData?.[i]?.[leaderboardData?.[i]?.length - 1]) / parseInt(leaderboardData?.[0]?.[leaderboardData?.[0]?.length - 1]) * 100}%`,
+                            width: `${parseInt(cleanLeaderboardData?.[i]?.[cleanLeaderboardData?.[i]?.length - 1]) / parseInt(cleanLeaderboardData?.[0]?.[cleanLeaderboardData?.[0]?.length - 1]) * 100}%`,
                             animationDuration: `${1.5 + (i * 0.1)}s`
                         }"></div>
                     <td class="logo-container">
@@ -24,16 +24,17 @@
                             class="player-team-logo"
                             :theme="getRelevantTeam(thing)?.theme"
                             logo-size="w-500" />
+                        <div v-else-if="markdownImages?.[i]" class="player-team-logo" style="background-size: contain" :style="{ backgroundImage: `url(${markdownImages?.[i]})` }"></div>
                         <div v-else class="player-team-logo default-thing player-team-logo-placeholder"></div>
                     </td>
                     <td class="player-name">
                         <div class="industry-align">{{ thing.name }}</div>
                     </td>
                     <td
-                        v-for="(item, itemNum) in (leaderboardData?.[i] || [])"
+                        v-for="(item, itemNum) in (cleanLeaderboardData?.[i] || [])"
                         :key="item"
                         class="leaderboard-item text-right"
-                        :class="{'nums': numeric(item), 'data-item': itemNum === leaderboardData?.[i]?.length - 1}"
+                        :class="{'nums': numeric(item), 'data-item': itemNum === cleanLeaderboardData?.[i]?.length - 1}"
                         :data-item-num="(itemNum)">
                         <div class="industry-align">{{ item }}</div>
                     </td>
@@ -58,9 +59,21 @@ export default {
         things() {
             if (this.gfx?.teams?.length) return this.gfx.teams;
             if (this.gfx?.players?.length) return this.gfx.players;
+            if (this.markdownThings?.length) return this.markdownThings;
             return [];
         },
-        leaderboardData() {
+        markdownThings() {
+            if (!this.rawLeaderboardData?.length || !this.rawLeaderboardData[0]?.length > 1 || !this.rawLeaderboardData[0].filter(item => item.startsWith("Name=")).length > 0) return [];
+            return this.rawLeaderboardData.map(row => row.filter(item => item.startsWith("Name=")).map(item => ({name: item.replace("Name=", "")}))[0]);
+        },
+        markdownImages() {
+            if (!this.rawLeaderboardData?.length || !this.rawLeaderboardData[0]?.length > 1 || !this.rawLeaderboardData[0].filter(item => item.startsWith("Image=")).length > 0) return [];
+            return this.rawLeaderboardData.map(row => row.filter(item => item.startsWith("Image=")).map(item => item.replace("Image=", ""))[0]);
+        },
+        cleanLeaderboardData() {
+            return this.rawLeaderboardData?.map(row => row.filter(item => !item.includes("=")));
+        },
+        rawLeaderboardData() {
             if (!this.gfx?.markdown?.length) return [];
             return this.gfx.markdown.split("\n").filter(Boolean).map(line => line.split("|"));
         },

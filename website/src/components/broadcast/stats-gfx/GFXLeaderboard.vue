@@ -18,7 +18,7 @@
                         v-if="showBarGraph"
                         class="bar"
                         :style="{
-                            width: `${parseInt(rawLeaderboardData?.[i]?.values?.[rawLeaderboardData?.[i]?.values?.length - 1]) / parseInt(rawLeaderboardData?.[0]?.values?.[rawLeaderboardData?.[i]?.values?.length - 1]) * 100}%`,
+                            width: `${parseFloat(rawLeaderboardData?.[i]?.values?.[rawLeaderboardData?.[i]?.values?.length - 1]) / parseFloat(rawLeaderboardData?.[0]?.values?.[rawLeaderboardData?.[i]?.values?.length - 1]) * 100}%`,
                             animationDuration: `${1.5 + (i * 0.1)}s`
                         }"></div>
                     <td class="logo-container">

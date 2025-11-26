@@ -463,8 +463,8 @@
 import { authenticatedRequest } from "@/utils/dashboard";
 import ContentThing from "@/components/website/ContentThing";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
-import { cleanID } from "shared";
-import {dirtyID, formatTime, processPickBanOrder, textSort } from "@/utils/content-utils";
+import { cleanID, dirtyID } from "shared";
+import { formatTime, processPickBanOrder, textSort } from "@/utils/content-utils";
 import TeamPicker from "@/components/website/dashboard/TeamPicker";
 import MapScoreEditor from "@/components/website/dashboard/MapScoreEditor";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";

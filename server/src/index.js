@@ -12,8 +12,7 @@ import webAuction from "./web_auction.js";
 import matchRooms from "./match-rooms.js";
 // import * as draftRoom from "./draft-room.ts";
 import * as actions from "./action-utils/action-manager.js";
-import { dirtyID } from "./action-utils/action-utils.js";
-import { cleanID } from "shared";
+import { cleanID, dirtyID } from "shared";
 
 const app = express();
 const port = 8901;

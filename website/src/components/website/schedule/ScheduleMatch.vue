@@ -100,7 +100,8 @@
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { url, cleanID, getScoreReportingBadge, getReschedulingBadge } from "@/utils/content-utils";
+import { url, getScoreReportingBadge, getReschedulingBadge } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import ScheduleTime from "@/components/website/schedule/ScheduleTime";
 import { authenticatedRequest } from "@/utils/dashboard";
 import { mapWritableState } from "pinia";

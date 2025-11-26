@@ -1,4 +1,5 @@
-import { dirtyID, getBroadcast, getMaps, getMatchData } from "../action-utils/action-utils.js";
+import { dirtyID } from "shared";
+import { getBroadcast, getMaps, getMatchData } from "../action-utils/action-utils.js";
 
 export default {
     key: "multi-map-win",

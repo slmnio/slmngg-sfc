@@ -1,10 +1,10 @@
 import { ActionAuth, Match, MatchResolvableID, Report, ScoreReportingReportKeys } from "../types.js";
 import { Action } from "../action-utils/action-manager-models.js";
-import { dirtyID, getMatchScoreReporting } from "../action-utils/action-utils.js";
+import { cleanID, dirtyID } from "shared";
+import { getMatchScoreReporting } from "../action-utils/action-utils.js";
 import { get } from "../action-utils/action-cache.js";
 import { MapObject } from "../discord/managers.js";
 import { looseDeleteRecordedMessage } from "../action-utils/ts-action-utils.js";
-import { cleanID } from "shared";
 
 export default {
     key: "approve-score-report",

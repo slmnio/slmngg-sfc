@@ -15,9 +15,10 @@ export function cleanTypedID<IDType extends string>(id: (IDType | DirtyAirtableI
     return id as IDType;
 }
 
-export function dirtyID(id: string) {
-    if (id.length === 14) return "rec" + id;
-    return id;
+// Allow a passthrough type for now - almost everything will be a dirty ID and the distinction to clean needs to be
+export function dirtyID<IDType extends string>(id: IDType) {
+    if (id.length === 14) return "rec" + id as IDType;
+    return id as IDType;
 }
 
 export * from "./types";

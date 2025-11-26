@@ -1,4 +1,5 @@
-import { dirtyID, getBroadcast, getMatchData } from "../action-utils/action-utils.js";
+import { dirtyID } from "shared";
+import { getBroadcast, getMatchData } from "../action-utils/action-utils.js";
 
 export default {
     key: "update-live-match-map-data",

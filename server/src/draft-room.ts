@@ -1,5 +1,6 @@
 import * as Cache from "./cache.js";
-import { createRecord, dirtyID, updateRecord } from "./action-utils/action-utils";
+import { createRecord, updateRecord } from "./action-utils/action-utils";
+import { dirtyID } from "shared";
 import { get } from "./action-utils/action-cache.js";
 import { MatchResolvableID } from "./types.js";
 import { Server, Socket } from "socket.io";

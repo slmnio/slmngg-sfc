@@ -17,23 +17,6 @@ export async function getSelfClient(Cache, token) {
     return await Cache.get(clientID);
 }
 
-/**
- *
- * @param {AnyAirtableID|null} id
- * @returns {CleanAirtableID|null}
- */
-
-/**
- * @param {AnyAirtableID} id
- * @returns {DirtyAirtableID}
- */
-export function dirtyID(id) {
-    // add rec
-    if (!id) return id;
-    if (id.length === 14) return "rec" + id;
-    return id;
-}
-
 const TimeOffset = 3 * 1000;
 
 /**

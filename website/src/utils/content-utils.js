@@ -88,13 +88,6 @@ function resizedImage(theme, key, minSize = 30) {
     return image.url;
 }
 
-export function dirtyID(id) {
-    // add rec
-    if (!id) return id;
-    if (id.length === 14) return "rec" + id;
-    return id;
-}
-
 export function cssImage(cssVar, theme, keys, minSize = 30, useResizer = true) {
     const url = multiImage(theme, keys, minSize, useResizer);
     const css = {};

@@ -1,6 +1,6 @@
 import * as Cache from "./cache.js";
-import { dirtyID, updateRecord } from "./action-utils/action-utils.js";
-import { cleanID } from "shared";
+import { cleanID, dirtyID } from "shared";
+import { updateRecord } from "./action-utils/action-utils.js";
 import { isEventStaffOrHasRole } from "./action-utils/action-permissions.js";
 
 

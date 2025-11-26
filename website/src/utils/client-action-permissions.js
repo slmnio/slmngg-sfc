@@ -1,3 +1,5 @@
+import { dirtyID } from "shared";
+
 export function canEditMatch(player, { event, match } = {}) {
     if (!player || !event) return false;
     if ((match?.player_relationships || []).some(rel => rel.player?.[0] === dirtyID(player.id) && (rel.permissions || []).includes("Match Editor"))) return true;

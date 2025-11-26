@@ -1,7 +1,10 @@
 {
-  "name": "shared",
-  "main": "./index.ts",
-  "types": "./index.ts",
-  "type": "module",
-  "private": true
+    "name": "shared",
+    "main": "./index.ts",
+    "types": "./index.ts",
+    "type": "module",
+    "private": true,
+    "dependencies": {
+        "discord-api-types": "^0.37.79"
+    }
 }

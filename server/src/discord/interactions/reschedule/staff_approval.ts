@@ -1,4 +1,4 @@
-import { MatchResolvableID } from "../../../types.js";
+import { MatchResolvableID } from "shared";
 import * as Cache from "../../../cache.js";
 import { getInternalManager } from "../../../action-utils/action-manager.js";
 import { InteractionHandler } from "../../interactions.js";

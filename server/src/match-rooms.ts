@@ -1,5 +1,7 @@
 import {
     AuthUserData,
+    cleanTypedID,
+    dirtyID,
     Event,
     HeroResolvableID,
     Match,
@@ -9,14 +11,13 @@ import {
     PlayerResolvableID,
     Team,
     TeamResolvableID
-} from "./types.js";
+} from "shared";
 
 import { Server, Socket } from "socket.io";
 import { Express, Request, Router } from "express";
 import { get } from "./action-utils/action-cache.js";
 import * as Cache from "./cache.js";
 import { createRecord, updateRecord } from "./action-utils/action-utils.js";
-import { cleanTypedID, dirtyID } from "shared";
 import { isEventStaffOrHasRole } from "./action-utils/action-permissions.js";
 import { processPickBanOrder } from "./action-utils/ts-action-utils.js";
 

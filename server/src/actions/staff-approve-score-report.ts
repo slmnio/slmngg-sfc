@@ -1,10 +1,18 @@
-import { ActionAuth, EventSettings, Match, MatchResolvableID, Report, ScoreReportingReportKeys } from "../types.js";
+import {
+    ActionAuth,
+    cleanTypedID,
+    dirtyID,
+    EventSettings,
+    MapObject,
+    Match,
+    MatchResolvableID,
+    Report,
+    ScoreReportingReportKeys
+} from "shared";
 import { Action } from "../action-utils/action-manager-models.js";
-import { cleanTypedID, dirtyID } from "shared";
 import { getMatchScoreReporting } from "../action-utils/action-utils.js";
 import { get } from "../action-utils/action-cache.js";
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
-import { MapObject } from "../discord/managers.js";
 import client from "../discord/client.js";
 import { looseDeleteRecordedMessage, looseDeleteRecordedMessages } from "../action-utils/ts-action-utils.js";
 

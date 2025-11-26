@@ -2,8 +2,7 @@ import client from "./client.js";
 import { ActivityType } from "discord-api-types/v10";
 import { Snowflake } from "discord-api-types/globals";
 import { get } from "../action-utils/action-cache.js";
-import { EventResolvableID, Match, Player, TeamResolvableID } from "../types.js";
-import { MapObject } from "./managers.js";
+import { EventResolvableID, MapObject, Match, Player, TeamResolvableID } from "shared";
 import { auth, cacheStatusEmitter, set } from "../cache.js";
 import { Activity, Collection, GuildMember, Presence } from "discord.js";
 

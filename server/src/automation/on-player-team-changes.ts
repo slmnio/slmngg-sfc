@@ -1,10 +1,8 @@
-import { AnyAirtableID, EventSettings, Player, TeamResolvableID } from "../types.js";
+import { AnyAirtableID, cleanTypedID, EventSettings, MapObject, Player, TeamResolvableID } from "shared";
 import { get } from "../action-utils/action-cache.js";
-import { MapObject } from "../discord/managers.js";
 import client from "../discord/client.js";
 import { findMember } from "../action-utils/action-utils.js";
 import emoji from "../discord/emoji.js";
-import { cleanTypedID } from "shared";
 
 const PlayerTeamRoleMap = {
     "member_of": "player",

@@ -1,17 +1,18 @@
 import {
     AnyAirtableID,
+    cleanTypedID,
     EventSettings,
+    MapObject,
     Report,
     ReschedulingReportKeys,
     ScoreReportingReportKeys,
     Theme
-} from "../types.js";
+} from "shared";
 import { get } from "../action-utils/action-cache.js";
 import * as Cache from "../cache.js";
 import { getInternalManager } from "../action-utils/action-manager.js";
 import { hammerTime, updateRecord } from "../action-utils/action-utils.js";
 import client from "../discord/client.js";
-import { MapObject } from "../discord/managers.js";
 import {
     generateMatchReportText,
     getTeamEmojiText,
@@ -22,7 +23,6 @@ import {
 } from "../action-utils/ts-action-utils.js";
 import { ButtonBuilder, ButtonStyle } from "discord.js";
 import emoji from "../discord/emoji.js";
-import { cleanTypedID } from "shared";
 
 const processing = new Set<AnyAirtableID>();
 const dataServer = process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg";

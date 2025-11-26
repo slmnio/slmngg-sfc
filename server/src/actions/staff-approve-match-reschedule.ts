@@ -1,9 +1,7 @@
-import { ActionAuth, Match, MatchResolvableID, Report, ReschedulingReportKeys } from "../types.js";
+import { ActionAuth, dirtyID, MapObject, Match, MatchResolvableID, Report, ReschedulingReportKeys } from "shared";
 import { Action } from "../action-utils/action-manager-models.js";
-import { dirtyID } from "shared";
 import { get } from "../action-utils/action-cache.js";
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
-import { MapObject } from "../discord/managers.js";
 import { looseDeleteRecordedMessages } from "../action-utils/ts-action-utils.js";
 import { getMatchRescheduling } from "../action-utils/action-utils.js";
 

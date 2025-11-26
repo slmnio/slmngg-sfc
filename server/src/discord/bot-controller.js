@@ -2,8 +2,7 @@ import { Client, GatewayIntentBits } from "discord.js";
 import { EndBehaviorType, joinVoiceChannel } from "@discordjs/voice";
 
 import { auth, get, onUpdate } from "../cache.js";
-import { MapObject } from "./managers.js";
-import { cleanID } from "shared";
+import { cleanID, MapObject } from "shared";
 
 const { getBots, getPlayer } = auth;
 

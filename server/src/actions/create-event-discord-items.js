@@ -1,6 +1,6 @@
 import client from "../discord/client.js";
 import * as Cache from "../cache.js";
-import { MapObject } from "../discord/managers.js";
+import { MapObject } from "shared";
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
 import { findMember, getAll } from "../action-utils/action-utils.js";
 import { getDiscordIcon } from "../discord/role-icon.js";

@@ -277,7 +277,7 @@
 
 <script>
 import { ReactiveRoot } from "@/utils/reactive";
-import { MapObject } from "@/utils/map-object";
+import { MapObject } from "shared";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import { authenticatedRequest } from "@/utils/dashboard";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";

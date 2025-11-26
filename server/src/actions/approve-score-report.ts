@@ -1,9 +1,16 @@
-import { ActionAuth, Match, MatchResolvableID, Report, ScoreReportingReportKeys } from "../types.js";
+import {
+    ActionAuth,
+    cleanTypedID,
+    dirtyID,
+    MapObject,
+    Match,
+    MatchResolvableID,
+    Report,
+    ScoreReportingReportKeys
+} from "shared";
 import { Action } from "../action-utils/action-manager-models.js";
-import { cleanTypedID, dirtyID } from "shared";
 import { getMatchScoreReporting } from "../action-utils/action-utils.js";
 import { get } from "../action-utils/action-cache.js";
-import { MapObject } from "../discord/managers.js";
 import { looseDeleteRecordedMessage } from "../action-utils/ts-action-utils.js";
 
 export default {

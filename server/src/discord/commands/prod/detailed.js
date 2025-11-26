@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from "discord.js";
 import * as Cache from "../../../cache.js";
-import { MapObject } from "../../managers.js";
-import { cleanID } from "shared";
+import { cleanID, MapObject } from "shared";
 
 
 export default {

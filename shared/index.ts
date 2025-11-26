@@ -22,3 +22,4 @@ export function dirtyID<IDType extends string>(id: IDType) {
 }
 
 export * from "./types";
+export * from "./managers";

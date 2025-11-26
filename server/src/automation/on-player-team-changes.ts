@@ -4,7 +4,7 @@ import { MapObject } from "../discord/managers.js";
 import client from "../discord/client.js";
 import { findMember } from "../action-utils/action-utils.js";
 import emoji from "../discord/emoji.js";
-import { cleanID, cleanTypedID } from "shared";
+import { cleanTypedID } from "shared";
 
 const PlayerTeamRoleMap = {
     "member_of": "player",
@@ -151,8 +151,8 @@ export default {
                     if (event?.subdomain || event?.partial_subdomain) {
                         subdomain = (event.subdomain || event.partial_subdomain || "") + ".";
                     }
-                    const playerLink = `https://${subdomain}slmn.gg/player/${cleanID(player.id)}`;
-                    const teamLink = `https://${subdomain}slmn.gg/team/${cleanID(team.id)}`;
+                    const playerLink = `https://${subdomain}slmn.gg/player/${cleanTypedID(player.id)}`;
+                    const teamLink = `https://${subdomain}slmn.gg/team/${cleanTypedID(team.id)}`;
 
                     if (eventSettings?.logging?.publicRosterChanges) {
                         if (!guild) {

@@ -1,6 +1,6 @@
 import { ActionAuth, Match, MatchResolvableID, Report, ScoreReportingReportKeys } from "../types.js";
 import { Action } from "../action-utils/action-manager-models.js";
-import { cleanID, dirtyID } from "shared";
+import { cleanTypedID, dirtyID } from "shared";
 import { getMatchScoreReporting } from "../action-utils/action-utils.js";
 import { get } from "../action-utils/action-cache.js";
 import { MapObject } from "../discord/managers.js";
@@ -27,9 +27,9 @@ export default {
         const reportableTeams = teams.filter(t => {
             if (reaction === "counter-approve" || reaction === "counter-deny") {
                 // original team
-                return cleanID(t.id) === cleanID(report.team?.[0]);
+                return (report.team?.[0]) && cleanTypedID(t.id) === cleanTypedID(report.team?.[0]);
             }
-            return cleanID(t.id) !== cleanID(report.team?.[0]);
+            return (report.team?.[0]) && cleanTypedID(t.id) !== cleanTypedID(report.team?.[0]);
         });
 
         const actingTeam = reportableTeams.find(team => [

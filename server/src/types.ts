@@ -154,9 +154,9 @@ export interface MatchMap extends Base {
     score_2?: number;
     stats?: string;
 
-    banner?: TeamResolvableID[];
-    picker?: TeamResolvableID[];
-    winner?: TeamResolvableID[];
+    banner?: [TeamResolvableID];
+    picker?: [TeamResolvableID];
+    winner?: [TeamResolvableID];
 
     team_1_bans?: HeroResolvableID[];
     team_2_bans?: HeroResolvableID[];

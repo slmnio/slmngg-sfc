@@ -1,5 +1,5 @@
 import store from "@/thing-store";
-import { cleanID } from "@/utils/content-utils";
+import { cleanID } from "shared";
 
 async function addToBuffer(id) {
     return store.commit("addToRequestBuffer", id);

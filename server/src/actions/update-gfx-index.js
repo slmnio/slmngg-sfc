@@ -1,4 +1,4 @@
-import { cleanID, dirtyID } from "../action-utils/action-utils.js";
+import { dirtyID } from "../action-utils/action-utils.js";
 
 export default {
     key: "update-gfx-index",

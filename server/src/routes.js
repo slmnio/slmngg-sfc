@@ -1,14 +1,8 @@
 import { createRecord, updateRecord } from "./action-utils/action-utils.js";
 import { exchangeCode, getTokenInfo, StaticAuthProvider } from "@twurple/auth";
 import { ApiClient } from "@twurple/api";
+import { cleanID } from "shared";
 
-
-function cleanID(id) {
-    if (!id) return null;
-    if (typeof id !== "string") return id.id || null; // no real id oops
-    if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
-    return id;
-}
 
 function niceJoin(array) {
     if (array.length > 1) {

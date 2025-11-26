@@ -2,7 +2,7 @@ import { canUpdateUserDetails } from "../action-utils/action-permissions.js";
 import { log } from "../discord/slmngg-log.js";
 import { userMention } from "discord.js";
 import * as Cache from "../cache.js";
-import { cleanID } from "../action-utils/action-utils.js";
+import { cleanID } from "shared";
 
 
 export default {

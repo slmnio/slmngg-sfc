@@ -166,7 +166,8 @@
 import { socket } from "@/socket";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import TeamPlayerList from "./TeamPlayerList";
-import { cleanID, decoratePlayerWithDraftData, getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
+import { decoratePlayerWithDraftData, getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import PlayerTeamDisplay from "./PlayerTeamDisplay";
 import { sortEvents } from "@/utils/sorts";
 import SignedTeamList from "@/components/broadcast/auction/SignedTeamList";

@@ -1,6 +1,7 @@
 import spacetime from "spacetime";
 import informal from "spacetime-informal";
 import { sortAlphaRaw, sortEvents, sortTeams } from "@/utils/sorts";
+import { cleanID } from "shared";
 
 import { computed } from "vue";
 
@@ -87,14 +88,6 @@ function resizedImage(theme, key, minSize = 30) {
     return image.url;
 }
 
-export function cleanID (id) {
-    if (id?.id) return id.id;
-    // console.log(">id", id);
-    if (!id) return null;
-    if (typeof id !== "string") return null;
-    if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
-    return id;
-}
 export function dirtyID(id) {
     // add rec
     if (!id) return id;

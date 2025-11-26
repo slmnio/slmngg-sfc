@@ -1,11 +1,6 @@
 import "dotenv/config";
+import { cleanID } from "shared";
 
-function cleanID(id) {
-    if (!id) return null;
-    if (typeof id !== "string") return id.id || null; // no real id oops
-    if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
-    return id;
-}
 
 function getFileEnding(url) {
     let splits = url.split(".");

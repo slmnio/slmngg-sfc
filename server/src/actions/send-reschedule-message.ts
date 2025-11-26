@@ -2,8 +2,9 @@ import { Action } from "../action-utils/action-manager-models.js";
 import { ActionAuth, EventSettings, MatchResolvableID } from "../types.js";
 import { get } from "../action-utils/action-cache.js";
 import { getTeamEmojiText, sendRecordedMessage } from "../action-utils/ts-action-utils.js";
-import { cleanID, hammerTime } from "../action-utils/action-utils.js";
+import { hammerTime } from "../action-utils/action-utils.js";
 import { MapObject } from "../discord/managers.js";
+import { cleanID } from "shared";
 
 export default {
     key: "send-reschedule-message",

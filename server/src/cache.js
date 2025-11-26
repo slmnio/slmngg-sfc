@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { accessTokenIsExpired, refreshUserToken } from "@twurple/auth";
 import { EventEmitter } from "events";
+import { cleanID } from "shared";
 
 /*
     - Get and set data
@@ -338,12 +339,6 @@ export async function set(id, data, options) {
     store.set(id, data);
 }
 
-function cleanID(id) {
-    if (!id) return null;
-    if (typeof id !== "string") return id.id || null; // no real id oops
-    if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
-    return id;
-}
 export async function get(id) {
     id = cleanID(id);
     let data = store.get(id);

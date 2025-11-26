@@ -19,7 +19,8 @@
 
 <script>
 import PickBanDisplay from "@/views/sub-views/match-room/PickBanDisplay.vue";
-import { cleanID, processPickBanOrder } from "@/utils/content-utils";
+import { cleanID } from "shared";
+import {processPickBanOrder } from "@/utils/content-utils";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import Markdown from "@/components/website/Markdown.vue";
 

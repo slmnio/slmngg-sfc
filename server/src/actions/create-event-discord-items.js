@@ -2,7 +2,7 @@ import client from "../discord/client.js";
 import * as Cache from "../cache.js";
 import { MapObject } from "../discord/managers.js";
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
-import { cleanID, findMember, getAll } from "../action-utils/action-utils.js";
+import { findMember, getAll } from "../action-utils/action-utils.js";
 import { getDiscordIcon } from "../discord/role-icon.js";
 import { ChannelType, GuildFeature, PermissionFlagsBits } from "discord-api-types/v10";
 import { PermissionsBitField } from "discord.js";

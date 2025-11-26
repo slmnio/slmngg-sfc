@@ -1,6 +1,7 @@
 import { ActionAuth, EventSettings, Match, MatchResolvableID, Report, ScoreReportingReportKeys } from "../types.js";
 import { Action } from "../action-utils/action-manager-models.js";
-import { cleanID, dirtyID, getMatchScoreReporting } from "../action-utils/action-utils.js";
+import { dirtyID, getMatchScoreReporting } from "../action-utils/action-utils.js";
+import { cleanID } from "shared";
 import { get } from "../action-utils/action-cache.js";
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
 import { MapObject } from "../discord/managers.js";

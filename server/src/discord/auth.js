@@ -1,6 +1,7 @@
 import bodyParser from "body-parser";
 import fetch from "node-fetch";
 import { updateRecord } from "../action-utils/action-utils.js";
+import { cleanID } from "shared";
 
 
 function discordEnvSet() {
@@ -163,14 +164,6 @@ export default ({ app, router, cors, Cache }) => {
 
 };
 
-
-function cleanID(id) {
-    // console.log(">id", id);
-    if (!id) return null;
-    if (typeof id !== "string") return null;
-    if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
-    return id;
-}
 
 function cleanUser(user) {
     // console.log("clean user", user);

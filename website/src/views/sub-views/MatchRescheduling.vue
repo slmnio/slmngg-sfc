@@ -115,7 +115,8 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cleanID, formatTime, url } from "@/utils/content-utils";
+import { cleanID } from "shared";
+import {formatTime, url } from "@/utils/content-utils";
 import { useAuthStore } from "@/stores/authStore.ts";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions.js";
 import AdvancedDateEditor from "@/components/website/dashboard/AdvancedDateEditor.vue";

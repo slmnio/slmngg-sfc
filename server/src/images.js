@@ -3,7 +3,7 @@ import fp from "node:fs/promises";
 import fs from "node:fs";
 import path from "node:path";
 import https from "node:https";
-import { cleanID } from "./action-utils/action-utils.js";
+import { cleanID } from "shared";
 import { fileURLToPath } from "node:url";
 
 const DIRNAME = path.dirname(fileURLToPath(import.meta.url));

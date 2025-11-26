@@ -19,7 +19,8 @@
 <script>
 import GenericOverlay from "@/components/broadcast/roots/GenericOverlay.vue";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cleanID, formatText } from "@/utils/content-utils";
+import { formatText } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import BreakMatch from "@/components/broadcast/break/BreakMatch.vue";
 import { themeBackground1 } from "@/utils/theme-styles";
 import { sortMatches } from "@/utils/sorts";

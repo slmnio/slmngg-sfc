@@ -283,7 +283,8 @@
 <script>
 import { socket } from "@/socket";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cleanID, decoratePlayerWithDraftData, dirtyID, getRoleSVG, money, url } from "@/utils/content-utils";
+import { cleanID } from "shared";
+import {decoratePlayerWithDraftData, dirtyID, getRoleSVG, money, url } from "@/utils/content-utils";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import AuctionCountdown from "@/components/broadcast/auction/AuctionCountdown.vue";
 import AuctionBid from "@/components/website/AuctionBid.vue";

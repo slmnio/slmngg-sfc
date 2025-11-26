@@ -26,7 +26,8 @@
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { cleanID, decoratePlayerWithDraftData, getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
+import { decoratePlayerWithDraftData, getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import MoneyBar from "@/components/broadcast/auction/MoneyBar";
 
 

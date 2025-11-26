@@ -1,5 +1,5 @@
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
-import { cleanID, deAirtableRecord, dirtyID } from "../action-utils/action-utils.js";
+import { deAirtableRecord, dirtyID } from "../action-utils/action-utils.js";
 import { log } from "../discord/slmngg-log.js";
 
 const working = new Map();

@@ -192,7 +192,8 @@
 import { socket } from "@/socket";
 import { useAuthStore } from "@/stores/authStore";
 import { bg, resizedImage, resizedImageNoWrap } from "@/utils/images.js";
-import { cleanID, dirtyID, processPickBanOrder } from "@/utils/content-utils";
+import { cleanID } from "shared";
+import {dirtyID, processPickBanOrder } from "@/utils/content-utils";
 import { ReactiveArray, ReactiveList, ReactiveRoot, ReactiveThing, } from "@/utils/reactive";
 import { useInterval } from "@vueuse/core";
 import { themeBackground1 } from "@/utils/theme-styles";

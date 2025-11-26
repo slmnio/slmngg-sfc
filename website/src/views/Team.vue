@@ -25,7 +25,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import SubPageNav from "@/components/website/SubPageNav";
 import Social from "@/components/website/Social";
 import { resizedImageNoWrap } from "@/utils/images";
-import { cleanID } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import { useAuthStore } from "@/stores/authStore";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 

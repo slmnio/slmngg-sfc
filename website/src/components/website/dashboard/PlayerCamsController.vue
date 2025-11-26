@@ -63,7 +63,7 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import RoleIcon from "@/components/website/RoleIcon.vue";
 import { authenticatedRequest } from "@/utils/dashboard";
-import { cleanID } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import { GameOverrides } from "@/utils/games";
 
 export default {

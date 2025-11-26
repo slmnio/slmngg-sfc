@@ -141,7 +141,7 @@
 
 <script>
 import { useAuthStore } from "@/stores/authStore.ts";
-import { cleanID } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions.js";
 import { getDataServerAddress } from "@/utils/fetch.js";
 import { socket } from "@/socket.js";

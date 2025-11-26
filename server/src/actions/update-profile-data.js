@@ -1,4 +1,5 @@
-import { cleanID, dirtyID, getValidHeroes } from "../action-utils/action-utils.js";
+import { dirtyID, getValidHeroes } from "../action-utils/action-utils.js";
+import { cleanID } from "shared";
 
 
 export default {

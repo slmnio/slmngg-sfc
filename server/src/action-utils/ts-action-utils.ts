@@ -4,8 +4,9 @@ import { get } from "./action-cache.js";
 import { MapObject } from "../discord/managers.js";
 import client from "../discord/client.js";
 import { ChannelType, Guild, MessageCreateOptions, MessagePayload } from "discord.js";
-import { cleanID, hammerTime, sendMessage } from "./action-utils.js";
+import { hammerTime, sendMessage } from "./action-utils.js";
 import emoji from "../discord/emoji.js";
+import { cleanID } from "shared";
 
 
 export async function getTeamEmojiText(team: Team | null) {

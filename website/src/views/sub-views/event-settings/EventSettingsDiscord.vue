@@ -286,7 +286,7 @@ import EventSettingsFix from "@/components/website/EventSettingsFix.vue";
 import { useAuthStore } from "@/stores/authStore";
 import { sortAlpha } from "@/utils/sorts";
 import SettingsMultiselect from "@/views/sub-views/event-settings/SettingsMultiselect.vue";
-import { cleanID } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import ContrastBadge from "@/components/website/ContrastBadge.vue";
 
 export default {

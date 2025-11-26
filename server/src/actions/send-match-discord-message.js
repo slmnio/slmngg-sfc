@@ -1,4 +1,4 @@
-import { cleanID, getMatchData } from "../action-utils/action-utils.js";
+import { getMatchData } from "../action-utils/action-utils.js";
 import discordClient from "../discord/client.js";
 import { MapObject } from "../discord/managers.js";
 

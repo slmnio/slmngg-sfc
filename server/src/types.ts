@@ -418,6 +418,9 @@ export interface Match extends Base {
 }
 
 export interface Team extends Base {
+    id: TeamResolvableID;
+    __tableName: "Teams";
+
     accolades?: AccoladeResolvableID[];
     aliases?: string;
     balance?: number;

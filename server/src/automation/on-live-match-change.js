@@ -1,5 +1,5 @@
 import * as Cache from "../cache.js";
-import { cleanID } from "../action-utils/action-utils.js";
+import { cleanID } from "shared";
 import { getInternalManager } from "../action-utils/action-manager.js";
 
 export default {

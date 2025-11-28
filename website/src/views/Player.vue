@@ -39,7 +39,8 @@
         <SubPageNav>
             <li class="nav-item"><router-link class="nav-link" :to="subLink('')">Overview</router-link></li>
             <li v-if="player.news" class="nav-item"><router-link class="nav-link" :to="subLink('news')">Articles</router-link></li>
-            <li v-if="player.member_of && player.member_of.some(t => t.matches)" class="nav-item"><router-link class="nav-link" :to="subLink('match-stats')">Match Stats</router-link></li>
+            <li v-if="hasTeamMatches" class="nav-item"><router-link class="nav-link" :to="subLink('played-matches')">Played Matches</router-link></li>
+            <li v-if="hasTeamMatches" class="nav-item"><router-link class="nav-link" :to="subLink('match-stats')">Match Stats</router-link></li>
 
             <li v-if="player.brands_designed" class="nav-item"><router-link class="nav-link" :to="subLink('brands')">Brands</router-link></li>
 
@@ -145,6 +146,10 @@ export default {
         hasMatchPlayerRelationships() {
             if (!this.player?.player_relationships) return false;
             return this.player.player_relationships.some(rel => !!rel.matches);
+        },
+        hasTeamMatches() {
+            if (!this.player?.member_of?.length) return false;
+            return this.player.member_of.some(t => t?.matches?.length);
         },
         trophies() {
             if (!this.player?.name) return [];

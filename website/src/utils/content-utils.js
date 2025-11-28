@@ -1443,3 +1443,23 @@ function generateDummyText(match) {
     }
     return `${match._m} M${(match.match_number || match.side)}`;
 }
+
+
+export function getVisibleVod(match) {
+    let visibleVod = match.vod;
+
+    if (visibleVod) {
+        const vodData = getEmbedData(match.vod);
+        if (vodData?.service === "twitch-live") {
+
+            visibleVod = null;
+            if (match.vod_2) {
+                const vod2Data = getEmbedData(match.vod_2);
+                if (vod2Data?.service && vod2Data.service === "twitch-live") {
+                    visibleVod = match.vod_2;
+                }
+            }
+        }
+    }
+    return visibleVod;
+}

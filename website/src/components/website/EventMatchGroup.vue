@@ -1,15 +1,28 @@
 <template>
     <div class="event-match-group d-flex flex-column" :class="{'showing': showMatches}">
         <div class="group-header d-flex gap-2 split-contents" @click="showMatches = !showMatches">
-            <div class="header-left d-flex gap-2">
-                <theme-logo
-                    class="event-logo"
-                    :theme="event?.theme"
-                    logo-size="w-64"
-                    icon-padding="5px"
-                    border-width="2px" />
-                <div class="event-name industry-align">
-                    <router-link :to="url('event', event)">{{ event?.name }}</router-link>
+            <div class="header-left d-flex gap-3">
+                <div class="flex-center gap-2">
+                    <theme-logo
+                        class="event-logo"
+                        :theme="event?.theme"
+                        logo-size="w-64"
+                        icon-padding="5px"
+                        border-width="2px" />
+                    <div class="event-name industry-align">
+                        <router-link :to="url('event', event)">{{ event?.name }}</router-link>
+                    </div>
+                </div>
+                <div v-if="highlightTeams" class="header-teams d-flex gap-2 flex-center">
+                    <div v-for="team in highlightTeams" :key="team.id" class="header-team d-flex flex-center gap-2">
+                        <theme-logo
+                            class="event-logo"
+                            :theme="team?.theme"
+                            logo-size="w-64"
+                            icon-padding="5px"
+                            border-width="2px" />
+                        <div class="industry-align">{{ team?.name }}</div>
+                    </div>
                 </div>
             </div>
             <div class="header-right industry-align text-right d-flex gap-2">
@@ -28,8 +41,9 @@
                         v-for="match in hydratedMatches"
                         :key="match?.id"
                         class="match">
-                        <td class="match-date text-nowrap">{{ match?.start ? formatTime(match.start, { format: "{day-short} {date-ordinal} {month-short} {year}" }) : '' }}</td>
-                        <td class="match-date text-nowrap">{{ match?.start ? formatTime(match.start, { format: "{time} {tz}" }) : '' }}</td>
+                        <td class="match-date text-nowrap d-none d-lg-table-cell">{{ match?.start ? formatTime(match.start, { format: "{day-short} {date-ordinal} {month-short} {year}" }) : '' }}</td>
+                        <td class="match-date text-nowrap d-none d-lg-table-cell">{{ match?.start ? formatTime(match.start, { format: "{time} {tz}" }) : '' }}</td>
+                        <td class="match-date d-lg-none">{{ match?.start ? formatTime(match.start, { format: "{date-ordinal} {month-short} {year}" }) : '' }}</td>
                         <td>
                             <div v-if="match?.sub_event" class="match-group">{{ match?.sub_event }}</div>
                         </td>
@@ -44,7 +58,7 @@
                         </td>
                         <td class="match-right">
                             <div class="match-vod text-nowrap">
-                                <a v-if="match?.vod" :href="match.vod" target="_blank">VOD</a>
+                                <a v-if="match?.visibleVod" :href="match.visibleVod" target="_blank">VOD</a>
                             </div>
                         </td>
                     </tr>
@@ -58,12 +72,12 @@
 import spacetime from "spacetime";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
-import { formatTime, url } from "@/utils/content-utils";
+import { cleanID, formatTime, getVisibleVod, url } from "@/utils/content-utils";
 
 export default {
     name: "EventMatchGroup",
     components: { ThemeLogo },
-    props: ["event", "matches"],
+    props: ["event", "matches", "highlightTeams", "onlyVODs"],
     data: () => ({
         showMatches: false,
         loaded: false
@@ -71,9 +85,14 @@ export default {
     computed: {
         hydratedMatches() {
             return this.matches.map(m => {
-                return ReactiveRoot(m.id, {
+                const match = ReactiveRoot(m.id, {
                     "teams": ReactiveArray("teams")
                 });
+
+                return {
+                    visibleVod: getVisibleVod(match),
+                    ...match
+                };
             });
         }
     },
@@ -81,6 +100,14 @@ export default {
         url,
         matchName(match) {
             if (match.special_event || !match?.teams?.length) return match.custom_name;
+            if (this.highlightTeams?.length === 1 && match?.teams?.length === 2) {
+                const index = (match.teams || []).findIndex(t => cleanID(t.id) === cleanID(this.highlightTeams[0]?.id));
+                let opponent = match.teams[+!index];
+
+                if (opponent?.name) {
+                    return `${[(index === 0 ? match.score_1 : match.score_2) || 0, (index === 0 ? match.score_2 : match.score_1) || 0].join(" - ")} vs ${opponent?.name}`;
+                }
+            }
             return (match.teams || []).map(t => t.name).join(` ${match.score_1 || 0} - ${match.score_2 || 0} `);
         },
         eventDate(date) {
@@ -116,9 +143,17 @@ export default {
     .group-header, .header-left {
         align-items: center;
     }
+    .header-left {
+        flex-wrap: wrap;
+        row-gap: .25rem !important;
+    }
     .event-logo {
         height: 32px;
         width: 37px;
+    }
+    .header-team .event-logo {
+        height: 28px;
+        width: 30px;
     }
     .opacity-50 {
         opacity: 0.5;

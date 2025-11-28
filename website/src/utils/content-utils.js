@@ -453,92 +453,96 @@ export function formatTime(timeString, {
 
 
 export function getEmbedData(url) {
-    const vodURL = new URL(url);
+    try {
+        const vodURL = new URL(url);
 
-    if (vodURL.host === "www.youtube.com") {
-        let ts = 0;
-        if (vodURL.searchParams.get("t")) {
-            let timestamp = vodURL.searchParams.get("t");
-            if (["h", "m", "s"].some(t => timestamp.includes(t))) {
-                // has a hms in it
-                timestamp = timestamp.match(/\d+[hms]/g);
-                timestamp.forEach(t => {
-                    const time = t.slice(0, -1);
-                    const hms = t.slice(-1);
-                    const mult = {
-                        s: 1,
-                        m: 60,
-                        h: 60 * 60
-                    };
-                    ts += parseInt(time) * mult[hms];
-                });
-            } else {
-                ts = timestamp;
+        if (vodURL.host === "www.youtube.com") {
+            let ts = 0;
+            if (vodURL.searchParams.get("t")) {
+                let timestamp = vodURL.searchParams.get("t");
+                if (["h", "m", "s"].some(t => timestamp.includes(t))) {
+                    // has a hms in it
+                    timestamp = timestamp.match(/\d+[hms]/g);
+                    timestamp.forEach(t => {
+                        const time = t.slice(0, -1);
+                        const hms = t.slice(-1);
+                        const mult = {
+                            s: 1,
+                            m: 60,
+                            h: 60 * 60
+                        };
+                        ts += parseInt(time) * mult[hms];
+                    });
+                } else {
+                    ts = timestamp;
+                }
             }
+
+            const code = vodURL.searchParams.get("v") ?? /\/live\/([^?&/]{11})/g.exec(vodURL.href)?.[1];
+            // console.log(ts);
+
+            return {
+                service: "youtube",
+                key: code,
+                timestamp: ts || null,
+                thumbnail: `http://img.youtube.com/vi/${code}/hqdefault.jpg`,
+                display: {
+                    text: "YouTube",
+                    icon: "fab fa-youtube"
+                }
+            };
+        }
+        if (vodURL.host === "youtu.be") {
+            return {
+                service: "youtube",
+                key: vodURL.pathname.slice(1),
+                timestamp: vodURL.searchParams.get("t") || null,
+                thumbnail: `http://img.youtube.com/vi/${vodURL.pathname.slice(1)}/hqdefault.jpg`,
+                display: {
+                    text: "YouTube",
+                    icon: "fab fa-youtube"
+                }
+            };
+        }
+        if (["www.twitch.tv", "twitch.tv"].includes(vodURL.host)) {
+            const embed = {
+                service: (vodURL.pathname.split("/").length === 3 ? "twitch" : "twitch-live"),
+                key: vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1),
+                thumbnail: `https://static-cdn.jtvnw.net/previews-ttv/live_user_${vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1).toLowerCase()}-1280x720.jpg`,
+                display: {
+                    text: "Twitch",
+                    icon: "fab fa-twitch"
+                }
+            };
+            if (embed.service === "twitch") {
+                embed.timestamp = vodURL.searchParams.get("t") || null;
+            }
+            return embed;
         }
 
-        const code = vodURL.searchParams.get("v") ?? /\/live\/([^?&/]{11})/g.exec(vodURL.href)?.[1];
-        console.log(ts);
-
-        return {
-            service: "youtube",
-            key: code,
-            timestamp: ts || null,
-            thumbnail: `http://img.youtube.com/vi/${code}/hqdefault.jpg`,
-            display: {
-                text: "YouTube",
-                icon: "fab fa-youtube"
-            }
-        };
-    }
-    if (vodURL.host === "youtu.be") {
-        return {
-            service: "youtube",
-            key: vodURL.pathname.slice(1),
-            timestamp: vodURL.searchParams.get("t") || null,
-            thumbnail: `http://img.youtube.com/vi/${vodURL.pathname.slice(1)}/hqdefault.jpg`,
-            display: {
-                text: "YouTube",
-                icon: "fab fa-youtube"
-            }
-        };
-    }
-    if (["www.twitch.tv", "twitch.tv"].includes(vodURL.host)) {
-        const embed = {
-            service: (vodURL.pathname.split("/").length === 3 ? "twitch" : "twitch-live"),
-            key: vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1),
-            thumbnail: `https://static-cdn.jtvnw.net/previews-ttv/live_user_${vodURL.pathname.slice(vodURL.pathname.lastIndexOf("/") + 1).toLowerCase()}-1280x720.jpg`,
-            display: {
-                text: "Twitch",
-                icon: "fab fa-twitch"
-            }
-        };
-        if (embed.service === "twitch") {
-            embed.timestamp = vodURL.searchParams.get("t") || null;
+        if (url.endsWith(".pdf")) {
+            return {
+                service: "pdf",
+                url,
+                display: {
+                    text: "PDF",
+                    icon: "fas fa-file-pdf"
+                }
+            };
         }
-        return embed;
-    }
 
-    if (url.endsWith(".pdf")) {
-        return {
-            service: "pdf",
-            url,
-            display: {
-                text: "PDF",
-                icon: "fas fa-file-pdf"
-            }
-        };
-    }
-
-    if (["mp4", "webm"].some(file => url.endsWith("." + file))) {
-        return {
-            service: "unknown-video",
-            url,
-            display: {
-                text: "Video",
-                icon: "fas fa-file-video"
-            }
-        };
+        if (["mp4", "webm"].some(file => url.endsWith("." + file))) {
+            return {
+                service: "unknown-video",
+                url,
+                display: {
+                    text: "Video",
+                    icon: "fas fa-file-video"
+                }
+            };
+        }
+    } catch (e) {
+        console.warn("VOD URL issue", url, e);
     }
 
     return {
@@ -1450,12 +1454,12 @@ export function getVisibleVod(match) {
 
     if (visibleVod) {
         const vodData = getEmbedData(match.vod);
-        if (vodData?.service === "twitch-live") {
+        if (vodData?.service && ["twitch-live", "unknown"].includes(vodData.service)) {
 
             visibleVod = null;
             if (match.vod_2) {
                 const vod2Data = getEmbedData(match.vod_2);
-                if (vod2Data?.service && vod2Data.service === "twitch-live") {
+                if (vod2Data?.service && ["twitch-live", "unknown"].includes(vod2Data.service)) {
                     visibleVod = match.vod_2;
                 }
             }

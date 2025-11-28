@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import Match from "@/components/website/match/Match.vue";
 import { sortEvents, sortMatches } from "@/utils/sorts";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import EventMatchGroup from "@/components/website/EventMatchGroup.vue";
@@ -33,8 +32,7 @@ import { getVisibleVod } from "@/utils/content-utils.js";
 export default {
     name: "PlayerPlayedMatches",
     components: {
-        EventMatchGroup,
-        Match
+        EventMatchGroup
     },
     props: ["player"],
     data: () => ({

@@ -76,7 +76,7 @@ import { GameOverrides } from "@/utils/games";
 export default {
     name: "HeroPriorityOverlay",
     components: { GenericOverlay },
-    props: ["broadcast", "title", "subtitle", "mode", "skip"],
+    props: ["broadcast", "title", "subtitle", "mode", "skip", "secondary"],
     computed: {
         schedule() {
             return (ReactiveRoot(this.broadcast, {
@@ -91,7 +91,7 @@ export default {
                         "team_2_bans": ReactiveArray("team_2_bans")
                     })
                 })
-            })?.schedule || []).filter(m => m.show_on_overlays);
+            })?.schedule || []).filter(m => this.secondary ? m.show_on_secondary_overlays : m.show_on_overlays);
         },
         heroes() {
             const heroes = ReactiveRoot("Heroes", {

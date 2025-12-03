@@ -134,6 +134,7 @@ export default [
         props: route => ({
             mode: route.query.mode,
             skip: route.query.skip,
+            secondary: route.query.secondary,
         })
     },
     {

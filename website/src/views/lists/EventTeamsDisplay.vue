@@ -20,11 +20,17 @@ export default {
     components: { EventDisplay, TeamDisplay },
     props: {
         eventID: String,
-        searchText: String
+        searchText: String,
+        partialEvent: Object
     },
     computed: {
         event() {
-            return ReactiveRoot(this.eventID, {
+            if (this.partialEvent?.teams) {
+                return ReactiveRoot(this.partialEvent.eventID, {
+                    "theme": ReactiveThing("theme")
+                });
+            }
+            return ReactiveRoot(this.partialEvent.eventID, {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
@@ -32,6 +38,11 @@ export default {
             });
         },
         teams() {
+            if (this.partialEvent?.teams?.length) {
+                return ReactiveArray("teams",{
+                    "theme": ReactiveThing("theme")
+                })(this.partialEvent);
+            }
             if (!this.searchText) return this.event?.teams;
             if (!(this.event?.teams || [])?.length) return [];
             return searchInCollection(this.event?.teams, this.searchText, "name");

@@ -171,8 +171,9 @@ async function teamList(Cache) {
             name: team.name,
             code: team.code,
             theme: team.theme?.[0],
+            game: team.game?.[0],
             event: eventID,
-            eventStart: event.start_date
+            eventStart: event.start_date,
         });
     });
     Cache.set("special:teams", { teams: publicTeams, __tableName: "Special Collection" });

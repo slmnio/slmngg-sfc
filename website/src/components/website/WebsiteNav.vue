@@ -80,7 +80,7 @@
                 </b-navbar-nav>
 
                 <b-navbar-nav>
-                    <div v-if="siteMode && siteMode !== 'production' && !isRebuilding" v-b-modal.force-auth-modal class="nav-link text-left justify-content-start">Force Auth</div>
+                    <div v-if="siteMode && siteMode !== 'production' && !isRebuilding" v-b-modal.force-auth-modal class="nav-link justify-content-start">Force Auth</div>
 
                     <router-link v-if="!user && !isRebuilding" class="nav-link" to="/login">Login</router-link>
                     <LoggedInUser v-if="user" />

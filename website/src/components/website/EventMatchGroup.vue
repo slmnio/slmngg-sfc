@@ -58,7 +58,8 @@
                         </td>
                         <td class="match-right">
                             <div class="match-vod text-nowrap">
-                                <a v-if="match?.visibleVod" :href="match.visibleVod" target="_blank">VOD</a>
+                                <a v-if="match?.visibleVod" :href="match.visibleVod" target="_blank"><i class="fas fa-video"></i></a>
+                                <span v-else title="No VOD listed"><i class="fas fa-video-slash text-secondary"></i></span>
                             </div>
                         </td>
                     </tr>

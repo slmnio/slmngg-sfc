@@ -6,6 +6,10 @@
             </div>
             <div class="match-left match-details flex-center flex-column text-center">
                 <div v-for="detail in details" :key="detail.short" v-b-tooltip="detail.long" class="match-detail">
+                    <router-link v-if="detail.icon" class="link-text no-link-style d-inline" :to="url('match', this.match)">
+                        <i :class="detail.icon" class="mr-1"></i>
+                    </router-link>
+
                     {{ detail.short }}
                 </div>
             </div>
@@ -105,7 +109,8 @@ import {
     cleanID,
     getScoreReportingBadge,
     getReschedulingBadge,
-    getTeamsWithPlaceholders
+    getTeamsWithPlaceholders,
+    getVisibleVod
 } from "@/utils/content-utils";
 import ScheduleTime from "@/components/website/schedule/ScheduleTime";
 import { authenticatedRequest } from "@/utils/dashboard";
@@ -114,6 +119,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { useAuthStore } from "@/stores/authStore";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions.js";
+import { GameOverrides } from "@/utils/games.js";
 
 
 export default {
@@ -173,11 +179,47 @@ export default {
             if (!this.match) return "";
             const details = [];
 
-            if (this.match.match_number) details.push({ short: `M${this.match.match_number}`, long: `Match number ${this.match.match_number}` });
-            if (this.match.stream_code) details.push({ short: `${this.match.stream_code} stream`, long: `Broadcast on the ${this.match.stream_code} stream` });
-            if (this.match.first_to) details.push({ short: `FT${this.match.first_to}`, long: `First to ${this.match.first_to} maps` });
+            if (this.match.stream_code) {
+                details.push({
+                    short: `${this.match.stream_code} stream`,
+                    long: ["on", "off"].includes(this.match.stream_code.toLowerCase()) ? `${this.match.stream_code.slice(0, 1).toUpperCase()}${this.match.stream_code.slice(1)}` : `Broadcast on the ${this.match.stream_code} stream`,
+                });
+
+                if (getVisibleVod(this.match)) {
+                    details[details.length - 1].icon = "fas fa-video text-primary";
+                } else {
+                    details[details.length - 1].icon = "fas fa-video-slash text-secondary";
+                    details[details.length - 1].long += " (no VOD)";
+                }
+            } else if (getVisibleVod(this.match)) {
+
+                details.push({
+                    short: "On stream",
+                    long: "Livestreamed with VOD recording",
+                    icon: "fas fa-video text-primary"
+                });
+            }
+
+            let ft = this.match.first_to ? (this.gameOverride?.useBestOf ? {
+                short: `BO${(this.match.first_to * 2) - 1}`,
+                long: `Best of ${(this.match.first_to * 2) - 1}`
+            } : {
+                short: `FT${this.match.first_to}`,
+                long: `First to ${this.match.first_to} maps`
+            }) : {};
+
+            if (this.match.match_number && this.match.first_to) {
+                details.push({ short: `M${this.match.match_number} • ${ft.short}`, long: `Match number ${this.match.match_number}, ${ft.long.slice(0,1).toLowerCase()}${ft.long.slice(1)}` });
+            } else {
+                if (this.match.first_to) details.push(ft);
+                if (this.match.match_number) details.push({ short: `M${this.match.match_number}`, long: `Match number ${this.match.match_number}` });
+            }
 
             return details.slice(0, 2);
+        },
+        gameOverride() {
+            if (this.match?.game || this.match?.event?.game) return GameOverrides[this.match?.game || this.match?.event?.game];
+            return null;
         },
         timeCustomText() {
             if (this.customText) return this.customText;

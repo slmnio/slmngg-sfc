@@ -99,6 +99,7 @@ import AddToCalendar from "@/components/website/AddToCalendar.vue";
 import { mapWritableState } from "pinia";
 import { useSettingsStore } from "@/stores/settingsStore";
 import CreditCreator from "@/components/website/CreditCreator.vue";
+import { getVisibleVod } from "@/utils/content-utils.js";
 
 
 export default {
@@ -187,7 +188,7 @@ export default {
                             if (m.first_to && [m.score_1, m.score_2].some(score => score === m.first_to)) return false;
                         }
 
-                        if (this.hideNoVods && !m.vod) return false;
+                        if (this.hideNoVods && !getVisibleVod(m)) return false;
 
                         return true;
                     })

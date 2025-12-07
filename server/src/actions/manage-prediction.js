@@ -49,7 +49,7 @@ export default {
      * @param {Client} client
      * @returns {Promise<void>}
      */
-    // eslint-disable-next-line no-empty-pattern
+
     async handler({ predictionAction, predictionType = "match", autoLockAfter = 120 }, { client }) {
         try {
             if (!(["create", "lock", "resolve", "cancel"].includes(predictionAction))) throw ("Invalid action");

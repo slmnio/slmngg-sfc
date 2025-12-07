@@ -23,6 +23,7 @@ import {
 } from "../action-utils/ts-action-utils.js";
 import { ButtonBuilder, ButtonStyle } from "discord.js";
 import emoji from "../discord/emoji.js";
+import { verboseLog } from "../discord/slmngg-log.js";
 
 const processing = new Set<AnyAirtableID>();
 const dataServer = process.env.NODE_ENV === "development" ? "http://localhost:8901" : "https://data.slmn.gg";
@@ -107,7 +108,7 @@ export default {
                         // Delete record here (not implemented?)
                         console.log("Can now delete the score report");
 
-                        messageData = await looseDeleteRecordedMessage<ScoreReportingReportKeys>(messageData, "report_staff_notification");
+                        messageData = await looseDeleteRecordedMessages<ScoreReportingReportKeys>(messageData, ["report_staff_notification", "report_opponent_notification"]);
 
                         if (client && eventSettings?.logging?.staffCompletedScoreReport && report?.log) {
                             const readableLog = await readableMatchLog(report.log);
@@ -138,8 +139,9 @@ export default {
                             }
                         }
 
-                    } catch (e) {
+                    } catch (e: any) {
                         console.error("Action error - not continuing");
+                        verboseLog("⚠ Error in automation `on-score-report-update`", e?.message || e);
                     }
                 } else {
                     // Not ready to approve - see what changed though
@@ -237,7 +239,12 @@ export default {
                                 key: "report_opponent_notification",
                                 mapObject: messageData,
                                 channelID: eventSettings.logging.captainNotifications,
-                                content: `📣 ${originalPing}\nYour score report has been denied and countered by your opponent. Please check their submission to see if it is correct:\n${matchLink}/score-reporting`
+                                content: `📣 ${originalPing}\nYour score report has been denied and countered by your opponent. Please check their submission to see if it is correct:\n${matchLink}/score-reporting`,
+                                success: async (mapObject : MapObject) => {
+                                    await updateRecord(Cache, "Reports", report, {
+                                        "Message Data": mapObject.textMap
+                                    }, "automation/on-score-report-update");
+                                }
                             });
                         }
 
@@ -335,8 +342,9 @@ export default {
                             }
                         }
 
-                    } catch (e) {
+                    } catch (e: any) {
                         console.error("Action error - not continuing");
+                        verboseLog("⚠ Error in automation `on-score-report-update`", e?.message || e);
                     }
 
                 } else {

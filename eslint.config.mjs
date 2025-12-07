@@ -49,7 +49,7 @@ export default [
         }
     },
     {
-        files: ["server/**/*.js"],
+        files: ["server/**/*.js", "server/**/*.ts"],
         languageOptions: {
             globals: {
                 ...globals.node,
@@ -57,6 +57,7 @@ export default [
         },
         rules: {
             "@typescript-eslint/no-var-requires": "off",
+            "@typescript-eslint/no-empty-object-type": "off"
         }
     },
     {
@@ -178,7 +179,10 @@ export default [
             }]
         },
         languageOptions: {
-            ecmaVersion: "latest"
+            ecmaVersion: "latest",
+            globals: {
+                ...globals.browser,
+            }
         }
     }
 ];

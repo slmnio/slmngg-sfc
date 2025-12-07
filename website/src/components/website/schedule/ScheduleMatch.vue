@@ -6,6 +6,10 @@
             </div>
             <div class="match-left match-details flex-center flex-column text-center">
                 <div v-for="detail in details" :key="detail.short" v-b-tooltip="detail.long" class="match-detail">
+                    <router-link v-if="detail.icon" class="link-text no-link-style d-inline" :to="url('match', this.match)">
+                        <i :class="detail.icon" class="mr-1"></i>
+                    </router-link>
+
                     {{ detail.short }}
                 </div>
             </div>
@@ -100,8 +104,14 @@
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { url, getScoreReportingBadge, getReschedulingBadge } from "@/utils/content-utils";
 import { cleanID } from "shared";
+import {
+    url,
+    getScoreReportingBadge,
+    getReschedulingBadge,
+    getTeamsWithPlaceholders,
+    getVisibleVod
+} from "@/utils/content-utils";
 import ScheduleTime from "@/components/website/schedule/ScheduleTime";
 import { authenticatedRequest } from "@/utils/dashboard";
 import { mapWritableState } from "pinia";
@@ -109,6 +119,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { useAuthStore } from "@/stores/authStore";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions.js";
+import { GameOverrides } from "@/utils/games.js";
 
 
 export default {
@@ -162,54 +173,53 @@ export default {
         },
         teams() {
             if (this.match?.special_event) return [];
-            const dummy = { text: "TBD", dummy: true, id: null };
-            if (!this.match) return [{ ...dummy, _empty: true }, { ...dummy, _empty: true }];
-
-            let text = (this.match.placeholder_teams || "").trim().split("|").filter(t => t !== "");
-            let extraText = null;
-
-            if (text.length === 4) {
-                extraText = [text[2], text[3]];
-                text = [text[0], text[1]];
-            }
-
-            if (!this.match.teams || this.match.teams.length === 0) {
-                if (text.length === 2) {
-                    return text.map((t, ti) => ({ ...dummy, text: t, ...(extraText ? { code: extraText[ti] } : {}) }));
-                } else if (text.length === 1) {
-                    if (this.match.placeholder_right) return [dummy, { ...dummy, text: text[0], ...(extraText ? { code: extraText[0] } : {}) }];
-                    return [{ ...dummy, text: text[0], ...(extraText ? { code: extraText[0] } : {}) }, dummy];
-                } else if (text.length === 0) {
-                    // no text, just use TBDs
-                    return [dummy, dummy];
-                }
-            }
-            if (this.match.teams.length === 1) {
-                if (text.length === 2) {
-                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[1], ...(extraText ? { code: extraText[1] } : {}) }];
-                    return [{ ...dummy, text: text[0], ...(extraText ? { code: extraText[0] } : {}) }, this.match.teams[0]];
-                } else if (text.length === 1) {
-                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummy, text: text[0], ...(extraText ? { code: extraText[0] } : {}) }];
-                    return [{ ...dummy, text: text[0], ...(extraText ? { code: extraText[0] } : {}) }, this.match.teams[0]];
-                } else if (text.length === 0) {
-                    // no text, just use TBDs
-                    if (this.match.placeholder_right) return [this.match.teams[0], dummy];
-                    return [dummy, this.match.teams[0]];
-                }
-            }
-
-            if (this.match.teams.length === 2) return this.match.teams;
-            return [];
+            return getTeamsWithPlaceholders(this.match);
         },
         details() {
             if (!this.match) return "";
             const details = [];
 
-            if (this.match.match_number) details.push({ short: `M${this.match.match_number}`, long: `Match number ${this.match.match_number}` });
-            if (this.match.stream_code) details.push({ short: `${this.match.stream_code} stream`, long: `Broadcast on the ${this.match.stream_code} stream` });
-            if (this.match.first_to) details.push({ short: `FT${this.match.first_to}`, long: `First to ${this.match.first_to} maps` });
+            if (this.match.stream_code) {
+                details.push({
+                    short: `${this.match.stream_code} stream`,
+                    long: ["on", "off"].includes(this.match.stream_code.toLowerCase()) ? `${this.match.stream_code.slice(0, 1).toUpperCase()}${this.match.stream_code.slice(1)}` : `Broadcast on the ${this.match.stream_code} stream`,
+                });
+
+                if (getVisibleVod(this.match)) {
+                    details[details.length - 1].icon = "fas fa-video text-primary";
+                } else {
+                    details[details.length - 1].icon = "fas fa-video-slash text-secondary";
+                    details[details.length - 1].long += " (no VOD)";
+                }
+            } else if (getVisibleVod(this.match)) {
+
+                details.push({
+                    short: "On stream",
+                    long: "Livestreamed with VOD recording",
+                    icon: "fas fa-video text-primary"
+                });
+            }
+
+            let ft = this.match.first_to ? (this.gameOverride?.useBestOf ? {
+                short: `BO${(this.match.first_to * 2) - 1}`,
+                long: `Best of ${(this.match.first_to * 2) - 1}`
+            } : {
+                short: `FT${this.match.first_to}`,
+                long: `First to ${this.match.first_to} maps`
+            }) : {};
+
+            if (this.match.match_number && this.match.first_to) {
+                details.push({ short: `M${this.match.match_number} • ${ft.short}`, long: `Match number ${this.match.match_number}, ${ft.long.slice(0,1).toLowerCase()}${ft.long.slice(1)}` });
+            } else {
+                if (this.match.first_to) details.push(ft);
+                if (this.match.match_number) details.push({ short: `M${this.match.match_number}`, long: `Match number ${this.match.match_number}` });
+            }
 
             return details.slice(0, 2);
+        },
+        gameOverride() {
+            if (this.match?.game || this.match?.event?.game) return GameOverrides[this.match?.game || this.match?.event?.game];
+            return null;
         },
         timeCustomText() {
             if (this.customText) return this.customText;

@@ -5,10 +5,10 @@
         <h1><LoadingIcon v-if="!search && !sortedEvents.length" /></h1>
 
         <EventTeamsDisplay
-            v-for="eventID in sortedEvents"
-            :key="eventID"
+            v-for="event in sortedEvents"
+            :key="event.eventID"
             class="mb-4"
-            :event-i-d="eventID"
+            :partial-event="event"
             :search-text="searchEvents ? search : null" />
         <b-pagination
             v-if="!searchEvents"
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
+import { ReactiveRoot } from "@/utils/reactive";
 import { searchInCollection } from "@/utils/search";
 import LoadingIcon from "@/components/website/LoadingIcon";
 import EventTeamsDisplay from "@/views/lists/EventTeamsDisplay.vue";
@@ -53,7 +53,7 @@ export default {
         sortedEvents() {
             if (!this.searchEvents) {
                 // group and paginate
-                return this.events.slice(this.eventsPerPage * (this.page - 1), this.eventsPerPage * this.page);
+                return this.events.slice(this.eventsPerPage * (this.page - 1), this.eventsPerPage * this.page).map(eventID => ({ eventID }));
             }
 
             console.log(this.search, this.teamData);
@@ -63,12 +63,11 @@ export default {
             const events = [];
 
             teamSearchResults.forEach(team => {
-                if (!team?.event?.length) return;
-                let existing = events.find(e => cleanID(e.eventID) === cleanID(team.event?.[0]));
+                let existing = events.find(e => cleanID(e.eventID) === cleanID(team.event));
                 if (!existing) {
                     existing = events[events.push({
-                        eventID: team.event?.[0],
-                        eventStart: team.event_date?.[0],
+                        eventID: team.event,
+                        eventStart: team.eventStart,
                         teams: []
                     }) - 1];
                 }
@@ -81,23 +80,10 @@ export default {
                 if (a.eventStart) return -1;
                 if (b.eventStart) return 1;
                 return 0;
-            }).reverse()?.map(e => e.eventID);
-
-            // return this.events
-            //     .map(e => {
-            //         if (this.search && this.search.length > 2 && e.teams) {
-            //             return {
-            //                 ...e,
-            //                 teams: searchInCollection(e.teams, this.search, "name")
-            //             };
-            //         }
-            //         return e;
-            //     }).filter(e => e.show_in_events && e.teams && e.teams.length !== 0);
+            }).reverse();
         },
         teamData() {
-            return ReactiveRoot("special:teams", {
-                teams: ReactiveArray("teams")
-            })?.teams;
+            return ReactiveRoot("special:teams")?.teams;
         }
     },
     methods: {

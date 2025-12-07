@@ -114,7 +114,7 @@
                         v-else-if="middleMode === 'Drafted Maps'"
                         key="Drafted Maps"
                         class="match-middle-drafted-maps flex-center">
-                        <BroadcastMapDisplay :small="true" :broadcast="broadcast" :drafted-style="true" />
+                        <BroadcastMapDisplay :broadcast="broadcast" :drafted-style="true" />
                     </div>
                     <div
                         v-else-if="middleMode === 'Interview'"

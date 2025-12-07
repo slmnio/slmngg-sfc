@@ -83,7 +83,8 @@ export default {
                 other_broadcasts: ReactiveArray("other_broadcasts"),
                 headlines: ReactiveArray("headlines"),
                 highlight_media: ReactiveThing("highlight_media"),
-                highlight_hero: ReactiveThing("highlight_hero")
+                highlight_hero: ReactiveThing("highlight_hero"),
+                break_gfx: ReactiveArray("break_gfx")
             });
             if (broadcast?.event?.id && broadcast?.theme_override?.id) {
                 return {
@@ -218,6 +219,8 @@ export default {
     .broadcast-app, #overlay, body.overlay {
         overflow: hidden;
         font-family: "SLMN-Industry", "Industry", sans-serif;
+        width: 100vw;
+        height: 100vh;
     }
     body.overlay #slmngg-app {
         padding-bottom: 0 !important;

@@ -89,7 +89,8 @@ export default {
                 matches: ReactiveArray("matches", {
                     teams: ReactiveArray("teams", {
                         theme: ReactiveThing("theme")
-                    })
+                    }),
+                    player_relationships: ReactiveArray("player_relationships")
                 }),
                 theme: ReactiveThing("theme")
             })(this.event);
@@ -107,6 +108,8 @@ export default {
                     if (match.stream_code) {
                         if (!counts[match.stream_code]) counts[match.stream_code] = 0;
                         counts[match.stream_code]++;
+                    } else if ((match.player_relationships || []).find(rel => ["Producer", "Observer"].includes(rel?.singular_name))) {
+                        counts.Streamed++;
                     } else {
                         counts.Off++;
                     }

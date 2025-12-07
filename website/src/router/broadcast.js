@@ -69,18 +69,35 @@ export default [
         })
     },
     {
+        path: "break-content",
+        component: () => import("@/components/broadcast/break/BreakContent.vue"),
+        props: route => ({
+            secondary: !!route.query.secondary,
+            interval: route.query.interval || route.query.headlineInterval,
+            fullView: true
+        })
+    },
+    {
         path: "break-schedule",
         component: () => import("@/components/broadcast/break/BreakScheduleOverlay.vue"),
         props: route => ({
             showSponsors: route.query.sponsors || route.query.showSponsors
         })
     },
-    { path: "versus", component: () => import("@/components/broadcast/roots/VersusOverlay.vue"), props: route => ({ vertical: route.query.vertical}) },
+    {
+        path: "versus",
+        component: () => import("@/components/broadcast/roots/VersusOverlay.vue"),
+        props: route => ({
+            vertical: route.query.vertical,
+            extraInfo: !!route.query.extra
+        })
+    },
     {
         path: "winners",
         component: () => import("@/components/broadcast/roots/WinnersOverlay.vue"),
         props: route => ({
-            useConfetti: !!route.query.confetti
+            useConfetti: !!route.query.confetti,
+            extraInfo: !!route.query.extra
         })
     },
     { path: "map-bump", component: () => import("@/components/broadcast/roots/MapBumpOverlay.vue") },
@@ -117,6 +134,7 @@ export default [
         props: route => ({
             mode: route.query.mode,
             skip: route.query.skip,
+            secondary: route.query.secondary,
         })
     },
     {
@@ -165,6 +183,7 @@ export default [
             alternate: route.query.alternate ? parseInt(route.query.alternate) : null,
             video: route.query.video ? parseInt(route.query.video) : null,
             showStaff: !!route.query.staff,
+            showHeadshots: !!route.query.headshot || !!route.query.headshots,
             fill: (route.query.fill || "").split(/[,/]/g)
         })
     },
@@ -254,6 +273,7 @@ export default [
         component: () => import("@/components/broadcast/roots/LBarOverlay"),
         props: route => ({
             showSponsors: route.query.sponsors || route.query.sponsor,
+            sponsorAnimationMode: route.query.sponsorAnimationMode || route.query.sponsorAnim,
             secondary: !!route.query.secondary
         })
     },
@@ -270,7 +290,7 @@ export default [
             undraftedText: route.query.undraftedText || route.query.undrafted || route.query.drop
         })
     },
-    { path: "ad-read", component: () => import("@/components/broadcast/roots/AdReadOverlay.vue"), props: route => ({ extraDelay: route.query.delay }) },
+    { path: "ad-read", component: () => import("@/components/broadcast/roots/AdReadOverlay.vue"), props: route => ({ extraDelay: route.query.delay, startDelay: route.query.start }) },
     { path: "logos", component: () => import("@/components/broadcast/roots/LogoAdOverlay.vue") },
     { path: "staff", component: () => import("@/components/broadcast/roots/StaffOverlay.vue") },
     { path: "player-history", component: () => import("@/components/broadcast/PlayerHistory.vue"), props: route => ({ showMinor: route.query.minor }) },
@@ -337,7 +357,8 @@ export default [
         path: "gfx/:index",
         component: () => import("@/components/broadcast/roots/GFXRoot.vue"),
         props: route => ({
-            index: parseInt(route.params.index) || parseInt(route.query.index ?? route.query.number) || 1
+            index: parseInt(route.params.index) || parseInt(route.query.index ?? route.query.number) || 1,
+            forceExtended: !!route.query.extended || !!route.query.expanded || !!route.query.full,
         })
     },
     {

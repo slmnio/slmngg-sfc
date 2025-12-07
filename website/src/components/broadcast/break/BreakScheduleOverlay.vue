@@ -13,7 +13,10 @@
                     </transition>
                 </div>
                 <transition name="fade" mode="out-in">
-                    <Countdown :key="broadcast.countdown_end" :to="broadcast.countdown_end" />
+                    <Countdown
+                        :key="broadcast.countdown_end"
+                        :class="{'counting-down': !!broadcast.countdown_end}"
+                        :to="broadcast.countdown_end" />
                 </transition>
             </div>
             <div v-if="showSponsors" class="break-sponsors-holder">

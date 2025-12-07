@@ -3,6 +3,7 @@
         <transition v-if="!vertical" name="fly-down">
             <div v-if="animationActive" class="top-logo-holder flex-center">
                 <div class="logo bg-center" :style="eventLogo"></div>
+                <div v-if="extraInfo && broadcast?.match_description_format" class="extra-match-description">{{ formatText(broadcast?.match_description_format, broadcast?.event, match) }}</div>
             </div>
         </transition>
         <transition name="fly-sides">
@@ -35,13 +36,15 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { resizedImage } from "@/utils/images";
 import { logoBackground1 } from "@/utils/theme-styles";
+import { formatText } from "@/utils/content-utils.js";
 
 export default {
     name: "VersusOverlay",
     props: {
         broadcast: {},
         animationActive: Boolean,
-        vertical: Boolean
+        vertical: Boolean,
+        extraInfo: Boolean
     },
     computed: {
         match() {
@@ -68,6 +71,7 @@ export default {
         }
     },
     methods: {
+        formatText,
         getTeamStyle(team) {
             return {
                 ...logoBackground1(team)

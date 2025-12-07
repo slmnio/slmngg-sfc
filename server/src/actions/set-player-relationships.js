@@ -34,7 +34,7 @@ export default {
      * @param {CamsData} clientCams
      * @returns {Promise<void>}
      */
-    // eslint-disable-next-line no-empty-pattern
+
     async handler({ matchID, roles, clientCams }, { user }) {
 
         let match = await this.helpers.get(matchID);

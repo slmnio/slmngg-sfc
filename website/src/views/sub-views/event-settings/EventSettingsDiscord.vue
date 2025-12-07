@@ -186,7 +186,11 @@
             </b-form-group>
         </div>
 
-        <b-form-checkbox v-model="testDiscordColors" switch>Test Discord role colors</b-form-checkbox>
+        <div>
+            <b-form-checkbox v-model="testDiscordColors" switch>Test Discord role colors</b-form-checkbox>
+            <b-form-checkbox v-model="discordRoleColorEditor" switch>Edit Discord role colors</b-form-checkbox>
+        </div>
+
         <table class="table table-bordered table-dark table-sm">
             <thead>
                 <tr>
@@ -218,6 +222,22 @@
                         <router-link v-if="testDiscordColors" :to="`/team/${team.id}/theme`">
                             <contrast-badge class="contrast-badge" :colors="['#2c2e32', team?.theme?.color_theme_on_dark || team?.theme?.color_theme]" />
                         </router-link>
+                        <div v-if="discordRoleColorEditor" class="color-selector opacity-changes" :class="{'low-opacity': processing[`discord-color-${team.id}`]}">
+                            <div
+                                v-for="color in team._colors"
+                                :key="color.value"
+                                :class="{'active': safeColor(color.value) === safeColor(team?.theme?.color_theme_on_dark || team?.theme?.color_theme)}"
+                                class="color selectable"
+                                :style="{color: color.value}"
+                                @click="setDiscordColor(team, color.value)">
+                                {{ color.value }}<i v-if="safeColor(color.value) === safeColor(team?.theme?.color_theme_on_dark || team?.theme?.color_theme)" class="fas fa-check-circle fa-fw"></i>
+                            </div>
+                            <input
+                                :value="team?.theme?.color_theme"
+                                type="color"
+                                class="color-input"
+                                @change="(e) => setDiscordColor(team, e.target.value)">
+                        </div>
                     </td>
                     <td v-if="anyTeamCategories">{{ team.team_category?.split(";")?.[1] || team.team_category }}</td>
                     <td>
@@ -287,7 +307,12 @@ import { useAuthStore } from "@/stores/authStore";
 import { sortAlpha } from "@/utils/sorts";
 import SettingsMultiselect from "@/views/sub-views/event-settings/SettingsMultiselect.vue";
 import { cleanID } from "shared";
+import { calculateContrastHex } from "@/utils/content-utils";
 import ContrastBadge from "@/components/website/ContrastBadge.vue";
+
+function cleanKey(key) {
+    return key.replace(/_/g, " ");
+}
 
 export default {
     name: "EventSettingsDiscord",
@@ -297,6 +322,7 @@ export default {
     },
     data: () => ({
         testDiscordColors: false,
+        discordRoleColorEditor: false,
         selectedGuildID: "",
         fixes: [],
 
@@ -478,7 +504,8 @@ export default {
                 const control = new MapObject(t?.discord_control || "");
                 return {
                     ...t,
-                    _control: control
+                    _control: control,
+                    _colors: this.getThemeColors(t?.theme).sort((a,b) => b.contrast - a.contrast)
                 };
             }).sort((a,b) => {
                 if (a.team_category && b.team_category) {
@@ -556,6 +583,42 @@ export default {
         }
     },
     methods: {
+        async setDiscordColor(team, hex) {
+            this.processing[`discord-color-${team.id}`] = true;
+            try {
+                await authenticatedRequest("actions/update-discord-color", {
+                    teamID: team.id,
+                    color: hex
+                });
+            } finally {
+                this.processing[`discord-color-${team.id}`] = false;
+            }
+        },
+        safeColor(col) {
+            if (!col) return null;
+            col = col.trim().toUpperCase();
+            return col;
+        },
+        getThemeColors(theme) {
+            if (!theme) return [];
+            const attrs = Object.entries(theme);
+            const colors = [];
+
+            attrs.forEach(([key, val]) => {
+                if (!key.startsWith("color_")) return;
+                if (val) val = val.toUpperCase();
+                if (!val) return;
+                const u = colors.find(c => c.value === val);
+                key = cleanKey(key.replace("color_", ""));
+                if (u) {
+                    u.name += ", " + key;
+                } else {
+                    colors.push({ name: key, value: val, contrast: calculateContrastHex("#2c2e32", val) });
+                }
+            });
+
+            return colors;
+        },
         swapCreateOptions(options, createActionPresent, defaultBool) {
             if (!createActionPresent) return options;
             return options.filter(opt => opt.value !== null).map(opt => {
@@ -648,6 +711,9 @@ export default {
                     this.roleData = await this.getGuildRoleData();
                 }
             }
+        },
+        testDiscordColors(val) {
+            if (!val) this.discordRoleColorEditor = val;
         },
         useRoleColorOverride: {
             immediate: true,
@@ -761,4 +827,31 @@ export default {
         text-align: center;
         font-size: 0.8em;
     }
+    .color-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5em;
+        margin-top: .1em
+    }
+    .color-selector .color {
+        font-family: monospace;
+    }
+    .color-selector .color {
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 0 0.5em;
+    }
+    .color-selector .color:hover {
+        background-color: rgba(255,255,255,0.1)
+    }
+    input.color-input {
+        width: 2em;
+        border-radius: .2em;
+        height: 1.5em;
+        border: 1px solid #ccc;
+    }
+    .selectable {
+        cursor: pointer;
+        user-select: none;
+    }
+
 </style>

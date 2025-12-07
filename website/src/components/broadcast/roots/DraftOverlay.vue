@@ -217,6 +217,7 @@ export default {
             const teams = [...this.draftTeams];
             if (!teams.length) return null;
 
+
             if (this.highlightOrder === "straight") {
                 let team = teams.sort((a,b) => (a.players || []).length - (b.players || []).length)?.[0];
                 if (!team) return null;
@@ -235,6 +236,46 @@ export default {
 
                     return 0;
                 }).map(t => t.team);
+
+
+                if (this.eachTeam) {
+                    const dummyTeams = teams.map(t => ({
+                        ...t,
+                        _dummyPlayers: this.insertDummies(t.players)
+                    }));
+                    // there will be dummies and maybe some players already in using draft position
+
+                    const cellCount = dummyTeams.length * this.eachTeam;
+                    for (let i = 0; i < (cellCount); i++) {
+                        // each cell
+
+                        let teamIndex = i % dummyTeams.length;
+                        let playerIndex = Math.floor(i / this.eachTeam);
+
+                        const forwards = this.highlightOrder === "straight" ? true : (this.highlightOrder.startsWith("snake") ? +(playerIndex % 2) : +!(playerIndex%2));
+                        if (forwards) {
+                            teamIndex = dummyTeams.length - teamIndex - 1;
+                        }
+
+                        const player = (dummyTeams[teamIndex]._dummyPlayers?.[playerIndex]);
+                        // console.log(i, `t=${teamIndex} p=${playerIndex}`, player, { forwards });
+
+                        if (!player?.dummy) {
+                            // player exists
+                        } else {
+                            // player is a dummy
+                            // console.log({
+                            //     team: dummyTeams[teamIndex]?.id,
+                            //     player: playerIndex
+                            // });
+                            return {
+                                team: dummyTeams[teamIndex].id,
+                                player: playerIndex
+                            };
+                        }
+                    }
+                    return null;
+                }
 
                 const minPlayers = Math.min(...sortedTeams.map(t => (t.players || []).length));
                 const teamsNotDraftedThisRound = sortedTeams.filter(t => (t.players || []).length === minPlayers);

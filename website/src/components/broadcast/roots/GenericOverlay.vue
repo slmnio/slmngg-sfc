@@ -1,5 +1,5 @@
 <template>
-    <div class="generic-overlay flex-center flex-column" :class="{'full': full}">
+    <div class="generic-overlay flex-center flex-column" :class="{'full': full, 'title-hidden': hideTitle}">
         <TourneyBar
             v-if="top === 'st4'"
             class="st4-top"
@@ -115,6 +115,9 @@ export default {
 .generic-overlay.full {
     padding: 60px 120px;
 }
+.generic-overlay.extended {
+    padding: 0;
+}
 
 .schedule-overlay .generic-overlay-body {
     padding: 0;
@@ -124,6 +127,12 @@ export default {
     background-color: #222;
     border-bottom: 8px solid transparent;
 }
+
+.generic-overlay.extended .generic-overlay-body,
+.generic-overlay.extended .generic-overlay-body {
+    border-bottom: 0 solid transparent;
+}
+
 .generic-overlay-title {
     background-color: #222;
     font-size: 96px;
@@ -151,6 +160,9 @@ export default {
     width: 100%;
     flex-grow: 1;
     overflow: hidden;
+}
+.title-hidden .g-body-wrapper {
+    margin-top: 0;
 }
 
 span.industry-align {

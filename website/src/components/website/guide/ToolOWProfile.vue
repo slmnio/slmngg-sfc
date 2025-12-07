@@ -173,7 +173,7 @@ const settingsData = computed(() => {
 });
 
 const wasOverwritten = computed(() => {
-    // eslint-disable-next-line eqeqeq
+
     return settingsData.value.WasOverwritten?.["1"]?.Value == 1;
 });
 

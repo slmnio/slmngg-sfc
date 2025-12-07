@@ -46,6 +46,13 @@ async function getOrWaitForDownload(url, filename, size) {
     return getImage(filename, size);
 }
 
+function cleanColor(str) {
+    if (!str) return null;
+    str = str.replaceAll(" ", "");
+    if (!str.startsWith("#")) str = `#${str}`;
+    return str;
+}
+
 async function downloadImage(url, filename, size) {
     console.log("[image|downloading]", url, filename, size);
     return await heldPromise(["download", url, size, filename], new Promise((resolve, reject) => {
@@ -290,7 +297,7 @@ export default ({ app, cors, Cache }) => {
             let logo = await Cache.getAttachment(theme.default_logo?.[0]?.id);
 
             if (!logo) return res.status(400).send("No logo to use");
-            let themeColor = theme.color_logo_background || theme.color_theme || "#222222";
+            let themeColor = cleanColor(theme.color_logo_background || theme.color_theme || "#222222");
 
             // background: logo background
             // centered logo
@@ -462,7 +469,7 @@ export default ({ app, cors, Cache }) => {
                         width: width,
                         height: size,
                         channels: 3,
-                        background: eventTheme?.color_logo_background || "#222222"
+                        background: cleanColor(eventTheme?.color_logo_background || "#222222")
                     }
                 });
 
@@ -470,7 +477,7 @@ export default ({ app, cors, Cache }) => {
                     const logo = await Cache.getAttachment(team.theme?.default_logo?.[0]?.id);
                     if (!logo) return null;
                     let filePath = await fullGetURL(logo, "orig", null);
-                    let themeColor = team.theme.color_logo_background || team.theme.color_theme || "#222222";
+                    let themeColor = cleanColor(team.theme.color_logo_background || team.theme.color_theme || "#222222");
 
                     let resizedLogo = await sharp(filePath).resize({
                         width: sizing.teamLogo.width - padding,
@@ -518,7 +525,7 @@ export default ({ app, cors, Cache }) => {
                 let event = await Cache.get(match.event[0]);
                 if (event.theme) event.theme = await Cache.get(event.theme[0]);
                 if (!event.theme?.id) return res.status(400).send("No event theme data");
-                let themeColor = event.theme.color_logo_background || event.theme.color_theme || "#222222";
+                let themeColor = cleanColor(event.theme.color_logo_background || event.theme.color_theme || "#222222");
 
                 let filePath = await fullGetURL(event.theme.default_logo[0], "orig", null);
 

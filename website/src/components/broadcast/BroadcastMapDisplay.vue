@@ -10,6 +10,7 @@
             <MapSegment
                 v-for="map in maps"
                 :key="map.id"
+                :match="match"
                 class="map"
                 :small="small"
                 :drafted-style="draftedStyle"
@@ -24,6 +25,7 @@
         <MapSegment
             v-for="map in maps"
             :key="map.id"
+            :match="match"
             class="map"
             :small="small"
             :drafted-style="draftedStyle"

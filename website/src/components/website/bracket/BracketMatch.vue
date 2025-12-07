@@ -64,7 +64,7 @@
 
 <script>
 import BracketTeam from "@/components/website/bracket/BracketTeam";
-import { url } from "@/utils/content-utils";
+import { getTeamsWithPlaceholders, url } from "@/utils/content-utils";
 import spacetime from "spacetime";
 import { useStatusStore } from "@/stores/statusStore";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -108,46 +108,7 @@ export default {
             return this.scores;
         },
         teams() {
-            const dummy = { text: "TBD", dummy: true, id: null };
-            const dummies = this.generateDummies(dummy, this.match);
-            if (!this.match) return [{ ...dummies[0], _empty: true }, { ...dummies[1], _empty: true }];
-            // console.log("dummies", this.match._bracket_data.num, dummies);
-
-            let text = (this.match.placeholder_teams || "").trim().split("|").filter(t => t !== "");
-            let extraText = [null, null];
-
-            if (text.length === 4) {
-                extraText = [text[2], text[3]];
-                text = [text[0], text[1]];
-            }
-
-            if (!this.match.teams || this.match.teams.length === 0) {
-                if (text.length === 2) {
-                    return text.map((t, i) => ({ ...dummies[i], text: t, short: extraText[i] }));
-                } else if (text.length === 1) {
-                    if (this.match.placeholder_right) return [dummies[0], { ...dummies[1], text: text[0] }];
-                    return [{ ...dummies[0], text: text[0], short: extraText[0] }, dummies[1]];
-                } else if (text.length === 0) {
-                    // no text, just use TBDs
-                    return dummies;
-                }
-            }
-            if (this.match.teams.length === 1) {
-                if (text.length === 2) {
-                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummies[1], text: text[1], short: extraText[1] }];
-                    return [{ ...dummies[0], text: text[0], short: extraText[0] }, this.match.teams[0]];
-                } else if (text.length === 1) {
-                    if (this.match.placeholder_right) return [this.match.teams[0], { ...dummies[1], text: text[0], short: extraText[0] }];
-                    return [{ ...dummies[0], text: text[0], short: extraText[0] }, this.match.teams[0]];
-                } else if (text.length === 0) {
-                    // no text, just use TBDs
-                    if (this.match.placeholder_right) return [this.match.teams[0], dummies[1]];
-                    return [dummies[0], this.match.teams[0]];
-                }
-            }
-
-            if (this.match.teams.length === 2) return this.match.teams;
-            return [];
+            return getTeamsWithPlaceholders(this.match, this.match?._bracket_data);
         },
         matchHighlight() {
             return useStatusStore().matchHighlights.find(match => match.id === this.match.id);
@@ -162,7 +123,7 @@ export default {
             const diffFromNow = new Date(this.match.start) - new Date();
 
             // if (diffFromNow <= 0) return null; // don't show on past matches (could be disabled)
-            if ((this.scores || []).some(s => s === this.match?.first_to || 2)) return null; // don't show on matches in progress / completed
+            if ((this.scores || []).some(s => s === (this.match?.first_to || 2))) return null; // don't show on matches in progress / completed
 
             const clarifyDate = diffFromNow <= 0 || diffFromNow >= 1000 * 60 * 60 * 24 * 7;
 
@@ -208,40 +169,6 @@ export default {
             useStatusStore().matchHighlights = [];
             useStatusStore().highlightedMatch = null;
         },
-        generateDummies(dummy, match) {
-            // "1" and "2" come from the dot notation (eg "winner": "7.2")
-            // so 1 is top/left, 2 is bottom/right
-
-            const feederMatches = match?._bracket_data?.connections?.feederMatches;
-            // console.log("cons", match?._bracket_data?.num, match?._bracket_data?.connections);
-            if (!feederMatches || (!feederMatches["1"] && !feederMatches["2"])) return [dummy, dummy];
-            const dummies = [dummy, dummy];
-            if (feederMatches["1"]) {
-                // console.log("f1", feederMatches["1"]);
-                dummies[0] = {
-                    ...dummy,
-                    text: this.generateDummyText(feederMatches["1"])
-                };
-            }
-
-            if (feederMatches["2"]) {
-                // console.log("f2", feederMatches["2"]);
-                dummies[1] = {
-                    ...dummy,
-                    text: this.generateDummyText(feederMatches["2"])
-                };
-            }
-
-            // console.log("dummies", match._bracket_data.num, dummies);
-
-            return dummies;
-        },
-        generateDummyText(match) {
-            if (match?.teams?.length === 2 && match.teams.every(team => team.code)) {
-                return `${match._m} of ${match.teams.map(team => team.code).join(" vs ")}`;
-            }
-            return `${match._m} M${(match.match_number || match.side)}`;
-        }
     }
 };
 </script>

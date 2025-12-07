@@ -9,7 +9,7 @@ export default {
      * @param {ActionAuth["client"]} client
      * @returns {Promise<void>}
      */
-    // eslint-disable-next-line no-empty-pattern
+
     async handler({ option }, { client }) {
 
         const broadcast = await getBroadcast(client);

@@ -118,7 +118,8 @@
                                 :class="{
                                     'audio-playing': audioPlaying[`pick/${ti+1}/${num}`],
                                     'show-stats': showStats[`pick/${ti+1}/${num}`],
-                                    'show-stats-2': showStats[`pick/${ti+1}/${num}`] === 2
+                                    'show-stats-2': showStats[`pick/${ti+1}/${num}`] === 2,
+                                    'show-stats-3': showStats[`pick/${ti+1}/${num}`] === 3
                                 }">
                                 <div class="pick-number">
                                     {{ getPickBanItem(pickBanOrder, "pick", ti + 1, num - 1)?.countOfTeamType }}
@@ -132,56 +133,139 @@
                                 <div v-show="loaded[picks[ti][num-1]?.id]" class="pick-text" :style="themeBackground1(broadcast?.event)">
                                     {{ picks[ti]?.[num - 1]?.name }}
                                 </div>
-                                <div class="pick-stats flex-center w-100 text-white flex-column stats-page-1" :style="themeBackground1(broadcast?.event)">
-                                    <div class="main-stats-row w-100 stats-page">
-                                        <div class="stat-row stat--pickban">
-                                            <div class="stat-text">PICK/BAN %</div>
-                                            <div class="stat-stat">{{ ((((stats?.[picks[ti]?.[num - 1]?.id]?.picks?.total || 0) + (stats?.[picks[ti]?.[num - 1]?.id]?.bans?.total || 0)) / stats?.totalMaps) * 100).toFixed(0) }}%</div>
-                                        </div>
-                                        <div class="stat-row stat--prio-pickban">
-                                            <div class="stat-text">FIRST ROUND</div>
-                                            <div class="stat-stat">{{ ((((stats?.[picks[ti]?.[num - 1]?.id]?.picks?.priority || 0) + (stats?.[picks[ti]?.[num - 1]?.id]?.bans?.priority || 0)) / stats?.totalMaps) * 100).toFixed(0) }}%</div>
-                                        </div>
-                                        <div class="stat-row all-center stat--winrate">
-                                            <Squeezable align="left">
-                                                <div class="stat-stat w-full text-center">
-                                                    {{ stats?.[picks[ti]?.[num - 1]?.id]?.picks?.wins || '0' }}W&nbsp;&nbsp;{{ stats?.[picks[ti]?.[num - 1]?.id]?.picks?.losses || '0' }}L
+                                <div
+                                    class="stats-zone"
+                                    :style="themeBackground1(broadcast?.event)">
+                                    <transition name="fade">
+                                        <div
+                                            v-if="showStats[`pick/${ti+1}/${num}`] === 1"
+                                            class="pick-stats flex-center w-100 text-white flex-column stats-page-1">
+                                            <div class="main-stats-row w-100 stats-page">
+                                                <div class="stat-row stat--pickban">
+                                                    <!--                                            <div class="stat-text">PICK/BAN %</div>-->
+                                                    <div class="stat-text">PB%</div>
+                                                    <div class="stat-stat">
+                                                        {{
+                                                            ((((stats?.[picks[ti]?.[num - 1]?.id]?.picks?.total || 0) + (stats?.[picks[ti]?.[num - 1]?.id]?.bans?.total || 0)) / stats?.totalMaps) * 100).toFixed(0)
+                                                        }}%
+                                                    </div>
                                                 </div>
-                                            </Squeezable>
+                                                <div class="stat-row stat--prio-pickban">
+                                                    <div class="stat-text">FIRST ROUND</div>
+                                                    <div class="stat-stat">
+                                                        {{
+                                                            ((((stats?.[picks[ti]?.[num - 1]?.id]?.picks?.priority || 0) + (stats?.[picks[ti]?.[num - 1]?.id]?.bans?.priority || 0)) / stats?.totalMaps) * 100).toFixed(0)
+                                                        }}%
+                                                    </div>
+                                                </div>
+                                                <div class="stat-row all-center stat--winrate">
+                                                    <Squeezable align="left">
+                                                        <div class="stat-stat w-full text-center">
+                                                            {{ stats?.[picks[ti]?.[num - 1]?.id]?.picks?.wins || "0" }}W&nbsp;{{
+                                                                stats?.[picks[ti]?.[num - 1]?.id]?.picks?.losses || "0"
+                                                            }}L
+                                                        </div>
+                                                    </Squeezable>
+                                                </div>
+                                                <!--                                        <div class="spacer"></div>-->
+                                                <div class="stats-title division-stats-title">
+                                                    {{ match?.division }} Stats
+                                                </div>
+                                            </div>
                                         </div>
-                                        <!--                                        <div class="spacer"></div>-->
-                                        <div class="stats-title division-stats-title">
-                                            {{ match?.division }} Stats
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="pick-stats flex-center w-100 text-white flex-column stats-page-2" :style="themeBackground1(broadcast?.event)">
-                                    <div class="team-stats-row w-100 stats-page">
-                                        <ThemeLogo
-                                            class="stats-team-icon"
-                                            :theme="team?.theme"
-                                            logo-size="w-200"
-                                            border-width="4px"
-                                            icon-padding="6px" />
+                                        <div
+                                            v-else-if="showStats[`pick/${ti+1}/${num}`] === 2"
+                                            class="pick-stats flex-center w-100 text-white flex-column stats-page-2">
+                                            <div class="team-stats-row w-100 stats-page">
+                                                <ThemeLogo
+                                                    class="stats-team-icon"
+                                                    :theme="team?.theme"
+                                                    logo-size="w-200"
+                                                    border-width="4px"
+                                                    icon-padding="6px" />
 
-                                        <div class="stats-title team-stats-title">
-                                            <div>TEAM STATS</div>
-                                            <div style="font-size: 0.8em">({{ stats?.teamMaps?.[team?.id] || '0' }} Map{{ stats?.teamMaps?.[team?.id] === 1 ? '' : 's' }})</div>
+                                                <div class="stats-title team-stats-title">
+                                                    <div>TEAM STATS</div>
+                                                    <div style="font-size: 0.8em">
+                                                        ({{ stats?.teamMaps?.[team?.id] || "0" }}
+                                                        Map{{ stats?.teamMaps?.[team?.id] === 1 ? "" : "s" }})
+                                                    </div>
+                                                </div>
+                                                <div class="team-stats-stat w-100">
+                                                    <div class="team-stats-pick-ban-row">
+                                                        <div class="stat-row">
+                                                            <div class="stat-text">PICK</div>
+                                                            <div class="stat-stat">
+                                                                {{
+                                                                    stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.total || 0
+                                                                }}x
+                                                            </div>
+                                                        </div>
+                                                        <div class="stat-row">
+                                                            <div class="stat-text">BAN</div>
+                                                            <div class="stat-stat">
+                                                                {{
+                                                                    stats?.[picks[ti]?.[num - 1]?.id]?.bans?.byTeam?.[team?.id]?.total || 0
+                                                                }}x
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="stat-row stat--team-winloss mt-2">
+                                                        <div class="stat-stat">
+                                                            {{
+                                                                stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.wins || "0"
+                                                            }}W&nbsp;&nbsp;{{
+                                                                stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.losses || "0"
+                                                            }}L
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="team-stats-stat w-100">
-                                            <div class="stat-row">
-                                                <div class="stat-text">PICK</div>
-                                                <div class="stat-stat">{{ (((stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.total || 0) / (stats?.teamMaps?.[team?.id] || 1)) * 100).toFixed(0) }}%</div>
-                                            </div>
-                                            <div class="stat-row">
-                                                <div class="stat-text">BAN</div>
-                                                <div class="stat-stat">{{ (((stats?.[picks[ti]?.[num - 1]?.id]?.bans?.byTeam?.[team?.id]?.total || 0) / (stats?.teamMaps?.[team?.id] || 1)) * 100).toFixed(0) }}%</div>
-                                            </div>
-                                            <div class="stat-row stat--team-winloss">
-                                                <div class="stat-stat">{{ stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.wins || '0' }}W&nbsp;&nbsp;{{ stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.losses || '0' }}L</div>
+                                        <div
+                                            v-else-if="showStats[`pick/${ti+1}/${num}`] === 3"
+                                            class="pick-stats flex-center w-100 text-white flex-column stats-page-3">
+                                            <div class="team-stats-row w-100 stats-page">
+                                                <div class="stats-title team-stats-title priority-stats-title">
+                                                    HERO PRIORITY
+                                                </div>
+                                                <div class="team-stats-stat w-100 priority-groups">
+                                                    <div
+                                                        v-for="({ week, stats: weekStats }) in priorityStats"
+                                                        :key="week"
+                                                        class="priority-group">
+                                                        <div class="priority-group-title">{{ week }}</div>
+                                                        <div class="pick-ban-icons">
+                                                            <div
+                                                                v-for="(ban, i) in (weekStats?.usesPriority ? weekStats?.[cleanID(picks[ti]?.[num-1]?.id)]?.bans?.priority : [])"
+                                                                :key="i"
+                                                                class="pick-ban-icon flex-center bg-first-ban text-white flex-center">
+                                                                <span
+                                                                    class="pick-ban-priority-number industry-align">1</span>
+                                                            </div>
+                                                            <div
+                                                                v-for="(ban, i) in (weekStats?.usesPriority ? (weekStats?.[cleanID(picks[ti]?.[num-1]?.id)]?.bans?.total || 0) - (weekStats?.[cleanID(picks[ti]?.[num-1]?.id)]?.bans?.priority || 0) : (weekStats?.[cleanID(picks[ti]?.[num-1]?.id)]?.bans?.total || 0))"
+                                                                :key="i"
+                                                                class="pick-ban-icon bg-danger flex-center">
+                                                            </div>
+                                                            <div
+                                                                v-for="(pick, i) in (weekStats?.usesPriority ? weekStats?.[cleanID(picks[ti]?.[num-1]?.id)]?.picks?.priority : [])"
+                                                                :key="i"
+                                                                class="pick-ban-icon flex-center bg-info text-white flex-center">
+                                                                <span
+                                                                    class="pick-ban-priority-number industry-align">1</span>
+                                                            </div>
+                                                            <div
+                                                                v-for="(pick, i) in (weekStats?.usesPriority ? (weekStats?.[cleanID(picks[ti]?.[num-1]?.id)]?.picks?.total || 0) - (weekStats?.[cleanID(picks[ti]?.[num-1]?.id)]?.picks?.priority || 0) : (weekStats?.[cleanID(picks[ti]?.[num-1]?.id)]?.picks?.total || 0))"
+                                                                :key="i"
+                                                                class="pick-ban-icon bg-primary flex-center">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </transition>
                                 </div>
                             </div>
                             <div
@@ -220,7 +304,7 @@
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import { getNewURL, resizedImage, resizedImageNoWrap } from "@/utils/images.js";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { countStats, formatText, getPickBanItem, processPickBanOrder } from "@/utils/content-utils";
+import { cleanID, countStats, formatText, getPickBanItem, processPickBanOrder } from "@/utils/content-utils";
 import { GameOverrides } from "@/utils/games";
 import { Howl } from "howler";
 import Squeezable from "@/components/broadcast/Squeezable.vue";
@@ -294,6 +378,56 @@ export default {
                 })
 
             });
+        },
+        priorityHistory() {
+            if (!(this.broadcast?.broadcast_settings || []).includes("Show priority stats screen on hero draft")) return [];
+            if (!this.hydratedMatch?.week) return [];
+
+            const thisWeek = parseInt(this.hydratedMatch?.week.toString().split(".").pop());
+
+            const previous = [
+                thisWeek - 3,
+                thisWeek - 2,
+                thisWeek - 1,
+                thisWeek
+            ].filter(p => p > 0);
+
+
+            const previousWeekMatches = ((ReactiveRoot(this.match?.event?.id, {
+                "matches": ReactiveArray("matches")
+            }))?.matches || []).filter(m => m.week && previous.includes(parseInt(m?.week.toString().split(".").pop())));
+
+            const hydratedMatches = ReactiveArray("matches", {
+                "maps": ReactiveArray("maps", {
+                    map: ReactiveThing("map"),
+                    winner: ReactiveThing("winner", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    picker: ReactiveThing("picker", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    banner: ReactiveThing("banner", {
+                        theme: ReactiveThing("theme")
+                    }),
+                    team_1_picks: ReactiveArray("team_1_picks"),
+                    team_1_bans: ReactiveArray("team_1_bans"),
+                    team_1_protects: ReactiveArray("team_1_protects"),
+                    team_2_picks: ReactiveArray("team_2_picks"),
+                    team_2_bans: ReactiveArray("team_2_bans"),
+                    team_2_protects: ReactiveArray("team_2_protects"),
+                })
+            })({
+                matches: previousWeekMatches.map(m => m?.id)
+            });
+
+            return previous.map(p => ({
+                week: p,
+                matches: hydratedMatches.filter(m => m.week && p === parseInt(m?.week.toString().split(".").pop()))
+            }));
+        },
+        priorityStats() {
+            if (!this.priorityHistory.length) return [];
+            return this.priorityHistory.map(({  week, matches }) => ({ week, stats: countStats(matches || [])}));
         },
         currentMap() {
             const maps = (this.hydratedMatch?.maps || []).map((map, i) => ({
@@ -433,6 +567,7 @@ export default {
     methods: {
         resizedImageNoWrap,
         getPickBanItem,
+        cleanID,
         padPickBans(arr, count, type, team, manualAdvanceIndex) {
             console.log("pad pick ban", { arr, count, type, team }, { manual: this.manualDraftAdvancing, showAll: this.showAll });
 
@@ -515,9 +650,10 @@ export default {
         currentPickBan(newNum, oldNum) {
             const statsTiming = {
                 afterVoiceline: 3000,
-                afterManual: 3000,
-                page1: 12000,
-                page2: 8000,
+                afterManual: 5000,
+                page1: 6000,
+                page2: 6000,
+                page3: 6000,
             };
 
 
@@ -565,10 +701,33 @@ export default {
                     setTimeout(() => {
                         this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 1;
                         setTimeout(() => {
-                            this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 2;
-                            setTimeout(() => {
-                                this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 0;
-                            }, statsTiming.page2);
+
+                            if (!this.currentMap?.number || this.stats?.teamMaps?.[this.teams[pickBan.team - 1]?.id] > this.currentMap?.number) {
+                                this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 2;
+                                setTimeout(() => {
+
+                                    if ((this.broadcast?.broadcast_settings || []).includes("Show priority stats screen on hero draft")) {
+                                        this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 3;
+                                        setTimeout(() => {
+                                            this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 0;
+                                        }, statsTiming.page3);
+                                    } else {
+                                        this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 0;
+                                    }
+
+                                }, statsTiming.page2);
+                            } else {
+                                // no stats for this team
+
+                                if ((this.broadcast?.broadcast_settings || []).includes("Show priority stats screen on hero draft")) {
+                                    this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 3;
+                                    setTimeout(() => {
+                                        this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 0;
+                                    }, statsTiming.page3);
+                                } else {
+                                    this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 0;
+                                }
+                            }
                         }, statsTiming.page1);
                     }, statsTiming.afterVoiceline);
                 }
@@ -909,6 +1068,9 @@ img.image-center {
 .pick.show-stats-2 .pick-stats.stats-page-2 {
     top: var(--pick-text-height) !important;
 }
+.pick.show-stats-3 .pick-stats.stats-page-3 {
+    top: var(--pick-text-height) !important;
+}
 .spacer {
     flex-grow: 1;
 }
@@ -957,4 +1119,65 @@ img.image-center {
     gap: .25em;
     text-align: center;
 }
+
+
+.pick-ban-icons {
+    display: flex;
+    /*flex-direction: row;*/
+    flex-direction: column;
+    /*flex-wrap: wrap;*/
+    gap: 1px;
+    justify-content: center;
+    align-items: center;
+    justify-items: center;
+}
+
+.pick-ban-icon {
+    width: .45em;
+    height: .45em;
+
+    border-radius: 50%;
+}
+
+.pick-ban-priority-number {
+    color: black;
+    font-size: .4em;
+}
+.bg-first-ban {
+    background-color: #fd4a14;
+}
+
+.priority-groups {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: center;
+    justify-content: space-around;
+}
+
+.priority-group {
+    font-size: 2.4em;
+}
+
+.priority-group-title {
+    font-size: 0.35em;
+    padding-bottom: .2em;
+}
+
+.priority-group-title:before {
+    content: "#"
+}
+
+.stats-page-3 .stats-page {
+    justify-content: flex-start;
+}
+
+.priority-stats-title.stats-title {
+    font-size: 1em !important;
+    letter-spacing: .0em;
+    padding: 0.1em 0.2em;
+    padding-top: .2em;
+}
+
 </style>

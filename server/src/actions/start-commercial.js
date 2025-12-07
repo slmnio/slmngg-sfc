@@ -10,7 +10,7 @@ export default {
      * @param {ActionAuth["client"]} client
      * @returns {Promise<void>}
      */
-    // eslint-disable-next-line no-empty-pattern
+
     async handler({ commercialDuration }, { user, client }) {
         if (!user.airtable?.website_settings?.includes("Full broadcast permissions")) throw { errorCode: 403, errorMessage: "You don't have permission to start a commercial" };
         const { channel } = await getTwitchChannel(client, ["channel:edit:commercial"]);

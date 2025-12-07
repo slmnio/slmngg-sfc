@@ -9,7 +9,7 @@ export default {
      * @param {ActionAuth["client"]} client
      * @returns {Promise<void>}
      */
-    // eslint-disable-next-line no-empty-pattern
+
     async handler({ cams }, { client }) {
         let broadcast = await this.helpers.get(client?.broadcast?.[0]);
         if (!broadcast?.id) throw ("No broadcast associated");

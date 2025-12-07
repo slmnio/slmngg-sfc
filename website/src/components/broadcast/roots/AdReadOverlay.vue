@@ -27,7 +27,7 @@ async function wait(ms) {
 
 export default {
     name: "AdReadOverlay",
-    props: ["broadcast", "extraDelay", "active"],
+    props: ["broadcast", "extraDelay", "startDelay", "active"],
     data: () => ({
         activeRead: null,
         activeAudio: null,
@@ -110,6 +110,9 @@ export default {
 
 
             if (group.opening_read) {
+                if (this.startDelay && !isNaN(parseInt(this.startDelay))) {
+                    await wait(parseInt(this.startDelay));
+                }
                 await this.runAudio(group.opening_read);
                 console.log("finished opener read");
                 await wait(400);

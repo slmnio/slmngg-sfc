@@ -1,8 +1,8 @@
 <template>
     <div>
         <div class="container">
-            <div class="d-flex align-items-start gap-2">
-                <h6 class="d-flex flex-wrap matches-bar">
+            <div class="d-flex flex-center gap-2 control-bar">
+                <h6 class="d-flex flex-wrap matches-bar w-100">
                     Games:
                     <a
                         v-for="rel in mainPlayerRelationships"
@@ -12,6 +12,9 @@
                     </a>
                 </h6>
                 <b-button class="text-nowrap" variant="secondary" size="sm" @click="sortDateAscending = !sortDateAscending">{{ sortDateAscending ? 'Newest' : 'Oldest' }} first <i class="fas ml-1" :class="sortDateAscending ? 'fa-sort-amount-down-alt' : 'fa-sort-amount-down'"></i></b-button>
+                <div class="d-flex flex-shrink-0">
+                    <b-form-select v-model="vodSetting" size :options="vodOptions" />
+                </div>
             </div>
             <div v-for="rel in mainPlayerRelationships" :key="rel.meta.singular_name" class="role-group mt-3">
                 <h1 :id="convertToSlug(rel.meta.singular_name)">
@@ -33,7 +36,7 @@
 <script>
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { sortEvents, sortMatches } from "@/utils/sorts";
-import { formatTime, url } from "@/utils/content-utils";
+import { formatTime, getVisibleVod, url } from "@/utils/content-utils";
 import { useSettingsStore } from "@/stores/settingsStore";
 import EventMatchGroup from "@/components/website/EventMatchGroup.vue";
 
@@ -42,7 +45,13 @@ export default {
     components: { EventMatchGroup },
     props: ["player"],
     data: () => ({
-        sortDateAscending: false
+        sortDateAscending: false,
+        vodSetting: "show",
+        vodOptions: [
+            { value: "show", text: "Show all matches" },
+            { value: "require-vod", text: "Matches with VOD" },
+            { value: "require-no-vod", text: "Matches without VOD" },
+        ]
     }),
     computed: {
         relationships() {
@@ -78,7 +87,7 @@ export default {
             Object.entries(groups).forEach(([key, val]) => {
                 if (val.items.length === 0) {
                     // TODO: no-dynamic-delete fix
-                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+
                     delete groups[key];
                 }
 
@@ -86,6 +95,9 @@ export default {
                     const events = { };
 
                     groups[key]?.items?.forEach(({ item }) => {
+
+                        if (this.vodSetting !== "show" && getVisibleVod(item) ? this.vodSetting === "require-no-vod" : this.vodSetting === "require-vod") return;
+
                         const eventID = item?.event?.id;
                         if (eventID) {
                             if (!events[eventID]) events[eventID] = { event: item.event, matches: [] };
@@ -120,5 +132,11 @@ export default {
 <style scoped>
     .matches-bar {
         gap: .5rem 1.5rem;
+    }
+
+    @media (max-width: 767px) {
+        .control-bar {
+            flex-wrap: wrap;
+        }
     }
 </style>

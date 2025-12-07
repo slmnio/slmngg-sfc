@@ -44,6 +44,8 @@ export default {
         client: Object,
         title: String,
         animationActive: Boolean,
+        forceExtended: Boolean,
+        gfxID: String
     },
     computed: {
         overlayProps() {
@@ -55,7 +57,7 @@ export default {
 
                 matches: (this.gfx?.graphics_settings || [])?.includes("Don't sort schedule") ? (this.gfx?.matches || []) : (this.gfx?.matches || []).sort(sortMatches),
                 title: this.title || this.gfx?.title,
-                extended: this.gfx?.extended,
+                extended: this.forceExtended ? true : this.gfx?.extended,
                 forceBracket: this.gfx?.bracket,
                 image: this.gfx?.image?.[0],
                 url: this.gfx?.url,
@@ -65,7 +67,7 @@ export default {
             };
         },
         gfx() {
-            return ReactiveRoot(this.broadcast?.gfx?.[this.index - 1]?.id, {
+            return ReactiveRoot(this.gfxID || this.broadcast?.gfx?.[this.index - 1]?.id, {
                 matches: ReactiveArray("matches", {
                     teams: ReactiveArray("teams", {
                         theme: ReactiveThing("theme")

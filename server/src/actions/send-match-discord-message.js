@@ -12,7 +12,7 @@ export default {
      * @param {ActionAuth["isAutomation"]} isAutomation
      * @returns {Promise<string>}
      */
-    // eslint-disable-next-line no-empty-pattern
+
     async handler({ broadcastID }, { user, client, isAutomation }) {
         if (!discordClient) throw "Discord is not set up on this server";
         if (!isAutomation && !user.airtable?.website_settings?.includes("Full broadcast permissions")) throw { errorCode: 403, errorMessage: "You don't have permission to start a commercial" };

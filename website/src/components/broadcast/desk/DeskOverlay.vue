@@ -1,5 +1,5 @@
 <template>
-    <div class="desk-overlay" :data-desk-display="deskDisplay">
+    <div class="desk-overlay" :data-desk-display="deskDisplay" :data-generic-desk-display="middleMode">
         <div class="top-holder">
             <TourneyBar :left="broadcast.event && broadcast.event.short" :right="broadcast.subtitle" :event="broadcast.event" />
         </div>
@@ -154,6 +154,15 @@ export default {
         },
         deskDisplay() {
             return this.displayOverride || this.broadcast?.desk_display;
+        },
+        middleMode() {
+            if (this.displayOverride) return this.displayOverride;
+            let display = this.deskDisplay || "";
+
+            if (display.indexOf("(") !== -1) {
+                display = display.slice(0, display.indexOf("(") - 1).trim();
+            }
+            return display || "Match";
         },
         useScoreboard() {
             return (this.deskDisplay) === "Scoreboard" || (this.deskDisplay) === "Scoreboard Bans";

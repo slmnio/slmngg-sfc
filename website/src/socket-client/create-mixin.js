@@ -9,10 +9,12 @@ export default (GlobalEmitter) => ({
         const addListener = GlobalEmitter.addListener.bind(null, this);
         const removeListenersByLabel = GlobalEmitter.removeListenersByLabel.bind(null, this);
 
-        sockets && Object.keys(sockets).forEach((key) => {
-            console.log("socket", key);
-            addListener(key, sockets[key]);
-        });
+        if (sockets) {
+            Object.keys(sockets).forEach((key) => {
+                console.log("socket", key);
+                addListener(key, sockets[key]);
+            });
+        }
 
         this.$socket = this.$socket || {};
         Object.defineProperties(this.$socket, {

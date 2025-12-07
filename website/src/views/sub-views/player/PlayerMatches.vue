@@ -87,7 +87,7 @@ export default {
             Object.entries(groups).forEach(([key, val]) => {
                 if (val.items.length === 0) {
                     // TODO: no-dynamic-delete fix
-                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+
                     delete groups[key];
                 }
 

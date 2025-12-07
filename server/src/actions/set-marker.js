@@ -10,7 +10,7 @@ export default {
      * @param {ActionAuth["client"]} client
      * @returns {Promise<string>}
      */
-    // eslint-disable-next-line no-empty-pattern
+
     async handler({ text, broadcastID }, { client, isAutomation }) {
         const { broadcast, channel } = await getTwitchChannel(client, ["channel:manage:broadcast"], isAutomation ? broadcastID : null);
 

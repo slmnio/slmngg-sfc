@@ -7,7 +7,7 @@ export default {
      * @param {ActionAuth["user"]} user
      * @returns {Promise<void>}
      */
-    // eslint-disable-next-line no-empty-pattern
+
     async handler({ match: matchID, overlayType, state }, { user }) {
         const match = await this.helpers.get(matchID);
         if (!match?.id) throw "No match associated";

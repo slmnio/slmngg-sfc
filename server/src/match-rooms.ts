@@ -552,13 +552,13 @@ class MatchRoom {
                     return {error: true, errorMessage: "Duplicate hero ID"};
                 }
 
-                console.log("updating", airtableKey)
+                console.log("updating", airtableKey);
 
                 await updateRecord(Cache, "Maps", map, {
                     [airtableKey]: [...existing, dirtyID(data.heroID)]
                 }, "match-rooms/hero-draft:lock-hero");
             } else {
-                console.warn("pick ban team number error", { pickBanTeamNum, teamID })
+                console.warn("pick ban team number error", { pickBanTeamNum, teamID });
             }
             this.sempahores.delete(command);
             const nextIndex = this.currentStepData.pickBanIndex + 1;
@@ -759,7 +759,6 @@ export default async ({ io, app, cors }: { io: Server, app: Express, cors: any }
             res.json({error: false, active: true});
         });
 
-        // @ts-expect-error it doesn't like returning things and not re-typing req,res but it's fine really
         router.post("/wake/:id", async (req, res) => {
             const token = getToken(req);
             if (!token) return res.status(401).send({error: true, errorMessage: "Unauthenticated"});

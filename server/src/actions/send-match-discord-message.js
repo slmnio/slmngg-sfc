@@ -1,6 +1,6 @@
 import { getMatchData } from "../action-utils/action-utils.js";
 import discordClient from "../discord/client.js";
-import { MapObject } from "shared";
+import { cleanID, MapObject } from "shared";
 
 export default {
     key: "send-match-discord-message",

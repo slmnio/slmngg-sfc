@@ -1,4 +1,4 @@
-import { dirtyID } from "shared";
+import { cleanID, dirtyID } from "shared";
 
 export default {
     key: "update-gfx-index",

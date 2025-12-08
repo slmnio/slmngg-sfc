@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "serve-server": "tsx watch src/index.js",
-    "register-commands": "node src/discord/register-slash-commands.js",
+    "register-commands": "tsx src/discord/register-slash-commands.js",
     "lint": "eslint --fix src",
     "build": "tsc"
   },

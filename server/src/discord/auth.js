@@ -1,5 +1,4 @@
 import bodyParser from "body-parser";
-import fetch from "node-fetch";
 import { updateRecord } from "../action-utils/action-utils.js";
 import { cleanID } from "shared";
 

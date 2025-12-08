@@ -10,7 +10,7 @@ if (process.env.DISCORD_TOKEN) {
         partials: [Partials.Message, Partials.Reaction]
     });
     client.login(process.env.DISCORD_TOKEN);
-    client.once("ready", () => console.log(`[discord] Logged in as ${client.user.tag}`));
+    client.once("clientReady", () => console.log(`[discord] Logged in as ${client.user.tag}`));
 }
 
 export default client;

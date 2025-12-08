@@ -12,7 +12,7 @@ async function updateGuilds() {
 }
 
 if (client && Cache) {
-    client.on("ready", () => updateGuilds());
+    client.on("clientReady", () => updateGuilds());
     client.on("guildCreate", () => updateGuilds());
     client.on("guildDelete", () => updateGuilds());
 }

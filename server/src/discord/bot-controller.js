@@ -304,7 +304,7 @@ class DiscordBot {
             ]
         });
 
-        this.client.once("ready", async () => {
+        this.client.once("clientReady", async () => {
             this.discord = {
                 tag: this.client.user.tag,
                 id: this.client.user.id

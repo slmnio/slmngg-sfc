@@ -47,7 +47,7 @@
 
 <script>
 import { cleanID } from "shared";
-import {processPickBanOrder } from "@/utils/content-utils";
+import { processPickBanOrder } from "@/utils/content-utils";
 import { socket } from "@/socket.js";
 import LoadingIcon from "@/components/website/LoadingIcon.vue";
 

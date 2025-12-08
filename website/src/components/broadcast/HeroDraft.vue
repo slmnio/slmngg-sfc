@@ -304,7 +304,8 @@
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import { getNewURL, resizedImage, resizedImageNoWrap } from "@/utils/images.js";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cleanID, countStats, formatText, getPickBanItem, processPickBanOrder } from "@/utils/content-utils";
+import { countStats, formatText, getPickBanItem, processPickBanOrder } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import { GameOverrides } from "@/utils/games";
 import { Howl } from "howler";
 import Squeezable from "@/components/broadcast/Squeezable.vue";

@@ -84,7 +84,7 @@
 import { logoBackground } from "@/utils/theme-styles";
 import { bg, getNewURL, resizedImage } from "@/utils/images";
 import ThemeLogo from "@/components/website/ThemeLogo";
-import { cleanID } from "@/utils/content-utils.js";
+import { cleanID } from "shared";
 
 export default {
     name: "MapSegment",

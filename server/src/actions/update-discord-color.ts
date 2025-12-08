@@ -1,4 +1,4 @@
-import { ActionAuth, TeamResolvableID } from "../types.js";
+import { ActionAuth, TeamResolvableID } from "shared";
 import { get } from "../action-utils/action-cache.js";
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
 import { Action } from "../action-utils/action-manager-models.js";

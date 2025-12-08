@@ -50,7 +50,7 @@
 </template>
 <script>
 import { cleanID } from "shared";
-import {formatTime, url } from "@/utils/content-utils";
+import { formatTime, url } from "@/utils/content-utils";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { useSettingsStore } from "@/stores/settingsStore";
 import spacetime from "spacetime";

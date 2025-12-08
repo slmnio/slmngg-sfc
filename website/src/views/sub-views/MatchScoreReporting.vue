@@ -313,7 +313,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { cleanID } from "shared";
-import {url } from "@/utils/content-utils";
+import { url } from "@/utils/content-utils";
 import MatchExplainerList from "@/components/website/dashboard/MatchExplainerList.vue";
 import { authenticatedRequest } from "@/utils/dashboard.ts";
 import ReportStepsTop from "@/components/website/ReportStepsTop.vue";

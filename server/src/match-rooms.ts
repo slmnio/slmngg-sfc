@@ -772,7 +772,6 @@ export default async ({ io, app, cors }: { io: Server, app: Express, cors: any }
             res.json({error: false, active: true});
         });
 
-        // @ts-expect-error typescript doesn't like this sorry
         router.post("/wake/:id", async (req, res) => {
             const token = getToken(req);
             if (!token) return res.status(401).send({error: true, errorMessage: "Unauthenticated"});

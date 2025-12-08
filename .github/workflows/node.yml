@@ -23,10 +23,10 @@ jobs:
       uses: pnpm/action-setup@v3
       with:
         version: 9
-    - name: Use Node.js 18.20.2
-      uses: actions/setup-node@v4
+    - name: Use Node.js from package.json
+      uses: actions/setup-node@v6
       with:
-        node-version: 18.20.2
+        node-version-file: 'package.json'
         cache: 'pnpm'
         cache-dependency-path: ./pnpm-lock.yaml
 

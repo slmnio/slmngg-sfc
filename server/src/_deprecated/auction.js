@@ -45,7 +45,7 @@ async function getAllPlayers() {
     return data.map(deAirtable);
 }
 
-discord.on("ready", () => {
+discord.on("clientReady", () => {
     let g = discord.guilds.resolve("646065580000149514");
     Auction.channel = g.channels.resolve("746461094654247003");
 });

@@ -337,7 +337,7 @@ const Auction = {
     }
 };
 
-client.once("ready", () => {
+client.once("clientReady", () => {
     try {
         Auction.guild = client.guilds.resolve("646065580000149514");
         console.log("[auction]", "loaded guild", Auction.guild.name);

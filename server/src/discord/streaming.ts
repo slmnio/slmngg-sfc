@@ -18,7 +18,7 @@ cacheStatusEmitter.on("flags", (flags) => {
     }
 });
 
-client.on("ready", () => {
+client.on("clientReady", () => {
     console.log("[streaming] Ready to calculate streaming");
 });
 

@@ -1,10 +1,9 @@
 import type { Snowflake } from "discord-api-types/globals";
-import { Match, MatchMap, Player, PlayerResolvableID, Team, TeamResolvableID } from "../types.js";
+import { cleanTypedID, MapObject, Match, MatchMap, Player, PlayerResolvableID, Team, TeamResolvableID } from "shared";
 import { get } from "./action-cache.js";
-import { MapObject } from "../discord/managers.js";
 import client from "../discord/client.js";
 import { ChannelType, Guild, MessageCreateOptions, MessagePayload } from "discord.js";
-import { cleanID, hammerTime, sendMessage } from "./action-utils.js";
+import { hammerTime, sendMessage } from "./action-utils.js";
 import emoji from "../discord/emoji.js";
 
 
@@ -52,7 +51,7 @@ export async function generateMatchReportText(match: Match) {
         if (event?.subdomain || event?.partial_subdomain) {
             subdomain = (event.subdomain || event.partial_subdomain || "") + ".";
         }
-        const matchLink = `https://${subdomain}slmn.gg/match/${cleanID(match.id)}`;
+        const matchLink = `https://${subdomain}slmn.gg/match/${cleanTypedID(match.id)}`;
 
         if (event.discord_control) {
             const eventDiscord = new MapObject(event.discord_control);
@@ -141,7 +140,7 @@ export async function generateMatchReportText(match: Match) {
             if (map.draw) {
                 mapLine.push("Draw");
             } else {
-                let winner = teams.find(t => cleanID(t.id) === cleanID(map.winner?.[0]));
+                let winner = teams.find(t => map.winner?.[0] && cleanTypedID(t.id) === cleanTypedID(map.winner?.[0]));
                 if (!winner) {
                     if (mapScores[0] > mapScores[1]) {
                         winner = teams[0];

@@ -1,17 +1,18 @@
 import {
     AnyAirtableID,
+    cleanTypedID,
     EventSettings,
+    MapObject,
     Report,
     ReschedulingReportKeys,
     ScoreReportingReportKeys,
     Theme
-} from "../types.js";
+} from "shared";
 import { get } from "../action-utils/action-cache.js";
 import * as Cache from "../cache.js";
 import { getInternalManager } from "../action-utils/action-manager.js";
-import { cleanID, hammerTime, updateRecord } from "../action-utils/action-utils.js";
+import { hammerTime, updateRecord } from "../action-utils/action-utils.js";
 import client from "../discord/client.js";
-import { MapObject } from "../discord/managers.js";
 import {
     generateMatchReportText,
     getTeamEmojiText,
@@ -55,7 +56,7 @@ export default {
             }
             const eventColor = parseInt((eventTheme?.color_theme_on_dark || eventTheme?.color_theme || defaultColor).slice(1), 16);
 
-            const opponentIDs = (match.teams || []).filter(id => cleanID(id) !== cleanID(report.team?.[0]));
+            const opponentIDs = (match.teams || []).filter(id => report.team?.[0] && cleanTypedID(id) !== cleanTypedID(report.team?.[0]));
             const opponents = await Promise.all(opponentIDs.map(id => get(id)));
             const submittingTeam = report.team?.[0] ? await get(report.team?.[0]) : null;
             const allTeams = await Promise.all((match.teams || []).map(id => get(id)));
@@ -65,7 +66,7 @@ export default {
             if (event?.subdomain || event?.partial_subdomain) {
                 subdomain = (event.subdomain || event.partial_subdomain || "") + ".";
             }
-            const matchLink = `https://${subdomain}slmn.gg/match/${cleanID(match.id)}`;
+            const matchLink = `https://${subdomain}slmn.gg/match/${cleanTypedID(match.id)}`;
             const eventSettings = JSON.parse(event.blocks) as EventSettings;
 
             let messageData = new MapObject(report.message_data);
@@ -380,7 +381,7 @@ export default {
                                         }
                                     ],
                                     thumbnail: {
-                                        url: `${dataServer}/match.png?id=${cleanID(match.id)}&size=720&padding=30`,
+                                        url: `${dataServer}/match.png?id=${cleanTypedID(match.id)}&size=720&padding=30`,
                                     },
                                     color: eventColor
                                 }],
@@ -392,17 +393,17 @@ export default {
                                                 .setLabel("Pre-approve")
                                                 .setEmoji(emoji.transparent.shield_check)
                                                 .setStyle(ButtonStyle.Primary)
-                                                .setCustomId(`reschedule_staff_approval/${cleanID(match.id)}/pre-approve`),
+                                                .setCustomId(`reschedule_staff_approval/${cleanTypedID(match.id)}/pre-approve`),
                                             new ButtonBuilder()
                                                 .setLabel("Force approve")
                                                 .setEmoji(emoji.transparent.check)
                                                 .setStyle(ButtonStyle.Success)
-                                                .setCustomId(`reschedule_staff_approval/${cleanID(match.id)}/force-approve`),
+                                                .setCustomId(`reschedule_staff_approval/${cleanTypedID(match.id)}/force-approve`),
                                             new ButtonBuilder()
                                                 .setLabel("Deny")
                                                 .setEmoji(emoji.transparent.times)
                                                 .setStyle(ButtonStyle.Danger)
-                                                .setCustomId(`reschedule_staff_approval/${cleanID(match.id)}/deny`),
+                                                .setCustomId(`reschedule_staff_approval/${cleanTypedID(match.id)}/deny`),
                                             new ButtonBuilder()
                                                 .setLabel("Details")
                                                 .setStyle(ButtonStyle.Link)
@@ -458,11 +459,11 @@ export default {
                                         ],
                                         // author: {
                                         //     name: event.name,
-                                        //     icon_url: eventTheme?.id ? `${dataServer}/theme.png?id=${cleanID(eventTheme?.id)}&size=500&padding=20` : null,
-                                        //     author_url: `https://${subdomain}slmn.gg/event/${cleanID(event.id)}`
+                                        //     icon_url: eventTheme?.id ? `${dataServer}/theme.png?id=${cleanTypedID(eventTheme?.id)}&size=500&padding=20` : null,
+                                        //     author_url: `https://${subdomain}slmn.gg/event/${cleanTypedID(event.id)}`
                                         // },
                                         thumbnail: {
-                                            url: `${dataServer}/match.png?id=${cleanID(match.id)}&size=720&padding=30`,
+                                            url: `${dataServer}/match.png?id=${cleanTypedID(match.id)}&size=720&padding=30`,
                                         },
                                         color: eventColor
                                     }],
@@ -474,12 +475,12 @@ export default {
                                                     .setLabel("Approve")
                                                     .setEmoji(emoji.transparent.check)
                                                     .setStyle(ButtonStyle.Success)
-                                                    .setCustomId(`reschedule_opponent_approval/${cleanID(match.id)}/approve`),
+                                                    .setCustomId(`reschedule_opponent_approval/${cleanTypedID(match.id)}/approve`),
                                                 new ButtonBuilder()
                                                     .setLabel("Deny")
                                                     .setEmoji(emoji.transparent.times)
                                                     .setStyle(ButtonStyle.Danger)
-                                                    .setCustomId(`reschedule_opponent_approval/${cleanID(match.id)}/deny`),
+                                                    .setCustomId(`reschedule_opponent_approval/${cleanTypedID(match.id)}/deny`),
                                                 new ButtonBuilder()
                                                     .setLabel("Details")
                                                     // .setEmoji("<:infocircle:1322010140916056225>")
@@ -532,7 +533,7 @@ export default {
                                         }
                                     ],
                                     thumbnail: {
-                                        url: `${dataServer}/match.png?id=${cleanID(match.id)}&size=720&padding=30`,
+                                        url: `${dataServer}/match.png?id=${cleanTypedID(match.id)}&size=720&padding=30`,
                                     },
                                     color: eventColor
                                 }],
@@ -544,12 +545,12 @@ export default {
                                                 .setLabel("Approve")
                                                 .setEmoji(emoji.transparent.check)
                                                 .setStyle(ButtonStyle.Success)
-                                                .setCustomId(`reschedule_staff_approval/${cleanID(match.id)}/approve`),
+                                                .setCustomId(`reschedule_staff_approval/${cleanTypedID(match.id)}/approve`),
                                             new ButtonBuilder()
                                                 .setLabel("Deny")
                                                 .setEmoji(emoji.transparent.times)
                                                 .setStyle(ButtonStyle.Danger)
-                                                .setCustomId(`reschedule_staff_approval/${cleanID(match.id)}/deny`),
+                                                .setCustomId(`reschedule_staff_approval/${cleanTypedID(match.id)}/deny`),
                                             new ButtonBuilder()
                                                 .setLabel("Details")
                                                 .setStyle(ButtonStyle.Link)
@@ -604,7 +605,7 @@ export default {
 
                                     ],
                                     thumbnail: {
-                                        url: `${dataServer}/match.png?id=${cleanID(match.id)}&size=720&padding=30`,
+                                        url: `${dataServer}/match.png?id=${cleanTypedID(match.id)}&size=720&padding=30`,
                                     },
                                     color: parseInt("dc3545", 16)
                                 }] : [{
@@ -624,7 +625,7 @@ export default {
                                         },
                                     ],
                                     thumbnail: {
-                                        url: `${dataServer}/match.png?id=${cleanID(match.id)}&size=720&padding=30`,
+                                        url: `${dataServer}/match.png?id=${cleanTypedID(match.id)}&size=720&padding=30`,
                                     },
                                     color: parseInt("dc3545", 16)
                                 }],
@@ -685,7 +686,7 @@ export default {
 
                                     ],
                                     thumbnail: {
-                                        url: `${dataServer}/match.png?id=${cleanID(match.id)}&size=720&padding=30`,
+                                        url: `${dataServer}/match.png?id=${cleanTypedID(match.id)}&size=720&padding=30`,
                                     },
                                     color: parseInt("dc3545", 16)
                                 }] : [{
@@ -705,7 +706,7 @@ export default {
                                         },
                                     ],
                                     thumbnail: {
-                                        url: `${dataServer}/match.png?id=${cleanID(match.id)}&size=720&padding=30`,
+                                        url: `${dataServer}/match.png?id=${cleanTypedID(match.id)}&size=720&padding=30`,
                                     },
                                     color: parseInt("dc3545", 16)
                                 }],

@@ -1,7 +1,7 @@
 import * as Cache from "./cache.js";
-import { createRecord, dirtyID, updateRecord } from "./action-utils/action-utils";
+import { createRecord, updateRecord } from "./action-utils/action-utils";
+import { dirtyID, MatchResolvableID } from "shared";
 import { get } from "./action-utils/action-cache.js";
-import { MatchResolvableID } from "./types.js";
 import { Server, Socket } from "socket.io";
 
 type DraftRoomEvent = "team_ready" | "swap_sides" | "draft_start" | "team_hover" | "team_lock" | "join";

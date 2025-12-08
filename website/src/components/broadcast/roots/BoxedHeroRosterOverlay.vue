@@ -78,7 +78,8 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import RecoloredHero from "@/components/broadcast/RecoloredHero";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
-import { autoRecord, cleanID, decoratePlayerWithDraftData, getRoleSVG } from "@/utils/content-utils";
+import { autoRecord, decoratePlayerWithDraftData, getRoleSVG } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import { bg, resizedAttachment, resizedImage } from "@/utils/images";
 import { useStatusStore } from "@/stores/statusStore";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";

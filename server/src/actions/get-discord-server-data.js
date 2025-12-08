@@ -1,6 +1,6 @@
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
 import client from "../discord/client.js";
-import { MapObject } from "../discord/managers.js";
+import { MapObject } from "shared";
 
 
 export default {

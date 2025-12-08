@@ -73,7 +73,7 @@
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
-import { dirtyID } from "@/utils/content-utils.js";
+import { dirtyID } from "shared";
 import Countdown from "@/components/broadcast/Countdown.vue";
 
 export default {

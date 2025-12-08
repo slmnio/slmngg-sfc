@@ -1,8 +1,16 @@
-import { ActionAuth, Match, MatchResolvableID, Report, ReschedulingReportKeys } from "../types.js";
-import { cleanID, dirtyID, getMatchRescheduling, } from "../action-utils/action-utils.js";
+import {
+    ActionAuth,
+    cleanTypedID,
+    dirtyID,
+    MapObject,
+    Match,
+    MatchResolvableID,
+    Report,
+    ReschedulingReportKeys
+} from "shared";
+import { getMatchRescheduling, } from "../action-utils/action-utils.js";
 import { Action } from "../action-utils/action-manager-models.js";
 import { get } from "../action-utils/action-cache.js";
-import { MapObject } from "../discord/managers.js";
 import { looseDeleteRecordedMessage, looseDeleteRecordedMessages } from "../action-utils/ts-action-utils.js";
 
 export default {
@@ -23,9 +31,9 @@ export default {
         const reportableTeams = teams.filter(t => {
             // if (reaction === "counter-approve" || reaction === "counter-deny") {
             //     // original team
-            //     return cleanID(t.id) === cleanID(report.team?.[0]);
+            //     return cleanTypedID(t.id) === cleanTypedID(report.team?.[0]);
             // }
-            return cleanID(t.id) !== cleanID(report.team?.[0]);
+            return report.team?.[0] && cleanTypedID(t.id) !== cleanTypedID(report.team?.[0]);
         });
 
         const actingTeam = reportableTeams.find(team => [

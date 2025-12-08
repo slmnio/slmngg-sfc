@@ -1,6 +1,6 @@
 import store from "../thing-store";
 import { queueThings, resolveThing } from "@/utils/fetch";
-import { cleanID } from "@/utils/content-utils";
+import { cleanID } from "shared";
 
 export function ReactiveRoot(id, structure) {
     // console.log("[reactive-root]", id);

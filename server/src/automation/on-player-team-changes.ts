@@ -1,8 +1,7 @@
-import { AnyAirtableID, EventSettings, Player, TeamResolvableID } from "../types.js";
+import { AnyAirtableID, cleanTypedID, EventSettings, MapObject, Player, TeamResolvableID } from "shared";
 import { get } from "../action-utils/action-cache.js";
-import { MapObject } from "../discord/managers.js";
 import client from "../discord/client.js";
-import { cleanID, findMember } from "../action-utils/action-utils.js";
+import { findMember } from "../action-utils/action-utils.js";
 import emoji from "../discord/emoji.js";
 
 const PlayerTeamRoleMap = {
@@ -94,10 +93,10 @@ export default {
             // we can, however, query they player and see if the team is on the player's relationships
 
             const allPlayerTeamPositions: TeamResolvableID[] = [];
-            PlayerTeamMembershipKeys.forEach(k => allPlayerTeamPositions.push(...(player[k] || []).map(id => cleanID(id))));
+            PlayerTeamMembershipKeys.forEach(k => allPlayerTeamPositions.push(...(player[k] || []).map(id => cleanTypedID(id))));
 
             console.log(allPlayerTeamPositions, playerID);
-            const addRole = allPlayerTeamPositions.includes(cleanID(team.id));
+            const addRole = allPlayerTeamPositions.includes(cleanTypedID(team.id));
             const removeRole = !addRole;
 
             let playerMember;
@@ -150,8 +149,8 @@ export default {
                     if (event?.subdomain || event?.partial_subdomain) {
                         subdomain = (event.subdomain || event.partial_subdomain || "") + ".";
                     }
-                    const playerLink = `https://${subdomain}slmn.gg/player/${cleanID(player.id)}`;
-                    const teamLink = `https://${subdomain}slmn.gg/team/${cleanID(team.id)}`;
+                    const playerLink = `https://${subdomain}slmn.gg/player/${cleanTypedID(player.id)}`;
+                    const teamLink = `https://${subdomain}slmn.gg/team/${cleanTypedID(team.id)}`;
 
                     if (eventSettings?.logging?.publicRosterChanges) {
                         if (!guild) {

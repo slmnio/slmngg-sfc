@@ -1,5 +1,5 @@
-import { ActionAuth, Match, MatchResolvableID, Report } from "../types.js";
-import { deAirtableRecord, dirtyID, getMatchRescheduling } from "../action-utils/action-utils.js";
+import { ActionAuth, dirtyID, Match, MatchResolvableID, Report } from "shared";
+import { deAirtableRecord, getMatchRescheduling } from "../action-utils/action-utils.js";
 import { get } from "../action-utils/action-cache.js";
 import { Action } from "../action-utils/action-manager-models.js";
 

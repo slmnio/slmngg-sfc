@@ -1,10 +1,11 @@
-/* Basic types */
-import { Snowflake } from "discord-api-types/globals";
-import { MapObject } from "./discord/managers.js";
-
 export type CleanAirtableID = string;
 export type DirtyAirtableID = `rec${CleanAirtableID}`;
 export type AnyAirtableID = DirtyAirtableID | CleanAirtableID;
+
+/* Basic types */
+import { Snowflake } from "discord-api-types/globals";
+import { MapObject } from "./managers.js";
+
 export type BroadcastResolvableID = `broadcast_${DirtyAirtableID}`;
 export type MatchResolvableID = `match_${DirtyAirtableID}`;
 export type TeamResolvableID = `team_${DirtyAirtableID}`;
@@ -34,29 +35,29 @@ export type CSSString = string;
 export type MapObjectString = MapObject["textMap"] | string;
 
 export type ResolvedData<IDType> =
-IDType extends MatchResolvableID ? Match :
-IDType extends TeamResolvableID ? Team :
-IDType extends PlayerResolvableID ? Player :
-IDType extends EventResolvableID ? Event :
-IDType extends BracketResolvableID ? Bracket :
-IDType extends GFXResolvableID ? GFX :
-IDType extends MatchMapResolvableID ? MatchMap :
-IDType extends PlayerRelationshipResolvableID ? PlayerRelationship :
-IDType extends ReportResolvableID ? Report :
-IDType extends LogFilesResolvableID ? LogFile :
-IDType extends HeroResolvableID ? Hero :
-IDType extends SocialResolvableID ? Social :
-IDType extends ClientResolvableID ? Client :
-IDType extends NewsResolvableID ? News :
-IDType extends AdReadResolvableID ? AdRead :
-IDType extends LiveGuestResolvableID ? LiveGuest :
-IDType extends ThemeResolvableID ? Theme :
-IDType extends AccoladeResolvableID ? Accolade :
-IDType extends GameMapResolvableID ? GameMap :
-IDType extends SignupDataResolvableID ? SignupData :
-IDType extends EventSeriesResolvableID ? EventSeries :
-IDType extends InterviewResolvableID ? Interview :
-any;
+    IDType extends MatchResolvableID ? Match :
+    IDType extends TeamResolvableID ? Team :
+    IDType extends PlayerResolvableID ? Player :
+    IDType extends EventResolvableID ? Event :
+    IDType extends BracketResolvableID ? Bracket :
+    IDType extends GFXResolvableID ? GFX :
+    IDType extends MatchMapResolvableID ? MatchMap :
+    IDType extends PlayerRelationshipResolvableID ? PlayerRelationship :
+    IDType extends ReportResolvableID ? Report :
+    IDType extends LogFilesResolvableID ? LogFile :
+    IDType extends HeroResolvableID ? Hero :
+    IDType extends SocialResolvableID ? Social :
+    IDType extends ClientResolvableID ? Client :
+    IDType extends NewsResolvableID ? News :
+    IDType extends AdReadResolvableID ? AdRead :
+    IDType extends LiveGuestResolvableID ? LiveGuest :
+    IDType extends ThemeResolvableID ? Theme :
+    IDType extends AccoladeResolvableID ? Accolade :
+    IDType extends GameMapResolvableID ? GameMap :
+    IDType extends SignupDataResolvableID ? SignupData :
+    IDType extends EventSeriesResolvableID ? EventSeries :
+    IDType extends InterviewResolvableID ? Interview :
+    any;
 
 export type LimitedPlayer = string;
 export type LimitedPlayersString = string;
@@ -137,15 +138,21 @@ export interface Player extends Base {
     highlighted_on?: BroadcastResolvableID[];
     mvp_matches?: MatchResolvableID[];
 }
+
 interface Bracket extends Base {
 
 }
+
 interface GFX extends Base {
 
 }
+
 export interface MatchMap extends Base {
-    map?: GameMapResolvableID[]
-    match?: MatchResolvableID[]
+    id: MatchMapResolvableID;
+    __tableName: "Maps"
+
+    map?: [GameMapResolvableID]
+    match?: [MatchResolvableID]
     draw?: boolean;
     mode?: string; // not sure what this does
     number?: number;
@@ -154,9 +161,9 @@ export interface MatchMap extends Base {
     score_2?: number;
     stats?: string;
 
-    banner?: TeamResolvableID[];
-    picker?: TeamResolvableID[];
-    winner?: TeamResolvableID[];
+    banner?: [TeamResolvableID];
+    picker?: [TeamResolvableID];
+    winner?: [TeamResolvableID];
 
     team_1_bans?: HeroResolvableID[];
     team_2_bans?: HeroResolvableID[];
@@ -167,9 +174,11 @@ export interface MatchMap extends Base {
     flip_pick_ban_order?: boolean;
     public?: boolean;
 }
+
 interface PlayerRelationship extends Base {
 
 }
+
 export interface Report extends Base {
     id: ReportResolvableID;
     __tableName: "Reports";
@@ -232,6 +241,7 @@ export type ScoreReportingReportKeys = (typeof ScoreReportingMessageTypes)[numbe
 interface LogFile extends Base {
 
 }
+
 export interface Hero extends Base {
     id: HeroResolvableID;
     __tableName: "Heroes";
@@ -259,18 +269,23 @@ export interface Hero extends Base {
     pick_audio?: CacheAttachment[];
     ban_audio?: CacheAttachment[];
 }
+
 interface Social extends Base {
 
 }
+
 interface News extends Base {
 
 }
+
 interface AdRead extends Base {
 
 }
+
 interface LiveGuest extends Base {
 
 }
+
 export interface Theme extends Base {
     id: ThemeResolvableID;
     __tableName: "Themes";
@@ -319,10 +334,15 @@ export interface Theme extends Base {
     wordmark_on_light?: CacheAttachment[];
     wordmark_on_theme?: CacheAttachment[];
 }
+
 interface Accolade extends Base {
 
 }
+
 export interface GameMap extends Base {
+    id: GameMapResolvableID;
+    __tableName: "Map Data"
+
     audio?: CacheAttachment[];
     audio_volume?: number;
     big_image?: CacheAttachment[];
@@ -341,9 +361,11 @@ export interface GameMap extends Base {
     type?: string;
 
 }
+
 interface SignupData extends Base {
 
 }
+
 interface EventSeries extends Base {
 
 }
@@ -351,6 +373,7 @@ interface EventSeries extends Base {
 interface Interview extends Base {
 
 }
+
 type PickBan = `${"pick" | "protect" | "ban"}${"1" | "2"}`;
 type PickBanOrder = `${PickBan},${PickBan}, ...`
 
@@ -406,7 +429,7 @@ export interface Match extends Base {
     stats?: string;
     stream_code?: string;
     sub_event?: string;
-    sub_matches?: MatchResolvableID;
+    sub_matches?: MatchResolvableID[];
     teams?: TeamResolvableID[];
     use_event_thumbnail?: boolean;
     valorant?: string;
@@ -418,10 +441,13 @@ export interface Match extends Base {
 }
 
 export interface Team extends Base {
+    id: TeamResolvableID;
+    __tableName: "Teams";
+
     accolades?: AccoladeResolvableID[];
     aliases?: string;
     balance?: number;
-    blue_theme?: ThemeResolvableID[];
+    blue_theme?: [ThemeResolvableID];
     bpl_performance_ranking?: number;
     brand_designers?: PlayerResolvableID[];
     broadcast_interviews?: InterviewResolvableID[];
@@ -452,7 +478,7 @@ export interface Team extends Base {
     players?: PlayerResolvableID[];
     ranking_sort?: number;
     ranking_text?: string;
-    red_theme?: ThemeResolvableID[];
+    red_theme?: [ThemeResolvableID];
     report?: ReportResolvableID[];
     show_notes?: string;
     sister_teams?: TeamResolvableID[];
@@ -464,7 +490,7 @@ export interface Team extends Base {
     subtitle?: string;
     team_category?: string;
     team_in_other_tournaments?: TeamResolvableID[];
-    theme?: ThemeResolvableID[];
+    theme?: [ThemeResolvableID];
     type_description?: string;
 }
 
@@ -478,7 +504,7 @@ export type CacheAttachment = {
 
 export type GameOption = "Overwatch" | "Valorant" | "League of Legends" | "F1" | "Counter-Strike" | "Deadlock";
 export type EventTag = "BPL community event" | "White-label" | "Tier 2" | "Tier 2/3" | "Production value example";
-export type EventTier = `${"S"|"A"|"B"|"C"} Tier` | "Unranked";
+export type EventTier = `${"S" | "A" | "B" | "C"} Tier` | "Unranked";
 
 export interface Event extends Base {
     id: EventResolvableID
@@ -525,7 +551,7 @@ export interface Event extends Base {
     subdomain?: string;
     tags?: EventTag[];
     teams?: TeamResolvableID[];
-    theme?: ThemeResolvableID[];
+    theme?: [ThemeResolvableID];
     tier?: EventTier;
     title_sponsor?: ThemeResolvableID[];
 }
@@ -536,9 +562,9 @@ export interface Client extends Base {
 
     name?: string;
     key?: string;
-    staff?: DirtyAirtableID[];
+    staff?: [DirtyAirtableID];
     /**
-     * Array of linked broadcasts, but first one is the "active" one -> [0] to make it active
+     * Array of linked broadcasts, but the first one is the "active" one -> [0] to make it active
      */
     broadcast?: BroadcastResolvableID[];
 }

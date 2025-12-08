@@ -31,7 +31,8 @@
 </template>
 
 <script>
-import { dirtyID, getPickBanItem } from "@/utils/content-utils";
+import { dirtyID } from "shared";
+import { getPickBanItem } from "@/utils/content-utils";
 import { resizedImage } from "@/utils/images.js";
 import { sortAlphaRaw } from "@/utils/sorts";
 import { GameOverrides } from "@/utils/games";

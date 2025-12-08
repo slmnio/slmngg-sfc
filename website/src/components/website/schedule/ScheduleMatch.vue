@@ -104,9 +104,9 @@
 
 <script>
 import ThemeLogo from "@/components/website/ThemeLogo";
+import { cleanID } from "shared";
 import {
     url,
-    cleanID,
     getScoreReportingBadge,
     getReschedulingBadge,
     getTeamsWithPlaceholders,

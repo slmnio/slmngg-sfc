@@ -297,7 +297,7 @@
 
 <script>
 import { ReactiveRoot } from "@/utils/reactive";
-import { MapObject } from "@/utils/map-object";
+import { MapObject } from "shared";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import { authenticatedRequest } from "@/utils/dashboard";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
@@ -306,7 +306,8 @@ import EventSettingsFix from "@/components/website/EventSettingsFix.vue";
 import { useAuthStore } from "@/stores/authStore";
 import { sortAlpha } from "@/utils/sorts";
 import SettingsMultiselect from "@/views/sub-views/event-settings/SettingsMultiselect.vue";
-import { calculateContrastHex, cleanID } from "@/utils/content-utils";
+import { cleanID } from "shared";
+import { calculateContrastHex } from "@/utils/content-utils";
 import ContrastBadge from "@/components/website/ContrastBadge.vue";
 
 function cleanKey(key) {

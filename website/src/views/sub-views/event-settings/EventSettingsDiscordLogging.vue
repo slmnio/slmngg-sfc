@@ -137,7 +137,7 @@ import { useAuthStore } from "@/stores/authStore.ts";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions.js";
 import { ReactiveRoot } from "@/utils/reactive";
 import { authenticatedRequest } from "@/utils/dashboard.ts";
-import { MapObject } from "@/utils/map-object.js";
+import { MapObject } from "shared";
 
 export default {
     name: "EventSettingsDiscordLogging",

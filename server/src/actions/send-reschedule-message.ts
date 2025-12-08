@@ -1,9 +1,8 @@
 import { Action } from "../action-utils/action-manager-models.js";
-import { ActionAuth, EventSettings, MatchResolvableID } from "../types.js";
+import { ActionAuth, cleanTypedID, EventSettings, MapObject, MatchResolvableID } from "shared";
 import { get } from "../action-utils/action-cache.js";
 import { getTeamEmojiText, sendRecordedMessage } from "../action-utils/ts-action-utils.js";
-import { cleanID, hammerTime } from "../action-utils/action-utils.js";
-import { MapObject } from "../discord/managers.js";
+import { hammerTime } from "../action-utils/action-utils.js";
 
 export default {
     key: "send-reschedule-message",
@@ -32,7 +31,7 @@ export default {
         if (event?.subdomain || event?.partial_subdomain) {
             subdomain = (event.subdomain || event.partial_subdomain || "") + ".";
         }
-        const matchLink = `https://${subdomain}slmn.gg/match/${cleanID(match.id)}`;
+        const matchLink = `https://${subdomain}slmn.gg/match/${cleanTypedID(match.id)}`;
 
         if (!eventSettings.logging?.matchTimeChanges) throw "No rescheduling channel found for this match";
 

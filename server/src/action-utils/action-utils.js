@@ -5,6 +5,7 @@ import { ApiClient } from "@twurple/api";
 import { verboseLog } from "../discord/slmngg-log.js";
 import { get } from "./action-cache.js";
 import client from "../discord/client.js";
+import { cleanID } from "shared";
 
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
 const slmngg = airtable.base(process.env.AIRTABLE_APP);
@@ -14,30 +15,6 @@ export async function getSelfClient(Cache, token) {
     if (!userData) return null;
     let clientID = userData?.user?.airtable?.clients?.[0];
     return await Cache.get(clientID);
-}
-
-/**
- *
- * @param {AnyAirtableID|null} id
- * @returns {CleanAirtableID|null}
- */
-export function cleanID(id) {
-    if (!id) return null;
-    if (id?.id) return id.id;
-    if (typeof id !== "string") return null;
-    if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
-    return id;
-}
-
-/**
- * @param {AnyAirtableID} id
- * @returns {DirtyAirtableID}
- */
-export function dirtyID(id) {
-    // add rec
-    if (!id) return id;
-    if (id.length === 14) return "rec" + id;
-    return id;
 }
 
 const TimeOffset = 3 * 1000;

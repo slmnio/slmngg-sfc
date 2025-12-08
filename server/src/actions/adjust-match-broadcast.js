@@ -1,5 +1,5 @@
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
-import { dirtyID } from "../action-utils/action-utils.js";
+import { dirtyID } from "shared";
 
 
 export default {

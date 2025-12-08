@@ -96,7 +96,7 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js"
 import { themeBackground1 } from "@/utils/theme-styles.js";
 import { sortMatches } from "@/utils/sorts.js";
 import { resizedImage, resizedImageNoWrap } from "@/utils/images.js";
-import { cleanID } from "@/utils/content-utils.js";
+import { cleanID } from "shared";
 import GFXRoot from "@/components/broadcast/roots/GFXRoot.vue";
 
 const tickTime = 20;

@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import { cleanID } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import { logoBackground1, themeBackground } from "@/utils/theme-styles";
 import { resizedImage } from "@/utils/images";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";

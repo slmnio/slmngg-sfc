@@ -99,8 +99,8 @@ import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import MatchHero from "@/components/website/match/MatchHero";
 import MatchScore from "@/components/website/match/MatchScore";
 import LinkedPlayers from "@/components/website/LinkedPlayers";
+import { cleanID } from "shared";
 import {
-    cleanID,
     formatTime,
     getMatchContext,
     getReschedulingBadge, getScoreReportingBadge,

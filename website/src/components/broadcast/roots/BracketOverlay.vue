@@ -30,7 +30,7 @@
 import GenericOverlay from "@/components/broadcast/roots/GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import Bracket from "@/components/website/bracket/Bracket";
-import { cleanID } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import { useStatusStore } from "@/stores/statusStore";
 export default {
     name: "BracketOverlay",

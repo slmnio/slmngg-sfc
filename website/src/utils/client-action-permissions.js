@@ -1,10 +1,4 @@
-
-function dirtyID(id) {
-    // add rec
-    if (!id) return id;
-    if (id.length === 14) return "rec" + id;
-    return id;
-}
+import { dirtyID } from "shared";
 
 export function canEditMatch(player, { event, match } = {}) {
     if (!player || !event) return false;

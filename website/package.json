@@ -37,7 +37,8 @@
     "vue-confetti": "^2.3.0",
     "vue-router": "^4.5.1",
     "vuex": "^4.1.0",
-    "youtube-vue3": "^0.1.15"
+    "youtube-vue3": "^0.1.15",
+    "shared": "workspace:^"
   },
   "devDependencies": {
     "@types/ini": "^4.1.1",

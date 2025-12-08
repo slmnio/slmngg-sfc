@@ -1,6 +1,6 @@
 /* eslint no-labels: 0 */
 
-import { cleanID } from "@/utils/content-utils.js";
+import { cleanID } from "shared";
 
 export class BitCounter {
     constructor (props) {

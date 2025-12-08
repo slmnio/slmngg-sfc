@@ -106,7 +106,8 @@
 <script>
 import LinkedPlayers from "@/components/website/LinkedPlayers.vue";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
-import { cleanID, getRoleSVG } from "@/utils/content-utils";
+import { cleanID } from "shared";
+import { getRoleSVG } from "@/utils/content-utils";
 import RoleIcon from "@/components/website/RoleIcon.vue";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
 import { sortRoles } from "@/utils/sorts";

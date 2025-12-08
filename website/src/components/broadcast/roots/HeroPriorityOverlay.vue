@@ -68,7 +68,8 @@
 <script>
 import GenericOverlay from "./GenericOverlay";
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cleanID, countStats } from "@/utils/content-utils";
+import { countStats } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import { sortAlphaRaw } from "@/utils/sorts";
 import { resizedImage } from "@/utils/images";
 import { GameOverrides } from "@/utils/games";

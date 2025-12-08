@@ -42,7 +42,7 @@ import SubPageNav from "@/components/website/SubPageNav";
 import Social from "@/components/website/Social";
 import { themeBackground1 } from "@/utils/theme-styles";
 import { resizedImageNoWrap } from "@/utils/images";
-import { cleanID } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import { isEventStaffOrHasRole } from "@/utils/client-action-permissions";
 import { useAuthStore } from "@/stores/authStore";
 

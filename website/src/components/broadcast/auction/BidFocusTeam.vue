@@ -10,7 +10,8 @@
 </template>
 
 <script>
-import { cleanID, money } from "@/utils/content-utils";
+import { money } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import { logoBackground1 } from "@/utils/theme-styles";
 import { resizedImage } from "@/utils/images";
 

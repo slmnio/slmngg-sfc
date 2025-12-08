@@ -88,7 +88,8 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { authenticatedRequest } from "@/utils/dashboard";
 import { resizedImage } from "@/utils/images";
-import { cleanID, getAssociatedThemeOptions, url } from "@/utils/content-utils";
+import { getAssociatedThemeOptions, url } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import { logoBackground } from "@/utils/theme-styles";
 import { mapWritableState } from "pinia";
 import { useAuthStore } from "@/stores/authStore";

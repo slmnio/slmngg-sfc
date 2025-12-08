@@ -1,4 +1,4 @@
-import { cleanID } from "./content-utils";
+import { cleanID } from "shared";
 import { sortTeamsIntoStandings } from "./scenarios";
 import { GameOverrides } from "@/utils/games";
 

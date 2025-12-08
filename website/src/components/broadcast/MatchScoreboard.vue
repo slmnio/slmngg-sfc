@@ -52,7 +52,8 @@
 
 <script>
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import { cleanID, DefaultMapImages, getFormatOptions, likelyNeededMaps, MapTypeIcons } from "@/utils/content-utils";
+import { cleanID } from "shared";
+import {DefaultMapImages, getFormatOptions, likelyNeededMaps, MapTypeIcons } from "@/utils/content-utils";
 import { logoBackground1, themeBackground1 } from "@/utils/theme-styles";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import Squeezable from "@/components/broadcast/Squeezable.vue";

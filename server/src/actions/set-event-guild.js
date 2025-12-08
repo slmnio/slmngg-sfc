@@ -1,5 +1,5 @@
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
-import { MapObject } from "../discord/managers.js";
+import { MapObject } from "shared";
 
 export default {
     key: "set-event-guild",

@@ -40,7 +40,7 @@
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import StandingsTeam from "@/components/broadcast/StandingsTeam";
 import { calculateStandings, StandingsShowKeys } from "@/utils/standings";
-import { cleanID } from "@/utils/content-utils";
+import { cleanID } from "shared";
 
 
 function avg(arr) {

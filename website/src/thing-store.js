@@ -1,6 +1,6 @@
 import { socket } from "@/socket";
 import { createStore } from "vuex";
-import { cleanID } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import { fetchThings } from "@/utils/fetch";
 
 const store = createStore({

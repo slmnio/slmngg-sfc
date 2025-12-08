@@ -90,7 +90,7 @@ import { KeyValueSelectEditor, MultiSelectEditor } from "@/views/sub-views/event
 import { sortAlphaRaw } from "@/utils/sorts";
 import { authenticatedRequest } from "@/utils/dashboard";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
-import { cleanID } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import { mapWritableState } from "pinia";
 import { useSettingsStore } from "@/stores/settingsStore.ts";
 

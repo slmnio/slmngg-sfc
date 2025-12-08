@@ -6,14 +6,8 @@ import { createRecord, updateRecord } from "./action-utils.js";
  */
 import * as Cache from "../cache.js";
 import * as permissions from "./action-permissions.js";
+import { cleanID } from "shared";
 
-function cleanID(id) {
-    // console.log(">id", id);
-    if (!id) return null;
-    if (typeof id !== "string") return null;
-    if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
-    return id;
-}
 function cleanUser(user) {
     // console.log("clean user", user);
     return ({

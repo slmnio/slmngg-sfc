@@ -1,5 +1,6 @@
 import * as Cache from "./cache.js";
-import { cleanID, dirtyID, updateRecord } from "./action-utils/action-utils.js";
+import { cleanID, dirtyID } from "shared";
+import { updateRecord } from "./action-utils/action-utils.js";
 import { isEventStaffOrHasRole } from "./action-utils/action-permissions.js";
 
 
@@ -265,7 +266,7 @@ export default class Auction {
         // TODO: check auction order & player teams - are they eligible?
 
 
-        return; // TODO: TESTING ONLY, REMOVE
+        // TODO: TESTING ONLY, REMOVE
     }
 
     get bids() {

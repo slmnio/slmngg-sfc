@@ -12,7 +12,7 @@ import webAuction from "./web_auction.js";
 import matchRooms from "./match-rooms.js";
 // import * as draftRoom from "./draft-room.ts";
 import * as actions from "./action-utils/action-manager.js";
-import { dirtyID } from "./action-utils/action-utils.js";
+import { cleanID, dirtyID } from "shared";
 
 const app = express();
 const port = 8901;
@@ -121,13 +121,6 @@ images({ app, cors, Cache, corsHandle });
 
 webAuction({ app, io });
 matchRooms({ app, io, cors: localCors });
-
-function cleanID(id) {
-    if (!id) return null;
-    if (typeof id !== "string") return id.id || null; // no real id oops
-    if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
-    return id;
-}
 
 let connected = 0;
 const connectedTransmitters = new Map();

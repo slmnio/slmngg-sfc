@@ -1,9 +1,18 @@
-import { ActionAuth, EventSettings, Match, MatchResolvableID, Report, ScoreReportingReportKeys } from "../types.js";
+import {
+    ActionAuth,
+    cleanTypedID,
+    dirtyID,
+    EventSettings,
+    MapObject,
+    Match,
+    MatchResolvableID,
+    Report,
+    ScoreReportingReportKeys
+} from "shared";
 import { Action } from "../action-utils/action-manager-models.js";
-import { cleanID, dirtyID, getMatchScoreReporting } from "../action-utils/action-utils.js";
+import { getMatchScoreReporting } from "../action-utils/action-utils.js";
 import { get } from "../action-utils/action-cache.js";
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
-import { MapObject } from "../discord/managers.js";
 import client from "../discord/client.js";
 import { looseDeleteRecordedMessage, looseDeleteRecordedMessages } from "../action-utils/ts-action-utils.js";
 
@@ -103,7 +112,7 @@ export default {
             if (event?.subdomain || event?.partial_subdomain) {
                 subdomain = (event.subdomain || event.partial_subdomain || "") + ".";
             }
-            const matchLink = `https://${subdomain}slmn.gg/match/${cleanID(match.id)}`;
+            const matchLink = `https://${subdomain}slmn.gg/match/${cleanTypedID(match.id)}`;
 
             if (client && eventSettings?.logging?.staffScoreReport) {
                 const channel = await client.channels.fetch(eventSettings.logging.staffScoreReport);

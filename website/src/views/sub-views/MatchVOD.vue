@@ -74,7 +74,8 @@
 <script>
 import EmbeddedVideo from "@/components/website/EmbeddedVideo";
 import MapDisplay from "@/components/website/match/MapDisplay";
-import { cleanID, getEmbedData, hydratedCommunityStreams } from "@/utils/content-utils";
+import { cleanID } from "shared";
+import { getEmbedData, hydratedCommunityStreams } from "@/utils/content-utils";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
 import { GameOverrides } from "@/utils/games";
 import { themeBackground1 } from "@/utils/theme-styles";

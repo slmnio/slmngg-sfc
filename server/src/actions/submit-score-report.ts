@@ -1,7 +1,7 @@
 import { Action } from "../action-utils/action-manager-models.js";
-import { cleanID, deAirtableRecord, dirtyID, getMatchScoreReporting } from "../action-utils/action-utils.js";
+import { deAirtableRecord, getMatchScoreReporting } from "../action-utils/action-utils.js";
 
-import { ActionAuth, Match, MatchResolvableID, Report } from "../types.js";
+import { ActionAuth, cleanTypedID, dirtyID, Match, MatchResolvableID, Report } from "shared";
 import { get } from "../action-utils/action-cache.js";
 
 export default {
@@ -75,7 +75,7 @@ export default {
             if (!originalSubmissionTeam?.id) throw "Unknown team in original score report";
 
             const teams = await Promise.all((match.teams || []).map(t => get(t)));
-            const actingTeam = teams.filter(t => cleanID(t.id) !== cleanID(originalSubmissionTeam.id)).find(team => [
+            const actingTeam = teams.filter(t => cleanTypedID(t.id) !== cleanTypedID(originalSubmissionTeam.id)).find(team => [
                 ...(team.players || []),
                 ...(team.captains || []),
                 ...(team.staff || []),

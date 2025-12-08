@@ -65,7 +65,7 @@ import { themeBackground } from "@/utils/theme-styles";
 import ThemeTransition from "@/components/broadcast/ThemeTransition";
 import { useStatusStore } from "@/stores/statusStore";
 import { bg, resizedAttachment, resizedImage } from "@/utils/images";
-import { cleanID } from "@/utils/content-utils";
+import { cleanID } from "shared";
 
 export default {
     name: "MVPOverlay",

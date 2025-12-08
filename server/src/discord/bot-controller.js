@@ -1,19 +1,13 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import { EndBehaviorType, joinVoiceChannel } from "@discordjs/voice";
 
-import { onUpdate, get, auth } from "../cache.js";
+import { auth, get, onUpdate } from "../cache.js";
+import { cleanID, MapObject } from "shared";
+
 const { getBots, getPlayer } = auth;
-import { MapObject } from "./managers.js";
 
 
 let io;
-
-function cleanID(id) {
-    if (!id) return null;
-    if (typeof id !== "string") return id.id || null; // no real id oops
-    if (id.startsWith("rec") && id.length === 17) id = id.slice(3);
-    return id;
-}
 
 // hivemind time
 

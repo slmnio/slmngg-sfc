@@ -1,5 +1,7 @@
 import {
     AuthUserData,
+    cleanTypedID,
+    dirtyID,
     Event,
     HeroResolvableID,
     Match,
@@ -9,30 +11,40 @@ import {
     PlayerResolvableID,
     Team,
     TeamResolvableID
-} from "./types.js";
+} from "shared";
 
 import { Server, Socket } from "socket.io";
 import { Express, Request, Router } from "express";
 import { get } from "./action-utils/action-cache.js";
 import * as Cache from "./cache.js";
-import { cleanID, createRecord, dirtyID, updateRecord } from "./action-utils/action-utils.js";
+import { createRecord, updateRecord } from "./action-utils/action-utils.js";
 import { isEventStaffOrHasRole } from "./action-utils/action-permissions.js";
 import { processPickBanOrder } from "./action-utils/ts-action-utils.js";
 
 const ActiveRooms = new Map<MatchResolvableID, MatchRoom>();
 let socketServer: Server;
-
 type MatchRoomStates = null | "offline" | "started" | "collect-match-ready" | "collect-choice" | "prematch" | "premap" | "ingame" | "postmap" | "postmatch" | "complete" | "errored";
-type MatchRoomCommand = "ready_up" | "unready" | "flip-pick-ban-order-choice" | "hero_draft:lock_hero" | "hero_draft:hover_hero" | "map_complete" | "staff:freeze" | "staff:unfreeze" | "staff:reset" | "staff:advance" | "staff:set_pick_ban_index" ;
-type MatchRoomCommandData<C extends MatchRoomCommand> =
-    C extends "ready_up" ? { teamID: TeamResolvableID } :
-    C extends "unready" ? { teamID: TeamResolvableID } :
-    C extends "flip-pick-ban-order-choice" ? { teamID: TeamResolvableID, flip: boolean } :
-    C extends "hero_draft:lock_hero" ? { teamID: TeamResolvableID, heroID: HeroResolvableID } :
-    C extends "hero_draft:hover_hero" ? { teamID: TeamResolvableID, heroID: HeroResolvableID } :
-    C extends "staff:set_pick_ban_index" ? { index: number | string } :
-    any;
 
+type MatchRoomCommandDefinitions = {
+    "ready_up": { teamID: TeamResolvableID },
+    "unready": { teamID: TeamResolvableID },
+    "flip-pick-ban-order-choice": { teamID: TeamResolvableID, flip: boolean },
+    "hero_draft:lock_hero": { teamID: TeamResolvableID, heroID: HeroResolvableID },
+    "hero_draft:hover_hero": { teamID: TeamResolvableID, heroID: HeroResolvableID },
+    "staff:set_pick_ban_index": { index: number | string },
+    "map_complete": any,
+    "staff:freeze": any,
+    "staff:unfreeze": any,
+    "staff:reset": any,
+    "staff:advance": any
+};
+
+type MatchRoomCommand = keyof MatchRoomCommandDefinitions;
+type MatchRoomCommandData<C extends MatchRoomCommand> = MatchRoomCommandDefinitions[C];
+
+type MatchRoomCommandArgs = {
+    [K in MatchRoomCommand]: [command: K, data: MatchRoomCommandDefinitions[K]]
+}[MatchRoomCommand];
 
 type MatchRoomBaseStep = {
     type: string;
@@ -142,7 +154,7 @@ class MatchRoom {
     }
 
     get id() {
-        return cleanID(this.match.id) as MatchResolvableID;
+        return cleanTypedID(this.match.id) as MatchResolvableID;
     }
     get socketRoomID() {
         return `match_room:${this.id}`;
@@ -377,7 +389,7 @@ class MatchRoom {
                 for (const map of mapData) {
                     if (byElement === "first_winner" && map.winner) return { teamID: map.winner[0], reason: byElement };
                     if (byElement === "first_loser" && map.winner) {
-                        const teamID = (this.match?.teams || []).find(teamID => map.winner && cleanID(teamID) !== cleanID(map.winner[0]));
+                        const teamID = (this.match?.teams || []).find(teamID => map.winner && cleanTypedID(teamID) !== cleanTypedID(map.winner[0]));
                         if (teamID) return { teamID, reason: byElement };
                     }
                     if (byElement === "first_banner" && map.banner) return { teamID: map.banner[0], reason: byElement };
@@ -388,7 +400,7 @@ class MatchRoom {
                 for (const map of mapData.reverse()) {
                     if (byElement === "recent_winner" && map.winner) return { teamID: map.winner[0], reason: byElement};
                     if (byElement === "recent_loser" && map.winner) {
-                        const teamID = (this.match?.teams || []).find(teamID => map.winner && cleanID(teamID) !== cleanID(map.winner[0]));
+                        const teamID = (this.match?.teams || []).find(teamID => map.winner && cleanTypedID(teamID) !== cleanTypedID(map.winner[0]));
                         if (teamID) return { teamID, reason: byElement };
                     }
                     if (byElement === "recent_banner" && map.banner) return { teamID: map.banner[0], reason: byElement};
@@ -432,7 +444,8 @@ class MatchRoom {
 
     private sempahores = new Set<MatchRoomCommand>();
 
-    async handleRoomCommand<C extends MatchRoomCommand>(socket: Socket, player: Player, command: C, data: MatchRoomCommandData<C>) {
+    async handleRoomCommand(socket: Socket, player: Player, ...[command, data]: MatchRoomCommandArgs) {
+
         const playerAuthStatus = await this.getAuthStatus(player);
 
         if (playerAuthStatus.staff && command === "staff:freeze") {
@@ -464,7 +477,7 @@ class MatchRoom {
             await this.advanceToNextStep();
             return;
         } else if (command === "staff:set_pick_ban_index" && playerAuthStatus.staff) {
-            this.setPickBanIndex(parseInt(data.index));
+            this.setPickBanIndex(typeof data.index === "number" ? data.index : parseInt(data.index));
             return;
         }
 
@@ -475,7 +488,7 @@ class MatchRoom {
         if ((this.state === "collect-match-ready" || this.currentStep?.type === "collect-ready") && command === "ready_up") {
             const teamID = data.teamID;
             if (!teamID) return { error: true, errorMessage: "No team ID" };
-            if (!playerAuthStatus.teams.includes(cleanID(teamID))) return { error: true, errorMessage: "No permission" };
+            if (!playerAuthStatus.teams.includes(cleanTypedID(teamID))) return { error: true, errorMessage: "No permission" };
 
             this.ready.add(teamID);
             this.roomBroadcast("match_room:ready", [...this.ready.keys()]);
@@ -484,7 +497,7 @@ class MatchRoom {
         } else if ((this.state === "collect-match-ready" || this.currentStep?.type === "collect-ready") && command === "unready") {
             const teamID = data.teamID;
             if (!teamID) return {error: true, errorMessage: "No team ID"};
-            if (!playerAuthStatus.teams.includes(cleanID(teamID))) return {error: true, errorMessage: "No permission"};
+            if (!playerAuthStatus.teams.includes(cleanTypedID(teamID))) return {error: true, errorMessage: "No permission"};
 
             this.ready.delete(teamID);
             this.roomBroadcast("match_room:ready", [...this.ready.keys()]);
@@ -492,7 +505,7 @@ class MatchRoom {
         } else if (command === "flip-pick-ban-order-choice") {
             const teamID = data.teamID;
             if (!teamID) return {error: true, errorMessage: "No team ID"};
-            if (!playerAuthStatus.teams.includes(cleanID(teamID))) return {error: true, errorMessage: "No permission"};
+            if (!playerAuthStatus.teams.includes(cleanTypedID(teamID))) return {error: true, errorMessage: "No permission"};
 
             // set map on airtable
 
@@ -500,7 +513,7 @@ class MatchRoom {
                 const map = await get(this.currentSectionData.mapID as MatchMapResolvableID);
                 if (map.flip_pick_ban_order !== data.flip) {
                     await updateRecord(Cache, "Maps", map, {
-                        "Flip Pick Ban Order": !!data.flip
+                        "Flip Pick Ban Order": data.flip
                     }, "match-rooms/flip-pick-ban-order-choice");
                 }
                 await this.advanceToNextStep();
@@ -524,7 +537,7 @@ class MatchRoom {
                 return {error: true, errorMessage: "No team ID"};
             }
             // team permission
-            if (!playerAuthStatus.teams.includes(cleanID(teamID))) return {error: true, errorMessage: "No permission"};
+            if (!playerAuthStatus.teams.includes(cleanTypedID(teamID))) return {error: true, errorMessage: "No permission"};
             // check if can act in order
             const pickBanTeamNum = this.currentPickBanStep?.team;
             console.log("[match-room]", this.currentPickBanStep);
@@ -533,8 +546,8 @@ class MatchRoom {
                 return {error: true, errorMessage: "Cannot pick ban as this team right now" };
             }
             if (
-                (pickBanTeamNum === 1 && cleanID(this.match.teams?.[0]) === cleanID(teamID)) ||
-                (pickBanTeamNum === 2 && cleanID(this.match.teams?.[1]) === cleanID(teamID))
+                (pickBanTeamNum === 1 && this.match.teams?.[0] && cleanTypedID(this.match.teams?.[0]) === cleanTypedID(teamID)) ||
+                (pickBanTeamNum === 2 && this.match.teams?.[1] && cleanTypedID(this.match.teams?.[1]) === cleanTypedID(teamID))
             ) {
                 // team 1 or 2, working
                 const map = await get(this.currentSectionData.mapID as MatchMapResolvableID);
@@ -571,7 +584,7 @@ class MatchRoom {
         } else if (command === "hero_draft:hover_hero") {
             const teamID = data.teamID;
             if (!teamID) return {error: true, errorMessage: "No team ID"};
-            if (!playerAuthStatus.teams.includes(cleanID(teamID))) return {error: true, errorMessage: "No permission"};
+            if (!playerAuthStatus.teams.includes(cleanTypedID(teamID))) return {error: true, errorMessage: "No permission"};
 
             this.roomBroadcast("hero_draft:hero_hover", { teamID: data.teamID, heroID: data.heroID });
         } else if (this.state === "premap" && this.currentStep?.type === "go-to-game" && command === "map_complete") {
@@ -588,7 +601,7 @@ class MatchRoom {
         if (!(this.state === "collect-match-ready" || this.currentStep?.type === "collect-ready")) return;
         const teams = await this.getTeams();
 
-        const ready = teams.every(team => this.ready.has(cleanID(team.id)));
+        const ready = teams.every(team => this.ready.has(cleanTypedID(team.id)));
         if (ready) {
             await this.advanceToNextStep();
         }
@@ -630,19 +643,19 @@ class MatchRoom {
                     id = user.airtableID;
                 }
             }
-            return cleanID(id) === cleanID(personID);
+            return id && cleanTypedID(id) === cleanTypedID(personID);
         }));
     }
     async getAuthStatus(user: Player | PlayerResolvableID | AuthUserData) {
         const status = {
             team: false,
-            teams: [] as Team[],
+            teams: [] as Team["id"][],
             staff: false
         };
         const teams = await this.getControllableTeams(user);
         if (teams.length) {
             status.team = true;
-            status.teams = teams.map(t => cleanID(t.id));
+            status.teams = teams.map(t => cleanTypedID(t.id));
         }
 
         const editorPerm = await isEventStaffOrHasRole(user, this.event, null, ["Can edit any match", "Can edit any event"]);
@@ -673,10 +686,10 @@ class MatchRoom {
                 console.log("[match-room]", socket.id, player?.id, player?.name);
                 // @ts-expect-error allowed under socket.io but a pain to type
                 socket._player_id = player.id;
-                this.addViewer(cleanID(player.id), socket);
+                this.addViewer(cleanTypedID(player.id), socket);
 
                 socket.on("match_room:room_command", async (id, roomCommand, data, callback) => {
-                    if (!id || cleanID(id) !== this.id) return console.warn("[match-room] ignoring command", id, this.id, roomCommand); // not a command for this room to deal with
+                    if (!id || cleanTypedID(id) !== this.id) return console.warn("[match-room] ignoring command", id, this.id, roomCommand); // not a command for this room to deal with
                     try {
                         const output = await this.handleRoomCommand(socket, player, roomCommand, data);
                         if (output) callback(output);
@@ -688,7 +701,7 @@ class MatchRoom {
                 });
 
                 socket.on("disconnect", () => {
-                    this.removeViewer(cleanID(player.id), socket);
+                    this.removeViewer(cleanTypedID(player.id), socket);
                 });
             }
         }
@@ -722,7 +735,7 @@ async function canInteractWithMatch(match: Match, player: Player) {
         ...team.captains || [],
         ...team.staff || [],
         ...team.owners || [],
-    ].some(personID => cleanID(player?.id) === cleanID(personID)));
+    ].some(personID => cleanTypedID(player?.id) === cleanTypedID(personID)));
 
     if (controllableTeams.length > 0) return true;
 
@@ -731,7 +744,7 @@ async function canInteractWithMatch(match: Match, player: Player) {
         const event = await get(match.event?.[0]);
         if (!event?.id || event.__tableName !== "Events") return false;
 
-        return (event.staff || []).some(personID => cleanID(player?.id) === cleanID(personID));
+        return (event.staff || []).some(personID => cleanTypedID(player?.id) === cleanTypedID(personID));
     }
     return false;
 }
@@ -800,7 +813,7 @@ export default async ({ io, app, cors }: { io: Server, app: Express, cors: any }
         io.on("connect", (socket) => {
             socket.on("match-room:join", (id) => {
                 console.log(`[match-room] ${socket.id} attempting join ${id}`);
-                id = cleanID(id);
+                id = cleanTypedID(id);
                 socket.join(`match_room:${id}`);
 
                 const room = ActiveRooms.get(id);

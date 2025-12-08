@@ -49,7 +49,8 @@
     </div>
 </template>
 <script>
-import { cleanID, formatTime, url } from "@/utils/content-utils";
+import { cleanID } from "shared";
+import { formatTime, url } from "@/utils/content-utils";
 import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
 import { useSettingsStore } from "@/stores/settingsStore";
 import spacetime from "spacetime";

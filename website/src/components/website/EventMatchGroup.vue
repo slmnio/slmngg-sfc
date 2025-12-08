@@ -73,7 +73,8 @@
 import spacetime from "spacetime";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
 import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
-import { cleanID, formatTime, getVisibleVod, url } from "@/utils/content-utils";
+import { formatTime, getVisibleVod, url } from "@/utils/content-utils";
+import { cleanID } from "shared";
 
 export default {
     name: "EventMatchGroup",

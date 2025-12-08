@@ -30,7 +30,8 @@
 
 <script>
 import { logoBackground1 } from "@/utils/theme-styles";
-import { cleanID, decoratePlayerWithDraftData, getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
+import { decoratePlayerWithDraftData, getAuctionMax, getRoleSVG, money } from "@/utils/content-utils";
+import { cleanID } from "shared";
 import { resizedImage } from "@/utils/images";
 import MoneyBar from "@/components/broadcast/auction/MoneyBar";
 

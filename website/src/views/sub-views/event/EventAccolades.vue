@@ -38,7 +38,7 @@
 import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive.js";
 import ContentRow from "@/components/website/ContentRow.vue";
 import ContentThing from "@/components/website/ContentThing.vue";
-import { cleanID } from "@/utils/content-utils.js";
+import { cleanID } from "shared";
 
 export default {
     name: "EventAccolades",

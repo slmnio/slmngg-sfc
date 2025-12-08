@@ -1,7 +1,9 @@
 <template>
-    <div id="slmngg-app">
-        <router-view />
-    </div>
+    <BApp>
+        <div id="slmngg-app">
+            <router-view />
+        </div>
+    </BApp>
 </template>
 
 <style scoped>
@@ -12,3 +14,6 @@
         background-color: #202020;
     }
 </style>
+<script setup lang="ts">
+import {BApp} from "bootstrap-vue-next";
+</script>

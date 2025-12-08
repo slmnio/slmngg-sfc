@@ -4,7 +4,6 @@ import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import store from "@/thing-store";
 
 import GlobalApp from "./apps/GlobalApp";
-import { createBootstrap } from "bootstrap-vue-next";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue-next/dist/bootstrap-vue-next.css";
 
@@ -89,8 +88,6 @@ app.use(pinia);
 app.use(socketMixin);
 
 app.use(router);
-
-app.use(createBootstrap()); // Important
 
 const head = createHead();
 app.use(head);

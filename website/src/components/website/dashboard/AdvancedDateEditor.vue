@@ -52,12 +52,12 @@
                 <div class="group">
                     <div class="top fw-bold" :class="{'text-muted': editTimeInSiteTimezone}">Local timezone</div>
                     <div class="bottom">{{ localTimezone }}</div>
-                    <div class="bottom">{{ formatTime(spaceTimeRef.toLocalDate(), { tz: localTimezone, use24HourTime: $store.state.use24HourTime }) }}</div>
+                    <div class="bottom">{{ formatTime(spaceTimeRef.toLocalDate(), { tz: localTimezone, use24HourTime: use24HourTime }) }}</div>
                 </div>
                 <div class="group ml-3">
                     <div class="top fw-bold" :class="{'text-muted': !editTimeInSiteTimezone}">Site timezone</div>
                     <div class="bottom">{{ siteTimezone }}</div>
-                    <div class="bottom">{{ formatTime(spaceTimeRef.toLocalDate(), { tz: siteTimezone, use24HourTime: $store.state.use24HourTime }) }}</div>
+                    <div class="bottom">{{ formatTime(spaceTimeRef.toLocalDate(), { tz: siteTimezone, use24HourTime: use24HourTime }) }}</div>
                 </div>
             </div>
         </b-modal>
@@ -86,7 +86,7 @@ export default {
         temporaryTime: null
     }),
     computed: {
-        ...mapWritableState(useSettingsStore, ["editTimeInSiteTimezone"]),
+        ...mapWritableState(useSettingsStore, ["editTimeInSiteTimezone", "use24HourTime"]),
         safeSavedTime() {
             if (!this.savedTime || typeof this.savedTime !== "string") return null;
             let ref = spacetime(this.savedTime.replace("Z", ""), "UTC");
@@ -137,7 +137,8 @@ export default {
                 {
                     tz: this.editTimeInSiteTimezone ? this.siteTimezone : this.localTimezone,
                     format: customFormat || SafeTimeFormat,
-                    use24HourTime: this.$store.state.use24HourTime }
+                    use24HourTime: this.use24HourTime
+                }
             );
         }
     }

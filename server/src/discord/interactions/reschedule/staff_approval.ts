@@ -1,7 +1,7 @@
-import { MatchResolvableID } from "shared";
+import type { MatchResolvableID } from "shared";
 import * as Cache from "../../../cache.js";
 import { getInternalManager } from "../../../action-utils/action-manager.js";
-import { InteractionHandler } from "../../interactions.js";
+import type { InteractionHandler } from "../../interactions.js";
 
 export default {
     execute: async (interaction, args) => {

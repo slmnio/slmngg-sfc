@@ -1,15 +1,17 @@
-import {
+import type {
     ActionAuth,
-    cleanTypedID,
-    dirtyID,
-    MapObject,
     Match,
     MatchResolvableID,
     Report,
     ReschedulingReportKeys
 } from "shared";
+import {
+    cleanTypedID,
+    dirtyID,
+    MapObject
+} from "shared";
 import { getMatchRescheduling, } from "../action-utils/action-utils.js";
-import { Action } from "../action-utils/action-manager-models.js";
+import type { Action } from "../action-utils/action-manager-models.js";
 import { get } from "../action-utils/action-cache.js";
 import { looseDeleteRecordedMessage, looseDeleteRecordedMessages } from "../action-utils/ts-action-utils.js";
 

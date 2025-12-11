@@ -1,4 +1,4 @@
-import { AnyAirtableID, CleanAirtableID, DirtyAirtableID } from "./types";
+import type { AnyAirtableID, CleanAirtableID, DirtyAirtableID } from "./types.js";
 
 export function cleanID(id: AnyAirtableID | null | undefined | { id: AnyAirtableID }): CleanAirtableID | null {
     if (!id) return null;
@@ -21,5 +21,5 @@ export function dirtyID<IDType extends string>(id: IDType) {
     return id as IDType;
 }
 
-export * from "./types";
-export * from "./managers";
+export * from "./types.js";
+export * from "./managers.js";

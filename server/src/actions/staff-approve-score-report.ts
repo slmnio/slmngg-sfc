@@ -1,15 +1,17 @@
-import {
+import type {
     ActionAuth,
-    cleanTypedID,
-    dirtyID,
     EventSettings,
-    MapObject,
     Match,
     MatchResolvableID,
     Report,
     ScoreReportingReportKeys
 } from "shared";
-import { Action } from "../action-utils/action-manager-models.js";
+import {
+    cleanTypedID,
+    dirtyID,
+    MapObject
+} from "shared";
+import type { Action } from "../action-utils/action-manager-models.js";
 import { getMatchScoreReporting } from "../action-utils/action-utils.js";
 import { get } from "../action-utils/action-cache.js";
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";

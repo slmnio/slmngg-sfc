@@ -3,13 +3,18 @@
         "outDir": "./dist",
         "allowSyntheticDefaultImports": true,
         "lib": ["ES2022"],
-        "module": "ES2022",
-        "moduleResolution": "node",
+        "module": "NodeNext",
+        "moduleResolution": "nodenext",
         "target": "ES2022",
         "strict": true,
         "allowJs": true,
         "skipLibCheck": true
     },
+    "references": [
+        {
+            "path": "../shared/"
+        }
+    ],
     "include": [
         "./**/*"
     ],

@@ -49,7 +49,7 @@ export default [
         }
     },
     {
-        files: ["server/**/*.js", "server/**/*.ts"],
+        files: ["server/**/*.js", "server/**/*.ts", "shared/**/*.ts"],
         languageOptions: {
             globals: {
                 ...globals.node,
@@ -57,7 +57,8 @@ export default [
         },
         rules: {
             "@typescript-eslint/no-var-requires": "off",
-            "@typescript-eslint/no-empty-object-type": "off"
+            "@typescript-eslint/no-empty-object-type": "off",
+            "@typescript-eslint/consistent-type-imports": "error"
         }
     },
     {

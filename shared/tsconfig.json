@@ -1,11 +1,13 @@
 {
     "compilerOptions": {
+        "outDir": "../server/dist/shared",
         "lib": ["ES2022"],
-        "module": "ES2022",
-        "moduleResolution": "node",
+        "module": "NodeNext",
+        "moduleResolution": "nodenext",
         "target": "ES2022",
         "strict": true,
         "allowJs": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "composite": true
     }
 }

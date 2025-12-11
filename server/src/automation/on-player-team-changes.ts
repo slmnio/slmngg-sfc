@@ -1,4 +1,5 @@
-import { AnyAirtableID, cleanTypedID, EventSettings, MapObject, Player, TeamResolvableID } from "shared";
+import type { AnyAirtableID, EventSettings, Player, TeamResolvableID } from "shared";
+import { cleanTypedID, MapObject } from "shared";
 import { get } from "../action-utils/action-cache.js";
 import client from "../discord/client.js";
 import { findMember } from "../action-utils/action-utils.js";
@@ -107,10 +108,14 @@ export default {
                 const eventDiscord = new MapObject(event.discord_control);
                 const teamDiscord = new MapObject(team.discord_control);
 
-                if (eventDiscord.get("guild_id") && teamDiscord.get("role_id")) {
+                const eventGuildID = eventDiscord.getString("guild_id");
+                if (eventGuildID && teamDiscord.get("role_id")) {
                     try {
+
                         if (!guild) {
-                            guild = await client.guilds.fetch(eventDiscord.get("guild_id"));
+                            if (eventGuildID) {
+                                guild = await client.guilds.fetch(eventGuildID);
+                            }
                         }
 
                         const { member } = await findMember(player, null, guild);
@@ -154,10 +159,13 @@ export default {
 
                     if (eventSettings?.logging?.publicRosterChanges) {
                         if (!guild) {
-                            guild = await client.guilds.fetch(eventDiscord.get("guild_id"));
+                            const eventGuildID = eventDiscord.getString("guild_id");
+                            if (eventGuildID) {
+                                guild = await client.guilds.fetch(eventGuildID);
+                            }
                         }
 
-                        if (!playerMember) {
+                        if (!playerMember && guild) {
                             const { member } = await findMember(player, null, guild);
 
                             if (member) {
@@ -217,8 +225,9 @@ export default {
 
                                 if (team.discord_control) {
                                     const teamDiscord = new MapObject(team.discord_control);
-                                    if (teamDiscord.get("emoji_id")) {
-                                        const emoji = await guild.emojis.fetch(teamDiscord.get("emoji_id"));
+                                    const teamDiscordEmojiID = teamDiscord.getString("emoji_id");
+                                    if (teamDiscordEmojiID) {
+                                        const emoji = await guild.emojis.fetch(teamDiscordEmojiID);
                                         if (emoji?.id) {
                                             parts.push(`<:${emoji.name}:${emoji.id}>`);
                                         }

@@ -4,7 +4,7 @@
 import client from "./client.js";
 import Airtable from "airtable";
 import { EmbedBuilder, Permissions } from "discord.js";
-import { MapHandler } from "./managers.js";
+import { MapHandler } from "./managers.ts";
 import { log } from "./slmngg-log.js";
 
 if (!client) return console.warn("Staff application system will not be set up because no Discord key is set.");
@@ -52,7 +52,8 @@ async function setupEvent(event) {
                 };
             }
         });
-        await roles.createMissingItems((["Staff", ...roles.map.uniqueData]).filter(r => !roles.ids.data.find(m => m.key === r)).map(e => ({key: e})));
+        // TODO: this is broken
+        await roles.createMissingItems((["Staff", ...roles]).filter(r => !roles.ids.data.find(m => m.key === r)).map(e => ({key: e})));
         updatedData["Role IDs"] = roles.ids.textMap;
 
         // let channels = new MapHandler({

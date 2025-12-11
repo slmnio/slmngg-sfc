@@ -1,8 +1,10 @@
 import type { Snowflake } from "discord-api-types/globals";
-import { cleanTypedID, MapObject, Match, MatchMap, Player, PlayerResolvableID, Team, TeamResolvableID } from "shared";
+import type { Match, MatchMap, Player, PlayerResolvableID, Team, TeamResolvableID } from "shared";
+import { cleanTypedID, MapObject } from "shared";
 import { get } from "./action-cache.js";
 import client from "../discord/client.js";
-import { ChannelType, Guild, MessageCreateOptions, MessagePayload } from "discord.js";
+import type { Guild, MessageCreateOptions, MessagePayload } from "discord.js";
+import { ChannelType } from "discord.js";
 import { hammerTime, sendMessage } from "./action-utils.js";
 import emoji from "../discord/emoji.js";
 
@@ -16,8 +18,9 @@ export async function getTeamEmojiText(team: Team | null) {
 
     if (event.discord_control) {
         const eventDiscord = new MapObject(event.discord_control);
-        if (eventDiscord.get("guild_id")) {
-            const testGuild = await client.guilds.fetch(eventDiscord.get("guild_id"));
+        const eventGuildID = eventDiscord.getString("guild_id");
+        if (eventGuildID) {
+            const testGuild = await client.guilds.fetch(eventGuildID);
             if (testGuild?.available) {
                 guild = testGuild;
             }
@@ -26,8 +29,9 @@ export async function getTeamEmojiText(team: Team | null) {
 
     if (guild && team.discord_control) {
         const teamDiscord = new MapObject(team.discord_control);
-        if (teamDiscord.get("emoji_id")) {
-            const emoji = await guild.emojis.fetch(teamDiscord.get("emoji_id"));
+        const teamDiscordEmojiID = teamDiscord.getString("emoji_id");
+        if (teamDiscordEmojiID) {
+            const emoji = await guild.emojis.fetch(teamDiscordEmojiID);
             if (emoji?.id) {
                 return (`<:${emoji.name}:${emoji.id}> `);
             }
@@ -55,8 +59,9 @@ export async function generateMatchReportText(match: Match) {
 
         if (event.discord_control) {
             const eventDiscord = new MapObject(event.discord_control);
-            if (eventDiscord.get("guild_id")) {
-                const testGuild = await client.guilds.fetch(eventDiscord.get("guild_id"));
+            const eventGuildID = eventDiscord.getString("guild_id");
+            if (eventGuildID) {
+                const testGuild = await client.guilds.fetch(eventGuildID);
                 if (testGuild?.available) {
                     guild = testGuild;
                 }
@@ -71,8 +76,9 @@ export async function generateMatchReportText(match: Match) {
         const teamEmoji = await Promise.all(teams.map(async team => {
             if (guild && team.discord_control) {
                 const teamDiscord = new MapObject(team.discord_control);
-                if (teamDiscord.get("emoji_id")) {
-                    const emoji = await guild.emojis.fetch(teamDiscord.get("emoji_id"));
+                const teamDiscordEmojiID = teamDiscord.getString("emoji_id");
+                if (teamDiscordEmojiID) {
+                    const emoji = await guild.emojis.fetch(teamDiscordEmojiID);
                     if (emoji?.id) {
                         return (`<:${emoji.name}:${emoji.id}>`);
                     }
@@ -201,15 +207,17 @@ export async function generateMatchReportText(match: Match) {
 }
 
 export async function checkDeleteMessage<KeyType extends string>(mapObject: MapObject, keyPrefix: KeyType) {
-    if (mapObject.get(`${keyPrefix}_message_id`) && mapObject.get(`${keyPrefix}_channel_id`)) {
+    const messageID = mapObject.getString(`${keyPrefix}_message_id`);
+    const channelID = mapObject.getString(`${keyPrefix}_channel_id`);
+    if (messageID && channelID) {
         try {
-            const channel = await client.channels.fetch(mapObject.get(`${keyPrefix}_channel_id`));
+            const channel = await client.channels.fetch(channelID);
             if (channel) {
                 console.log(`${keyPrefix} - ${channel.id} ${channel.type !== ChannelType.DM ? channel.name : ""}`);
             } else {
                 console.warn(`${keyPrefix} - No channel`);
             }
-            if (channel?.isSendable()) await channel.messages.delete(mapObject.get(`${keyPrefix}_message_id`));
+            if (channel?.isSendable()) await channel.messages.delete(messageID);
         } catch (e) {
             console.error(`Error trying to delete ${keyPrefix} message`, e);
         } finally {

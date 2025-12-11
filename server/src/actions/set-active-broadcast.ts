@@ -1,5 +1,6 @@
-import { ActionAuth, BroadcastResolvableID, dirtyID } from "shared";
-import { Action } from "../action-utils/action-manager-models.js";
+import type { ActionAuth, BroadcastResolvableID} from "shared";
+import { dirtyID } from "shared";
+import type { Action } from "../action-utils/action-manager-models.js";
 
 export default {
     key: "set-active-broadcast",

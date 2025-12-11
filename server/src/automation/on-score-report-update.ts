@@ -1,12 +1,14 @@
-import {
+import type {
     AnyAirtableID,
-    cleanTypedID,
     EventSettings,
-    MapObject,
     Report,
     ReschedulingReportKeys,
     ScoreReportingReportKeys,
     Theme
+} from "shared";
+import {
+    cleanTypedID,
+    MapObject
 } from "shared";
 import { get } from "../action-utils/action-cache.js";
 import * as Cache from "../cache.js";

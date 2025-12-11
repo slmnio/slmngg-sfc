@@ -1,5 +1,6 @@
-import { Action } from "../action-utils/action-manager-models.js";
-import { ActionAuth, cleanTypedID, EventSettings, MapObject, MatchResolvableID } from "shared";
+import type { Action } from "../action-utils/action-manager-models.js";
+import type { ActionAuth, EventSettings, MatchResolvableID } from "shared";
+import { cleanTypedID, MapObject } from "shared";
 import { get } from "../action-utils/action-cache.js";
 import { getTeamEmojiText, sendRecordedMessage } from "../action-utils/ts-action-utils.js";
 import { hammerTime } from "../action-utils/action-utils.js";
@@ -44,7 +45,7 @@ export default {
         });
         await sendRecordedMessage({
             key: "reschedule_completed",
-            mapObject: new MapObject(), // we don't care about this
+            mapObject: new MapObject(undefined), // we don't care about this
             channelID: eventSettings.logging?.matchTimeChanges,
             content: `⌚ Match reschedule ${teamPings.join(" ")}: \n${allTeamsDisplay} ${match.start ? "rescheduled to" : "scheduled for"} ${hammerTime(newTime)}.\n${matchLink}`
         });

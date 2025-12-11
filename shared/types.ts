@@ -3,8 +3,9 @@ export type DirtyAirtableID = `rec${CleanAirtableID}`;
 export type AnyAirtableID = DirtyAirtableID | CleanAirtableID;
 
 /* Basic types */
-import { Snowflake } from "discord-api-types/globals";
-import { MapObject } from "./managers.js";
+// import { Snowflake } from "discord-api-types/globals";
+type Snowflake = string;
+import type { MapObject } from "./managers.js";
 
 export type BroadcastResolvableID = `broadcast_${DirtyAirtableID}`;
 export type MatchResolvableID = `match_${DirtyAirtableID}`;
@@ -140,10 +141,12 @@ export interface Player extends Base {
 }
 
 interface Bracket extends Base {
+    __tableName: "Brackets";
 
 }
 
 interface GFX extends Base {
+    __tableName: "GFX";
 
 }
 
@@ -239,7 +242,7 @@ const ScoreReportingMessageTypes = [
 export type ScoreReportingReportKeys = (typeof ScoreReportingMessageTypes)[number];
 
 interface LogFile extends Base {
-
+    __tableName: "Log Files";
 }
 
 export interface Hero extends Base {
@@ -271,18 +274,22 @@ export interface Hero extends Base {
 }
 
 interface Social extends Base {
+    __tableName: "Social";
 
 }
 
 interface News extends Base {
+    __tableName: "News";
 
 }
 
 interface AdRead extends Base {
+    __tableName: "Ad Reads";
 
 }
 
 interface LiveGuest extends Base {
+    __tableName: "Live Guests";
 
 }
 
@@ -336,6 +343,7 @@ export interface Theme extends Base {
 }
 
 interface Accolade extends Base {
+    __tableName: "Accolades";
 
 }
 
@@ -363,14 +371,17 @@ export interface GameMap extends Base {
 }
 
 interface SignupData extends Base {
+    __tableName: "Signup Data";
 
 }
 
 interface EventSeries extends Base {
+    __tableName: "Event Series";
 
 }
 
 interface Interview extends Base {
+    __tableName: "Interviews";
 
 }
 

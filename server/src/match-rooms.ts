@@ -1,7 +1,5 @@
-import {
+import type {
     AuthUserData,
-    cleanTypedID,
-    dirtyID,
     Event,
     HeroResolvableID,
     Match,
@@ -12,9 +10,14 @@ import {
     Team,
     TeamResolvableID
 } from "shared";
+import {
+    cleanTypedID,
+    dirtyID
+} from "shared";
 
-import { Server, Socket } from "socket.io";
-import { Express, Request, Router } from "express";
+import type { Server, Socket } from "socket.io";
+import type { Express, Request} from "express";
+import { Router } from "express";
 import { get } from "./action-utils/action-cache.js";
 import * as Cache from "./cache.js";
 import { createRecord, updateRecord } from "./action-utils/action-utils.js";

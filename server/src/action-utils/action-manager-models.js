@@ -101,6 +101,8 @@ class ActionManager {
 }
 
 export class HTTPActionManager extends ActionManager {
+    app = express.Router();
+
     constructor({ cors }) {
         super({ cors });
         this.cors = cors;

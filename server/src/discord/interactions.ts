@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import { Collection, Events, InteractionType, MessageComponentInteraction } from "discord.js";
+import type { MessageComponentInteraction } from "discord.js";
+import { Collection, Events, InteractionType } from "discord.js";
 import client from "./client.js";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import emoji from "./emoji.js";

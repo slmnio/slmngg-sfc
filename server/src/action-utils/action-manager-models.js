@@ -101,7 +101,6 @@ class ActionManager {
 }
 
 export class HTTPActionManager extends ActionManager {
-    app = express.Router();
 
     constructor({ cors }) {
         super({ cors });
@@ -109,9 +108,9 @@ export class HTTPActionManager extends ActionManager {
     }
 
     _setup(args) {
-        this.app = express.Router();
-        this.app.use(bodyParser.json({ limit: "50mb" }));
-        this.app.options("/*", args.cors());
+        this.actionRouter = express.Router();
+        this.actionRouter.use(bodyParser.json({ limit: "50mb" }));
+        this.actionRouter.options("/*", args.cors());
     }
 
     /**
@@ -123,7 +122,7 @@ export class HTTPActionManager extends ActionManager {
     async register(action, registerFunction) {
         await super.register(action, registerFunction);
 
-        this.app.post(`/${action.key}`, this.cors(), async (req, res) => {
+        this.actionRouter.post(`/${action.key}`, this.cors(), async (req, res) => {
             let args = req.body;
             let token = this.getToken(req);
 
@@ -178,7 +177,7 @@ export class HTTPActionManager extends ActionManager {
     }
 
     finalSetup(expressApp) {
-        expressApp.use("/actions", this.app);
+        expressApp.use("/actions", this.actionRouter);
     }
 
 }

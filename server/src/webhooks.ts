@@ -44,7 +44,7 @@ export default async function load({ app }: { app: express.Express }) {
     const schemaFieldNames = await getSchema();
 
 
-    webhookRouter.get("/schema", (req, res) => res.json(schemaFieldNames));
+    // webhookRouter.get("/schema", (req, res) => res.json(schemaFieldNames));
 
 
     const emitter = new EventEmitter();
@@ -213,28 +213,28 @@ export default async function load({ app }: { app: express.Express }) {
 
         return res.status(204).send();
     });
-    webhookRouter.get("/deliveries", async (req, res) => {
-        res.json(await Promise.all(Object.keys(webhooks).map(async id => {
-
-            try {
-                return ({
-                    id,
-                    data: (await slmnWebhook.makeRequest({
-                        path: `/webhooks/${id}/payloads`
-                    }))?.body
-                });
-            } catch (e) {
-                console.error(e);
-            }
-            return null;
-        })));
-    });
-    webhookRouter.get("/webhooks", async (req, res) => {
-        const { body } = await slmnWebhook.makeRequest({
-            path: "/webhooks"
-        });
-        return res.json(body.webhooks);
-    });
+    // webhookRouter.get("/deliveries", async (req, res) => {
+    //     res.json(await Promise.all(Object.keys(webhooks).map(async id => {
+    //
+    //         try {
+    //             return ({
+    //                 id,
+    //                 data: (await slmnWebhook.makeRequest({
+    //                     path: `/webhooks/${id}/payloads`
+    //                 }))?.body
+    //             });
+    //         } catch (e) {
+    //             console.error(e);
+    //         }
+    //         return null;
+    //     })));
+    // });
+    // webhookRouter.get("/webhooks", async (req, res) => {
+    //     const { body } = await slmnWebhook.makeRequest({
+    //         path: "/webhooks"
+    //     });
+    //     return res.json(body.webhooks);
+    // });
     app.use("/webhook", webhookRouter);
 
 

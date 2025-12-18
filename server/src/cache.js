@@ -106,7 +106,7 @@ async function dataUpdate(id, data, options) {
     recents.triggered++;
     const dataDifferent = JSON.stringify(({...(store.get(id) || {}), modified: null})) !== JSON.stringify({...(data || {}), modified: null});
     const oldDate = (store.get(id)?.modified);
-    if (!dataDifferent && (data.modified !== oldDate)) {
+    if (!dataDifferent && (data?.modified !== oldDate)) {
         console.warn(`[cache] Data is the same but modified timestamps are different\n      id=${id} \n     old=${(new Date(oldDate)).toLocaleString()} \n     new=${(new Date(data.modified)).toLocaleString()}`);
     }
     if (dataDifferent) {

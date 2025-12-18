@@ -90,6 +90,9 @@ importers:
       '@mapbox/node-pre-gyp':
         specifier: ^2.0.3
         version: 2.0.3
+      '@types/body-parser':
+        specifier: ^1.19.6
+        version: 1.19.6
       '@types/cors':
         specifier: ^2.8.18
         version: 2.8.19

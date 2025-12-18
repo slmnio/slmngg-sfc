@@ -88,6 +88,7 @@ export async function createRecord(Cache, tableName, records, source = null) {
 export function deAirtable(obj) {
     const data = {};
     Object.entries(obj).forEach(([key, val]) => {
+        if (key === "__tableName") return data[key] = val;
         data[key.replace(/ +/g, "_").replace(/[:()]/g, "_").replace(/_+/g,"_").toLowerCase()] = val;
     });
     Object.entries(data).forEach(([key, val]) => {

@@ -10,6 +10,7 @@ import discordAuth from "./discord/auth.js";
 import "./discord/discord-data.js";
 import webAuction from "./web_auction.js";
 import matchRooms from "./match-rooms.js";
+import airtableWebhooks from "./webhooks.js";
 // import * as draftRoom from "./draft-room.ts";
 import * as actions from "./action-utils/action-manager.js";
 import { cleanID, dirtyID } from "shared";
@@ -62,6 +63,12 @@ const Cache = (await import("./cache.js")).setup(io);
 (await import("./airtable-v2.js")).setup({ web: app, io });
 (await import("./discord/bot-controller.js")).setup(io);
 actions.load(app, localCors, Cache, io);
+if (process.env.AIRTABLE_WEBHOOK_DELIVERY_URL) {
+    airtableWebhooks({ app });
+} else {
+    console.warn("Not using Airtable webhooks - set AIRTABLE_WEBHOOK_DELIVERY_URL to enable.");
+}
+
 
 await import("./discord/slash-commands.js");
 await import("./discord/interactions.js");

@@ -21,5 +21,9 @@ export function dirtyID<IDType extends string>(id: IDType) {
     return id as IDType;
 }
 
+export function multiple(num: number, singular: string, plural = singular + "s") {
+    if (num === 1) return num + " " + singular;
+    return num + " " + plural;
+}
 export * from "./types.js";
 export * from "./managers.js";

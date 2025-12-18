@@ -1,16 +1,11 @@
 import client from "../discord/client.js";
 import * as Cache from "../cache.js";
-import { cleanID, MapObject } from "shared";
+import { cleanID, MapObject, multiple } from "shared";
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
 import { findMember, getAll } from "../action-utils/action-utils.js";
 import { getDiscordIcon } from "../discord/role-icon.js";
 import { ChannelType, GuildFeature, PermissionFlagsBits } from "discord-api-types/v10";
 import { PermissionsBitField } from "discord.js";
-
-function multiple(num, singular, plural) {
-    if (num === 1) return num + " " + singular;
-    return num + " " + plural;
-}
 
 function determinate(val) {
     if (val === true) return true;

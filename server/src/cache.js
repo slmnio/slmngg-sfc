@@ -104,7 +104,12 @@ async function dataUpdate(id, data, options) {
     // broadcast something here
     if (options?.eager) console.log("Eager update on", id);
     recents.triggered++;
-    if (JSON.stringify(store.get(id)) !== JSON.stringify(data)) {
+    const dataDifferent = JSON.stringify(({...(store.get(id) || {}), modified: null})) !== JSON.stringify({...(data || {}), modified: null});
+    const oldDate = (store.get(id)?.modified);
+    if (!dataDifferent && (data.modified !== oldDate)) {
+        console.warn(`[cache] Data is the same but modified timestamps are different\n      id=${id} \n     old=${(new Date(oldDate)).toLocaleString()} \n     new=${(new Date(data.modified)).toLocaleString()}`);
+    }
+    if (dataDifferent) {
         // console.log(`Data update on [${id}]`);
         recents.sent++;
         if (data) data = await removeAntiLeak(id, data);
@@ -237,6 +242,13 @@ function generateLimitedPlayers(longText) {
 
         return player;
     });
+}
+
+export async function partialSet(id, data, options) {
+    return set(id, {
+        ...(store.get(id) || {}),
+        ...data
+    }, options);
 }
 
 export async function set(id, data, options) {

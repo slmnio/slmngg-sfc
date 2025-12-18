@@ -266,8 +266,10 @@ class AirtableManager {
         this.removeWebsiteFlag("server_rebuilding");
         if (process.env.IS_SLMNGG_MAIN_SERVER) log(`SLMN.GG has finished rebuilding in ${time(Math.floor((new Date() - new Date(fullLoadStart)) / 1000))}.`);
 
-        for (let i = 0; i < 2; i++) {
-            this.startNextOldestTable();
+        if (!process.env.AIRTABLE_WEBHOOK_DELIVERY_URL) {
+            for (let i = 0; i < 2; i++) {
+                this.startNextOldestTable();
+            }
         }
         for (let i = 0; i < 2; i++) {
             this.startNextOldestTable(true);

@@ -1,13 +1,9 @@
-import { cleanID } from "shared";
+import { cleanID, multiple } from "shared";
 import { sortTeamsIntoStandings } from "./scenarios";
 import { GameOverrides } from "@/utils/games";
 
 function winrateText(num, toFixed = 0) {
     return isNaN(num) ? "-" : (num * 100).toFixed(toFixed) + "%";
-}
-function multiple(num, singular, plural = singular + "s") {
-    if (num === 1) return num + " " + singular;
-    return num + " " + plural;
 }
 function diffString(val) {
     if (val === 0) return "±0";

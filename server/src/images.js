@@ -248,9 +248,12 @@ export default ({ app, cors, Cache }) => {
             }
 
             // not already cached
-            console.log("[image]", `no file for ${filename} (${att.filename}) @ ${size}`);
 
-            if (!airtableURL) return res.status(404).send("No URL available for this image");
+            if (!airtableURL) {
+                console.log("[image]", `no file or URL for ${filename} (${att.filename}) @ ${size}, 404`);
+                return res.status(404).header("Cache-Control", "no-cache, no-store, must-revalidate").header("Expires", 0).send("No URL available for this image");
+            }
+            console.log("[image]", `no file for ${filename} (${att.filename}) @ ${size}, attempting`);
 
             // first download or retrieve to orig/
             let orig = await getOrWaitForDownload(airtableURL, filename, "orig");

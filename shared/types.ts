@@ -1,3 +1,6 @@
+import type { FieldSet, Record } from "airtable";
+import type { MapObject } from "./managers.js";
+
 export type CleanAirtableID = string;
 export type DirtyAirtableID = `rec${CleanAirtableID}`;
 export type AnyAirtableID = DirtyAirtableID | CleanAirtableID;
@@ -5,9 +8,10 @@ export type AnyAirtableID = DirtyAirtableID | CleanAirtableID;
 /* Basic types */
 // import { Snowflake } from "discord-api-types/globals";
 type Snowflake = string;
-import type { MapObject } from "./managers.js";
+export type AirtableRecord = Record<FieldSet>
 
 export type BroadcastResolvableID = `broadcast_${DirtyAirtableID}`;
+export type ChannelResolvableID = `channel_${DirtyAirtableID}`;
 export type MatchResolvableID = `match_${DirtyAirtableID}`;
 export type TeamResolvableID = `team_${DirtyAirtableID}`;
 export type PlayerResolvableID = `player_${DirtyAirtableID}`;
@@ -23,6 +27,7 @@ export type SocialResolvableID = `social_${DirtyAirtableID}`;
 export type ClientResolvableID = `client_${DirtyAirtableID}`;
 export type NewsResolvableID = `news_${DirtyAirtableID}`;
 export type AdReadResolvableID = `adread_${DirtyAirtableID}`;
+export type AdReadGroupResolvableID = `adreadgroup_${DirtyAirtableID}`;
 export type LiveGuestResolvableID = `liveguest_${DirtyAirtableID}`;
 export type ThemeResolvableID = `theme_${DirtyAirtableID}`;
 export type AccoladeResolvableID = `accolade_${DirtyAirtableID}`;
@@ -142,7 +147,7 @@ export interface Player extends Base {
 
 interface Bracket extends Base {
     __tableName: "Brackets";
-
+    key: string
 }
 
 interface GFX extends Base {
@@ -507,6 +512,24 @@ export interface Team extends Base {
 
 export type AntileakOptions = `Hide ${"all" | "teams" | "matches" | "staff" | "brackets" | "articles"}`
 
+interface AirtableAttachment {
+    id: string;
+    url: string;
+    filename: string;
+    size: number;
+    type: string;
+    thumbnails?: {
+        small: AirtableThumbnail;
+        large: AirtableThumbnail;
+        full: AirtableThumbnail;
+    };
+}
+interface AirtableThumbnail {
+    url: string;
+    width: number;
+    height: number;
+}
+
 /* TODO: need to check what the raw data is here, then see what attachment data can be pulled from cache */
 export type CacheAttachment = {
     _autoFilename: string;
@@ -529,6 +552,7 @@ export interface Event extends Base {
     broadcast_css?: CSSString;
     broadcast_texture?: CacheAttachment[];
     broadcasts?: BroadcastResolvableID[];
+    active_broadcast: (boolean | null)[];
     broadcasts_highlighted?: BroadcastResolvableID[];
     casters?: PlayerResolvableID[];
     clarify_teams?: boolean;
@@ -565,6 +589,118 @@ export interface Event extends Base {
     theme?: [ThemeResolvableID];
     tier?: EventTier;
     title_sponsor?: ThemeResolvableID[];
+}
+
+export interface Broadcast extends Base {
+    id: BroadcastResolvableID;
+    __tableName: "Broadcasts";
+
+    name: string;
+    active: boolean;
+    ad_read_groups?: AdReadGroupResolvableID[];
+    advertise: boolean;
+    auction_display?: "Leaderboard" | "Team overview" | "Not full teams" | "Full teams" | "All teams";
+    automation_settings?: (
+        "Set title when live match changes" |
+        "Resolve predictions when live match completes" |
+        "Set marker when live match changes" |
+        "Send Discord message when live match changes"
+    )[];
+    available_for_solo: boolean;
+    background?: CacheAttachment[];
+    bar_options?: (
+        "Countdown" |
+        "Event logo" |
+        "Next match" |
+        "Sponsors" |
+        "Title"
+    )[];
+    bracket_key?: Bracket["key"],
+    break_automation?: (
+        "use: Schedule" |
+        "use: Standings" |
+        "use: Image" |
+        "setting: Always do 30s Schedule" |
+        "use: Staff" |
+        "use: Bracket" |
+        "use: Matchup" |
+        "setting: Always do 30s Matchup" |
+        "use: Title" |
+        "use: Other Info"
+    )[];
+    break_display?: (
+        "Schedule" |
+        "Standings" |
+        "Image" |
+        "Bracket" |
+        "Automated" |
+        "Staff" |
+        "Matchup" |
+        "Title" |
+        "Other Streams" |
+        "Other Info"
+    );
+    break_image?: CacheAttachment[];
+    broadcast_css?: CSSString;
+    broadcast_interviews?: InterviewResolvableID[];
+    broadcast_settings?: (
+        "Disable casters" |
+        "Enable podcast" |
+        "Use map videos" |
+        "Disable POV cams" |
+        "Disable team cams" |
+        "Enable player names" |
+        "Ignore client cam whitelists" |
+        "Show match records ingame" |
+        "Show map modes text" |
+        "Cams lower: traditional" |
+        "No animations" |
+        "Use coloured team themes" |
+        "Highlight live match on bracket" |
+        "Highlight team on bracket" |
+        "Split desk match score" |
+        "Use built-in stingers" |
+        "Extend ingame map icons" |
+        "Fade ingame sponsors" |
+        "Use team codes" |
+        "Use map number in middle text" |
+        "Use shorter map names" |
+        "Use highlight event team badges" |
+        "Use dots instead of numbers for score" |
+        "Show map scores" |
+        "Show team shield on cams" |
+        "Connect for caster voice" |
+        "Connect for team comms" |
+        "Show pronouns on desk" |
+        "Show desk pronouns on new lines" |
+        "Show borders on middle" |
+        "Use scoreboard on desk" |
+        "Use flat desk elements" |
+        "Color ingame team logo holder" |
+        "Show event details ingame" |
+        "Show map information ingame" |
+        "Show scoreboard title" |
+        "Show full names on casters" |
+        "Only show live match staff on break" |
+        "Only show primary matches staff on break" |
+        "Show banned heroes ingame" |
+        "Display hero bans: together" |
+        "Show all player names" |
+        "Set title when going live" |
+        "Display hero bans: on ingame teams" |
+        "Show backgrounds on ingame sponsors" |
+        "Show previous picks as fearless bans" |
+        "Always show all heroes on desk hero draft" |
+        "Display hero bans: on ingame teams (asymmetric)" |
+        "Force zeros on versus"
+    )[];
+    cams_default_params?: "";
+    cams_relay_prefix?: "";
+    channel?: ChannelResolvableID[];
+    channel_id?: string[];
+    channel_username?: string[];
+    clients?: ClientResolvableID[];
+    controllers?: any[];
 }
 
 export interface Client extends Base {

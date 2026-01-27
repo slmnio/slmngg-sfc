@@ -5,7 +5,7 @@ import { ApiClient } from "@twurple/api";
 import { verboseLog } from "../discord/slmngg-log.js";
 import { get } from "./action-cache.js";
 import client from "../discord/client.js";
-import { cleanID } from "shared";
+import { cleanID, deAirtable } from "shared";
 
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
 const slmngg = airtable.base(process.env.AIRTABLE_APP);
@@ -85,35 +85,6 @@ export async function createRecord(Cache, tableName, records, source = null) {
     }
 }
 
-export function deAirtable(obj) {
-    const data = {};
-    Object.entries(obj).forEach(([key, val]) => {
-        if (key === "__tableName") return data[key] = val;
-        data[key.replace(/ +/g, "_").replace(/[:()]/g, "_").replace(/_+/g,"_").toLowerCase()] = val;
-    });
-    Object.entries(data).forEach(([key, val]) => {
-        if (typeof val === "object" && val?.length === 0) {
-            console.log("[Action deAirtable] Skipping", key, val);
-            delete data[key];
-        }
-        if (key === "limited_players" && typeof data[key] === "object") {
-            // reflatten
-            data[key] = data[key].map(limitedPlayer => Object.entries(limitedPlayer).map(([k, v]) => `${k.replaceAll("_"," ")}=${v}`)).join("\n");
-        }
-    });
-    data.id = obj.id;
-    return data;
-}
-
-
-export function deAirtableRecord(record) {
-    // console.log("deAirtableRecord", record.id, record.fields);
-    if (!record?.fields) return null;
-    return {
-        ...deAirtable(record.fields),
-        id: record.id
-    };
-}
 export async function getValidHeroes() {
     // Get Heroes table
     // Get any OW hero only

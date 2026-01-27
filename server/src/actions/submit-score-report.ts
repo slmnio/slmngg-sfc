@@ -1,8 +1,7 @@
 import type { Action } from "../action-utils/action-manager-models.js";
-import { deAirtableRecord, getMatchScoreReporting } from "../action-utils/action-utils.js";
-
+import { getMatchScoreReporting } from "../action-utils/action-utils.js";
 import type { ActionAuth, Match, MatchResolvableID, Report } from "shared";
-import { cleanTypedID, dirtyID } from "shared";
+import { cleanTypedID, deAirtableRecord, dirtyID } from "shared";
 import { get } from "../action-utils/action-cache.js";
 
 export default {

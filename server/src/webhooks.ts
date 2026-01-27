@@ -4,9 +4,8 @@ import Airtable from "airtable";
 import bodyParser from "body-parser";
 import * as Cache from "./cache.js";
 import cors from "cors";
-import { cleanID, dirtyID, multiple } from "shared";
+import { cleanID, deAirtableRecord, dirtyID, keyDeAirtable, multiple, slmnggAttachments } from "shared";
 import { EventEmitter } from "events";
-import { deAirtableRecord } from "./action-utils/action-utils.js";
 
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_KEY });
 if (!process.env.AIRTABLE_APP) throw "No AIRTABLE_APP specified";
@@ -59,6 +58,7 @@ export default async function load({ app }: { app: express.Express }) {
         if (existing.body?.webhooks?.length) {
             for (const webhook of existing.body.webhooks) {
 
+                console.log(`[webhook] ${webhook.id} -> ${webhook.notificationUrl}`);
                 if (webhook.notificationUrl === process.env.AIRTABLE_WEBHOOK_DELIVERY_URL) {
                     await slmnWebhook.makeRequest({
                         path: `/webhooks/${webhook.id}`,
@@ -130,6 +130,7 @@ export default async function load({ app }: { app: express.Express }) {
     const emitterCursors = new Map<string, number>();
 
     emitter.on("delivery", async ({ base, webhook, timestamp }) => {
+        // console.log(`[webhook] delivery ${webhook.id} ${timestamp}`);
         if (!schemaFieldNames) return console.error("No database schema to process delivery");
         try {
             const data = (await slmnWebhook.makeRequest({
@@ -151,6 +152,7 @@ export default async function load({ app }: { app: express.Express }) {
                 console.log(`[webhook] pinged ${webhook.id} with ${multiple(data.payloads.length, "payload")}`);
                 for (const payload of data.payloads) {
                     // console.log(payload);
+                    // console.dir(payload, { depth: Infinity });
                     for (const [tableID, table] of Object.entries(payload.changedTablesById)) {
                         // console.log(`Table ${tableID} has data`, table);
 
@@ -162,23 +164,69 @@ export default async function load({ app }: { app: express.Express }) {
 
                             // console.log(`Record ${recordID} has data`, record);
                             for (const [fieldID, fieldValue] of Object.entries((record as any).current.cellValuesByFieldId)) {
+                                const deAirtabledFieldName = keyDeAirtable(schemaFieldNames.get(fieldID));
+                                const isAttachment = (slmnggAttachments[recordData.__tableName] || []).includes(deAirtabledFieldName);
+                                // console.log("Record row", {
+                                //     table: recordData.__tableName,
+                                //     tableAttachments: slmnggAttachments[recordData.__tableName],
+                                //     deAirtabledFieldName,
+                                //     isAttachment,
+                                //     fieldValue,
+                                //     valTypeof: typeof fieldValue,
+                                // });
+
                                 if (fieldValue) {
                                     if (typeof fieldValue === "object" && "id" in fieldValue && typeof fieldValue.id === "string") {
-                                        recordData[schemaFieldNames.get(fieldID)] = dirtyID(fieldValue.id);
+                                        if (isAttachment) {
+                                            // console.log("[record data] setting raw value because non-empty attachment");
+                                            recordData[schemaFieldNames.get(fieldID)] = fieldValue;
+                                        } else {
+                                            // console.log("[record data] setting sub object ID");
+                                            if ("name" in fieldValue && fieldValue.id.startsWith("sel")) {
+                                                recordData[schemaFieldNames.get(fieldID)] = fieldValue.name;
+                                            } else {
+                                                recordData[schemaFieldNames.get(fieldID)] = dirtyID(fieldValue.id);
+                                            }
+                                        }
                                     } else if (typeof fieldValue === "object" && "length" in fieldValue && fieldValue.length) {
-                                        recordData[schemaFieldNames.get(fieldID)] = (fieldValue as any[]).map(val => (typeof val === "object" && "id" in val) ? dirtyID(val?.id) : val);
+                                        // console.log("[record data] setting as array");
+                                        if (isAttachment) {
+                                            // console.log("[record data] setting raw array value because non-empty attachment");
+                                            recordData[schemaFieldNames.get(fieldID)] = fieldValue;
+                                        } else {
+                                            recordData[schemaFieldNames.get(fieldID)] = (fieldValue as any[]).map(val => {
+                                                if (typeof val === "object" && "id" in val) {
+                                                    if (val.id.startsWith("sel")) {
+                                                        return val.name;
+                                                    }
+                                                    return dirtyID(val.id);
+                                                } else {
+                                                    return val;
+                                                }
+                                            });
+                                        }
                                     } else {
+                                        // console.log("[record data] setting raw value (fallthrough)");
+                                        recordData[schemaFieldNames.get(fieldID)] = fieldValue;
+                                    }
+                                } else {
+                                    if (isAttachment) {
+                                        // console.log("[record data] empty but attachment");
+                                        recordData[schemaFieldNames.get(fieldID)] = [];
+                                    } else {
+                                        // console.log("[record data] empty but normal");
                                         recordData[schemaFieldNames.get(fieldID)] = fieldValue;
                                     }
                                 }
                             }
 
                             if (recordData["Modified"]) {
+                                console.log("Data modification from webhook, changes:", recordID, recordData);
                                 changes[recordID] = deAirtableRecord({
                                     fields: recordData,
                                     id: recordID
-                                });
-                                console.log(changes[recordID]);
+                                }, { allowEmptyValues: true });
+                                // console.log("De-airtabled:", changes[recordID]);
                             }
                         }
                     }
@@ -203,6 +251,7 @@ export default async function load({ app }: { app: express.Express }) {
 
     webhookRouter.post("/delivery", async (req, res) => {
         const verified = req.headers["x-airtable-content-mac"] === getHmac(req.body.webhook.id, req.body);
+        // console.log("[delivery]", req.body);
 
         if (!verified) {
             console.error("Unverified webhook delivery");

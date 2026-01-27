@@ -31,8 +31,12 @@ function getPath(filename, size) {
 async function getImage(filename, size) {
     try {
         let filePath = getPath(filename, size);
-        await fp.access(filePath, fs.constants.R_OK);
-        return filePath;
+        const stats = await fp.stat(filePath);
+        console.log(filePath, stats.size, new Date(stats.birthtimeMs));
+        if (stats.size > 32) {
+            return filePath;
+        }
+        return null;
     } catch (e) {
         return null;
     }

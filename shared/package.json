@@ -5,6 +5,10 @@
     "type": "module",
     "private": true,
     "dependencies": {
-        "discord-api-types": "^0.37.79"
+        "discord-api-types": "^0.37.79",
+        "airtable": "^0.12.2"
+    },
+    "devDependencies": {
+        "@types/node": "^24.1.0"
     }
 }

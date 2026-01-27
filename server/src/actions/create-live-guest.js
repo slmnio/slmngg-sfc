@@ -1,4 +1,4 @@
-import { deAirtable } from "../action-utils/action-utils.js";
+import { deAirtable } from "shared";
 
 export default {
     key: "create-live-guest",

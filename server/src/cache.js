@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { accessTokenIsExpired, refreshUserToken } from "@twurple/auth";
 import { EventEmitter } from "events";
-import { cleanID } from "shared";
+import { cleanID, deAirtable, keyDeAirtable, slmnggAttachments } from "shared";
 
 /*
     - Get and set data
@@ -126,23 +126,6 @@ const longTextMap = {
     "Teams": ["show_notes"],
 };
 
-const slmnggAttachments = {
-    "Events": ["broadcast_texture"],
-    "Players": ["headshot"],
-    "Themes": ["default_logo", "default_wordmark", "small_logo", "other_images", "logo_on_dark", "logo_on_light", "logo_on_theme", "wordmark_on_dark", "wordmark_on_light", "wordmark_on_theme"],
-    "Broadcasts": ["break_image", "background"],
-    "News": ["header", "thumbnail"],
-    "Map Data": ["image", "big_image", "video", "audio"],
-    "Maps": ["image", "big_image"],
-    "Log Files": ["log_file"],
-    "Heroes": ["icon", "main_image", "recolor_base", "recolor_layers", "alternate_set_image", "pick_audio", "ban_audio", "video", "background", "wordmark"],
-    "Ad Reads": ["audio", "image"],
-    "Tracks": ["file"],
-    "Teams": ["icon", "images"],
-    "GFX": ["image"],
-    "Trivia": ["question_content", "reveal_content"]
-};
-
 function generateAttachmentURL(str, attachment) {
     let idx = str.indexOf("ts=");
     if (idx !== -1) str = str.slice(0, idx -1);
@@ -211,10 +194,6 @@ async function removeAttachmentTimestamps(data) {
     return data;
 }
 
-function keyDeAirtable(key) {
-    return key.replace(/ +/g, "_").replace(/[:()]/g, "_").replace(/_+/g,"_").toLowerCase();
-}
-
 function generateLimitedPlayers(longText) {
     return longText.split(/[\n;]/g).filter(e => e).map(line => {
         let player = {
@@ -245,10 +224,12 @@ function generateLimitedPlayers(longText) {
 }
 
 export async function partialSet(id, data, options) {
-    return set(id, {
+    const partialData = deAirtable({
         ...(store.get(id) || {}),
         ...data
-    }, options);
+    });
+    // console.log("[partial set]", id, data, "->", partialData);
+    return set(id, partialData, options);
 }
 
 export async function set(id, data, options) {

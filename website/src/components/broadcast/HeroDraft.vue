@@ -1,5 +1,28 @@
 <template>
     <div class="hero-draft-container d-flex flex-column" :style="themeBackground1(broadcast?.event)">
+        <div v-if="showHeroBackgrounds" class="hero-background-container">
+            <transition name="hero-bg">
+                <div
+                    v-if="currentlyPlaying?.key
+                        && (
+                            (currentlyPlaying?.mode === 'pick' && showPickHeroBackgrounds) ||
+                            (currentlyPlaying?.mode === 'ban' && showBanHeroBackgrounds) ||
+                            (currentlyPlaying?.mode === 'protect' && showProtectHeroBackgrounds)
+                        )
+                    "
+                    :key="currentlyPlaying?.key ?? 'empty'"
+                    :class="[`team-${currentlyPlaying?.teamNum}`, `mode-${currentlyPlaying?.mode}`]"
+                    class="hero-background">
+                    <img
+                        class="hero-background-image"
+                        :src="resizedImageNoWrap(currentlyPlaying?.hero, ['background'], 'w-1980')"
+                        @load="() => loaded[`${currentlyPlaying?.hero?.id}-bg`] = true">
+                    <img
+                        class="hero-background-image zoomed"
+                        :src="resizedImageNoWrap(currentlyPlaying?.hero, ['background'], 'w-1980')">
+                </div>
+            </transition>
+        </div>
         <div class="timing-bar-container" :class="{'auto-active': !!autoDraftLast}">
             <transition name="fade" :duration="500" mode="out-in">
                 <div v-if="timingBarStyle" :key="timingBarKey" class="timing-bar" :style="{...(timingBarStyle || {}), backgroundColor: themeBackground1(this?.broadcast?.event)?.borderColor}"></div>
@@ -352,7 +375,8 @@ export default {
 
         loaded: {},
         audioPlaying: {},
-        showStats: {}
+        showStats: {},
+        currentlyPlaying: null
     }),
     computed: {
         middle() {
@@ -378,6 +402,18 @@ export default {
         },
         protectImageKeys() {
             return (this.broadcast?.broadcast_settings || [])?.includes("Use positive images for protects") ? ["positive_image", "icon", "main_image"] : ["icon", "main_image"];
+        },
+        showPickHeroBackgrounds() {
+            return (this.broadcast?.broadcast_settings || [])?.includes("Show hero background on picks");
+        },
+        showBanHeroBackgrounds() {
+            return (this.broadcast?.broadcast_settings || [])?.includes("Show hero background on bans");
+        },
+        showProtectHeroBackgrounds() {
+            return (this.broadcast?.broadcast_settings || [])?.includes("Show hero background on protects");
+        },
+        showHeroBackgrounds() {
+            return this.showPickHeroBackgrounds || this.showBanHeroBackgrounds || this.showProtectHeroBackgrounds;
         },
         game() {
             return this.broadcast?.event?.game;
@@ -595,12 +631,36 @@ export default {
         },
         hideNextPick() {
             return this.pickBanJustChanged || Object.values(this.audioPlaying).some(Boolean);
-        }
+        },
     },
     methods: {
         resizedImageNoWrap,
         getPickBanItem,
         cleanID,
+        firstAudioPlaying(all) {
+            let playing = Object.entries(all).find(([k, v]) => v);
+            if (!playing) return null;
+            let [key] = playing;
+            let [mode, teamNum, index] = key.split("/");
+
+            if (mode === "pick") {
+                return {
+                    hero: this.picks[parseInt(teamNum) - 1][parseInt(index) - 1],
+                    mode, teamNum, index, key
+                };
+            } else if (mode === "ban") {
+                return {
+                    hero: this.bans[parseInt(teamNum) - 1][parseInt(index) - 1],
+                    mode, teamNum, index, key
+                };
+            } else if (mode === "protect") {
+                return {
+                    hero: this.protects[parseInt(teamNum) - 1][parseInt(index) - 1],
+                    mode, teamNum, index, key
+                };
+            }
+            return null;
+        },
         padPickBans(arr, count, type, team, manualAdvanceIndex) {
             console.log("pad pick ban", { arr, count, type, team }, { manual: this.manualDraftAdvancing, showAll: this.showAll });
 
@@ -634,6 +694,9 @@ export default {
             this.manualDraftAdvancing = true;
             this.resetAutoDraft();
             this.loaded = {};
+            this.currentlyPlaying = null;
+            this.audioPlaying = {};
+            this.showStats = {};
         },
         resetAutoDraft() {
             this.timingBarKey = 0;
@@ -679,6 +742,12 @@ export default {
                 console.log("match ID change", id, oldId);
                 this.resetPickBan();
             }
+        },
+        audioPlaying: {
+            handler(all) {
+                this.currentlyPlaying = this.firstAudioPlaying(all);
+            },
+            deep: true,
         },
         currentPickBan(newNum, oldNum) {
             const statsTiming = {
@@ -1215,5 +1284,80 @@ img.image-center {
     padding: 0.1em 0.2em;
     padding-top: .2em;
 }
+.hero-background-container {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    /*background-color: orangered;*/
+    z-index: -1;
+}
+.hero-background-container {
+    opacity: 0.5;
+}
+.hero-background, .hero-background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
+.hero-background-image {
+    transform: scaleX(var(--scale-x, 1));
+}
+.hero-background-image.zoomed {
+        transform: scale(2) translate(-40%, -20%) scaleX(var(--scale-x, 1)) !important;
+        z-index: -1;
+        opacity: 0.5;
+        filter: blur(15px)
+    }
+
+.team-1 .hero-background-image {
+    --scale-x: -1;
+}
+
+.team-1 .hero-background-image.zoomed {
+    transform: scale(2) translate(40%, -20%) scaleX(var(--scale-x, 1)) !important;
+
+}
+
+.hero-bg-enter-from,
+.hero-bg-leave-to { opacity: 0; }
+
+.hero-background {
+    --off-screen: 400px;
+    --on-screen-start: 300px;
+    --on-screen-end: 250px;
+    --left-offset: -5vw;
+}
+
+.hero-background.team-1 { transform: translate(calc(var(--left-offset) - var(--on-screen-end)), 0px); transition: all 6000ms linear }
+.hero-background.team-2 { transform: translate(var(--on-screen-end), 0px); transition: all 6000ms linear }
+
+.hero-background.hero-bg-enter-active { transition: opacity 1000ms ease, transform 2000ms ease-out; }
+.hero-background.hero-bg-leave-active { transition: opacity 3000ms ease 1000ms, transform 3000ms ease-in 0ms; }
+
+.team-1.hero-bg-enter-from { opacity: 0; transform: translate(calc(var(--left-offset) - var(--off-screen)), 0px) }
+.team-1.hero-bg-enter-to   { opacity: 1; transform: translate(calc(var(--left-offset) - var(--on-screen-start)), 0px) }
+.team-1.hero-bg-leave-from { opacity: 1; transform: translate(calc(var(--left-offset) - var(--on-screen-start)), 0px) }
+.team-1.hero-bg-leave-to   { opacity: 0; transform: translate(calc(var(--left-offset) - var(--on-screen-end)), 0px) }
+.team-2.hero-bg-enter-from { opacity: 0; transform: translate(var(--off-screen), 0px); }
+.team-2.hero-bg-enter-to   { opacity: 1; transform: translate(var(--on-screen-start), 0px); }
+.team-2.hero-bg-leave-from { opacity: 1; transform: translate(var(--on-screen-start), 0px); }
+.team-2.hero-bg-leave-to   { opacity: 0; transform: translate(var(--on-screen-end), 0px); }
+
+/*@keyframes jump {*/
+/*    0%, 50% { transform: translate(10px, 0); }*/
+/*    52% { transform: translate(0px, 0); }*/
+/*    53% { transform: translate(50px, 0); }*/
+/*    55% { transform: translate(5px, 0); }*/
+/*    57%, 100% { transform: translate(15px, 0); }*/
+/*}*/
+
+/*.hero-background {*/
+/*    animation: jump 2s infinite steps(2);*/
+/*    transition: opacity 2000ms ease !important;*/
+/*}*/
 
 </style>

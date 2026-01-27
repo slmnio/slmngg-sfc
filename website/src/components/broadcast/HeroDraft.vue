@@ -58,7 +58,7 @@
                                     :class="{'audio-playing': audioPlaying[`ban/${ti+1}/${num+1}`]}">
                                     <div class="square-image flex-center">
                                         <transition name="fade">
-                                            <img v-show="loaded[bans[ti][num-1]?.id]" class="image-center" :src="resizedImageNoWrap(ban, ['icon'], 's-500')" @load="() => loaded[bans[ti][num-1]?.id] = true">
+                                            <img v-show="loaded[bans[ti][num-1]?.id]" class="image-center" :src="resizedImageNoWrap(ban, banImageKeys, 's-500')" @load="() => loaded[bans[ti][num-1]?.id] = true">
                                         </transition>
                                     </div>
 
@@ -87,7 +87,7 @@
                                     :class="{'audio-playing': audioPlaying[`protect/${ti+1}/${num+1}`]}">
                                     <div class="protect-image square-image flex-center">
                                         <transition name="fade">
-                                            <img v-show="loaded[protects[ti][num-1]?.id]" class="image-center" :src="resizedImageNoWrap(protect, ['icon'], 's-500')" @load="() => loaded[protects[ti][num-1]?.id] = true">
+                                            <img v-show="loaded[protects[ti][num-1]?.id]" class="image-center" :src="resizedImageNoWrap(protect, protectImageKeys, 's-500')" @load="() => loaded[protects[ti][num-1]?.id] = true">
                                         </transition>
                                     </div>
 
@@ -124,10 +124,25 @@
                                 <div class="pick-number">
                                     {{ getPickBanItem(pickBanOrder, "pick", ti + 1, num - 1)?.countOfTeamType }}
                                 </div>
-                                <div
-                                    class="pick-image bg-center">
+                                <div v-if="showPositivePickHighlight && picks[ti][num-1]?.positive_image" class="pick-image bg-center">
+                                    <transition name="fade" mode="out-in">
+                                        <img
+                                            v-show="loaded[picks[ti][num-1]?.id] && audioPlaying[`pick/${ti+1}/${num}`]"
+                                            v-if="audioPlaying[`pick/${ti+1}/${num}`]"
+                                            class="image-center"
+                                            :src="resizedImageNoWrap(picks[ti][num-1], ['positive_image'], 'h-500')"
+                                            @load="() => loaded[picks[ti][num-1]?.id] = true">
+                                        <img
+                                            v-show="loaded[picks[ti][num-1]?.id] && !audioPlaying[`pick/${ti+1}/${num}`]"
+                                            v-else
+                                            class="image-center"
+                                            :src="resizedImageNoWrap(picks[ti][num-1], ['main_image'], 'h-500')"
+                                            @load="() => loaded[picks[ti][num-1]?.id] = true">
+                                    </transition>
+                                </div>
+                                <div v-else class="pick-image bg-center">
                                     <transition name="fade">
-                                        <img v-show="loaded[picks[ti][num-1]?.id]" class="image-center" :src="resizedImageNoWrap(picks[ti][num-1], ['main_image', 'icon'], 'h-500')" @load="() => loaded[picks[ti][num-1]?.id] = true">
+                                        <img v-show="loaded[picks[ti][num-1]?.id]" class="image-center" :src="resizedImageNoWrap(picks[ti][num-1], pickImageKeys, 'h-500')" @load="() => loaded[picks[ti][num-1]?.id] = true">
                                     </transition>
                                 </div>
                                 <div v-show="loaded[picks[ti][num-1]?.id]" class="pick-text" :style="themeBackground1(broadcast?.event)">
@@ -260,6 +275,11 @@
                                                                 :key="i"
                                                                 class="pick-ban-icon bg-primary flex-center">
                                                             </div>
+                                                            <div
+                                                                v-for="(empty, i) in (weekStats?.totalMaps - (weekStats?.[cleanID(picks[ti]?.[num-1]?.id)]?.picks?.total || 0) - (weekStats?.[cleanID(picks[ti]?.[num-1]?.id)]?.bans?.total || 0))"
+                                                                :key="i"
+                                                                class="pick-ban-icon bg-secondary non-picked flex-center">
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -346,6 +366,18 @@ export default {
         },
         fearless() {
             return (this.broadcast?.broadcast_settings || [])?.includes("Show previous picks as fearless bans");
+        },
+        banImageKeys() {
+            return (this.broadcast?.broadcast_settings || [])?.includes("Use negative images for bans") ? ["negative_image", "icon", "main_image"] : ["icon", "main_image"];
+        },
+        pickImageKeys() {
+            return (this.broadcast?.broadcast_settings || [])?.includes("Use positive images for picks") ? ["positive_image", "main_image"] : ["main_image"];
+        },
+        showPositivePickHighlight() {
+            return (this.broadcast?.broadcast_settings || [])?.includes("Use positive images for highlighted picks");
+        },
+        protectImageKeys() {
+            return (this.broadcast?.broadcast_settings || [])?.includes("Use positive images for protects") ? ["positive_image", "icon", "main_image"] : ["icon", "main_image"];
         },
         game() {
             return this.broadcast?.event?.game;
@@ -688,11 +720,18 @@ export default {
 
             console.log("~~", item, itemAudio);
             if (!itemAudio) return console.warn("No audio found", item);
+            if (this.showPositivePickHighlight) {
+                // start with the highlight graphic
+                this.audioPlaying[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = true;
+            }
             const audio = new Howl({
                 src: [getNewURL(itemAudio, "orig")],
                 onplay: () => {
                     console.log("playing", pickBan);
                     this.audioPlaying[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = true;
+                },
+                onerror: () => {
+                    this.audioPlaying[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = false;
                 },
                 onend: () => {
                     console.log("ending", pickBan);
@@ -1164,10 +1203,6 @@ img.image-center {
 .priority-group-title {
     font-size: 0.35em;
     padding-bottom: .2em;
-}
-
-.priority-group-title:before {
-    content: "#"
 }
 
 .stats-page-3 .stats-page {

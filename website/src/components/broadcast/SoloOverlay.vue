@@ -83,7 +83,7 @@
                     :key="'team-1-' + score"
                     :class="{'is-score': scores[0] === score}"
                     class="score"
-                    :click="() => setScore(0, score)">
+                    :click="() => setScore(0, score, true)">
                     {{ score }}
                 </SoloControlButton>
 
@@ -97,7 +97,7 @@
                     :key="'team-2-' + score"
                     :class="{'is-score': scores[1] === score}"
                     class="score"
-                    :click="() => setScore(1, score)">
+                    :click="() => setScore(1, score, true)">
                     {{ score }}
                 </SoloControlButton>
 
@@ -262,7 +262,7 @@
                 :client="client"
                 :title="title"
                 :animation-active="true"
-                :show-roles="(rosterOptions || []).includes('roles')"
+                :show-roles="(rosterOptions || []).includes('eligible') ? 'eligible' : (rosterOptions || []).includes('roles')"
                 :sort="(rosterOptions || []).includes('sort')"
                 :show-badges="(rosterOptions || []).includes('badges')" />
         </div>
@@ -320,7 +320,7 @@ export default {
         DeskMatch,
         Middle
     },
-    props: ["broadcast", "client", "title", "modules", "rosterOptions", "showMapVideos"],
+    props: ["broadcast", "client", "title", "modules", "rosterOptions", "showMapVideos", "companionPrefix", "companionPort"],
     data: () => ({
         controlMode: "default",
         controlPage: 0,
@@ -340,7 +340,8 @@ export default {
         firstTo: 3,
 
         noStinger: true,
-        cropGuides: {}
+        cropGuides: {},
+        companionData: {}
     }),
     computed: {
         autoMiddle() {
@@ -370,7 +371,9 @@ export default {
                 theme: ReactiveThing("theme"),
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme"),
-                    players: ReactiveArray("players")
+                    players: ReactiveArray("players", {
+                        "signup_data": ReactiveArray("signup_data")
+                    }),
                 }),
                 map_pool: ReactiveArray("map_pool")
             })(this.broadcast);
@@ -518,8 +521,12 @@ export default {
             this.controlMode = "set-maps"; // TODO: change to "set-map" so other things can be done with it
             //                                         what does this even mean
         },
-        setScore(index, score) {
+        setScore(index, score, pushUpdate = false) {
             this.scores[index] = score;
+
+            if (this.companionPort && pushUpdate) {
+                this.setCompanionData(`team${index+1}`, score);
+            }
         },
         setMiddle() {
             this.middle = this.tempMiddle.toUpperCase();
@@ -574,6 +581,22 @@ export default {
                 this.mapWinners[num] = rotation[index + 1];
             }
             console.log(this.mapWinners[num]);
+        },
+        async getCompanionData(variableName) {
+            let response = await fetch(`http://localhost:${this.companionPort}/api/custom-variable/${this.companionPrefix}_${variableName}/value`);
+
+            if (!response.ok) {
+                console.error(`Could not fetch companion variable ${response.status}`);
+                return;
+            }
+
+            this.companionData[variableName] = await response.text();
+        },
+        async setCompanionData(variableName, value) {
+            console.log("[companion]", "setting", variableName, "variable on companion to", value);
+            await fetch(`http://localhost:${this.companionPort}/api/custom-variable/${this.companionPrefix}_${variableName}/value?value=${value}`, {
+                method: "POST"
+            });
         }
     },
     watch: {
@@ -596,6 +619,19 @@ export default {
                 });
 
             }
+        },
+        "companionData.team1"(num) { this.setScore(0, parseInt(num)); },
+        "companionData.team2"(num) { this.setScore(1, parseInt(num)); },
+
+    },
+    async mounted() {
+        if (this.companionPort && this.companionPrefix) {
+            setInterval(async () => {
+                await Promise.all([
+                    this.getCompanionData("team1", 0),
+                    this.getCompanionData("team2", 1)
+                ]);
+            }, 1000);
         }
     }
 };

@@ -435,7 +435,9 @@ export default [
         props: route => ({
             modules: route.query.modules?.split(","),
             rosterOptions: (route.query.rosterOptions || route.query.roster)?.split(","),
-            showMapVideos: !!(route.query.mapVideos || route.query.videos)
+            showMapVideos: !!(route.query.mapVideos || route.query.videos),
+            companionPort: route.query.companionPort,
+            companionPrefix: route.query.companionPrefix
         })
     },
     {

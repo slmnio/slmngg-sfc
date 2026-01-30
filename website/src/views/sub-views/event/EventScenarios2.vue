@@ -55,6 +55,7 @@
                 </div>
                 <div class="mt-2">
                     <b-button v-if="scenarioCount?.mode === 'static'" variant="success" :disabled="!activeMatchGroup" @click="calculateSheet()">Generate ({{ scenarioCount?.scenarioCount }})</b-button>
+                    <b-alert v-else-if="scenarioCount?.mode === 'not-processing'" :model-value="true" variant="warning"><b>Not processing this group:</b> Total scenarios remaining: <span class="text-monospace">{{ (scenarioCount.scenarioCount).toLocaleString() }}</span>.</b-alert>
                 </div>
             </div>
         </div>

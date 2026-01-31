@@ -1,7 +1,7 @@
 <template>
     <div
         class="bracket-team default-thing"
-        :class="{'text': !!text, 'empty': empty, 'highlighted': highlighted, 'lowlighted': lowlighted}"
+        :class="{'text': !!text, 'empty': empty, 'highlighted': highlighted, 'lowlighted': lowlighted, 'team-win': win}"
         :style="background"
         @mouseover="highlight"
         @mouseout="unHighlight">

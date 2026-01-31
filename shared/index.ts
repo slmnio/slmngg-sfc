@@ -28,8 +28,12 @@ export function deAirtable(obj: AirtableRecord["fields"], options: DeAirtableOpt
     Object.entries(data).forEach(([key, val]) => {
         if (!options?.allowEmptyValues) {
             if (typeof val === "object" && (Array.isArray(val) ? val?.length === 0 : true)) {
-                console.log("[Action deAirtable] Skipping", key, val);
-                delete data[key];
+                if (val instanceof Date) {
+                    data[key] = val.getTime();
+                } else {
+                    console.log("[Action deAirtable] Skipping", key, val);
+                    delete data[key];
+                }
             }
         }
         if (key === "limited_players" && typeof data[key] === "object") {

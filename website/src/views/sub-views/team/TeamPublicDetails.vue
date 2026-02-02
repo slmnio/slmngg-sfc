@@ -6,13 +6,13 @@
                     <th></th>
                     <th>Name</th>
                     <th>Discord Tag</th>
-                    <th>Battletag</th>
+                    <th>{{ gameOverride?.usernameText || 'Battletag' }}</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="player in players" :key="player.id">
-                    <td v-b-tooltip class="role" :title="player.role">
-                        <RoleIcon class="flex-center" :role="player.role" />
+                    <td class="role">
+                        <RoleIcon v-b-tooltip class="details-role-icon flex-center" :role="player.role" :title="player.role" />
                     </td>
                     <td>
                         <i
@@ -32,15 +32,15 @@
                         <CopyTextButton v-if="player?.discord_tag">{{ player?.discord_tag }}</CopyTextButton>
                     </td>
                     <td>
-                        <CopyTextButton v-if="player?.battletag">{{ player?.battletag }}</CopyTextButton>
+                        <CopyTextButton v-if="player?.[gameOverride?.usernameKey] || player?.battletag">{{ player?.[gameOverride?.usernameKey] || player?.battletag }}</CopyTextButton>
                     </td>
                 </tr>
-                <tr v-if="staff?.length" class="spacer">
+                <tr v-if="staff?.length" class="spacer" style="opacity: 0.5">
                     <td colspan="4"></td>
                 </tr>
                 <tr v-for="staff in staff" :key="staff.id">
-                    <td v-b-tooltip class="role" :title="staff.staff_role || 'Staff'">
-                        <RoleIcon class="flex-center" :role="staff.staff_role || 'Staff'" />
+                    <td class="role">
+                        <RoleIcon v-b-tooltip :title="staff.staff_role || 'Staff'" class="flex-center" :role="staff.staff_role || 'Staff'" />
                     </td>
                     <td>
                         <i
@@ -48,13 +48,15 @@
                             v-b-tooltip
                             class="fas fa-fw fa-star mr-1 text-warning"
                             :title="staff.highlight_role"></i>
-                        {{ staff?.name }}
+
+                        <router-link v-if="staff.id" :to="url('player', staff)">{{ staff?.name }}</router-link>
+                        <span v-else>{{ staff?.name }}</span>
                     </td>
                     <td>
                         <CopyTextButton v-if="staff?.discord_tag">{{ staff?.discord_tag }}</CopyTextButton>
                     </td>
                     <td>
-                        <CopyTextButton v-if="staff?.battletag">{{ staff?.battletag }}</CopyTextButton>
+                        <CopyTextButton v-if="staff?.[gameOverride?.usernameKey] || staff?.battletag">{{ staff?.[gameOverride?.usernameKey] || staff?.battletag }}</CopyTextButton>
                     </td>
                 </tr>
             </tbody>
@@ -66,6 +68,7 @@
 import RoleIcon from "@/components/website/RoleIcon.vue";
 import CopyTextButton from "@/components/website/CopyTextButton.vue";
 import { url } from "@/utils/content-utils";
+import { GameOverrides } from "@/utils/games.js";
 
 export default {
     name: "TeamPublicDetails",
@@ -101,7 +104,10 @@ export default {
                 if ((b.is_captain || b.highlight_role)) return 1;
                 return 0;
             });
-        }
+        },
+        gameOverride() {
+            return GameOverrides[this.team?.event?.game];
+        },
     },
     methods: {
         url,
@@ -118,5 +124,11 @@ export default {
         width: 1em;
         vertical-align: middle;
         line-height: 1;
+    }
+
+    .details-role-icon:deep(img) {
+        object-fit: contain;
+        width: 100%;
+        height: 100%;
     }
 </style>

@@ -791,6 +791,7 @@ export default {
             // console.log("locked", calc, team);
             const incomplete = team.positions[team.positions.length - 1];
 
+            if (team.positions.every(n => n === 0)) return false;
 
             let invalidated = false;
             let standingIndex = 0;

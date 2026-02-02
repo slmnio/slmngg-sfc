@@ -47,7 +47,8 @@ const verboseEmitter = new EventEmitter();
 
 verboseEmitter.on("log", async ({ text, json }) => {
 
-    const trimmedJSON = structuredClone(json);
+    let trimmedJSON = structuredClone(json);
+    if (!json || !trimmedJSON) trimmedJSON = {};
     Object.entries(trimmedJSON).forEach(([key, val]) => {
         if (Array.isArray(val) && val.length > 15) {
             trimmedJSON[key] = [

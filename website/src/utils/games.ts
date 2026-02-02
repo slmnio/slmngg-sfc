@@ -20,7 +20,8 @@ export const GameOverrides = {
             "pick1,pick2,pick2,pick1,pick1,pick2," +
             "ban2,ban1,ban2,ban1," +
             "pick2,pick1,pick1,pick2",
-        usernameKey: "riot_id"
+        usernameKey: "riot_id",
+        usernameText: "Riot ID"
     },
     "Marvel Rivals": {
         playerCount: 6,
@@ -43,6 +44,7 @@ export const GameOverrides = {
             "matchDraftPick": ["icon", "main_image"]
         },
         usernameKey: "marvel_rivals_username",
+        usernameText: "Marvel Rivals Username",
         heroRoles: ["Duelist", "Vanguard", "Strategist"]
     },
     "Valorant": {
@@ -51,7 +53,8 @@ export const GameOverrides = {
             "hero": "Agent",
             "heroes": "Agents",
         },
-        usernameKey: "riot_id"
+        usernameKey: "riot_id",
+        usernameText: "Riot ID"
     },
     "Deadlock": {
         useBestOf: true,
@@ -78,7 +81,8 @@ export const GameOverrides = {
         imageSets: {
             "heroPriority": ["main_image", "icon"]
         },
-        usernameKey: "steam_id"
+        usernameKey: "steam_id",
+        usernameText: "Steam ID"
     },
     "Overwatch": {
         heroRoles: ["DPS", "Tank", "Support"]

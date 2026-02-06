@@ -355,6 +355,7 @@ export default {
 
 .player-role {
     width: 2em;
+    text-align: center;
 }
 
 .player-pronouns {

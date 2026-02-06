@@ -316,6 +316,8 @@ export default {
         /* from .top-overlay  */
         height: var(--team-height, 48px);
 
+        --item-gap: 12px;
+
         transition: background-color .2s, border-color .2s, color .2s, width 200ms ease;
     }
     .ingame-team-holder {
@@ -408,16 +410,19 @@ export default {
     .team-logo-holder {
         width: 48px;
         flex-shrink: 0;
-        margin: 0 12px 0 0;
+        margin: 0 var(--item-gap) 0 0;
     }
     .team-name {
-        margin: 0 12px 0 24px;
+        --logo-gap: var(--item-gap);
+        --side-gap: calc(2 * var(--item-gap));
+
+        margin: 0 var(--logo-gap) 0 var(--side-gap);
     }
     .ingame-team-holder.right .team-logo-holder {
-        margin: 0 0 0 12px;
+        margin: 0 0 0 var(--item-gap);
     }
     .ingame-team-holder.right .team-name {
-        margin: 0 24px 0 12px;
+        margin: 0 var(--side-gap) 0 var(--logo-gap);
     }
 
     .team-logo {

@@ -273,7 +273,7 @@ export default {
     .segment-countdown .countdown {
         line-height: 1;
         font-size: 7em;
-        letter-spacing: -5px;
+        /*letter-spacing: -5px;*/
         font-weight: bold;
     }
 

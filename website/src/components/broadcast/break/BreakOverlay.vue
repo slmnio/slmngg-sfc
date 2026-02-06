@@ -350,7 +350,7 @@ span.industry-align {
     font-weight: bold;
     flex-grow: 1;
     height: 0;
-    letter-spacing: -5px;
+    /*letter-spacing: -5px;*/
 }
 
 

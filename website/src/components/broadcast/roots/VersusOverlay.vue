@@ -14,7 +14,7 @@
                 <div v-for="(team, i) in teams" :key="team.id" :class="vertical ? 'team-text-box-vertical' : 'team default-thing'" :style="{...getTeamStyle(team), order: i * 2}">
                     <div v-if="!vertical" class="team-logo bg-center" :style="getTeamLogo(team)"></div>
                     <div v-if="!vertical" class="team-text-box">
-                        <div class="team-text">{{ team.name }}</div>
+                        <div class="team-text overlay--bg">{{ team.name }}</div>
                     </div>
                     <div v-if="vertical" class="team-text-vertical">{{ team.name }}</div>
                 </div>

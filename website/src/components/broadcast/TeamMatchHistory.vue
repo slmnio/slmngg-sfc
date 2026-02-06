@@ -26,7 +26,7 @@ export default {
             let matches = (this.team.matches || [])
                 .filter(m => {
                     if (!m.event) return false;
-                    if (this.match.week && m.week && this.match.week < m.week) return false; // no future matches?
+                    // if (this.match.week && m.week && this.match.week < m.week) return false; // no future matches?
                     if (m.id === this.match.id) return ([m.score_1, m.score_2].includes(m.first_to));
                     return true;
                 })

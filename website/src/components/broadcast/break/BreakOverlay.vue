@@ -75,7 +75,7 @@
                     :starting-delay="350"
                     :inner-delay="150"
                     :duration="500">
-                    <BreakContent :force-gfx-small="true" v-bind="{ broadcast, customBreakAutomation, virtualMatch, title }" />
+                    <BreakContent :force-gfx-small="true" v-bind="{ broadcast, customBreakAutomation, virtualMatch, title, lastCountdownTick }" />
                 </ThemeTransition>
             </div>
         </div>

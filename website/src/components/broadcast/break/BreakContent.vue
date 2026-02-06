@@ -123,10 +123,10 @@ export default {
         animationActive: Boolean,
         secondary: Boolean,
         forceGfxSmall: Boolean,
+        lastCountdownTick: Number
     },
     data: () => ({
         tick: 0,
-        lastCountdownTick: 0
     }),
     computed: {
         event() {
@@ -303,9 +303,6 @@ export default {
         nbr(text) {
             if (!text) return "";
             return text.replace(/\\n/g, "<br>");
-        },
-        countdownTick(x) {
-            this.lastCountdownTick = x;
         },
         resizedImage,
         hasStaff(matches) {

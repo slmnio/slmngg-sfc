@@ -154,7 +154,7 @@ export default {
             if (this.playerRelationshipGroups?.length) {
                 this.playerRelationshipGroups.forEach(({ items, meta }) => {
                     if (!items?.length) return;
-                    if (items.length === 1 && !["Producer"].includes(meta.singular_name)) {
+                    if (items.length === 1/* && !["Producer"].includes(meta.singular_name)*/) {
                         singleSlides.push({
                             type: "items",
                             title: items?.length === 1 ? meta.singular_name : meta.plural_name,

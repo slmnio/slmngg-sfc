@@ -435,6 +435,13 @@ export default {
                                     teamTextCategoryChannel = searchedCategoryChannel;
                                     eventTextCategories.set(teamCategory, teamTextCategoryChannel);
                                     teamControl.push("team_category_text_category_id", teamTextCategoryChannel.id);
+
+                                    if (searchedCategoryChannel.name !== teamCategory) {
+                                        await searchedCategoryChannel.edit({
+                                            name: teamCategory,
+                                            reason: "Updating team category name"
+                                        });
+                                    }
                                 }
                             } catch (e) {
                                 console.warn("Couldn't find category channel", teamCategory, teamControl.textMap());
@@ -469,6 +476,13 @@ export default {
                                     teamVoiceCategoryChannel = searchedCategoryChannel;
                                     eventVoiceCategories.set(teamCategory, teamVoiceCategoryChannel);
                                     teamControl.push("team_category_voice_category_id", teamVoiceCategoryChannel.id);
+
+                                    if (searchedCategoryChannel.name !== teamCategory) {
+                                        await searchedCategoryChannel.edit({
+                                            name: teamCategory,
+                                            reason: "Updating team category name"
+                                        });
+                                    }
                                 }
                             } catch (e) {
                                 console.warn("Couldn't find category channel", teamCategory, teamControl.textMap);

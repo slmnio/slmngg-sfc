@@ -175,21 +175,17 @@ export default {
                 const isSecondTeam = cleanID(this.team?.id) === cleanID(this.match?.teams?.[1]?.id);
 
                 const broadcast = ReactiveRoot(this.broadcast?.id, {
-                    "team_1_cams": ReactiveArray("team_1_cams", {
-                        "player": ReactiveThing("player", {
-                            "favourite_hero": ReactiveThing("favourite_hero")
-                        })
+                    "team_1_player_cams": ReactiveArray("team_1_player_cams", {
+                        "favourite_hero": ReactiveThing("favourite_hero")
                     }),
-                    "team_2_cams": ReactiveArray("team_2_cams", {
-                        "player": ReactiveThing("player", {
-                            "favourite_hero": ReactiveThing("favourite_hero")
-                        })
+                    "team_2_player_cams": ReactiveArray("team_2_player_cams", {
+                        "favourite_hero": ReactiveThing("favourite_hero")
                     })
                 });
 
-                const cams = broadcast?.[isSecondTeam ? "team_2_cams" : "team_1_cams"] || [];
+                const cams = broadcast?.[isSecondTeam ? "team_2_player_cams" : "team_1_player_cams"] || [];
                 if (cams.length) {
-                    players = cams.map(cam => cam?.player);
+                    players = cams;
                 }
             }
 

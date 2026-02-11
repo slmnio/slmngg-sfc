@@ -39,6 +39,9 @@ interface Player {
     casted_events?: DirtyAirtableID[]
     socials?: DirtyAirtableID[]
     news?: DirtyAirtableID[]
+    /**
+     * @deprecated Live guests are being removed
+     */
     live_guests?: DirtyAirtableID[]
     player_relationships?: DirtyAirtableID[]
     clients?: DirtyAirtableID[]

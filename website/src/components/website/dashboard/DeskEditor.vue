@@ -107,12 +107,10 @@ export default {
     }),
     computed: {
         guests() {
-            if (!this.broadcast?.guests) return [];
+            if (!this.broadcast?.player_guests) return [];
             return ReactiveArray("guests", {
-                player: ReactiveThing("player", {
-                    socials: ReactiveArray("socials")
-                }),
-                theme: ReactiveThing("theme"),
+                socials: ReactiveArray("socials"),
+                live_theme: ReactiveThing("live_theme"),
                 prediction_team: ReactiveThing("prediction_team", {
                     theme: ReactiveThing("theme")
                 })

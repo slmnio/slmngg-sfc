@@ -70,8 +70,8 @@ export default {
                 ...resizedImage(this.event?.theme, ["default_logo", "default_wordmark"], "h-200"),
                 ...logoBackground(this.team?.theme),
                 ...resizedImage(this.team?.theme, ["default_logo"], "h-200"),
-                ...logoBackground(this.guest?.theme),
-                ...resizedImage(this.guest?.theme, ["default_logo"], "h-200"),
+                ...logoBackground(this.guest?.live_theme || this.guest?.theme),
+                ...resizedImage(this.guest?.live_theme || this.guest?.theme, ["default_logo"], "h-200"),
                 eventFallback: true
             };
         },

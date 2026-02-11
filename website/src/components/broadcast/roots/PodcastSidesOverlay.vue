@@ -34,13 +34,11 @@ export default {
             return manualGuests;
         },
         guests() {
-            const guests = (!this.broadcast?.guests)
+            const guests = (!this.broadcast?.player_guests)
                 ? []
                 : ReactiveArray("guests", {
-                    player: ReactiveThing("player", {
-                        socials: ReactiveArray("socials")
-                    }),
-                    theme: ReactiveThing("theme"),
+                    socials: ReactiveArray("socials"),
+                    live_theme: ReactiveThing("live_theme"),
                     prediction_team: ReactiveThing("prediction_team", {
                         theme: ReactiveThing("theme")
                     })

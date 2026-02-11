@@ -20,7 +20,6 @@
                             </div>
                             <RoleIcon :role="player.role" />
                             <div class="player-name">{{ player?.name }}{{ usernameDiscriminator(player) }}</div>
-                            <div v-if="!player?.live_guests?.length" v-b-tooltip="'Player does not have a Live Guest record'" class="mx-2"><i class="fas fa-video-slash"></i></div>
                         </div>
                     </div>
                     <div class="team-cams">
@@ -111,10 +110,10 @@ export default {
         },
         cams() {
             return ReactiveRoot(this.broadcast?.id, {
-                "team_1_cams": ReactiveArray("team_1_cams", {
+                "team_1_player_cams": ReactiveArray("team_1_player_cams", {
                     "player": ReactiveThing("player")
                 }),
-                "team_2_cams": ReactiveArray("team_2_cams", {
+                "team_2_player_cams": ReactiveArray("team_2_player_cams", {
                     "player": ReactiveThing("player")
                 })
             });
@@ -179,16 +178,16 @@ export default {
         }
     },
     watch: {
-        "cams.team_1_cams": {
+        "cams.team_1_player_cams": {
             immediate: true,
             handler(cams) {
-                this.setPlayers[0] = (cams || []).map(cam => cleanID(cam.player?.id));
+                this.setPlayers[0] = (cams || []).map(cam => cleanID(cam?.id));
             }
         },
-        "cams.team_2_cams": {
+        "cams.team_2_player_cams": {
             immediate: true,
             handler(cams) {
-                this.setPlayers[1] = (cams || []).map(cam => cleanID(cam.player?.id));
+                this.setPlayers[1] = (cams || []).map(cam => cleanID(cam?.id));
             }
         }
     }

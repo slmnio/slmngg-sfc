@@ -50,7 +50,7 @@ export default {
             return this.color;
         },
         player() {
-            return this.caster || this.guest.player;
+            return this.guest;
         },
         pronouns() {
             return this.player?.pronouns || this.guest?.pronouns;
@@ -63,7 +63,7 @@ export default {
             return twitter.name;
         },
         liveGuestData() {
-            return this.caster?.live_guests || this.guest;
+            return this.caster || this.guest;
         },
         cam() {
             if (this.disableVideo) return false;
@@ -72,7 +72,7 @@ export default {
             return this.liveGuestData.cam_code.includes("http") ? `${this.liveGuestData.cam_code}&z=04&mute` : `https://webcam.slmn.gg/?view=${this.liveGuestData.cam_code}&z=04&mute`;
         },
         name() {
-            return this.caster?.name || this.guest?.name;
+            return this.player?.live_override_name || this.player?.name;
         },
         themeColor() {
             if (!this.color) return {};

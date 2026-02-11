@@ -94,9 +94,9 @@
         </div>
         <transition name="clip-swipe-down">
             <div v-if="playerNames?.length" class="player-names">
-                <div v-for="guest in playerNames" :key="guest.id" class="player">
+                <div v-for="player in playerNames" :key="player.id" class="player">
                     <transition name="fade">
-                        <span :key="guest?.name">{{ guest?.name }}</span>
+                        <span :key="player?.name">{{ player?.name }}</span>
                     </transition>
                 </div>
             </div>

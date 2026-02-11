@@ -100,7 +100,6 @@ export default {
                     theme: ReactiveThing("theme")
                 }),
                 casters: ReactiveArray("casters", {
-                    live_guests: ReactiveThing("live_guests"),
                     socials: ReactiveArray("socials")
                 }),
                 player_relationships: ReactiveArray("player_relationships", {
@@ -115,13 +114,11 @@ export default {
             return manualGuests;
         },
         guests() {
-            const guests = (!this.broadcast?.guests)
+            const guests = (!this.broadcast?.player_guests)
                 ? []
-                : ReactiveArray("guests", {
-                    player: ReactiveThing("player", {
-                        socials: ReactiveArray("socials")
-                    }),
-                    theme: ReactiveThing("theme"),
+                : ReactiveArray("player_guests", {
+                    socials: ReactiveArray("socials"),
+                    live_theme: ReactiveThing("live_theme"),
                     prediction_team: ReactiveThing("prediction_team", {
                         theme: ReactiveThing("theme")
                     })
@@ -133,10 +130,7 @@ export default {
             ];
         },
         casters() {
-            return this.guests.length ? this.guests : (this.liveMatch?.casters || []).map(caster => ({
-                ...caster.live_guests,
-                player: caster
-            })).filter(g => g?.name);
+            return this.guests.length ? this.guests : (this.liveMatch?.casters || [])?.filter(g => g?.name);
         },
         themeColor() {
             if (!this.broadcast?.event?.theme) return {};

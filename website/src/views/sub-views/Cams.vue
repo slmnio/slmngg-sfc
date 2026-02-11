@@ -38,10 +38,9 @@
         </ul>
         <h3>Cam Link</h3>
         <div v-if="user">
-            <p v-if="this.camId">
+            <p v-if="camId">
                 <b-button variant="success" class="link-text" :href="camLink">Open Cam <i class="fas fa-fw fa-external-link"></i></b-button>
             </p>
-            <p v-else><LoadingIcon /> Finding your camera</p>
         </div>
         <p v-else>
             <b-button variant="secondary" @click="login"><i class="fas fa-fw fa-lock"></i> Login to see your cam link</b-button>
@@ -51,21 +50,15 @@
 
 <script>
 import { mapState } from "pinia";
-import { authenticatedRequest } from "@/utils/dashboard";
-import { ReactiveRoot, ReactiveThing } from "@/utils/reactive";
-import LoadingIcon from "@/components/website/LoadingIcon";
+import { ReactiveRoot } from "@/utils/reactive";
 import { useAuthStore } from "@/stores/authStore";
 
 export default {
     name: "TeamCams",
-    components: { LoadingIcon },
-    data: () => ({
-        hasCreatedLiveGuest: false
-    }),
     computed: {
         ...mapState(useAuthStore, ["user"]),
         camId() {
-            return this.playerWithCams.live_guests?.cam_code ?? this.playerWithCams.live_guests?.discord_id;
+            return this.playerWithCams?.cam_code ?? this.playerWithCams?.discord_id;
         },
         camLink() {
             return `https://webcam.slmn.gg/?push=${this.camId}&webcam&meshcast&meshcastbitrate=1000&meshcastscale=50&cb=0&nmb=0&hideaudio=1`;
@@ -73,31 +66,13 @@ export default {
         playerWithCams() {
             const { user } = useAuthStore();
             if (!user?.airtableID) return {};
-            return ReactiveRoot(user.airtableID, {
-                live_guests: ReactiveThing("live_guests")
-            });
-        },
-        isAuthed() {
-            return useAuthStore().isAuthenticated;
+            return ReactiveRoot(user.airtableID);
         }
     },
     methods: {
-        async createLiveGuest() {
-            const { user } = useAuthStore();
-            if (user && !this.hasCreatedLiveGuest) {
-                console.log("Creating live guest");
-                await authenticatedRequest("actions/create-live-guest", {});
-                this.hasCreatedLiveGuest = true;
-            }
-        },
         login() {
             localStorage.setItem("auth_next", this.$route.fullPath);
             this.$router.push("/login");
-        }
-    },
-    watch: {
-        isAuthed() {
-            this.createLiveGuest();
         }
     },
     head() {

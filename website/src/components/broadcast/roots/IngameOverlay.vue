@@ -132,12 +132,8 @@ export default {
         teamPlayerNames() {
             if (!(this.broadcast?.broadcast_settings || [])?.includes("Show all player names")) return [];
             const names = [
-                ReactiveArray("team_1_cams", {
-                    "player": ReactiveThing("player")
-                })(this.broadcast),
-                ReactiveArray("team_2_cams", {
-                    "player": ReactiveThing("player")
-                })(this.broadcast)
+                ReactiveArray("team_1_player_cams")(this.broadcast),
+                ReactiveArray("team_2_player_cams")(this.broadcast)
             ];
             if (this.flippingTeams) {
                 // hold old ones for a second

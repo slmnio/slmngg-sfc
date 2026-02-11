@@ -269,7 +269,7 @@ export default {
             return brackets.filter(b => !b.hide_bracket);
         },
         deskGuestSource() {
-            if (this.broadcast?.guests) {
+            if (this.broadcast?.player_guests) {
                 return "Broadcast › Guests";
             } else if (this.broadcast?.manual_guests) {
                 return "Broadcast › Manual Guests";

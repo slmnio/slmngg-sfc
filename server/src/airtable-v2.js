@@ -230,7 +230,7 @@ function time(secs) {
 
 class AirtableManager {
     constructor() {
-        this.tableNames = ["Maps", "Players", "Teams", "Matches", "Themes", "Live Guests", "Redirects", "Broadcasts", "Clients", "Channels", "Discord Bots", "Events", "GFX", "Event Series", "Signup Data", "Reports", "Ad Reads", "Ad Read Groups", "News", "Socials", "Accolades", "Player Relationships", "Brackets", "Headlines", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles", "Trivia"];
+        this.tableNames = ["Maps", "Players", "Teams", "Matches", "Themes", "Redirects", "Broadcasts", "Clients", "Channels", "Discord Bots", "Events", "GFX", "Event Series", "Signup Data", "Reports", "Ad Reads", "Ad Read Groups", "News", "Socials", "Accolades", "Player Relationships", "Brackets", "Headlines", "Map Data", "Heroes", "Log Files", "Tracks", "Track Groups", "Track Group Roles", "Trivia"];
         // this.tableNames = ["Redirects", "Broadcasts", "Clients", "Channels", "Discord Bots", "Players", "Live Guests"];
         this.tables = this.tableNames.map(tableName => new TableManager(tableName));
         this.availableRequests = 4;

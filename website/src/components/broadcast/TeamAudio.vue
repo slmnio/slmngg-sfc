@@ -36,9 +36,7 @@ export default {
             return this.broadcast.key;
         },
         decoratedMemberList() {
-            const airtableData = ReactiveArray("members", {
-                live_guests: ReactiveThing("live_guests")
-            })({ members: this.memberList.map(m => m.airtableID).filter(m => m) });
+            const airtableData = ReactiveArray("members")({ members: this.memberList.map(m => m.airtableID).filter(m => m) });
 
             return this.memberList.map(member => ({
                 ...member,

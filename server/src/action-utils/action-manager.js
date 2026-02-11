@@ -65,11 +65,11 @@ export async function load(expressApp, cors, Cache, io) {
 
                 if (!isAutomation && action.auth?.includes("user")) {
                     /** @type {AuthUserData.user} */
-                    authObjects.user = (await Cache.auth.getData(token))?.user;
+                    authObjects.user = structuredClone((await Cache.auth.getData(token))?.user);
                     if (!authObjects.user) return error(401, "Unauthorized operation. You might have a stale token (try logging in again)");
                 }
                 if (!isAutomation && action.auth?.includes("client")) {
-                    authObjects.client = await getSelfClient(Cache, token);
+                    authObjects.client = structuredClone(await getSelfClient(Cache, token));
                     if (!authObjects.client) return error(401, "No client data associated with this token");
                 }
 

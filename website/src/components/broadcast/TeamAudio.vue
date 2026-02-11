@@ -12,7 +12,7 @@
 import { socket } from "@/socket";
 import PCMPlayer from "@/utils/pcmplayer";
 import { OpusDecoderWebWorker } from "opus-decoder";
-import { ReactiveArray, ReactiveThing } from "@/utils/reactive";
+import { ReactiveArray } from "@/utils/reactive";
 import { cleanID } from "shared";
 
 export default {

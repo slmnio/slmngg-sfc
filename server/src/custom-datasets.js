@@ -126,7 +126,10 @@ async function playerList(Cache) {
             name: p.name,
             battletag: p.battletag,
             discord_tag: p.discord_tag,
-            discord_id: p.discord_id
+            discord_id: p.discord_id,
+            marvel_rivals_username: p.marvel_rivals_username,
+            steam_id: p.steam_id,
+            riot_id: p.riot_id
         });
         return {
             id: p.id,

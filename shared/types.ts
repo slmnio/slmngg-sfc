@@ -121,9 +121,24 @@ export interface Player extends Base {
 
     auction_price?: number;
 
+    live_override_name?: string;
+    avatar?: string;
+    cam_code?: string;
+    use_cam?: boolean;
+
+    broadcasts_as_guest?: BroadcastResolvableID[];
+    prediction_team?: [TeamResolvableID];
+    live_theme?: [ThemeResolvableID];
+    broadcasts_as_team_1_cam?: BroadcastResolvableID[];
+    broadcasts_as_team_2_cam?: BroadcastResolvableID[];
+
     created?: string;
     favourite_hero?: HeroResolvableID[];
+    /**
+     * @deprecated Live guests are being removed, use `player_guests` instead
+     */
     live_guests?: LiveGuestResolvableID[];
+    player_guests?: PlayerResolvableID[];
     profile_picture_theme?: ThemeResolvableID[];
 
 
@@ -304,6 +319,9 @@ export interface Theme extends Base {
 
     event?: EventResolvableID[];
     events_as_title_sponsor?: EventResolvableID[];
+    /**
+     * @deprecated Live guests are being removed
+     */
     live_guests?: LiveGuestResolvableID[];
     team?: TeamResolvableID[];
 
@@ -480,6 +498,9 @@ export interface Team extends Base {
     hide_from_listings?: boolean;
     images?: CacheAttachment[];
     limited_players?: LimitedPlayersString;
+    /**
+     * @deprecated Live guests are being removed
+     */
     live_guests?: LiveGuestResolvableID[];
     maps_won?: MatchMapResolvableID[];
     maps_banned?: MatchMapResolvableID[];

@@ -1,4 +1,4 @@
-import type { ActionAuth, BroadcastResolvableID} from "shared";
+import type { ActionAuth, BroadcastResolvableID } from "shared";
 import { dirtyID } from "shared";
 import type { Action } from "../action-utils/action-manager-models.js";
 

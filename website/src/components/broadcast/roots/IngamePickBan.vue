@@ -64,6 +64,7 @@ export default {
         },
         scores() {
             if (!this.match?.id) return [];
+            if (this.match.flip_teams) return [this.match.score_2, this.match.score_1];
             return [this.match.score_1, this.match.score_2];
         },
         teams() {
@@ -90,7 +91,7 @@ export default {
             return currentMap;
         },
         pickBanOrder() {
-            return processPickBanOrder(this.match?.pick_ban_order || this.gameOverride?.defaultPickBanOrder, this.currentMap?.flip_pick_ban_order);
+            return processPickBanOrder(this.match?.pick_ban_order || this.gameOverride?.defaultPickBanOrder/*, this.currentMap?.flip_pick_ban_order*/);
         },
         gameOverride() {
             return GameOverrides[this.broadcast?.event?.game];

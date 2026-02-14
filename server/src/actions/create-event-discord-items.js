@@ -205,6 +205,8 @@ export default {
                     __tableName: "auto"
                 });
                 const theme = await this.helpers.get(team?.theme?.[0]);
+                let themeControl = theme.discord_emoji_control ? new MapObject(theme.discord_emoji_control) : null;
+                let startingThemeControl = themeControl ? themeControl.textMap : null;
                 console.log(`[Discord-Automation] team ${i + 1}/${teams.length}`);
                 const teamControl = new MapObject(team.discord_control);
                 const starting = teamControl.textMap;
@@ -630,6 +632,10 @@ export default {
                         console.error(e?.rawError ?? e);
                     }
                     teamControl.push("emoji_id", null);
+
+                    if (themeControl) {
+                        themeControl.push(guild.id, null);
+                    }
                 }
                 if (actions.includes("edit_team_emoji") || actions.includes("create_team_emoji")) {
                     const emoji = {};
@@ -651,6 +657,9 @@ export default {
                                 await guildEmoji.edit({
                                     name: emoji.name
                                 });
+                                if (themeControl) {
+                                    themeControl.push(guildEmoji.id, null);
+                                }
                                 responseCounts.emoji.edited++;
                             }
                         } catch (e) {
@@ -663,14 +672,36 @@ export default {
                         if (emoji.icon) {
                             try {
                                 console.log(emoji);
-                                const guildEmoji = await guild.emojis.create({
-                                    attachment: emoji.icon,
-                                    name: emoji.name,
-                                    reason: `Creating team emoji for ${team.name}`
+                                let guildEmoji;
+                                const thisGuildEmojiID = themeControl ? themeControl.get(guild.id) : null;
+
+                                if (themeControl && thisGuildEmojiID) {
+                                    guildEmoji = await client.emojis.resolve(thisGuildEmojiID);
+                                    if (guildEmoji) {
+                                        await guildEmoji.edit({
+                                            name: emoji.name,
+                                            reason: `Re-using emoji for ${team.name} in ${event.name}`
+                                        });
+                                        teamControl.push("emoji_id", guildEmoji.id);
+                                        themeControl.push(guild.id, guildEmoji.id);
+                                        responseCounts.emoji.edited++;
+                                    }
                                 }
-                                );
-                                teamControl.push("emoji_id", guildEmoji.id);
-                                responseCounts.emoji.created++;
+
+                                if (!guildEmoji) {
+                                    guildEmoji = await guild.emojis.create({
+                                        attachment: emoji.icon,
+                                        name: emoji.name,
+                                        reason: `Creating team emoji for ${team.name}`
+                                    });
+                                    teamControl.push("emoji_id", guildEmoji.id);
+                                    if (themeControl) {
+                                        themeControl.push(guild.id, guildEmoji.id);
+                                    }
+                                    responseCounts.emoji.created++;
+                                }
+
+
                             } catch (e) {
                                 console.error(e?.rawError ?? e);
                                 fixes.push({
@@ -684,6 +715,12 @@ export default {
                     }
                 }
 
+
+                if (themeControl && startingThemeControl !== themeControl.textMap) {
+                    await this.helpers.updateRecord("Themes", theme, {
+                        "Discord Emoji Control": themeControl.textMap
+                    });
+                }
 
                 if (starting !== teamControl.textMap) {
                     await this.helpers.updateRecord("Teams", team, {

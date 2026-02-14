@@ -324,6 +324,7 @@ export interface Theme extends Base {
      */
     live_guests?: LiveGuestResolvableID[];
     team?: TeamResolvableID[];
+    discord_theme_control?: MapObjectString;
 
     team_blue?: TeamResolvableID[];
     team_red?: TeamResolvableID[];

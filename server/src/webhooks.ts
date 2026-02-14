@@ -154,79 +154,103 @@ export default async function load({ app }: { app: express.Express }) {
                     // console.log(payload);
                     // console.dir(payload, { depth: Infinity });
                     for (const [tableID, table] of Object.entries(payload.changedTablesById)) {
-                        // console.log(`Table ${tableID} has data`, table);
+                        // console.log(`Table ${tableID} has changed data`, table);
 
-                        for (const [recordID, record] of Object.entries((table as any).changedRecordsById)) {
-                            const recordData : {[k: string]: any} = {
-                                __tableName: schemaFieldNames.get(tableID),
-                                // "Modified": (new Date((new Date()).getTime() - (2 * 1000))).toString()
-                            };
+                        const tableData = [
+                            {
+                                created: true,
+                                changed: false,
+                                data: (table as any)?.createdRecordsById || {}
+                            },
+                            {
+                                created: false,
+                                changed: true,
+                                data: (table as any)?.changedRecordsById || {}
+                            }
+                        ];
 
-                            // console.log(`Record ${recordID} has data`, record);
-                            for (const [fieldID, fieldValue] of Object.entries((record as any).current.cellValuesByFieldId)) {
-                                const deAirtabledFieldName = keyDeAirtable(schemaFieldNames.get(fieldID));
-                                const isAttachment = (slmnggAttachments[recordData.__tableName] || []).includes(deAirtabledFieldName);
-                                // console.log("Record row", {
-                                //     table: recordData.__tableName,
-                                //     tableAttachments: slmnggAttachments[recordData.__tableName],
-                                //     deAirtabledFieldName,
-                                //     isAttachment,
-                                //     fieldValue,
-                                //     valTypeof: typeof fieldValue,
-                                // });
+                        for (const tableDataItem of tableData) {
+                            const { created, changed, data } = tableDataItem;
 
-                                if (fieldValue) {
-                                    if (typeof fieldValue === "object" && "id" in fieldValue && typeof fieldValue.id === "string") {
-                                        if (isAttachment) {
-                                            // console.log("[record data] setting raw value because non-empty attachment");
-                                            recordData[schemaFieldNames.get(fieldID)] = fieldValue;
-                                        } else {
-                                            // console.log("[record data] setting sub object ID");
-                                            if ("name" in fieldValue && fieldValue.id.startsWith("sel")) {
-                                                recordData[schemaFieldNames.get(fieldID)] = fieldValue.name;
+                            for (const [recordID, record] of Object.entries(data)) {
+                                const recordData: { [k: string]: any } = {
+                                    __tableName: schemaFieldNames.get(tableID),
+                                    // "Modified": (new Date((new Date()).getTime() - (2 * 1000))).toString()
+                                };
+
+                                // console.log(`Record ${recordID} has data`);
+                                // console.dir(record, { depth: Infinity });
+
+                                const recordFieldData = created ? (record as any).cellValuesByFieldId : (record as any).current.cellValuesByFieldId;
+
+                                for (const [fieldID, fieldValue] of Object.entries(recordFieldData)) {
+                                    const deAirtabledFieldName = keyDeAirtable(schemaFieldNames.get(fieldID));
+                                    const isAttachment = (slmnggAttachments[recordData.__tableName] || []).includes(deAirtabledFieldName);
+                                    // console.log("Record row", {
+                                    //     data: record,
+                                    //     table: recordData.__tableName,
+                                    //     deAirtabledFieldName,
+                                    //     isAttachment,
+                                    //     fieldValue,
+                                    //     valTypeof: typeof fieldValue,
+                                    // });
+
+                                    if (fieldValue) {
+                                        if (typeof fieldValue === "object" && "id" in fieldValue && typeof fieldValue.id === "string") {
+                                            if (isAttachment) {
+                                                // console.log("[record data] setting raw value because non-empty attachment");
+                                                recordData[schemaFieldNames.get(fieldID)] = fieldValue;
                                             } else {
-                                                recordData[schemaFieldNames.get(fieldID)] = dirtyID(fieldValue.id);
-                                            }
-                                        }
-                                    } else if (typeof fieldValue === "object" && "length" in fieldValue && fieldValue.length) {
-                                        // console.log("[record data] setting as array");
-                                        if (isAttachment) {
-                                            // console.log("[record data] setting raw array value because non-empty attachment");
-                                            recordData[schemaFieldNames.get(fieldID)] = fieldValue;
-                                        } else {
-                                            recordData[schemaFieldNames.get(fieldID)] = (fieldValue as any[]).map(val => {
-                                                if (typeof val === "object" && "id" in val) {
-                                                    if (val.id.startsWith("sel")) {
-                                                        return val.name;
-                                                    }
-                                                    return dirtyID(val.id);
+                                                // console.log("[record data] setting sub object ID");
+                                                if ("name" in fieldValue && fieldValue.id.startsWith("sel")) {
+                                                    recordData[schemaFieldNames.get(fieldID)] = fieldValue.name;
                                                 } else {
-                                                    return val;
+                                                    recordData[schemaFieldNames.get(fieldID)] = dirtyID(fieldValue.id);
                                                 }
-                                            });
+                                            }
+                                        } else if (typeof fieldValue === "object" && "length" in fieldValue && fieldValue.length) {
+                                            // console.log("[record data] setting as array");
+                                            if (isAttachment) {
+                                                // console.log("[record data] setting raw array value because non-empty attachment");
+                                                recordData[schemaFieldNames.get(fieldID)] = fieldValue;
+                                            } else {
+                                                recordData[schemaFieldNames.get(fieldID)] = (fieldValue as any[]).map(val => {
+                                                    if (typeof val === "object" && "id" in val) {
+                                                        if (val.id.startsWith("sel")) {
+                                                            return val.name;
+                                                        }
+                                                        return dirtyID(val.id);
+                                                    } else {
+                                                        return val;
+                                                    }
+                                                });
+                                            }
+                                        } else {
+                                            // console.log("[record data] setting raw value (fallthrough)");
+                                            recordData[schemaFieldNames.get(fieldID)] = fieldValue;
                                         }
                                     } else {
-                                        // console.log("[record data] setting raw value (fallthrough)");
-                                        recordData[schemaFieldNames.get(fieldID)] = fieldValue;
-                                    }
-                                } else {
-                                    if (isAttachment) {
-                                        // console.log("[record data] empty but attachment");
-                                        recordData[schemaFieldNames.get(fieldID)] = [];
-                                    } else {
-                                        // console.log("[record data] empty but normal");
-                                        recordData[schemaFieldNames.get(fieldID)] = fieldValue;
+                                        if (isAttachment) {
+                                            // console.log("[record data] empty but attachment");
+                                            recordData[schemaFieldNames.get(fieldID)] = [];
+                                        } else {
+                                            // console.log("[record data] empty but normal");
+                                            recordData[schemaFieldNames.get(fieldID)] = fieldValue;
+                                        }
                                     }
                                 }
-                            }
 
-                            if (recordData["Modified"]) {
-                                console.log("Data modification from webhook, changes:", recordID, recordData);
-                                changes[recordID] = deAirtableRecord({
-                                    fields: recordData,
-                                    id: recordID
-                                }, { allowEmptyValues: true });
-                                // console.log("De-airtabled:", changes[recordID]);
+                                if (recordData["Modified"] || created) {
+                                    console.log(`Data ${created ? "creation" : "modified"} from webhook, changes:`, recordID, recordData);
+                                    changes[recordID] = {
+                                        ...(changes[recordID] || {}),
+                                        ...deAirtableRecord({
+                                            fields: recordData,
+                                            id: recordID
+                                        }, {allowEmptyValues: true})
+                                    };
+                                    // console.log("De-airtabled:", changes[recordID]);
+                                }
                             }
                         }
                     }

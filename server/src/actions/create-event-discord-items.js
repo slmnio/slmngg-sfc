@@ -232,6 +232,9 @@ export default {
                         mentionable: determinate(settings.roles.pingable),
                         hoist: determinate(settings.roles.hoist)
                     };
+                    if (role.mentionable === null) delete role.mentionable;
+                    if (role.hoist === null) delete role.hoist;
+
                     if (theme && guild.features.includes(GuildFeature.RoleIcons)) {
                         role.icon = await getDiscordIcon(theme);
                     }

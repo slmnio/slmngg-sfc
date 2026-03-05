@@ -36,11 +36,7 @@ export default {
     computed: {
         isLoading() {
             try {
-                if (this.noTeams) {
-                    return (this.match.__loading || this.match?.event?.__loading || this.match?.event?.theme?.__loading);
-                } else {
-                    return (this.match.__loading || this.match?.event?.__loading || this.match?.event?.theme?.__loading || this.match.teams[0].__loading || this.match.teams[0].theme.__loading);
-                }
+                return (this.match.__loading || this.match?.event?.__loading || this.match?.event?.theme?.__loading);
             } catch (e) {
                 return true;
             }
@@ -90,7 +86,7 @@ export default {
             };
         },
         logo(team, minSize = 120) {
-            if (!team?.theme) return {};
+            if (!team?.theme) return this.match?.event ? resizedImage(this.match?.event?.theme, ["small_logo", "default_logo"], `h-${minSize}`) : {};
             return resizedImage(team.theme, ["small_logo", "default_logo"], `h-${minSize}`);
         }
     }

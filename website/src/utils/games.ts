@@ -75,7 +75,7 @@ export const GameOverrides = {
         ],
         formStyles: {
             "replay_code": {
-                "min-width": "6em"
+                "min-width": "7em"
             }
         },
         imageSets: {

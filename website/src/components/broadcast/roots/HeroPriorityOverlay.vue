@@ -144,19 +144,18 @@ export default {
                     if (aTotal > bTotal) return -1;
                     if (aTotal < bTotal) return 1;
 
+                    const [aPrio, bPrio] = [a, b].map(x => (x.stat.bans.priority || 0) + (x.stat.picks.priority || 0));
 
-                    if (a.stat.bans.total < b.stat.bans.total) return 1;
-                    if (a.stat.bans.total > b.stat.bans.total) return -1;
-
+                    if (aPrio < bPrio) return 1;
+                    if (aPrio > bPrio) return -1;
                     if (a.stat.bans.priority < b.stat.bans.priority) return 1;
                     if (a.stat.bans.priority > b.stat.bans.priority) return -1;
-
-
-                    if (a.stat.picks.total < b.stat.picks.total) return 1;
-                    if (a.stat.picks.total > b.stat.picks.total) return -1;
-
                     if (a.stat.picks.priority < b.stat.picks.priority) return 1;
                     if (a.stat.picks.priority > b.stat.picks.priority) return -1;
+                    if (a.stat.bans.total < b.stat.bans.total) return 1;
+                    if (a.stat.bans.total > b.stat.bans.total) return -1;
+                    if (a.stat.picks.total < b.stat.picks.total) return 1;
+                    if (a.stat.picks.total > b.stat.picks.total) return -1;
 
 
                     return sortAlphaRaw(a.hero?.name, b.hero?.name);

@@ -109,6 +109,9 @@ export interface Player extends Base {
     discord_id?: string;
     discord_tag?: string;
     battletag?: string;
+    marvel_rivals_username?: string;
+    steam_id?: string;
+    riot_id?: string;
     pronouns?: string;
     pronunciation?: string;
     verified?: boolean;

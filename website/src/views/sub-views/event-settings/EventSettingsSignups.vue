@@ -89,10 +89,11 @@ import Handsontable from "handsontable";
 import { KeyValueSelectEditor, MultiSelectEditor } from "@/views/sub-views/event-settings/editor/multiSelectEditor";
 import { sortAlphaRaw } from "@/utils/sorts";
 import { authenticatedRequest } from "@/utils/dashboard";
-import { ReactiveArray, ReactiveRoot } from "@/utils/reactive";
+import { ReactiveArray, ReactiveRoot, ReactiveThing } from "@/utils/reactive";
 import { cleanID } from "shared";
 import { mapWritableState } from "pinia";
 import { useSettingsStore } from "@/stores/settingsStore.ts";
+import { GameOverrides } from "@/utils/games.js";
 
 registerAllModules();
 function empty(element) {
@@ -217,6 +218,23 @@ export default {
                 ...(this._event?.teams || []).map(t => (t.name))
             ];
         },
+        heroes() {
+            const heroes = ReactiveRoot("Heroes", {
+                ids: ReactiveArray("ids")
+            })?.ids || [];
+            return heroes.filter(h => h.game === (this._event?.game || "Overwatch"));
+        },
+        emptyValue() {
+            return `No ${this.gameOverride?.lang?.hero?.toLowerCase() || "hero"}`;
+        },
+        heroOptions() {
+            return [
+                this.emptyValue,
+                ...this.heroes.filter(h => h.game === (this._event?.game || "Overwatch"))
+                    .sort((a,b) => sortAlphaRaw(a?.name, b?.name))
+                    .map((h) => (h.name))
+            ];
+        },
         eventID() {
             return (this.event?._original_data_id || this.event?.id) || this.team?.event?.id;
         },
@@ -234,18 +252,20 @@ export default {
                 if (!this.event?.draftable_players?.length) return [];
                 return ((ReactiveArray("draftable_players", {
                     "member_of": ReactiveArray("member_of"),
-                    "signup_data": ReactiveArray("signup_data")
+                    "signup_data": ReactiveArray("signup_data"),
+                    "favourite_hero": ReactiveThing("favourite_hero")
                 })(this.event)) || []).map(player => ({
                     ...player,
                     this_event_signup_data: (player.signup_data || []).find(data => cleanID(data?.event?.[0]) === cleanID(this.eventID)),
-                    this_event_teams: (player.member_of || []).filter(team => cleanID(team?.event?.[0]) === cleanID(this.eventID)),
+                    this_event_teams: (player.member_of || []).filter(team => cleanID(team?.event?.[0]) === cleanID(this.eventID))
                 }));
             } else if (this.team) {
                 if (!this.team?.players?.length) return [];
 
                 return ((ReactiveArray("players", {
                     "member_of": ReactiveArray("member_of"),
-                    "signup_data": ReactiveArray("signup_data")
+                    "signup_data": ReactiveArray("signup_data"),
+                    "favourite_hero": ReactiveThing("favourite_hero")
                 })(this.team)) || []).map(player => ({
                     ...player,
                     this_event_signup_data: (player.signup_data || []).find(data => cleanID(data?.event?.[0]) === cleanID(this.eventID)),
@@ -266,8 +286,17 @@ export default {
             cols.push({ header: "Player ID", data: "id", renderer: "diffchecker" });
             cols.push({ header: "Name", data: "name", renderer: "diffchecker" });
             cols.push({ header: "Discord Tag", data: "discord_tag", renderer: "diffchecker" });
-            cols.push({ header: "Battletag", data: "battletag", renderer: "diffchecker" });
-            cols.push({ type: "select", selectOptions: ["Tank", "DPS", "Support", "Flex"], header: "Main Role", data: "role" });
+
+            cols.push({ header: this.gameOverride?.usernameText || "Battletag", data: this.gameOverride?.usernameKey || "battletag", renderer: "diffchecker" });
+            cols.push({
+                type: "select",
+                selectOptions: [
+                    ...(this.gameOverride?.heroRoles || ["Tank", "DPS", "Support"]),
+                    "Flex"
+                ],
+                header: "Main Role",
+                data: "role"
+            });
             if (this.showNonCompetitive) {
                 cols.push({ header: "Pronouns", data: "pronouns", renderer: "diffchecker" });
                 cols.push({ header: "Pronunciation", data: "pronunciation", renderer: "diffchecker" });
@@ -284,7 +313,27 @@ export default {
                 cols.push({ header: "SR", data: "sr", renderer: "diffchecker" });
             }
 
-            cols.push({ type: "multiselect", selectOptions: ["Tank", "DPS", "Support"], header: "Eligible Roles", data: "eligible_roles" });
+            cols.push({
+                type: "multiselect",
+                selectOptions: [
+                    ...(this.gameOverride?.heroRoles || ["Tank", "DPS", "Support"]),
+                    "Flex"
+                ],
+                header: "Eligible Roles",
+                data: "eligible_roles"
+            });
+
+            if (this.showNonCompetitive) {
+                cols.push({
+                    type: "select",
+                    renderer: "select-diff",
+                    header: "Favourite Hero",
+                    data: "favourite_hero_name",
+                    selectOptions: this.heroOptions
+                });
+                cols.push({ header: "Favourite Hero ID", data: "favourite_hero_id", readOnly: true, renderer: "diffchecker" });
+            }
+
             cols.push({ type: "select", renderer: "select-diff", header: "Team", data: "team_name", selectOptions: this.teamOptions });
             cols.push({ header: "Team ID", data: "team_id", readOnly: true, renderer: "diffchecker" });
             return cols;
@@ -362,7 +411,13 @@ export default {
         },
         changeCount() {
             return this.rowStatus.filter(Boolean).length;
-        }
+        },
+        gameOverride() {
+            return GameOverrides[this._event?.game];
+        },
+        usernameKey() {
+            return this.gameOverride?.usernameKey || "battletag";
+        },
     },
     methods: {
         beforeChange(changes, source) {
@@ -402,6 +457,14 @@ export default {
                         changes.push([changes[i][0], "team_id", null, teamID]);
                     } else {
                         changes.push([changes[i][0], "team_id", null, ""]);
+                    }
+                }
+                if (changes[i][1] === "favourite_hero_name") {
+                    const heroID = (this.heroes || []).find(t => t.name === changes[i][3])?.id;
+                    if (heroID) {
+                        changes.push([changes[i][0], "favourite_hero_id", null, heroID]);
+                    } else {
+                        changes.push([changes[i][0], "favourite_hero_id", null, ""]);
                     }
                 }
             }
@@ -484,13 +547,23 @@ export default {
                 this.data[i].id = cleanID(player.id);
                 this.data[i].name = player.name;
                 this.data[i].discord_tag = player.discord_tag;
-                this.data[i].battletag = player.battletag;
+                if (this.gameOverride?.usernameKey) {
+                    this.data[i][this.gameOverride.usernameKey] = player[this.gameOverride.usernameKey];
+                } else {
+                    this.data[i].battletag = player.battletag;
+                }
+
                 this.data[i].pronouns = player.pronouns;
                 this.data[i].pronunciation = player.pronunciation;
 
                 if (player.this_event_teams?.length) {
                     this.data[i].team_id = player.this_event_teams?.[0]?.id;
                     this.data[i].team_name = player.this_event_teams?.[0]?.name;
+                }
+                if (player.favourite_hero) {
+                    this.data[i].favourite_hero_id = player.favourite_hero?.id;
+                    this.data[i].favourite_hero_name = player.favourite_hero?.name;
+                    console.log("player.favourite_hero", this.data[i].favourite_hero_id, this.data[i].favourite_hero_name);
                 }
 
                 if (this.usePlayerSignupData) {
@@ -537,6 +610,8 @@ export default {
                 "eligible_roles": this.usePlayerSignupData ? player?.this_event_signup_data?.eligible_roles?.join(", ") : player?.eligible_roles?.join(", "),
                 "role": this.usePlayerSignupData ? player?.this_event_signup_data?.main_role : player?.role,
                 "info_for_captains": this.usePlayerSignupData ? player?.this_event_signup_data?.info_for_captains : player?.draft_data,
+                "favourite_hero_id": player?.favourite_hero?.id,
+                "favourite_hero_name": player?.favourite_hero?.name,
                 "team_id": player?.this_event_teams?.[0]?.id,
                 "team_name": player?.this_event_teams?.[0]?.name
             };

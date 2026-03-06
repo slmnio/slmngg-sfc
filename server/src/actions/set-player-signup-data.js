@@ -141,6 +141,10 @@ export default {
                 }
                 // if (playerData?.discord_id) airtablePlayerData["Discord ID"] = playerData.discord_id;
                 if (playerData?.battletag) airtablePlayerData["Battletag"] = playerData.battletag;
+                if (playerData?.marvel_rivals_username) airtablePlayerData["Marvel Rivals Username"] = playerData.marvel_rivals_username;
+                if (playerData?.riot_id) airtablePlayerData["Riot ID"] = playerData.riot_id;
+                if (playerData?.steam_id) airtablePlayerData["Steam ID"] = playerData.steam_id;
+
                 if (playerData?.pronouns) airtablePlayerData["Pronouns"] = playerData.pronouns.toLowerCase().trim();
                 if (playerData?.pronunciation) airtablePlayerData["Pronunciation"] = playerData.pronunciation;
 
@@ -263,7 +267,15 @@ export default {
                 }
 
             } else {
-                actionResponse.errors.push("Can't edit player profiles directly yet");
+                // actionResponse.errors.push("Can't edit player profiles directly yet");
+
+                if (playerData?.eligible_roles) playerUpdateData["Eligible Roles"] = playerData.eligible_roles.split(", ").filter(Boolean);
+                if (playerData?.role) playerUpdateData["Role"] = playerData.role;
+                if (playerData?.sr) playerUpdateData["Manual SR"] = playerData.sr;
+                if (playerData?.tank_sr) playerUpdateData["Composition Tank SR"] = playerData.tank_sr;
+                if (playerData?.dps_sr) playerUpdateData["Composition DPS SR"] = playerData.dps_sr;
+                if (playerData?.support_sr) playerUpdateData["Composition Support SR"] = playerData.support_sr;
+                if (playerData?.info_for_captains) playerUpdateData["Draft Data"] = playerData.info_for_captains;
             }
 
             if (player) {
@@ -332,6 +344,10 @@ export default {
                     { signupDataKey: "discord_tag", airtableKey: "Discord Tag", },
                     // { signupDataKey: "discord_id", airtableKey: "Discord ID", },
                     { signupDataKey: "battletag", airtableKey: "Battletag", },
+                    { signupDataKey: "marvel_rivals_username", airtableKey: "Marvel Rivals Username", },
+                    { signupDataKey: "riot_id", airtableKey: "Riot ID", },
+                    { signupDataKey: "steam_id", airtableKey: "Steam ID", },
+                    { signupDataKey: "favourite_hero_id", airtableKey: "Favourite Hero", validation: (str) => str ? ([dirtyID(str)]) : null  },
                     { signupDataKey: "pronouns", airtableKey: "Pronouns", validation: (str) => str?.toLowerCase()?.trim() },
                     { signupDataKey: "pronunciation", airtableKey: "Pronunciation", },
                 ];

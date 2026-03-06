@@ -1182,10 +1182,11 @@ export function countStats(matches) {
             // console.log(map, map?.winner?.[0], match?.teams?.[0]);
 
             stats.totalMaps++;
-            (match?.teams || []).forEach(teamID => {
+            (match?.teams || []).forEach((teamID, i) => {
                 const id = cleanID(teamID);
-                if (!stats.teamMaps[id]) stats.teamMaps[id] = 0;
-                stats.teamMaps[id]++;
+                if (!stats.teamMaps[id]) stats.teamMaps[id] = { total: 0, wins: 0, losses: 0 };
+                stats.teamMaps[id].total++;
+                stats.teamMaps[id][["wins", "losses"][+(i === +team1Won)]]++;
             });
 
             const baseStats = {

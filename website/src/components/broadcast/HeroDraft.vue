@@ -225,8 +225,8 @@
                                                 <div class="stats-title team-stats-title">
                                                     <div>TEAM STATS</div>
                                                     <div style="font-size: 0.8em">
-                                                        ({{ stats?.teamMaps?.[team?.id] || "0" }}
-                                                        Map{{ stats?.teamMaps?.[team?.id] === 1 ? "" : "s" }})
+                                                        ({{ stats?.teamMaps?.[team?.id]?.total || "0" }}
+                                                        Map{{ stats?.teamMaps?.[team?.id]?.total === 1 ? "" : "s" }})
                                                     </div>
                                                 </div>
                                                 <div class="team-stats-stat w-100">
@@ -811,7 +811,7 @@ export default {
                         this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 1;
                         setTimeout(() => {
 
-                            if (!this.currentMap?.number || this.stats?.teamMaps?.[this.teams[pickBan.team - 1]?.id] > this.currentMap?.number) {
+                            if (!this.currentMap?.number || this.stats?.teamMaps?.[this.teams[pickBan.team - 1]?.id]?.total > this.currentMap?.number) {
                                 this.showStats[`${pickBan.type}/${pickBan.team}/${pickBan.countOfTeamType}`] = 2;
                                 setTimeout(() => {
 

@@ -1,9 +1,9 @@
 import type { Snowflake } from "discord-api-types/globals";
 import type { Match, MatchMap, Player, PlayerResolvableID, Team, TeamResolvableID } from "shared";
-import { cleanTypedID, MapObject } from "shared";
+import { cleanID, cleanTypedID, MapObject } from "shared";
 import { get } from "./action-cache.js";
 import client from "../discord/client.js";
-import type { Guild, MessageCreateOptions, MessagePayload } from "discord.js";
+import type { Guild, MessageCreateOptions, MessagePayload, User } from "discord.js";
 import { ChannelType } from "discord.js";
 import { hammerTime, sendMessage } from "./action-utils.js";
 import emoji from "../discord/emoji.js";
@@ -372,4 +372,96 @@ export function processPickBanOrder(order: Match["pick_ban_order"], flip: MatchM
         return item;
     });
 
+}
+
+
+function norm(text: string, extra?: string) {
+    if (!text) return null;
+    let normalised = text.toLowerCase().trim();
+    if (extra === "discord_tag") {
+        if (normalised.startsWith("@")) normalised = normalised.slice(1);
+    }
+    if (extra === "id") {
+        return cleanID(text);
+    }
+    return normalised;
+}
+
+type PartialPlayer = Pick<Player,
+"id" |
+"name" |
+"battletag" |
+"discord_tag" |
+"discord_id" |
+"marvel_rivals_username" |
+"steam_id" |
+"riot_id"
+>
+
+export async function lookupDiscord(playerData: Partial<PartialPlayer>, guild?: Guild) {
+    try {
+        let foundDiscord: User | null = null;
+        if (playerData.discord_id) {
+            // resolve with id
+            foundDiscord = client.users.resolve(playerData.discord_id);
+        } else if (playerData.discord_tag !== undefined) {
+            // lookup with username
+            const discordTag = playerData.discord_tag;
+            const checkFunction = (user: User) => norm(user.username, "discord_tag") === norm(discordTag, "discord_tag");
+            foundDiscord = client.users.cache.find(checkFunction) || null;
+
+            if (!foundDiscord && guild) {
+                const results = await guild.members.search({query: discordTag.trim()});
+                if (!results) return null;
+                foundDiscord = (results.find((member) => checkFunction(member.user)))?.user || null;
+            }
+        }
+        return foundDiscord;
+    } catch (e) {
+        console.warn(e);
+        return null;
+    }
+}
+
+export async function lookupPlayer(playerData: Partial<PartialPlayer>, players?: PartialPlayer[], guild?: Guild) {
+    try {
+        if (players == undefined) {
+            players = (((await get("internal:lookup-players"))?.players) || []) as PartialPlayer[];
+        }
+        if (!players?.length) return null;
+
+        function checkField(field: keyof PartialPlayer, p: PartialPlayer, customData?: Partial<PartialPlayer>) {
+            const data = customData ?? playerData;
+            return (p[field] && data[field] && (norm(p[field], field) === norm(data[field], field)));
+        }
+
+        const found = players.find(p => {
+            const fields = ["discord_tag", "id", "battletag", "discord_id", "marvel_rivals_username", "riot_id", "steam_id"] satisfies (keyof PartialPlayer)[];
+            return (fields).some(key => checkField(key, p));
+        });
+        if (found) return found;
+        // check discord
+        if (!client.isReady()) return console.warn("Can't lookup Discord - client is not ready");
+
+        const foundDiscord: User | null = await lookupDiscord(playerData, guild);
+
+        if (foundDiscord) {
+            console.log(`[Deep search] found ${foundDiscord.username}`, playerData);
+            const foundID = players.find(p => checkField("discord_id", p, { "discord_id": foundDiscord.id })) || null;
+            if (foundID) {
+                console.log(`[Deep search completed] Found ${foundID.name} through Discord ${foundDiscord.id}`);
+                return foundID;
+            }
+            const foundTag = players.find(p => checkField("discord_tag", p, { "discord_tag": foundDiscord.username })) || null;
+            if (foundTag) {
+                console.log(`[Deep search completed] Found ${foundTag.name} through Discord ${foundDiscord.username}`);
+                return foundTag;
+            }
+        }
+
+        return null;
+    } catch (e) {
+        console.warn(e);
+        return null;
+    }
 }

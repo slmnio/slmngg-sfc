@@ -1,6 +1,8 @@
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
-import { cleanID, deAirtableRecord, dirtyID } from "shared";
+import { cleanID, deAirtableRecord, dirtyID, MapObject } from "shared";
 import { verboseLog } from "../discord/slmngg-log.js";
+import { lookupDiscord, lookupPlayer } from "../action-utils/ts-action-utils.js";
+import client from "../discord/client.js";
 
 const working = new Map();
 
@@ -54,6 +56,24 @@ export default {
         *
         * */
 
+        let eventGuild = null;
+
+        if (event.discord_control) {
+            const eventDiscord = new MapObject(event.discord_control);
+            const eventGuildID = eventDiscord.getString("guild_id");
+            if (eventGuildID) {
+                try {
+                    const testGuild = await client.guilds.fetch(eventGuildID);
+                    if (testGuild?.available) {
+                        eventGuild = testGuild;
+                    }
+                } catch (e) {
+                    console.warn(e);
+                }
+            }
+        }
+
+
         let actionResponses = [];
         for (const playerData of allPlayerData) {
             /**
@@ -79,12 +99,7 @@ export default {
                     discord_id: playerData?.discord_id,
                 });
                 // THESE PLAYERS ARE
-                let tempPlayer = limitedPlayers.find(p => {
-                    if (playerData?.discord_tag && norm(p.discord_tag) === norm(playerData?.discord_tag)) return true;
-                    if (playerData?.battletag && norm(p.battletag) === norm(playerData?.battletag)) return true;
-                    if (playerData?.discord_id && norm(p.discord_id) === norm(playerData?.discord_id)) return true;
-                    return false;
-                });
+                let tempPlayer = await lookupPlayer(playerData, limitedPlayers, eventGuild);
                 console.log("Player after lookup", tempPlayer?.name, tempPlayer?.id);
 
                 if (tempPlayer?.id) {
@@ -115,7 +130,15 @@ export default {
                     // create a name
                     airtablePlayerData["Name"] = (playerData?.battletag?.split("#")?.[0] || playerData?.discord_tag?.replace(/[._]/g, "") || "").trim();
                 }
-                if (playerData?.discord_tag) airtablePlayerData["Discord Tag"] = playerData.discord_tag.replace("@", "").trim();
+                if (playerData?.discord_tag) {
+                    airtablePlayerData["Discord Tag"] = playerData.discord_tag.replace("@", "").trim();
+                    const discordUser = await lookupDiscord(playerData, eventGuild);
+                    if (discordUser) {
+                        airtablePlayerData["Discord ID"] = discordUser.id;
+                        airtablePlayerData["Discord Tag"] = discordUser.username;
+                        console.log(`[creating] New player - found Discord details: ${discordUser.username} ${discordUser.id}`);
+                    }
+                }
                 // if (playerData?.discord_id) airtablePlayerData["Discord ID"] = playerData.discord_id;
                 if (playerData?.battletag) airtablePlayerData["Battletag"] = playerData.battletag;
                 if (playerData?.pronouns) airtablePlayerData["Pronouns"] = playerData.pronouns.toLowerCase().trim();

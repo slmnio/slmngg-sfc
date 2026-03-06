@@ -1,9 +1,7 @@
 import { isEventStaffOrHasRole } from "../action-utils/action-permissions.js";
-
-function norm(text) {
-    if (!text) return null;
-    return text.toLowerCase().trim();
-}
+import { lookupPlayer } from "../action-utils/ts-action-utils.js";
+import client from "../discord/client.js";
+import { MapObject } from "shared";
 
 export default {
     key: "find-player-data",
@@ -28,18 +26,22 @@ export default {
 
         const { players } = await this.helpers.get("internal:lookup-players");
 
-        return playerData.map(({ discord_tag, battletag, discord_id, id }) => {
-            const player = players.find(p => {
-                if (discord_tag && norm(p.discord_tag) === norm(discord_tag)) return true;
-                if (battletag && norm(p.battletag) === norm(battletag)) return true;
-                if (discord_id && norm(p.discord_id) === norm(discord_id)) return true;
-                if (id && p.id === id) return true;
-                //p.discord_tag === discord_tag || p.battletag === battletag || p.discord_id === discord_id
-                return false;
-            });
-            if (player) return player;
-            // if (name) return players.find(p => norm(p.name) === norm(name));
-            return null;
-        });
+        let eventGuild = null;
+        if (event.discord_control) {
+            const eventDiscord = new MapObject(event.discord_control);
+            const eventGuildID = eventDiscord.getString("guild_id");
+            if (eventGuildID) {
+                try {
+                    const testGuild = await client.guilds.fetch(eventGuildID);
+                    if (testGuild?.available) {
+                        eventGuild = testGuild;
+                    }
+                } catch (e) {
+                    console.warn(e);
+                }
+            }
+        }
+
+        return Promise.all(playerData.map((player) => lookupPlayer(player, players, eventGuild)));
     }
 };

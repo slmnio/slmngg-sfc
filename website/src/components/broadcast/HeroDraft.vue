@@ -230,31 +230,30 @@
                                                     </div>
                                                 </div>
                                                 <div class="team-stats-stat w-100">
-                                                    <div class="team-stats-pick-ban-row">
+                                                    <div class="team-stats-pick-winrate-row">
                                                         <div class="stat-row">
-                                                            <div class="stat-text">PICK</div>
+                                                            <div class="stat-text">Picks</div>
                                                             <div class="stat-stat">
                                                                 {{
-                                                                    stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.total || 0
+                                                                    heroPercentageData(picks[ti]?.[num-1]?.id, team, stats).teamHeroTotal
                                                                 }}x
                                                             </div>
                                                         </div>
                                                         <div class="stat-row">
-                                                            <div class="stat-text">BAN</div>
+                                                            <div class="stat-text">Winrate</div>
                                                             <div class="stat-stat">
                                                                 {{
-                                                                    stats?.[picks[ti]?.[num - 1]?.id]?.bans?.byTeam?.[team?.id]?.total || 0
-                                                                }}x
+                                                                    heroPercentageData(picks[ti]?.[num-1]?.id, team, stats).teamHeroWinrateString
+                                                                }}
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="stat-row stat--team-winloss mt-2">
+                                                    <div class="team-stats-diff-delta stat-row stat--team-winloss mt-2">
+                                                        <div class="stat-text" style="white-space: nowrap">WR% <span style="text-transform: uppercase">&delta;</span></div>
                                                         <div class="stat-stat">
-                                                            {{
-                                                                stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.wins || "0"
-                                                            }}W&nbsp;&nbsp;{{
-                                                                stats?.[picks[ti]?.[num - 1]?.id]?.picks?.byTeam?.[team?.id]?.losses || "0"
-                                                            }}L
+                                                            <span class="delta" :class="{'delta-positive': heroPercentageData(picks[ti]?.[num - 1]?.id, team, stats).teamMapHeroWinrateDelta > 0, 'delta-negative': heroPercentageData(picks[ti]?.[num - 1]?.id, team, stats).teamMapHeroWinrateDelta < 0}">{{
+                                                                heroPercentageData(picks[ti]?.[num - 1]?.id, team, stats).teamMapHeroWinrateDeltaString
+                                                            }}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -338,6 +337,9 @@
                 <div v-if="draftText" class="draft-text">
                     {{ draftText }}
                 </div>
+                <div v-if="match.game_version" class="draft-text draft-text-version">
+                    {{ match.game_version }}
+                </div>
             </div>
         </div>
     </div>
@@ -411,6 +413,9 @@ export default {
         },
         showProtectHeroBackgrounds() {
             return (this.broadcast?.broadcast_settings || [])?.includes("Show hero background on protects");
+        },
+        filterToGameVersion() {
+            return (this.broadcast?.broadcast_settings || [])?.includes("Filter hero stats to current game version");
         },
         showHeroBackgrounds() {
             return this.showPickHeroBackgrounds || this.showBanHeroBackgrounds || this.showProtectHeroBackgrounds;
@@ -589,7 +594,7 @@ export default {
                 })
             });
 
-            const stageMatches = matches.filter(match => match?.division === this.match?.division);
+            const stageMatches = matches.filter(match => match?.division === this.match?.division && this.filterToGameVersion ? (this.match?.game_version === match?.game_version) : true);
 
             const stats = countStats(stageMatches);
             console.log("stats", stats);
@@ -732,8 +737,28 @@ export default {
             }, (this.autoDraftDuration + 1) * 1000);
         },
         logoBackground1, resizedImage, themeBackground1,
+        heroPercentageData(heroID, team) {
+            const teamMapWins =  this.stats?.teamMaps?.[team?.id]?.wins || 0;
+            const teamMapTotal =  this.stats?.teamMaps?.[team?.id]?.total || 0;
+            const teamHeroWins =  this.stats?.[heroID]?.picks?.byTeam?.[team?.id]?.wins || 0;
+            const teamHeroTotal =  this.stats?.[heroID]?.picks?.byTeam?.[team?.id]?.total || 0;
+            const teamMapWinrate = !teamMapTotal ? 0 : ((teamMapWins / teamMapTotal) * 100);
+            const teamHeroWinrate = !teamHeroTotal ? 0 : ((teamHeroWins / teamHeroTotal) * 100);
+            const teamMapHeroWinrateDelta = teamHeroWinrate - teamMapWinrate;
+            return {
+                teamMapWins,
+                teamMapTotal,
+                teamHeroWins,
+                teamHeroTotal,
+                teamMapWinrate,
+                teamHeroWinrate,
+                teamMapWinrateString: `${(teamMapWinrate).toFixed(0)}%`,
+                teamHeroWinrateString: `${(teamHeroWinrate).toFixed(0)}%`,
+                teamMapHeroWinrateDelta,
 
-
+                teamMapHeroWinrateDeltaString: `${teamMapHeroWinrateDelta > 0 ? `+${teamMapHeroWinrateDelta.toFixed(0)}` : teamMapHeroWinrateDelta.toFixed(0)}%`
+            };
+        }
     },
     watch: {
         "match.id": {

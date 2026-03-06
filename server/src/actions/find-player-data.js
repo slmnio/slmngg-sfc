@@ -42,6 +42,6 @@ export default {
             }
         }
 
-        return Promise.all(playerData.map((player) => lookupPlayer(player, players, eventGuild)));
+        return Promise.all(playerData.map(async (player) => (await lookupPlayer(player, players, eventGuild)).player));
     }
 };

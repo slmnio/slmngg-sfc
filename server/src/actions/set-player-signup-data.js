@@ -91,6 +91,8 @@ export default {
                 console.log(player?.name, player?.id);
             }
 
+            let playerDiscord = null;
+
             if (!player) {
                 // lookup player here
                 console.log("Looking up a player", {
@@ -99,11 +101,14 @@ export default {
                     discord_id: playerData?.discord_id,
                 });
                 // THESE PLAYERS ARE
-                let tempPlayer = await lookupPlayer(playerData, limitedPlayers, eventGuild);
+                let { player: tempPlayer, discord: tempPlayerDiscord } = await lookupPlayer(playerData, limitedPlayers, eventGuild);
                 console.log("Player after lookup", tempPlayer?.name, tempPlayer?.id);
 
                 if (tempPlayer?.id) {
                     player = await this.helpers.get(tempPlayer.id);
+                }
+                if (tempPlayerDiscord?.username) {
+                    playerDiscord = tempPlayerDiscord;
                 }
 
             }
@@ -367,6 +372,11 @@ export default {
 
                     playerUpdateData[airtableKey] = data;
                 });
+
+                // Updating username with Discord ground truth data - catches username updates if detected in other ways
+                if (playerDiscord?.username && playerDiscord?.username !== (playerUpdateData["Discord Tag"] ?? player.discord_tag)) {
+                    playerUpdateData["Discord Tag"] = playerDiscord.username;
+                }
 
                 if (Object.keys(playerUpdateData)?.length) {
                     console.log(playerUpdateData);

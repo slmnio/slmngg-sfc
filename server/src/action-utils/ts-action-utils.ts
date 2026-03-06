@@ -428,7 +428,10 @@ export async function lookupPlayer(playerData: Partial<PartialPlayer>, players?:
         if (players == undefined) {
             players = (((await get("internal:lookup-players"))?.players) || []) as PartialPlayer[];
         }
-        if (!players?.length) return null;
+        if (!players?.length) return {
+            player: null,
+            discord: null
+        };
 
         function checkField(field: keyof PartialPlayer, p: PartialPlayer, customData?: Partial<PartialPlayer>) {
             const data = customData ?? playerData;
@@ -439,9 +442,18 @@ export async function lookupPlayer(playerData: Partial<PartialPlayer>, players?:
             const fields = ["discord_tag", "id", "battletag", "discord_id", "marvel_rivals_username", "riot_id", "steam_id"] satisfies (keyof PartialPlayer)[];
             return (fields).some(key => checkField(key, p));
         });
-        if (found) return found;
+        if (found) return {
+            player: found,
+            discord: null
+        };
         // check discord
-        if (!client.isReady()) return console.warn("Can't lookup Discord - client is not ready");
+        if (!client.isReady()) {
+            console.warn("Can't lookup Discord - client is not ready");
+            return {
+                player: null,
+                discord: null
+            };
+        }
 
         const foundDiscord: User | null = await lookupDiscord(playerData, guild);
 
@@ -450,18 +462,35 @@ export async function lookupPlayer(playerData: Partial<PartialPlayer>, players?:
             const foundID = players.find(p => checkField("discord_id", p, { "discord_id": foundDiscord.id })) || null;
             if (foundID) {
                 console.log(`[Deep search completed] Found ${foundID.name} through Discord ${foundDiscord.id}`);
-                return foundID;
+                return {
+                    player: foundID,
+                    discord: foundDiscord
+                };
             }
             const foundTag = players.find(p => checkField("discord_tag", p, { "discord_tag": foundDiscord.username })) || null;
             if (foundTag) {
                 console.log(`[Deep search completed] Found ${foundTag.name} through Discord ${foundDiscord.username}`);
-                return foundTag;
+                return {
+                    player: foundTag,
+                    discord: foundDiscord
+                };
             }
+
+            return {
+                player: null,
+                discord: foundDiscord
+            };
         }
 
-        return null;
+        return {
+            player: null,
+            discord: null
+        };
     } catch (e) {
         console.warn(e);
-        return null;
+        return {
+            player: null,
+            discord: null
+        };
     }
 }

@@ -63,7 +63,9 @@ export default {
                 teams: ReactiveArray("teams", {
                     theme: ReactiveThing("theme")
                 }),
-                staff: ReactiveArray("staff"),
+                staff: ReactiveArray("staff", {
+                    "player_relationships": ReactiveArray("player_relationships")
+                }),
                 player_relationships: ReactiveArray("player_relationships", {
                     player: ReactiveThing("player")
                 }),

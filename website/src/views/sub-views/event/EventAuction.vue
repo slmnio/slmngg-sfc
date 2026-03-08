@@ -2,10 +2,42 @@
     <div class="container event-auction">
         <div class="auction-section">
             <div v-if="pageNoLongerNew && auctionState === 'NOT_CONNECTED'" class="bar bg-danger text-white text-center mb-2 p-2 rounded">Not connected to auction server</div>
-            <div v-if="isAdmin" class="admin-settings border-danger border p-2 rounded mb-2 d-flex align-items-center">
+            <div v-if="isAdmin" class="admin-settings border-info border p-2 rounded mb-2 d-flex align-items-center">
+                <button class="btn btn-secondary mr-1" @click="expandedTeamSetup = !expandedTeamSetup"><i class="fas fa-chevron-down fa-fw"></i></button>
                 <button class="btn btn-info mr-1" @click="sendToAuctionServer('auction:admin_set_state', {'state': 'READY'})">Set state: READY</button>
                 <button class="btn btn-warning mr-1" @click="sendToAuctionServer('auction:admin_set_state', {'state': 'RESTRICTED'})">Set state: RESTRICTED</button>
-                <div class="btn-text text-end flex-grow-1">{{ auctionState }}</div>
+                <div class="btn-text fw-bold text-end flex-grow-1">{{ auctionState }}</div>
+            </div>
+            <div v-if="isAdmin && (teamsWithViewers?.length || spectators?.length)" class="team-setup border border-secondary p-2 rounded mb-2" :class="{'expanded': expandedTeamSetup, 'collapsed': !expandedTeamSetup}">
+                <div v-for="({ team, staff, connected }) in teamsWithViewers" :key="team?.team?.id" class="team">
+                    <div v-if="expandedTeamSetup" class="team-name text-center rounded px-2" :class="{'bg-primary': connected, 'bg-secondary': !connected && auctionState !== 'READY', 'bg-danger': !connected && auctionState === 'READY'}">{{ team.name }}<span v-if="team.draft_order"> ({{ team.draft_order }})</span></div>
+                    <router-link v-else :to="url('team', team)" target="_blank">
+                        <theme-logo
+                            :theme="team.theme"
+                            logo-size="s-100"
+                            class="team-setup-logo"
+                            icon-padding=".5em"
+                            border-width=".25em" />
+                    </router-link>
+                    <div class="staff-list">
+                        <div v-for="s in staff" :key="s.id" class="staff-item">
+                            <i v-if="s.status.connected" class="fas fa-fw fa-wifi text-primary"></i>
+                            <i v-else class="fas fa-fw fa-wifi-slash text-secondary"></i>
+                            <div class="name" :class="{'text-secondary': !expandedTeamSetup && !s.status.connected}">{{ s.name }}</div>
+                            <div v-if="expandedTeamSetup && s.status.is.captain" class="badge" :class="{'bg-primary': s.status.connected, 'bg-secondary': !s.status.connected}">Captain</div>
+                            <div v-if="expandedTeamSetup && s.status.is.staff" class="badge" :class="{'bg-primary': s.status.connected, 'bg-secondary': !s.status.connected}">Staff</div>
+                            <div v-if="expandedTeamSetup && s.status.is.controller" class="badge" :class="{'bg-primary': s.status.connected, 'bg-secondary': !s.status.connected}">Controller</div>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="spectators.length" class="spectators">
+                    <div class="title fw-bold"><i class="fas fa-eye"></i> Spectators</div>
+                    <div class="spectators-list">
+                        <div v-for="v in spectators" :key="v.id" class="spectator">
+                            {{ v.name }}
+                        </div>
+                    </div>
+                </div>
             </div>
             <AuctionCountdown class="auction-countdown mb-2" web :style="themeBackground1(event)" show-time />
 
@@ -72,15 +104,21 @@
                 </div>
             </div>
             <div class="row mt-2">
-                <div class="col-12 col-lg-6 d-flex justify-content-end align-items-center control-box">
-                    <div class="mr-3">Team control</div>
-                    <div class="active-team-select">
-                        <b-form-select v-model="actingTeamID" :state="!!actingTeamID">
-                            <option :value="null" disabled>Choose a team to control</option>
-                            <option v-for="team in teamsYouControl" :key="team.id" :value="team.id">{{ team.name }}</option>
-                        </b-form-select>
+                <div class="col-12 col-lg-6">
+                    <div class="viewers text-muted px-2 d-flex gap-3">
+                        <div v-if="teams?.length"><i class="fas fa-users fa-fw"></i> {{ spectatorCount }}</div>
+                        <div v-if="viewers?.length"><i class="fas fa-eye fa-fw"></i> {{ viewers.length }}</div>
                     </div>
-                    <div class="active-team-balance">{{ money(balance) }}</div>
+                    <div class="d-flex justify-content-end align-items-center control-box">
+                        <div class="mr-3">Team control</div>
+                        <div class="active-team-select">
+                            <b-form-select v-model="actingTeamID" :state="!!actingTeamID">
+                                <option :value="null" disabled>Choose a team to control</option>
+                                <option v-for="team in teamsYouControl" :key="team.id" :value="team.id">{{ team.name }}</option>
+                            </b-form-select>
+                        </div>
+                        <div class="active-team-balance">{{ money(balance) }}</div>
+                    </div>
                 </div>
                 <div class="col-12 col-lg-6 text-center bid-buttons">
                     <div v-if="!actingTeamID" class="status-bar fw-bold">
@@ -244,9 +282,10 @@
                                     <router-link :to="url('player', player)">{{ player.name }}</router-link>
                                 </div>
                                 <div
+                                    :key="eligibleRoles(player._draftData.eligible_roles).map(r => r.role).join(',')"
                                     v-b-tooltip
                                     class="player-eligible-roles"
-                                    :title="`Eligible for ${niceJoin(eligibleRoles(player._draftData.eligible_roles).map(r => r.role))}`">
+                                    :title="`Eligible for ${niceJoin((eligibleRoles(player._draftData.eligible_roles).map(r => r.role)))}`">
                                     <div
                                         v-for="role in eligibleRoles(player._draftData.eligible_roles)"
                                         :key="role?.role"
@@ -311,7 +350,9 @@ export default {
         customBidAmount: 0,
         adminTeamID: null,
         lastStartedTeamID: null,
-        searchText: ""
+        searchText: "",
+        viewerIDs: [],
+        expandedTeamSetup: false
     }),
     computed: {
         activePlayer() {
@@ -434,11 +475,53 @@ export default {
             if (!this.event?.teams?.length) return [];
             return this.allEventTeams.filter(team => team?.draft_order).sort((a, b) => a.draft_order - b.draft_order);
         },
+        teamsWithViewers() {
+            if (!this.teams?.length) return [];
+            return this.teams.map(t => {
+                const controllable = {};
+
+                ["staff", "captains", "controllers"].forEach(key => {
+                    console.log(key, t[key]);
+                    if (t[key]?.length) {
+                        t[key].forEach(u => {
+                            controllable[u.id] = u;
+                        });
+                    }
+                });
+
+                const staff = (Object.values(controllable)).map(player => {
+                    const status = {};
+                    status.authStatus = (this.viewers.find(v => cleanID(v.id) === cleanID(player.id)) || {})?._authStatus;
+                    status.connected = this.viewerIDs.includes(cleanID(player.id));
+                    status.is = {
+                        staff: ((t.staff || []).map(s => cleanID(s.id))).includes(cleanID(player.id)),
+                        captain: ((t.captains || []).map(s => cleanID(s.id))).includes(cleanID(player.id)),
+                        controller: ((t.controllers || []).map(s => cleanID(s.id))).includes(cleanID(player.id)),
+                    };
+                    return {
+                        ...player,
+                        status
+                    };
+                });
+
+                return ({
+                    team: t,
+                    staff: staff,
+                    connected: staff.filter(s => s.status.connected)?.length
+                });
+            });
+        },
+        spectatorCount() {
+            return `${this.teamsWithViewers.filter(t => t.connected)?.length || 0}/${this.teams?.length || 0}`;
+        },
         allEventTeams() {
             if (!this.event?.teams?.length) return [];
             return ReactiveArray("teams", {
                 theme: ReactiveThing("theme"),
-                players: ReactiveArray("players")
+                players: ReactiveArray("players"),
+                captains: ReactiveArray("captains"),
+                staff: ReactiveArray("staff"),
+                controllers: ReactiveArray("controllers"),
             })(this.event);
         },
         groupedTeams() {
@@ -569,6 +652,15 @@ export default {
                 }
             }
             return "";
+        },
+        viewers() {
+            return (ReactiveArray("ids")({ ids: this.viewerIDs })).map(viewer => ({
+                ...viewer,
+                _authStatus: this.getAuthStatus(viewer)
+            }));
+        },
+        spectators() {
+            return this.viewers.filter(v => !v._authStatus?.team);
         }
     },
     methods: {
@@ -629,7 +721,33 @@ export default {
         async sendBid(bidAmount) {
             if (!this.canBid) return this.$notyf.error("You can't bid");
             this.sendToAuctionServer("auction:bid", { teamID: this.actingTeam.id, amount: bidAmount });
-        }
+        },
+        getControllableTeams(user) {
+            return (this.teams || []).filter(team => [
+                ...team.captains || [],
+                ...team.staff || [],
+                ...team.owners || [],
+                ...team.controllers || [],
+            ].some(person => {
+                return cleanID(user?.id || user?.airtableID) === cleanID(person?.id || person);
+            }));
+        },
+        getAuthStatus(user) {
+            let status = {
+                team: false,
+                teams: [],
+                staff: false
+            };
+            const teams = this.getControllableTeams(user);
+            if (teams.length) {
+                status.team = true;
+                status.teams = teams.map(t => cleanID(t.id));
+            }
+
+            const editorPerm = isEventStaffOrHasRole(user, this.event, ["Can edit any match", "Can edit any event"]);
+            if (editorPerm) status.staff = true;
+            return status;
+        },
     },
     watch: {
         eventID: {
@@ -708,6 +826,10 @@ export default {
         auction_bids(bids) {
             console.log("auction_bids", bids);
             this.bids = bids;
+        },
+        "auction:viewers"(ids) {
+            console.log("viewers", ids);
+            this.viewerIDs = ids;
         }
     },
     mounted() {
@@ -780,7 +902,7 @@ export default {
         display: inline-flex;
     }
     .control-box {
-        padding-top: 26px;
+        padding-top: 15px;
     }
     .player-buttons-cell .buttons {
         gap: 4px;
@@ -815,7 +937,8 @@ export default {
         font-size: 18px;
     }
     .draft-data {
-        white-space: pre-wrap;;
+        white-space: pre-wrap;
+        font-size: .85em;
     }
     .last-started {
         display: flex;
@@ -877,6 +1000,72 @@ export default {
 
     .active-player {
         min-height: 22em;
+    }
+
+    .team-setup {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: .5em;
+        row-gap: 1em;
+    }
+    .team-setup .team {
+        width: 350px
+    }
+    .team-setup .team-name {
+        font-weight: bold;
+        font-size: 1.25em
+    }
+    .team-setup .staff-list {
+        display: flex;
+        flex-direction: column;
+        gap: .25em;
+        margin-top: .25em;
+    }
+    .team-setup .staff-item {
+        display: flex;
+        gap: .5em;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .team-setup .team-setup-logo {
+        width: 4em;
+        height: 3em;
+    }
+    .team-setup.collapsed .team {
+        min-width: 200px;
+        width: auto;
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: .5em;
+    }
+
+    .team-setup.collapsed {
+        justify-content: flex-start;
+        column-gap: 1em;
+        row-gap: .5em;
+    }
+
+    .team-setup.collapsed .staff-list {
+        margin-top: 0;
+        gap: 0;
+    }
+    .spectators {
+        display: flex;
+        width: 100%;
+        gap: 1em
+    }
+    .spectators .title {
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .spectators-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1em;
+        row-gap: .25em;
     }
 </style>
 

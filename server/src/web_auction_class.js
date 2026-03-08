@@ -1,5 +1,5 @@
 import * as Cache from "./cache.js";
-import { cleanID, dirtyID } from "shared";
+import { cleanID, cleanTypedID, dirtyID } from "shared";
 import { updateRecord } from "./action-utils/action-utils.js";
 import { isEventStaffOrHasRole } from "./action-utils/action-permissions.js";
 
@@ -9,6 +9,33 @@ import { isEventStaffOrHasRole } from "./action-utils/action-permissions.js";
  */
 function money(num) {
     return `$${num || 0}k`;
+}
+
+function addToMapArray(map, key, data, test) {
+    if (map.has(key)) {
+        console.log({ key, data, existing: map.get(key) });
+        if (!(map.get(key) || []).some(x => test ? test(x, data) : x === data)) {
+            // not adding duplicates
+            console.log("setting");
+            map.set(key, [...(map.get(key) || []), data]);
+        } else {
+            console.log("not setting");
+        }
+    } else {
+        map.set(key, [data]);
+    }
+}
+function removeFromMapArray(map, key, data, test) {
+    const existingData = map.get(key);
+    console.log({ existingData, key, data });
+    if (!existingData) return;
+    const adjusted = existingData.filter(x => test ? test(x, data) : x === data);
+
+    if (adjusted.length === 0) {
+        map.delete(key);
+    } else {
+        map.set(key, adjusted);
+    }
 }
 
 export default class Auction {
@@ -21,6 +48,8 @@ export default class Auction {
 
         this.activePlayerID = null;
         this.lastStartedTeamID = null;
+
+        this.viewerSessions = new Map();
 
         this.wait = {
             beforeFirstBids: auctionData?.time?.beforeFirstBids ?? 5,
@@ -116,7 +145,9 @@ export default class Auction {
     }
 
     get socketIdentifier() { return `auction:${this.id}`; }
-    log(...data) { console.log(`[Auction] [${this.socketIdentifier}]`, ...data); }
+    log(...data) {
+        console.log(`[Auction] [${this.socketIdentifier}]`, ...data);
+    }
 
     /**
      * @param {Socket} socket
@@ -134,9 +165,15 @@ export default class Auction {
 
     get events() {
         return {
-            subscribe: (socket) => {
+            subscribe: (socket, data) => {
                 socket.join(this.socketIdentifier);
                 this.welcomeSocket(socket.id);
+                if (!data.user) return;
+                this.addViewer(cleanTypedID(data.user.airtable.id), socket);
+
+                socket.on("disconnect", () => {
+                    if (data?.user?.airtable?.id) this.removeViewer(cleanTypedID(data.user.airtable.id), socket);
+                });
             },
             adminSetState: async (socket, data) => {
                 if (!data.user) {
@@ -415,4 +452,22 @@ export default class Auction {
         };
     }
 
+    updateSocketViewers() {
+        console.log("[match-room] viewers", [...this.viewerSessions.keys()]);
+        this.broadcastData("auction:viewers", [...this.viewerSessions.keys()]);
+    }
+
+    addViewer(userID, socket) {
+        console.log(this.viewerSessions);
+        addToMapArray(this.viewerSessions, userID, socket.id);
+        console.log(this.viewerSessions);
+        this.updateSocketViewers();
+    }
+    removeViewer(userID, socket) {
+
+        console.log(this.viewerSessions);
+        removeFromMapArray(this.viewerSessions, userID, socket.id);
+        console.log(this.viewerSessions);
+        this.updateSocketViewers();
+    }
 };

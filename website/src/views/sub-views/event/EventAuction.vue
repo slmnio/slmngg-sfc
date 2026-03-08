@@ -579,9 +579,9 @@ export default {
             if (!userAirtableID) return [];
             userAirtableID = "rec" + userAirtableID;
             return this.teams.filter(t =>
-                (t.captains || []).includes(userAirtableID) ||
-                (t.staff || []).includes(userAirtableID) ||
-                (t.controllers || []).includes(userAirtableID)
+                (t.captains || []).find((p) => cleanID(p?.id || p) === cleanID(userAirtableID)) ||
+                (t.staff || []).find((p) => cleanID(p?.id || p) === cleanID(userAirtableID)) ||
+                (t.controllers || []).find((p) => cleanID(p?.id || p) === cleanID(userAirtableID))
             );
         },
         allPlayers() {

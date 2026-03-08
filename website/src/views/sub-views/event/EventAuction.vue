@@ -23,7 +23,7 @@
                         <div v-for="s in staff" :key="s.id" class="staff-item">
                             <i v-if="s.status.connected" class="fas fa-fw fa-wifi text-primary"></i>
                             <i v-else class="fas fa-fw fa-wifi-slash text-secondary"></i>
-                            <div class="name" :class="{'text-secondary': !expandedTeamSetup && !s.status.connected}">{{ s.name }}</div>
+                            <router-link :to="url('player', s)" target="_blank" class="name no-link-style" :class="{'text-secondary': !expandedTeamSetup && !s.status.connected}">{{ s.name }}</router-link>
                             <div v-if="expandedTeamSetup && s.status.is.captain" class="badge" :class="{'bg-primary': s.status.connected, 'bg-secondary': !s.status.connected}">Captain</div>
                             <div v-if="expandedTeamSetup && s.status.is.staff" class="badge" :class="{'bg-primary': s.status.connected, 'bg-secondary': !s.status.connected}">Staff</div>
                             <div v-if="expandedTeamSetup && s.status.is.controller" class="badge" :class="{'bg-primary': s.status.connected, 'bg-secondary': !s.status.connected}">Controller</div>
@@ -33,9 +33,14 @@
                 <div v-if="spectators.length" class="spectators">
                     <div class="title fw-bold"><i class="fas fa-eye"></i> Spectators</div>
                     <div class="spectators-list">
-                        <div v-for="v in spectators" :key="v.id" class="spectator">
+                        <router-link
+                            v-for="v in spectators"
+                            :key="v.id"
+                            :to="url('player', v)"
+                            target="_blank"
+                            class="spectator no-link-style">
                             {{ v.name }}
-                        </div>
+                        </router-link>
                     </div>
                 </div>
             </div>

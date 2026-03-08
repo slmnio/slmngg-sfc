@@ -107,7 +107,7 @@
                 <div class="col-12 col-lg-6">
                     <div class="viewers text-muted px-2 d-flex gap-3">
                         <div v-if="teams?.length"><i class="fas fa-users fa-fw"></i> {{ spectatorCount }}</div>
-                        <div v-if="viewers?.length"><i class="fas fa-eye fa-fw"></i> {{ viewers.length }}</div>
+                        <div v-if="spectators?.length"><i class="fas fa-eye fa-fw"></i> {{ spectators.length }}</div>
                     </div>
                     <div class="d-flex justify-content-end align-items-center control-box">
                         <div class="mr-3">Team control</div>

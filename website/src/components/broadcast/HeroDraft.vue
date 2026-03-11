@@ -184,7 +184,9 @@
                                                     <div class="stat-text">PB%</div>
                                                     <div class="stat-stat">
                                                         {{
-                                                            ((((stats?.[picks[ti]?.[num - 1]?.id]?.picks?.total || 0) + (stats?.[picks[ti]?.[num - 1]?.id]?.bans?.total || 0)) / stats?.totalMaps) * 100).toFixed(0)
+                                                            stats?.totalMaps ?
+                                                                ((((stats?.[picks[ti]?.[num - 1]?.id]?.picks?.total || 0) + (stats?.[picks[ti]?.[num - 1]?.id]?.bans?.total || 0)) / stats?.totalMaps) * 100).toFixed(0)
+                                                                : '--'
                                                         }}%
                                                     </div>
                                                 </div>
@@ -192,7 +194,9 @@
                                                     <div class="stat-text">FIRST ROUND</div>
                                                     <div class="stat-stat">
                                                         {{
-                                                            ((((stats?.[picks[ti]?.[num - 1]?.id]?.picks?.priority || 0) + (stats?.[picks[ti]?.[num - 1]?.id]?.bans?.priority || 0)) / stats?.totalMaps) * 100).toFixed(0)
+                                                            stats?.totalMaps ?
+                                                                ((((stats?.[picks[ti]?.[num - 1]?.id]?.picks?.priority || 0) + (stats?.[picks[ti]?.[num - 1]?.id]?.bans?.priority || 0)) / stats?.totalMaps) * 100).toFixed(0)
+                                                                : '--'
                                                         }}%
                                                     </div>
                                                 </div>
@@ -229,7 +233,7 @@
                                                         Map{{ stats?.teamMaps?.[team?.id]?.total === 1 ? "" : "s" }})
                                                     </div>
                                                 </div>
-                                                <div class="team-stats-stat w-100">
+                                                <div v-if="heroPercentageData(picks[ti]?.[num-1]?.id, team, stats)?.teamHeroTotal" class="team-stats-stat w-100">
                                                     <div class="team-stats-pick-winrate-row">
                                                         <div class="stat-row">
                                                             <div class="stat-text">Picks</div>
@@ -254,6 +258,21 @@
                                                             <span class="delta" :class="{'delta-positive': heroPercentageData(picks[ti]?.[num - 1]?.id, team, stats).teamMapHeroWinrateDelta > 0, 'delta-negative': heroPercentageData(picks[ti]?.[num - 1]?.id, team, stats).teamMapHeroWinrateDelta < 0}">{{
                                                                 heroPercentageData(picks[ti]?.[num - 1]?.id, team, stats).teamMapHeroWinrateDeltaString
                                                             }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div v-else class="team-stats-stat w-100 gap-2 d-flex flex-column">
+                                                    <div class="team-stats-pick-winrate-row">
+                                                        <div class="stat-row">
+                                                            <div class="stat-text">Picks</div>
+                                                            <div class="stat-stat">
+                                                                0x
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="stat-row text-center">
+                                                            <i class="fas fa-sparkles mr-1"></i> First time!
                                                         </div>
                                                     </div>
                                                 </div>
@@ -594,10 +613,10 @@ export default {
                 })
             });
 
-            const stageMatches = matches.filter(match => match?.division === this.match?.division && this.filterToGameVersion ? (this.match?.game_version === match?.game_version) : true);
+            const stageMatches = matches.filter(match => match?.division === this.match?.division && (this.filterToGameVersion ? (this.match?.game_version === match?.game_version) : true));
 
             const stats = countStats(stageMatches);
-            console.log("stats", stats);
+            console.log("stats", stats, stageMatches, this.filterToGameVersion, this.match.game_version);
 
             return stats;
         },
@@ -752,11 +771,11 @@ export default {
                 teamHeroTotal,
                 teamMapWinrate,
                 teamHeroWinrate,
-                teamMapWinrateString: `${(teamMapWinrate).toFixed(0)}%`,
-                teamHeroWinrateString: `${(teamHeroWinrate).toFixed(0)}%`,
+                teamMapWinrateString: !teamHeroTotal ? "--" : `${(teamMapWinrate).toFixed(0)}%`,
+                teamHeroWinrateString: !teamHeroTotal ? "--" : `${(teamHeroWinrate).toFixed(0)}%`,
                 teamMapHeroWinrateDelta,
 
-                teamMapHeroWinrateDeltaString: `${teamMapHeroWinrateDelta > 0 ? `+${teamMapHeroWinrateDelta.toFixed(0)}` : teamMapHeroWinrateDelta.toFixed(0)}%`
+                teamMapHeroWinrateDeltaString: !teamHeroTotal ? "--" : `${teamMapHeroWinrateDelta > 0 ? `+${teamMapHeroWinrateDelta.toFixed(0)}` : teamMapHeroWinrateDelta.toFixed(0)}%`
             };
         }
     },
@@ -1319,7 +1338,7 @@ img.image-center {
     z-index: -1;
 }
 .hero-background-container {
-    opacity: 0.5;
+    opacity: 0.6;
 }
 .hero-background, .hero-background-image {
     position: absolute;

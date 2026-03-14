@@ -55,7 +55,7 @@ export default {
         heroOptions() {
             return this.gameOverride?.heroRoles?.length ?
                 [
-                    { value: null, text: this.emptyValue },
+                    { value: -1, text: this.emptyValue },
                     ...(this.gameOverride?.heroRoles || []).map(key => ({
                         text: key,
                         options: this.heroes.filter(h => h.role === key).sort((a,b) => sortAlphaRaw(a?.name, b?.name)).map(h => ({
@@ -65,7 +65,7 @@ export default {
                     }))
                 ] :
                 [
-                    { value: null, text: this.emptyValue },
+                    { value: -1, text: this.emptyValue },
                     ...this.heroes.filter(h => h.game === this.game)
                         .sort((a,b) => sortAlphaRaw(a?.name, b?.name))
                         .map((h) => ({
@@ -107,6 +107,19 @@ export default {
         modelValue: {
             immediate: true,
             handler(data) {
+                if (this.single) {
+                    if (data === -1 || data === "-1") {
+                        this.localValue = null;
+                        this.$emit("update:modelValue",  null);
+                        return;
+                    }
+                } else {
+                    if (data?.length && (data.includes("-1") || data.includes(-1) || data.includes(null))) {
+                        const updated = [...data].filter(d => !(d === -1 || d === "-1" || d === null));
+                        this.$emit("update:modelValue",  updated);
+                        return;
+                    }
+                }
                 this.count = Math.max(this.count, (data || []).length);
                 this.localValue = data || [];
             }

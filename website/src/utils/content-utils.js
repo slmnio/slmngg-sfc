@@ -445,7 +445,7 @@ export function getEmbedData(url) {
     try {
         const vodURL = new URL(url);
 
-        if (vodURL.host === "www.youtube.com") {
+        if (vodURL.host === "youtube.com") {
             let ts = 0;
             if (vodURL.searchParams.get("t")) {
                 let timestamp = vodURL.searchParams.get("t");
@@ -474,7 +474,7 @@ export function getEmbedData(url) {
                 service: "youtube",
                 key: code,
                 timestamp: ts || null,
-                thumbnail: `http://img.youtube.com/vi/${code}/hqdefault.jpg`,
+                thumbnail: `https://img.youtube.com/vi/${code}/maxresdefault.jpg`,
                 display: {
                     text: "YouTube",
                     icon: "fab fa-youtube"
@@ -486,7 +486,7 @@ export function getEmbedData(url) {
                 service: "youtube",
                 key: vodURL.pathname.slice(1),
                 timestamp: vodURL.searchParams.get("t") || null,
-                thumbnail: `http://img.youtube.com/vi/${vodURL.pathname.slice(1)}/hqdefault.jpg`,
+                thumbnail: `https://img.youtube.com/vi/${vodURL.pathname.slice(1)}/maxresdefault.jpg`,
                 display: {
                     text: "YouTube",
                     icon: "fab fa-youtube"
@@ -1111,7 +1111,7 @@ export function getPickBanItem(order, type, team, index) {
 
 
 export function countStats(matches) {
-    console.log(matches);
+    console.log("silver matches", matches);
     const stats = {
         totalMaps: 0,
         hasPicks: false,
@@ -1178,7 +1178,7 @@ export function countStats(matches) {
 
         (match.maps || []).forEach(map => {
             if (!map.winner) return; // only completed
-            const team1Won = map?.winner?.[0] === match?.teams?.[0];
+            const team1Won = cleanID(map?.winner?.[0]) === cleanID(match?.teams?.[0]);
             // console.log(map, map?.winner?.[0], match?.teams?.[0]);
 
             stats.totalMaps++;
@@ -1281,6 +1281,7 @@ export function countStats(matches) {
         });
     });
 
+    console.log("stats for silver", structuredClone(stats?.["UVJXc26zNQqcFv"]));
     return stats;
 }
 

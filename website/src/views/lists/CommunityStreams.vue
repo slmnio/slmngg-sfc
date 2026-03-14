@@ -9,7 +9,7 @@
                         <div class="stream-name">
                             <div class="stream-name-text bg-dark px-1 d-flex gap-1 flex-center">
                                 <i class="fa-fw" :class="stream?.embed?.display?.icon"></i>
-                                <div class="mr-1">{{ stream?.embed?.key }}</div>
+                                <div v-if="['twitch-live'].includes(stream.embed.service)" class="mr-1">{{ stream?.embed?.key }}</div>
                             </div>
                         </div>
                     </div>
@@ -135,6 +135,7 @@ export default {
 .stream-name-text {
     --bs-bg-opacity: 0.75;
     border-top-right-radius: .25em;
+    min-height: 23px;
 }
 .stream-text {
     line-height: 1.25;

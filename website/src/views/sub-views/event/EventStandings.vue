@@ -8,7 +8,6 @@
             :stage="standing.group"
             :stages="standing.groups"
             :title="standing.title"
-            :tie-text="standing.tieText"
             show-map-diff />
     </div>
 </template>

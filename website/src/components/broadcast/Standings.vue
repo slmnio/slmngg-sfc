@@ -21,7 +21,6 @@
                 <div v-for="team in group" :key="team.id" class="team">
                     <StandingsTeam
                         :team="team"
-                        :tie-text="tieText"
                         :show-columns="showColumns"
                         icon-size="w-60"
                         :game="event?.game"
@@ -59,7 +58,6 @@ export default {
         stage: String,
         stages: Array,
         title: String,
-        tieText: String,
         showMapDiff: Boolean,
         useCodes: Boolean,
         overrideShowColumns: Array,

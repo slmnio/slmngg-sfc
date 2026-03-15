@@ -7,7 +7,6 @@
                     :stage="standings.group"
                     :use-codes="useCodes"
                     :override-show-columns="showColumns"
-                    :tie-text="standings && standings.tieText"
                     :title="standings.short || standings.title" />
 
                 <!--            event: Object,-->

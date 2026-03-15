@@ -774,7 +774,6 @@ export type EventSettings = {
         group?: string;
         title?: string;
         key?: string;
-        tieText?: string;
     }[];
     auction?: {
         money: any;

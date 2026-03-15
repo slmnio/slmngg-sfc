@@ -437,7 +437,7 @@ export default {
             grid-template-columns: 1fr 0.2fr 1fr 1.5fr;
         }
         .match.special-event {
-            grid-template-columns: 1fr;
+            grid-template-columns: 1.5fr .5fr;
         }
         .match.batch {
             grid-template-columns: 0.75fr 0.75fr 2fr 0.25fr 2fr 0.75fr;
@@ -449,6 +449,7 @@ export default {
 
     .match-special-event-name {
         font-size: 1.2em;
+        line-height: 1.2;
     }
 
     .match-vs {

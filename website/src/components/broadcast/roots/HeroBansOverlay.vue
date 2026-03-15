@@ -32,7 +32,8 @@
                                     logo-size="s-50" />
                             </div>
                             <div v-else-if="banStatus[hero.id]?.currentlyBanned && banStatus[hero.id]?.bannedByTeam1" class="banned team-1 current-banned" :style="logoBackground1(liveMatch.teams?.[0])">
-                                <div class="current-ban-text">BAN BY {{ liveMatch?.teams?.[0]?.code }}</div>
+                                <div v-if="liveMatch?.teams?.[0]?.code" class="current-ban-text">BAN BY {{ liveMatch?.teams?.[0]?.code }}</div>
+                                <div v-else class="current-ban-text">BANNED</div>
                             </div>
 
 
@@ -45,7 +46,8 @@
                                     logo-size="s-50" />
                             </div>
                             <div v-else-if="banStatus[hero.id]?.currentlyBanned && banStatus[hero.id]?.bannedByTeam2" class="banned team-2 current-banned" :style="logoBackground1(liveMatch.teams?.[1])">
-                                <div class="current-ban-text">BAN BY {{ liveMatch?.teams?.[1]?.code }}</div>
+                                <div v-if="liveMatch?.teams?.[1]?.code" class="current-ban-text">BAN BY {{ liveMatch?.teams?.[1]?.code }}</div>
+                                <div v-else class="current-ban-text">BANNED</div>
                             </div>
                         </div>
                         <div class="hero-name">{{ hero.name }}</div>

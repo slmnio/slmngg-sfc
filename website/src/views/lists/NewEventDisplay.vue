@@ -69,6 +69,7 @@ export default {
     font-size: 1.2em;
     line-height: 1;
     margin-right: .33em;
+    text-wrap-style: pretty;
 }
 .event.team-display .event-name {
     font-weight: bold;

@@ -10,32 +10,37 @@ import emoji from "../discord/emoji.js";
 
 
 export async function getTeamEmojiText(team: Team | null) {
-    if (!team) return null;
+    try {
+        if (!team) return null;
 
-    if (!team?.event?.[0]) return null;
-    const event = await get(team.event?.[0]);
-    let guild: Guild | null = null;
+        if (!team?.event?.[0]) return null;
+        const event = await get(team.event?.[0]);
+        let guild: Guild | null = null;
 
-    if (event.discord_control) {
-        const eventDiscord = new MapObject(event.discord_control);
-        const eventGuildID = eventDiscord.getString("guild_id");
-        if (eventGuildID) {
-            const testGuild = await client.guilds.fetch(eventGuildID);
-            if (testGuild?.available) {
-                guild = testGuild;
+        if (event.discord_control) {
+            const eventDiscord = new MapObject(event.discord_control);
+            const eventGuildID = eventDiscord.getString("guild_id");
+            if (eventGuildID) {
+                const testGuild = await client.guilds.fetch(eventGuildID);
+                if (testGuild?.available) {
+                    guild = testGuild;
+                }
             }
         }
-    }
 
-    if (guild && team.discord_control) {
-        const teamDiscord = new MapObject(team.discord_control);
-        const teamDiscordEmojiID = teamDiscord.getString("emoji_id");
-        if (teamDiscordEmojiID) {
-            const emoji = await guild.emojis.fetch(teamDiscordEmojiID);
-            if (emoji?.id) {
-                return (`<:${emoji.name}:${emoji.id}> `);
+        if (guild && team.discord_control) {
+            const teamDiscord = new MapObject(team.discord_control);
+            const teamDiscordEmojiID = teamDiscord.getString("emoji_id");
+            if (teamDiscordEmojiID) {
+                const emoji = await guild.emojis.fetch(teamDiscordEmojiID);
+                if (emoji?.id) {
+                    return (`<:${emoji.name}:${emoji.id}> `);
+                }
             }
         }
+    } catch (e) {
+        console.warn(e);
+        return null;
     }
     return null;
 }

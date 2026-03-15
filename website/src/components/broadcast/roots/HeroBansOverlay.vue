@@ -1,5 +1,5 @@
 <template>
-    <div class="hero-bans-overlay text-white d-flex flex-column h-100 w-100 flex-center">
+    <div class="hero-bans-overlay text-white d-flex justify-content-start flex-column h-100 w-100 flex-center">
         <div class="hero-bans-display d-flex">
             <div v-for="group in heroGroups" :key="group.role" class="hero-group" :class="{'role-has-current-ban': banStatus[group.role]?.hasCurrentBan }">
                 <div class="role-title text-center" :style="boxColorCSS">{{ group.role }}</div>

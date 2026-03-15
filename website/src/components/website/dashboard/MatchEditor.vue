@@ -140,7 +140,8 @@
                                             class="fas fa-plus"></i>
                                     </div>
                                 </div>
-                                <div class="form-button">
+                                <div class="form-button d-flex gap-1">
+                                    <LiquipediaModal v-if="liquipedia?.[mapI]" :data="liquipedia[mapI]" />
                                     <b-button
                                         v-if="controls.showHeroPicks && !banners[mapI]"
                                         size="sm"
@@ -474,10 +475,11 @@ import MatchExplainerModal from "@/components/website/dashboard/MatchExplainerMo
 import HeroesPicker from "@/components/website/dashboard/HeroesPicker.vue";
 import { GameOverrides } from "@/utils/games";
 import ThemeLogo from "@/components/website/ThemeLogo.vue";
+import LiquipediaModal from "@/views/sub-views/LiquipediaModal.vue";
 
 export default {
     name: "MatchEditor",
-    components: { ThemeLogo, HeroesPicker, MatchExplainerModal, AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
+    components: { LiquipediaModal, ThemeLogo, HeroesPicker, MatchExplainerModal, AdvancedDateEditor, MapScoreEditor, TeamPicker, ContentThing },
     props: ["match", "hideMatchExtras", "scoreReporting", "proposedData", "scoreReportAction", "lockControls", "showHeroPicks", "showHeroBans", "showMapBans", "ignoreRemoteUpdates", "showScoreReportForfeit", "dashboardView"],
     data: () => ({
         processing: {},

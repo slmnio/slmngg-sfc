@@ -129,6 +129,11 @@ export default {
                     display: "distinct"
                 },
                 {
+                    key: "game_version",
+                    text: "Version",
+                    display: "distinct"
+                },
+                {
                     key: "pick_ban_order",
                     text: "Pick/Ban Order",
                     display: "distinct",

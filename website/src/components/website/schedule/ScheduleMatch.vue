@@ -79,13 +79,13 @@
             <b-button-group class="gap-1">
                 <b-button
                     v-if="canEditMatches"
-                    class="text-white"
+                    class="text-white hide-small"
                     size="sm"
                     :to="url('match', this.match, { subPage: 'editor' })"
                     title="Editor">
                     <i class="fas fa-pencil"></i>
                 </b-button>
-                <b-button class="text-white" size="sm" :to="url('detailed', this.match)" title="Detailed">
+                <b-button class="text-white hide-small" size="sm" :to="url('detailed', this.match)" title="Detailed">
                     <i class="fas fa-book-open"></i>
                 </b-button>
                 <b-button
@@ -408,7 +408,7 @@ export default {
     }
     @media (max-width: 767px) {
         .match {
-            grid-template-columns: 0.5fr 1fr 0.2fr 1fr 0.75fr;
+            grid-template-columns: 0.5fr 1fr 0.2fr 1fr 1.5fr;
         }
         .match.special-event {
             grid-template-columns: 0.5fr 2.2fr 0.5fr;
@@ -421,11 +421,20 @@ export default {
         }
     }
     @media (max-width: 575px) {
-        .match-left.match-details, .match-time {
+        .match-left.match-details {
             display: none;
         }
+        .match-time {
+            /*display: none;*/
+        }
+        .buttons .hide-small {
+            display: none;
+        }
+        .buttons .btn {
+            border-radius: var(--bs-btn-border-radius);
+        }
         .match {
-            grid-template-columns: 1fr 0.2fr 1fr;
+            grid-template-columns: 1fr 0.2fr 1fr 1.5fr;
         }
         .match.special-event {
             grid-template-columns: 1fr;
